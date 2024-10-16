@@ -17,7 +17,7 @@
         "doctrine/annotations": "^1.0",
         "doctrine/doctrine-bundle": "^2",
         "doctrine/doctrine-migrations-bundle": "^3",
-        "doctrine/orm": "^2",
+        "doctrine/orm": "^3",
         "jaybizzle/crawler-detect": "^1.2",
         "jfcherng/php-diff": "^6.4",
         "michelf/php-markdown": "^1.8",
