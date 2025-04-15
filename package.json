@@ -5,7 +5,7 @@
   "devDependencies": {
     "gulp": "<4.0.0",
     "gulp-autoprefixer": "*",
-    "gulp-babel-minify": "^0.4.3",
+    "gulp-babel-minify": "^0.5.2",
     "gulp-clean": "*",
     "gulp-concat": "*",
     "gulp-cssnano": "^2.1.3",
