@@ -56,7 +56,10 @@ class ZZPageController extends AbstractInachisController
                 )
             );
         }
-        if ($url->getContent()->isScheduledPage() || $url->getContent()->isDraft()) {
+        if (
+            ($url->getContent()->isScheduledPage() || $url->getContent()->isDraft())
+            && !$this->security->isGranted('IS_AUTHENTICATED_FULLY')
+        ) {
             return $this->redirectToRoute(
                 'app_default_homepage',
                 []
