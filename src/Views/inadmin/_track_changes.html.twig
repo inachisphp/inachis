@@ -32,10 +32,12 @@
         </section>
 
         <div class="fixed-bottom-bar">
-            <p>
-                <button class="button button--negative"><span class="material-icons">undo</span> Revert</button>
-                <a href="#" class="button button--info">Cancel</a>
-            </p>
+            <form method="post">
+                <p>
+                    <button class="button button--negative" name="doRevert" type="submit"><span class="material-icons">undo</span> Revert</button>
+                    <a href="/incc/post/{{ link }}" class="button button--info">Cancel</a>
+                </p>
+            </form>
         </div>
 
     {% endblock track_changes %}

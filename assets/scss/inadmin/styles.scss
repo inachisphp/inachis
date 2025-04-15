@@ -4,6 +4,8 @@ $information-small: "screen and (min-width: 320px)";
 $information-medium: "screen and (min-width: 480px)";
 $information-large: "screen and (min-width: 480px)";
 
+$admin__background-color: #fcfefe;
+
 $admin__flash-background: #lightsalmon;
 
 $admin__container--collapsed-width: 45px;
@@ -25,6 +27,7 @@ $admin__filter_button-background--hover: #0cf;
 $admin__filter_button-color--hover: #fff;
 
 body {
+	background-color: $admin__background-color;
 	font-family: Roboto, Helvetica Neue, Helvetica, Arial, sans-serif;
 	font-display: swap;
 	overflow-x: hidden;
@@ -63,6 +66,7 @@ body {
 }
 
 @import '_data-list';
+@import '_tables';
 
 @import '_post__edit';
 @import '_bonsai';
@@ -367,6 +371,7 @@ body {
 
 	.admin__body-container {
 		margin-left: $admin__container--collapsed-width + 15;
+		margin-right: 1em;
 		//padding-top:20px;
 	}
 }

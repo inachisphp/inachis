@@ -186,6 +186,11 @@ class Page
     #[ORM\InverseJoinColumn(name: 'tag_id', referencedColumnName: 'id')]
     #[ORM\OrderBy([ 'title' => 'ASC' ])]
     protected $tags;
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Series", inversedBy="items")
+     * @var Collection|Series[]  The array of Series that contains this page
+     */
+    protected $series;
 
     /**
      * @var Collection|Series[]  The array of Series that contains this page

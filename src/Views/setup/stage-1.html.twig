@@ -7,13 +7,10 @@
         {% block form_setup_stage1_pre %}{% endblock form_setup_stage1_pre %}
         {% block form_setup_stage1 %}
 
-            <h1>Welcome!</h1>
-            <p>We just need to take a few details to get you set up…</p>
-            <img alt="An image of an Inachis io butterfly" class="admin__form__brand" src="/assets/imgs/incc/inachis.png" />
-
-            {{ form_start(form, {attr: {class: 'form form__login form__setup', autocomplete: false}}) }}
-            {{ form_widget(form) }}
-            {{ form_end(form) }}
+        <form name="setup_stage1" method="post" class="form form__login form__setup">
+            <h2>{{ settings.siteTitle }}</h2>
+            <p>Before you can use this site, you need to configure it in .env.local, config/services.yaml, and create a new administrator using bin/console</p>
+        </form>
 
         {% endblock form_setup_stage1 %}
         {% block form_setup_stage1_post %}{% endblock form_setup_stage1_post %}

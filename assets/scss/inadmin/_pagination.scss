@@ -1,5 +1,11 @@
 $pagination-border-radius: 5px;
 
+section.paginated-list {
+  background-color: #fff;
+  margin-bottom: 4em;
+  padding: 1em;
+}
+
 .pagination {
   display: flex;
   list-style-type: none;

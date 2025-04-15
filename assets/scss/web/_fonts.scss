@@ -6,6 +6,7 @@
   url('/assets/fonts/OptimusPrincepsSemiBold.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -13,6 +14,7 @@
   src: url('/assets/fonts/Bitter-Bold.otf') format('opentype');
   font-weight: bold;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -20,4 +22,5 @@
   src: url('/assets/fonts/Bitter-Regular.otf') format('opentype');
   font-weight: bold;
   font-style: normal;
+  font-display: swap;
 }

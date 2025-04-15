@@ -20,6 +20,7 @@ class RevisionRepository extends AbstractRepository
     const PUBLISHED = 'Published';
     const UPDATED = 'Updated';
     const VISIBILITY_CHANGE = 'Visibility changed to %s';
+    const REVERTED = 'Reverted to version %s';
 
     public function __construct(ManagerRegistry $registry)
     {

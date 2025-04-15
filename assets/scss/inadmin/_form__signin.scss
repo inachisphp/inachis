@@ -5,12 +5,20 @@ $form-input__complete: #090;
 @import 'mixins.scss';
 
 .container__login, .setup {
-	text-align: center;
+	border: 1px solid transparent;
+	border-top: 10px solid #069;
+
+	@include box-shadow(5px, 7px, 14px, 0, rgba(0,0,0,0.26));
+
+	& > div {
+		margin:3em 0;
+	}
+
+	.logo {
+		text-align: center;
+	}
 
 	.form__login {
-		@include box-shadow(5px, 7px, 14px, 0, rgba(0,0,0,0.26));
-
-		background: $form-background__light;
 		margin: 0 auto;
 		max-width: 450px;
 		padding: 10px;
@@ -22,6 +30,7 @@ $form-input__complete: #090;
 		}
 
 		input {
+			background-color: #eee;
 			border: 2px solid transparent;
 			margin-bottom: 10px;
 			width: 90%;

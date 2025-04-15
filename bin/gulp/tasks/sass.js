@@ -1,33 +1,38 @@
-var gulp = require('gulp');
-var autoprefixer = require('gulp-autoprefixer');
-var config = require('../config');
-var cssnano = require('gulp-cssnano');
-var rename = require('gulp-rename');
-var sass = require('gulp-ruby-sass');
+"use strict";
 
-gulp.task('sass:compile', [
-    'sass:compile-admin',
-    'sass:compile-web'
-]);
-gulp.task('sass:compile-web', function() {
+const gulp = require('gulp');
+const sass = require('gulp-sass')(require('sass'));
+const autoprefixer = require('gulp-autoprefixer');
+const config = require('../config');
+const cssnano = require('gulp-cssnano');
+const rename = require('gulp-rename');
+
+
+const sassCompileWeb = () => {
   return sassCompile(config.paths.src.sass.web , config.paths.dist.sass.web);
-});
-gulp.task('sass:compile-admin', function() {
+};
+const sassCompileAdmin = () => {
   return sassCompile(config.paths.src.sass.admin, config.paths.dist.sass.admin);
-});
+};
 
-gulp.task('sass:watch', function() {
-    gulp.watch(config.paths.src.sass.all + '**/*.scss', [
-        'sass:compile-web',
-        'sass:compile-admin'
-    ]);
-});
-
-function sassCompile(src, dest)
+function sassCompile (scssSource, cssDest)
 {
-    return sass(src + '**/*.scss', { style: 'expanded' })
+    return gulp.src(scssSource + '**/*.scss')
+        .pipe(sass()).on('error', sass.logError)
         .pipe(autoprefixer('last 2 version'))
         .pipe(cssnano())
         .pipe(rename({suffix: '.min'}))
-        .pipe(gulp.dest(dest));
+        .pipe(gulp.dest(cssDest));
+}
+
+exports.sassCompileAdmin = sassCompileAdmin;
+exports.sassCompileWeb = sassCompileWeb;
+
+exports.sassCompile = gulp.parallel(
+    sassCompileAdmin,
+    sassCompileWeb
+);
+
+exports.sassWatch = function() {
+    gulp.watch(config.paths.src.sass.all + '**/*.scss', sassCompile);
 }

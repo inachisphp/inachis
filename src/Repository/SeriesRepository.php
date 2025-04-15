@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Page;
 use App\Entity\Series;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;

@@ -82,12 +82,12 @@
                 {{ form_errors(form.tags) }}
                 {{ form_widget(form.tags) }}
             </p>
-            {% if settings.google.key is defined and settings.google.key is not empty %}
-                <p>
-                    {{ form_label(form.latlong) }}
-                    {{ form_errors(form.latlong) }}
-                    {{ form_widget(form.latlong) }}
-                </p>
+            {% if settings.geotagContent is defined and settings.geotagContent and settings.google.key is defined and settings.google.key is not empty %}
+            <p>
+                {{ form_label(form.latlong) }}
+                {{ form_errors(form.latlong) }}
+                {{ form_widget(form.latlong) }}
+            </p>
             {% endif %}
         </fieldset>
 
@@ -101,11 +101,11 @@
             </p>
             {% endif %}
             <section class="col span_4_of_8">
-            <p>
-                {{ form_label(form.featureSnippet) }}
-                {{ form_errors(form.featureSnippet) }}
-                {{ form_widget(form.featureSnippet) }}
-            </p>
+                <p>
+                    {{ form_label(form.featureSnippet) }}
+                    {{ form_errors(form.featureSnippet) }}
+                    {{ form_widget(form.featureSnippet) }}
+                </p>
             </section>
             <section class="col span_3_of_8">
             {{
@@ -167,7 +167,7 @@
         <p>
             {{ form_widget(form.submit) }}
             {%- if post.status != "published" %}
-                <button type="submit" class="button button--info" name="publish">{% if post.postDate > date() %}Schedule{% else %}Publish{% endif %}</button>
+                <button type="submit" class="button button--secondary button--info" name="publish">{% if post.postDate > date() %}Schedule{% else %}Publish{% endif %}</button>
             {%- endif %}
             {{ form_widget(form.delete) }}
             {%  if post.id is not empty and not post.isDraft %}

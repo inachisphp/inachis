@@ -102,8 +102,13 @@ var InachisContentSelectorDialog = {
                 method: 'POST',
                 success: function()
                 {
-                    $choseContent.html('<span class="material-icons">done</span> Content added');
-                    // @todo add code for updating series list in current view to avoid refresh
+                    if(data.success == true) {
+                        $choseContent.html('<span class="material-icons">done</span> Content added');
+                        setTimeout(function() {
+                            location.reload();
+                        }, 5000);
+                    }
+                    // @todo add code for updating series list in current view to avoid refresh instead
                 }
             }
         );
@@ -115,6 +120,7 @@ var InachisContentSelectorDialog = {
         var $contentSelector = $('#dialog__contentSelector');
         $contentSelector.find('ol').load('/incc/ax/contentSelector/get',
             {
+                seriesId: simplemde.options.autosave.uniqueId,
                 default: null
             }, function(responseText, status) {
                 var $uiDialog = $('.ui-dialog'),

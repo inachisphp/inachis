@@ -21,13 +21,13 @@
         <!-- h1>Title / breadcrumb goes here</h1 -->
         <section class="admin__user">
             <a href="#admin__user__options">
-                <img alt="User avatar" height="40" src="{% if session.user.avatar is not empty %}{{ session.user.avatar }}{% else %}{{ settings.domain }}/assets/imgs/incc/defaultAvatar.png{% endif %}" width="40" />
+                <img alt="User avatar" height="40" src="{% if session.avatar is not empty %}{{ session.avatar }}{% else %}{{ settings.domain }}/assets/imgs/incc/defaultAvatar.png{% endif %}" width="40" />
                 {%- if notifications|length > 0 %}<span class="admin__user__notifications">{{ notifications|length }}</span>{% endif %}
             </a>
             <ul id="admin__user__options">
-                <li><a href="{{ path('app_admin_admindetails', {'id': session.user.username }) }}" title="Edit profile for {{ session.user.displayName }}">Edit your profile <span class="material-icons">perm_identity</span></a></li>
+                <li><a href="{{ path('app_admin_admindetails', {'id': session.username }) }}" title="Edit profile for {{ session.displayName }}">Edit your profile <span class="material-icons">perm_identity</span></a></li>
                 <li><a href="/incc/settings/releases">Update available <span class="material-icons">new_releases</span></a></li>
-                <li><form action="{{ path('security_logout') }}" method="post"><button>Log out <span class="material-icons">exit_to_app</span></button></form></li>
+                <li><form action="{{ path('app_logout') }}" method="post"><button>Log out <span class="material-icons">exit_to_app</span></button></form></li>
             </ul>
         </section>
         <section class="admin__search">

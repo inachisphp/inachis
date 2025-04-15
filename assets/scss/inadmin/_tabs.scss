@@ -1,5 +1,4 @@
 .ui-tabs, .ui-tabs-external {
-	background-color: $admin__tabs-background;
 	clear: both;
 
 	fieldset {
@@ -11,6 +10,7 @@
 	}
 
 	.ui-tabs-nav {
+		background-color: $admin__tabs-background;
 		clear: both;
 		display: block;
 		font-size: 0.9em;
@@ -32,7 +32,7 @@
 		li {
 			border-bottom: 3px solid transparent;
 			float: left;
-			margin: 0 5px 10px;
+			margin: 0 5px 0;
 			padding: 10px;
 
 			&:hover {

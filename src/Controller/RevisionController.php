@@ -77,4 +77,43 @@ class RevisionController extends AbstractInachisController
 
         return $this->render('inadmin/track_changes.html.twig', $this->data);
     }
+
+    #[Route("/incc/page/diff/{id}", methods: [ "POST" ])]
+    public function doRevert(Request $request)
+    {
+        $revision = $this->entityManager->getRepository(Revision::class)->findOneById(
+            $request->get('id')
+        );
+        if (empty($revision) || empty($revision->getPageId())) {
+            throw new NotFoundHttpException(
+                sprintf('Version history could not be found for %s', $request->get('id'))
+            );
+        }
+        $page = $this->entityManager->getRepository(Page::class)->findOneById($revision->getPageId());
+        if (empty($page) || empty($page->getId())) {
+            throw new NotFoundHttpException(
+                sprintf('Page could not be found for revision %s', $request->get('id'))
+            );
+        }
+        $page->setTitle($revision->getTitle())
+            ->setSubTitle($revision->getSubTitle())
+            ->setContent($revision->getContent())
+            ->setModDate(new \DateTime('now'))
+            ->setAuthor($this->getUser())
+        ;
+
+        $newRevision = $this->entityManager->getRepository(Revision::class)->hydrateNewRevisionFromPage($page);
+        $newRevision->setAction(sprintf(RevisionRepository::REVERTED, $revision->getVersionNumber()));
+
+        $this->entityManager->persist($newRevision);
+        $this->entityManager->persist($page);
+        $this->entityManager->flush();
+
+        $this->addFlash('notice', sprintf('Content reverted to version %s.', $revision->getVersionNumber()));
+        return $this->redirect(
+            '/incc/' .
+            $page->getType() . '/' .
+            $page->getUrls()[0]->getLink()
+        );
+    }
 }

@@ -1,9 +1,12 @@
+{% set filename = value.filename|default('/assets/imgs/no-image.svg') %}
+{# if not (value.filename starts with 'http') #}<!-- /imgs/ -->{# endif #}
+
 <p class="image_preview" id="{{ id }}__preview">
     <input id="{{ id }}" name="{{ name }}" type="hidden" value="{{ value.id|default('') }}" />
     <img alt="Preview of chosen image"{% if
         additionalClass is defined and additionalClass is not empty %} class="{{ additionalClass }}"{%
-        endif %} src="{{ value.filename|default('/assets/imgs/no-image.svg') }}" />
-    <button href="#" class="button button--information dialog__link"
+        endif %} src="{{ filename }}" />
+    <button href="#" class="button button--info dialog__link"
             data-buttons="eyJ0ZXh0IjoiQ2hvb3NlIEltYWdlIiwiY2xhc3MiOiJidXR0b24gYnV0dG9uLS1wb3NpdGl2ZSIsImRpc2FibGVkIjp0cnVlfQ=="
             data-class-name="dialog__imageManager"
             data-target="{{ id }}"
