@@ -4,24 +4,20 @@ namespace App\Controller;
 
 use App\Entity\Category;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class CategoryManagerController extends AbstractInachisController
 {
-    /**
-     * @Route("/incc/ax/categoryManager/get", methods={"POST"})
-     */
-    public function content()
+    #[Route("/incc/ax/categoryManager/get", methods: [ "POST" ])]
+    public function content(): Response
     {
 //        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 //        $this->data['categories'] =  $this->entityManager->getRepository(Category::class)->getRootCategories();
 //        return $this->render('inadmin/dialog/category-manager-list.html.twig', $this->data);
     }
 
-    /**
-     * @Route("/incc/ax/categoryList/get", methods={"POST"})
-     */
-    public function list()
+    #[Route("/incc/ax/categoryList/get", methods: [ "POST" ])]
+    public function list(): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 //        $categoryManager = new CategoryManager(Application::getInstance()->getService('em'));
@@ -65,10 +61,8 @@ class CategoryManagerController extends AbstractInachisController
         return $this->json((object) $result);
     }
 
-    /**
-     * @Route("/incc/ax/categoryManager/save", methods={"POST"})
-     */
-    public function save()
+    #[Route("/incc/ax/categoryManager/save", methods: [ "POST" ])]
+    public function save(): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 //        $categoryManager = new CategoryManager(Application::getInstance()->getService('em'));

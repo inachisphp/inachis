@@ -7,17 +7,17 @@ use App\Form\ImageType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ResourceController extends AbstractInachisController
 {
     /**
-     * @Route("/incc/resources", methods={"GET"})
      * @param Request $request
-     * @return null
+     * @return Response
      * @throws \Exception
      */
-    public function resourcesList(Request $request)
+    #[Route("/incc/resources", methods: [ "GET" ])]
+    public function resourcesList(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -38,22 +38,22 @@ class ResourceController extends AbstractInachisController
     }
 
     /**
-     * @Route("/incc/resource/image/upload", methods={"POST", "PUT"})
      * @param Request $request
      * @return JsonResponse
      */
-    public function uploadImage(Request $request) : JsonResponse
+    #[Route("/incc/resource/image/upload", methods: [ "POST", "PUT" ])]
+    public function uploadImage(Request $request): JsonResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         dump($request);
     }
 
     /**
-     * @Route("/incc/resource/image/save", methods={"POST"})
      * @param Request $request
      * @return JsonResponse
      */
-    public function saveImage(Request $request) : JsonResponse
+    #[Route("/incc/resource/image/save", methods: [ "POST" ])]
+    public function saveImage(Request $request): JsonResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $image = null;

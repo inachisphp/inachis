@@ -29,9 +29,9 @@ class ArrayCollectionToArrayTransformer implements DataTransformerInterface
     /**
      * @param mixed $value
      *
-     * @return mixed
+     * @return array
      */
-    public function transform($value)
+    public function transform($value): array
     {
         return !empty($value) ? $value->toArray() : [];
     }
@@ -39,9 +39,9 @@ class ArrayCollectionToArrayTransformer implements DataTransformerInterface
     /**
      * @param mixed $value
      *
-     * @return ArrayCollection|mixed
+     * @return ArrayCollection
      */
-    public function reverseTransform($value)
+    public function reverseTransform($value): ArrayCollection
     {
         return new ArrayCollection($value);
     }

@@ -13,111 +13,112 @@ use App\Validator\Constraints as InachisAssert;
 
 /**
  * Object for handling User entity.
- *
- * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @ORM\Table(indexes={@ORM\Index(name="search_idx", columns={"usernameCanonical", "emailCanonical"})})
  */
+#[ORM\Entity(repositoryClass: "App\Repository\UserRepository", readOnly: false)]
+#[ORM\Index(name: "search_idx", columns: [ "usernameCanonical", "emailCanonical" ])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * Constant for specifying passwords have no expiry time.
      */
     const NO_PASSWORD_EXPIRY = -1;
+
     /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true, nullable=false)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=UuidGenerator::class)
-     *
      * @var \Ramsey\Uuid\UuidInterface The unique identifier for the {@link User}
      */
+    #[ORM\Id]
+    #[ORM\Column(type: "uuid", unique: true, nullable: false)]
+    #[ORM\GeneratedValue(strategy: "CUSTOM")]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected $id;
+
     /**
-     * @ORM\Column(type="string", length=512, nullable=false)
-     * @Assert\NotBlank()
-     *
      * @var string Username of the user
      */
+    #[ORM\Column(type: "string", length: 512, nullable: false)]
+    #[Assert\NotBlank]
     protected $username;
+
     /**
-     * @ORM\Column(name="usernameCanonical",type="string", length=255, unique=true, nullable=false)
-     *
      * @var string Username of the user
      */
+    #[ORM\Column(type: "string", length: 255, name: 'usernameCanonical', unique: true, nullable: false)]
     protected $usernameCanonical;
+
     /**
-     * @ORM\Column(type="string", length=512, nullable=false)
-     *
      * @var string Password for the user
      */
+    #[ORM\Column(type: "string", length: 512, nullable: false)]
     protected $password;
+
     /**
-     * @Assert\NotBlank()
-     * @Assert\Length(max=4096)
-     * @Assert\NotCompromisedPassword
-     * @Assert\PasswordStrength
-     *
      * @var string Plaintext version of password - used for validation only and is not stored
      */
+    #[Assert\NotBlank]
+    #[Asset\Length(max: 4096)]
+    #[Assert\NotCompromisedPassword]
+    #[Assert\PasswordStrength]
     protected $plainPassword;
+
     /**
-     * @ORM\Column(type="string", length=512, nullable=false)
-     *
      * @var string Email address of the user
      */
+    #[ORM\Column(type: "string", length: 512, nullable: false)]
     protected $email;
+
     /**
-     * @ORM\Column(name="emailCanonical",type="string", length=255, unique=true, nullable=false)
-     *
      * @var string Email address of the user
      */
+    #[ORM\Column(type: "string", length: 255, name: 'emailCanonical', unique: true, nullable: false)]
     protected $emailCanonical;
+
     /**
-     * @ORM\Column(type="string", length=512)
-     *
      * @var string The display name for the user
      */
+    #[ORM\Column(type: "string", length: 512)]
     protected $displayName;
+
     /**
      * @var Image string An image to use for the {@link User}
      */
     protected $avatar;
+
     /**
-     * @ORM\Column(type="boolean")
-     *
      * @var bool Flag indicating if the {@link User} can sign in
      */
+    #[ORM\Column(type: "boolean")]
     protected $isActive = true;
+
     /**
-     * @ORM\Column(type="boolean")
-     *
      * @var bool Flag indicating if the {@link User} has been "deleted"
      */
+    #[ORM\Column(type: "boolean")]
     protected $isRemoved = false;
+
     /**
-     * @ORM\Column(type="datetime")
-     *
      * @var string The date the {@link User} was added
      */
+    #[ORM\Column(type: "datetime")]
     protected $createDate;
+
     /**
-     * @ORM\Column(type="datetime")
-     *
      * @var string The date the {@link User} was last modified
      */
+    #[ORM\Column(type: "datetime")]
     protected $modDate;
+
     /**
-     * @ORM\Column(type="datetime")
-     *
      * @var string The date the password was last modified
      */
+    #[ORM\Column(type: "datetime")]
     protected $passwordModDate;
+
     /**
-     * @ORM\Column(type="string",length=32, options={"default": "UTC"})
-     * @Assert\NotBlank()
      * @InachisAssert\ValidTimezone()
      * @var string The local timezone for the user
      */
+    #[ORM\Column(type: "string",length: 32, options: ["default" => "UTC" ])]
+    #[Assert\NotBlank]
     protected $timezone;
 
     /**
@@ -131,7 +132,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @param string $email    The email for the {@link User}
      * @throws \Exception
      */
-    public function __construct($username = '', $password = '', $email = '')
+    public function __construct(string $username = '', string $password = '', string $email = '')
     {
         $this->setUsername($username);
         $this->setPassword($password);
@@ -148,7 +149,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return string The ID of the user
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
@@ -158,7 +159,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return string The username of the user
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
@@ -176,7 +177,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return string
      */
-    public function getPlainPassword()
+    public function getPlainPassword(): string
     {
         return $this->plainPassword;
     }
@@ -186,7 +187,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return string The email of the user
      */
-    public function getEmail()
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -196,7 +197,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return string The display name for the user
      */
-    public function getDisplayName()
+    public function getDisplayName(): ?string
     {
         return $this->displayName;
     }
@@ -206,7 +207,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return \App\Entity\Image The avatar for the user
      */
-    public function getAvatar()
+    public function getAvatar(): ?string
     {
         return $this->avatar;
     }
@@ -216,7 +217,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return bool Returns check if the user is active
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->isActive;
     }
@@ -226,7 +227,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return bool Returns check if the user has been "deleted"
      */
-    public function hasBeenRemoved()
+    public function hasBeenRemoved(): bool
     {
         return $this->isRemoved;
     }
@@ -236,7 +237,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return string The creation date for the user
      */
-    public function getCreateDate()
+    public function getCreateDate(): \DateTime
     {
         return $this->createDate;
     }
@@ -246,7 +247,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return string The modification for the user
      */
-    public function getModDate()
+    public function getModDate(): \DateTime
     {
         return $this->modDate;
     }
@@ -256,7 +257,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return string The local timezone for the user
      */
-    public function getTimezone()
+    public function getTimezone(): string
     {
         return $this->timezone;
     }
@@ -266,7 +267,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return string The password last modification date for the user
      */
-    public function getPasswordModDate()
+    public function getPasswordModDate(): \DateTime
     {
         return $this->passwordModDate;
     }
@@ -275,29 +276,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the value of {@link Id}.
      *
      * @param string $value The value to set
+     * @return $this
      */
-    public function setId($value) : void
+    public function setId(string $value): self
     {
         $this->id = $value;
+
+        return $this;
     }
 
     /**
      * Sets the value of {@link username}.
      *
      * @param string $value The value to set
+     * @return $this
      */
-    public function setUsername($value) : void
+    public function setUsername(string $value): self
     {
         $this->username = $value;
         $this->usernameCanonical = $value;
+
+        return $this;
     }
 
     /**
      * Sets the value of {@link password}.
      *
      * @param string $value The value to set
+     * @return $this
      */
-    public function setPassword($value) : self
+    public function setPassword(string $value): self
     {
         $this->password = $value;
 
@@ -306,110 +314,140 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @param string $value New password to use
+     * @return $this
      */
-    public function setPlainPassword($value) : void
+    public function setPlainPassword(string $value): self
     {
         $this->plainPassword = $value;
         $this->password = null;
+
+        return $this;
     }
 
     /**
      * Sets the value of {@link email}.
      *
      * @param string $value The value to set
+     * @return $this
      */
-    public function setEmail($value) : void
+    public function setEmail(string $value): self
     {
         $this->email = $value;
         $this->emailCanonical = $value;
+
+        return $this;
     }
 
     /**
      * Sets the value of {@link displayName}.
      *
      * @param string $value The value to set
+     * @return $this
      */
-    public function setDisplayName($value) : void
+    public function setDisplayName(string $value): self
     {
         $this->displayName = $value;
+
+        return $this;
     }
 
     /**
      * Sets the value of {@link avatar}.
      *
      * @param string $value The value to set
+     * @return $this
      */
-    public function setAvatar($value) : void
+    public function setAvatar($value): self
     {
         $this->avatar = $value;
+
+        return $this;
     }
 
     /**
      * Sets the value of {@link isActive}.
      *
      * @param bool $value The value to set
+     * @return $this
      */
-    public function setActive($value) : void
+    public function setActive($value): self
     {
         $this->isActive = (bool) $value;
+
+        return $this;
     }
 
     /**
      * Sets the value of {@link isRemoved}.
      *
      * @param bool $value The value to set
+     * @return $this
      */
-    public function setRemoved($value) : void
+    public function setRemoved($value): self
     {
         $this->isRemoved = (bool) $value;
+
+        return $this;
     }
 
     /**
      * Sets the {@link createDate} from a DateTime object.
      *
      * @param \DateTime $value The date to be set
+     * @return $this
      */
-    public function setCreateDate(\DateTime $value) : void
+    public function setCreateDate(\DateTime $value): self
     {
         //$this->setCreateDate($value->format('Y-m-d H:i:s'));
         $this->createDate = $value;
+
+        return $this;
     }
 
     /**
      * Sets the {@link modDate} from a DateTime object.
      *
      * @param \DateTime $value The date to set
+     * @return $this
      */
-    public function setModDate(\DateTime $value) : void
+    public function setModDate(\DateTime $value): self
     {
         //$this->setModDate($value->format('Y-m-d H:i:s'));
         $this->modDate = $value;
+
+        return $this;
     }
 
     /**
      * Sets the {@link passwordModDate} from a DateTime object.
      *
      * @param \DateTime $value The date to set
+     * @return $this
      */
-    public function setPasswordModDate(\DateTime $value) : void
+    public function setPasswordModDate(\DateTime $value): self
     {
         $this->passwordModDate = $value;
+
+        return $this;
     }
 
     /**
      * @param string $value
+     * @return $this
      * @throws InvalidTimezoneException
      */
-    public function setTimezone(string $value) : void
+    public function setTimezone(string $value): self
     {
         $this->timezone = DateValidator::validateTimezone($value);
+
+        return $this;
     }
 
     /**
      * Removes the credentials for the current {@link User} along
      * with personal information other than "displayName".
      */
-    public function erase()
+    public function erase(): void
     {
 //        $this->setUsername('');
 //        $this->setPassword('');
@@ -426,10 +464,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * if the user should be alerted.
      *
      * @param int $expiryDays The number of days the password expires after
-     *
      * @return bool The result of testing the {@link passwordModDate}
      */
-    public function hasCredentialsExpired($expiryDays = self::NO_PASSWORD_EXPIRY)
+    public function hasCredentialsExpired(int $expiryDays = self::NO_PASSWORD_EXPIRY): bool
     {
         return $expiryDays !== self::NO_PASSWORD_EXPIRY &&
             time() >= strtotime(
@@ -444,7 +481,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return bool The result of testing the email address
      */
-    public function validateEmail()
+    public function validateEmail(): bool
     {
         return (bool) preg_match(
             '/[a-z0-9!#\$%&\'*+\/=?^_`{|}~-]+'.
@@ -458,7 +495,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return string
      */
-    public function serialize()
+    public function serialize(): string
     {
         return serialize([
             $this->id,
@@ -472,7 +509,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @param string $serialized
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         list(
             $this->id,
@@ -495,7 +532,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        return ['ROLE_ADMIN', 'ROLE_USER'];
+//        $roles = $this->roles;
+        $roles = [ 'ROLE_ADMIN' ];
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
     }
 
     public function setRoles(array $roles): self

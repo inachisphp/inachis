@@ -4,6 +4,11 @@ namespace App\Utils;
 
 class ContentRevisionCompare
 {
+    /**
+     * @param $page
+     * @param $revision
+     * @return bool
+     */
     public function doesPageMatchRevision($page, $revision): bool
     {
         return

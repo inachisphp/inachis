@@ -7,7 +7,8 @@ use App\Entity\Page;
 use App\Entity\Series;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 class WidgetController extends AbstractController
 {
@@ -25,9 +26,9 @@ class WidgetController extends AbstractController
 
     /**
      * @param int $maxDisplayCount
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    public function getRecentTrips($maxDisplayCount = self::DEFAULT_MAX_DISPLAY_COUNT)
+    public function getRecentTrips($maxDisplayCount = self::DEFAULT_MAX_DISPLAY_COUNT): Response
     {
         return $this->render('web/partials/recent_trips.html.twig', [
             'trips' => $this->getRecentSeries($maxDisplayCount),
@@ -36,9 +37,9 @@ class WidgetController extends AbstractController
 
     /**
      * @param int $maxDisplayCount
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    public function getRecentRunning($maxDisplayCount = self::DEFAULT_MAX_DISPLAY_COUNT)
+    public function getRecentRunning($maxDisplayCount = self::DEFAULT_MAX_DISPLAY_COUNT): Response
     {
         return $this->render('web/partials/recent_running.html.twig', [
             'races' => $this->getPagesWithCategoryName('Running', $maxDisplayCount),
@@ -47,9 +48,9 @@ class WidgetController extends AbstractController
 
     /**
      * @param int $maxDisplayCount
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    public function getRecentArticles($maxDisplayCount = self::DEFAULT_MAX_DISPLAY_COUNT)
+    public function getRecentArticles($maxDisplayCount = self::DEFAULT_MAX_DISPLAY_COUNT): Response
     {
         return $this->render('web/partials/recent_articles.html.twig', [
             'articles' => $this->getPagesWithCategoryName('Articles', $maxDisplayCount),
@@ -60,7 +61,7 @@ class WidgetController extends AbstractController
      * @param $categoryName
      * @return Page[]
      */
-    private function getPagesWithCategoryName($categoryName, int $maxDisplayCount = null)
+    private function getPagesWithCategoryName($categoryName, int $maxDisplayCount = null): array
     {
         $category = $this->entityManager->getRepository(Category::class)->findOneByTitle($categoryName);
         if ($category instanceof Category) {
@@ -72,7 +73,11 @@ class WidgetController extends AbstractController
         return [];
     }
 
-    private function getRecentSeries(int $maxDisplayCount = null)
+    /**
+     * @param int|null $maxDisplayCount
+     * @return Series[]
+     */
+    private function getRecentSeries(int $maxDisplayCount = null): array
     {
         return $this->entityManager->getRepository(Series::class)->findBy([], ['lastDate' => 'DESC'], $maxDisplayCount);
     }

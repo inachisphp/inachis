@@ -34,7 +34,7 @@ class PostType extends AbstractType
         $this->transformer = $transformer;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options) : void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $categories = $options['data']->getCategories();
         $tags = $options['data']->getTags();
@@ -236,7 +236,7 @@ class PostType extends AbstractType
 //        $builder->get('tags')->addModelTransformer($this->transformer);
     }
 
-    public function configureOptions(OptionsResolver $resolver) : void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'attr' => [

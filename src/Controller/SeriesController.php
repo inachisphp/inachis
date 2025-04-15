@@ -9,23 +9,24 @@ use App\Form\SeriesType;
 use App\Utils\UrlNormaliser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class SeriesController extends AbstractInachisController
 {
     /**
-     * @Route("/incc/series/list/{offset}/{limit}",
-     *     methods={"GET", "POST"},
-     *     requirements={
-     *          "offset": "\d+",
-     *          "limit"="\d+"
-     *     },
-     *     defaults={"offset"=0, "limit"=10}
-     * )
      * @param Request $request
      * @return Response
      */
-    public function list(Request $request)
+    #[Route(
+        "/incc/series/list/{offset}/{limit}",
+        methods: [ "GET", "POST" ],
+        requirements: [
+            "offset" => "\d+",
+            "limit" => "\d+"
+        ],
+        defaults: [ "offset" => 0, "limit" => 10 ]
+    )]
+    public function list(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $form = $this->createFormBuilder()->getForm();
@@ -39,7 +40,18 @@ class SeriesController extends AbstractInachisController
                         $this->entityManager->getRepository(Series::class)->remove($deleteItem);
                     }
                 }
+//                if ($request->get('privacy') !== null) {
+//                    $post = $entityManager->getRepository(Series::class)->findOneById($item);
+//                    if ($post !== null) {
+//                        $post->setVisibility(Page::VIS_PRIVATE);
+//                        $post->setModDate(new \DateTime('now'));
+//                        $entityManager->persist($post);
+//                    }
+//                }
             }
+//            if ($request->get('privacy') !== null) {
+//                $entityManager->flush();
+//            }
             return $this->redirectToRoute(
                 'app_series_list',
                 [],
@@ -65,13 +77,13 @@ class SeriesController extends AbstractInachisController
     }
 
     /**
-     * @Route("/incc/series/edit/{id}", methods={"GET", "POST"})
-     * @Route("/incc/series/new", methods={"GET", "POST"}, name="app_series_new")
      * @param Request $request
      * @return Response
      * @throws \Exception
      */
-    public function edit(Request $request)
+    #[Route("/incc/series/edit/{id}", methods: [ "GET", "POST" ])]
+    #[Route("/incc/series/new", methods: [ "GET", "POST" ], name: "app_series_new")]
+    public function edit(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $series = $request->get('id') !== null ?
@@ -110,8 +122,8 @@ class SeriesController extends AbstractInachisController
             }
 
             $series->setModDate(new \DateTime('now'));
-            $entityManager->persist($series);
-            $entityManager->flush();
+            $this->entityManager->persist($series);
+            $this->entityManager->flush();
 
             $this->addFlash('notice', 'Content saved.');
             return $this->redirect(
@@ -132,13 +144,13 @@ class SeriesController extends AbstractInachisController
     }
 
     /**
-     * @Route("/{year}-{title}", methods={"GET"})
      * @param Request $request
      * @param int $year
      * @param string $title
      * @return Response
      */
-    public function view(Request $request, int $year, string $title)
+    #[Route("/{year}-{title}", methods: [ "GET" ])]
+    public function view(Request $request, int $year, string $title): Response
     {
         $this->data['series'] = $this->entityManager->getRepository(Series::class)->getSeriesByYearAndUrl(
             $year,

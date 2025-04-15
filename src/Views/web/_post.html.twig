@@ -33,14 +33,14 @@
             {{ post.content|markdown }}
         </div>
 
-        {% if series is defined %}
+        {% if series is defined and series is not empty %}
             <ul class="page-navigation">
-                <li><span>More posts on &ldquo;</span><a href="">{{ series.title }}</a><span>&rdquo;</span></li>
-            {% if series.previous is defined %}
-                <li><span>Previous:</span> <a href="{{ series.previous.url }}">{{ series.previous.title }}</a></li>
+                <li><span>More posts on &ldquo;</span><a href="{{ path('app_series_view', { 'year': post.postDate|date('Y'), 'title': series.title|lower }) }}">{{ series.title }}{% if series.subTitle is not empty %} {% if series.subTitle|slice(0,3) != 'And' %}- {% endif %}{{ series.subTitle }}{% endif %}</a><span>&rdquo;</span></li>
+            {% if series.previous|default('') is not empty %}
+                <li><span>Previous:</span> <a href="{{ settings.domain }}/{{ series.previous.urls|first.link }}">{{ series.previous.title }}{% if series.previous.subTitle is not empty %} - {{ series.previous.subTitle }}{% endif %}</a></li>
             {% endif %}
-            {% if series.next is defined %}
-                <li><span>Next:</span> <a href="{{ series.next.url }}">{{ series.next.title }}</a></li>
+            {% if series.next|default('') is not empty %}
+                <li><span>Next:</span> <a href="{{ settings.domain }}/{{ series.next.urls|first.link }}">{{ series.next.title }}{% if series.next.subTitle is not empty %} - {{ series.next.subTitle }}{% endif %}</a></li>
             {% endif %}
             </ul>
         {% endif %}

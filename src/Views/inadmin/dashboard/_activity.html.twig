@@ -10,10 +10,12 @@
                 <em class="badge">{{ dashboard.upcomingCount }}</em>
             </li>
         {% endif %}
+        {% if dashboard.publishCount > 0 %}
         <li>
             <a href="#widget-posts__published">Latest</a>
             <em class="badge{% if dashboard.publishCount == 0 %} badge__empty{% endif %}">{{ dashboard.publishCount }}</em>
         </li>
+        {% endif %}
         {% if dashboard.comments|default([]) is not empty %}
             <li>
                 <a href="#widget-posts__comments">Comments</a>
@@ -53,7 +55,19 @@
         <ol id="widget-posts__published">
             {% for post in dashboard.posts %}
                 <li>
-                    <h2><a aria-label="Edit {{ post.title }}" href="/incc/{{ post.type }}/{{ post.urls[0].link }}">{{ post.title }}</a></h2>
+                    <h2>
+                        <strong><a aria-label="Edit {{ post.title }}" href="/incc/{{ post.type }}/{{ post.urls[0].link }}">{{ post.title }}</a></strong>
+                        {{ include('inadmin/partials/badge.html.twig', {
+                            'item': post,
+                            'badges': {
+                                'private': {
+                                    'field': 'visibility',
+                                    'condition': false,
+                                    'className': 'badge__private'
+                                }
+                            }
+                        }) }}
+                    </h2>
                     <p>{{ post.content|length > 250 ? post.content|slice(0, 250) ~ '…' : post.content  }}</p>
                     <p class="date"><span class="material-icons">schedule</span> Published on <em>{{ post.modDate|date('jS F Y \\a\\t H:i', post.timezone) }} {{ post.timezone }}</em></p>
                 </li>

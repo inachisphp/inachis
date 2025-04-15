@@ -12,9 +12,9 @@ use Twig\TwigFilter;
 class AppExtension extends AbstractExtension
 {
     /**
-     * @return array|TwigFilter[]
+     * @return TwigFilter[]
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('activeMenu', [$this, 'activeMenuFilter']),
@@ -22,11 +22,11 @@ class AppExtension extends AbstractExtension
     }
 
     /**
-     * @param $menuOption
-     * @param string $selectedOption
+     * @param string $menuOption
+     * @param string|null $selectedOption
      * @return string
      */
-    public function activeMenuFilter($menuOption, $selectedOption = '')
+    public function activeMenuFilter(string $menuOption, ?string $selectedOption = ''): string
     {
         return !empty($menuOption) && $menuOption == $selectedOption ? 'menu__active' : '';
     }

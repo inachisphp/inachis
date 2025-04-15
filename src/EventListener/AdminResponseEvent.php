@@ -4,7 +4,6 @@ namespace App\EventListener;
 
 use App\Security\ContentSecurityPolicy;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -18,21 +17,17 @@ final class AdminResponseEvent implements EventSubscriberInterface
      */
     private $logger;
 
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private $csp;
 
     /**
      * AdminResponseEvent constructor.
      *
      * @param LoggerInterface    $logger
-     * @param ContainerInterface $container
      */
-    public function __construct(LoggerInterface $logger, ContainerInterface $container)
+    public function __construct(LoggerInterface $logger, $csp)
     {
         $this->logger = $logger;
-        $this->container = $container;
+        $this->csp = $csp;
     }
 
     /**
@@ -49,23 +44,23 @@ final class AdminResponseEvent implements EventSubscriberInterface
     /**
      * @param ResponseEvent $event
      */
-    public function onKernelResponse(ResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         $this->sendSecurityHeaders($event);
     }
 
-    public function onKernelController(ControllerEvent $event)
+    public function onKernelController(ControllerEvent $event): void
     {
         $controller = $event->getController();
-        if (method_exists($controller[0], 'setDefaults')) {
+        if (is_array($controller) && method_exists($controller[0], 'setDefaults')) {
             $controller[0]->setDefaults();
         }
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST    => 'onKernelRequest',
@@ -77,22 +72,23 @@ final class AdminResponseEvent implements EventSubscriberInterface
     /**
      * @param ResponseEvent $event
      */
-    public function sendSecurityHeaders(ResponseEvent $event)
+    public function sendSecurityHeaders(ResponseEvent $event): void
     {
         $event->getResponse()->headers->set('X-Frame-Options', 'SAMEORIGIN');
         $event->getResponse()->headers->set('X-XSS-Protection', '1; mode=block');
         $event->getResponse()->headers->set('X-Content-Type-Options', 'nosniff');
-        $cspHeader = ContentSecurityPolicy::getInstance()->getCSPEnforceHeader(
-            $this->container->getParameter('csp')
-        );
-        if (!empty($cspHeader)) {
-            $event->getResponse()->headers->set('Content-Security-Policy', $cspHeader);
-        }
-        $cspReportHeader = ContentSecurityPolicy::getInstance()->getCSPReportHeader(
-            $this->container->getParameter('csp')
-        );
-        if (!empty($cspReportHeader)) {
-            $event->getResponse()->headers->set('Content-Security-Policy-Report-Only', $cspReportHeader);
-        }
+        // default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' ajax.googleapis.com,cdn.jsdelivr.net,cdnjs.cloudflare.com,unpkg.com,www.google-analytics.com; style-src 'self' data: cdn.jsdelivr.net,cdnjs.cloudflare.com,fonts.googleapis.com,maxcdn.bootstrapcdn.com,unpkg.com; img-src 'self' data: maps.googleapis.com,staticflickr.com; font-src 'self' fonts.gstatic.com,maxcdn.bootstrapcdn.com; connect-src 'self' cdn.jsdelivr.net,maps.googleapis.com; form-action 'self'; upgrade-insecure-requests; block-all-mixed-content
+//        $cspHeader = ContentSecurityPolicy::getInstance()->getCSPEnforceHeader(
+//            $this->csp
+//        );
+//        if (!empty($cspHeader)) {
+//            $event->getResponse()->headers->set('Content-Security-Policy', $cspHeader);
+//        }
+//        $cspReportHeader = ContentSecurityPolicy::getInstance()->getCSPReportHeader(
+//            $this->csp
+//        );
+//        if (!empty($cspReportHeader)) {
+//            $event->getResponse()->headers->set('Content-Security-Policy-Report-Only', $cspReportHeader);
+//        }
     }
 }

@@ -11,15 +11,13 @@ use Doctrine\DBAL\Exception\ConnectionException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class SettingsController extends AbstractInachisController
 {
-    /**
-     * @Route("/incc/settings")
-     */
-    public function index(Request $request)
+    #[Route("/incc/settings")]
+    public function index(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -46,10 +44,8 @@ class SettingsController extends AbstractInachisController
         return $this->render('inadmin/settings.html.twig', $this->data);
     }
 
-    /**
-     * @Route("/incc/settings/check")
-     */
-    public function check()
+    #[Route("/incc/settings/check")]
+    public function check(): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->data['check'] = [
@@ -103,9 +99,9 @@ class SettingsController extends AbstractInachisController
      * @param Request $request
      * @return RedirectResponse
      * @throws \Doctrine\DBAL\ConnectionException
-     * @Route("/incc/settings/wipe", methods={"POST"})
      */
-    public function wipe(LoggerInterface $logger, Request $request)
+    #[Route("/incc/settings/wipe", methods: [ "POST" ])]
+    public function wipe(LoggerInterface $logger, Request $request): RedirectResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         if ($request->get('confirm', false)) {

@@ -6,6 +6,8 @@ $information-large: "screen and (min-width: 480px)";
 
 $admin__background-color: #fcfefe;
 
+$admin__flash-background: #lightsalmon;
+
 $admin__container--collapsed-width: 45px;
 $admin__container--expanded-width: 200px;
 $admin__container-button--hover: #0cf;
@@ -78,6 +80,11 @@ body {
 //	position: absolute;
 //}
 
+.flash-notice {
+	background-color: $admin__flash-background;
+	padding: 10px;
+	margin: 0 0 20px 0;
+}
 
 .switch-wrapper {
 	display: inline-block;

@@ -5,24 +5,39 @@
 
     {% block profile %}
 
+        {{ form_start(form, {'attr': { 'class': 'form form__post form__user' }}) }}
         <div class="col span_4_of_8">
             <h2>Edit Profile</h2>
+            <h3>{{ user.username }}</h3>
+            <p>
+                {{ form_label(form.displayName) }}
+                {{ form_errors(form.displayName) }}
+                {{ form_widget(form.displayName) }}
+            </p>
 
-            Username
+            <p>
+                {{ form_label(form.email) }}
+                {{ form_errors(form.email) }}
+                {{ form_widget(form.email) }}
+            </p>
 
-            Password
-            Confirm Password
-
-            Email address
-            Display Name
-            Timezone
+            <p>
+                {{ form_label(form.timezone) }}
+                {{ form_errors(form.timezone) }}
+                {{ form_widget(form.timezone) }}
+            </p>
+            <p><button class="button button--positive" type="submit">Save</button></p>
         </div>
         <div class="col span_4_of_8">
             <a class="profile-photo" href="#">
                 <i class="material-icons">local_see</i>
                 <img src="/assets/imgs/incc/defaultAvatar.png" />
             </a>
+            {% if session.user.username == user.username %}
+            <p><button class="button button--info" type="button">Change Password</button></p>
+            {% endif %}
         </div>
+        {{ form_end(form) }}
 
     {% endblock profile %}
 

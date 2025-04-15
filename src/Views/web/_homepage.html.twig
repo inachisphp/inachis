@@ -1,8 +1,35 @@
 {% extends "web/structure/main.html.twig" %}
 {% block content %}
 
-    {% for post in content %}
-        {% include 'web/structure/post-feature.html.twig' %}
-    {% endfor %}
+    {% if filterName|default('') is not empty %}
+<div class="section group">
+    <div class="col span_1_of_8"></div>
+    <div class="col span_6_of_8">
+        <article class="blogbox">
+            <h2>{{ filterName|title }}: {{ filterValue }}</h2>
+            <p>Found <strong>{{ content|length }}</strong> post{% if content|length > 1 %}s{% endif %}.</p>
+        </article>
+    </div>
+    <div class="col span_1_of_8"></div>
+</div>
+    {% endif %}
+
+    {% if content is not empty %}
+        {% set lazyload = false %}
+        {% for post in content %}
+            {% include 'web/structure/post-feature.html.twig' %}
+            {% set lazyload = true %}
+        {% endfor %}
+    {% else %}
+<div class="section group">
+    <div class="col span_1_of_8"></div>
+    <div class="col span_6_of_8">
+        <article class="blogbox">
+            This site doesn't have any content yet! Please check back again later.
+        </article>
+    </div>
+    <div class="col span_1_of_8"></div>
+</div>
+    {% endif %}
 
 {% endblock content %}

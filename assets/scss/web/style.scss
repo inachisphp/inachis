@@ -37,7 +37,7 @@ h4 {
   margin: 3em 1.8em 3em 0;
 }
 
-.assistive-text, #skiptomain {
+.assistive-text, #skiptomain, .visually-hidden {
   display: none;
 }
 
@@ -68,12 +68,12 @@ h4 {
     }
   }
   &.expanded {
-    background:#999 url(https://farm1.staticflickr.com/643/31631436281_7811ca0364_o_d.jpg) center -12em no-repeat;
-    background-attachment: cover;
+    background:#999 url(/assets/mastbg.jpg) center -12em no-repeat;
+    background-size: cover;
     border-bottom:1px solid #333;
     color:#fff;
     /*min-height:180px;*/
-    min-height:480px;
+    min-height:250px;
     position:relative;
     width:100%;
 

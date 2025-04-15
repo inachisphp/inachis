@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -21,14 +21,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AccountController extends AbstractInachisController
 {
     /**
-     * @Route("/incc/login", name="app_account_login", methods={"GET","POST"})
-     *
      * @param Request             $request
      * @param AuthenticationUtils $authenticationUtils
-     *
      * @return Response The response the controller results in
      */
-    public function login(Request $request, AuthenticationUtils $authenticationUtils) : Response
+    #[Route("/incc/login", name: "app_account_login", methods: [ "GET", "POST" ])]
+    public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
     {
         $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();
         if (!empty($redirectTo)) {
@@ -40,30 +38,28 @@ class AccountController extends AbstractInachisController
         $form->handleRequest($request);
         $this->data['page']['title'] = 'Sign In';
         $this->data['form'] = $form->createView();
+        $this->data['expired'] = $request->query->has('expired');
         $this->data['error'] = $authenticationUtils->getLastAuthenticationError();
 
         return $this->render('inadmin/signin.html.twig', $this->data);
     }
 
     /**
-     * @Route("/incc/signout", name="app_logout", methods={"GET"})
-     *
      * @throws \Exception
      */
+    #[Route("/incc/logout", name: "app_logout", methods: [ "GET", "POST" ])]
     public function logout(): never
     {
         throw new \Exception('Don\'t forget to activate logout in security.yaml');
     }
 
     /**
-     * @Route("/incc/forgot-password", methods={"GET","POST"})
-     *
      * @param Request             $request
      * @param TranslatorInterface $translator
-     *
      * @return Response
      */
-    public function forgotPassword(Request $request, TranslatorInterface $translator)
+    #[Route("/incc/forgot-password", methods: [ "GET", "POST" ])]
+    public function forgotPassword(Request $request, TranslatorInterface $translator): Response
     {
         $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();
         if (!empty($redirectTo)) {
@@ -104,13 +100,11 @@ class AccountController extends AbstractInachisController
     }
 
     /**
-     * @Route("/incc/forgot-password", methods={"POST"})
-     *
      * @param Request $request
-     *
      * @return Response
      */
-    public function forgotPasswordSent(Request $request)
+    #[Route("/incc/forgot-password", methods: [ "POST" ])]
+    public function forgotPasswordSent(Request $request): Response
     {
         $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();
         if (!empty($redirectTo)) {

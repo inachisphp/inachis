@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  redis:
+    container_name: container_redis
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  db:
+    image: mariadb:10.5
+    container_name: '${APP_NAME}_db'
+    #command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    command: '--default-authentication-plugin=mysql_native_password'
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/mariadb/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    networks:
+      - inachis_net
+    ports:
+      - '${DB_PORT}:3306'
+    restart: always
+    #healthcheck:
+    #  test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+    #  interval: 5s
+    #  retries: 5
+    #  start_period: 30s
+
+  web:
+    container_name: '${APP_NAME}_web'
+    #depends_on:
+    #  db:
+    #    condition: service_healthy
+    build: .
+    ports:
+      - '8080:80'
+      - '4443:443'
+    networks:
+      - inachis_net
+    environment:
+      - 'DATABASE_URL=mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE}?serverVersion=10.5'
+      - 'APP_ENV=dev'
+      - 'APP_DEBUG=true'
+      - 'REDIS_HOST=@redis'
+      - 'REDIS_PORT=6379'
+    volumes:
+      - .:/var/www/inachis/
+
+volumes:
+  db_data:
+
+networks:
+  inachis_net:

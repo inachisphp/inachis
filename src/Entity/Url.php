@@ -7,61 +7,60 @@ use Ramsey\Uuid\Doctrine\UuidGenerator;
 
 /**
  * Object for handling custom URLs that are mapped to content.
- *
- * @ORM\Entity(repositoryClass="App\Repository\UrlRepository")
- * @ORM\Table(indexes={@ORM\Index(name="search_idx", columns={"linkCanonical"})})
  */
+#[ORM\Entity(repositoryClass: 'App\Repository\UrlRepository', readOnly: false)]
+#[ORM\Index(name: 'search_idx', columns: [ 'linkCanonical' ])]
 class Url
 {
     /**
      * @const The maximum size allowed for SEO-friendly short URLs
      */
     const DEFAULT_URL_SIZE_LIMIT = 255;
+
     /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true, nullable=false)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=UuidGenerator::class)
-     *
      * @var \Ramsey\Uuid\UuidInterface The unique identifier for the Url
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected $id;
+
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Page", inversedBy="urls", fetch="EAGER")
-     * @ORM\JoinColumn(name="content_id", referencedColumnName="id")
-     *
      * @var int The UUID of the content of the type specified by @see
      */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Page', inversedBy: 'urls', fetch: 'EAGER')]
+    #[ORM\JoinColumn(name: 'content_id', referencedColumnName: 'id')]
     protected $content;
+
     /**
-     * @ORM\Column(type="string", length=512)
-     *
      * @var string The SEO-friendly short link
      */
+    #[ORM\Column(type: 'string', length: 512)]
     protected $link;
+
     /**
-     * @ORM\Column(name="linkCanonical",type="string", length=255, unique=true)
-     *
      * @var string The canonical hash for the link
      */
+    #[ORM\Column(type: 'string', length: 255, name: 'linkCanonical', unique: true)]
     protected $linkCanonical;
+
     /**
-     * @ORM\Column(type="boolean", name="defaultLink")
-     *
      * @var bool Flag specifying if the URL is the canonical one to use
      */
+    #[ORM\Column(type: 'boolean', name: 'defaultLink')]
     protected $default;
+
     /**
-     * @ORM\Column(type="datetime", nullable=false)
-     *
      * @var string The date the Url was added
      */
+    #[ORM\Column(type: 'datetime', nullable: false)]
     protected $createDate;
+
     /**
-     * @ORM\Column(type="datetime", nullable=false)
-     *
      * @var string The date the Url was last modified
      */
+    #[ORM\Column(type: 'datetime', nullable: false)]
     protected $modDate;
 
     /**
@@ -74,7 +73,7 @@ class Url
      * @param bool   $default
      * @throws \Exception
      */
-    public function __construct(Page $content, $link = '', $default = true)
+    public function __construct(Page $content, ?string $link = '', ?bool $default = true)
     {
         $this->setContent($content);
         $this->setLink($link);
@@ -89,78 +88,127 @@ class Url
      *
      * @return string The UUID of the URL
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
 
-    public function getLink()
+    /**
+     * @return string
+     */
+    public function getLink(): string
     {
         return $this->link;
     }
 
-    public function getLinkCanonical()
+    /**
+     * @return string
+     */
+    public function getLinkCanonical(): string
     {
         return $this->linkCanonical;
     }
 
-    public function getContent()
+    /**
+     * @return string
+     */
+    public function getContent(): Page
     {
         return $this->content;
     }
 
-    public function isDefault()
+    /**
+     * @return bool
+     */
+    public function isDefault(): bool
     {
         return $this->default;
     }
 
-    public function getCreateDate()
+    /**
+     * @return \DateTime
+     */
+    public function getCreateDate(): \DateTime
     {
         return $this->createDate;
     }
 
-    public function getModDate()
+    /**
+     * @return \DateTime
+     */
+    public function getModDate(): \DateTime
     {
         return $this->modDate;
     }
 
-    public function setId($value)
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setId(string $value): self
     {
         $this->id = $value;
+        return $this;
     }
 
-    public function setLink($value)
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setLink(string $value): self
     {
         $this->link = $value;
         $this->linkCanonical = md5($value);
+        return $this;
     }
 
-    public function setContent($value)
+    /**
+     * @param Page $value
+     * @return $this
+     */
+    public function setContent(Page $value): self
     {
         $this->content = $value;
+        return $this;
     }
 
-    public function setDefault($value)
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setDefault($value): self
     {
         $this->default = (bool) $value;
+        return $this;
     }
 
-    public function setCreateDate(\DateTime $value)
+    /**
+     * @param \DateTime $value
+     * @return $this
+     */
+    public function setCreateDate(\DateTime $value): self
     {
         $this->createDate = $value;
+        return $this;
     }
 
-    public function setModDate(\DateTime $value)
+    /**
+     * @param \DateTime $value
+     * @return $this
+     */
+    public function setModDate(\DateTime $value): self
     {
         $this->modDate = $value;
+        return $this;
     }
 
     /**
      * Sets the mod date for the {@link Url} to the current date.
      */
-    public function setModDateToNow()
+    public function setModDateToNow(): self
     {
         $this->setModDate(new \DateTime('now'));
+        return $this;
     }
 
     /**
@@ -169,12 +217,15 @@ class Url
      * @return bool The result of validating if the SEO friendly short URL
      *              contains only alphanumeric values and hyphens
      */
-    public function validateURL()
+    public function validateURL(): bool
     {
         return preg_match('/^[a-z0-9\-]+$/i', $this->link) === 1;
     }
 
-    public function associateContent()
+    /**
+     * @return void
+     */
+    public function associateContent(): void
     {
         $this->content->addUrl($this);
     }

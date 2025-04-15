@@ -5,16 +5,14 @@ namespace App\Controller;
 use App\Entity\Page;
 use App\Entity\Series;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class DefaultController extends AbstractInachisController
 {
     const ITEMS_TO_SHOW = 10;
     
-    /**
-     * @Route("/", methods={"GET"})
-     */
-    public function homepage()
+    #[Route("/", methods: [ "GET" ])]
+    public function homepage(): Response
     {
         $series = $this->entityManager->getRepository(Series::class)->getAll(
             0,

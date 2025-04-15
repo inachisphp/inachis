@@ -2,7 +2,7 @@
     <h4>Recent Races</h4>
     {% if races is defined and races is not empty %}
         {% for race in races %}
-            <p><a href="#"><strong>Sainsbury's Sport Relief Mile</strong></a> (6 mile)<br />A run around Leicester Forest East RFC in support of Sport Relief. This is an initiative set up by Comic Relief to raise cash and change lives of poor and disadvantaged people in the UK and across the world.</p>
+            <p><a href="{{ race.urls|first.link }}"><strong>{{ race.title }}</strong></a> <!-- (6 mile) --><br />{{ race.featureSnippet|slice(0, 200) }}…</p>
         {% endfor %}
         <p><a href="/running">More Running…</a></p>
     {% else %}

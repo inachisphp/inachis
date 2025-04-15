@@ -1,0 +1,34 @@
+{% extends "inadmin/structure/main.html.twig" %}
+{% block content %}
+
+    {% block user_list_pre %}{% endblock user_list_pre %}
+
+    {% block user_list %}
+        {% include 'inadmin/partials/list.html.twig' with {
+            'className': 'form__users',
+            'type': 'users',
+
+            'offset': page.offset,
+            'limit': page.limit,
+            'total': dataset.count,
+
+            'snippet_description': 'username',
+            'slug_prefix': 'user',
+            'slug': 'username',
+
+            'url_add': path('app_admin_admindetails', { 'id': 'add'}),
+            'url_result': path('app_admin_adminlist'),
+
+            'actions': {
+                'delete': {
+                    'button_class': 'button--negative button--delete',
+                    'icon': 'delete_forever',
+                    'title': 'Delete',
+                },
+            }
+        }
+        %}
+    {% endblock user_list %}
+
+    {% block user_list_post %}{% endblock user_list_post %}
+{% endblock content %}

@@ -21,7 +21,7 @@ class LoginType extends AbstractType
         $this->translator = $translator;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options) : void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('loginUsername', TextType::class, [
@@ -67,7 +67,7 @@ class LoginType extends AbstractType
             ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver) : void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             // uncomment if you want to bind to a class

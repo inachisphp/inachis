@@ -1,74 +1,41 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
 # Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    app.title: 'Wandering the World'
-    locale: 'en'
-    app.twitter: 'jedi58'
+    app.config.title: 'Wandering the World'
+    app.config.locale: 'en'
+    app.config.twitter: 'jedi58'
+
     csp:
-      enforce:
-        default-src:
-          self: true
-        connect-src:
-          self: true
-          sources:
-            - cdn.jsdelivr.net
-            - maps.googleapis.com
-        font-src:
-          self: true
-          sources:
-            - fonts.gstatic.com
-            - maxcdn.bootstrapcdn.com
-        form-action:
-          self: true
-        img-src:
-          data: true
-          self: true
-          sources:
-            - maps.googleapis.com
-            - staticflickr.com
-        script-src:
-          self: true
-          sources:
-            - ajax.googleapis.com
-            - cdn.jsdelivr.net
-            - cdnjs.cloudflare.com
-            - unpkg.com
-            - www.google-analytics.com
-          unsafe-inline: true
-          unsafe-eval: true
-        style-src:
-          self: true
-          data: true
-          sources:
-            - cdn.jsdelivr.net
-            - cdnjs.cloudflare.com
-            - fonts.googleapis.com
-            - maxcdn.bootstrapcdn.com
-            - unpkg.com
-        report-uri: https://jedi58.report-uri.io/r/default/csp/enforce
-      report:
-        report-uri: https://jedi58.report-uri.io/r/default/csp/reportOnly
 
 services:
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
-        public: false       # Allows optimizing the container by removing unused services; this also means
-                            # fetching services directly from the container via $container->get() won't work.
-                            # The best practice is to be explicit about your dependencies anyway.
+        public: false
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
-        resource: '../src/*'
-        exclude: '../src/{Entity,Migrations,Tests}'
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Migrations/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
 
-    # controllers are imported separately to make sure services can be injected
-    # as action arguments even if you don't extend any base controller class
-    App\Controller\:
-        resource: '../src/Controller'
-        tags: ['controller.service_arguments']
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+#
+#    App\Controller\AbstractInachisController:
+#        arguments: [ '%app.config%' ]
+
+    App\EventListener\AdminResponseEvent:
+        arguments:
+            $csp: '%csp%'
 
     # Add support for Markdown in Twig templates
     markdown.engine:

@@ -1,13 +1,11 @@
+{% if articles is defined and articles is not empty %}
 <div class="col span_2_of_8">
     <h4>Recent Articles</h4>
-    {% if articles is defined and articles is not empty %}
-        <ul>
-            {% for article in articles %}
-                <li><a href="#">Sending Emails Without Becoming a Spammer</a><!-- br />Without the correct headers and precautions, emails sent from your site or web application could easily get marked as spam. --></li>
-            {% endfor %}
-            <li><a href="/articles">More Articles…</a></li>
-        </ul>
-    {% else %}
-        <p>There aren't any yet!</p>
-    {% endif %}
+    <ul>
+    {% for article in articles %}
+        <li><a href="#">Sending Emails Without Becoming a Spammer</a><!-- br />Without the correct headers and precautions, emails sent from your site or web application could easily get marked as spam. --></li>
+    {% endfor %}
+        <li><a href="/articles">More Articles…</a></li>
+    </ul>
 </div>
+{% endif %}

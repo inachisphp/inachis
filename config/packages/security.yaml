@@ -1,65 +1,67 @@
-# see https://symfony.com/doc/current/reference/configuration/security.html
-# CSRF Protection: https://symfony.com/doc/current/security/guard_authentication.html
 security:
-    encoders:
-        App\Entity\User: argon2i
-
-    role_hierarchy:
-        ROLE_ADMIN: ROLE_USER
-        ROLE_SUPER_ADMIN: ROLE_ADMIN
-
-    # http://symfony.com/doc/current/book/security.html#where-do-users-come-from-user-providers
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-      admins:
-        entity:
-          class: App\Entity\User
-          property: username
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: username
 
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        main:
+            lazy: true
+            provider: app_user_provider
 
-        admin:
-            pattern: ^/incc
-            anonymous: ~
+            form_login:
+                login_path: app_account_login
+                check_path: app_account_login
 
-            guard:
-              authenticators:
-                - App\Security\LoginFormAuthenticator
+                username_parameter: login[loginUsername]
+                password_parameter: login[loginPassword]
+                csrf_parameter: login[_token]
+
+                use_referer: true
 
             logout:
-              path: /incc/signout
+                path: app_logout
+                target: app_account_login
+#                clear_site_data: *
 
-#            form_login:
-#              provider: ^/
-#
-#              check_path: app_account_login_action
-#              login_path: app_account_login
-#              default_target_path: app_dashboard_default
-#              use_referer: true
-#              csrf_parameter: login[_token]
-#              csrf_token_generator: security.csrf.token_manager
-#              remember_me: true
-#              username_parameter: login[loginUsername]
-#              password_parameter: login[loginPassword]
+        secured_area:
+            form_login:
+                enable_csrf: true
 
-#            remember_me:
-              #token_provider: name
-#              secret: '%kernel.secret%'
-#              name: NX02
-#              lifetime: 604800
-#              path: /incc
-              #domain: somedomain.foo
-#              secure: true
-#              httponly: true
-#              remember_me_parameter: login[rememberMe]
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#the-firewall
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+
+    # Note: Only the *first* access control that matches will be used
     access_control:
-      - { path: ^/incc/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-      - { path: ^/incc/forgot-password$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-      - { path: ^/incc/logout$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-      - { path: ^/incc/login-check$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/incc/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/incc/forgot-password$, roles: PUBLIC_ACCESS }
+        - { path: ^/incc/logout, roles: PUBLIC_ACCESS }
+        - { path: ^/incc/login-check$, roles: PUBLIC_ACCESS }
 
-      - { path: ^/incc, roles: [ ROLE_ADMIN ] }
-      #- { path: ^/.*, role: IS_AUTHENTICATED_ANONYMOUSLY }
-      - { path: ^/.*, roles: ROLE_USER }
+        - { path: ^/incc, roles: [ ROLE_ADMIN ] }
+        #- { path: ^/.*, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/.*, roles: PUBLIC_ACCESS, requires_channel: https }
+
+when@test:
+    security:
+        password_hashers:
+            # By default, password hashers are resource intensive and take time. This is
+            # important to generate secure password hashes. In tests however, secure hashes
+            # are not important, waste resources and increase test times. The following
+            # reduces the work factor to the lowest possible values.
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4 # Lowest possible value for bcrypt
+                time_cost: 3 # Lowest possible value for argon
+                memory_cost: 10 # Lowest possible value for argon

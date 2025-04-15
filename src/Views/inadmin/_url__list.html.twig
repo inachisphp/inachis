@@ -5,38 +5,43 @@
 
     {% block url_list %}
         <div class="col span_8_of_8 widget-data-list">
-            {%  if urls is not empty %}
-                <form>
-                    <p>Showing {{ page.offset + 1 }} to {{ min(page.offset + page.limit, urls.count) }} of {{ urls.count }}</p>
+            {% include 'inadmin/partials/list.html.twig' with {
+                'className': 'form__url',
+                'type': 'url',
 
-                    {%  for url in urls.iterator %}
-                        <article id="url-{{ url.id }}" class="hentry url-{% if not url.default %}not-{% endif %}default">
-                            <input id="post-{{ url.id }}__input" type="checkbox" name="urls[]" value="{{ url.id }}" />
-                            <label for="post-{{ url.id }}__input">
-                                <strong>{{ url.link }}</strong>
-                                {% if url.default %}
-                                    <span class="badge badge__default">default</span>
-                                {% endif %}
-                                <span>{{  url.content.title }}</span>
-                                <em class="date">{{ url.modDate|date('jS F Y \\a\\t H:i') }}</em>
-                            </label>
-                        </article>
-                    {%  endfor %}
-                    {{  include('inadmin/partials/pagination.html.twig', {
-                        offset: page.offset,
-                        limit: page.limit,
-                        maxResults: urls.count,
-                        maxPagesToShow: 4,
-                        result_url: path('app_url_list')
-                    }) }}
-                </form>
-            {% else %}
-                <p class="content-warning">
-                    <i class="material-icons">info_outline</i>
-                    <span>You don't have any URLs yet!</span>
-                    <a href="{{ path('app_zzpage_getpostadmin') }}">Add some content first!</a>
-                </p>
-            {% endif %}
+                'offset': page.offset,
+                'limit': page.limit,
+                'total': dataset.count,
+
+                'item_title': 'link',
+                'snippet_description': 'content.title',
+                'additional_classes': 'default',
+                'inline': true,
+                'showDate': false,
+                'url_result': path('app_url_list'),
+
+                'badges': {
+                    'default': {
+                        'field': 'default',
+                        'condition': 'default',
+                        'className': 'badge__default'
+                    }
+                },
+
+                'actions': {
+                    'make_default': {
+                        'button_class': 'button--info',
+                        'icon': 'published_with_changes',
+                        'title': 'Set as default',
+                    },
+                    'delete': {
+                        'button_class': 'button--negative button--delete',
+                        'icon': 'delete_forever',
+                        'title': 'Delete',
+                    },
+                }
+            }
+            %}
         </div>
     {% endblock url_list %}
 

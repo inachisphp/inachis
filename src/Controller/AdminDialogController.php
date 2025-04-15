@@ -14,19 +14,19 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 class AdminDialogController extends AbstractInachisController
 {
     /**
-     * @Route("/incc/ax/categoryManager/get", methods={"POST"})
-     *
-     * @return mixed
+     * @return Response
      */
-    public function getCategoryManagerContent()
+    #[Route("/incc/ax/categoryManager/get", methods: [ "POST" ])]
+    public function getCategoryManagerContent(): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->data['categories'] = $this->entityManager->getRepository(Category::class)->findByParent(null);
@@ -35,29 +35,27 @@ class AdminDialogController extends AbstractInachisController
     }
 
     /**
-     * @Route("/incc/ax/imageManager/get", methods={"POST"})
-     * @return mixed
+     * @return Response
      */
-    public function getImageManagerList()
+    #[Route("/incc/ax/imageManager/get", methods: [ "POST" ])]
+    public function getImageManagerList(): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->data['form'] = $this->createForm(ImageType::class)->createView();
         $this->data['allowedTypes'] = Image::ALLOWED_TYPES;
         // @todo add pagination
-        $this->data['images'] = $this->entityManager->getRepository(Image::class)->getAll();
+        $this->data['images'] = $this->entityManager->getRepository(Image::class)->getAll(0, 250);
         $this->data['image_count'] = sizeof($this->data['images']);
         return $this->render('inadmin/dialog/imageManager.html.twig', $this->data);
     }
 
     /**
-     * @Route("incc/ax/categoryList/get", methods={"POST"})
-     *
      * @param Request         $request
      * @param LoggerInterface $logger
-     *
-     * @return string
+     * @return Response
      */
-    public function getCategoryManagerListContent(Request $request, LoggerInterface $logger)
+    #[Route("incc/ax/categoryList/get", methods: [ "POST" ])]
+    public function getCategoryManagerListContent(Request $request, LoggerInterface $logger): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $categories = empty($request->get('q')) ?
@@ -94,13 +92,11 @@ class AdminDialogController extends AbstractInachisController
     }
 
     /**
-     * @Route("incc/ax/categoryManager/save", methods={"POST"})
-     *
      * @param Request $request
-     *
-     * @return string
+     * @return Response
      */
-    public function saveCategoryManagerContent(Request $request)
+    #[Route("incc/ax/categoryManager/save", methods: [ "POST" ])]
+    public function saveCategoryManagerContent(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $category = $this->entityManager->getRepository(Category::class)->create($request->request->all());
@@ -114,24 +110,24 @@ class AdminDialogController extends AbstractInachisController
     }
 
     /**
-     * @Route("/incc/ax/export/get", methods={"POST"})
      * @param Request $request
-     * @return mixed
+     * @return Response
      */
-    public function export(Request $request)
+    #[Route("/incc/ax/export/get", methods: [ "POST" ])]
+    public function export(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         return $this->render('inadmin/dialog/export.html.twig', $this->data);
     }
 
     /**
-     * @Route("/incc/ax/export/output", methods={"POST"})
      * @param Request $request
-     * @param Serializer\ $serializer
-     * @return mixed
-     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     * @param SerializerInterface $serializer
+     * @return Response
+     * @throws ExceptionInterface
      */
-    public function performExport(Request $request, SerializerInterface $serializer)
+    #[Route("/incc/ax/export/output", methods: [ "POST" ])]
+    public function performExport(Request $request, SerializerInterface $serializer): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -212,14 +208,12 @@ class AdminDialogController extends AbstractInachisController
     }
 
     /**
-     * @Route("incc/ax/tagList/get", methods={"POST"})
-     *
      * @param Request         $request
      * @param LoggerInterface $logger
-     *
-     * @return string
+     * @return Response
      */
-    public function getTagManagerListContent(Request $request, LoggerInterface $logger)
+    #[Route("incc/ax/tagList/get", methods: [ "POST" ])]
+    public function getTagManagerListContent(Request $request, LoggerInterface $logger): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $tags = $this->entityManager->getRepository(Tag::class)->findByTitleLike($request->request->get('q'));

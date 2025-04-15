@@ -8,6 +8,7 @@ admin.button.save: Save
 admin.button.addItem: Add Item
 admin.button.publish: Publish
 admin.button.delete: Delete
+admin.button.remove: Remove
 admin.reset.enter_email_address: 'Enter your email address to reset login'
 admin.label.reset_password: 'Reset Password'
 admin.reset_password: 'Request Reset'
@@ -35,6 +36,8 @@ admin.label.series.title: Title
 admin.placeholder.series.title: e.g. The Great Adventure
 admin.label.series.subTitle: Sub-title
 admin.placeholder.series.subTitle: e.g. A short story
+admin.label.series.url: URL (Use five or more letters, numbers, and/or hyphens)
+admin.placeholder.series.url: e.g. my-series
 admin.label.series.description: Short description
 admin.label.series.firstDate: First date
 admin.label.series.lastDate: Last date

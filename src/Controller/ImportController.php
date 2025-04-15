@@ -11,26 +11,25 @@ use PHPUnit\Util\Json;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class ImportController extends AbstractInachisController
 {
-    /**
-     * @Route("/incc/import", methods={"GET"})
-     */
-    public function index()
+    #[Route("/incc/import", methods: [ "GET" ])]
+    public function index(): Response
     {
         // @todo change text if handheld device
         return $this->render('inadmin/import__main.html.twig', $this->data);
     }
 
     /**
-     * @Route("/incc/import", methods={"POST", "PUT"})
      * @param Request $request
      * @return JsonResponse
+     * @throws \Exception
      */
-    public function process(Request $request) : JsonResponse
+    #[Route("/incc/import", methods: [ "POST", "PUT" ])]
+    public function process(Request $request): JsonResponse
     {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
@@ -51,7 +50,7 @@ class ImportController extends AbstractInachisController
     /**
      * @throws \Exception
      */
-    private function processFile($file)
+    private function processFile($file): string
     {
         $postObjects = [];
         switch ($file->getMimeType()) {

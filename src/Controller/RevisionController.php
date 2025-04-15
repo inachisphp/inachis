@@ -9,15 +9,17 @@ use Jfcherng\Diff\DiffHelper;
 use Jfcherng\Diff\Factory\RendererFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 
 class RevisionController extends AbstractInachisController
 {
     /**
-     * @Route("/incc/page/diff/{id}", methods={"GET"})
+     * @param Request $request
+     * @return Response
      */
-    public function diff(Request $request)
+    #[Route("/incc/page/diff/{id}", methods: [ "GET" ])]
+    public function diff(Request $request): Response
     {
         $revision = $this->entityManager->getRepository(Revision::class)->findOneById(
             $request->get('id')
@@ -76,9 +78,7 @@ class RevisionController extends AbstractInachisController
         return $this->render('inadmin/track_changes.html.twig', $this->data);
     }
 
-    /**
-     * @Route("/incc/page/diff/{id}", methods={"POST"})
-     */
+    #[Route("/incc/page/diff/{id}", methods: [ "POST" ])]
     public function doRevert(Request $request)
     {
         $revision = $this->entityManager->getRepository(Revision::class)->findOneById(

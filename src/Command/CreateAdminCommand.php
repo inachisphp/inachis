@@ -22,6 +22,11 @@ class CreateAdminCommand extends Command
 {
     protected $entityManager;
     protected $passwordHasher;
+
+    /**
+     * @param EntityManagerInterface $entityManager
+     * @param UserPasswordHasherInterface $passwordHasher
+     */
     public function __construct(EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher)
     {
         $this->entityManager = $entityManager;
@@ -29,6 +34,9 @@ class CreateAdminCommand extends Command
         parent::__construct();
     }
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
 //        $this
@@ -37,6 +45,12 @@ class CreateAdminCommand extends Command
 //        ;
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws \Exception
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

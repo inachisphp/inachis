@@ -13,37 +13,38 @@ use App\Entity\Url;
 use App\Form\PostType;
 use App\Repository\RevisionRepository;
 use App\Utils\ContentRevisionCompare;
+use App\Utils\ReadingTime;
 use Doctrine\ORM\EntityManager;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ZZPageController extends AbstractInachisController
 {
     const ITEMS_TO_SHOW = 20;
 
     /**
-     * @Route(
-     *     "/{year}/{month}/{day}/{title}",
-     *     methods={"GET"},
-     *     requirements={
-     *          "year": "\d+",
-     *          "month": "\d+",
-     *          "day": "\d+"
-     *     }
-     * )
      * @param Request $request
      * @param int $year
      * @param int $month
      * @param int $day
      * @param string $title
-     * @return mixed
+     * @return Response
      * @throws NotFoundHttpException
      */
-    public function getPost(Request $request, $year, $month, $day, $title)
+    #[Route(
+        "/{year}/{month}/{day}/{title}",
+        methods: ["GET" ],
+        requirements: [
+            "year" => "\d+",
+            "month" => "\d+",
+            "day" => "\d+"
+        ]
+    )]
+    public function getPost(Request $request, $year, $month, $day, $title): Response
     {
         $url = $this->entityManager->getRepository(Url::class)->findOneByLink(
             ltrim(strtok($request->getRequestUri(), '?'), '/')
@@ -73,6 +74,8 @@ class ZZPageController extends AbstractInachisController
         }
         $this->data['post'] = $url->getContent();
         $this->data['url'] = $url->getLink();
+        $this->data['textStats'] = ReadingTime::getWordCountAndReadingTime($this->data['post']->getContent());
+
         $series = $this->entityManager->getRepository(Series::class)->getPublishedSeriesByPost($this->data['post']);
         if (!empty($series)) {
             $postIndex = $series->getItems()->indexOf($this->data['post']);
@@ -97,22 +100,22 @@ class ZZPageController extends AbstractInachisController
     }
 
     /**
-     * @Route(
-     *     "/incc/{type}/list/{offset}/{limit}",
-     *     methods={"GET", "POST"},
-     *     requirements={
-     *          "type": "post|page",
-     *          "offset": "\d+",
-     *          "limit"="\d+"
-     *     },
-     *     defaults={"offset"=0, "limit"=10}
-     * )
      * @param Request $request
      * @param string $type
-     * @return null
+     * @return Response
      * @throws \Exception
      */
-    public function getPostListAdmin(Request $request, $type = 'post')
+    #[Route(
+        "/incc/{type}/list/{offset}/{limit}",
+        methods: [ "GET", "POST" ],
+        requirements: [
+            "type" => "post|page",
+            "offset" => "\d+",
+            "limit" => "\d+"
+        ],
+        defaults: [ "offset" => 0, "limit" => 10 ]
+    )]
+    public function getPostListAdmin(Request $request, $type = 'post'): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $form = $this->createFormBuilder()->getForm();
@@ -136,6 +139,10 @@ class ZZPageController extends AbstractInachisController
                         $this->entityManager->persist($post);
                     }
                 }
+//                if ($request->request->has('export')) {
+//                    echo 'export';
+//                    die;
+//                }
             }
             if ($request->request->has('private') || $request->request->has('public')) {
                 $revision = $this->entityManager->getRepository(Revision::class)->hydrateNewRevisionFromPage($post);
@@ -170,35 +177,34 @@ class ZZPageController extends AbstractInachisController
     }
 
     /**
-     * @Route(
-     *     "/incc/{type}/{title}",
-     *     methods={"GET", "POST"},
-     *     defaults={"type": "post"},
-     *     requirements={
-     *          "type": "post|page"
-     *     }
-     * )
-     * @Route(
-     *     "/incc/{type}/{year}/{month}/{day}/{title}",
-     *     methods={"GET", "POST"},
-     *     requirements={
-     *          "type": "post",
-     *          "year": "\d+",
-     *          "month": "\d+",
-     *          "day": "\d+"
-     *     }
-     * )
-     *
      * @param Request $request
      * @param ContentRevisionCompare $contentRevisionCompare
      * @param string $type
      * @param string $title
-     * @return mixed
+     * @return Response
      * @throws \Exception
      *
      * @return mixed
      */
-    public function getPostAdmin(Request $request, ContentRevisionCompare $contentRevisionCompare, $type = 'post', $title = null)
+    #[Route(
+        "/incc/{type}/{title}",
+        methods: [ "GET", "POST" ],
+        defaults: [ "type" => "post" ],
+        requirements: [
+            "type" => "post|page"
+        ]
+    )]
+    #[Route(
+        "/incc/{type}/{year}/{month}/{day}/{title}",
+        methods: [ "GET", "POST" ],
+        requirements: [
+            "type" => "post",
+            "year" => "\d+",
+            "month" => "\d+",
+            "day" => "\d+"
+        ]
+    )]
+    public function getPostAdmin(Request $request, ContentRevisionCompare $contentRevisionCompare, $type = 'post', $title = null): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -227,8 +233,8 @@ class ZZPageController extends AbstractInachisController
 
         if ($form->isSubmitted()) {//} && $form->isValid()) {
             if ($form->get('delete')->isClicked()) {
-                $entityManager->getRepository(Page::class)->remove($post);
-                $entityManager->getRepository(Revision::class)->deleteAndRecordByPage($post);
+                $this->entityManager->getRepository(Page::class)->remove($post);
+                $this->entityManager->getRepository(Revision::class)->deleteAndRecordByPage($post);
                 return $this->redirectToRoute(
                     'app_dashboard_default',
                     [],
@@ -336,14 +342,11 @@ class ZZPageController extends AbstractInachisController
     }
 
     /**
-     * @Route(
-     *     "/{page}",
-     *     methods={"GET"}
-     * )
      * @param Request $request
-     * @return mixed
+     * @return Response
      */
-    public function getPage(Request $request)
+    #[Route("/{page}", methods: [ "GET" ])]
+    public function getPage(Request $request): Response
     {
         return $this->getPost($request, 0, 0, 0, '');
     }
@@ -353,7 +356,7 @@ class ZZPageController extends AbstractInachisController
      * @param Request $request
      * @return string The result of testing the current URL
      */
-    private function getContentType(Request $request)
+    private function getContentType(Request $request): string
     {
         return 1 === preg_match(
             '/\/incc\/([0-9]{4}\/[0-9]{2}\/[0-9]{2}\/.*|post)/',
@@ -362,17 +365,15 @@ class ZZPageController extends AbstractInachisController
     }
 
     /**
-     * @Route(
-     *     "/tag/{tagName}",
-     *     methods={"GET"}
-     * )
      * @param Request $request
      * @param string $tagName
-     * @return mixed
+     * @return Response
      */
-    public function getPostsByTag(Request $request, string $tagName)
+    #[Route("/tag/{tagName}", methods: [ "GET" ])]
+    public function getPostsByTag(Request $request, string $tagName): Response
     {
-        $tag = $entityManager->getRepository(Tag::class)->findOneByTitle($tagName);
+        $tag = $this->entityManager->getRepository(Tag::class)->findOneByTitle($tagName);
+
         if (!$tag instanceof Tag) {
             throw new NotFoundHttpException(
                 sprintf(
@@ -389,15 +390,12 @@ class ZZPageController extends AbstractInachisController
     }
 
     /**
-     * @Route(
-     *     "/category/{categoryName}",
-     *     methods={"GET"}
-     * )
      * @param Request $request
      * @param string $categoryName
-     * @return mixed
+     * @return Response
      */
-    public function getPostsByCategory(Request $request, string $categoryName)
+    #[Route("/category/{categoryName}", methods: [ "GET" ])]
+    public function getPostsByCategory(Request $request, string $categoryName): Response
     {
         $category = $this->entityManager->getRepository(Category::class)->findOneByTitle($categoryName);
         if (!$category instanceof Category) {

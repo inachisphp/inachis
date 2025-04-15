@@ -1,10 +1,21 @@
-{% extends 'base.html.twig' %}
+{% extends 'web/structure/main.html.twig' %}
 
-{% block body %}
-    <h1>Page not found</h1>
+{% block content %}
+<div class="section group">
+    <div class="col span_1_of_8"></div>
+    <div class="col span_6_of_8">
 
-    <p>
-        The requested page couldn't be located. Checkout for any URL
-        misspelling or <a href="{{ path('homepage') }}">return to the homepage</a>.
-    </p>
+        <article class="post format-standard hentry" id="series-{{ series.id }}">
+            <header class="entry-header">
+                <h1 class="entry-title">Sorry, we couldn't find that page for you.</h1>
+            </header>
+            <div class="entry-content aligncenter">
+                <p><img alt="Silhouette of a person walking away" src="/assets/imgs/404.png" /></p>
+                <p>We're really sorry; it may be that it never existed, or has been lost in the Bermuda triangle…</p>
+                <p>For now we'd recommend going back to the <a href="/">Homepage</a> and trying another page.</p>
+            </div>
+        </article>
+    </div>
+    <div class="col span_1_of_8"></div>
+</div>
 {% endblock %}

@@ -2,7 +2,7 @@
     <h4>Recent Trips</h4>
     {% if trips is defined and trips is not empty %}
         {% for trip in trips %}
-            <p><a href="#"><strong>Antarctica</strong></a><br />Here is a bit of text that describes the trip to make you want to read more</p>
+            <p><a href="{{ path('app_series_view', { 'year': trip.firstDate|date('Y'), 'title': trip.title|lower }) }}"><strong>{{ trip.title }}</strong></a><br />{{ trip.description|slice(0,200) }}…</p>
         {% endfor %}
         <p><a href="/trips">More Trips…</a></p>
     {% else %}

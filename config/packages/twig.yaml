@@ -1,8 +1,11 @@
 twig:
-    paths: ['%kernel.project_dir%/templates', '%kernel.project_dir%/src/Views']
-    debug: '%kernel.debug%'
-    strict_variables: '%kernel.debug%'
-    #globals:
-    #  settings: "@App\"
+    default_path: '%kernel.project_dir%/src/Views'
     form_themes:
-      - 'form/fieldset.html.twig'
+        - 'form/fieldset.html.twig'
+    paths:
+        '%kernel.project_dir%/templates': ~
+        '%kernel.project_dir%/src/Views': ~
+
+when@test:
+    twig:
+        strict_variables: true

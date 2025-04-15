@@ -14,7 +14,7 @@ class FieldsetType extends AbstractType
      * @param FormBuilderInterface $builder
      * @param array $options
      */
-    public function buildForm(FormBuilderInterface $builder, array $options) : void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // execute the callable with our FormBuilder passed as an argument
         $options['types']($builder);
@@ -25,7 +25,7 @@ class FieldsetType extends AbstractType
      * @param FormInterface $form
      * @param array $options
      */
-    public function buildView(FormView $view, FormInterface $form, array $options) : void
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         if (false !== $options['legend']) {
             $view->vars['legend'] = $options['legend'];
@@ -35,7 +35,7 @@ class FieldsetType extends AbstractType
     /**
      * @param OptionsResolver $resolver
      */
-    public function configureOptions(OptionsResolver $resolver) : void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'legend' => false,
@@ -49,7 +49,7 @@ class FieldsetType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'fieldset';
     }

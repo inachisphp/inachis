@@ -8,88 +8,84 @@ use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\SeriesRepository")
  */
+#[ORM\Entity(repositoryClass: 'App\Repository\SeriesRepository', readOnly: false)]
+#[ORM\Index(name: 'search_idx', columns: ['title'])]
 class Series
 {
     /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true, nullable=false)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=UuidGenerator::class)
-     *
      * @var \Ramsey\Uuid\UuidInterface
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected $id;
-    /**
-     * @ORM\Column(type="string", length=255, nullable=false)
-     *
-     * @var string
-     */
-    protected $title;
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @var string
-     */
-    protected $subTitle;
-    /**
-     * @ORM\Column(type="string", length=255, unique=true, nullable=false)
-     * @var string
-     */
-    protected $url;
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     *
-     * @var string
-     */
-    protected $description;
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     *
-     * @var string
-     */
-    protected $firstDate;
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     *
-     * @var string
-     */
-    protected $lastDate;
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Page", inversedBy="series", fetch="EAGER")
-     * @ORM\JoinTable(
-     *     name="Series_pages",
-     *     joinColumns={
-     *      @ORM\JoinColumn(name="series_id", referencedColumnName="id")
-     *     },
-     *     inverseJoinColumns={
-     *      @ORM\JoinColumn(name="page_id", referencedColumnName="id")
-     *     }
-     * )
-     * @ORM\OrderBy({"postDate" = "ASC"})
-     *
-     * @var Collection|Page[] The array of pages in the series
-     */
-    protected $items = [];
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Image", cascade={"detach"})
-     * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
-     *
-     * @var Image
-     */
-    protected $image;
-    /**
-     * @ORM\Column(type="datetime")
-     *
-     * @var string
-     */
-    protected $createDate;
 
     /**
-     * @ORM\Column(type="datetime")
-     *
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
+    protected $title;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    protected $subTitle;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(type: 'string', length: 255, unique: true, nullable: false)]
+    protected $url;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(type: 'text', nullable: true)]
+    protected $description;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    protected $firstDate;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    protected $lastDate;
+
+    /**
+     * @var Collection|Page[] The array of pages in the series
+     */
+    #[ORM\ManyToMany(targetEntity: 'App\Entity\Page', inversedBy: 'series', fetch: 'EAGER')]
+    #[ORM\JoinTable(name: 'Series_pages')]
+    #[ORM\JoinColumn(name: 'series_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'page_id', referencedColumnName: 'id')]
+    #[ORM\OrderBy(['postDate' => 'ASC'])]
+    protected $items = [];
+
+    /**
+     * @var Image
+     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Image', cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'image_id', referencedColumnName: 'id')]
+    protected $image;
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(type: 'datetime')]
+    protected $createDate;
+
+
+    /**
+     * @var string
+     */
+    #[ORM\Column(type: 'datetime')]
     protected $modDate;
 
     /**
@@ -107,17 +103,16 @@ class Series
     /**
      * @return string
      */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->id;
     }
 
     /**
      * @param string $id
-     *
      * @return $this
      */
-    public function setId(string $id)
+    public function setId(string $id): self
     {
         $this->id = $id;
 
@@ -125,19 +120,18 @@ class Series
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
     /**
-     * @param mixed $title
-     *
+     * @param string $title
      * @return $this
      */
-    public function setTitle($title)
+    public function setTitle(string $title): self
     {
         $this->title = $title;
 
@@ -145,19 +139,18 @@ class Series
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getSubTitle()
+    public function getSubTitle(): ?string
     {
         return $this->subTitle;
     }
 
     /**
-     * @param mixed $subTitle
-     *
+     * @param string $subTitle
      * @return $this
      */
-    public function setSubTitle($subTitle)
+    public function setSubTitle(?string $subTitle): self
     {
         $this->subTitle = $subTitle;
 
@@ -187,19 +180,18 @@ class Series
     /**
      * @return string
      */
-    public function getDescription()
+    public function getUrl(): ?string
     {
-        return $this->description;
+        return $this->url;
     }
 
     /**
-     * @param string $description
-     *
+     * @param mixed $url
      * @return $this
      */
-    public function setDescription(string $description)
+    public function setUrl($url): self
     {
-        $this->description = $description;
+        $this->url = $url;
 
         return $this;
     }
@@ -207,7 +199,26 @@ class Series
     /**
      * @return string
      */
-    public function getFirstDate()
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     * @return $this
+     */
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getFirstDate(): ?\DateTime
     {
         return $this->firstDate;
     }
@@ -216,7 +227,7 @@ class Series
      * @param \DateTime $firstDate
      * @return $this
      */
-    public function setFirstDate(\DateTime $firstDate = null)
+    public function setFirstDate(\DateTime $firstDate = null): self
     {
         $this->firstDate = $firstDate;
 
@@ -226,7 +237,7 @@ class Series
     /**
      * @return string
      */
-    public function getLastDate()
+    public function getLastDate(): ?\DateTime
     {
         return $this->lastDate;
     }
@@ -236,7 +247,7 @@ class Series
      *
      * @return $this
      */
-    public function setLastDate(\DateTime $lastDate = null)
+    public function setLastDate(\DateTime $lastDate = null): self
     {
         $this->lastDate = $lastDate;
 
@@ -246,7 +257,7 @@ class Series
     /**
      * @return array
      */
-    public function getItems()
+    public function getItems(): ?Collection
     {
         return $this->items;
     }
@@ -256,7 +267,7 @@ class Series
      *
      * @return $this
      */
-    public function setItems(array $items)
+    public function setItems(array $items): self
     {
         $this->items = $items;
 
@@ -268,7 +279,7 @@ class Series
      *
      * @return $this
      */
-    public function addItem(Page $item)
+    public function addItem(Page $item): self
     {
         $this->items[] = $item;
 
@@ -278,7 +289,7 @@ class Series
     /**
      * @return Image
      */
-    public function getImage()
+    public function getImage(): ?Image
     {
         return $this->image;
     }
@@ -287,7 +298,7 @@ class Series
      * @param Image $image
      * @return $this
      */
-    public function setImage(Image $image)
+    public function setImage(?Image $image): self
     {
         $this->image = $image;
 
@@ -297,7 +308,7 @@ class Series
     /**
      * @return mixed
      */
-    public function getCreateDate()
+    public function getCreateDate(): ?\DateTime
     {
         return $this->createDate;
     }
@@ -307,7 +318,7 @@ class Series
      *
      * @return $this
      */
-    public function setCreateDate($createDate)
+    public function setCreateDate(\DateTime $createDate): self
     {
         $this->createDate = $createDate;
 
@@ -317,7 +328,7 @@ class Series
     /**
      * @return mixed
      */
-    public function getModDate()
+    public function getModDate(): ?\DateTime
     {
         return $this->modDate;
     }
@@ -327,7 +338,7 @@ class Series
      *
      * @return $this
      */
-    public function setModDate($modDate)
+    public function setModDate(\DateTime $modDate): self
     {
         $this->modDate = $modDate;
 

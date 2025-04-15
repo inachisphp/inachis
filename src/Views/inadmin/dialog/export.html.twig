@@ -1,0 +1,38 @@
+<section class="export__options">
+<form action="{{ path('app_admindialog_performexport') }}" class="form" method="post" name="export">
+    <fieldset class="col span_1_of_2">
+        <p>The export will include:</p>
+        <ul>
+        </ul>
+    </fieldset>
+    <fieldset class="col span_1_of_2">
+        <p>
+            <label for="export_format">Format</label>
+            <select class="text full-width" id="export_format" name="export_format">
+                <option value="json">JSON</option>
+                <option value="md">Markdown</option>
+                <option value="xml">XML</option>
+            </select>
+        </p>
+        <p>
+            <label for="export_name">Name <em>(optional)</em></label>
+            <input class="text full-width" id="export_name" name="export_name" />
+        </p>
+        <p>
+            <label class="inline_label" for="export_categories">Include Categories</label>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="export_categories" name="export_categories" class="ui-switch" data-label-off="No" data-label-on="Yes" value="1">
+            </span>
+        </p>
+        <p>
+            <label class="inline_label" for="export_tags">Include Tags</label>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="export_tags" name="export_tags" class="ui-switch" data-label-off="No" data-label-on="Yes" value="1">
+            </span>
+        </p>
+    </fieldset>
+</form>
+</section>
+<link rel="stylesheet" href="/assets/css/incc/jquery.switchButton.css">
+<script src="/assets/js/incc/jquery.switchButton.js"></script>
+<script>InachisExport._init();</script>

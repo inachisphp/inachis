@@ -1,0 +1,7 @@
+{% if badges|default(null) is not empty %}
+    {% for badgeName,badge in badges %}
+        {%- if attribute(item, badge.field) == badge.condition %}
+            <span class="badge {{ badge.className }}">{{ badgeName }}</span>
+        {% endif -%}
+    {% endfor %}
+{% endif %}

@@ -67,7 +67,7 @@ var InachisContentSelectorDialog = {
     addContentToSeries: function()
     {
         // dependency on page having a SimpleMDE interface available
-        if (!simplemde.options.autosave.uniqueId) {
+        if (!easymde.options.autosave.uniqueId) {
             return;
         }
         var $selectedContent = [],
@@ -89,7 +89,7 @@ var InachisContentSelectorDialog = {
                 }, $choseContent),
                 data: {
                     'ids': $selectedContent,
-                    'seriesId': simplemde.options.autosave.uniqueId
+                    'seriesId': easymde.options.autosave.uniqueId
                 },
                 error: $.proxy(function()
                 {

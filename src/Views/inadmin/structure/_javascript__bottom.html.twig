@@ -29,5 +29,22 @@
         {% endif %}
     </script>
     {% endif %}
+
+    <script src="https://unpkg.com/@travishorn/session-timeout"></script>
+    <script>
+        sessionTimeout({
+            warnAfter: 1140000, //ms
+            timeOutAfter: 1450000,
+            message: 'For your security, we log you out automatically after 24 minutes of inactivity.',
+
+            appendTimestamp: true,
+            //keepAliveUrl: '/keep-alive',
+            //logOutBtnText: 'Log out now',
+            logOutUrl: '/incc/signout',
+            stayConnectedBtnText: 'Continue session',
+            timeOutUrl: '/incc/login?expired',
+            titleText: 'You will be logged out soon'
+        });
+    </script>
 {% endif %}
 {% endblock javascript_bottom %}

@@ -26,7 +26,9 @@
                         <ul>
                             {% for item in series.items %}
                                 {% set title = item.title|replace({ (series.title): '' }) %}
-                            <li>{{ title }} - <a href="{{ item.urls|first.link }}">{{ item.subTitle }}</a></li>
+                                {% if item.status == 'published' %}
+                            <li>{% if title is not empty %}{{ title }} - {% endif %}<a href="{{ item.urls|first.link }}">{{ item.subTitle }}</a></li>
+                                {% endif %}
                             {% endfor %}
                         </ul>
                         {% endif %}
