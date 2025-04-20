@@ -194,6 +194,12 @@ class Page
     protected $series;
 
     /**
+     * @var string The two character language code this content uses, empty means unknown
+     */
+    #[ORM\Column(type: 'string', length: 15, nullable: true)]
+    protected $language;
+
+    /**
      * Default constructor for {@link Page}.
      *
      * @param string    $title   The title for the {@link Page}
@@ -457,6 +463,14 @@ class Page
     }
 
     /**
+     * @return string The language used by this content
+     */
+    public function getLanguage(): string
+    {
+        return $this->language;
+    }
+
+    /**
      * Sets the value of {@link id}.
      *
      * @param string $value The UUID of the {@link Page}
@@ -706,6 +720,15 @@ class Page
     public function setSeries(array $series): void
     {
         $this->series = $series;
+    }
+
+    /**
+     * @param string $language
+     * @return void
+     */
+    public function setLanguage(string $language): void
+    {
+        $this->language = $language;
     }
 
     /**

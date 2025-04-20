@@ -7,8 +7,10 @@ use App\Entity\Page;
 use App\Entity\Tag;
 use App\Form\DataTransformer\ArrayCollectionToArrayTransformer;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -24,6 +26,8 @@ class PostType extends AbstractType
     private $transformer;
     private $translator;
 
+    private $emojisTransliterator;
+
     public function __construct(
         TranslatorInterface $translator,
         RouterInterface $router,
@@ -32,6 +36,7 @@ class PostType extends AbstractType
         $this->router = $router;
         $this->translator = $translator;
         $this->transformer = $transformer;
+        $this->emojisTransliterator = EmojiTransliterator::create('github-emoji');
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -175,6 +180,15 @@ class PostType extends AbstractType
                 'mapped'   => false,
                 'multiple' => true,
                 'required' => false,
+            ])
+            ->add('language', ChoiceType::class, [
+                'choices' => [
+                    $this->emojisTransliterator->transliterate(':cn: 简体中文') => 'zh_Hans',
+                    $this->emojisTransliterator->transliterate(':uk: English') => 'en_GB',
+                    $this->emojisTransliterator->transliterate(':fr: Français') => 'fr_FR',
+                ],
+                'empty_data'  => 'en_GB',
+                'preferred_choices' => [ 'en_GB' ],
             ])
             ->add('latlong', TextType::class, [
                 'attr' => [
