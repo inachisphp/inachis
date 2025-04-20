@@ -1,0 +1,14 @@
+section.widget-stats article {
+  background-color: white;
+  border: 1px solid #eee;
+  padding: 0.6em;
+  margin-bottom: 2em;
+
+  &.widget-stats__focus {
+    border-bottom: 3px solid orange;
+
+    h2 {
+      margin: 0;
+    }
+  }
+}

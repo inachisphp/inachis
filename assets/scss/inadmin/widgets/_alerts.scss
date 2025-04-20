@@ -1,0 +1,21 @@
+.widget-alerts {
+  article {
+    margin-bottom: 2em;
+    padding: 0.6em;
+
+    p span {
+      font-size: 0.75em;
+      font-weight: bold;
+      margin-right: 1em;
+      text-transform: uppercase;
+    }
+    &.alert_priority__high {
+      background-color: #fcc;
+      border-bottom: 3px solid #f00;
+    }
+    &.alert_priority__medium {
+      background-color: #fac19dff;
+      border-bottom: 3px solid orange;
+    }
+  }
+}
