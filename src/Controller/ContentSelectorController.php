@@ -35,26 +35,30 @@ class ContentSelectorController extends AbstractInachisController
     public function saveContent(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         if (!empty($request->get('ids'))) {
             $series = $this->entityManager->getRepository(Series::class)->findOneById($request->get('seriesId'));
-            foreach ($request->get('ids') as $pageId) {
-                $page = $this->entityManager->getRepository(Page::class)->findOneById($pageId);
-                if (!empty($page) && !empty($page->getId())) {
+            if ($series !== null) {
+                foreach ($request->get('ids') as $pageId) {
+                    $page = $this->entityManager->getRepository(Page::class)->findOneById($pageId);
+                    if (empty($page) || empty($page->getId())) {
+                        continue;
+                    }
                     $series->addItem($page);
+                    $firstDate = $series->getFirstDate();
+                    $lastDate = $series->getLastDate();
+                    if ($firstDate === null || $page->getPostDate()->format('Y-m-d H:i:s') < $firstDate->format('Y-m-d H:i:s')) {
+                        $series->setFirstDate($page->getPostDate());
+                    }
+                    if ($lastDate === null || $page->getPostDate()->format('Y-m-d H:i:s') > $lastDate->format('Y-m-d H:i:s')) {
+                        $series->setLastDate($page->getPostDate());
+                    }
                 }
-                $firstDate = $series->getFirstDate();
-                $lastDate = $series->getLastDate();
-                if ($firstDate === null || $page->getPostDate()->format('Y-m-d H:i:s') < $firstDate->format('Y-m-d H:i:s')) {
-                    $series->setFirstDate($page->getPostDate());
-                }
-                if ($lastDate === null || $page->getPostDate()->format('Y-m-d H:i:s') > $lastDate->format('Y-m-d H:i:s')) {
-                    $series->setLastDate($page->getPostDate());
-                }
+                $series->setModDate(new \DateTime('now'));
+                $this->entityManager->persist($series);
+                $this->entityManager->flush();
+                return new Response('Saved', Response::HTTP_CREATED);
             }
-            $series->setModDate(new \DateTime('now'));
-            $this->entityManager->getManager()->persist($series);
-            $this->entityManager->getManager()->flush();
-            return new Response('Saved', Response::HTTP_CREATED);
         }
         return new Response('No change', Response::HTTP_NO_CONTENT);
     }
