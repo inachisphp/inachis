@@ -68,7 +68,8 @@ class SeriesController extends AbstractInachisController
             [],
             [
 //                [ 'q.lastDate', 'DESC' ]
-                [ 'q.title', 'ASC' ]
+                [ 'q.title', 'ASC' ],
+                [ 'q.subTitle', 'ASC' ]
             ]
         );
         $this->data['page']['offset'] = $offset;
@@ -141,6 +142,23 @@ class SeriesController extends AbstractInachisController
         $this->data['includeEditorId'] = $series->getId();
         $this->data['includeDatePicker'] = true;
         return $this->render('inadmin/series__edit.html.twig', $this->data);
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     */
+    #[Route("/incc/series/contents/{id}", methods: [ "POST" ])]
+    public function contents(Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $series = $this->entityManager->getRepository(Series::class)->findOneById($request->get('id'));
+        $form = $this->createForm(SeriesType::class, $series);
+        $form->handleRequest($request);
+
+        $this->data['series'] = $series;
+        $this->data['form'] = $form->createView();
+        return $this->render('inadmin/partials/series_contents.html.twig', $this->data);
     }
 
     /**
