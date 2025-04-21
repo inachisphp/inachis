@@ -237,6 +237,10 @@ body {
 				}
 				ul {
 					display: none;
+
+					&.admin__nav-new span {
+						display: inline-block;
+					}
 				}
 			}
 
