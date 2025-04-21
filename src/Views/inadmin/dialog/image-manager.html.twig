@@ -15,7 +15,7 @@
     {% for image in images %}
         <li>
             <label for="chosenImage_{{ image.id }}">
-                <img alt="{{ image.altText }}" src="{{ image.filename }}" />
+                <img alt="{{ image.altText }}" src="{% if not (image.filename starts with 'http') %}/imgs/{% endif %}{{ image.filename }}" />
                 <span>{{ image.title }}</span>
             </label>
             <input id="chosenImage_{{ image.id }}" name="chosenImage[]" type="radio" value="{{ image.id }}" />
