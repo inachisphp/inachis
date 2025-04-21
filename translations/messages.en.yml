@@ -46,3 +46,11 @@ admin.series.contents.not_saved: You must save the series before you can add ite
 admin.series.contents.no_content: You haven't added any content yet!
 
 admin.dialog.image_manager.title: Image Manager
+
+admin:
+  posts:
+    tabs:
+      content: Content
+      properties: Properties
+      sharing: Sharing
+      revisions: History

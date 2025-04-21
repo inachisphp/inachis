@@ -1,43 +1,238 @@
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
-        <body>
-            <trans-unit id="admin.label.username">
-                <source>admin.label.username</source>
-                <target>Username</target>
-            </trans-unit>
-            <trans-unit id="admin.label.password">
-                <source>admin.label.password</source>
-                <target>Password</target>
-            </trans-unit>
-            <trans-unit id="admin.label.remember_me">
-                <source>admin.label.remember_me</source>
-                <target>Keep me logged in</target>
-            </trans-unit>
-            <trans-unit id="admin.label.forgot_password">
-                <source>admin.label.forgot_password</source>
-                <target>Forgot your password?</target>
-            </trans-unit>
-            <trans-unit id="admin.button.login">
-                <source>admin.button.login</source>
-                <target>Log In</target>
-            </trans-unit>
-            <trans-unit id="admin.button.cancel">
-                <source>admin.button.cancel</source>
-                <target>Cancel</target>
-            </trans-unit>
-            <trans-unit id="admin.reset.enter_email_address">
-                <source>admin.reset.enter_email_address</source>
-                <target>Enter your email address to reset login</target>
-            </trans-unit>
-            <trans-unit id="admin.label.reset_password">
-                <source>admin.label.reset_password</source>
-                <target>Reset Password</target>
-            </trans-unit>
-            <trans-unit id="admin.email_example">
-                <source>admin.email_example</source>
-                <target>user@example.com</target>
-            </trans-unit>
-        </body>
-    </file>
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="Xqfz1Vi" resname="admin.label.username">
+        <source>admin.label.username</source>
+        <target>Username</target>
+      </trans-unit>
+      <trans-unit id="Fpsdmwy" resname="admin.label.password">
+        <source>admin.label.password</source>
+        <target>Password</target>
+      </trans-unit>
+      <trans-unit id="ZUBVEkd" resname="admin.label.remember_me">
+        <source>admin.label.remember_me</source>
+        <target>Keep me logged in</target>
+      </trans-unit>
+      <trans-unit id="AL_MrpE" resname="admin.label.forgot_password">
+        <source>admin.label.forgot_password</source>
+        <target>Forgot your password?</target>
+      </trans-unit>
+      <trans-unit id="PUpL3q6" resname="admin.button.login">
+        <source>admin.button.login</source>
+        <target>Log In</target>
+      </trans-unit>
+      <trans-unit id="uUzvj.x" resname="admin.button.cancel">
+        <source>admin.button.cancel</source>
+        <target>Cancel</target>
+      </trans-unit>
+      <trans-unit id="KLJvq6W" resname="admin.button.save">
+        <source>admin.button.save</source>
+        <target>Save</target>
+      </trans-unit>
+      <trans-unit id="OkLmt66" resname="admin.button.addItem">
+        <source>admin.button.addItem</source>
+        <target>Add Item</target>
+      </trans-unit>
+      <trans-unit id="8k3nSdO" resname="admin.button.publish">
+        <source>admin.button.publish</source>
+        <target>Publish</target>
+      </trans-unit>
+      <trans-unit id="1u2hdwW" resname="admin.button.delete">
+        <source>admin.button.delete</source>
+        <target>Delete</target>
+      </trans-unit>
+      <trans-unit id="jgV8P7M" resname="admin.button.remove">
+        <source>admin.button.remove</source>
+        <target>Remove</target>
+      </trans-unit>
+      <trans-unit id="vZFeO.0" resname="admin.reset.enter_email_address">
+        <source>admin.reset.enter_email_address</source>
+        <target>Enter your email address to reset login</target>
+      </trans-unit>
+      <trans-unit id="00s7efp" resname="admin.label.reset_password">
+        <source>admin.label.reset_password</source>
+        <target>Reset Password</target>
+      </trans-unit>
+      <trans-unit id="nnNh10_" resname="admin.reset_password">
+        <source>admin.reset_password</source>
+        <target>Request Reset</target>
+      </trans-unit>
+      <trans-unit id="wVlwvyR" resname="admin.email_example">
+        <source>admin.email_example</source>
+        <target>user@example.com</target>
+      </trans-unit>
+      <trans-unit id="yDIy2Iv" resname="admin.label.post.title">
+        <source>admin.label.post.title</source>
+        <target>Title</target>
+      </trans-unit>
+      <trans-unit id="KBM7_fb" resname="admin.placeholder.post.title">
+        <source>admin.placeholder.post.title</source>
+        <target>e.g. My First Blog Post</target>
+      </trans-unit>
+      <trans-unit id="MUkHT8z" resname="admin.label.post.subTitle">
+        <source>admin.label.post.subTitle</source>
+        <target>Sub-title</target>
+      </trans-unit>
+      <trans-unit id="DbDcOtE" resname="admin.placeholder.post.subTitle">
+        <source>admin.placeholder.post.subTitle</source>
+        <target>(Optional)</target>
+      </trans-unit>
+      <trans-unit id="2ICrmco" resname="admin.label.post.url">
+        <source>admin.label.post.url</source>
+        <target>URL</target>
+      </trans-unit>
+      <trans-unit id="Qktu7DP" resname="admin.label.post.content">
+        <source>admin.label.post.content</source>
+        <target>Content</target>
+      </trans-unit>
+      <trans-unit id="DbILffg" resname="admin.label.post.visibility">
+        <source>admin.label.post.visibility</source>
+        <target>Visibility</target>
+      </trans-unit>
+      <trans-unit id="OUhW5Zo" resname="admin.tip.title.post.postDate">
+        <source>admin.tip.title.post.postDate</source>
+        <target>Publishing</target>
+      </trans-unit>
+      <trans-unit id="sqBXTBk" resname="admin.tip.content.post.postDate">
+        <source>admin.tip.content.post.postDate</source>
+        <target>On publishing this content for the first time, if the date is in the past or the present it will publish immediately. If the date is in the future then it will be scheduled for publishing and will action any social media sharing options selected at the same time.</target>
+      </trans-unit>
+      <trans-unit id=".jjKcPG" resname="admin.label.post.postDate-future">
+        <source>admin.label.post.postDate-future</source>
+        <target>Publish on</target>
+      </trans-unit>
+      <trans-unit id="O64RCVi" resname="admin.label.post.postDate-past">
+        <source>admin.label.post.postDate-past</source>
+        <target>Published on</target>
+      </trans-unit>
+      <trans-unit id="siJ2_9M" resname="admin.label.post.categories">
+        <source>admin.label.post.categories</source>
+        <target>Categories</target>
+      </trans-unit>
+      <trans-unit id="TyZ.ebE" resname="admin.placeholder.post.categories">
+        <source>admin.placeholder.post.categories</source>
+        <target>Select a category</target>
+      </trans-unit>
+      <trans-unit id="UMGIsaV" resname="admin.tip.content.post.categories">
+        <source>admin.tip.content.post.categories</source>
+        <target>Separate existing categories with a comma or by pressing [Enter]. New categories should be created using the adjacent [+] icon.</target>
+      </trans-unit>
+      <trans-unit id="AW7_432" resname="admin.label.post.tags">
+        <source>admin.label.post.tags</source>
+        <target>Tags</target>
+      </trans-unit>
+      <trans-unit id="nWOfy7d" resname="admin.tip.content.post.tags">
+        <source>admin.tip.content.post.tags</source>
+        <target>Separate tags with a comma or by pressing [Enter]</target>
+      </trans-unit>
+      <trans-unit id="E9767IE" resname="admin.label.post.teaser">
+        <source>admin.label.post.teaser</source>
+        <target>Abstract / Summary</target>
+      </trans-unit>
+      <trans-unit id="YYnlwnn" resname="admin.series.legend">
+        <source>admin.series.legend</source>
+        <target>Series</target>
+      </trans-unit>
+      <trans-unit id="gF7UrZl" resname="admin.label.series.title">
+        <source>admin.label.series.title</source>
+        <target>Title</target>
+      </trans-unit>
+      <trans-unit id=".hQ3wWr" resname="admin.placeholder.series.title">
+        <source>admin.placeholder.series.title</source>
+        <target>e.g. The Great Adventure</target>
+      </trans-unit>
+      <trans-unit id="wrQIKYe" resname="admin.label.series.subTitle">
+        <source>admin.label.series.subTitle</source>
+        <target>Sub-title</target>
+      </trans-unit>
+      <trans-unit id="Bl9dPP1" resname="admin.placeholder.series.subTitle">
+        <source>admin.placeholder.series.subTitle</source>
+        <target>e.g. A short story</target>
+      </trans-unit>
+      <trans-unit id="nY.s4Z8" resname="admin.label.series.url">
+        <source>admin.label.series.url</source>
+        <target>URL (Use five or more letters, numbers, and/or hyphens)</target>
+      </trans-unit>
+      <trans-unit id="be9dEAa" resname="admin.placeholder.series.url">
+        <source>admin.placeholder.series.url</source>
+        <target>e.g. my-series</target>
+      </trans-unit>
+      <trans-unit id="eHobLyo" resname="admin.label.series.description">
+        <source>admin.label.series.description</source>
+        <target>Short description</target>
+      </trans-unit>
+      <trans-unit id="XZvLyjp" resname="admin.label.series.firstDate">
+        <source>admin.label.series.firstDate</source>
+        <target>First date</target>
+      </trans-unit>
+      <trans-unit id="9.VF5zf" resname="admin.label.series.lastDate">
+        <source>admin.label.series.lastDate</source>
+        <target>Last date</target>
+      </trans-unit>
+      <trans-unit id="Hx8WHdj" resname="admin.series.contents.title">
+        <source>admin.series.contents.title</source>
+        <target>Contents</target>
+      </trans-unit>
+      <trans-unit id="o_7ELoN" resname="admin.series.contents.not_saved">
+        <source>admin.series.contents.not_saved</source>
+        <target>You must save the series before you can add items.</target>
+      </trans-unit>
+      <trans-unit id="O4SZPP6" resname="admin.series.contents.no_content">
+        <source>admin.series.contents.no_content</source>
+        <target>You haven't added any content yet!</target>
+      </trans-unit>
+      <trans-unit id="IuZijP8" resname="admin.dialog.image_manager.title">
+        <source>admin.dialog.image_manager.title</source>
+        <target>Image Manager</target>
+      </trans-unit>
+      <trans-unit id="qIhAvrP" resname="admin.posts.tabs.content">
+        <source>admin.posts.tabs.content</source>
+        <target>Content</target>
+      </trans-unit>
+      <trans-unit id="mqCIu2g" resname="admin.posts.tabs.properties">
+        <source>admin.posts.tabs.properties</source>
+        <target>Properties</target>
+      </trans-unit>
+      <trans-unit id="_x4bPIF" resname="admin.posts.tabs.sharing">
+        <source>admin.posts.tabs.sharing</source>
+        <target>Sharing</target>
+      </trans-unit>
+      <trans-unit id="wyXor3e" resname="admin.posts.tabs.revisions">
+        <source>admin.posts.tabs.revisions</source>
+        <target>History</target>
+      </trans-unit>
+      <trans-unit id="SufHIiZ" resname="admin.tip.post.postDate">
+        <source>admin.tip.post.postDate</source>
+        <target>__admin.tip.post.postDate</target>
+      </trans-unit>
+      <trans-unit id="_Xptxuf" resname="admin.label.post.sharingMessage">
+        <source>admin.label.post.sharingMessage</source>
+        <target>__admin.label.post.sharingMessage</target>
+      </trans-unit>
+      <trans-unit id="AG2KOnK" resname="admin.tip.series.firstDate">
+        <source>admin.tip.series.firstDate</source>
+        <target>__admin.tip.series.firstDate</target>
+      </trans-unit>
+      <trans-unit id="kCLx_nX" resname="admin.tip.title.series.firstDate">
+        <source>admin.tip.title.series.firstDate</source>
+        <target>__admin.tip.title.series.firstDate</target>
+      </trans-unit>
+      <trans-unit id="AmLG1tn" resname="admin.tip.series.lastDate">
+        <source>admin.tip.series.lastDate</source>
+        <target>__admin.tip.series.lastDate</target>
+      </trans-unit>
+      <trans-unit id="1UbQLok" resname="admin.tip.title.series.lastDate">
+        <source>admin.tip.title.series.lastDate</source>
+        <target>__admin.tip.title.series.lastDate</target>
+      </trans-unit>
+      <trans-unit id="Fztxgjr" resname="Forgot your password?">
+        <source>Forgot your password?</source>
+        <target>__Forgot your password?</target>
+      </trans-unit>
+    </body>
+  </file>
 </xliff>

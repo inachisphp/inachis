@@ -5,17 +5,17 @@
     <div class="col span_8_of_8 ui-tabbed content__edit">
         <ul>
             <li>
-                <a href="#post__edit">Content</a>
+                <a href="#post__edit">{% trans %}admin.posts.tabs.content{% endtrans %}</a>
             </li>
             <li>
-                <a href="#post__properties">Properties</a>
+                <a href="#post__properties">{% trans %}admin.posts.tabs.properties{% endtrans %}</a>
             </li>
             <li>
-                <a href="#post__sharing">Sharing</a>
+                <a href="#post__sharing">{% trans %}admin.posts.tabs.sharing{% endtrans %}</a>
             </li>
             {%  if revisions is defined and revisions is not empty %}
             <li>
-                <a href="#post__history">History</a>
+                <a href="#post__history">{% trans %}admin.posts.tabs.revisions{% endtrans %}</a>
             </li>
             {% endif %}
         </ul>
