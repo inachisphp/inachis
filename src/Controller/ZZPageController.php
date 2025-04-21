@@ -344,6 +344,9 @@ class ZZPageController extends AbstractInachisController
             ], [
                 [ 'q.versionNumber', 'DESC']
             ]);
+        if ($post->getId() !== null) {
+            $this->data['textStats'] = ReadingTime::getWordCountAndReadingTime($this->data['post']->getContent());
+        }
         return $this->render('inadmin/post__edit.html.twig', $this->data);
     }
 

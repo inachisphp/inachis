@@ -99,6 +99,8 @@
                 <input type="text" value="{{ post.urls|first.link }}" />
                 <button id="post__link__copy">Copy this link</button>
             </p>
+            {% if textStats is defined %}
+                <p>Approximate reading time (at last save): <strong>{{ textStats.readingTime }}</strong> minute(s)</p>
             {% endif %}
             <section class="col span_4_of_8">
             <p>
