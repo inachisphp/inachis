@@ -25,12 +25,15 @@
                         {% endfor %}
                     {% endif %}
 			    </span>
+                {% if textStats.readingTime >= 5 %}
+                <p>Reading Time: {{ textStats.readingTime }} minutes ({{ textStats.wordCount }} words)</p>
+                {% endif %}
             </div>
             {% endif %}
         </header>
 
         <div class="entry-content">
-            {{ post.content|markdown }}
+            {% if post.content is not empty %}{{ post.content|markdown }}{% endif %}
         </div>
 
         {% if series is defined and series is not empty %}
