@@ -16,6 +16,7 @@ use App\Utils\ContentRevisionCompare;
 use App\Utils\ReadingTime;
 use Doctrine\ORM\EntityManager;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -271,7 +272,10 @@ class ZZPageController extends AbstractInachisController
                 $newCategories = $request->get('post')['categories'];
                 if (!empty($newCategories)) {
                     foreach ($newCategories as $newCategory) {
-                        $category = $this->entityManager->getRepository(Category::class)->findOneById($newCategory);
+                        $category = null;
+                        if (Uuid::isValid($newCategory)) {
+                            $category = $this->entityManager->getRepository(Category::class)->findOneById($newCategory);
+                        }
                         if (!empty($category)) {
                             $post->getCategories()->add($category);
                         }
@@ -282,7 +286,10 @@ class ZZPageController extends AbstractInachisController
                 $newTags = $request->get('post')['tags'];
                 if (!empty($newTags)) {
                     foreach ($newTags as $newTag) {
-                        $tag = $this->entityManager->getRepository(Tag::class)->findOneById($newTag);
+                        $tag = null;
+                        if (Uuid::isValid($newTag)) {
+                            $tag = $this->entityManager->getRepository(Tag::class)->findOneById($newTag);
+                        }
                         if (empty($tag)) {
                             $tag = new Tag($newTag);
                         }
