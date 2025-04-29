@@ -50,10 +50,15 @@
 
 <section class="admin__body-container">
     {% block form_login_pre %}
-        {% for message in app.flashes('success') %}
-            <div class="flash-notice">
-                {{ message }}
-            </div>
+        {% if 'Content saved.' in app.session.flashbag.peek('success') %}
+            {{ app.session.set('clearAutosave', true) }}
+        {% endif %}
+        {% for label, messages in app.flashes(['success', 'warning', 'notice']) %}
+            {% for message in messages %}
+                <div class="flash-{{ label }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
         {% endfor %}
     {% endblock form_login_pre %}
 

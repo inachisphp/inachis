@@ -319,7 +319,7 @@ class ZZPageController extends AbstractInachisController
             $this->entityManager->persist($post);
             $this->entityManager->flush();
 
-            $this->addFlash('notice', 'Content saved.');
+            $this->addFlash('success', 'Content saved.');
             return $this->redirect(
                 '/incc/' .
                 $post->getType() . '/' .

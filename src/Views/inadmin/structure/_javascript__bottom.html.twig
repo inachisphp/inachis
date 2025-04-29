@@ -24,8 +24,9 @@
         {% endif %}
             forceSync: true
         });
-        {% if clearAutosave|default(false) %}
+        {% if app.session.get('clearAutosave')|default(false) %}
         easymde.clearAutosavedValue();
+            {{ app.session.set('clearAutosave', false) }}
         {% endif %}
     </script>
     {% endif %}
