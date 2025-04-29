@@ -61,10 +61,13 @@ body {
 //	position: absolute;
 //}
 
-.flash-notice {
+.flash-notice, .flash-success, .flash-warning {
 	background-color: $admin__flash-background;
 	padding: 10px;
 	margin: 0 0 20px 0;
+}
+.flash-success {
+	background-color: #d9e7cb;
 }
 
 .switch-wrapper {
@@ -110,7 +113,7 @@ body {
 .admin__container {
 	position: absolute;
 	top: 5px;
-	z-index: 1000;
+	z-index: 7;
 
 	.admin__nav-main {
 		height: 100%;
