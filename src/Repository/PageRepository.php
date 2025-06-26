@@ -56,6 +56,7 @@ final class PageRepository extends AbstractRepository
                 $qb->expr()->andX(
                     'Page_categories.id = :categoryId',
                     'p.status = \'published\'',
+                    'p.visibility = \'1\'',
                     'p.type = \'post\''
                 )
             )
@@ -86,6 +87,7 @@ final class PageRepository extends AbstractRepository
                 $qb->expr()->andX(
                     'Page_tags.id = :tagId',
                     'p.status = \'published\'',
+                    'p.visibility = \'1\'',
                     'p.type = \'post\''
                 )
             )
