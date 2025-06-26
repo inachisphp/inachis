@@ -4,6 +4,10 @@
     {% block post_list_pre %}{% endblock post_list_pre %}
 
     {% block post_list %}
+        {% set link_new = path('app_zzpage_getpostadmin', {'type': 'post'}) ~ '/post/new' %}
+        {% if page.tab == 'page' %}
+            {% set link_new = path('app_zzpage_getpostadmin', {'type': 'page'}) ~ '/new' %}
+        {% endif %}
 
         <div class="col span_8_of_8 widget-posts ui-tabs-external">
             <ul class="ui-tabs-nav ui-corner-all ui-helper-reset ui-helper-clearfix ui-widget-header">
@@ -33,7 +37,7 @@
                 'slug_prefix': page.tab,
                 'slug': 'urls[0].link',
 
-                'url_add': path('app_zzpage_getpostadmin', {'type': page.tab}),
+                'url_add': link_new,
                 'url_result': path('app_zzpage_getpostlistadmin'),
 
                 'badges': {
