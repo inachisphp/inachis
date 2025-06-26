@@ -1,6 +1,7 @@
 @use "sass:color";
-@import '../shared/_reset';
 @import '_definitions';
+@import '../shared/_reset';
+
 
 
 
@@ -53,13 +54,6 @@ body {
 @import '_bonsai';
 
 @import '_warnings';
-
-
-//.admin__form__brand {
-//	margin-left: -60px;
-//	margin-top: -50px;
-//	position: absolute;
-//}
 
 .flash-notice, .flash-success, .flash-warning {
 	background-color: $admin__flash-background;
