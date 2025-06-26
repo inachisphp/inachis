@@ -68,7 +68,7 @@ h4 {
     }
   }
   &.expanded {
-    background:#999 url(/assets/mastbg.jpg) center -12em no-repeat;
+    background:#999 url(/assets/imgs/mastbg.jpg) top no-repeat;
     background-size: cover;
     border-bottom:1px solid #333;
     color:#fff;
@@ -226,11 +226,14 @@ h4 {
     width:25%;
   }
   img {
-    /*height:100%;*/
-    position:absolute;
-    top:-50%;
-    left:-50%;
-    width:auto;
+    width: 100%;
+    width: -moz-available;          /* WebKit-based browsers will ignore this. */
+    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+    width: fill-available;
+    height: 100%;
+    height: -moz-available;          /* WebKit-based browsers will ignore this. */
+    height: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+    height: fill-available;
   }
   p {
     color:#666;
@@ -375,6 +378,12 @@ article.post {
       margin: 9px 5px 0 0;
     }
 
+    h3 {
+      font-size: 1.35em;
+      border-bottom: 3px solid #ddd;
+      margin-top: 3em;
+    }
+
     img {
       max-width: 100%;
     }
@@ -465,7 +474,12 @@ article.post {
     margin-left: 0;
     margin-right: 0;
     padding-left: 0;
-    padding-right: 0; } }
+    padding-right: 0;
+  }
+  article.post ol, article.post ul {
+    margin: 2em 0.5em;
+  }
+}
 
 
 // @import 'responsive';
