@@ -100,9 +100,11 @@ class AdminDialogController extends AbstractInachisController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $category = $this->entityManager->getRepository(Category::class)->create($request->request->all());
-        $category->setParent(
-            $this->entityManager->getRepository(Category::class)->findOneById($request->request->get('parentID'))
-        );
+        if ($request->request->get('parentID') > 0) {
+            $category->setParent(
+                $this->entityManager->getRepository(Category::class)->findOneById($request->request->get('parentID'))
+            );
+        }
         $this->entityManager->persist($category);
         $this->entityManager->flush();
 
