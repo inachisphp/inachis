@@ -84,6 +84,7 @@
                 <li class="{{ page.tab|activeMenu('post') }}"><a href="{{ settings.domain ~ path('app_zzpage_getpostlistadmin', {'type': 'post'}) }}" title="View list of posts"><i class="material-icons">library_books</i><span> Posts</span></a></li>
                 <li class="{{ page.tab|activeMenu('series') }}"><a href="{{ settings.domain ~ path('app_series_list') }}" title="View list of series"><i class="material-icons">chrome_reader_mode</i><span> Series</span></a></li>
                 <li class="{{ page.tab|activeMenu('url') }}"><a href="{{ settings.domain ~ path('app_url_list') }}" title="View list of defined URLs"><i class="material-icons">insert_link</i><span> URLs</span></a></li>
+                <li class="{{ page.tab|activeMenu('categories') }}"><a href="{{ settings.domain ~ path('app_categorymanager_list') }}" title="Manage categories for content"><i class="material-icons">category</i><span> Categories</span></a></li>
                 <li class="{{ page.tab|activeMenu('settings') }}">
                     <a href="#admin__nav-settings" title="More tools and settings"><i class="material-icons">more_horiz</i><span> More…</span></a>
                     <ul id="admin__nav-settings">
