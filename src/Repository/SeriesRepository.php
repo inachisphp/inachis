@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Page;
 use App\Entity\Series;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -42,7 +43,7 @@ class SeriesRepository extends AbstractRepository
             ->getOneOrNullResult();
     }
 
-    public function getPublishedSeriesByPost(string $page)
+    public function getPublishedSeriesByPost(Page $page)
     {
         $qb = $this->createQueryBuilder('s');
         return $qb
