@@ -31,6 +31,7 @@ var InachisImageManager = {
                 .done(function(data) {
                     if (data['result'] === 'success') {
                         var $imageCount = $('.ui-dialog-secondary-bar strong'),
+                            newElementSelector = '#chosenImage_' + data['image']['id'],
                             $gallery = $('.gallery ol'),
                             newImage = '<li>' +
                                 '<label for="chosenImage_' + data['image']['id'] + '">' +
@@ -44,7 +45,14 @@ var InachisImageManager = {
                         newImage += '</li>';
                         $gallery.append(newImage);
                         $imageCount.text(parseInt($imageCount.text(), 10) + 1);
-                        $('#chosenImage_' + data['image']['id']).change(InachisImageManager.enableChooseButton);
+                        $(newElementSelector).change(InachisImageManager.enableChooseButton);
+                        // @todo fix the below so it scrolls to the new image
+                        $([document.documentElement, document.body]).animate(
+                            {
+                                scrollTop: $(newElementSelector).offset().top
+                            },
+                            2000
+                        );
                     }
                     InachisImageManager.toggleUploadImage();
                     $('.ui-dialog-image-uploader button[type=submit]').prop('disabled', false);
@@ -71,6 +79,7 @@ var InachisImageManager = {
 
     searchImages: function()
     {
+        // @todo: implement search
         // queue up ajax request to get results; should previous search be cancelled if not complete?
     },
 
