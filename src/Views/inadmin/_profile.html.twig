@@ -33,7 +33,7 @@
                 <i class="material-icons">local_see</i>
                 <img src="/assets/imgs/incc/defaultAvatar.png" />
             </a>
-            {% if session.user.username == user.username %}
+            {% if app.user.username == user.username %}
             <p><button class="button button--info" type="button">Change Password</button></p>
             {% endif %}
         </div>

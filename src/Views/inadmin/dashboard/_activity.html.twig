@@ -28,7 +28,11 @@
             {% for post in dashboard.drafts %}
                 <li>
                     <a aria-label="Edit {{ post.title }}" href="/incc/{{ post.type }}/{{ post.urls[0].link }}"><h2>{{ post.title }}</h2>
-                        <p>{{ post.content|markdown|striptags|length > 300 ? post.content|markdown|striptags|slice(0, 300) ~ '…' : post.content|markdown|striptags  }}</p></a>
+                    <p>
+                {%- if post.content is not empty -%}
+                    {{ post.content|markdown|striptags|length > 300 ? post.content|markdown|striptags|slice(0, 300) ~ '…' : post.content|markdown|striptags  }}
+                {%- endif -%}
+                    </p></a>
                     <p class="date"><span class="material-icons">schedule</span> Last modified: <em>{{ post.modDate|date('jS F Y \\a\\t H:i', post.timezone) }} {{ post.timezone }}</em></p>
                 </li>
             {% endfor %}

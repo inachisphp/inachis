@@ -1,0 +1,38 @@
+{% extends "inadmin/structure/main.html.twig" %}
+{% block content %}
+
+    {% block waste_pre %}{% endblock waste_pre %}
+
+    {% block waste %}
+        <div class="col span_8_of_8 widget-posts">
+        {% include 'inadmin/partials/list.html.twig' with {
+            'className': 'form__waste',
+            'type': 'waste',
+
+            'offset': page.offset,
+            'limit': page.limit,
+            'total': dataset.count,
+
+            'snippet_description': 'title',
+
+            'url_result': path('app_admin_waste'),
+
+            'actions': {
+                'recover' {
+                    'button_class': 'button--positive button-recover',
+                    'icon': 'restore_from_trash',
+                    'title': 'Restore',
+                },
+                'delete': {
+                    'button_class': 'button--negative button--delete',
+                    'icon': 'delete_forever',
+                    'title': 'Delete',
+                    },
+                }
+            }
+        %}
+        </div>
+    {% endblock waste %}
+
+    {% block waste_post %}{% endblock waste_post %}
+{% endblock content %}

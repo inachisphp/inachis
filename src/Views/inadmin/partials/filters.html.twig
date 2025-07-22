@@ -1,4 +1,5 @@
 {% block filter %}
+
 {% if filters is defined and filters is not empty or show_search|default(false) %}
 <section class="filter">
     <p><a href="#" class="filter__toggle" title="Show filter options"><span class="material-icons">filter_list</span> Filters</a></p>
@@ -25,4 +26,5 @@
     </div>
 </section>
 {% endif %}
+
 {% endblock %}

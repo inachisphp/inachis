@@ -27,7 +27,7 @@
         "jaybizzle/crawler-detect": "^1.2",
         "jedi58/versioning-bundle": "5.0.1",
         "jfcherng/php-diff": "^6.4",
-        "google/apiclient": "^2.18.13",
+        "google/apiclient": "^2.18",
         "karser/karser-recaptcha3-bundle": "^0.1.27",
         "michelf/php-markdown": "^1.8",
         "phpdocumentor/reflection-docblock": "^5.2",

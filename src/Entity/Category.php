@@ -32,13 +32,13 @@ class Category
     /**
      * @var string Description of the category
      */
-    #[ORM\Column(type: 'text')]
+    #[ORM\Column(type: 'text', nullable: true)]
     protected $description;
 
     /**
      * @var string The UUID of the image, or the image path
      */
-    #[ORM\Column(type: 'string', length: 255, nullable: false)]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     protected $image;
 
     /**
@@ -46,6 +46,12 @@ class Category
      */
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     protected $icon;
+
+    /**
+     * @var bool Whether this category should be visible
+     */
+    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    protected $visible;
 
     /**
      * @var Category The parent category, if self is not a top-level category
@@ -70,6 +76,7 @@ class Category
     {
         $this->setTitle($title);
         $this->setDescription($description);
+        $this->setVisible(true);
         $this->children = new ArrayCollection();
     }
 
@@ -108,7 +115,7 @@ class Category
      *
      * @return string The image for {@link Category}
      */
-    public function getImage(): ?string
+    public function getImage(): ?Image
     {
         return $this->image;
     }
@@ -121,6 +128,14 @@ class Category
     public function getIcon(): ?string
     {
         return $this->icon;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVisible(): bool
+    {
+        return $this->visible;
     }
 
     /**
@@ -188,7 +203,7 @@ class Category
      * @param string $value The UUID or URL of the image for {@link Category}
      * @return $this
      */
-    public function setImage(?string $value): self
+    public function setImage(?Image $value): self
     {
         $this->image = $value;
 
@@ -204,6 +219,17 @@ class Category
     public function setIcon(?string $value): self
     {
         $this->icon = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $value
+     * @return self
+     */
+    public function setVisible(bool $value): self
+    {
+        $this->visible = $value;
 
         return $this;
     }

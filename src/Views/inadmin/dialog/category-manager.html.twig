@@ -9,19 +9,26 @@
                 <label for="dialog__categoryManager__description">Description</label>
                 <textarea class="text full-width" id="dialog__categoryManager__description" rows="5"></textarea>
             </p>
+            <p>
+                <label for="dialog__categoryManager__visible">Visible</label>
+                <span class="switch-wrapper">
+                    <input type="checkbox" id="dialog__categoryManager__visible" aria-labelledby="dialog__categoryManager__visible" aria-required="false" class="ui-switch" data-label-off="private" data-label-on="public" value="1" />
+                </span>
+            </p>
         </fieldset>
         <fieldset class="col span_1_of_2">
+{% if show_categories|default(true) %}
             <p>
                 <label for="dialog__categoryManager__existing">
                 <input checked class="checkbox" id="dialog__categoryManager__existing" name="catParent[]" type="radio" value="-1" />
                 As top-level category</label>
             </p>
-
-{% if categories is not empty  %}
+    {% if categories is not empty  %}
             <p>As a sub-category of:</p>
             <ol data-name="catParent[]">
                 {{ include("inadmin/dialog/category-manager-list.html.twig", { 'categories': categories }) }}
             </ol>
+    {% endif %}
 {% endif %}
         </fieldset>
     </form>

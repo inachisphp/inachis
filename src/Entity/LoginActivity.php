@@ -13,7 +13,6 @@ class LoginActivity
      *
      */
     const STATUS_UNBLOCKED = false;
-
     /**
      *
      */

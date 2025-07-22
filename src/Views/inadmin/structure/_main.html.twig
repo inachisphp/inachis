@@ -91,6 +91,9 @@
                         <li><a href="{{ settings.domain }}/incc/resources" title="Manage resources">
                                 <i class="material-icons">wallpaper</i><span> Resources</span></a>
                         </li>
+                        <li><a href="{{ settings.domain ~ path('app_tools_index') }}" title="Tools">
+                                <i class="material-icons">build</i><span> Tools</span></a>
+                        </li>
                         <li><a href="{{ settings.domain ~ path('app_admin_adminlist') }}" title="Manage users">
                                 <i class="material-icons">people</i><span> Users</span></a>
                         </li>
@@ -100,10 +103,14 @@
                         <li><a href="{{ settings.domain }}/incc/tools" title="Tools">
                                 <i class="material-icons">build</i><span> Tools</span></a>
                             </a>
+                        <li><a href="{{ settings.domain ~ path('app_admin_waste') }}" title="Manage deleted content">
+                                <i class="material-icons">delete</i><span> Bin</span></a>
                         </li>
                     </ul>
                 </li>
-
+                <li><a href="{{ settings.domain ~ path('app_settings_index') }}" title="Change advanced settings">
+                        <i class="material-icons">settings</i><span> Settings</span></a>
+                </li>
                 <li class="admin__view-site"><a href="/"><i class="material-icons">exit_to_app</i><span> View Site</span></a></li>
 
                 <li class="admin__nav-expand"><a href="#expand"><i class="material-icons">keyboard_arrow_right</i><span> Expand</span></a></li>

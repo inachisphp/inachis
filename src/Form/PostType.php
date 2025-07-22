@@ -187,6 +187,7 @@ class PostType extends AbstractType
                     $this->emojisTransliterator->transliterate(':uk: English') => 'en_GB',
                     $this->emojisTransliterator->transliterate(':fr: Français') => 'fr_FR',
                 ],
+                'duplicate_preferred_choices' => false,
                 'empty_data'  => 'en_GB',
                 'preferred_choices' => [ 'en_GB' ],
             ])

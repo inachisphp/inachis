@@ -76,6 +76,7 @@ class ZZPageController extends AbstractInachisController
         $this->data['post'] = $url->getContent();
         $this->data['url'] = $url->getLink();
         $this->data['textStats'] = ReadingTime::getWordCountAndReadingTime($this->data['post']->getContent());
+
         $series = $this->entityManager->getRepository(Series::class)->getPublishedSeriesByPost($this->data['post']);
         if (!empty($series)) {
             $postIndex = $series->getItems()->indexOf($this->data['post']);
@@ -382,6 +383,7 @@ class ZZPageController extends AbstractInachisController
     public function getPostsByTag(Request $request, string $tagName): Response
     {
         $tag = $this->entityManager->getRepository(Tag::class)->findOneByTitle($tagName);
+
         if (!$tag instanceof Tag) {
             throw new NotFoundHttpException(
                 sprintf(
