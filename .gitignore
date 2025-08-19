@@ -30,5 +30,5 @@
 /backup
 /bin/.phpunit
 composer
-/docker/apache/logs
-/docker/mysqldata
+/docker
+docker-compose.yml
