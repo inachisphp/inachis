@@ -72,6 +72,7 @@ class SeriesController extends AbstractInachisController
                 [ 'q.subTitle', 'ASC' ]
             ]
         );
+        $this->data['page']['tab'] = 'series';
         $this->data['page']['offset'] = $offset;
         $this->data['page']['limit'] = $limit;
         return $this->render('inadmin/series__list.html.twig', $this->data);
@@ -137,6 +138,7 @@ class SeriesController extends AbstractInachisController
         $this->data['page']['title'] = $series->getId() !== null ?
             'Editing "' . $series->getTitle() . '"' :
             'New Series';
+        $this->data['page']['tab'] = 'series';
         $this->data['series'] = $series;
         $this->data['includeEditor'] = true;
         $this->data['includeEditorId'] = $series->getId();

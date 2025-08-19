@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{{ settings.language }}" lang="{{ settings.language }}" dir="{{ settings.textDirection }}">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{{ settings.language|default('en') }}" lang="{{ settings.language|default('en') }}" dir="{{ settings.textDirection|default('ltr') }}">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
@@ -22,7 +22,7 @@
     {% include "inadmin/structure/stylesheets.html.twig" %}
     {% include "inadmin/structure/javascript__top.html.twig" %}
 </head>
-<body>
+<body{% if page_type|default('default') != 'default' %} class="type_{{ page_type }}"{% endif %}>
 
 {%- if is_granted('ROLE_USER') %}
     <header class="admin__header">
@@ -35,7 +35,7 @@
             <ul id="admin__user__options">
                 <li><a href="{{ path('app_admin_admindetails', {'id': session.username }) }}" title="Edit profile for {{ session.displayName }}">Edit your profile <span class="material-icons">perm_identity</span></a></li>
                 <li><a href="/incc/settings/releases">Update available <span class="material-icons">new_releases</span></a></li>
-                <li><form action="{{ path('app_logout') }}" method="post"><button>Log out <span class="material-icons">exit_to_app</span></button></form></li>
+                <li><form action="{{ path('app_logout') }}" method="post"><button>Log out <span class="material-icons">logout</span></button></form></li>
             </ul>
         </section>
         <section class="admin__search">
@@ -83,33 +83,29 @@
                 <li class="{{ page.tab|activeMenu('dashboard') }}"><a href="{{ settings.domain ~ path('app_dashboard_default') }}" title="View dashboard"><i class="material-icons">home</i><span> Dashboard</span></a></li>
                 <li class="{{ page.tab|activeMenu('post') }}"><a href="{{ settings.domain ~ path('app_zzpage_getpostlistadmin', {'type': 'post'}) }}" title="View list of posts"><i class="material-icons">library_books</i><span> Posts</span></a></li>
                 <li class="{{ page.tab|activeMenu('series') }}"><a href="{{ settings.domain ~ path('app_series_list') }}" title="View list of series"><i class="material-icons">chrome_reader_mode</i><span> Series</span></a></li>
-                <li class="{{ page.tab|activeMenu('url') }}"><a href="{{ settings.domain ~ path('app_url_list') }}" title="View list of defined URLs"><i class="material-icons">insert_link</i><span> URLs</span></a></li>
-                <li class="{{ page.tab|activeMenu('categories') }}"><a href="{{ settings.domain ~ path('app_categorymanager_list') }}" title="Manage categories for content"><i class="material-icons">category</i><span> Categories</span></a></li>
-                <li class="{{ page.tab|activeMenu('settings') }}">
+                <li class="{{ page.tab|activeMenu('categories') }}"><a href="{{ settings.domain ~ path('app_categorymanager_list') }}" title="Manage categories for content"><i class="material-icons">view_list</i><span> Categories</span></a></li>
+                <li>
                     <a href="#admin__nav-settings" title="More tools and settings"><i class="material-icons">more_horiz</i><span> More…</span></a>
                     <ul id="admin__nav-settings">
-                        <li><a href="{{ settings.domain }}/incc/resources" title="Manage resources">
+                        <li class="{{ page.tab|activeMenu('url') }}"><a href="{{ settings.domain ~ path('app_url_list') }}" title="View list of defined URLs">
+                                <i class="material-icons">insert_link</i><span> URLs</span></a>
+                        </li>
+                        <li class="{{ page.tab|activeMenu('resources') }}"><a href="{{ settings.domain }}/incc/resources" title="Manage resources">
                                 <i class="material-icons">wallpaper</i><span> Resources</span></a>
                         </li>
-                        <li><a href="{{ settings.domain ~ path('app_tools_index') }}" title="Tools">
-                                <i class="material-icons">build</i><span> Tools</span></a>
-                        </li>
-                        <li><a href="{{ settings.domain ~ path('app_admin_adminlist') }}" title="Manage users">
+                        <li class="{{ page.tab|activeMenu('users') }}"><a href="{{ settings.domain ~ path('app_admin_adminlist') }}" title="Manage users">
                                 <i class="material-icons">people</i><span> Users</span></a>
                         </li>
-                        <li><a href="{{ settings.domain ~ path('app_settings_index') }}" title="Change advanced settings">
+                        <li class="{{ page.tab|activeMenu('tools') }}"><a href="{{ settings.domain ~ path('app_tools_index') }}" title="Tools">
+                                <i class="material-icons">build</i><span> Tools</span></a>
+                        </li>
+                        <li class="{{ page.tab|activeMenu('settings') }}"><a href="{{ settings.domain ~ path('app_settings_index') }}" title="Change advanced settings">
                                 <i class="material-icons">settings</i><span> Settings</span></a>
                         </li>
-                        <li><a href="{{ settings.domain }}/incc/tools" title="Tools">
-                                <i class="material-icons">build</i><span> Tools</span></a>
-                            </a>
-                        <li><a href="{{ settings.domain ~ path('app_admin_waste') }}" title="Manage deleted content">
-                                <i class="material-icons">delete</i><span> Bin</span></a>
-                        </li>
+{#                        <li><a href="{{ settings.domain ~ path('app_waste_list') }}" title="Manage deleted content">#}
+{#                                <i class="material-icons">delete</i><span> Bin</span></a>#}
+{#                        </li>#}
                     </ul>
-                </li>
-                <li><a href="{{ settings.domain ~ path('app_settings_index') }}" title="Change advanced settings">
-                        <i class="material-icons">settings</i><span> Settings</span></a>
                 </li>
                 <li class="admin__view-site"><a href="/"><i class="material-icons">exit_to_app</i><span> View Site</span></a></li>
 
