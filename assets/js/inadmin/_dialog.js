@@ -12,6 +12,7 @@ var InachisDialog = {
     ],
     templateName: '',
     title: '',
+    view: '',
 
     _init: function()
     {
@@ -26,6 +27,7 @@ var InachisDialog = {
         }
         let $dialogLink = $(event.currentTarget);
         this.title = $dialogLink.data('title'),
+            this.view = $dialogLink.data('view'),
             this.templateName = $dialogLink.data('templateName'),
             this.className = $dialogLink.data('className');//,
             //this.buttons = JSON.parse(window.atob($dialogLink.data('buttons')));
