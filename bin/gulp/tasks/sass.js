@@ -34,5 +34,5 @@ exports.sassCompile = gulp.parallel(
 );
 
 exports.sassWatch = function() {
-    gulp.watch(config.paths.src.sass.all + '**/*.scss', sassCompile);
+    gulp.watch(config.paths.src.sass.all + '**/*.scss', exports.sassCompile);
 }

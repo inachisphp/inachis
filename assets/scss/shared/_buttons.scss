@@ -13,12 +13,13 @@ $button--default-hover-color: color.adjust($button--default-active-color, $light
 	border-radius: 0.5em;
 	font-size: 1.05em;
 	padding: 10px 20px;
+	text-decoration: none;
 
 	&:disabled {
 		opacity: 0.5;
 	}
 
-	span {
+	span, i {
 		vertical-align: middle;
 	}
 

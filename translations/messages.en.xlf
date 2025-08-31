@@ -53,13 +53,13 @@
         <source>admin.reset.enter_email_address</source>
         <target>Enter your email address to reset login</target>
       </trans-unit>
-      <trans-unit id="00s7efp" resname="admin.label.reset_password">
-        <source>admin.label.reset_password</source>
-        <target>Reset Password</target>
+      <trans-unit id="00s7efp" resname="admin.label.email_address">
+        <source>admin.label.email_address</source>
+        <target>Email address</target>
       </trans-unit>
       <trans-unit id="nnNh10_" resname="admin.reset_password">
         <source>admin.reset_password</source>
-        <target>Request Reset</target>
+        <target>Continue</target>
       </trans-unit>
       <trans-unit id="wVlwvyR" resname="admin.email_example">
         <source>admin.email_example</source>
@@ -228,10 +228,6 @@
       <trans-unit id="1UbQLok" resname="admin.tip.title.series.lastDate">
         <source>admin.tip.title.series.lastDate</source>
         <target>__admin.tip.title.series.lastDate</target>
-      </trans-unit>
-      <trans-unit id="Fztxgjr" resname="Forgot your password?">
-        <source>Forgot your password?</source>
-        <target>__Forgot your password?</target>
       </trans-unit>
     </body>
   </file>

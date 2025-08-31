@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Form\ForgotPasswordType;
 use App\Form\LoginType;
+use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3Validator;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -10,6 +13,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -54,67 +60,57 @@ class AccountController extends AbstractInachisController
     }
 
     /**
-     * @param Request             $request
+     * @param Request $request
      * @param TranslatorInterface $translator
+     * @param Recaptcha3Validator $recaptcha3Validator
      * @return Response
+     * @throws TransportExceptionInterface
      */
     #[Route("/incc/forgot-password", methods: [ "GET", "POST" ])]
-    public function forgotPassword(Request $request, TranslatorInterface $translator): Response
+    public function forgotPassword(
+        Request $request,
+        TranslatorInterface $translator,
+        Recaptcha3Validator $recaptcha3Validator,
+        MailerInterface $mailer,
+    ): Response
     {
         $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();
         if (!empty($redirectTo)) {
             return $this->redirectToRoute($redirectTo);
         }
-
         $this->data['page']['title'] = 'Request a password reset';
-        $form = $this->createFormBuilder([
+        $form = $this->createForm(ForgotPasswordType::class, [
             'forgot_email' => $request->get('forgot_email'),
-        ])
-//                ->addComponent(new FieldsetType(array(
-//                    'legend' => 'Enter your Email address / Username'
-//                )))
-            ->add('forgot_email', TextType::class, [
-                'attr' => [
-                    'aria-labelledby' => 'form-login__username-label',
-                    'aria-required'   => 'true',
-                    'autofocus'       => 'true',
-                    'class'           => 'text',
-                    'id'              => 'form-forgot__email',
-                    'placeholder'     => $translator->trans('admin.email_example'),
-                ],
-                'label'      => $translator->trans('admin.reset.enter_email_address'),
-                'label_attr' => [
-                    'id' => 'forgot__email-label',
-                ],
-            ])
-            ->add('resetPassword', SubmitType::class, [
-                'label' => $translator->trans('admin.reset_password'),
-                'attr'  => [
-                    'class' => 'button button--positive',
-                ],
-            ])
-            ->getForm();
+        ]);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            //$score = $recaptcha3Validator->getLastResponse()->getScore();
+            $user = $this->entityManager->getRepository(User::class)->findOneBy([
+                'email' => $request->get('forgot_password')['forgot_email']
+            ]);
+            if (null !== $user) {
+                $email = (new Email())
+                    ->from('jedi58@gmail.com')
+                    ->to($user->getEmail())
+                    ->subject('Forgotten password')
+                    ->text('Click this link to reset your password')
+                    ->html('<p>Click this link to reset your password</p>');
+                $mailer->send($email);
+            }
+            // Always send below even if user not found - for security
+            $this->redirectToRoute('app_account_forgotpasswordsent');
+            exit;
+        }
         $this->data['form'] = $form->createView();
 
         return $this->render('inadmin/forgot-password.html.twig', $this->data);
     }
 
-    /**
-     * @param Request $request
-     * @return Response
-     */
-    #[Route("/incc/forgot-password", methods: [ "POST" ])]
-    public function forgotPasswordSent(Request $request): Response
+    #[Route("/incc/forgot-password-sent", methods: [ "POST" ])]
+    public function forgotPasswordSent(): Response
     {
-        $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();
-        if (!empty($redirectTo)) {
-            return $this->redirectToRoute($redirectTo);
-        }
-
-//        if (false) { // @todo if request contains errors then use
-//            return $response->redirect('/incc/forgot-password')->send();
-//        }
-        return $this->render('inadmin/forgot-password-sent.html.twig');
+        $this->data['page']['title'] = 'Password reset request sent';
+        return $this->render('inadmin/forgot-password-sent.html.twig', $this->data);
     }
 
     public function register(UserPasswordHasherInterface $passwordHasher): Response
