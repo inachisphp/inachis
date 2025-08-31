@@ -49,4 +49,26 @@ class UrlRepository extends AbstractRepository
             ]
         );
     }
+
+    public function findSimilarUrlsExcludingId(string $url, string $id)
+    {
+        $qb = $this->createQueryBuilder('u');
+        $qb = $qb
+            ->select('u.link')
+            ->where(
+                $qb->expr()->andX(
+                    'u.link LIKE  :url',
+                    $qb->expr()->not($qb->expr()->eq('u.content', ':id'))
+                )
+            )
+            ->orderBy('u.link', 'DESC')
+            ->setParameters([
+                'url' => $url . '%',
+                'id' => $id,
+            ])
+            ->setMaxResults(1);
+        return $qb
+            ->getQuery()
+            ->execute();
+    }
 }

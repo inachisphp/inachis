@@ -16,6 +16,22 @@ var InachisPostEdit = {
         // }
 		this.initTooltips();
 		this.initTitleChange();
+		if (this.hasAutosavedValue()) {
+			$('#subTitle_label').parent().after(
+				$('<p>', {'class': 'autosave-notification'})
+					.text('The below content has been recovered from an auto-save and must be saved before publishing.')
+					.append(
+						$('<button>', {'class': 'button button--negative', 'type': 'button'})
+							.text('Clear auto-save')
+							.on('click',function(event)
+							{
+								event.preventDefault();
+								easymde.clearAutosavedValue();
+								location.reload();
+							})
+					)
+			);
+		}
 	},
 
 	initTooltips: function()
@@ -103,7 +119,7 @@ var InachisPostEdit = {
 			if (this._postOrPage === 'post') {
 				title = this.convertDate($('#post_postDate').val().substring(0,10)) + '/' + title.substring(0, 255);
 			}
-			// @todo XHR to check if URL is already in use
+			title = this.ensureUniqueUrl();
 			return title;
 		}
 		return $originalTitle;
@@ -124,6 +140,26 @@ var InachisPostEdit = {
 			return;
 		}
 		return value.toLowerCase().replace(/&/g, 'and').replace(/[_\s]/g, '-').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\-]/gi, '')
+	},
+
+	hasAutosavedValue: function()
+	{
+		return easymde && easymde.options.element.defaultValue !== easymde.value();
+	},
+
+	ensureUniqueUrl: function()
+	{
+		$.ajax({
+			data: {
+				id: easymde.options.autosave.uniqueId,
+				url: $('#post_url')[0].value
+			},
+			dataType: 'json',
+			method: 'post',
+			url: '/incc/ax/check-url-usage',
+		}).done(function (response) {
+			return response.responseText;
+		});
 	}
 };
 
