@@ -43,6 +43,9 @@ class SeriesRepository extends AbstractRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * @throws NonUniqueResultException
+     */
     public function getPublishedSeriesByPost(Page $page)
     {
         $qb = $this->createQueryBuilder('s');
