@@ -24,10 +24,10 @@
         "doctrine/doctrine-bundle": "^2.11.1",
         "doctrine/doctrine-migrations-bundle": "^3",
         "doctrine/orm": "^2",
+        "google/apiclient": "^2.18",
         "jaybizzle/crawler-detect": "^1.2",
         "jedi58/versioning-bundle": "5.0.1",
         "jfcherng/php-diff": "^6.4",
-        "google/apiclient": "^2.18",
         "karser/karser-recaptcha3-bundle": "^0.1.27",
         "michelf/php-markdown": "^1.8",
         "phpdocumentor/reflection-docblock": "^5.2",
@@ -57,7 +57,9 @@
         "symfony/translation": "^7.2",
         "symfony/twig-bundle": "^7.2",
         "symfony/validator": "^7.2",
-        "symfony/yaml": "^7.2"
+        "symfony/yaml": "^7.2",
+        "twig/extra-bundle": "^3.21",
+        "twig/string-extra": "^3.21"
     },
     "require-dev": {
         "php-parallel-lint/php-parallel-lint": "*",
