@@ -62,7 +62,7 @@ class Page
     protected $title;
 
     /**
-     * @var string An optional sub-title for the {@link Page}
+     * @var string An optional subtitle for the {@link Page}
      */
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     protected $subTitle = null;
@@ -541,7 +541,7 @@ class Page
      * @param Image $value The UUID or URL to use for the {@link feature_image}
      * @return $this
      */
-    public function setFeatureImage(?string $value): self
+    public function setFeatureImage(?Image $value): self
     {
         $this->featureImage = $value;
 
@@ -854,6 +854,12 @@ class Page
     public function isDraft(): bool
     {
         return $this->status === self::DRAFT;
+    }
+
+    public function hasHotlinkedImages(): bool
+    {
+        preg_match('/\!\\[[^\\]]*\\]\\(https?:/', $this->getContent(), $matches);
+        return !empty($matches);
     }
 
     public static function isExportable(): bool
