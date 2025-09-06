@@ -5,3 +5,12 @@
 
 Documentation will follow shortly
 
+
+## Configuration
+
+### Warn if hot-linked images are used
+Add the following to your .env.local:
+```yaml
+WARN_HOTLINKED_IMAGES_ENABLED=1
+```
+
