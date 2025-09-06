@@ -159,11 +159,11 @@ class ZZPageController extends AbstractInachisController
                 [ 'type' => $type ]
             );
         }
+        $filters = array_filter($request->get('filter', []));
         if ($request->isMethod('post')) {
-            $filters = array_filter($request->get('filter', []));
-            $_SESSION['filters'] = $filters;
-        } else {
-            $filters = $_SESSION['filters'];
+            $_SESSION['post_filters'] = $filters;
+        } elseif (isset($_SESSION['post_filters'])) {
+            $filters = $_SESSION['post_filters'];
         }
 
         $offset = (int) $request->get('offset', 0);

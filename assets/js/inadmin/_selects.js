@@ -19,6 +19,10 @@ $(document).ready(function() {
 		$('#filter__options').toggle();
 		$(this).toggleClass('selected');
 	});
+	if ($('#filter__keyword').val() !== '') {
+		$('#filter__options').toggle();
+		$('.filter .filter__toggle').toggleClass('selected');
+	}
 
 	// https://select2.github.io/examples.html
 	$('.js-select').each(function ()
