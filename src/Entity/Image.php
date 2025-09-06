@@ -9,13 +9,14 @@ use Ramsey\Uuid\Doctrine\UuidGenerator;
  * Object for handling images on a site.
  */
 #[ORM\Entity(repositoryClass: 'App\Repository\ImageRepository', readOnly: false)]
-#[ORM\Index(name: 'search_idx', columns: ['title', 'filename', 'filetype'])]
+#[ORM\Index(columns: ['title', 'filename', 'filetype'], name: 'search_idx')]
 class Image extends AbstractFile
 {
     /**
      * @const string RegExp for allowed mime-types
      */
-    const ALLOWED_TYPES = 'image\/(png|p?jpeg|gif)';
+    public const ALLOWED_MIME_TYPES = 'image\/(png|p?jpeg|hei[cf])';
+    public const ALLOWED_TYPES = '.jpg,.jpeg,.png,.heic,.heif';
 
     /**
      * @var \Ramsey\Uuid\UuidInterface The unique identifier for the image
@@ -30,19 +31,19 @@ class Image extends AbstractFile
      * @var int
      */
     #[ORM\Column(type: 'integer')]
-    protected $dimensionX = 0;
+    protected int $dimensionX = 0;
 
     /**
      * @var int
      */
     #[ORM\Column(type: 'integer')]
-    protected $dimensionY = 0;
+    protected int $dimensionY = 0;
 
     /**
      * @var string
      */
     #[ORM\Column(type: 'string', nullable: true)]
-    protected $altText;
+    protected string $altText;
 
     /**
      * Default constructor for {@link Image}.
@@ -72,7 +73,7 @@ class Image extends AbstractFile
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function getAltText(): ?string
     {
@@ -85,7 +86,7 @@ class Image extends AbstractFile
      */
     public function setDimensionX(int $value): self
     {
-        $this->dimensionX = (int) $value;
+        $this->dimensionX = $value;
 
         return $this;
     }
@@ -96,7 +97,7 @@ class Image extends AbstractFile
      */
     public function setDimensionY(int $value): self
     {
-        $this->dimensionY = (int) $value;
+        $this->dimensionY = $value;
 
         return $this;
     }
