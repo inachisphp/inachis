@@ -7,49 +7,50 @@ use Ramsey\Uuid\Doctrine\UuidGenerator;
 
 /**
  * Object for handling {@link Waste} contents
- * @ORM\Entity(repositoryClass="App\Repository\WasteRepository")
- * @ORM\Table(indexes={@ORM\Index(name="search_idx", columns={"sourceType", "user_id"})})
  */
+#[ORM\Entity(repositoryClass: 'App\Repository\WasteRepository', readOnly: false)]
+#[ORM\Index(columns: ['source_type', 'user_id'], name: 'search_idx')]
 class Waste
 {
     /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true, nullable=false)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=UuidGenerator::class)
-     *
-     * @var \Ramsey\Uuid\UuidInterface
+     * @var \Ramsey\Uuid\UuidInterface The unique id of the waste item
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     private $id;
     /**
-     * @ORM\Column(type="string", length=255, nullable=false)
+     * @var string
      */
-    private $sourceType;
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
+    private string $sourceType;
     /**
-     * @ORM\Column(type="string", length=255, nulllable=false)
+     * @var string
      */
-    private $sourceName;
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
+    private string $sourceName;
     /**
-     * @ORM\Column(type="string", length=255)
+     * @var ?string
      */
-    private $title;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $title;
     /**
-     * @ORM\Column(type="text", nullable=true)
+     * @var ?string
      */
-    private $content;
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $content;
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", cascade={"detach"})
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
-     *
      * @var User The author for the {@link Page}
      */
-    private $user;
+    #[ORM\ManyToOne(targetEntity: 'User', cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    private User $user;
     /**
-     * @ORM\Column(type="datetime")
-     *
      * @var string The date the item was added to the bin
      */
-    protected $modDate;
+    #[ORM\Column(type: 'datetime')]
+    protected string $modDate;
 
     /**
      * @return string|null
