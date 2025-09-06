@@ -1,0 +1,42 @@
+@use 'sass:color';
+
+$image-tile-background: #eee;
+
+.form input[type="checkbox"] + label {
+  display: inline;
+}
+
+.ui-image-library {
+  display: flex;
+  flex-wrap: wrap;
+  list-style-type: none;
+
+  li {
+    display: inline-block;
+    font-size: 0.85em;
+    margin: 0.2em;
+    text-align: center;
+
+    a, a:visited {
+      background: $image-tile-background;
+      display: block;
+      height: 14.5em;
+      padding: 1em;
+      width: 150px;
+    }
+
+    a:hover {
+      background-color: color.scale($image-tile-background, $lightness: -10%);
+    }
+
+    img {
+      max-height: 150px;
+      max-width: 150px;
+    }
+    span {
+      display: block;
+      height: 150px;
+      margin: 0 auto 1em;
+    }
+  }
+}

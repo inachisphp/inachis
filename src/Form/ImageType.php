@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Image;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -20,9 +21,21 @@ class ImageType extends AbstractType
                     'data-tip-content' => 'Must be a linked to a file and not a webpage',
                     'class' => 'text full-width',
                 ],
-                'label' => 'URL',
+                'label' => 'Image file',
                 'label_attr' => [
                     'id' => 'image-uploader__filename__label'
+                ],
+            ])
+            ->add('optimiseImage', CheckboxType::class, [
+                'attr' => [
+                    'aria-labelledby' => 'image-uploader__optimiseImage__label',
+                    'checked' => 'checked',
+                    'class' => 'checkbox',
+                    'data-tip-content' => 'This will resize the image to a maximum of 1024x1024 and will modify compression',
+                ],
+                'label' => 'Optimize image',
+                'label_attr' => [
+                    'id' => 'image-uploader__optimiseImage__label'
                 ],
             ])
             ->add('title', TextType::class, [
