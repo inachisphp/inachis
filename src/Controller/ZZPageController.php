@@ -108,15 +108,15 @@ class ZZPageController extends AbstractInachisController
      */
     #[Route(
         "/incc/{type}/list/{offset}/{limit}",
-        methods: [ "GET", "POST" ],
         requirements: [
             "type" => "post|page",
             "offset" => "\d+",
             "limit" => "\d+"
         ],
-        defaults: [ "offset" => 0, "limit" => 10 ]
+        defaults: [ "offset" => 0, "limit" => 10 ],
+        methods: [ "GET", "POST" ]
     )]
-    public function getPostListAdmin(Request $request, $type = 'post'): Response
+    public function getPostListAdmin(Request $request, string $type = 'post'): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $form = $this->createFormBuilder()->getForm();
@@ -159,7 +159,13 @@ class ZZPageController extends AbstractInachisController
                 [ 'type' => $type ]
             );
         }
-        $filters = array_filter($request->get('filter', []));
+        if ($request->isMethod('post')) {
+            $filters = array_filter($request->get('filter', []));
+            $_SESSION['filters'] = $filters;
+        } else {
+            $filters = $_SESSION['filters'];
+        }
+
         $offset = (int) $request->get('offset', 0);
         $limit = $this->entityManager->getRepository(Page::class)->getMaxItemsToShow();
         $this->data['form'] = $form->createView();
