@@ -144,7 +144,7 @@ var InachisPostEdit = {
 
 	hasAutosavedValue: function()
 	{
-		return easymde && easymde.options.element.defaultValue !== easymde.value();
+		return "easymde" in window && easymde.options.element.defaultValue !== easymde.value();
 	},
 
 	ensureUniqueUrl: function()
