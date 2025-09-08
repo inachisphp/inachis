@@ -1,30 +1,6 @@
+@use "sass:color";
+@import '_definitions';
 @import '../shared/_reset';
-
-$information-small: "screen and (min-width: 320px)";
-$information-medium: "screen and (min-width: 480px)";
-$information-large: "screen and (min-width: 480px)";
-
-$admin__background-color: #fcfefe;
-
-$admin__flash-background: #lightsalmon;
-
-$admin__container--collapsed-width: 45px;
-$admin__container--expanded-width: 200px;
-$admin__container-button--hover: #0cf;
-$admin__container-add-button: #069;
-$admin__search_color: gray;
-
-$admin__tabs__highlighted-color: #069;
-$admin__tabs-background: #fff;
-
-$admin__button-bar-background-color: #eee;
-
-$admin__filter_button-background: #eee;
-$admin__filter_button-color: #333;
-$admin__filter_button-background--selected: #069;
-$admin__filter_button-color--selected: #fff;
-$admin__filter_button-background--hover: #0cf;
-$admin__filter_button-color--hover: #fff;
 
 body {
 	background-color: $admin__background-color;
@@ -53,7 +29,10 @@ body {
 @import '_editor';
 @import '_dropzone';
 
-@import '_widget__posts';
+@import "widgets/widgets";
+	@import "widgets/alerts";
+	@import 'widgets/posts';
+	@import 'widgets/stats';
 @import '_pagination';
 @import '_contextual';
 @import '_progressbar';
@@ -73,17 +52,13 @@ body {
 
 @import '_warnings';
 
-
-//.admin__form__brand {
-//	margin-left: -60px;
-//	margin-top: -50px;
-//	position: absolute;
-//}
-
-.flash-notice {
+.flash-notice, .flash-success, .flash-warning {
 	background-color: $admin__flash-background;
 	padding: 10px;
 	margin: 0 0 20px 0;
+}
+.flash-success {
+	background-color: #d9e7cb;
 }
 
 .switch-wrapper {
@@ -129,7 +104,7 @@ body {
 .admin__container {
 	position: absolute;
 	top: 5px;
-	z-index: 1000;
+	z-index: 7;
 
 	.admin__nav-main {
 		height: 100%;
@@ -207,7 +182,7 @@ body {
 
 			@media #{$information-medium} {
 				background-color: $admin__container-add-button;
-				border: 1px solid darken($admin__container-add-button, 10%);
+				border: 1px solid color.adjust($admin__container-add-button, $lightness: -10%);
 				margin:5px auto 50px auto;
 
 				&:hover {
@@ -256,6 +231,10 @@ body {
 				}
 				ul {
 					display: none;
+
+					&.admin__nav-new span {
+						display: inline-block;
+					}
 				}
 			}
 

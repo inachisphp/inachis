@@ -26,6 +26,7 @@ security:
                 csrf_parameter: login[_token]
 
                 use_referer: true
+                default_target_path: app_dashboard_default
 
             logout:
                 path: app_logout

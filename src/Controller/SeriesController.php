@@ -59,18 +59,22 @@ class SeriesController extends AbstractInachisController
             );
         }
 
+        $filters = array_filter($request->get('filter', []));
+        if ($request->isMethod('post')) {
+            $_SESSION['series_filters'] = $filters;
+        } elseif (isset($_SESSION['series_filters'])) {
+            $filters = $_SESSION['series_filters'];
+        }
         $offset = (int) $request->get('offset', 0);
         $limit = $this->entityManager->getRepository(Series::class)->getMaxItemsToShow();
         $this->data['form'] = $form->createView();
-        $this->data['dataset'] = $this->entityManager->getRepository(Series::class)->getAll(
+        $this->data['dataset'] = $this->entityManager->getRepository(Series::class)->getFiltered(
+            $filters,
             $offset,
-            $limit,
-            [],
-            [
-//                [ 'q.lastDate', 'DESC' ]
-                [ 'q.title', 'ASC' ]
-            ]
+            $limit
         );
+        $this->data['filters'] = $filters;
+        $this->data['page']['tab'] = 'series';
         $this->data['page']['offset'] = $offset;
         $this->data['page']['limit'] = $limit;
         return $this->render('inadmin/series__list.html.twig', $this->data);
@@ -136,11 +140,29 @@ class SeriesController extends AbstractInachisController
         $this->data['page']['title'] = $series->getId() !== null ?
             'Editing "' . $series->getTitle() . '"' :
             'New Series';
+        $this->data['page']['tab'] = 'series';
         $this->data['series'] = $series;
         $this->data['includeEditor'] = true;
         $this->data['includeEditorId'] = $series->getId();
         $this->data['includeDatePicker'] = true;
         return $this->render('inadmin/series__edit.html.twig', $this->data);
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     */
+    #[Route("/incc/series/contents/{id}", methods: [ "POST" ])]
+    public function contents(Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $series = $this->entityManager->getRepository(Series::class)->findOneById($request->get('id'));
+        $form = $this->createForm(SeriesType::class, $series);
+        $form->handleRequest($request);
+
+        $this->data['series'] = $series;
+        $this->data['form'] = $form->createView();
+        return $this->render('inadmin/partials/series_contents.html.twig', $this->data);
     }
 
     /**

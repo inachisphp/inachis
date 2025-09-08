@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class RevisionController extends AbstractInachisController
 {
@@ -79,7 +80,7 @@ class RevisionController extends AbstractInachisController
     }
 
     #[Route("/incc/page/diff/{id}", methods: [ "POST" ])]
-    public function doRevert(Request $request)
+    public function doRevert(Request $request): Response
     {
         $revision = $this->entityManager->getRepository(Revision::class)->findOneById(
             $request->get('id')

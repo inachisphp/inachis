@@ -100,9 +100,11 @@ class AdminDialogController extends AbstractInachisController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $category = $this->entityManager->getRepository(Category::class)->create($request->request->all());
-        $category->setParent(
-            $this->entityManager->getRepository(Category::class)->findOneById($request->request->get('parentID'))
-        );
+        if ($request->request->get('parentID') > 0) {
+            $category->setParent(
+                $this->entityManager->getRepository(Category::class)->findOneById($request->request->get('parentID'))
+            );
+        }
         $this->entityManager->persist($category);
         $this->entityManager->flush();
 
@@ -132,11 +134,11 @@ class AdminDialogController extends AbstractInachisController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $posts = [];
-        if (empty($request->request->get('postId'))) {
+        if (empty($request->request->all('postId'))) {
             return new Response(null, Response::HTTP_EXPECTATION_FAILED);
         }
         $posts = $this->entityManager->getRepository(Page::class)->getFilteredIds(
-            $request->request->get('postId')
+            $request->request->all('postId')
         )->getIterator()->getArrayCopy();
         if (empty($posts)) {
             return new Response(null, Response::HTTP_EXPECTATION_FAILED);
@@ -181,12 +183,19 @@ class AdminDialogController extends AbstractInachisController
             case 'md':
             default:
                 $format = 'md';
-                $markdownPosts = [];
-                // @todo use https://packagist.org/packages/maennchen/zipstream-php to zip contents
-                // export_zip
+
+                // https://maennchen.dev/ZipStream-PHP/guide/Symfony.html
+                $zip = new ZipStream\ZipStream(
+                    outputStream: $request->request->get('export_name') ?: date('YmdHis') . '.zip',
+                    sendHttpHeaders: true,
+                );
                 foreach ($posts as $post) {
-                    $markdownPosts[] = ArrayToMarkdown::parse($post);
+                    $zip->addFile(
+                        filename: $post->getPostDate()->format('Ymd') . '.md',
+                        data: ArrayToMarkdown::parse($post),
+                    );
                 }
+                $zip->finish();
         }
         $response->setContent($posts);
 

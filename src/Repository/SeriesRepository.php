@@ -43,7 +43,10 @@ class SeriesRepository extends AbstractRepository
             ->getOneOrNullResult();
     }
 
-    public function getPublishedSeriesByPost(string $page)
+    /**
+     * @throws NonUniqueResultException
+     */
+    public function getPublishedSeriesByPost(Page $page)
     {
         $qb = $this->createQueryBuilder('s');
         return $qb
@@ -77,5 +80,33 @@ class SeriesRepository extends AbstractRepository
             ])
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * @param $filters
+     * @param $offset
+     * @param $limit
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
+    public function getFiltered($filters, $offset, $limit)
+    {
+        $where = [];
+        if (!empty($filters['keyword'])) {
+            $where = [
+                '(q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.description LIKE :keyword )',
+                [
+                    'keyword' => '%' . $filters['keyword']  . '%',
+                ],
+            ];
+        }
+        return $this->getAll(
+            $offset,
+            $limit,
+            $where,
+            [
+                [ 'q.title', 'ASC' ],
+                [ 'q.subTitle', 'ASC' ]
+            ]
+        );
     }
 }

@@ -1,14 +1,17 @@
 .badge {
-	background-color: #ddd;
+	background-color: #999;
 	color: #fff;
 	border: 1px solid transparent;
 	border-radius: 40px;
 	font-size: 0.7em;
 	padding: 5px 10px;
 
+	.ui-tabs-nav li & {
+		margin-left: 1em;
+	}
 
 	.ui-state-active & {
-		background-color: #ccc;
+		background-color: #069;
 	}
 
 	&.badge__draft, &.badge__default {
@@ -21,5 +24,10 @@
 
 	&.badge__private {
 		background-color: #f70;
+	}
+
+	&.badge__hotlink {
+		background-color: #ffd700;
+		color: #000;
 	}
 }

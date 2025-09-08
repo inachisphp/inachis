@@ -28,9 +28,10 @@ class DefaultController extends AbstractInachisController
             ]
         );
 
-        $pageQuery = 'q.status = :status AND q.postDate <= :postDate AND q.type = :type';
+        $pageQuery = 'q.status = :status AND q.visibility = :visibility AND q.postDate <= :postDate AND q.type = :type';
         $pageParameters = [
             'status'   => Page::PUBLISHED,
+            'visibility' => Page::VIS_PUBLIC,
             'postDate' => new \DateTime(),
             'type' => Page::TYPE_POST,
         ];

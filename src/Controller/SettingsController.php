@@ -7,17 +7,18 @@ use App\Entity\Page;
 use App\Entity\Series;
 use App\Entity\Tag;
 use App\Entity\Url;
+use App\Form\ContentType;
 use Doctrine\DBAL\Exception\ConnectionException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use PHPStan\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class SettingsController extends AbstractInachisController
 {
     #[Route("/incc/settings")]
-    public function index(Request $request): Response
+    public function index(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -28,6 +29,9 @@ class SettingsController extends AbstractInachisController
         $this->data['counts']['series'] = $this->entityManager->getRepository(Series::class)->getAllCount();
         $this->data['counts']['tag'] = $this->entityManager->getRepository(Tag::class)->getAllCount();
         $this->data['counts']['url'] = $this->entityManager->getRepository(Url::class)->getAllCount();
+        $form = $this->createForm(ContentType::class);
+        $form->handleRequest($request);
+        $this->data['form'] = $form->createView();
 
         $this->data['data_types'] = [
             'raw' => $this->entityManager->getConfiguration()->getMetadataDriverImpl()->getAllClassNames()

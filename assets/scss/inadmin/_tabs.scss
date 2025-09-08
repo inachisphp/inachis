@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .ui-tabs, .ui-tabs-external {
 	clear: both;
 
@@ -36,7 +38,8 @@
 			padding: 10px;
 
 			&:hover {
-				background-color: lighten($admin__tabs__highlighted-color, 80);
+
+				background-color: color.adjust($admin__tabs__highlighted-color, $lightness: 80%);
 			}
 		}
 

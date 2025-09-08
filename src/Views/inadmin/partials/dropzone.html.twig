@@ -1,18 +1,19 @@
 <p><label for="{{ paramName }}">{{ helpText }}</label></p>
 <div class="fallback">
-    <input id="{{ paramName }}" name="{{ paramName }}" type="file" multiple />
+    <input id="{{ paramName|replace({'[': '_', ']': ''}) }}" name="{{ paramName }}" type="file" multiple />
 </div>
 <script src="/assets/js/incc/dropzone.min.js"></script>
 <script>
     var dropzone = $('.dropzone').dropzone({
         url: '{{ dropzoneUrl }}',
         paramName: '{{ paramName }}',
+        addRemoveLinks: true,
 
     {% if uploadMultiple is defined and uploadMultiple is not empty %}
         uploadMultiple: {{ uploadMultiple }},
     {% endif %}
     {% if maxFilesize is defined and maxFilesize is not empty %}
-        maxFilesize: {{ maxFilesize }}, // MB
+        maxFilesize: {{ maxFilesize }}, // bytes
     {% endif %}
     {% if acceptedFiles is defined and acceptedFiles is not empty %}
         acceptedFiles: '{{ acceptedFiles }}',

@@ -32,10 +32,10 @@ class AppExtension extends AbstractExtension
     }
 
     /**
-     * @param $bytes
+     * @param int $bytes
      * @return string
      */
-    public function bytesToMinimumUnit($bytes)
+    public function bytesToMinimumUnit(int $bytes): string
     {
         $symbols = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
         $exp = (int) floor(log($bytes)/log(1024));

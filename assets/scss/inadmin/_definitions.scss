@@ -1,0 +1,26 @@
+$information-small: "screen and (min-width: 320px)";
+$information-medium: "screen and (min-width: 480px)";
+$information-large: "screen and (min-width: 480px)";
+
+//$admin__background-color: #fcfefe;
+$admin__background-color: #fafafa;
+
+$admin__flash-background: lightsalmon;
+
+$admin__container--collapsed-width: 45px;
+$admin__container--expanded-width: 200px;
+$admin__container-button--hover: #0cf;
+$admin__container-add-button: #069;
+$admin__search_color: gray;
+
+$admin__tabs__highlighted-color: #069;
+$admin__tabs-background: #fff;
+
+$admin__button-bar-background-color: #eee;
+
+$admin__filter_button-background: #eee;
+$admin__filter_button-color: #333;
+$admin__filter_button-background--selected: #069;
+$admin__filter_button-color--selected: #fff;
+$admin__filter_button-background--hover: #0cf;
+$admin__filter_button-color--hover: #fff;

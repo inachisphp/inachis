@@ -50,6 +50,7 @@ class LoginType extends AbstractType
                 'label_attr' => [
                     'id' => 'form-login__password-label',
                 ],
+//                'toggle' => true,
             ])
 //            ->add('rememberMe', CheckboxType::class, [
 //                'attr' => [
@@ -60,7 +61,11 @@ class LoginType extends AbstractType
 //                'label' => $this->translator->trans('admin.label.remember_me'),
 //            ])
             ->add('logIn', SubmitType::class, [
-                'label' => $this->translator->trans('admin.button.login'),
+                'label' => sprintf(
+                    '<span>%s</span> <i class="material-icons">arrow_forward</i>',
+                    $this->translator->trans('admin.button.login')
+                ),
+                'label_html' => true,
                 'attr'  => [
                     'class' => 'button button--positive',
                 ],

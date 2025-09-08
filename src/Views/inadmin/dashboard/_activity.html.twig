@@ -77,10 +77,6 @@
                 </li>
             {% endfor %}
         </ol>
-    {% else %}
-        <div id="widget-posts__published">
-            <p>There are currently no published posts available</p>
-        </div>
     {% endif %}
 
     {% if dashboard.comments|default([]) is not empty %}

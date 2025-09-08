@@ -6,9 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\LoginActivityRepository")
- */
+#[ORM\Entity(repositoryClass: 'App\Repository\LoginActivityRepository', readOnly: false)]
 class LoginActivity
 {
     /**
@@ -19,45 +17,50 @@ class LoginActivity
      *
      */
     const STATUS_BLOCKED = true;
+
     /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true, nullable=false)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=UuidGenerator::class)
-     *
      * @var \Ramsey\Uuid\UuidInterface
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     private $id;
+
     /**
-     * @ORM\Column(type="string", length=512, nullable=false)
-     * @Assert\NotBlank()
      * @var string The username being logged in as
      */
+    #[ORM\Column(type: 'string', length: 512, nullable: false)]
+    #[ORM\Assert\NotBlank]
     private $username;
+
     /**
-     * @ORM\Column(type="string", length=50)
      * @var string The source IP of the login-in attempt
      */
+    #[ORM\Column(type: 'string', length: 50)]
     private $remoteIp;
+
     /**
-     * @ORM\Column(type="string", length=128)
      * @var string A hash of the user-agent detected by the log-in attempt
      */
+    #[ORM\Column(type: 'string', length: 128)]
     private $userAgent;
+
     /**
-     * @ORM\Column(type="integer")
      * @var integer The number of attempts at sign-in during the given period
      */
+    #[ORM\Column(type: 'integer')]
     private $attemptCount = 1;
+
     /**
-     * @ORM\Column(type="boolean")
      * @var bool Flag indicating if the request result in a temporary block
      */
+    #[ORM\Column(type: 'boolean')]
     private $blockStatus = self::STATUS_UNBLOCKED;
     /**
-     * @ORM\Column(type="datetime")
      * @var string The date and time of the attempt
      */
+    #[ORM\Column(type: 'datetime')]
     private $timestamp;
 
     /**
@@ -70,7 +73,7 @@ class LoginActivity
 
     /**
      * @param int $id
-     * @return LoginActivity
+     * @return $this
      */
     public function setId(int $id): self
     {
@@ -89,7 +92,7 @@ class LoginActivity
 
     /**
      * @param string $username
-     * @return LoginActivity
+     * @return $this
      */
     public function setUsername(string $username): self
     {
@@ -108,7 +111,7 @@ class LoginActivity
 
     /**
      * @param string $remoteIp
-     * @return LoginActivity
+     * @return $this
      */
     public function setRemoteIp(string $remoteIp): self
     {
@@ -127,7 +130,7 @@ class LoginActivity
 
     /**
      * @param string $userAgent
-     * @return LoginActivity
+     * @return $this
      */
     public function setUserAgent(string $userAgent): self
     {
@@ -146,7 +149,7 @@ class LoginActivity
 
     /**
      * @param int $attemptCount
-     * @return LoginActivity
+     * @return $this
      */
     public function setAttemptCount(int $attemptCount): self
     {
@@ -165,7 +168,7 @@ class LoginActivity
 
     /**
      * @param bool $blockStatus
-     * @return LoginActivity
+     * @return $this
      */
     public function setBlockStatus(bool $blockStatus): self
     {
@@ -184,7 +187,7 @@ class LoginActivity
 
     /**
      * @param string $timestamp
-     * @return LoginActivity
+     * @return $this
      */
     public function setTimestamp(string $timestamp): self
     {

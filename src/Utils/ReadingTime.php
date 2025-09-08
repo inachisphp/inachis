@@ -13,7 +13,7 @@ class ReadingTime
      */
     public static function getReadingTime(?string $text, ?int $wordCount = 0, ?int $wpm = self::WORDS_PER_MINUTE): int
     {
-        return ceil( $wordCount > 0 ? $wordCount : self::getWordCount($text) / $wpm);
+        return ceil( ($wordCount > 0 ? $wordCount : self::getWordCount($text)) / $wpm);
     }
 
     /**

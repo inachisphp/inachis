@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": ">=8.1.0",
+        "php": ">=8.2",
         "ext-iconv": "*",
         "ext-json": "*",
         "aptoma/twig-markdown": "^3.0",
@@ -24,9 +24,11 @@
         "doctrine/doctrine-bundle": "^2.11.1",
         "doctrine/doctrine-migrations-bundle": "^3",
         "doctrine/orm": "^2",
+        "google/apiclient": "^2.18",
         "jaybizzle/crawler-detect": "^1.2",
         "jedi58/versioning-bundle": "5.0.1",
         "jfcherng/php-diff": "^6.4",
+        "karser/karser-recaptcha3-bundle": "^0.1.27",
         "michelf/php-markdown": "^1.8",
         "phpdocumentor/reflection-docblock": "^5.2",
         "ramsey/uuid": "^4.7",
@@ -36,6 +38,7 @@
         "symfony/dependency-injection": "^7.2",
         "symfony/doctrine-bridge": "^7.2",
         "symfony/dotenv": "^7.2",
+        "symfony/emoji": "7.*",
         "symfony/flex": "^2.3",
         "symfony/form": "^7.2",
         "symfony/framework-bundle": "^7.2",
@@ -54,7 +57,9 @@
         "symfony/translation": "^7.2",
         "symfony/twig-bundle": "^7.2",
         "symfony/validator": "^7.2",
-        "symfony/yaml": "^7.2"
+        "symfony/yaml": "^7.2",
+        "twig/extra-bundle": "^3.21",
+        "twig/string-extra": "^3.21"
     },
     "require-dev": {
         "php-parallel-lint/php-parallel-lint": "*",
@@ -100,6 +105,7 @@
         "symfony/polyfill-php56": "*"
     },
     "scripts": {
+        "pre-autoload-dump": "Google\\Task\\Composer::cleanup",
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install --symlink --relative %PUBLIC_DIR%": "symfony-cmd",
@@ -129,6 +135,9 @@
             "allow-contrib": true,
             "docker": true,
             "require": "7.*"
-        }
+        },
+        "google/apiclient-services": [
+            "Analytics"
+        ]
     }
 }

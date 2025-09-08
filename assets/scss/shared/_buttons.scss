@@ -1,22 +1,25 @@
+@use "sass:color";
+
 $button--positive--active-color: #393;
-$button--positive--hover-color: lighten($button--positive--active-color, 10);
+$button--positive--hover-color: color.adjust($button--positive--active-color, $lightness: 10%);
 $button--negative--active-color: #900;
-$button--negative--hover-color: lighten($button--negative--active-color, 10);
+$button--negative--hover-color: color.adjust($button--negative--active-color, $lightness: 10%);
 $button--info--active-color: #999;
-$button--info--hover-color: darken($button--info--active-color, 10);
+$button--info--hover-color: color.adjust($button--info--active-color, $lightness: -10%);
 $button--default-active-color: #d9e7cb;
-$button--default-hover-color: darken($button--default-active-color, 10);
+$button--default-hover-color: color.adjust($button--default-active-color, $lightness: -10%);
 
 .button {
 	border-radius: 0.5em;
 	font-size: 1.05em;
 	padding: 10px 20px;
+	text-decoration: none;
 
 	&:disabled {
 		opacity: 0.5;
 	}
 
-	span {
+	span, i {
 		vertical-align: middle;
 	}
 

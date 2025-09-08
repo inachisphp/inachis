@@ -11,13 +11,17 @@
 		}
 	}
 
+	.zebra article:nth-of-type(2n) {
+		background-color: #f2f2f2;
+	}
+
 	ol.ui-widget-content, .post, .page, .series {
 		clear: left;
 		list-style-type: none;
-		padding: 0 10px 30px 10px;
+		padding: 15px 5px;
 
 		@media #{$information-medium} {
-			padding: 0 0 30px 0;
+			padding: 15px 5px;
 		}
 
 		a, a:visited {

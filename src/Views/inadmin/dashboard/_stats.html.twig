@@ -1,3 +1,33 @@
-Stats for today / week / month
+{% if dashboard.publishCount > 0 %}
+<section class="widget widget-stats">
+    <article class="widget-stats__focus">
+        <p>
+            <span class="material-icons">trending_up</span>
+            Your most recent post has had <strong>{{ dashboard.stats.recent }}</strong> visitors
+        </p>
+    </article>
 
-Your most recent post has had <strong>X</strong> visitors
+    <article>
+        <h2>Popular content</h2>
+        <p>Last 30 days - {{ 'now'|date('j F') }} &ndash; {{ '-30 days'|date('j F') }}</p>
+        <ol>
+            <li>
+                <span>post 1</span>
+                <em>10,022</em>
+            </li>
+            <li>
+                <span>post 2</span>
+                <em>70</em>
+            </li>
+            <li>
+                <span>post 3</span>
+                <em>2</em>
+            </li>
+        </ol>
+    </article>
+</section>
+{% else %}
+<section class="widget disabled">
+    <p>Statistics will appear here when you have published posts.</p>
+</section>
+{% endif %}

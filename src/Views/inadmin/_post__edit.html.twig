@@ -5,17 +5,17 @@
     <div class="col span_8_of_8 ui-tabbed content__edit">
         <ul>
             <li>
-                <a href="#post__edit">Content</a>
+                <a href="#post__edit">{% trans %}admin.posts.tabs.content{% endtrans %}</a>
             </li>
             <li>
-                <a href="#post__properties">Properties</a>
+                <a href="#post__properties">{% trans %}admin.posts.tabs.properties{% endtrans %}</a>
             </li>
             <li>
-                <a href="#post__sharing">Sharing</a>
+                <a href="#post__sharing">{% trans %}admin.posts.tabs.sharing{% endtrans %}</a>
             </li>
             {%  if revisions is defined and revisions is not empty %}
             <li>
-                <a href="#post__history">History</a>
+                <a href="#post__history">{% trans %}admin.posts.tabs.revisions{% endtrans %}</a>
             </li>
             {% endif %}
         </ul>
@@ -82,6 +82,14 @@
                 {{ form_errors(form.tags) }}
                 {{ form_widget(form.tags) }}
             </p>
+            <p>
+                {{ form_label(form.language) }}
+                {{ form_errors(form.language) }}
+                {{ form_widget(form.language) }}
+            </p>
+            {% if textStats is defined %}
+                <p>Approximate reading time (at last save): <strong>{{ textStats.readingTime }}</strong> minute(s)</p>
+            {% endif %}
             {% if settings.geotagContent is defined and settings.geotagContent and settings.google.key is defined and settings.google.key is not empty %}
             <p>
                 {{ form_label(form.latlong) }}
@@ -92,14 +100,13 @@
         </fieldset>
 
         <fieldset id="post__sharing">
-            <h3>Teaser Details</h3>
-            <p><em class="material-icons">info</em> This text will be used whenever people share a link to your content on social media. It can also be used in other places such as your homepage.</p>
-            {% if post.urls is not empty %}
-            <p>
-                <input type="text" value="{{ post.urls|first.link }}" />
-                <button id="post__link__copy">Copy this link</button>
-            </p>
-            {% endif %}
+            <h3>
+                Teaser Details
+                <a href="#" class="ui-help">
+                    <em class="material-icons">info</em>
+                    <span>This text will be used whenever people share a link to your content on social media. It can also be used in other places such as your homepage.</span>
+                </a>
+            </h3>
             <section class="col span_4_of_8">
                 <p>
                     {{ form_label(form.featureSnippet) }}
@@ -115,10 +122,19 @@
                     'value': post.featureImage
                 })
             }}
-            <p>
-                {{ form_label(form.sharingMessage) }}
-                {{ form_errors(form.sharingMessage) }}
-                {{ form_widget(form.sharingMessage) }}
+                <!-- h3>
+                    Sharing
+                    <a href="#" class="ui-help">
+                        <em class="material-icons">info</em>
+                        <span>These will be published to the selected Social Media accounts automatically when first published, or scheduled to to be posted.</span>
+                    </a>
+                </h3>
+                loop through services / accounts for checkboxes + add char counter below for ui-counter
+                <p>
+                    {{ form_label(form.sharingMessage) }}
+                    {{ form_errors(form.sharingMessage) }}
+                    {{ form_widget(form.sharingMessage) }}
+                </p -->
             </section>
             {% if post.urls is not empty %}
             <p class="col span_8_of_8">
@@ -149,11 +165,9 @@
                         <td>{{ revision.user.displayName }}</td>
                         <td>{{ revision.action }}</td>
                         <td>
-                    {% if revision.content is not empty %}
                             <a href="{{ path('app_revision_diff', { 'id': revision.id} ) }}" class="button button--info" type="button"><span class="material-icons">compare_arrows</span> View Version</a>
                             <button class="button button--info" type="button"><span class="material-icons">save_alt</span> Download</button>
                             <button class="button button--negative" type="button"><span class="material-icons">undo</span> Revert</button>
-                    {% endif %}
                         </td>
                     </tr>
                 {% endfor %}

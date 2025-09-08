@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
 const gulp = require('gulp');
 const sass = require('gulp-sass')(require('sass'));
-const autoprefixer = require('gulp-autoprefixer');
+const autoprefixer = import('gulp-autoprefixer');
 const config = require('../config');
 const cssnano = require('gulp-cssnano');
 const rename = require('gulp-rename');
@@ -19,7 +19,7 @@ function sassCompile (scssSource, cssDest)
 {
     return gulp.src(scssSource + '**/*.scss')
         .pipe(sass()).on('error', sass.logError)
-        .pipe(autoprefixer('last 2 version'))
+        // .pipe(autoprefixer('last 2 version'))
         .pipe(cssnano())
         .pipe(rename({suffix: '.min'}))
         .pipe(gulp.dest(cssDest));
@@ -34,5 +34,5 @@ exports.sassCompile = gulp.parallel(
 );
 
 exports.sassWatch = function() {
-    gulp.watch(config.paths.src.sass.all + '**/*.scss', sassCompile);
+    gulp.watch(config.paths.src.sass.all + '**/*.scss', exports.sassCompile);
 }

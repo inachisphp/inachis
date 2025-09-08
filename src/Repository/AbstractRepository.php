@@ -104,7 +104,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
                 $qb = $qb->orderBy($order);
             }
         }
-        if (!empty($where)) {
+        if (!empty($where[1])) {
             $qb = $qb->setParameters($where[1]);
         }
         if (!empty($groupBy)) {
@@ -130,8 +130,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
     public function getMaxItemsToShow()
     {
         // @todo check if an alternative is set in yaml config
-        $count = defined('static::MAX_ITEMS_TO_SHOW_ADMIN') ? (int) static::MAX_ITEMS_TO_SHOW_ADMIN : 10;
-        return $count;
+        return defined('static::MAX_ITEMS_TO_SHOW_ADMIN') ? (int) static::MAX_ITEMS_TO_SHOW_ADMIN : 10;
     }
 
     /**

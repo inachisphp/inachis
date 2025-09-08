@@ -62,18 +62,22 @@ $form-input__complete: #090;
 			color: #fff;
 			display: inline;
 		}
-		color: #666;
-		display: block;
-		margin-top: 35px;
-		text-align: center;
-		text-decoration: none;
+		& {
+			color: #666;
+			display: block;
+			margin-top: 35px;
+			text-align: center;
+			text-decoration: none;
+		}
 	}
 	a:hover {
 		&.button {
 			color: #fff;
 			text-decoration: none;
 		}
-		color: #069;
-		text-decoration: underline;
+		& {
+			color: #069;
+			text-decoration: underline;
+		}
 	}
 }

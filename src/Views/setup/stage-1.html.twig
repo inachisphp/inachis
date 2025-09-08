@@ -9,7 +9,15 @@
 
         <form name="setup_stage1" method="post" class="form form__login form__setup">
             <h2>{{ settings.siteTitle }}</h2>
-            <p>Before you can use this site, you need to configure it in .env.local, config/services.yaml, and create a new administrator using bin/console</p>
+            <p>Thank you for using inachis Framework for your website.</p>
+            <p>Before you can use this site, you need to:</p>
+            <ol>
+                <li>configure database connections in .env.local,</li>
+                <li>application config in config/services.yaml,</li>
+                <li>and create a new administrator using <pre>bin/console app:create-admin</pre></li>
+            </ol>
+            <p>You can then log-in using your new administrator account.</p>
+            <p>Enjoy!</p>
         </form>
 
         {% endblock form_setup_stage1 %}

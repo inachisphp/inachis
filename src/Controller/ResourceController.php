@@ -7,6 +7,7 @@ use App\Form\ImageType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ResourceController extends AbstractInachisController
@@ -20,19 +21,26 @@ class ResourceController extends AbstractInachisController
     public function resourcesList(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $typeClass = match ($request->request?->get('type')) {
+            'downloads' => Download::class,
+            default => Image::class,
+        };
+        $type = substr(strrchr($typeClass, '\\'), 1);
 
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
         $offset = (int) $request->get('offset', 0);
-        $limit = $this->entityManager->getRepository(Image::class)->getMaxItemsToShow();
-        $this->data['dataset'] = $this->entityManager->getRepository(Image::class)->getAll(
+
+        $limit = $this->entityManager->getRepository($typeClass)->getMaxItemsToShow();
+        $this->data['dataset'] = $this->entityManager->getRepository($typeClass)->getAll(
             $offset,
             $limit
         );
         $this->data['form'] = $form->createView();
         $this->data['page']['offset'] = $offset;
         $this->data['page']['limit'] = $limit;
-        $this->data['page']['title'] = 'Users';
+        $this->data['page']['tab'] = $type;
+        $this->data['page']['title'] = $type . 's';
 
         return $this->render('inadmin/_resources.html.twig', $this->data);
     }
@@ -74,8 +82,8 @@ class ResourceController extends AbstractInachisController
             $image->setChecksum(sha1_file($image->getFilename()));
             unset($imageInfo);
 
-            $this->getDoctrine()->getManager()->persist($image);
-            $this->getDoctrine()->getManager()->flush();
+            $this->entityManager->persist($image);
+            $this->entityManager->flush();
         }
 
 //        foreach ($request->files as $file) {

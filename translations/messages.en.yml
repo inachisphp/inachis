@@ -11,7 +11,7 @@ admin.button.delete: Delete
 admin.button.remove: Remove
 admin.reset.enter_email_address: 'Enter your email address to reset login'
 admin.label.reset_password: 'Reset Password'
-admin.reset_password: 'Request Reset'
+admin.reset_password: 'Continue'
 admin.email_example: user@example.com
 admin.label.post.title: Title
 admin.placeholder.post.title: e.g. My First Blog Post
@@ -46,3 +46,14 @@ admin.series.contents.not_saved: You must save the series before you can add ite
 admin.series.contents.no_content: You haven't added any content yet!
 
 admin.dialog.image_manager.title: Image Manager
+admin:
+  dialog:
+    upload:
+      title: Upload an image
+
+  posts:
+    tabs:
+      content: Content
+      properties: Properties
+      sharing: Sharing
+      revisions: History

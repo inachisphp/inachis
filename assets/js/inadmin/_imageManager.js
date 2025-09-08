@@ -46,8 +46,7 @@ var InachisImageManager = {
                         $gallery.append(newImage);
                         $imageCount.text(parseInt($imageCount.text(), 10) + 1);
                         $(newElementSelector).change(InachisImageManager.enableChooseButton);
-                        // @todo fix the below so it scrolls to the new image
-                        $([document.documentElement, document.body]).animate(
+                        $('.gallery').animate(
                             {
                                 scrollTop: $(newElementSelector).offset().top
                             },

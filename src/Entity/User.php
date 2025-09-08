@@ -6,6 +6,7 @@ use App\Exception\InvalidTimezoneException;
 use App\Validator\DateValidator;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
+use Random\RandomException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -15,13 +16,13 @@ use App\Validator\Constraints as InachisAssert;
  * Object for handling User entity.
  */
 #[ORM\Entity(repositoryClass: "App\Repository\UserRepository", readOnly: false)]
-#[ORM\Index(name: "search_idx", columns: [ "usernameCanonical", "emailCanonical" ])]
+#[ORM\Index(columns: [ "usernameCanonical", "emailCanonical" ], name: "search_idx")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * Constant for specifying passwords have no expiry time.
      */
-    const NO_PASSWORD_EXPIRY = -1;
+    public const NO_PASSWORD_EXPIRY = -1;
 
     /**
      * @var \Ramsey\Uuid\UuidInterface The unique identifier for the {@link User}
@@ -30,99 +31,111 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: "uuid", unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: "CUSTOM")]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected $id;
+    protected \Ramsey\Uuid\UuidInterface $id;
 
     /**
      * @var string Username of the user
      */
     #[ORM\Column(type: "string", length: 512, nullable: false)]
     #[Assert\NotBlank]
-    protected $username;
+    protected string $username;
 
     /**
      * @var string Username of the user
      */
-    #[ORM\Column(type: "string", length: 255, name: 'usernameCanonical', unique: true, nullable: false)]
-    protected $usernameCanonical;
+    #[ORM\Column(name: 'usernameCanonical', type: "string", length: 255, unique: true, nullable: false)]
+    protected string $usernameCanonical;
 
     /**
      * @var string Password for the user
      */
     #[ORM\Column(type: "string", length: 512, nullable: false)]
-    protected $password;
+    protected string $password;
 
     /**
-     * @var string Plaintext version of password - used for validation only and is not stored
+     * @var string|null Plaintext version of password - used for validation only and is not stored
      */
     #[Assert\NotBlank]
-    #[Asset\Length(max: 4096)]
+    #[Assert\Length(max: 4096)]
     #[Assert\NotCompromisedPassword]
     #[Assert\PasswordStrength]
-    protected $plainPassword;
+    protected ?string $plainPassword;
 
     /**
      * @var string Email address of the user
      */
     #[ORM\Column(type: "string", length: 512, nullable: false)]
-    protected $email;
+    protected string $email;
 
     /**
      * @var string Email address of the user
      */
-    #[ORM\Column(type: "string", length: 255, name: 'emailCanonical', unique: true, nullable: false)]
-    protected $emailCanonical;
+    #[ORM\Column(name: 'emailCanonical', type: "string", length: 255, unique: true, nullable: false)]
+    protected string $emailCanonical;
 
     /**
      * @var string The display name for the user
      */
     #[ORM\Column(type: "string", length: 512)]
-    protected $displayName;
+    protected string $displayName;
 
     /**
-     * @var Image string An image to use for the {@link User}
+     * @var ?Image string An image to use for the {@link User}
      */
-    protected $avatar;
+    #[ORM\Column(name: 'avatar', type: "string", length: 255, nullable: true)]
+    protected ?Image $avatar;
 
     /**
      * @var bool Flag indicating if the {@link User} can sign in
      */
     #[ORM\Column(type: "boolean")]
-    protected $isActive = true;
+    protected bool $isActive = true;
 
     /**
      * @var bool Flag indicating if the {@link User} has been "deleted"
      */
     #[ORM\Column(type: "boolean")]
-    protected $isRemoved = false;
+    protected bool $isRemoved = false;
 
     /**
-     * @var string The date the {@link User} was added
+     * @var \DateTime The date the {@link User} was added
      */
     #[ORM\Column(type: "datetime")]
-    protected $createDate;
+    protected \DateTime $createDate;
 
     /**
-     * @var string The date the {@link User} was last modified
+     * @var \DateTime The date the {@link User} was last modified
      */
     #[ORM\Column(type: "datetime")]
-    protected $modDate;
+    protected \DateTime $modDate;
 
     /**
-     * @var string The date the password was last modified
+     * @var \DateTime|null The date the password was last modified
      */
     #[ORM\Column(type: "datetime")]
-    protected $passwordModDate;
+    protected \DateTime $passwordModDate;
 
+    /**
+     * @var string|null A token used when resetting the users password
+     */
+    #[ORM\Column(type: "string", length: 20, nullable: true)]
+    protected ?string $passwordResetToken;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(type: "datetime", nullable: true)]
+    protected \DateTime $passwordResetTokenExpire;
     /**
      * @InachisAssert\ValidTimezone()
      * @var string The local timezone for the user
      */
     #[ORM\Column(type: "string",length: 32, options: ["default" => "UTC" ])]
     #[Assert\NotBlank]
-    protected $timezone;
+    protected string $timezone;
 
     /**
-     * Default constructor for {@link User}. If a password if passed into
+     * Default constructor for {@link User}. If a password is passed into
      * the constructor it will use {@link setPasswordHash} to store a hashed
      * version of the password instead. This entity should never hold
      * the password in plain-text.
@@ -185,7 +198,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link email} of the {@link User}.
      *
-     * @return string The email of the user
+     * @return string|null The email of the user
      */
     public function getEmail(): ?string
     {
@@ -195,7 +208,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link displayName} for the {@link User}.
      *
-     * @return string The display name for the user
+     * @return string|null The display name for the user
      */
     public function getDisplayName(): ?string
     {
@@ -205,9 +218,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link avatar} for the {@link User}.
      *
-     * @return \App\Entity\Image The avatar for the user
+     * @return Image|null The avatar for the user
      */
-    public function getAvatar(): ?string
+    public function getAvatar(): ?Image
     {
         return $this->avatar;
     }
@@ -265,7 +278,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link passwordModDate} for the {@link User}.
      *
-     * @return string The password last modification date for the user
+     * @return DateTime The password last modification date for the user
      */
     public function getPasswordModDate(): \DateTime
     {
@@ -354,10 +367,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the value of {@link avatar}.
      *
-     * @param string $value The value to set
+     * @param string|null $value The value to set
      * @return $this
      */
-    public function setAvatar($value): self
+    public function setAvatar(?string $value): self
     {
         $this->avatar = $value;
 
@@ -370,9 +383,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @param bool $value The value to set
      * @return $this
      */
-    public function setActive($value): self
+    public function setActive(bool $value): self
     {
-        $this->isActive = (bool) $value;
+        $this->isActive = $value;
 
         return $this;
     }
@@ -383,9 +396,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @param bool $value The value to set
      * @return $this
      */
-    public function setRemoved($value): self
+    public function setRemoved(bool $value): self
     {
-        $this->isRemoved = (bool) $value;
+        $this->isRemoved = $value;
 
         return $this;
     }
@@ -449,12 +462,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function erase(): void
     {
-//        $this->setUsername('');
-//        $this->setPassword('');
-//        $this->setEmail('');
-//        $this->setAvatar('');
-//        $this->setActive(false);
-//        $this->setRemoved(true);
+        $this->setUsername('');
+        $this->setPassword('');
+        $this->setEmail('');
+        $this->setAvatar('');
+        $this->setActive(false);
+        $this->setRemoved(true);
     }
 
     /**
@@ -470,7 +483,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $expiryDays !== self::NO_PASSWORD_EXPIRY &&
             time() >= strtotime(
-                '+'.(int) $expiryDays.' days',
+                '+' . $expiryDays . ' days',
                 $this->getPasswordModDate()->getTimestamp()
             );
     }
@@ -509,7 +522,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @param string $serialized
      */
-    public function unserialize($serialized): void
+    public function unserialize(string $serialized): void
     {
         list(
             $this->id,
@@ -520,7 +533,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return null
+     * @return string|null
      */
     public function getSalt(): ?string
     {
@@ -555,5 +568,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier(): string
     {
         return $this->username;
+    }
+
+    /**
+     * @throws RandomException
+     */
+    public function generatePasswordResetToken(): string
+    {
+        $this->passwordResetToken = random_int(100000, 999999);
+
+        return $this->passwordResetToken;
     }
 }

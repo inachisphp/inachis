@@ -31,21 +31,23 @@ class UserType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'user__displayName__label',
                     'data-tip-content' => 'How the user will be known',
-                    'class' => 'text full-width',
+                    'class' => 'text inline_label',
                 ],
                 'label' => 'Display Name',
                 'label_attr' => [
+                    'class' => 'inline_label',
                     'id' => 'user__displayName__label'
                 ],
             ])
             ->add('email', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'user__email__label',
-                    'class' => 'text full-width',
+                    'class' => 'text inline_label',
                     'readOnly' => true,
                 ],
                 'label' => 'Email Address',
                 'label_attr' => [
+                    'class' => 'inline_label',
                     'id' => 'user__email__label'
                 ],
             ])
@@ -53,11 +55,12 @@ class UserType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'user__timezone__label',
                     'data-tip-content' => 'How the user will be known',
-                    'class' => 'text full-width',
+                    'class' => 'text inline_label',
                 ],
                 'choices' => array_combine(timezone_identifiers_list(), timezone_identifiers_list()),
                 'label' => 'Timezone',
                 'label_attr' => [
+                    'class' => 'inline_label',
                     'id' => 'user__timezone__label',
                 ],
             ])

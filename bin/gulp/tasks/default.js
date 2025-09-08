@@ -1,13 +1,7 @@
-var gulp = require('gulp');
-gulp.task('default', [
-	//'clean',
-	'js:compile',
-	'sass:compile',
-	'images:min'
-]);
+'use strict';
 
-gulp.task('watchall', [
-	'sass:watch',
-	'js:watch',
-	'images:watch'
-]);
+const { parallel } = require('gulp');
+const { sassWatch } = require('./sass');
+const { jsWatch } = require('./jscombinemin')
+
+exports.default = parallel(sassWatch, jsWatch);

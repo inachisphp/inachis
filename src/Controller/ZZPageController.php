@@ -16,6 +16,7 @@ use App\Utils\ContentRevisionCompare;
 use App\Utils\ReadingTime;
 use Doctrine\ORM\EntityManager;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -107,15 +108,15 @@ class ZZPageController extends AbstractInachisController
      */
     #[Route(
         "/incc/{type}/list/{offset}/{limit}",
-        methods: [ "GET", "POST" ],
         requirements: [
             "type" => "post|page",
             "offset" => "\d+",
             "limit" => "\d+"
         ],
-        defaults: [ "offset" => 0, "limit" => 10 ]
+        defaults: [ "offset" => 0, "limit" => 10 ],
+        methods: [ "GET", "POST" ]
     )]
-    public function getPostListAdmin(Request $request, $type = 'post'): Response
+    public function getPostListAdmin(Request $request, string $type = 'post'): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $form = $this->createFormBuilder()->getForm();
@@ -159,6 +160,12 @@ class ZZPageController extends AbstractInachisController
             );
         }
         $filters = array_filter($request->get('filter', []));
+        if ($request->isMethod('post')) {
+            $_SESSION['post_filters'] = $filters;
+        } elseif (isset($_SESSION['post_filters'])) {
+            $filters = $_SESSION['post_filters'];
+        }
+
         $offset = (int) $request->get('offset', 0);
         $limit = $this->entityManager->getRepository(Page::class)->getMaxItemsToShow();
         $this->data['form'] = $form->createView();
@@ -272,7 +279,10 @@ class ZZPageController extends AbstractInachisController
                 $newCategories = $request->get('post')['categories'];
                 if (!empty($newCategories)) {
                     foreach ($newCategories as $newCategory) {
-                        $category = $this->entityManager->getRepository(Category::class)->findOneById($newCategory);
+                        $category = null;
+                        if (Uuid::isValid($newCategory)) {
+                            $category = $this->entityManager->getRepository(Category::class)->findOneById($newCategory);
+                        }
                         if (!empty($category)) {
                             $post->getCategories()->add($category);
                         }
@@ -283,7 +293,10 @@ class ZZPageController extends AbstractInachisController
                 $newTags = $request->get('post')['tags'];
                 if (!empty($newTags)) {
                     foreach ($newTags as $newTag) {
-                        $tag = $this->entityManager->getRepository(Tag::class)->findOneById($newTag);
+                        $tag = null;
+                        if (Uuid::isValid($newTag)) {
+                            $tag = $this->entityManager->getRepository(Tag::class)->findOneById($newTag);
+                        }
                         if (empty($tag)) {
                             $tag = new Tag($newTag);
                         }
@@ -313,7 +326,7 @@ class ZZPageController extends AbstractInachisController
             $this->entityManager->persist($post);
             $this->entityManager->flush();
 
-            $this->addFlash('notice', 'Content saved.');
+            $this->addFlash('success', 'Content saved.');
             return $this->redirect(
                 '/incc/' .
                 $post->getType() . '/' .
@@ -338,6 +351,9 @@ class ZZPageController extends AbstractInachisController
             ], [
                 [ 'q.versionNumber', 'DESC']
             ]);
+        if ($post->getId() !== null) {
+            $this->data['textStats'] = ReadingTime::getWordCountAndReadingTime($this->data['post']->getContent());
+        }
         return $this->render('inadmin/post__edit.html.twig', $this->data);
     }
 

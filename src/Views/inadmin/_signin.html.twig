@@ -1,31 +1,20 @@
-{% extends "inadmin/structure/main.html.twig" %}
-{% block content %}
+{% extends "inadmin/partials/form_account.html.twig" %}
+{% set page_type = 'login' %}
+{% set page_title = 'Login to' %}
 
-    <div class="col span_2_of_8"></div>
-    <div class="col span_4_of_8 container__login">
+{% block form_account %}
+    {{ form_row(form.loginUsername) }}
+    {{ form_row(form.loginPassword) }}
 
-    {% block form_login_pre %}{% endblock form_login_pre %}
-    {% block form_login %}
-        <div class="col span_1_of_2 logo">
-            <h1>Login to</h1>
-            <h2>{{ settings.siteTitle }}</h2>
-        </div>
-        <div class="col span_1_of_2">
-            {{ form_start(form, {attr: {class: 'form form__login', autocomplete: false}}) }}
-            {% if error %}
-                <div class="flash-notice">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-            {% elseif expired %}
-                <div class="flash-notice">Your session has expired.</div>
-            {% endif %}
-            {{ form_widget(form) }}
-            {{ form_end(form) }}
+    <p class="forgot-password"><a href="{{ path('app_account_forgotpassword') }}" title=""><span>{% trans %}Forgot your password?{% endtrans %}</span></a></p>
 
-            <p><a href="{{ path('app_account_forgotpassword') }}" title=""><span>{% trans %}Forgot your password?{% endtrans %}</span></a></p>
-        </div>
-    {% endblock form_login %}
-    {% block form_login_post %}{% endblock form_login_post %}
+    {% if recaptcha|default(false) %}
+    <p>This page is protected using Google reCAPTCHA. <a href="https://cloud.google.com/security/products/recaptcha#how-it-works" title="View Google's documentation for reCAPTCHA">Learn more</a>.</p>
+    {% endif %}
 
-    </div>
-    <div class="col span_2_of_8"></div>
+    {{ form_row(form.logIn) }}
 
-{% endblock content %}
+    {% if sso_enabled|default(false) %}
+        Login using Google or Apple
+    {% endif %}
+{% endblock form_account %}

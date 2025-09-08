@@ -62,7 +62,7 @@ class Page
     protected $title;
 
     /**
-     * @var string An optional sub-title for the {@link Page}
+     * @var string An optional subtitle for the {@link Page}
      */
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     protected $subTitle = null;
@@ -186,17 +186,18 @@ class Page
     #[ORM\InverseJoinColumn(name: 'tag_id', referencedColumnName: 'id')]
     #[ORM\OrderBy([ 'title' => 'ASC' ])]
     protected $tags;
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Series", inversedBy="items")
-     * @var Collection|Series[]  The array of Series that contains this page
-     */
-    protected $series;
 
     /**
      * @var Collection|Series[]  The array of Series that contains this page
      */
     #[ORM\ManyToMany(targetEntity: 'App\Entity\Series', inversedBy: 'items')]
     protected $series;
+
+    /**
+     * @var string The two character language code this content uses, empty means unknown
+     */
+    #[ORM\Column(type: 'string', length: 15, nullable: true)]
+    protected $language;
 
     /**
      * Default constructor for {@link Page}.
@@ -462,6 +463,14 @@ class Page
     }
 
     /**
+     * @return string The language used by this content
+     */
+    public function getLanguage(): string
+    {
+        return $this->language;
+    }
+
+    /**
      * Sets the value of {@link id}.
      *
      * @param string $value The UUID of the {@link Page}
@@ -532,7 +541,7 @@ class Page
      * @param Image $value The UUID or URL to use for the {@link feature_image}
      * @return $this
      */
-    public function setFeatureImage(?string $value): self
+    public function setFeatureImage(?Image $value): self
     {
         $this->featureImage = $value;
 
@@ -714,6 +723,15 @@ class Page
     }
 
     /**
+     * @param string $language
+     * @return void
+     */
+    public function setLanguage(string $language): void
+    {
+        $this->language = $language;
+    }
+
+    /**
      * Adds a {@link Url} to the {@link Page}.
      *
      * @param Url $url The new {@link Url} to add to the {@link Page}
@@ -836,6 +854,12 @@ class Page
     public function isDraft(): bool
     {
         return $this->status === self::DRAFT;
+    }
+
+    public function hasHotlinkedImages(): bool
+    {
+        preg_match('/\!\\[[^\\]]*\\]\\(https?:/', $this->getContent(), $matches);
+        return !empty($matches);
     }
 
     public static function isExportable(): bool

@@ -34,8 +34,13 @@ when@test:
 when@prod:
     doctrine:
         orm:
+            controller_resolver:
+                auto_mapping: true
             auto_generate_proxy_classes: false
             proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
+            metadata_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
             query_cache_driver:
                 type: pool
                 pool: doctrine.system_cache_pool

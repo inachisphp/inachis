@@ -100,16 +100,24 @@ var InachisContentSelectorDialog = {
                     }, $choseContent), 1200);
                 }, $choseContent),
                 method: 'POST',
-                success: function()
+                success: $.proxy(function(data)
                 {
-                    if(data.success == true) {
+                    if(data == 'Saved') {
                         $choseContent.html('<span class="material-icons">done</span> Content added');
                         setTimeout(function() {
                             location.reload();
                         }, 5000);
+                        // $.ajax(
+                        //     '/incc/series/contents',
+                        //      data: { 'seriesId': easymde.options.autosave.uniqueId },
+                        //      method: 'POST',
+                        //      success: function(data)
+                        //      {
+                        //          $('.edit__list') = data;
+                        //      }
+                        // );
                     }
-                    // @todo add code for updating series list in current view to avoid refresh instead
-                }
+                }, $choseContent)
             }
         );
     },
@@ -120,7 +128,7 @@ var InachisContentSelectorDialog = {
         var $contentSelector = $('#dialog__contentSelector');
         $contentSelector.find('ol').load('/incc/ax/contentSelector/get',
             {
-                seriesId: simplemde.options.autosave.uniqueId,
+                seriesId: easymde.options.autosave.uniqueId,
                 default: null
             }, function(responseText, status) {
                 var $uiDialog = $('.ui-dialog'),

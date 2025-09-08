@@ -1,0 +1,25 @@
+{% extends "inadmin/structure/main.html.twig" %}
+{% set page_type = 'login' %}
+
+{% block content %}
+<div class="container__login">
+    {{ form_start(form, {attr: {class: 'form form__login', autocomplete: false}}) }}
+    <img src="/assets/imgs/incc/inachis.png" title="inachis logo" />
+    <h1>{{ page_title }}</h1>
+    <h2>{{ settings.siteTitle }}</h2>
+
+    {% if error|default(false) %}
+        <div class="flash-error">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% elseif expired|default(false) %}
+        <div class="flash-notice">Your session has expired.</div>
+    {% endif %}
+
+    {% block form_account %}{% endblock form_account %}
+
+    {% if copyright|default('') is not empty %}
+        <p class="copyright">{{ copyright }}</p>
+    {% endif %}
+
+    {{ form_end(form) }}
+</div>
+{% endblock content %}

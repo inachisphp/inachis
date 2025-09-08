@@ -1,28 +1,26 @@
 {
-  "name": "inachis",
-  "version": "1.0.0",
-  "private": true,
   "devDependencies": {
-    "gulp": "<4.0.0",
+    "cypress": "^13.4.0",
+    "gulp": "*",
     "gulp-autoprefixer": "*",
-    "gulp-babel-minify": "^0.4.3",
+    "gulp-babel-minify": "*",
     "gulp-clean": "*",
     "gulp-concat": "*",
-    "gulp-cssnano": "^2.1.3",
+    "gulp-cssnano": "*",
     "gulp-exec": "*",
     "gulp-imagemin": "*",
     "gulp-jshint": "*",
-    "gulp-json-editor": "^2.4.1",
-    "gulp-rename": "^1.3.0",
-    "gulp-ruby-sass": "*",
-    "gulp-sass": "^4.0.2",
+    "gulp-json-editor": "*",
+    "gulp-rename": "*",
+    "gulp-sass": "*",
     "jshint": "*",
-    "node-sass": "^4.12.0",
     "pump": "*",
-    "require-dir": "*"
+    "require-dir": "*",
+    "sass": "*"
   },
   "dependencies": {
     "jquery-datetimepicker": "^2.5.20",
     "simplemde": "*"
-  }
+  },
+  "scripts": {}
 }
