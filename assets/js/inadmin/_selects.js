@@ -1,3 +1,31 @@
+function initSwitches(selector)
+{
+	$(selector + ' .ui-switch').each(function ()
+	{
+		var $properties = {
+			checked: this.checked,
+			clear: true,
+			height: 20,
+			width: 40
+		};
+		if ($(this).attr('data-label-on')) {
+			$properties.on_label = $(this).attr('data-label-on');
+		}
+		if ($(this).attr('data-label-off')) {
+			$properties.off_label = $(this).attr('data-label-off');
+		}
+		$(this).switchButton($properties);
+	});
+}
+
+function initClearSearch(selector)
+{
+	$(selector + '.clear-search').on('click', function()
+	{
+		$($(this).attr('data-target')).val('').val('');
+	});
+}
+
 $(document).ready(function() {
 	var $uiToggle = $('.ui-toggle');
 	$uiToggle.each(function()
@@ -89,22 +117,8 @@ $(document).ready(function() {
 		});
 	});
 
-	$('.ui-switch').each(function ()
-	{
-		var $properties = {
-			checked: this.checked,
-			clear: true,
-			height: 20,
-			width: 40
-		};
-		if ($(this).attr('data-label-on')) {
-			$properties.on_label = $(this).attr('data-label-on');
-		}
-		if ($(this).attr('data-label-off')) {
-			$properties.off_label = $(this).attr('data-label-off');
-		}
-		$(this).switchButton($properties);
-	});
+	initSwitches('');
+	initClearSearch('');
 
 	// jQuery Tabs
 	$('.ui-tabbed').tabs();
