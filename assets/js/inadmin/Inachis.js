@@ -1,5 +1,6 @@
 var Inachis = {
 	_debug: false,
+	prefix: '/incc',
 
 	_log: function(msg)
 	{

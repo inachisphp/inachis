@@ -33,7 +33,7 @@
                 {%- if notifications|length > 0 %}<span class="admin__user__notifications">{{ notifications|length }}</span>{% endif %}
             </a>
             <ul id="admin__user__options">
-                <li><a href="{{ path('app_admin_admindetails', {'id': session.username }) }}" title="Edit profile for {{ session.displayName }}">Edit your profile <span class="material-icons">perm_identity</span></a></li>
+                <li><a href="{{ path('app_admin_adminprofile_admindetails', {'id': session.username }) }}" title="Edit profile for {{ session.displayName }}">Edit your profile <span class="material-icons">perm_identity</span></a></li>
                 <!-- li><a href="/incc/settings/releases">Update available <span class="material-icons">new_releases</span></a></li -->
                 <li><form action="{{ path('app_logout') }}" method="post"><button>Log out <span class="material-icons">logout</span></button></form></li>
             </ul>
@@ -101,7 +101,7 @@
                         <li class="{{ page.tab|activeMenu('resources') }}"><a href="{{ settings.domain }}/incc/resources" title="Manage resources">
                                 <i class="material-icons">wallpaper</i><span> Resources</span></a>
                         </li>
-                        <li class="{{ page.tab|activeMenu('users') }}"><a href="{{ settings.domain ~ path('app_admin_adminlist') }}" title="Manage users">
+                        <li class="{{ page.tab|activeMenu('users') }}"><a href="{{ settings.domain ~ path('app_admin_adminprofile_adminlist') }}" title="Manage users">
                                 <i class="material-icons">people</i><span> Users</span></a>
                         </li>
                         <li class="{{ page.tab|activeMenu('tools') }}"><a href="{{ settings.domain ~ path('app_tools_index') }}" title="Tools">

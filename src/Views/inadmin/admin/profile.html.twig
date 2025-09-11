@@ -1,0 +1,58 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block content %}
+    {% block profile_pre %}{% endblock profile_pre %}
+
+    {% block profile %}
+
+        {{ form_start(form, {'attr': { 'class': 'form form__post form__user' }}) }}
+        <div class="col span_8_of_8 ui-tabs-external">
+            {{ include('inadmin/partials/profile_tabs.html.twig', {
+                'activeTab': 'profile'
+            }) }}
+
+            <h2>Edit profile</h2>
+            <h3>{{ user.username }}</h3>
+
+            <fieldset class="multisection">
+                <legend>Your Display Picture</legend>
+                <p class="profile-photo">
+                    <img alt="A user uploaded profile picture" height="100" src="{%
+                        if user.avatar is not empty %}/imgs/incc/{{ user.avatar }}{%
+                        else %}/assets/imgs/incc/defaultAvatar.png{% endif %}" width="100" />
+
+                </p>
+                <p><button class="button button--info" type="button">Upload a new picture</button></p>
+                <p>You can upload a JPEG, PNG, or HEIC image. It is recommended that this image is square (such as 100px x 100px) to avoid distortion.</p>
+            </fieldset>
+
+            <fieldset class="content__edit multisection">
+                <legend>Personal Information</legend>
+                <p>
+                    {{ form_label(form.displayName) }}
+                    {{ form_widget(form.displayName) }}
+                    {{ form_errors(form.displayName) }}
+                </p>
+
+                <p>
+                    {{ form_label(form.email) }}
+                    {{ form_widget(form.email) }}
+                    {{ form_errors(form.email) }}
+                </p>
+
+                <p>
+                    {{ form_label(form.timezone) }}
+                    {{ form_widget(form.timezone) }}
+                    {{ form_errors(form.timezone) }}
+                </p>
+            </fieldset>
+
+            <p><button class="button button--positive" type="submit">Save</button></p>
+        </div>
+        {{ form_end(form) }}
+
+    {% endblock profile %}
+
+
+    {% block profile_post %}{% endblock profile_post %}
+{% endblock content %}

@@ -44,7 +44,7 @@ class AdminDialogController extends AbstractInachisController
         $this->data['form'] = $this->createForm(ImageType::class)->createView();
         $this->data['allowedTypes'] = Image::ALLOWED_TYPES;
         // @todo add pagination
-        $this->data['images'] = $this->entityManager->getRepository(Image::class)->getAll(0, 250);
+        $this->data['images'] = $this->entityManager->getRepository(Image::class)->getAll(0, 20);
         $this->data['image_count'] = sizeof($this->data['images']);
         return $this->render('inadmin/dialog/imageManager.html.twig', $this->data);
     }

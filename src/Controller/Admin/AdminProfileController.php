@@ -1,21 +1,22 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Admin;
 
+use App\Controller\AbstractInachisController;
 use App\Entity\User;
 use App\Form\UserType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class AdminController extends AbstractInachisController
+class AdminProfileController extends AbstractInachisController
 {
     /**
      * @param Request $request
      * @return Response
      * @throws \Exception
      */
-    #[Route("/incc/user-management", methods: [ 'GET', 'POST' ])]
+    #[Route("/incc/admin-management", methods: [ 'GET', 'POST' ])]
     public function adminList(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -33,7 +34,7 @@ class AdminController extends AbstractInachisController
         $this->data['page']['limit'] = $limit;
         $this->data['page']['title'] = 'Users';
 
-        return $this->render('inadmin/user__list.html.twig', $this->data);
+        return $this->render('inadmin/admin/list.html.twig', $this->data);
     }
 
     /**
@@ -42,7 +43,7 @@ class AdminController extends AbstractInachisController
      * @return Response
      * @throws \Exception
      */
-    #[Route("/incc/user/{id}", methods: [ "GET", "POST" ])]
+    #[Route("/incc/admin/{id}", methods: [ "GET", "POST" ])]
     public function adminDetails(Request $request, string $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -56,14 +57,16 @@ class AdminController extends AbstractInachisController
             $this->entityManager->persist($user);
             $this->entityManager->flush();
 
-            $this->addFlash('notice', 'User details saved.');
-            return $this->redirect('/incc/user/' . $user->getId());
+            $this->addFlash('success', 'User details saved.');
+            return $this->redirect($this->generateUrl('app_admin_adminprofile_admindetails', [
+                'id' => $user->getUsername(),
+            ]));
         }
 
         $this->data['user'] = $user;
         $this->data['form'] = $form->createView();
         $this->data['page']['title'] = 'Profile';
 
-        return $this->render('inadmin/profile.html.twig', $this->data);
+        return $this->render('inadmin/admin/profile.html.twig', $this->data);
     }
 }

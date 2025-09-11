@@ -1,0 +1,22 @@
+.admonition {
+  border-left: 3px solid transparent;
+  border-radius: 0.5em;
+  line-height: 1.75em;
+  padding: 1em;
+
+  .admonition__title {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 1em;
+    text-transform: uppercase;
+
+    .material-icons {
+      vertical-align: middle;
+    }
+  }
+}
+
+.admonition__info {
+  background-color: $admonition-tip__background-color;
+  border-left-color: $admonition-tip__border-color;
+}
