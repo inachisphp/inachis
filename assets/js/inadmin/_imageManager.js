@@ -12,6 +12,9 @@ var InachisImageManager = {
     ],
 
     saveUrl: '',
+    offset: 0,
+    limit: 25,
+    saveTimeout: false,
 
     _init: function()
     {
@@ -58,24 +61,17 @@ var InachisImageManager = {
                 });
         });
         $('.gallery input[type=radio]').change(InachisImageManager.enableChooseButton);
-        let saveTimeout = false;
-        $('#ui-dialog-search-input').on('input', function (event)
-        {
-            if(saveTimeout) clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(function() {
-                $('.gallery').load(
-                    Inachis.prefix + '/ax/imageManager/getImages/0/25',
-                    {
-                        filter: {
-                            keyword: $(event.currentTarget).val(),
-                        },
-                    },
-                    function ()
-                    {
-                        $('#images_count').html($('.gallery ol').attr('data-total'));
-                    }
-                );
-            }, 500);
+        $('#ui-dialog-search-input').on('input', function (event) { InachisImageManager.searchImages(); });
+        this.addPaginationLinks();
+    },
+
+    addPaginationLinks: function()
+    {
+        $('nav .pagination li a').on('click', function(event) {
+            event.preventDefault();
+            InachisImageManager.offset = $(event.currentTarget).html() * (InachisImageManager.limit - 1);
+            InachisImageManager.searchImages();
+            return false;
         });
     },
 
@@ -94,10 +90,26 @@ var InachisImageManager = {
         $('#dialog__imageManager').dialog('close');
     },
 
-    searchImages: function()
+    searchImages: function ()
     {
-        // @todo: implement search
-        // queue up ajax request to get results; should previous search be cancelled if not complete?
+        if(InachisImageManager.saveTimeout) clearTimeout(InachisImageManager.saveTimeout);
+        InachisImageManager.saveTimeout = setTimeout(function() {
+            $('.gallery').load(
+                Inachis.prefix + '/ax/imageManager/getImages/' + InachisImageManager.offset +'/' + InachisImageManager.limit,
+                {
+                    filter: {
+                        keyword: $('#ui-dialog-search-input').val(),
+                    },
+                },
+                function ()
+                {
+                    InachisImageManager.offset = 0;
+                    $('.gallery').animate({ scrollTop:0}, 100);
+                    InachisImageManager.addPaginationLinks();
+                    $('#images_count').html($('.gallery ol').attr('data-total'));
+                }
+            );
+        }, 500);
     },
 
     toggleUploadImage: function()
