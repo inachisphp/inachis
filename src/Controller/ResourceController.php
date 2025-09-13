@@ -17,7 +17,15 @@ class ResourceController extends AbstractInachisController
      * @return Response
      * @throws \Exception
      */
-    #[Route("/incc/resources", methods: [ "GET" ])]
+    #[Route("/incc/resources/{type}/{offset}/{limit}",
+        requirements: [
+            "type" => "(images|downloads)",
+            "offset" => "\d+",
+            "limit" => "\d+"
+        ],
+        defaults: [ "offset" => 0, "limit" => 10 ],
+        methods: [ "GET", "POST" ],
+    )]
     public function resourcesList(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -27,16 +35,23 @@ class ResourceController extends AbstractInachisController
         };
         $type = substr(strrchr($typeClass, '\\'), 1);
 
-        $form = $this->createFormBuilder()->getForm();
+        $form = $this->createFormBuilder()
+            ->setAction($this->generateUrl('app_resource_resourceslist', [
+                'type' => $request->get('type'),
+            ]))
+            ->getForm()
+        ;
         $form->handleRequest($request);
+        $filters = array_filter($request->get('filter', []));
         $offset = (int) $request->get('offset', 0);
-
         $limit = $this->entityManager->getRepository($typeClass)->getMaxItemsToShow();
-        $this->data['dataset'] = $this->entityManager->getRepository($typeClass)->getAll(
+        $this->data['dataset'] = $this->entityManager->getRepository($typeClass)->getFiltered(
+            $filters,
             $offset,
             $limit
         );
         $this->data['form'] = $form->createView();
+        $this->data['page']['type'] = $request->get('type');
         $this->data['page']['offset'] = $offset;
         $this->data['page']['limit'] = $limit;
         $this->data['page']['tab'] = $type;

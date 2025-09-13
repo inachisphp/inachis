@@ -14,38 +14,73 @@
             </li>
         </ul>
 
+        {% if dataset|default(null) is not empty and form|default(null) is not empty %}
+        {{ form_start(form, {'attr': { 'class': 'form form__' ~ page.type ~ ' content__list' }}) }}
+
+        {{- form_errors(form) -}}
         <p>
-            <a class="button button--positive" href="#"><span class="material-icons">cloud_upload</span> Upload Image</a>
+            <button href="#" class="button button--info dialog__link"
+                    data-buttons="eyJ0ZXh0IjoiQ2hvb3NlIEltYWdlIiwiY2xhc3MiOiJidXR0b24gYnV0dG9uLS1wb3NpdGl2ZSIsImRpc2FibGVkIjp0cnVlfQ=="
+                    data-class-name="dialog__imageManager"
+                    data-template-name="image-manager"
+                    data-title="{% trans %}admin.dialog.upload.title{% endtrans %}"
+                    data-view="upload"
+                    type="button"
+            ><span class="material-icons">cloud_upload</span> Upload a new Image</button>
         </p>
 
-        {% include 'inadmin/partials/list.html.twig' with {
-            'className': 'form__' ~ page.tab|lower,
-            'type': page.tab,
-            'dataset': dataset,
+        {{ include('inadmin/partials/filters.html.twig', {
+            show_search: true,
 
-            'offset': page.offset,
-            'limit': page.limit,
-            'total': dataset.count,
+        }) }}
 
-            'snippet_description': 'content',
+        {% if dataset is not empty %}
+        <p class="pagination--info">
+            Showing {{ page.offset + 1 }} to {{ min(page.offset + page.limit, dataset.count) }} of {{ dataset.count }}
+        </p>
+        <ul class="ui-image-library">
+            {% for item in dataset %}
+            <li>
+                <a title="{{ item.title }}">
+                    <span><img alt="{{ item.altText }}" src="{{ item.filename }}" /></span>
+                    {{ item.title|u.truncate(35, '...', false) }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        {{ include('inadmin/partials/pagination.html.twig', {
+            offset: page.offset,
+            limit: page.limit,
+            maxResults: dataset.count,
+            maxPagesToShow: 5,
+            result_url: path('app_resource_resourceslist', { type: page.type }),
+        }) }}
+        {% endif %}
+        {% if actions|default(null) is not empty %}
+            {% include 'inadmin/partials/action_bar.html.twig' %}
+        {% endif %}
+        {{ form_end(form) }}
+        {% elseif filter_values|default(null) is not empty %}
+            {% include 'inadmin/partials/filters.html.twig' with {
+                'filters': filters,
+                'filter_values': filter_values,
+                'show_search': show_search
+            } only %}
 
-            'url_result': path('app_zzpage_getpostlistadmin'),
-
-            'actions': {
-                'delete': {
-                    'button_class': 'button--negative button--delete',
-                    'data': {
-                        'form-action': ''
-                    },
-                    'icon': 'delete_forever',
-                    'title': 'Delete',
-                }
-            },
-
-            'show_search': true,
-            'zebra': true,
-        }
-        %}
+            <p class="content-warning">
+                <i class="material-icons">info_outline</i>
+                <span>Oops! Your filter didn't find anything!</span>
+                <a href="{{ url_result }}">Remove filter</a>
+            </p>
+        {% else %}
+            <p class="content-warning">
+                <i class="material-icons">info_outline</i>
+                <span>You don't have any content yet!</span>
+                {% if url_add|default(null) is not empty %}
+                    <a href="{{ url_add }}">Add some now!</a>
+                {% endif %}
+            </p>
+        {% endif %}
     </div>
     {% endblock resources %}
 
