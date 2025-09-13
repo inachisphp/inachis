@@ -56,9 +56,27 @@ var InachisImageManager = {
                     InachisImageManager.toggleUploadImage();
                     $('.ui-dialog-image-uploader button[type=submit]').prop('disabled', false);
                 });
-            event.preventDefault();
         });
         $('.gallery input[type=radio]').change(InachisImageManager.enableChooseButton);
+        let saveTimeout = false;
+        $('#ui-dialog-search-input').on('input', function (event)
+        {
+            if(saveTimeout) clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(function() {
+                $('.gallery').load(
+                    Inachis.prefix + '/ax/imageManager/getImages/0/25',
+                    {
+                        filter: {
+                            keyword: $(event.currentTarget).val(),
+                        },
+                    },
+                    function ()
+                    {
+                        $('#images_count').html($('.gallery ol').attr('data-total'));
+                    }
+                );
+            }, 500);
+        });
     },
 
     enableChooseButton: function()

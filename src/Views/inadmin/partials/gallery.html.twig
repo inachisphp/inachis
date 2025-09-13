@@ -1,0 +1,25 @@
+{% if images is not empty %}
+    <ol data-total="{{ images.count }}">
+        {% for image in images %}
+            <li>
+                <label for="chosenImage_{{ image.id }}">
+                    <img alt="{{ image.altText }}" src="{% if not (image.filename starts with 'http') %}/imgs/{% endif %}{{ image.filename }}" />
+                    <span>{{ image.title }}</span>
+                </label>
+                <input id="chosenImage_{{ image.id }}" name="chosenImage[]" type="radio" value="{{ image.id }}" />
+                {% if image.filename|slice(0,4) == 'http' %}
+                    <em class="material-icons">link</em>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ol>
+    {{ include('inadmin/partials/pagination.html.twig', {
+        offset: page.offset,
+        limit: page.limit,
+        maxResults: images.count,
+        maxPagesToShow: 5,
+        result_url: path('app_resource_resourceslist', { type: 'images' }),
+    }) }}
+{% else %}
+    <p>No images to choose from, maybe you'd like to add some</p>
+{% endif %}

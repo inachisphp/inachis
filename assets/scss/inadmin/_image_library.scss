@@ -2,6 +2,13 @@
 
 $image-tile-background: #eee;
 
+#dialog__imageManager {
+  .pagination {
+    clear: both;
+    display: block;
+  }
+}
+
 .form input[type="checkbox"] + label {
   display: inline;
 }

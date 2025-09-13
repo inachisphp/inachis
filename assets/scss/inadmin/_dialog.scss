@@ -35,10 +35,15 @@
     }
     .search {
       float: right;
+      margin-top: 0.75em;
 
+      button {
+        vertical-align: middle;
+      }
       input {
         font-size: 1.2em;
         padding: 5px;
+        vertical-align: middle;
       }
       label {
         display: none;

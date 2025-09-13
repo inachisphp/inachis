@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Dialog;
 
+use App\Controller\AbstractInachisController;
 use App\Entity\Page;
 use App\Entity\Series;
 use Symfony\Component\HttpFoundation\Request;
