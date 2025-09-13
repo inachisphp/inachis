@@ -98,7 +98,7 @@
                         <li class="{{ page.tab|activeMenu('url') }}"><a href="{{ settings.domain ~ path('app_url_list') }}" title="View list of defined URLs">
                                 <i class="material-icons">insert_link</i><span> URLs</span></a>
                         </li>
-                        <li class="{{ page.tab|activeMenu('resources') }}"><a href="{{ settings.domain }}/incc/resources" title="Manage resources">
+                        <li class="{{ page.tab|activeMenu('resources') }}"><a href="{{ settings.domain ~ path('app_resource_resourceslist', { type: 'images' }) }}" title="Manage resources">
                                 <i class="material-icons">wallpaper</i><span> Resources</span></a>
                         </li>
                         <li class="{{ page.tab|activeMenu('users') }}"><a href="{{ settings.domain ~ path('app_admin_adminprofile_adminlist') }}" title="Manage users">
