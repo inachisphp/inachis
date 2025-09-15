@@ -3,9 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\Category;
+use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Tag;
 use App\Entity\Url;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 final class PageRepository extends AbstractRepository
@@ -165,6 +167,25 @@ final class PageRepository extends AbstractRepository
                 'q.id IN (:ids)',
                 [
                     'ids' => $ids,
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @param Image $image
+     * @return Paginator
+     */
+    public function getPostsUsingImage(Image $image): Paginator
+    {
+        return $this->getAll(
+            0,
+            25,
+            [
+                'q.content LIKE :filename OR q.featureImage = :image',
+                [
+                    'filename' => '%' . $image->getFilename() . '%',
+                    'image' => $image->getId(),
                 ]
             ]
         );

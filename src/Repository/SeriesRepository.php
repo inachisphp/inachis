@@ -2,10 +2,13 @@
 
 namespace App\Repository;
 
+use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Series;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use http\Env\Response;
 
 /**
  * @method Series|null find($id, $lockMode = null, $lockVersion = null)
@@ -86,9 +89,9 @@ class SeriesRepository extends AbstractRepository
      * @param $filters
      * @param $offset
      * @param $limit
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return Paginator
      */
-    public function getFiltered($filters, $offset, $limit)
+    public function getFiltered($filters, $offset, $limit): Paginator
     {
         $where = [];
         if (!empty($filters['keyword'])) {
@@ -106,6 +109,25 @@ class SeriesRepository extends AbstractRepository
             [
                 [ 'q.title', 'ASC' ],
                 [ 'q.subTitle', 'ASC' ]
+            ]
+        );
+    }
+
+    /**
+     * @param Image $image
+     * @return Paginator
+     */
+    public function getSeriesUsingImage(Image $image): Paginator
+    {
+        return $this->getAll(
+            0,
+            25,
+            [
+                'q.description LIKE :filename OR q.image = :image',
+                [
+                    'filename' => '%' . $image->getFilename() . '%',
+                    'image' => $image,
+                ]
             ]
         );
     }

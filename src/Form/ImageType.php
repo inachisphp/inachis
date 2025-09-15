@@ -77,7 +77,6 @@ class ImageType extends AbstractType
 
 //            ->add('dimensionX')
 //            ->add('dimensionY')
-//            ->add('description')
 //            ->add('filetype')
 //            ->add('filesize')
 //            ->add('checksum')

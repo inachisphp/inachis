@@ -1,0 +1,77 @@
+{% extends "inadmin/structure/main.html.twig" %}
+{% block content %}
+
+    {% block resources_pre %}{% endblock resources_pre %}
+
+    {% block resources %}
+        {{ form_start(form, {'attr': { 'class': 'form form__post form__resource' }}) }}
+        <div class="col span_5_of_8 content__edit">
+        <fieldset id="post__edit">
+            <legend>{% trans %}admin.series.legend{% endtrans %}</legend>
+            <p>
+                {{ form_label(form.title) }}
+                {{ form_errors(form.title) }}
+                {{ form_widget(form.title) }}
+            </p>
+            <p>
+                {{ form_label(form.altText) }}
+                {{ form_errors(form.altText) }}
+                {{ form_widget(form.altText) }}
+            </p>
+            <p>
+                {{ form_label(form.description) }}
+                {{ form_errors(form.description) }}
+                {{ form_widget(form.description) }}
+            </p>
+        </fieldset>
+        <fieldset id="post__properties">
+            <legend>Properties</legend>
+            {% if page.type == 'images' %}
+            <p><strong>Dimensions:</strong> {{ resource.dimensionX ~ ' (w) x ' ~ resource.dimensionY ~ ' (h)' }}</p>
+            {% endif %}
+            <p><strong>File name:</strong> {{ resource.filename }}</p>
+            <p><strong>File type:</strong> {{ resource.filetype }}</p>
+            <p><strong>Size:</strong> {{ resource.filesize }}</p>
+        </fieldset>
+        </div>
+        <div class="col span_3_of_8">
+            {% if page.type == 'images' %}
+                {{ include('inadmin/partials/image_preview.html.twig', {
+                    id: resource.id,
+                    value: resource,
+                    name: '',
+                    show_gallery_button: 0,
+                }) }}
+            {% endif %}
+            <fieldset id="post_usages">
+                <legend>Usages</legend>
+                {% if usages.posts|default(null) is not empty or usages.series|default(null) is not empty %}
+                    <ol>
+                        {% for content_type,content_uses in usages %}
+                            {% for image_use in content_uses %}
+                                <li>
+                                    <a href="path to post or series">{{ image_use.title }} &mdash; {{ image_use.subTitle }}</a>
+                                </li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ol>
+                {% else %}
+                    <p>Image is not in known use.</p>
+                {% endif %}
+            </fieldset>
+        </div>
+        <div class="fixed-bottom-bar">
+            <p>
+                {{ form_widget(form.submit) }}
+            {% if resource.id is not null and usages.posts|default(null) is empty and usages.series|default(null) is empty %}
+                {{ form_widget(form.delete) }}
+            {% endif %}
+            </p>
+        </div>
+
+        {{ form_row(form._token) }}
+        {{ form_end(form, {render_rest: false}) }}
+    {% endblock resources %}
+
+    {% block resources_post %}{% endblock resources_post %}
+{% endblock content %}

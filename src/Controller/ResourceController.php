@@ -3,7 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Image;
+use App\Entity\Page;
+use App\Entity\Series;
 use App\Form\ImageType;
+use App\Form\ResourceType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -58,6 +61,50 @@ class ResourceController extends AbstractInachisController
         $this->data['page']['title'] = $type . 's';
 
         return $this->render('inadmin/_resources.html.twig', $this->data);
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     */
+    #[Route('/incc/resources/{type}/{id}',
+        requirements: [
+            "type" => "(images|downloads)",
+            "id" => "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+        ],
+        methods: [ "GET", "POST" ],
+    )]
+    public function editResource(Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $typeClass = match ($request->request?->get('type')) {
+            'downloads' => Download::class,
+            default => Image::class,
+        };
+        $type = substr(strrchr($typeClass, '\\'), 1);
+        $resource = $this->entityManager->getRepository($typeClass)->find($request->get('id'));
+        $form = $this->createForm(ResourceType::class, $resource);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $resource = $form->getData();
+            if ($request->get('delete') !== null) {
+                // @todo add code for removing file
+            }
+            $this->entityManager->persist($resource);
+            $this->entityManager->flush();
+        }
+        $this->data['form'] = $form->createView();
+        $this->data['page']['type'] = $request->get('type');
+        $this->data['page']['tab'] = $type;
+        $this->data['page']['title'] = sprintf('%s: %s', $type, $resource->getTitle());
+        $this->data['resource'] = $resource;
+        if ($type === 'Image') {
+            $this->data['usages']['posts'] = $this->entityManager->getRepository(Page::class)->getPostsUsingImage($resource);
+            $this->data['usages']['series'] = $this->entityManager->getRepository(Series::class)->getSeriesUsingImage($resource);
+        }
+
+        return $this->render('inadmin/_resource_edit.html.twig', $this->data);
     }
 
     /**

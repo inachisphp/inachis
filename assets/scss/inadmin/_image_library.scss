@@ -26,14 +26,17 @@ $image-tile-background: #eee;
 
     a, a:visited {
       background: $image-tile-background;
+      color: #333;
       display: block;
       height: 14.5em;
       padding: 1em;
+      text-decoration: none;
       width: 150px;
     }
 
     a:hover {
       background-color: color.scale($image-tile-background, $lightness: -10%);
+      color: #000;
     }
 
     img {

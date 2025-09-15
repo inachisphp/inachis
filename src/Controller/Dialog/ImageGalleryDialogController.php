@@ -32,7 +32,8 @@ class ImageGalleryDialogController extends AbstractInachisController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->data['form'] = $this->createForm(ImageType::class)->createView();
         $this->data['allowedTypes'] = Image::ALLOWED_TYPES;
-        $this->data['dataset'] = $this->entityManager->getRepository(Image::class)->getAll(
+        $this->data['dataset'] = $this->entityManager->getRepository(Image::class)->getFiltered(
+            [],
             0,
             $this->entityManager->getRepository(Image::class)->getMaxItemsToShow()
         );
