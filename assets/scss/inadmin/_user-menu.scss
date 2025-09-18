@@ -1,8 +1,7 @@
 $admin__user__notification__colour: #b01c3f;
 
 .admin__user {
-	float: right;
-	margin: 8px 20px;
+	margin: 0.5em 1em 0.5em 0;
 
 	a[href="#admin__user__options"] {
 		&:after {
@@ -10,9 +9,9 @@ $admin__user__notification__colour: #b01c3f;
 		    border-style: solid;
 		    border-width: 5px 5px 0 5px;
 		    border-color: #aaa transparent transparent transparent;
-		    left: 3em;
 		    position: relative;
-		    top: -1.25em;
+			top: 1em;
+			right: -0.5em;
 		}
 	}
 
@@ -28,8 +27,24 @@ $admin__user__notification__colour: #b01c3f;
 		background-color: #fff;
 		border: 1px solid #aaa;
 		border-radius: 50%;
-		padding: 1px;
+		padding: 2px;
 		vertical-align: middle;
+	}
+
+	[data-initials]:before {
+		background: #099bdd;
+		color: white;
+		opacity: 1;
+		content: attr(data-initials);
+		display: inline-block;
+		font-weight: bold;
+		border-radius: 50%;
+		vertical-align: middle;
+		//margin-right: 0.5em;
+		width: 45px;
+		height: 45px;
+		line-height: 45px;
+		text-align: center;
 	}
 
 	ul {
@@ -40,9 +55,10 @@ $admin__user__notification__colour: #b01c3f;
 		display: none;
 		font-size: 0.85em;
 		list-style-type: none;
+		min-width: 20em;
 		padding: 0;
 		position: absolute;
-		right: 10px;
+		right: 0;
 		top: 45px;
 
 		li {

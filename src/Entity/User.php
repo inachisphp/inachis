@@ -579,4 +579,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this->passwordResetToken;
     }
+
+    public function getInitials(): string
+    {
+        $initials = '';
+        $nameWords = explode(' ', $this->getDisplayName());
+        foreach ($nameWords as $nameWord) {
+            $initials .= ucfirst($nameWord[0]);
+        }
+        return $initials;
+    }
 }

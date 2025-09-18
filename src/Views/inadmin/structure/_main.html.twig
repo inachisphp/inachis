@@ -29,7 +29,11 @@
         <!-- h1>Title / breadcrumb goes here</h1 -->
         <section class="admin__user">
             <a href="#admin__user__options">
-                <img alt="User avatar" height="40" src="{% if session.avatar|default('') is not empty %}{{ session.avatar.filename }}{% else %}{{ settings.domain }}/assets/imgs/incc/defaultAvatar.png{% endif %}" width="40" />
+                {% if session.avatar is not empty %}
+                <img alt="User avatar" height="40" src="{{ session.avatar.filename }}" width="40" />
+                {% else %}
+                <span data-initials="{{ session.initials }}"></span>
+                {% endif %}
                 {%- if notifications|length > 0 %}<span class="admin__user__notifications">{{ notifications|length }}</span>{% endif %}
             </a>
             <ul id="admin__user__options">
@@ -84,8 +88,8 @@
                 <li>
                     <a class="button admin__add-content" href="#new" title="Add new content"><i class="material-icons">edit</i><span> Add</span></a>
                     <ul class="admin__nav-new contextual-menu">
-                        <li><a href="{{ settings.domain ~ path('app_zzpage_getpostadmin', {'type': 'post'}) }}/post/new" title="Add a new post"><i class="material-icons">short_text</i><span> New Post</span></a></li>
-                        <li><a href="{{ settings.domain ~ path('app_zzpage_getpostadmin', {'type': 'page'}) }}/new" title="Add a new page"><i class="material-icons">content_copy</i><span> New Page</span></a></li>
+                        <li><a href="{{ settings.domain ~ path('app_zzpage_getpostadmin', { type: 'post'}) }}/post/new" title="Add a new post"><i class="material-icons">short_text</i><span> New Post</span></a></li>
+                        <li><a href="{{ settings.domain ~ path('app_zzpage_getpostadmin', { type: 'page'}) }}/new" title="Add a new page"><i class="material-icons">content_copy</i><span> New Page</span></a></li>
                     </ul>
                 </li>
                 <li class="{{ page.tab|activeMenu('dashboard') }}"><a href="{{ settings.domain ~ path('app_dashboard_default') }}" title="View dashboard"><i class="material-icons">home</i><span> Dashboard</span></a></li>
