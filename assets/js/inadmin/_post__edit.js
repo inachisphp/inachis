@@ -156,7 +156,7 @@ var InachisPostEdit = {
 			},
 			dataType: 'json',
 			method: 'post',
-			url: '/incc/ax/check-url-usage',
+			url: Inachis.prefix + '/ax/check-url-usage',
 		}).done(function (response) {
 			return response.responseText;
 		});

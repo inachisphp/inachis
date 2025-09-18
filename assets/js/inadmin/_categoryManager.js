@@ -50,7 +50,7 @@ var InachisCategoryManager = {
             $createCategory = $('.ui-dialog-buttonpane').find('button').first();
         $createCategory.prop('disabled', true).html('Saving…');
         $.ajax(
-            '/incc/ax/categoryManager/save',
+            Inachis.prefix + '/ax/categoryManager/save',
             {
                 complete: $.proxy(function()
                 {

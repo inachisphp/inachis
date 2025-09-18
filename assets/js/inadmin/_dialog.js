@@ -62,7 +62,7 @@ var InachisDialog = {
     {
         $('.ui-dialog-titlebar-close').addClass('material-icons').html('close');
         $('.ui-dialog-content').load(
-            '/incc/ax/' + this.hyphenToCamel(templateName) + '/get', {
+            Inachis.prefix + '/ax/' + this.hyphenToCamel(templateName) + '/get', {
                 selectedImage: ''
             }, function() // response, status, xhr
             {

@@ -77,7 +77,7 @@ var InachisContentSelectorDialog = {
         });
         $choseContent.prop('disabled', true).html('Saving…');
         $.ajax(
-            '/incc/ax/contentSelector/save',
+            Inachis.prefix + '/ax/contentSelector/save',
             {
                 complete: $.proxy(function()
                 {
@@ -108,7 +108,7 @@ var InachisContentSelectorDialog = {
                             location.reload();
                         }, 5000);
                         // $.ajax(
-                        //     '/incc/series/contents',
+                        //     Inachis.prefix + '/series/contents',
                         //      data: { 'seriesId': easymde.options.autosave.uniqueId },
                         //      method: 'POST',
                         //      success: function(data)
@@ -126,7 +126,7 @@ var InachisContentSelectorDialog = {
     {
         // @todo filter out content already in series
         var $contentSelector = $('#dialog__contentSelector');
-        $contentSelector.find('ol').load('/incc/ax/contentSelector/get',
+        $contentSelector.find('ol').load(Inachis.prefix + '/ax/contentSelector/get',
             {
                 seriesId: easymde.options.autosave.uniqueId,
                 default: null
