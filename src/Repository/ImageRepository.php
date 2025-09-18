@@ -16,6 +16,15 @@ class ImageRepository extends AbstractRepository
     }
 
     /**
+     * @param Series $series
+     */
+    public function remove(Image $image)
+    {
+        $this->getEntityManager()->remove($image);
+        $this->getEntityManager()->flush();
+    }
+
+    /**
      * @param $filters
      * @param $offset
      * @param $limit

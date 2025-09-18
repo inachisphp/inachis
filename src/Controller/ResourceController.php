@@ -7,11 +7,17 @@ use App\Entity\Page;
 use App\Entity\Series;
 use App\Form\ImageType;
 use App\Form\ResourceType;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+//use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
+
 
 class ResourceController extends AbstractInachisController
 {
@@ -70,29 +76,66 @@ class ResourceController extends AbstractInachisController
      * @param Request $request
      * @return Response
      */
-    #[Route('/incc/resources/{type}/{id}',
+    #[Route('/incc/resources/{type}/{filename}',
         requirements: [
             "type" => "(images|downloads)",
-            "id" => "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
         ],
         methods: [ "GET", "POST" ],
     )]
-    public function editResource(Request $request): Response
+    public function editResource(
+        Request $request,
+        Filesystem $filesystem,
+        #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+//            "filename" => "[a-zA-Z0-9\-\_]\.(jpe?g|heic|png)",
         $typeClass = match ($request->request?->get('type')) {
             'downloads' => Download::class,
             default => Image::class,
         };
         $type = substr(strrchr($typeClass, '\\'), 1);
-        $resource = $this->entityManager->getRepository($typeClass)->find($request->get('id'));
+        $resource = $this->entityManager->getRepository($typeClass)->find($request->get('filename'));
+        if (empty($resource)) {
+            return $this->redirectToRoute(
+                'app_resource_resourceslist',
+                [
+                    'type' => $request->get('type'),
+
+                ],
+                Response::HTTP_PERMANENTLY_REDIRECT
+            );
+        }
         $form = $this->createForm(ResourceType::class, $resource);
         $form->handleRequest($request);
+        if ($type === 'Image') {
+            $this->data['usages']['posts'] = $this->entityManager->getRepository(Page::class)->getPostsUsingImage($resource);
+            $this->data['usages']['series'] = $this->entityManager->getRepository(Series::class)->getSeriesUsingImage($resource);
+        }
 
         if ($form->isSubmitted() && $form->isValid()) {
             $resource = $form->getData();
-            if ($request->get('delete') !== null) {
-                // @todo add code for removing file
+            if ($request->get('resource')['delete'] !== null) {
+                $filename = $imageDirectory . $resource->getFilename();
+                if ($type === 'Image' &&
+                    sizeof($this->data['usages']['posts']) === 0 &&
+                    sizeof($this->data['usages']['series']) === 0 &&
+                    $filesystem->exists($filename)) {
+                    try {
+                        $filesystem->remove($filename);
+                        $this->entityManager->getRepository($typeClass)->remove($resource);
+                        $this->addFlash('success', 'Resource deleted.');
+                        return $this->redirectToRoute(
+                            'app_resource_resourceslist',
+                            [
+                                'type' => $request->get('type'),
+
+                            ],
+                            Response::HTTP_PERMANENTLY_REDIRECT
+                        );
+                    } catch (IOExceptionInterface $e) {
+                        $this->addFlash('error', 'Failed to remove file.');
+                    }
+                }
             }
             $this->entityManager->persist($resource);
             $this->entityManager->flush();
@@ -159,6 +202,8 @@ class ResourceController extends AbstractInachisController
         } catch (FileException $e) {
             return new JsonResponse(['error' => $e->getMessage()], 400);
         }
+        $this->entityManager->persist($image);
+        $this->entityManager->flush();
         return new JsonResponse(['OK' => $image->getId()], 200);
     }
 }

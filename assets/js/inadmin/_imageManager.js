@@ -35,15 +35,18 @@ var InachisImageManager = {
             event.preventDefault();
             event.stopPropagation();
             dropzone.on('success', file => {
+                $('#ui-dialog-search-input').val($('#image_title').val());
                 if (InachisDialog.view === 'upload') {
-                    // close the dialog
+                    $('#filter__keyword').val($('#image_title').val());
+                    $('#dialog__imageManager').dialog('destroy');
+                    $('form.form__images').submit();
                 } else {
                     InachisImageManager.toggleUploadImage();
                     InachisImageManager.addPaginationLinks();
                 }
             });
             dropzone.on('error', file => {
-                console.log('show error, remove file, and keep submit button disabled until file re-added');
+                console.log('@todo show error, remove file, and keep submit button disabled until file re-added');
             });
             dropzone.processQueue();
         });

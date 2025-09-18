@@ -19,7 +19,12 @@ $button--default-hover-color: color.adjust($button--default-active-color, $light
 		opacity: 0.5;
 	}
 
+	span:nth-of-type(2), i:nth-last-of-type(1) {
+		margin-top: 0.2em;
+	}
+
 	span, i {
+		display: inline-block;
 		vertical-align: middle;
 	}
 
