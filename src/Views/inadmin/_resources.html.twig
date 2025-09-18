@@ -30,11 +30,26 @@
         </p>
 
         {{ include('inadmin/partials/filters.html.twig', {
+            filters: {
+                Usage: {
+                    '': 'All',
+                    'notinuse': 'Not in use',
+                }
+            },
             show_search: true,
-
         }) }}
 
         {% if dataset is not empty %}
+            {{ include('/inadmin/partials/sort-by.html.twig', {
+                sort_options: {
+                    'title asc': 'Title A-Z',
+                    'title desc': 'Title Z-A',
+                    'modDate desc': 'Modified dates closest to now',
+                    'modDate asc': 'Modified dates farthest from now',
+                    'createDate desc': 'Uploaded dates closest to now',
+                    'createDate asc': 'Uploaded dates farthest from now',
+                }
+            }) }}
         <p class="pagination--info">
             Showing {{ page.offset + 1 }} to {{ min(page.offset + page.limit, dataset.count) }} of {{ dataset.count }}
         </p>

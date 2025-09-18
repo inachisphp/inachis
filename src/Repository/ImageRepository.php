@@ -21,7 +21,7 @@ class ImageRepository extends AbstractRepository
      * @param $limit
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function getFiltered($filters, $offset, $limit)
+    public function getFiltered($filters, $offset, $limit, ?string $sortby = 'title asc')
     {
         $where = [];
         if (!empty($filters['keyword'])) {
@@ -32,13 +32,32 @@ class ImageRepository extends AbstractRepository
                 ],
             ];
         }
+        switch ($sortby) {
+            case 'title desc':
+                $sortby = ['q.title', 'DESC'];
+                break;
+            case 'createDate asc':
+                $sortby = ['q.createDate', 'ASC'];
+                break;
+            case 'createDate desc':
+                $sortby = ['q.createDate', 'DESC'];
+                break;
+            case 'modDate asc':
+                $sortby = ['q.modDate', 'ASC'];
+                break;
+            case 'modDate desc':
+                $sortby = ['q.modDate', 'DESC'];
+                break;
+            case 'title asc':
+            default:
+                $sortby = ['q.title', 'ASC'];
+        }
         return $this->getAll(
             $offset,
             $limit,
             $where,
             [
-                [ 'q.title', 'ASC' ],
-                [ 'q.createDate', 'ASC' ]
+                $sortby,
             ]
         );
     }

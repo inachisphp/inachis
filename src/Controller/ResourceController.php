@@ -48,15 +48,18 @@ class ResourceController extends AbstractInachisController
         $filters = array_filter($request->get('filter', []));
         $offset = (int) $request->get('offset', 0);
         $limit = $this->entityManager->getRepository($typeClass)->getMaxItemsToShow();
+        $sortby = $request->get('sort', 'title asc');
         $this->data['dataset'] = $this->entityManager->getRepository($typeClass)->getFiltered(
             $filters,
             $offset,
-            $limit
+            $limit,
+            $sortby,
         );
         $this->data['form'] = $form->createView();
         $this->data['page']['type'] = $request->get('type');
         $this->data['page']['offset'] = $offset;
         $this->data['page']['limit'] = $limit;
+        $this->data['page']['sortby'] = $sortby;
         $this->data['page']['tab'] = $type;
         $this->data['page']['title'] = $type . 's';
 
