@@ -19,8 +19,8 @@
     }) }}
 </section>
 <section class="ui-dialog-image-uploader visually-hidden">
-    {{ form_start(form, {'action': path('app_resource_saveimage'), 'attr': { 'class': 'form' }}) }}
-        <fieldset class="col dropzone span_1_of_2">
+    {{ form_start(form, {'attr': { 'class': 'form' }}) }}
+        <fieldset class="col span_1_of_2 dropzone">
             {{
                 include('inadmin/partials/dropzone.html.twig', {
                     'dropzoneUrl': path('app_resource_uploadimage'),
@@ -28,7 +28,9 @@
                     'paramName': 'image[imageFile]',
                     'uploadMultiple': false,
                     'maxFilesize': 2097152,
-                    'acceptedFiles': allowedTypes
+                    'acceptedFiles': allowedTypes,
+                    'autoUpload': false,
+                    'selector': '.ui-dialog-image-uploader form'
                 })
             }}
             <p>
@@ -51,7 +53,7 @@
                 {{ form_widget(form.description) }}
             </p>
             <p>
-                <button class="button button--positive" data-submit-url="{{ path('app_resource_saveimage') }}" type="submit">Save Image</button>
+                <button class="button button--positive" type="submit"><span class="material-icons">save</span> Save Image</button>
             </p>
         </fieldset>
     {{ form_row(form._token) }}

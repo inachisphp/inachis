@@ -112,59 +112,53 @@ class ResourceController extends AbstractInachisController
 
     /**
      * @param Request $request
+     * @param SluggerInterface $slugger
+     * @param string $imageDirectory
      * @return JsonResponse
      */
     #[Route("/incc/resource/image/upload", methods: [ "POST", "PUT" ])]
-    public function uploadImage(Request $request): JsonResponse
+    public function uploadImage(
+        Request $request,
+        SluggerInterface $slugger,
+        #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory): JsonResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        dump($request);
-    }
-
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     */
-    #[Route("/incc/resource/image/save", methods: [ "POST" ])]
-    public function saveImage(Request $request): JsonResponse
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $image = null;
-//        if (!empty($request->files))
-//        {
-//
-//        }
-
-        if (!empty($request->get('image'))) {
-            $image = new Image();
-            $form = $this->createForm(ImageType::class, $image);
-            $form->handleRequest($request);
-
-            $imageInfo = getimagesize($image->getFilename());
-            $image->setDimensionX($imageInfo[0]);
-            $image->setDimensionY($imageInfo[1]);
-            $image->setFiletype($imageInfo['mime']);
-            $image->setChecksum(sha1_file($image->getFilename()));
-            unset($imageInfo);
-
-            $this->entityManager->persist($image);
-            $this->entityManager->flush();
+        if (empty($request->files->get("image"))) {
+            return new JsonResponse(['error' => 'No file provided'], 400);
+        } elseif (empty($request->get('image')['title'])) {
+            return new JsonResponse(['error' => 'No title provided'], 400);
         }
+        $uploadedFile = $request->files->get("image")['imageFile'];
+        $dimensions = getimagesize($uploadedFile->getRealPath());
+        $ctx = hash_init('sha256');
+        $fp = fopen($uploadedFile->getRealPath(), 'rb');
+        while (!feof($fp)) {
+            hash_update($ctx, fread($fp, 8192));
+        }
+        fclose($fp);
+        dump($uploadedFile);
+        $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeFilename = $slugger->slug($originalFilename);
+        $newFilename = $safeFilename.'-'.uniqid().'.'.$uploadedFile->guessExtension();
 
-//        foreach ($request->files as $file) {
-//            if ($file->getError() != UPLOAD_ERR_OK) {
-//                return $this->json('error', 400);
-//            }
-//            $post = $parser->parse($this->getDoctrine()->getManager(), file_get_contents($file->getRealPath()));
+        $image = new Image();
+        $image
+            ->setTitle($request->get('image')['title'])
+            ->setDescription($request->get('image')['description'])
+            ->setAltText($request->get('image')['altText'])
+            ->setFilesize($uploadedFile->getSize())
+            ->setFiletype($uploadedFile->getMimeType())
+            ->setFilename($newFilename)
+            ->setChecksum(hash_final($ctx))
+            ->setDimensionX($dimensions[0])
+            ->setDimensionY($dimensions[1])
+        ;
 
-        return $this->json([
-            'result' => 'success',
-            'image' => [
-                'id' => $image->getId(),
-                'filename' => $image->getFilename(),
-                'altText' => $image->getAltText(),
-                'title' => $image->getTitle(),
-            ]
-        ], 200);
+        try {
+            $uploadedFile->move($imageDirectory, $newFilename);
+        } catch (FileException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 400);
+        }
+        return new JsonResponse(['OK' => $image->getId()], 200);
     }
 }

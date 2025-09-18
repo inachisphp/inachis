@@ -18,51 +18,35 @@ var InachisImageManager = {
 
     _init: function()
     {
+        if (InachisDialog.view === 'upload') {
+            this.buttons = [];
+            $('.ui-dialog-secondary-bar').toggle();
+            this.toggleUploadImage();
+        } else {
+            $('.gallery input[type=radio]').change(InachisImageManager.enableChooseButton);
+            $('#ui-dialog-search-input').on('input', function (event) {
+                InachisImageManager.searchImages();
+            });
+            this.addPaginationLinks();
+        }
         this.updateDialogButtons();
         $('.ui-dialog-secondary-bar a').click(this.toggleUploadImage);
-        $('.ui-dialog-image-uploader form').submit(function (event)
-        {
-            var $submitButton = $('.ui-dialog-image-uploader button[type=submit]');
-            $submitButton.prop('disabled', true);
-            $.ajax({
-                type: 'POST',
-                url: $submitButton.data('submit-url'),
-                data: $(this).serializeArray(),
-                dataType: 'json',
-                encode: true
-            })
-                .done(function(data) {
-                    if (data['result'] === 'success') {
-                        var $imageCount = $('.ui-dialog-secondary-bar strong'),
-                            newElementSelector = '#chosenImage_' + data['image']['id'],
-                            $gallery = $('.gallery ol'),
-                            newImage = '<li>' +
-                                '<label for="chosenImage_' + data['image']['id'] + '">' +
-                                    '<img alt="' + data['image']['altText'] + '" src="' + data['image']['filename'] + '" />' +
-                                    '<span>' + data['image']['title'] + '</span>' +
-                                '</label>' +
-                                '<input id="chosenImage_' + data['image']['id'] + '" name="chosenImage[]" type="radio" value="' + data['image']['id'] + '" />';
-                        if (data['image']['filename'].substring(0, 4) === 'http') {
-                            newImage += '<em class="material-icons">link</em>';
-                        }
-                        newImage += '</li>';
-                        $gallery.append(newImage);
-                        $imageCount.text(parseInt($imageCount.text(), 10) + 1);
-                        $(newElementSelector).change(InachisImageManager.enableChooseButton);
-                        $('.gallery').animate(
-                            {
-                                scrollTop: $(newElementSelector).offset().top
-                            },
-                            2000
-                        );
-                    }
+        $('.ui-dialog-image-uploader form').submit(function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            dropzone.on('success', file => {
+                if (InachisDialog.view === 'upload') {
+                    // close the dialog
+                } else {
                     InachisImageManager.toggleUploadImage();
-                    $('.ui-dialog-image-uploader button[type=submit]').prop('disabled', false);
-                });
+                    InachisImageManager.addPaginationLinks();
+                }
+            });
+            dropzone.on('error', file => {
+                console.log('show error, remove file, and keep submit button disabled until file re-added');
+            });
+            dropzone.processQueue();
         });
-        $('.gallery input[type=radio]').change(InachisImageManager.enableChooseButton);
-        $('#ui-dialog-search-input').on('input', function (event) { InachisImageManager.searchImages(); });
-        this.addPaginationLinks();
     },
 
     addPaginationLinks: function()

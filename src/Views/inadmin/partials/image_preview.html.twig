@@ -1,4 +1,4 @@
-{% set filename = value.filename|trim|default('/assets/imgs/no-image.svg') %}
+{% set filename = value.filename|default('/assets/imgs/no-image.svg')|trim %}
 {% if not (filename starts with 'http') and not(filename starts with '/') %}
     {% set filename = '/imgs/' ~ filename %}
 {% endif %}
@@ -16,6 +16,6 @@
             data-template-name="image-manager"
             data-title="{% trans %}admin.dialog.image_manager.title{% endtrans %}"
             type="button"
-    >Choose Image</button>
+    ><span class="material-icons">photo_library</span> Choose Image</button>
     {% endif %}
 </p>
