@@ -22,12 +22,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PostType extends AbstractType
 {
-    private $router;
+    private RouterInterface $router;
     private $transformer;
-    private $translator;
+    private TranslatorInterface $translator;
 
-    private $emojisTransliterator;
+    private EmojiTransliterator $emojisTransliterator;
 
+    /**
+     * @throws \IntlException
+     */
     public function __construct(
         TranslatorInterface $translator,
         RouterInterface $router,
@@ -41,8 +44,6 @@ class PostType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $categories = $options['data']->getCategories();
-        $tags = $options['data']->getTags();
         $builder
             ->add('title', TextType::class, [
                 'attr' => [
@@ -73,7 +74,6 @@ class PostType extends AbstractType
                 ],
                 'required' => false,
             ])
-            //value="{% if post.urls is not empty %}{{ post.urls|first.link }}{% endif %}"
             ->add('url', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'url_label',
@@ -147,7 +147,7 @@ class PostType extends AbstractType
                     'class'            => 'js-select halfwidth',
                     'data-placeholder' => $this->translator->trans('admin.placeholder.post.categories', [], 'messages'),
                     'data-tip-content' => $this->translator->trans('admin.tip.content.post.categories', [], 'messages'),
-                    'data-url'         => $this->router->generate('app_admindialog_getcategorymanagerlistcontent'),
+                    'data-url'         => $this->router->generate('app_dialog_categorydialog_getcategorymanagerlistcontent'),
                 ],
                 'label'      => $this->translator->trans('admin.label.post.categories', [], 'messages'),
                 'label_attr' => [
@@ -164,8 +164,7 @@ class PostType extends AbstractType
                     'class'            => 'js-select halfwidth',
                     'data-tags'        => 'true',
                     'data-tip-content' => $this->translator->trans('admin.tip.content.post.tags', [], 'messages'),
-                    'data-url'         => $this->router->generate('app_admindialog_gettagmanagerlistcontent'),
-//                    'selected'         => 'selected',
+                    'data-url'         => $this->router->generate('app_tags_gettagmanagerlistcontent'),
                 ],
                 'choices'      => $options['data']->getTags()->toArray(),
                 'choice_label' => 'title',
@@ -234,21 +233,35 @@ class PostType extends AbstractType
                 'attr' => [
                     'class' => 'button button--positive',
                 ],
-                'label' => $this->translator->trans('admin.button.save', [], 'messages'),
+                'label' => sprintf(
+                    '<span class="material-icons">%s</span> <span>%s</span>',
+                    'save',
+                    $this->translator->trans('admin.button.save', [], 'messages')
+                ),
+                'label_html' => true,
             ])
             ->add('publish', SubmitType::class, [
                 'attr' => [
                     'class' => 'button button--info',
                 ],
-                'label' => $this->translator->trans('admin.button.publish', [], 'messages'),
+                'label' => sprintf(
+                    '<span class="material-icons">%s</span> <span>%s</span>',
+                    'publish',
+                    $this->translator->trans('admin.button.publish', [], 'messages')
+                ),
+                'label_html' => true,
             ])
             ->add('delete', SubmitType::class, [
                 'attr' => [
                     'class' => 'button button--negative',
                 ],
-                'label' => $this->translator->trans('admin.button.delete', [], 'messages'),
+                'label' => sprintf(
+                    '<span class="material-icons">%s</span> <span>%s</span>',
+                    'delete_forever',
+                    $this->translator->trans('admin.button.delete', [], 'messages')
+                ),
+                'label_html' => true,
             ]);
-//        $builder->get('tags')->addModelTransformer($this->transformer);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

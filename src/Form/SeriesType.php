@@ -135,7 +135,12 @@ class SeriesType extends AbstractType
                     'attr' => [
                         'class' => 'button button--info content-selector__link',
                     ],
-                    'label' => $this->translator->trans('admin.button.addItem', [], 'messages'),
+                    'label' => sprintf(
+                        '<span class="material-icons">%s</span> %s',
+                        'playlist_add',
+                        $this->translator->trans('admin.button.addItem', [], 'messages')
+                    ),
+                    'label_html' => true,
                 ])
             ;
         }
@@ -144,7 +149,12 @@ class SeriesType extends AbstractType
                 'attr' => [
                     'class' => 'button button--positive',
                 ],
-                'label' => $this->translator->trans('admin.button.save', [], 'messages'),
+                'label' => sprintf(
+                    '<span class="material-icons">%s</span> %s',
+                    'save',
+                    $this->translator->trans('admin.button.save', [], 'messages')
+                ),
+                'label_html' => true,
             ])
 //            ->add('publish', SubmitType::class, [
 //                'attr' => [
@@ -156,13 +166,23 @@ class SeriesType extends AbstractType
                 'attr' => [
                     'class' => 'button button--negative',
                 ],
-                'label' => $this->translator->trans('admin.button.delete', [], 'messages'),
+                'label' => sprintf(
+                    '<span class="material-icons">%s</span> %s',
+                    'delete_forever',
+                    $this->translator->trans('admin.button.delete', [], 'messages')
+                ),
+                'label_html' => true,
             ])
             ->add('remove', SubmitType::class, [
                 'attr' => [
                     'class' => 'button button--negative',
                 ],
-                'label' => $this->translator->trans('admin.button.remove', [], 'messages'),
+                'label' => sprintf(
+                    '<span class="material-icons">%s</span> %s',
+                    'playlist_remove',
+                    $this->translator->trans('admin.button.remove', [], 'messages')
+                ),
+                'label_html' => true,
             ])
         ;
     }

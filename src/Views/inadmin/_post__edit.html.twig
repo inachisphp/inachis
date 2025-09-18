@@ -181,7 +181,7 @@
         <p>
             {{ form_widget(form.submit) }}
             {%- if post.status != "published" %}
-                <button type="submit" class="button button--secondary button--info" name="publish">{% if post.postDate > date() %}Schedule{% else %}Publish{% endif %}</button>
+                <button type="submit" class="button button--secondary button--info" name="publish">{% if post.postDate > date() %}<span class="material-icons">schedule</span> Schedule{% else %}<span class="material-icons">publish</span> Publish{% endif %}</button>
             {%- endif %}
             {{ form_widget(form.delete) }}
             {%  if post.id is not empty and not post.isDraft %}

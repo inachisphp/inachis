@@ -19,12 +19,12 @@ class SeriesController extends AbstractInachisController
      */
     #[Route(
         "/incc/series/list/{offset}/{limit}",
-        methods: [ "GET", "POST" ],
         requirements: [
             "offset" => "\d+",
             "limit" => "\d+"
         ],
-        defaults: [ "offset" => 0, "limit" => 10 ]
+        defaults: [ "offset" => 0, "limit" => 10 ],
+        methods: [ "GET", "POST" ]
     )]
     public function list(Request $request): Response
     {
