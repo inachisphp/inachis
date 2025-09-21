@@ -22,6 +22,7 @@
 {% endif %}
         method: 'post',
         init: function() {
+{% if selector is defined %}
             this.on('addedfile', file => {
                 $('{{ selector }} button[type=submit]').prop('disabled', false);
             });
@@ -38,6 +39,7 @@
                 }
                 $('{{ selector }} button[type=submit]').prop('disabled', true);
             });
+{% endif %}
         }
     });
 </script>
