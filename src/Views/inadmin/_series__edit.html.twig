@@ -1,4 +1,10 @@
 {% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('app_series_list') }}">Series</a>
+    {% if series.id is empty %}New{% else %}Edit{% endif %} Series
+{% endblock pagetitle %}
+
 {% block content %}
 
     {% block series_edit_pre %}{% endblock series_edit_pre %}

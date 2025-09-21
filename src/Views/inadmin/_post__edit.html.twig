@@ -1,4 +1,10 @@
 {% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('app_zzpage_getpostlistadmin', { type: page.tab }) }}">{{ page.tab|title }}s</a>
+    <span>{% if post.id is empty %}New{% else %}Edit{% endif %} {{ page.tab }}</span>
+{% endblock pagetitle %}
+
 {% block content %}
 
     {{ form_start(form, {'attr': { 'class': 'form form__post' }}) }}

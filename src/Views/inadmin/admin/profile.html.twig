@@ -1,5 +1,10 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 
+{% block pagetitle %}
+    <a href="{{ path('app_admin_adminprofile_adminlist') }}">Users</a>
+    <span>Edit User</span>
+{% endblock pagetitle %}
+
 {% block content %}
     {% block profile_pre %}{% endblock profile_pre %}
 

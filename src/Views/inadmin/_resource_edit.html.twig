@@ -1,4 +1,10 @@
 {% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('app_resource_resourceslist', { type: page.type }) }}">{{ page.type|title }}</a>
+    <span>{% if resource.id is empty %}New{% else %}Edit{% endif %} {{ page.type }}</span>
+{% endblock pagetitle %}
+
 {% block content %}
 
     {% block resources_pre %}{% endblock resources_pre %}

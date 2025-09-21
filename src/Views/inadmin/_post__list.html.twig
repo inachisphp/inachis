@@ -1,4 +1,9 @@
 {% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <span>{{ page.tab|title }}s</span>
+{% endblock pagetitle %}
+
 {% block content %}
     {% set badges = {
         'draft': {
