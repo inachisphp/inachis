@@ -13,6 +13,15 @@ class CategoryRepository extends AbstractRepository
     }
 
     /**
+     * @param Category $category
+     */
+    public function remove(Category $category)
+    {
+        $this->getEntityManager()->remove($category);
+        $this->getEntityManager()->flush();
+    }
+
+    /**
      * Returns an array of the root level categories.
      * @return Category[] The array of {@link Category} objects
      */

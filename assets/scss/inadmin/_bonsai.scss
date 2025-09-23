@@ -1,3 +1,5 @@
+#dialog__categoryManager .info {font-size:0.9em;}
+
 .bonsai {
   margin: 0;
   padding: 0;
@@ -11,6 +13,7 @@
   label, .ui-dialog & label {
     margin-left: 10px;
     display: inline-block;
+    vertical-align: middle;
   }
 
   li {
@@ -20,6 +23,24 @@
     overflow: hidden;
     position: relative;
     padding-left: 1.3em; /* padding for the thumb */
+
+    .material-icons {
+      font-size: 1.3em;
+      vertical-align: middle;
+    }
+
+    &>span {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.2em;
+
+      &:hover { background-color: #eee; }
+    }
+
+    a, a:visited {
+      font-size: 0.9em;
+      vertical-align: middle;
+    }
 
     &.has-children > .thumb:after {
       content: '▸';

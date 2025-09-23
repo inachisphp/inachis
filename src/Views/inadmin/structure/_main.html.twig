@@ -96,15 +96,12 @@
                 <li class="{{ page.tab|activeMenu('dashboard') }}"><a href="{{ settings.domain ~ path('app_dashboard_default') }}" title="View dashboard"><i class="material-icons">home</i><span> Dashboard</span></a></li>
                 <li class="{{ page.tab|activeMenu('post') }}"><a href="{{ settings.domain ~ path('app_zzpage_getpostlistadmin', {'type': 'post'}) }}" title="View list of posts"><i class="material-icons">library_books</i><span> Posts</span></a></li>
                 <li class="{{ page.tab|activeMenu('series') }}"><a href="{{ settings.domain ~ path('app_series_list') }}" title="View list of series"><i class="material-icons">chrome_reader_mode</i><span> Series</span></a></li>
-                <li class="{{ page.tab|activeMenu('categories') }}"><a href="{{ settings.domain ~ path('app_categorymanager_list') }}" title="Manage categories for content"><i class="material-icons">view_list</i><span> Categories</span></a></li>
+                <li class="{{ page.tab|activeMenu('Image') }}"><a href="{{ settings.domain ~ path('app_resource_resourceslist', { type: 'images' }) }}" title="Manage resources"><i class="material-icons">wallpaper</i><span> Resources</span></a></li>
                 <li>
                     <a href="#admin__nav-settings" title="More tools and settings"><i class="material-icons">more_horiz</i><span> More…</span></a>
                     <ul id="admin__nav-settings">
                         <li class="{{ page.tab|activeMenu('url') }}"><a href="{{ settings.domain ~ path('app_url_list') }}" title="View list of defined URLs">
                                 <i class="material-icons">insert_link</i><span> URLs</span></a>
-                        </li>
-                        <li class="{{ page.tab|activeMenu('resources') }}"><a href="{{ settings.domain ~ path('app_resource_resourceslist', { type: 'images' }) }}" title="Manage resources">
-                                <i class="material-icons">wallpaper</i><span> Resources</span></a>
                         </li>
                         <li class="{{ page.tab|activeMenu('users') }}"><a href="{{ settings.domain ~ path('app_admin_adminprofile_adminlist') }}" title="Manage users">
                                 <i class="material-icons">people</i><span> Users</span></a>

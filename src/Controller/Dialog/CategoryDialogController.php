@@ -5,21 +5,12 @@ namespace App\Controller\Dialog;
 use App\Controller\AbstractInachisController;
 use App\Controller\ZipStream;
 use App\Entity\Category;
-use App\Entity\Image;
 use App\Entity\Page;
-use App\Entity\Tag;
-use App\Form\ImageType;
-use App\Parser\ArrayToMarkdown;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class CategoryDialogController extends AbstractInachisController
 {
@@ -33,6 +24,19 @@ class CategoryDialogController extends AbstractInachisController
         $this->data['categories'] = $this->entityManager->getRepository(Category::class)->findByParent(null);
 
         return $this->render('inadmin/dialog/categoryManager.html.twig', $this->data);
+    }
+
+
+    /**
+     * @return Response
+     */
+    #[Route("/incc/ax/categoryManager/list", methods: [ "POST" ])]
+    public function getCategoryManagerList(): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $this->data['categories'] = $this->entityManager->getRepository(Category::class)->findByParent(null);
+
+        return $this->render('inadmin/dialog/category-manager-list.html.twig', $this->data);
     }
 
     /**
@@ -85,15 +89,53 @@ class CategoryDialogController extends AbstractInachisController
     public function saveCategoryManagerContent(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $category = $this->entityManager->getRepository(Category::class)->create($request->request->all());
-        if ($request->request->get('parentID') > 0) {
-            $category->setParent(
-                $this->entityManager->getRepository(Category::class)->findOneById($request->request->get('parentID'))
-            );
-        }
+        $category = $request->get('id') !== '-1' ?
+            $this->entityManager->getRepository(Category::class)->findOneById($request->get('id')):
+            new Category();
+        $this->entityManager->getRepository(Category::class)->hydrate($category, $request->request->all());
+        $category->setParent(
+            $request->request->get('parentID') !== '-1' ?
+            $this->entityManager->getRepository(Category::class)->findOneById($request->request->get('parentID')):
+            null
+        );
         $this->entityManager->persist($category);
         $this->entityManager->flush();
+        return new JsonResponse(
+            [
+                'success' => '<span class="material-icons">check_circle</span> Category saved',
+            ],
+            Response::HTTP_OK
+        );
+    }
 
-        return new JsonResponse($category, Response::HTTP_OK);
+    #[Route("incc/ax/categoryManager/usage", methods: [ "POST" ])]
+    public function getCategoryUsages(Request $request): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $category =  $this->entityManager->getRepository(Category::class)->findOneById($request->get('id'));
+        $count = $this->entityManager->getRepository(Page::class)->getPagesWithCategoryCount($category);
+        foreach ($category->getChildren() as $child) {
+            $count += $this->entityManager->getRepository(Page::class)->getPagesWithCategoryCount($child);
+        }
+        return new JsonResponse([ 'count' => $count]);
+    }
+
+    #[Route("incc/ax/categoryManager/delete", methods: [ "POST" ])]
+    public function deleteCategory(Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $category =  $this->entityManager->getRepository(Category::class)->findOneById($request->get('id'));
+        $count = $this->entityManager->getRepository(Page::class)->getPagesWithCategoryCount($category);
+
+        if ($count > 0) {
+            return new JsonResponse(
+                [
+                    'error' => sprintf('<span class="material-icons">warning</span> %d categories present', $count)
+                ],
+            Response::HTTP_BAD_REQUEST
+            );
+        }
+        $this->entityManager->getRepository(Category::class)->remove($category);
+        return new JsonResponse();
     }
 }

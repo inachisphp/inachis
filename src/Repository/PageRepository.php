@@ -74,6 +74,21 @@ final class PageRepository extends AbstractRepository
     }
 
     /**
+     * @param Category $category
+     * @return int
+     */
+    public function getPagesWithCategoryCount(Category $category): int
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb = $qb
+            ->select('COUNT(p) AS numPages')
+            ->leftJoin('p.categories', 'Page_categories')
+            ->andWhere('Page_categories.id = :categoryId')
+            ->setParameter('categoryId', $category);
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
      * @param Tag $tag
      * @param int $maxDisplayCount
      * @param int $offset
