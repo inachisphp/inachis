@@ -1,4 +1,80 @@
-a.profile-photo, a.profile-photo:visited {
+fieldset.multisection {
+  border: 1px solid #f3f3f3;
+  border-radius: 1em;
+  background-color: #fff;
+  margin-bottom: 1em;
+}
+
+.profile-photo {
+  border: 1px solid #333;
+  border-radius: 50%;
+  height: 106px;
+  float: left;
+  margin-right: 2em;
+  width: 106px;
+
+  img {
+    background: #fff;
+    border-radius: 50%;
+    height: 100px;
+    max-height: 100%;
+    object-fit: cover;
+    padding: 3px;
+    width: 100px;
+  }
+}
+
+.form__profile fieldset {
+  input {
+    border: 2px solid #eee;
+    border-radius: 0.5em;
+    width: 90%;
+  }
+  .input:active {
+    border-bottom-color: #069;
+  }
+  input[value^=""], .input__complete {
+    border-color: $form-input__complete;
+  }
+  p {
+    margin-bottom: 2em;
+  }
+}
+
+.strength {
+  background-color: #ccc;
+  display: block;
+  height: 0.5em;
+  margin: 0 auto;
+  width: 99%;
+  span {
+    display: block;
+    margin: 0;
+    height: 0.5em;
+    &.percent20 {
+      width: 20%;
+      background-color: #de1616;
+    }
+    &.percent40 {
+      width: 40%;
+      background-color: #f0620a;
+    }
+    &.percent60 {
+      width: 60%;
+      background-color: #ffa200;
+    }
+    &.percent80 {
+      width: 80%;
+      background-color: #8eaf03;
+    }
+    &.percent100 {
+      width: 100%;
+      background-color: #06bf06;
+    }
+  }
+}
+
+/*p.profile-photo, p.profile-photo:visited {
   border: 1px solid #000;
   border-radius: 50%;
   display: block;
@@ -20,4 +96,4 @@ a.profile-photo, a.profile-photo:visited {
   img {
     vertical-align: middle;
   }
-}
+}*/

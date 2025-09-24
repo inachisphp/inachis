@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 $information-small: "screen and (min-width: 320px)";
 $information-medium: "screen and (min-width: 480px)";
 $information-large: "screen and (min-width: 480px)";
@@ -5,7 +7,8 @@ $information-large: "screen and (min-width: 480px)";
 //$admin__background-color: #fcfefe;
 $admin__background-color: #fafafa;
 
-$admin__flash-background: lightsalmon;
+$admin__flash-background: #ffa07a;
+$admin__flash-color: #000;
 
 $admin__container--collapsed-width: 45px;
 $admin__container--expanded-width: 200px;
@@ -24,3 +27,21 @@ $admin__filter_button-background--selected: #069;
 $admin__filter_button-color--selected: #fff;
 $admin__filter_button-background--hover: #0cf;
 $admin__filter_button-color--hover: #fff;
+
+// --- new colour structure below
+
+$menubar__background-color: #222;
+$menubar__background-color--is-active: color.adjust($menubar__background-color, $lightness: 6.67%);
+$menubar__background-color--hover: hsla(0, 0%, 100%, .15);
+$menubar__color--hover: #0cf;
+
+$menubar-button__background-color: #069;
+$menubar-button__background-color--hover: $menubar__color--hover;
+
+$admonition-tip__border-color: #069;
+$admonition-tip__background-color: color.adjust($admonition-tip__border-color, $lightness: 65%);
+
+$body__background: light-dark(#eee, #303030);
+
+$dialog__background: #303030;
+$dialog_color: #fff;

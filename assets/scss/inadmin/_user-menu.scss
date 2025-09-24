@@ -55,10 +55,10 @@ $admin__user__notification__colour: #b01c3f;
 		display: none;
 		font-size: 0.85em;
 		list-style-type: none;
-		min-width: 20em;
+		min-width: 17em;
 		padding: 0;
 		position: absolute;
-		right: 0;
+		right: 1em;
 		top: 45px;
 
 		li {
@@ -78,6 +78,15 @@ $admin__user__notification__colour: #b01c3f;
 
 			a:hover, button:hover {
 				background-color: #eee;
+			}
+
+			button {
+				border: 1px solid #eee;
+				border-radius: .5em;
+				display: block;
+				margin: 0.5em auto;
+				text-align: center;
+				width: 90%;
 			}
 
 			span.material-icons {
