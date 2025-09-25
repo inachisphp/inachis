@@ -1,0 +1,22 @@
+.flash-notice, .flash-success, .flash-warning {
+  background-color: $admin__flash-background;
+  border-radius: 0.5em;
+  color: $admin__flash-color;
+  padding: 1em;
+  margin: 0.5em 0;
+
+  span {
+    vertical-align: middle;
+
+    &.material-icons {
+      margin-right: 0.5em;
+    }
+  }
+}
+.flash-success {
+  background-color: #d9e7cb;
+}
+.flash-warning {
+  background-color: #f00000;
+  color: #fff;
+}

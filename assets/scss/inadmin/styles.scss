@@ -85,37 +85,13 @@ body {
 
 @import '_post__edit';
 @import '_bonsai';
-
 @import '_warnings';
-
 @import '_image_library';
-
 @import '_admonitions';
-
+@import '_flash_messages';
 @import '_sessionTimeout';
 
-.flash-notice, .flash-success, .flash-warning {
-	background-color: $admin__flash-background;
-	border-radius: 0.5em;
-	color: $admin__flash-color;
-	padding: 1em;
-	margin: 0.5em 0;
 
-	span {
-		vertical-align: middle;
-
-		&.material-icons {
-			margin-right: 0.5em;
-		}
-	}
-}
-.flash-success {
-	background-color: #d9e7cb;
-}
-.flash-warning {
-	background-color: #f00000;
-	color: #fff;
-}
 
 .switch-wrapper {
 	display: inline-block;
@@ -203,6 +179,7 @@ body {
 		.menu__active {
 			background-color: $menubar__background-color--is-active;
 			border-left: 2px solid #aaa;
+			font-weight: bold;
 		}
 
 
