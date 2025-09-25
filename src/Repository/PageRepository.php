@@ -132,12 +132,13 @@ final class PageRepository extends AbstractRepository
 
     /**
      * @param $filters
-     * @param $type
-     * @param $offset
-     * @param $limit
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @param string $type
+     * @param int $offset
+     * @param int $limit
+     * @param string $sort
+     * @return Paginator
      */
-    public function getFilteredOfTypeByPostDate($filters, $type, $offset, $limit)
+    public function getFilteredOfTypeByPostDate($filters, string $type, int $offset, int $limit, string $sort = 'postDate desc')
     {
         $where = [
             'q.type = :type',
@@ -158,14 +159,37 @@ final class PageRepository extends AbstractRepository
             $where[0] .= ' AND (q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.content LIKE :keyword )';
             $where[1]['keyword'] = '%' . $where[1]['keyword'] . '%';
         }
+        switch ($sort) {
+            case 'title asc':
+                $sort = [
+                    [ 'q.title', 'ASC' ],
+                    [ 'q.subTitle', 'ASC' ],
+                ];
+                break;
+            case 'title desc':
+                $sort = [
+                    [ 'q.title', 'DESC' ],
+                    [ 'q.subTitle', 'DESC' ],
+                ];
+                break;
+            case 'modDate asc':
+                $sort = [[ 'q.modDate', 'ASC' ]];
+                break;
+            case 'modDate desc':
+                $sort = [[ 'q.modDate', 'DESC' ]];
+                break;
+            case 'postDate asc':
+                $sort = [[ 'q.postDate', 'ASC' ]];
+                break;
+            case 'postDate desc':
+            default:
+                $sort =  [[ 'q.postDate', 'DESC' ]];
+        }
         return $this->getAll(
             $offset,
             $limit,
             $where,
-            [
-                [ 'q.postDate', 'DESC' ],
-                [ 'q.modDate', 'DESC' ]
-            ]
+            $sort,
         );
     }
 

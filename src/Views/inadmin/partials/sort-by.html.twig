@@ -3,7 +3,7 @@
     <label class="visually-hidden" for="sort">Sort by</label>
     <select id="sort" name="sort">
         {% for option,option_name in sort_options %}
-        <option value="{{ option }}"{% if page.sortby == option %} selected{% endif %}>{{ option_name }}</option>
+        <option value="{{ option }}"{% if page.sort == option %} selected{% endif %}>{{ option_name }}</option>
         {% endfor %}
     </select>
 </p>

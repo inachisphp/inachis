@@ -6,11 +6,11 @@
     <div id="filter__options">
     {% if filters is defined and filters is not empty %}
         {% for filter_name, filter in filters %}
-        <span class="filter__section-{{ filter_name|lower|spaceless }}">
-            <label for="filter__{{ filter_name|lower|spaceless }}">{{ filter_name }}</label>
-            <select name="filter[{{ filter_name|lower|spaceless }}]" id="filter__{{ filter_name|lower|spaceless }}">
+        <span class="filter__section-{{ filter_name|lower }}">
+            <label for="filter__{{ filter_name|lower }}">{{ filter_name }}</label>
+            <select name="filter[{{ filter_name|lower }}]" id="filter__{{ filter_name|lower }}">
                 {% for key, value in filter %}
-                    <option value="{{ key }}"{% if filter_values[filter_name|lower|spaceless]|default('') == key %} selected{% endif %}>{{ value }}</option>
+                    <option value="{{ key }}"{% if filter_values[filter_name|lower]|default('') == key %} selected{% endif %}>{{ value }}</option>
                 {% endfor %}
             </select>
         </span>

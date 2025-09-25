@@ -53,7 +53,6 @@
                     <a href="{{ settings.domain ~ path('app_import_index') }}">Import</a>
                 </li>
             </ul>
-
 {# 'additional_classes': 'status-' ~ post.status ~ ' visibility-' ~ post.visibility, #}
             {% include 'inadmin/partials/list.html.twig' with {
                 'className': 'form__posts',
@@ -128,6 +127,16 @@
                 },
 
                 'filter_values': filters,
+
+                'sort_options': {
+                    'postDate asc': 'Published dates oldest to newest',
+                    'postDate desc': 'Published dates newest from oldest',
+                    'modDate asc': 'Modified dates oldest from newest',
+                    'modDate desc': 'Modified dates newest to oldest',
+                    'title asc': 'Title A-Z',
+                    'title desc': 'Title Z-A',
+
+                },
 
                 'show_search': true,
                 'zebra': true,
