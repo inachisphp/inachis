@@ -34,18 +34,15 @@
             ><span class="material-icons">cloud_upload</span> Upload a new Image</button>
         </p>
 
-        {{ include('inadmin/partials/filters.html.twig', {
-            filters: {
-                Usage: {
-                    '': 'All',
-                    'notinuse': 'Not in use',
-                }
-            },
-            show_search: true,
-        }) }}
-
         {% if dataset is not empty %}
-            {{ include('/inadmin/partials/sort-by.html.twig', {
+            {{ include('inadmin/partials/filters.html.twig', {
+                filters: {
+                    Usage: {
+                        '': 'All',
+                        'notinuse': 'Not in use',
+                    }
+                },
+                show_search: true,
                 sort_options: {
                     'title asc': 'Title A-Z',
                     'title desc': 'Title Z-A',
@@ -55,6 +52,7 @@
                     'createDate asc': 'Uploaded dates farthest from now',
                 }
             }) }}
+        <section class="paginated-list">
         <p class="pagination--info">
             Showing {{ page.offset + 1 }} to {{ min(page.offset + page.limit, dataset.count) }} of {{ dataset.count }}
         </p>
@@ -84,6 +82,7 @@
             {% include 'inadmin/partials/action_bar.html.twig' %}
         {% endif %}
         {{ form_end(form) }}
+        </section>
         {% elseif filter_values|default(null) is not empty %}
             {% include 'inadmin/partials/filters.html.twig' with {
                 'filters': filters,

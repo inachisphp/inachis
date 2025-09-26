@@ -7,10 +7,6 @@
 
     {{ include('inadmin/partials/filters.html.twig') }}
 
-    {% if sort_options is defined and sort_options is not empty %}
-        {{ include('/inadmin/partials/sort-by.html.twig') }}
-    {% endif %}
-
     <section class="paginated-list{%- if zebra|default(false) %} zebra{% endif %}">
         <p class="pagination--info">
             Showing {{ offset + 1 }} to {{ min(offset + limit, total) }} of {{ total }}

@@ -2,29 +2,33 @@
 
 {% if filters is defined and filters is not empty or show_search|default(false) %}
 <section class="filter">
+    {% if show_search|default(false) %}
+    <p class="filter__section-keyword">
+        <label class="material-icons" for="filter__keyword">search</label>
+        <input id="filter__keyword" name="filter[keyword]" placeholder="enter a keyword" type="search" value="{{ filter_values['keyword']|default('') }}" />
+        <button class="clear-search material-icons" data-target="#filter__keyword" type="button">cancel</button>
+        <button class="button button--info" type="submit">Search</button>
+    </p>
+    {% endif %}
     <p><a href="#" class="filter__toggle" title="Show filter options"><span class="material-icons">filter_list</span> Filters</a></p>
-    <div id="filter__options">
+    {% if sort_options is defined and sort_options is not empty %}
+        {{ include('/inadmin/partials/sort-by.html.twig') }}
+    {% endif %}
+</section>
+<div id="filter__options">
     {% if filters is defined and filters is not empty %}
         {% for filter_name, filter in filters %}
-        <span class="filter__section-{{ filter_name|lower }}">
-            <label for="filter__{{ filter_name|lower }}">{{ filter_name }}</label>
-            <select name="filter[{{ filter_name|lower }}]" id="filter__{{ filter_name|lower }}">
-                {% for key, value in filter %}
-                    <option value="{{ key }}"{% if filter_values[filter_name|lower]|default('') == key %} selected{% endif %}>{{ value }}</option>
-                {% endfor %}
-            </select>
-        </span>
+            <span class="filter__section-{{ filter_name|lower }}">
+        <label for="filter__{{ filter_name|lower }}">{{ filter_name }}</label>
+        <select name="filter[{{ filter_name|lower }}]" id="filter__{{ filter_name|lower }}">
+            {% for key, value in filter %}
+                <option value="{{ key }}"{% if filter_values[filter_name|lower]|default('') == key %} selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+        </select>
+    </span>
         {% endfor %}
     {% endif %}
-    {% if show_search|default(false) %}
-        <span class="filter__section-keyword">
-            <label for="filter__keyword">Search</label>
-            <input id="filter__keyword" name="filter[keyword]" type="search" value="{{ filter_values['keyword']|default('') }}" />
-            <button class="button button--info" type="submit">Search</button>
-        </span>
-    {% endif %}
-    </div>
-</section>
+</div>
 {% endif %}
 
 {% endblock %}

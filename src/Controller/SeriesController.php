@@ -6,7 +6,7 @@ use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Series;
 use App\Form\SeriesType;
-use App\Utils\UrlNormaliser;
+use App\Util\UrlNormaliser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

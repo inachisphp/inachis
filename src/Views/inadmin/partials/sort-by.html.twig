@@ -1,6 +1,6 @@
 {% if sort_options|default(null) is not empty %}
 <p class="ui-sortby">
-    <label class="visually-hidden" for="sort">Sort by</label>
+    <label for="sort"><em class="material-icons">swap_vert</em> <span class="visually-hidden">Sort by</span></label>
     <select id="sort" name="sort">
         {% for option,option_name in sort_options %}
         <option value="{{ option }}"{% if page.sort == option %} selected{% endif %}>{{ option_name }}</option>

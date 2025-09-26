@@ -1,47 +1,112 @@
+@use 'sass:color';
+
 .filter {
+  align-items: center;
+  float: left;
+  display: flex;
   font-size: 0.9em;
+  position: relative;
+
+  .filter__section-keyword {
+    input {
+      border: 1px solid #eee;
+      border-radius: .5em;
+      padding-left: 2em;
+    }
+    label {
+      color: gray;
+      left: 0.25em;
+      position: absolute;
+      top: 1em;
+    }
+    button[type=submit] {
+      margin-left: -2.5em;
+    }
+    .clear-search {
+      background: none;
+      border: none;
+      color: #666;
+      position: relative;
+      right: 1.5em;
+      top: 0.3em;
+    }
+  }
 
   p {
     a, a:visited {
       background-color: $admin__filter_button-background;
-      background-color: $admin__filter_button-color;
-      border: 1px solid transparent;
-      color: #fff;
-      display: inline-block;
       border-radius: 0.5em;
-      padding: 0.2em 0.95em;
+      border: 1px solid transparent;
+      color: $admin__filter_button-color;
+      display: inline-block;
+      margin-left: 1em;
+      padding: .5em 1em;
       text-decoration: none;
     }
     a:hover {
-      background-color: $admin__filter_button-background--hover;
-      color: $admin__filter_button-color--hover;
+      background-color: color.adjust($admin__filter_button-background, $lightness: -20%);
+      //background-color: $admin__filter_button-background--hover;
+      //color: $admin__filter_button-color--hover;
     }
-    a.selected {
-      background-color: $admin__filter_button-background--selected;
-      color: $admin__filter_button-color--selected;
-      border-radius: 0.5em 0.5em 0 0;
-    }
+    //a.selected {
+    //  background-color: $admin__filter_button-background--selected;
+    //  color: $admin__filter_button-color--selected;
+    //  border-radius: 0.5em 0.5em 0 0;
+    //}
   }
 
   span {
     vertical-align: middle;
   }
+}
 
-  div#filter__options {
-    display:none;
+div#filter__options {
+  display: none;
 
-    background-color: $admin__filter_button-background--selected;
-    color: $admin__filter_button-color--selected;
-    margin-top: -1em;
-    padding: 10px;
+  span {
+    background-color: #000;
     border: 1px solid transparent;
-    border-radius: 0 0.5em 0.5em 0.5em;
+    border-radius: 0.5em;
+    color: #fff;
+    font-size: 0.9em;
+    margin-right: 1em;
+    padding: 0.4em 0.4em 0.4em 1em;
 
-    input, select {
-      width: 10em;
+    label::after {
+      content: ':';
     }
-    span {
-      margin-right: 1em;
+
+    select::before, select::after {
+      box-sizing: border-box;
     }
+
+    select {
+      background: transparent;
+      border: none;
+      color: #fff;
+      padding: 0;
+      margin: 0;
+      width: auto;
+      font-family: inherit;
+      font-size: inherit;
+      cursor: inherit;
+      line-height: inherit;
+      outline: none;
+    }
+  }
+}
+
+.ui-sortby {
+  float: right;
+  font-size: 0.9em;
+
+  em {
+    vertical-align: middle;
+  }
+
+  select {
+    border: 1px solid #eee;
+    border-radius: .5em;
+    width: auto;
   }
 }
