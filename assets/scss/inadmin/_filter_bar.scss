@@ -2,9 +2,9 @@
 
 .filter {
   align-items: center;
-  float: left;
   display: flex;
   font-size: 0.9em;
+  justify-content: space-between;
   position: relative;
 
   .filter__section-keyword {
@@ -61,8 +61,6 @@
 }
 
 div#filter__options {
-  display: none;
-
   span {
     background-color: #000;
     border: 1px solid transparent;
@@ -97,7 +95,6 @@ div#filter__options {
 }
 
 .ui-sortby {
-  float: right;
   font-size: 0.9em;
 
   em {

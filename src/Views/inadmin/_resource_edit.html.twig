@@ -13,7 +13,7 @@
         {{ form_start(form, {'attr': { 'class': 'form form__post form__resource' }}) }}
         <div class="col span_5_of_8 content__edit">
         <fieldset id="post__edit">
-            <legend>{% trans %}admin.series.legend{% endtrans %}</legend>
+            <h3>Details</h3>
             <p>
                 {{ form_label(form.title) }}
                 {{ form_errors(form.title) }}
@@ -31,7 +31,7 @@
             </p>
         </fieldset>
         <fieldset id="post__properties">
-            <legend>Properties</legend>
+            <h3>Properties</h3>
             {% if page.type == 'images' %}
             <p><strong>Dimensions:</strong> {{ resource.dimensionX ~ ' (w) x ' ~ resource.dimensionY ~ ' (h)' }}</p>
             {% endif %}
@@ -50,7 +50,7 @@
                 }) }}
             {% endif %}
             <fieldset id="post_usages">
-                <legend>Usages</legend>
+                <h3>Usages</h3>
                 {% if usages.posts|default(null) is not empty or usages.series|default(null) is not empty %}
                     <ol>
                         {% for content_type,content_uses in usages %}

@@ -15,10 +15,10 @@
         {{ include('/inadmin/partials/sort-by.html.twig') }}
     {% endif %}
 </section>
-<div id="filter__options">
+<div id="filter__options"{% if filter_values is not defined or filter_values is empty %} class="visually-hidden{% endif %}">
     {% if filters is defined and filters is not empty %}
         {% for filter_name, filter in filters %}
-            <span class="filter__section-{{ filter_name|lower }}">
+    <span class="filter__section-{{ filter_name|lower }}">
         <label for="filter__{{ filter_name|lower }}">{{ filter_name }}</label>
         <select name="filter[{{ filter_name|lower }}]" id="filter__{{ filter_name|lower }}">
             {% for key, value in filter %}
