@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\Page;
 use App\Entity\Url;
 use App\Parser\MarkdownFileParser;
-use App\Utils\UrlNormaliser;
+use App\Util\UrlNormaliser;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Util\Json;
 use Symfony\Component\HttpFoundation\JsonResponse;

@@ -84,7 +84,7 @@
             </span>
                 {% endif %}
             {% endif %}
-            {% if item.modDate is defined and showDate|default(true) == true %}
+            {% if item.modDate is defined and (showDate is not defined or showDate == true) %}
                 {% set timezone = session.user.timezone|default(item.timezone|default('UTC')) %}
                 {% if inline|default(false) == false %}
             <p class="date">

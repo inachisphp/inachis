@@ -44,7 +44,7 @@
             <p class="post__link__edit">
                 {{ form_label(form.url) }}
                 {{ form_errors(form.url) }}
-                {{ settings.domain -}}/<input id="post_url" name="post[url]" type="text" value="{% if post.urls is not empty %}{{ post.urls|first.link }}{% endif %}" />
+                {{ settings.domain -}}/<input class="field__wide" id="post_url" name="post[url]" type="text" value="{% if post.urls is not empty %}{{ post.urls|first.link }}{% endif %}" />
             </p>
             <p>
                 {{ form_label(form.content) }}

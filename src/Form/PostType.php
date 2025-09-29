@@ -78,7 +78,7 @@ class PostType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'url_label',
                     'aria-required'   => 'false',
-                    'class' => 'halfwidth',
+                    'class' => 'field__wide',
                 ],
                 'label'      => $this->translator->trans('admin.label.post.url', [], 'messages'),
                 'label_attr' => [

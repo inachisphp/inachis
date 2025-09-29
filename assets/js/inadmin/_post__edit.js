@@ -2,6 +2,7 @@ var InachisPostEdit = {
 	_pageTitle: '',
 	_postOrPage: 'post',
 	categoryList: '',
+	ajaxTimeout: false,
 
 	_init: function()
 	{
@@ -54,62 +55,65 @@ var InachisPostEdit = {
 
 	initTitleChange: function()
 	{
-		$(document).on('keyup', '#post__edit #post_title, #post__edit #post_subTitle', $.proxy(function(event)
+		$(document).on('input', '#post_title, #post_subTitle', $.proxy(function(event)
 		{
-			if ([
-				13, // enter
-				16, // shift
-				17, // ctrl
-				18, // alt
-				19, // pause
-				20, // capslock
-				27, // esc
-				33, // page up
-				34, // page down
-				35, // end
-				36, // home
-				37, // left
-				38, // up
-				39, // right
-				40, // down
-				45, // insert
-				91, // left-window / apple
-				92, // right-window / apple
-				93, // select key
-				112, // f1
-				113, // f2
-				114, // f3
-				115, // f4
-				116, // f5
-				117, // f6
-				118, // f7
-				119, // f8
-				120, // f9
-				121, // f10
-				122, // f11
-				123, // f12
-				124, // f13
-				125, // f14
-				126, // f15
-				127, // f16
-				128, // f17
-				129, // f18
-				130, // f19
-				144, // num lock
-				145 // scroll lock
-			].indexOf(event.which) >= 0) {
-				return;
-			}
-			var urlInput = $('input#post_url');
-			urlInput.val(this.getUrlFromTitle());
+			if (InachisPostEdit.ajaxTimeout) clearTimeout(InachisPostEdit.ajaxTimeout);
+			InachisPostEdit.ajaxTimeout = setTimeout(function() {
+				if ([
+					13, // enter
+					16, // shift
+					17, // ctrl
+					18, // alt
+					19, // pause
+					20, // capslock
+					27, // esc
+					33, // page up
+					34, // page down
+					35, // end
+					36, // home
+					37, // left
+					38, // up
+					39, // right
+					40, // down
+					45, // insert
+					91, // left-window / apple
+					92, // right-window / apple
+					93, // select key
+					112, // f1
+					113, // f2
+					114, // f3
+					115, // f4
+					116, // f5
+					117, // f6
+					118, // f7
+					119, // f8
+					120, // f9
+					121, // f10
+					122, // f11
+					123, // f12
+					124, // f13
+					125, // f14
+					126, // f15
+					127, // f16
+					128, // f17
+					129, // f18
+					130, // f19
+					144, // num lock
+					145 // scroll lock
+				].indexOf(event.which) >= 0) {
+					return;
+				}
+				var urlInput = $('input#post_url');
+				urlInput.val(InachisPostEdit.getUrlFromTitle());
+			}, 500);
 		}, this));
 	},
 
 	getUrlFromTitle: function()
 	{
-		var $originalTitle = $('#post_url').val();
+		let $originalTitle = $('input#post_url').val();
 		if ($originalTitle === '' || $originalTitle.match(/\d{4}\/\d{2}\/\d{2}\/[a-z0-9\-]+/)) {
-			var $postContainer = $('#post__edit'),
+			let $postContainer = $('#post__edit'),
 				title = this.urlify($postContainer.find('#post_title').val()),
 				subTitle = this.urlify($postContainer.find('#post_subTitle').val());
 			if (title.length > 0 && subTitle.length > 0) {
@@ -119,7 +123,7 @@ var InachisPostEdit = {
 			if (this._postOrPage === 'post') {
 				title = this.convertDate($('#post_postDate').val().substring(0,10)) + '/' + title.substring(0, 255);
 			}
-			title = this.ensureUniqueUrl();
+			this.ensureUniqueUrl(title);
 			return title;
 		}
 		return $originalTitle;
@@ -147,18 +151,18 @@ var InachisPostEdit = {
 		return "easymde" in window && easymde.options.element.defaultValue !== easymde.value();
 	},
 
-	ensureUniqueUrl: function()
+	ensureUniqueUrl: function(title)
 	{
 		$.ajax({
 			data: {
 				id: easymde.options.autosave.uniqueId,
-				url: $('#post_url')[0].value
+				url: title
 			},
-			dataType: 'json',
 			method: 'post',
 			url: Inachis.prefix + '/ax/check-url-usage',
-		}).done(function (response) {
-			return response.responseText;
+		}).done(function (jqXHR) {
+
+			$('input#post_url').val(jqXHR)
 		});
 	}
 };
