@@ -38,6 +38,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column(type: "string", length: 512, nullable: false)]
     #[Assert\NotBlank]
+    #[Assert\Type(type: ['alpha', 'digit'])]
     protected string $username;
 
     /**
@@ -58,13 +59,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank]
     #[Assert\Length(max: 4096)]
     #[Assert\NotCompromisedPassword]
-    #[Assert\PasswordStrength]
+    #[Assert\PasswordStrength(
+        minScore: Assert\PasswordStrength::STRENGTH_WEAK,
+    )]
     protected ?string $plainPassword;
 
     /**
      * @var string Email address of the user
      */
     #[ORM\Column(type: "string", length: 512, nullable: false)]
+    #[Assert\NotBlank]
     protected string $email;
 
     /**
@@ -77,6 +81,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The display name for the user
      */
     #[ORM\Column(type: "string", length: 512)]
+    #[Assert\NotBlank]
     protected string $displayName;
 
     /**
@@ -135,6 +140,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected string $timezone;
 
     /**
+     * @var string
+     */
+    #[ORM\Column(type: "string", length: 10, nullable: false)]
+    #[Assert\NotBlank]
+    protected string $color = '#099bdd';
+
+    /**
      * Default constructor for {@link User}. If a password is passed into
      * the constructor it will use {@link setPasswordHash} to store a hashed
      * version of the password instead. This entity should never hold
@@ -150,6 +162,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->setUsername($username);
         $this->setPassword($password);
         $this->setEmail($email);
+        $this->setAvatar(null);
         $currentTime = new \DateTime('now');
         $this->setCreateDate($currentTime);
         $this->setModDate($currentTime);
@@ -588,5 +601,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $initials .= ucfirst($nameWord[0]);
         }
         return $initials;
+    }
+
+    /**
+     * @param string $color
+     * @return $this
+     */
+    public function setColor(string $color): self
+    {
+        $this->color = $color;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getColor(): string
+    {
+        return $this->color;
     }
 }

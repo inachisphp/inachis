@@ -73,6 +73,48 @@ fieldset.multisection {
     }
   }
 }
+#user_color {
+  input[type=radio] {
+    margin: 0 1em 0 0;
+    width:auto;
+    visibility: hidden;
+  }
+  input:checked+label {
+    border: 4px solid #333;
+  }
+  label {
+    border: 4px solid transparent;
+    border-radius: 50%;
+    display: inline-block;
+    height: 3em;
+    overflow: hidden;
+    width: 3em;
+  }
+  input[data-color="#099bdd"]+label {
+    background-color: #099bdd;
+    color: #099bdd;
+  }
+  input[data-color="#f90"]+label {
+    background-color: #f90;
+    color: #f90;
+  }
+  input[data-color="#090"]+label {
+    background-color: #090;
+    color: #090;
+  }
+  input[data-color="#dd0909"]+label {
+    background-color: #dd0909;
+    color: #dd0909;
+  }
+  input[data-color="#8409dd"]+label {
+    background-color: #8409dd;
+    color: #8409dd;
+  }
+  input[data-color="#dd8709"]+label {
+    background-color: #dd8709;
+    color: #dd8709;
+  }
+}
 
 /*p.profile-photo, p.profile-photo:visited {
   border: 1px solid #000;

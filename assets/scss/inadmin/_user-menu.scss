@@ -32,7 +32,7 @@ $admin__user__notification__colour: #b01c3f;
 	}
 
 	[data-initials]:before {
-		background: #099bdd;
+		background-color: #099bdd;
 		color: white;
 		opacity: 1;
 		content: attr(data-initials);
@@ -45,6 +45,22 @@ $admin__user__notification__colour: #b01c3f;
 		height: 45px;
 		line-height: 45px;
 		text-align: center;
+	}
+
+	[data-color="#f90"]:before {
+		background-color: #f90;
+	}
+	[data-color="#090"]:before {
+		background-color: #090;
+	}
+	[data-color="#dd0909"]:before {
+		background-color: #dd0909;
+	}
+	[data-color="#8409dd"]:before {
+		background-color: #8409dd;
+	}
+	[data-color="#dd8709"]:before {
+		background-color: #dd8709;
 	}
 
 	ul {

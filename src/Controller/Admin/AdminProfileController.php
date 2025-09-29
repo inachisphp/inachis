@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Controller\AbstractInachisController;
 use App\Entity\User;
 use App\Form\UserType;
+use App\Util\RandomColorPicker;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -41,19 +42,24 @@ class AdminProfileController extends AbstractInachisController
      * @param Request $request
      * @param string $id
      * @return Response
-     * @throws \Exception
      */
     #[Route("/incc/admin/{id}", methods: [ "GET", "POST" ])]
     public function adminDetails(Request $request, string $id): Response
+    #[Route("/incc/admin/new", name: "app_admin_new", methods: [ "GET", "POST" ])]
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $request->get('id')]);
+        $user = $request->get('id') !== 'new' ?
+            $this->entityManager->getRepository(User::class)->findOneBy(['username' => $request->get('id')]):
+            new User();
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
             $user->setModDate(new \DateTime('now'));
+            if ($user->getId() === '') {
+                $user->setColor(RandomColorPicker::generate());
+            }
             $this->entityManager->persist($user);
             $this->entityManager->flush();
 

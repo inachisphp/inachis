@@ -1,3 +1,4 @@
+{% if user.username is defined and user.username is not empty %}
 <ul class="ui-tabs-nav">
     <li{% if activeTab == 'profile' %} class="ui-state-active"{% endif %}>
         <a href="{{ settings.domain ~ path('app_admin_adminprofile_admindetails', { 'id': user.username } ) }}">Profile</a>
@@ -11,3 +12,4 @@
         <a href="">Access</a>
     </li -->
 </ul>
+{% endif %}

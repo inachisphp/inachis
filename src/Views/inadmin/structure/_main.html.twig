@@ -27,16 +27,18 @@
 {%- if is_granted('ROLE_USER') %}
     <header class="admin__header">
         <h1>{% block pagetitle %}{% endblock pagetitle %}</h1>
+        <div class="admin__actions">
         <section class="admin__user">
             <a href="#admin__user__options">
                 {% if session.avatar is not empty %}
                 <img alt="User avatar" height="40" src="{{ session.avatar.filename }}" width="40" />
                 {% else %}
-                <span data-initials="{{ session.initials }}"></span>
+                <span data-color="{{ session.color }}" data-initials="{{ session.initials }}"></span>
                 {% endif %}
                 {%- if notifications|length > 0 %}<span class="admin__user__notifications">{{ notifications|length }}</span>{% endif %}
             </a>
             <ul id="admin__user__options">
+                <li><p><strong>Welcome,</strong> {{ session.displayName }}</p></li>
                 <li><a href="{{ path('app_admin_adminprofile_admindetails', {'id': session.username }) }}" title="Edit profile for {{ session.displayName }}">Edit your profile <span class="material-icons">perm_identity</span></a></li>
                 <!-- li><a href="/incc/settings/releases">Update available <span class="material-icons">new_releases</span></a></li -->
                 <li><form action="{{ path('app_logout') }}" method="post"><button>Log out <span class="material-icons">logout</span></button></form></li>
@@ -50,6 +52,7 @@
                 <button class="material-icons mobile-only" type="submit">search</button>
             </form>
         </section>
+        </div>
     </header>
 {% endif %}
 

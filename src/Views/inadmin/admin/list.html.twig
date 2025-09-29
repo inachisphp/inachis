@@ -1,33 +1,38 @@
 {% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <span>Users</span>
+{% endblock pagetitle %}
+
 {% block content %}
 
     {% block user_list_pre %}{% endblock user_list_pre %}
 
     {% block user_list %}
+    <div class="col span_8_of_8 widget-posts">
+        <a class="button button--positive" href="{{ path('app_admin_new') }}">
+            <span class="material-icons">add</span> Create admin</a>
         {% include 'inadmin/partials/list.html.twig' with {
-            'className': 'form__users',
-            'type': 'users',
+            className: 'form__users',
+            type: 'users',
 
-            'offset': page.offset,
-            'limit': page.limit,
-            'total': dataset.count,
+            offset: page.offset,
+            limit: page.limit,
+            total: dataset.count,
 
-            'snippet_description': 'username',
-            'slug_prefix': 'admin',
-            'slug': 'username',
+            snippet_description: 'username',
+            slug_prefix: 'admin',
+            slug: 'username',
+            inline: true,
+            showDate: false,
+            show_search: true,
+            zebra: true,
 
-            'url_add': path('app_admin_adminprofile_admindetails', { 'id': 'add'}),
-            'url_result': path('app_admin_adminprofile_adminlist'),
-
-            'actions': {
-                'delete': {
-                    'button_class': 'button--negative button--delete',
-                    'icon': 'delete_forever',
-                    'title': 'Delete',
-                },
-            }
+            url_add: path('app_admin_new'),
+            url_result: path('app_admin_adminprofile_adminlist'),
         }
         %}
+    </div>
     {% endblock user_list %}
 
     {% block user_list_post %}{% endblock user_list_post %}

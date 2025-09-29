@@ -15,24 +15,41 @@
             {{ include('inadmin/partials/profile_tabs.html.twig', {
                 'activeTab': 'profile'
             }) }}
-
-            <h2>Edit profile</h2>
-            <h3>{{ user.username }}</h3>
-
+    {% if user.username is defined and user.username is not empty %}
+            <h3>Editing user: {{ user.username }}</h3>
+        {% if app.user.username == user.username %}
             <fieldset class="multisection">
                 <legend>Your Display Picture</legend>
+                {{ form_widget(form.avatar) }}
+                {% if user.avatar is defined and user.avatar is not empty %}
                 <p class="profile-photo">
-                    <img alt="A user uploaded profile picture" height="100" src="{%
-                        if user.avatar is not empty %}/imgs/incc/{{ user.avatar }}{%
-                        else %}/assets/imgs/incc/defaultAvatar.png{% endif %}" width="100" />
-
+                    <img alt="A user uploaded profile picture" height="100" src="/incc/profile-img/{{ user.avatar }}" width="100" />
                 </p>
-                <p><button class="button button--info" type="button"><span class="material-icons">image_arrow_up</span> Upload a new picture</button></p>
-                <p>You can upload a JPEG, PNG, or HEIC image. It is recommended that this image is square (such as 100px x 100px) to avoid distortion.</p>
+                {% endif %}
+                <p>
+                    <button class="button button--info dialog__link"
+                            data-class-name="dialog__uploader"
+                            data-target="avatar"
+                            data-template-name="uploader"
+                            data-title="Upload a new display picture"
+                            type="button"
+                    ><span class="material-icons">image</span> Upload a new picture</button>
+                </p>
+                <p>You can upload a JPEG {% if heicSupported %},PNG, or HEIC{% else%}or PNG{% endif %} image. It is recommended that this image is square (such as 100px x 100px) to avoid distortion.</p>
             </fieldset>
-
+        {% endif %}
+    {% else %}
+        <h3>New administrator</h3>
+    {% endif %}
             <fieldset class="content__edit multisection">
                 <legend>Personal Information</legend>
+    {% if user.username is not defined or user.username is empty %}
+                <p>
+                    {{ form_label(form.username) }}
+                    {{ form_widget(form.username) }}
+                    {{ form_errors(form.username) }}
+                </p>
+    {% endif %}
                 <p>
                     {{ form_label(form.displayName) }}
                     {{ form_widget(form.displayName) }}
@@ -52,7 +69,22 @@
                 </p>
             </fieldset>
 
-            <p><button class="button button--positive" type="submit"><span class="material-icons">save</span> Save</button></p>
+        {% if app.user.username == user.username %}
+            <fieldset class="content__edit multisection">
+                <legend>Settings</legend>
+                <p>
+                    {{ form_label(form.color) }}
+                    {{ form_widget(form.color) }}
+                    {{ form_errors(form.color) }}
+                </p>
+            </fieldset>
+        {% endif %}
+
+            <p>
+                <button class="button button--positive" type="submit"><span class="material-icons">save</span> Save</button>
+                <button class="button button--negative" type="submit"><span class="material-icons">disabled_visible</span> Disable</button>
+                <button class="button button--negative" type="submit"><span class="material-icons">delete</span> Delete</button>
+            </p>
         </div>
         {{ form_end(form) }}
 
