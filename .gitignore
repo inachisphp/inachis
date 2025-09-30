@@ -32,3 +32,4 @@
 composer
 /docker
 docker-compose.yml
+!/var/uploads/avatars.gitkeep
