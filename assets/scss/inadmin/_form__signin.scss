@@ -1,12 +1,29 @@
 $form-background__light: #dde8ed;
-$form-label__light: #666;
+$form-label__light: #bbb;
 $form-input__complete: #090;
+$form-link: #ddd;
+$form-link__hover: #fff;
 
 @import 'mixins.scss';
 
+body.type_login {
+	background-image: url(/assets/imgs/incc/bg-signin.png);
+	background-size: cover;
+
+	.admin__body-container {
+		align-items: center;
+		display: flex;
+		height:100vh;
+		justify-content: center;
+	}
+}
+
 .container__login, .setup {
+	background-color: #303030;
 	border: 1px solid transparent;
 	border-top: 10px solid #069;
+	border-radius: 0.5em;
+	color: #fff;
 
 	@include box-shadow(5px, 7px, 14px, 0, rgba(0,0,0,0.26));
 
@@ -14,14 +31,25 @@ $form-input__complete: #090;
 		margin:3em 0;
 	}
 
+	h2 {
+		margin-bottom: 2em;
+	}
+
 	.logo {
 		text-align: center;
 	}
 
 	.form__login {
-		margin: 0 auto;
+		margin: 2em;
 		max-width: 450px;
-		padding: 10px;
+		padding: 0;
+		//width: 20em;
+
+		button {
+			i {
+				margin-left: 0.5em;
+			}
+		}
 
 		fieldset {
 			border: none;
@@ -29,11 +57,21 @@ $form-input__complete: #090;
 			padding: 0;
 		}
 
+		img {
+			float: right;
+			width: 5em;
+		}
+
 		input {
-			background-color: #eee;
-			border: 2px solid transparent;
-			margin-bottom: 10px;
+			background-color: #252525;
+			border: 2px solid #353535;
+			border-radius: 0.5em;
+			color: #fff;
+			margin-bottom: 1.3em;
 			width: 90%;
+		}
+		.input:active {
+			border-bottom-color: #069;
 		}
 		input[value^=""], .input__complete {
 			border-color: $form-input__complete;
@@ -47,7 +85,7 @@ $form-input__complete: #090;
 			color: $form-label__light;
 			display: block;
 			font-size: 0.85em;
-			margin-bottom: 5px;
+			margin-bottom: 0.3em;
 			text-align: left;
 			text-transform: uppercase;
 		}
@@ -59,14 +97,15 @@ $form-input__complete: #090;
 
 	a, a:visited {
 		&.button {
-			color: #fff;
 			display: inline;
 		}
 		& {
-			color: #666;
+			color: $form-link;
 			display: block;
-			margin-top: 35px;
-			text-align: center;
+			font-size: 0.9em;
+			margin-right: 1em;
+			margin-top: -1em;
+			text-align: right;
 			text-decoration: none;
 		}
 	}
@@ -76,7 +115,7 @@ $form-input__complete: #090;
 			text-decoration: none;
 		}
 		& {
-			color: #069;
+			color: $form-link__hover;
 			text-decoration: underline;
 		}
 	}

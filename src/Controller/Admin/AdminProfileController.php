@@ -5,9 +5,17 @@ namespace App\Controller\Admin;
 use App\Controller\AbstractInachisController;
 use App\Entity\User;
 use App\Form\UserType;
+use App\Service\PasswordResetTokenService;
+use App\Transformer\ImageTransformer;
+use App\Util\Base64EncodeFile;
 use App\Util\RandomColorPicker;
+use Random\RandomException;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AdminProfileController extends AbstractInachisController
@@ -40,12 +48,19 @@ class AdminProfileController extends AbstractInachisController
 
     /**
      * @param Request $request
-     * @param string $id
+     * @param ImageTransformer $imageTransformer
+     * @param MailerInterface $mailer
      * @return Response
+     * @throws RandomException
      */
     #[Route("/incc/admin/{id}", methods: [ "GET", "POST" ])]
-    public function adminDetails(Request $request, string $id): Response
     #[Route("/incc/admin/new", name: "app_admin_new", methods: [ "GET", "POST" ])]
+    public function adminDetails(
+        Request $request,
+        ImageTransformer $imageTransformer,
+        MailerInterface $mailer,
+        PasswordResetTokenService $tokenService,
+    ): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -57,8 +72,29 @@ class AdminProfileController extends AbstractInachisController
 
         if ($form->isSubmitted()) {
             $user->setModDate(new \DateTime('now'));
-            if ($user->getId() === '') {
+            $reflection = new \ReflectionProperty(User::class, 'id');
+
+            if (!$reflection->isInitialized($user)) {
+                $data = $tokenService->createResetRequestForEmail($user->getEmail());
                 $user->setColor(RandomColorPicker::generate());
+                try {
+                    $email = (new TemplatedEmail())
+                        ->to(new Address($user->getEmail()))
+                        ->subject('Welcome to ' . $this->data['settings']['siteTitle'])
+                        ->htmlTemplate('inadmin/emails/registration.html.twig')
+                        ->textTemplate('inadmin/emails/registration.txt.twig')
+                        ->context([
+                            'name' => $user->getDisplayName(),
+                            'url' => $this->generateUrl('app_account_newpassword', [ 'token' => $data['token']]),
+                            'expiresAt' => $data['expiresAt']->format('l jS F Y \a\\t H:i'),
+                            'settings' => $this->data['settings'],
+                            'logo' => Base64EncodeFile::encode('public/assets/imgs/incc/inachis.png'),
+                        ])
+                    ;
+                    $mailer->send($email);
+                } catch (TransportExceptionInterface $e) {
+                    $this->addFlash('warning', 'Error while sending mail: ' . $e->getMessage());
+                }
             }
             $this->entityManager->persist($user);
             $this->entityManager->flush();
@@ -72,6 +108,7 @@ class AdminProfileController extends AbstractInachisController
         $this->data['user'] = $user;
         $this->data['form'] = $form->createView();
         $this->data['page']['title'] = 'Profile';
+        $this->data['heicSupported'] = $imageTransformer->isHEICSupported();
 
         return $this->render('inadmin/admin/profile.html.twig', $this->data);
     }

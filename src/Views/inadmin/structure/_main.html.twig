@@ -61,20 +61,9 @@
         {% if 'Content saved.' in app.session.flashbag.peek('success') %}
             {{ app.session.set('clearAutosave', true) }}
         {% endif %}
-        {% for label, messages in app.flashes(['success', 'warning', 'notice']) %}
-            {% for message in messages %}
-                <div class="flash-{{ label }}">
-                    {% if label == 'success' %}
-                        <span class="material-icons">check_circle</span>
-                    {% elseif label == 'warning' %}
-                        <span class="material-icons">warning</span>
-                    {% elseif label == 'notice' %}
-                        <span class="material-icons">info</span>
-                    {% endif %}
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endfor %}
+        {% if page_type|default(null) is null or page_type != 'login' %}
+            {% include "inadmin/partials/flashes.html.twig" %}
+        {% endif %}
     {% endblock form_login_pre %}
 
     {% block content %}{% endblock content %}

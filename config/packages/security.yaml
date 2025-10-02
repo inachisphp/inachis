@@ -47,6 +47,7 @@ security:
     access_control:
         - { path: ^/incc/login$, roles: PUBLIC_ACCESS }
         - { path: ^/incc/forgot-password$, roles: PUBLIC_ACCESS }
+        - { path: ^/incc/new-password, roles: PUBLIC_ACCESS }
         - { path: ^/incc/logout, roles: PUBLIC_ACCESS }
         - { path: ^/incc/login-check$, roles: PUBLIC_ACCESS }
 

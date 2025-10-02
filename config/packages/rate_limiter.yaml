@@ -1,0 +1,12 @@
+framework:
+  rate_limiter:
+    forgot_password_ip:
+      policy: 'sliding_window'
+      limit: 10      # max 10 requests
+      interval: '1 hour'
+      # Key will be client IP
+    forgot_password_account:
+      policy: 'sliding_window'
+      limit: 3       # max 3 requests
+      interval: '1 hour'
+      # Key will be user email (or hashed user id)

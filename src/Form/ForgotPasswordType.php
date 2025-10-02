@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ForgotPasswordType extends AbstractType
 {
-    private $translator;
+    private ?TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator = null)
     {
@@ -42,15 +42,15 @@ class ForgotPasswordType extends AbstractType
                     'id' => 'forgot__email-label',
                 ],
             ])
-            ->add('captcha', Recaptcha3Type::class, [
-                'constraints' => new Recaptcha3([
-                    'message' => 'karser_recaptcha3.message',
-                    'messageMissingValue' => 'karser_recaptcha3.message_missing_value',
-                ]),
-                'action_name' => 'homepage',
-//                'script_nonce_csp' => $nonceCSP,
-                'locale' => $_ENV['APP_LOCALE'] ?: 'en',
-            ])
+//            ->add('captcha', Recaptcha3Type::class, [
+//                'constraints' => new Recaptcha3([
+//                    'message' => 'karser_recaptcha3.message',
+//                    'messageMissingValue' => 'karser_recaptcha3.message_missing_value',
+//                ]),
+//                'action_name' => 'homepage',
+////                'script_nonce_csp' => $nonceCSP,
+//                'locale' => $_ENV['APP_LOCALE'] ?: 'en',
+//            ])
             ->add('resetPassword', SubmitType::class, [
                 'label' => $this->translator->trans('admin.reset_password'),
                 'attr'  => [
