@@ -120,6 +120,8 @@
             text-decoration:none;
             -webkit-text-size-adjust:none;
         }
+
+        {% block email_styles %}{% endblock email_styles %}
     </style>
 
     <style type="text/css" media="screen">
@@ -208,17 +210,37 @@
 <p class="preheader">{% block preheader %}Preheader text goes here - 85-199 chars{% endblock preheader %}</></p>
 
 <p>
-    <a href="#" style="text-decoration:none;">
+    <a href="{{ settings.domain }}/incc" style="text-decoration:none;">
         <center>
-            <img src="{{ settings.domain }}/assets/imgs/incc/inachis.png" alt="{{ settings.siteTitle }}" />
+        {% block email_logo %}
+            <img src="{{ logo }}" alt="{{ settings.siteTitle }}" width="150" />
+        {% endblock email_logo %}
         </center>
     </a>
 </p>
 
 {% block content %}
 {% endblock content %}
+<p><center>Best wishes,</center></p>
+<p><center>{{ settings.siteTitle|default(settings.domain) }}</center></p>
 
-<p><center>social media links / copyright</center></p>
-<p><center><a href="">Edit email settings</a> | <a href="">Unsubscribe</a></center></p>
+<p>
+{% if settings is defined and settings.twitter is defined and settings.twitter is not empty %}
+    <a href="https://twitter.com/{{ settings.twitter }}" class="twitter-follow-button" data-show-count="false"><span>Follow @{{ settings.twitter }}</span></a>
+{% endif %}
+{% if settings.facebookUrl is defined and settings.facebookUrl is not empty %}
+    <a href="https://www.facebook.com/{{ settings.facebookUrl }}" class="facebook-follow-button" data-show-count="false"><span>Facebook</span></a>
+{% endif %}
+{% if settings.pinterest is defined and settings.pinterest is not empty %}
+    <a href="http://www.pinterest.com/{{ settings.pinterest }}/" class="pinterest-follow-button" data-show-count="false"><span>Pinterest</span></a>
+{% endif %}
+{% if settings.instagram is defined and settings.instagram is not empty %}
+    <a href="https://instagram.com/{{ settings.instagram }}/" class="googleplus-follow-button" data-show-count="false"><span>Instagram</span></a>
+{% endif %}
+</p>
+
+{% block settings_unsubscribe %}
+<p><center><a href="{{ settings.domain }}">Edit email settings</a> | <a href="{{ settings.domain }}">Unsubscribe</a></center></p>
+{% endblock settings_unsubscribe %}
 </body>
 </html>

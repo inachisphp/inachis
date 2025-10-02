@@ -1,4 +1,15 @@
-{% extends "inadmin/emails/email-layout.txt.twig" %}
-{% block content %}
+{% extends "inadmin/emails/_email-layout.txt.twig" %}
 
+{% block preheader %}{% endblock preheader %}
+
+{% block content %}
+Welcome {{ name }}!
+
+Thank you for registering on <strong>{{ settings.siteTitle|default(settings.domain) }}.
+
+To complete your registration, please follow the URL below:
+
+{{ settings.domain ~ url }}
+
+Once you have clicked the link, you will be asked to create a new password for your account. For security purposes, this link will expire on {{ expiresAt }}.
 {% endblock content %}
