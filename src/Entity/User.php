@@ -10,7 +10,6 @@ use Random\RandomException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Validator\Constraints as InachisAssert;
 
 /**
  * Object for handling User entity.
@@ -120,17 +119,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: "datetime")]
     protected \DateTime $passwordModDate;
 
-    /**
-     * @var string|null A token used when resetting the users password
-     */
-    #[ORM\Column(type: "string", length: 20, nullable: true)]
-    protected ?string $passwordResetToken;
-
-    /**
-     * @var string|null
-     */
-    #[ORM\Column(type: "datetime", nullable: true)]
-    protected \DateTime $passwordResetTokenExpire;
     /**
      * @InachisAssert\ValidTimezone()
      * @var string The local timezone for the user
@@ -581,16 +569,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier(): string
     {
         return $this->username;
-    }
-
-    /**
-     * @throws RandomException
-     */
-    public function generatePasswordResetToken(): string
-    {
-        $this->passwordResetToken = random_int(100000, 999999);
-
-        return $this->passwordResetToken;
     }
 
     public function getInitials(): string

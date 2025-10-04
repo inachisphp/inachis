@@ -129,7 +129,7 @@ class SeriesController extends AbstractInachisController
             $this->entityManager->persist($series);
             $this->entityManager->flush();
 
-            $this->addFlash('notice', 'Content saved.');
+            $this->addFlash('success', 'Content saved.');
             return $this->redirect(
                 '/incc/series/edit/' .
                 $series->getId() . '/'

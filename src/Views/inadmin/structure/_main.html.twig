@@ -49,7 +49,6 @@
                 <label for="q" class="material-icons">search</label>
                 <input id="q" name="filter[keyword]" placeholder="search for content" type="search" />
                 <button class="clear-search material-icons" data-target="#q" type="button">cancel</button>
-                <button class="material-icons mobile-only" type="submit">search</button>
             </form>
         </section>
         </div>
@@ -96,13 +95,13 @@
                         </li>
                         <li class="{{ page.tab|activeMenu('users') }}"><a href="{{ settings.domain ~ path('app_admin_adminprofile_adminlist') }}" title="Manage users">
                                 <i class="material-icons">people</i><span> Users</span></a>
-                        </li>
-                        <li class="{{ page.tab|activeMenu('tools') }}"><a href="{{ settings.domain ~ path('app_tools_index') }}" title="Tools">
-                                <i class="material-icons">build</i><span> Tools</span></a>
-                        </li>
-                        <li class="{{ page.tab|activeMenu('settings') }}"><a href="{{ settings.domain ~ path('app_settings_index') }}" title="Change advanced settings">
-                                <i class="material-icons">settings</i><span> Settings</span></a>
-                        </li>
+{#                        </li>#}
+{#                        <li class="{{ page.tab|activeMenu('tools') }}"><a href="{{ settings.domain ~ path('app_tools_index') }}" title="Tools">#}
+{#                                <i class="material-icons">build</i><span> Tools</span></a>#}
+{#                        </li>#}
+{#                        <li class="{{ page.tab|activeMenu('settings') }}"><a href="{{ settings.domain ~ path('app_settings_index') }}" title="Change advanced settings">#}
+{#                                <i class="material-icons">settings</i><span> Settings</span></a>#}
+{#                        </li>#}
 {#                        <li><a href="{{ settings.domain ~ path('app_waste_list') }}" title="Manage deleted content">#}
 {#                                <i class="material-icons">delete</i><span> Bin</span></a>#}
 {#                        </li>#}

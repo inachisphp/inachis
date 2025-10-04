@@ -28,6 +28,19 @@
             show_search: true,
             zebra: true,
 
+            badges: {
+                'disabled': {
+                    'field': 'isEnabled',
+                    'condition': true,
+                    'className': 'badge__disabled',
+                },
+                'new-user': {
+                    'field': 'password',
+                    'condition': '',
+                    'className': 'badge__new',
+                },
+            },
+
             url_add: path('app_admin_new'),
             url_result: path('app_admin_adminprofile_adminlist'),
         }

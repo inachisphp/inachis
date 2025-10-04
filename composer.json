@@ -16,6 +16,7 @@
     "require": {
         "php": ">=8.2",
         "ext-iconv": "*",
+        "ext-intl": "*",
         "ext-json": "*",
         "aptoma/twig-markdown": "^3.0",
         "beberlei/doctrineextensions": "^1.3",

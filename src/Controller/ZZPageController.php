@@ -151,7 +151,6 @@ class ZZPageController extends AbstractInachisController
                     ->setContent('')
                     ->setAction(sprintf(RevisionRepository::VISIBILITY_CHANGE, $post->getVisibility()));
                 $this->entityManager->persist($revision);
-
                 $this->entityManager->flush();
             }
             return $this->redirectToRoute(
@@ -216,7 +215,7 @@ class ZZPageController extends AbstractInachisController
         ],
         methods: [ "GET", "POST" ]
     )]
-    public function getPostAdmin(Request $request, ContentRevisionCompare $contentRevisionCompare, $type = 'post', $title = null): Response
+    public function getPostAdmin(Request $request, ContentRevisionCompare $contentRevisionCompare, string $type = 'post', $title = null): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 

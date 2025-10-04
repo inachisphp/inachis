@@ -1,5 +1,13 @@
 framework:
   rate_limiter:
+    login_username:
+      policy: 'sliding_window'
+      limit: 5
+      interval: '15 minutes'
+    login_ip:
+      policy: 'sliding_window'
+      limit: 50
+      interval: '15 minutes'
     forgot_password_ip:
       policy: 'sliding_window'
       limit: 10      # max 10 requests

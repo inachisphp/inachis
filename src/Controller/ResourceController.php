@@ -68,12 +68,16 @@ class ResourceController extends AbstractInachisController
         $this->data['page']['sort'] = $sort;
         $this->data['page']['tab'] = $type;
         $this->data['page']['title'] = $type . 's';
+        $this->data['limitKByte'] = Image::WARNING_FILESIZE;
+        $this->data['limitSize'] = Image::WARNING_DIMENSIONS;
 
         return $this->render('inadmin/_resources.html.twig', $this->data);
     }
 
     /**
      * @param Request $request
+     * @param Filesystem $filesystem
+     * @param string $imageDirectory
      * @return Response
      */
     #[Route('/incc/resources/{type}/{filename}',
@@ -114,7 +118,7 @@ class ResourceController extends AbstractInachisController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $resource = $form->getData();
-            if ($request->get('resource')['delete'] !== null) {
+            if (!empty($request->get('resource')['delete'])) {
                 $filename = $imageDirectory . $resource->getFilename();
                 if ($type === 'Image' &&
                     sizeof($this->data['usages']['posts']) === 0 &&
@@ -148,6 +152,15 @@ class ResourceController extends AbstractInachisController
         if ($type === 'Image') {
             $this->data['usages']['posts'] = $this->entityManager->getRepository(Page::class)->getPostsUsingImage($resource);
             $this->data['usages']['series'] = $this->entityManager->getRepository(Series::class)->getSeriesUsingImage($resource);
+            $fullImagePath = $resource->getFilename();
+            if (!str_starts_with($fullImagePath, 'http')) {
+                $fullImagePath = $imageDirectory . $fullImagePath;
+            }
+            $sizes = getimagesize($fullImagePath);
+            $this->data['channels'] = $sizes['channels'];
+            $this->data['bits'] = $sizes['bits'];
+            $this->data['limitKByte'] = Image::WARNING_FILESIZE;
+            $this->data['limitSize'] = Image::WARNING_DIMENSIONS;
         }
 
         return $this->render('inadmin/_resource_edit.html.twig', $this->data);

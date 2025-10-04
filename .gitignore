@@ -9,6 +9,7 @@
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
+!/var/uploads/avatars/.gitkeep
 /vendor/
 ###< symfony/framework-bundle ###
 ###> symfony/phpunit-bridge ###
@@ -32,4 +33,3 @@
 composer
 /docker
 docker-compose.yml
-!/var/uploads/avatars.gitkeep

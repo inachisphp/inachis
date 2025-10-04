@@ -197,7 +197,6 @@ class AccountController extends AbstractInachisController
             $limiter = $forgotPasswordIpLimiter->create($request->getClientIp() ?? 'unknown');
             $limit = $limiter->consume(1);
             if (!$limit->isAccepted()) {
-                // @todo consider locking target account
                 $headers = [
                     'X-RateLimit-Remaining' => $limit->getRemainingTokens(),
                     'X-RateLimit-Retry-After' => $limit->getRetryAfter()->getTimestamp() - time(),
