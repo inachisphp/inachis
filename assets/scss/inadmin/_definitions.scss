@@ -1,26 +1,49 @@
 @use 'sass:color';
 
+// media queries
 $information-small: "screen and (min-width: 320px)";
 $information-medium: "screen and (min-width: 480px)";
 $information-large: "screen and (min-width: 480px)";
 
-//$admin__background-color: #fcfefe;
+// Global styles
 $admin__background-color: #fafafa;
 
-$admin__flash-background: #ffa07a;
-$admin__flash-color: #000;
+// header
+$admin__container--collapsed-width: 45px;
+$admin__container--expanded-width: 200px;
 
+// bottom-bar
+$admin__button-bar-background-color: #eee;
+
+// search area
+$admin__search_color: gray;
+
+// user menu
+$admin__user__notification__colour: #b01c3f;
+
+// menu
 $admin__container--collapsed-width: 45px;
 $admin__container--expanded-width: 200px;
 $admin__container-button--hover: #0cf;
 $admin__container-add-button: #069;
-$admin__search_color: gray;
+$menubar__background-color: #222;
+$menubar__background-color--is-active: color.adjust($menubar__background-color, $lightness: 6.67%);
+$menubar__background-color--hover: hsla(0, 0%, 100%, .15);
+$menubar__color--hover: #0cf;
+$menubar-button__background-color: #069;
+$menubar-button__background-color--hover: $menubar__color--hover;
 
-$admin__tabs__highlighted-color: #069;
-$admin__tabs-background: #fff;
+// dropzone
+$admin__dropzone__background: rgb(223, 232, 238);
+$admin__dropzone__background_hover: rgb(189, 209, 216);
+$admin__dropzone__border_hover: $admin__container-add-button;
+$admin__dropzone__image_color: rgb(124, 156, 160);
 
-$admin__button-bar-background-color: #eee;
+// editor
+//$notification--autosave-background: #069;
+//$notification--autosave-color: #fff;
 
+// filter bar
 $admin__filter_button-background: #eee;
 $admin__filter_button-color: #333;
 $admin__filter_button-background--selected: #069;
@@ -28,20 +51,81 @@ $admin__filter_button-color--selected: #fff;
 $admin__filter_button-background--hover: #0cf;
 $admin__filter_button-color--hover: #fff;
 
-// --- new colour structure below
+// flash messages
+$admin__flash-background: #ffa07a;
+$admin__flash-color: #000;
 
-$menubar__background-color: #222;
-$menubar__background-color--is-active: color.adjust($menubar__background-color, $lightness: 6.67%);
-$menubar__background-color--hover: hsla(0, 0%, 100%, .15);
-$menubar__color--hover: #0cf;
+// gallery
+$image-tile-background: #eee;
 
-$menubar-button__background-color: #069;
-$menubar-button__background-color--hover: $menubar__color--hover;
+// pagination
+$pagination-border-radius: 5px;
 
+// tables
+//$spacer: 1rem !default;
+//$white:    #fff !default;
+//$gray-200: #e9ecef !default;
+//$gray-300: #dee2e6 !default;
+//$gray-600: #6c757d !default;
+//$gray-700: #495057 !default;
+//$gray-800: #343a40 !default;
+//$gray-900: #212529 !default;
+//$black:    #000 !default;
+//$text-muted:                  $gray-600 !default;
+//$body-color:                $gray-900 !default;
+//$border-width:                1px !default;
+//$border-color:                $gray-300 !default;
+//$table-cell-padding:          .75rem !default;
+//$table-cell-padding-sm:       .3rem !default;
+//$table-color:                 $body-color !default;
+//$table-bg:                    null !default;
+//$table-accent-bg:             rgba($black, .05) !default;
+//$table-hover-color:           $table-color !default;
+//$table-hover-bg:              rgba($black, .075) !default;
+//$table-active-bg:             $table-hover-bg !default;
+//$table-border-width:          $border-width !default;
+//$table-border-color:          $border-color !default;
+//$table-head-bg:               $gray-200 !default;
+//$table-head-color:            $gray-700 !default;
+//$table-dark-color:            $white !default;
+//$table-dark-bg:               $gray-800 !default;
+//$table-dark-accent-bg:        rgba($white, .05) !default;
+//$table-dark-hover-color:      $table-dark-color !default;
+//$table-dark-hover-bg:         rgba($white, .075) !default;
+//$table-dark-border-color:     color.adjust($table-dark-bg, $lightness: 7.5%) !default;
+//$table-dark-color:            $white !default;
+//$table-striped-order:         odd !default;
+//$table-caption-color:         $text-muted !default;
+//$table-bg-level:              -9 !default;
+//$table-border-level:          -6 !default;
+
+// tabs
+$admin__tabs__highlighted-color: #069;
+$admin__tabs-background: #fff;
+
+// admonitions
 $admonition-tip__border-color: #069;
 $admonition-tip__background-color: color.adjust($admonition-tip__border-color, $lightness: 65%);
 
-$body__background: light-dark(#eee, #303030);
+// forms
+$button--positive--active-color: #393;
+$button--positive--hover-color: color.adjust($button--positive--active-color, $lightness: 10%);
+$button--negative--active-color: #900;
+$button--negative--hover-color: color.adjust($button--negative--active-color, $lightness: 10%);
+$button--info--active-color: #999;
+$button--info--hover-color: color.adjust($button--info--active-color, $lightness: -10%);
+$button--default-active-color: #d9e7cb;
+$button--default-hover-color: color.adjust($button--default-active-color, $lightness: -10%);
 
-$dialog__background: #303030;
-$dialog_color: #fff;
+// dialogs
+//$dialog__background: #303030;
+//$dialog_color: #fff;
+
+// Unauthenticated pages
+$signin_background-image__dark: url(/assets/imgs/incc/bg-signin.png);
+
+$form-background__light: #dde8ed;
+$form-label__light: #bbb;
+$form-input__complete: #090;
+$form-link: #ddd;
+$form-link__hover: #fff;

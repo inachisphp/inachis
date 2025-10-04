@@ -1,0 +1,51 @@
+@use '../definitions' as *;
+
+.admin__header {
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  background: #eee;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+
+  @media #{$information-medium} {
+    flex-direction: row;
+  }
+
+  h1 {
+    display: none;
+  }
+
+  @media #{$information-medium} {
+    h1 {
+      display: block;
+      font-size: 1em;
+      margin-left: $admin__container--collapsed-width;
+
+      a, a:visited {
+        background-color: #333;
+        border: 1px solid transparent;
+        border-top-right-radius: 2em;
+        border-bottom-right-radius: 2em;
+        color: #fff;
+        padding: 1em 2em 1em 1em;
+        text-decoration: none;
+      }
+      a:hover {
+        background-color: #999;
+        color: #333;
+      }
+      span {
+        padding: 1em;
+      }
+      & > span:first-child {
+        margin-left: 0;
+      }
+    }
+  }
+
+  .admin__actions {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+}

@@ -1,3 +1,5 @@
+@use '../definitions' as *;
+
 fieldset.multisection {
   border: 1px solid #f3f3f3;
   border-radius: 1em;
@@ -44,9 +46,9 @@ fieldset.multisection {
 .strength {
   background-color: #ccc;
   display: block;
-  height: 0.5em;
-  margin: 0 auto;
-  width: 99%;
+  height: 0.25em;
+  margin: 0 1.55em 0 0.4em;
+
   span {
     display: block;
     margin: 0;

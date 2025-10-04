@@ -1,7 +1,4 @@
-$admin__dropzone__background: rgb(223, 232, 238);
-$admin__dropzone__background_hover: rgb(189, 209, 216);
-$admin__dropzone__border_hover: $admin__container-add-button;
-$admin__dropzone__image_color: rgb(124, 156, 160);
+@use '../definitions' as *;
 
 .dropzone {
   &.dz-clickable {

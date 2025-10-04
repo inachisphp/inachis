@@ -1,0 +1,93 @@
+@use 'definitions' as *;
+
+.form {
+	input, textarea, select {
+	    border: 1px solid #999;
+		font-size: 1em;
+	    line-height: 1.5em;
+	    padding: 5px 10px;
+	    width: 15em;
+	}
+	input.checkbox {
+		margin-right: 0.5em;
+		width: auto;
+	}
+	fieldset {
+		border: none;
+	}
+	legend {
+		display: none;
+	}
+
+	button:hover {
+		cursor: pointer;
+	}
+
+	.field__wide {
+		width: 30em;
+	}
+}
+
+.button {
+	border-radius: 0.5em;
+	font-size: 1.05em;
+	padding: 10px 20px;
+	text-decoration: none;
+
+	&:disabled {
+		opacity: 0.5;
+	}
+
+	span:nth-of-type(2), i:nth-last-of-type(1) {
+		margin-top: 0.2em;
+	}
+
+	span, i {
+		display: inline-block;
+		vertical-align: middle;
+	}
+
+	&.button--secondary {
+		background-color: $button--default-active-color;
+		border: 1px solid $button--default-active-color;
+
+		&:hover {
+			background-color: $button--default-hover-color;
+		}
+	}
+
+	&.button--positive {
+		background-color: $button--positive--active-color;
+		border:1px solid $button--positive--active-color;
+		color: #fff;
+
+		&:hover {
+			background-color: $button--positive--hover-color;
+		}
+	}
+
+	&.button--negative {
+		background-color: $button--negative--active-color;
+		border: 1px solid $button--negative--active-color;
+		color: #fff;
+
+		&:hover {
+			background-color: $button--negative--hover-color;
+		}
+	}
+
+	&.button--info {
+		background-color: $button--info--active-color;
+		border: 1px solid $button--info--active-color;
+		color: #fff;
+
+		&:hover {
+			background-color: $button--info--hover-color;
+		}
+	}
+
+	&.button--menu {
+		float: left;
+		padding: 5px 10px;
+	}
+}

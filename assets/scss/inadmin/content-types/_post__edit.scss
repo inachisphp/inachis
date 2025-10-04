@@ -1,4 +1,4 @@
-.content__edit {
+div.content__edit {
     margin-bottom: 45px;
 
     .editor__title {
@@ -8,7 +8,7 @@
         font-size: 1.2em;
     }
 }
-.content__edit, .ui-dialog form {
+div.content__edit, .ui-dialog form {
     a, a:visited {
         color: #666;
         text-decoration: none;

@@ -1,4 +1,5 @@
-@use "sass:color";
+@use 'sass:color';
+@use '../definitions' as *;
 
 section.widget-stats article {
   background-color: color.adjust($admin__background-color, $lightness: 10%);

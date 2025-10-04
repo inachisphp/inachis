@@ -1,3 +1,5 @@
+@use '../definitions' as *;
+
 .flash-notice, .flash-success, .flash-warning {
   background-color: $admin__flash-background;
   border-radius: 0.5em;

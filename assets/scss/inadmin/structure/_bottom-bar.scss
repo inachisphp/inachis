@@ -1,0 +1,15 @@
+@use '../definitions' as *;
+
+.fixed-bottom-bar {
+  background-color: $admin__button-bar-background-color;
+  border-top: 1px solid #ddd;
+  bottom: 0;
+  padding-left: 20px;
+  position: fixed;
+  width: 100%;
+  z-index: 999;
+
+  @media #{$information-medium} {
+    left: $admin__container--collapsed-width;
+  }
+}

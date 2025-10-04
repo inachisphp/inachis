@@ -1,4 +1,4 @@
-$pagination-border-radius: 5px;
+@use '../definitions' as *;
 
 section.paginated-list {
   background-color: #fff;

@@ -1,0 +1,15 @@
+.switch-wrapper {
+  display: inline-block;
+  padding: 0 20px;
+  position: relative;
+  top: 3px;
+
+  div {
+    clear: none;
+  }
+
+  .switch-button-label {
+    font-size: 1em;
+    line-height: 1.3em;
+  }
+}

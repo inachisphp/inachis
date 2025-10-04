@@ -1,3 +1,5 @@
+@use '../mixins/box-shadow' as *;
+
 .setup {
   & > h1 {
     margin-left: 5px;

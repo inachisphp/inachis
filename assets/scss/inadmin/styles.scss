@@ -1,416 +1,53 @@
-@use "sass:color";
-@import '_definitions';
-@import '../shared/_reset';
-
-body {
-	background-color: $admin__background-color;
-	font-family: Roboto, Helvetica Neue, Helvetica, Arial, sans-serif;
-	font-display: swap;
-	overflow-x: hidden;
-}
-
-@import 'mixins.scss';
-
-@import '../shared/_col';
-@import '../shared/_8cols';
-@import '../shared/_3cols';
-@import '../shared/_2cols';
-
-@import '../shared/_forms';
-	@import '_form__signin';
-	@import '_form__setup';
-	@import '../shared/_buttons';
-	@import '_profile';
-@import '_toggle_password';
-
-@import '_tabs';
-@import '_filter_bar';
-@import '_dialog';
-@import '_badge';
-@import '_editor';
-@import '_dropzone';
-
-@import "widgets/widgets";
-	@import "widgets/alerts";
-	@import 'widgets/posts';
-	@import 'widgets/stats';
-@import '_pagination';
-@import '_contextual';
-@import '_progressbar';
-
-.admin__header {
-	align-items: center;
-	border-bottom: 1px solid #ddd;
-	background: #eee;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-
-	h1 {
-		font-size: 1em;
-		margin-left: $admin__container--collapsed-width;
-
-		a, a:visited {
-			background-color: #333;
-			border: 1px solid transparent;
-			border-top-right-radius: 2em;
-			border-bottom-right-radius: 2em;
-			color: #fff;
-			padding: 1em 2em 1em 1em;
-			text-decoration: none;
-		}
-		a:hover {
-			background-color: #999;
-			color: #333;
-		}
-		span {
-			padding: 1em;
-		}
-		& > span:first-child {
-			margin-left: 0;
-		}
-	}
-
-	.admin__actions {
-		display: flex;
-		flex-direction: row-reverse;
-	}
-
-	@import '_user-menu';
-	@import '_search';
-}
-
-@import '_data-list';
-@import '_tables';
-
-@import '_post__edit';
-@import '_bonsai';
-@import '_warnings';
-@import '_image_library';
-@import '_admonitions';
-@import '_flash_messages';
-@import '_sessionTimeout';
-
-
-
-.switch-wrapper {
-	display: inline-block;
-	padding: 0 20px;
-	position: relative;
-	top: 3px;
-
-	div {
-		clear: none;
-	}
-
-	.switch-button-label {
-		font-size: 1em;
-		line-height: 1.3em;
-	}
-}
-
-.mapbox {
-	background-color: #eee;
-	border: 1px solid #999;
-	height: 200px;
-	margin-top: 5px;
-	overflow: hidden;
-	text-align: center;
-	width: 98%;
-
-	p {
-		margin: 85px 20px;
-	}
-}
-
-.ui-cross {
-	background-color: #fff;
-	border: 1px solid #ccc;
-	border-radius: 50%;
-	margin: 20px 10px;
-	padding: 5px;
-	position: absolute;
-	right: 0;
-}
-
-.admin__container {
-	position: absolute;
-	top: 5px;
-	z-index: 7;
-
-	.admin__nav-main {
-		height: 100%;
-	}
-
-	&.admin__container--expanded {
-		height: 100%;
-		width: 80%;
-		-webkit-box-shadow: 20px 0px 20px 0px rgba(0,0,0,0.3);
-		-moz-box-shadow: 20px 0px 20px 0px rgba(0,0,0,0.3);
-		box-shadow: 20px 0px 20px 0px rgba(0,0,0,0.3);
-	}
-
-	.admin__nav-main__link {
-		margin-left: 10px;
-
-		a, a:visited {
-			border: 1px solid #999;
-			border-radius: 5px;
-			color: #999;
-			padding: 5px;
-			text-decoration: none;
-			text-transform: uppercase;
-		}
-	}
-
-	.admin__nav-main__list, .admin__identity {
-		display: none;
-	}
-
-	.admin__nav-main__list {
-		background-color: $menubar__background-color;
-		height: 100%;
-		list-style-type: none;
-		font-size: 0.8em;
-		margin: 0;
-		padding: 0;
-		text-transform: uppercase;
-
-		.menu__active {
-			background-color: $menubar__background-color--is-active;
-			border-left: 2px solid #aaa;
-			font-weight: bold;
-		}
-
-
-		a:link, a:visited {
-			color: #fff;
-			display: block;
-			padding: 5px;
-			text-decoration: none;
-		}
-        a:hover {
-            background-color: $menubar__background-color--hover;
-        }
-		a:hover, a:hover i, a:hover span {
-			color: $admin__container-button--hover;
-		}
-
-		i {
-			vertical-align: middle;
-		}
-
-		span {
-			margin-left: 10px;
-			vertical-align: middle;
-		}
-
-		ul {
-			background: #222;
-			list-style-type: none;
-			display: none;
-		}
-
-		.button.admin__add-content {
-			display: block;
-			margin-bottom: 20px;
-
-			@media #{$information-medium} {
-				background-color: $admin__container-add-button;
-				border: 1px solid color.adjust($admin__container-add-button, $lightness: -10%);
-				margin:5px auto 50px auto;
-
-				&:hover {
-					background-color: $admin__container-button--hover;
-					border: 1px solid $admin__container-add-button;
-					color: #fff;
-                    i {
-                      color: #fff;
-                    }
-				}
-				& span {
-					display: none;
-					height: auto;
-					padding: 0 0 0 10px;
-				}
-			}
-		}
-		.admin__nav-expand, .admin__nav-collapse {
-			display: none;
-		}
-	}
-
-	@media #{$information-medium} {
-		background-color: #222;
-		color: #fff;
-		height: 100%;
-		left: 0;
-		position: fixed;
-		//overflow: hidden;
-		top: 0;
-	
-		.admin__nav-main__list, .admin__identity {
-			display: block;
-		}
-
-		&.admin__container--collapsed {
-			width: $admin__container--collapsed-width;
-
-			ul {
-				li {
-					margin: 5px auto;
-					padding: 5px;
-				}
-				span {
-					display: none;
-				}
-				ul {
-					display: none;
-
-					&.admin__nav-new span {
-						display: inline-block;
-					}
-				}
-			}
-
-			.admin__identity {
-				height: 35px;
-				width: $admin__container--collapsed-width - 5;
-			}
-
-			.admin__nav-expand {
-				display: block;
-			}
-			li.admin__nav-expand {
-				margin-top: 50px;
-			}
-
-			ul.admin__nav-new {
-				left: 40px;
-				top: 85px;
-			}
-		}
-
-		&.admin__container--expanded {
-			width: $admin__container--expanded-width;
-			//border-radius: 1.5em;
-			//margin: 0.5em;
-
-			ul {
-				li {
-					margin: 10px 5px;
-					text-align: left;
-					vertical-align: middle;
-
-					span {
-	    				display: inline-block;
-	    				height: 0.9em;
-	    				padding-left: 5px;
-						vertical-align: middle;
-	    			}
-				}
-
-				ul {
-					display: none;
-					margin-left: 1em;
-				}
-			}
-
-			.admin__identity {
-				height: 75px;
-				width: $admin__container--expanded-width - 5;
-			}
-
-			.admin__nav-collapse {
-				display: block;
-			}
-			li.admin__nav-collapse {
-				margin-top: 50px;
-			}
-
-			.button.admin__add-content {
-				padding: 10px;
-				vertical-align: middle;
-				width: 7em;
-
-				span {
-					display: inline-block;
-					vertical-align: middle;
-				}
-			}
-
-			ul.admin__nav-new {
-				left: 130px;
-				top: 130px;
-			}
-		}
-	}
-}
-
-
-@media #{$information-medium} {
-	.mobile-only, .material-icons.mobile-only {
-		display: none;
-	}
-
-	.admin__container {
-		.admin__identity {
-			background: transparent url(/assets/imgs/incc/inachis.png) no-repeat 50% 50%;
-			background-size: contain;
-			display: block;
-			margin:0 auto 40px auto;
-
-			span {
-				display: none;
-			}
-		}
-
-		.admin__nav-main__list {
-			li {
-				text-align: center;
-				vertical-align: middle;
-
-				a, a:visited {
-					color: #fff;
-					text-decoration: none;
-				}
-			}
-
-			ul, li {
-				list-style-type: none;
-				margin: 0;
-				padding: 0;
-			}
-		}
-	}
-
-	.admin__body-container {
-		margin-left: $admin__container--collapsed-width + 15;
-		margin-right: 1em;
-		clear: both;
-		//padding-top:20px;
-	}
-}
-
-.visually-hidden {
-	display: none;
-}
-
-#series_addItem {
-	float:right;
-	margin: -5px 20px 0 0;
-}
-
-.fixed-bottom-bar {
-	background-color: $admin__button-bar-background-color;
-	border-top: 1px solid #ddd;
-	bottom: 0;
-	padding-left: 20px;
-	position: fixed;
-	width: 100%;
-	z-index: 999;
-
-	@media #{$information-medium} {
-		left: $admin__container--collapsed-width;
-	}
-}
+@use '../shared/_reset';
+
+// Page structures
+@use '../shared/_col';
+@use '../shared/_8cols' as eightcols;
+@use '../shared/_3cols' as threecols;
+@use '../shared/_2cols' as twocols;
+@use 'base';
+@use 'structure/header';
+  @use 'structure/search';
+  @use 'structure/user-menu';
+  @use 'structure/menu';
+    @use 'structure/contextual';
+@use 'structure/bottom-bar';
+
+// Structural components
+@use 'components/badge';
+@use 'components/bonsai';
+@use 'components/data-list';
+@use 'components/dropzone';
+@use 'components/filter_bar';
+@use 'components/flash_messages';
+@use 'components/map';
+@use 'components/pagination';
+@use 'components/progressbar';
+@use 'components/sortby';
+@use 'components/switch';
+//@use 'components/tables';
+@use 'components/tabs';
+@use 'components/toggle_password';
+
+// content types
+@use 'content-types/code';
+@use 'content-types/post__edit';
+@use 'content-types/gallery';
+@use 'content-types/series';
+@use 'content-types/warnings';
+@use 'widgets/widgets';
+  @use 'widgets/alerts';
+  @use 'widgets/posts';
+  @use 'widgets/stats';
+
+@use 'forms';
+
+@use 'admin/profile';
+
+// dialogs
+@use 'dialogs/dialog';
+  @use 'dialogs/sessionTimeout';
+
+// Unauthenticated pages
+@use 'admin/form__signin';
+@use 'admin/form__setup';

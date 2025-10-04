@@ -1,12 +1,11 @@
-.admin__search {
-	padding: 15px 10px 10px 0;
-	margin-right: 1em;
+@use '../definitions' as *;
 
-	button {
-		background: none;
-		border: none;
-		color: $admin__search_color;
-		vertical-align: top;
+.admin__search {
+	margin-right: 1em;
+	padding: 15px 0 10px 0;
+
+	@media #{$information-medium} {
+		padding: 15px 10px 10px 0;
 	}
 
 	input {
@@ -26,19 +25,22 @@
 
 	label {
 		color: $admin__search_color;
-		display: none;
-
-		@media #{$information-medium} {
-			display: inline;
-			position: relative;
-			right: -1.5em;
-			vertical-align: middle;
-		}
+		display: inline;
+		position: relative;
+		right: -1.5em;
+		vertical-align: middle;
 	}
 }
 
 .clear-search {
+	background: transparent;
+	border: none;
+	color: $admin__search_color;
 	position: absolute;
-	right: 4em;
+	right: 3.5em;
 	top: 0.8em;
+
+	@media #{$information-medium} {
+		right: 4em;
+	}
 }

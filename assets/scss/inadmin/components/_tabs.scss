@@ -1,4 +1,5 @@
-@use "sass:color";
+@use 'sass:color';
+@use '../definitions' as *;
 
 .ui-tabs, .ui-tabs-external {
 	clear: both;

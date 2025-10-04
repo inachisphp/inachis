@@ -31,3 +31,20 @@
   color: #333;
   font-size: 0.95em;
 }
+
+.expand-all {
+  .separator {
+    width: 2em;
+    display: inline-block;
+  }
+}
+
+.form__users {
+  article {
+    display: table-row;
+    a, a:visited, span {
+      display: table-cell;
+      padding: 0.5em 1em;
+    }
+  }
+}

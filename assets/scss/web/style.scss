@@ -1,4 +1,7 @@
-@import 'fonts';
+@use 'fonts';
+@use '../shared/_reset' as reset;
+@use '../shared/_col' as col;
+@use '../shared/_8cols' as eightcols;
 
 body {
   margin: 0 auto;
@@ -6,11 +9,6 @@ body {
   font: 100%/1.4 'lucida sans unicode', 'lucida grande', 'Trebuchet MS', verdana, arial, helvetica, helve, sans-serif;
   color: #000;
 }
-
-@import '../shared/_reset';
-@import '../shared/_col';
-@import '../shared/_8cols';
-
 h1, h2, h3, h4, h5, h6 {
   font-family: Bitter-Regular, 'lucida sans unicode', 'lucida grande', 'Trebuchet MS', verdana, arial, helvetica, helve, sans-serif;
   font-weight: normal;
@@ -234,6 +232,7 @@ h4 {
     height: -moz-available;          /* WebKit-based browsers will ignore this. */
     height: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
     height: fill-available;
+    object-fit: cover;
   }
   p {
     color:#666;
@@ -385,7 +384,7 @@ article.post {
     }
 
     img {
-      max-width: 100%;
+      inline-size: 100%;
     }
 
     p {
@@ -481,5 +480,36 @@ article.post {
   }
 }
 
+.series {
+  display: inline-flex;
+  height: 267px;
+  width: 400px;
+  overflow: hidden;
+
+  a, a:visited {
+    color: #fff;
+    position: relative;
+
+    img {
+    }
+    span.series--year {
+      position: absolute;
+      right: 23em;
+      bottom: 0.5em;
+      writing-mode: sideways-rl;
+    }
+    span.series--title {
+      display: block;
+      font-weight: bold;
+      font-size: 1.5em;
+      margin-left: 1.5em;
+      margin-top: -2.7em;
+    }
+    span.series--subtitle {
+      display: block;
+      margin-left: 2.3em;
+    }
+  }
+}
 
 // @import 'responsive';

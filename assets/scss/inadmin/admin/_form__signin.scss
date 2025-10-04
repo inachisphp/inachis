@@ -1,13 +1,8 @@
-$form-background__light: #dde8ed;
-$form-label__light: #bbb;
-$form-input__complete: #090;
-$form-link: #ddd;
-$form-link__hover: #fff;
-
-@import 'mixins.scss';
+@use '../_definitions' as *;
+@use '../mixins/box-shadow' as *;
 
 body.type_login {
-	background-image: url(/assets/imgs/incc/bg-signin.png);
+	background-image: $signin_background-image__dark;
 	background-size: cover;
 
 	.admin__body-container {
@@ -43,7 +38,7 @@ body.type_login {
 		margin: 2em;
 		max-width: 450px;
 		padding: 0;
-		//width: 20em;
+		width: 20em;
 
 		button {
 			i {

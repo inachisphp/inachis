@@ -1,4 +1,5 @@
 @use 'sass:color';
+@use '../definitions' as *;
 
 .filter {
   align-items: center;
@@ -91,19 +92,5 @@ div#filter__options {
       line-height: inherit;
       outline: none;
     }
-  }
-}
-
-.ui-sortby {
-  font-size: 0.9em;
-
-  em {
-    vertical-align: middle;
-  }
-
-  select {
-    border: 1px solid #eee;
-    border-radius: .5em;
-    width: auto;
   }
 }

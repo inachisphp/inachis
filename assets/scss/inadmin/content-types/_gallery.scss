@@ -1,6 +1,5 @@
 @use 'sass:color';
-
-$image-tile-background: #eee;
+@use '../definitions' as *;
 
 #dialog__imageManager {
   .pagination {

@@ -1,7 +1,9 @@
-$admin__user__notification__colour: #b01c3f;
+@use '../definitions' as *;
+@use '../mixins/box-shadow' as *;
 
 .admin__user {
 	margin: 0.5em 1em 0.5em 0;
+	z-index: 100;
 
 	a[href="#admin__user__options"] {
 		&:after {
@@ -40,7 +42,6 @@ $admin__user__notification__colour: #b01c3f;
 		font-weight: bold;
 		border-radius: 50%;
 		vertical-align: middle;
-		//margin-right: 0.5em;
 		width: 45px;
 		height: 45px;
 		line-height: 45px;
