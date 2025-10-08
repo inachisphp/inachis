@@ -32,10 +32,34 @@
                 'zebra': true,
 
                 'actions': {
+                    'private': {
+                        'button_class': 'button--secondary button--privacy',
+                        'data': {
+                            'form-action': ''
+                        },
+                        'icon': 'visibility_off',
+                        'title': 'Make private',
+                    },
+                    'public': {
+                        'button_class': 'button--secondary button--privacy',
+                        'data': {
+                            'form-action': ''
+                        },
+                        'icon': 'visibility',
+                        'title': 'Make public',
+                    },
                     'delete': {
                         'button_class': 'button--negative button--delete',
                         'icon': 'delete_forever',
                         'title': 'Delete',
+                    },
+                },
+
+                'badges': {
+                    'private': {
+                        'field': 'visibility',
+                        'condition': false,
+                        'className': 'badge__private'
                     },
                 }
             }

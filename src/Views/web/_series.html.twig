@@ -18,7 +18,7 @@
                         {{ series.description|markdown }}
 
                         {% if series.image.filename|default('') is not empty %}
-                        <p><img alt="{{ series.image.altText }}" class="align_centre" src="{{ series.image.filename }}" /></p>
+                        <p><img alt="{{ series.image.altText }}" class="align_centre" src="{% if not (series.image.filename starts with 'http') %}/imgs/{% endif %}{{ series.image.filename }}" /></p>
                         {% endif %}
 
                         {% if series.items is not empty %}

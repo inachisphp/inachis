@@ -31,7 +31,6 @@ class SeriesController extends AbstractInachisController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid() && !empty($request->get('items'))) {
             foreach ($request->get('items') as $item) {
                 if ($request->get('delete') !== null) {
@@ -40,23 +39,21 @@ class SeriesController extends AbstractInachisController
                         $this->entityManager->getRepository(Series::class)->remove($deleteItem);
                     }
                 }
-//                if ($request->get('privacy') !== null) {
-//                    $post = $entityManager->getRepository(Series::class)->findOneById($item);
-//                    if ($post !== null) {
-//                        $post->setVisibility(Page::VIS_PRIVATE);
-//                        $post->setModDate(new \DateTime('now'));
-//                        $entityManager->persist($post);
-//                    }
-//                }
+                if ($request->request->has('private') || $request->request->has('public')) {
+                    $series = $this->entityManager->getRepository(Series::class)->findOneById($item);
+                    if ($series !== null) {
+                        $series->setVisibility(
+                            $request->request->has('private') ? Page::VIS_PRIVATE : Page::VIS_PUBLIC
+                        );
+                        $series->setModDate(new \DateTime('now'));
+                        $this->entityManager->persist($series);
+                    }
+                }
             }
-//            if ($request->get('privacy') !== null) {
-//                $entityManager->flush();
-//            }
-            return $this->redirectToRoute(
-                'app_series_list',
-                [],
-                Response::HTTP_PERMANENTLY_REDIRECT
-            );
+            if ($request->request->has('private') || $request->request->has('public')) {
+                $this->entityManager->flush();
+            }
+            return $this->redirectToRoute('app_series_list');
         }
 
         $filters = array_filter($request->get('filter', []));
