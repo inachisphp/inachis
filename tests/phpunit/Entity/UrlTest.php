@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class UrlTest extends TestCase
 {
-    protected $user;
+    protected ?Url $url;
 
     /**
      * @throws \Exception

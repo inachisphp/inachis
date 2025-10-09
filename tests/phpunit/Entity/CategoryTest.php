@@ -3,7 +3,9 @@
 namespace App\Tests\phpunit\Entity;
 
 use App\Entity\Category;
+use App\Entity\Image;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 
 class CategoryTest extends TestCase
 {
@@ -18,8 +20,9 @@ class CategoryTest extends TestCase
 
     public function testGetAndSetId()
     {
-        $this->category->setId('test-id');
-        $this->assertEquals('test-id', $this->category->getId());
+        $uuid = Uuid::uuid1();
+        $this->category->setId($uuid);
+        $this->assertEquals($uuid->toString(), $this->category->getId());
     }
 
     public function testGetAndSetTitle()
@@ -36,14 +39,18 @@ class CategoryTest extends TestCase
 
     public function testGetAndSetImage()
     {
-        $this->category->setImage('test');
-        $this->assertEquals('test', $this->category->getImage());
+        $image = new Image();
+        $this->category->setImage($image);
+        $this->assertEquals($image, $this->category->getImage());
+        $this->category->setImage(null);
+        $this->assertEquals(null, $this->category->getImage());
     }
 
     public function testGetAndSetIcon()
     {
-        $this->category->setIcon('test');
-        $this->assertEquals('test', $this->category->getIcon());
+        $image = new Image();
+        $this->category->setIcon($image);
+        $this->assertEquals($image, $this->category->getIcon());
     }
 
     public function testGetAndSetParent()
@@ -68,14 +75,15 @@ class CategoryTest extends TestCase
     public function testHasImage()
     {
         $this->assertFalse($this->category->hasImage());
-        $this->category->setImage('test');
+        $this->category->setImage(new Image());
         $this->assertTrue($this->category->hasImage());
     }
 
     public function testHasIcon()
     {
+        $image = new Image();
         $this->assertFalse($this->category->hasIcon());
-        $this->category->setIcon('test');
+        $this->category->setIcon($image);
         $this->assertTrue($this->category->hasIcon());
     }
 

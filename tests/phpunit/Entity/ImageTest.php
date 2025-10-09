@@ -4,11 +4,12 @@ namespace App\Tests\phpunit\Entity;
 
 use App\Entity\Image;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class ImageTest extends TestCase
 {
-    protected $image;
+    protected ?Image $image;
 
     public function setUp() : void
     {
@@ -19,8 +20,9 @@ class ImageTest extends TestCase
 
     public function testGetAndSetId()
     {
-        $this->image->setId('test');
-        $this->assertEquals('test', $this->image->getId());
+        $uuid = Uuid::uuid1();
+        $this->image->setId($uuid);
+        $this->assertEquals($uuid, $this->image->getId());
     }
 
     public function testGetAndSetTitle()

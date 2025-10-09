@@ -3,6 +3,7 @@
 namespace App\Tests\phpunit\Entity;
 
 use App\Entity\Category;
+use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Tag;
 use App\Entity\Url;
@@ -51,8 +52,11 @@ class PageTest extends TestCase
 
     public function testSetAndGetFeatureImage()
     {
-        $this->page->setFeatureImage('test');
-        $this->assertEquals('test', $this->page->getFeatureImage());
+        $image = new Image();
+        $this->page->setFeatureImage($image);
+        $this->assertEquals($image, $this->page->getFeatureImage());
+        $this->page->setFeatureImage(null);
+        $this->assertEquals(null, $this->page->getFeatureImage());
     }
 
     public function testSetAndGetPassword()
@@ -85,6 +89,7 @@ class PageTest extends TestCase
     {
         $currentTime = new \DateTime('yesterday');
         $this->page->setPostDate($currentTime);
+        $this->page->setStatus(Page::PUBLISHED);
         $this->assertFalse($this->page->isScheduledPage());
         $currentTime = new \DateTime('tomorrow');
         $this->page->setPostDate($currentTime);
@@ -173,9 +178,9 @@ class PageTest extends TestCase
 
     public function testAddAndGetUrls()
     {
+        $this->assertNull($this->page->getUrl(0));
         $this->page->addUrl(new Url($this->page, 'test', true));
         $this->assertNotEmpty($this->page->getUrls());
-        $this->assertNull($this->page->getUrl());
         $this->assertInstanceOf('\App\Entity\Url', $this->page->getUrl(0));
         $this->expectException(\InvalidArgumentException::class);
         $this->page->getUrl(100);

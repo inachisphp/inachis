@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\phpunit\Utils;
+namespace App\Tests\phpunit\Util;
 
 use App\Validator\Constraints\ValidTimezone;
 use App\Validator\Constraints\ValidTimezoneValidator;

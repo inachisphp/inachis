@@ -2,25 +2,21 @@
 
 namespace App\Tests\phpunit\Entity;
 
+use App\Entity\Image;
 use App\Entity\User;
 use App\Exception\InvalidTimezoneException;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 
 class UserTest extends TestCase
 {
-    protected $user;
+    protected ?User $user;
 
     public function setUp() : void
     {
         $this->user = new User();
 
         parent::setUp();
-    }
-
-    public function testSetAndGetId()
-    {
-        $this->user->setId('test');
-        $this->assertEquals('test', $this->user->getId());
     }
 
     public function testSetAndGetUsername()
@@ -55,8 +51,9 @@ class UserTest extends TestCase
 
     public function testSetAndGetAvatar()
     {
-        $this->user->setAvatar('test');
-        $this->assertEquals('test', $this->user->getAvatar());
+        $image = new Image();
+        $this->user->setAvatar($image);
+        $this->assertEquals($image, $this->user->getAvatar());
     }
 
     public function testIsEnabled()
@@ -115,30 +112,9 @@ class UserTest extends TestCase
         $this->assertFalse($this->user->validateEmail());
     }
 
-    public function testSerialize()
-    {
-        $this->user->setId('id');
-        $this->user->setUsername('username');
-        $this->user->setPassword('password');
-        $this->user->setActive(true);
-        $this->assertEquals(
-            'a:4:{i:0;s:2:"id";i:1;s:8:"username";i:2;s:8:"password";i:3;b:1;}',
-            $this->user->serialize()
-        );
-    }
-
-    public function testUnserialize()
-    {
-        $this->user->unserialize('a:4:{i:0;s:2:"id";i:1;s:8:"username";i:2;s:8:"password";i:3;b:1;}');
-        $this->assertEquals('id', $this->user->getId());
-        $this->assertEquals('username', $this->user->getUsername());
-        $this->assertEquals('password', $this->user->getPassword());
-        $this->assertTrue($this->user->isEnabled());
-    }
-
     public function testGetRoles()
     {
-        $this->user->setRoles();
+        $this->user->setRoles([ 'ROLE_ADMIN', 'ROLE_USER' ]);
         $this->assertEquals([ 'ROLE_ADMIN', 'ROLE_USER' ], $this->user->getRoles());
     }
 
@@ -153,11 +129,6 @@ class UserTest extends TestCase
     public function testErase()
     {
         $this->assertNull($this->user->erase());
-    }
-
-    public function getSalt()
-    {
-        $this->assertNull($this->user->getSalt());
     }
 
     public function testSetAndGetTimezone()

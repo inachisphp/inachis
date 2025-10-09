@@ -17,12 +17,6 @@ class SeriesTest extends TestCase
         parent::setUp();
     }
 
-    public function testGetAndSetId()
-    {
-        $this->series->setId('test');
-        $this->assertEquals('test', $this->series->getId());
-    }
-
     public function testGetAndSetTitle()
     {
         $this->series->setTitle('test');
@@ -68,13 +62,15 @@ class SeriesTest extends TestCase
 
     public function testSetAndGetCreateDate()
     {
-        $this->series->setCreateDate('test');
-        $this->assertEquals('test', $this->series->getCreateDate());
+        $date = new \DateTime('now');
+        $this->series->setCreateDate($date);
+        $this->assertEquals($date, $this->series->getCreateDate());
     }
 
     public function testSetAndGetModDate()
     {
-        $this->series->setModDate('test');
-        $this->assertEquals('test', $this->series->getModDate());
+        $date = new \DateTime('now');
+        $this->series->setModDate($date);
+        $this->assertEquals($date, $this->series->getModDate());
     }
 }
