@@ -5,6 +5,7 @@ namespace App\Tests\phpunit\Entity;
 use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Series;
+use DateTime;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -15,7 +16,6 @@ class SeriesTest extends TestCase
     public function setUp() : void
     {
         $this->series = new Series();
-
         parent::setUp();
     }
 
@@ -53,14 +53,14 @@ class SeriesTest extends TestCase
 
     public function testGetAndSetFirstDate() : void
     {
-        $testDate = new \DateTime();
+        $testDate = new DateTime();
         $this->series->setFirstDate($testDate);
         $this->assertEquals($testDate, $this->series->getFirstDate());
     }
 
     public function testGetAndSetLastDate() : void
     {
-        $testDate = new \DateTime();
+        $testDate = new DateTime();
         $this->series->setLastDate($testDate);
         $this->assertEquals($testDate, $this->series->getLastDate());
     }
@@ -78,14 +78,14 @@ class SeriesTest extends TestCase
 
     public function testSetAndGetCreateDate() : void
     {
-        $date = new \DateTime('now');
+        $date = new DateTime('now');
         $this->series->setCreateDate($date);
         $this->assertEquals($date, $this->series->getCreateDate());
     }
 
     public function testSetAndGetModDate() : void
     {
-        $date = new \DateTime('now');
+        $date = new DateTime('now');
         $this->series->setModDate($date);
         $this->assertEquals($date, $this->series->getModDate());
     }
@@ -102,7 +102,7 @@ class SeriesTest extends TestCase
     {
         $this->series->setVisibility(Series::VIS_PUBLIC);
         $this->assertEquals(Series::VIS_PUBLIC, $this->series->getVisibility());
-        $this->series->setVisibility(Series::VIS_PRIVATE);
+        $this->series->setVisibility();
         $this->assertEquals(Series::VIS_PRIVATE, $this->series->getVisibility());
     }
 }

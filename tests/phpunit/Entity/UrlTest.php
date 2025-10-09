@@ -4,6 +4,8 @@ namespace App\Tests\phpunit\Entity;
 
 use App\Entity\Page;
 use App\Entity\Url;
+use DateTime;
+use Exception;
 use PHPUnit\Framework\TestCase;
 
 class UrlTest extends TestCase
@@ -11,19 +13,18 @@ class UrlTest extends TestCase
     protected ?Url $url;
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function setUp() : void
     {
         $this->url = new Url(new Page());
-
         parent::setUp();
     }
 
     /**
      *
      */
-    public function testSetAndGetId()
+    public function testSetAndGetId() : void
     {
         $this->url->setId('test');
         $this->assertEquals('test', $this->url->getId());
@@ -32,7 +33,7 @@ class UrlTest extends TestCase
     /**
      *
      */
-    public function testSetAndGetLink()
+    public function testSetAndGetLink() : void
     {
         $this->url->setLink('test');
         $this->assertEquals('test', $this->url->getLink());
@@ -41,22 +42,22 @@ class UrlTest extends TestCase
     /**
      *
      */
-    public function testSetAndGetLinkCanonical()
+    public function testSetAndGetLinkCanonical() : void
     {
         $this->url->setLink('test');
         $this->assertEquals(md5('test'), $this->url->getLinkCanonical());
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
-    public function testSetModDateToNow()
+    public function testSetModDateToNow() : void
     {
-        $yesterdayDateTime = new \DateTime('yesterday');
+        $yesterdayDateTime = new DateTime('yesterday');
         $this->url->setModDate($yesterdayDateTime);
         $this->url->setModDateToNow();
         $this->assertEquals(
-            (new \DateTime('now'))->format('Ymd'),
+            (new DateTime('now'))->format('Ymd'),
             $this->url->getModDate()->format('Ymd')
         );
     }
@@ -64,7 +65,7 @@ class UrlTest extends TestCase
     /**
      *
      */
-    public function testValidateURL()
+    public function testValidateURL() : void
     {
         $this->url->setLink('test-link');
         $this->assertTrue($this->url->validateURL());
@@ -72,17 +73,17 @@ class UrlTest extends TestCase
         $this->assertFalse($this->url->validateURL());
     }
 
-    public function testGetCreateDate()
+    public function testGetCreateDate() : void
     {
         $this->assertGreaterThan(0, $this->url->getCreateDate()->getTimestamp());
     }
 
-    public function testGetContent()
+    public function testGetContent() : void
     {
         $this->assertInstanceOf(Page::class, $this->url->getContent());
     }
 
-    public function testIsDefault()
+    public function testIsDefault() : void
     {
         $this->assertTrue($this->url->isDefault());
         $this->url->setDefault(false);

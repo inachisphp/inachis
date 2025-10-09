@@ -4,6 +4,7 @@ namespace App\Tests\phpunit\Entity;
 
 use App\Entity\PasswordResetRequest;
 use App\Entity\User;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class PasswordResetRequestTest extends TestCase
@@ -12,17 +13,22 @@ class PasswordResetRequestTest extends TestCase
 
     protected ?User $user;
 
-    protected \DateTimeImmutable $expiresAt;
+    protected DateTimeImmutable $expiresAt;
 
     public function setUp(): void
     {
         $this->user = new User();
-        $this->expiresAt = new \DateTimeImmutable();
+        $this->expiresAt = new DateTimeImmutable();
         $this->passwordResetRequest = new PasswordResetRequest($this->user, 'abc123', $this->expiresAt);
         parent::setUp();
     }
 
-    public function testGetUser()
+    public function testGetId() : void
+    {
+        $this->assertEmpty($this->passwordResetRequest->getId());
+    }
+
+    public function testGetUser() : void
     {
         $this->assertEquals($this->user, $this->passwordResetRequest->getUser());
     }
