@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Tests\phpunit\Utils;
+namespace App\Tests\phpunit\Util;
 
-use App\Utils\UrlNormaliser;
+use App\Util\UrlNormaliser;
 use PHPUnit\Framework\TestCase;
 
 class UrlNormaliserTest extends TestCase
