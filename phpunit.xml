@@ -6,7 +6,7 @@
     </include>
     <report>
       <html outputDirectory="coverage" />
-      <text outputFile="php://stdout" />
+      <!-- text outputFile="php://stdout" / -->
       <clover outputFile="tests/logs/clover.xml"/>
     </report>
   </coverage>
