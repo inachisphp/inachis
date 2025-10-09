@@ -6,57 +6,69 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  */
 #[ORM\Entity(repositoryClass: 'App\Repository\SeriesRepository', readOnly: false)]
-#[ORM\Index(name: 'search_idx', columns: ['title'])]
+#[ORM\Index(columns: ['title'], name: 'search_idx')]
 class Series
 {
+
     /**
-     * @var \Ramsey\Uuid\UuidInterface
+     * @const string Indicates a Series is public
+     */
+    public const VIS_PUBLIC = true;
+
+    /**
+     * @const string Indicates a Series is private
+     */
+    public const VIS_PRIVATE = false;
+
+    /**
+     * @var UuidInterface|null
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected $id;
+    protected ?UuidInterface $id = null;
 
     /**
      * @var string
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    protected $title;
+    protected string $title;
 
     /**
      * @var string
      */
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    protected $subTitle;
+    protected ?string $subTitle = '';
 
     /**
      * @var string
      */
     #[ORM\Column(type: 'string', length: 255, unique: true, nullable: false)]
-    protected $url;
+    protected string $url;
 
     /**
-     * @var string
+     * @var string|null
      */
     #[ORM\Column(type: 'text', nullable: true)]
-    protected $description;
+    protected ?string $description = '';
 
     /**
-     * @var string
+     * @var \DateTime|null
      */
     #[ORM\Column(type: 'datetime', nullable: true)]
-    protected $firstDate;
+    protected ?\DateTime $firstDate;
 
     /**
-     * @var string
+     * @var \DateTime|null
      */
     #[ORM\Column(type: 'datetime', nullable: true)]
-    protected $lastDate;
+    protected ?\DateTime $lastDate;
 
     /**
      * @var Collection|Page[] The array of pages in the series
@@ -69,30 +81,38 @@ class Series
     protected $items = [];
 
     /**
-     * @var Image
+     * @var Image|null
      */
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Image', cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'image_id', referencedColumnName: 'id')]
-    protected $image;
+    protected ?Image $image;
 
     /**
-     * @var string
+     * @var \DateTime
      */
     #[ORM\Column(type: 'datetime')]
-    protected $createDate;
+    protected \DateTime $createDate;
 
 
     /**
-     * @var string
+     * @var \DateTime
      */
     #[ORM\Column(type: 'datetime')]
-    protected $modDate;
+    protected \DateTime $modDate;
+
+    /**
+     * @var bool Determining if a {@link Series} is visible to the public
+     */
+    #[ORM\Column(type: 'boolean', length: 20)]
+    protected bool $visibility = self::VIS_PUBLIC;
 
     /**
      * Series constructor.
      */
     public function __construct()
     {
+        $this->image = null;
+        $this->setVisibility(self::VIS_PRIVATE);
         $this->items = new ArrayCollection();
 
         $currentTime = new \DateTime('now');
@@ -101,18 +121,18 @@ class Series
     }
 
     /**
-     * @return string
+     * @return UuidInterface|null
      */
-    public function getId(): ?string
+    public function getId(): ?UuidInterface
     {
         return $this->id;
     }
 
     /**
-     * @param string $id
+     * @param UuidInterface $id
      * @return $this
      */
-    public function setId(string $id): self
+    public function setId(UuidInterface $id): self
     {
         $this->id = $id;
 
@@ -120,7 +140,7 @@ class Series
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getTitle(): ?string
     {
@@ -139,7 +159,7 @@ class Series
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getSubTitle(): ?string
     {
@@ -147,10 +167,10 @@ class Series
     }
 
     /**
-     * @param string $subTitle
+     * @param string|null $subTitle
      * @return $this
      */
-    public function setSubTitle(?string $subTitle): self
+    public function setSubTitle(?string $subTitle = ''): self
     {
         $this->subTitle = $subTitle;
 
@@ -158,7 +178,7 @@ class Series
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUrl(): ?string
     {
@@ -166,10 +186,10 @@ class Series
     }
 
     /**
-     * @param mixed $url
+     * @param string|null $url
      * @return $this
      */
-    public function setUrl($url): self
+    public function setUrl(?string $url): self
     {
         $this->url = $url;
 
@@ -177,7 +197,7 @@ class Series
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription(): ?string
     {
@@ -185,7 +205,7 @@ class Series
     }
 
     /**
-     * @param string $description
+     * @param string|null $description
      * @return $this
      */
     public function setDescription(?string $description): self
@@ -196,7 +216,7 @@ class Series
     }
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
     public function getFirstDate(): ?\DateTime
     {
@@ -204,7 +224,7 @@ class Series
     }
 
     /**
-     * @param \DateTime $firstDate
+     * @param \DateTime|null $firstDate
      * @return $this
      */
     public function setFirstDate(\DateTime $firstDate = null): self
@@ -215,7 +235,7 @@ class Series
     }
 
     /**
-     * @return string
+     * @return \DateTime|null
      */
     public function getLastDate(): ?\DateTime
     {
@@ -223,7 +243,7 @@ class Series
     }
 
     /**
-     * @param \DateTime $lastDate
+     * @param \DateTime|null $lastDate
      *
      * @return $this
      */
@@ -235,7 +255,7 @@ class Series
     }
 
     /**
-     * @return array
+     * @return Collection|null
      */
     public function getItems(): ?Collection
     {
@@ -267,7 +287,7 @@ class Series
     }
 
     /**
-     * @return Image
+     * @return Image|null
      */
     public function getImage(): ?Image
     {
@@ -275,10 +295,10 @@ class Series
     }
 
     /**
-     * @param Image $image
+     * @param Image|null $image
      * @return $this
      */
-    public function setImage(?Image $image): self
+    public function setImage(?Image $image = null): self
     {
         $this->image = $image;
 
@@ -286,7 +306,7 @@ class Series
     }
 
     /**
-     * @return mixed
+     * @return \DateTime|null
      */
     public function getCreateDate(): ?\DateTime
     {
@@ -294,7 +314,7 @@ class Series
     }
 
     /**
-     * @param mixed $createDate
+     * @param \DateTime $createDate
      *
      * @return $this
      */
@@ -306,7 +326,7 @@ class Series
     }
 
     /**
-     * @return mixed
+     * @return \DateTime|null
      */
     public function getModDate(): ?\DateTime
     {
@@ -322,6 +342,24 @@ class Series
     {
         $this->modDate = $modDate;
 
+        return $this;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getVisibility(): ?bool
+    {
+        return $this->visibility;
+    }
+
+    /**
+     * @param bool $visibility
+     * @return $this
+     */
+    public function setVisibility(bool $visibility = self::VIS_PRIVATE): self
+    {
+        $this->visibility = $visibility;
         return $this;
     }
 }

@@ -6,6 +6,7 @@ use App\Entity\Series;
 use App\Form\DataTransformer\ArrayCollectionToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -66,7 +67,7 @@ class SeriesType extends AbstractType
                     'aria-labelledby' => 'url_label',
                     'aria-required'   => 'false',
                     'class' => 'editor__url text',
-                    'pattern' => '[0-9a-zA-ZÀ-ž\-]{5,}',
+                    'pattern' => '[0-9a-zA-ZÀ-ž\-]{4,}',
                     'placeholder'     => $this->translator->trans('admin.placeholder.series.url', [], 'messages'),
                 ],
                 'label'      => $this->translator->trans('admin.label.series.url', [], 'messages'),
@@ -135,7 +136,27 @@ class SeriesType extends AbstractType
                     'attr' => [
                         'class' => 'button button--info content-selector__link',
                     ],
-                    'label' => $this->translator->trans('admin.button.addItem', [], 'messages'),
+                    'label' => sprintf(
+                        '<span class="material-icons">%s</span> %s',
+                        'playlist_add',
+                        $this->translator->trans('admin.button.addItem', [], 'messages')
+                    ),
+                    'label_html' => true,
+                ])
+                ->add('visibility', CheckboxType::class, [
+                    'attr' => [
+                        'aria-labelledby' => 'visibility_label',
+                        'aria-required'   => 'false',
+                        'class'           => 'ui-switch',
+                        'data-label-off'  => 'private',
+                        'data-label-on'   => 'public',
+                    ],
+                    'label'      => $this->translator->trans('admin.label.post.visibility', [], 'messages'),
+                    'label_attr' => [
+                        'id' => 'visibility_label',
+                        'class' => 'inline_label',
+                    ],
+                    'required' => false,
                 ])
             ;
         }
@@ -144,7 +165,12 @@ class SeriesType extends AbstractType
                 'attr' => [
                     'class' => 'button button--positive',
                 ],
-                'label' => $this->translator->trans('admin.button.save', [], 'messages'),
+                'label' => sprintf(
+                    '<span class="material-icons">%s</span> %s',
+                    'save',
+                    $this->translator->trans('admin.button.save', [], 'messages')
+                ),
+                'label_html' => true,
             ])
 //            ->add('publish', SubmitType::class, [
 //                'attr' => [
@@ -156,13 +182,23 @@ class SeriesType extends AbstractType
                 'attr' => [
                     'class' => 'button button--negative',
                 ],
-                'label' => $this->translator->trans('admin.button.delete', [], 'messages'),
+                'label' => sprintf(
+                    '<span class="material-icons">%s</span> %s',
+                    'delete_forever',
+                    $this->translator->trans('admin.button.delete', [], 'messages')
+                ),
+                'label_html' => true,
             ])
             ->add('remove', SubmitType::class, [
                 'attr' => [
                     'class' => 'button button--negative',
                 ],
-                'label' => $this->translator->trans('admin.button.remove', [], 'messages'),
+                'label' => sprintf(
+                    '<span class="material-icons">%s</span> %s',
+                    'playlist_remove',
+                    $this->translator->trans('admin.button.remove', [], 'messages')
+                ),
+                'label_html' => true,
             ])
         ;
     }

@@ -6,7 +6,7 @@ use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Series;
 use App\Form\SeriesType;
-use App\Utils\UrlNormaliser;
+use App\Util\UrlNormaliser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -19,19 +19,18 @@ class SeriesController extends AbstractInachisController
      */
     #[Route(
         "/incc/series/list/{offset}/{limit}",
-        methods: [ "GET", "POST" ],
         requirements: [
             "offset" => "\d+",
             "limit" => "\d+"
         ],
-        defaults: [ "offset" => 0, "limit" => 10 ]
+        defaults: [ "offset" => 0, "limit" => 10 ],
+        methods: [ "GET", "POST" ]
     )]
     public function list(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid() && !empty($request->get('items'))) {
             foreach ($request->get('items') as $item) {
                 if ($request->get('delete') !== null) {
@@ -40,23 +39,21 @@ class SeriesController extends AbstractInachisController
                         $this->entityManager->getRepository(Series::class)->remove($deleteItem);
                     }
                 }
-//                if ($request->get('privacy') !== null) {
-//                    $post = $entityManager->getRepository(Series::class)->findOneById($item);
-//                    if ($post !== null) {
-//                        $post->setVisibility(Page::VIS_PRIVATE);
-//                        $post->setModDate(new \DateTime('now'));
-//                        $entityManager->persist($post);
-//                    }
-//                }
+                if ($request->request->has('private') || $request->request->has('public')) {
+                    $series = $this->entityManager->getRepository(Series::class)->findOneById($item);
+                    if ($series !== null) {
+                        $series->setVisibility(
+                            $request->request->has('private') ? Page::VIS_PRIVATE : Page::VIS_PUBLIC
+                        );
+                        $series->setModDate(new \DateTime('now'));
+                        $this->entityManager->persist($series);
+                    }
+                }
             }
-//            if ($request->get('privacy') !== null) {
-//                $entityManager->flush();
-//            }
-            return $this->redirectToRoute(
-                'app_series_list',
-                [],
-                Response::HTTP_PERMANENTLY_REDIRECT
-            );
+            if ($request->request->has('private') || $request->request->has('public')) {
+                $this->entityManager->flush();
+            }
+            return $this->redirectToRoute('app_series_list');
         }
 
         $filters = array_filter($request->get('filter', []));
@@ -129,7 +126,7 @@ class SeriesController extends AbstractInachisController
             $this->entityManager->persist($series);
             $this->entityManager->flush();
 
-            $this->addFlash('notice', 'Content saved.');
+            $this->addFlash('success', 'Content saved.');
             return $this->redirect(
                 '/incc/series/edit/' .
                 $series->getId() . '/'

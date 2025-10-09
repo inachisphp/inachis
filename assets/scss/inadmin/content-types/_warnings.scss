@@ -1,0 +1,45 @@
+@use '../definitions' as *;
+
+.content-warning {
+  color: #aaa;
+  font-size: 2.5em;
+  margin-bottom: 0.5em;
+  text-align: center;
+
+  a:link, a:visited {
+    color: #069;
+    font-size: 0.5em;
+  }
+
+  a:hover {
+    color: $admin__container-button--hover;
+  }
+
+  i.material-icons {
+    color: #eee;
+    display: block;
+    font-size: 3.5em;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: #ddd;
+  }
+
+  span {
+    display: block;
+  }
+}
+
+.ui-help {
+  span {
+    display: none;
+  }
+  &:hover span {
+    background-color: #eee;
+    border: 1px solid #333;
+    display: block;
+    font-size: 0.8em;
+    font-weight: normal;
+    padding: 10px;
+    position: absolute;
+    width: auto;
+  }
+}

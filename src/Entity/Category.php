@@ -11,7 +11,7 @@ use Ramsey\Uuid\Doctrine\UuidGenerator;
  * Object for handling categories on a site.
  */
 #[ORM\Entity(repositoryClass: 'App\Repository\CategoryRepository', readOnly: false)]
-#[ORM\Index(name: 'search_idx', columns: ['title'])]
+#[ORM\Index(columns: ['title'], name: 'search_idx')]
 class Category
 {
     /**
@@ -62,7 +62,7 @@ class Category
     /**
      * @var ArrayCollection|Category[] The array of child categories if applicable
      */
-    #[ORM\OneToMany(targetEntity: 'App\Entity\Category', mappedBy: 'parent')]
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: 'App\Entity\Category')]
     #[ORM\OrderBy(['title' => 'ASC'])]
     protected $children;
 
@@ -103,7 +103,7 @@ class Category
     /**
      * Returns the value of {@link description}.
      *
-     * @return string The description of the {@link Category}
+     * @return ?string The description of the {@link Category}
      */
     public function getDescription(): ?string
     {
@@ -113,7 +113,7 @@ class Category
     /**
      * Returns the value of {@link image}.
      *
-     * @return string The image for {@link Category}
+     * @return ?string The image for {@link Category}
      */
     public function getImage(): ?Image
     {
@@ -123,7 +123,7 @@ class Category
     /**
      * Returns the value of {@link icon}.
      *
-     * @return string The 'icon' for the {@link Category}
+     * @return ?string The 'icon' for the {@link Category}
      */
     public function getIcon(): ?string
     {
@@ -187,7 +187,7 @@ class Category
     /**
      * Sets the value of {@link description}.
      *
-     * @param string $value The description of the {@link Category}
+     * @param ?string $value The description of the {@link Category}
      * @return $this
      */
     public function setDescription(?string $value): self
@@ -200,7 +200,7 @@ class Category
     /**
      * Sets the value of {@link image}.
      *
-     * @param string $value The UUID or URL of the image for {@link Category}
+     * @param ?Image $value The UUID or URL of the image for {@link Category}
      * @return $this
      */
     public function setImage(?Image $value): self
@@ -213,7 +213,7 @@ class Category
     /**
      * Sets the value of {@link icon}.
      *
-     * @param string $value The UUID or URL of the image for {@link Category}
+     * @param ?string $value The UUID or URL of the image for {@link Category}
      * @return $this
      */
     public function setIcon(?string $value): self
@@ -237,7 +237,7 @@ class Category
     /**
      * Sets the value of {@link parent}.
      *
-     * @param Category $parent The parent of the current category
+     * @param ?Category $parent The parent of the current category
      * @return $this
      */
     public function setParent(?Category $parent = null): self

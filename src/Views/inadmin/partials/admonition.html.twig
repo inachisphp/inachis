@@ -1,0 +1,11 @@
+<p class="admonition admonition__{{ type }}">
+    {% if show_title|default(true) %}
+        <span class="admonition__title">
+        {% if type in [ 'dangerous', 'help', 'info', 'warning'] %}
+            <span class="material-icons">{{ type }}</span>
+        {% endif %}
+        {{ type }}
+        </span>
+    {% endif %}
+    {{ text }}
+</p>

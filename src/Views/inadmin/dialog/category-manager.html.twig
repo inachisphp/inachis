@@ -1,13 +1,33 @@
 <section>
     <form class="form">
+        <div class="flash">
+
+        </div>
         <fieldset class="col span_1_of_2">
             <p>
-                <label for="dialog__categoryManager__new">New category name</label>
-                <input class="text full-width" id="dialog__categoryManager__new" placeholder="Enter category name…" type="text" />
+                <button class="button button--positive" id="dialog__imageManager__addnew" type="button"><span class="material-icons">add</span> Add new category</button>
+            </p>
+            <p class="visually-hidden" id="dialog__categoryManager__top-level-category">
+                <label for="dialog__categoryManager__existing_-1">
+                    <input checked class="checkbox" id="dialog__categoryManager__existing_-1" name="catParent[]" type="radio" value="-1" />
+                    As top-level category</label>
+            </p>
+{% if categories is not empty  %}
+            <p class="visually-hidden" id="dialog__categoryManager__as-subcat">As a sub-category of:</p>
+            <ol data-name="catParent[]">
+                {{ include("inadmin/dialog/category-manager-list.html.twig", { 'categories': categories }) }}
+            </ol>
+{% endif %}
+        </fieldset>
+        <fieldset class="col span_1_of_2 visually-hidden" id="dialog__categoryManager__add-edit-category">
+            <input id="dialog__categoryManager__id" type="hidden" />
+            <p>
+                <label for="dialog__categoryManager__new">Category name</label>
+                <input class="text full-width" id="dialog__categoryManager__new" placeholder="Enter category name…" required aria-required="true" type="text" />
             </p>
             <p>
                 <label for="dialog__categoryManager__description">Description</label>
-                <textarea class="text full-width" id="dialog__categoryManager__description" rows="5"></textarea>
+                <textarea class="text full-width" id="dialog__categoryManager__description" rows="3"></textarea>
             </p>
             <p>
                 <label for="dialog__categoryManager__visible">Visible</label>
@@ -15,21 +35,12 @@
                     <input type="checkbox" id="dialog__categoryManager__visible" aria-labelledby="dialog__categoryManager__visible" aria-required="false" class="ui-switch" data-label-off="private" data-label-on="public" value="1" />
                 </span>
             </p>
-        </fieldset>
-        <fieldset class="col span_1_of_2">
-{% if show_categories|default(true) %}
             <p>
-                <label for="dialog__categoryManager__existing">
-                <input checked class="checkbox" id="dialog__categoryManager__existing" name="catParent[]" type="radio" value="-1" />
-                As top-level category</label>
+                <button class="button button--positive" id="dialog__categoryManager__save" type="submit">Save</button>
+                <button aria-disabled="true" class="button button--negative" disabled="disabled" id="dialog__categoryManager__delete" type="button">Delete</button>
+                <a class="button button--info" id="dialog__categoryManager__cancel" title="Cancel">Cancel</a>
             </p>
-    {% if categories is not empty  %}
-            <p>As a sub-category of:</p>
-            <ol data-name="catParent[]">
-                {{ include("inadmin/dialog/category-manager-list.html.twig", { 'categories': categories }) }}
-            </ol>
-    {% endif %}
-{% endif %}
+            <p class="info">Note: This category cannot be removed as content is assigned</p>
         </fieldset>
     </form>
 </section>

@@ -1,0 +1,136 @@
+@use '../definitions' as *;
+
+.ui-dialog {
+  background: #fff;
+  position: absolute;
+  z-index: 110 !important;
+
+  &.ui-dialog-loading {
+    background: #fff url(/assets/imgs/incc/loading.gif) no-repeat center;
+  }
+
+  .ui-dialog-titlebar {
+    button {
+      background-color: #fff;
+      border: none;
+      float: right;
+      margin: 5px;
+      padding: 0;
+    }
+
+    span {
+      display: inline-block;
+      font-size: 1.3em;
+      font-weight: bold;
+      padding: 10px;
+    }
+  }
+
+  .ui-dialog-secondary-bar {
+    background-color: #eee;
+    border: 1px solid #ddd;
+    margin: 10px 0 0 0;
+    padding: 5px;
+
+    a, a:visited {
+      text-decoration: none;
+    }
+    .search {
+      float: right;
+      margin-top: 0.75em;
+
+      button {
+        vertical-align: middle;
+      }
+      input {
+        font-size: 1.2em;
+        padding: 5px;
+        vertical-align: middle;
+      }
+      label {
+        display: none;
+      }
+    }
+  }
+
+  .ui-dialog-content {
+    max-height: 400px !important;
+    padding: 10px;
+    overflow-y: auto;
+
+    fieldset {
+      padding: 0;
+    }
+
+    .dz-default {
+      font-size: 1em;
+      margin: 1.5em 1.5em 0 1.5em;
+    }
+  }
+
+  .ui-dialog-buttonpane {
+    background-color: $admin__button-bar-background-color;
+    padding: 5px;
+    text-align: right;
+
+    button {
+      margin: 3px;
+    }
+  }
+
+  .gallery {
+    max-height: 330px;
+    overflow-y: scroll;
+
+    img {
+      height: 150px;
+      object-fit: cover;
+      width: 150px;
+    }
+    input {
+      position: absolute;
+      right: 0.5em;
+      top: 0.5em;
+    }
+    label span {
+      display: none;
+    }
+    li {
+      float: left;
+      position: relative;
+    }
+    ol, li {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .material-icons {
+      color: #fff;
+      bottom: 0.1em;
+      position: absolute;
+      right: 0.1em;
+      text-shadow: 1px 1px 3px #333;
+    }
+  }
+}
+
+.ui-widget-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 100 !important;
+}
+
+.ui-cross {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  margin: 20px 10px;
+  padding: 5px;
+  position: absolute;
+  right: 0;
+}

@@ -59,7 +59,13 @@ abstract class AbstractInachisController extends AbstractController
                 'featureImage' => '',
             ],
             'session' => $this->security->getUser(),
+            'session_timeout' => ini_get('session.gc_maxlifetime'),
+            'session_timeout_time' => date(
+                'Y-m-d\TH:i:s',
+                strtotime('+' . ini_get('session.gc_maxlifetime') . ' seconds')
+            ),
         ];
+        $this->data['timeout_template'] = base64_encode($this->renderView('inadmin/dialog/session_timeout.html.twig'));
     }
 
     /**

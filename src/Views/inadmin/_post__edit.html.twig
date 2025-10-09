@@ -1,4 +1,10 @@
 {% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('app_zzpage_getpostlistadmin', { type: page.tab }) }}">{{ page.tab|title }}s</a>
+    <span>{% if post.id is empty %}New{% else %}Edit{% endif %} {{ page.tab }}</span>
+{% endblock pagetitle %}
+
 {% block content %}
 
     {{ form_start(form, {'attr': { 'class': 'form form__post' }}) }}
@@ -38,7 +44,7 @@
             <p class="post__link__edit">
                 {{ form_label(form.url) }}
                 {{ form_errors(form.url) }}
-                {{ settings.domain -}}/<input id="post_url" name="post[url]" type="text" value="{% if post.urls is not empty %}{{ post.urls|first.link }}{% endif %}" />
+                {{ settings.domain -}}/<input class="field__wide" id="post_url" name="post[url]" type="text" value="{% if post.urls is not empty %}{{ post.urls|first.link }}{% endif %}" />
             </p>
             <p>
                 {{ form_label(form.content) }}
@@ -67,8 +73,6 @@
                 {{ form_label(form.categories) }}
                 {{ form_errors(form.categories) }}
                 {{ form_widget(form.categories) }}
-                <!-- a class="material-icons category-manager__link" href="#">add_box</a -->
-
                 <a href="#" class="material-icons dialog__link"
                         data-buttons="W3sidGl0bGUiOiJDcmVhdGUgQ2F0ZWdvcnkiLCJjbGFzcyI6ImJ1dHRvbiBidXR0b24tLXBvc2l0aXZlIiwiZGlzYWJsZWQiOnRydWV9XQ=="
                         data-class-name="dialog__categoryManager"
@@ -181,7 +185,7 @@
         <p>
             {{ form_widget(form.submit) }}
             {%- if post.status != "published" %}
-                <button type="submit" class="button button--secondary button--info" name="publish">{% if post.postDate > date() %}Schedule{% else %}Publish{% endif %}</button>
+                <button type="submit" class="button button--secondary button--info" name="publish">{% if post.postDate > date() %}<span class="material-icons">schedule</span> Schedule{% else %}<span class="material-icons">publish</span> Publish{% endif %}</button>
             {%- endif %}
             {{ form_widget(form.delete) }}
             {%  if post.id is not empty and not post.isDraft %}

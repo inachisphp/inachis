@@ -12,8 +12,8 @@ use App\Entity\Tag;
 use App\Entity\Url;
 use App\Form\PostType;
 use App\Repository\RevisionRepository;
-use App\Utils\ContentRevisionCompare;
-use App\Utils\ReadingTime;
+use App\Util\ContentRevisionCompare;
+use App\Util\ReadingTime;
 use Doctrine\ORM\EntityManager;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Ramsey\Uuid\Uuid;
@@ -151,7 +151,6 @@ class ZZPageController extends AbstractInachisController
                     ->setContent('')
                     ->setAction(sprintf(RevisionRepository::VISIBILITY_CHANGE, $post->getVisibility()));
                 $this->entityManager->persist($revision);
-
                 $this->entityManager->flush();
             }
             return $this->redirectToRoute(
@@ -160,10 +159,13 @@ class ZZPageController extends AbstractInachisController
             );
         }
         $filters = array_filter($request->get('filter', []));
+        $sort = $request->get('sort', 'postDate desc');
         if ($request->isMethod('post')) {
             $_SESSION['post_filters'] = $filters;
+            $_SESSION['sort'] = $sort;
         } elseif (isset($_SESSION['post_filters'])) {
             $filters = $_SESSION['post_filters'];
+            $sort = $_SESSION['sort'];
         }
 
         $offset = (int) $request->get('offset', 0);
@@ -173,11 +175,13 @@ class ZZPageController extends AbstractInachisController
             $filters,
             $type,
             $offset,
-            $limit
+            $limit,
+            $sort
         );
         $this->data['filters'] = $filters;
         $this->data['page']['offset'] = $offset;
         $this->data['page']['limit'] = $limit;
+        $this->data['page']['sort'] = $sort;
         $this->data['page']['tab'] = $type;
         $this->data['page']['title'] = ucfirst($type) . 's';
         return $this->render('inadmin/post__list.html.twig', $this->data);
@@ -195,23 +199,23 @@ class ZZPageController extends AbstractInachisController
      */
     #[Route(
         "/incc/{type}/{title}",
-        methods: [ "GET", "POST" ],
-        defaults: [ "type" => "post" ],
         requirements: [
             "type" => "post|page"
-        ]
+        ],
+        defaults: [ "type" => "post" ],
+        methods: [ "GET", "POST" ]
     )]
     #[Route(
         "/incc/{type}/{year}/{month}/{day}/{title}",
-        methods: [ "GET", "POST" ],
         requirements: [
             "type" => "post",
             "year" => "\d+",
             "month" => "\d+",
             "day" => "\d+"
-        ]
+        ],
+        methods: [ "GET", "POST" ]
     )]
-    public function getPostAdmin(Request $request, ContentRevisionCompare $contentRevisionCompare, $type = 'post', $title = null): Response
+    public function getPostAdmin(Request $request, ContentRevisionCompare $contentRevisionCompare, string $type = 'post', $title = null): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 

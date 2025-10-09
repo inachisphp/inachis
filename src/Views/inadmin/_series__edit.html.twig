@@ -1,4 +1,10 @@
 {% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('app_series_list') }}">Series</a>
+    {% if series.id is empty %}New{% else %}Edit{% endif %} Series
+{% endblock pagetitle %}
+
 {% block content %}
 
     {% block series_edit_pre %}{% endblock series_edit_pre %}
@@ -34,6 +40,13 @@
                     {{ form_errors(form.url) }}
                     /{{ series.firstDate|date('Y') }}-{{ form_widget(form.url) }}
                 </p>
+                <p>
+                    {{ form_label(form.visibility) }}
+                    {{ form_errors(form.visibility) }}
+                    <span class="switch-wrapper">
+                        {{ form_widget(form.visibility) }}
+				    </span>
+                </p>
                 {% else %}
                     {{ form_widget(form.url, {'type': 'hidden', 'attr': {'pattern': ''}}) }}
                 {% endif %}
@@ -58,6 +71,9 @@
         </div>
         {{ form_row(form._token) }}
         {{ form_end(form, {render_rest: false}) }}
+
+        <link rel="stylesheet" href="/assets/css/incc/jquery.switchButton.css">
+        <script src="/assets/js/incc/jquery.switchButton.js"></script>
 
     {% endblock series_edit %}
 

@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\User;
+use App\Util\RandomColorPicker;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -15,17 +16,22 @@ class UserType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $newUser = $options['data']->getUsername() === '';
         $builder
-            ->add('username', HiddenType::class, [
+            ->add('username', $newUser ? TextType::class : HiddenType::class, [
                 'attr' => [
                     'aria-labelledby' => 'user__username__label',
-                    'class' => 'text full-width',
-                    'readOnly' => true,
+                    'autofocus' => 'true',
+                    'class' => 'text inline_label',
+                    'placeholder' => 'Enter a unique username',
+                    'readOnly' => !$newUser,
                 ],
                 'label' => 'Username',
                 'label_attr' => [
+                    'class' => 'inline_label',
                     'id' => 'user__username__label'
                 ],
+                'required' => true,
             ])
             ->add('displayName', TextType::class, [
                 'attr' => [
@@ -43,13 +49,14 @@ class UserType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'user__email__label',
                     'class' => 'text inline_label',
-                    'readOnly' => true,
+                    'readOnly' => !$newUser,
                 ],
                 'label' => 'Email Address',
                 'label_attr' => [
                     'class' => 'inline_label',
                     'id' => 'user__email__label'
                 ],
+                'required' => true,
             ])
             ->add('timezone', ChoiceType::class, [
                 'attr' => [
@@ -64,7 +71,25 @@ class UserType extends AbstractType
                     'id' => 'user__timezone__label',
                 ],
             ])
+            ->add('avatar', HiddenType::class)
         ;
+        if (!$newUser) {
+            $builder->add('color', ChoiceType::class, [
+                'attr' => [
+                    'aria-labelledby' => 'user__color__label',
+                ],
+                'choices' => array_combine(RandomColorPicker::getAll(), RandomColorPicker::getAll()),
+                'choice_attr' => function ($choice, $key, $value) {
+                    return ['data-color' => $value];
+                },
+                'expanded' => true,
+                'label' => 'Color',
+                'label_attr' => [
+                    'id' => 'user__color__label'
+                ],
+                'multiple' => false,
+            ]);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void

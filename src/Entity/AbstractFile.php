@@ -25,49 +25,49 @@ abstract class AbstractFile
      * @var string The title of the {@link Image}
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    protected $title;
+    protected string $title;
     
     /**
-     * @var string
+     * @var ?string
      */
     #[ORM\Column(type: 'string', nullable: true)]
-    protected $description;
+    protected ?string $description;
 
     /**
      * @var string
      */
     #[ORM\Column(type: 'string')]
-    protected $filename;
+    protected string $filename;
 
     /**
      * @var string
      */
     #[ORM\Column(type: 'string')]
-    protected $filetype;
+    protected string $filetype;
 
     /**
      * @var int
      */
     #[ORM\Column(type: 'integer')]
-    protected $filesize = 0;
+    protected int $filesize = 0;
 
     /**
      * @var string
      */
     #[ORM\Column(type: 'string')]
-    protected $checksum;
+    protected string $checksum;
 
     /**
-     * @var string
+     * @var \DateTime
      */
     #[ORM\Column(type: 'datetime')]
-    protected $createDate;
+    protected \DateTime $createDate;
 
     /**
-     * @var string
+     * @var \DateTime
      */
     #[ORM\Column(type: 'datetime')]
-    protected $modDate;
+    protected \DateTime $modDate;
 
     /**
      * Returns the value of {@link id}.
@@ -92,7 +92,7 @@ abstract class AbstractFile
     /**
      * Returns the value of {@link description}.
      *
-     * @return string The description of the record
+     * @return ?string The description of the record
      */
     public function getDescription(): ?string
     {
@@ -142,7 +142,7 @@ abstract class AbstractFile
     /**
      * Returns the value of {@link createDate}.
      *
-     * @return string The creation date of the file
+     * @return \DateTime The creation date of the file
      */
     public function getCreateDate(): \DateTime
     {
@@ -152,7 +152,7 @@ abstract class AbstractFile
     /**
      * Returns the value of {@link modDate}.
      *
-     * @return string The date the file was last modified
+     * @return \DateTime The date the file was last modified
      */
     public function getModDate(): \DateTime
     {
@@ -188,7 +188,7 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link description}.
      *
-     * @param string $value The description to set
+     * @param ?string $value The description to set
      * @return $this
      */
     public function setDescription(?string $value): self
@@ -228,13 +228,13 @@ abstract class AbstractFile
     }
 
     /**
-     * @param $value
+     * @param string $value
      * @return bool
      */
     public function isValidFiletype(string $value): bool
     {
-        if (defined('static::ALLOWED_TYPES')) {
-            return preg_match('/' . static::ALLOWED_TYPES . '/', $value) === 1;
+        if (defined('static::ALLOWED_MIME_TYPES')) {
+            return preg_match('/' . static::ALLOWED_MIME_TYPES . '/', $value) === 1;
         }
         return true;
     }
@@ -271,7 +271,7 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link createDate}.
      *
-     * @param \DateTime $value The date to be set
+     * @param \DateTime|null $value The date to be set
      * @return $this
      */
     public function setCreateDate(\DateTime $value = null): self
@@ -284,7 +284,7 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link modDate}.
      *
-     * @param \DateTime $value Specifies the mod date for the {@link Page}
+     * @param \DateTime|null $value Specifies the mod date for the {@link Page}
      * @return $this
      */
     public function setModDate(\DateTime $value = null): self
@@ -302,6 +302,6 @@ abstract class AbstractFile
      */
     public function verifyChecksum(string $checksum): bool
     {
-        return $this->checksum === $checksum;
+        return hash_equals($checksum, $this->checksum);
     }
 }

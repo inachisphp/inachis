@@ -1,0 +1,50 @@
+.widget-data-list {
+  article {
+    background-color: #eee;
+    margin: 1px 20px;
+    padding: 10px;
+    width: 90%;
+
+    strong {
+      padding-left: 10px;
+    }
+    span {
+      padding: 0 10px;
+    }
+    em.date {
+      text-align: right;
+    }
+  }
+  .url-not-default {
+    color: #333;
+    input {
+      margin-left: 25px;
+    }
+  }
+}
+
+.checkbox__checked {
+  color: #3a3;
+}
+
+.pagination--info {
+  color: #333;
+  font-size: 0.95em;
+}
+
+.expand-all {
+  .separator {
+    width: 2em;
+    display: inline-block;
+  }
+}
+
+.form__users {
+  article {
+    display: table-row;
+    a, a:visited, span {
+      display: table-cell;
+      padding: 0.5em 1em;
+    }
+  }
+}

@@ -1,4 +1,9 @@
 {% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <span>Dashboard</span>
+{% endblock pagetitle %}
+
 {% block content %}
 
     {% block dashboard_pre %}{% endblock dashboard_pre %}
@@ -10,8 +15,10 @@
         </div>
 
         <div class="col span_4_of_8">
+            <!--
             {% include "inadmin/dashboard/alerts.html.twig" %}
             {% include "inadmin/dashboard/stats.html.twig" %}
+            -->
         </div>
 
     {% endblock dashboard %}

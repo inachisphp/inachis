@@ -3,9 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\Category;
+use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Tag;
 use App\Entity\Url;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 final class PageRepository extends AbstractRepository
@@ -72,6 +74,21 @@ final class PageRepository extends AbstractRepository
     }
 
     /**
+     * @param Category $category
+     * @return int
+     */
+    public function getPagesWithCategoryCount(Category $category): int
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb = $qb
+            ->select('COUNT(p) AS numPages')
+            ->leftJoin('p.categories', 'Page_categories')
+            ->andWhere('Page_categories.id = :categoryId')
+            ->setParameter('categoryId', $category);
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
      * @param Tag $tag
      * @param int $maxDisplayCount
      * @param int $offset
@@ -115,12 +132,13 @@ final class PageRepository extends AbstractRepository
 
     /**
      * @param $filters
-     * @param $type
-     * @param $offset
-     * @param $limit
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @param string $type
+     * @param int $offset
+     * @param int $limit
+     * @param string $sort
+     * @return Paginator
      */
-    public function getFilteredOfTypeByPostDate($filters, $type, $offset, $limit)
+    public function getFilteredOfTypeByPostDate($filters, string $type, int $offset, int $limit, string $sort = 'postDate desc')
     {
         $where = [
             'q.type = :type',
@@ -141,14 +159,37 @@ final class PageRepository extends AbstractRepository
             $where[0] .= ' AND (q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.content LIKE :keyword )';
             $where[1]['keyword'] = '%' . $where[1]['keyword'] . '%';
         }
+        switch ($sort) {
+            case 'title asc':
+                $sort = [
+                    [ 'q.title', 'ASC' ],
+                    [ 'q.subTitle', 'ASC' ],
+                ];
+                break;
+            case 'title desc':
+                $sort = [
+                    [ 'q.title', 'DESC' ],
+                    [ 'q.subTitle', 'DESC' ],
+                ];
+                break;
+            case 'modDate asc':
+                $sort = [[ 'q.modDate', 'ASC' ]];
+                break;
+            case 'modDate desc':
+                $sort = [[ 'q.modDate', 'DESC' ]];
+                break;
+            case 'postDate asc':
+                $sort = [[ 'q.postDate', 'ASC' ]];
+                break;
+            case 'postDate desc':
+            default:
+                $sort =  [[ 'q.postDate', 'DESC' ]];
+        }
         return $this->getAll(
             $offset,
             $limit,
             $where,
-            [
-                [ 'q.postDate', 'DESC' ],
-                [ 'q.modDate', 'DESC' ]
-            ]
+            $sort,
         );
     }
 
@@ -165,6 +206,25 @@ final class PageRepository extends AbstractRepository
                 'q.id IN (:ids)',
                 [
                     'ids' => $ids,
+                ]
+            ]
+        );
+    }
+
+    /**
+     * @param Image $image
+     * @return Paginator
+     */
+    public function getPostsUsingImage(Image $image): Paginator
+    {
+        return $this->getAll(
+            0,
+            25,
+            [
+                'q.content LIKE :filename OR q.featureImage = :image',
+                [
+                    'filename' => '%' . $image->getFilename() . '%',
+                    'image' => $image->getId(),
                 ]
             ]
         );

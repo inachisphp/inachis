@@ -10,7 +10,7 @@
                             <td align="left" class="mobile-padding" style="padding:20px">
                                 <br class="mobile-hide" />
 
-                                <h2>Welcome {{ '%NAME%' }}!</h2>
+                                <h2>Welcome {{ name }}!</h2>
                                 <p>Thank you for registering on <strong>{{ settings.siteTitle|default(settings.domain) }}</strong>.</p>
                                 <p>To complete your registration, please click the button below:</p>
 
@@ -20,21 +20,14 @@
                                         <w:anchorlock/>
                                         <center>
                                     <![endif]-->
-                                    <a href="{{ settings.domain }}/register/complete/{{ '%TOKEN%' }}" class="button--cta">Complete my registration</a>
+                                    <a href="{{ settings.domain ~ url }}" class="button--cta">Complete my registration</a>
                                     <!--[if mso]>
                                         </center>
                                     </v:rect>
                                     <![endif]-->
                                 </div>
-                            </td>
-                            <td class="mobile-hide" style="padding-top:20px;padding-bottom:0; vertical-align:bottom;" valign="bottom">
-                                <table cellspacing="0" cellpadding="0" width="100%">
-                                    <tr>
-                                        <td align="right" valign="bottom" style="padding-bottom:0; vertical-align:bottom;">
-                                            <img  style="vertical-align:bottom;" src="https://www.filepicker.io/api/file/9f3sP1z8SeW1sMiDA48o"  width="174" height="294" />
-                                        </td>
-                                    </tr>
-                                </table>
+
+                                <p>Once you have clicked the link, you will be asked to create a new password for your account. For security purposes, this link will expire on {{ expiresAt }}.</p>
                             </td>
                         </tr>
                     </table>
@@ -43,5 +36,6 @@
         </tr>
     </tbody>
 </table>
-
 {% endblock content %}
+
+{% block settings_unsubscribe %}{% endblock settings_unsubscribe %}

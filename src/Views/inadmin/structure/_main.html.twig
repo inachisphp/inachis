@@ -26,14 +26,20 @@
 
 {%- if is_granted('ROLE_USER') %}
     <header class="admin__header">
-        <!-- h1>Title / breadcrumb goes here</h1 -->
+        <h1>{% block pagetitle %}{% endblock pagetitle %}</h1>
+        <div class="admin__actions">
         <section class="admin__user">
             <a href="#admin__user__options">
-                <img alt="User avatar" height="40" src="{% if session.avatar|default('') is not empty %}{{ session.avatar.filename }}{% else %}{{ settings.domain }}/assets/imgs/incc/defaultAvatar.png{% endif %}" width="40" />
+                {% if session.avatar is not empty %}
+                <img alt="User avatar" height="40" src="{{ session.avatar.filename }}" width="40" />
+                {% else %}
+                <span data-color="{{ session.color }}" data-initials="{{ session.initials }}"></span>
+                {% endif %}
                 {%- if notifications|length > 0 %}<span class="admin__user__notifications">{{ notifications|length }}</span>{% endif %}
             </a>
             <ul id="admin__user__options">
-                <li><a href="{{ path('app_admin_admindetails', {'id': session.username }) }}" title="Edit profile for {{ session.displayName }}">Edit your profile <span class="material-icons">perm_identity</span></a></li>
+                <li><p><strong>Welcome,</strong> {{ session.displayName }}</p></li>
+                <li><a href="{{ path('app_admin_adminprofile_admindetails', {'id': session.username }) }}" title="Edit profile for {{ session.displayName }}">Edit your profile <span class="material-icons">perm_identity</span></a></li>
                 <!-- li><a href="/incc/settings/releases">Update available <span class="material-icons">new_releases</span></a></li -->
                 <li><form action="{{ path('app_logout') }}" method="post"><button>Log out <span class="material-icons">logout</span></button></form></li>
             </ul>
@@ -43,9 +49,9 @@
                 <label for="q" class="material-icons">search</label>
                 <input id="q" name="filter[keyword]" placeholder="search for content" type="search" />
                 <button class="clear-search material-icons" data-target="#q" type="button">cancel</button>
-                <button class="material-icons mobile-only" type="submit">search</button>
             </form>
         </section>
+        </div>
     </header>
 {% endif %}
 
@@ -54,20 +60,9 @@
         {% if 'Content saved.' in app.session.flashbag.peek('success') %}
             {{ app.session.set('clearAutosave', true) }}
         {% endif %}
-        {% for label, messages in app.flashes(['success', 'warning', 'notice']) %}
-            {% for message in messages %}
-                <div class="flash-{{ label }}">
-                    {% if label == 'success' %}
-                        <span class="material-icons">check_circle</span>
-                    {% elseif label == 'warning' %}
-                        <span class="material-icons">warning</span>
-                    {% elseif label == 'notice' %}
-                        <span class="material-icons">info</span>
-                    {% endif %}
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endfor %}
+        {% if page_type|default(null) is null or page_type != 'login' %}
+            {% include "inadmin/partials/flashes.html.twig" %}
+        {% endif %}
     {% endblock form_login_pre %}
 
     {% block content %}{% endblock content %}
@@ -84,32 +79,29 @@
                 <li>
                     <a class="button admin__add-content" href="#new" title="Add new content"><i class="material-icons">edit</i><span> Add</span></a>
                     <ul class="admin__nav-new contextual-menu">
-                        <li><a href="{{ settings.domain ~ path('app_zzpage_getpostadmin', {'type': 'post'}) }}/post/new" title="Add a new post"><i class="material-icons">short_text</i><span> New Post</span></a></li>
-                        <li><a href="{{ settings.domain ~ path('app_zzpage_getpostadmin', {'type': 'page'}) }}/new" title="Add a new page"><i class="material-icons">content_copy</i><span> New Page</span></a></li>
+                        <li><a href="{{ settings.domain ~ path('app_zzpage_getpostadmin', { type: 'post'}) }}/post/new" title="Add a new post"><i class="material-icons">short_text</i><span> New Post</span></a></li>
+                        <li><a href="{{ settings.domain ~ path('app_zzpage_getpostadmin', { type: 'page'}) }}/new" title="Add a new page"><i class="material-icons">content_copy</i><span> New Page</span></a></li>
                     </ul>
                 </li>
                 <li class="{{ page.tab|activeMenu('dashboard') }}"><a href="{{ settings.domain ~ path('app_dashboard_default') }}" title="View dashboard"><i class="material-icons">home</i><span> Dashboard</span></a></li>
                 <li class="{{ page.tab|activeMenu('post') }}"><a href="{{ settings.domain ~ path('app_zzpage_getpostlistadmin', {'type': 'post'}) }}" title="View list of posts"><i class="material-icons">library_books</i><span> Posts</span></a></li>
                 <li class="{{ page.tab|activeMenu('series') }}"><a href="{{ settings.domain ~ path('app_series_list') }}" title="View list of series"><i class="material-icons">chrome_reader_mode</i><span> Series</span></a></li>
-                <li class="{{ page.tab|activeMenu('categories') }}"><a href="{{ settings.domain ~ path('app_categorymanager_list') }}" title="Manage categories for content"><i class="material-icons">view_list</i><span> Categories</span></a></li>
+                <li class="{{ page.tab|activeMenu('Image') }}"><a href="{{ settings.domain ~ path('app_resource_resourceslist', { type: 'images' }) }}" title="Manage resources"><i class="material-icons">wallpaper</i><span> Resources</span></a></li>
                 <li>
                     <a href="#admin__nav-settings" title="More tools and settings"><i class="material-icons">more_horiz</i><span> More…</span></a>
                     <ul id="admin__nav-settings">
                         <li class="{{ page.tab|activeMenu('url') }}"><a href="{{ settings.domain ~ path('app_url_list') }}" title="View list of defined URLs">
                                 <i class="material-icons">insert_link</i><span> URLs</span></a>
                         </li>
-                        <li class="{{ page.tab|activeMenu('resources') }}"><a href="{{ settings.domain }}/incc/resources" title="Manage resources">
-                                <i class="material-icons">wallpaper</i><span> Resources</span></a>
-                        </li>
-                        <li class="{{ page.tab|activeMenu('users') }}"><a href="{{ settings.domain ~ path('app_admin_adminlist') }}" title="Manage users">
+                        <li class="{{ page.tab|activeMenu('users') }}"><a href="{{ settings.domain ~ path('app_admin_adminprofile_adminlist') }}" title="Manage users">
                                 <i class="material-icons">people</i><span> Users</span></a>
-                        </li>
-                        <li class="{{ page.tab|activeMenu('tools') }}"><a href="{{ settings.domain ~ path('app_tools_index') }}" title="Tools">
-                                <i class="material-icons">build</i><span> Tools</span></a>
-                        </li>
-                        <li class="{{ page.tab|activeMenu('settings') }}"><a href="{{ settings.domain ~ path('app_settings_index') }}" title="Change advanced settings">
-                                <i class="material-icons">settings</i><span> Settings</span></a>
-                        </li>
+{#                        </li>#}
+{#                        <li class="{{ page.tab|activeMenu('tools') }}"><a href="{{ settings.domain ~ path('app_tools_index') }}" title="Tools">#}
+{#                                <i class="material-icons">build</i><span> Tools</span></a>#}
+{#                        </li>#}
+{#                        <li class="{{ page.tab|activeMenu('settings') }}"><a href="{{ settings.domain ~ path('app_settings_index') }}" title="Change advanced settings">#}
+{#                                <i class="material-icons">settings</i><span> Settings</span></a>#}
+{#                        </li>#}
 {#                        <li><a href="{{ settings.domain ~ path('app_waste_list') }}" title="Manage deleted content">#}
 {#                                <i class="material-icons">delete</i><span> Bin</span></a>#}
 {#                        </li>#}

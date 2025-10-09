@@ -1,8 +1,8 @@
 {% block list %}
 
-{% if dataset|default(null) is not empty and form|default(null) is not empty %}
     {{ form_start(form, {'attr': { 'class': 'form form__' ~ type ~ ' content__list' }}) }}
 
+    {% if dataset|default(null) is not empty and form|default(null) is not empty %}
     {{- form_errors(form) -}}
 
     {{ include('inadmin/partials/filters.html.twig') }}
@@ -84,7 +84,7 @@
             </span>
                 {% endif %}
             {% endif %}
-            {% if item.modDate is defined and showDate|default(true) == true %}
+            {% if item.modDate is defined and (showDate is not defined or showDate == true) %}
                 {% set timezone = session.user.timezone|default(item.timezone|default('UTC')) %}
                 {% if inline|default(false) == false %}
             <p class="date">
@@ -122,7 +122,6 @@
         {% if actions|default(null) is not empty %}
             {% include 'inadmin/partials/action_bar.html.twig' %}
         {% endif %}
-        {{ form_end(form) }}
     </section>
 
 {% elseif filter_values|default(null) is not empty %}
@@ -146,5 +145,6 @@
     {% endif %}
     </p>
 {% endif %}
+    {{ form_end(form, render_rest: false) }}
 
 {% endblock list %}

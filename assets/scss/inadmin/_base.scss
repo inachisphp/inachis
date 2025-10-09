@@ -1,0 +1,12 @@
+@use 'definitions' as *;
+
+body {
+  background-color: $admin__background-color;
+  font-family: Roboto, Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-display: swap;
+  overflow-x: hidden;
+}
+
+.visually-hidden {
+  display: none;
+}

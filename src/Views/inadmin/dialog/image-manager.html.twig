@@ -2,48 +2,41 @@
     <form class="search">
         <label class="ui-helper-hidden-accessible" for="ui-dialog-search-input">Search</label>
         <input class="text ui-icon-search" id="ui-dialog-search-input" placeholder="Filter by name" type="search" />
-        <button class="material-icons" type="submit">search</button>
+        <!-- button class="material-icons" type="submit">search</button -->
     </form>
     <p>
-        <a class="button button--positive" href="#"><span class="material-icons">cloud_upload</span> Upload Image</a>
-        <strong>{{ image_count|number_format }}</strong> images
+        <a class="button button--positive" href="#"><span class="material-icons">cloud_upload</span> Upload a new Image</a>
+        <strong id="images_count">{{ image_count|number_format }}</strong> images
     </p>
 </section>
 <section class="gallery">
-{% if images is not empty %}
-    <ol>
-    {% for image in images %}
-        <li>
-            <label for="chosenImage_{{ image.id }}">
-                <img alt="{{ image.altText }}" src="{% if not (image.filename starts with 'http') %}/imgs/{% endif %}{{ image.filename }}" />
-                <span>{{ image.title }}</span>
-            </label>
-            <input id="chosenImage_{{ image.id }}" name="chosenImage[]" type="radio" value="{{ image.id }}" />
-        {% if image.filename|slice(0,4) == 'http' %}
-            <em class="material-icons">link</em>
-        {% endif %}
-        </li>
-    {% endfor %}
-    </ol>
-{% else %}
-    <p>No images to choose from, please add some!</p>
-{% endif %}
+    {{ include('inadmin/partials/gallery.html.twig', {
+        images: dataset,
+        page: {
+            offset: 0,
+            limit: 25,
+        }
+    }) }}
 </section>
 <section class="ui-dialog-image-uploader visually-hidden">
-    {{ form_start(form, {'action': path('app_resource_saveimage'), 'attr': { 'class': 'form' }}) }}
-        <fieldset class="col dropzone span_1_of_2">
-        {{
-            include('inadmin/partials/dropzone.html.twig', {
-                'dropzoneUrl': path('app_resource_uploadimage'),
-                'helpText': 'Upload image (PNG. JPEG, GIF).',
-                'paramName': 'imageFile',
-                'uploadMultiple': false,
-                'maxFilesize': 2,
-                'acceptedFiles': allowedTypes
-            })
-        }}
-        {{ form_label(form.filename) }}
-        {{ form_widget(form.filename) }}
+    {{ form_start(form, {'attr': { 'class': 'form' }}) }}
+        <fieldset class="col span_1_of_2 dropzone">
+            {{
+                include('inadmin/partials/dropzone.html.twig', {
+                    'dropzoneUrl': path('app_resource_uploadimage'),
+                    'helpText': 'Upload an image (JPEG or HEIC only)',
+                    'paramName': 'image[imageFile]',
+                    'uploadMultiple': false,
+                    'maxFilesize': 2097152,
+                    'acceptedFiles': allowedTypes,
+                    'autoUpload': false,
+                    'selector': '.ui-dialog-image-uploader form'
+                })
+            }}
+            <p>
+                {{ form_widget(form.optimiseImage) }}
+                {{ form_label(form.optimiseImage) }}
+            </p>
         </fieldset>
 
         <fieldset class="col span_1_of_2">
@@ -60,7 +53,7 @@
                 {{ form_widget(form.description) }}
             </p>
             <p>
-                <button class="button button--positive" data-submit-url="{{ path('app_resource_saveimage') }}" type="submit">Save Image</button>
+                <button class="button button--positive" type="submit"><span class="material-icons">save</span> Save Image</button>
             </p>
         </fieldset>
     {{ form_row(form._token) }}

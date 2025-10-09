@@ -1,0 +1,117 @@
+@use '../_definitions' as *;
+@use '../mixins/box-shadow' as *;
+
+body.type_login {
+	background-image: $signin_background-image__dark;
+	background-size: cover;
+
+	.admin__body-container {
+		align-items: center;
+		display: flex;
+		height:100vh;
+		justify-content: center;
+	}
+}
+
+.container__login, .setup {
+	background-color: #303030;
+	border: 1px solid transparent;
+	border-top: 10px solid #069;
+	border-radius: 0.5em;
+	color: #fff;
+
+	@include box-shadow(5px, 7px, 14px, 0, rgba(0,0,0,0.26));
+
+	& > div {
+		margin:3em 0;
+	}
+
+	h2 {
+		margin-bottom: 2em;
+	}
+
+	.logo {
+		text-align: center;
+	}
+
+	.form__login {
+		margin: 2em;
+		max-width: 450px;
+		padding: 0;
+		width: 20em;
+
+		button {
+			i {
+				margin-left: 0.5em;
+			}
+		}
+
+		fieldset {
+			border: none;
+			margin: 15px 50px;
+			padding: 0;
+		}
+
+		img {
+			float: right;
+			width: 5em;
+		}
+
+		input {
+			background-color: #252525;
+			border: 2px solid #353535;
+			border-radius: 0.5em;
+			color: #fff;
+			margin-bottom: 1.3em;
+			width: 90%;
+		}
+		.input:active {
+			border-bottom-color: #069;
+		}
+		input[value^=""], .input__complete {
+			border-color: $form-input__complete;
+		}
+		input.checkbox {
+			margin-right: .5em;
+			width: auto;
+		}
+
+		label {
+			color: $form-label__light;
+			display: block;
+			font-size: 0.85em;
+			margin-bottom: 0.3em;
+			text-align: left;
+			text-transform: uppercase;
+		}
+
+		legend {
+			display: none;
+		}
+	}
+
+	a, a:visited {
+		&.button {
+			display: inline;
+		}
+		& {
+			color: $form-link;
+			display: block;
+			font-size: 0.9em;
+			margin-right: 1em;
+			margin-top: -1em;
+			text-align: right;
+			text-decoration: none;
+		}
+	}
+	a:hover {
+		&.button {
+			color: #fff;
+			text-decoration: none;
+		}
+		& {
+			color: $form-link__hover;
+			text-decoration: underline;
+		}
+	}
+}
