@@ -14,13 +14,9 @@
 ###< symfony/framework-bundle ###
 ###> symfony/phpunit-bridge ###
 .phpunit.result.cache
-/phpunit.xml
+/tests/logs/
+!/tests/logs/.gitkeep
 ###< symfony/phpunit-bridge ###
-
-###> phpunit/phpunit ###
-/phpunit.xml
-.phpunit.result.cache
-###< phpunit/phpunit ###
 
 ###> squizlabs/php_codesniffer ###
 /.phpcs-cache
@@ -30,6 +26,8 @@
 /.vagrant
 /backup
 /bin/.phpunit
-composer
+/composer
+
 /docker
-docker-compose.yml
+/docker-compose.yml
+

@@ -10,10 +10,11 @@ use App\Entity\Url;
 use App\Entity\User;
 use App\Exception\InvalidTimezoneException;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 
 class PageTest extends TestCase
 {
-    protected $page;
+    protected Page $page;
 
     public function setUp() : void
     {
@@ -139,8 +140,9 @@ class PageTest extends TestCase
 
     public function testSetAndGetId()
     {
-        $this->page->setId('test');
-        $this->assertEquals('test', $this->page->getId());
+        $uuid = Uuid::uuid1();
+        $this->page->setId($uuid);
+        $this->assertEquals($uuid, $this->page->getId());
     }
 
     public function testSetAndGetStatus()

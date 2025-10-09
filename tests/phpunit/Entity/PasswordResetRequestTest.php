@@ -5,7 +5,6 @@ namespace App\Tests\phpunit\Entity;
 use App\Entity\PasswordResetRequest;
 use App\Entity\User;
 use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Uuid;
 
 class PasswordResetRequestTest extends TestCase
 {
