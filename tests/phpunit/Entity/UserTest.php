@@ -19,86 +19,111 @@ class UserTest extends TestCase
         parent::setUp();
     }
 
-    public function testSetAndGetUsername()
+    public function testSetAndGetId() : void
+    {
+        $uuid = Uuid::uuid1();
+        $this->user->setId($uuid);
+        $this->assertEquals($uuid, $this->user->getId());
+    }
+
+    public function testSetAndGetUsername() : void
     {
         $this->user->setUsername('test');
         $this->assertEquals('test', $this->user->getUsername());
     }
 
-    public function testSetAndGetPassword()
+    public function testSetAndGetPassword() : void
     {
         $this->user->setPassword('test');
         $this->assertEquals('test', $this->user->getPassword());
     }
 
-    public function testSetAndGetPlainPassword()
+    public function testSetAndGetPlainPassword() : void
     {
         $this->user->setPlainPassword('test');
         $this->assertEquals('test', $this->user->getPlainPassword());
     }
 
-    public function testSetAndGetEmail()
+    public function testSetAndGetEmail() : void
     {
         $this->user->setEmail('test');
         $this->assertEquals('test', $this->user->getEmail());
     }
 
-    public function testSetAndGetDisplayName()
+    public function testSetAndGetDisplayName() : void
     {
-        $this->user->setDisplayName('test');
-        $this->assertEquals('test', $this->user->getDisplayName());
+        $this->user->setDisplayName('test user');
+        $this->assertEquals('test user', $this->user->getDisplayName());
     }
 
-    public function testSetAndGetAvatar()
+    public function testSetAndGetInitials() : void
+    {
+        $this->user->setDisplayName('test');
+        $this->assertEquals('T', $this->user->getInitials());
+        $this->user->setDisplayName('test user');
+        $this->assertEquals('TU', $this->user->getInitials());
+        $this->user->setDisplayName('test user-hyphenated');
+        $this->assertEquals('TU', $this->user->getInitials());
+        $this->user->setDisplayName('forename middle-name surname');
+        $this->assertEquals('FMS', $this->user->getInitials());
+    }
+
+    public function testSetAndGetColor() : void
+    {
+        $this->user->setColor('#069');
+        $this->assertEquals('#069', $this->user->getColor());
+    }
+
+    public function testSetAndGetAvatar() : void
     {
         $image = new Image();
         $this->user->setAvatar($image);
         $this->assertEquals($image, $this->user->getAvatar());
     }
 
-    public function testIsEnabled()
+    public function testIsEnabled() : void
     {
         $this->assertTrue($this->user->isEnabled());
         $this->user->setActive(false);
         $this->assertFalse($this->user->isEnabled());
     }
 
-    public function testHasBeenRemoved()
+    public function testHasBeenRemoved() : void
     {
         $this->assertFalse($this->user->hasBeenRemoved());
         $this->user->setRemoved(true);
         $this->assertTrue($this->user->hasBeenRemoved());
     }
 
-    public function testSetAndGetCreateDate()
+    public function testSetAndGetCreateDate() : void
     {
         $currentDateTime = new \DateTime('now');
         $this->user->setCreateDate($currentDateTime);
         $this->assertEquals($currentDateTime, $this->user->getCreateDate());
     }
 
-    public function testSetAndGetModDate()
+    public function testSetAndGetModDate() : void
     {
         $currentDateTime = new \DateTime('now');
         $this->user->setModDate($currentDateTime);
         $this->assertEquals($currentDateTime, $this->user->getModDate());
     }
 
-    public function testSetAndGetPasswordModDate()
+    public function testSetAndGetPasswordModDate() : void
     {
         $currentDateTime = new \DateTime('now');
         $this->user->setPasswordModDate($currentDateTime);
         $this->assertEquals($currentDateTime, $this->user->getPasswordModDate());
     }
 
-    public function testHasCredentialsExpired()
+    public function testHasCredentialsExpired() : void
     {
         $this->assertFalse($this->user->hasCredentialsExpired());
         $this->user->setPasswordModDate(new \DateTime('-20 days'));
         $this->assertTrue($this->user->hasCredentialsExpired(10));
     }
 
-    public function testValidateEmail()
+    public function testValidateEmail() : void
     {
         $this->user->setEmail('test@test.com');
         $this->assertTrue($this->user->validateEmail());
@@ -112,13 +137,18 @@ class UserTest extends TestCase
         $this->assertFalse($this->user->validateEmail());
     }
 
-    public function testGetRoles()
+    public function testGetRoles() : void
     {
         $this->user->setRoles([ 'ROLE_ADMIN', 'ROLE_USER' ]);
         $this->assertEquals([ 'ROLE_ADMIN', 'ROLE_USER' ], $this->user->getRoles());
     }
 
-    public function testEraseCredentials()
+    public function testGetUserIdentifier() : void
+    {
+        $this->assertEquals($this->user->getUsername(), $this->user->getUserIdentifier());
+    }
+
+    public function testEraseCredentials() : void
     {
         $this->user->setPlainPassword('test');
         $this->assertEquals('test', $this->user->getPlainPassword());
@@ -126,12 +156,12 @@ class UserTest extends TestCase
         $this->assertEquals('', $this->user->getPlainPassword());
     }
 
-    public function testErase()
+    public function testErase() : void
     {
         $this->assertNull($this->user->erase());
     }
 
-    public function testSetAndGetTimezone()
+    public function testSetAndGetTimezone() : void
     {
         $this->user->setTimezone('Europe/London');
         $this->assertEquals('Europe/London', $this->user->getTimezone());
