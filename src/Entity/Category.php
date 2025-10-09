@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Object for handling categories on a site.
@@ -15,56 +16,56 @@ use Ramsey\Uuid\Doctrine\UuidGenerator;
 class Category
 {
     /**
-     * @var \Ramsey\Uuid\UuidInterface The unique id of the category
+     * @var UuidInterface The unique id of the category
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected $id;
+    protected UuidInterface $id;
 
     /**
-     * @var string The name of the category
+     * @var string|null The name of the category
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    protected $title;
+    protected ?string $title = '';
 
     /**
-     * @var string Description of the category
+     * @var string|null Description of the category
      */
     #[ORM\Column(type: 'text', nullable: true)]
-    protected $description;
+    protected ?string $description = '';
 
     /**
-     * @var string The UUID of the image, or the image path
+     * @var Image|null The UUID of the image
      */
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    protected $image;
+    protected ?Image $image = null;
 
     /**
-     * @var string The UUID of the image, or the image path
+     * @var Image|null The UUID of the image
      */
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    protected $icon;
+    protected ?Image $icon = null;
 
     /**
      * @var bool Whether this category should be visible
      */
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
-    protected $visible;
+    protected bool $visible = true;
 
     /**
-     * @var Category The parent category, if self is not a top-level category
+     * @var Category|null The parent category, if self is not a top-level category
      */
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Category', inversedBy: 'children')]
-    protected $parent;
+    protected ?Category $parent = null;
 
     /**
-     * @var ArrayCollection|Category[] The array of child categories if applicable
+     * @var ArrayCollection The array of child categories if applicable
      */
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: 'App\Entity\Category')]
     #[ORM\OrderBy(['title' => 'ASC'])]
-    protected $children;
+    protected ArrayCollection $children;
 
     /**
      * Default constructor for {@link Category}.
@@ -76,7 +77,6 @@ class Category
     {
         $this->setTitle($title);
         $this->setDescription($description);
-        $this->setVisible(true);
         $this->children = new ArrayCollection();
     }
 
@@ -93,9 +93,9 @@ class Category
     /**
      * Returns the value of {@link title}.
      *
-     * @return string The title of the {@link Category} - cannot be empty
+     * @return string|null The title of the {@link Category} - cannot be empty
      */
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -113,7 +113,7 @@ class Category
     /**
      * Returns the value of {@link image}.
      *
-     * @return ?string The image for {@link Category}
+     * @return Image|null The image for {@link Category}
      */
     public function getImage(): ?Image
     {
@@ -123,9 +123,9 @@ class Category
     /**
      * Returns the value of {@link icon}.
      *
-     * @return ?string The 'icon' for the {@link Category}
+     * @return Image|null The 'icon' for the {@link Category}
      */
-    public function getIcon(): ?string
+    public function getIcon(): ?Image
     {
         return $this->icon;
     }
@@ -141,7 +141,7 @@ class Category
     /**
      * Returns the value of {@link parent}.
      *
-     * @return Category The parent {@link Category} if applicable
+     * @return Category|null The parent {@link Category} if applicable
      */
     public function getParent(): ?Category
     {
@@ -151,7 +151,7 @@ class Category
     /**
      * Returns all child categories for the current {@link Category}.
      *
-     * @return ArrayCollection|Category[]
+     * @return ArrayCollection
      */
     public function getChildren(): Collection
     {
@@ -161,10 +161,10 @@ class Category
     /**
      * Sets the value of {@link id}.
      *
-     * @param string $value The UUID of the {@link Category}
+     * @param UuidInterface $value The UUID of the {@link Category}
      * @return $this
      */
-    public function setId(string $value): self
+    public function setId(UuidInterface $value): self
     {
         $this->id = $value;
 
@@ -174,10 +174,10 @@ class Category
     /**
      * Sets the value of {@link title}.
      *
-     * @param string $value The title of the {@link Category}
+     * @param string|null $value The title of the {@link Category}
      * @return $this
      */
-    public function setTitle(string $value): self
+    public function setTitle(?string $value): self
     {
         $this->title = $value;
 
@@ -187,7 +187,7 @@ class Category
     /**
      * Sets the value of {@link description}.
      *
-     * @param ?string $value The description of the {@link Category}
+     * @param string|null $value The description of the {@link Category}
      * @return $this
      */
     public function setDescription(?string $value): self
@@ -200,7 +200,7 @@ class Category
     /**
      * Sets the value of {@link image}.
      *
-     * @param ?Image $value The UUID or URL of the image for {@link Category}
+     * @param Image|null $value The UUID or URL of the image for {@link Category}
      * @return $this
      */
     public function setImage(?Image $value): self
@@ -213,10 +213,10 @@ class Category
     /**
      * Sets the value of {@link icon}.
      *
-     * @param ?string $value The UUID or URL of the image for {@link Category}
+     * @param Image|null $value The UUID or URL of the image for {@link Category}
      * @return $this
      */
-    public function setIcon(?string $value): self
+    public function setIcon(?Image $value): self
     {
         $this->icon = $value;
 
@@ -237,7 +237,7 @@ class Category
     /**
      * Sets the value of {@link parent}.
      *
-     * @param ?Category $parent The parent of the current category
+     * @param Category|null $parent The parent of the current category
      * @return $this
      */
     public function setParent(?Category $parent = null): self

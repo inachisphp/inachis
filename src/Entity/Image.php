@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Object for handling images on a site.
@@ -22,13 +23,13 @@ class Image extends AbstractFile
     public const WARNING_FILESIZE = 2048; //kb
 
     /**
-     * @var \Ramsey\Uuid\UuidInterface The unique identifier for the image
+     * @var UuidInterface The unique identifier for the image
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected $id;
+    protected UuidInterface $id;
 
     /**
      * @var int
@@ -43,10 +44,10 @@ class Image extends AbstractFile
     protected int $dimensionY = 0;
 
     /**
-     * @var string
+     * @var string|null
      */
     #[ORM\Column(type: 'string', nullable: true)]
-    protected string $altText;
+    protected ?string $altText = '';
 
     /**
      * Default constructor for {@link Image}.
