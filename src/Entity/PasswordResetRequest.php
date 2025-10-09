@@ -4,6 +4,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PasswordResetRequestRepository;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
+use Ramsey\Uuid\UuidInterface;
 
 #[ORM\Entity(repositoryClass: PasswordResetRequestRepository::class)]
 #[ORM\Table(name: "password_reset_requests")]
@@ -11,13 +12,13 @@ use Ramsey\Uuid\Doctrine\UuidGenerator;
 class PasswordResetRequest
 {
     /**
-     * @var \Ramsey\Uuid\UuidInterface The unique identifier for the {@link User}
+     * @var UuidInterface The unique identifier for the {@link PasswordResetRequest}
      */
     #[ORM\Id]
     #[ORM\Column(type: "uuid", unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: "CUSTOM")]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected \Ramsey\Uuid\UuidInterface $id;
+    protected ?UuidInterface $id = null;
     /**
      * @var User
      */
@@ -48,12 +49,14 @@ class PasswordResetRequest
         $this->used = false;
     }
 
-    public function getId(): \Ramsey\Uuid\UuidInterface
+    public function getId(): ?UuidInterface
     {
         return $this->id;
     }
     public function getUser(): User
-    { return $this->user; }
+    {
+        return $this->user;
+    }
     public function getTokenHash(): string
     {
         return $this->tokenHash;

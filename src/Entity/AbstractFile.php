@@ -2,8 +2,10 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 /**
@@ -13,13 +15,13 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 abstract class AbstractFile
 {
     /**
-     * @var \Ramsey\Uuid\UuidInterface The unique id of the category
+     * @var UuidInterface The unique id of the category
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected $id;
+    protected UuidInterface $id;
     
     /**
      * @var string The title of the {@link Image}
@@ -31,19 +33,19 @@ abstract class AbstractFile
      * @var ?string
      */
     #[ORM\Column(type: 'string', nullable: true)]
-    protected ?string $description;
+    protected ?string $description = '';
 
     /**
      * @var string
      */
-    #[ORM\Column(type: 'string')]
-    protected string $filename;
+    #[ORM\Column(type: 'string', nullable: false)]
+    protected string $filename = '';
 
     /**
      * @var string
      */
-    #[ORM\Column(type: 'string')]
-    protected string $filetype;
+    #[ORM\Column(type: 'string', nullable: false)]
+    protected string $filetype = '';
 
     /**
      * @var int
@@ -58,16 +60,16 @@ abstract class AbstractFile
     protected string $checksum;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     #[ORM\Column(type: 'datetime')]
-    protected \DateTime $createDate;
+    protected DateTime $createDate;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     #[ORM\Column(type: 'datetime')]
-    protected \DateTime $modDate;
+    protected DateTime $modDate;
 
     /**
      * Returns the value of {@link id}.
@@ -82,9 +84,9 @@ abstract class AbstractFile
     /**
      * Returns the value of {@link title}.
      *
-     * @return string The title of the record
+     * @return string|null The title of the record
      */
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -92,7 +94,7 @@ abstract class AbstractFile
     /**
      * Returns the value of {@link description}.
      *
-     * @return ?string The description of the record
+     * @return string|null The description of the record
      */
     public function getDescription(): ?string
     {
@@ -102,9 +104,9 @@ abstract class AbstractFile
     /**
      * Returns the value of {@link filename}.
      *
-     * @return string The filename of the record
+     * @return string|null The filename of the record
      */
-    public function getFilename(): string
+    public function getFilename(): ?string
     {
         return $this->filename;
     }
@@ -112,9 +114,9 @@ abstract class AbstractFile
     /**
      * Returns the value of {@link filetype}.
      *
-     * @return string The filetype of the record
+     * @return string|null The filetype of the record
      */
-    public function getFiletype(): string
+    public function getFiletype(): ?string
     {
         return $this->filetype;
     }
@@ -132,9 +134,9 @@ abstract class AbstractFile
     /**
      * Returns the value of {@link checksum}.
      *
-     * @return string The checksum of the record
+     * @return string|null The checksum of the record
      */
-    public function getChecksum(): string
+    public function getChecksum(): ?string
     {
         return $this->checksum;
     }
@@ -142,9 +144,9 @@ abstract class AbstractFile
     /**
      * Returns the value of {@link createDate}.
      *
-     * @return \DateTime The creation date of the file
+     * @return DateTime The creation date of the file
      */
-    public function getCreateDate(): \DateTime
+    public function getCreateDate(): DateTime
     {
         return $this->createDate;
     }
@@ -152,9 +154,9 @@ abstract class AbstractFile
     /**
      * Returns the value of {@link modDate}.
      *
-     * @return \DateTime The date the file was last modified
+     * @return DateTime The date the file was last modified
      */
-    public function getModDate(): \DateTime
+    public function getModDate(): DateTime
     {
         return $this->modDate;
     }
@@ -162,10 +164,10 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link id}.
      *
-     * @param string $value The id to set
+     * @param UuidInterface $value The id to set
      * @return $this
      */
-    public function setId(string $value): self
+    public function setId(UuidInterface $value): self
     {
         $this->id = $value;
 
@@ -175,10 +177,10 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link title}.
      *
-     * @param string $value The title to set
+     * @param string|null $value The title to set
      * @return $this
      */
-    public function setTitle(string $value): self
+    public function setTitle(?string $value): self
     {
         $this->title = $value;
 
@@ -188,7 +190,7 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link description}.
      *
-     * @param ?string $value The description to set
+     * @param string|null $value The description to set
      * @return $this
      */
     public function setDescription(?string $value): self
@@ -201,10 +203,10 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link filename}.
      *
-     * @param string $value The filename to set
+     * @param string|null $value The filename to set
      * @return $this
      */
-    public function setFilename(string $value): self
+    public function setFilename(?string $value): self
     {
         $this->filename = $value;
 
@@ -250,7 +252,7 @@ abstract class AbstractFile
         if ($value < 0) {
             throw new FileException('File size must be a positive integer');
         }
-        $this->filesize = (int) $value;
+        $this->filesize = $value;
 
         return $this;
     }
@@ -271,10 +273,10 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link createDate}.
      *
-     * @param \DateTime|null $value The date to be set
+     * @param DateTime|null $value The date to be set
      * @return $this
      */
-    public function setCreateDate(\DateTime $value = null): self
+    public function setCreateDate(DateTime $value = null): self
     {
         $this->createDate = $value;
 
@@ -284,10 +286,10 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link modDate}.
      *
-     * @param \DateTime|null $value Specifies the mod date for the {@link Page}
+     * @param DateTime|null $value Specifies the mod date for the {@link Page}
      * @return $this
      */
-    public function setModDate(\DateTime $value = null): self
+    public function setModDate(DateTime $value = null): self
     {
         $this->modDate = $value;
 

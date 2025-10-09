@@ -255,9 +255,9 @@ class Series
     }
 
     /**
-     * @return Collection|null
+     * @return array|null
      */
-    public function getItems(): ?Collection
+    public function getItems(): ?array
     {
         return $this->items;
     }

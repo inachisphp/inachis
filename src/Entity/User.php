@@ -6,6 +6,7 @@ use App\Exception\InvalidTimezoneException;
 use App\Validator\DateValidator;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
+use Ramsey\Uuid\UuidInterface;
 use Random\RandomException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -24,33 +25,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public const NO_PASSWORD_EXPIRY = -1;
 
     /**
-     * @var \Ramsey\Uuid\UuidInterface The unique identifier for the {@link User}
+     * @var UuidInterface The unique identifier for the {@link User}
      */
     #[ORM\Id]
     #[ORM\Column(type: "uuid", unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: "CUSTOM")]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected \Ramsey\Uuid\UuidInterface $id;
+    protected UuidInterface $id;
 
     /**
-     * @var string Username of the user
+     * @var string|null Username of the user
      */
     #[ORM\Column(type: "string", length: 512, nullable: false)]
     #[Assert\NotBlank]
     #[Assert\Type(type: ['alpha', 'digit'])]
-    protected string $username;
+    protected ?string $username;
 
     /**
-     * @var string Username of the user
+     * @var string|null Username of the user
      */
     #[ORM\Column(name: 'usernameCanonical', type: "string", length: 255, unique: true, nullable: false)]
-    protected string $usernameCanonical;
+    protected ?string $usernameCanonical;
 
     /**
-     * @var string Password for the user
+     * @var string|null Password for the user
      */
     #[ORM\Column(type: "string", length: 512, nullable: false)]
-    protected string $password;
+    protected ?string $password;
 
     /**
      * @var string|null Plaintext version of password - used for validation only and is not stored
@@ -64,17 +65,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected ?string $plainPassword;
 
     /**
-     * @var string Email address of the user
+     * @var string|null Email address of the user
      */
     #[ORM\Column(type: "string", length: 512, nullable: false)]
     #[Assert\NotBlank]
-    protected string $email;
+    protected ?string $email;
 
     /**
-     * @var string Email address of the user
+     * @var string|null Email address of the user
      */
     #[ORM\Column(name: 'emailCanonical', type: "string", length: 255, unique: true, nullable: false)]
-    protected string $emailCanonical;
+    protected ?string $emailCanonical;
 
     /**
      * @var string The display name for the user
@@ -82,6 +83,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: "string", length: 512)]
     #[Assert\NotBlank]
     protected string $displayName;
+
+    /**
+     * @var array The roles assigned to this user. Currently, not in use.
+     */
+    protected array $roles;
 
     /**
      * @var ?Image string An image to use for the {@link User}
@@ -171,9 +177,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link username} of the {@link User}.
      *
-     * @return string The username of the user
+     * @return string|null The username of the user
      */
-    public function getUsername(): string
+    public function getUsername(): ?string
     {
         return $this->username;
     }
@@ -181,17 +187,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link password} hash for the {@link User}.
      *
-     * @return string The password hash for the user
+     * @return string|null The password hash for the user
      */
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPlainPassword(): string
+    public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }
@@ -292,7 +298,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @param string $value The value to set
      * @return $this
      */
-    public function setId(string $value): self
+    public function setId(UuidInterface $value): self
     {
         $this->id = $value;
 
@@ -302,10 +308,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the value of {@link username}.
      *
-     * @param string $value The value to set
+     * @param string|null $value The value to set
      * @return $this
      */
-    public function setUsername(string $value): self
+    public function setUsername(?string $value): self
     {
         $this->username = $value;
         $this->usernameCanonical = $value;
@@ -316,10 +322,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the value of {@link password}.
      *
-     * @param string $value The value to set
+     * @param string|null $value The value to set
      * @return $this
      */
-    public function setPassword(string $value): self
+    public function setPassword(?string $value): self
     {
         $this->password = $value;
 
@@ -327,10 +333,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @param string $value New password to use
+     * @param string|null $value New password to use
      * @return $this
      */
-    public function setPlainPassword(string $value): self
+    public function setPlainPassword(?string $value): self
     {
         $this->plainPassword = $value;
         $this->password = null;
@@ -341,10 +347,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the value of {@link email}.
      *
-     * @param string $value The value to set
+     * @param string|null $value The value to set
      * @return $this
      */
-    public function setEmail(string $value): self
+    public function setEmail(?string $value): self
     {
         $this->email = $value;
         $this->emailCanonical = $value;
@@ -355,10 +361,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the value of {@link displayName}.
      *
-     * @param string $value The value to set
+     * @param string|null $value The value to set
      * @return $this
      */
-    public function setDisplayName(string $value): self
+    public function setDisplayName(?string $value): self
     {
         $this->displayName = $value;
 
@@ -368,10 +374,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the value of {@link avatar}.
      *
-     * @param string|null $value The value to set
+     * @param Image|null $value The value to set
      * @return $this
      */
-    public function setAvatar(?string $value): self
+    public function setAvatar(?Image $value): self
     {
         $this->avatar = $value;
 
@@ -446,11 +452,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      * @throws InvalidTimezoneException
      */
-    public function setTimezone(string $value): self
+    public function setTimezone(?string $value): self
     {
         $this->timezone = DateValidator::validateTimezone($value);
 
@@ -463,10 +469,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function erase(): void
     {
-        $this->setUsername('');
-        $this->setPassword('');
-        $this->setEmail('');
-        $this->setAvatar('');
+        $this->setUsername(null);
+        $this->setPassword(null);
+        $this->setEmail(null);
+        $this->setAvatar(null);
         $this->setActive(false);
         $this->setRemoved(true);
     }
@@ -504,41 +510,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             '[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/',
             $this->email
         );
-    }
-
-    /**
-     * @return string
-     */
-    public function serialize(): string
-    {
-        return serialize([
-            $this->id,
-            $this->username,
-            $this->password,
-            // $this->salt,
-            $this->isActive,
-        ]);
-    }
-
-    /**
-     * @param string $serialized
-     */
-    public function unserialize(string $serialized): void
-    {
-        list(
-            $this->id,
-            $this->username,
-            $this->password,
-            // $this->salt,
-            $this->isActive) = unserialize($serialized);
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getSalt(): ?string
-    {
-        return null;
     }
 
     /**
