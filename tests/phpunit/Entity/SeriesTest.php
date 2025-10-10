@@ -68,10 +68,10 @@ class SeriesTest extends TestCase
 
     public function testGetAndSetItems() : void
     {
-        $collection = new ArrayCollection();
-        $collection->add('test1');
-        $collection->add('test2');
-        $this->series->setItems($collection);
+        $this->series->setItems(new ArrayCollection([
+            'test1',
+            'test2',
+        ]));
         $this->assertCount(2, $this->series->getItems());
         $this->series->addItem(new Page('test'));
         $this->assertCount(3, $this->series->getItems());

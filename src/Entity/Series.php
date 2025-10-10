@@ -258,11 +258,11 @@ class Series
     }
 
     /**
-     * @param Collection $items
+     * @param Collection|null $items
      *
      * @return Series
      */
-    public function setItems(Collection $items): self
+    public function setItems(?Collection $items): self
     {
         $this->items = $items;
         return $this;
@@ -274,7 +274,7 @@ class Series
      */
     public function addItem(Page $item): self
     {
-        $this->items[] = $item;
+        $this->items->add($item);
         return $this;
     }
 

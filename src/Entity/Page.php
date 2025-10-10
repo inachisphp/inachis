@@ -460,7 +460,7 @@ class Page
     /**
      * @return Collection|null
      */
-    public function getSeries()
+    public function getSeries(): ?Collection
     {
         return $this->series;
     }
@@ -701,10 +701,10 @@ class Page
     }
 
     /**
-     * @param Collection $series
+     * @param Collection|null $series
      * @return Page
      */
-    public function setSeries(Collection $series): self
+    public function setSeries(?Collection $series): self
     {
         $this->series = $series;
         return $this;

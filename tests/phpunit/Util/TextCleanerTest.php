@@ -1,0 +1,66 @@
+<?php
+
+namespace App\Tests\phpunit\Util;
+
+use App\Util\TextCleaner;
+use PHPUnit\Framework\TestCase;
+
+class TextCleanerTest extends TestCase
+{
+    protected TextCleaner $cleaner;
+
+    protected string $example = '';
+
+    public function setUp(): void
+    {
+        $this->cleaner = new TextCleaner();
+        $this->example = <<<MD
+<p><a href="" title="don't keep this">example</a> of <strong>HTML</strong></p>
+Which *mistakenly* an > ![image](https://www.example.com/image.jpg) and [link](https://www.example.com)
+
+> A blockquote here
+> second line
+
+```
+code block
+```
+
+some `inline code`
+
+- this
+- is
+
+* a 
+* list
+
+__more__ text
+MD;
+
+        parent::setUp();
+    }
+
+    public function testStripDefault(): void
+    {
+        $result = $this->cleaner->strip($this->example);
+dump($result);
+        $this->assertEquals(<<<MD
+example of HTML
+Which mistakenly an > image and link
+
+A blockquote here
+second line
+
+code block
+
+some inline code
+
+this
+is
+
+a 
+list
+
+more text
+MD, $result);
+    }
+}
