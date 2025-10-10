@@ -6,6 +6,7 @@ use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Series;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -67,10 +68,10 @@ class SeriesTest extends TestCase
 
     public function testGetAndSetItems() : void
     {
-        $this->series->setItems([
-            'test1',
-            'test2',
-        ]);
+        $collection = new ArrayCollection();
+        $collection->add('test1');
+        $collection->add('test2');
+        $this->series->setItems($collection);
         $this->assertCount(2, $this->series->getItems());
         $this->series->addItem(new Page('test'));
         $this->assertCount(3, $this->series->getItems());

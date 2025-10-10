@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -35,22 +36,22 @@ class Series
     protected ?UuidInterface $id = null;
 
     /**
-     * @var string
+     * @var string|null
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    protected string $title;
+    protected ?string $title = '';
 
     /**
-     * @var string
+     * @var string|null
      */
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     protected ?string $subTitle = '';
 
     /**
-     * @var string
+     * @var string|null
      */
     #[ORM\Column(type: 'string', length: 255, unique: true, nullable: false)]
-    protected string $url;
+    protected ?string $url = '';
 
     /**
      * @var string|null
@@ -59,46 +60,46 @@ class Series
     protected ?string $description = '';
 
     /**
-     * @var \DateTime|null
+     * @var DateTime|null
      */
     #[ORM\Column(type: 'datetime', nullable: true)]
-    protected ?\DateTime $firstDate;
+    protected ?DateTime $firstDate;
 
     /**
-     * @var \DateTime|null
+     * @var DateTime|null
      */
     #[ORM\Column(type: 'datetime', nullable: true)]
-    protected ?\DateTime $lastDate;
+    protected ?DateTime $lastDate;
 
     /**
-     * @var Collection|Page[] The array of pages in the series
+     * @var Collection|null The array of pages in the series
      */
     #[ORM\ManyToMany(targetEntity: 'App\Entity\Page', inversedBy: 'series', fetch: 'EAGER')]
     #[ORM\JoinTable(name: 'Series_pages')]
     #[ORM\JoinColumn(name: 'series_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\OrderBy(['postDate' => 'ASC'])]
-    protected $items = [];
+    protected ?Collection $items;
 
     /**
      * @var Image|null
      */
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Image', cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'image_id', referencedColumnName: 'id')]
-    protected ?Image $image;
+    protected ?Image $image = null;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     #[ORM\Column(type: 'datetime')]
-    protected \DateTime $createDate;
+    protected DateTime $createDate;
 
 
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     #[ORM\Column(type: 'datetime')]
-    protected \DateTime $modDate;
+    protected DateTime $modDate;
 
     /**
      * @var bool Determining if a {@link Series} is visible to the public
@@ -112,7 +113,7 @@ class Series
     public function __construct()
     {
         $this->image = null;
-        $this->setVisibility(self::VIS_PRIVATE);
+        $this->setVisibility();
         $this->items = new ArrayCollection();
 
         $currentTime = new \DateTime('now');
@@ -129,13 +130,12 @@ class Series
     }
 
     /**
-     * @param UuidInterface $id
-     * @return $this
+     * @param UuidInterface|null $id
+     * @return Series
      */
-    public function setId(UuidInterface $id): self
+    public function setId(?UuidInterface $id): self
     {
         $this->id = $id;
-
         return $this;
     }
 
@@ -148,13 +148,12 @@ class Series
     }
 
     /**
-     * @param string $title
-     * @return $this
+     * @param string|null $title
+     * @return Series
      */
-    public function setTitle(string $title): self
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -168,12 +167,11 @@ class Series
 
     /**
      * @param string|null $subTitle
-     * @return $this
+     * @return Series
      */
     public function setSubTitle(?string $subTitle = ''): self
     {
         $this->subTitle = $subTitle;
-
         return $this;
     }
 
@@ -187,12 +185,11 @@ class Series
 
     /**
      * @param string|null $url
-     * @return $this
+     * @return Series
      */
     public function setUrl(?string $url): self
     {
         $this->url = $url;
-
         return $this;
     }
 
@@ -206,7 +203,7 @@ class Series
 
     /**
      * @param string|null $description
-     * @return $this
+     * @return Series
      */
     public function setDescription(?string $description): self
     {
@@ -216,73 +213,68 @@ class Series
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime|null
      */
-    public function getFirstDate(): ?\DateTime
+    public function getFirstDate(): ?DateTime
     {
         return $this->firstDate;
     }
 
     /**
-     * @param \DateTime|null $firstDate
-     * @return $this
+     * @param DateTime|null $firstDate
+     * @return Series
      */
-    public function setFirstDate(\DateTime $firstDate = null): self
+    public function setFirstDate(DateTime $firstDate = null): self
     {
         $this->firstDate = $firstDate;
-
         return $this;
     }
 
     /**
-     * @return \DateTime|null
+     * @return DateTime|null
      */
-    public function getLastDate(): ?\DateTime
+    public function getLastDate(): ?DateTime
     {
         return $this->lastDate;
     }
 
     /**
-     * @param \DateTime|null $lastDate
+     * @param DateTime|null $lastDate
      *
-     * @return $this
+     * @return Series
      */
-    public function setLastDate(\DateTime $lastDate = null): self
+    public function setLastDate(DateTime $lastDate = null): self
     {
         $this->lastDate = $lastDate;
-
         return $this;
     }
 
     /**
-     * @return array|null
+     * @return Collection|null
      */
-    public function getItems(): ?array
+    public function getItems(): ?Collection
     {
         return $this->items;
     }
 
     /**
-     * @param array $items
+     * @param Collection $items
      *
-     * @return $this
+     * @return Series
      */
-    public function setItems(array $items): self
+    public function setItems(Collection $items): self
     {
         $this->items = $items;
-
         return $this;
     }
 
     /**
      * @param Page $item
-     *
-     * @return $this
+     * @return Series
      */
     public function addItem(Page $item): self
     {
         $this->items[] = $item;
-
         return $this;
     }
 
@@ -296,29 +288,27 @@ class Series
 
     /**
      * @param Image|null $image
-     * @return $this
+     * @return Series
      */
     public function setImage(?Image $image = null): self
     {
         $this->image = $image;
-
         return $this;
     }
 
     /**
-     * @return \DateTime|null
+     * @return DateTime|null
      */
-    public function getCreateDate(): ?\DateTime
+    public function getCreateDate(): ?DateTime
     {
         return $this->createDate;
     }
 
     /**
-     * @param \DateTime $createDate
-     *
-     * @return $this
+     * @param DateTime $createDate
+     * @return Series
      */
-    public function setCreateDate(\DateTime $createDate): self
+    public function setCreateDate(DateTime $createDate): self
     {
         $this->createDate = $createDate;
 
@@ -326,22 +316,20 @@ class Series
     }
 
     /**
-     * @return \DateTime|null
+     * @return DateTime|null
      */
-    public function getModDate(): ?\DateTime
+    public function getModDate(): ?DateTime
     {
         return $this->modDate;
     }
 
     /**
      * @param mixed $modDate
-     *
-     * @return $this
+     * @return Series
      */
-    public function setModDate(\DateTime $modDate): self
+    public function setModDate(DateTime $modDate): self
     {
         $this->modDate = $modDate;
-
         return $this;
     }
 
@@ -355,7 +343,7 @@ class Series
 
     /**
      * @param bool $visibility
-     * @return $this
+     * @return Series
      */
     public function setVisibility(bool $visibility = self::VIS_PRIVATE): self
     {
