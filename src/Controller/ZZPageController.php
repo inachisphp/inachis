@@ -38,12 +38,12 @@ class ZZPageController extends AbstractInachisController
      */
     #[Route(
         "/{year}/{month}/{day}/{title}",
-        methods: ["GET" ],
         requirements: [
             "year" => "\d+",
             "month" => "\d+",
             "day" => "\d+"
-        ]
+        ],
+        methods: ["GET" ]
     )]
     public function getPost(Request $request, $year, $month, $day, $title): Response
     {

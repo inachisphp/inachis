@@ -127,7 +127,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
     /**
      * @return int
      */
-    public function getMaxItemsToShow()
+    public function getMaxItemsToShow(): int
     {
         // @todo check if an alternative is set in yaml config
         return defined('static::MAX_ITEMS_TO_SHOW_ADMIN') ? (int) static::MAX_ITEMS_TO_SHOW_ADMIN : 10;

@@ -11,6 +11,7 @@ use App\Entity\Url;
 use App\Entity\User;
 use App\Exception\InvalidTimezoneException;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -259,7 +260,9 @@ class PageTest extends TestCase
     {
         $this->assertEmpty($this->page->getSeries());
         $series = new Series();
-        $this->page->setSeries([$series]);
+        $collection = new ArrayCollection();
+        $collection->add($series);
+        $this->page->setSeries($collection);
         $this->assertTrue($this->page->getSeries()->contains($series));
     }
 }

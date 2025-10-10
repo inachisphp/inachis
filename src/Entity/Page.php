@@ -51,13 +51,13 @@ class Page
     const TYPE_POST = 'post';
 
     /**
-     * @var UuidInterface
+     * @var UuidInterface|null
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected UuidInterface $id;
+    protected ?UuidInterface $id = null;
 
     /**
      * @var string|null The title of the {@link Page}
@@ -165,37 +165,37 @@ class Page
     protected ?string $sharingMessage;
 
     /**
-     * @var ArrayCollection|array The array of URLs for the content
+     * @var ArrayCollection|null The array of URLs for the content
      */
     #[ORM\OneToMany(mappedBy: 'content', targetEntity: 'App\Entity\Url', cascade: [ 'persist' ])]
     #[ORM\OrderBy(['default' => 'DESC'])]
-    protected array|ArrayCollection $urls;
+    protected ?ArrayCollection $urls;
 
     /**
-     * @var ArrayCollection|array The array of categories assigned to the post/page
+     * @var ArrayCollection|null The array of categories assigned to the post/page
      */
     #[ORM\ManyToMany(targetEntity: 'App\Entity\Category')]
     #[ORM\JoinTable(name: 'Page_categories')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'category_id', referencedColumnName: 'id')]
     #[ORM\OrderBy([ 'title' => 'ASC' ])]
-    protected array|ArrayCollection $categories;
+    protected ?ArrayCollection $categories;
 
     /**
-     * @var ArrayCollection|array The array of tags assigned to the post/page
+     * @var ArrayCollection|null The array of tags assigned to the post/page
      */
     #[ORM\ManyToMany(targetEntity: 'App\Entity\Tag', cascade: [ 'persist' ])]
     #[ORM\JoinTable(name: 'Page_tags')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'tag_id', referencedColumnName: 'id')]
     #[ORM\OrderBy([ 'title' => 'ASC' ])]
-    protected array|ArrayCollection $tags;
+    protected ?ArrayCollection $tags;
 
     /**
-     * @var array|Collection  The array of Series that contains this page
+     * @var ArrayCollection|null  The array of Series that contains this page
      */
     #[ORM\ManyToMany(targetEntity: 'App\Entity\Series', inversedBy: 'items')]
-    protected array|Collection $series;
+    protected ?ArrayCollection $series;
 
     /**
      * @var string|null The two character language code this content uses, empty means unknown
@@ -458,9 +458,9 @@ class Page
     }
 
     /**
-     * @return Collection|null
+     * @return ArrayCollection|null
      */
-    public function getSeries(): ?Collection
+    public function getSeries(): ?ArrayCollection
     {
         return $this->series;
     }
@@ -701,10 +701,10 @@ class Page
     }
 
     /**
-     * @param array $series
+     * @param ArrayCollection|null $series
      * @return Page
      */
-    public function setSeries(array $series): self
+    public function setSeries(?ArrayCollection $series): self
     {
         $this->series = $series;
         return $this;
