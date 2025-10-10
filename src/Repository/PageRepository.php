@@ -10,7 +10,7 @@ use App\Entity\Url;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
-final class PageRepository extends AbstractRepository
+final class PageRepository extends AbstractRepository implements PageRepositoryInterface
 {
     /**
      * The maximum number of items to show in the admin interface
@@ -138,7 +138,7 @@ final class PageRepository extends AbstractRepository
      * @param string $sort
      * @return Paginator
      */
-    public function getFilteredOfTypeByPostDate($filters, string $type, int $offset, int $limit, string $sort = 'postDate desc')
+    public function getFilteredOfTypeByPostDate($filters, string $type, int $offset, int $limit, string $sort = 'postDate desc'): Paginator
     {
         $where = [
             'q.type = :type',
