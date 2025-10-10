@@ -71,14 +71,14 @@ class Series
     protected ?\DateTime $lastDate;
 
     /**
-     * @var Collection|Page[] The array of pages in the series
+     * @var Collection|null The array of pages in the series
      */
     #[ORM\ManyToMany(targetEntity: 'App\Entity\Page', inversedBy: 'series', fetch: 'EAGER')]
     #[ORM\JoinTable(name: 'Series_pages')]
     #[ORM\JoinColumn(name: 'series_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\OrderBy(['postDate' => 'ASC'])]
-    protected $items = [];
+    protected ?Collection $items;
 
     /**
      * @var Image|null
@@ -255,19 +255,19 @@ class Series
     }
 
     /**
-     * @return array|null
+     * @return Collection|null
      */
-    public function getItems(): ?array
+    public function getItems(): ?Collection
     {
         return $this->items;
     }
 
     /**
-     * @param array $items
+     * @param Collection|null $items
      *
      * @return $this
      */
-    public function setItems(array $items): self
+    public function setItems(?Collection $items): self
     {
         $this->items = $items;
 
@@ -281,7 +281,7 @@ class Series
      */
     public function addItem(Page $item): self
     {
-        $this->items[] = $item;
+        $this->items->add($item);
 
         return $this;
     }
