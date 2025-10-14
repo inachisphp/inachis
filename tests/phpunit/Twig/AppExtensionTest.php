@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class AppExtensionTest extends TestCase
 {
-    protected $appExtension;
+    protected AppExtension $appExtension;
 
     public function setUp() : void
     {
@@ -28,5 +28,14 @@ class AppExtensionTest extends TestCase
     {
         $this->assertEquals('menu__active', $this->appExtension->activeMenuFilter('test', 'test'));
         $this->assertEmpty('', $this->appExtension->activeMenuFilter('test', 'test23'));
+    }
+
+    public function testBytesToMinimumUnit() : void
+    {
+        $this->assertEquals('10.00 B', $this->appExtension->bytesToMinimumUnit(10));
+        $this->assertEquals('10 B', $this->appExtension->bytesToMinimumUnit(10,true));
+        $this->assertEquals('1.00 KiB', $this->appExtension->bytesToMinimumUnit(1024));
+        $this->assertEquals('3.81 MiB', $this->appExtension->bytesToMinimumUnit(4000000));
+        $this->assertEquals('-100.00 B', $this->appExtension->bytesToMinimumUnit(-100));
     }
 }

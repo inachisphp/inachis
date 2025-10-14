@@ -8,5 +8,5 @@ use Symfony\Component\Validator\Constraint;
  */
 class ValidIPAddress extends Constraint
 {
-    public $message = '"{{ string }}" is not a valid IPv4 or IPv6 address';
+    public string $message = '"{{ string }}" is not a valid IPv4 or IPv6 address';
 }

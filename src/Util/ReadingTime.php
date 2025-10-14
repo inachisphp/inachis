@@ -23,8 +23,8 @@ class ReadingTime
      */
     public static function getWordCount(?string $text): int
     {
-        // @todo: consider removing markdown from string also
-        return str_word_count(strip_tags((string) $text));
+        $text = TextCleaner::strip($text, TextCleaner::REMOVE_IMAGE_ALT|TextCleaner::NORMALISE_WHITESPACE);
+        return str_word_count($text);
     }
 
     /**

@@ -9,12 +9,12 @@ class UrlNormaliser
     /**
      * Turns a given string into an SEO-friendly URL
      * @param string $title The string to turn into an SEO friendly short URL
-     * @param int|null    $limit The maximum number of characters to allow;
+     * @param int $limit The maximum number of characters to allow;
      *                   the default is defined by URL::DEFAULT_URL_SIZE_LIMIT
      *                   is defined by URL::DEFAULT_URL_SIZE_LIMIT
      * @return string The generated SEO-friendly URL
      */
-    public static function toUri(string $title, ?int $limit = Url::DEFAULT_URL_SIZE_LIMIT): string
+    public static function toUri(string $title, int $limit = Url::DEFAULT_URL_SIZE_LIMIT): string
     {
         $title = trim(
             preg_replace(
@@ -46,7 +46,7 @@ class UrlNormaliser
     public static function fromUri(string $uri) : string
     {
         $uri = parse_url($uri, PHP_URL_PATH);
-        if (substr($uri, -1) == '/') {
+        if (str_ends_with($uri, '/')) {
             $uri = substr($uri, 0, -1);
         }
         $uri = explode('/', $uri);

@@ -42,7 +42,6 @@ MD;
     public function testStripDefault(): void
     {
         $result = $this->cleaner->strip($this->example);
-dump($result);
         $this->assertEquals(<<<MD
 example of HTML
 Which mistakenly an > image and link
@@ -60,6 +59,89 @@ is
 a 
 list
 
+more text
+MD, $result);
+    }
+
+    public function testStripRemoveBlockquote(): void
+    {
+        $result = $this->cleaner->strip($this->example, TextCleaner::REMOVE_BLOCKQUOTE_CONTENT);
+        $this->assertEquals(<<<MD
+example of HTML
+Which mistakenly an > image and link
+
+
+code block
+
+some inline code
+
+this
+is
+
+a 
+list
+
+more text
+MD, $result);
+    }
+
+    public function testStripImageAlt(): void
+    {
+        $result = $this->cleaner->strip($this->example, TextCleaner::REMOVE_IMAGE_ALT);
+        $this->assertEquals(<<<MD
+example of HTML
+Which mistakenly an >  and link
+
+A blockquote here
+second line
+
+code block
+
+some inline code
+
+this
+is
+
+a 
+list
+
+more text
+MD, $result);
+    }
+
+    public function testStripNormaliseWhitespace(): void
+    {
+        $result = $this->cleaner->strip($this->example, TextCleaner::NORMALISE_WHITESPACE);
+        $this->assertEquals(<<<MD
+example of HTML
+Which mistakenly an > image and link
+A blockquote here
+second line
+code block
+some inline code
+this
+is
+a 
+list
+more text
+MD, $result);
+    }
+
+    public function testStripAll(): void
+    {
+        $result = $this->cleaner->strip(
+            $this->example,
+            TextCleaner::NORMALISE_WHITESPACE|TextCleaner::REMOVE_IMAGE_ALT|TextCleaner::REMOVE_BLOCKQUOTE_CONTENT
+        );
+        $this->assertEquals(<<<MD
+example of HTML
+Which mistakenly an > and link
+code block
+some inline code
+this
+is
+a 
+list
 more text
 MD, $result);
     }

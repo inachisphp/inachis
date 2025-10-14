@@ -7,6 +7,7 @@ use App\Entity\User;
 use DateTime;
 use Exception;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 
 class RevisionTest extends TestCase
 {
@@ -20,8 +21,9 @@ class RevisionTest extends TestCase
 
     public function testGetAndSetId() : void
     {
-        $this->revision->setId('test');
-        $this->assertEquals('test', $this->revision->getId());
+        $uuid = Uuid::uuid1();
+        $this->revision->setId($uuid);
+        $this->assertEquals($uuid, $this->revision->getId());
     }
 
     public function testGetAndSetPageId() : void
