@@ -9,7 +9,7 @@ class ContentRevisionCompare
      * @param $revision
      * @return bool
      */
-    public function doesPageMatchRevision($page, $revision): bool
+    public static function doesPageMatchRevision($page, $revision): bool
     {
         return
             $revision->getContent() === $page->getContent() &&
