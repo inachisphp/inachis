@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\EventListener;
 
 use App\Security\ContentSecurityPolicy;
@@ -33,7 +40,7 @@ final class AdminResponseEvent implements EventSubscriberInterface
     /**
      * @param ResponseEvent $event
      */
-    public function onKernelRequest(RequestEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         // Redirect to /setup if no admins
         // Redirect if not signed in

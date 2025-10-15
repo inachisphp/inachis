@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Controller;
 
 use App\Entity\Page;
@@ -13,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use DateTimeInterface;
 
 class ImportController extends AbstractInachisController
 {
@@ -89,7 +97,7 @@ class ImportController extends AbstractInachisController
                 $post->setSubTitle($object->subTitle ?? '');
                 $post->setPostDate(
                     date_create_from_format(
-                        \DateTimeInterface::ISO8601,
+                        DateTimeInterface::ISO8601,
                         $object->postDate
                     ) ?? time()
                 );
@@ -100,9 +108,11 @@ class ImportController extends AbstractInachisController
                         $post->getTitle() .
                         ($post->getSubTitle() !== '' ? ' ' . $post->getSubTitle() : '')
                     );
-                if (!empty(
-                    $this->entityManager->getRepository(Url::class)->findOneByLink($newLink)
-                )) {
+                if (
+                    !empty(
+                        $this->entityManager->getRepository(Url::class)->findOneByLink($newLink)
+                    )
+                ) {
                     // @todo should it prompt to rename?
                     return $this->json('error', 409);
                 }

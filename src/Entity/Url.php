@@ -1,15 +1,25 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Object for handling custom URLs that are mapped to content.
  */
 #[ORM\Entity(repositoryClass: 'App\Repository\UrlRepository', readOnly: false)]
-#[ORM\Index(name: 'search_idx', columns: [ 'linkCanonical' ])]
+#[ORM\Index(columns: [ 'linkCanonical' ], name: 'search_idx')]
 class Url
 {
     /**
@@ -18,50 +28,50 @@ class Url
     const DEFAULT_URL_SIZE_LIMIT = 255;
 
     /**
-     * @var \Ramsey\Uuid\UuidInterface The unique identifier for the Url
+     * @var UuidInterface|null The unique identifier for the Url
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected $id;
+    protected ?UuidInterface $id = null;
 
     /**
-     * @var int The UUID of the content of the type specified by @see
+     * @var Page The UUID of the content of the type specified by @see
      */
-    #[ORM\ManyToOne(targetEntity: 'App\Entity\Page', inversedBy: 'urls', fetch: 'EAGER')]
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Page', fetch: 'EAGER', inversedBy: 'urls')]
     #[ORM\JoinColumn(name: 'content_id', referencedColumnName: 'id')]
-    protected $content;
+    protected Page $content;
 
     /**
      * @var string The SEO-friendly short link
      */
     #[ORM\Column(type: 'string', length: 512)]
-    protected $link;
+    protected string $link;
 
     /**
      * @var string The canonical hash for the link
      */
-    #[ORM\Column(type: 'string', length: 255, name: 'linkCanonical', unique: true)]
-    protected $linkCanonical;
+    #[ORM\Column(name: 'linkCanonical', type: 'string', length: 255, unique: true)]
+    protected string $linkCanonical;
 
     /**
      * @var bool Flag specifying if the URL is the canonical one to use
      */
-    #[ORM\Column(type: 'boolean', name: 'defaultLink')]
-    protected $default;
+    #[ORM\Column(name: 'defaultLink', type: 'boolean')]
+    protected bool $default;
 
     /**
-     * @var string The date the Url was added
+     * @var DateTime The date the Url was added
      */
     #[ORM\Column(type: 'datetime', nullable: false)]
-    protected $createDate;
+    protected DateTime $createDate;
 
     /**
-     * @var string The date the Url was last modified
+     * @var DateTime The date the Url was last modified
      */
     #[ORM\Column(type: 'datetime', nullable: false)]
-    protected $modDate;
+    protected DateTime $modDate;
 
     /**
      * Default constructor for entity - by default the
@@ -69,17 +79,17 @@ class Url
      * {@link Url::setDefault}.
      *
      * @param Page   $content The {@link Page} object the link is for
-     * @param string $link    The short link for the content
-     * @param bool   $default
-     * @throws \Exception
+     * @param string|null $link The short link for the content
+     * @param bool $default
+     * @throws Exception
      */
     public function __construct(Page $content, ?string $link = '', ?bool $default = true)
     {
         $this->setContent($content);
         $this->setLink($link);
         $this->setDefault((bool) $default);
-        $this->setCreateDate(new \DateTime('now'));
-        $this->setModDate(new \DateTime('now'));
+        $this->setCreateDate(new DateTime('now'));
+        $this->setModDate(new DateTime('now'));
         $this->associateContent();
     }
 
@@ -110,7 +120,7 @@ class Url
     }
 
     /**
-     * @return string
+     * @return Page
      */
     public function getContent(): Page
     {
@@ -126,26 +136,26 @@ class Url
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime
      */
-    public function getCreateDate(): \DateTime
+    public function getCreateDate(): DateTime
     {
         return $this->createDate;
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime
      */
-    public function getModDate(): \DateTime
+    public function getModDate(): DateTime
     {
         return $this->modDate;
     }
 
     /**
-     * @param string $value
+     * @param UuidInterface $value
      * @return $this
      */
-    public function setId(string $value): self
+    public function setId(UuidInterface $value): self
     {
         $this->id = $value;
         return $this;
@@ -183,20 +193,20 @@ class Url
     }
 
     /**
-     * @param \DateTime $value
+     * @param DateTime $value
      * @return $this
      */
-    public function setCreateDate(\DateTime $value): self
+    public function setCreateDate(DateTime $value): self
     {
         $this->createDate = $value;
         return $this;
     }
 
     /**
-     * @param \DateTime $value
+     * @param DateTime $value
      * @return $this
      */
-    public function setModDate(\DateTime $value): self
+    public function setModDate(DateTime $value): self
     {
         $this->modDate = $value;
         return $this;
@@ -207,7 +217,7 @@ class Url
      */
     public function setModDateToNow(): self
     {
-        $this->setModDate(new \DateTime('now'));
+        $this->setModDate(new DateTime('now'));
         return $this;
     }
 

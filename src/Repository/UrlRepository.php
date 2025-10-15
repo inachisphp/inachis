@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Repository;
 
 use App\Entity\Page;
@@ -29,7 +36,7 @@ class UrlRepository extends AbstractRepository
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function remove(Url $url)
+    public function remove(Url $url): void
     {
         $this->getEntityManager()->remove($url);
         $this->getEntityManager()->flush();
@@ -40,7 +47,7 @@ class UrlRepository extends AbstractRepository
      *
      * @return mixed
      */
-    public function getDefaultUrl(Page $page)
+    public function getDefaultUrl(Page $page): mixed
     {
         return $this->findOneBy(
             [

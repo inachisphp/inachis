@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -31,7 +38,7 @@ class ArrayCollectionToArrayTransformer implements DataTransformerInterface
      *
      * @return array
      */
-    public function transform($value): array
+    public function transform(mixed $value): array
     {
         return !empty($value) ? $value->toArray() : [];
     }
@@ -41,7 +48,7 @@ class ArrayCollectionToArrayTransformer implements DataTransformerInterface
      *
      * @return ArrayCollection
      */
-    public function reverseTransform($value): ArrayCollection
+    public function reverseTransform(mixed $value): ArrayCollection
     {
         return new ArrayCollection($value);
     }

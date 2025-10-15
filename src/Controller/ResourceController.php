@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Controller;
 
 use App\Entity\Image;
@@ -17,7 +24,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
-
 
 class ResourceController extends AbstractInachisController
 {
@@ -89,8 +95,8 @@ class ResourceController extends AbstractInachisController
     public function editResource(
         Request $request,
         Filesystem $filesystem,
-        #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory): Response
-    {
+        #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory
+    ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 //            "filename" => "[a-zA-Z0-9\-\_]\.(jpe?g|heic|png)",
         $typeClass = match ($request->request?->get('type')) {
@@ -195,7 +201,7 @@ class ResourceController extends AbstractInachisController
         dump($uploadedFile);
         $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
         $safeFilename = $slugger->slug($originalFilename);
-        $newFilename = $safeFilename.'-'.uniqid().'.'.$uploadedFile->guessExtension();
+        $newFilename = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
 
         $image = new Image();
         $image

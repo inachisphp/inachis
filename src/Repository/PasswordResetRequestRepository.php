@@ -1,4 +1,12 @@
 <?php
+
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -7,6 +15,8 @@ use App\Entity\User;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
+use DateTimeImmutable;
+use DateInterval;
 
 class PasswordResetRequestRepository extends ServiceEntityRepository
 {
@@ -21,7 +31,7 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
             ->andWhere('r.user = :user')
             ->andWhere('r.used = false')
             ->andWhere('r.expiresAt > :now')
-            ->setParameters(['user' => $user, 'now' => new \DateTimeImmutable()])
+            ->setParameters(['user' => $user, 'now' => new DateTimeImmutable()])
             ->getQuery()
             ->getResult();
     }
@@ -36,7 +46,7 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
             ->andWhere('r.used = false')
             ->andWhere('r.expiresAt > :now')
             ->setParameter('user', $user)
-            ->setParameter('now', new \DateTimeImmutable())
+            ->setParameter('now', new DateTimeImmutable())
             ->orderBy('r.createdAt', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
@@ -50,7 +60,7 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
             ->andWhere('r.used = false')
             ->andWhere('r.expiresAt > :now')
             ->setParameter('hash', $hash)
-            ->setParameter('now', new \DateTimeImmutable())
+            ->setParameter('now', new DateTimeImmutable())
             ->orderBy('r.createdAt', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
@@ -62,7 +72,7 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('r')
             ->delete()
             ->andWhere('r.expiresAt < :now')
-            ->setParameter('now', (new \DateTimeImmutable())->sub(new \DateInterval('PT1H')))
+            ->setParameter('now', (new DateTimeImmutable())->sub(new DateInterval('PT1H')))
             ->getQuery()
             ->execute();
     }

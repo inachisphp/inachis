@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Entity;
 
 use DateTime;
@@ -22,13 +29,13 @@ abstract class AbstractFile
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected UuidInterface $id;
-    
+
     /**
      * @var string The title of the {@link Image}
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
     protected string $title;
-    
+
     /**
      * @var ?string
      */

@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ * 
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Tests\phpunit\Entity;
 
 use App\Entity\Image;
@@ -12,48 +19,48 @@ class ImageTest extends TestCase
 {
     protected ?Image $image;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->image = new Image();
         parent::setUp();
     }
 
-    public function testGetAndSetId() : void
+    public function testGetAndSetId(): void
     {
         $uuid = Uuid::uuid1();
         $this->image->setId($uuid);
         $this->assertEquals($uuid, $this->image->getId());
     }
 
-    public function testGetAndSetTitle() : void
+    public function testGetAndSetTitle(): void
     {
         $this->image->setTitle('test');
         $this->assertEquals('test', $this->image->getTitle());
     }
 
-    public function testGetAndSetDescription() : void
+    public function testGetAndSetDescription(): void
     {
         $this->image->setDescription('test');
         $this->assertEquals('test', $this->image->getDescription());
     }
 
-    public function testGetAndSetFilename() : void
+    public function testGetAndSetFilename(): void
     {
         $this->image->setFilename('test');
         $this->assertEquals('test', $this->image->getFilename());
     }
 
-    public function testInvalidFiletype() : void
+    public function testInvalidFiletype(): void
     {
         $this->assertFalse($this->image->isValidFiletype('test'));
     }
 
-    public function testValidFiletype() : void
+    public function testValidFiletype(): void
     {
         $this->assertTrue($this->image->isValidFiletype('image/jpeg'));
     }
 
-    public function testGetAndSetFiletype() : void
+    public function testGetAndSetFiletype(): void
     {
         $this->image->setFiletype('image/jpeg');
         $this->assertEquals('image/jpeg', $this->image->getFiletype());
@@ -61,7 +68,7 @@ class ImageTest extends TestCase
         $this->image->setFiletype('test');
     }
 
-    public function testSetAndGetFilesize() : void
+    public function testSetAndGetFilesize(): void
     {
         $this->image->setFilesize(100);
         $this->assertEquals(100, $this->image->getFilesize());
@@ -69,7 +76,7 @@ class ImageTest extends TestCase
         $this->image->setFilesize(-100);
     }
 
-    public function testSetAndGetChecksum() : void
+    public function testSetAndGetChecksum(): void
     {
         $this->image->setChecksum('test');
         $this->assertEquals('test', $this->image->getChecksum());
@@ -77,31 +84,31 @@ class ImageTest extends TestCase
         $this->assertFalse($this->image->verifyChecksum('test123'));
     }
 
-    public function testSetAndGetCreateDate()
+    public function testSetAndGetCreateDate(): void
     {
         $this->image->setCreateDate(new DateTime('1970-01-02 01:34:56'));
         $this->assertEquals('1970-01-02 01:34:56', $this->image->getCreateDate()->format('Y-m-d H:i:s'));
     }
 
-    public function testSetAndGetModDate() : void
+    public function testSetAndGetModDate(): void
     {
         $this->image->setModDate(new DateTime('1970-01-02 01:34:56'));
         $this->assertEquals('1970-01-02 01:34:56', $this->image->getModDate()->format('Y-m-d H:i:s'));
     }
 
-    public function testSetAndGetDimensionX() : void
+    public function testSetAndGetDimensionX(): void
     {
         $this->image->setDimensionX(100);
         $this->assertEquals(100, $this->image->getDimensionX());
     }
 
-    public function testSetAndGetDimensionY() : void
+    public function testSetAndGetDimensionY(): void
     {
         $this->image->setDimensionY(100);
         $this->assertEquals(100, $this->image->getDimensionY());
     }
 
-    public function testSetAndGetAltText() : void
+    public function testSetAndGetAltText(): void
     {
         $this->image->setAltText('test');
         $this->assertEquals('test', $this->image->getAltText());

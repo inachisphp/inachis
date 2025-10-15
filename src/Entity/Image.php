@@ -1,7 +1,15 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
@@ -54,7 +62,7 @@ class Image extends AbstractFile
      */
     public function __construct()
     {
-        $now = new \DateTime();
+        $now = new DateTime();
         $this->setCreateDate($now);
         $this->setModDate($now);
         unset($now);
@@ -107,7 +115,7 @@ class Image extends AbstractFile
     }
 
     /**
-     * @param ?string $value
+     * @param string $value
      * @return $this
      */
     public function setAltText(?string $value): self

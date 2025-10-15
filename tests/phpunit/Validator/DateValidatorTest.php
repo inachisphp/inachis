@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ * 
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Tests\phpunit\Util;
 
 use App\Utils\UrlNormaliser;
@@ -13,7 +20,7 @@ class DateValidatorTest extends TestCase
     /**
      * @throws InvalidTimezoneException
      */
-    public function testValidateTimezone() : void
+    public function testValidateTimezone(): void
     {
         $this->assertEquals('UTC', DateValidator::validateTimezone('UTC'));
         $this->assertEquals('Europe/London', DateValidator::validateTimezone('Europe/London'));
@@ -22,7 +29,7 @@ class DateValidatorTest extends TestCase
     /**
      * @throws InvalidTimezoneException
      */
-    public function testValidateTimezoneInvalidArgumentException() : void
+    public function testValidateTimezoneInvalidArgumentException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         DateValidator::validateTimezone('');
@@ -31,7 +38,7 @@ class DateValidatorTest extends TestCase
     /**
      * @throws InvalidTimezoneException
      */
-    public function testValidateTimezoneInvalidTimezoneException() : void
+    public function testValidateTimezoneInvalidTimezoneException(): void
     {
         $this->expectException(InvalidTimezoneException::class);
         DateValidator::validateTimezone('Europe\London');

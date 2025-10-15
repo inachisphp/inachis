@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Entity;
 
 use DateTime;
@@ -33,12 +40,12 @@ class Page
     /**
      * @const string Indicates a Page is public
      */
-    public const VIS_PUBLIC = true;
+    public const PUBLIC = true;
 
     /**
      * @const string Indicates a Page is private
      */
-    public const VIS_PRIVATE = false;
+    public const PRIVATE = false;
 
     /**
      * @const string Indicates a Page is standalone
@@ -107,7 +114,7 @@ class Page
      * @var bool Determining if a {@link Page} is visible to the public
      */
     #[ORM\Column(type: 'boolean', length: 20)]
-    protected bool $visibility = self::VIS_PUBLIC;
+    protected bool $visibility = self::PUBLIC;
 
     /**
      * @var DateTime|null The date the {@link Page} was created
@@ -575,7 +582,7 @@ class Page
      * @param bool $value The visibility of the {@link Page}
      * @return Page
      */
-    public function setVisibility(bool $value = self::VIS_PRIVATE): self
+    public function setVisibility(bool $value = self::PRIVATE): self
     {
         $this->visibility = $value;
         return $this;
@@ -782,9 +789,9 @@ class Page
         if (empty($this->postDate)) {
             return '';
         }
-        return $this->postDate->format('Y').
-            '/'.$this->postDate->format('m').
-            '/'.$this->postDate->format('d');
+        return $this->postDate->format('Y') .
+            '/' . $this->postDate->format('m') .
+            '/' . $this->postDate->format('d');
     }
 
     /**

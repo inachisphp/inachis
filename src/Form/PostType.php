@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Form;
 
 use App\Entity\Category;
@@ -19,6 +26,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use DateTime;
 
 class PostType extends AbstractType
 {
@@ -124,9 +132,7 @@ class PostType extends AbstractType
                 ],
                 'format' => 'dd/MM/yyyy HH:mm',
                 'html5'  => false,
-                'label'  => $options['data']->getPostDate() < new \DateTime() ?
-                    $this->translator->trans('admin.label.post.postDate-past', [], 'messages') :
-                    $this->translator->trans('admin.label.post.postDate-future', [], 'messages'),
+                'label'  => $options['data']->getPostDate() < new DateTime() ? $this->translator->trans('admin.label.post.postDate-past', [], 'messages') : $this->translator->trans('admin.label.post.postDate-future', [], 'messages'),
                 'label_attr' => [
                     'id' => 'postDate_label',
                     'class' => 'inline_label',

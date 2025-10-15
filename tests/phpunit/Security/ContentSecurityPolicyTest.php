@@ -1,10 +1,18 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ * 
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Tests\phpunit\Security;
 
 use App\Exception\InvalidContentSecurityPolicyException;
 use App\Security\ContentSecurityPolicy;
 use PHPUnit\Framework\TestCase;
+use Exception;
 
 /**
  * @Entity
@@ -20,7 +28,7 @@ class ContentSecurityPolicyTest extends TestCase
     /**
      * Set-up CSP defaults
      */
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->csp = json_decode(
             '{
@@ -53,7 +61,7 @@ class ContentSecurityPolicyTest extends TestCase
      * Test the enforce header
      * @throws InvalidContentSecurityPolicyException
      */
-    public function testGenerateCSPEnforceHeader()
+    public function testGenerateCSPEnforceHeader(): void
     {
         $this->assertEquals(
             'default-src \'self\'; script-src \'unsafe-eval\' \'self\' analytics.google.com; upgrade-insecure-requests',
@@ -64,7 +72,7 @@ class ContentSecurityPolicyTest extends TestCase
      * Test the report header
      * @throws InvalidContentSecurityPolicyException
      */
-    public function testGenerateCSPReportHeader()
+    public function testGenerateCSPReportHeader(): void
     {
         $this->assertEquals(
             'style-src \'self\' data:',
@@ -75,7 +83,7 @@ class ContentSecurityPolicyTest extends TestCase
      * Test the enforce header default is not an empty string
      * @throws InvalidContentSecurityPolicyException
      */
-    public function testGenerateCSPEnforceHeaderDefault()
+    public function testGenerateCSPEnforceHeaderDefault(): void
     {
         $this->assertEmpty(
             ContentSecurityPolicy::getInstance()->getCSPEnforceHeader()
@@ -85,14 +93,14 @@ class ContentSecurityPolicyTest extends TestCase
      * Test the report header default is not an empty string
      * @throws InvalidContentSecurityPolicyException
      */
-    public function testGenerateCSPReportHeaderDefault()
+    public function testGenerateCSPReportHeaderDefault(): void
     {
         $this->assertEmpty(
             ContentSecurityPolicy::getInstance()->getCSPReportHeader()
         );
     }
 
-    public function testGenerateCSPPolicyFail()
+    public function testGenerateCSPPolicyFail(): void
     {
         try {
             $csp = json_decode(
@@ -104,12 +112,12 @@ class ContentSecurityPolicyTest extends TestCase
                 true
             );
             ContentSecurityPolicy::getInstance()->generateCSP($csp);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->assertStringContainsString('policy is not supported', $exception->getMessage());
         }
     }
 
-    public function testGenerateCSPDirectiveFail()
+    public function testGenerateCSPDirectiveFail(): void
     {
         try {
             $csp = json_decode(
@@ -121,7 +129,7 @@ class ContentSecurityPolicyTest extends TestCase
                 true
             );
             ContentSecurityPolicy::getInstance()->generateCSP($csp);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->assertStringContainsString('Could not understand', $exception->getMessage());
         }
     }

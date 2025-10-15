@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Controller;
 
 use App\Entity\Image;
@@ -24,7 +31,7 @@ class SettingsController extends AbstractInachisController
 
         $available_space = disk_free_space(dirname($request->server->get('SCRIPT_FILENAME')));
         $total_space = disk_total_space(dirname($request->server->get('SCRIPT_FILENAME')));
-        $this->data['storage']['percent'] = ($total_space - $available_space)/$total_space * 100;
+        $this->data['storage']['percent'] = ($total_space - $available_space) / $total_space * 100;
         $this->data['counts']['page'] = $this->entityManager->getRepository(Page::class)->getAllCount();
         $this->data['counts']['series'] = $this->entityManager->getRepository(Series::class)->getAllCount();
         $this->data['counts']['tag'] = $this->entityManager->getRepository(Tag::class)->getAllCount();
