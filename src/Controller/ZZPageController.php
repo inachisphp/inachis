@@ -29,6 +29,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use DateTime;
 
 class ZZPageController extends AbstractInachisController
 {
@@ -52,7 +53,7 @@ class ZZPageController extends AbstractInachisController
         ],
         methods: ["GET" ]
     )]
-    public function getPost(Request $request, $year, $month, $day, $title): Response
+    public function getPost(Request $request, int $year, int $month, int $day, string $title): Response
     {
         $url = $this->entityManager->getRepository(Url::class)->findOneByLink(
             ltrim(strtok($request->getRequestUri(), '?'), '/')
@@ -143,7 +144,7 @@ class ZZPageController extends AbstractInachisController
                         $post->setVisibility(
                             $request->request->has('private') ? Page::PRIVATE : Page::PUBLIC
                         );
-                        $post->setModDate(new \DateTime('now'));
+                        $post->setModDate(new DateTime('now'));
                         $this->entityManager->persist($post);
                     }
                 }
@@ -222,7 +223,7 @@ class ZZPageController extends AbstractInachisController
         ],
         methods: [ "GET", "POST" ]
     )]
-    public function getPostAdmin(Request $request, ContentRevisionCompare $contentRevisionCompare, string $type = 'post', $title = null): Response
+    public function getPostAdmin(Request $request, ContentRevisionCompare $contentRevisionCompare, string $type = 'post', string $title = null): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -236,9 +237,7 @@ class ZZPageController extends AbstractInachisController
                 ['type' => $type]
             );
         }
-        $post = null !== $title ?
-            $this->entityManager->getRepository(Page::class)->findOneById($url[0]->getContent()->getId()) :
-            $post = new Page();
+        $post = null !== $title ? $this->entityManager->getRepository(Page::class)->findOneById($url[0]->getContent()->getId()) : $post = new Page();
         if ($post->getId() === null) {
             $post->setType($type);
         }
@@ -330,7 +329,7 @@ class ZZPageController extends AbstractInachisController
                 }
             }
 
-            $post->setModDate(new \DateTime('now'));
+            $post->setModDate(new DateTime('now'));
             if (!empty($post->getId())) {
                 $this->entityManager->persist($revision);
             }
@@ -347,9 +346,7 @@ class ZZPageController extends AbstractInachisController
 
         $this->data['form'] = $form->createView();
         $this->data['page']['tab'] = $post->getType();
-        $this->data['page']['title'] = $post->getId() !== null ?
-            'Editing "' . $post->getTitle() . '"' :
-            'New ' . $post->getType();
+        $this->data['page']['title'] = $post->getId() !== null ? 'Editing "' . $post->getTitle() . '"' : 'New ' . $post->getType();
         $this->data['includeEditor'] = true;
         $this->data['includeEditorId'] = $post->getId();
         $this->data['includeDatePicker'] = true;

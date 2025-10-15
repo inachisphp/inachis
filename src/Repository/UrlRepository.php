@@ -36,7 +36,7 @@ class UrlRepository extends AbstractRepository
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function remove(Url $url)
+    public function remove(Url $url): void
     {
         $this->getEntityManager()->remove($url);
         $this->getEntityManager()->flush();
@@ -47,7 +47,7 @@ class UrlRepository extends AbstractRepository
      *
      * @return mixed
      */
-    public function getDefaultUrl(Page $page)
+    public function getDefaultUrl(Page $page): mixed
     {
         return $this->findOneBy(
             [

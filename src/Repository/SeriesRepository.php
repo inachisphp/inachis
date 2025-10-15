@@ -33,7 +33,7 @@ class SeriesRepository extends AbstractRepository
     /**
      * @param Series $series
      */
-    public function remove(Series $series)
+    public function remove(Series $series): void
     {
         $this->getEntityManager()->remove($series);
         $this->getEntityManager()->flush();

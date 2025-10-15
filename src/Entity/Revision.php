@@ -153,7 +153,7 @@ class Revision
      * Returns the value of {@link modDate}.
      * @return DateTime The date the {@link Page} was last modified
      */
-    public function getModDate() : DateTime
+    public function getModDate(): DateTime
     {
         return $this->modDate;
     }

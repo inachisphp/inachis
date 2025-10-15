@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use DateTime;
 
 class DashboardController extends AbstractInachisController
 {
@@ -53,7 +54,7 @@ class DashboardController extends AbstractInachisController
                     'q.status = :status AND q.postDate > :postDate',
                     [
                         'status'   => Page::PUBLISHED,
-                        'postDate' => new \DateTime(),
+                        'postDate' => new DateTime(),
                     ],
                 ],
                 'q.postDate ASC, q.modDate'
@@ -65,7 +66,7 @@ class DashboardController extends AbstractInachisController
                     'q.status = :status AND q.postDate <= :postDate',
                     [
                         'status'   => Page::PUBLISHED,
-                        'postDate' => new \DateTime(),
+                        'postDate' => new DateTime(),
                     ],
                 ],
                 'q.postDate DESC, q.modDate'

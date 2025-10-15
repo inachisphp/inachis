@@ -12,6 +12,7 @@ namespace App\Repository;
 use App\Entity\Image;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class ImageRepository extends AbstractRepository
 {
@@ -25,7 +26,7 @@ class ImageRepository extends AbstractRepository
     /**
      * @param Series $series
      */
-    public function remove(Image $image)
+    public function remove(Image $image): void
     {
         $this->getEntityManager()->remove($image);
         $this->getEntityManager()->flush();
@@ -37,7 +38,7 @@ class ImageRepository extends AbstractRepository
      * @param $limit
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function getFiltered($filters, $offset, $limit, ?string $sortby = 'title asc')
+    public function getFiltered($filters, $offset, $limit, ?string $sortby = 'title asc'): Paginator
     {
         $where = [];
         if (!empty($filters['keyword'])) {

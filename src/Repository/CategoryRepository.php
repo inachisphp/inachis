@@ -11,6 +11,7 @@ namespace App\Repository;
 
 use App\Entity\Category;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class CategoryRepository extends AbstractRepository
 {
@@ -22,7 +23,7 @@ class CategoryRepository extends AbstractRepository
     /**
      * @param Category $category
      */
-    public function remove(Category $category)
+    public function remove(Category $category): void
     {
         $this->getEntityManager()->remove($category);
         $this->getEntityManager()->flush();
@@ -32,7 +33,7 @@ class CategoryRepository extends AbstractRepository
      * Returns an array of the root level categories.
      * @return Category[] The array of {@link Category} objects
      */
-    public function getRootCategories()
+    public function getRootCategories(): array
     {
         return $this->getRepository()->createQueryBuilder('q')
             ->where('q.parent is null')
@@ -44,7 +45,7 @@ class CategoryRepository extends AbstractRepository
      * @param $title
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function findByTitleLike($title)
+    public function findByTitleLike($title): Paginator
     {
         return $this->getAll(
             0,

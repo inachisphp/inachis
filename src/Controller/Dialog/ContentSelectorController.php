@@ -15,6 +15,7 @@ use App\Entity\Series;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use DateTime;
 
 class ContentSelectorController extends AbstractInachisController
 {
@@ -62,7 +63,7 @@ class ContentSelectorController extends AbstractInachisController
                         $series->setLastDate($page->getPostDate());
                     }
                 }
-                $series->setModDate(new \DateTime('now'));
+                $series->setModDate(new DateTime('now'));
                 $this->entityManager->persist($series);
                 $this->entityManager->flush();
                 return new Response('Saved', Response::HTTP_CREATED);

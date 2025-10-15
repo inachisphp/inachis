@@ -82,6 +82,7 @@ class LanguageCodes
         ],
     ];
 }
+
 /*var LANGUAGE_BY_LOCALE = {
     af_NA: "Afrikaans (Namibia)",
     af_ZA: "Afrikaans (South Africa)",

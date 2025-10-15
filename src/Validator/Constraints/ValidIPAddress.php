@@ -12,7 +12,7 @@ namespace App\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @Annotation
+ * Validation message for invalid IP addresses
  */
 class ValidIPAddress extends Constraint
 {

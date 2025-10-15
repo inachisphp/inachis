@@ -50,7 +50,7 @@ class UrlNormaliser
      * @param string $uri The URL to parse and obtain the short URL for
      * @return string
      */
-    public static function fromUri(string $uri) : string
+    public static function fromUri(string $uri): string
     {
         $uri = parse_url($uri, PHP_URL_PATH);
         if (str_ends_with($uri, '/')) {

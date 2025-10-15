@@ -9,6 +9,8 @@
 
 namespace App\Exception;
 
-class InvalidTimezoneException extends \Exception
+use Exception;
+
+class InvalidTimezoneException extends Exception
 {
 }

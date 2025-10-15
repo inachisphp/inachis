@@ -20,6 +20,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Constraints\PasswordStrength;
 use Symfony\Component\Validator\Constraints\PasswordStrengthValidator;
+use DateTime;
 
 class ChangePasswordController extends AbstractInachisController
 {
@@ -46,7 +47,7 @@ class ChangePasswordController extends AbstractInachisController
             $plaintextPassword = $request->get('change_password')['new_password'];
             $hashedPassword = $passwordHasher->hashPassword($user, $plaintextPassword);
             $user->setPassword($hashedPassword);
-            $user->setPasswordModDate(new \DateTime('now'));
+            $user->setPasswordModDate(new DateTime('now'));
             if (!$passwordHasher->isPasswordValid($user, $plaintextPassword)) {
                 throw new AccessDeniedHttpException();
             }

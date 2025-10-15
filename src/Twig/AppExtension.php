@@ -46,11 +46,12 @@ class AppExtension extends AbstractExtension
     public function bytesToMinimumUnit(int $bytes, bool $trimTrailing = false): string
     {
         $symbols = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
-        $exp = (int) floor(log($bytes)/log(1024));
-        $result = sprintf('%.2f', ($bytes/pow(1024, floor($exp))));
+        $exp = (int) floor(log($bytes) / log(1024));
+        $result = sprintf('%.2f', ($bytes / pow(1024, floor($exp))));
         if ($trimTrailing) {
             return sprintf(
-                '%s %s', rtrim(rtrim($result, '0'), '.'),
+                '%s %s',
+                rtrim(rtrim($result, '0'), '.'),
                 $symbols[$exp]
             );
         }

@@ -789,9 +789,9 @@ class Page
         if (empty($this->postDate)) {
             return '';
         }
-        return $this->postDate->format('Y').
-            '/'.$this->postDate->format('m').
-            '/'.$this->postDate->format('d');
+        return $this->postDate->format('Y') .
+            '/' . $this->postDate->format('m') .
+            '/' . $this->postDate->format('d');
     }
 
     /**

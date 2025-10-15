@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ * 
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Tests\phpunit\Util;
 
 use App\Util\TextCleaner;
@@ -131,7 +138,7 @@ MD, $result);
     {
         $result = $this->cleaner->strip(
             $this->example,
-            TextCleaner::NORMALISE_WHITESPACE|TextCleaner::REMOVE_IMAGE_ALT|TextCleaner::REMOVE_BLOCKQUOTE_CONTENT
+            TextCleaner::NORMALISE_WHITESPACE | TextCleaner::REMOVE_IMAGE_ALT | TextCleaner::REMOVE_BLOCKQUOTE_CONTENT
         );
         $this->assertEquals(<<<MD
 example of HTML

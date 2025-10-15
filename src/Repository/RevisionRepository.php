@@ -14,6 +14,7 @@ use App\Entity\Revision;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\NonUniqueResultException;
+use DateTime;
 
 /**
  * @method Revision|null find($id, $lockMode = null, $lockVersion = null)
@@ -40,7 +41,7 @@ class RevisionRepository extends AbstractRepository
      * @throws NonUniqueResultException
      * @throws \Exception
      */
-    public function hydrateNewRevisionFromPage(Page $page)
+    public function hydrateNewRevisionFromPage(Page $page): Revision
     {
         $revision = new Revision();
         return $revision
@@ -59,7 +60,7 @@ class RevisionRepository extends AbstractRepository
      * @throws NonUniqueResultException
      * @throws \Doctrine\ORM\NoResultException
      */
-    public function getNextVersionNumberForPageId(string $pageId)
+    public function getNextVersionNumberForPageId(string $pageId): int
     {
         return ((int) $this->createQueryBuilder('r')
             ->select('MAX(r.versionNumber) as max_version')
@@ -86,7 +87,7 @@ class RevisionRepository extends AbstractRepository
             ->setTitle($page->getTitle())
             ->setSubTitle($page->getSubTitle())
             ->setUser()
-            ->setModDate(new \DateTime())
+            ->setModDate(new DateTime())
             ->setAction(self::DELETED);
         return $revision;
     }

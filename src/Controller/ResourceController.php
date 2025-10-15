@@ -95,8 +95,8 @@ class ResourceController extends AbstractInachisController
     public function editResource(
         Request $request,
         Filesystem $filesystem,
-        #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory): Response
-    {
+        #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory
+    ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 //            "filename" => "[a-zA-Z0-9\-\_]\.(jpe?g|heic|png)",
         $typeClass = match ($request->request?->get('type')) {
@@ -201,7 +201,7 @@ class ResourceController extends AbstractInachisController
         dump($uploadedFile);
         $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
         $safeFilename = $slugger->slug($originalFilename);
-        $newFilename = $safeFilename.'-'.uniqid().'.'.$uploadedFile->guessExtension();
+        $newFilename = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
 
         $image = new Image();
         $image

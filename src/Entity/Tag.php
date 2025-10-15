@@ -35,6 +35,9 @@ class Tag
     #[ORM\Column(type: "string", length: 50)]
     protected string $title;
 
+    /**
+     * @param string $title The value of the tag
+     */
     public function __construct(string $title = '')
     {
         $this->setTitle($title);
@@ -57,7 +60,7 @@ class Tag
     }
 
     /**
-     * @param UuidInterface $value
+     * @param UuidInterface $value The unique identifier of the tag
      * @return $this
      */
     public function setId(UuidInterface $value): self
@@ -67,7 +70,7 @@ class Tag
     }
 
     /**
-     * @param string $value
+     * @param string $value The value of the tag
      * @return $this
      */
     public function setTitle(string $value): self

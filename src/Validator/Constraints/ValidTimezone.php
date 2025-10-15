@@ -12,9 +12,9 @@ namespace App\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * @Annotation
+ * Validation message for unrecognised timezones
  */
 class ValidTimezone extends Constraint
 {
-    public $message = '"{{ string }}" is not a recognised timezone';
+    public string $message = '"{{ string }}" is not a recognised timezone';
 }

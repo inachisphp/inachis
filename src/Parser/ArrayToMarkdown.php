@@ -24,7 +24,7 @@ final class ArrayToMarkdown
      * @param string[] $post
      * @return string
      */
-    public static function parse(array $post) : string
+    public static function parse(array $post): string
     {
         $markdown = '';
 
@@ -38,7 +38,7 @@ final class ArrayToMarkdown
             $markdown .= $post['postDate'] . PHP_EOL;
         }
         if (!empty($post['categories']) && !empty($post['categories'][0]['fullPath'])) {
-            $markdown .=  $post['categories'][0]['fullPath'] . PHP_EOL;
+            $markdown .= $post['categories'][0]['fullPath'] . PHP_EOL;
         }
         if (!empty($post['content'])) {
             $markdown .= PHP_EOL . PHP_EOL . $post['content'];

@@ -137,7 +137,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @InachisAssert\ValidTimezone()
      * @var string The local timezone for the user
      */
-    #[ORM\Column(type: "string",length: 32, options: ["default" => "UTC" ])]
+    #[ORM\Column(type: "string", length: 32, options: ["default" => "UTC" ])]
     #[Assert\NotBlank]
     protected string $timezone;
 
@@ -512,9 +512,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function validateEmail(): bool
     {
         return (bool) preg_match(
-            '/[a-z0-9!#\$%&\'*+\/=?^_`{|}~-]+'.
-            '(?:\.[a-z0-9!#\$%&\'*+\/=?^_`{|}~-]+)'.
-            '*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+'.
+            '/[a-z0-9!#\$%&\'*+\/=?^_`{|}~-]+' .
+            '(?:\.[a-z0-9!#\$%&\'*+\/=?^_`{|}~-]+)' .
+            '*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+' .
             '[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/',
             $this->email
         );

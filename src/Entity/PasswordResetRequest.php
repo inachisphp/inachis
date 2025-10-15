@@ -21,67 +21,109 @@ use Ramsey\Uuid\UuidInterface;
 class PasswordResetRequest
 {
     /**
-     * @var UuidInterface The unique identifier for the {@link PasswordResetRequest}
+     * @var UuidInterface|null The unique identifier for the {@link PasswordResetRequest}
      */
     #[ORM\Id]
     #[ORM\Column(type: "uuid", unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: "CUSTOM")]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected ?UuidInterface $id = null;
+
     /**
-     * @var User
+     * @var User The User this token relates to
      */
     #[ORM\ManyToOne(targetEntity: 'App\Entity\User')]
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
+
     /**
      * @var string Store HMAC hash of token, not raw token
      */
     #[ORM\Column(type: "string", length: 128)]
     private string $tokenHash;
 
+    /**
+     * @var DateTimeImmutable DateTime the token was created
+     */
     #[ORM\Column(type: "datetime_immutable")]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
+    /**
+     * @var DateTimeImmutable Expiry DateTime for the token
+     */
     #[ORM\Column(type: "datetime_immutable")]
-    private \DateTimeImmutable $expiresAt;
+    private DateTimeImmutable $expiresAt;
 
+    /**
+     * @var bool Has this reset token been used already
+     */
     #[ORM\Column(type: "boolean")]
     private bool $used = false;
 
-    public function __construct($user, string $tokenHash, \DateTimeImmutable $expiresAt)
+    /**
+     * @param $user
+     * @param string            $tokenHash
+     * @param DateTimeImmutable $expiresAt
+     */
+    public function __construct($user, string $tokenHash, DateTimeImmutable $expiresAt)
     {
         $this->user = $user;
         $this->tokenHash = $tokenHash;
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
         $this->expiresAt = $expiresAt;
-        $this->used = false;
     }
 
+    /**
+     * @return UuidInterface|null
+     */
     public function getId(): ?UuidInterface
     {
         return $this->id;
     }
+
+    /**
+     * @return User
+     */
     public function getUser(): User
     {
         return $this->user;
     }
+
+    /**
+     * @return string
+     */
     public function getTokenHash(): string
     {
         return $this->tokenHash;
     }
-    public function getCreatedAt(): \DateTimeImmutable
+
+    /**
+     * @return DateTimeImmutable
+     */
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
-    public function getExpiresAt(): \DateTimeImmutable
+
+    /**
+     * @return DateTimeImmutable
+     */
+    public function getExpiresAt(): DateTimeImmutable
     {
         return $this->expiresAt;
     }
+
+    /**
+     * @return boolean
+     */
     public function isUsed(): bool
     {
         return $this->used;
     }
+
+    /**
+     * @return void
+     */
     public function markUsed(): void
     {
         $this->used = true;

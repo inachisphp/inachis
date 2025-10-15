@@ -31,6 +31,8 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Exception;
+use DateTime;
 
 /**
  * Class AccountController.
@@ -67,7 +69,7 @@ class AccountController extends AbstractInachisController
     #[Route("/incc/logout", name: "app_logout", methods: [ "GET", "POST" ])]
     public function logout(): never
     {
-        throw new \Exception('Don\'t forget to activate logout in security.yaml');
+        throw new Exception('Don\'t forget to activate logout in security.yaml');
     }
 
     /**
@@ -90,8 +92,7 @@ class AccountController extends AbstractInachisController
         RateLimiterFactory $forgotPasswordIpLimiter,
         RateLimiterFactory $forgotPasswordAccountLimiter,
         MailerInterface $mailer,
-    ): Response
-    {
+    ): Response {
         $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();
         if (!empty($redirectTo)) {
             return $this->redirectToRoute($redirectTo);
@@ -179,8 +180,7 @@ class AccountController extends AbstractInachisController
         UserPasswordHasherInterface $hasher,
         RateLimiterFactory $forgotPasswordIpLimiter,
         string $token,
-    ): Response
-    {
+    ): Response {
         $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();
         if (!empty($redirectTo)) {
             return $this->redirectToRoute($redirectTo);
@@ -229,7 +229,7 @@ class AccountController extends AbstractInachisController
                 throw new AccessDeniedHttpException();
             }
             $user->setPassword($hashed);
-            $user->setPasswordModDate(new \DateTime('now'));
+            $user->setPasswordModDate(new DateTime('now'));
             $tokenService->markAsUsed($resetRequest);
             $this->entityManager->persist($user);
             $this->entityManager->flush();

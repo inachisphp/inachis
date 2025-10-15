@@ -115,7 +115,7 @@ class Image extends AbstractFile
     }
 
     /**
-     * @param ?string $value
+     * @param string $value
      * @return $this
      */
     public function setAltText(?string $value): self

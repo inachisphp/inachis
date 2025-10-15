@@ -14,15 +14,20 @@ use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Tag;
 use App\Entity\Url;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * Repository for retrieving {@link Page} entities
+ */
 final class PageRepository extends AbstractRepository implements PageRepositoryInterface
 {
     /**
      * The maximum number of items to show in the admin interface
      */
-    const MAX_ITEMS_TO_SHOW_ADMIN = 10;
+    public const MAX_ITEMS_TO_SHOW_ADMIN = 10;
 
     /**
      * PageRepository constructor.
@@ -34,12 +39,10 @@ final class PageRepository extends AbstractRepository implements PageRepositoryI
     }
 
     /**
-     * @param Page $page
-     *
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @param Page $page The {@link Page} entity to be removed.
+     * @return void
      */
-    public function remove(Page $page)
+    public function remove(Page $page): void
     {
         foreach ($page->getUrls() as $postUrl) {
             $this->getEntityManager()->getRepository(Url::class)->remove($postUrl);
@@ -130,9 +133,9 @@ final class PageRepository extends AbstractRepository implements PageRepositoryI
      * @param $type
      * @param $offset
      * @param $limit
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return Paginator
      */
-    public function getAllOfTypeByPostDate($type, $offset, $limit)
+    public function getAllOfTypeByPostDate($type, $offset, $limit): Paginator
     {
         return $this->getFilteredOfTypeByPostDate([], $type, $offset, $limit);
     }
@@ -145,8 +148,13 @@ final class PageRepository extends AbstractRepository implements PageRepositoryI
      * @param string $sort
      * @return Paginator
      */
-    public function getFilteredOfTypeByPostDate($filters, string $type, int $offset, int $limit, string $sort = 'postDate desc'): Paginator
-    {
+    public function getFilteredOfTypeByPostDate(
+        $filters,
+        string $type,
+        int $offset,
+        int $limit,
+        string $sort = 'postDate desc'
+    ): Paginator {
         $where = [
             'q.type = :type',
             array_merge(
@@ -190,7 +198,7 @@ final class PageRepository extends AbstractRepository implements PageRepositoryI
                 break;
             case 'postDate desc':
             default:
-                $sort =  [[ 'q.postDate', 'DESC' ]];
+                $sort = [[ 'q.postDate', 'DESC' ]];
         }
         return $this->getAll(
             $offset,
@@ -202,9 +210,9 @@ final class PageRepository extends AbstractRepository implements PageRepositoryI
 
     /**
      * @param $ids
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return Paginator
      */
-    public function getFilteredIds($ids)
+    public function getFilteredIds($ids): Paginator
     {
         return $this->getAll(
             0,

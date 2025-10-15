@@ -11,37 +11,39 @@ namespace App\Security;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
 {
     use TargetPathTrait;
+
     /**
      * @var FormFactoryInterface
      */
-    private $formFactory;
+    private FormFactoryInterface $formFactory;
     /**
      * @var EntityManagerInterface
      */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
     /**
      * @var RouterInterface
      */
-    private $router;
+    private RouterInterface $router;
     /**
      * @var UserPasswordEncoderInterface
      */
-    private $userPasswordEncoder;
+    private UserPasswordEncoderInterface $userPasswordEncoder;
 
     /**
      * LoginFormAuthenticator constructor.
@@ -66,9 +68,9 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
     /**
      * @param Request $request
      *
-     * @return bool
+     * @return boolean
      */
-    public function supports(Request $request)
+    public function supports(Request $request): bool
     {
         return $request->attributes->get('_route') === 'app_account_login_action'
             && $request->isMethod('POST');
@@ -77,12 +79,12 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
     /**
      * @param Request $request
      *
-     * @return mixed|null
+     * @return array
      */
-    public function getCredentials(Request $request)
+    public function getCredentials(Request $request): array
     {
         $credentials = $request->request->get('login');
-        $request->getSession()->set(Security::LAST_USERNAME, $credentials['loginUsername']);
+        $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $credentials['loginUsername']);
 
         return [
             'loginUsername' => $credentials['loginUsername'],
@@ -91,24 +93,24 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
     }
 
     /**
-     * @param mixed                 $credentials
+     * @param array                 $credentials
      * @param UserProviderInterface $userProvider
      *
      * @return User|null|object|UserInterface
      */
-    public function getUser($credentials, UserProviderInterface $userProvider)
+    public function getUser(array $credentials, UserProviderInterface $userProvider): User|object|UserInterface|null
     {
         return $this->entityManager->getRepository(User::class)
             ->findOneBy(['username' => $credentials['loginUsername']]);
     }
 
     /**
-     * @param mixed         $credentials
+     * @param array         $credentials
      * @param UserInterface $user
      *
-     * @return bool
+     * @return boolean
      */
-    public function checkCredentials($credentials, UserInterface $user)
+    public function checkCredentials(array $credentials, UserInterface $user): bool
     {
         if ($this->userPasswordEncoder->isPasswordValid($user, $credentials['loginPassword'])) {
             return true;
@@ -120,7 +122,7 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
     /**
      * @return string
      */
-    protected function getLoginUrl()
+    protected function getLoginUrl(): string
     {
         return $this->router->generate('app_account_login');
     }
@@ -132,7 +134,7 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
      *
      * @return RedirectResponse
      */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): RedirectResponse
     {
         $targetPath = $this->getTargetPath($request->getSession(), $providerKey);
         if (!$targetPath) {

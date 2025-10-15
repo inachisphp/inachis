@@ -12,6 +12,7 @@ namespace App\Parser;
 use App\Entity\Category;
 use App\Entity\Page;
 use Doctrine\Common\Persistence\ObjectManager;
+use DateTime;
 
 class MarkdownFileParser
 {
@@ -60,7 +61,7 @@ class MarkdownFileParser
             $subTitleOffset = 1;
         }
         if (preg_match(MarkdownFileParser::PARSE_DATE, $post[1 + $subTitleOffset], $match)) {
-            $page->setPostDate(new \DateTime($match[0]));
+            $page->setPostDate(new DateTime($match[0]));
         }
         $category = $this->getCategoryFromPath(explode('/', $post[2 + $subTitleOffset]));
         $category = $entityManager->getRepository(Category::class)->findOneByTitle($category);

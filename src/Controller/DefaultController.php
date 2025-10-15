@@ -13,6 +13,7 @@ use App\Entity\Page;
 use App\Entity\Series;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use DateTime;
 
 class DefaultController extends AbstractInachisController
 {
@@ -27,7 +28,7 @@ class DefaultController extends AbstractInachisController
             [
                 'q.lastDate < :postDate',
                 [
-                    'postDate' => new \DateTime(),
+                    'postDate' => new DateTime(),
                 ],
             ],
             [
@@ -39,7 +40,7 @@ class DefaultController extends AbstractInachisController
         $pageParameters = [
             'status'   => Page::PUBLISHED,
             'visibility' => Page::PUBLIC,
-            'postDate' => new \DateTime(),
+            'postDate' => new DateTime(),
             'type' => Page::TYPE_POST,
         ];
         $this->data['content'] = [];

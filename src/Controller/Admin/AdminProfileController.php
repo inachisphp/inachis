@@ -24,6 +24,8 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
+use DateTime;
+use ReflectionProperty;
 
 class AdminProfileController extends AbstractInachisController
 {
@@ -67,19 +69,16 @@ class AdminProfileController extends AbstractInachisController
         ImageTransformer $imageTransformer,
         MailerInterface $mailer,
         PasswordResetTokenService $tokenService,
-    ): Response
-    {
+    ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $user = $request->get('id') !== 'new' ?
-            $this->entityManager->getRepository(User::class)->findOneBy(['username' => $request->get('id')]):
-            new User();
+        $user = $request->get('id') !== 'new' ? $this->entityManager->getRepository(User::class)->findOneBy(['username' => $request->get('id')]) : new User();
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
-            $user->setModDate(new \DateTime('now'));
-            $reflection = new \ReflectionProperty(User::class, 'id');
+            $user->setModDate(new DateTime('now'));
+            $reflection = new ReflectionProperty(User::class, 'id');
 
             if (!$reflection->isInitialized($user)) {
                 $data = $tokenService->createResetRequestForEmail($user->getEmail());

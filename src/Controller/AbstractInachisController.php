@@ -78,7 +78,7 @@ abstract class AbstractInachisController extends AbstractController
     /**
      * @return string
      */
-    private function getProtocolAndHostname() : string
+    private function getProtocolAndHostname(): string
     {
         $protocol = $this->isSecure() ? 'https://' : 'http://';
 
@@ -88,12 +88,13 @@ abstract class AbstractInachisController extends AbstractController
     /**
      * @return bool
      */
-    private function isSecure() : bool
+    private function isSecure(): bool
     {
         $isSecure = false;
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
             $isSecure = true;
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https'
+        } elseif (
+            !empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https'
             || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on'
         ) {
             $isSecure = true;
@@ -106,7 +107,7 @@ abstract class AbstractInachisController extends AbstractController
      * Returns the result of testing if a user is currently signed in
      * @return bool Status of user authentication
      */
-    private function isAuthenticated() : bool
+    private function isAuthenticated(): bool
     {
         return $this->security instanceof Security &&
             $this->security->getUser() instanceof User &&

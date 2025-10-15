@@ -9,6 +9,8 @@
 
 namespace App\Exception;
 
-class InvalidContentSecurityPolicyException extends \Exception
+use Exception;
+
+class InvalidContentSecurityPolicyException extends Exception
 {
 }

@@ -40,7 +40,7 @@ final class AdminResponseEvent implements EventSubscriberInterface
     /**
      * @param ResponseEvent $event
      */
-    public function onKernelRequest(RequestEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         // Redirect to /setup if no admins
         // Redirect if not signed in

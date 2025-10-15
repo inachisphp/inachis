@@ -1,13 +1,21 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ * 
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Tests\phpunit\Util;
 
 use App\Util\UrlNormaliser;
 use PHPUnit\Framework\TestCase;
+use TypeError;
 
 class UrlNormaliserTest extends TestCase
 {
-    public function testFromUri()
+    public function testFromUri(): void
     {
         $this->assertEquals('some-short-text', UrlNormaliser::toUri('some short text'));
         $this->assertEquals('some-short-text', UrlNormaliser::toUri('Some Short Text'));
@@ -23,13 +31,13 @@ class UrlNormaliserTest extends TestCase
         $this->assertEquals('rock-and-roll', UrlNormaliser::toUri('rock & roll'));
     }
 
-    public function testFromUriException()
+    public function testFromUriException(): void
     {
-        $this->expectException(\TypeError::class);
+        $this->expectException(TypeError::class);
         UrlNormaliser::toUri(['string-in-an-array']);
     }
 
-    public function testToUri()
+    public function testToUri(): void
     {
         $this->assertEquals(
             'something-really-cool',

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<ruleset name="Inachis AutoFixer">
+    <description>Automatic fixer rules for Inachis PHP code style</description>
+
+    <config name="php_version" value="80300"/>
+
+    <file>src</file>
+    <file>tests</file>
+
+    <exclude-pattern>var/*</exclude-pattern>
+    <exclude-pattern>vendor/*</exclude-pattern>
+    <exclude-pattern>node_modules/*</exclude-pattern>
+
+    <rule ref="PSR12"/>
+
+    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint"/>
+    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint"/>
+    <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly"/>
+
+    <arg name="extensions" value="php"/>
+    <arg name="colors"/>
+    <arg name="parallel" value="4"/>
+    <arg name="report" value="summary"/>
+</ruleset>
