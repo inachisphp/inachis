@@ -30,32 +30,32 @@ class Page
     /**
      * @const string Indicates a Page is currently in draft
      */
-    const DRAFT = 'draft';
+    public const DRAFT = 'draft';
 
     /**
      * @const string Indicates a Page has been published
      */
-    const PUBLISHED = 'published';
+    public const PUBLISHED = 'published';
 
     /**
      * @const string Indicates a Page is public
      */
-    const PUBLIC = true;
+    public const PUBLIC = true;
 
     /**
      * @const string Indicates a Page is private
      */
-    const PRIVATE = false;
+    public const PRIVATE = false;
 
     /**
      * @const string Indicates a Page is standalone
      */
-    const TYPE_PAGE = 'page';
+    public const TYPE_PAGE = 'page';
 
     /**
      * @const string Indicates a Page is a blog post
      */
-    const TYPE_POST = 'post';
+    public const TYPE_POST = 'post';
 
     /**
      * @var UuidInterface|null
@@ -89,20 +89,20 @@ class Page
      */
     #[ORM\ManyToOne(targetEntity: 'App\Entity\User', cascade: [ 'detach' ])]
     #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id')]
-    protected ?User $author;
+    protected ?User $author = null;
 
     /**
      * @var Image|null The featured {@link Image} for the {@link Page}
      */
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Image', cascade: [ 'detach' ])]
     #[ORM\JoinColumn(name: 'image_id', referencedColumnName: 'id')]
-    protected ?Image $featureImage;
+    protected ?Image $featureImage = null;
 
     /**
      * @var string|null A short excerpt describing the contents of the {@link Page}
      */
     #[ORM\Column(type: 'text', nullable: true)]
-    protected ?string $featureSnippet;
+    protected ?string $featureSnippet = '';
 
     /**
      * @var string|null Current status of the {@link Page}, defaults to {@link DRAFT}
@@ -145,7 +145,7 @@ class Page
      * @var string|null A password to protect the {@link Page} with if required
      */
     #[ORM\Column(type: 'string', length:255, nullable: true)]
-    protected ?string $password;
+    protected ?string $password = '';
 
     /**
      * @var bool Flag determining if the {@link Page} allows comments
@@ -163,46 +163,46 @@ class Page
      * @var string|null A location for geo-context aware content
      */
     #[ORM\Column(type: 'string', nullable: true)]
-    protected ?string $latlong;
+    protected ?string $latlong = '';
 
     /**
      * @var string|null A short 140-character message to use when sharing content
      */
     #[ORM\Column(type: 'string', length: 140, nullable: true)]
-    protected ?string $sharingMessage;
+    protected ?string $sharingMessage = '';
 
     /**
-     * @var ArrayCollection|null The array of URLs for the content
+     * @var Collection|null The array of URLs for the content
      */
     #[ORM\OneToMany(mappedBy: 'content', targetEntity: 'App\Entity\Url', cascade: [ 'persist' ])]
     #[ORM\OrderBy(['default' => 'DESC'])]
-    protected ?ArrayCollection $urls;
+    protected ?Collection $urls;
 
     /**
-     * @var ArrayCollection|null The array of categories assigned to the post/page
+     * @var Collection|null The array of categories assigned to the post/page
      */
     #[ORM\ManyToMany(targetEntity: 'App\Entity\Category')]
     #[ORM\JoinTable(name: 'Page_categories')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'category_id', referencedColumnName: 'id')]
     #[ORM\OrderBy([ 'title' => 'ASC' ])]
-    protected ?ArrayCollection $categories;
+    protected ?Collection $categories;
 
     /**
-     * @var ArrayCollection|null The array of tags assigned to the post/page
+     * @var Collection|null The array of tags assigned to the post/page
      */
     #[ORM\ManyToMany(targetEntity: 'App\Entity\Tag', cascade: [ 'persist' ])]
     #[ORM\JoinTable(name: 'Page_tags')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'tag_id', referencedColumnName: 'id')]
     #[ORM\OrderBy([ 'title' => 'ASC' ])]
-    protected ?ArrayCollection $tags;
+    protected ?Collection $tags;
 
     /**
-     * @var ArrayCollection|null  The array of Series that contains this page
+     * @var Collection|null  The array of Series that contains this page
      */
     #[ORM\ManyToMany(targetEntity: 'App\Entity\Series', inversedBy: 'items')]
-    protected ?ArrayCollection $series;
+    protected ?Collection $series;
 
     /**
      * @var string|null The two character language code this content uses, empty means unknown
@@ -435,7 +435,7 @@ class Page
      *
      * @return Collection|null The array of {$link Category} entities for the {@link Page}
      */
-    public function getCategories(): ?Collection
+    public function getCategories()
     {
         return $this->categories;
     }
@@ -445,7 +445,7 @@ class Page
      *
      * @return Collection|null The array of {$link Category} entities for the {@link Page}
      */
-    public function getTags(): ?Collection
+    public function getTags()
     {
         return $this->tags;
     }
@@ -465,9 +465,9 @@ class Page
     }
 
     /**
-     * @return ArrayCollection|null
+     * @return Collection|null
      */
-    public function getSeries(): ?ArrayCollection
+    public function getSeries(): ?Collection
     {
         return $this->series;
     }
@@ -708,10 +708,10 @@ class Page
     }
 
     /**
-     * @param ArrayCollection|null $series
+     * @param Collection|null $series
      * @return Page
      */
-    public function setSeries(?ArrayCollection $series): self
+    public function setSeries(?Collection $series): self
     {
         $this->series = $series;
         return $this;

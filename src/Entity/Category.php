@@ -23,13 +23,13 @@ use Ramsey\Uuid\UuidInterface;
 class Category
 {
     /**
-     * @var UuidInterface The unique id of the category
+     * @var UuidInterface|null The unique id of the category
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected UuidInterface $id;
+    protected ?UuidInterface $id = null;
 
     /**
      * @var string|null The name of the category
@@ -68,11 +68,11 @@ class Category
     protected ?Category $parent = null;
 
     /**
-     * @var ArrayCollection The array of child categories if applicable
+     * @var Collection|null The array of child categories if applicable
      */
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: 'App\Entity\Category')]
     #[ORM\OrderBy(['title' => 'ASC'])]
-    protected ArrayCollection $children;
+    protected ?Collection $children;
 
     /**
      * Default constructor for {@link Category}.
@@ -158,7 +158,7 @@ class Category
     /**
      * Returns all child categories for the current {@link Category}.
      *
-     * @return ArrayCollection
+     * @return Collection
      */
     public function getChildren(): Collection
     {

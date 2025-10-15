@@ -42,10 +42,10 @@ class Series
     protected ?UuidInterface $id = null;
 
     /**
-     * @var string
+     * @var string|null
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    protected string $title;
+    protected ?string $title = '';
 
     /**
      * @var string|null
@@ -54,10 +54,10 @@ class Series
     protected ?string $subTitle = '';
 
     /**
-     * @var string
+     * @var string|null
      */
     #[ORM\Column(type: 'string', length: 255, unique: true, nullable: false)]
-    protected string $url;
+    protected ?string $url = '';
 
     /**
      * @var string|null
@@ -92,7 +92,7 @@ class Series
      */
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Image', cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'image_id', referencedColumnName: 'id')]
-    protected ?Image $image;
+    protected ?Image $image = null;
 
     /**
      * @var DateTime
@@ -134,13 +134,12 @@ class Series
     }
 
     /**
-     * @param UuidInterface $id
-     * @return $this
+     * @param UuidInterface|null $id
+     * @return Series
      */
-    public function setId(UuidInterface $id): self
+    public function setId(?UuidInterface $id): self
     {
         $this->id = $id;
-
         return $this;
     }
 
@@ -153,13 +152,12 @@ class Series
     }
 
     /**
-     * @param string $title
-     * @return $this
+     * @param string|null $title
+     * @return Series
      */
-    public function setTitle(string $title): self
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -173,12 +171,11 @@ class Series
 
     /**
      * @param string|null $subTitle
-     * @return $this
+     * @return Series
      */
     public function setSubTitle(?string $subTitle = ''): self
     {
         $this->subTitle = $subTitle;
-
         return $this;
     }
 
@@ -192,12 +189,11 @@ class Series
 
     /**
      * @param string|null $url
-     * @return $this
+     * @return Series
      */
     public function setUrl(?string $url): self
     {
         $this->url = $url;
-
         return $this;
     }
 
@@ -211,7 +207,7 @@ class Series
 
     /**
      * @param string|null $description
-     * @return $this
+     * @return Series
      */
     public function setDescription(?string $description): self
     {
@@ -235,7 +231,6 @@ class Series
     public function setFirstDate(DateTime $firstDate = null): self
     {
         $this->firstDate = $firstDate;
-
         return $this;
     }
 
@@ -250,12 +245,11 @@ class Series
     /**
      * @param DateTime|null $lastDate
      *
-     * @return $this
+     * @return Series
      */
     public function setLastDate(DateTime $lastDate = null): self
     {
         $this->lastDate = $lastDate;
-
         return $this;
     }
 
@@ -270,24 +264,21 @@ class Series
     /**
      * @param Collection|null $items
      *
-     * @return $this
+     * @return Series
      */
     public function setItems(?Collection $items): self
     {
         $this->items = $items;
-
         return $this;
     }
 
     /**
      * @param Page $item
-     *
-     * @return $this
+     * @return Series
      */
     public function addItem(Page $item): self
     {
         $this->items->add($item);
-
         return $this;
     }
 
@@ -301,12 +292,11 @@ class Series
 
     /**
      * @param Image|null $image
-     * @return $this
+     * @return Series
      */
     public function setImage(?Image $image = null): self
     {
         $this->image = $image;
-
         return $this;
     }
 
@@ -320,7 +310,6 @@ class Series
 
     /**
      * @param DateTime $createDate
-     *
      * @return $this
      */
     public function setCreateDate(DateTime $createDate): self
@@ -340,13 +329,11 @@ class Series
 
     /**
      * @param mixed $modDate
-     *
-     * @return $this
+     * @return Series
      */
     public function setModDate(DateTime $modDate): self
     {
         $this->modDate = $modDate;
-
         return $this;
     }
 
@@ -360,7 +347,7 @@ class Series
 
     /**
      * @param bool $visibility
-     * @return $this
+     * @return Series
      */
     public function setVisibility(bool $visibility = self::PRIVATE): self
     {
