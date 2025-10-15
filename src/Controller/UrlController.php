@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Controller;
 
 use App\Entity\Url;
@@ -7,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use DateTime;
 
 class UrlController extends AbstractInachisController
 {
@@ -30,7 +38,7 @@ class UrlController extends AbstractInachisController
             foreach ($request->get('items') as $item) {
                 $link = $this->entityManager->getRepository(Url::class)->findOneBy(
                     [
-                        'id' =>$item,
+                        'id' => $item,
                         'default' => false,
                     ]
                 );
@@ -46,10 +54,10 @@ class UrlController extends AbstractInachisController
                             ]
                         );
                         if ($previous_default !== null) {
-                            $previous_default->setDefault(false)->setModDate(new \DateTime('now'));
+                            $previous_default->setDefault(false)->setModDate(new DateTime('now'));
                             $this->entityManager->persist($previous_default);
                         }
-                        $link->setDefault(true)->setModDate(new \DateTime('now'));
+                        $link->setDefault(true)->setModDate(new DateTime('now'));
                         $this->entityManager->persist($link);
                         $this->entityManager->flush();
                     }

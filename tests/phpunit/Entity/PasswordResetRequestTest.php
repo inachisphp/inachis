@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ * 
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Tests\phpunit\Entity;
 
 use App\Entity\PasswordResetRequest;
@@ -23,32 +30,32 @@ class PasswordResetRequestTest extends TestCase
         parent::setUp();
     }
 
-    public function testGetId() : void
+    public function testGetId(): void
     {
         $this->assertEmpty($this->passwordResetRequest->getId());
     }
 
-    public function testGetUser() : void
+    public function testGetUser(): void
     {
         $this->assertEquals($this->user, $this->passwordResetRequest->getUser());
     }
 
-    public function testGetTokenHash()
+    public function testGetTokenHash(): void
     {
         $this->assertEquals('abc123', $this->passwordResetRequest->getTokenHash());
     }
 
-    public function testGetCreatedAt()
+    public function testGetCreatedAt(): void
     {
         $this->assertNotEmpty($this->passwordResetRequest->getCreatedAt());
     }
 
-    public function testGetExpiresAt()
+    public function testGetExpiresAt(): void
     {
         $this->assertEquals($this->expiresAt, $this->passwordResetRequest->getExpiresAt());
     }
 
-    public function testMarkUsed()
+    public function testMarkUsed(): void
     {
         $this->assertFalse($this->passwordResetRequest->isUsed());
         $this->passwordResetRequest->markUsed();

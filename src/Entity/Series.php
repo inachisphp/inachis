@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Entity;
 
 use DateTime;
@@ -15,16 +22,15 @@ use Ramsey\Uuid\UuidInterface;
 #[ORM\Index(columns: ['title'], name: 'search_idx')]
 class Series
 {
-
     /**
      * @const string Indicates a Series is public
      */
-    public const VIS_PUBLIC = true;
+    public const PUBLIC = true;
 
     /**
      * @const string Indicates a Series is private
      */
-    public const VIS_PRIVATE = false;
+    public const PRIVATE = false;
 
     /**
      * @var UuidInterface|null
@@ -105,7 +111,7 @@ class Series
      * @var bool Determining if a {@link Series} is visible to the public
      */
     #[ORM\Column(type: 'boolean', length: 20)]
-    protected bool $visibility = self::VIS_PUBLIC;
+    protected bool $visibility = self::PRIVATE;
 
     /**
      * Series constructor.
@@ -113,10 +119,8 @@ class Series
     public function __construct()
     {
         $this->image = null;
-        $this->setVisibility();
         $this->items = new ArrayCollection();
-
-        $currentTime = new \DateTime('now');
+        $currentTime = new DateTime('now');
         $this->setCreateDate($currentTime);
         $this->setModDate($currentTime);
     }
@@ -222,7 +226,7 @@ class Series
 
     /**
      * @param DateTime|null $firstDate
-     * @return Series
+     * @return $this
      */
     public function setFirstDate(DateTime $firstDate = null): self
     {
@@ -306,7 +310,7 @@ class Series
 
     /**
      * @param DateTime $createDate
-     * @return Series
+     * @return $this
      */
     public function setCreateDate(DateTime $createDate): self
     {
@@ -345,7 +349,7 @@ class Series
      * @param bool $visibility
      * @return Series
      */
-    public function setVisibility(bool $visibility = self::VIS_PRIVATE): self
+    public function setVisibility(bool $visibility = self::PRIVATE): self
     {
         $this->visibility = $visibility;
         return $this;

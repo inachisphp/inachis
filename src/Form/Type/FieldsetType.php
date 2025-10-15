@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -8,6 +15,11 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Fieldset form component
+ *
+ * @package Inachis
+ */
 class FieldsetType extends AbstractType
 {
     /**

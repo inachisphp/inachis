@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ * 
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Tests\phpunit;
 
 use App\Kernel;
@@ -9,14 +16,14 @@ class KernelTest extends TestCase
 {
     protected $kernel;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->kernel = new Kernel('test', false);
 
         parent::setUp();
     }
 
-    public function testGetCacheDir()
+    public function testGetCacheDir(): void
     {
         $this->assertEquals(
             str_replace('/tests/phpunit', '/var/cache/test', __DIR__),
@@ -24,7 +31,7 @@ class KernelTest extends TestCase
         );
     }
 
-    public function testGetLogDir()
+    public function testGetLogDir(): void
     {
         $this->assertEquals(
             str_replace('/tests/phpunit', '/var/log', __DIR__),

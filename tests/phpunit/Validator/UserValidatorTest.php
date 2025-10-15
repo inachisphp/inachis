@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ * 
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Tests\phpunit\Util;
 
 use App\Validator\UserValidator;
@@ -10,71 +17,71 @@ class UserValidatorTest extends TestCase
 {
     protected $userValidator;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->userValidator = new UserValidator();
 
         parent::setUp();
     }
 
-    public function testValidateUsernameEmpty() : void
+    public function testValidateUsernameEmpty(): void
     {
         $this->expectException('InvalidArgumentException');
         $this->userValidator->validateUsername('');
     }
 
-    public function testValidateUsernameInvalid() : void
+    public function testValidateUsernameInvalid(): void
     {
         $this->expectException('InvalidArgumentException');
         $this->userValidator->validateUsername('something-wrong');
     }
 
-    public function testValidateUsernameValid() : void
+    public function testValidateUsernameValid(): void
     {
         $this->assertEquals('test_user', $this->userValidator->validateUsername('test_user'));
     }
 
-    public function testValidatePasswordEmpty() : void
+    public function testValidatePasswordEmpty(): void
     {
         $this->expectException('InvalidArgumentException');
         $this->userValidator->validatePassword('');
     }
 
-    public function testValidatePasswordInvalid() : void
+    public function testValidatePasswordInvalid(): void
     {
         $this->expectException('InvalidArgumentException');
         $this->userValidator->validatePassword('short');
     }
 
-    public function testValidatePasswordValid() : void
+    public function testValidatePasswordValid(): void
     {
         $this->assertEquals('jUstr1ght%', $this->userValidator->validatePassword('jUstr1ght%'));
     }
 
-    public function testValidateEmailEmpty() : void
+    public function testValidateEmailEmpty(): void
     {
         $this->expectException('InvalidArgumentException');
         $this->userValidator->validateEmail('');
     }
 
-    public function testValidateEmailInvaid() : void
+    public function testValidateEmailInvaid(): void
     {
         $this->expectException('InvalidArgumentException');
         $this->userValidator->validateEmail('notvalid');
     }
 
-    public function testValidateEmailValid() : void
+    public function testValidateEmailValid(): void
     {
         $this->assertEquals('test\'s@example.com', $this->userValidator->validateEmail('test\'s@example.com'));
     }
 
-    public function testValidateDisplayNameEmpty() : void
+    public function testValidateDisplayNameEmpty(): void
     {
         $this->expectException('InvalidArgumentException');
         $this->userValidator->validateDisplayName('');
     }
 
-    public function testValidateDisplayNameValid() : void
+    public function testValidateDisplayNameValid(): void
     {
         $this->assertEquals('A Name', $this->userValidator->validateDisplayName('A Name'));
     }

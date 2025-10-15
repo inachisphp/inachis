@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractInachisController;
@@ -20,6 +27,8 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
+use DateTime;
+use ReflectionProperty;
 
 class AdminProfileController extends AbstractInachisController
 {
@@ -74,13 +83,10 @@ class AdminProfileController extends AbstractInachisController
         ImageTransformer $imageTransformer,
         MailerInterface $mailer,
         PasswordResetTokenService $tokenService,
-    ): Response
-    {
+    ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $user = $request->get('id') !== 'new' ?
-            $this->entityManager->getRepository(User::class)->findOneBy(['username' => $request->get('id')]):
-            new User();
+        $user = $request->get('id') !== 'new' ? $this->entityManager->getRepository(User::class)->findOneBy(['username' => $request->get('id')]) : new User();
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 

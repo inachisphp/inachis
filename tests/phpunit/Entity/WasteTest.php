@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ * 
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Tests\phpunit\Entity;
 
 use App\Entity\User;
@@ -39,28 +46,28 @@ class WasteTest extends TestCase
         $this->assertEquals('Image', $this->waste->getSourceName());
     }
 
-    public function testSetAndGetTitle() : void
+    public function testSetAndGetTitle(): void
     {
         $this->assertEmpty($this->waste->getTitle());
         $this->waste->setTitle('Test');
         $this->assertEquals('Test', $this->waste->getTitle());
     }
 
-    public function testSetAndGetContent() : void
+    public function testSetAndGetContent(): void
     {
         $this->assertEmpty($this->waste->getContent());
         $this->waste->setContent('Test');
         $this->assertEquals('Test', $this->waste->getContent());
     }
 
-    public function testSetAndGetModDate() : void
+    public function testSetAndGetModDate(): void
     {
         $date =  new DateTime();
         $this->waste->setModDate($date);
         $this->assertEquals($date, $this->waste->getModDate());
     }
 
-    public function testSetAndGetUser() : void
+    public function testSetAndGetUser(): void
     {
         $user = new User();
         $this->waste->setUser($user);

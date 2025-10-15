@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Controller;
 
 use App\Entity\Category;
@@ -28,7 +35,7 @@ class WidgetController extends AbstractController
      * @param int $maxDisplayCount
      * @return Response
      */
-    public function getRecentTrips($maxDisplayCount = self::DEFAULT_MAX_DISPLAY_COUNT): Response
+    public function getRecentTrips(int $maxDisplayCount = self::DEFAULT_MAX_DISPLAY_COUNT): Response
     {
         return $this->render('web/partials/recent_trips.html.twig', [
             'trips' => $this->getRecentSeries($maxDisplayCount),
@@ -39,7 +46,7 @@ class WidgetController extends AbstractController
      * @param int $maxDisplayCount
      * @return Response
      */
-    public function getRecentRunning($maxDisplayCount = self::DEFAULT_MAX_DISPLAY_COUNT): Response
+    public function getRecentRunning(int $maxDisplayCount = self::DEFAULT_MAX_DISPLAY_COUNT): Response
     {
         return $this->render('web/partials/recent_running.html.twig', [
             'races' => $this->getPagesWithCategoryName('Running', $maxDisplayCount),
@@ -50,7 +57,7 @@ class WidgetController extends AbstractController
      * @param int $maxDisplayCount
      * @return Response
      */
-    public function getRecentArticles($maxDisplayCount = self::DEFAULT_MAX_DISPLAY_COUNT): Response
+    public function getRecentArticles(int $maxDisplayCount = self::DEFAULT_MAX_DISPLAY_COUNT): Response
     {
         return $this->render('web/partials/recent_articles.html.twig', [
             'articles' => $this->getPagesWithCategoryName('Articles', $maxDisplayCount),

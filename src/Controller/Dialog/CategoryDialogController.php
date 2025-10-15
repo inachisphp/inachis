@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Controller\Dialog;
 
 use App\Controller\AbstractInachisController;
@@ -90,13 +97,13 @@ class CategoryDialogController extends AbstractInachisController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $category = $request->get('id') !== '-1' ?
-            $this->entityManager->getRepository(Category::class)->findOneById($request->get('id')):
+            $this->entityManager->getRepository(Category::class)->findOneById($request->get('id')) :
             new Category();
         $this->entityManager->getRepository(Category::class)->hydrate($category, $request->request->all());
         $category->setParent(
             $request->request->get('parentID') !== '-1' ?
-            $this->entityManager->getRepository(Category::class)->findOneById($request->request->get('parentID')):
-            null
+                $this->entityManager->getRepository(Category::class)->findOneById($request->request->get('parentID')) :
+                null
         );
         $this->entityManager->persist($category);
         $this->entityManager->flush();
@@ -112,7 +119,7 @@ class CategoryDialogController extends AbstractInachisController
     public function getCategoryUsages(Request $request): JsonResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $category =  $this->entityManager->getRepository(Category::class)->findOneById($request->get('id'));
+        $category = $this->entityManager->getRepository(Category::class)->findOneById($request->get('id'));
         $count = $this->entityManager->getRepository(Page::class)->getPagesWithCategoryCount($category);
         foreach ($category->getChildren() as $child) {
             $count += $this->entityManager->getRepository(Page::class)->getPagesWithCategoryCount($child);
@@ -124,7 +131,7 @@ class CategoryDialogController extends AbstractInachisController
     public function deleteCategory(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $category =  $this->entityManager->getRepository(Category::class)->findOneById($request->get('id'));
+        $category = $this->entityManager->getRepository(Category::class)->findOneById($request->get('id'));
         $count = $this->entityManager->getRepository(Page::class)->getPagesWithCategoryCount($category);
 
         if ($count > 0) {
@@ -132,7 +139,7 @@ class CategoryDialogController extends AbstractInachisController
                 [
                     'error' => sprintf('<span class="material-icons">warning</span> %d categories present', $count)
                 ],
-            Response::HTTP_BAD_REQUEST
+                Response::HTTP_BAD_REQUEST
             );
         }
         $this->entityManager->getRepository(Category::class)->remove($category);

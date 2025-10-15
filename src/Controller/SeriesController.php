@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Controller;
 
 use App\Entity\Image;
@@ -10,6 +17,7 @@ use App\Util\UrlNormaliser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use DateTime;
 
 class SeriesController extends AbstractInachisController
 {
@@ -43,9 +51,9 @@ class SeriesController extends AbstractInachisController
                     $series = $this->entityManager->getRepository(Series::class)->findOneById($item);
                     if ($series !== null) {
                         $series->setVisibility(
-                            $request->request->has('private') ? Page::VIS_PRIVATE : Page::VIS_PUBLIC
+                            $request->request->has('private') ? Page::PRIVATE : Page::PUBLIC
                         );
-                        $series->setModDate(new \DateTime('now'));
+                        $series->setModDate(new DateTime('now'));
                         $this->entityManager->persist($series);
                     }
                 }
@@ -87,9 +95,7 @@ class SeriesController extends AbstractInachisController
     public function edit(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $series = $request->get('id') !== null ?
-            $this->entityManager->getRepository(Series::class)->findOneById($request->get('id')):
-            new Series();
+        $series = $request->get('id') !== null ? $this->entityManager->getRepository(Series::class)->findOneById($request->get('id')) : new Series();
         $form = $this->createForm(SeriesType::class, $series);
         $form->handleRequest($request);
 
@@ -122,7 +128,7 @@ class SeriesController extends AbstractInachisController
                 return $this->redirect($this->generateUrl('app_series_list'));
             }
 
-            $series->setModDate(new \DateTime('now'));
+            $series->setModDate(new DateTime('now'));
             $this->entityManager->persist($series);
             $this->entityManager->flush();
 
@@ -134,9 +140,7 @@ class SeriesController extends AbstractInachisController
         }
 
         $this->data['form'] = $form->createView();
-        $this->data['page']['title'] = $series->getId() !== null ?
-            'Editing "' . $series->getTitle() . '"' :
-            'New Series';
+        $this->data['page']['title'] = $series->getId() !== null ? 'Editing "' . $series->getTitle() . '"' : 'New Series';
         $this->data['page']['tab'] = 'series';
         $this->data['series'] = $series;
         $this->data['includeEditor'] = true;

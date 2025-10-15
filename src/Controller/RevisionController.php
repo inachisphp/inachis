@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Controller;
 
 use App\Entity\Page;
@@ -12,6 +19,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use DateTime;
 
 class RevisionController extends AbstractInachisController
 {
@@ -99,7 +107,7 @@ class RevisionController extends AbstractInachisController
         $page->setTitle($revision->getTitle())
             ->setSubTitle($revision->getSubTitle())
             ->setContent($revision->getContent())
-            ->setModDate(new \DateTime('now'))
+            ->setModDate(new DateTime('now'))
             ->setAuthor($this->getUser())
         ;
 

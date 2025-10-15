@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ * 
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Tests\phpunit\Util;
 
 use App\Validator\Constraints\ValidIPAddress;
@@ -17,7 +24,7 @@ class ValidIPAddressValidatorTest extends ConstraintValidatorTestCase
         return new ValidIPAddressValidator();
     }
 
-    public function testValidate()
+    public function testValidate(): void
     {
         $this->assertEmpty($this->validator->validate('', new ValidIPAddress()));
         $this->assertEmpty($this->validator->validate('127.0.0.1', new ValidIPAddress()));

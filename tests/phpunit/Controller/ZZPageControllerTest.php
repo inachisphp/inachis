@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ * 
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Tests\Controller;
 
 use App\Controller\ZZPageController;
@@ -45,7 +52,7 @@ class ZZPageControllerTest extends WebTestCase
         $this->security = $this->createMock(Security::class);
         $this->controller = new ZZPageController($this->entityManager, $this->security);
 
-        $ref = new \ReflectionClass($this->controller);
+        $ref = new ReflectionClass($this->controller);
         foreach (['entityManager', 'security'] as $prop) {
             $property = $ref->getProperty($prop);
             $property->setValue($this->controller, $this->$prop);
@@ -288,7 +295,10 @@ class ZZPageControllerTest extends WebTestCase
             ->method('getPost')
             ->with(
                 $this->isInstanceOf(Request::class),
-                0, 0, 0, ''
+                0,
+                0,
+                0,
+                ''
             )
             ->willReturn(new Response('OK'));
         $request = new Request();
@@ -419,8 +429,7 @@ class ZZPageControllerTest extends WebTestCase
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }
 
-    private function renderTestHelper()
+    private function renderTestHelper(): void
     {
-
     }
 }

@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ * 
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Tests\phpunit\Repository;
 
 use App\Entity\Category;
@@ -16,7 +23,7 @@ class CategoryRepositoryTest extends TestCase
     private EntityManagerInterface $entityManager;
     private EntityRepository $repository;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
@@ -31,7 +38,7 @@ class CategoryRepositoryTest extends TestCase
         parent::setUp();
     }
 
-    public function testRemoveCallsEntityManagerMethods()
+    public function testRemoveCallsEntityManagerMethods(): void
     {
         $category = new Category();
 
@@ -47,7 +54,7 @@ class CategoryRepositoryTest extends TestCase
         $this->repository->remove($category);
     }
 
-    public function testGetRootCategoriesBuildsCorrectQuery()
+    public function testGetRootCategoriesBuildsCorrectQuery(): void
     {
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $query = $this->createMock(AbstractQuery::class);
@@ -77,7 +84,7 @@ class CategoryRepositoryTest extends TestCase
     }
 
 
-    public function testFindByTitleLikeDelegatesToGetAll()
+    public function testFindByTitleLikeDelegatesToGetAll(): void
     {
         $this->repository->expects($this->once())
             ->method('getAll')

@@ -1,14 +1,21 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Entity;
 
 use App\Exception\InvalidTimezoneException;
 use App\Validator\DateValidator;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
-use Random\RandomException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -130,7 +137,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @InachisAssert\ValidTimezone()
      * @var string The local timezone for the user
      */
-    #[ORM\Column(type: "string",length: 32, options: ["default" => "UTC" ])]
+    #[ORM\Column(type: "string", length: 32, options: ["default" => "UTC" ])]
     #[Assert\NotBlank]
     protected string $timezone;
 
@@ -147,12 +154,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * version of the password instead. This entity should never hold
      * the password in plain-text.
      *
-     * @param string $username The username for the {@link User}
-     * @param string $password The password for the {@link User}
-     * @param string $email    The email for the {@link User}
-     * @throws \Exception
+     * @param string|null $username The username for the {@link User}
+     * @param string|null $password The password for the {@link User}
+     * @param string|null $email The email for the {@link User}
+     * @throws Exception
      */
-    public function __construct(string $username = '', string $password = '', string $email = '')
+    public function __construct(?string $username = '', ?string $password = '', ?string $email = '')
     {
         $this->setUsername($username);
         $this->setPassword($password);
@@ -503,9 +510,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function validateEmail(): bool
     {
         return (bool) preg_match(
-            '/[a-z0-9!#\$%&\'*+\/=?^_`{|}~-]+'.
-            '(?:\.[a-z0-9!#\$%&\'*+\/=?^_`{|}~-]+)'.
-            '*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+'.
+            '/[a-z0-9!#\$%&\'*+\/=?^_`{|}~-]+' .
+            '(?:\.[a-z0-9!#\$%&\'*+\/=?^_`{|}~-]+)' .
+            '*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+' .
             '[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/',
             $this->email
         );

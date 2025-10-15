@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Entity;
 
 use DateTime;
@@ -146,7 +153,7 @@ class Revision
      * Returns the value of {@link modDate}.
      * @return DateTime The date the {@link Page} was last modified
      */
-    public function getModDate() : DateTime
+    public function getModDate(): DateTime
     {
         return $this->modDate;
     }

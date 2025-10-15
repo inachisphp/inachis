@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Util;
 
 use App\Entity\Url;
@@ -43,7 +50,7 @@ class UrlNormaliser
      * @param string $uri The URL to parse and obtain the short URL for
      * @return string
      */
-    public static function fromUri(string $uri) : string
+    public static function fromUri(string $uri): string
     {
         $uri = parse_url($uri, PHP_URL_PATH);
         if (str_ends_with($uri, '/')) {

@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ * 
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Tests\phpunit\Entity;
 
 use App\Entity\Page;
@@ -7,6 +14,7 @@ use App\Entity\Url;
 use DateTime;
 use Exception;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 
 class UrlTest extends TestCase
 {
@@ -15,7 +23,7 @@ class UrlTest extends TestCase
     /**
      * @throws Exception
      */
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->url = new Url(new Page());
         parent::setUp();
@@ -24,16 +32,17 @@ class UrlTest extends TestCase
     /**
      *
      */
-    public function testSetAndGetId() : void
+    public function testSetAndGetId(): void
     {
-        $this->url->setId('test');
-        $this->assertEquals('test', $this->url->getId());
+        $uuid = Uuid::uuid1();
+        $this->url->setId($uuid);
+        $this->assertEquals($uuid, $this->url->getId());
     }
 
     /**
      *
      */
-    public function testSetAndGetLink() : void
+    public function testSetAndGetLink(): void
     {
         $this->url->setLink('test');
         $this->assertEquals('test', $this->url->getLink());
@@ -42,7 +51,7 @@ class UrlTest extends TestCase
     /**
      *
      */
-    public function testSetAndGetLinkCanonical() : void
+    public function testSetAndGetLinkCanonical(): void
     {
         $this->url->setLink('test');
         $this->assertEquals(md5('test'), $this->url->getLinkCanonical());
@@ -51,7 +60,7 @@ class UrlTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testSetModDateToNow() : void
+    public function testSetModDateToNow(): void
     {
         $yesterdayDateTime = new DateTime('yesterday');
         $this->url->setModDate($yesterdayDateTime);
@@ -65,7 +74,7 @@ class UrlTest extends TestCase
     /**
      *
      */
-    public function testValidateURL() : void
+    public function testValidateURL(): void
     {
         $this->url->setLink('test-link');
         $this->assertTrue($this->url->validateURL());
@@ -73,17 +82,17 @@ class UrlTest extends TestCase
         $this->assertFalse($this->url->validateURL());
     }
 
-    public function testGetCreateDate() : void
+    public function testGetCreateDate(): void
     {
         $this->assertGreaterThan(0, $this->url->getCreateDate()->getTimestamp());
     }
 
-    public function testGetContent() : void
+    public function testGetContent(): void
     {
         $this->assertInstanceOf(Page::class, $this->url->getContent());
     }
 
-    public function testIsDefault() : void
+    public function testIsDefault(): void
     {
         $this->assertTrue($this->url->isDefault());
         $this->url->setDefault(false);

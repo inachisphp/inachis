@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Security;
 
 use App\Exception\InvalidContentSecurityPolicyException;
@@ -13,7 +20,7 @@ final class ContentSecurityPolicy
     /**
      * @var string[] SRC-based directives
      */
-    public static $srcDirectives = [
+    public static array $srcDirectives = [
         'default-src',
         'child-src',
         'connect-src',
@@ -33,14 +40,14 @@ final class ContentSecurityPolicy
     /**
      * @var string[] URI-based directives for reporting
      */
-    public static $uriDirectives = [
+    public static array $uriDirectives = [
         'report-uri',
         'policy-uri',
     ];
     /**
      * @var string[] Directives used for toggling policy components
      */
-    public static $otherDirectives = [
+    public static array $otherDirectives = [
         'block-all-mixed-content',
         'sandbox',
         'upgrade-insecure-requests',
@@ -48,14 +55,14 @@ final class ContentSecurityPolicy
     /**
      * @var ContentSecurityPolicy reference to instance of self
      */
-    protected static $instance;
+    protected static ContentSecurityPolicy $instance;
 
     /**
      * Returns an instance of {@link Application}.
      *
      * @return ContentSecurityPolicy The current or a new instance of {@link Application}
      */
-    public static function getInstance() : ContentSecurityPolicy
+    public static function getInstance(): ContentSecurityPolicy
     {
         if (null === static::$instance) {
             static::$instance = new static();
@@ -67,11 +74,11 @@ final class ContentSecurityPolicy
     /**
      * Returns the CSP policy for enforcing.
      *
-     * @param string[] $policy The policy to process for CSP enforce
-     * @throws InvalidContentSecurityPolicyException
+     * @param array $policy The policy to process for CSP enforce
      * @return string The parsed policies
+     *@throws InvalidContentSecurityPolicyException
      */
-    public static function getCSPEnforceHeader($policy = []) : string
+    public static function getCSPEnforceHeader(array $policy = []): string
     {
         if (!empty($policy) && !empty($policy['enforce'])) {
             return self::generateCSP($policy['enforce']);
@@ -82,11 +89,11 @@ final class ContentSecurityPolicy
     /**
      * Returns the CSP policy for reporting only.
      *
-     * @param string[] $policy The policy to process for CSP reporting
-     * @throws InvalidContentSecurityPolicyException
+     * @param array $policy The policy to process for CSP reporting
      * @return string The parsed policies
+     *@throws InvalidContentSecurityPolicyException
      */
-    public static function getCSPReportHeader($policy = []) : string
+    public static function getCSPReportHeader(array $policy = []): string
     {
         if (!empty($policy) && !empty($policy['report'])) {
             return self::generateCSP($policy['report']);
@@ -97,11 +104,11 @@ final class ContentSecurityPolicy
     /**
      * Generates the CSP from the given policy JSON object.
      *
-     * @param mixed $csp The CSP policy
+     * @param array $csp The CSP policy
      * @throws InvalidContentSecurityPolicyException
      * @return string The parsed policies
      */
-    public static function generateCSP($csp) : string
+    public static function generateCSP(array $csp): string
     {
         $policies = [];
         foreach ($csp as $policy => $directives) {
@@ -124,14 +131,14 @@ final class ContentSecurityPolicy
                         case 'unsafe-inline':
                         case 'unsafe-eval':
                             if ($value === true) {
-                                $policies[$policy] .= ' \''.$directive.'\'';
+                                $policies[$policy] .= ' \'' . $directive . '\'';
                             }
                             break;
 
                         case 'sources':
                             if (!empty($value)) {
                                 foreach ($value as $source) {
-                                    $policies[$policy] .= ' '.$source;
+                                    $policies[$policy] .= ' ' . $source;
                                 }
                             }
                             break;
@@ -152,7 +159,7 @@ final class ContentSecurityPolicy
      * @param $directive
      * @return bool
      */
-    private static function isValidDirective($directive)
+    private static function isValidDirective($directive): bool
     {
         return in_array($directive, self::$srcDirectives) ||
             in_array($directive, self::$uriDirectives) ||
