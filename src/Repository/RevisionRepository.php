@@ -1,12 +1,19 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Repository;
 
 use App\Entity\Page;
 use App\Entity\Revision;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use \Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NonUniqueResultException;
 
 /**
  * @method Revision|null find($id, $lockMode = null, $lockVersion = null)

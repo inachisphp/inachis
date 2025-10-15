@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Controller;
 
 use App\Entity\Image;
@@ -17,7 +24,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
-
 
 class ResourceController extends AbstractInachisController
 {

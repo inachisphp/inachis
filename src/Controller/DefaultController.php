@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Controller;
 
 use App\Entity\Page;
@@ -10,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class DefaultController extends AbstractInachisController
 {
     const ITEMS_TO_SHOW = 10;
-    
+
     #[Route("/", methods: [ "GET" ])]
     public function homepage(): Response
     {
