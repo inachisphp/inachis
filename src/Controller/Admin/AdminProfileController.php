@@ -9,7 +9,10 @@ use App\Service\PasswordResetTokenService;
 use App\Transformer\ImageTransformer;
 use App\Util\Base64EncodeFile;
 use App\Util\RandomColorPicker;
+use DateTime;
+use Exception;
 use Random\RandomException;
+use ReflectionProperty;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,7 +26,7 @@ class AdminProfileController extends AbstractInachisController
     /**
      * @param Request $request
      * @return Response
-     * @throws \Exception
+     * @throws Exception
      */
     #[Route("/incc/admin-management", methods: [ 'GET', 'POST' ])]
     public function adminList(Request $request): Response
@@ -32,13 +35,23 @@ class AdminProfileController extends AbstractInachisController
 
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
+
+        $filters = array_filter($request->get('filter', []));
+        if ($request->isMethod('post')) {
+            $_SESSION['series_filters'] = $filters;
+        } elseif (isset($_SESSION['series_filters'])) {
+            $filters = $_SESSION['series_filters'];
+        }
+
         $offset = (int) $request->get('offset', 0);
         $limit = $this->entityManager->getRepository(User::class)->getMaxItemsToShow();
-        $this->data['dataset'] = $this->entityManager->getRepository(User::class)->getAll(
+        $this->data['dataset'] = $this->entityManager->getRepository(User::class)->getFiltered(
+            $filters,
             $offset,
             $limit
         );
         $this->data['form'] = $form->createView();
+        $this->data['filters'] = $filters;
         $this->data['page']['offset'] = $offset;
         $this->data['page']['limit'] = $limit;
         $this->data['page']['title'] = 'Users';
@@ -50,6 +63,7 @@ class AdminProfileController extends AbstractInachisController
      * @param Request $request
      * @param ImageTransformer $imageTransformer
      * @param MailerInterface $mailer
+     * @param PasswordResetTokenService $tokenService
      * @return Response
      * @throws RandomException
      */
@@ -71,8 +85,8 @@ class AdminProfileController extends AbstractInachisController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
-            $user->setModDate(new \DateTime('now'));
-            $reflection = new \ReflectionProperty(User::class, 'id');
+            $user->setModDate(new DateTime('now'));
+            $reflection = new ReflectionProperty(User::class, 'id');
 
             if (!$reflection->isInitialized($user)) {
                 $data = $tokenService->createResetRequestForEmail($user->getEmail());

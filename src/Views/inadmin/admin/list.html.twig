@@ -12,39 +12,58 @@
     <div class="col span_8_of_8 widget-posts">
         <a class="button button--positive" href="{{ path('app_admin_new') }}">
             <span class="material-icons">add</span> Create admin</a>
-        {% include 'inadmin/partials/list.html.twig' with {
+
+        {% include 'inadmin/partials/table.html.twig' with {
             className: 'form__users',
             type: 'users',
+
+            table_name: 'Administrator list',
+            table_class: 'table-responsive table-borderless table-darkhead table-selectable',
+            table_desc: 'This table lists administrators. The first column contains checkboxes allowing users to select one or more tasks.',
+            columns: [
+                {
+                    title: 'Display Name',
+                    slug: 'username',
+                    source: 'displayName',
+                    header: true,
+                },
+                {
+                    title: 'Username',
+                    source: 'username',
+                },
+                {
+                    title: 'Status',
+                    badges: {
+                        'disabled': {
+                            field: 'enabled',
+                            condition: false,
+                            className: 'badge__disabled',
+                        },
+                        'new-user': {
+                            field: 'password',
+                            condition: '',
+                            className: 'badge__new',
+                        },
+                    },
+                },
+                {
+                    title: 'Password Last Modified',
+                    source: 'passwordModDate',
+                    source_type: 'date',
+                },
+            ],
 
             offset: page.offset,
             limit: page.limit,
             total: dataset.count,
 
-            snippet_description: 'username',
             slug_prefix: 'admin',
-            slug: 'username',
-            inline: true,
-            showDate: false,
+
             show_search: true,
-            zebra: true,
-
-            badges: {
-                'disabled': {
-                    'field': 'isEnabled',
-                    'condition': true,
-                    'className': 'badge__disabled',
-                },
-                'new-user': {
-                    'field': 'password',
-                    'condition': '',
-                    'className': 'badge__new',
-                },
-            },
-
             url_add: path('app_admin_new'),
             url_result: path('app_admin_adminprofile_adminlist'),
-        }
-        %}
+            zebra: true,
+        } %}
     </div>
     {% endblock user_list %}
 
