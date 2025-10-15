@@ -1,0 +1,88 @@
+{% block table %}
+
+    {{ form_start(form, {'attr': { 'class': 'form form__' ~ type ~ ' content__list' }}) }}
+
+    {% if dataset|default(null) is not empty and form|default(null) is not empty %}
+    {{- form_errors(form) -}}
+
+    {{ include('inadmin/partials/filters.html.twig') }}
+
+    <p class="pagination--info">
+        Showing {{ offset + 1 }} to {{ min(offset + limit, total) }} of {{ total }}
+    </p>
+    {% if table_desc|default('') is not empty %}
+    <p id="table-desc" class="visually-hidden">
+        {{ table_desc }}
+    </p>
+    {% endif %}
+    <table {%- if table_desc|default('') is not empty %} aria-describedby="table-desc"{% endif %} class="table{%- if table_class %} {{ table_class }}{% endif %}{%- if zebra|default(false) %}  table-striped{% endif %}">
+        <caption class="visually-hidden">{{ table_name }}</caption>
+        <thead>
+        <tr>
+            <th scope="col">
+                <label for="select-all" class="visually-hidden">Select all rows</label>
+                <input type="checkbox" id="select-all" aria-label="Select all rows">
+            </th>
+            {% for column in columns %}
+            <th scope="col">{{ column.title }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in dataset.iterator %}
+            <tr>
+                <td> <input type="checkbox" /></td>
+            {% for column in columns %}
+                {% if column.slug is defined %}
+                    {% if '.' in column.slug %}
+                        {% set slug_exploded = column.slug|split('.')  %}
+                        {% set slug_object = item %}
+                        {% for part in slug_exploded %}
+                            {% if '[' in part %}
+                                {% set part = part|split('[')[0] %}
+                                {% set slug_object = attribute(slug_object, part)[0] %}
+                            {% else %}
+                                {% set slug_object = attribute(slug_object, part) %}
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {% set slug_object = attribute(item, column.slug) %}
+                    {% endif %}
+                {% endif %}
+                <{% if column.header is defined and column.header %}th scope="row"{% else %}td{% endif %}>
+                    {% if column.slug is defined %}
+                        <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incc/{{ slug_prefix }}/{{ slug_object }}">
+                    {% endif %}
+                    {% if column.source is defined and attribute(item, column.source) is defined %}
+                        {% if column.source_type is defined and column.source_type == 'date' %}
+                            {{ attribute(item, column.source)|date('d/m/Y') }}
+                        {% else %}
+                            {{ attribute(item, column.source) }}
+                        {% endif %}
+                    {% elseif column.badges|default(null) is not empty %}
+                        {% include 'inadmin/partials/badge.html.twig' with {
+                            badges: column.badges,
+                        } %}
+                    {% endif %}
+                    {% if column.slug is defined %}
+                        </a>
+                    {% endif %}
+                </{% if column.header is defined and column.header %}th{% else %}td{% endif %}>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+        {{ include('inadmin/partials/pagination.html.twig', {
+            offset: offset + 1,
+            limit: limit,
+            maxResults: total,
+            maxPagesToShow: 4,
+            result_url: url_result
+        }) }}
+        {% if actions|default(null) is not empty %}
+            {% include 'inadmin/partials/action_bar.html.twig' %}
+        {% endif %}
+    {% endif %}
+{% endblock table %}

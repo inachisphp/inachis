@@ -426,7 +426,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function setCreateDate(DateTime $value): self
     {
-        //$this->setCreateDate($value->format('Y-m-d H:i:s'));
         $this->createDate = $value;
 
         return $this;
@@ -440,7 +439,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function setModDate(DateTime $value): self
     {
-        //$this->setModDate($value->format('Y-m-d H:i:s'));
         $this->modDate = $value;
 
         return $this;

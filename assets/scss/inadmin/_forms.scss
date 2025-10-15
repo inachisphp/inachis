@@ -1,4 +1,5 @@
 @use 'definitions' as *;
+@use 'sass:color';
 
 .form {
 	input, textarea, select {
@@ -89,5 +90,24 @@
 	&.button--menu {
 		float: left;
 		padding: 5px 10px;
+	}
+
+	&.button--ai {
+		background: linear-gradient(90deg, #069, #0063a7, #005fb4, #0059c0, #1751c9, #3e46ce, #5d35cf, #7914cc);
+		color: #fff;
+		transition: background 0.3s ease;
+
+		&:hover {
+			background: linear-gradient(90deg,
+							color.adjust(#069, $lightness: 10%),
+							color.adjust(#0063a7, $lightness:10%),
+							color.adjust(#005fb4, $lightness:10%),
+							color.adjust(#0059c0, $lightness:10%),
+							color.adjust(#1751c9, $lightness:10%),
+							color.adjust(#3e46ce, $lightness:10%),
+							color.adjust(#5d35cf, $lightness:10%),
+							color.adjust(#7914cc, $lightness:10%));
+			border-color: #f60;
+		}
 	}
 }

@@ -4,11 +4,23 @@
 .filter {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   font-size: 0.9em;
-  justify-content: space-between;
+  justify-content: flex-start;
   position: relative;
 
+  @media #{$information-medium} {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+
   .filter__section-keyword {
+    margin: 1em auto;
+
+    @media #{$information-medium} {
+      margin: 1em 0;
+    }
+
     input {
       border: 1px solid #eee;
       border-radius: .5em;
@@ -16,9 +28,13 @@
     }
     label {
       color: gray;
-      left: 0.25em;
+      left: 1.8em;
       position: absolute;
       top: 1em;
+
+      @media #{$information-medium} {
+        left: 0.25em;
+      }
     }
     button[type=submit] {
       margin-left: -2.5em;
