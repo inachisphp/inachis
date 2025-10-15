@@ -101,9 +101,9 @@ class SeriesTest extends TestCase
 
     public function testSetAndGetVisibility() : void
     {
-        $this->series->setVisibility(Series::VIS_PUBLIC);
-        $this->assertEquals(Series::VIS_PUBLIC, $this->series->getVisibility());
+        $this->series->setVisibility(Series::PUBLIC);
+        $this->assertEquals(Series::PUBLIC, $this->series->getVisibility());
         $this->series->setVisibility();
-        $this->assertEquals(Series::VIS_PRIVATE, $this->series->getVisibility());
+        $this->assertEquals(Series::PRIVATE, $this->series->getVisibility());
     }
 }

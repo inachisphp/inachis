@@ -33,12 +33,12 @@ class Page
     /**
      * @const string Indicates a Page is public
      */
-    const VIS_PUBLIC = true;
+    const PUBLIC = true;
 
     /**
      * @const string Indicates a Page is private
      */
-    const VIS_PRIVATE = false;
+    const PRIVATE = false;
 
     /**
      * @const string Indicates a Page is standalone
@@ -107,7 +107,7 @@ class Page
      * @var bool Determining if a {@link Page} is visible to the public
      */
     #[ORM\Column(type: 'boolean', length: 20)]
-    protected bool $visibility = self::VIS_PUBLIC;
+    protected bool $visibility = self::PUBLIC;
 
     /**
      * @var DateTime|null The date the {@link Page} was created
@@ -575,7 +575,7 @@ class Page
      * @param bool $value The visibility of the {@link Page}
      * @return Page
      */
-    public function setVisibility(bool $value = self::VIS_PRIVATE): self
+    public function setVisibility(bool $value = self::PRIVATE): self
     {
         $this->visibility = $value;
         return $this;

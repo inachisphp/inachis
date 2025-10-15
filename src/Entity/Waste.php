@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
@@ -23,7 +24,7 @@ class Waste
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     private ?UuidInterface $id;
     /**
-     * @var string|null
+     * @var string|null The entity type
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
     private ?string $sourceType = '';
@@ -33,12 +34,12 @@ class Waste
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
     private ?string $sourceName = '';
     /**
-     * @var string|null
+     * @var string|null The former title for the item
      */
     #[ORM\Column(type: 'string', length: 255)]
     private ?string $title = '';
     /**
-     * @var string|null
+     * @var string|null The contents of the item deleted
      */
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $content = '';
@@ -153,7 +154,7 @@ class Waste
     /**
      * @return DateTimeInterface|null The date the content was deleted
      */
-    public function getModDate(): ?\DateTimeInterface
+    public function getModDate(): ?DateTimeInterface
     {
         return $this->modDate;
     }

@@ -7,6 +7,7 @@ use App\Entity\Url;
 use DateTime;
 use Exception;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 
 class UrlTest extends TestCase
 {
@@ -26,8 +27,9 @@ class UrlTest extends TestCase
      */
     public function testSetAndGetId() : void
     {
-        $this->url->setId('test');
-        $this->assertEquals('test', $this->url->getId());
+        $uuid = Uuid::uuid1();
+        $this->url->setId($uuid);
+        $this->assertEquals($uuid, $this->url->getId());
     }
 
     /**

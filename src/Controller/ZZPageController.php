@@ -134,7 +134,7 @@ class ZZPageController extends AbstractInachisController
                     $post = $this->entityManager->getRepository(Page::class)->findOneById($item);
                     if ($post !== null) {
                         $post->setVisibility(
-                            $request->request->has('private') ? Page::VIS_PRIVATE : Page::VIS_PUBLIC
+                            $request->request->has('private') ? Page::PRIVATE : Page::PUBLIC
                         );
                         $post->setModDate(new \DateTime('now'));
                         $this->entityManager->persist($post);

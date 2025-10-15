@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
@@ -54,7 +55,7 @@ class Image extends AbstractFile
      */
     public function __construct()
     {
-        $now = new \DateTime();
+        $now = new DateTime();
         $this->setCreateDate($now);
         $this->setModDate($now);
         unset($now);

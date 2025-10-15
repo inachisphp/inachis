@@ -43,7 +43,7 @@ class SeriesController extends AbstractInachisController
                     $series = $this->entityManager->getRepository(Series::class)->findOneById($item);
                     if ($series !== null) {
                         $series->setVisibility(
-                            $request->request->has('private') ? Page::VIS_PRIVATE : Page::VIS_PUBLIC
+                            $request->request->has('private') ? Page::PRIVATE : Page::PUBLIC
                         );
                         $series->setModDate(new \DateTime('now'));
                         $this->entityManager->persist($series);

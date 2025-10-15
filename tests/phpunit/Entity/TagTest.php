@@ -4,6 +4,7 @@ namespace App\Tests\phpunit\Entity;
 
 use App\Entity\Tag;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 
 class TagTest extends TestCase
 {
@@ -17,8 +18,9 @@ class TagTest extends TestCase
 
     public function testSetAndGetId() : void
     {
-        $this->tag->setId('test');
-        $this->assertEquals('test', $this->tag->getId());
+        $uuid = Uuid::uuid1();
+        $this->tag->setId($uuid);
+        $this->assertEquals($uuid, $this->tag->getId());
     }
 
     public function testSetAndGetTitle() : void

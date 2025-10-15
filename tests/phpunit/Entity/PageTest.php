@@ -104,9 +104,9 @@ class PageTest extends TestCase
     public function testSetAndGetVisibility()
     {
         $this->page->setVisibility();
-        $this->assertEquals(Page::VIS_PRIVATE, $this->page->getVisibility());
-        $this->page->setVisibility(Page::VIS_PUBLIC);
-        $this->assertEquals(Page::VIS_PUBLIC, $this->page->getVisibility());
+        $this->assertEquals(Page::PRIVATE, $this->page->getVisibility());
+        $this->page->setVisibility(Page::PUBLIC);
+        $this->assertEquals(Page::PUBLIC, $this->page->getVisibility());
 
     }
 
