@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Exception\InvalidTimezoneException;
 use App\Validator\DateValidator;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
@@ -108,22 +109,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected bool $isRemoved = false;
 
     /**
-     * @var \DateTime The date the {@link User} was added
+     * @var DateTime The date the {@link User} was added
      */
     #[ORM\Column(type: "datetime")]
-    protected \DateTime $createDate;
+    protected DateTime $createDate;
 
     /**
-     * @var \DateTime The date the {@link User} was last modified
+     * @var DateTime The date the {@link User} was last modified
      */
     #[ORM\Column(type: "datetime")]
-    protected \DateTime $modDate;
+    protected DateTime $modDate;
 
     /**
-     * @var \DateTime|null The date the password was last modified
+     * @var DateTime|null The date the password was last modified
      */
     #[ORM\Column(type: "datetime")]
-    protected \DateTime $passwordModDate;
+    protected ?DateTime $passwordModDate;
 
     /**
      * @InachisAssert\ValidTimezone()
@@ -157,7 +158,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->setPassword($password);
         $this->setEmail($email);
         $this->setAvatar(null);
-        $currentTime = new \DateTime('now');
+        $currentTime = new DateTime('now');
         $this->setCreateDate($currentTime);
         $this->setModDate($currentTime);
         $this->setPasswordModDate($currentTime);
@@ -255,9 +256,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link createDate} for the {@link User}.
      *
-     * @return string The creation date for the user
+     * @return DateTime The creation date for the user
      */
-    public function getCreateDate(): \DateTime
+    public function getCreateDate(): DateTime
     {
         return $this->createDate;
     }
@@ -265,9 +266,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link modDate} for the {@link User}.
      *
-     * @return string The modification for the user
+     * @return DateTime The modification for the user
      */
-    public function getModDate(): \DateTime
+    public function getModDate(): DateTime
     {
         return $this->modDate;
     }
@@ -287,7 +288,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return DateTime The password last modification date for the user
      */
-    public function getPasswordModDate(): \DateTime
+    public function getPasswordModDate(): DateTime
     {
         return $this->passwordModDate;
     }
@@ -295,7 +296,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the value of {@link Id}.
      *
-     * @param string $value The value to set
+     * @param UuidInterface $value The value to set
      * @return $this
      */
     public function setId(UuidInterface $value): self
@@ -413,12 +414,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the {@link createDate} from a DateTime object.
      *
-     * @param \DateTime $value The date to be set
+     * @param DateTime $value The date to be set
      * @return $this
      */
-    public function setCreateDate(\DateTime $value): self
+    public function setCreateDate(DateTime $value): self
     {
-        //$this->setCreateDate($value->format('Y-m-d H:i:s'));
         $this->createDate = $value;
 
         return $this;
@@ -427,12 +427,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the {@link modDate} from a DateTime object.
      *
-     * @param \DateTime $value The date to set
+     * @param DateTime $value The date to set
      * @return $this
      */
-    public function setModDate(\DateTime $value): self
+    public function setModDate(DateTime $value): self
     {
-        //$this->setModDate($value->format('Y-m-d H:i:s'));
         $this->modDate = $value;
 
         return $this;
@@ -441,10 +440,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the {@link passwordModDate} from a DateTime object.
      *
-     * @param \DateTime $value The date to set
+     * @param DateTime $value The date to set
      * @return $this
      */
-    public function setPasswordModDate(\DateTime $value): self
+    public function setPasswordModDate(DateTime $value): self
     {
         $this->passwordModDate = $value;
 

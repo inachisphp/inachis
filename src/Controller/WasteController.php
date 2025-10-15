@@ -1,29 +1,31 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Controller;
 
 use App\Entity\Waste;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
-class WasteController extends AbstractController
+class WasteController extends AbstractInachisController
 {
     /**
-     * @Route("/incc/waste/{offset}/{limit}",
-     *     methods={"GET", "POST"},
-     *     requirements={
-     *          "offset": "\d+",
-     *          "limit"="\d+"
-     *     },
-     *     defaults={"offset"=0, "limit"=10}
-     * )
      * @param Request $request
      * @return Response
      */
+    #[Route(
+        "/incc/waste/{offset}/{limit}",
+        requirements: [
+          "offset" => "\d+",
+          "limit" => "\d+"
+        ],
+        defaults: [
+            "offset" => 0,
+            "limit" => 10
+        ],
+        methods: [ 'GET', 'POST' ]
+    )]
     public function list(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');

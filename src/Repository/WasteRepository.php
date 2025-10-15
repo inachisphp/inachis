@@ -8,16 +8,16 @@ use Doctrine\Persistence\ManagerRegistry;
 use \Doctrine\ORM\NonUniqueResultException;
 
 /**
- * @method Revision|null find($id, $lockMode = null, $lockVersion = null)
- * @method Revision|null findOneBy(array $criteria, array $orderBy = null)
- * @method Revision[]    findAll()
- * @method Revision[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Waste|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Waste|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Waste[]    findAll()
+ * @method Waste[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class WasteRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Revision::class);
+        parent::__construct($registry, Waste::class);
     }
 
     public function deleteWasteByUser(User $user): void

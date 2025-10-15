@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Form\DataTransformer\ArrayCollectionToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -61,11 +62,28 @@ class ResourceType extends AbstractType
                 ],
 
             ])
+            ->add('generate_alt_text', ButtonType::class, [
+                'attr' => [
+                    'class' => 'button button--ai',
+                    'id' => 'generate_alt_text',
+                ],
+                'label' => sprintf(
+                    '<span class="material-icons">%s</span> <span>%s</span>',
+                    'auto_awesome',
+                    'Generate Alt Text',
+                ),
+                'label_html' => true,
+            ])
             ->add('submit', SubmitType::class, [
                 'attr' => [
                     'class' => 'button button--positive',
                 ],
-                'label' => $this->translator->trans('admin.button.save', [], 'messages'),
+                'label' => sprintf(
+                    '<span class="material-icons">%s</span> <span>%s</span>',
+                    'save',
+                    $this->translator->trans('admin.button.save', [], 'messages')
+                ),
+                'label_html' => true,
             ])
             ->add('delete', SubmitType::class, [
                 'attr' => [

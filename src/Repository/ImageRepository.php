@@ -41,6 +41,10 @@ class ImageRepository extends AbstractRepository
                 ],
             ];
         }
+        if (!empty($filters['usage']) && $filters['usage'] === 'notinuse') {
+//            left join pages
+//            left join series
+        }
         switch ($sortby) {
             case 'title desc':
                 $sortby = ['q.title', 'DESC'];

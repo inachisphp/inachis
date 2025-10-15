@@ -141,8 +141,17 @@ class ResourceController extends AbstractInachisController
                     }
                 }
             }
+            $resource->setModDate(new \DateTime('now'));
             $this->entityManager->persist($resource);
             $this->entityManager->flush();
+
+            $this->addFlash('success', 'Content saved.');
+            return $this->redirectToRoute(
+                'app_resource_editresource', [
+                    'type' => $request->get('type'),
+                    'filename' => $resource->getId(),
+                ]
+            );
         }
         $this->data['form'] = $form->createView();
         $this->data['page']['type'] = $request->get('type');
@@ -185,6 +194,8 @@ class ResourceController extends AbstractInachisController
             return new JsonResponse(['error' => 'No title provided'], 400);
         }
         $uploadedFile = $request->files->get("image")['imageFile'];
+        // @todo handle optimise image which reduces to Image::WARNING_SIZE max and 85% compression if JPEG
+        // @todo if HEIC, and HEIC supported, convert to JPEG
         $dimensions = getimagesize($uploadedFile->getRealPath());
         $ctx = hash_init('sha256');
         $fp = fopen($uploadedFile->getRealPath(), 'rb');
@@ -192,7 +203,7 @@ class ResourceController extends AbstractInachisController
             hash_update($ctx, fread($fp, 8192));
         }
         fclose($fp);
-        dump($uploadedFile);
+        // @todo change filename to use the title for better SEO
         $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
         $safeFilename = $slugger->slug($originalFilename);
         $newFilename = $safeFilename.'-'.uniqid().'.'.$uploadedFile->guessExtension();
