@@ -30,32 +30,32 @@ class Page
     /**
      * @const string Indicates a Page is currently in draft
      */
-    const DRAFT = 'draft';
+    public const DRAFT = 'draft';
 
     /**
      * @const string Indicates a Page has been published
      */
-    const PUBLISHED = 'published';
+    public const PUBLISHED = 'published';
 
     /**
      * @const string Indicates a Page is public
      */
-    const PUBLIC = true;
+    public const PUBLIC = true;
 
     /**
      * @const string Indicates a Page is private
      */
-    const PRIVATE = false;
+    public const PRIVATE = false;
 
     /**
      * @const string Indicates a Page is standalone
      */
-    const TYPE_PAGE = 'page';
+    public const TYPE_PAGE = 'page';
 
     /**
      * @const string Indicates a Page is a blog post
      */
-    const TYPE_POST = 'post';
+    public const TYPE_POST = 'post';
 
     /**
      * @var UuidInterface|null

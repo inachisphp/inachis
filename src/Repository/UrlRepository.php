@@ -18,7 +18,7 @@ class UrlRepository extends AbstractRepository
     /**
      * The maximum number of items to show in the admin interface
      */
-    const MAX_ITEMS_TO_SHOW_ADMIN = 20;
+    public const MAX_ITEMS_TO_SHOW_ADMIN = 20;
 
     /**
      * UrlRepository constructor.
