@@ -13,28 +13,29 @@ use App\Entity\Category;
 use App\Entity\Page;
 use Doctrine\Common\Persistence\ObjectManager;
 use DateTime;
+use Exception;
 
 class MarkdownFileParser
 {
     /**
      *
      */
-    const PARSE_TITLE = '/# (.*)/';
+    public const PARSE_TITLE = '/# (.*)/';
 
     /**
      *
      */
-    const PARSE_SUBTITLE = '/## (.*)/';
+    public const PARSE_SUBTITLE = '/## (.*)/';
 
     /**
      *
      */
-    const PARSE_DATE = '/([0-9]{4})-([0-9]{2})-([0-9]{2})/';
+    public const PARSE_DATE = '/([0-9]{4})-([0-9]{2})-([0-9]{2})/';
 
     /**
      * @var
      */
-    private $entityManager;
+    private ObjectManager $entityManager;
 
     /**
      * Row 0 - title
@@ -45,7 +46,7 @@ class MarkdownFileParser
      * @param ObjectManager $entityManager
      * @param string $post
      * @return Page
-     * @throws \Exception
+     * @throws Exception
      */
     public function parse(ObjectManager $entityManager, string $post): Page
     {

@@ -65,7 +65,7 @@ class ContentSecurityPolicyTest extends TestCase
     {
         $this->assertEquals(
             'default-src \'self\'; script-src \'unsafe-eval\' \'self\' analytics.google.com; upgrade-insecure-requests',
-            ContentSecurityPolicy::getInstance()->getCSPEnforceHeader($this->csp)
+            ContentSecurityPolicy::getCSPEnforceHeader($this->csp)
         );
     }
     /**
@@ -76,7 +76,7 @@ class ContentSecurityPolicyTest extends TestCase
     {
         $this->assertEquals(
             'style-src \'self\' data:',
-            ContentSecurityPolicy::getInstance()->getCSPReportHeader($this->csp)
+            ContentSecurityPolicy::getCSPReportHeader($this->csp)
         );
     }
     /**
@@ -86,7 +86,7 @@ class ContentSecurityPolicyTest extends TestCase
     public function testGenerateCSPEnforceHeaderDefault(): void
     {
         $this->assertEmpty(
-            ContentSecurityPolicy::getInstance()->getCSPEnforceHeader()
+            ContentSecurityPolicy::getCSPEnforceHeader()
         );
     }
     /**
@@ -96,7 +96,7 @@ class ContentSecurityPolicyTest extends TestCase
     public function testGenerateCSPReportHeaderDefault(): void
     {
         $this->assertEmpty(
-            ContentSecurityPolicy::getInstance()->getCSPReportHeader()
+            ContentSecurityPolicy::getCSPReportHeader()
         );
     }
 
@@ -111,7 +111,7 @@ class ContentSecurityPolicyTest extends TestCase
                 }',
                 true
             );
-            ContentSecurityPolicy::getInstance()->generateCSP($csp);
+            ContentSecurityPolicy::generateCSP($csp);
         } catch (Exception $exception) {
             $this->assertStringContainsString('policy is not supported', $exception->getMessage());
         }
@@ -128,7 +128,7 @@ class ContentSecurityPolicyTest extends TestCase
                 }',
                 true
             );
-            ContentSecurityPolicy::getInstance()->generateCSP($csp);
+            ContentSecurityPolicy::generateCSP($csp);
         } catch (Exception $exception) {
             $this->assertStringContainsString('Could not understand', $exception->getMessage());
         }

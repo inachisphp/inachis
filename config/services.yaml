@@ -1,11 +1,13 @@
 parameters:
-    password_reset.ttl: '%env(PASSWORD_RESET_TTL)%'
-    
     app.config.title: 'Wandering the World'
     app.config.locale: 'en'
+
+    password_reset.ttl: '%env(PASSWORD_RESET_TTL)%'
+    app.public_img_path: '%env(APP_PUBLIC_IMG_PATH)%'
+
     app.config.twitter: 'jedi58'
 
-    csp:
+    csp: ''
 
 services:
     # default configuration for services in *this* file
@@ -21,6 +23,10 @@ services:
             - '../src/Migrations/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+
+    App\Service\Image\ImageLocaliser:
+        arguments:
+            $publicImgPath: '%app.public_img_path%'
 
     App\Service\PasswordResetTokenService:
         arguments:

@@ -21,11 +21,11 @@ class LoginActivity
     /**
      *
      */
-    const STATUS_UNBLOCKED = false;
+    public const STATUS_UNBLOCKED = false;
     /**
      *
      */
-    const STATUS_BLOCKED = true;
+    public const STATUS_BLOCKED = true;
 
     /**
      * @var UuidInterface|null

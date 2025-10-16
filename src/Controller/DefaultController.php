@@ -17,7 +17,7 @@ use DateTime;
 
 class DefaultController extends AbstractInachisController
 {
-    const ITEMS_TO_SHOW = 10;
+    public const ITEMS_TO_SHOW = 10;
 
     #[Route("/", methods: [ "GET" ])]
     public function homepage(): Response

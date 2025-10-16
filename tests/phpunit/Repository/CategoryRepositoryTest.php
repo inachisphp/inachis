@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 
@@ -86,6 +87,7 @@ class CategoryRepositoryTest extends TestCase
 
     public function testFindByTitleLikeDelegatesToGetAll(): void
     {
+        $paginator = $this->createMock(Paginator::class);
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
@@ -97,9 +99,9 @@ class CategoryRepositoryTest extends TestCase
                 ],
                 'q.title'
             )
-            ->willReturn('mock_paginator');
+            ->willReturn($paginator);
 
         $result = $this->repository->findByTitleLike('test');
-        $this->assertEquals('mock_paginator', $result);
+        $this->assertEquals($paginator, $result);
     }
 }
