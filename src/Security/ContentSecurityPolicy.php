@@ -52,24 +52,6 @@ final class ContentSecurityPolicy
         'sandbox',
         'upgrade-insecure-requests',
     ];
-    /**
-     * @var ContentSecurityPolicy reference to instance of self
-     */
-    protected static ContentSecurityPolicy $instance;
-
-    /**
-     * Returns an instance of {@link Application}.
-     *
-     * @return ContentSecurityPolicy The current or a new instance of {@link Application}
-     */
-    public static function getInstance(): ContentSecurityPolicy
-    {
-        if (null === static::$instance) {
-            static::$instance = new static();
-        }
-
-        return static::$instance;
-    }
 
     /**
      * Returns the CSP policy for enforcing.
