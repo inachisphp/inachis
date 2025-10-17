@@ -1,7 +1,6 @@
 parameters:
     .container.dumper.inline_factories: true
-    password_reset.ttl: '%env(PASSWORD_RESET_TTL)%'
-    
+
     app.config.title: 'Wandering the World'
     app.config.locale: 'en'
 
