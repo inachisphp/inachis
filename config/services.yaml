@@ -1,4 +1,5 @@
 parameters:
+    .container.dumper.inline_factories: true
     password_reset.ttl: '%env(PASSWORD_RESET_TTL)%'
     
     app.config.title: 'Wandering the World'
@@ -6,6 +7,7 @@ parameters:
     app.config.twitter: 'jedi58'
 
     csp:
+    google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
 
 services:
     # default configuration for services in *this* file
@@ -31,7 +33,20 @@ services:
         arguments:
             $csp: '%csp%'
 
-    # Add support for Markdown in Twig templates
+#    App\Service\CryptoService:
+#        arguments:
+#            $masterKey: '%env(APP_ENCRYPTION_KEY)%'
+
+#    App\EntityListener\SettingListener:
+#        tags:
+#            - { name: doctrine.orm.entity_listener }
+
+#    App\Service\ImageResizer\GdImageResizer: ~
+#    App\Service\ImageResizer\ImagickResizer: ~
+    App\Service\ImageResizer\ImageResizerInterface:
+        factory: ['App\Service\ImageResizer\ImageResizerFactory', 'create']
+        public: true
+
     markdown.engine:
         class: Aptoma\Twig\Extension\MarkdownEngine\MichelfMarkdownEngine
     twig.markdown:
