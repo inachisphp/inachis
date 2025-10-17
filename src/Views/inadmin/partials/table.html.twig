@@ -10,28 +10,34 @@
     <p class="pagination--info">
         Showing {{ offset + 1 }} to {{ min(offset + limit, total) }} of {{ total }}
     </p>
-    {% if table_desc|default('') is not empty %}
+        {% if table_desc|default('') is not empty %}
     <p id="table-desc" class="visually-hidden">
         {{ table_desc }}
     </p>
-    {% endif %}
+        {% endif %}
     <table {%- if table_desc|default('') is not empty %} aria-describedby="table-desc"{% endif %} class="table{%- if table_class %} {{ table_class }}{% endif %}{%- if zebra|default(false) %}  table-striped{% endif %}">
         <caption class="visually-hidden">{{ table_name }}</caption>
         <thead>
         <tr>
+        {% if actions|default(null) is not empty %}
             <th scope="col">
                 <label for="select-all" class="visually-hidden">Select all rows</label>
                 <input type="checkbox" id="select-all" aria-label="Select all rows">
             </th>
-            {% for column in columns %}
+        {% endif %}
+        {% for column in columns %}
             <th scope="col">{{ column.title }}</th>
-            {% endfor %}
+        {% endfor %}
         </tr>
         </thead>
         <tbody>
         {% for item in dataset.iterator %}
             <tr>
-                <td> <input type="checkbox" /></td>
+            {% if actions|default(null) is not empty %}
+                <td>
+                    <input class="checkbox" id="{{ type }}-{{ item.id }}__input" type="checkbox" name="items[]" value="{{ item.id }}" />
+                </td>
+            {% endif %}
             {% for column in columns %}
                 {% if column.slug is defined %}
                     {% if '.' in column.slug %}
@@ -85,4 +91,6 @@
             {% include 'inadmin/partials/action_bar.html.twig' %}
         {% endif %}
     {% endif %}
+
+    {{ form_end(form, render_rest: false) }}
 {% endblock table %}
