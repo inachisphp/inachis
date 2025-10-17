@@ -47,7 +47,7 @@ class LoginType extends AbstractType
             ])
             ->add('loginPassword', PasswordType::class, [
                 'attr' => [
-                    'aria-labelled-by' => 'form-login__password-label',
+                    'aria-labelledby' => 'form-login__password-label',
                     'aria-required'    => 'true',
                     'class'            => 'text',
                     'id'               => 'form-login__password',

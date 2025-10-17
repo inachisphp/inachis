@@ -11,30 +11,44 @@ namespace App\Parser;
 
 use App\Entity\Category;
 use App\Entity\Page;
-use Doctrine\Common\Persistence\ObjectManager;
 use DateTime;
+use Doctrine\Persistence\ObjectManager;
+use Exception;
 
 class MarkdownFileParser
 {
     /**
-     *
+     * Regular expression for matching an H1 from markdown
      */
-    const PARSE_TITLE = '/# (.*)/';
+    public const PARSE_TITLE = '/^# (.+)$/m';
 
     /**
-     *
+     * Regular expression for matching an H2 from markdown
      */
-    const PARSE_SUBTITLE = '/## (.*)/';
+    public const PARSE_SUBTITLE = '/^## (.+)$/m';
 
     /**
-     *
+     * Regular expression for matching dates in YYYY-mm-dd format
      */
-    const PARSE_DATE = '/([0-9]{4})-([0-9]{2})-([0-9]{2})/';
+    public const PARSE_DATE = '/^(\d{4}-\d{2}-\d{2})( \d{2}:\d{2})?(:\d{2})?$/m';
 
     /**
-     * @var
+     * Regular expression for matching a slash-separated category path
      */
-    private $entityManager;
+    public const PARSE_CATEGORY_PATH = '/^[a-z0-9 &]+(\/[a-z0-9 &]+)*$/mi';
+
+    /**
+     * @var ObjectManager
+     */
+    private ObjectManager $em;
+
+    /**
+     * @param ObjectManager $em
+     */
+    public function __construct(ObjectManager $em)
+    {
+        $this->em = $em;
+    }
 
     /**
      * Row 0 - title
@@ -42,63 +56,74 @@ class MarkdownFileParser
      * Row 2 - postdate / category
      * Row 3 - Category / null
      * Row 4+ - Post content
-     * @param ObjectManager $entityManager
-     * @param string $post
+     * @param string $markdown
      * @return Page
-     * @throws \Exception
+     * @throws Exception
      */
-    public function parse(ObjectManager $entityManager, string $post): Page
+    public function parse(string $markdown): Page
     {
-        $this->entityManager = $entityManager;
         $page = new Page();
-        $post = preg_split('/[\r\n]/', $post, 5);
-        $subTitleOffset = 0;
-        if (preg_match(MarkdownFileParser::PARSE_TITLE, $post[0], $match)) {
+        $markdown = preg_split('/\R/', trim($markdown));
+        if (!$markdown || count($markdown) < 2) {
+            throw new Exception('Invalid blog markdown format.');
+        }
+
+        $offset = 1;
+        if (preg_match(self::PARSE_TITLE, $markdown[0], $match)) {
             $page->setTitle(trim($match[1]));
+        } else {
+            throw new Exception('Invalid blog markdown format - entry must start with a title.');
         }
-        if (preg_match(MarkdownFileParser::PARSE_SUBTITLE, $post[1], $match)) {
+        if (preg_match(self::PARSE_SUBTITLE, $markdown[1], $match)) {
             $page->setSubTitle(trim($match[1]));
-            $subTitleOffset = 1;
+            ++$offset;
         }
-        if (preg_match(MarkdownFileParser::PARSE_DATE, $post[1 + $subTitleOffset], $match)) {
+        if (preg_match(self::PARSE_DATE, $markdown[$offset], $match)) {
             $page->setPostDate(new DateTime($match[0]));
+            ++$offset;
         }
-        $category = $this->getCategoryFromPath(explode('/', $post[2 + $subTitleOffset]));
-        $category = $entityManager->getRepository(Category::class)->findOneByTitle($category);
-        if ($category) {
-            $page->addCategory($category);
+        if (preg_match(self::PARSE_CATEGORY_PATH, $markdown[$offset], $match)) {
+            $categoryPath = array_filter(explode('/', trim($markdown[$offset])));
+            $category = $this->resolveCategoryPath($categoryPath);
+            if ($category) {
+                $page->addCategory($category);
+            }
+            ++$offset;
         }
-        $page->setContent(trim($post[4]));
+        $content = implode("\n", array_slice($markdown, $offset));
+        $page->setContent(trim($content));
 
         return $page;
     }
 
     /**
-     * @param array $categoryPath
-     * @param Category|null $category
-     * @return Category
+     * @param array $path
+     * @return Category|null
      */
-    private function getCategoryFromPath(array $categoryPath, Category $category = null): Category
+    private function resolveCategoryPath(array $path): ?Category
     {
-        if ($category === null) {
-            $category = $categoryPath;
-            if (is_array($categoryPath)) {
-                $category = str_replace(['-'], [' '], array_shift($categoryPath));
-            }
-            $category = $this->entityManager->getRepository(Category::class)->findOneByTitle($category);
+        if (empty($path)) {
+            return null;
         }
 
-        if (!empty($categoryPath) && !empty($category->getChildren())) {
-            foreach ($category->getChildren() as $childCategory) {
-                if ($childCategory->getTitle() === $categoryPath[0]) {
-                    $category = $childCategory;
-                    array_shift($categoryPath);
+        $repo = $this->em->getRepository(Category::class);
+        $parent = null;
 
-                    return $this->getCategoryFromPath($categoryPath, $category);
-                }
+        foreach ($path as $segment) {
+            $title = str_replace('-', ' ', trim($segment));
+
+            $criteria = ['title' => $title];
+            if ($parent !== null) {
+                $criteria['parent'] = $parent;
             }
+            $category = $repo->findOneBy($criteria);
+
+            if (!$category) {
+                return $parent;
+            }
+            $parent = $category;
         }
 
-        return $category;
+        return $parent;
     }
 }

@@ -24,11 +24,11 @@ use DateTime;
  */
 class RevisionRepository extends AbstractRepository
 {
-    const DELETED = 'Deleted';
-    const PUBLISHED = 'Published';
-    const UPDATED = 'Updated';
-    const VISIBILITY_CHANGE = 'Visibility changed to %s';
-    const REVERTED = 'Reverted to version %s';
+    public const DELETED = 'Deleted';
+    public const PUBLISHED = 'Published';
+    public const UPDATED = 'Updated';
+    public const VISIBILITY_CHANGE = 'Visibility changed to %s';
+    public const REVERTED = 'Reverted to version %s';
 
     public function __construct(ManagerRegistry $registry)
     {

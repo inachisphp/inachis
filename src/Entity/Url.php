@@ -25,7 +25,7 @@ class Url
     /**
      * @const The maximum size allowed for SEO-friendly short URLs
      */
-    const DEFAULT_URL_SIZE_LIMIT = 255;
+    public const DEFAULT_URL_SIZE_LIMIT = 255;
 
     /**
      * @var UuidInterface|null The unique identifier for the Url

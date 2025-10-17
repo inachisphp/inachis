@@ -22,9 +22,9 @@ class WidgetController extends AbstractController
     /*
      * @var int Default number of items to be shown by "widgets"
      */
-    const DEFAULT_MAX_DISPLAY_COUNT = 10;
+    public const DEFAULT_MAX_DISPLAY_COUNT = 10;
 
-    protected $entityManager;
+    protected EntityManagerInterface $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
     {

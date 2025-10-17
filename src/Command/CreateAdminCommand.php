@@ -59,26 +59,25 @@ class CreateAdminCommand extends Command
         $helper = $this->getHelper('question');
 
         $question = new Question('Please enter a new username: ');
-        $question->setNormalizer(function (string $value): string {
+        $question->setNormalizer(function (?string $value = ''): string {
             return $value ? trim($value) : '';
         });
         $username = $helper->ask($input, $output, $question);
 
         $question = new Question('Please enter an email address for the user: ');
-        $question->setNormalizer(function (string $value): string {
+        $question->setNormalizer(function (?string $value = ''): string {
             return $value ? trim($value) : '';
         });
         $emailAddress = $helper->ask($input, $output, $question);
 
         $question = new Question('Please enter a password for the user: ');
-        $question->setNormalizer(function (string $value): string {
+        $question->setNormalizer(function (?string $value = ''): string {
             return $value ? trim($value) : '';
         });
-        $question->setValidator(function (string $value): string {
+        $question->setValidator(function (?string $value = ''): string {
             if ('' === trim($value)) {
                 throw new Exception('The password cannot be empty');
             }
-
             return $value;
         });
         $question->setHidden(true);

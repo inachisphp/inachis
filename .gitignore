@@ -31,3 +31,4 @@
 /docker
 /docker-compose.yml
 
+deploy.php

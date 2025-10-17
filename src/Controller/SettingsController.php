@@ -15,7 +15,6 @@ use App\Entity\Series;
 use App\Entity\Tag;
 use App\Entity\Url;
 use App\Form\ContentType;
-use Doctrine\DBAL\Exception\ConnectionException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +24,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class SettingsController extends AbstractInachisController
 {
     #[Route("/incc/settings")]
-    public function index(Request $request): \Symfony\Component\HttpFoundation\Response
+    public function index(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
