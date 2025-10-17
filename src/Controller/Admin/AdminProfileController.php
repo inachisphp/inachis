@@ -19,7 +19,6 @@ use App\Util\RandomColorPicker;
 use DateTime;
 use Exception;
 use Random\RandomException;
-use ReflectionProperty;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,8 +26,7 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
-use DateTime;
-use ReflectionProperty;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class AdminProfileController extends AbstractInachisController
 {
@@ -41,30 +39,46 @@ class AdminProfileController extends AbstractInachisController
     public function adminList(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
-        $filters = array_filter($request->get('filter', []));
-        if ($request->isMethod('post')) {
-            $_SESSION['series_filters'] = $filters;
-        } elseif (isset($_SESSION['series_filters'])) {
-            $filters = $_SESSION['series_filters'];
+        if ($form->isSubmitted() && !empty($request->get('items'))) {
+            foreach ($request->get('items') as $item) {
+                $selectedItem = $this->entityManager->getRepository(User::class)->findOneById($item);
+                if ($selectedItem !== null) {
+                    if ($request->get('delete') !== null) {
+                        $selectedItem->setRemoved(true);
+                    } elseif ($request->get('enable') !== null) {
+                        $selectedItem->setActive(true);
+                    } elseif ($request->get('disable') !== null) {
+                        $selectedItem->setActive(false);
+                    }
+                    $selectedItem->setModDate(new DateTime('now'));
+                    $this->entityManager->persist($selectedItem);
+                }
+            }
+            $this->entityManager->flush();
+            return $this->redirectToRoute('app_admin_adminprofile_adminlist');
         }
 
+        $filters = array_filter($request->get('filter', []));
+        if ($request->isMethod('post')) {
+            $_SESSION['admin_filters'] = $filters;
+        } elseif (isset($_SESSION['admin_filters'])) {
+            $filters = $_SESSION['admin_filters'];
+        }
         $offset = (int) $request->get('offset', 0);
         $limit = $this->entityManager->getRepository(User::class)->getMaxItemsToShow();
+        $this->data['form'] = $form->createView();
         $this->data['dataset'] = $this->entityManager->getRepository(User::class)->getFiltered(
             $filters,
             $offset,
             $limit
         );
-        $this->data['form'] = $form->createView();
         $this->data['filters'] = $filters;
         $this->data['page']['offset'] = $offset;
         $this->data['page']['limit'] = $limit;
         $this->data['page']['title'] = 'Users';
-
         return $this->render('inadmin/admin/list.html.twig', $this->data);
     }
 
@@ -73,6 +87,7 @@ class AdminProfileController extends AbstractInachisController
      * @param ImageTransformer $imageTransformer
      * @param MailerInterface $mailer
      * @param PasswordResetTokenService $tokenService
+     * @param ValidatorInterface $validator
      * @return Response
      * @throws RandomException
      */
@@ -83,18 +98,28 @@ class AdminProfileController extends AbstractInachisController
         ImageTransformer $imageTransformer,
         MailerInterface $mailer,
         PasswordResetTokenService $tokenService,
+        ValidatorInterface $validator,
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $user = $request->get('id') !== 'new' ? $this->entityManager->getRepository(User::class)->findOneBy(['username' => $request->get('id')]) : new User();
-        $form = $this->createForm(UserType::class, $user);
+        $form = $this->createForm(UserType::class, $user, [
+            'validation_groups' => [ '' ],
+        ]);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($form->has('enableDisable') && $form->get('enableDisable')->isClicked()) {
+                $user->setActive(!$user->isEnabled());
+            }
+            if ($form->has('delete') && $form->get('delete')->isClicked()) {
+                $user->setRemoved(true);
+            }
             $user->setModDate(new DateTime('now'));
-            $reflection = new ReflectionProperty(User::class, 'id');
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
 
-            if (!$reflection->isInitialized($user)) {
+            if ($request->get('id') === 'new') {
                 $data = $tokenService->createResetRequestForEmail($user->getEmail());
                 $user->setColor(RandomColorPicker::generate());
                 try {
@@ -112,12 +137,12 @@ class AdminProfileController extends AbstractInachisController
                         ])
                     ;
                     $mailer->send($email);
+                    $this->entityManager->persist($user);
+                    $this->entityManager->flush();
                 } catch (TransportExceptionInterface $e) {
                     $this->addFlash('warning', 'Error while sending mail: ' . $e->getMessage());
                 }
             }
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
 
             $this->addFlash('success', 'User details saved.');
             return $this->redirect($this->generateUrl('app_admin_adminprofile_admindetails', [

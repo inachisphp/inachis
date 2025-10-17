@@ -33,7 +33,7 @@ use DateTime;
 
 class ZZPageController extends AbstractInachisController
 {
-    const ITEMS_TO_SHOW = 20;
+    public const ITEMS_TO_SHOW = 20;
 
     /**
      * @param Request $request
@@ -103,7 +103,7 @@ class ZZPageController extends AbstractInachisController
         }
         $crawlerDetect = new CrawlerDetect();
         if (!$crawlerDetect->isCrawler()) {
-            // record page hit by day
+            // @todo record page hit by day
         }
         return $this->render('web/post.html.twig', $this->data);
     }

@@ -16,6 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Exception;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,8 +24,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Object for handling User entity.
  */
-#[ORM\Entity(repositoryClass: "App\Repository\UserRepository", readOnly: false)]
-#[ORM\Index(columns: [ "usernameCanonical", "emailCanonical" ], name: "search_idx")]
+#[ORM\Entity(repositoryClass: 'App\Repository\UserRepository', readOnly: false)]
+#[ORM\Index(columns: [ 'usernameCanonical', 'emailCanonical' ], name: 'search_idx')]
+#[UniqueEntity(fields: ['email'], message: 'This email address is already used.')]
+#[UniqueEntity(fields: ['username'], message: 'This username is already taken.')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
@@ -33,20 +36,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public const NO_PASSWORD_EXPIRY = -1;
 
     /**
-     * @var UuidInterface The unique identifier for the {@link User}
+     * @var UuidInterface|null The unique identifier for the {@link User}
      */
     #[ORM\Id]
     #[ORM\Column(type: "uuid", unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: "CUSTOM")]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected UuidInterface $id;
+    protected ?UuidInterface $id = null;
 
     /**
      * @var string|null Username of the user
      */
-    #[ORM\Column(type: "string", length: 512, nullable: false)]
+    #[ORM\Column(type: "string", length: 255, unique: true, nullable: false)]
     #[Assert\NotBlank]
-    #[Assert\Type(type: ['alpha', 'digit'])]
+    #[Assert\Regex(
+        pattern: '/^[A-Za-z0-9]{3,}$/',
+        message: 'Username may only contain letters and digits, and must be 3 characters or more.'
+    )]
     protected ?string $username;
 
     /**
@@ -64,7 +70,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string|null Plaintext version of password - used for validation only and is not stored
      */
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(groups: [ 'Default' ])]
     #[Assert\Length(max: 4096)]
     #[Assert\NotCompromisedPassword]
     #[Assert\PasswordStrength(
@@ -75,7 +81,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string|null Email address of the user
      */
-    #[ORM\Column(type: "string", length: 512, nullable: false)]
+    #[ORM\Column(type: "string", length: 512, unique: true, nullable: false)]
+    #[Assert\Email]
     #[Assert\NotBlank]
     protected ?string $email;
 
@@ -131,7 +138,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var DateTime|null The date the password was last modified
      */
     #[ORM\Column(type: "datetime")]
-    protected ?DateTime $passwordModDate;
+    protected ?DateTime $passwordModDate = null;
 
     /**
      * @InachisAssert\ValidTimezone()
@@ -168,16 +175,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $currentTime = new DateTime('now');
         $this->setCreateDate($currentTime);
         $this->setModDate($currentTime);
-        $this->setPasswordModDate($currentTime);
         $this->setTimezone('UTC');
     }
 
     /**
      * Returns the {@link id} of the {@link User}.
      *
-     * @return string The ID of the user
+     * @return UuidInterface|null The ID of the user
      */
-    public function getId(): string
+    public function getId(): ?UuidInterface
     {
         return $this->id;
     }
@@ -247,7 +253,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function isEnabled(): bool
     {
-        return $this->isActive;
+        return $this->isActive && !$this->isRemoved;
     }
 
     /**
@@ -303,10 +309,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the value of {@link Id}.
      *
-     * @param UuidInterface $value The value to set
+     * @param UuidInterface|null $value The value to set
      * @return $this
      */
-    public function setId(UuidInterface $value): self
+    public function setId(?UuidInterface $value): self
     {
         $this->id = $value;
 
@@ -336,6 +342,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(?string $value): self
     {
         $this->password = $value;
+        $this->setPasswordModDate(new DateTime('now'));
 
         return $this;
     }

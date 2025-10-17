@@ -225,9 +225,6 @@ class AccountController extends AbstractInachisController
             }
             $plainPassword = $form->getData()['change_password']['new_password'];
             $hashed = $hasher->hashPassword($user, $plainPassword);
-            if (!$hasher->isPasswordValid($user, $plainPassword)) {
-                throw new AccessDeniedHttpException();
-            }
             $user->setPassword($hashed);
             $user->setPasswordModDate(new DateTime('now'));
             $tokenService->markAsUsed($resetRequest);
