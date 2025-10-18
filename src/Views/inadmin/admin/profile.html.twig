@@ -17,7 +17,8 @@
             }) }}
     {% if user.username is defined and user.username is not empty %}
             <h3>Editing user: {{ user.username }}</h3>
-        {% if app.user.username == user.username %}
+{# @todo add avatar selector #}
+        {% if false or app.user.username == user.username %}
             <fieldset class="multisection">
                 <legend>Your Display Picture</legend>
                 {{ form_widget(form.avatar) }}
@@ -32,6 +33,8 @@
                             data-target="avatar"
                             data-template-name="uploader"
                             data-title="Upload a new display picture"
+                            data-filesize-limit="2048"
+                            data-dimensions-limt="200"
                             type="button"
                     ><span class="material-icons">image</span> Upload a new picture</button>
                 </p>
@@ -90,10 +93,9 @@
                 </p>
             </div>
         </div>
-        {{ form_end(form) }}
+    {{ form_end(form) }}
 
     {% endblock profile %}
-
 
     {% block profile_post %}{% endblock profile_post %}
 {% endblock content %}

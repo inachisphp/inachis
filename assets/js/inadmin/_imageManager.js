@@ -23,7 +23,8 @@ var InachisImageManager = {
             $('.ui-dialog-secondary-bar').toggle();
             this.toggleUploadImage();
         } else {
-            $('.gallery input[type=radio]').change(InachisImageManager.enableChooseButton);
+            InachisImageManager.buttons[0].disabled = true;
+            $('.gallery input[type=radio]').on('change', InachisImageManager.enableChooseButton);
             $('#ui-dialog-search-input').on('input', function (event) {
                 InachisImageManager.searchImages();
             });
@@ -93,6 +94,7 @@ var InachisImageManager = {
                     InachisImageManager.offset = 0;
                     $('.gallery').animate({ scrollTop:0}, 100);
                     InachisImageManager.addPaginationLinks();
+                    $('.gallery input[type=radio]').on('change', InachisImageManager.enableChooseButton);
                     $('#images_count').html($('.gallery ol').attr('data-total'));
                 }
             );

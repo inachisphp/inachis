@@ -10,8 +10,6 @@
 
     {% block user_list %}
     <div class="col span_8_of_8 widget-posts">
-        <a class="button button--positive" href="{{ path('app_admin_new') }}">
-            <span class="material-icons">add</span> Create admin</a>
 
         {% include 'inadmin/partials/table.html.twig' with {
             className: 'form__users',
@@ -66,7 +64,12 @@
             filters: [],
             filter_values: filters,
             show_search: true,
-            url_add: path('app_admin_new'),
+
+            add_button: {
+                text: 'Create Admin',
+                url: path('app_admin_new'),
+            },
+
             url_result: path('app_admin_adminprofile_adminlist'),
             zebra: true,
 

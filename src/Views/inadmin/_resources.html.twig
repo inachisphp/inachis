@@ -23,19 +23,23 @@
         {{ form_start(form, {'attr': { 'class': 'form form__' ~ page.type ~ ' content__list' }}) }}
 
         {{- form_errors(form) -}}
-        <p>
-            <button href="#" class="button button--info dialog__link"
-                    data-buttons="eyJ0ZXh0IjoiQ2hvb3NlIEltYWdlIiwiY2xhc3MiOiJidXR0b24gYnV0dG9uLS1wb3NpdGl2ZSIsImRpc2FibGVkIjp0cnVlfQ=="
-                    data-class-name="dialog__imageManager"
-                    data-template-name="image-manager"
-                    data-title="{% trans %}admin.dialog.upload.title{% endtrans %}"
-                    data-view="upload"
-                    type="button"
-            ><span class="material-icons">cloud_upload</span> Upload a new Image</button>
-        </p>
 
         {% if dataset is not empty %}
             {{ include('inadmin/partials/filters.html.twig', {
+                add_button: {
+                    class: 'dialog__link',
+                    data: {
+                        buttons: 'eyJ0ZXh0IjoiQ2hvb3NlIEltYWdlIiwiY2xhc3MiOiJidXR0b24gYnV0dG9uLS1wb3NpdGl2ZSIsImRpc2FibGVkIjp0cnVlfQ==',
+                        'class-name': 'dialog__imageManager',
+                        'template-name': 'image-manager',
+                        title: 'admin.dialog.upload.title'|trans,
+                        view: 'upload',
+                    },
+                    text: 'Upload a new image',
+                    image: 'cloud_upload',
+                    type: 'button',
+                    url: '#',
+                },
                 filters: {
                     Usage: {
                         '': 'All',
@@ -63,7 +67,7 @@
                     {% set filename = '/imgs/' ~ filename %}
                 {% endif %}
             <li>
-                <a href="{{ path('app_resource_editresource', { type: page.type, id: item.id }) }}" title="{{ item.title }}">
+                <a href="{{ path('app_resource_editresource', { type: page.type, filename: item.id }) }}" title="{{ item.title }}">
                     <span><img alt="{{ item.altText }}" src="{{ filename }}" /></span>
                     {{ item.title|u.truncate(35, '...', false) }}
                 </a>

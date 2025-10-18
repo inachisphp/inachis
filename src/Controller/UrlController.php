@@ -66,20 +66,25 @@ class UrlController extends AbstractInachisController
             return $this->redirectToRoute('app_url_list');
         }
         $filters = array_filter($request->get('filter', []));
+        $sort = $request->get('sort', 'contentDate asc');
+        if ($request->isMethod('post')) {
+            $_SESSION['series_filters'] = $filters;
+            $_SESSION['sort'] = $sort;
+        } elseif (isset($_SESSION['series_filters'])) {
+            $filters = $_SESSION['series_filters'];
+            $sort = $_SESSION['sort'];
+        }
         $offset = (int) $request->get('offset', 0);
         $limit = $this->entityManager->getRepository(Url::class)->getMaxItemsToShow();
-        $this->data['dataset'] = $this->entityManager->getRepository(Url::class)->getAll(
+        $this->data['dataset'] = $this->entityManager->getRepository(Url::class)->getFiltered(
+            $filters,
             $offset,
             $limit,
-            [],
-            [
-                [ 'substring(q.link, 1, 10)', 'asc' ],
-                [ 'q.default', 'desc' ],
-                [ 'q.createDate', 'desc' ],
-            ]
+            $sort
         );
         $this->data['form'] = $form->createView();
         $this->data['filters'] = $filters;
+        $this->data['page']['sort'] = $sort;
         $this->data['page']['offset'] = $offset;
         $this->data['page']['limit'] = $limit;
         $this->data['page']['title'] = 'URLs';

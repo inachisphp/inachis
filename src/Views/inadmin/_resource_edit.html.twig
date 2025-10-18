@@ -34,10 +34,14 @@
             <h3>Properties</h3>
             {% if page.type == 'images' %}
             <p><strong>Dimensions:</strong> {{ resource.dimensionX ~ ' (w) x ' ~ resource.dimensionY ~ ' (h)' }}</p>
+            <p><strong>Colour Depth:</strong> {{ bits }}-bit {% if channels == 3 %}RGB{% else %}CMYK{% endif %}</p>
             {% endif %}
             <p><strong>File name:</strong> {{ resource.filename }}</p>
             <p><strong>File type:</strong> {{ resource.filetype }}</p>
-            <p><strong>Size:</strong> {{ resource.filesize }}</p>
+            {% if not (resource.filename starts with 'http')  %}
+            <p><strong>Size:</strong> {{ resource.filesize }} bytes ({{ (resource.filesize / 1024 / 1024) }} Mb)</p>
+            {% endif %}
+            <p>&nbsp;</p>
         </fieldset>
         </div>
         <div class="col span_3_of_8">

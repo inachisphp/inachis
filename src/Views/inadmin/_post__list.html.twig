@@ -68,7 +68,10 @@
                 'slug_prefix': page.tab,
                 'slug': 'urls[0].link',
 
-                'url_add': link_new,
+                'add_button': {
+                    'text': 'Create ' ~ page.tab|capitalize,
+                    'url': link_new,
+                },
                 'url_result': path('app_zzpage_getpostlistadmin'),
 
                 'badges': badges,
@@ -135,7 +138,6 @@
                     'modDate desc': 'Modified dates newest to oldest',
                     'title asc': 'Title A-Z',
                     'title desc': 'Title Z-A',
-
                 },
 
                 'show_search': true,
