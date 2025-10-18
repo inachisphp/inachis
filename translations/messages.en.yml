@@ -12,7 +12,7 @@ admin.reset_sent.heading: 'Thank you,'
 admin.reset_sent.text: 'If your account was found, you will soon receive an email to the email address you provided with instructions to reset your password.'
 
 admin.button.cancel: 'Cancel'
-admin.button:disable: 'Disable'
+admin.button.disable: 'Disable'
 admin.button.enable: 'Enable'
 admin.button.save: 'Save'
 admin.button.continue: 'Continue'
