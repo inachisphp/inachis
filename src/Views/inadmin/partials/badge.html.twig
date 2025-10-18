@@ -1,6 +1,8 @@
 {% if badges|default(null) is not empty %}
+    {% set badges_used = false %}
     {% for badgeName,badge in badges %}
-        {%- if attribute(item, badge.field) == badge.condition %}
+        {%- if (badge.field is defined and attribute(item, badge.field) == badge.condition) or (badge.default|default(false) == true and not badges_used) %}
+            {% set badges_used = true %}
             <span class="badge {{ badge.className }}">{{ badgeName }}</span>
         {% endif -%}
     {% endfor %}

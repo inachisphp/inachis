@@ -37,13 +37,17 @@
                         'disabled': {
                             field: 'enabled',
                             condition: false,
-                            className: 'badge__disabled',
+                            className: 'badge__draft',
                         },
                         'new-user': {
                             field: 'password',
                             condition: '',
-                            className: 'badge__new',
+                            className: 'badge__hotlink',
                         },
+                        'active': {
+                            default: true,
+                            className: 'badge__scheduled',
+                        }
                     },
                 },
                 {
@@ -59,10 +63,39 @@
 
             slug_prefix: 'admin',
 
+            filters: [],
+            filter_values: filters,
             show_search: true,
             url_add: path('app_admin_new'),
             url_result: path('app_admin_adminprofile_adminlist'),
             zebra: true,
+
+            actions: {
+                enable: {
+                    button_class: 'button--secondary',
+                    'data': {
+                        'form-action': ''
+                    },
+                    icon: 'person_outline',
+                    title: 'admin.button.enable'|trans,
+                },
+                disable: {
+                    button_class: 'button--secondary',
+                    'data': {
+                        'form-action': ''
+                    },
+                    icon: 'person_off',
+                    title: 'admin.button.disable'|trans,
+                },
+                delete: {
+                    button_class: 'button--negative button--delete',
+                    'data': {
+                        'form-action': ''
+                    },
+                    icon: 'delete',
+                    title: 'Delete',
+                }
+            }
         } %}
     </div>
     {% endblock user_list %}

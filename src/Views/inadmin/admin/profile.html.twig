@@ -43,7 +43,7 @@
     {% endif %}
             <fieldset class="content__edit multisection">
                 <legend>Personal Information</legend>
-    {% if user.username is not defined or user.username is empty %}
+    {% if user.id is not defined or user.id is empty %}
                 <p>
                     {{ form_label(form.username) }}
                     {{ form_widget(form.username) }}
@@ -69,7 +69,7 @@
                 </p>
             </fieldset>
 
-        {% if app.user.username == user.username %}
+    {% if app.user.username == user.username %}
             <fieldset class="content__edit multisection">
                 <legend>Settings</legend>
                 <p>
@@ -78,14 +78,16 @@
                     {{ form_errors(form.color) }}
                 </p>
             </fieldset>
-        {% endif %}
+    {% endif %}
 
             <div class="fixed-bottom-bar">
-            <p>
-                <button class="button button--positive" type="submit"><span class="material-icons">save</span> Save</button>
-                <button class="button button--negative" type="submit"><span class="material-icons">disabled_visible</span> Disable</button>
-                <button class="button button--negative" type="submit"><span class="material-icons">delete</span> Delete</button>
-            </p>
+                <p>
+                    {{ form_widget(form.submit) }}
+    {% if user.id is not empty and app.user.username != user.username %}
+                    {{ form_widget(form.enableDisable) }}
+                    {{ form_widget(form.delete) }}
+    {% endif %}
+                </p>
             </div>
         </div>
         {{ form_end(form) }}
