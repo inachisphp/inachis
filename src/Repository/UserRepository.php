@@ -29,14 +29,13 @@ class UserRepository extends AbstractRepository //ServiceEntityRepository
      */
     public function getFiltered($filters, $offset, $limit): Paginator
     {
-        $where = [];
+        $where = [
+            'q.isRemoved = \'0\'',
+            []
+        ];
         if (!empty($filters['keyword'])) {
-            $where = [
-                '(q.displayName LIKE :keyword OR q.username LIKE :keyword OR q.email LIKE :keyword )',
-                [
-                    'keyword' => '%' . $filters['keyword']  . '%',
-                ],
-            ];
+            $where[0] .= ' AND (q.displayName LIKE :keyword OR q.username LIKE :keyword OR q.email LIKE :keyword )';
+            $where[1]['keyword'] = '%' . $filters['keyword']  . '%';
         }
         return $this->getAll(
             $offset,

@@ -9,7 +9,7 @@
 
 namespace App\Tests\Controller;
 
-use App\Controller\ZZPageController;
+use App\Controller\Page\Post\PageController;
 use App\Entity\Category;
 use App\Entity\Page;
 use App\Entity\Revision;
@@ -39,7 +39,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ZZPageControllerTest extends WebTestCase
 {
-    private ZZPageController $controller;
+    private PageController $controller;
     private EntityManagerInterface|MockObject $entityManager;
     private Security|MockObject $security;
 
@@ -50,7 +50,7 @@ class ZZPageControllerTest extends WebTestCase
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->security = $this->createMock(Security::class);
-        $this->controller = new ZZPageController($this->entityManager, $this->security);
+        $this->controller = new PageController($this->entityManager, $this->security);
 
         $ref = new ReflectionClass($this->controller);
         foreach (['entityManager', 'security'] as $prop) {
@@ -124,7 +124,7 @@ class ZZPageControllerTest extends WebTestCase
                 [Series::class, $seriesRepository],
             ]);
 
-        $controller = $this->getMockBuilder(ZZPageController::class)
+        $controller = $this->getMockBuilder(PageController::class)
             ->setConstructorArgs([$this->entityManager, $this->security])
             ->onlyMethods(['render'])
             ->getMock();
@@ -144,7 +144,7 @@ class ZZPageControllerTest extends WebTestCase
     {
         $request = new Request();
 
-        $controller = $this->getMockBuilder(ZZPageController::class)
+        $controller = $this->getMockBuilder(PageController::class)
             ->setConstructorArgs([$this->entityManager, $this->security])
             ->onlyMethods(['denyAccessUnlessGranted', 'render'])
             ->getMock();
@@ -206,7 +206,7 @@ class ZZPageControllerTest extends WebTestCase
             ->with(Url::class)
             ->willReturn($urlRepository);
 
-        $controller = $this->getMockBuilder(ZZPageController::class)
+        $controller = $this->getMockBuilder(PageController::class)
             ->setConstructorArgs([$this->entityManager, $this->security])
             ->onlyMethods(['denyAccessUnlessGranted', 'redirectToRoute'])
             ->getMock();
@@ -259,7 +259,7 @@ class ZZPageControllerTest extends WebTestCase
         $form->method('handleRequest');
         $form->method('isSubmitted')->willReturn(false);
 
-        $controller = $this->getMockBuilder(ZZPageController::class)
+        $controller = $this->getMockBuilder(PageController::class)
             ->setConstructorArgs([$this->entityManager, $this->security])
             ->onlyMethods(['denyAccessUnlessGranted', 'createForm', 'render'])
             ->getMock();
@@ -287,7 +287,7 @@ class ZZPageControllerTest extends WebTestCase
 
     public function testGetPageDelegatesToGetPost(): void
     {
-        $controller = $this->getMockBuilder(ZZPageController::class)
+        $controller = $this->getMockBuilder(PageController::class)
             ->setConstructorArgs([$this->entityManager, $this->security])
             ->onlyMethods(['getPost'])
             ->getMock();
@@ -348,7 +348,7 @@ class ZZPageControllerTest extends WebTestCase
                 [Tag::class, $tagRepo],
                 [Page::class, $pageRepo]
             ]);
-        $controller = $this->getMockBuilder(ZZPageController::class)
+        $controller = $this->getMockBuilder(PageController::class)
             ->setConstructorArgs([$this->entityManager, $this->security])
             ->onlyMethods(['render'])
             ->getMock();
@@ -409,7 +409,7 @@ class ZZPageControllerTest extends WebTestCase
                 [Category::class, $categoryRepository],
                 [Page::class, $pageRepository]
             ]);
-        $controller = $this->getMockBuilder(ZZPageController::class)
+        $controller = $this->getMockBuilder(PageController::class)
             ->setConstructorArgs([$this->entityManager, $this->security])
             ->onlyMethods(['render'])
             ->getMock();

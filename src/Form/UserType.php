@@ -11,23 +11,36 @@ namespace App\Form;
 
 use App\Entity\User;
 use App\Util\RandomColorPicker;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserType extends AbstractType
 {
+    private TranslatorInterface $translator;
+    private Security $security;
+
+    public function __construct(TranslatorInterface $translator, Security $security)
+    {
+        $this->translator = $translator;
+        $this->security = $security;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $newUser = $options['data']->getUsername() === '';
+        $newUser = $options['data']->getId() === null;
         $builder
             ->add('username', $newUser ? TextType::class : HiddenType::class, [
                 'attr' => [
                     'aria-labelledby' => 'user__username__label',
-                    'autofocus' => 'true',
+                    'autofocus' => $newUser,
                     'class' => 'text inline_label',
                     'placeholder' => 'Enter a unique username',
                     'readOnly' => !$newUser,
@@ -78,6 +91,17 @@ class UserType extends AbstractType
                 ],
             ])
             ->add('avatar', HiddenType::class)
+            ->add('submit', SubmitType::class, [
+                'attr' => [
+                    'class' => 'button button--positive',
+                ],
+                'label' => sprintf(
+                    '<span class="material-icons">%s</span> %s',
+                    'save',
+                    $this->translator->trans('admin.button.save', [], 'messages')
+                ),
+                'label_html' => true,
+            ])
         ;
         if (!$newUser) {
             $builder->add('color', ChoiceType::class, [
@@ -95,6 +119,31 @@ class UserType extends AbstractType
                 ],
                 'multiple' => false,
             ]);
+            if ($options['data']->getId() !== $this->security->getUser()->getId()) {
+                $builder
+                    ->add('delete', SubmitType::class, [
+                        'attr' => [
+                            'class' => 'button button--negative',
+                        ],
+                        'label' => sprintf(
+                            '<span class="material-icons">%s</span> %s',
+                            'delete',
+                            $this->translator->trans('admin.button.delete', [], 'messages')
+                        ),
+                        'label_html' => true,
+                    ])
+                    ->add('enableDisable', SubmitType::class, [
+                        'attr' => [
+                            'class' => 'button button--secondary',
+                        ],
+                        'label' => sprintf(
+                            '<span class="material-icons">%s</span> %s',
+                            $options['data']->isEnabled() ? 'person_off' : 'person_outline',
+                            $this->translator->trans($options['data']->isEnabled() ? 'admin.button.disable' : 'admin.button.enable', [], 'messages')
+                        ),
+                        'label_html' => true,
+                    ]);
+            }
         }
     }
 

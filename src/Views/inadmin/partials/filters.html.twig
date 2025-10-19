@@ -2,12 +2,25 @@
 
 {% if filters is defined and filters is not empty or show_search|default(false) %}
 <section class="filter">
+    {% if add_button is defined and add_button is not empty %}
+        {% set tagname = add_button.type|default('a') %}
+        <p>
+            <{{ tagname }}
+                class="button button--add {{ add_button.class|default('') }}"
+        {% for dataName,dataValue in add_button.data|default(null) %}
+            data-{{ dataName }}="{{ dataValue }}"
+        {% endfor %}
+                href="{{ add_button.url }}"
+                {% if add_button.type|default('a') == 'button' %} type="button"{% endif %}
+            ><span class="material-icons">{{ add_button.image|default('add') }}</span> {{ add_button.text }}</{{ tagname }}>
+        </p>
+    {% endif %}
     {% if show_search|default(false) %}
     <p class="filter__section-keyword">
         <label class="material-icons" for="filter__keyword">search</label>
-        <input id="filter__keyword" name="filter[keyword]" placeholder="enter a keyword" type="search" value="{{ filter_values['keyword']|default('') }}" />
+        <input id="filter__keyword" name="filter[keyword]" placeholder="filter by keyword" type="search" value="{{ filter_values['keyword']|default('') }}" />
         <button class="clear-search material-icons" data-target="#filter__keyword" type="button">cancel</button>
-        <button class="button button--info" type="submit">Search</button>
+        <button class="button button--info mobile-only" type="submit">Apply</button>
     </p>
     {% endif %}
     {% if filters is defined and filters is not empty %}

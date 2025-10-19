@@ -1,0 +1,126 @@
+{% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <span>{{ page.type|title }}</span>
+{% endblock pagetitle %}
+
+{% block content %}
+
+    {% block resources_pre %}{% endblock resources_pre %}
+
+    {% block resources %}
+    <div class="col span_8_of_8 widget-posts ui-tabs-external">
+        <ul class="ui-tabs-nav ui-corner-all ui-helper-reset ui-helper-clearfix ui-widget-header">
+            <li role="tab" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab ui-tabs-active{% if page.tab == 'Image' %} ui-state-active{% endif %}">
+                <a href="{{ settings.domain ~ path('incc_resource_list', { type: 'images' }) }}">Images</a>
+            </li>
+            <li role="tab" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab ui-tabs-active{% if page.tab == 'Download' %} ui-state-active{% endif %}">
+                <a href="{{ settings.domain ~ path('incc_resource_list', { type: 'downloads' }) }}">Downloads</a>
+            </li>
+        </ul>
+
+        {% if dataset|default(null) is not empty and form|default(null) is not empty %}
+        {{ form_start(form, {'attr': { 'class': 'form form__' ~ page.type ~ ' content__list' }}) }}
+
+        {{- form_errors(form) -}}
+
+        {% if dataset is not empty %}
+            {{ include('inadmin/partials/filters.html.twig', {
+                add_button: {
+                    class: 'dialog__link',
+                    data: {
+                        buttons: 'eyJ0ZXh0IjoiQ2hvb3NlIEltYWdlIiwiY2xhc3MiOiJidXR0b24gYnV0dG9uLS1wb3NpdGl2ZSIsImRpc2FibGVkIjp0cnVlfQ==',
+                        'class-name': 'dialog__imageManager',
+                        'template-name': 'image-manager',
+                        title: 'admin.dialog.upload.title'|trans,
+                        view: 'upload',
+                    },
+                    text: 'Upload a new image',
+                    image: 'cloud_upload',
+                    type: 'button',
+                    url: '#',
+                },
+                filters: {
+                    Usage: {
+                        '': 'All',
+                        'notinuse': 'Not in use',
+                    }
+                },
+                show_search: true,
+                sort_options: {
+                    'title asc': 'Title A-Z',
+                    'title desc': 'Title Z-A',
+                    'modDate desc': 'Modified dates closest to now',
+                    'modDate asc': 'Modified dates farthest from now',
+                    'createDate desc': 'Uploaded dates closest to now',
+                    'createDate asc': 'Uploaded dates farthest from now',
+                }
+            }) }}
+        <section class="paginated-list">
+        <p class="pagination--info">
+            Showing {{ page.offset + 1 }} to {{ min(page.offset + page.limit, dataset.count) }} of {{ dataset.count }}
+        </p>
+        <ul class="ui-image-library">
+            {% for item in dataset %}
+                {% set filename = item.filename %}
+                {% if not (filename starts with 'http') and not(filename starts with '/') %}
+                    {% set filename = '/imgs/' ~ filename %}
+                {% endif %}
+            <li>
+                <a href="{{ path('incc_resource_edit', { type: page.type, filename: item.id }) }}" title="{{ item.title }}">
+                    <span><img alt="{{ item.altText }}" src="{{ filename }}" /></span>
+                    {{ item.title|u.truncate(35, '...', false) }}
+                </a>
+                {% if item.filesize / 1024 > limitKByte %}
+                    <a href="#" class="ui-help">
+                        <em class="material-icons">warning</em>
+                        <span>This image is larger than {{ limitKByte/1024 }} kb</span>
+                    </a>
+                {% elseif item.dimensionX > limitSize or item.dimensionY > limitSize %}
+                    <a href="#" class="ui-help">
+                        <em class="material-icons">warning</em>
+                        <span>This image is larger than {{ limitSize }} on at least one side</span>
+                    </a>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {{ include('inadmin/partials/pagination.html.twig', {
+            offset: page.offset,
+            limit: page.limit,
+            maxResults: dataset.count,
+            maxPagesToShow: 5,
+            result_url: path('incc_resource_list', { type: page.type }),
+        }) }}
+        {% endif %}
+        {% if actions|default(null) is not empty %}
+            {% include 'inadmin/partials/action_bar.html.twig' %}
+        {% endif %}
+        {{ form_end(form) }}
+        </section>
+        {% elseif filter_values|default(null) is not empty %}
+            {% include 'inadmin/partials/filters.html.twig' with {
+                'filters': filters,
+                'filter_values': filter_values,
+                'show_search': show_search
+            } only %}
+
+            <p class="content-warning">
+                <i class="material-icons">info_outline</i>
+                <span>Oops! Your filter didn't find anything!</span>
+                <a href="{{ url_result }}">Remove filter</a>
+            </p>
+        {% else %}
+            <p class="content-warning">
+                <i class="material-icons">info_outline</i>
+                <span>You don't have any content yet!</span>
+                {% if url_add|default(null) is not empty %}
+                    <a href="{{ url_add }}">Add some now!</a>
+                {% endif %}
+            </p>
+        {% endif %}
+    </div>
+    {% endblock resources %}
+
+    {% block resources_post %}{% endblock resources_post %}
+{% endblock content %}

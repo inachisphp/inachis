@@ -6,32 +6,38 @@
     {{- form_errors(form) -}}
 
     {{ include('inadmin/partials/filters.html.twig') }}
-
+    <section class="paginated-list{%- if zebra|default(false) %} zebra{% endif %}">
     <p class="pagination--info">
         Showing {{ offset + 1 }} to {{ min(offset + limit, total) }} of {{ total }}
     </p>
-    {% if table_desc|default('') is not empty %}
+        {% if table_desc|default('') is not empty %}
     <p id="table-desc" class="visually-hidden">
         {{ table_desc }}
     </p>
-    {% endif %}
+        {% endif %}
     <table {%- if table_desc|default('') is not empty %} aria-describedby="table-desc"{% endif %} class="table{%- if table_class %} {{ table_class }}{% endif %}{%- if zebra|default(false) %}  table-striped{% endif %}">
         <caption class="visually-hidden">{{ table_name }}</caption>
         <thead>
         <tr>
+        {% if actions|default(null) is not empty %}
             <th scope="col">
                 <label for="select-all" class="visually-hidden">Select all rows</label>
                 <input type="checkbox" id="select-all" aria-label="Select all rows">
             </th>
-            {% for column in columns %}
+        {% endif %}
+        {% for column in columns %}
             <th scope="col">{{ column.title }}</th>
-            {% endfor %}
+        {% endfor %}
         </tr>
         </thead>
         <tbody>
         {% for item in dataset.iterator %}
             <tr>
-                <td> <input type="checkbox" /></td>
+            {% if actions|default(null) is not empty %}
+                <td>
+                    <input class="checkbox" id="{{ type }}-{{ item.id }}__input" type="checkbox" name="items[]" value="{{ item.id }}" />
+                </td>
+            {% endif %}
             {% for column in columns %}
                 {% if column.slug is defined %}
                     {% if '.' in column.slug %}
@@ -56,6 +62,8 @@
                     {% if column.source is defined and attribute(item, column.source) is defined %}
                         {% if column.source_type is defined and column.source_type == 'date' %}
                             {{ attribute(item, column.source)|date('d/m/Y') }}
+                        {% elseif column.source_type is defined and column.source_type == 'title' %}
+                            {{ attribute(attribute(item, column.source), 'title') }}
                         {% else %}
                             {{ attribute(item, column.source) }}
                         {% endif %}
@@ -81,8 +89,11 @@
             maxPagesToShow: 4,
             result_url: url_result
         }) }}
+    </section>
         {% if actions|default(null) is not empty %}
             {% include 'inadmin/partials/action_bar.html.twig' %}
         {% endif %}
     {% endif %}
+
+    {{ form_end(form, render_rest: false) }}
 {% endblock table %}

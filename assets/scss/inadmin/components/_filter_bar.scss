@@ -3,15 +3,16 @@
 
 .filter {
   align-items: center;
+  background-color: #ccc;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: row-reverse;
   font-size: 0.9em;
   justify-content: flex-start;
-  position: relative;
 
   @media #{$information-medium} {
     flex-wrap: nowrap;
-    justify-content: space-between;
+    //justify-content: space-between;
+    padding-right: 1em;
   }
 
   .filter__section-keyword {
@@ -24,16 +25,18 @@
     input {
       border: 1px solid #eee;
       border-radius: .5em;
-      padding-left: 2em;
+      padding: 0.55em 0.55em 0.55em 2em;
     }
     label {
       color: gray;
-      left: 1.8em;
-      position: absolute;
-      top: 1em;
+      //left: 1.8em;
+      position: relative;
+      //top: 1em;
 
       @media #{$information-medium} {
-        left: 0.25em;
+        position: relative;
+        top: 0.3em;
+        left: 1.25em;
       }
     }
     button[type=submit] {
@@ -50,7 +53,7 @@
   }
 
   p {
-    a, a:visited {
+    a.filter__toggle, a.filter__toggle:visited {
       background-color: $admin__filter_button-background;
       border-radius: 0.5em;
       border: 1px solid transparent;
@@ -60,12 +63,12 @@
       padding: .5em 1em;
       text-decoration: none;
     }
-    a:hover {
+    a.filter__toggle:hover {
       background-color: color.adjust($admin__filter_button-background, $lightness: -20%);
       //background-color: $admin__filter_button-background--hover;
       //color: $admin__filter_button-color--hover;
     }
-    //a.selected {
+    //a.filter__toggle.selected {
     //  background-color: $admin__filter_button-background--selected;
     //  color: $admin__filter_button-color--selected;
     //  border-radius: 0.5em 0.5em 0 0;
@@ -78,6 +81,11 @@
 }
 
 div#filter__options {
+  background-color: #fff;
+  border-left: 1px solid #eee;
+  border-right: 1px solid #eee;
+  padding: 1em;
+
   span {
     background-color: #000;
     border: 1px solid transparent;

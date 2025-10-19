@@ -86,6 +86,8 @@ $table-active-bg:             $table-hover-bg !default;
 $table-border-width:          $border-width !default;
 $table-border-color:          $border-color !default;
 $table-head-bg:               $gray-200 !default;
+$table-head-dark-bg:          #069;
+$table-head-dark-color:       #fff;
 $table-head-color:            $gray-700 !default;
 $table-dark-color:            $white !default;
 $table-dark-bg:               $gray-800 !default;
@@ -116,6 +118,8 @@ $button--info--active-color: #999;
 $button--info--hover-color: color.adjust($button--info--active-color, $lightness: -10%);
 $button--default-active-color: #d9e7cb;
 $button--default-hover-color: color.adjust($button--default-active-color, $lightness: -10%);
+$button--add--active-color: #069;
+$button--add--hover-color: color.adjust($button--add--active-color, $lightness: 10%);
 
 // dialogs
 //$dialog__background: #303030;
