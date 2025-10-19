@@ -1,29 +1,21 @@
-{% extends "inadmin/structure/main.html.twig" %}
-{% block content %}
+{% extends "inadmin/partials/form_account.html.twig" %}
+{% set page_type = 'login' %}
+{% set page_title = 'First time set-up' %}
 
-    <div class="col span_2_of_8"></div>
-    <div class="col span_4_of_8 setup">
-
+{% block form_account %}
         {% block form_setup_stage1_pre %}{% endblock form_setup_stage1_pre %}
         {% block form_setup_stage1 %}
 
-        <form name="setup_stage1" method="post" class="form form__login form__setup">
-            <h2>{{ settings.siteTitle }}</h2>
-            <p>Thank you for using inachis Framework for your website.</p>
-            <p>Before you can use this site, you need to:</p>
-            <ol>
-                <li>configure database connections in .env.local,</li>
-                <li>application config in config/services.yaml,</li>
-                <li>and create a new administrator using <pre>bin/console app:create-admin</pre></li>
-            </ol>
-            <p>You can then log-in using your new administrator account.</p>
-            <p>Enjoy!</p>
-        </form>
+        <p>Thank you for using inachis Framework for your website.</p>
+        <p>Before you can use this site, you need to:</p>
+        <ol>
+            <li>configure database connections in .env.local,</li>
+            <li>application config in config/services.yaml,</li>
+            <li>and create a new administrator using <pre>bin/console app:create-admin</pre></li>
+        </ol>
+        <p>You can then log-in using your new administrator account.</p>
+        <p>Enjoy!</p>
 
         {% endblock form_setup_stage1 %}
         {% block form_setup_stage1_post %}{% endblock form_setup_stage1_post %}
-
-    </div>
-    <div class="col span_2_of_8"></div>
-
-{% endblock content %}
+{% endblock form_account %}
