@@ -33,7 +33,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * based on the provided values.
      *
      * @param mixed $object The object to hydrate
-     * @param array[mixed] $values The values to apply to the obect
+     * @param array $values The values to apply to the object
      *
      * @return mixed The hydrated object
      */
@@ -44,7 +44,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
         }
         foreach ($values as $key => $value) {
             $methodName = 'set' . ucfirst($key);
-            if (method_exists($object, $methodName)) {
+            if (method_exists($object, $methodName) && !($key === 'id' && $value === '-1')) {
                 $object->$methodName($value);
             }
         }
@@ -86,6 +86,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * @param array        $where
      * @param array|string $order
      * @param array|string $groupBy
+     * @param array $join  $join
      *
      * @return Paginator The result of fetching the objects
      */
@@ -94,11 +95,15 @@ abstract class AbstractRepository extends ServiceEntityRepository
         int $limit = 25,
         array $where = [],
         array|string $order = [],
-        array|string $groupBy = []
+        array|string $groupBy = [],
+        array $join = []
     ): Paginator {
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('q')
             ->from($this->getClassName(), 'q');
+        if (!empty($join)) {
+            $qb->join($join[0], $join[1]);
+        }
         if (!empty($where)) {
             $qb = $qb->where($where[0]);
         }

@@ -22,12 +22,14 @@ function initClearSearch(selector)
 {
 	$(selector + '.clear-search').on('click', function()
 	{
-		$($(this).attr('data-target')).val('').val('');
+		let $searchBox = $($(this).attr('data-target'));
+		$searchBox.val('');
+		$searchBox.closest('form').trigger('submit');
 	});
 }
 
 $(document).ready(function() {
-	var $uiToggle = $('.ui-toggle');
+	let $uiToggle = $('.ui-toggle');
 	$uiToggle.each(function()
 	{
 		var targetElement = $(this).attr('data-target'),
@@ -41,7 +43,7 @@ $(document).ready(function() {
 		$($(this).attr('data-target')).toggle();
 	});
 
-	var $filterOptions = $('.filter .filter__toggle');
+	let $filterOptions = $('.filter .filter__toggle');
 	$filterOptions.on('click', function()
 	{
 		$('#filter__options').toggle();

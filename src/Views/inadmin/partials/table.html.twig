@@ -6,7 +6,7 @@
     {{- form_errors(form) -}}
 
     {{ include('inadmin/partials/filters.html.twig') }}
-
+    <section class="paginated-list{%- if zebra|default(false) %} zebra{% endif %}">
     <p class="pagination--info">
         Showing {{ offset + 1 }} to {{ min(offset + limit, total) }} of {{ total }}
     </p>
@@ -62,6 +62,8 @@
                     {% if column.source is defined and attribute(item, column.source) is defined %}
                         {% if column.source_type is defined and column.source_type == 'date' %}
                             {{ attribute(item, column.source)|date('d/m/Y') }}
+                        {% elseif column.source_type is defined and column.source_type == 'title' %}
+                            {{ attribute(attribute(item, column.source), 'title') }}
                         {% else %}
                             {{ attribute(item, column.source) }}
                         {% endif %}
@@ -87,6 +89,7 @@
             maxPagesToShow: 4,
             result_url: url_result
         }) }}
+    </section>
         {% if actions|default(null) is not empty %}
             {% include 'inadmin/partials/action_bar.html.twig' %}
         {% endif %}

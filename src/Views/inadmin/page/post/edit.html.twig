@@ -1,0 +1,203 @@
+{% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_post_list', { type: page.tab }) }}">{{ page.tab|title }}s</a>
+    <span>{% if post.id is empty %}New{% else %}Edit{% endif %} {{ page.tab }}</span>
+{% endblock pagetitle %}
+
+{% block content %}
+
+    {{ form_start(form, {'attr': { 'class': 'form form__post' }}) }}
+    <div class="col span_8_of_8 ui-tabbed content__edit">
+        <ul>
+            <li>
+                <a href="#post__edit">{% trans %}admin.posts.tabs.content{% endtrans %}</a>
+            </li>
+            <li>
+                <a href="#post__properties">{% trans %}admin.posts.tabs.properties{% endtrans %}</a>
+            </li>
+            <li>
+                <a href="#post__sharing">{% trans %}admin.posts.tabs.sharing{% endtrans %}</a>
+            </li>
+            {%  if revisions is defined and revisions is not empty %}
+            <li>
+                <a href="#post__history">{% trans %}admin.posts.tabs.revisions{% endtrans %}</a>
+            </li>
+            {% endif %}
+        </ul>
+
+        {{- form_errors(form) -}}
+
+        <fieldset id="post__edit">
+            <legend>Edit Post</legend>
+            <p>
+                <a class="material-icons ui-toggle" href="#" data-target=".post__link__edit" data-target-state="hidden">link</a>
+                {{ form_label(form.title) }}
+                {{ form_errors(form.title) }}
+                {{ form_widget(form.title) }}
+            </p>
+            <p>
+                {{ form_label(form.subTitle) }}
+                {{ form_errors(form.subTitle) }}
+                {{ form_widget(form.subTitle) }}
+            </p>
+            <p class="post__link__edit">
+                {{ form_label(form.url) }}
+                {{ form_errors(form.url) }}
+                {{ settings.domain -}}/<input class="field__wide" id="post_url" name="post[url]" type="text" value="{% if post.urls is not empty %}{{ post.urls|first.link }}{% endif %}" />
+            </p>
+            <p>
+                {{ form_label(form.content) }}
+                {{ form_errors(form.content) }}
+                {{ form_widget(form.content) }}
+            </p>
+        </fieldset>
+
+        <fieldset id="post__properties">
+            <legend>Properties</legend>
+            <p>
+                {{ form_label(form.visibility) }}
+                {{ form_errors(form.visibility) }}
+                <span class="switch-wrapper">
+                    {{ form_widget(form.visibility) }}
+				</span>
+            </p>
+            <p>
+                {{ form_label(form.postDate) }}
+                {{ form_errors(form.postDate) }}
+                <span id="post__schedule__timed">
+                    {{ form_widget(form.postDate) }}
+				</span>
+            </p>
+            <p>
+                {{ form_label(form.categories) }}
+                {{ form_errors(form.categories) }}
+                {{ form_widget(form.categories) }}
+                <a href="#" class="material-icons dialog__link"
+                        data-buttons="W3sidGl0bGUiOiJDcmVhdGUgQ2F0ZWdvcnkiLCJjbGFzcyI6ImJ1dHRvbiBidXR0b24tLXBvc2l0aXZlIiwiZGlzYWJsZWQiOnRydWV9XQ=="
+                        data-class-name="dialog__categoryManager"
+                        data-template-name="category-manager"
+                        data-title="Categories"
+                >add_box</a>
+
+            </p>
+            <p>
+                {{ form_label(form.tags) }}
+                {{ form_errors(form.tags) }}
+                {{ form_widget(form.tags) }}
+            </p>
+            <p>
+                {{ form_label(form.language) }}
+                {{ form_errors(form.language) }}
+                {{ form_widget(form.language) }}
+            </p>
+            {% if textStats is defined %}
+                <p>Approximate reading time (at last save): <strong>{{ textStats.readingTime }}</strong> minute(s)</p>
+            {% endif %}
+            {% if settings.geotagContent is defined and settings.geotagContent and settings.google.key is defined and settings.google.key is not empty %}
+            <p>
+                {{ form_label(form.latlong) }}
+                {{ form_errors(form.latlong) }}
+                {{ form_widget(form.latlong) }}
+            </p>
+            {% endif %}
+        </fieldset>
+
+        <fieldset id="post__sharing">
+            <h3>
+                Teaser Details
+                <a href="#" class="ui-help">
+                    <em class="material-icons">info</em>
+                    <span>This text will be used whenever people share a link to your content on social media. It can also be used in other places such as your homepage.</span>
+                </a>
+            </h3>
+            <section class="col span_4_of_8">
+                <p>
+                    {{ form_label(form.featureSnippet) }}
+                    {{ form_errors(form.featureSnippet) }}
+                    {{ form_widget(form.featureSnippet) }}
+                </p>
+            </section>
+            <section class="col span_3_of_8">
+            {{
+                include('inadmin/partials/image_preview.html.twig', {
+                    'id': 'featureImage',
+                    'name': 'post[featureImage]',
+                    'value': post.featureImage
+                })
+            }}
+                <!-- h3>
+                    Sharing
+                    <a href="#" class="ui-help">
+                        <em class="material-icons">info</em>
+                        <span>These will be published to the selected Social Media accounts automatically when first published, or scheduled to to be posted.</span>
+                    </a>
+                </h3>
+                loop through services / accounts for checkboxes + add char counter below for ui-counter
+                <p>
+                    {{ form_label(form.sharingMessage) }}
+                    {{ form_errors(form.sharingMessage) }}
+                    {{ form_widget(form.sharingMessage) }}
+                </p -->
+            </section>
+            {% if post.urls is not empty %}
+            <p class="col span_8_of_8">
+                <input class="halfwidth" type="text" value="{{ settings.domain }}/{{ post.urls|first.link }}" />
+                <button class="button button--information" id="post__link__copy" type="button">Copy this link</button>
+            </p>
+            {% endif %}
+        </fieldset>
+
+        {%  if revisions is defined and revisions is not empty %}
+        <fieldset id="post__history">
+            <table class="table table-responsive table-striped table-borderless">
+                <caption>Revision history</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Author</th>
+                        <th scope="col">Changes</th>
+                        <th scope="col">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for revision in revisions %}
+                    <tr>
+                        <th scope="row">{{ revision.versionNumber }}</th>
+                        <td>{{ revision.modDate|date('d/m/Y H:i') }}</td>
+                        <td>{{ revision.user.displayName }}</td>
+                        <td>{{ revision.action }}</td>
+                        <td>
+                            <a href="{{ path('app_page_post_revision_diff', { 'id': revision.id} ) }}" class="button button--info" type="button"><span class="material-icons">compare_arrows</span> View Version</a>
+                            {# @todo fix download button #}
+                            <button class="button button--info" type="button"><span class="material-icons">save_alt</span> Download</button>
+                            <button class="button button--negative" type="button"><span class="material-icons">undo</span> Revert</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </fieldset>
+        {% endif %}
+    </div>
+
+    <div class="fixed-bottom-bar">
+        <p>
+            {{ form_widget(form.submit) }}
+            {%- if post.status != "published" %}
+                <button type="submit" class="button button--secondary button--info" name="publish">{% if post.postDate > date() %}<span class="material-icons">schedule</span> Schedule{% else %}<span class="material-icons">publish</span> Publish{% endif %}</button>
+            {%- endif %}
+            {{ form_widget(form.delete) }}
+            {%  if post.id is not empty and not post.isDraft %}
+                <a class="button button--secondary" href="/{{ post.urls|first.link }}" target="_blank" title="View Live"><span class="material-icons">exit_to_app</span> View Live</a>
+            {%  endif %}
+        </p>
+    </div>
+    {{ form_row(form._token) }}
+    {{ form_end(form, { 'render_rest': false }) }}
+
+    <link rel="stylesheet" href="/assets/css/incc/jquery.switchButton.css">
+    <script src="/assets/js/incc/jquery.switchButton.js"></script>
+
+{% endblock content %}

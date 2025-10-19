@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Admin;
+namespace App\Controller\Page\Admin;
 
 use App\Controller\AbstractInachisController;
 use App\Entity\User;
@@ -26,6 +26,7 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class AdminProfileController extends AbstractInachisController
 {
@@ -34,8 +35,8 @@ class AdminProfileController extends AbstractInachisController
      * @return Response
      * @throws Exception
      */
-    #[Route("/incc/admin-management", methods: [ 'GET', 'POST' ])]
-    public function adminList(Request $request): Response
+    #[Route("/incc/admin-management", name: "incc_admin_list", methods: [ 'GET', 'POST' ])]
+    public function list(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $form = $this->createFormBuilder()->getForm();
@@ -57,7 +58,7 @@ class AdminProfileController extends AbstractInachisController
                 }
             }
             $this->entityManager->flush();
-            return $this->redirectToRoute('app_admin_adminprofile_adminlist');
+            return $this->redirectToRoute('incc_admin_list');
         }
 
         $filters = array_filter($request->get('filter', []));
@@ -78,7 +79,7 @@ class AdminProfileController extends AbstractInachisController
         $this->data['page']['offset'] = $offset;
         $this->data['page']['limit'] = $limit;
         $this->data['page']['title'] = 'Users';
-        return $this->render('inadmin/admin/list.html.twig', $this->data);
+        return $this->render('inadmin/page/admin/list.html.twig', $this->data);
     }
 
     /**
@@ -90,9 +91,9 @@ class AdminProfileController extends AbstractInachisController
      * @return Response
      * @throws RandomException
      */
-    #[Route("/incc/admin/{id}", methods: [ "GET", "POST" ])]
-    #[Route("/incc/admin/new", name: "app_admin_new", methods: [ "GET", "POST" ])]
-    public function adminDetails(
+    #[Route("/incc/admin/{id}", name: "incc_admin_edit", methods: [ "GET", "POST" ])]
+    #[Route("/incc/admin/new", name: "incc_admin_new", methods: [ "GET", "POST" ])]
+    public function edit(
         Request $request,
         ImageTransformer $imageTransformer,
         MailerInterface $mailer,
@@ -144,7 +145,7 @@ class AdminProfileController extends AbstractInachisController
             }
 
             $this->addFlash('success', 'User details saved.');
-            return $this->redirect($this->generateUrl('app_admin_adminprofile_admindetails', [
+            return $this->redirect($this->generateUrl('incc_admin_edit', [
                 'id' => $user->getUsername(),
             ]));
         }
@@ -154,6 +155,6 @@ class AdminProfileController extends AbstractInachisController
         $this->data['page']['title'] = 'Profile';
         $this->data['heicSupported'] = $imageTransformer->isHEICSupported();
 
-        return $this->render('inadmin/admin/profile.html.twig', $this->data);
+        return $this->render('inadmin/page/admin/profile.html.twig', $this->data);
     }
 }

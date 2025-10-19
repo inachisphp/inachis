@@ -31,11 +31,12 @@
   }
 }
 
+.table-darkhead thead {
+  background-color: $table-head-dark-bg;
+  color: $table-head-dark-color;
+}
 
 // Border versions
-//
-// Add or remove borders all around the table and between all the columns.
-
 .table-bordered {
   border: $table-border-width solid $table-border-color;
 
@@ -176,4 +177,20 @@
   //    }
   //  }
   //}
+}
+
+form table.table-selectable {
+  table-layout: fixed;
+
+  input {
+    width: auto;
+  }
+
+  tr td:nth-child(1), tr th:nth-child(1) {
+    width: 0.8em;
+  }
+  th[scope="row"] {
+    font-weight: bold;
+    text-align: left;
+  }
 }

@@ -7,30 +7,30 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Admin;
+namespace App\Controller\Page\Admin;
 
 use App\Controller\AbstractInachisController;
 use App\Entity\User;
 use App\Form\ChangePasswordType;
+use DateTime;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Validator\Constraints\PasswordStrength;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Constraints\PasswordStrengthValidator;
-use DateTime;
 
 class ChangePasswordController extends AbstractInachisController
 {
     /**
      * Controller for the change-password tab in the admin interface
+     * @param UserPasswordHasherInterface $passwordHasher
      * @param Request $request
      * @param string $id
      * @return Response
      */
-    #[Route("/incc/admin/{id}/change-password", methods: [ "GET", "POST" ])]
+    #[Route("/incc/admin/{id}/change-password", name: "incc_admin_change_password", methods: [ "GET", "POST" ])]
     public function changePasswordTab(UserPasswordHasherInterface $passwordHasher, Request $request, string $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -56,7 +56,7 @@ class ChangePasswordController extends AbstractInachisController
         }
         $this->data['user'] = $user;
         $this->data['form'] = $form->createView();
-        return $this->render('inadmin/admin/change-password.html.twig', $this->data);
+        return $this->render('inadmin/page/admin/change-password.html.twig', $this->data);
     }
 
     /**
@@ -64,7 +64,7 @@ class ChangePasswordController extends AbstractInachisController
      * @param Request $request
      * @return JsonResponse
      */
-    #[Route("/incc/ax/calculate-password-strength", methods: [ "POST" ])]
+    #[Route("/incc/ax/calculate-password-strength", name:"incc_admin_calculate-password-strength", methods: [ "POST" ])]
     public function calculatePasswordStrength(Request $request): JsonResponse
     {
         return new JsonResponse(PasswordStrengthValidator::estimateStrength($request->get('password')));

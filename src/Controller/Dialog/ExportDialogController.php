@@ -44,7 +44,7 @@ class ExportDialogController extends AbstractInachisController
      * @return Response
      * @throws ExceptionInterface
      */
-    #[Route("/incc/ax/export/output", methods: [ "POST" ])]
+    #[Route("/incc/ax/export/output", name: "incc_dialog_export_perform", methods: [ "POST" ])]
     public function performExport(Request $request, SerializerInterface $serializer): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');

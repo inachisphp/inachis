@@ -31,8 +31,10 @@ var InachisDialog = {
             this.title = $dialogLink.data('title'),
                 this.view = $dialogLink.data('view'),
                 this.templateName = $dialogLink.data('templateName'),
-                this.className = $dialogLink.data('className');//,
-            this.buttons = JSON.parse(window.atob($dialogLink.data('buttons')));
+                this.className = $dialogLink.data('className');
+            if ($dialogLink.data('buttons')) {
+                this.buttons = JSON.parse(window.atob($dialogLink.data('buttons')));
+            }
         }
         this.buttons = (typeof this.buttons != 'undefined' && this.buttons instanceof Array) ? this.buttons : [ this.buttons ];
 

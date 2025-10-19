@@ -11,6 +11,7 @@ namespace App\Repository;
 
 use App\Entity\Page;
 use App\Entity\Url;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 class UrlRepository extends AbstractRepository
@@ -77,5 +78,53 @@ class UrlRepository extends AbstractRepository
         return $qb
             ->getQuery()
             ->execute();
+    }
+
+    /**
+     * @param $filters
+     * @param int $offset
+     * @param int $limit
+     * @param string $sort
+     * @return Paginator
+     */
+    public function getFiltered(
+        $filters,
+        int $offset,
+        int $limit,
+        string $sort = 'postDate desc'
+    ): Paginator {
+        $where = [];
+        if (!empty($filters['keyword'])) {
+            $where = [
+                '(p.title LIKE :keyword OR q.link LIKE :keyword)',
+                [
+                    'keyword' => '%' . $filters['keyword'] . '%',
+                ]
+            ];
+        }
+        $sort = match ($sort) {
+            'contentDate desc' => [
+                [ 'substring(q.link, 1, 10)', 'desc' ],
+                [ 'q.default', 'desc' ],
+                [ 'q.createDate', 'desc' ],
+            ],
+            'link asc' => [['q.link', 'ASC']],
+            'link desc' => [['q.link', 'DESC']],
+            'content asc' => [['p.title', 'ASC']],
+            'content desc' => [['p.title', 'DESC']],
+            default => [
+                [ 'substring(q.link, 1, 10)', 'asc' ],
+                [ 'q.default', 'desc' ],
+                [ 'q.createDate', 'desc' ],
+            ],
+        };
+        return $this->getAll(
+            $offset,
+            $limit,
+            $where,
+            $sort,
+            [],
+            ['q.content', 'p']
+        );
     }
 }
