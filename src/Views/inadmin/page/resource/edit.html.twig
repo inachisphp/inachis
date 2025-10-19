@@ -59,8 +59,14 @@
                     <ol>
                         {% for content_type,content_uses in usages %}
                             {% for image_use in content_uses %}
+                                {% set link = '' %}
+                                {% if content_type == 'series' %}
+                                    {% set link = path('incc_series_edit', {id: image_use.id}) %}
+                                {% elseif content_type == 'posts' %}
+                                    {% set link = '/incc/' ~ image_use.type ~ '/' ~ image_use.urls[0].link %}
+                                {% endif %}
                                 <li>
-                                    <a href="path to post or series">{{ image_use.title }} &mdash; {{ image_use.subTitle }}</a>
+                                    <a href="{{ link }}">{{ image_use.title }} {% if image_use.subTitle is not empty %} &mdash; {{ image_use.subTitle }}{% endif %}</a>
                                 </li>
                             {% endfor %}
                         {% endfor %}

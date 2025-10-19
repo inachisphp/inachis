@@ -49,3 +49,17 @@
     }
   }
 }
+
+#post_usages {
+  li {
+    margin-bottom: 1em;
+  }
+  a, a:visited {
+    line-height: 2em;
+    margin-bottom: 1em;
+    padding: 0.5em 0.25em;
+  }
+  a:hover {
+    background-color: #ccc;
+  }
+}

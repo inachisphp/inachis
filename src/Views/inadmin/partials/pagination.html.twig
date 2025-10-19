@@ -4,6 +4,10 @@
 %}
 {% set pageBlockEnd = min(offset + (limit * maxPagesToShow / 2), lastPage) %}
 {% block pagination %}
+<section class="pagination--row">
+<p class="pagination--info" aria-live="polite">
+    Showing {{ offset + 1 }} to {{ min(offset + limit, total) }} of {{ total }} results
+</p>
 <nav role="navigation" aria-label="Pagination Navigation">
     <ul class="pagination">
     {% if showTitle|default(false) %}
@@ -13,7 +17,7 @@
     {% if pageBlockStart > 1 %}
         <li class="page-item{% if offset == 0 %} current{% endif %}">
             <a href="{{ result_url ~ '/0/' ~ limit }}"
-               {%- if offset == 0 %} aria-current="true" {% endif -%}
+               {%- if offset == 0 %} aria-current="page" {% endif -%}
                aria-label="Go to first page" class="page-link">
                 {%- if showFirstNext|default(false) %}
                     <span>First</span>
@@ -63,4 +67,5 @@
     {% endif %}
     </ul>
 </nav>
+</section>
 {% endblock pagination %}

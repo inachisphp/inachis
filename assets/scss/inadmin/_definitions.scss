@@ -111,7 +111,7 @@ $admonition-tip__background-color: color.adjust($admonition-tip__border-color, $
 
 // forms
 $button--positive--active-color: #393;
-$button--positive--hover-color: color.adjust($button--positive--active-color, $lightness: 10%);
+$button--positive--hover-color: color.adjust($button--positive--active-color, $lightness: -10%);
 $button--negative--active-color: #900;
 $button--negative--hover-color: color.adjust($button--negative--active-color, $lightness: 10%);
 $button--info--active-color: #999;

@@ -30,10 +30,16 @@
 }
 
 .button {
-	border: none;
+	background-color: #fff;
+	border: 3px solid #fff;
 	border-radius: 0.5em;
 	padding: 0.75em 1em;
 	text-decoration: none;
+	transition: background-color 0.2s ease;
+
+	&:hover {
+		background-color: color.adjust(#fff, $lightness: -10%);
+	}
 
 	&:disabled {
 		opacity: 0.5;
@@ -50,7 +56,7 @@
 
 	&.button--secondary {
 		background-color: $button--default-active-color;
-		border: 1px solid $button--default-active-color;
+		border-color: $button--default-active-color;
 
 		&:hover {
 			background-color: $button--default-hover-color;
@@ -59,7 +65,7 @@
 
 	&.button--positive {
 		background-color: $button--positive--active-color;
-		border:1px solid $button--positive--active-color;
+		border-color: $button--positive--active-color;
 		color: #fff;
 
 		&:hover {
@@ -69,7 +75,7 @@
 
 	&.button--negative {
 		background-color: $button--negative--active-color;
-		border: 1px solid $button--negative--active-color;
+		border-color: $button--negative--active-color;
 		color: #fff;
 
 		&:hover {
@@ -79,7 +85,7 @@
 
 	&.button--info {
 		background-color: $button--info--active-color;
-		border: 1px solid $button--info--active-color;
+		border-color: $button--info--active-color;
 		color: #fff;
 
 		&:hover {
@@ -94,6 +100,7 @@
 
 	&.button--add {
 		background-color: $button--add--active-color;
+		border-color: $button--add--active-color;
 		color: #fff;
 
 		&:hover {
