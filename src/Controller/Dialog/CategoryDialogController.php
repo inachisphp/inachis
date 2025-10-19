@@ -30,7 +30,7 @@ class CategoryDialogController extends AbstractInachisController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->data['categories'] = $this->entityManager->getRepository(Category::class)->findByParent(null);
 
-        return $this->render('inadmin/dialog/categoryManager.html.twig', $this->data);
+        return $this->render('inadmin/dialog/category-manager.html.twig', $this->data);
     }
 
 

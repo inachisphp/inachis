@@ -1,11 +1,11 @@
 {% if user.username is defined and user.username is not empty %}
 <ul class="ui-tabs-nav">
     <li{% if activeTab == 'profile' %} class="ui-state-active"{% endif %}>
-        <a href="{{ settings.domain ~ path('app_admin_adminprofile_admindetails', { 'id': user.username } ) }}">Profile</a>
+        <a href="{{ settings.domain ~ path('incc_admin_edit', { 'id': user.username } ) }}">Profile</a>
     </li>
     {% if app.user.username == user.username %}
         <li{% if activeTab == 'change-password' %} class="ui-state-active"{% endif %}>
-            <a href="{{ settings.domain ~ path('app_admin_changepassword_changepasswordtab', {'id': user.username}) }}">Security</a>
+            <a href="{{ settings.domain ~ path('incc_admin_change_password', {'id': user.username}) }}">Security</a>
         </li>
     {% endif %}
     <!-- li{% if activeTab == 'access' %} class="ui-state-active"{% endif %}>

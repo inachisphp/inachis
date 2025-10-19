@@ -45,7 +45,7 @@ class ImageGalleryDialogController extends AbstractInachisController
             $this->entityManager->getRepository(Image::class)->getMaxItemsToShow()
         );
         $this->data['image_count'] = sizeof($this->data['dataset']);
-        return $this->render('inadmin/dialog/imageManager.html.twig', $this->data);
+        return $this->render('inadmin/dialog/image-manager.html.twig', $this->data);
     }
 
     /**

@@ -24,6 +24,7 @@ class ContentSelectorController extends AbstractInachisController
 
     /**
      * @param Request $request
+     * @return Response
      */
     #[Route("/incc/ax/contentSelector/get", methods: [ "POST" ])]
     public function contentList(Request $request): Response

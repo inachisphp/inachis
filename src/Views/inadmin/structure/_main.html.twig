@@ -39,14 +39,14 @@
             </a>
             <ul id="admin__user__options">
                 <li><p><strong>Welcome,</strong> {{ session.displayName }}</p></li>
-                <li><a href="{{ path('app_admin_adminprofile_admindetails', {'id': session.username }) }}" title="Edit profile for {{ session.displayName }}">Edit your profile <span class="material-icons">perm_identity</span></a></li>
+                <li><a href="{{ path('incc_admin_edit', {'id': session.username }) }}" title="Edit profile for {{ session.displayName }}">Edit your profile <span class="material-icons">perm_identity</span></a></li>
                 <li><a href="#" title="Change your appearance settings">Appearance <span class="material-icons">brush</span></a></li>
                 <!-- li><a href="/incc/settings/releases">Update available <span class="material-icons">new_releases</span></a></li -->
                 <li><form action="{{ path('app_logout') }}" method="post"><button>Log out <span class="material-icons">logout</span></button></form></li>
             </ul>
         </section>
         <section class="admin__search">
-            <form action="{{ path('app_zzpage_getpostlistadmin', {'type': 'post'}) }}" method="post">
+            <form action="{{ path('incc_post_list', {'type': 'post'}) }}" method="post">
                 <label for="q" class="material-icons">{% trans %}admin.search.label{% endtrans %}</label>
                 <input id="q" name="filter[keyword]" placeholder="{% trans %}admin.search.placeholder{% endtrans %}" type="search" />
                 <button class="clear-search material-icons" data-target="#q" type="button">cancel</button>
@@ -80,21 +80,21 @@
                 <li>
                     <a class="button admin__add-content" href="#new" title="{% trans %}admin.menu.add.content.help{% endtrans %}"><i class="material-icons">edit</i><span> {% trans %}admin.menu.add.content.title{% endtrans %}</span></a>
                     <ul class="admin__nav-new contextual-menu">
-                        <li><a href="{{ settings.domain ~ path('app_zzpage_getpostadmin', { type: 'post'}) }}/post/new" title="{% trans %}admin.menu.add.post.help{% endtrans %}"><i class="material-icons">short_text</i><span> {% trans %}admin.menu.add.post.title{% endtrans %}</span></a></li>
-                        <li><a href="{{ settings.domain ~ path('app_zzpage_getpostadmin', { type: 'page'}) }}/new" title="{% trans %}admin.menu.add.page.help{% endtrans %}"><i class="material-icons">content_copy</i><span> {% trans %}admin.menu.add.page.title{% endtrans %}</span></a></li>
+                        <li><a href="{{ settings.domain ~ path('incc_post_edit', { type: 'post'}) }}/post/new" title="{% trans %}admin.menu.add.post.help{% endtrans %}"><i class="material-icons">short_text</i><span> {% trans %}admin.menu.add.post.title{% endtrans %}</span></a></li>
+                        <li><a href="{{ settings.domain ~ path('incc_post_edit', { type: 'page'}) }}/new" title="{% trans %}admin.menu.add.page.help{% endtrans %}"><i class="material-icons">content_copy</i><span> {% trans %}admin.menu.add.page.title{% endtrans %}</span></a></li>
                     </ul>
                 </li>
-                <li class="{{ page.tab|activeMenu('dashboard') }}"><a href="{{ settings.domain ~ path('app_dashboard_default') }}" title="{% trans %}admin.dashboard.help{% endtrans %}"><i class="material-icons">home</i><span> {% trans %}admin.dashboard.title{% endtrans %}</span></a></li>
-                <li class="{{ page.tab|activeMenu('post') }}"><a href="{{ settings.domain ~ path('app_zzpage_getpostlistadmin', {'type': 'post'}) }}" title="{% trans %}admin.posts.help{% endtrans %}"><i class="material-icons">library_books</i><span> {% trans %}admin.posts.title{% endtrans %}</span></a></li>
-                <li class="{{ page.tab|activeMenu('series') }}"><a href="{{ settings.domain ~ path('app_series_list') }}" title="{% trans %}admin.series.help{% endtrans %}"><i class="material-icons">chrome_reader_mode</i><span> {% trans %}admin.series.title{% endtrans %}</span></a></li>
-                <li class="{{ page.tab|activeMenu('Image') }}"><a href="{{ settings.domain ~ path('app_resource_resourceslist', { type: 'images' }) }}" title="{% trans %}admin.resources.help{% endtrans %}"><i class="material-icons">wallpaper</i><span> {% trans %}admin.resources.title{% endtrans %}</span></a></li>
+                <li class="{{ page.tab|activeMenu('dashboard') }}"><a href="{{ settings.domain ~ path('incc_dashboard') }}" title="{% trans %}admin.dashboard.help{% endtrans %}"><i class="material-icons">home</i><span> {% trans %}admin.dashboard.title{% endtrans %}</span></a></li>
+                <li class="{{ page.tab|activeMenu('post') }}"><a href="{{ settings.domain ~ path('incc_post_list', {'type': 'post'}) }}" title="{% trans %}admin.posts.help{% endtrans %}"><i class="material-icons">library_books</i><span> {% trans %}admin.posts.title{% endtrans %}</span></a></li>
+                <li class="{{ page.tab|activeMenu('series') }}"><a href="{{ settings.domain ~ path('incc_series_list') }}" title="{% trans %}admin.series.help{% endtrans %}"><i class="material-icons">chrome_reader_mode</i><span> {% trans %}admin.series.title{% endtrans %}</span></a></li>
+                <li class="{{ page.tab|activeMenu('Image') }}"><a href="{{ settings.domain ~ path('incc_resource_list', { type: 'images' }) }}" title="{% trans %}admin.resources.help{% endtrans %}"><i class="material-icons">wallpaper</i><span> {% trans %}admin.resources.title{% endtrans %}</span></a></li>
                 <li>
                     <a href="#admin__nav-settings" title="{% trans %}admin.menu.more.help{% endtrans %}"><i class="material-icons">more_horiz</i><span> {% trans %}admin.menu.more.title{% endtrans %}</span></a>
                     <ul id="admin__nav-settings">
-                        <li class="{{ page.tab|activeMenu('url') }}"><a href="{{ settings.domain ~ path('app_url_list') }}" title="{% trans %}admin.urls.help{% endtrans %}">
+                        <li class="{{ page.tab|activeMenu('url') }}"><a href="{{ settings.domain ~ path('incc_url_list') }}" title="{% trans %}admin.urls.help{% endtrans %}">
                                 <i class="material-icons">insert_link</i><span> {% trans %}admin.urls.title{% endtrans %}</span></a>
                         </li>
-                        <li class="{{ page.tab|activeMenu('users') }}"><a href="{{ settings.domain ~ path('app_admin_adminprofile_adminlist') }}" title="{% trans %}admin.users.help{% endtrans %}">
+                        <li class="{{ page.tab|activeMenu('users') }}"><a href="{{ settings.domain ~ path('incc_admin_list') }}" title="{% trans %}admin.users.help{% endtrans %}">
                                 <i class="material-icons">people</i><span> {% trans %}admin.user.title{% endtrans %}</span></a>
 {#                        </li>#}
 {#                        <li class="{{ page.tab|activeMenu('tools') }}"><a href="{{ settings.domain ~ path('app_tools_index') }}" title="Tools">#}

@@ -33,7 +33,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * based on the provided values.
      *
      * @param mixed $object The object to hydrate
-     * @param array[mixed] $values The values to apply to the obect
+     * @param array $values The values to apply to the object
      *
      * @return mixed The hydrated object
      */
@@ -44,7 +44,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
         }
         foreach ($values as $key => $value) {
             $methodName = 'set' . ucfirst($key);
-            if (method_exists($object, $methodName)) {
+            if (method_exists($object, $methodName) && !($key === 'id' && $value === '-1')) {
                 $object->$methodName($value);
             }
         }
