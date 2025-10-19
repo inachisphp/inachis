@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller;
+namespace App\Controller\Admin;
 
+use App\Controller\AbstractInachisController;
 use App\Entity\User;
-use App\Form\SetupStage1Type;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -31,7 +31,8 @@ class SetupController extends AbstractInachisController
                 Response::HTTP_PERMANENTLY_REDIRECT
             );
         }
-
+        $form = $this->createFormBuilder()->getForm();
+        $this->data['form'] = $form->createView();
         $this->data['page']['title'] = 'Inachis Install';
         return $this->render('setup/stage-1.html.twig', $this->data);
     }

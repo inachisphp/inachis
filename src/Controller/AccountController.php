@@ -75,7 +75,6 @@ class AccountController extends AbstractInachisController
     /**
      * @param Request $request
      * @param TranslatorInterface $translator
-     * @param Recaptcha3Validator $recaptcha3Validator
      * @param PasswordResetTokenService $tokenService
      * @param RateLimiterFactory $forgotPasswordIpLimiter
      * @param RateLimiterFactory $forgotPasswordAccountLimiter
@@ -87,7 +86,6 @@ class AccountController extends AbstractInachisController
     public function forgotPassword(
         Request $request,
         TranslatorInterface $translator,
-        Recaptcha3Validator $recaptcha3Validator,
         PasswordResetTokenService $tokenService,
         RateLimiterFactory $forgotPasswordIpLimiter,
         RateLimiterFactory $forgotPasswordAccountLimiter,
