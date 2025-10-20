@@ -9,6 +9,7 @@
 
 namespace App\Security;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;
@@ -23,7 +24,7 @@ class UserChecker implements UserCheckerInterface
         }
 
         if (!$user->isEnabled()) {
-            throw new CustomUserMessageAccountStatusException('Invalid credentials.');
+            throw new CustomUserMessageAccountStatusException('Your account has been disabled.');
         }
 
         if ($user->hasBeenRemoved()) {
@@ -31,8 +32,11 @@ class UserChecker implements UserCheckerInterface
         }
     }
 
-    public function checkPostAuth(UserInterface $user): void
+    /**
+     * @param UserInterface $user
+     * @return void
+     */
+    public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void
     {
-        // Optional post-auth checks, e.g. expired credentials
     }
 }

@@ -41,6 +41,7 @@ class SeriesType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $newItem = empty($options['data']->getId());
         $builder
             ->add('title', TextType::class, [
                 'attr' => [
@@ -97,7 +98,7 @@ class SeriesType extends AbstractType
                 'required' => false,
             ])
         ;
-        if (!empty($options['data']->getId())) {
+        if (!$newItem) {
             $builder
                 ->add('firstDate', DateTimeType::class, [
                     'attr' => [
@@ -185,29 +186,33 @@ class SeriesType extends AbstractType
 //                ],
 //                'label' => $this->translator->trans('admin.button.publish', [], 'messages'),
 //            ])
-            ->add('delete', SubmitType::class, [
-                'attr' => [
-                    'class' => 'button button--negative',
-                ],
-                'label' => sprintf(
-                    '<span class="material-icons">%s</span> %s',
-                    'delete_forever',
-                    $this->translator->trans('admin.button.delete', [], 'messages')
-                ),
-                'label_html' => true,
-            ])
-            ->add('remove', SubmitType::class, [
-                'attr' => [
-                    'class' => 'button button--negative',
-                ],
-                'label' => sprintf(
-                    '<span class="material-icons">%s</span> %s',
-                    'playlist_remove',
-                    $this->translator->trans('admin.button.remove', [], 'messages')
-                ),
-                'label_html' => true,
-            ])
         ;
+        if (!$newItem) {
+            $builder
+                ->add('delete', SubmitType::class, [
+                    'attr' => [
+                        'class' => 'button button--negative',
+                    ],
+                    'label' => sprintf(
+                        '<span class="material-icons">%s</span> %s',
+                        'delete_forever',
+                        $this->translator->trans('admin.button.delete', [], 'messages')
+                    ),
+                    'label_html' => true,
+                ])
+                ->add('remove', SubmitType::class, [
+                    'attr' => [
+                        'class' => 'button button--negative',
+                    ],
+                    'label' => sprintf(
+                        '<span class="material-icons">%s</span> %s',
+                        'playlist_remove',
+                        $this->translator->trans('admin.button.remove', [], 'messages')
+                    ),
+                    'label_html' => true,
+                ])
+            ;
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void

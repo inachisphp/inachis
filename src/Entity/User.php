@@ -253,7 +253,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function isEnabled(): bool
     {
-        return $this->isActive && !$this->isRemoved;
+        return $this->isActive;
     }
 
     /**
