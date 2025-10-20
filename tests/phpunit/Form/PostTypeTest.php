@@ -20,10 +20,10 @@ use Doctrine\Persistence\ManagerRegistry;
 use IntlException;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -37,15 +37,41 @@ class PostTypeTest extends TypeTestCase
         $router = $this->createMock(RouterInterface::class);
         $translator = $this->createMock(TranslatorInterface::class);
         $transformer = $this->createMock(ArrayCollectionToArrayTransformer::class);
+
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $entityManager = $this->createMock(EntityManagerInterface::class);
-        $classMetadata = new ClassMetadata(Category::class);
-        $classMetadata->identifier = ['id'];
-        $managerRegistry->method('getManagerForClass')->willReturn($entityManager);
-        $entityManager->method('getClassMetadata')->willReturn($classMetadata);
+
+        $entityManager->method('getClassMetadata')->willReturnCallback(function ($class) {
+            $metadata = new ClassMetadata($class);
+            $metadata->identifier = ['id'];
+
+            $reflectionClass = new \ReflectionClass($class);
+            if ($reflectionClass->hasProperty('id')) {
+                $metadata->reflFields['id'] = $reflectionClass->getProperty('id');
+                $metadata->reflFields['id']->setAccessible(true);
+            }
+            return $metadata;
+        });
+        $entityManager->method('contains')->willReturn(true);
+
+        $managerRegistry->method('getManagerForClass')->willReturnCallback(function ($class) use ($entityManager) {
+            if (in_array($class, [Category::class, Tag::class], true)) {
+                return $entityManager;
+            }
+            return null;
+        });
+
         $doctrineExtension = new DoctrineOrmExtension($managerRegistry);
+        $entityType = new EntityType($managerRegistry);
+
         return [
-            new PreloadedExtension([new PostType($translator, $router, $transformer)], []),
+            new PreloadedExtension(
+                [
+                    new PostType($translator, $router, $transformer),
+                    EntityType::class => $entityType,
+                ],
+                []
+            ),
             $doctrineExtension,
         ];
     }
@@ -73,18 +99,18 @@ class PostTypeTest extends TypeTestCase
     public function testBuildFormForExistingPage(): void
     {
         $page = (new Page())->setId(Uuid::uuid1());
-        $tag = new Tag();
-        $tag->setTitle('Tag One');
+        $tag = (new Tag())->setTitle('Tag One');
         $page->addTag($tag);
+        $category = (new Category())->setTitle('Category One');
+        $page->addCategory($category);
 
         $form = $this->factory->create(PostType::class, $page);
         $view = $form->createView();
         $tagView = $view['tags'];
-        $choiceViews = $tagView->vars['choices'];
-
+        $tagViews = $tagView->vars['choices'];
         $expectedFields = [ 'title', 'subTitle', 'url', 'content', 'visibility', 'postDate', 'categories',
             'tags', 'language', 'latlong', 'featureSnippet', 'sharingMessage', 'submit', 'publish', 'delete' ];
         $this->assertSame($expectedFields, array_keys($view->children));
-        $this->assertSame('selected', $choiceViews[0]->attr['selected']);
+        $this->assertSame('selected', $tagViews[0]->attr['selected']);
     }
 }
