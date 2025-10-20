@@ -43,7 +43,7 @@ class ForgotPasswordType extends AbstractType
                     'id'              => 'form-forgot__email',
                     'placeholder'     => $this->translator->trans('admin.email_example'),
                 ],
-                'label'      => $this->translator->trans('admin.label.email_address'),
+                'label'      => $this->translator->trans('admin.reset.email_address.label'),
                 'label_attr' => [
                     'id' => 'forgot__email-label',
                 ],

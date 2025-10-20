@@ -7,14 +7,11 @@
 
     {{ include('inadmin/partials/filters.html.twig') }}
     <section class="paginated-list{%- if zebra|default(false) %} zebra{% endif %}">
-    <p class="pagination--info">
-        Showing {{ offset + 1 }} to {{ min(offset + limit, total) }} of {{ total }}
-    </p>
-        {% if table_desc|default('') is not empty %}
+    {% if table_desc|default('') is not empty %}
     <p id="table-desc" class="visually-hidden">
         {{ table_desc }}
     </p>
-        {% endif %}
+    {% endif %}
     <table {%- if table_desc|default('') is not empty %} aria-describedby="table-desc"{% endif %} class="table{%- if table_class %} {{ table_class }}{% endif %}{%- if zebra|default(false) %}  table-striped{% endif %}">
         <caption class="visually-hidden">{{ table_name }}</caption>
         <thead>
@@ -83,11 +80,12 @@
     </table>
 
         {{ include('inadmin/partials/pagination.html.twig', {
-            offset: offset + 1,
+            offset: offset,
             limit: limit,
             maxResults: total,
             maxPagesToShow: 4,
-            result_url: url_result
+            result_url: url_result,
+            total: total,
         }) }}
     </section>
         {% if actions|default(null) is not empty %}

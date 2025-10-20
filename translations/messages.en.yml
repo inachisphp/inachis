@@ -6,6 +6,7 @@ admin.logout: 'Log out'
 
 admin.reset.title: 'Reset your password for'
 admin.reset.enter_email_address: 'Enter your email address to reset login'
+admin.reset.email_address.label: 'Email address'
 admin.reset.cancel.help: 'Cancel your request to reset your password'
 admin.reset_sent.title: 'Password reset email sent'
 admin.reset_sent.heading: 'Thank you,'

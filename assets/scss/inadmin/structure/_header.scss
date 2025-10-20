@@ -10,6 +10,8 @@
 
   @media #{$information-medium} {
     flex-direction: row;
+    position: fixed;
+    width: 100%;
   }
 
   h1 {
