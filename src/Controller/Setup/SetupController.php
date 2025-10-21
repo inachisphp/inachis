@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Admin;
+namespace App\Controller\Setup;
 
 use App\Controller\AbstractInachisController;
 use App\Entity\User;
@@ -21,12 +21,12 @@ class SetupController extends AbstractInachisController
      * @param Request $request
      * @return Response
      */
-    #[Route("/setup", name: 'incc/setup', methods: [ "GET", "POST" ])]
+    #[Route("/setup", name: 'incc_setup_stage1', methods: [ "GET", "POST" ])]
     public function stage1(Request $request): Response
     {
         if ($this->entityManager->getRepository(User::class)->getAllCount() > 0) {
             return $this->redirectToRoute(
-                'app_dashboard_default',
+                'incc_dashboard',
                 [],
                 Response::HTTP_PERMANENTLY_REDIRECT
             );
