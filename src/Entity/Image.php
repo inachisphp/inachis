@@ -11,8 +11,6 @@ namespace App\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\Doctrine\UuidGenerator;
-use Ramsey\Uuid\UuidInterface;
 
 /**
  * Object for handling images on a site.
@@ -29,15 +27,6 @@ class Image extends AbstractFile
 
     public const WARNING_DIMENSIONS = 2048;
     public const WARNING_FILESIZE = 2048; //kb
-
-    /**
-     * @var UuidInterface The unique identifier for the image
-     */
-    #[ORM\Id]
-    #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected UuidInterface $id;
 
     /**
      * @var int
@@ -85,7 +74,7 @@ class Image extends AbstractFile
     }
 
     /**
-     * @return ?string
+     * @return string|null
      */
     public function getAltText(): ?string
     {
@@ -115,7 +104,7 @@ class Image extends AbstractFile
     }
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return $this
      */
     public function setAltText(?string $value): self

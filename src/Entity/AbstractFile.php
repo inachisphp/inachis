@@ -17,18 +17,18 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 /**
  * File entity properties common to different upload types
- * such as {@link Image}.
+ * such as {@link Image} and {@link Download}.
  */
 abstract class AbstractFile
 {
     /**
-     * @var UuidInterface The unique id of the category
+     * @var UuidInterface|null The unique id of the category
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected UuidInterface $id;
+    protected ?UuidInterface $id = null;
 
     /**
      * @var string The title of the {@link Image}
