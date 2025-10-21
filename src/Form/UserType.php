@@ -35,7 +35,7 @@ class UserType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $newUser = $options['data']->getId() === null;
+        $newUser = !isset($options['data']) || !($options['data'] instanceof User) || $options['data']->getId() === null;
         $builder
             ->add('username', $newUser ? TextType::class : HiddenType::class, [
                 'attr' => [

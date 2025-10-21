@@ -13,6 +13,7 @@ use App\Entity\Category;
 use App\Entity\Page;
 use App\Entity\Tag;
 use App\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use IntlException;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\Form\AbstractType;
@@ -31,13 +32,13 @@ use DateTime;
 class PostType extends AbstractType
 {
     private RouterInterface $router;
-    private $transformer;
+    private ArrayCollectionToArrayTransformer $transformer;
     private TranslatorInterface $translator;
 
     private EmojiTransliterator $emojisTransliterator;
 
     /**
-     * @throws \IntlException
+     * @throws IntlException
      */
     public function __construct(
         TranslatorInterface $translator,
@@ -52,6 +53,7 @@ class PostType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $newItem = empty($options['data']->getId());
         $builder
             ->add('title', TextType::class, [
                 'attr' => [
@@ -132,7 +134,7 @@ class PostType extends AbstractType
                 ],
                 'format' => 'dd/MM/yyyy HH:mm',
                 'html5'  => false,
-                'label'  => $options['data']->getPostDate() < new DateTime() ? $this->translator->trans('admin.label.post.postDate-past', [], 'messages') : $this->translator->trans('admin.label.post.postDate-future', [], 'messages'),
+                'label'  => isset($options['data']) && $options['data']->getPostDate() < new DateTime() ? $this->translator->trans('admin.label.post.postDate-past', [], 'messages') : $this->translator->trans('admin.label.post.postDate-future', [], 'messages'),
                 'label_attr' => [
                     'id' => 'postDate_label',
                     'class' => 'inline_label',
@@ -145,7 +147,7 @@ class PostType extends AbstractType
                     return ['selected' => 'selected'];
                 },
                 'choice_label' => 'title',
-                'choices'      => $options['data']->getCategories()->toArray(),
+                'choices'      => isset($options['data']) ? $options['data']->getCategories()->toArray() : [],
                 'class'        => Category::class,
                 'attr'         => [
                     'aria-labelledby'  => 'categories_label',
@@ -172,7 +174,7 @@ class PostType extends AbstractType
                     'data-tip-content' => $this->translator->trans('admin.tip.content.post.tags', [], 'messages'),
                     'data-url'         => $this->router->generate('app_tags_gettagmanagerlistcontent'),
                 ],
-                'choices'      => $options['data']->getTags()->toArray(),
+                'choices'      => isset($options['data']) ? $options['data']->getTags()->toArray() : [],
                 'choice_label' => 'title',
                 'choice_attr'  => function ($choice, $key, $value) {
                     return ['selected' => 'selected'];
@@ -246,28 +248,33 @@ class PostType extends AbstractType
                 ),
                 'label_html' => true,
             ])
-            ->add('publish', SubmitType::class, [
-                'attr' => [
-                    'class' => 'button button--info',
-                ],
-                'label' => sprintf(
-                    '<span class="material-icons">%s</span> <span>%s</span>',
-                    'publish',
-                    $this->translator->trans('admin.button.publish', [], 'messages')
-                ),
-                'label_html' => true,
-            ])
-            ->add('delete', SubmitType::class, [
-                'attr' => [
-                    'class' => 'button button--negative',
-                ],
-                'label' => sprintf(
-                    '<span class="material-icons">%s</span> <span>%s</span>',
-                    'delete_forever',
-                    $this->translator->trans('admin.button.delete', [], 'messages')
-                ),
-                'label_html' => true,
-            ]);
+        ;
+        if (!$newItem) {
+            $builder
+                ->add('publish', SubmitType::class, [
+                    'attr' => [
+                        'class' => 'button button--info',
+                    ],
+                    'label' => sprintf(
+                        '<span class="material-icons">%s</span> <span>%s</span>',
+                        'publish',
+                        $this->translator->trans('admin.button.publish', [], 'messages')
+                    ),
+                    'label_html' => true,
+                ])
+                ->add('delete', SubmitType::class, [
+                    'attr' => [
+                        'class' => 'button button--negative',
+                    ],
+                    'label' => sprintf(
+                        '<span class="material-icons">%s</span> <span>%s</span>',
+                        'delete_forever',
+                        $this->translator->trans('admin.button.delete', [], 'messages')
+                    ),
+                    'label_html' => true,
+                ])
+            ;
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void

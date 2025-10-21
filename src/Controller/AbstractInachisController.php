@@ -19,10 +19,10 @@ use Symfony\Flex\Response;
 
 abstract class AbstractInachisController extends AbstractController
 {
-    protected $security;
-    protected $entityManager;
-    protected $errors = [];
-    protected $data = [];
+    protected Security $security;
+    protected EntityManagerInterface $entityManager;
+    protected array $errors = [];
+    protected array $data = [];
 
     public function __construct(EntityManagerInterface $entityManager, Security $security)
     {
@@ -154,7 +154,7 @@ abstract class AbstractInachisController extends AbstractController
     public function redirectIfNoAdmins(): string
     {
         if ($this->entityManager->getRepository(User::class)->count([]) == 0) {
-            return 'app_setup_stage1';
+            return 'incc_setup_stage1';
         }
         return '';
     }
@@ -168,7 +168,7 @@ abstract class AbstractInachisController extends AbstractController
     public function redirectIfAuthenticated(): string
     {
         if ($this->isAuthenticated()) {
-            return 'app_dashboard_default';
+            return 'incc_dashboard';
         }
         return '';
     }

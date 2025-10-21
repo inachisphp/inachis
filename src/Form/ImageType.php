@@ -44,6 +44,7 @@ class ImageType extends AbstractType
                 'label_attr' => [
                     'id' => 'image-uploader__optimiseImage__label'
                 ],
+                'mapped' => false,
             ])
             ->add('title', TextType::class, [
                 'attr' => [

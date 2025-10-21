@@ -56,10 +56,7 @@
                     'createDate asc': 'Uploaded dates farthest from now',
                 }
             }) }}
-        <section class="paginated-list">
-        <p class="pagination--info">
-            Showing {{ page.offset + 1 }} to {{ min(page.offset + page.limit, dataset.count) }} of {{ dataset.count }}
-        </p>
+    <section class="paginated-list">
         <ul class="ui-image-library">
             {% for item in dataset %}
                 {% set filename = item.filename %}
@@ -91,13 +88,14 @@
             maxResults: dataset.count,
             maxPagesToShow: 5,
             result_url: path('incc_resource_list', { type: page.type }),
+            total: dataset.count,
         }) }}
         {% endif %}
         {% if actions|default(null) is not empty %}
             {% include 'inadmin/partials/action_bar.html.twig' %}
         {% endif %}
         {{ form_end(form) }}
-        </section>
+    </section>
         {% elseif filter_values|default(null) is not empty %}
             {% include 'inadmin/partials/filters.html.twig' with {
                 'filters': filters,
@@ -105,19 +103,23 @@
                 'show_search': show_search
             } only %}
 
-            <p class="content-warning">
-                <i class="material-icons">info_outline</i>
-                <span>Oops! Your filter didn't find anything!</span>
-                <a href="{{ url_result }}">Remove filter</a>
-            </p>
+            <section class="paginated-list">
+                <p class="content-warning">
+                    <i class="material-icons">info_outline</i>
+                    <span>Oops! Your filter didn't find anything!</span>
+                    <a href="{{ url_result }}">Remove filter</a>
+                </p>
+            </section>
         {% else %}
-            <p class="content-warning">
-                <i class="material-icons">info_outline</i>
-                <span>You don't have any content yet!</span>
-                {% if url_add|default(null) is not empty %}
-                    <a href="{{ url_add }}">Add some now!</a>
-                {% endif %}
-            </p>
+            <section class="paginated-list">
+                <p class="content-warning">
+                    <i class="material-icons">info_outline</i>
+                    <span>You don't have any content yet!</span>
+                    {% if url_add|default(null) is not empty %}
+                        <a href="{{ url_add }}">Add some now!</a>
+                    {% endif %}
+                </p>
+            </section>
         {% endif %}
     </div>
     {% endblock resources %}

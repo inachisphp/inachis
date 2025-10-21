@@ -112,15 +112,15 @@ class ChangePasswordType extends AbstractType
                 ],
                 'constraints' => [
                     new Assert\NotBlank(),
-                    new Assert\Length([
-                        'min' => 8,
-                        'minMessage' => 'Your password should be at least 8 characters',
-                        'max' => 4096,
-                    ]),
-                    new Assert\PasswordStrength([
-                        'minScore' => Assert\PasswordStrength::STRENGTH_WEAK,
-                        'message' => "Your password must be more complex. See the below guidance.",
-                    ]),
+                    new Assert\Length(
+                        min: 8,
+                        max: 4096,
+                        minMessage: 'Your password should be at least 8 characters',
+                    ),
+                    new Assert\PasswordStrength(
+                        minScore: Assert\PasswordStrength::STRENGTH_WEAK,
+                        message: 'Your password must be more complex. See the below guidance.',
+                    ),
                 ],
                 'label' => 'New password',
                 'label_attr' => [

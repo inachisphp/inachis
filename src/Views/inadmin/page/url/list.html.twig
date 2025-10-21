@@ -47,6 +47,7 @@
                 total: dataset.count,
                 url_result: path('incc_url_list'),
 
+                zebra: true,
                 show_search: true,
                 sort_options: {
                     'contentDate asc': 'Content Date ASC',
@@ -56,8 +57,8 @@
                     'content asc': 'Content A-Z',
                     'content desc': 'Content Z-A',
                 },
-                'filters': [],
-                'filter_values': filters,
+                filters: [],
+                filter_values: filters,
 
                 actions: {
                     make_default: {

@@ -7,14 +7,11 @@
 
     {{ include('inadmin/partials/filters.html.twig') }}
     <section class="paginated-list{%- if zebra|default(false) %} zebra{% endif %}">
-    <p class="pagination--info">
-        Showing {{ offset + 1 }} to {{ min(offset + limit, total) }} of {{ total }}
-    </p>
-        {% if table_desc|default('') is not empty %}
+    {% if table_desc|default('') is not empty %}
     <p id="table-desc" class="visually-hidden">
         {{ table_desc }}
     </p>
-        {% endif %}
+    {% endif %}
     <table {%- if table_desc|default('') is not empty %} aria-describedby="table-desc"{% endif %} class="table{%- if table_class %} {{ table_class }}{% endif %}{%- if zebra|default(false) %}  table-striped{% endif %}">
         <caption class="visually-hidden">{{ table_name }}</caption>
         <thead>
@@ -83,16 +80,40 @@
     </table>
 
         {{ include('inadmin/partials/pagination.html.twig', {
-            offset: offset + 1,
+            offset: offset,
             limit: limit,
             maxResults: total,
             maxPagesToShow: 4,
-            result_url: url_result
+            result_url: url_result,
+            total: total,
         }) }}
     </section>
         {% if actions|default(null) is not empty %}
             {% include 'inadmin/partials/action_bar.html.twig' %}
         {% endif %}
+    {% elseif filter_values|default(null) is not empty %}
+        {% include 'inadmin/partials/filters.html.twig' with {
+            'filters': filters,
+            'filter_values': filter_values,
+            'show_search': show_search
+        } only %}
+        <section class="paginated-list">
+            <p class="content-warning">
+                <i class="material-icons">info_outline</i>
+                <span>Oops! Your filter didn't find anything!</span>
+                <a href="{{ url_result }}">Remove filter</a>
+            </p>
+        </section>
+    {% else %}
+        <section class="paginated-list">
+            <p class="content-warning">
+                <i class="material-icons">info_outline</i>
+                <span>You don't have any content yet!</span>
+                {% if add_button is defined and add_button.url is defined %}
+                    <a href="{{ add_button.url }}">Add some now!</a>
+                {% endif %}
+            </p>
+        </section>
     {% endif %}
 
     {{ form_end(form, render_rest: false) }}

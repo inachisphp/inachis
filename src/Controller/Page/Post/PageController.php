@@ -14,7 +14,6 @@ use App\Entity\Category;
 use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Revision;
-use App\Entity\Series;
 use App\Entity\Tag;
 use App\Entity\Url;
 use App\Form\PostType;
@@ -22,12 +21,10 @@ use App\Repository\RevisionRepository;
 use App\Util\ContentRevisionCompare;
 use App\Util\ReadingTime;
 use DateTime;
-use Jaybizzle\CrawlerDetect\CrawlerDetect;
+use Exception;
 use Ramsey\Uuid\Uuid;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 class PageController extends AbstractInachisController
@@ -38,7 +35,7 @@ class PageController extends AbstractInachisController
      * @param Request $request
      * @param string $type
      * @return Response
-     * @throws \Exception
+     * @throws Exception
      */
     #[Route(
         "/incc/{type}/list/{offset}/{limit}",
@@ -126,11 +123,9 @@ class PageController extends AbstractInachisController
      * @param Request $request
      * @param ContentRevisionCompare $contentRevisionCompare
      * @param string $type
-     * @param string $title
+     * @param string|null $title
      * @return Response
-     * @throws \Exception
-     *
-     * @return mixed
+     * @throws Exception
      */
     #[Route(
         "/incc/{type}/{title}",

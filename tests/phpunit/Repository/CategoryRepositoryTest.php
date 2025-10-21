@@ -31,8 +31,8 @@ class CategoryRepositoryTest extends TestCase
 
         $this->repository = $this->getMockBuilder(CategoryRepository::class)
             ->setConstructorArgs([$registry])
-            ->onlyMethods(['getEntityManager', 'getAll']) // exist in the class
-            ->addMethods(['getRepository'])                // does NOT exist
+            ->onlyMethods(['getEntityManager', 'getAll'])
+            ->addMethods(['getRepository'])
             ->getMock();
 
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);
@@ -83,7 +83,6 @@ class CategoryRepositoryTest extends TestCase
         $result = $this->repository->getRootCategories();
         $this->assertEquals(['mock_result'], $result);
     }
-
 
     public function testFindByTitleLikeDelegatesToGetAll(): void
     {

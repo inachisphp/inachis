@@ -10,26 +10,37 @@
 namespace App\Tests\phpunit\Form\DataTransformer;
 
 use App\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 
 class ArrayCollectionToArrayTransformerTest extends TestCase
 {
-    private $transformer;
-    private $entityManager;
+    private EntityManagerInterface $em;
+    private ArrayCollectionToArrayTransformer $transformer;
 
-//    public function test__construct() : void
-//    {
-//        $this->transformer = new ArrayCollectionToArrayTransformer($this->entityManager);
-//        $this->assertInstanceOf('ArrayCollectionToArrayTransformer', $this->transformer);
-//    }
-
-//    public function testReverseTransform()
-//    {
-//    }
-
-    public function testTransform(): void
+    public function setUp(): void
     {
-        // @todo: replace this
-        $this->assertTrue(true);
+        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->transformer = new ArrayCollectionToArrayTransformer($this->em);
+    }
+
+    public function testTransformEmpty(): void
+    {
+        $this->assertEmpty($this->transformer->transform(''));
+    }
+
+    public function testTransformArrayCollection(): void
+    {
+        $result = $this->transformer->transform(new ArrayCollection(['something']));
+        $this->assertNotEmpty($result);
+        $this->assertContains('something', $result);
+    }
+
+    public function testReverseTransform(): void
+    {
+        $result = $this->transformer->reverseTransform(['something']);
+        $this->assertContains('something', $result);
+        $this->assertInstanceOf(ArrayCollection::class, $result);
     }
 }
