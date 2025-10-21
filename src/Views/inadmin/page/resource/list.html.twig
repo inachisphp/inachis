@@ -103,19 +103,23 @@
                 'show_search': show_search
             } only %}
 
-            <p class="content-warning">
-                <i class="material-icons">info_outline</i>
-                <span>Oops! Your filter didn't find anything!</span>
-                <a href="{{ url_result }}">Remove filter</a>
-            </p>
+            <section class="paginated-list">
+                <p class="content-warning">
+                    <i class="material-icons">info_outline</i>
+                    <span>Oops! Your filter didn't find anything!</span>
+                    <a href="{{ url_result }}">Remove filter</a>
+                </p>
+            </section>
         {% else %}
-            <p class="content-warning">
-                <i class="material-icons">info_outline</i>
-                <span>You don't have any content yet!</span>
-                {% if url_add|default(null) is not empty %}
-                    <a href="{{ url_add }}">Add some now!</a>
-                {% endif %}
-            </p>
+            <section class="paginated-list">
+                <p class="content-warning">
+                    <i class="material-icons">info_outline</i>
+                    <span>You don't have any content yet!</span>
+                    {% if url_add|default(null) is not empty %}
+                        <a href="{{ url_add }}">Add some now!</a>
+                    {% endif %}
+                </p>
+            </section>
         {% endif %}
     </div>
     {% endblock resources %}

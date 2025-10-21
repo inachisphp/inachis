@@ -13,7 +13,11 @@ class Base64EncodeFile
 {
     public static function encode(string $filename): string
     {
-        $filename = __DIR__ . '/../../' . $filename;
+        $projectDir = realpath(__DIR__ . '/../../');
+        $fullPath = realpath($projectDir . '/' . ltrim('/' . $filename));
+        if ($fullPath === false || !str_starts_with($fullPath, $projectDir)) {
+            return '';
+        }
         $type = pathinfo($filename, PATHINFO_EXTENSION);
         return 'data:image/' . $type . ';base64,' . base64_encode(file_get_contents($filename));
     }

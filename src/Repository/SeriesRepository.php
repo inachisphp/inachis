@@ -20,8 +20,8 @@ use http\Env\Response;
 /**
  * @method Series|null find($id, $lockMode = null, $lockVersion = null)
  * @method Series|null findOneBy(array $criteria, array $orderBy = null)
- * @method Series[]    findAll()
- * @method Series[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Series[] findAll()
+ * @method Series[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class SeriesRepository extends AbstractRepository
 {
@@ -42,7 +42,7 @@ class SeriesRepository extends AbstractRepository
     /**
      * @throws NonUniqueResultException
      */
-    public function getSeriesByPost(string $page): mixed
+    public function getSeriesByPost(Page $page): mixed
     {
         return $this->createQueryBuilder('s')
             ->select('s')
