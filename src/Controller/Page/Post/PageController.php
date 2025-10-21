@@ -181,7 +181,7 @@ class PageController extends AbstractInachisController
                 $this->entityManager->getRepository(Page::class)->remove($post);
                 $this->entityManager->getRepository(Revision::class)->deleteAndRecordByPage($post);
                 return $this->redirectToRoute(
-                    'app_dashboard_default',
+                    'incc_dashboard',
                     [],
                     Response::HTTP_PERMANENTLY_REDIRECT
                 );

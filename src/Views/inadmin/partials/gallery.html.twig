@@ -19,6 +19,8 @@
         maxResults: images.count,
         maxPagesToShow: 5,
         result_url: path('incc_resource_list', { type: 'images' }),
+        showSummary: false,
+        total: page.total,
     }) }}
 {% else %}
     <p>No images to choose from, maybe you'd like to add some</p>

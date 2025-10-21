@@ -109,7 +109,7 @@ class PageWebController extends AbstractInachisController
      * @param Request $request
      * @return Response
      */
-    #[Route("/{page}", methods: [ "GET" ])]
+    #[Route("/{page}", methods: [ "GET" ], condition: "params['page'] != 'setup'")]
     public function getPage(Request $request): Response
     {
         return $this->getPost($request, 0, 0, 0, '');
