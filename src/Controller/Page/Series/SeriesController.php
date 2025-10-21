@@ -127,7 +127,7 @@ class SeriesController extends AbstractInachisController
             }
             if ($form->get('delete')->isClicked()) {
                 $this->entityManager->getRepository(Series::class)->remove($series);
-                return $this->redirect($this->generateUrl('app_series_list'));
+                return $this->redirect($this->generateUrl('incc_series_list'));
             }
 
             $series->setModDate(new DateTime('now'));

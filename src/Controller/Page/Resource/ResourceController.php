@@ -10,7 +10,7 @@
 namespace App\Controller\Page\Resource;
 
 use App\Controller\AbstractInachisController;
-use App\Controller\Download;
+use App\Entity\Download;
 use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Series;
@@ -47,12 +47,11 @@ class ResourceController extends AbstractInachisController
     public function list(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $typeClass = match ($request->request?->get('type')) {
+        $typeClass = match ($request?->get('type')) {
             'downloads' => Download::class,
             default => Image::class,
         };
         $type = substr(strrchr($typeClass, '\\'), 1);
-
         $form = $this->createFormBuilder()
             ->setAction($this->generateUrl('incc_resource_list', [
                 'type' => $request->get('type'),
@@ -157,7 +156,7 @@ class ResourceController extends AbstractInachisController
 
             $this->addFlash('success', 'Content saved.');
             return $this->redirectToRoute(
-                'app_resource_edit', [
+                'incc_resource_edit', [
                     'type' => $request->get('type'),
                     'filename' => $resource->getId(),
                 ]
