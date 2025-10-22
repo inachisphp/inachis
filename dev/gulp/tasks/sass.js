@@ -15,6 +15,13 @@ const sassCompileAdmin = () => {
   return sassCompile(config.paths.src.sass.admin, config.paths.dist.sass.admin);
 };
 
+const copyCSS = () => {
+    return gulp.src(config.paths.src.sass.admin + '*.css')
+        .pipe(cssnano())
+        .pipe(rename({suffix: '.min'}))
+        .pipe(gulp.dest(config.paths.dist.sass.admin));
+};
+
 function sassCompile (scssSource, cssDest)
 {
     return gulp.src(scssSource + '**/*.scss')
@@ -27,10 +34,12 @@ function sassCompile (scssSource, cssDest)
 
 exports.sassCompileAdmin = sassCompileAdmin;
 exports.sassCompileWeb = sassCompileWeb;
+exports.copyCSS = copyCSS;
 
 exports.sassCompile = gulp.parallel(
     sassCompileAdmin,
-    sassCompileWeb
+    sassCompileWeb,
+    copyCSS
 );
 
 exports.sassWatch = function() {

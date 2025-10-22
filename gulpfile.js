@@ -1,7 +1,6 @@
 const gulp = require('gulp');
 const requireDir = require('require-dir');
-// load tasks
-requireDir('./bin/gulp/tasks', {
+requireDir('./dev/gulp/tasks', {
     recurse: true,
     mapValue: function(value) {
         if (typeof value === 'object') {
