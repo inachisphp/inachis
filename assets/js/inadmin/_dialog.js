@@ -4,7 +4,7 @@ var InachisDialog = {
     buttons: [
         {
             text: 'Close',
-            class: 'button button--negative',
+            class: 'button button--secondary',
             click: function() {
                 $(this).dialog('close');
             }

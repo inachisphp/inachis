@@ -14,9 +14,9 @@
             <li role="tab" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab ui-tabs-active{% if page.tab == 'Image' %} ui-state-active{% endif %}">
                 <a href="{{ settings.domain ~ path('incc_resource_list', { type: 'images' }) }}">Images</a>
             </li>
-            <li role="tab" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab ui-tabs-active{% if page.tab == 'Download' %} ui-state-active{% endif %}">
-                <a href="{{ settings.domain ~ path('incc_resource_list', { type: 'downloads' }) }}">Downloads</a>
-            </li>
+{#            <li role="tab" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab ui-tabs-active{% if page.tab == 'Download' %} ui-state-active{% endif %}">#}
+{#                <a href="{{ settings.domain ~ path('incc_resource_list', { type: 'downloads' }) }}">Downloads</a>#}
+{#            </li>#}
         </ul>
 
         {% if dataset|default(null) is not empty and form|default(null) is not empty %}
@@ -103,19 +103,23 @@
                 'show_search': show_search
             } only %}
 
-            <p class="content-warning">
-                <i class="material-icons">info_outline</i>
-                <span>Oops! Your filter didn't find anything!</span>
-                <a href="{{ url_result }}">Remove filter</a>
-            </p>
+            <section class="paginated-list">
+                <p class="content-warning">
+                    <i class="material-icons">info_outline</i>
+                    <span>Oops! Your filter didn't find anything!</span>
+                    <a href="{{ url_result }}">Remove filter</a>
+                </p>
+            </section>
         {% else %}
-            <p class="content-warning">
-                <i class="material-icons">info_outline</i>
-                <span>You don't have any content yet!</span>
-                {% if url_add|default(null) is not empty %}
-                    <a href="{{ url_add }}">Add some now!</a>
-                {% endif %}
-            </p>
+            <section class="paginated-list">
+                <p class="content-warning">
+                    <i class="material-icons">info_outline</i>
+                    <span>You don't have any content yet!</span>
+                    {% if url_add|default(null) is not empty %}
+                        <a href="{{ url_add }}">Add some now!</a>
+                    {% endif %}
+                </p>
+            </section>
         {% endif %}
     </div>
     {% endblock resources %}

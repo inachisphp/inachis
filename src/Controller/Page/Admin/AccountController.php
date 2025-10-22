@@ -82,7 +82,7 @@ class AccountController extends AbstractInachisController
      * @return Response
      * @throws RandomException
      */
-    #[Route("/incc/forgot-password", name: "app_account_forgotpassword", methods: [ "GET", "POST" ])]
+    #[Route("/incc/forgot-password", name: "incc_account_forgot-password", methods: [ "GET", "POST" ])]
     public function forgotPassword(
         Request $request,
         TranslatorInterface $translator,
@@ -139,7 +139,7 @@ class AccountController extends AbstractInachisController
                         ->textTemplate('inadmin/emails/forgot-password.txt.twig')
                         ->context([
                             'ipAddress' => $request->getClientIp(),
-                            'url' => $this->generateUrl('app_account_newpassword', [ 'token' => $data['token']]),
+                            'url' => $this->generateUrl('incc_account_new-password', [ 'token' => $data['token']]),
                             'expiresAt' => $data['expiresAt']->format('l jS F Y \a\\t H:i'),
                             'settings' => $this->data['settings'],
                             'logo' => Base64EncodeFile::encode('public/assets/imgs/incc/inachis.png'),
@@ -170,7 +170,7 @@ class AccountController extends AbstractInachisController
      * @return Response
      * @throws NonUniqueResultException
      */
-    #[Route("/incc/new-password/{token}", name: "app_account_newpassword", methods: [ "GET", "POST" ])]
+    #[Route("/incc/new-password/{token}", name: "incc_account_new-password", methods: [ "GET", "POST" ])]
     public function newPassword(
         Request $request,
         TranslatorInterface $translator,
@@ -186,7 +186,7 @@ class AccountController extends AbstractInachisController
 
         if (!$token || strlen($token) !== 64) {
             $this->addFlash('warning', 'Invalid token.');
-            return $this->redirectToRoute('app_account_forgotpassword');
+            return $this->redirectToRoute('incc_account_forgot-password');
         }
 
         $form = $this->createForm(ChangePasswordType::class, [
@@ -214,12 +214,12 @@ class AccountController extends AbstractInachisController
             );
             if (!$user) {
                 $this->addFlash('error', 'Invalid token.');
-                return $this->redirectToRoute('app_forgot_password');
+                return $this->redirectToRoute('incc_account_forgot-password');
             }
             $resetRequest = $tokenService->validateTokenForUser($token, $user);
             if (!$resetRequest) {
                 $this->addFlash('error', 'Invalid or expired reset token.');
-                return $this->redirectToRoute('app_account_forgotpassword');
+                return $this->redirectToRoute('incc_account_forgot-password');
             }
             $plainPassword = $form->getData()['change_password']['new_password'];
             $hashed = $hasher->hashPassword($user, $plainPassword);

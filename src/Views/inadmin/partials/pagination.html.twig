@@ -5,9 +5,11 @@
 {% set pageBlockEnd = min(offset + (limit * maxPagesToShow / 2), lastPage) %}
 {% block pagination %}
 <section class="pagination--row">
+{% if showSummary is defined and showSummary %}
 <p class="pagination--info" aria-live="polite">
     Showing {{ offset + 1 }} to {{ min(offset + limit, total) }} of {{ total }} results
 </p>
+{% endif %}
 <nav role="navigation" aria-label="Pagination Navigation">
     <ul class="pagination">
     {% if showTitle|default(false) %}

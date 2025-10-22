@@ -6,7 +6,7 @@
     {{ form_row(form.loginUsername) }}
     {{ form_row(form.loginPassword) }}
 
-    <p class="forgot-password"><a href="{{ path('app_account_forgotpassword') }}" title=""><span>{% trans %}Forgot your password?{% endtrans %}</span></a></p>
+    <p class="forgot-password"><a href="{{ path('incc_account_forgot-password') }}" title=""><span>{% trans %}Forgot your password?{% endtrans %}</span></a></p>
 
     {% if recaptcha|default(false) %}
     <p>This page is protected using Google reCAPTCHA. <a href="https://cloud.google.com/security/products/recaptcha#how-it-works" title="View Google's documentation for reCAPTCHA">Learn more</a>.</p>

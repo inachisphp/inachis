@@ -13,7 +13,19 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 interface PageRepositoryInterface
 {
+    /**
+     * @return int
+     */
     public function getMaxItemsToShow(): int;
+
+    /**
+     * @param $filters
+     * @param string $type
+     * @param int $offset
+     * @param int $limit
+     * @param string $sort
+     * @return Paginator
+     */
     public function getFilteredOfTypeByPostDate(
         $filters,
         string $type,

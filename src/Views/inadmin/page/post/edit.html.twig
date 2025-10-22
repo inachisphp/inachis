@@ -74,7 +74,6 @@
                 {{ form_errors(form.categories) }}
                 {{ form_widget(form.categories) }}
                 <a href="#" class="material-icons dialog__link"
-                        data-buttons="W3sidGl0bGUiOiJDcmVhdGUgQ2F0ZWdvcnkiLCJjbGFzcyI6ImJ1dHRvbiBidXR0b24tLXBvc2l0aXZlIiwiZGlzYWJsZWQiOnRydWV9XQ=="
                         data-class-name="dialog__categoryManager"
                         data-template-name="category-manager"
                         data-title="Categories"
@@ -169,9 +168,8 @@
                         <td>{{ revision.user.displayName }}</td>
                         <td>{{ revision.action }}</td>
                         <td>
-                            <a href="{{ path('app_page_post_revision_diff', { 'id': revision.id} ) }}" class="button button--info" type="button"><span class="material-icons">compare_arrows</span> View Version</a>
-                            {# @todo fix download button #}
-                            <button class="button button--info" type="button"><span class="material-icons">save_alt</span> Download</button>
+                            <a href="{{ path('app_page_post_revision_diff', { 'id': revision.id}) }}" class="button button--info"><span class="material-icons">compare_arrows</span> View Version</a>
+                            <a href="{{ path('incc_post_download', { 'id': revision.id }) }}" class="button button--info"><span class="material-icons">save_alt</span> Download</a>
                             <button class="button button--negative" type="button"><span class="material-icons">undo</span> Revert</button>
                         </td>
                     </tr>

@@ -9,17 +9,15 @@
 
 namespace App\Repository;
 
-use App\Entity\Image;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\Download;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 
-class ImageRepository extends AbstractRepository implements ResourceRepositoryInterface
+class DownloadRepository extends AbstractRepository implements ResourceRepositoryInterface
 {
     use DefaultResourceRepository;
 
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Image::class);
+        parent::__construct($registry, Download::class);
     }
 }

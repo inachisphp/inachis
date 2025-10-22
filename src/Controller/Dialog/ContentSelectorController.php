@@ -19,8 +19,8 @@ use DateTime;
 
 class ContentSelectorController extends AbstractInachisController
 {
-    protected $errors = [];
-    protected $data = [];
+    protected array $errors = [];
+    protected array $data = [];
 
     /**
      * @param Request $request
