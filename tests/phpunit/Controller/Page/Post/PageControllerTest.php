@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller;
+namespace App\Tests\phpunit\Controller\Page\Post;
 
 use App\Controller\Page\Post\PageController;
 use App\Entity\Page;

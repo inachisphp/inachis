@@ -1,10 +1,31 @@
 @use '../definitions' as *;
 
-fieldset.multisection {
-  border: 1px solid #f3f3f3;
-  border-radius: 1em;
-  background-color: #fff;
-  margin-bottom: 1em;
+fieldset.multisection.content__edit {
+  //background-color: #eee;
+  //border: 1px solid #f3f3f3;
+  //border-radius: 1em;
+  display: grid;
+  grid-template-columns: auto 1fr; /* label size + flexible input */
+  gap: 0.5rem 1rem; /* row and column gaps */
+  max-width: 600px;
+
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
+    gap: 0.5rem 0;
+
+  }
+
+  label {
+    white-space: nowrap;
+
+    @media (max-width: 500px) {
+      text-align: left;
+    }
+  }
+
+  input {
+    box-sizing: border-box;
+  }
 }
 
 .profile-photo {
