@@ -83,9 +83,8 @@ class UserTest extends TestCase
 
     public function testSetAndGetAvatar(): void
     {
-        $image = new Image();
-        $this->user->setAvatar($image);
-        $this->assertEquals($image, $this->user->getAvatar());
+        $this->user->setAvatar('test.jpg');
+        $this->assertEquals('test.jpg', $this->user->getAvatar());
     }
 
     public function testIsEnabled(): void

@@ -105,10 +105,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected array $roles;
 
     /**
-     * @var ?Image string An image to use for the {@link User}
+     * @var string|null string An image to use for the {@link User}
      */
     #[ORM\Column(name: 'avatar', type: "string", length: 255, nullable: true)]
-    protected ?Image $avatar;
+    protected ?string $avatar = '';
 
     /**
      * @var bool Flag indicating if the {@link User} can sign in
@@ -239,9 +239,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link avatar} for the {@link User}.
      *
-     * @return Image|null The avatar for the user
+     * @return string|null The avatar for the user
      */
-    public function getAvatar(): ?Image
+    public function getAvatar(): ?string
     {
         return $this->avatar;
     }
@@ -389,10 +389,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the value of {@link avatar}.
      *
-     * @param Image|null $value The value to set
+     * @param string|null $value The value to set
      * @return $this
      */
-    public function setAvatar(?Image $value): self
+    public function setAvatar(?string $value): self
     {
         $this->avatar = $value;
 

@@ -18,9 +18,6 @@ class Base64EncodeFile
         if ($fullPath === false || !str_starts_with($fullPath, $projectDir)) {
             return '';
         }
-        if (!file_exists($fullPath)) {
-            return '';
-        }
         $type = pathinfo($filename, PATHINFO_EXTENSION);
         return 'data:image/' . $type . ';base64,' . base64_encode(file_get_contents($fullPath));
     }
