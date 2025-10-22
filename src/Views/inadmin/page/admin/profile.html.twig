@@ -2,7 +2,7 @@
 
 {% block pagetitle %}
     <a href="{{ path('incc_admin_list') }}">Users</a>
-    <span>Edit User</span>
+    <span>Edit User: {{ user.username }}</span>
 {% endblock pagetitle %}
 
 {% block content %}
@@ -15,10 +15,10 @@
             {{ include('inadmin/partials/profile_tabs.html.twig', {
                 'activeTab': 'profile'
             }) }}
+            <section class="paginated-list">
     {% if user.username is defined and user.username is not empty %}
-            <h3>Editing user: {{ user.username }}</h3>
 {# @todo add avatar selector #}
-        {% if false or app.user.username == user.username %}
+        {% if false and app.user.username == user.username %}
             <fieldset class="multisection">
                 <legend>Your Display Picture</legend>
                 {{ form_widget(form.avatar) }}
@@ -47,33 +47,25 @@
             <fieldset class="content__edit multisection">
                 <legend>Personal Information</legend>
     {% if user.id is not defined or user.id is empty %}
-                <p>
                     {{ form_label(form.username) }}
                     {{ form_widget(form.username) }}
                     {{ form_errors(form.username) }}
-                </p>
     {% endif %}
-                <p>
                     {{ form_label(form.displayName) }}
                     {{ form_widget(form.displayName) }}
                     {{ form_errors(form.displayName) }}
-                </p>
 
-                <p>
                     {{ form_label(form.email) }}
                     {{ form_widget(form.email) }}
                     {{ form_errors(form.email) }}
-                </p>
 
-                <p>
                     {{ form_label(form.timezone) }}
                     {{ form_widget(form.timezone) }}
                     {{ form_errors(form.timezone) }}
-                </p>
             </fieldset>
 
     {% if app.user.username == user.username %}
-            <fieldset class="content__edit multisection">
+            <fieldset class="multisection">
                 <legend>Settings</legend>
                 <p>
                     {{ form_label(form.color) }}
@@ -92,6 +84,7 @@
     {% endif %}
                 </p>
             </div>
+            </section>
         </div>
     {{ form_end(form) }}
 

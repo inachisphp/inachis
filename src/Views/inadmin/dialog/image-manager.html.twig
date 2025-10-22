@@ -9,6 +9,10 @@
         <strong id="images_count">{{ image_count|number_format }}</strong> images
     </p>
 </section>
+{#<section class="ui-dialog-secondary-bar">#}
+{#    <p><a href="#"><span class="material-icons" style="vertical-align: middle;">arrow_back</span> Back</a></p>#}
+{#    <div class="flash-warning"><span class="material-icons">warning</span> Failed to upload file</div>#}
+{#</section>#}
 <section class="gallery">
     {{ include('inadmin/partials/gallery.html.twig', {
         images: dataset,
