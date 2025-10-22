@@ -1,7 +1,22 @@
-'use strict';
+import gulp from 'gulp';
+import { sassCompileAdmin, sassWatch } from './sass.js';
+import { jsCompileAdmin, jsWatch } from './jscombinemin.js';
+import { imgOptimiseAdmin } from "./imagemin.js";
 
-const { parallel } = require('gulp');
-const { sassWatch } = require('./sass');
-const { jsWatch } = require('./jscombinemin')
+export default gulp.series(
+    imgOptimiseAdmin,
+    gulp.parallel(sassCompileAdmin, jsCompileAdmin),
+    gulp.parallel(sassWatch, jsWatch)
+);
 
-exports.default = parallel(sassWatch, jsWatch);
+export const build:web = () => gulp.parallel(
+    imgOptimiseWeb,
+    sassCompileWeb,
+    jsCompileWeb
+);
+
+export const build:admin = () => gulp.parallel(
+    imgOptimiseAdmin,
+    sassCompileAdmin,
+    jsCompileAdmin
+);

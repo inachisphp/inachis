@@ -1,47 +1,48 @@
-'use strict';
+import gulp from 'gulp';
+import * as dartSass from 'sass';
+import gulpSass from 'gulp-sass';
+import autoprefixer from 'gulp-autoprefixer';
+import cssnano from 'gulp-cssnano';
+import rename from 'gulp-rename';
+import plumber from 'gulp-plumber';
+import config from '../config.js';
 
-const gulp = require('gulp');
-const sass = require('gulp-sass')(require('sass'));
-const autoprefixer = import('gulp-autoprefixer');
-const config = require('../config');
-const cssnano = require('gulp-cssnano');
-const rename = require('gulp-rename');
+const sass = gulpSass(dartSass);
 
-
-const sassCompileWeb = () => {
-  return sassCompile(config.paths.src.sass.web , config.paths.dist.sass.web);
-};
-const sassCompileAdmin = () => {
-  return sassCompile(config.paths.src.sass.admin, config.paths.dist.sass.admin);
-};
-
-const copyCSS = () => {
-    return gulp.src(config.paths.src.sass.admin + '*.css')
+async function compileSass(src, dest) {
+    return gulp.src(`${src}**/*.scss`)
+        .pipe(plumber())
+        .pipe(sass.sync().on('error', sass.logError))
+        .pipe(autoprefixer({
+            cascade: false,
+            overrideBrowserslist: ['last 2 versions']
+        }))
         .pipe(cssnano())
-        .pipe(rename({suffix: '.min'}))
-        .pipe(gulp.dest(config.paths.dist.sass.admin));
-};
-
-function sassCompile (scssSource, cssDest)
-{
-    return gulp.src(scssSource + '**/*.scss')
-        .pipe(sass()).on('error', sass.logError)
-        // .pipe(autoprefixer('last 2 version'))
-        .pipe(cssnano())
-        .pipe(rename({suffix: '.min'}))
-        .pipe(gulp.dest(cssDest));
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(gulp.dest(dest));
 }
 
-exports.sassCompileAdmin = sassCompileAdmin;
-exports.sassCompileWeb = sassCompileWeb;
-exports.copyCSS = copyCSS;
+async function copyCSS(src, dest) {
+    return gulp.src(`${config.paths.src.sass.admin}*.css`)
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(gulp.dest(config.paths.dist.sass.admin));
+}
 
-exports.sassCompile = gulp.parallel(
-    sassCompileAdmin,
+export const sassCompileWeb = async () =>
+    compileSass(config.paths.src.sass.web, config.paths.dist.sass.web);
+
+export const sassCompileAdmin = async () =>
+    compileSass(config.paths.src.sass.admin, config.paths.dist.sass.admin);
+
+export const copyCSSAdmin = async () =>
+    copyCSS(config.paths.src.sass.admin, config.paths.dist.sass.admin);
+
+export const sassCompile = gulp.parallel(
     sassCompileWeb,
-    copyCSS
+    sassCompileAdmin,
+    copyCSSAdmin
 );
 
-exports.sassWatch = function() {
-    gulp.watch(config.paths.src.sass.all + '**/*.scss', exports.sassCompile);
+export async function sassWatch() {
+    gulp.watch(`${config.paths.src.sass.all}**/*.scss`, gulp.series(sassCompile));
 }

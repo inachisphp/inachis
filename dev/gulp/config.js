@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	paths: {
 		config: {
 			system: 'config/system.json'

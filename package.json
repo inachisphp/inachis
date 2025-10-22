@@ -1,4 +1,9 @@
 {
+  "name": "inachis",
+  "version": "1.0.0",
+  "description": "JS requirements for inachis framework",
+  "license": "MIT",
+  "type": "module",
   "devDependencies": {
     "cypress": "^13.4.0",
     "gulp": "*",
@@ -11,6 +16,7 @@
     "gulp-imagemin": "*",
     "gulp-jshint": "*",
     "gulp-json-editor": "*",
+    "gulp-plumber": "*",
     "gulp-rename": "*",
     "gulp-sass": "*",
     "jshint": "*",
@@ -20,6 +26,7 @@
   },
   "dependencies": {
     "jquery-datetimepicker": "^2.5.20",
+    "npm-check-updates": "^19.1.1",
     "simplemde": "*"
   },
   "scripts": {}
