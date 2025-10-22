@@ -130,7 +130,7 @@ class AdminProfileController extends AbstractInachisController
                         ->textTemplate('inadmin/emails/registration.txt.twig')
                         ->context([
                             'name' => $user->getDisplayName(),
-                            'url' => $this->generateUrl('app_account_newpassword', [ 'token' => $data['token']]),
+                            'url' => $this->generateUrl('incc_account_new-password', [ 'token' => $data['token']]),
                             'expiresAt' => $data['expiresAt']->format('l jS F Y \a\\t H:i'),
                             'settings' => $this->data['settings'],
                             'logo' => Base64EncodeFile::encode('public/assets/imgs/incc/inachis.png'),
