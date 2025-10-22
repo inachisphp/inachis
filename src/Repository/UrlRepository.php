@@ -58,6 +58,11 @@ class UrlRepository extends AbstractRepository
         );
     }
 
+    /**
+     * @param string $url
+     * @param string $id
+     * @return float|int|mixed|string
+     */
     public function findSimilarUrlsExcludingId(string $url, string $id)
     {
         $qb = $this->createQueryBuilder('u');
@@ -77,7 +82,7 @@ class UrlRepository extends AbstractRepository
             ->setMaxResults(1);
         return $qb
             ->getQuery()
-            ->execute();
+            ->getResult();
     }
 
     /**

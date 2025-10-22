@@ -46,6 +46,11 @@ class Base64EncodeFileTest extends TestCase
         $this->assertEquals(file_get_contents($this->tempFile), $decodedContent);
     }
 
+    public function testEncodeMissingFile(): void
+    {
+        $this->assertEmpty(Base64EncodeFile::encode('tests/tmp/test_images.png'));
+    }
+
     public function testEncodeProtectsPathTraversal(): void
     {
         $result = Base64EncodeFile::encode('env.local');

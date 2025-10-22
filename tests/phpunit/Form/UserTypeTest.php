@@ -128,7 +128,7 @@ class UserTypeTest extends TypeTestCase
             'displayName' => 'John Doe',
             'email' => 'john@example.com',
             'timezone' => 'UTC',
-            'avatar' => new Image(),
+            'avatar' => 'test.jpg',
         ];
 
         $form = $this->factory->create(UserType::class, $user);
@@ -141,5 +141,6 @@ class UserTypeTest extends TypeTestCase
         $this->assertSame('John Doe', $user->getDisplayName());
         $this->assertSame('john@example.com', $user->getEmail());
         $this->assertSame('UTC', $user->getTimezone());
+        $this->assertSame('test.jpg', $user->getAvatar());
     }
 }

@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller;
+namespace App\Tests\phpunit\Controller\Page\Post;
 
 use App\Controller\Page\Post\PageWebController;
 use App\Entity\Category;
@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\RouterInterface;
 
 class PageWebControllerTest extends WebTestCase
 {
@@ -72,13 +73,91 @@ class PageWebControllerTest extends WebTestCase
         $this->controller->getPost($request, 2025, 10, 10, 'sample-post');
     }
 
-//    public function testGetPostRedirectsIfScheduledOrDraft(): void
-//    {
-//    }
+    public function testGetPostRedirectsIfScheduledOrDraft(): void
+    {
+        $request = new Request([], [], [], [], [], [
+            'REQUEST_URI' => '/2025/10/10/sample-post'
+        ]);
+        $page = $this->createMock(Page::class);
+        $page->method('isScheduledPage')->willReturn(true);
+        $url = $this->createMock(Url::class);
+        $url->method('getContent')->willReturn($page);
+        $urlRepository = $this->getMockBuilder(EntityRepository::class)
+            ->addMethods(['findOneByLink', 'getDefaultUrl'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $urlRepository->expects($this->once())
+            ->method('findOneByLink')
+            ->with($this->stringContains('2025/10/10/sample-post'))
+            ->willReturn($url);
+        $urlRepository->method('getDefaultUrl')->willReturn($url);
 
-//    public function testGetPostRedirectsWhenNotDefault(): void
-//    {
-//    }
+        $this->entityManager->method('getRepository')
+            ->willReturnMap([
+                [Url::class, $urlRepository],
+            ]);
+
+        $controller = $this->getMockBuilder(PageWebController::class)
+            ->setConstructorArgs([$this->entityManager, $this->security])
+            ->onlyMethods(['render'])
+            ->getMock();
+        $router = $this->createMock(RouterInterface::class);
+        $router->method('generate')->willReturn('/');
+        $container = $this->createMock(ContainerInterface::class);
+        $container->method('get')->willReturnCallback(function (string $id) use ($router) {
+            if (str_contains($id, 'router')) {
+                return $router;
+            }
+            return null;
+        });
+        $controller->setContainer($container);
+        $response = $controller->getPost($request, '2025', '10', '10', 'sample-post');
+        $this->assertTrue($response->isRedirect());
+        $this->assertEquals('/', $response->headers->get('Location'));
+    }
+
+    public function testGetPostRedirectsWhenNotDefault(): void
+    {
+        $request = new Request([], [], [], [], [], [
+            'REQUEST_URI' => '/2025/10/10/sample-post'
+        ]);
+        $url = $this->createMock(Url::class);
+        $url->method('isDefault')->willReturn(false);
+        $url2 = $this->createMock(Url::class);
+        $url2->method('isDefault')->willReturn(true);
+        $urlRepository = $this->getMockBuilder(EntityRepository::class)
+            ->addMethods(['findOneByLink', 'getDefaultUrl'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $urlRepository->expects($this->once())
+            ->method('findOneByLink')
+            ->with($this->stringContains('2025/10/10/sample-post'))
+            ->willReturn($url);
+        $urlRepository->method('getDefaultUrl')->willReturn($url2);
+
+        $this->entityManager->method('getRepository')
+            ->willReturnMap([
+                [Url::class, $urlRepository],
+            ]);
+
+        $controller = $this->getMockBuilder(PageWebController::class)
+            ->setConstructorArgs([$this->entityManager, $this->security])
+            ->onlyMethods(['render'])
+            ->getMock();
+        $router = $this->createMock(RouterInterface::class);
+        $router->method('generate')->willReturn('/');
+        $container = $this->createMock(ContainerInterface::class);
+        $container->method('get')->willReturnCallback(function (string $id) use ($router) {
+            if (str_contains($id, 'router')) {
+                return $router;
+            }
+            return null;
+        });
+        $controller->setContainer($container);
+        $response = $controller->getPost($request, '2025', '10', '10', 'sample-post');
+        $this->assertTrue($response->isRedirect());
+        $this->assertEquals('/', $response->headers->get('Location'));
+    }
 
     public function testGetPostRendersTemplate(): void
     {
