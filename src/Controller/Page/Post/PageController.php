@@ -177,7 +177,7 @@ class PageController extends AbstractInachisController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {//} && $form->isValid()) {
-            if ($form->get('delete')->isClicked()) {
+            if ($form->has('delete') && $form->get('delete')->isClicked()) {
                 $this->entityManager->getRepository(Page::class)->remove($post);
                 $this->entityManager->getRepository(Revision::class)->deleteAndRecordByPage($post);
                 return $this->redirectToRoute(
@@ -250,7 +250,7 @@ class PageController extends AbstractInachisController
                 );
             }
 
-            if ($form->get('publish')->isClicked()) {
+            if ($form->has('publish') && $form->get('publish')->isClicked()) {
                 $post->setStatus(Page::PUBLISHED);
                 if (isset($revision)) {
                     $revision->setAction(RevisionRepository::PUBLISHED);

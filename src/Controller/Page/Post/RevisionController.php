@@ -12,13 +12,19 @@ namespace App\Controller\Page\Post;
 use App\Controller\AbstractInachisController;
 use App\Entity\Page;
 use App\Entity\Revision;
+use App\Parser\ArrayToMarkdown;
 use App\Repository\RevisionRepository;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Jfcherng\Diff\DiffHelper;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class RevisionController extends AbstractInachisController
 {
@@ -29,6 +35,8 @@ class RevisionController extends AbstractInachisController
     #[Route("/incc/page/diff/{id}", methods: [ "GET" ])]
     public function diff(Request $request): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $revision = $this->entityManager->getRepository(Revision::class)->findOneById(
             $request->get('id')
         );
@@ -89,6 +97,7 @@ class RevisionController extends AbstractInachisController
     #[Route("/incc/page/diff/{id}", methods: [ "POST" ])]
     public function doRevert(Request $request): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $revision = $this->entityManager->getRepository(Revision::class)->findOneById(
             $request->get('id')
         );
@@ -123,5 +132,50 @@ class RevisionController extends AbstractInachisController
             $page->getType() . '/' .
             $page->getUrls()[0]->getLink()
         );
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     */
+    #[Route("/incc/page/download/{id}", name: "incc_post_download", methods: [ "GET" ])]
+    public function download(Request $request, SerializerInterface $serializer): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $revision = $this->entityManager->getRepository(Revision::class)->findOneById(
+            $request->get('id')
+        );
+        if (empty($revision) || empty($revision->getPageId())) {
+            throw new NotFoundHttpException(
+                sprintf('Version history could not be found for %s', $request->get('id'))
+            );
+        }
+        $normalisedAttributes = [
+            'title',
+            'subTitle',
+            'postDate',
+            'content',
+            'featureSnippet',
+            'featureImage',
+        ];
+        $post = [
+            'title' => $revision->getTitle(),
+            'subTitle' => $revision->getSubTitle(),
+            'content' => $revision->getContent(),
+        ];
+
+        $response = new Response();
+        $response->setContent(ArrayToMarkdown::parse($post));
+        $filename = date('YmdHis') . '.md';
+
+        $response->headers->set(
+            'Content-Disposition',
+            $response->headers->makeDisposition(
+                ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+                $filename
+            )
+        );
+
+        return $response;
     }
 }
