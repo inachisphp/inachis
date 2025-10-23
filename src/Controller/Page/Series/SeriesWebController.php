@@ -30,6 +30,9 @@ class SeriesWebController extends AbstractInachisController
             $year,
             $title
         );
+        if (empty($this->data['series'])) {
+            throw $this->createNotFoundException('This page does not exist');
+        }
         return $this->render('web/series.html.twig', $this->data);
     }
 
