@@ -9,13 +9,13 @@ export default gulp.series(
     gulp.parallel(sassWatch, jsWatch)
 );
 
-export const build:web = () => gulp.parallel(
+export const buildweb = () => gulp.parallel(
     imgOptimiseWeb,
     sassCompileWeb,
     jsCompileWeb
 );
 
-export const build:admin = () => gulp.parallel(
+export const buildadmin = () => gulp.parallel(
     imgOptimiseAdmin,
     sassCompileAdmin,
     jsCompileAdmin

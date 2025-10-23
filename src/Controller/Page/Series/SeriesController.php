@@ -114,7 +114,7 @@ class SeriesController extends AbstractInachisController
                     UrlNormaliser::toUri($series->getTitle())
                 );
             }
-            if ($form->get('remove')->isClicked()) {
+            if ($form->has('remove') && $form->get('remove')->isClicked()) {
                 $deleteItems = $this->entityManager->getRepository(Page::class)->findBy([
                     'id' => $request->get('series')['itemList']
                 ]);
@@ -125,7 +125,7 @@ class SeriesController extends AbstractInachisController
                     $series->setFirstDate(null)->setLastDate(null);
                 }
             }
-            if ($form->get('delete')->isClicked()) {
+            if ($form->has('delete') && $form->get('delete')->isClicked()) {
                 $this->entityManager->getRepository(Series::class)->remove($series);
                 return $this->redirect($this->generateUrl('incc_series_list'));
             }
