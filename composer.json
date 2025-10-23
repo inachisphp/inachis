@@ -61,7 +61,8 @@
         "symfony/yaml": "^7.2",
         "twig/extra-bundle": "^3.21",
         "twig/string-extra": "^3.21",
-      "ext-fileinfo": "*"
+      "ext-fileinfo": "*",
+      "ext-mbstring": "*"
     },
     "require-dev": {
         "pheromone/phpcs-security-audit": "^2.0",
