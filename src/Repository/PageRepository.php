@@ -155,7 +155,10 @@ final class PageRepository extends AbstractRepository implements PageRepositoryI
         int $limit,
         string $sort = 'postDate desc'
     ): Paginator {
-        $where = [];
+        $where = [
+            '1=1',
+            $filters,
+        ];
         if ($type != '*') {
             $where = [
                 'q.type = :type',
@@ -176,6 +179,9 @@ final class PageRepository extends AbstractRepository implements PageRepositoryI
         if (!empty($filters['keyword'])) {
             $where[0] .= ' AND (q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.content LIKE :keyword )';
             $where[1]['keyword'] = '%' . $where[1]['keyword'] . '%';
+        }
+        if (!empty($filters['excludeIds'])) {
+            $where[0] .= ' AND q.id NOT IN (:excludeIds)';
         }
         $sort = match ($sort) {
             'title asc' => [

@@ -188,7 +188,7 @@
                 <button type="submit" class="button button--secondary button--info" name="publish">{% if post.postDate > date() %}<span class="material-icons">schedule</span> Schedule{% else %}<span class="material-icons">publish</span> Publish{% endif %}</button>
             {%- endif %}
             {{ form_widget(form.delete) }}
-            {%  if post.isDraft %}
+            {%  if not post.isDraft %}
                 <a class="button button--secondary" href="/{{ post.urls|first.link }}" target="_blank" title="View Live"><span class="material-icons">exit_to_app</span> View Live</a>
             {%  endif %}
         {% endif %}
