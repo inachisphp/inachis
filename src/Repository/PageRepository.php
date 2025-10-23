@@ -155,15 +155,18 @@ final class PageRepository extends AbstractRepository implements PageRepositoryI
         int $limit,
         string $sort = 'postDate desc'
     ): Paginator {
-        $where = [
-            'q.type = :type',
-            array_merge(
-                [
-                    'type' => $type,
-                ],
-                $filters
-            )
-        ];
+        $where = [];
+        if ($type != '*') {
+            $where = [
+                'q.type = :type',
+                array_merge(
+                    [
+                        'type' => $type,
+                    ],
+                    $filters
+                )
+            ];
+        }
         if (!empty($filters['status'])) {
             $where[0] .= ' AND q.status = :status';
         }
@@ -174,32 +177,20 @@ final class PageRepository extends AbstractRepository implements PageRepositoryI
             $where[0] .= ' AND (q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.content LIKE :keyword )';
             $where[1]['keyword'] = '%' . $where[1]['keyword'] . '%';
         }
-        switch ($sort) {
-            case 'title asc':
-                $sort = [
-                    [ 'q.title', 'ASC' ],
-                    [ 'q.subTitle', 'ASC' ],
-                ];
-                break;
-            case 'title desc':
-                $sort = [
-                    [ 'q.title', 'DESC' ],
-                    [ 'q.subTitle', 'DESC' ],
-                ];
-                break;
-            case 'modDate asc':
-                $sort = [[ 'q.modDate', 'ASC' ]];
-                break;
-            case 'modDate desc':
-                $sort = [[ 'q.modDate', 'DESC' ]];
-                break;
-            case 'postDate asc':
-                $sort = [[ 'q.postDate', 'ASC' ]];
-                break;
-            case 'postDate desc':
-            default:
-                $sort = [[ 'q.postDate', 'DESC' ]];
-        }
+        $sort = match ($sort) {
+            'title asc' => [
+                ['q.title', 'ASC'],
+                ['q.subTitle', 'ASC'],
+            ],
+            'title desc' => [
+                ['q.title', 'DESC'],
+                ['q.subTitle', 'DESC'],
+            ],
+            'modDate asc' => [['q.modDate', 'ASC']],
+            'modDate desc' => [['q.modDate', 'DESC']],
+            'postDate asc' => [['q.postDate', 'ASC']],
+            default => [['q.postDate', 'DESC']],
+        };
         return $this->getAll(
             $offset,
             $limit,
