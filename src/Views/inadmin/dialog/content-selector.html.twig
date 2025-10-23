@@ -1,7 +1,31 @@
-{% if pages is not empty  %}
-    {% for page in pages %}
-        <li data-value="{{ page.id }}">
-            <label for="page_{{ page.id }}">{{ page.title }}{% if page.subTitle is not empty %} - {{ page.subTitle }}{% endif %}</label>
-        </li>
-    {% endfor %}
-{% endif %}
+<section class="ui-dialog-secondary-bar">
+    <form class="search">
+        <label for="ui-dialog-search-input">Search</label>
+        <input class="text ui-icon-search" id="ui-dialog-search-input" placeholder="Filter by name" type="search" value="{{ filters.keyword|default('') }}" />
+    </form>
+    <p>
+        <strong id="content_count">{{ pages.count }}</strong> posts/pages
+    </p>
+</section>
+<form class="form">
+    {% if pages is not empty  %}
+        <ol>
+            {% for item in pages %}
+                <li>
+                    <input aria-labelledby="page_{{ item.id }}" id="page_{{ item.id }}" name="pages[]}}" type="checkbox" value="{{ item.id }}" />
+                    <label for="page_{{ item.id }}">{{ item.title }}{% if item.subTitle is not empty %} - {{ item.subTitle }}{% endif %}</label>
+                </li>
+            {% endfor %}
+        </ol>
+        {{ include('inadmin/partials/pagination.html.twig', {
+            offset: page.offset,
+            limit: page.limit,
+            maxResults: pages.count,
+            maxPagesToShow: 5,
+            showSummary: false,
+            result_url: '#',
+        }) }}
+    {% else %}
+        <p>No content available for selection.</p>
+    {% endif %}
+</form>

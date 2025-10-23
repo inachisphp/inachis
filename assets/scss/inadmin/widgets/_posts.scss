@@ -19,6 +19,12 @@
 		background-color: #f2f2f2;
 	}
 
+	ol.ui-widget-content {
+		background-color: #fff;
+		border: 1px solid #eee;
+		margin: 0;
+	}
+
 	ol.ui-widget-content, .post, .page, .series {
 		clear: left;
 		list-style-type: none;

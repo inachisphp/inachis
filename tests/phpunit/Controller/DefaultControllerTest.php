@@ -55,28 +55,19 @@ class DefaultControllerTest extends WebTestCase
     {
         $uuid = Uuid::uuid1();
         $uuid2 = Uuid::uuid1();
+        $uuid3 = Uuid::uuid1();
         $page1 = (new Page())->setId($uuid);
         $page2 = (new Page())->setId($uuid2);
-        $series = (new Series())->addItem($page1);
-        $postDate = new DateTime('now');
+        $page3 = (new Page())->setId($uuid3);
+        $series = (new Series())->addItem($page1)->addItem($page3);
+        $series->setFirstDate(new DateTime('now'))->setLastDate(new DateTime('now'));
         $seriesRepo = $this->getMockBuilder(EntityRepository::class)
             ->addMethods([ 'findOneByTitle', 'getAll' ])
             ->disableOriginalConstructor()
             ->getMock();
         $seriesRepo->expects($this->once())
             ->method('getAll')
-            ->with(
-                0,
-                10,
-                [
-                    'q.lastDate < :postDate',
-                    [
-                        'postDate' => $postDate,
-                    ],
-                ],
-                [ [ 'q.lastDate', 'DESC' ] ]
-            )
-            ->willReturn($series);
+            ->willReturn([ $series ]);
         $pageRepo = $this->getMockBuilder(EntityRepository::class)
             ->addMethods([ 'findOneByTitle', 'getAll' ])
             ->disableOriginalConstructor()
@@ -84,7 +75,7 @@ class DefaultControllerTest extends WebTestCase
         $pageRepo->expects($this->once())
             ->method('getAll')
             ->with()
-            ->willReturn([$page2]);
+            ->willReturn([ $page1, $page2, $page3 ]);
         $this->entityManager->method('getRepository')
             ->willReturnMap([
                 [Series::class, $seriesRepo],

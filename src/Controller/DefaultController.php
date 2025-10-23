@@ -47,7 +47,7 @@ class DefaultController extends AbstractInachisController
         $excludePages = [];
         if (!empty($series)) {
             foreach ($series as $group) {
-                if (!empty($group->getItems())) {
+                if (!$group->getItems()->isEmpty()) {
                     foreach ($group->getItems() as $page) {
                         $excludePages[] = $page->getId();
                     }

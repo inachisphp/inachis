@@ -30,10 +30,28 @@ class ContentSelectorController extends AbstractInachisController
     public function contentList(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        // @todo paginate data returned with auto-loading from Ajax
-        $this->data['pages'] = $this->entityManager->getRepository(Page::class)->findBy([], [
-            'title' => 'ASC'
-        ]);
+        $filters = array_filter($request->get('filters', []));
+        if ($request->get('seriesId', '') !== '') {
+            $series = $this->entityManager->getRepository(Series::class)->find($request->get('seriesId'));
+            if ($series !== null && !$series->getItems()->isEmpty()) {
+                $filters['excludeIds'] = [];
+                foreach ($series->getItems() as $item) {
+                    $filters['excludeIds'][] = $item->getId();
+                }
+            }
+        }
+        $offset = (int) $request->get('offset', 0);
+        $limit = (int) $request->get('limit', 25);
+        $this->data['pages'] = $this->entityManager->getRepository(Page::class)->getFilteredOfTypeByPostDate(
+            $filters,
+            '*',
+            $offset,
+            $limit,
+            'title asc'
+        );
+        $this->data['filters'] = $filters;
+        $this->data['page']['offset'] = $offset;
+        $this->data['page']['limit'] = $limit;
         return $this->render('inadmin/dialog/content-selector.html.twig', $this->data);
     }
 

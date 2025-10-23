@@ -120,15 +120,20 @@
             "cp -R vendor/jedi58/inachis/{bin,config,public} .",
             "cp -R vendor/jedi58/inachis/.env.dist .env"
         ],
+        "setup-git-hook": [
+            "php -r \"if (!file_exists('.git/hooks')) exit(0); copy('dev/git-hooks/pre-commit', '.git/hooks/pre-commit'); chmod('.git/hooks/pre-commit', 0755); echo '✅ Installed Git pre-commit hook.\\n';\""
+        ],
         "post-create-project-cmd": [
             "@create-skeleton",
             "@auto-scripts"
         ],
         "post-install-cmd": [
-            "@auto-scripts"
+            "@auto-scripts",
+            "@setup-git-hook"
         ],
         "post-update-cmd": [
-            "@auto-scripts"
+            "@auto-scripts",
+            "@setup-git-hook"
         ]
     },
     "conflict": {
