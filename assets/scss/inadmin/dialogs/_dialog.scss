@@ -134,3 +134,18 @@
   position: absolute;
   right: 0;
 }
+
+#dialog__contentSelector {
+  ol {
+    list-style-type: none;
+
+    li {
+      margin: 0.5em;
+    }
+
+    input {
+      margin: 0 1em 0 0;
+      width: auto;
+    }
+  }
+}

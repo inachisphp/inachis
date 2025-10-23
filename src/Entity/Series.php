@@ -80,7 +80,7 @@ class Series
     /**
      * @var Collection|null The array of pages in the series
      */
-    #[ORM\ManyToMany(targetEntity: 'App\Entity\Page', mappedBy: 'series', fetch: 'EAGER')]
+    #[ORM\ManyToMany(targetEntity: 'App\Entity\Page', fetch: 'EAGER')]
     #[ORM\JoinTable(name: 'Series_pages')]
     #[ORM\JoinColumn(name: 'series_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'page_id', referencedColumnName: 'id')]

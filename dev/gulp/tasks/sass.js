@@ -24,7 +24,7 @@ async function compileSass(src, dest) {
 
 async function copyCSS(src, dest) {
     return gulp.src(`${config.paths.src.sass.admin}*.css`)
-        .pipe(rename({ suffix: '.min' }))
+        // .pipe(rename({ suffix: '.min' }))
         .pipe(gulp.dest(config.paths.dist.sass.admin));
 }
 
