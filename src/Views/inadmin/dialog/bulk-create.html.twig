@@ -1,0 +1,31 @@
+<form class="form">
+    <fieldset class="col span_1_of_2">
+        <legend>Bulk Creation</legend>
+        <p>
+            <label id="bulk_startDate_label" for="bulk_startDate">Start Date</label>
+            <input aria-labelledby="bulk_startDate_label" aria-required="true" id="bulk_startDate" type="date" name="startDate" />
+        </p>
+        <p>
+            <label id="bulk_endDate_label" for="bulk_endDate">End Date</label>
+            <input aria-labelledby="bulk_endDate_label" aria-required="true" id="bulk_endDate" type="date" name="endDate" />
+        </p>
+        <p>
+            <label id="bulk_title_label" for="bulk_title">Title stub</label>
+            <input aria-labelledby="bulk_title_label" aria-required="true" class="text" id="bulk_title" name="title" type="text" value="{{ page.title }}" />
+        </p>
+        <p>
+            <input aria-labelledby="bulk_addDay_label" class="checkbox" id="bulk_addDay" name="addDay" type="checkbox" />
+            <label id="bulk_addDay_label" for="bulk_addDay">Add 'Day X' to each title?</label>
+        </p>
+    </fieldset>
+    <fieldset class="col span_1_of_2">
+        <p>
+            <label id="bulk_categories_label" for="bulk_categories">Categories</label>
+            <select id="bulk_categories" name="categories" aria-labelledby="bulk_categories_label" aria-required="false" class="js-select" data-placeholder="Select a category" data-tip-content="Separate existing categories with a comma or by pressing [Enter]. New categories should be created using the adjacent [+] icon." data-url="/incc/ax/categoryList/get" multiple="multiple"></select>
+        </p>
+        <p>
+            <label id="bulk_tags_label" for="bulk_tags">Tags</label>
+            <select id="bulk_tags" name="tags" aria-labelledby="bulk_tags_label" aria-required="false" class="js-select" data-tags="true" data-tip-content="Separate tags with a comma or by pressing [Enter]" data-url="/incc/ax/tagList/get" multiple="multiple"></select>
+        </p>
+    </fieldset>
+</form>

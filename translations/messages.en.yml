@@ -54,6 +54,27 @@ admin.posts.help: 'View list of posts and pages'
 
 admin.series.title: 'Series'
 admin.series.help: 'View list of series'
+admin.series.bulk.label: 'Create'
+admin.series.add.label: 'Add'
+admin.series.contents.title: 'Contents'
+admin.series.contents.not_saved: 'You must save the series before you can add items.'
+admin.series.contents.no_content: "You haven't added any content yet!"
+admin.series.legend: 'Series'
+admin.series.title.label: 'Title'
+admin.series.title.placeholder: 'e.g. The Great Adventure'
+admin.series.subTitle.label: 'Sub-title'
+admin.series.subTitle.placeholder: 'e.g. A short story'
+admin.series.url.label: 'URL (Use five or more letters, numbers, and/or hyphens)'
+admin.series.url.placeholder: 'e.g. my-series'
+admin.series.description.label: 'Short description'
+admin.series.firstDate.label: 'First date'
+admin.series.firstDate.tip.title: ''
+admin.series.firstDate.tip.content: ''
+admin.series.lastDate.label: 'Last date'
+admin.series.lastDate.tip.title: ''
+admin.series.lastDate.tip.content: ''
+admin.series.visibility.label: 'Visibility'
+
 
 admin.resources.title: 'Resources'
 admin.resources.help: 'Manage resources'
@@ -99,19 +120,7 @@ admin.label.post.tags: Tags
 admin.tip.content.post.tags: Separate tags with a comma or by pressing [Enter]
 admin.label.post.teaser: Abstract / Summary
 
-admin.series.legend: Series
-admin.label.series.title: Title
-admin.placeholder.series.title: e.g. The Great Adventure
-admin.label.series.subTitle: Sub-title
-admin.placeholder.series.subTitle: e.g. A short story
-admin.label.series.url: URL (Use five or more letters, numbers, and/or hyphens)
-admin.placeholder.series.url: e.g. my-series
-admin.label.series.description: Short description
-admin.label.series.firstDate: First date
-admin.label.series.lastDate: Last date
-admin.series.contents.title: Contents
-admin.series.contents.not_saved: You must save the series before you can add items.
-admin.series.contents.no_content: You haven't added any content yet!
+
 
 admin.dialog.image_manager.title: Image Gallery
 admin:

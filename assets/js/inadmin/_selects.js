@@ -28,34 +28,10 @@ function initClearSearch(selector)
 	});
 }
 
-$(document).ready(function() {
-	let $uiToggle = $('.ui-toggle');
-	$uiToggle.each(function()
-	{
-		var targetElement = $(this).attr('data-target'),
-			targetDefaultState = $(this).attr('data-target-state');
-		if (targetDefaultState === 'hidden') {
-			$(targetElement).hide();
-		}
-	});
-	$uiToggle.on('click', function()
-	{
-		$($(this).attr('data-target')).toggle();
-	});
-
-	let $filterOptions = $('.filter .filter__toggle');
-	$filterOptions.on('click', function()
-	{
-		$('#filter__options').toggle();
-		$(this).toggleClass('selected');
-	});
-	if ($('#filter__keyword').val() !== '') {
-		$('#filter__options').toggle();
-		$('.filter .filter__toggle').toggleClass('selected');
-	}
-
+function initSelect2(selector)
+{
 	// https://select2.github.io/examples.html
-	$('.js-select').each(function ()
+	$(selector + '.js-select').each(function ()
 	{
 		var $properties = {
 			allowClear: true,
@@ -94,6 +70,35 @@ $(document).ready(function() {
 		}
 		$(this).select2($properties);
 	});
+}
+
+$(document).ready(function() {
+	let $uiToggle = $('.ui-toggle');
+	$uiToggle.each(function()
+	{
+		var targetElement = $(this).attr('data-target'),
+			targetDefaultState = $(this).attr('data-target-state');
+		if (targetDefaultState === 'hidden') {
+			$(targetElement).hide();
+		}
+	});
+	$uiToggle.on('click', function()
+	{
+		$($(this).attr('data-target')).toggle();
+	});
+
+	let $filterOptions = $('.filter .filter__toggle');
+	$filterOptions.on('click', function()
+	{
+		$('#filter__options').toggle();
+		$(this).toggleClass('selected');
+	});
+	if ($('#filter__keyword').val() !== '') {
+		$('#filter__options').toggle();
+		$('.filter .filter__toggle').toggleClass('selected');
+	}
+
+	initSelect2('');
 
 	// https://github.com/daredevel/jquery-tree
 	$('ui-tree').each(function()
@@ -110,7 +115,8 @@ $(document).ready(function() {
 		$(this).datetimepicker({
 			format: 'd/m/Y H:i',
 			validateOnBlue: false,
-            onChangeDateTime:function(dp,$input) {
+            onChangeDateTime: function(dp,$input)
+			{
 				if (InachisPostEdit) {
 					// @todo Need to update JS so that it only updates URL if previously set URL matches the auto-generated pattern
                     $('input#post_url').val(InachisPostEdit.getUrlFromTitle());
