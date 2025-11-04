@@ -25,18 +25,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SeriesType extends AbstractType
 {
-    private $router;
-    private $transformer;
-    private $translator;
+    private TranslatorInterface $translator;
 
     public function __construct(
-        TranslatorInterface $translator,
-        RouterInterface $router,
-        ArrayCollectionToArrayTransformer $transformer
+        TranslatorInterface $translator
     ) {
-        $this->router = $router;
         $this->translator = $translator;
-        $this->transformer = $transformer;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -50,9 +44,9 @@ class SeriesType extends AbstractType
                     'data-tip-content' => '<strong>Required.</strong>',
                     'autofocus'        => 'true',
                     'class'            => 'editor__title text',
-                    'placeholder'      => $this->translator->trans('admin.placeholder.series.title', [], 'messages'),
+                    'placeholder'      => $this->translator->trans('admin.series.title.placeholder', [], 'messages'),
                 ],
-                'label'      => $this->translator->trans('admin.label.series.title', [], 'messages'),
+                'label'      => $this->translator->trans('admin.series.title.label', [], 'messages'),
                 'label_attr' => [
                     'id' => 'title_label',
                 ],
@@ -62,9 +56,9 @@ class SeriesType extends AbstractType
                     'aria-labelledby' => 'subTitle_label',
                     'aria-required'   => 'false',
                     'class' => 'editor__sub-title text',
-                    'placeholder'     => $this->translator->trans('admin.placeholder.series.subTitle', [], 'messages'),
+                    'placeholder'     => $this->translator->trans('admin.series.subTitle.placeholder', [], 'messages'),
                 ],
-                'label'      => $this->translator->trans('admin.label.series.subTitle', [], 'messages'),
+                'label'      => $this->translator->trans('admin.series.subTitle.label', [], 'messages'),
                 'label_attr' => [
                     'id' => 'subTitle_label',
                 ],
@@ -76,9 +70,9 @@ class SeriesType extends AbstractType
                     'aria-required'   => 'false',
                     'class' => 'editor__url text',
                     'pattern' => '[0-9a-zA-ZÀ-ž\-]{4,}',
-                    'placeholder'     => $this->translator->trans('admin.placeholder.series.url', [], 'messages'),
+                    'placeholder'     => $this->translator->trans('admin.series.url.placeholder', [], 'messages'),
                 ],
-                'label'      => $this->translator->trans('admin.label.series.url', [], 'messages'),
+                'label'      => $this->translator->trans('admin.series.url.label', [], 'messages'),
                 'label_attr' => [
                     'id' => 'url_label',
                 ],
@@ -90,7 +84,7 @@ class SeriesType extends AbstractType
                     'aria-required'   => 'false',
                     'class' => 'mde_editor',
                 ],
-                'label'      => $this->translator->trans('admin.label.series.description', [], 'messages'),
+                'label'      => $this->translator->trans('admin.series.description.label', [], 'messages'),
                 'label_attr' => [
                     'class' => 'hidden',
                     'id'    => 'description_label',
@@ -105,13 +99,13 @@ class SeriesType extends AbstractType
                         'aria-labelledby'  => 'firstDate_label',
                         'aria-required'    => 'false',
                         'class' => 'halfwidth',
-                        'data-tip-content' => $this->translator->trans('admin.tip.series.firstDate', [], 'messages'),
-                        'data-tip-title'   => $this->translator->trans('admin.tip.title.series.firstDate', [], 'messages'),
+                        'data-tip-content' => $this->translator->trans('admin.series.firstDate.tip.content', [], 'messages'),
+                        'data-tip-title'   => $this->translator->trans('admin.series.firstDate.tip.title', [], 'messages'),
                         'readOnly' => true,
                     ],
-                    'format' => 'dd/MM/yyyy', // HH:mm',
+                    'format' => 'dd/MM/yyyy', // HH:mm,
                     'html5'  => false,
-                    'label'  => $this->translator->trans('admin.label.series.firstDate', [], 'messages'),
+                    'label'  => $this->translator->trans('admin.series.firstDate.label', [], 'messages'),
                     'label_attr' => [
                         'class' => 'date-range__label',
                         'id' => 'firstDate_label',
@@ -125,13 +119,13 @@ class SeriesType extends AbstractType
                         'aria-labelledby'  => 'lastDate_label',
                         'aria-required'    => 'false',
                         'class' => 'halfwidth',
-                        'data-tip-content' => $this->translator->trans('admin.tip.series.lastDate', [], 'messages'),
-                        'data-tip-title'   => $this->translator->trans('admin.tip.title.series.lastDate', [], 'messages'),
+                        'data-tip-content' => $this->translator->trans('admin.series.lastDate.tip.content', [], 'messages'),
+                        'data-tip-title'   => $this->translator->trans('admin.series.lastDate.tip.title', [], 'messages'),
                         'readOnly' => true,
                     ],
-                    'format' => 'dd/MM/yyyy', // HH:mm',
+                    'format' => 'dd/MM/yyyy', // HH:mm,
                     'html5'  => false,
-                    'label'  => $this->translator->trans('admin.label.series.lastDate', [], 'messages'),
+                    'label'  => $this->translator->trans('admin.series.lastDate.label', [], 'messages'),
                     'label_attr' => [
                         'class' => 'date-range__label',
                         'id' => 'lastDate_label',
@@ -140,6 +134,17 @@ class SeriesType extends AbstractType
                     'widget'   => 'single_text',
 
                 ])
+                ->add('bulkCreate', ButtonType::class, [
+                    'attr' => [
+                        'class' => 'button button--add bulk-create__link',
+                    ],
+                    'label' => sprintf(
+                        '<span class="material-icons">%s</span> %s',
+                        'create',
+                        $this->translator->trans('admin.series.bulk.label', [], 'messages')
+                    ),
+                    'label_html' => true,
+                ])
                 ->add('addItem', ButtonType::class, [
                     'attr' => [
                         'class' => 'button button--info content-selector__link',
@@ -147,7 +152,7 @@ class SeriesType extends AbstractType
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> %s',
                         'playlist_add',
-                        $this->translator->trans('admin.button.addItem', [], 'messages')
+                        $this->translator->trans('admin.series.add.label', [], 'messages')
                     ),
                     'label_html' => true,
                 ])
@@ -159,7 +164,7 @@ class SeriesType extends AbstractType
                         'data-label-off'  => 'private',
                         'data-label-on'   => 'public',
                     ],
-                    'label'      => $this->translator->trans('admin.label.post.visibility', [], 'messages'),
+                    'label'      => $this->translator->trans('admin.series.visibility.label', [], 'messages'),
                     'label_attr' => [
                         'id' => 'visibility_label',
                         'class' => 'inline_label',

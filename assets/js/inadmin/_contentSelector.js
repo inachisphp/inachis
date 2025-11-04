@@ -1,4 +1,4 @@
-var InachisContentSelectorDialog = {
+let InachisContentSelectorDialog = {
     offset: 0,
     limit: 25,
     saveTimeout: false,
@@ -13,7 +13,7 @@ var InachisContentSelectorDialog = {
 
     createDialog: function()
     {
-        var dialogWidth = $(window).width() * 0.75;
+        let dialogWidth = $(window).width() * 0.75;
         if (dialogWidth < 380) {
             dialogWidth = 376;
         }
@@ -113,7 +113,7 @@ var InachisContentSelectorDialog = {
                 method: 'POST',
                 success: $.proxy(function(data)
                 {
-                    if(data == 'Saved') {
+                    if(data === 'Saved') {
                         $choseContent.html('<span class="material-icons">done</span> Content added');
                         setTimeout(function() {
                             location.reload();
