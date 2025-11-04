@@ -1,10 +1,12 @@
+{% set page_start = page.offset + 1 %}
+{% set page_end = page_start + pages.getIterator|length - 1 %}
 <section class="ui-dialog-secondary-bar">
     <form class="search">
         <label for="ui-dialog-search-input">Search</label>
         <input class="text ui-icon-search" id="ui-dialog-search-input" placeholder="Filter by name" type="search" value="{{ filters.keyword|default('') }}" />
     </form>
     <p>
-        <strong id="content_count">{{ pages.count }}</strong> posts/pages
+        Showing {{ page_start|number_format }} to {{ page_end|number_format }} of <strong id="content_count">{{ pages.count }}</strong> posts and pages
     </p>
 </section>
 <form class="form">

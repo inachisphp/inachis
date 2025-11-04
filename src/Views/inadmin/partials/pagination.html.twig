@@ -3,11 +3,14 @@
     ((maxResults/limit)|round(0, 'ceil') - 1) * limit
 %}
 {% set pageBlockEnd = min(offset + (limit * maxPagesToShow / 2), lastPage) %}
+{% set pagination_start = offset %}
+{% set pagination_end = min(offset + limit - 1, total) %}
+
 {% block pagination %}
 <section class="pagination--row">
 {% if showSummary is defined and showSummary %}
 <p class="pagination--info" aria-live="polite">
-    Showing {{ offset + 1 }} to {{ min(offset + limit, total) }} of {{ total }} results
+    Showing <strong>{{ pagination_start|number_format }}</strong>{% if pagination_start != pagination_end %}-<strong>{{ pagination_end|number_format }}</strong>{% endif %} of <strong>{{ total }}</strong> results
 </p>
 {% endif %}
 <nav role="navigation" aria-label="Pagination Navigation">
