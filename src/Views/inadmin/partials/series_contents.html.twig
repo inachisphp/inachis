@@ -1,4 +1,9 @@
-{% if series.id is not empty %}<p class="float_right">{{ form_widget(form.addItem) }}</p>{% endif %}
+{% if series.id is not empty %}
+<p>
+    {{ form_widget(form.bulkCreate) }}
+    {{ form_widget(form.addItem) }}
+</p>
+{% endif %}
 <h2>
     {% trans %}admin.series.contents.title{% endtrans %}
     <span class="badge">{{ series.items|length }}</span>

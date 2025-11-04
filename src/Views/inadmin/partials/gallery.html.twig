@@ -1,5 +1,8 @@
 {% if images is not empty %}
-    <ol data-total="{{ images.count }}">
+    {% set page_start = page.offset + 1 %}
+    {% set page_end = page_start + images.getIterator|length - 1 %}
+
+    <ol data-end="{{ page_end }}" data-start="{{ page_start }}" data-total="{{ images.count }}">
         {% for image in images %}
             <li>
                 <label for="chosenImage_{{ image.id }}">
@@ -16,11 +19,10 @@
     {{ include('inadmin/partials/pagination.html.twig', {
         offset: page.offset,
         limit: page.limit,
-        maxResults: images.count,
         maxPagesToShow: 5,
         result_url: path('incc_resource_list', { type: 'images' }),
         showSummary: false,
-        total: page.total,
+        total: images.count,
     }) }}
 {% else %}
     <p>No images to choose from, maybe you'd like to add some</p>
