@@ -57,8 +57,8 @@ class SeriesTypeTest extends TypeTestCase
         $view = $form->createView();
 
         $expectedFields = [
-            'title', 'subTitle', 'url', 'description', 'firstDate', 'lastDate', 'addItem', 'visibility',
-            'submit', 'delete', 'remove',
+            'title', 'subTitle', 'url', 'description', 'firstDate', 'lastDate',
+            'bulkCreate', 'addItem', 'visibility','submit', 'delete', 'remove',
         ];
         $this->assertSame($expectedFields, array_keys($view->children));
     }

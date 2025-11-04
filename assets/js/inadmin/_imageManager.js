@@ -24,11 +24,10 @@ var InachisImageManager = {
             this.toggleUploadImage();
         } else {
             InachisImageManager.buttons[0].disabled = true;
-            $('.gallery input[type=radio]').on('change', InachisImageManager.enableChooseButton);
             $('#ui-dialog-search-input').on('input', function (event) {
                 InachisImageManager.searchImages();
             });
-            this.addPaginationLinks();
+            InachisImageManager.searchImages();
         }
         this.updateDialogButtons();
         $('.ui-dialog-secondary-bar a').click(this.toggleUploadImage);
@@ -57,7 +56,7 @@ var InachisImageManager = {
     {
         $('nav .pagination li a').on('click', function(event) {
             event.preventDefault();
-            InachisImageManager.offset = $(event.currentTarget).html() * (InachisImageManager.limit - 1);
+            InachisImageManager.offset = ($(event.currentTarget).html() - 1) * InachisImageManager.limit;
             InachisImageManager.searchImages();
             return false;
         });
@@ -95,7 +94,15 @@ var InachisImageManager = {
                     $('.gallery').animate({ scrollTop:0}, 100);
                     InachisImageManager.addPaginationLinks();
                     $('.gallery input[type=radio]').on('change', InachisImageManager.enableChooseButton);
-                    $('#images_count').html($('.gallery ol').attr('data-total'));
+                    const $ol = $('.gallery ol');
+                    const values = [
+                        $ol.attr('data-start'),
+                        $ol.attr('data-end'),
+                        $ol.attr('data-total')
+                    ];
+                    $('#images_count strong').each(function(i) {
+                        $(this).html(values[i]);
+                    });
                 }
             );
         }, 500);
