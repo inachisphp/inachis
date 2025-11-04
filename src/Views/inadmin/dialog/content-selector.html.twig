@@ -6,7 +6,7 @@
         <input class="text ui-icon-search" id="ui-dialog-search-input" placeholder="Filter by name" type="search" value="{{ filters.keyword|default('') }}" />
     </form>
     <p>
-        Showing {{ page_start|number_format }} to {{ page_end|number_format }} of <strong id="content_count">{{ pages.count }}</strong> posts and pages
+        Showing <strong>{{ page_start|number_format }}</strong>-<strong>{{ page_end|number_format }}</strong> of <strong id="content_count">{{ pages.count }}</strong> posts and pages
     </p>
 </section>
 <form class="form">
@@ -24,8 +24,9 @@
             limit: page.limit,
             maxResults: pages.count,
             maxPagesToShow: 5,
-            showSummary: false,
             result_url: '#',
+            showSummary: false,
+            total: pages.count,
         }) }}
     {% else %}
         <p>No content available for selection.</p>

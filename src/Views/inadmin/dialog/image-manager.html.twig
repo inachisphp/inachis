@@ -3,10 +3,10 @@
         <label class="ui-helper-hidden-accessible" for="ui-dialog-search-input">Search</label>
         <input class="text ui-icon-search" id="ui-dialog-search-input" placeholder="Filter by name" type="search" />
         <!-- button class="material-icons" type="submit">search</button -->
-    </form>
-    <p>
         <a class="button button--add" href="#"><span class="material-icons">cloud_upload</span> Upload a new Image</a>
-        <strong id="images_count">{{ image_count|number_format }}</strong> images
+    </form>
+    <p id="images_count">
+        Showing <strong>0</strong>-<strong>0</strong> of <strong>0</strong> images
     </p>
 </section>
 {#<section class="ui-dialog-secondary-bar">#}
@@ -14,14 +14,7 @@
 {#    <div class="flash-warning"><span class="material-icons">warning</span> Failed to upload file</div>#}
 {#</section>#}
 <section class="gallery">
-    {{ include('inadmin/partials/gallery.html.twig', {
-        images: dataset,
-        page: {
-            offset: 0,
-            limit: 25,
-            total: image_count,
-        }
-    }) }}
+    <div class="loader"></div>
 </section>
 <section class="ui-dialog-image-uploader visually-hidden">
     {{ form_start(form, {'attr': { 'class': 'form' }}) }}
