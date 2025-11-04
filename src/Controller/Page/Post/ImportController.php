@@ -27,6 +27,7 @@ class ImportController extends AbstractInachisController
     #[Route("/incc/import", name: "incc_post_import", methods: [ "GET" ])]
     public function index(): Response
     {
+        $this->data['page']['tab'] = 'import';
         // @todo change text if handheld device
         return $this->render('inadmin/page/post/import.html.twig', $this->data);
     }
