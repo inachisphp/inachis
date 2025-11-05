@@ -17,7 +17,7 @@ let InachisContentSelectorDialog = {
         if (dialogWidth < 380) {
             dialogWidth = 376;
         }
-        $('<div id="dialog__contentSelector"><p/><p/><p/><p/><p/></div>').dialog({
+        $('<div id="dialog__contentSelector"><p/><p/><div class="loader"></div><p/><p/></div>').dialog({
             buttons: [
                 {
                     text: 'Attach to series',
@@ -130,6 +130,7 @@ let InachisContentSelectorDialog = {
     getContentList: function()
     {
         let $contentSelector = $('#dialog__contentSelector');
+        $contentSelector.find('.form').html('<p/><div class="loader"></div><p/>');
         $contentSelector.load(Inachis.prefix + '/ax/contentSelector/get',
             {
                 offset: InachisContentSelectorDialog.offset,
