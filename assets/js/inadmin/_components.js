@@ -5,6 +5,7 @@ let InachisComponents = {
 		this.initFilterBar();
 		this.initSelect2('');
 		this.initSelectAllNone('');
+		this.initSeriesControls();
 		this.initSwitches('');
 		this.initUIToggle();
 
@@ -113,6 +114,13 @@ let InachisComponents = {
 			InachisComponents.toggleActionBar();
 		});
 		$('input[name^="items"]').on('change', this.toggleActionBar);
+	},
+	initSeriesControls: function ()
+	{
+		$('input[name=series\\[itemList\\]\\[\\]]').on('change', function() {
+			let anyChecked = $('input[name=series\\[itemList\\]\\[\\]]:checked').length > 0;
+			$('.series__controls').toggleClass('visually-hidden', !anyChecked);
+		});
 	},
 	initSwitches: function (selector)
 	{

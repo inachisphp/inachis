@@ -40,12 +40,15 @@
                     type: 'button',
                     url: '#',
                 },
+
                 filters: {
                     Usage: {
                         '': 'All',
                         'notinuse': 'Not in use',
                     }
                 },
+                filter_values: filters,
+
                 show_search: true,
                 sort_options: {
                     'title asc': 'Title A-Z',
@@ -96,31 +99,28 @@
         {% endif %}
         {{ form_end(form) }}
     </section>
-        {% elseif filter_values|default(null) is not empty %}
-            {% include 'inadmin/partials/filters.html.twig' with {
-                'filters': filters,
-                'filter_values': filter_values,
-                'show_search': show_search
-            } only %}
+    {% elseif filter_values|default(null) is not empty %}
+        {% include 'inadmin/partials/filters.html.twig' with {
+            'filters': filters,
+            'filter_values': filter_values,
+            'show_search': show_search
+        } only %}
 
-            <section class="paginated-list">
-                <p class="content-warning">
-                    <i class="material-icons">info_outline</i>
-                    <span>Oops! Your filter didn't find anything!</span>
-                    <a href="{{ url_result }}">Remove filter</a>
-                </p>
-            </section>
-        {% else %}
-            <section class="paginated-list">
-                <p class="content-warning">
-                    <i class="material-icons">info_outline</i>
-                    <span>You don't have any content yet!</span>
-                    {% if url_add|default(null) is not empty %}
-                        <a href="{{ url_add }}">Add some now!</a>
-                    {% endif %}
-                </p>
-            </section>
-        {% endif %}
+    <section class="paginated-list">
+        <p class="content-warning">
+            <i class="material-icons">info_outline</i>
+            <span>Oops! Your filter didn't find anything!</span>
+        </p>
+    </section>
+    {% else %}
+        <section class="paginated-list">
+            <p class="content-warning">
+                <i class="material-icons">info_outline</i>
+                <span>You don't have any content yet!</span>
+                <a class="dialog__link" data-class-name="dialog__imageManager" data-target="featureImage" data-template-name="image-manager" data-title="{{ 'admin.dialog.upload.title'|trans }}" data-view="upload" href="">Add some now!</a>
+            </p>
+        </section>
+    {% endif %}
     </div>
     {% endblock resources %}
 
