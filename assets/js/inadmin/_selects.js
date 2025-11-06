@@ -72,6 +72,13 @@ function initSelect2(selector)
 	});
 }
 
+function toggleActionBar (){
+	let anyUnchecked = $('input[name^="items"]:not(:checked)').length > 0;
+	let anyChecked = $('input[name^="items"]:checked').length > 0;
+	$('.fixed-bottom-bar').toggleClass('visually-hidden', !anyChecked);
+	$('.selectAllNone').prop('checked', !anyUnchecked);
+}
+
 $(document).ready(function() {
 	let $uiToggle = $('.ui-toggle');
 	$uiToggle.each(function()
@@ -135,7 +142,9 @@ $(document).ready(function() {
 	$('.selectAllNone').on('click', function()
 	{
 		$(this).closest('form').first().find('input[type=checkbox]').prop('checked', $(this).prop('checked'));
+		toggleActionBar();
 	});
+	$('input[name^="items"]').on('change', toggleActionBar);
 	$('.error-select').hide();
 
     $(function() {
