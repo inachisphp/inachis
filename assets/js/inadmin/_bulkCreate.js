@@ -70,7 +70,7 @@ let InachisBulkCreateDialog = {
 
     initInputs: function ()
     {
-        initSelect2('.ui-dialog ');
+        InachisComponents.initSelect2('.ui-dialog ');
         $('#bulk_title').on('keyup', this.validateInputs);
         $('#dialog__bulkCreate input[type=date]').each(function ()
         {

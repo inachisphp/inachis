@@ -35,14 +35,15 @@ var InachisImageManager = {
             event.preventDefault();
             event.stopPropagation();
             dropzone.on('success', file => {
-                $('#ui-dialog-search-input').val($('#image_title').val());
+                let image_title = $('#image_title').val();
                 if (InachisDialog.view === 'upload') {
-                    $('#filter__keyword').val($('#image_title').val());
+                    $('#filter__keyword').val(image_title);
                     $('#dialog__imageManager').dialog('destroy');
                     $('form.form__images').submit();
                 } else {
+                    $('#ui-dialog-search-input').val(image_title);
                     InachisImageManager.toggleUploadImage();
-                    InachisImageManager.addPaginationLinks();
+                    InachisImageManager.searchImages();
                 }
             });
             dropzone.on('error', file => {

@@ -22,6 +22,7 @@ var InachisDialog = {
 
     createDialog: function(event)
     {
+        event.preventDefault();
         let dialogWidth = $(window).width() * 0.75;
         if (dialogWidth < 380) {
             dialogWidth = 376;

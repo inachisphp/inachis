@@ -6,8 +6,23 @@
   background-color: #ccc;
   display: flex;
   flex-direction: row-reverse;
+  flex-wrap: nowrap;
   font-size: 0.9em;
-  justify-content: flex-start;
+  justify-content: space-between;
+
+  input[name=selectAllNone] {
+    margin: 0 1.4em;
+  }
+
+  input[type=checkbox]+label.visually-hidden {
+    display: none;
+  }
+
+  .filter__controls {
+    align-items: center;
+    display: flex;
+    flex-direction: row-reverse;
+  }
 
   @media #{$information-medium} {
     flex-wrap: nowrap;
