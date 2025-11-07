@@ -16,13 +16,21 @@
                     {% for part in slug_exploded %}
                         {% if '[' in part %}
                             {% set part = part|split('[')[0] %}
-                            {% set slug_object = attribute(slug_object, part)[0] %}
-                        {% else %}
+                            {% if attribute(slug_object, part)[0] is defined %}
+                                {% set slug_object = attribute(slug_object, part)[0] %}
+                            {% else %}
+                                {% set slug_object = '' %}
+                            {% endif %}
+                        {% elseif attribute(slug_object, part) is defined %}
                             {% set slug_object = attribute(slug_object, part) %}
+                        {% else %}
+                            {% set slug_object = '' %}
                         {% endif %}
                     {% endfor %}
-                {% else %}
+                {% elseif attribute(item, slug) is defined %}
                     {% set slug_object = attribute(item, slug) %}
+                {% else %}
+                    {% set slug_object = '' %}
                 {% endif %}
             {% endif %}
         <article id="{{ type ~ '-' ~ item.id }}" class="{{ type }} {{ additional_classes|default(null) }} hentry">

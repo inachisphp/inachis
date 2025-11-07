@@ -31,20 +31,21 @@
                 },
                 {
                     title: 'Status',
+                    flex: true,
                     badges: {
                         'disabled': {
                             field: 'enabled',
                             condition: false,
-                            className: 'badge__draft',
+                            className: 'badge__disabled',
                         },
                         'new-user': {
                             field: 'password',
                             condition: '',
-                            className: 'badge__hotlink',
+                            className: 'badge__newuser',
                         },
                         'active': {
                             default: true,
-                            className: 'badge__scheduled',
+                            className: 'badge__active',
                         }
                     },
                 },

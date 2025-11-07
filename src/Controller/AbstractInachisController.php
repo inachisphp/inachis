@@ -62,9 +62,6 @@ abstract class AbstractInachisController extends AbstractController
                 'keywords'      => '',
                 'modDate'       => '',
             ],
-            'post' => [
-                'featureImage' => '',
-            ],
             'session' => $this->security->getUser(),
             'session_timeout' => ini_get('session.gc_maxlifetime'),
             'session_timeout_time' => date(
