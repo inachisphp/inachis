@@ -1,4 +1,4 @@
-var InachisPasswordManager = {
+let InachisPasswordManager = {
     _init: function ()
     {
         let saveTimeout = false;

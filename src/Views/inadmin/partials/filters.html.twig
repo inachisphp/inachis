@@ -2,6 +2,7 @@
 
 {% if filters is defined and filters is not empty or show_search|default(false) %}
 <section class="filter">
+    <div class="filter__controls">
     {% if add_button is defined and add_button is not empty %}
         {% set tagname = add_button.type|default('a') %}
         <p>
@@ -28,6 +29,13 @@
     {% endif %}
     {% if sort_options is defined and sort_options is not empty %}
         {{ include('/inadmin/partials/sort-by.html.twig') }}
+    {% endif %}
+    </div>
+    {% if show_select_deselect is defined and show_select_deselect %}
+        <p>
+            <input aria-labelledby="selectAllNone_label" class="checkbox selectAllNone" name="selectAllNone" type="checkbox" />
+            <label class="visually-hidden" id="selectAllNone_label" for="selectAllNone">Select all</label>
+        </p>
     {% endif %}
 </section>
 {% endif %}

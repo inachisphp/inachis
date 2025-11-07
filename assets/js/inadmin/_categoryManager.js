@@ -21,7 +21,7 @@ var InachisCategoryManager = {
         });
         $categoryMangerTree.bonsai('collapseAll');
 
-        initSwitches('#dialog__categoryManager');
+        InachisCategoryManager.initSwitches('#dialog__categoryManager');
         $('#dialog__imageManager__addnew').on('click', this.showHideAddCategory);
         $('#dialog__categoryManager__cancel').on('click', this.showHideAddCategory);
         $('#dialog__categoryManager__save').on('click', this.saveNewCategory);

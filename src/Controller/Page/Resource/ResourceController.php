@@ -70,6 +70,7 @@ class ResourceController extends AbstractInachisController
             $sort,
         );
         $this->data['form'] = $form->createView();
+        $this->data['filters'] = $filters;
         $this->data['page']['type'] = $request->get('type');
         $this->data['page']['offset'] = $offset;
         $this->data['page']['limit'] = $limit;
@@ -127,7 +128,7 @@ class ResourceController extends AbstractInachisController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $resource = $form->getData();
-            if (!empty($request->get('resource')['delete'])) {
+            if (isset($request->get('resource')['delete'])) {
                 $filename = $imageDirectory . $resource->getFilename();
                 if ($type === 'Image' &&
                     sizeof($this->data['usages']['posts']) === 0 &&
