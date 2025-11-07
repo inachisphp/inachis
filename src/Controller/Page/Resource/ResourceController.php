@@ -54,15 +54,18 @@ class ResourceController extends AbstractInachisController
         $type = substr(strrchr($typeClass, '\\'), 1);
         $form = $this->createFormBuilder()
             ->setAction($this->generateUrl('incc_resource_list', [
-                'type' => $request->get('type'),
+                'type' => $request->attributes->get('type'),
             ]))
             ->getForm()
         ;
         $form->handleRequest($request);
-        $filters = array_filter($request->get('filter', []));
-        $offset = (int) $request->get('offset', 0);
-        $limit = $this->entityManager->getRepository($typeClass)->getMaxItemsToShow();
-        $sort = $request->get('sort', 'title asc');
+        $filters = array_filter($request->request->all('filter', []));
+        $offset = (int) $request->attributes->get('offset', 0);
+        $limit = (int) $request->attributes->get(
+            'limit',
+            $this->entityManager->getRepository($typeClass)->getMaxItemsToShow()
+        );
+        $sort = $request->request->get('sort', 'title asc');
         $this->data['dataset'] = $this->entityManager->getRepository($typeClass)->getFiltered(
             $filters,
             $offset,
@@ -71,7 +74,7 @@ class ResourceController extends AbstractInachisController
         );
         $this->data['form'] = $form->createView();
         $this->data['filters'] = $filters;
-        $this->data['page']['type'] = $request->get('type');
+        $this->data['page']['type'] = $request->attributes->get('type');
         $this->data['page']['offset'] = $offset;
         $this->data['page']['limit'] = $limit;
         $this->data['page']['sort'] = $sort;
@@ -103,17 +106,17 @@ class ResourceController extends AbstractInachisController
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 //            "filename" => "[a-zA-Z0-9\-\_]\.(jpe?g|heic|png)",
-        $typeClass = match ($request->request?->get('type')) {
+        $typeClass = match ($request->attributes->get('type')) {
             'downloads' => Download::class,
             default => Image::class,
         };
         $type = substr(strrchr($typeClass, '\\'), 1);
-        $resource = $this->entityManager->getRepository($typeClass)->find($request->get('filename'));
+        $resource = $this->entityManager->getRepository($typeClass)->find($request->attributes->get('filename'));
         if (empty($resource)) {
             return $this->redirectToRoute(
                 'incc_resource_list',
                 [
-                    'type' => $request->get('type'),
+                    'type' => $request->attributes->get('type'),
 
                 ],
                 Response::HTTP_PERMANENTLY_REDIRECT
@@ -128,7 +131,7 @@ class ResourceController extends AbstractInachisController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $resource = $form->getData();
-            if (isset($request->get('resource')['delete'])) {
+            if (isset($request->request->all('resource')['delete'])) {
                 $filename = $imageDirectory . $resource->getFilename();
                 if ($type === 'Image' &&
                     sizeof($this->data['usages']['posts']) === 0 &&
@@ -141,7 +144,7 @@ class ResourceController extends AbstractInachisController
                         return $this->redirectToRoute(
                             'incc_resource_list',
                             [
-                                'type' => $request->get('type'),
+                                'type' => $request->attributes->get('type'),
 
                             ],
                             Response::HTTP_PERMANENTLY_REDIRECT
@@ -158,13 +161,13 @@ class ResourceController extends AbstractInachisController
             $this->addFlash('success', 'Content saved.');
             return $this->redirectToRoute(
                 'incc_resource_edit', [
-                    'type' => $request->get('type'),
+                    'type' => $request->attributes->get('type'),
                     'filename' => $resource->getId(),
                 ]
             );
         }
         $this->data['form'] = $form->createView();
-        $this->data['page']['type'] = $request->get('type');
+        $this->data['page']['type'] = $request->attributes->get('type');
         $this->data['page']['tab'] = $type;
         $this->data['page']['title'] = sprintf('%s: %s', $type, $resource->getTitle());
         $this->data['resource'] = $resource;
@@ -200,7 +203,7 @@ class ResourceController extends AbstractInachisController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         if (empty($request->files->get("image"))) {
             return new JsonResponse(['error' => 'No file provided'], 400);
-        } elseif (empty($request->get('image')['title'])) {
+        } elseif (empty($request->request->all('image')['title'])) {
             return new JsonResponse(['error' => 'No title provided'], 400);
         }
         $uploadedFile = $request->files->get("image")['imageFile'];
@@ -220,9 +223,9 @@ class ResourceController extends AbstractInachisController
 
         $image = new Image();
         $image
-            ->setTitle($request->get('image')['title'])
-            ->setDescription($request->get('image')['description'])
-            ->setAltText($request->get('image')['altText'])
+            ->setTitle($request->request->all('image')['title'])
+            ->setDescription($request->request->all('image')['description'])
+            ->setAltText($request->request->all('image')['altText'])
             ->setFilesize($uploadedFile->getSize())
             ->setFiletype($uploadedFile->getMimeType())
             ->setFilename($newFilename)

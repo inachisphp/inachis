@@ -109,11 +109,11 @@ class AccountController extends AbstractInachisController
 
         $this->data['page']['title'] = 'Request a password reset';
         $form = $this->createForm(ForgotPasswordType::class, [
-            'forgot_email' => $request->get('forgot_email'),
+            'forgot_email' => $request->request->get('forgot_email'),
         ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $emailAddress = (string) $request->get('forgot_password')['forgot_email'];
+            $emailAddress = (string) $request->request->all('forgot_password')['forgot_email'];
             if ($emailAddress) {
                 $accountLimiter = $forgotPasswordAccountLimiter->create(strtolower($emailAddress));
                 $limit = $accountLimiter->consume(1);
@@ -190,7 +190,7 @@ class AccountController extends AbstractInachisController
         }
 
         $form = $this->createForm(ChangePasswordType::class, [
-            'change_password' => $request->get('change_password', [
+            'change_password' => $request->request->all('change_password', [
                 'username' => '',
             ]),
         ], [

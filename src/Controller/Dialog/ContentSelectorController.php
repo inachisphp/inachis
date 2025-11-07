@@ -30,9 +30,9 @@ class ContentSelectorController extends AbstractInachisController
     public function contentList(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $filters = array_filter($request->get('filters', []));
-        if ($request->get('seriesId', '') !== '') {
-            $series = $this->entityManager->getRepository(Series::class)->find($request->get('seriesId'));
+        $filters = array_filter($request->request->all('filters', []));
+        if ($request->request->get('seriesId', '') !== '') {
+            $series = $this->entityManager->getRepository(Series::class)->find($request->request->get('seriesId'));
             if ($series !== null && !$series->getItems()->isEmpty()) {
                 $filters['excludeIds'] = [];
                 foreach ($series->getItems() as $item) {
@@ -40,8 +40,8 @@ class ContentSelectorController extends AbstractInachisController
                 }
             }
         }
-        $offset = (int) $request->get('offset', 0);
-        $limit = (int) $request->get('limit', 25);
+        $offset = (int) $request->request->get('offset', 0);
+        $limit = (int) $request->request->get('limit', 25);
         $this->data['pages'] = $this->entityManager->getRepository(Page::class)->getFilteredOfTypeByPostDate(
             $filters,
             '*',
@@ -64,10 +64,10 @@ class ContentSelectorController extends AbstractInachisController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        if (!empty($request->get('ids'))) {
-            $series = $this->entityManager->getRepository(Series::class)->findOneById($request->get('seriesId'));
+        if (!empty($request->request->all('ids'))) {
+            $series = $this->entityManager->getRepository(Series::class)->findOneById($request->request->get('seriesId'));
             if ($series !== null) {
-                foreach ($request->get('ids') as $pageId) {
+                foreach ($request->request->all('ids') as $pageId) {
                     $page = $this->entityManager->getRepository(Page::class)->findOneById($pageId);
                     if (empty($page) || empty($page->getId())) {
                         continue;

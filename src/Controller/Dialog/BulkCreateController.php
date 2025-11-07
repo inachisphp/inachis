@@ -56,24 +56,24 @@ class BulkCreateController extends AbstractInachisController
     public function saveContent(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $series = $this->entityManager->getRepository(Series::class)->findOneById($request->get('seriesId'));
-        if ($series !== null && !empty($request->get('form')['title'])
-            && !empty($request->get('form')['startDate']) && !empty($request->get('form')['endDate'])
+        $series = $this->entityManager->getRepository(Series::class)->findOneById($request->request->get('seriesId'));
+        if ($series !== null && !empty($request->request->all('form')['title'])
+            && !empty($request->request->all('form')['startDate']) && !empty($request->request->all('form')['endDate'])
         ) {
-            $startDate = DateTime::createFromFormat('d/m/Y', $request->get('form')['startDate']);
-            $endDate = DateTime::createFromFormat('d/m/Y', $request->get('form')['endDate']);
+            $startDate = DateTime::createFromFormat('d/m/Y', $request->request->all('form')['startDate']);
+            $endDate = DateTime::createFromFormat('d/m/Y', $request->request->all('form')['endDate']);
 
             $period = new DatePeriod($startDate, new DateInterval('P1D'), $endDate->modify('+1 day'));
             $counter = 0;
             foreach ($period as $date) {
                 ++$counter;
-                $title = $request->get('form')['title'] . (!empty($request->get('form')['addDay']) ? ' Day ' . $counter : '');
+                $title = $request->request->all('form')['title'] . (!empty($request->request->all('form')['addDay']) ? ' Day ' . $counter : '');
                 $post = new Page($title);
                 $post->setPostDate($date);
                 $post->addUrl(new Url($post, $post->getPostDateAsLink() . '/' . UrlNormaliser::toUri($title)));
                 $post->setAuthor($this->getUser());
-                if (!empty($request->get('form')['tags'])) {
-                    foreach($request->get('form')['tags'] as $newTag) {
+                if (!empty($request->request->all('form')['tags'])) {
+                    foreach($request->request->all('form')['tags'] as $newTag) {
                         $tag = null;
                         if (Uuid::isValid($newTag)) {
                             $tag = $this->entityManager->getRepository(Tag::class)->findOneById($newTag);
@@ -84,8 +84,8 @@ class BulkCreateController extends AbstractInachisController
                         $post->getTags()->add($tag);
                     }
                 }
-                if(!empty($request->get('form')['categories'])) {
-                    foreach($request->get('form')['categories'] as $newCategory) {
+                if(!empty($request->request->all('form')['categories'])) {
+                    foreach($request->request->all('form')['categories'] as $newCategory) {
                         $category = null;
                         if (Uuid::isValid($newCategory)) {
                             $category = $this->entityManager->getRepository(Category::class)->findOneById($newCategory);
