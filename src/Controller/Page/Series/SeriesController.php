@@ -67,10 +67,13 @@ class SeriesController extends AbstractInachisController
         }
 
         $filters = array_filter($request->get('filter', []));
+        $sort = $request->get('sort', 'lastDate desc');
         if ($request->isMethod('post')) {
             $_SESSION['series_filters'] = $filters;
+            $_SESSION['series_sort'] = $sort;
         } elseif (isset($_SESSION['series_filters'])) {
             $filters = $_SESSION['series_filters'];
+            $sort = $_SESSION['series_sort'];
         }
         $offset = (int) $request->get('offset', 0);
         $limit = $this->entityManager->getRepository(Series::class)->getMaxItemsToShow();
@@ -78,9 +81,11 @@ class SeriesController extends AbstractInachisController
         $this->data['dataset'] = $this->entityManager->getRepository(Series::class)->getFiltered(
             $filters,
             $offset,
-            $limit
+            $limit,
+            $sort
         );
         $this->data['filters'] = $filters;
+        $this->data['page']['sort'] = $sort;
         $this->data['page']['tab'] = 'series';
         $this->data['page']['offset'] = $offset;
         $this->data['page']['limit'] = $limit;
