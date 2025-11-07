@@ -34,7 +34,7 @@ class ChangePasswordController extends AbstractInachisController
     public function changePasswordTab(UserPasswordHasherInterface $passwordHasher, Request $request, string $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $request->get('id')]);
+        $user = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $request->attributes->get('id')]);
         $form = $this->createForm(
             ChangePasswordType::class,
             null,
@@ -44,7 +44,7 @@ class ChangePasswordController extends AbstractInachisController
         );
         $form->handleRequest($request);
         if ($form->isSubmitted() && $user->getId() === $this->security->getUser()->getId() && $form->isValid()) {
-            $plaintextPassword = $request->get('change_password')['new_password'];
+            $plaintextPassword = $request->request->all('change_password')['new_password'];
             $hashedPassword = $passwordHasher->hashPassword($user, $plaintextPassword);
             $user->setPassword($hashedPassword);
             $user->setPasswordModDate(new DateTime('now'));
@@ -67,6 +67,6 @@ class ChangePasswordController extends AbstractInachisController
     #[Route("/incc/ax/calculate-password-strength", name:"incc_admin_calculate-password-strength", methods: [ "POST" ])]
     public function calculatePasswordStrength(Request $request): JsonResponse
     {
-        return new JsonResponse(PasswordStrengthValidator::estimateStrength($request->get('password')));
+        return new JsonResponse(PasswordStrengthValidator::estimateStrength($request->request->get('password')));
     }
 }

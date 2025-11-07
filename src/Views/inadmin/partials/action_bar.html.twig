@@ -1,16 +1,7 @@
 {% if actions|default(null) is not empty %}
-<div class="fixed-bottom-bar">
+<div class="fixed-bottom-bar{% if show_select_deselect is defined and show_select_deselect %} visually-hidden{% endif %}">
     <p>
-        {% if show_select_deselect is not defined or show_select_deselect %}
-        <button class="button button--select button--select-all" type="button">
-            <span class="material-icons">select_all</span>
-            Select all
-        </button>
-        <button class="button button--select button--select-none" type="button">
-            <span class="material-icons">deselect</span>
-            Select none
-        </button>
-        <span class="divider"></span>
+        {% if show_select_deselect is defined and show_select_deselect %}
         <span class="error ui-state-error error-select">Select content to see actions</span>
         <span>with selected:</span>
         {% endif %}

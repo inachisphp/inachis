@@ -41,9 +41,9 @@ class SeriesController extends AbstractInachisController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid() && !empty($request->get('items'))) {
-            foreach ($request->get('items') as $item) {
-                if ($request->get('delete') !== null) {
+        if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
+            foreach ($request->request->all('items') as $item) {
+                if ($request->request->get('delete') !== null) {
                     $deleteItem = $this->entityManager->getRepository(Series::class)->findOneById($item);
                     if ($deleteItem !== null) {
                         $this->entityManager->getRepository(Series::class)->remove($deleteItem);
@@ -66,21 +66,29 @@ class SeriesController extends AbstractInachisController
             return $this->redirectToRoute('incc_series_list');
         }
 
-        $filters = array_filter($request->get('filter', []));
+        $filters = array_filter($request->request->all('filter', []));
+        $sort = $request->get('sort', 'lastDate desc');
         if ($request->isMethod('post')) {
             $_SESSION['series_filters'] = $filters;
+            $_SESSION['series_sort'] = $sort;
         } elseif (isset($_SESSION['series_filters'])) {
             $filters = $_SESSION['series_filters'];
+            $sort = $_SESSION['series_sort'];
         }
-        $offset = (int) $request->get('offset', 0);
-        $limit = $this->entityManager->getRepository(Series::class)->getMaxItemsToShow();
+        $offset = (int) $request->attributes->get('offset', 0);
+        $limit = (int) $request->attributes->get(
+            'limit',
+            $this->entityManager->getRepository(Series::class)->getMaxItemsToShow()
+        );
         $this->data['form'] = $form->createView();
         $this->data['dataset'] = $this->entityManager->getRepository(Series::class)->getFiltered(
             $filters,
             $offset,
-            $limit
+            $limit,
+            $sort
         );
         $this->data['filters'] = $filters;
+        $this->data['page']['sort'] = $sort;
         $this->data['page']['tab'] = 'series';
         $this->data['page']['offset'] = $offset;
         $this->data['page']['limit'] = $limit;
@@ -97,26 +105,26 @@ class SeriesController extends AbstractInachisController
     public function edit(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $series = $request->get('id') !== null ? $this->entityManager->getRepository(Series::class)->findOneById($request->get('id')) : new Series();
+        $series = $request->attributes->get('id') !== null ? $this->entityManager->getRepository(Series::class)->findOneById($request->attributes->get('id')) : new Series();
         $form = $this->createForm(SeriesType::class, $series);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {//} && $form->isValid()) {
-            if (!empty($request->get('series')['image'])) {
+            if (!empty($request->request->all('series')['image'])) {
                 $series->setImage(
                     $this->entityManager->getRepository(Image::class)->findOneById(
-                        $request->get('series')['image']
+                        $request->request->all('series')['image']
                     )
                 );
             }
-            if (empty($request->get('series')['url'])) {
+            if (empty($request->request->all('series')['url'])) {
                 $series->setUrl(
                     UrlNormaliser::toUri($series->getTitle())
                 );
             }
             if ($form->has('remove') && $form->get('remove')->isClicked()) {
                 $deleteItems = $this->entityManager->getRepository(Page::class)->findBy([
-                    'id' => $request->get('series')['itemList']
+                    'id' => $request->request->all('series')['itemList']
                 ]);
                 foreach ($deleteItems as $deleteItem) {
                     $series->getItems()->removeElement($deleteItem);
@@ -159,7 +167,7 @@ class SeriesController extends AbstractInachisController
     public function contents(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $series = $this->entityManager->getRepository(Series::class)->findOneById($request->get('id'));
+        $series = $this->entityManager->getRepository(Series::class)->findOneById($request->attributes->get('id'));
         $form = $this->createForm(SeriesType::class, $series);
         $form->handleRequest($request);
 

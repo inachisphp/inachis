@@ -114,7 +114,7 @@ class SettingsController extends AbstractInachisController
     public function wipe(LoggerInterface $logger, Request $request): RedirectResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        if ($request->get('confirm', false)) {
+        if ($request->request->get('confirm', false)) {
             $logger->info('Wiping all content');
             $this->entityManager->getRepository(Image::class)->wipe($logger);
             $this->entityManager->getRepository(Page::class)->wipe($logger);

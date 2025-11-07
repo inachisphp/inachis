@@ -35,8 +35,8 @@ class UrlController extends AbstractInachisController
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid() && !empty($request->get('items'))) {
-            foreach ($request->get('items') as $item) {
+        if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
+            foreach ($request->request->all('items') as $item) {
                 $link = $this->entityManager->getRepository(Url::class)->findOneBy(
                     [
                         'id' => $item,
@@ -66,8 +66,8 @@ class UrlController extends AbstractInachisController
             }
             return $this->redirectToRoute('incc_url_list');
         }
-        $filters = array_filter($request->get('filter', []));
-        $sort = $request->get('sort', 'contentDate asc');
+        $filters = array_filter($request->request->all('filter', []));
+        $sort = $request->request->get('sort', 'contentDate asc');
         if ($request->isMethod('post')) {
             $_SESSION['series_filters'] = $filters;
             $_SESSION['sort'] = $sort;
@@ -75,8 +75,11 @@ class UrlController extends AbstractInachisController
             $filters = $_SESSION['series_filters'];
             $sort = $_SESSION['sort'];
         }
-        $offset = (int) $request->get('offset', 0);
-        $limit = $this->entityManager->getRepository(Url::class)->getMaxItemsToShow();
+        $offset = (int) $request->attributes->get('offset', 0);
+        $limit = (int) $request->attributes->get(
+            'limit',
+            $this->entityManager->getRepository(Url::class)->getMaxItemsToShow()
+        );
         $this->data['dataset'] = $this->entityManager->getRepository(Url::class)->getFiltered(
             $filters,
             $offset,
@@ -104,10 +107,10 @@ class UrlController extends AbstractInachisController
     public function checkUrlUsage(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $url = $request->get('url');
+        $url = $request->request->get('url');
         $urls = $this->entityManager->getRepository(Url::class)->findSimilarUrlsExcludingId(
             $url,
-            $request->get('id')
+            $request->attributes->get('id')
         );
         if (!empty($urls)) {
             preg_match('/\-([0-9]+)$/', $urls[0]['link'], $matches);

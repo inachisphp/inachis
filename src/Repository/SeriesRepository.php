@@ -98,7 +98,7 @@ class SeriesRepository extends AbstractRepository
      * @param $limit
      * @return Paginator
      */
-    public function getFiltered($filters, $offset, $limit): Paginator
+    public function getFiltered($filters, $offset, $limit, $sort): Paginator
     {
         $where = [];
         if (!empty($filters['keyword'])) {
@@ -109,14 +109,28 @@ class SeriesRepository extends AbstractRepository
                 ],
             ];
         }
+        $sort = match ($sort) {
+            'title desc' => [
+                ['q.title', 'DESC'],
+                ['q.subTitle', 'DESC'],
+            ],
+            'modDate asc' => [['q.modDate', 'ASC']],
+            'modDate desc' => [['q.modDate', 'DESC']],
+            'lastDate asc' => [['q.lastDate', 'ASC']],
+            'lastDate desc' => [
+                ['CASE WHEN q.lastDate IS NULL THEN 1 ELSE 0 END', 'DESC'],
+                ['q.lastDate', 'DESC']
+            ],
+            default => [
+                ['q.title', 'ASC'],
+                ['q.subTitle', 'ASC'],
+            ],
+        };
         return $this->getAll(
             $offset,
             $limit,
             $where,
-            [
-                [ 'q.title', 'ASC' ],
-                [ 'q.subTitle', 'ASC' ]
-            ]
+            $sort
         );
     }
 

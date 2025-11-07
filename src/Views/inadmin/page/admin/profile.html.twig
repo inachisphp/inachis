@@ -12,7 +12,7 @@
 
         {{ form_start(form, {'attr': { 'class': 'form form__post form__user' }}) }}
         <div class="col span_8_of_8 ui-tabs-external">
-            {{ include('inadmin/partials/profile_tabs.html.twig', {
+            {{ include('inadmin/partials/tab-sets/profile.html.twig', {
                 'activeTab': 'profile'
             }) }}
             <section class="paginated-list">

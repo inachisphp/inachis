@@ -24,11 +24,10 @@ var InachisImageManager = {
             this.toggleUploadImage();
         } else {
             InachisImageManager.buttons[0].disabled = true;
-            $('.gallery input[type=radio]').on('change', InachisImageManager.enableChooseButton);
             $('#ui-dialog-search-input').on('input', function (event) {
                 InachisImageManager.searchImages();
             });
-            this.addPaginationLinks();
+            InachisImageManager.searchImages();
         }
         this.updateDialogButtons();
         $('.ui-dialog-secondary-bar a').click(this.toggleUploadImage);
@@ -36,14 +35,15 @@ var InachisImageManager = {
             event.preventDefault();
             event.stopPropagation();
             dropzone.on('success', file => {
-                $('#ui-dialog-search-input').val($('#image_title').val());
+                let image_title = $('#image_title').val();
                 if (InachisDialog.view === 'upload') {
-                    $('#filter__keyword').val($('#image_title').val());
+                    $('#filter__keyword').val(image_title);
                     $('#dialog__imageManager').dialog('destroy');
                     $('form.form__images').submit();
                 } else {
+                    $('#ui-dialog-search-input').val(image_title);
                     InachisImageManager.toggleUploadImage();
-                    InachisImageManager.addPaginationLinks();
+                    InachisImageManager.searchImages();
                 }
             });
             dropzone.on('error', file => {
@@ -57,7 +57,7 @@ var InachisImageManager = {
     {
         $('nav .pagination li a').on('click', function(event) {
             event.preventDefault();
-            InachisImageManager.offset = $(event.currentTarget).html() * (InachisImageManager.limit - 1);
+            InachisImageManager.offset = ($(event.currentTarget).html() - 1) * InachisImageManager.limit;
             InachisImageManager.searchImages();
             return false;
         });
@@ -82,6 +82,7 @@ var InachisImageManager = {
     {
         if(InachisImageManager.saveTimeout) clearTimeout(InachisImageManager.saveTimeout);
         InachisImageManager.saveTimeout = setTimeout(function() {
+            $('.gallery').html('<p/><div class="loader"></div><p/>');
             $('.gallery').load(
                 Inachis.prefix + '/ax/imageManager/getImages/' + InachisImageManager.offset +'/' + InachisImageManager.limit,
                 {
@@ -95,7 +96,15 @@ var InachisImageManager = {
                     $('.gallery').animate({ scrollTop:0}, 100);
                     InachisImageManager.addPaginationLinks();
                     $('.gallery input[type=radio]').on('change', InachisImageManager.enableChooseButton);
-                    $('#images_count').html($('.gallery ol').attr('data-total'));
+                    const $ol = $('.gallery ol');
+                    const values = [
+                        $ol.attr('data-start'),
+                        $ol.attr('data-end'),
+                        $ol.attr('data-total')
+                    ];
+                    $('#images_count strong').each(function(i) {
+                        $(this).html(values[i]);
+                    });
                 }
             );
         }, 500);
