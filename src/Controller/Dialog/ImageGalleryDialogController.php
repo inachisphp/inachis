@@ -58,9 +58,9 @@ class ImageGalleryDialogController extends AbstractInachisController
     public function getImageList(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $filters = array_filter($request->get('filter', []));
-        $offset = (int) $request->get('offset', 0);
-        $limit = (int) $request->get(
+        $filters = array_filter($request->request->all('filter', []));
+        $offset = (int) $request->attributes->get('offset', 0);
+        $limit = (int) $request->attributes->get(
             'limit',
             $this->entityManager->getRepository(Image::class)::MAX_ITEMS_TO_SHOW_ADMIN
         );

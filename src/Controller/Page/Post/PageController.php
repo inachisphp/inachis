@@ -53,8 +53,8 @@ class PageController extends AbstractInachisController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid() && !empty($request->get('items'))) {
-            foreach ($request->get('items') as $item) {
+        if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
+            foreach ($request->request->all('items') as $item) {
                 if ($request->request->has('delete')) {
                     $post = $this->entityManager->getRepository(Page::class)->findOneById($item);
                     if ($post !== null) {
@@ -90,8 +90,8 @@ class PageController extends AbstractInachisController
                 [ 'type' => $type ]
             );
         }
-        $filters = array_filter($request->get('filter', []));
-        $sort = $request->get('sort', 'postDate desc');
+        $filters = array_filter($request->request->all('filter', []));
+        $sort = $request->request->get('sort', 'postDate desc');
         if ($request->isMethod('post')) {
             $_SESSION['post_filters'] = $filters;
             $_SESSION['sort'] = $sort;
@@ -100,8 +100,11 @@ class PageController extends AbstractInachisController
             $sort = $_SESSION['sort'];
         }
 
-        $offset = (int) $request->get('offset', 0);
-        $limit = $this->entityManager->getRepository(Page::class)->getMaxItemsToShow();
+        $offset = (int) $request->attributes->get('offset', 0);
+        $limit = (int) $request->attributes->get(
+            'limit',
+            $this->entityManager->getRepository(Page::class)->getMaxItemsToShow()
+        );
         $this->data['form'] = $form->createView();
         $this->data['posts'] = $this->entityManager->getRepository(Page::class)->getFilteredOfTypeByPostDate(
             $filters,
@@ -187,7 +190,7 @@ class PageController extends AbstractInachisController
                 );
             }
             $post->setAuthor($this->getUser());
-            if (null !== $request->get('publish')) {
+            if (null !== $request->request->get('publish')) {
                 $post->setStatus(Page::PUBLISHED);
                 if (isset($revision)) {
                     if ($contentRevisionCompare->doesPageMatchRevision($post, $revision)) {
@@ -196,8 +199,8 @@ class PageController extends AbstractInachisController
                     $revision->setAction(RevisionRepository::PUBLISHED);
                 }
             }
-            if (!empty($request->get('post')['url'])) {
-                $newUrl = $request->get('post')['url'];
+            if (!empty($request->request->all('post')['url'])) {
+                $newUrl = $request->request->all('post')['url'];
                 $urlFound = false;
                 if (!empty($post->getUrls())) {
                     foreach ($post->getUrls() as $url) {
@@ -213,8 +216,8 @@ class PageController extends AbstractInachisController
                 }
             }
             $post = $post->removeCategories()->removeTags();
-            if (!empty($request->get('post')['categories'])) {
-                $newCategories = $request->get('post')['categories'];
+            if (!empty($request->request->all('post')['categories'])) {
+                $newCategories = $request->request->all('post')['categories'];
                 if (!empty($newCategories)) {
                     foreach ($newCategories as $newCategory) {
                         $category = null;
@@ -227,8 +230,8 @@ class PageController extends AbstractInachisController
                     }
                 }
             }
-            if (!empty($request->get('post')['tags'])) {
-                $newTags = $request->get('post')['tags'];
+            if (!empty($request->request->all('post')['tags'])) {
+                $newTags = $request->request->all('post')['tags'];
                 if (!empty($newTags)) {
                     foreach ($newTags as $newTag) {
                         $tag = null;
@@ -242,10 +245,10 @@ class PageController extends AbstractInachisController
                     }
                 }
             }
-            if (!empty($request->get('post')['featureImage'])) {
+            if (!empty($request->request->all('post')['featureImage'])) {
                 $post->setFeatureImage(
                     $this->entityManager->getRepository(Image::class)->findOneById(
-                        $request->get('post')['featureImage']
+                        $request->request->all('post')['featureImage']
                     )
                 );
             }

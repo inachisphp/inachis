@@ -39,9 +39,9 @@ class WasteController extends AbstractInachisController
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid() && !empty($request->get('items'))) {
-            foreach ($request->get('items') as $item) {
-                if ($request->get('delete') !== null) {
+        if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
+            foreach ($request->request->all('items') as $item) {
+                if ($request->request->get('delete') !== null) {
                     $deleteItem = $this->entityManager->getRepository(Waste::class)->findOneById($item);
                     if ($deleteItem !== null) {
                         $this->entityManager->getRepository(Waste::class)->remove($deleteItem);
@@ -55,8 +55,11 @@ class WasteController extends AbstractInachisController
             );
         }
 
-        $offset = (int) $request->get('offset', 0);
-        $limit = $this->entityManager->getRepository(Waste::class)->getMaxItemsToShow();
+        $offset = (int) $request->attributes->get('offset', 0);
+        $limit = (int) $request->attributes->get(
+            'limit',
+            $this->entityManager->getRepository(Waste::class)->getMaxItemsToShow()
+        );
         $this->data['form'] = $form->createView();
         $this->data['dataset'] = $this->entityManager->getRepository(Waste::class)->getAll(
             $offset,

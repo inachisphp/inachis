@@ -42,15 +42,15 @@ class AdminProfileController extends AbstractInachisController
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && !empty($request->get('items'))) {
-            foreach ($request->get('items') as $item) {
+        if ($form->isSubmitted() && !empty($request->request->all('items'))) {
+            foreach ($request->request->all('items') as $item) {
                 $selectedItem = $this->entityManager->getRepository(User::class)->findOneById($item);
                 if ($selectedItem !== null) {
-                    if ($request->get('delete') !== null) {
+                    if ($request->request->get('delete') !== null) {
                         $selectedItem->setRemoved(true);
-                    } elseif ($request->get('enable') !== null) {
+                    } elseif ($request->request->get('enable') !== null) {
                         $selectedItem->setActive(true);
-                    } elseif ($request->get('disable') !== null) {
+                    } elseif ($request->request->get('disable') !== null) {
                         $selectedItem->setActive(false);
                     }
                     $selectedItem->setModDate(new DateTime('now'));
@@ -61,13 +61,13 @@ class AdminProfileController extends AbstractInachisController
             return $this->redirectToRoute('incc_admin_list');
         }
 
-        $filters = array_filter($request->get('filter', []));
+        $filters = array_filter($request->request->all('filter', []));
         if ($request->isMethod('post')) {
             $_SESSION['admin_filters'] = $filters;
         } elseif (isset($_SESSION['admin_filters'])) {
             $filters = $_SESSION['admin_filters'];
         }
-        $offset = (int) $request->get('offset', 0);
+        $offset = (int) $request->request->get('offset', 0);
         $limit = $this->entityManager->getRepository(User::class)->getMaxItemsToShow();
         $this->data['form'] = $form->createView();
         $this->data['dataset'] = $this->entityManager->getRepository(User::class)->getFiltered(
@@ -102,7 +102,7 @@ class AdminProfileController extends AbstractInachisController
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $user = $request->get('id') !== 'new' ? $this->entityManager->getRepository(User::class)->findOneBy(['username' => $request->get('id')]) : new User();
+        $user = $request->attributes->get('id') !== 'new' ? $this->entityManager->getRepository(User::class)->findOneBy(['username' => $request->attributes->get('id')]) : new User();
         $form = $this->createForm(UserType::class, $user, [
             'validation_groups' => [ '' ],
         ]);
@@ -119,7 +119,7 @@ class AdminProfileController extends AbstractInachisController
             $this->entityManager->persist($user);
             $this->entityManager->flush();
 
-            if ($request->get('id') === 'new') {
+            if ($request->attributes->get('id') === 'new') {
                 $data = $tokenService->createResetRequestForEmail($user->getEmail());
                 $user->setColor(RandomColorPicker::generate());
                 try {
