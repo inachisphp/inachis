@@ -141,8 +141,12 @@
             </section>
             {% if post.urls is not empty %}
             <p class="col span_8_of_8">
-                <input class="halfwidth" type="text" value="{{ settings.domain }}/{{ post.urls|first.link }}" />
-                <button class="button button--information" id="post__link__copy" type="button">Copy this link</button>
+                <input class="halfwidth" id="post_link" type="text" value="{{ settings.domain }}/{{ post.urls|first.link }}" />
+                <button aria-label="{{ 'admin.posts.share.copyLink.help'|trans }}"
+                        data-target="post_link"
+                        class="button button--secondary button--copy"
+                        type="button"
+                >{{ 'admin.posts.share.copyLink.label'|trans }}</button>
             </p>
             {% endif %}
         </fieldset>
