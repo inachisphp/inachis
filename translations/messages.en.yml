@@ -51,6 +51,7 @@ admin.dashboard.tab.latest: 'Latest'
 
 admin.posts.title: 'Posts'
 admin.posts.help: 'View list of posts and pages'
+admin.post.featureSnippet.label: 'Description'
 
 admin.series.title: 'Series'
 admin.series.help: 'View list of series'
@@ -118,7 +119,6 @@ admin.placeholder.post.categories: Select a category
 admin.tip.content.post.categories: Separate existing categories with a comma or by pressing [Enter]. New categories should be created using the adjacent [+] icon.
 admin.label.post.tags: Tags
 admin.tip.content.post.tags: Separate tags with a comma or by pressing [Enter]
-admin.label.post.teaser: Abstract / Summary
 
 
 

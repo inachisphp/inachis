@@ -103,19 +103,29 @@
         </fieldset>
 
         <fieldset id="post__sharing">
-            <h3>
-                Teaser Details
-                <a href="#" class="ui-help">
-                    <em class="material-icons">info</em>
-                    <span>This text will be used whenever people share a link to your content on social media. It can also be used in other places such as your homepage.</span>
-                </a>
-            </h3>
             <section class="col span_4_of_8">
                 <p>
                     {{ form_label(form.featureSnippet) }}
                     {{ form_errors(form.featureSnippet) }}
                     {{ form_widget(form.featureSnippet) }}
                 </p>
+                <p>
+                    <input class="checkbox" type="checkbox" />
+                    <label for="">Search engines should not index this page</label>
+                </p>
+                <p>
+                    <input class="checkbox" type="checkbox" />
+                    <label for="">Search engines should not follow links</label>
+                </p>
+            {% if post.urls is not empty %}
+                <p>
+                    <input class="visually-hidden" type="text" value="{{ settings.domain }}/{{ post.urls|first.link }}" />
+                    <button class="button button--info" id="post__link__copy" type="button">
+                        <span class="material-icons">content_paste</span>
+                        Copy content link to clipboard
+                    </button>
+                </p>
+            {% endif %}
             </section>
             <section class="col span_3_of_8">
             {{
@@ -139,12 +149,6 @@
                     {{ form_widget(form.sharingMessage) }}
                 </p -->
             </section>
-            {% if post.urls is not empty %}
-            <p class="col span_8_of_8">
-                <input class="halfwidth" type="text" value="{{ settings.domain }}/{{ post.urls|first.link }}" />
-                <button class="button button--information" id="post__link__copy" type="button">Copy this link</button>
-            </p>
-            {% endif %}
         </fieldset>
 
         {%  if revisions is defined and revisions is not empty %}
