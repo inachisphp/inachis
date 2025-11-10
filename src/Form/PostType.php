@@ -59,7 +59,6 @@ class PostType extends AbstractType
                 'attr' => [
                     'aria-labelledby'  => 'title_label',
                     'aria-required'    => 'true',
-                    'data-tip-content' => '<strong>Required.</strong> This will also be used in the URL for your content. You can click on the link icon to adjust the URL.',
                     'autofocus'        => 'true',
                     'class'            => 'editor__title text',
                     'placeholder'      => $this->translator->trans('admin.placeholder.post.title', [], 'messages'),
@@ -129,8 +128,6 @@ class PostType extends AbstractType
                 'attr' => [
                     'aria-labelledby'  => 'postDate_label',
                     'aria-required'    => 'false',
-                    'data-tip-content' => $this->translator->trans('admin.tip.post.postDate', [], 'messages'),
-                    'data-tip-title'   => $this->translator->trans('admin.tip.title.post.postDate', [], 'messages'),
                 ],
                 'format' => 'dd/MM/yyyy HH:mm',
                 'html5'  => false,
@@ -154,7 +151,6 @@ class PostType extends AbstractType
                     'aria-required'    => 'false',
                     'class'            => 'js-select halfwidth',
                     'data-placeholder' => $this->translator->trans('admin.placeholder.post.categories', [], 'messages'),
-                    'data-tip-content' => $this->translator->trans('admin.tip.content.post.categories', [], 'messages'),
                     'data-url'         => $this->router->generate('app_dialog_categorydialog_getcategorymanagerlistcontent'),
                 ],
                 'label'      => $this->translator->trans('admin.label.post.categories', [], 'messages'),
@@ -171,7 +167,6 @@ class PostType extends AbstractType
                     'aria-required'    => 'false',
                     'class'            => 'js-select halfwidth',
                     'data-tags'        => 'true',
-                    'data-tip-content' => $this->translator->trans('admin.tip.content.post.tags', [], 'messages'),
                     'data-url'         => $this->router->generate('app_tags_gettagmanagerlistcontent'),
                 ],
                 'choices'      => isset($options['data']) ? $options['data']->getTags()->toArray() : [],
@@ -204,7 +199,6 @@ class PostType extends AbstractType
                     'aria-required' => 'false',
                     'class' => 'ui-map',
                     'data-google-key' => '{{ settings.google.key }}',
-                    'data-tip-content' => 'Please enter a location name, postcode, zip code, or longitude/latitude to search for the location.',
                 ],
                 'label' => 'Location',
                 'label_attr' => [

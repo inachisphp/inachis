@@ -55,7 +55,6 @@ class UserType extends AbstractType
             ->add('displayName', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'user__displayName__label',
-                    'data-tip-content' => 'How the user will be known',
                     'class' => 'text inline_label',
                 ],
                 'label' => 'Display Name',
@@ -80,7 +79,6 @@ class UserType extends AbstractType
             ->add('timezone', ChoiceType::class, [
                 'attr' => [
                     'aria-labelledby' => 'user__timezone__label',
-                    'data-tip-content' => 'How the user will be known',
                     'class' => 'text inline_label',
                 ],
                 'choices' => array_combine(timezone_identifiers_list(), timezone_identifiers_list()),

@@ -51,6 +51,8 @@ admin.dashboard.tab.latest: 'Latest'
 
 admin.posts.title: 'Posts'
 admin.posts.help: 'View list of posts and pages'
+admin.posts.share.copyLink.help: 'Copy Post/Page Link to Clipboard'
+admin.posts.share.copyLink.label: 'Copy this link'
 
 admin.series.title: 'Series'
 admin.series.help: 'View list of series'
@@ -78,6 +80,24 @@ admin.series.visibility.label: 'Visibility'
 
 admin.resources.title: 'Resources'
 admin.resources.help: 'Manage resources'
+admin.resources.details.title: 'Details'
+admin.resources.title.label: 'Title'
+admin.resources.altText.label: 'Alt Text'
+admin.resources.caption.label: 'Caption'
+admin.resources.generateAlt.label: 'Generate Alt Text'
+admin.resources.properties.title: 'Properties'
+admin.resources.properties.dimensions: 'Dimensions'
+admin.resources.properties.colourDepth: 'Colour Depth'
+admin.resources.properties.filename: 'File name'
+admin.resources.properties.filetype: 'File type'
+admin.resources.properties.filesize: 'Size'
+admin.resources.usages.title: 'Usages'
+admin.resources.usages.notInUse: 'Image is not in known use.'
+
+admin.resources.images.copyMarkdown.label: 'Copy Image Markdown'
+admin.resources.images.copyMarkdown.help: 'Copy Markdown Image Link to Clipboard'
+admin.resources.images.copyLink.label: 'Copy Image Link'
+admin.resources.images.copyLink.help: 'Copy Image Link to Clipboard'
 
 admin.urls.title: 'URLs'
 admin.urls.help: 'View list of defined URLs'
@@ -109,15 +129,11 @@ admin.placeholder.post.subTitle: (Optional)
 admin.label.post.url: URL
 admin.label.post.content: Content
 admin.label.post.visibility: Visibility
-admin.tip.title.post.postDate: Publishing
-admin.tip.content.post.postDate: On publishing this content for the first time, if the date is in the past or the present it will publish immediately. If the date is in the future then it will be scheduled for publishing and will action any social media sharing options selected at the same time.
 admin.label.post.postDate-future: Publish on
 admin.label.post.postDate-past: Published on
 admin.label.post.categories: Categories
 admin.placeholder.post.categories: Select a category
-admin.tip.content.post.categories: Separate existing categories with a comma or by pressing [Enter]. New categories should be created using the adjacent [+] icon.
 admin.label.post.tags: Tags
-admin.tip.content.post.tags: Separate tags with a comma or by pressing [Enter]
 admin.label.post.teaser: Abstract / Summary
 
 

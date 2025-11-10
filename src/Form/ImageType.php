@@ -25,7 +25,6 @@ class ImageType extends AbstractType
             ->add('filename', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'image-uploader__filename__label',
-                    'data-tip-content' => 'Must be a linked to a file and not a webpage',
                     'class' => 'text full-width',
                 ],
                 'label' => 'Image file',
@@ -38,7 +37,6 @@ class ImageType extends AbstractType
                     'aria-labelledby' => 'image-uploader__optimiseImage__label',
                     'checked' => 'checked',
                     'class' => 'checkbox',
-                    'data-tip-content' => 'This will resize the image to a maximum of 1024x1024 and will modify compression',
                 ],
                 'label' => 'Optimize image',
                 'label_attr' => [
@@ -61,7 +59,6 @@ class ImageType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'image-uploader__altText__label',
                     'class' => 'full-width',
-                    'data-tip-content' => 'This is important as it is used by screen readers to improve accessibility',
                     'rows' => 1,
                 ],
                 'label' => 'Alt Text',
