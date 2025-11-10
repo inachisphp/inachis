@@ -10,7 +10,7 @@ var InachisDialog = {
             }
         }
     ],
-    preloadContent: '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>',
+    preloadContent: '<p>&nbsp;</p><div class="loader"></div><p>&nbsp;</p>',
     templateName: '',
     title: '',
     view: '',

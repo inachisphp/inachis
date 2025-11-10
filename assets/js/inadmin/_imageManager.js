@@ -82,6 +82,7 @@ var InachisImageManager = {
     {
         if(InachisImageManager.saveTimeout) clearTimeout(InachisImageManager.saveTimeout);
         InachisImageManager.saveTimeout = setTimeout(function() {
+            $('.gallery').html('<p/><div class="loader"></div><p/>');
             $('.gallery').load(
                 Inachis.prefix + '/ax/imageManager/getImages/' + InachisImageManager.offset +'/' + InachisImageManager.limit,
                 {

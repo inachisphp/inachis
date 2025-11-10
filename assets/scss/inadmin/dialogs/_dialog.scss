@@ -5,10 +5,6 @@
   position: absolute;
   z-index: 110 !important;
 
-  &.ui-dialog-loading {
-    background: #fff url(/assets/imgs/incc/loading.gif) no-repeat center;
-  }
-
   .ui-dialog-titlebar {
     button {
       background-color: #fff;
