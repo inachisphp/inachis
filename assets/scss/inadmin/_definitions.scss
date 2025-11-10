@@ -133,3 +133,16 @@ $form-label__light: #bbb;
 $form-input__complete: #090;
 $form-link: #ddd;
 $form-link__hover: #fff;
+
+// badges
+$badge-colors: (
+  default: (bg: #E0E0E0, text: #000),
+  draft: (bg: #F6C343, text: #000),
+  scheduled: (bg: #007BFF, text: #fff),
+  private: (bg: #6C757D, text: #fff),
+  hotlinked: (bg: #E83E8C, text: #fff),
+  issue: (bg: #DC3545, text: #fff),
+  active: (bg: #28A745, text: #fff),
+  newuser: (bg: #17A2B8, text: #fff),
+  disabled: (bg: #A0A0A0, text: #fff),
+);
