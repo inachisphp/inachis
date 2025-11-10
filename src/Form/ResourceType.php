@@ -26,10 +26,18 @@ class ResourceType extends AbstractType
 {
     private TranslatorInterface $translator;
 
+    /**
+     * @param TranslatorInterface $translator
+     */
     public function __construct(TranslatorInterface $translator) {
         $this->translator = $translator;
     }
 
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -38,7 +46,7 @@ class ResourceType extends AbstractType
                     'aria-labelledby' => 'resource__title__label',
                     'class' => 'text full-width',
                 ],
-                'label' => 'Title',
+                'label' => $this->translator->trans('admin.resources.title.label', [], 'messages'),
                 'label_attr' => [
                     'id' => 'resource__title__label'
                 ],
@@ -48,10 +56,9 @@ class ResourceType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'resource__altText__label',
                     'class' => 'full-width',
-                    'data-tip-content' => 'This is important as it is used by screen readers to improve accessibility',
                     'rows' => 2,
                 ],
-                'label' => 'Alt Text',
+                'label' => $this->translator->trans('admin.resources.altText.label', [], 'messages'),
                 'label_attr' => [
                     'id' => 'resource__altText__label'
                 ],
@@ -63,7 +70,7 @@ class ResourceType extends AbstractType
                     'class' => 'full-width',
                     'rows' => 5,
                 ],
-                'label' => 'Caption',
+                'label' => $this->translator->trans('admin.resources.caption.label', [], 'messages'),
                 'label_attr' => [
                     'id' => 'resource__description__label'
                 ],
@@ -77,7 +84,7 @@ class ResourceType extends AbstractType
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> <span>%s</span>',
                     'auto_awesome',
-                    'Generate Alt Text',
+                    $this->translator->trans('admin.resources.generateAlt.label', [], 'messages'),
                 ),
                 'label_html' => true,
             ])
@@ -101,6 +108,10 @@ class ResourceType extends AbstractType
         ;
     }
 
+    /**
+     * @param OptionsResolver $resolver
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
