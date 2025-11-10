@@ -6,20 +6,25 @@
 
 {% block content %}
     {% set badges = {
-        'draft': {
-            'field': 'status',
-            'condition': 'draft',
-            'className': 'badge__draft'
+        draft: {
+            field: 'status',
+            condition: 'draft',
+            className: 'badge__draft',
         },
-        'scheduled': {
-            'field': 'isScheduledPage',
-            'condition': true,
-            'className': 'badge__scheduled'
+        scheduled: {
+            field: 'isScheduledPage',
+            condition: true,
+            className: 'badge__scheduled',
         },
-        'private': {
-            'field': 'visibility',
-            'condition': false,
-            'className': 'badge__private'
+        private: {
+            field: 'visibility',
+            condition: false,
+            className: 'badge__private',
+        },
+        issue: {
+            context: 'slug_object',
+            condition: '',
+            className: 'badge__issue',
         },
 
     } %}
@@ -47,7 +52,6 @@
                 'className': 'form__posts',
                 'type': 'post',
                 'dataset': posts,
-
 
                 'offset': page.offset,
                 'limit': page.limit,

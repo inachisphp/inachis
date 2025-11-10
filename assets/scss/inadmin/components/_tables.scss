@@ -194,3 +194,11 @@ form table.table-selectable {
     text-align: left;
   }
 }
+.table__flex {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.6em;
+  row-gap: 0.6em;
+  align-items: flex-start;
+  padding: 0.5em;
+}
