@@ -43,9 +43,10 @@ let InachisComponents = {
 	{
 		$(selector + '.button--copy').on('click', async function ()
 		{
-			const $textSource = $('#' + $(this).attr('data-target'));
+			const $textSource = $('#' + $(this).attr('data-target')),
+				copyText = ($(this).attr('data-prefix') ?? '') + $textSource.val();
 			try {
-				await navigator.clipboard.writeText($textSource.val());
+				await navigator.clipboard.writeText(copyText);
 			} catch (err) {
 				console.error('Failed to copy: ', err)
 			}

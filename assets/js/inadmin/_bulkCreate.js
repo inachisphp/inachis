@@ -15,7 +15,7 @@ let InachisBulkCreateDialog = {
         if (dialogWidth < 380) {
             dialogWidth = 376;
         }
-        $('<div id="dialog__bulkCreate"><p/><p/><p/><p/><p/></div>').dialog({
+        $('<div id="dialog__bulkCreate"><p/><div class="loader"></div><p/></div>').dialog({
             buttons: [
                 {
                     text: 'Create',
