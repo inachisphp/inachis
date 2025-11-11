@@ -37,7 +37,7 @@
 {% block sm_open_graph %}
     <meta property="og:site_name" content="{{ settings.siteTitle }}">
     <meta property="og:url" content="{{ item.url }}">
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="{% if source is empty %}website{% else %}article{% endif %}">
     <meta property="og:title" content="{% if item.title is not empty %}{{ item.title }} / {% endif %}{{ settings.siteTitle }}">
     <meta property="og:description" content="{{ item.description }}">
 {% if item.image is not empty %}
