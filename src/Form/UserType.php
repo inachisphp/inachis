@@ -121,7 +121,14 @@ class UserType extends AbstractType
                 $builder
                     ->add('delete', SubmitType::class, [
                         'attr' => [
-                            'class' => 'button button--negative',
+                            'class' => 'button button--negative button--confirm',
+                            'data-entity' => 'user',
+                            'data-title' => sprintf(
+                                '%s (%s)',
+                                $options['data']->getDisplayName(),
+                                $options['data']->getUsername(),
+                            ),
+                            'data-warning' => 'This action cannot be undone, and will result in the user no longer being able to access this system.',
                         ],
                         'label' => sprintf(
                             '<span class="material-icons">%s</span> %s',

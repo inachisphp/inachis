@@ -191,7 +191,9 @@ class SeriesType extends AbstractType
             $builder
                 ->add('delete', SubmitType::class, [
                     'attr' => [
-                        'class' => 'button button--negative',
+                        'class' => 'button button--negative button--confirm',
+                        'data-entity' => 'series',
+                        'data-title' => $options['data']->getTitle(),
                     ],
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> %s',

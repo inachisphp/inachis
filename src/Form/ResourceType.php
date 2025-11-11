@@ -101,7 +101,9 @@ class ResourceType extends AbstractType
             ])
             ->add('delete', SubmitType::class, [
                 'attr' => [
-                    'class' => 'button button--negative',
+                    'class' => 'button button--negative button--confirm',
+                    'data-entity' => 'image',
+                    'data-title' => $options['data']->getTitle(),
                 ],
                 'label' => $this->translator->trans('admin.button.delete', [], 'messages'),
             ])

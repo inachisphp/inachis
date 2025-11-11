@@ -53,7 +53,13 @@
                         'title': 'Make public',
                     },
                     'delete': {
-                        'button_class': 'button--negative button--delete',
+                        'button_class': 'button--negative button--delete button--confirm',
+                        'data': {
+                            'entity': 'series',
+                            'form-action': '',
+                            'title': 'all selected series',
+                            'warning': 'All currently selected content will be deleted permanently. This action cannot be undone.',
+                        },
                         'icon': 'delete_forever',
                         'title': 'Delete',
                     },
