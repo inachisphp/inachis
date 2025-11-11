@@ -73,7 +73,7 @@
 
             add_button: {
                 text: 'Create Admin',
-                url: path('incc_admin_new'),
+                url: path('incc_admin_edit', { id: 'new' }),
             },
 
             url_result: path('incc_admin_list'),
@@ -83,7 +83,7 @@
                 enable: {
                     button_class: 'button--secondary',
                     'data': {
-                        'form-action': ''
+                        'form-action': '',
                     },
                     icon: 'person_outline',
                     title: 'admin.button.enable'|trans,
