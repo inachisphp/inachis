@@ -27,12 +27,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PageWebControllerTest extends WebTestCase
 {
     private PageWebController $controller;
     private EntityManagerInterface|MockObject $entityManager;
     private Security|MockObject $security;
+
+    private TranslatorInterface $translator;
 
     /**
      * @throws \ReflectionException
@@ -41,7 +44,8 @@ class PageWebControllerTest extends WebTestCase
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->security = $this->createMock(Security::class);
-        $this->controller = new PageWebController($this->entityManager, $this->security);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->controller = new PageWebController($this->entityManager, $this->security, $this->translator);
 
         $ref = new ReflectionClass($this->controller);
         foreach (['entityManager', 'security'] as $prop) {
@@ -98,7 +102,7 @@ class PageWebControllerTest extends WebTestCase
             ]);
 
         $controller = $this->getMockBuilder(PageWebController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security])
+            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
             ->onlyMethods(['render'])
             ->getMock();
         $router = $this->createMock(RouterInterface::class);
@@ -141,7 +145,7 @@ class PageWebControllerTest extends WebTestCase
             ]);
 
         $controller = $this->getMockBuilder(PageWebController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security])
+            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
             ->onlyMethods(['render'])
             ->getMock();
         $router = $this->createMock(RouterInterface::class);
@@ -194,7 +198,7 @@ class PageWebControllerTest extends WebTestCase
             ]);
 
         $controller = $this->getMockBuilder(PageWebController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security])
+            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
             ->onlyMethods(['render'])
             ->getMock();
         $controller->expects($this->once())
@@ -209,7 +213,7 @@ class PageWebControllerTest extends WebTestCase
     public function testGetPageDelegatesToGetPost(): void
     {
         $controller = $this->getMockBuilder(PageWebController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security])
+            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
             ->onlyMethods(['getPost'])
             ->getMock();
         $controller->expects($this->once())
@@ -270,7 +274,7 @@ class PageWebControllerTest extends WebTestCase
                 [Page::class, $pageRepo]
             ]);
         $controller = $this->getMockBuilder(PageWebController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security])
+            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
             ->onlyMethods(['render'])
             ->getMock();
         $ref = new ReflectionClass($controller);
@@ -331,7 +335,7 @@ class PageWebControllerTest extends WebTestCase
                 [Page::class, $pageRepository]
             ]);
         $controller = $this->getMockBuilder(PageWebController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security])
+            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
             ->onlyMethods(['render'])
             ->getMock();
         $ref = new ReflectionClass($controller);

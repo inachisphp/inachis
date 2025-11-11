@@ -1,6 +1,7 @@
 let InachisComponents = {
 	initialize: function() {
 		this.initClearSearch('');
+		this.initCopyPaste('');
 		this.initDatePicker();
 		this.initFilterBar();
 		this.initSelect2('');
@@ -36,6 +37,19 @@ let InachisComponents = {
 			let $searchBox = $($(this).attr('data-target'));
 			$searchBox.val('');
 			$searchBox.closest('form').trigger('submit');
+		});
+	},
+	initCopyPaste: function (selector)
+	{
+		$(selector + '.button--copy').on('click', async function ()
+		{
+			const $textSource = $('#' + $(this).attr('data-target')),
+				copyText = ($(this).attr('data-prefix') ?? '') + $textSource.val();
+			try {
+				await navigator.clipboard.writeText(copyText);
+			} catch (err) {
+				console.error('Failed to copy: ', err)
+			}
 		});
 	},
 	initDatePicker: function ()

@@ -41,7 +41,6 @@ class SeriesType extends AbstractType
                 'attr' => [
                     'aria-labelledby'  => 'title_label',
                     'aria-required'    => 'true',
-                    'data-tip-content' => '<strong>Required.</strong>',
                     'autofocus'        => 'true',
                     'class'            => 'editor__title text',
                     'placeholder'      => $this->translator->trans('admin.series.title.placeholder', [], 'messages'),
@@ -99,8 +98,6 @@ class SeriesType extends AbstractType
                         'aria-labelledby'  => 'firstDate_label',
                         'aria-required'    => 'false',
                         'class' => 'halfwidth',
-                        'data-tip-content' => $this->translator->trans('admin.series.firstDate.tip.content', [], 'messages'),
-                        'data-tip-title'   => $this->translator->trans('admin.series.firstDate.tip.title', [], 'messages'),
                         'readOnly' => true,
                     ],
                     'format' => 'dd/MM/yyyy', // HH:mm,
@@ -119,8 +116,6 @@ class SeriesType extends AbstractType
                         'aria-labelledby'  => 'lastDate_label',
                         'aria-required'    => 'false',
                         'class' => 'halfwidth',
-                        'data-tip-content' => $this->translator->trans('admin.series.lastDate.tip.content', [], 'messages'),
-                        'data-tip-title'   => $this->translator->trans('admin.series.lastDate.tip.title', [], 'messages'),
                         'readOnly' => true,
                     ],
                     'format' => 'dd/MM/yyyy', // HH:mm,
@@ -196,7 +191,9 @@ class SeriesType extends AbstractType
             $builder
                 ->add('delete', SubmitType::class, [
                     'attr' => [
-                        'class' => 'button button--negative',
+                        'class' => 'button button--negative button--confirm',
+                        'data-entity' => 'series',
+                        'data-title' => $options['data']->getTitle(),
                     ],
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> %s',

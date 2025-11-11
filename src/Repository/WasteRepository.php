@@ -9,6 +9,7 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\Waste;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -27,11 +28,18 @@ class WasteRepository extends AbstractRepository
         parent::__construct($registry, Waste::class);
     }
 
-    public function deleteWasteByUser(User $user): void
+    /**
+     * @param User $user
+     * @return int
+     */
+    public function deleteWasteByUser(User $user): int
     {
-        $this->createQueryBuilder('w')
-            ->delete()
+        return $this->createQueryBuilder('w')
+            ->delete(Waste::class, 'w')
             ->where('w.user = :user')
-            ->setParameter('user', $user);
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->execute()
+        ;
     }
 }

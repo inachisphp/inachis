@@ -55,7 +55,6 @@ class UserType extends AbstractType
             ->add('displayName', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'user__displayName__label',
-                    'data-tip-content' => 'How the user will be known',
                     'class' => 'text inline_label',
                 ],
                 'label' => 'Display Name',
@@ -80,7 +79,6 @@ class UserType extends AbstractType
             ->add('timezone', ChoiceType::class, [
                 'attr' => [
                     'aria-labelledby' => 'user__timezone__label',
-                    'data-tip-content' => 'How the user will be known',
                     'class' => 'text inline_label',
                 ],
                 'choices' => array_combine(timezone_identifiers_list(), timezone_identifiers_list()),
@@ -123,7 +121,14 @@ class UserType extends AbstractType
                 $builder
                     ->add('delete', SubmitType::class, [
                         'attr' => [
-                            'class' => 'button button--negative',
+                            'class' => 'button button--negative button--confirm',
+                            'data-entity' => 'user',
+                            'data-title' => sprintf(
+                                '%s (%s)',
+                                $options['data']->getDisplayName(),
+                                $options['data']->getUsername(),
+                            ),
+                            'data-warning' => 'This action cannot be undone, and will result in the user no longer being able to access this system.',
                         ],
                         'label' => sprintf(
                             '<span class="material-icons">%s</span> %s',

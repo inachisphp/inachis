@@ -45,6 +45,17 @@
                 {{ form_label(form.url) }}
                 {{ form_errors(form.url) }}
                 {{ settings.domain -}}/<input class="field__wide" id="post_url" name="post[url]" type="text" value="{% if post.urls is not empty %}{{ post.urls|first.link }}{% endif %}" />
+                {% if post.urls is not empty %}
+                <button aria-label="{{ 'admin.posts.share.copyLink.help'|trans }}"
+                        data-prefix="{{ settings.domain }}/"
+                        data-target="post_url"
+                        class="button button--info button--copy"
+                        type="button"
+                >
+                    <span class="material-icons">content_paste</span>
+                    {{ 'admin.posts.share.copyLink.label'|trans }}
+                </button>
+                {% endif %}
             </p>
             <p>
                 {{ form_label(form.content) }}
@@ -117,15 +128,6 @@
                     <input class="checkbox" type="checkbox" />
                     <label for="">Search engines should not follow links</label>
                 </p>
-            {% if post.urls is not empty %}
-                <p>
-                    <input class="visually-hidden" type="text" value="{{ settings.domain }}/{{ post.urls|first.link }}" />
-                    <button class="button button--info" id="post__link__copy" type="button">
-                        <span class="material-icons">content_paste</span>
-                        Copy content link to clipboard
-                    </button>
-                </p>
-            {% endif %}
             </section>
             <section class="col span_3_of_8">
             {{

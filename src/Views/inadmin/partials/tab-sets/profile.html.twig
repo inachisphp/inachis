@@ -10,7 +10,7 @@
         {
             id: 'change-password',
             title: 'Security',
-            url: path('incc_admin_change_password', {'id': user.username}),
+            url: path('incc_admin_change_password', { 'id': user.username }),
             displayCondition: app.user.username == user.username,
         }
     ]
