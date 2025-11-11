@@ -15,19 +15,22 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Flex\Response;
 
 abstract class AbstractInachisController extends AbstractController
 {
     protected Security $security;
     protected EntityManagerInterface $entityManager;
+    protected TranslatorInterface $translator;
     protected array $errors = [];
     protected array $data = [];
 
-    public function __construct(EntityManagerInterface $entityManager, Security $security)
+    public function __construct(EntityManagerInterface $entityManager, Security $security, TranslatorInterface $translator)
     {
         $this->entityManager = $entityManager;
         $this->security = $security;
+        $this->translator = $translator;
     }
 
     /**

@@ -102,7 +102,9 @@ admin.resources.images.copyLink.help: 'Copy Image Link to Clipboard'
 admin.urls.title: 'URLs'
 admin.urls.help: 'View list of defined URLs'
 
-
+admin.dialog.confirm.title: 'Are you sure?'
+admin.dialog.confirm.default.title: 'untitled'
+admin.dialog.confirm.default.warning: 'This action cannot be undone.'
 
 
 

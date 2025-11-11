@@ -258,7 +258,8 @@ class PostType extends AbstractType
                 ])
                 ->add('delete', SubmitType::class, [
                     'attr' => [
-                        'class' => 'button button--negative',
+                        'class' => 'button button--negative button--confirm',
+                        'data-title' => $options['data']->getTitle(),
                     ],
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> <span>%s</span>',

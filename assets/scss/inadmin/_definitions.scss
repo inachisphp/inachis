@@ -108,6 +108,8 @@ $admin__tabs-background: #fff;
 // admonitions
 $admonition-tip__border-color: #069;
 $admonition-tip__background-color: color.adjust($admonition-tip__border-color, $lightness: 65%);
+$admonition-warning__border-color: #f60;
+$admonition-warning__background-color: color.adjust($admonition-warning__border-color, $lightness: 35%);
 
 // forms
 $button--positive--active-color: #393;
