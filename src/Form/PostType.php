@@ -213,7 +213,7 @@ class PostType extends AbstractType
                     'class' => 'full-width',
                     'rows' => 3,
                 ],
-                'label'      => $this->translator->trans('admin.label.post.teaser', [], 'messages'),
+                'label'      => $this->translator->trans('admin.post.featureSnippet.label', [], 'messages'),
                 'label_attr' => [
                     'id'    => 'teaser_label',
                 ],

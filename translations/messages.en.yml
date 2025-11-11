@@ -52,7 +52,8 @@ admin.dashboard.tab.latest: 'Latest'
 admin.posts.title: 'Posts'
 admin.posts.help: 'View list of posts and pages'
 admin.posts.share.copyLink.help: 'Copy Post/Page Link to Clipboard'
-admin.posts.share.copyLink.label: 'Copy this link'
+admin.posts.share.copyLink.label: 'Copy link to Clipboard'
+admin.post.featureSnippet.label: 'Description'
 
 admin.series.title: 'Series'
 admin.series.help: 'View list of series'
@@ -136,8 +137,6 @@ admin.label.post.postDate-past: Published on
 admin.label.post.categories: Categories
 admin.placeholder.post.categories: Select a category
 admin.label.post.tags: Tags
-admin.label.post.teaser: Abstract / Summary
-
 
 
 admin.dialog.image_manager.title: Image Gallery

@@ -181,8 +181,8 @@ class PageController extends AbstractInachisController
 
         if ($form->isSubmitted()) {//} && $form->isValid()) {
             if ($form->has('delete') && $form->get('delete')->isClicked()) {
-                $this->entityManager->getRepository(Page::class)->remove($post);
                 $this->entityManager->getRepository(Revision::class)->deleteAndRecordByPage($post);
+                $this->entityManager->getRepository(Page::class)->remove($post);
                 return $this->redirectToRoute(
                     'incc_dashboard',
                     [],

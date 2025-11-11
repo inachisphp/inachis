@@ -45,6 +45,17 @@
                 {{ form_label(form.url) }}
                 {{ form_errors(form.url) }}
                 {{ settings.domain -}}/<input class="field__wide" id="post_url" name="post[url]" type="text" value="{% if post.urls is not empty %}{{ post.urls|first.link }}{% endif %}" />
+                {% if post.urls is not empty %}
+                <button aria-label="{{ 'admin.posts.share.copyLink.help'|trans }}"
+                        data-prefix="{{ settings.domain }}/"
+                        data-target="post_url"
+                        class="button button--info button--copy"
+                        type="button"
+                >
+                    <span class="material-icons">content_paste</span>
+                    {{ 'admin.posts.share.copyLink.label'|trans }}
+                </button>
+                {% endif %}
             </p>
             <p>
                 {{ form_label(form.content) }}
@@ -103,12 +114,19 @@
         </fieldset>
 
         <fieldset id="post__sharing">
-            <h3>Teaser Details</h3>
             <section class="col span_4_of_8">
                 <p>
                     {{ form_label(form.featureSnippet) }}
                     {{ form_errors(form.featureSnippet) }}
                     {{ form_widget(form.featureSnippet) }}
+                </p>
+                <p>
+                    <input class="checkbox" type="checkbox" />
+                    <label for="">Search engines should not index this page</label>
+                </p>
+                <p>
+                    <input class="checkbox" type="checkbox" />
+                    <label for="">Search engines should not follow links</label>
                 </p>
             </section>
             <section class="col span_3_of_8">
@@ -133,16 +151,6 @@
                     {{ form_widget(form.sharingMessage) }}
                 </p -->
             </section>
-            {% if post.urls is not empty %}
-            <p class="col span_8_of_8">
-                <input class="halfwidth" id="post_link" type="text" value="{{ settings.domain }}/{{ post.urls|first.link }}" />
-                <button aria-label="{{ 'admin.posts.share.copyLink.help'|trans }}"
-                        data-target="post_link"
-                        class="button button--secondary button--copy"
-                        type="button"
-                >{{ 'admin.posts.share.copyLink.label'|trans }}</button>
-            </p>
-            {% endif %}
         </fieldset>
 
         {%  if revisions is defined and revisions is not empty %}

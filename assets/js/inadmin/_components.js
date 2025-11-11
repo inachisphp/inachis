@@ -10,6 +10,15 @@ let InachisComponents = {
 		this.initSwitches('');
 		this.initUIToggle();
 
+		$('.image_preview .button--confirm').on('click', function(event)
+		{
+			event.preventDefault();
+			const $imagePreview = $('.image_preview');
+			$imagePreview.find('input[type=hidden]').val('');
+			$imagePreview.find('img').remove();
+			$imagePreview.find('button.button--confirm').remove();
+		});
+
 		// jQuery Tabs
 		$('.ui-tabbed').tabs();
 		$('.error-select').hide();
