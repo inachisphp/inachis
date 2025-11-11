@@ -13,7 +13,6 @@ use App\Controller\AbstractInachisController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfirmationController extends AbstractInachisController
 {
@@ -25,11 +24,13 @@ class ConfirmationController extends AbstractInachisController
     public function contentList(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $this->data['title'] = $request->request->get('title', sprintf(
+        $this->data['title'] = $request->request->get('title', '') ?: sprintf(
             '<%s>',
             $this->translator->trans('admin.dialog.confirm.default.title', [], 'messages'),
-        ));
-        $this->data['warning'] = $request->request->get('warning', $this->translator->trans('admin.dialog.confirm.default.warning', [], 'messages'));
+        );
+        $this->data['entity'] = $request->request->get('entity', '');
+        $this->data['warning'] = $request->request->get('warning', '') ?:
+            $this->translator->trans('admin.dialog.confirm.default.warning', [], 'messages');
         return $this->render('inadmin/dialog/confirmation.html.twig', $this->data);
     }
 }

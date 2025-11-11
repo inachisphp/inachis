@@ -69,7 +69,9 @@ let InachisConfirmationPrompt = {
     {
         let $confirmationPrompt = $('#dialog__confirmationPrompt');
         $confirmationPrompt.load(Inachis.prefix + '/ax/confirmation/get', {
-            title: InachisConfirmationPrompt.$target.data('title') ?? '',
+            'title': InachisConfirmationPrompt.$target.data('title') ?? '',
+            'entity': InachisConfirmationPrompt.$target.data('entity') ?? '',
+            'warning': InachisConfirmationPrompt.$target.data('warning') ?? '',
         }, function(responseText, status)
         {
             if (status === 'success') {
