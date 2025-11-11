@@ -35,7 +35,16 @@ class AdminProfileController extends AbstractInachisController
      * @return Response
      * @throws Exception
      */
-    #[Route("/incc/admin-management", name: "incc_admin_list", methods: [ 'GET', 'POST' ])]
+    #[Route(
+        "/incc/admin/list/{offset}/{limit}",
+        name: 'incc_admin_list',
+        requirements: [
+            "offset" => "\d+",
+            "limit" => "\d+"
+        ],
+        defaults: [ "offset" => 0, "limit" => 25 ],
+        methods: [ "GET", "POST" ]
+    )]
     public function list(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');

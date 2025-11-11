@@ -131,5 +131,10 @@ div#filter__options {
       line-height: inherit;
       outline: none;
     }
+
+    option {
+      background-color: #fff;
+      color: #000;
+    }
   }
 }
