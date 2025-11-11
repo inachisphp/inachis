@@ -34,7 +34,7 @@ abstract class AbstractFile
      * @var string The title of the {@link Image}
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    protected string $title;
+    protected string $title = '';
 
     /**
      * @var ?string

@@ -10,6 +10,7 @@
 namespace App\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\ConnectionException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Psr\Log\LoggerInterface;
 use Exception;
@@ -148,7 +149,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
 
     /**
      * @param LoggerInterface $logger
-     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws ConnectionException|Exception
      */
     public function wipe(LoggerInterface $logger): void
     {
