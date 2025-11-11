@@ -15,17 +15,15 @@ use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DashboardController extends AbstractInachisController
 {
     /**
      * @param Request             $request    The request made to the controller
-     * @param TranslatorInterface $translator
      * @return Response
      */
     #[Route('/incc', name: "incc_dashboard", methods: [ 'GET' ])]
-    public function default(Request $request, TranslatorInterface $translator): Response
+    public function default(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
