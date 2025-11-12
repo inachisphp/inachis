@@ -64,7 +64,12 @@
                         {% elseif column.source_type is defined and column.source_type == 'title' %}
                             {{ attribute(attribute(item, column.source), 'title') }}
                         {% else %}
-                            {{ attribute(item, column.source) }}
+                            {% if column.maxLength is defined %}
+                                {{ attribute(item, column.source)|slice(0, column.maxLength) }}
+                                {% if attribute(item, column.source)|length > 300 %}…{% endif %}
+                            {% else %}
+                                {{ attribute(item, column.source) }}
+                            {% endif %}
                         {% endif %}
                     {% elseif column.badges|default(null) is not empty %}
                         {% include 'inadmin/partials/badge.html.twig' with {

@@ -1,0 +1,70 @@
+{% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <span>Search results</span>
+{% endblock pagetitle %}
+
+{% block content %}
+    {% block results_pre %}{% endblock results_pre %}
+    {% block results_list %}
+
+        <p>Showing <strong>{{ page.offset + 1 }}</strong>-<strong>{{ min(page.offset + page.limit,total) }}</strong> of <strong>{{ total }}</strong> results</p>
+
+        {% include 'inadmin/partials/table.html.twig' with {
+            className: 'form__search_results',
+            type: 'search_results',
+            dataset: results,
+
+            table_name: 'Search results',
+            table_class: 'table-responsive table-borderless table-darkhead',
+            table_desc: 'This table lists URLs used by pages and posts. The first column contains checkboxes allowing users to select one or more tasks.',
+
+            columns: [
+                {
+                    title: 'Type',
+                    source: 'type',
+                },
+                {
+                    title: 'Title',
+                    source: 'title',
+                    slug: 'title',
+                },
+                {
+                    title: 'Sub Title',
+                    source: 'sub_title',
+                },
+                {
+                    title: 'Content',
+                    source: 'content',
+                    maxLength: 150,
+                },
+                {
+                    title: 'Date',
+                    source: 'contentDate',
+                    source_type: 'date',
+                },
+                {
+                    title: 'Relevance Score',
+                    source: 'relevance',
+                }
+            ],
+            limit: page.limit,
+            offset: page.offset,
+            total: total,
+            url_result: path('incc_search_results', { keyword: keyword }),
+            slug_prefix: 'post',
+
+            zebra: true,
+            sort_options: {
+                'title asc': 'Title A-Z',
+                'title desc': 'Title Z-A',
+                'type asc': 'Type A-Z',
+                'type desc': 'TypeR Z-A',
+                'contentDate asc': 'Date Old to New',
+                'contentDate desc': 'Date New to Old',
+            }
+        } %}
+    {% endblock results_list %}
+
+    {% block result_post %}{% endblock result_post %}
+{% endblock %}
