@@ -83,8 +83,8 @@ class SearchRepository extends AbstractRepository
     private function getWhereConditions($type)
     {
         return match($type) {
-            'page' => 'LOWER(p.title) LIKE :kw OR LOWER(p.sub_title) LIKE :kw OR LOWER(p.content) LIKE :kw',
-            'series' => 'LOWER(s.title) LIKE :kw OR LOWER(s.sub_title) LIKE :kw OR LOWER(s.description) LIKE :kw',
+            'page' => 'MATCH(p.title, p.sub_title, p.content) AGAINST(:kw IN NATURAL LANGUAGE MODE)',
+            'series' => 'MATCH(s.title, s.sub_title, s.description) AGAINST(:kw IN NATURAL LANGUAGE MODE)',
         };
     }
 }

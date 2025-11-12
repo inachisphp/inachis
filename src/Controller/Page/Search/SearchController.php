@@ -33,12 +33,16 @@ class SearchController extends AbstractInachisController
             "offset" => "\d+",
             "limit" => "\d+"
         ],
-        defaults: [ "offset" => 0, "limit" => 25 ],
+        defaults: [ "keyword" => null, "offset" => 0, "limit" => 25 ],
         methods: [ "GET", "POST" ],
     )]
     public function results(SearchRepository $repo, Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        if ($request->attributes->get('keyword') === ' ' && !empty($request->request->get('keyword', ''))) {
+            return $this->redirectToRoute('incc_search_results', ['keyword' => $request->request->get('keyword')]);
+        }
+
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
@@ -55,7 +59,13 @@ class SearchController extends AbstractInachisController
         $this->data['page']['title'] =  sprintf('\'%s\' results', $request->attributes->get('keyword'));
 
         $this->data['results'] = $results;
+
         foreach ($this->data['results']->getResults() as $key => $result) {
+            $this->data['results']->updateResultPropertyByKey(
+                $key,
+                'relevance',
+                number_format($result['relevance'], 2)
+            );
             switch ($result['type']) {
                 case 'Series':
                     $this->data['results']->updateResultPropertyByKey(
@@ -77,7 +87,11 @@ class SearchController extends AbstractInachisController
                     $this->data['results']->updateResultPropertyByKey(
                         $key,
                         'url',
-                        sprintf('/incc/%s/' . $link->getLink(), strtolower($result['type'])),
+                        sprintf(
+                            '/incc/%s/%s',
+                            strtolower($result['type']),
+                            !empty($link) ? $link->getLink() : ''
+                        ),
                     );
                     $this->data['results']->updateResultPropertyByKey(
                         $key,
