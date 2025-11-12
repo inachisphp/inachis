@@ -12,11 +12,17 @@ admin.reset_sent.title: 'Password reset email sent'
 admin.reset_sent.heading: 'Thank you,'
 admin.reset_sent.text: 'If your account was found, you will soon receive an email to the email address you provided with instructions to reset your password.'
 
+admin.button.addItem: 'Add Item'
 admin.button.cancel: 'Cancel'
+admin.button.continue: 'Continue'
+admin.button.delete: 'Delete'
 admin.button.disable: 'Disable'
 admin.button.enable: 'Enable'
+admin.button.publish: 'Publish'
+admin.button.remove: 'Remove'
 admin.button.save: 'Save'
-admin.button.continue: 'Continue'
+admin.button.schedule: 'Schedule'
+admin.button.viewLive: 'View live'
 
 admin.user.title: 'Users'
 admin.user.help: 'Manage users'
@@ -51,9 +57,38 @@ admin.dashboard.tab.latest: 'Latest'
 
 admin.posts.title: 'Posts'
 admin.posts.help: 'View list of posts and pages'
-admin.posts.share.copyLink.help: 'Copy Post/Page Link to Clipboard'
-admin.posts.share.copyLink.label: 'Copy link to Clipboard'
-admin.post.featureSnippet.label: 'Description'
+admin.post.edit.fieldset: 'Edit Post'
+admin.post.title.label: 'Title'
+admin.post.title.placeholder: 'e.g. My First Blog Post'
+admin.post.subTitle.label: 'Sub-title'
+admin.post.subTitle.placeholder: '(Optional)'
+admin.post.url.label: 'URL'
+admin.post.share.copyLink.help: 'Copy Post/Page Link to Clipboard'
+admin.post.share.copyLink.label: 'Copy link to Clipboard'
+admin.post.content.label: 'Content'
+admin.post.properties.fieldset: 'Properties'
+admin.post.properties.visibility.label: 'Visibility'
+admin.post.properties.visibility.private: 'private'
+admin.post.properties.visibility.public: 'public'
+admin.post.properties.postDate-future.label: 'Publish on'
+admin.post.properties.postDate-past.label: 'Published on'
+admin.post.properties.modDate.label: 'Last modified'
+admin.post.properties.categories.label: 'Categories'
+admin.post.properties.categories.placeholder: 'Select a category'
+admin.post.properties.tags.label: 'Tags'
+admin.post.properties.location.label: 'Location'
+admin.post.properties.readingTime: 'Approximate reading time (at last save): %readingTime% minute(s)'
+admin.post.sharing.featureSnippet.label: 'Description snippet'
+admin.post.sharing.featureSnippet.help: 'This text will be used as the preview text when sharing on social media'
+admin.post.sharing.noindex.label: 'Search engines should not index this page'
+admin.post.sharing.nofollow.label: 'Search engines should not follow links on this page'
+admin.post.revision.caption: 'Revision history'
+admin.post.revision.date: 'Date'
+admin.post.revision.author: 'Author'
+admin.post.revision.changes: 'Changes'
+admin.post.revision.view: 'View'
+admin.post.revision.download: 'Download'
+admin.post.revision.revert: 'Revert'
 
 admin.series.title: 'Series'
 admin.series.help: 'View list of series'
@@ -78,7 +113,6 @@ admin.series.lastDate.tip.title: ''
 admin.series.lastDate.tip.content: ''
 admin.series.visibility.label: 'Visibility'
 
-
 admin.resources.title: 'Resources'
 admin.resources.help: 'Manage resources'
 admin.resources.details.title: 'Details'
@@ -92,6 +126,7 @@ admin.resources.properties.colourDepth: 'Colour Depth'
 admin.resources.properties.filename: 'File name'
 admin.resources.properties.filetype: 'File type'
 admin.resources.properties.filesize: 'Size'
+admin.resources.properties.modDate: 'Last modified'
 admin.resources.usages.title: 'Usages'
 admin.resources.usages.notInUse: 'Image is not in known use.'
 
@@ -103,9 +138,12 @@ admin.resources.images.copyLink.help: 'Copy Image Link to Clipboard'
 admin.urls.title: 'URLs'
 admin.urls.help: 'View list of defined URLs'
 
+admin.dialog.categories.title: 'Categories'
+
 admin.dialog.confirm.title: 'Are you sure?'
 admin.dialog.confirm.default.title: 'untitled'
 admin.dialog.confirm.default.warning: 'This action cannot be undone.'
+
 
 
 
@@ -118,25 +156,10 @@ admin.label.remember_me: 'Keep me logged in'
 admin.label.forgot_password: 'Forgot your password?'
 admin.button.login: 'Log In'
 
-admin.button.addItem: Add Item
-admin.button.publish: Publish
-admin.button.delete: Delete
-admin.button.remove: Remove
+
 admin.label.reset_password: 'Reset Password'
 admin.reset_password: 'Continue'
 admin.email_example: user@example.com
-admin.label.post.title: Title
-admin.placeholder.post.title: e.g. My First Blog Post
-admin.label.post.subTitle: Sub-title
-admin.placeholder.post.subTitle: (Optional)
-admin.label.post.url: URL
-admin.label.post.content: Content
-admin.label.post.visibility: Visibility
-admin.label.post.postDate-future: Publish on
-admin.label.post.postDate-past: Published on
-admin.label.post.categories: Categories
-admin.placeholder.post.categories: Select a category
-admin.label.post.tags: Tags
 
 
 admin.dialog.image_manager.title: Image Gallery
