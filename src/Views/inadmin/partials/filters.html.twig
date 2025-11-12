@@ -21,7 +21,6 @@
         <label class="material-icons" for="filter__keyword">search</label>
         <input id="filter__keyword" name="filter[keyword]" placeholder="filter by keyword" type="search" value="{{ filter_values['keyword']|default('') }}" />
         <button class="clear-search material-icons" data-target="#filter__keyword" type="button">cancel</button>
-        <button class="button button--info mobile-only" type="submit">Apply</button>
     </p>
     {% endif %}
     {% if filters is defined and filters is not empty %}
@@ -34,7 +33,7 @@
     {% if show_select_deselect is defined and show_select_deselect %}
         <p>
             <input aria-labelledby="selectAllNone_label" class="checkbox selectAllNone" name="selectAllNone" type="checkbox" />
-            <label class="visually-hidden" id="selectAllNone_label" for="selectAllNone">Select all</label>
+            <label class="mobile-only" id="selectAllNone_label" for="selectAllNone">Select all on this page</label>
         </p>
     {% endif %}
 </section>

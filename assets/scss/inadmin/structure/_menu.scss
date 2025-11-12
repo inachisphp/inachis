@@ -38,11 +38,18 @@
   .admin__nav-main__list {
     background-color: $menubar__background-color;
     height: 100%;
+    line-height: 2em;
     list-style-type: none;
-    font-size: 0.8em;
+    font-size: 1.25em;
     margin: 0;
-    padding: 0;
+    padding: 1em 0.2em;
     text-transform: uppercase;
+
+    @media #{$information-medium} {
+      font-size: 0.8em;
+      line-height: 1em;
+      padding: 0;
+    }
 
     .menu__active {
       background-color: $menubar__background-color--is-active;
@@ -84,13 +91,16 @@
     }
 
     .button.admin__add-content {
+      background-color: $admin__container-add-button;
+      border: 1px solid color.adjust($admin__container-add-button, $lightness: -10%);
       display: block;
-      margin-bottom: 20px;
+      margin: 0 auto 3em;
+      text-align: center;
+      width: 50%;
 
       @media #{$information-medium} {
-        background-color: $admin__container-add-button;
-        border: 1px solid color.adjust($admin__container-add-button, $lightness: -10%);
         margin:5px auto 50px auto;
+        width: auto;
 
         &:hover {
           background-color: $admin__container-button--hover;
@@ -221,7 +231,7 @@
 
 @media #{$information-medium} {
   .mobile-only, .material-icons.mobile-only {
-    display: none;
+    display: none !important;
   }
 
   .admin__container {

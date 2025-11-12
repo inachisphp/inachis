@@ -94,7 +94,7 @@ let InachisComponents = {
 			let $properties = {
 				allowClear: true,
 				maximumInputLength: 20,
-				width: '40%'
+				width: 'element',
 			};
 			if ($(this).attr('data-tags')) {
 				$properties.tags = 'true';

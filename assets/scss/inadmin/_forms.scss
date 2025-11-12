@@ -27,6 +27,14 @@
 	.field__wide {
 		width: 30em;
 	}
+
+	.js-select {
+		width: 100%;
+
+		@media #{$information-medium} {
+			width: 40%;
+		}
+	}
 }
 
 .button, .button:visited {
@@ -35,6 +43,7 @@
 	border-radius: 0.5em;
 	padding: 0.5em 0.75em;
 	text-decoration: none;
+	text-wrap-mode: nowrap;
 	transition: background-color 0.2s ease;
 
 	&:hover {
