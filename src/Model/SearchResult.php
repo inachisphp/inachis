@@ -12,13 +12,13 @@ namespace App\Model;
 /**
  * Model for containing search result items
  */
-readonly class SearchResult implements \IteratorAggregate
+class SearchResult implements \IteratorAggregate
 {
     public function __construct(
         private array $results,
-        private int   $total,
-        private int   $offset,
-        private int   $limit
+        private readonly int $total,
+        private readonly int $offset,
+        private readonly int $limit
     ) {}
 
     /**
@@ -59,5 +59,16 @@ readonly class SearchResult implements \IteratorAggregate
     public function getResults(): array
     {
         return $this->results;
+    }
+
+    /**
+     * @param $key
+     * @param $property
+     * @param mixed $value
+     * @return void
+     */
+    public function updateResultPropertyByKey($key, $property, mixed $value): void
+    {
+        $this->results[$key][$property] = $value;
     }
 }

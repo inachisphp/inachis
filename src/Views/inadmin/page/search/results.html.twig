@@ -27,7 +27,7 @@
                 {
                     title: 'Title',
                     source: 'title',
-                    slug: 'title',
+                    url: 'url',
                 },
                 {
                     title: 'Sub Title',
@@ -44,6 +44,10 @@
                     source_type: 'date',
                 },
                 {
+                    title: 'Author',
+                    source: 'author',
+                },
+                {
                     title: 'Relevance Score',
                     source: 'relevance',
                 }
@@ -52,7 +56,6 @@
             offset: page.offset,
             total: total,
             url_result: path('incc_search_results', { keyword: keyword }),
-            slug_prefix: 'post',
 
             zebra: true,
             sort_options: {

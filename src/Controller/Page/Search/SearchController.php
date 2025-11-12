@@ -10,7 +10,10 @@
 namespace App\Controller\Page\Search;
 
 use App\Controller\AbstractInachisController;
+use App\Entity\Url;
+use App\Entity\User;
 use App\Repository\SearchRepository;
+use DateTime;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -52,13 +55,39 @@ class SearchController extends AbstractInachisController
         $this->data['page']['title'] =  sprintf('\'%s\' results', $request->attributes->get('keyword'));
 
         $this->data['results'] = $results;
+        foreach ($this->data['results']->getResults() as $key => $result) {
+            switch ($result['type']) {
+                case 'Series':
+                    $this->data['results']->updateResultPropertyByKey(
+                        $key,
+                        'url',
+                        $this->generateUrl('incc_series_edit', ['id' => $result['id']])
+                    );
+                    break;
+
+                case 'Page':
+                case 'Post':
+                    $link = $this->entityManager->getRepository(Url::class)->findOneBy([
+                        'content' => $result['id'],
+                        'default' => true,
+                    ]);
+                    $author = $this->entityManager->getRepository(User::class)->findOneBy([
+                        'id' => $result['author'],
+                    ]);
+                    $this->data['results']->updateResultPropertyByKey(
+                        $key,
+                        'url',
+                        sprintf('/incc/%s/' . $link->getLink(), strtolower($result['type'])),
+                    );
+                    $this->data['results']->updateResultPropertyByKey(
+                        $key,
+                        'author',
+                        $author->getDisplayName(),
+                    );
+            }
+        }
         $this->data['total'] = $results->getTotal();
         $this->data['keyword'] = $request->attributes->get('keyword');
-
-//        $keyword = $request->query->get('q', '');
-//        $page = max(1, (int) $request->query->get('page', 1));
-//        $sort = $request->query->get('sort', 'title');
-//        $dir = $request->query->get('dir', 'ASC');
 
         return $this->render('inadmin/page/search/results.html.twig', $this->data);
     }

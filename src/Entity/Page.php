@@ -25,6 +25,7 @@ use Ramsey\Uuid\UuidInterface;
  */
 #[ORM\Entity(repositoryClass: 'App\Repository\PageRepository', readOnly: false)]
 #[ORM\Index(columns: ['title', 'author_id', 'image_id'], name: 'search_idx')]
+#[ORM\Index(columns: ['title', 'sub_title', 'content'], name: "fulltext_title_content", flags: ["fulltext"])]
 class Page
 {
     /**

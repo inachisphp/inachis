@@ -34,24 +34,17 @@ class SearchRepository extends AbstractRepository
     ): SearchResult {
         $sql = sprintf('%s ORDER BY %s LIMIT :limit OFFSET :offset;',
             $this->getSQLUnion([
-                'p.id, p.title, p.sub_title, p.content, CONCAT(UCASE(LEFT(type, 1)), LCASE(SUBSTRING(type, 2))) AS type, p.post_date AS contentDate, p.mod_date,
-                (
-                    (CASE WHEN LOWER(p.title) LIKE :kw THEN 10 ELSE 0 END) +
-                    (CASE WHEN LOWER(p.sub_title) LIKE :kw THEN 5 ELSE 0 END) +
-                    (CASE WHEN LOWER(p.content) LIKE :kw THEN 2 ELSE 0 END)
-                ) AS relevance',
-                's.id, s.title, s.sub_title, s.description AS content, \'Series\' AS type, s.last_date AS contentDate, s.mod_date,
-                (
-                    (CASE WHEN LOWER(s.title) LIKE :kw THEN 10 ELSE 0 END) +
-                    (CASE WHEN LOWER(s.sub_title) LIKE :kw THEN 5 ELSE 0 END) +
-                    (CASE WHEN LOWER(s.description) LIKE :kw THEN 2 ELSE 0 END)
-                ) AS relevance',
+                'p.id, p.title, p.sub_title, p.content, CONCAT(UCASE(LEFT(type, 1)), LCASE(SUBSTRING(type, 2))) AS type, p.post_date AS contentDate, p.mod_date, p.author_id as author,
+                MATCH(p.title, p.sub_title, p.content) AGAINST(:kw IN NATURAL LANGUAGE MODE) AS relevance',
+                's.id, s.title, s.sub_title, s.description AS content, \'Series\' AS type, s.last_date AS contentDate, s.mod_date, \'\' AS author, 
+                MATCH(s.title, s.sub_title, s.description) AGAINST(:kw IN NATURAL LANGUAGE MODE) AS relevance',
             ]),
             $orderBy,
         );
 
         $stmt = $this->connection->prepare($sql);
         $stmt->bindValue('kw', '%' . strtolower($keyword) . '%');
+        $stmt->bindValue('plainKw', strtolower($keyword));
         $stmt->bindValue('limit', $limit, \PDO::PARAM_INT);
         $stmt->bindValue('offset', $offset, \PDO::PARAM_INT);
 
