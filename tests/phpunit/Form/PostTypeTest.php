@@ -92,7 +92,7 @@ class PostTypeTest extends TypeTestCase
         $view = $form->createView();
 
         $expectedFields = [ 'title', 'subTitle', 'url', 'content', 'visibility', 'postDate', 'categories',
-            'tags', 'language', 'latlong', 'featureSnippet', 'sharingMessage', 'submit' ];
+            'tags', 'language', 'latlong', 'featureSnippet', 'noindex', 'nofollow', 'submit' ];
         $this->assertSame($expectedFields, array_keys($view->children));
     }
 
@@ -109,7 +109,9 @@ class PostTypeTest extends TypeTestCase
         $tagView = $view['tags'];
         $tagViews = $tagView->vars['choices'];
         $expectedFields = [ 'title', 'subTitle', 'url', 'content', 'visibility', 'postDate', 'categories',
-            'tags', 'language', 'latlong', 'featureSnippet', 'sharingMessage', 'submit', 'publish', 'delete' ];
+            'tags', 'language', 'latlong', 'featureSnippet', 'noindex', 'nofollow', 'submit', 'modDate', 'publish',
+            'delete'
+        ];
         $this->assertSame($expectedFields, array_keys($view->children));
         $this->assertSame('selected', $tagViews[0]->attr['selected']);
     }
