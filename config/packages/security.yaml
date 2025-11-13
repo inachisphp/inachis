@@ -16,6 +16,7 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            user_checker: App\Security\UserChecker
 
             form_login:
                 login_path: app_account_login
@@ -26,7 +27,7 @@ security:
                 csrf_parameter: login[_token]
 
                 use_referer: true
-                default_target_path: app_dashboard_default
+                default_target_path: incc_dashboard
 
             logout:
                 path: app_logout

@@ -1,5 +1,7 @@
-var InachisContentSelectorDialog = {
-    alreadyInitialised: false,
+let InachisContentSelectorDialog = {
+    offset: 0,
+    limit: 25,
+    saveTimeout: false,
 
     _init: function()
     {
@@ -11,68 +13,77 @@ var InachisContentSelectorDialog = {
 
     createDialog: function()
     {
-        var dialogWidth = $(window).width() * 0.75;
+        let dialogWidth = $(window).width() * 0.75;
         if (dialogWidth < 380) {
             dialogWidth = 376;
         }
-        $('<div id="dialog__contentSelector"><form class="form"><ol data-name="pages[]"></ol></form></div>').dialog(
-            {
-                buttons: [
-                    {
-                        text: 'Attach to series',
-                        class: 'button button--positive',
-                        disabled: true,
-                        click: $.proxy(this.addContentToSeries, this)
-                    },
-                    {
-                        text: 'Close',
-                        class: 'button button--info',
-                        click: function() {
-                            $(this).dialog('close');
-                        }
-                    }
-                ],
-                close: function()
+        $('<div id="dialog__contentSelector"><p/><p/><div class="loader"></div><p/><p/></div>').dialog({
+            buttons: [
                 {
-                    $(this).dialog('destroy');
-                    $(this).parent().remove();
-                    $('.fixed-bottom-bar').toggle();
+                    text: 'Attach to series',
+                    class: 'button button--positive',
+                    disabled: true,
+                    click: $.proxy(this.addContentToSeries, this)
                 },
-                draggable: false,
-                modal: true,
-                open: $.proxy(function()
                 {
-                    $('.fixed-bottom-bar').toggle();
-                    this.addDialogContent();
-                    this.getContentList();
-                }, this),
-                resizable: false,
-                title: 'Choose content…',
-                width: dialogWidth
-            });
+                    text: 'Close',
+                    class: 'button button--info',
+                    click: function() {
+                        $(this).dialog('close');
+                    }
+                }
+            ],
+            close: function()
+            {
+                $(this).dialog('destroy');
+                $(this).parent().remove();
+                $('.fixed-bottom-bar').toggle();
+            },
+            draggable: false,
+            modal: true,
+            open: $.proxy(function()
+            {
+                $('.fixed-bottom-bar').toggle();
+                $('.ui-dialog-titlebar-close').addClass('material-icons').html('close');
+                this.getContentList();
+            }, this),
+            resizable: false,
+            title: 'Choose content…',
+            width: dialogWidth
+        });
     },
 
-    addDialogContent: function()
+    initInputs: function()
     {
-        $('.ui-dialog-titlebar-close').addClass('material-icons').html('close');
-        $(document).on('change', '.ui-dialog .bonsai input[type=checkbox]', function ()
+        $('#dialog__contentSelector .pagination li a').on('click', function(event) {
+            event.preventDefault();
+            InachisContentSelectorDialog.offset = ($(event.currentTarget).html() - 1) * InachisContentSelectorDialog.limit;
+            InachisContentSelectorDialog.getContentList();
+            return false;
+        });
+        $('#ui-dialog-search-input').on('input', function (event) {
+            if(InachisContentSelectorDialog.saveTimeout) {
+                clearTimeout(InachisContentSelectorDialog.saveTimeout);
+            }
+            InachisContentSelectorDialog.saveTimeout = setTimeout(function() {
+                InachisContentSelectorDialog.offset = 0;
+                InachisContentSelectorDialog.getContentList();
+            }, 500);
+        });
+        $(document).on('change', '#dialog__contentSelector input[type=checkbox]', function ()
         {
             $('.ui-dialog .button--positive').prop(
                 'disabled',
-                !$('.ui-dialog .bonsai input[type=checkbox]:checked').length > 0
+                !$('#dialog__contentSelector input[type=checkbox]:checked').length > 0
             );
         });
     },
 
     addContentToSeries: function()
     {
-        // dependency on page having a SimpleMDE interface available
-        if (!easymde.options.autosave.uniqueId) {
-            return;
-        }
-        var $selectedContent = [],
+        let $selectedContent = [],
             $choseContent = $('.ui-dialog-buttonpane').find('button').first();
-        $('.ui-dialog .bonsai input[type=checkbox]:checked').each(function() {
+        $('#dialog__contentSelector input[type=checkbox]:checked').each(function() {
             $selectedContent.push($(this).val());
         });
         $choseContent.prop('disabled', true).html('Saving…');
@@ -81,11 +92,11 @@ var InachisContentSelectorDialog = {
             {
                 complete: $.proxy(function()
                 {
-                     setTimeout($.proxy(function()
-                     {
-                         $choseContent.prop('disabled', false).removeClass('button--negative');
-                         $(this).closest('.ui-dialog-content').dialog('close');
-                     }, $choseContent), 1200);
+                    setTimeout($.proxy(function()
+                    {
+                        $choseContent.prop('disabled', false).removeClass('button--negative');
+                        $(this).closest('.ui-dialog-content').dialog('close');
+                    }, $choseContent), 1200);
                 }, $choseContent),
                 data: {
                     'ids': $selectedContent,
@@ -102,20 +113,14 @@ var InachisContentSelectorDialog = {
                 method: 'POST',
                 success: $.proxy(function(data)
                 {
-                    if(data == 'Saved') {
+                    if(data === 'Saved') {
                         $choseContent.html('<span class="material-icons">done</span> Content added');
                         setTimeout(function() {
                             location.reload();
                         }, 5000);
-                        // $.ajax(
-                        //     Inachis.prefix + '/series/contents',
-                        //      data: { 'seriesId': easymde.options.autosave.uniqueId },
-                        //      method: 'POST',
-                        //      success: function(data)
-                        //      {
-                        //          $('.edit__list') = data;
-                        //      }
-                        // );
+                    } else {
+                        $choseContent.html('No changes saved');
+                        $choseContent.prop('disabled', false);
                     }
                 }, $choseContent)
             }
@@ -124,31 +129,20 @@ var InachisContentSelectorDialog = {
 
     getContentList: function()
     {
-        // @todo filter out content already in series
-        var $contentSelector = $('#dialog__contentSelector');
-        $contentSelector.find('ol').load(Inachis.prefix + '/ax/contentSelector/get',
+        let $contentSelector = $('#dialog__contentSelector');
+        $contentSelector.find('.form').html('<p/><div class="loader"></div><p/>');
+        $contentSelector.load(Inachis.prefix + '/ax/contentSelector/get',
             {
+                offset: InachisContentSelectorDialog.offset,
+                limit: InachisContentSelectorDialog.limit,
+                filters: { keyword: $('#ui-dialog-search-input').val() },
                 seriesId: easymde.options.autosave.uniqueId,
-                default: null
             }, function(responseText, status) {
-                var $uiDialog = $('.ui-dialog'),
-                    $categoryMangerTree = $contentSelector.find('ol');
-                if (responseText.trim() === '') {
-                    var $dialogParas = $('#dialog__contentSelector').find('p');
-                    $dialogParas.last().toggle();
-                }
+                let $uiDialog = $('.ui-dialog');
                 if (status === 'success') {
-                    if (this.alreadyInitialised) {
-                        $categoryMangerTree.bonsai('update');
-                        $categoryMangerTree.bonsai('expandAll');
-                        $uiDialog.position({ my: 'center', at: 'center', of: window });
-                        return;
-                    }
-                    $categoryMangerTree.bonsai({
-                        createInputs: 'checkbox',
-                        expandAll: true
-                    });
-                    this.alreadyInitialised = true;
+                    InachisContentSelectorDialog.initInputs();
+                    $uiDialog.position({ my: 'center', at: 'center', of: window });
+                    return;
                 }
                 $uiDialog.position({ my: 'center', at: 'center', of: window });
             }, $contentSelector);

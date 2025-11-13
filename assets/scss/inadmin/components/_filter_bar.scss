@@ -3,22 +3,85 @@
 
 .filter {
   align-items: center;
+  background-color: #ccc;
   display: flex;
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
   font-size: 0.9em;
   justify-content: space-between;
-  position: relative;
+
+  @media #{$information-medium} {
+    flex-wrap: nowrap;
+    //justify-content: space-between;
+    padding-right: 1em;
+  }
+
+  & > p:last-child {
+    display: block;
+    text-align: left;
+    width: 100%;
+
+    @media #{$information-medium} {
+      display: inline-block;
+      width: auto;
+    }
+  }
+
+  input[name=selectAllNone] {
+    margin: 0 1.4em;
+  }
+
+  input[type=checkbox]+label.visually-hidden {
+    display: none;
+  }
+
+  .button--add {
+    margin-right: 0.5em;
+    @media #{$information-medium} {
+      margin-right: 0;
+    }
+  }
+
+  .filter__controls {
+    align-items: center;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+
+    @media #{$information-medium} {
+      flex-wrap: nowrap;
+    }
+  }
 
   .filter__section-keyword {
+    margin: 1em auto;
+    position: relative;
+
+    @media #{$information-medium} {
+      margin: 1em 0;
+    }
+
     input {
       border: 1px solid #eee;
       border-radius: .5em;
-      padding-left: 2em;
+      padding: 0.55em 0.55em 0.55em 2em;
+      width: 13em;
+
+      @media #{$information-medium} {
+        width: 15em;
+      }
     }
     label {
       color: gray;
-      left: 0.25em;
       position: absolute;
-      top: 1em;
+      right: 8.4em;
+      top: 0.3em;
+
+      @media #{$information-medium} {
+        position: relative;
+        top: 0.3em;
+        left: 1.35em;
+      }
     }
     button[type=submit] {
       margin-left: -2.5em;
@@ -34,22 +97,26 @@
   }
 
   p {
-    a, a:visited {
+    a.filter__toggle, a.filter__toggle:visited {
       background-color: $admin__filter_button-background;
       border-radius: 0.5em;
       border: 1px solid transparent;
       color: $admin__filter_button-color;
       display: inline-block;
-      margin-left: 1em;
+      margin: 0 1em;
       padding: .5em 1em;
       text-decoration: none;
+
+      @media #{$information-medium} {
+        margin: 0 0 0 1em;
+      }
     }
-    a:hover {
+    a.filter__toggle:hover {
       background-color: color.adjust($admin__filter_button-background, $lightness: -20%);
       //background-color: $admin__filter_button-background--hover;
       //color: $admin__filter_button-color--hover;
     }
-    //a.selected {
+    //a.filter__toggle.selected {
     //  background-color: $admin__filter_button-background--selected;
     //  color: $admin__filter_button-color--selected;
     //  border-radius: 0.5em 0.5em 0 0;
@@ -62,6 +129,11 @@
 }
 
 div#filter__options {
+  background-color: #fff;
+  border-left: 1px solid #eee;
+  border-right: 1px solid #eee;
+  padding: 1em;
+
   span {
     background-color: #000;
     border: 1px solid transparent;
@@ -91,6 +163,11 @@ div#filter__options {
       cursor: inherit;
       line-height: inherit;
       outline: none;
+    }
+
+    option {
+      background-color: #fff;
+      color: #000;
     }
   }
 }

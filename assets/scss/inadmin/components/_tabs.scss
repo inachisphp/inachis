@@ -8,18 +8,22 @@
 		clear: both;
 	}
 
-	ol, div {
+	ol, div:not(.switch-wrapper div) {
 		clear: left;
 	}
 
 	.ui-tabs-nav {
 		background-color: $admin__tabs-background;
+		border: 1px solid #eee;
+		border-top-left-radius: 1em;
+		border-top-right-radius: 1em;
+		border-bottom: none;
 		clear: both;
 		display: block;
 		font-size: 0.9em;
 		list-style-type: none;
-		margin: 5px 5px 0 0;
-		padding: 0;
+		margin: 1em 0 0 0;
+		padding: 0.5em 0 0 0;
 
 		&::after {
 			content: ' ';
@@ -39,8 +43,8 @@
 			padding: 10px;
 
 			&:hover {
-
-				background-color: color.adjust($admin__tabs__highlighted-color, $lightness: 80%);
+				background-color: #eee;
+				border-bottom-color: color.adjust($admin__tabs__highlighted-color, $lightness: 10%);
 			}
 		}
 
@@ -53,4 +57,10 @@
 			}
 		}
 	}
+}
+
+.form__post fieldset.ui-tabs-panel {
+	background-color: #fff;
+	border: 1px solid #eee;
+	margin: 0;
 }

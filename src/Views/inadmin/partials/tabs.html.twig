@@ -1,0 +1,11 @@
+{% if displayTabsCondition is not defined or displayTabsCondition %}
+<ul class="ui-tabs-nav ui-corner-all ui-helper-reset ui-helper-clearfix ui-widget-header">
+{% for tab in tabs %}
+    {% if tab.displayCondition is not defined or tab.displayCondition %}
+    <li role="tab" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab ui-tabs-active{% if page.tab == tab.id %} ui-state-active{% endif %}">
+        <a href="{{ settings.domain ~ tab.url }}">{{ tab.title }}</a>
+    </li>
+    {% endif %}
+{% endfor %}
+</ul>
+{% endif %}

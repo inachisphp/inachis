@@ -1,9 +1,16 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\Doctrine\UuidGenerator;
 
 /**
  * Object for handling images on a site.
@@ -22,15 +29,6 @@ class Image extends AbstractFile
     public const WARNING_FILESIZE = 2048; //kb
 
     /**
-     * @var \Ramsey\Uuid\UuidInterface The unique identifier for the image
-     */
-    #[ORM\Id]
-    #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected $id;
-
-    /**
      * @var int
      */
     #[ORM\Column(type: 'integer')]
@@ -43,17 +41,17 @@ class Image extends AbstractFile
     protected int $dimensionY = 0;
 
     /**
-     * @var string
+     * @var string|null
      */
     #[ORM\Column(type: 'string', nullable: true)]
-    protected string $altText;
+    protected ?string $altText = '';
 
     /**
      * Default constructor for {@link Image}.
      */
     public function __construct()
     {
-        $now = new \DateTime();
+        $now = new DateTime();
         $this->setCreateDate($now);
         $this->setModDate($now);
         unset($now);
@@ -76,7 +74,7 @@ class Image extends AbstractFile
     }
 
     /**
-     * @return ?string
+     * @return string|null
      */
     public function getAltText(): ?string
     {
@@ -106,7 +104,7 @@ class Image extends AbstractFile
     }
 
     /**
-     * @param ?string $value
+     * @param string|null $value
      * @return $this
      */
     public function setAltText(?string $value): self

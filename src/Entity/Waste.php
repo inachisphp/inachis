@@ -1,9 +1,19 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Entity;
 
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Object for handling {@link Waste} contents
@@ -13,44 +23,44 @@ use Ramsey\Uuid\Doctrine\UuidGenerator;
 class Waste
 {
     /**
-     * @var \Ramsey\Uuid\UuidInterface The unique id of the waste item
+     * @var UuidInterface|null The unique id of the waste item
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    private $id;
+    private ?UuidInterface $id;
     /**
-     * @var string
+     * @var string|null The entity type
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    private string $sourceType;
+    private ?string $sourceType = '';
     /**
-     * @var string
+     * @var string|null
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    private string $sourceName;
+    private ?string $sourceName = '';
     /**
-     * @var ?string
+     * @var string|null The former title for the item
      */
     #[ORM\Column(type: 'string', length: 255)]
-    private ?string $title;
+    private ?string $title = '';
     /**
-     * @var ?string
+     * @var string|null The contents of the item deleted
      */
     #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $content;
+    private ?string $content = '';
     /**
-     * @var User The author for the {@link Page}
+     * @var User|null The author for the {@link Page}
      */
     #[ORM\ManyToOne(targetEntity: 'User', cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
-    private User $user;
+    private ?User $user;
     /**
-     * @var string The date the item was added to the bin
+     * @var DateTime The date the item was added to the bin
      */
     #[ORM\Column(type: 'datetime')]
-    protected string $modDate;
+    protected DateTime $modDate;
 
     /**
      * @return string|null
@@ -61,10 +71,10 @@ class Waste
     }
 
     /**
-     * @param string $id
+     * @param UuidInterface $id
      * @return $this
      */
-    public function setId(string $id): self
+    public function setId(UuidInterface $id): self
     {
         $this->id = $id;
 
@@ -80,10 +90,10 @@ class Waste
     }
 
     /**
-     * @param string $sourceType
+     * @param string|null $sourceType
      * @return $this
      */
-    public function setSourceType(string $sourceType): self
+    public function setSourceType(?string $sourceType): self
     {
         $this->sourceType = $sourceType;
 
@@ -100,10 +110,10 @@ class Waste
     }
 
     /**
-     * @param string $sourceName
+     * @param string|null $sourceName
      * @return $this
      */
-    public function setSourceName(string $sourceName): self
+    public function setSourceName(?string $sourceName): self
     {
         $this->sourceName = $sourceName;
 
@@ -111,7 +121,7 @@ class Waste
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getTitle(): ?string
     {
@@ -119,10 +129,10 @@ class Waste
     }
 
     /**
-     * @param mixed $title
+     * @param string|null $title
      * @return $this
      */
-    public function setTitle($title): self
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
 
@@ -151,16 +161,16 @@ class Waste
     /**
      * @return DateTimeInterface|null The date the content was deleted
      */
-    public function getModDate(): ?\DateTimeInterface
+    public function getModDate(): ?DateTimeInterface
     {
         return $this->modDate;
     }
 
     /**
-     * @param \DateTimeInterface $value
+     * @param DateTime|null $value
      * @return $this
      */
-    public function setModDate(\DateTime $value = null): self
+    public function setModDate(DateTime $value = null): self
     {
         $this->modDate = $value;
 
@@ -178,7 +188,7 @@ class Waste
     /**
      * Sets the value of {@link author}.
      *
-     * @param User $value The UUID of user adding the {@link Waste}
+     * @param User|null $value The UUID of user adding the {@link Waste}
      * @return $this
      */
     public function setUser(User $value = null): self

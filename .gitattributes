@@ -1,0 +1,13 @@
+# Enforce LF for code files
+*.php text eol=lf
+*.js  text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.sh  text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+
+# Optionally mark binary files
+*.png binary
+*.jpg binary
+*.exe binary

@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Form;
 
 use App\Entity\Login;
@@ -40,7 +47,7 @@ class LoginType extends AbstractType
             ])
             ->add('loginPassword', PasswordType::class, [
                 'attr' => [
-                    'aria-labelled-by' => 'form-login__password-label',
+                    'aria-labelledby' => 'form-login__password-label',
                     'aria-required'    => 'true',
                     'class'            => 'text',
                     'id'               => 'form-login__password',

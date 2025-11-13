@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Controller;
 
 use App\Entity\Image;
@@ -8,7 +15,6 @@ use App\Entity\Series;
 use App\Entity\Tag;
 use App\Entity\Url;
 use App\Form\ContentType;
-use Doctrine\DBAL\Exception\ConnectionException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,13 +24,13 @@ use Symfony\Component\Routing\Attribute\Route;
 class SettingsController extends AbstractInachisController
 {
     #[Route("/incc/settings")]
-    public function index(Request $request): \Symfony\Component\HttpFoundation\Response
+    public function index(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $available_space = disk_free_space(dirname($request->server->get('SCRIPT_FILENAME')));
         $total_space = disk_total_space(dirname($request->server->get('SCRIPT_FILENAME')));
-        $this->data['storage']['percent'] = ($total_space - $available_space)/$total_space * 100;
+        $this->data['storage']['percent'] = ($total_space - $available_space) / $total_space * 100;
         $this->data['counts']['page'] = $this->entityManager->getRepository(Page::class)->getAllCount();
         $this->data['counts']['series'] = $this->entityManager->getRepository(Series::class)->getAllCount();
         $this->data['counts']['tag'] = $this->entityManager->getRepository(Tag::class)->getAllCount();
@@ -108,7 +114,7 @@ class SettingsController extends AbstractInachisController
     public function wipe(LoggerInterface $logger, Request $request): RedirectResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        if ($request->get('confirm', false)) {
+        if ($request->request->get('confirm', false)) {
             $logger->info('Wiping all content');
             $this->entityManager->getRepository(Image::class)->wipe($logger);
             $this->entityManager->getRepository(Page::class)->wipe($logger);

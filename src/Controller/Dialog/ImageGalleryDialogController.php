@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Controller\Dialog;
 
 use App\Controller\AbstractInachisController;
@@ -32,13 +39,8 @@ class ImageGalleryDialogController extends AbstractInachisController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->data['form'] = $this->createForm(ImageType::class)->createView();
         $this->data['allowedTypes'] = Image::ALLOWED_TYPES;
-        $this->data['dataset'] = $this->entityManager->getRepository(Image::class)->getFiltered(
-            [],
-            0,
-            $this->entityManager->getRepository(Image::class)->getMaxItemsToShow()
-        );
-        $this->data['image_count'] = sizeof($this->data['dataset']);
-        return $this->render('inadmin/dialog/imageManager.html.twig', $this->data);
+        $this->data['dataset'] = [];
+        return $this->render('inadmin/dialog/image-manager.html.twig', $this->data);
     }
 
     /**
@@ -50,15 +52,18 @@ class ImageGalleryDialogController extends AbstractInachisController
             "offset" => "\d+",
             "limit" => "\d+"
         ],
-        defaults: [ "offset" => 0, "limit" => 10 ],
+        defaults: [ "offset" => 0, "limit" => 25 ],
         methods: [ "POST" ],
     )]
     public function getImageList(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $filters = array_filter($request->get('filter', []));
-        $offset = (int) $request->get('offset', 0);
-        $limit = $this->entityManager->getRepository(Image::class)->getMaxItemsToShow();
+        $filters = array_filter($request->request->all('filter', []));
+        $offset = (int) $request->attributes->get('offset', 0);
+        $limit = (int) $request->attributes->get(
+            'limit',
+            $this->entityManager->getRepository(Image::class)::MAX_ITEMS_TO_SHOW_ADMIN
+        );
         $this->data['images'] = $this->entityManager->getRepository(Image::class)->getFiltered(
             $filters,
             $offset,

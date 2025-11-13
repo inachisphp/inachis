@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Repository;
 
 use App\Entity\Category;
@@ -7,15 +14,20 @@ use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Tag;
 use App\Entity\Url;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
-final class PageRepository extends AbstractRepository
+/**
+ * Repository for retrieving {@link Page} entities
+ */
+final class PageRepository extends AbstractRepository implements PageRepositoryInterface
 {
     /**
      * The maximum number of items to show in the admin interface
      */
-    const MAX_ITEMS_TO_SHOW_ADMIN = 10;
+    public const MAX_ITEMS_TO_SHOW_ADMIN = 10;
 
     /**
      * PageRepository constructor.
@@ -27,12 +39,10 @@ final class PageRepository extends AbstractRepository
     }
 
     /**
-     * @param Page $page
-     *
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @param Page $page The {@link Page} entity to be removed.
+     * @return void
      */
-    public function remove(Page $page)
+    public function remove(Page $page): void
     {
         foreach ($page->getUrls() as $postUrl) {
             $this->getEntityManager()->getRepository(Url::class)->remove($postUrl);
@@ -123,9 +133,9 @@ final class PageRepository extends AbstractRepository
      * @param $type
      * @param $offset
      * @param $limit
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return Paginator
      */
-    public function getAllOfTypeByPostDate($type, $offset, $limit)
+    public function getAllOfTypeByPostDate($type, $offset, $limit): Paginator
     {
         return $this->getFilteredOfTypeByPostDate([], $type, $offset, $limit);
     }
@@ -138,17 +148,28 @@ final class PageRepository extends AbstractRepository
      * @param string $sort
      * @return Paginator
      */
-    public function getFilteredOfTypeByPostDate($filters, string $type, int $offset, int $limit, string $sort = 'postDate desc')
-    {
+    public function getFilteredOfTypeByPostDate(
+        $filters,
+        string $type,
+        int $offset,
+        int $limit,
+        string $sort = 'postDate desc'
+    ): Paginator {
         $where = [
-            'q.type = :type',
-            array_merge(
-                [
-                    'type' => $type,
-                ],
-                $filters
-            )
+            '1=1',
+            $filters,
         ];
+        if ($type != '*') {
+            $where = [
+                'q.type = :type',
+                array_merge(
+                    [
+                        'type' => $type,
+                    ],
+                    $filters
+                )
+            ];
+        }
         if (!empty($filters['status'])) {
             $where[0] .= ' AND q.status = :status';
         }
@@ -159,32 +180,23 @@ final class PageRepository extends AbstractRepository
             $where[0] .= ' AND (q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.content LIKE :keyword )';
             $where[1]['keyword'] = '%' . $where[1]['keyword'] . '%';
         }
-        switch ($sort) {
-            case 'title asc':
-                $sort = [
-                    [ 'q.title', 'ASC' ],
-                    [ 'q.subTitle', 'ASC' ],
-                ];
-                break;
-            case 'title desc':
-                $sort = [
-                    [ 'q.title', 'DESC' ],
-                    [ 'q.subTitle', 'DESC' ],
-                ];
-                break;
-            case 'modDate asc':
-                $sort = [[ 'q.modDate', 'ASC' ]];
-                break;
-            case 'modDate desc':
-                $sort = [[ 'q.modDate', 'DESC' ]];
-                break;
-            case 'postDate asc':
-                $sort = [[ 'q.postDate', 'ASC' ]];
-                break;
-            case 'postDate desc':
-            default:
-                $sort =  [[ 'q.postDate', 'DESC' ]];
+        if (!empty($filters['excludeIds'])) {
+            $where[0] .= ' AND q.id NOT IN (:excludeIds)';
         }
+        $sort = match ($sort) {
+            'title asc' => [
+                ['q.title', 'ASC'],
+                ['q.subTitle', 'ASC'],
+            ],
+            'title desc' => [
+                ['q.title', 'DESC'],
+                ['q.subTitle', 'DESC'],
+            ],
+            'modDate asc' => [['q.modDate', 'ASC']],
+            'modDate desc' => [['q.modDate', 'DESC']],
+            'postDate asc' => [['q.postDate', 'ASC']],
+            default => [['q.postDate', 'DESC']],
+        };
         return $this->getAll(
             $offset,
             $limit,
@@ -195,9 +207,9 @@ final class PageRepository extends AbstractRepository
 
     /**
      * @param $ids
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return Paginator
      */
-    public function getFilteredIds($ids)
+    public function getFilteredIds($ids): Paginator
     {
         return $this->getAll(
             0,

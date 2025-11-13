@@ -17,7 +17,7 @@ let InachisNavMenu = {
 		}, this));
 		// settings menu
 		$('a[href*=admin__nav-settings]').click(function() {
-			$('#admin__nav-settings').toggle();
+			$('li.menu__collapsed').toggle();
 		});
 		// collapse/expand links
 		$('.admin__nav-expand a, .admin__nav-collapse a').click(function () {

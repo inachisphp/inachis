@@ -1,10 +1,19 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\ConnectionException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Psr\Log\LoggerInterface;
+use Exception;
 
 abstract class AbstractRepository extends ServiceEntityRepository
 {
@@ -13,7 +22,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
      *
      * @return mixed
      */
-    public function create($values = [])
+    public function create(array $values = []): mixed
     {
         $objectType = $this->getClassName();
 
@@ -25,18 +34,18 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * based on the provided values.
      *
      * @param mixed $object The object to hydrate
-     * @param array[mixed] $values The values to apply to the obect
+     * @param array $values The values to apply to the object
      *
      * @return mixed The hydrated object
      */
-    public function hydrate($object, array $values)
+    public function hydrate(mixed $object, array $values): mixed
     {
         if (!is_object($object)) {
             return $object;
         }
         foreach ($values as $key => $value) {
-            $methodName = 'set'.ucfirst($key);
-            if (method_exists($object, $methodName)) {
+            $methodName = 'set' . ucfirst($key);
+            if (method_exists($object, $methodName) && !($key === 'id' && $value === '-1')) {
                 $object->$methodName($value);
             }
         }
@@ -53,7 +62,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getAllCount($where = [])
+    public function getAllCount(array $where = []): int
     {
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('count(q.id)')
@@ -78,19 +87,24 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * @param array        $where
      * @param array|string $order
      * @param array|string $groupBy
+     * @param array $join  $join
      *
      * @return Paginator The result of fetching the objects
      */
     public function getAll(
-        $offset = 0,
-        $limit = 25,
-        $where = [],
-        $order = [],
-        $groupBy = []
-    ) {
+        int $offset = 0,
+        int $limit = 25,
+        array $where = [],
+        array|string $order = [],
+        array|string $groupBy = [],
+        array $join = []
+    ): Paginator {
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('q')
             ->from($this->getClassName(), 'q');
+        if (!empty($join)) {
+            $qb->join($join[0], $join[1]);
+        }
         if (!empty($where)) {
             $qb = $qb->where($where[0]);
         }
@@ -127,7 +141,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
     /**
      * @return int
      */
-    public function getMaxItemsToShow()
+    public function getMaxItemsToShow(): int
     {
         // @todo check if an alternative is set in yaml config
         return defined('static::MAX_ITEMS_TO_SHOW_ADMIN') ? (int) static::MAX_ITEMS_TO_SHOW_ADMIN : 10;
@@ -135,9 +149,9 @@ abstract class AbstractRepository extends ServiceEntityRepository
 
     /**
      * @param LoggerInterface $logger
-     * @throws \Doctrine\DBAL\ConnectionException
+     * @throws ConnectionException|Exception
      */
-    public function wipe(LoggerInterface $logger)
+    public function wipe(LoggerInterface $logger): void
     {
         $connection = $this->getEntityManager()->getConnection();
         $connection->beginTransaction();
@@ -150,7 +164,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
             );
             $connection->query('SET FOREIGN_KEY_CHECKS=1');
             $connection->commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $logger->error(sprintf('Failed to wipe table: %s', $e->getTraceAsString()));
             $connection->rollBack();
         }

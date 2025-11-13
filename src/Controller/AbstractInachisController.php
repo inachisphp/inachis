@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Controller;
 
 use App\Entity\User;
@@ -8,19 +15,22 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Flex\Response;
 
 abstract class AbstractInachisController extends AbstractController
 {
-    protected $security;
-    protected $entityManager;
-    protected $errors = [];
-    protected $data = [];
+    protected Security $security;
+    protected EntityManagerInterface $entityManager;
+    protected TranslatorInterface $translator;
+    protected array $errors = [];
+    protected array $data = [];
 
-    public function __construct(EntityManagerInterface $entityManager, Security $security)
+    public function __construct(EntityManagerInterface $entityManager, Security $security, TranslatorInterface $translator)
     {
         $this->entityManager = $entityManager;
         $this->security = $security;
+        $this->translator = $translator;
     }
 
     /**
@@ -55,9 +65,6 @@ abstract class AbstractInachisController extends AbstractController
                 'keywords'      => '',
                 'modDate'       => '',
             ],
-            'post' => [
-                'featureImage' => '',
-            ],
             'session' => $this->security->getUser(),
             'session_timeout' => ini_get('session.gc_maxlifetime'),
             'session_timeout_time' => date(
@@ -71,7 +78,7 @@ abstract class AbstractInachisController extends AbstractController
     /**
      * @return string
      */
-    private function getProtocolAndHostname() : string
+    private function getProtocolAndHostname(): string
     {
         $protocol = $this->isSecure() ? 'https://' : 'http://';
 
@@ -81,12 +88,13 @@ abstract class AbstractInachisController extends AbstractController
     /**
      * @return bool
      */
-    private function isSecure() : bool
+    private function isSecure(): bool
     {
         $isSecure = false;
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
             $isSecure = true;
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https'
+        } elseif (
+            !empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https'
             || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on'
         ) {
             $isSecure = true;
@@ -99,7 +107,7 @@ abstract class AbstractInachisController extends AbstractController
      * Returns the result of testing if a user is currently signed in
      * @return bool Status of user authentication
      */
-    private function isAuthenticated() : bool
+    private function isAuthenticated(): bool
     {
         return $this->security instanceof Security &&
             $this->security->getUser() instanceof User &&
@@ -146,7 +154,7 @@ abstract class AbstractInachisController extends AbstractController
     public function redirectIfNoAdmins(): string
     {
         if ($this->entityManager->getRepository(User::class)->count([]) == 0) {
-            return 'app_setup_stage1';
+            return 'incc_setup_stage1';
         }
         return '';
     }
@@ -160,7 +168,7 @@ abstract class AbstractInachisController extends AbstractController
     public function redirectIfAuthenticated(): string
     {
         if ($this->isAuthenticated()) {
-            return 'app_dashboard_default';
+            return 'incc_dashboard';
         }
         return '';
     }

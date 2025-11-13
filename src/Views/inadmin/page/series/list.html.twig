@@ -1,0 +1,91 @@
+{% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <span>Series</span>
+{% endblock pagetitle %}
+
+{% block content %}
+
+    {% block series_list_pre %}{% endblock series_list_pre %}
+
+    {% block series_list %}
+        <div class="col span_8_of_8 widget-posts">
+        {% include 'inadmin/partials/list.html.twig' with {
+                'className': 'form__series',
+                'type': 'series',
+
+                'offset': page.offset,
+                'limit': page.limit,
+                'total': dataset.count,
+
+                'snippet_description': 'description',
+                'slug_prefix': 'series/edit',
+                'slug': 'id',
+
+                'add_button': {
+                    'text': 'Create Series',
+                    'url': path('incc_series_new'),
+                },
+                'url_result': path('incc_series_list'),
+
+                'filters': [],
+                'filter_values': filters,
+                'show_select_deselect': true,
+                'show_search': true,
+                showSummary: true,
+                'zebra': true,
+
+                'actions': {
+                    'private': {
+                        'button_class': 'button--secondary button--privacy',
+                        'data': {
+                            'form-action': ''
+                        },
+                        'icon': 'visibility_off',
+                        'title': 'Make private',
+                    },
+                    'public': {
+                        'button_class': 'button--secondary button--privacy',
+                        'data': {
+                            'form-action': ''
+                        },
+                        'icon': 'visibility',
+                        'title': 'Make public',
+                    },
+                    'delete': {
+                        'button_class': 'button--negative button--delete button--confirm',
+                        'data': {
+                            'entity': 'series',
+                            'form-action': '',
+                            'title': 'all selected series',
+                            'warning': 'All currently selected content will be deleted permanently. This action cannot be undone.',
+                        },
+                        'icon': 'delete_forever',
+                        'title': 'Delete',
+                    },
+                },
+
+                'sort_options': {
+                    'lastDate asc': 'End date oldest to newest',
+                    'lastDate desc': 'End date newest from oldest',
+                    'modDate asc': 'Modified dates oldest from newest',
+                    'modDate desc': 'Modified dates newest to oldest',
+                    'title asc': 'Title A-Z',
+                    'title desc': 'Title Z-A',
+                },
+
+                'badges': {
+                    'private': {
+                        'field': 'visibility',
+                        'condition': false,
+                        'className': 'badge__private'
+                    },
+                }
+            }
+        %}
+        </div>
+    {% endblock series_list %}
+
+
+    {% block series_list_post %}{% endblock series_list_post %}
+{% endblock content %}

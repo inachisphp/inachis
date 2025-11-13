@@ -16,6 +16,12 @@
   display: flex;
   flex-wrap: wrap;
   list-style-type: none;
+  margin: auto;
+  padding: 0;
+
+  @media #{$information-medium} {
+    padding: 0 40px;
+  }
 
   li {
     display: inline-block;
@@ -30,7 +36,11 @@
       height: 14.5em;
       padding: 1em;
       text-decoration: none;
-      width: 150px;
+      width: 145px;
+
+      @media #{$information-medium} {
+        width: 150px;
+      }
     }
 
     a:hover {
@@ -47,5 +57,19 @@
       height: 150px;
       margin: 0 auto 1em;
     }
+  }
+}
+
+#post_usages {
+  li {
+    margin-bottom: 1em;
+  }
+  a, a:visited {
+    line-height: 2em;
+    margin-bottom: 1em;
+    padding: 0.5em 0.25em;
+  }
+  a:hover {
+    background-color: #ccc;
   }
 }

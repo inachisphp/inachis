@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Form;
 
 use App\Entity\User;
@@ -15,15 +22,29 @@ use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Change password form used for changing the current password for the user
+ */
 class ChangePasswordType extends AbstractType
 {
+    /**
+     * @var TranslatorInterface|null
+     */
     private ?TranslatorInterface $translator;
 
+    /**
+     * @param TranslatorInterface|null $translator Translator for getting UI text from.
+     */
     public function __construct(TranslatorInterface $translator = null)
     {
         $this->translator = $translator;
     }
 
+    /**
+     * @param FormBuilderInterface $builder The form builder object to attach this form to.
+     * @param array                $options Options to use - password_reset toggle, and last_modified date.
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!$options['password_reset']) {
@@ -91,15 +112,15 @@ class ChangePasswordType extends AbstractType
                 ],
                 'constraints' => [
                     new Assert\NotBlank(),
-                    new Assert\Length([
-                        'min' => 8,
-                        'minMessage' => 'Your password should be at least 8 characters',
-                        'max' => 4096,
-                    ]),
-                    new Assert\PasswordStrength([
-                        'minScore' => Assert\PasswordStrength::STRENGTH_WEAK,
-                        'message' => "Your password must be more complex. See the below guidance.",
-                    ]),
+                    new Assert\Length(
+                        min: 8,
+                        max: 4096,
+                        minMessage: 'Your password should be at least 8 characters',
+                    ),
+                    new Assert\PasswordStrength(
+                        minScore: Assert\PasswordStrength::STRENGTH_WEAK,
+                        message: 'Your password must be more complex. See the below guidance.',
+                    ),
                 ],
                 'label' => 'New password',
                 'label_attr' => [
@@ -110,6 +131,10 @@ class ChangePasswordType extends AbstractType
         ;
     }
 
+    /**
+     * @param OptionsResolver $resolver The resolver to apply defaults to.
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

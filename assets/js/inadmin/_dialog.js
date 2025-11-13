@@ -4,13 +4,13 @@ var InachisDialog = {
     buttons: [
         {
             text: 'Close',
-            class: 'button button--negative',
+            class: 'button button--secondary',
             click: function() {
                 $(this).dialog('close');
             }
         }
     ],
-    preloadContent: '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>',
+    preloadContent: '<p>&nbsp;</p><div class="loader"></div><p>&nbsp;</p>',
     templateName: '',
     title: '',
     view: '',
@@ -22,6 +22,7 @@ var InachisDialog = {
 
     createDialog: function(event)
     {
+        event.preventDefault();
         let dialogWidth = $(window).width() * 0.75;
         if (dialogWidth < 380) {
             dialogWidth = 376;
@@ -31,8 +32,10 @@ var InachisDialog = {
             this.title = $dialogLink.data('title'),
                 this.view = $dialogLink.data('view'),
                 this.templateName = $dialogLink.data('templateName'),
-                this.className = $dialogLink.data('className');//,
-            this.buttons = JSON.parse(window.atob($dialogLink.data('buttons')));
+                this.className = $dialogLink.data('className');
+            if ($dialogLink.data('buttons')) {
+                this.buttons = JSON.parse(window.atob($dialogLink.data('buttons')));
+            }
         }
         this.buttons = (typeof this.buttons != 'undefined' && this.buttons instanceof Array) ? this.buttons : [ this.buttons ];
 

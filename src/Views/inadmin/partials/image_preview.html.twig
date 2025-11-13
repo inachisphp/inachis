@@ -1,16 +1,22 @@
-{% set filename = value.filename|default('/assets/imgs/no-image.svg')|trim %}
-{% if not (filename starts with 'http') and not(filename starts with '/') %}
+{% set filename = value.filename|default('')|trim %}
+{% if not (filename starts with 'http') and not(filename starts with '/') and filename is not empty %}
     {% set filename = '/imgs/' ~ filename %}
 {% endif %}
 
 <p class="image_preview" id="{{ id }}__preview">
     <input id="{{ id }}" name="{{ name }}" type="hidden" value="{{ value.id|default('') }}" />
+    {% if filename is not empty %}
     <img alt="Preview of chosen image"{% if
         additionalClass is defined and additionalClass is not empty %} class="{{ additionalClass }}"{%
         endif %} src="{{ filename }}" />
+    {% endif %}
     {% if show_gallery_button|default(true) %}
-    <button href="#" class="button button--info dialog__link"
-            data-buttons="eyJ0ZXh0IjoiQ2hvb3NlIEltYWdlIiwiY2xhc3MiOiJidXR0b24gYnV0dG9uLS1wb3NpdGl2ZSIsImRpc2FibGVkIjp0cnVlfQ=="
+        {% if filename is not empty %}
+            <button class="button button--info button--confirm"
+
+            ><span class="material-icons">hide_image</span> Remove Image</button>
+        {% endif %}
+    <button class="button button--info dialog__link"
             data-class-name="dialog__imageManager"
             data-target="{{ id }}"
             data-template-name="image-manager"

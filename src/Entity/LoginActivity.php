@@ -1,9 +1,18 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: 'App\Repository\LoginActivityRepository', readOnly: false)]
@@ -12,130 +21,126 @@ class LoginActivity
     /**
      *
      */
-    const STATUS_UNBLOCKED = false;
+    public const STATUS_UNBLOCKED = false;
     /**
      *
      */
-    const STATUS_BLOCKED = true;
+    public const STATUS_BLOCKED = true;
 
     /**
-     * @var \Ramsey\Uuid\UuidInterface
+     * @var UuidInterface|null
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    private $id;
+    private ?UuidInterface $id;
 
     /**
-     * @var string The username being logged in as
+     * @var string|null The username being logged in as
      */
     #[ORM\Column(type: 'string', length: 512, nullable: false)]
-    #[ORM\Assert\NotBlank]
-    private $username;
+    #[Assert\NotBlank]
+    private ?string $username = '';
 
     /**
-     * @var string The source IP of the login-in attempt
+     * @var string|null The source IP of the login-in attempt
      */
     #[ORM\Column(type: 'string', length: 50)]
-    private $remoteIp;
+    private ?string $remoteIp = '';
 
     /**
-     * @var string A hash of the user-agent detected by the log-in attempt
+     * @var string|null A hash of the user-agent detected by the log-in attempt
      */
-    #[ORM\Column(type: 'string', length: 128)]
-    private $userAgent;
+    #[ORM\Column(type: 'string', length: 256)]
+    private ?string $userAgent = '';
 
     /**
      * @var integer The number of attempts at sign-in during the given period
      */
     #[ORM\Column(type: 'integer')]
-    private $attemptCount = 1;
+    private int $attemptCount = 1;
 
     /**
-     * @var bool Flag indicating if the request result in a temporary block
-     */
-    #[ORM\Column(type: 'boolean')]
-    private $blockStatus = self::STATUS_UNBLOCKED;
-    /**
-     * @var string The date and time of the attempt
+     * @var DateTime|null The date and time of the attempt
      */
     #[ORM\Column(type: 'datetime')]
-    private $timestamp;
+    private ?DateTime $timestamp;
+
+    public function __construct()
+    {
+        $this->timestamp = new DateTime('now');
+    }
 
     /**
-     * @return int|null
+     * @return UuidInterface|null
      */
-    public function getId(): ?int
+    public function getId(): ?UuidInterface
     {
         return $this->id;
     }
 
     /**
-     * @param int $id
-     * @return $this
+     * @param UuidInterface|null $id
+     * @return LoginActivity
      */
-    public function setId(int $id): self
+    public function setId(?UuidInterface $id): self
     {
         $this->id = $id;
-
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getUsername(): string
+    public function getUsername(): ?string
     {
         return $this->username;
     }
 
     /**
-     * @param string $username
-     * @return $this
+     * @param string|null $username
+     * @return LoginActivity
      */
-    public function setUsername(string $username): self
+    public function setUsername(?string $username): self
     {
         $this->username = $username;
-
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getRemoteIp(): string
+    public function getRemoteIp(): ?string
     {
         return $this->remoteIp;
     }
 
     /**
-     * @param string $remoteIp
-     * @return $this
+     * @param string|null $remoteIp
+     * @return LoginActivity
      */
-    public function setRemoteIp(string $remoteIp): self
+    public function setRemoteIp(?string $remoteIp): self
     {
         $this->remoteIp = $remoteIp;
-
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getUserAgent(): string
+    public function getUserAgent(): ?string
     {
         return $this->userAgent;
     }
 
     /**
-     * @param string $userAgent
-     * @return $this
+     * @param string|null $userAgent
+     * @return LoginActivity
      */
-    public function setUserAgent(string $userAgent): self
+    public function setUserAgent(?string $userAgent): self
     {
         $this->userAgent = $userAgent;
-
         return $this;
     }
 
@@ -149,50 +154,29 @@ class LoginActivity
 
     /**
      * @param int $attemptCount
-     * @return $this
+     * @return LoginActivity
      */
-    public function setAttemptCount(int $attemptCount): self
+    public function setAttemptCount(int $attemptCount = 0): self
     {
         $this->attemptCount = $attemptCount;
-
         return $this;
     }
 
     /**
-     * @return bool
+     * @return DateTime|null
      */
-    public function isBlockStatus(): bool
-    {
-        return $this->blockStatus;
-    }
-
-    /**
-     * @param bool $blockStatus
-     * @return $this
-     */
-    public function setBlockStatus(bool $blockStatus): self
-    {
-        $this->blockStatus = $blockStatus;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTimestamp(): string
+    public function getTimestamp(): ?DateTime
     {
         return $this->timestamp;
     }
 
     /**
-     * @param string $timestamp
-     * @return $this
+     * @param DateTime|null $timestamp
+     * @return LoginActivity
      */
-    public function setTimestamp(string $timestamp): self
+    public function setTimestamp(?DateTime $timestamp): self
     {
         $this->timestamp = $timestamp;
-
         return $this;
     }
 }

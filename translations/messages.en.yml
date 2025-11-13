@@ -1,52 +1,173 @@
+admin.login.title: 'Login to'
+admin.login.forgot: 'Forgot your password?'
+admin.login.submit: 'Log In'
+
+admin.logout: 'Log out'
+
+admin.reset.title: 'Reset your password for'
+admin.reset.enter_email_address: 'Enter your email address to reset login'
+admin.reset.email_address.label: 'Email address'
+admin.reset.cancel.help: 'Cancel your request to reset your password'
+admin.reset_sent.title: 'Password reset email sent'
+admin.reset_sent.heading: 'Thank you,'
+admin.reset_sent.text: 'If your account was found, you will soon receive an email to the email address you provided with instructions to reset your password.'
+
+admin.button.addItem: 'Add Item'
+admin.button.cancel: 'Cancel'
+admin.button.continue: 'Continue'
+admin.button.delete: 'Delete'
+admin.button.disable: 'Disable'
+admin.button.enable: 'Enable'
+admin.button.publish: 'Publish'
+admin.button.remove: 'Remove'
+admin.button.save: 'Save'
+admin.button.schedule: 'Schedule'
+admin.button.viewLive: 'View live'
+
+admin.user.title: 'Users'
+admin.user.help: 'Manage users'
+admin.user.username: 'Username'
+admin.user.password: 'Password'
+admin.user.displayName: 'Display Name'
+
+admin.search.label: 'search'
+admin.search.placeholder: 'search for content'
+admin.search.submit: 'Search'
+
+admin.actions.avatar: 'User avatar'
+
+admin.menu.title: 'menu'
+admin.menu.more.title: 'More…'
+admin.menu.more.help: 'More tools and settings'
+admin.menu.collapse: 'Collapse'
+admin.menu.expand: 'Expand'
+admin.menu.view_site: 'View Site'
+admin.menu.add.content.title: 'Add'
+admin.menu.add.content.help: 'Add new content'
+admin.menu.add.page.title: 'New Page'
+admin.menu.add.page.help: 'Add a new page'
+admin.menu.add.post.title: 'New Post'
+admin.menu.add.post.help: 'Add a new post'
+
+admin.dashboard.title: 'Dashboard'
+admin.dashboard.help: 'View dashboard'
+admin.dashboard.tab.drafts: 'Drafts'
+admin.dashboard.tab.upcoming: 'Upcoming'
+admin.dashboard.tab.latest: 'Latest'
+
+admin.posts.title: 'Posts'
+admin.posts.help: 'View list of posts and pages'
+admin.post.edit.fieldset: 'Edit Post'
+admin.post.title.label: 'Title'
+admin.post.title.placeholder: 'e.g. My First Blog Post'
+admin.post.subTitle.label: 'Sub-title'
+admin.post.subTitle.placeholder: '(Optional)'
+admin.post.url.label: 'URL'
+admin.post.share.copyLink.help: 'Copy Post/Page Link to Clipboard'
+admin.post.share.copyLink.label: 'Copy link to Clipboard'
+admin.post.content.label: 'Content'
+admin.post.properties.fieldset: 'Properties'
+admin.post.properties.visibility.label: 'Visibility'
+admin.post.properties.visibility.private: 'private'
+admin.post.properties.visibility.public: 'public'
+admin.post.properties.postDate-future.label: 'Publish on'
+admin.post.properties.postDate-past.label: 'Published on'
+admin.post.properties.modDate.label: 'Last modified'
+admin.post.properties.categories.label: 'Categories'
+admin.post.properties.categories.placeholder: 'Select a category'
+admin.post.properties.tags.label: 'Tags'
+admin.post.properties.location.label: 'Location'
+admin.post.properties.readingTime: 'Approximate reading time (at last save): %readingTime% minute(s)'
+admin.post.sharing.featureSnippet.label: 'Description snippet'
+admin.post.sharing.featureSnippet.help: 'This text will be used as the preview text when sharing on social media'
+admin.post.sharing.noindex.label: 'Search engines should not index this page'
+admin.post.sharing.nofollow.label: 'Search engines should not follow links on this page'
+admin.post.revision.caption: 'Revision history'
+admin.post.revision.date: 'Date'
+admin.post.revision.author: 'Author'
+admin.post.revision.changes: 'Changes'
+admin.post.revision.view: 'View'
+admin.post.revision.download: 'Download'
+admin.post.revision.revert: 'Revert'
+
+admin.series.title: 'Series'
+admin.series.help: 'View list of series'
+admin.series.bulk.label: 'Create'
+admin.series.add.label: 'Add'
+admin.series.contents.title: 'Contents'
+admin.series.contents.not_saved: 'You must save the series before you can add items.'
+admin.series.contents.no_content: "You haven't added any content yet!"
+admin.series.legend: 'Series'
+admin.series.title.label: 'Title'
+admin.series.title.placeholder: 'e.g. The Great Adventure'
+admin.series.subTitle.label: 'Sub-title'
+admin.series.subTitle.placeholder: 'e.g. A short story'
+admin.series.url.label: 'URL (Use five or more letters, numbers, and/or hyphens)'
+admin.series.url.placeholder: 'e.g. my-series'
+admin.series.description.label: 'Short description'
+admin.series.firstDate.label: 'First date'
+admin.series.firstDate.tip.title: ''
+admin.series.firstDate.tip.content: ''
+admin.series.lastDate.label: 'Last date'
+admin.series.lastDate.tip.title: ''
+admin.series.lastDate.tip.content: ''
+admin.series.visibility.label: 'Visibility'
+
+admin.resources.title: 'Resources'
+admin.resources.help: 'Manage resources'
+admin.resources.details.title: 'Details'
+admin.resources.title.label: 'Title'
+admin.resources.altText.label: 'Alt Text'
+admin.resources.caption.label: 'Caption'
+admin.resources.generateAlt.label: 'Generate Alt Text'
+admin.resources.properties.title: 'Properties'
+admin.resources.properties.dimensions: 'Dimensions'
+admin.resources.properties.colourDepth: 'Colour Depth'
+admin.resources.properties.filename: 'File name'
+admin.resources.properties.filetype: 'File type'
+admin.resources.properties.filesize: 'Size'
+admin.resources.properties.modDate: 'Last modified'
+admin.resources.usages.title: 'Usages'
+admin.resources.usages.notInUse: 'Image is not in known use.'
+
+admin.resources.images.copyMarkdown.label: 'Copy Image Markdown'
+admin.resources.images.copyMarkdown.help: 'Copy Markdown Image Link to Clipboard'
+admin.resources.images.copyLink.label: 'Copy Image Link'
+admin.resources.images.copyLink.help: 'Copy Image Link to Clipboard'
+
+admin.urls.title: 'URLs'
+admin.urls.help: 'View list of defined URLs'
+
+admin.dialog.categories.title: 'Categories'
+
+admin.dialog.confirm.title: 'Are you sure?'
+admin.dialog.confirm.default.title: 'untitled'
+admin.dialog.confirm.default.warning: 'This action cannot be undone.'
+
+
+
+
+
+
+
 admin.label.username: Username
 admin.label.password: Password
 admin.label.remember_me: 'Keep me logged in'
 admin.label.forgot_password: 'Forgot your password?'
 admin.button.login: 'Log In'
-admin.button.cancel: Cancel
-admin.button.save: Save
-admin.button.addItem: Add Item
-admin.button.publish: Publish
-admin.button.delete: Delete
-admin.button.remove: Remove
-admin.reset.enter_email_address: 'Enter your email address to reset login'
+
+
 admin.label.reset_password: 'Reset Password'
 admin.reset_password: 'Continue'
 admin.email_example: user@example.com
-admin.label.post.title: Title
-admin.placeholder.post.title: e.g. My First Blog Post
-admin.label.post.subTitle: Sub-title
-admin.placeholder.post.subTitle: (Optional)
-admin.label.post.url: URL
-admin.label.post.content: Content
-admin.label.post.visibility: Visibility
-admin.tip.title.post.postDate: Publishing
-admin.tip.content.post.postDate: On publishing this content for the first time, if the date is in the past or the present it will publish immediately. If the date is in the future then it will be scheduled for publishing and will action any social media sharing options selected at the same time.
-admin.label.post.postDate-future: Publish on
-admin.label.post.postDate-past: Published on
-admin.label.post.categories: Categories
-admin.placeholder.post.categories: Select a category
-admin.tip.content.post.categories: Separate existing categories with a comma or by pressing [Enter]. New categories should be created using the adjacent [+] icon.
-admin.label.post.tags: Tags
-admin.tip.content.post.tags: Separate tags with a comma or by pressing [Enter]
-admin.label.post.teaser: Abstract / Summary
 
-admin.series.legend: Series
-admin.label.series.title: Title
-admin.placeholder.series.title: e.g. The Great Adventure
-admin.label.series.subTitle: Sub-title
-admin.placeholder.series.subTitle: e.g. A short story
-admin.label.series.url: URL (Use five or more letters, numbers, and/or hyphens)
-admin.placeholder.series.url: e.g. my-series
-admin.label.series.description: Short description
-admin.label.series.firstDate: First date
-admin.label.series.lastDate: Last date
-admin.series.contents.title: Contents
-admin.series.contents.not_saved: You must save the series before you can add items.
-admin.series.contents.no_content: You haven't added any content yet!
 
 admin.dialog.image_manager.title: Image Gallery
 admin:
+  menu:
+    add:
+      post:
+        title:
   dialog:
     upload:
       title: Upload an image

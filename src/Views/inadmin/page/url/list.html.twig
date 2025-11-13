@@ -1,0 +1,83 @@
+{% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <span>URL List</span>
+{% endblock pagetitle %}
+
+{% block content %}
+
+    {% block url_list_pre %}{% endblock url_list_pre %}
+
+    {% block url_list %}
+        <div class="col span_8_of_8 widget-data-list">
+            {% include 'inadmin/partials/table.html.twig' with {
+                className: 'form__url',
+                type: 'url',
+                additional_classes: 'default',
+
+                table_name: 'URL list',
+                table_class: 'table-responsive table-borderless table-darkhead table-selectable',
+                table_desc: 'This table lists URLs used by pages and posts. The first column contains checkboxes allowing users to select one or more tasks.',
+
+                columns: [
+                    {
+                        title: 'URL',
+                        source: 'link',
+                        header: true,
+                    },
+                    {
+                        title: 'Content',
+                        source: 'content',
+                        source_type: 'title',
+                    },
+                    {
+                        title: 'Default',
+                        badges: {
+                            'default': {
+                                'field': 'default',
+                                'condition': 'default',
+                                'className': 'badge__default'
+                            }
+                        },
+                    },
+                ],
+
+                limit: page.limit,
+                offset: page.offset,
+                total: dataset.count,
+                url_result: path('incc_url_list'),
+
+                zebra: true,
+                show_search: true,
+                show_select_deselect: true,
+                sort_options: {
+                    'contentDate asc': 'Content Date ASC',
+                    'contentDate desc': 'Content Date DESC',
+                    'link asc': 'URL A-Z',
+                    'link desc': 'URL Z-A',
+                    'content asc': 'Content A-Z',
+                    'content desc': 'Content Z-A',
+                },
+                filters: [],
+                filter_values: filters,
+
+                actions: {
+                    make_default: {
+                        button_class: 'button--info',
+                        icon: 'published_with_changes',
+                        title: 'Set as default',
+                    },
+                    delete: {
+                        button_class: 'button--negative button--delete',
+                        icon: 'delete_forever',
+                        title: 'Delete',
+                    },
+                }
+            }
+            %}
+        </div>
+    {% endblock url_list %}
+
+
+    {% block url_list_post %}{% endblock url_list_post %}
+{% endblock content %}

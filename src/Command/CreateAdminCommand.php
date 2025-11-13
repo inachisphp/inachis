@@ -1,14 +1,20 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Command;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -20,8 +26,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 )]
 class CreateAdminCommand extends Command
 {
-    protected $entityManager;
-    protected $passwordHasher;
+    protected EntityManagerInterface $entityManager;
+    protected UserPasswordHasherInterface $passwordHasher;
 
     /**
      * @param EntityManagerInterface $entityManager
@@ -39,17 +45,13 @@ class CreateAdminCommand extends Command
      */
     protected function configure(): void
     {
-//        $this
-//            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-//            ->addOption('username', null, InputOption::VALUE_NONE, 'Option description')
-//        ;
     }
 
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
-     * @throws \Exception
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -57,26 +59,25 @@ class CreateAdminCommand extends Command
         $helper = $this->getHelper('question');
 
         $question = new Question('Please enter a new username: ');
-        $question->setNormalizer(function (string $value): string {
+        $question->setNormalizer(function (?string $value = ''): string {
             return $value ? trim($value) : '';
         });
         $username = $helper->ask($input, $output, $question);
 
         $question = new Question('Please enter an email address for the user: ');
-        $question->setNormalizer(function (string $value): string {
+        $question->setNormalizer(function (?string $value = ''): string {
             return $value ? trim($value) : '';
         });
         $emailAddress = $helper->ask($input, $output, $question);
 
         $question = new Question('Please enter a password for the user: ');
-        $question->setNormalizer(function (string $value): string {
+        $question->setNormalizer(function (?string $value = ''): string {
             return $value ? trim($value) : '';
         });
-        $question->setValidator(function (string $value): string {
+        $question->setValidator(function (?string $value = ''): string {
             if ('' === trim($value)) {
-                throw new \Exception('The password cannot be empty');
+                throw new Exception('The password cannot be empty');
             }
-
             return $value;
         });
         $question->setHidden(true);

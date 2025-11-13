@@ -1,0 +1,129 @@
+{% block table %}
+
+    {{ form_start(form, {'attr': { 'class': 'form form__' ~ type ~ ' content__list' }}) }}
+
+    {% if dataset|default(null) is not empty and form|default(null) is not empty %}
+    {{- form_errors(form) -}}
+
+    {{ include('inadmin/partials/filters.html.twig', {
+        'show_select_deselect': false,
+    }) }}
+    <section class="paginated-list{%- if zebra|default(false) %} zebra{% endif %}">
+    {% if table_desc|default('') is not empty %}
+    <p id="table-desc" class="visually-hidden">
+        {{ table_desc }}
+    </p>
+    {% endif %}
+    <table {%- if table_desc|default('') is not empty %} aria-describedby="table-desc"{% endif %} class="table{%- if table_class %} {{ table_class }}{% endif %}{%- if zebra|default(false) %}  table-striped{% endif %}">
+        <caption class="visually-hidden">{{ table_name }}</caption>
+        <thead>
+        <tr>
+        {% if actions|default(null) is not empty %}
+            <th scope="col">
+                <label for="select-all" class="visually-hidden">Select all rows</label>
+                <input aria-label="Select all rows" class="selectAllNone" id="select-all" name="selectAllNone" type="checkbox"  />
+            </th>
+        {% endif %}
+        {% for column in columns %}
+            <th scope="col">{{ column.title }}</th>
+        {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in dataset.iterator %}
+            <tr>
+            {% if actions|default(null) is not empty %}
+                <td>
+                    <input class="checkbox" id="{{ type }}-{{ item.id }}__input" type="checkbox" name="items[]" value="{{ item.id }}" />
+                </td>
+            {% endif %}
+            {% for column in columns %}
+                {% if column.slug is defined %}
+                    {% if '.' in column.slug %}
+                        {% set slug_exploded = column.slug|split('.')  %}
+                        {% set slug_object = item %}
+                        {% for part in slug_exploded %}
+                            {% if '[' in part %}
+                                {% set part = part|split('[')[0] %}
+                                {% set slug_object = attribute(slug_object, part)[0] %}
+                            {% else %}
+                                {% set slug_object = attribute(slug_object, part) %}
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {% set slug_object = attribute(item, column.slug) %}
+                    {% endif %}
+                {% endif %}
+                <{% if column.header is defined and column.header %}th scope="row"{% else %}td{% if column.flex|default(false) %} class="table__flex"{% endif %}{% endif %}>
+                    {% if column.slug is defined %}
+                        <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incc/{{ slug_prefix }}/{{ slug_object }}">
+                    {% endif %}
+                    {% if column.url is defined and column.url is not empty %}
+                            <a aria-label="Edit {{ attribute(item, 'title') }}" href="{{ attribute(item, column.url) }}">
+                    {% endif %}
+                    {% if column.source is defined and attribute(item, column.source) is defined %}
+                        {% if column.source_type is defined and column.source_type == 'date' %}
+                            {{ attribute(item, column.source)|date('d/m/Y') }}
+                        {% elseif column.source_type is defined and column.source_type == 'title' %}
+                            {{ attribute(attribute(item, column.source), 'title') }}
+                        {% else %}
+                            {% if column.maxLength is defined %}
+                                {{ attribute(item, column.source)|slice(0, column.maxLength) }}
+                                {% if attribute(item, column.source)|length > 300 %}…{% endif %}
+                            {% else %}
+                                {{ attribute(item, column.source) }}
+                            {% endif %}
+                        {% endif %}
+                    {% elseif column.badges|default(null) is not empty %}
+                        {% include 'inadmin/partials/badge.html.twig' with {
+                            badges: column.badges,
+                        } %}
+                    {% endif %}
+                    {% if column.slug is defined or (column.url is defined and column.url is not empty) %}
+                        </a>
+                    {% endif %}
+                </{% if column.header is defined and column.header %}th{% else %}td{% endif %}>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+        {{ include('inadmin/partials/pagination.html.twig', {
+            offset: offset,
+            limit: limit,
+            maxResults: total,
+            maxPagesToShow: 4,
+            result_url: url_result,
+            total: total,
+        }) }}
+    </section>
+        {% if actions|default(null) is not empty %}
+            {% include 'inadmin/partials/action_bar.html.twig' %}
+        {% endif %}
+    {% elseif filter_values|default(null) is not empty %}
+        {% include 'inadmin/partials/filters.html.twig' with {
+            'filters': filters,
+            'filter_values': filter_values,
+            'show_search': show_search
+        } only %}
+        <section class="paginated-list">
+            <p class="content-warning">
+                <i class="material-icons">info_outline</i>
+                <span>Oops! Your filter didn't find anything!</span>
+            </p>
+        </section>
+    {% else %}
+        <section class="paginated-list">
+            <p class="content-warning">
+                <i class="material-icons">info_outline</i>
+                <span>You don't have any content yet!</span>
+                {% if add_button is defined and add_button.url is defined %}
+                    <a href="{{ add_button.url }}">Add some now!</a>
+                {% endif %}
+            </p>
+        </section>
+    {% endif %}
+
+    {{ form_end(form, render_rest: false) }}
+{% endblock table %}

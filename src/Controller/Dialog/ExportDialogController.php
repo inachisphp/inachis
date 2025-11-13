@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Controller\Dialog;
 
 use App\Controller\AbstractInachisController;
@@ -37,7 +44,7 @@ class ExportDialogController extends AbstractInachisController
      * @return Response
      * @throws ExceptionInterface
      */
-    #[Route("/incc/ax/export/output", methods: [ "POST" ])]
+    #[Route("/incc/ax/export/output", name: "incc_dialog_export_perform", methods: [ "POST" ])]
     public function performExport(Request $request, SerializerInterface $serializer): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');

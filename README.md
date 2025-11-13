@@ -1,16 +1,16 @@
 # inachis
-## Framework for creating simple websites
+ianchis is a framework for creating simple websites in PHP using symfony such as a blog.
 
-[![Build Status](https://travis-ci.org/jedi58/inachis.svg?branch=master)](https://travis-ci.org/jedi58/inachis)
+## Requirements
 
-Documentation will follow shortly
+- PHP 8.3 or above
+- Optional: ImageMagick with libheif (for HEIC -> JPEG conversions)
 
+## Installation
 
-## Configuration
+1. Download a [release package](https://github.com/inachisphp/inachis/releases), and extract on your intended server
+2. Import dev/install/inachis.sql into your DBMS
+3. Add database connection settings to `.env.local`
+3. [Create your first administrator](https://github.com/inachisphp/inachis/wiki/Configuration#create-you-first-administrator) and sign-in
 
-### Warn if hot-linked images are used
-Add the following to your .env.local:
-```yaml
-WARN_HOTLINKED_IMAGES_ENABLED=1
-```
 

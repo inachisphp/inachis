@@ -15,7 +15,6 @@ var InachisPostEdit = {
         // 	$('.fixed-bottom-bar').css('bottom', _BarHeight);
         // 	$('.ui-tabs-panel').css('margin-bottom', _BarHeight);
         // }
-		this.initTooltips();
 		this.initTitleChange();
 		if (this.hasAutosavedValue()) {
 			$('#subTitle_label').parent().after(
@@ -33,24 +32,6 @@ var InachisPostEdit = {
 					)
 			);
 		}
-	},
-
-	initTooltips: function()
-	{
-		$('[data-qtip-content]').qtip({
-			content: {
-				text: function() {
-					return $(this).attr('data-tip-content');
-				},
-				title: function() {
-					return $(this).attr('data-tip-title');
-				}
-			},
-			position: {
-				target: 'mouse',
-				adjust: { mouse: true }
-			}
-		});
 	},
 
 	initTitleChange: function()

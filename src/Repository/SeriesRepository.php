@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Repository;
 
 use App\Entity\Image;
@@ -13,8 +20,8 @@ use http\Env\Response;
 /**
  * @method Series|null find($id, $lockMode = null, $lockVersion = null)
  * @method Series|null findOneBy(array $criteria, array $orderBy = null)
- * @method Series[]    findAll()
- * @method Series[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Series[] findAll()
+ * @method Series[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class SeriesRepository extends AbstractRepository
 {
@@ -26,7 +33,7 @@ class SeriesRepository extends AbstractRepository
     /**
      * @param Series $series
      */
-    public function remove(Series $series)
+    public function remove(Series $series): void
     {
         $this->getEntityManager()->remove($series);
         $this->getEntityManager()->flush();
@@ -35,7 +42,7 @@ class SeriesRepository extends AbstractRepository
     /**
      * @throws NonUniqueResultException
      */
-    public function getSeriesByPost(string $page): mixed
+    public function getSeriesByPost(Page $page): mixed
     {
         return $this->createQueryBuilder('s')
             ->select('s')
@@ -91,7 +98,7 @@ class SeriesRepository extends AbstractRepository
      * @param $limit
      * @return Paginator
      */
-    public function getFiltered($filters, $offset, $limit): Paginator
+    public function getFiltered($filters, $offset, $limit, $sort): Paginator
     {
         $where = [];
         if (!empty($filters['keyword'])) {
@@ -102,14 +109,28 @@ class SeriesRepository extends AbstractRepository
                 ],
             ];
         }
+        $sort = match ($sort) {
+            'title desc' => [
+                ['q.title', 'DESC'],
+                ['q.subTitle', 'DESC'],
+            ],
+            'modDate asc' => [['q.modDate', 'ASC']],
+            'modDate desc' => [['q.modDate', 'DESC']],
+            'lastDate asc' => [['q.lastDate', 'ASC']],
+            'lastDate desc' => [
+                ['CASE WHEN q.lastDate IS NULL THEN 1 ELSE 0 END', 'DESC'],
+                ['q.lastDate', 'DESC']
+            ],
+            default => [
+                ['q.title', 'ASC'],
+                ['q.subTitle', 'ASC'],
+            ],
+        };
         return $this->getAll(
             $offset,
             $limit,
             $where,
-            [
-                [ 'q.title', 'ASC' ],
-                [ 'q.subTitle', 'ASC' ]
-            ]
+            $sort
         );
     }
 

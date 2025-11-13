@@ -15,9 +15,11 @@
     ],
     "require": {
         "php": ">=8.2",
+        "ext-fileinfo": "*",
         "ext-iconv": "*",
         "ext-intl": "*",
         "ext-json": "*",
+        "ext-mbstring": "*",
         "aptoma/twig-markdown": "^3.0",
         "beberlei/doctrineextensions": "^1.3",
         "composer/package-versions-deprecated": "1.11.99.4",
@@ -27,13 +29,13 @@
         "doctrine/orm": "^2",
         "google/apiclient": "^2.18",
         "jaybizzle/crawler-detect": "^1.2",
-        "jedi58/versioning-bundle": "5.0.1",
         "jfcherng/php-diff": "^6.4",
         "karser/karser-recaptcha3-bundle": "^0.1.27",
         "michelf/php-markdown": "^1.8",
         "phpdocumentor/reflection-docblock": "^5.2",
         "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.0",
+        "shivas/versioning-bundle": "^4.1",
         "symfony/config": "^7.2",
         "symfony/console": "^7.2",
         "symfony/dependency-injection": "^7.2",
@@ -63,14 +65,15 @@
         "twig/string-extra": "^3.21"
     },
     "require-dev": {
-        "php-parallel-lint/php-parallel-lint": "*",
         "pheromone/phpcs-security-audit": "^2.0",
         "php-coveralls/php-coveralls": "^2.1",
+        "php-parallel-lint/php-parallel-lint": "*",
         "phpmd/phpmd": "^2.6",
         "phpstan/phpstan": "^0.12",
         "phpstan/phpstan-symfony": "^0.12",
         "phpunit/phpunit": "^9.0",
         "psalm/phar": "^4.23",
+        "slevomat/coding-standard": "^8.21",
         "symfony/browser-kit": "^7.2",
         "symfony/css-selector": "^7.2",
         "symfony/error-handler": "^7.2",
@@ -86,7 +89,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "symfony/flex": true,
-            "symfony/runtime": true
+            "symfony/runtime": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     },
     "autoload": {
@@ -116,15 +120,20 @@
             "cp -R vendor/jedi58/inachis/{bin,config,public} .",
             "cp -R vendor/jedi58/inachis/.env.dist .env"
         ],
+        "setup-git-hook": [
+            "php -r \"if (!file_exists('.git/hooks')) exit(0); copy('dev/git-hooks/pre-commit', '.git/hooks/pre-commit'); chmod('.git/hooks/pre-commit', 0755); echo '✅ Installed Git pre-commit hook.\\n';\""
+        ],
         "post-create-project-cmd": [
             "@create-skeleton",
             "@auto-scripts"
         ],
         "post-install-cmd": [
-            "@auto-scripts"
+            "@auto-scripts",
+            "@setup-git-hook"
         ],
         "post-update-cmd": [
-            "@auto-scripts"
+            "@auto-scripts",
+            "@setup-git-hook"
         ]
     },
     "conflict": {

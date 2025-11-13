@@ -21,12 +21,14 @@ var InachisCategoryManager = {
         });
         $categoryMangerTree.bonsai('collapseAll');
 
-        initSwitches('#dialog__categoryManager');
+        InachisCategoryManager.initSwitches('#dialog__categoryManager');
         $('#dialog__imageManager__addnew').on('click', this.showHideAddCategory);
         $('#dialog__categoryManager__cancel').on('click', this.showHideAddCategory);
         $('#dialog__categoryManager__save').on('click', this.saveNewCategory);
         $('#dialog__categoryManager li>span>a').on('click', this.showEditCategory);
         $('#dialog__categoryManager__delete').on('click', this.removeCategory);
+        $('[data-action=export_categories]').on('click', this.export);
+        $('[data-action=import_categories]').on('click', this.import);
     },
 
     showHideAddCategory: function()
@@ -90,6 +92,7 @@ var InachisCategoryManager = {
         $('#dialog__categoryManager ol input[type=radio]').toggle();
         $('#dialog__categoryManager__top-level-category').toggle();
         $('#dialog__categoryManager__as-subcat').toggle();
+        $('#dialog__categoryManager__exportimport').toggle();
         $('#dialog__categoryManager__add-edit-category').toggle();
         $('#dialog__categoryManager li>span>a').toggle();
         $('#dialog__imageManager__addnew').toggle();
@@ -202,5 +205,15 @@ var InachisCategoryManager = {
                 },
             }
         );
+    },
+
+    export: function()
+    {
+        // download a json file
+    },
+
+    import: function()
+    {
+        // @todo show dropzone dialog for uploading a json file
     },
 };

@@ -1,37 +1,59 @@
 <?php
 
-namespace App\Tests\phpunit\Utils;
+/**
+ * This file is part of the inachis framework
+ * 
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
+namespace App\Tests\phpunit\Util;
 
 use App\Validator\Constraints\ValidTimezone;
 use App\Validator\Constraints\ValidTimezoneValidator;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use stdClass;
 
-class ValidTimezoneValidatorTest extends TestCase
+class ValidTimezoneValidatorTest extends ConstraintValidatorTestCase
 {
-    protected $validTimezoneValidator;
+    protected ValidTimezoneValidator $validTimezoneValidator;
 
-    public function setUp() : void
+    protected function createValidator(): ConstraintValidatorInterface
     {
-        $this->validTimezoneValidator = new ValidTimezoneValidator();
-
-        parent::setUp();
+        return new ValidTimezoneValidator();
     }
 
-    public function testValidateEmpty() : void
+    public function testValidateEmpty(): void
     {
-        $this->assertEmpty($this->validTimezoneValidator->validate('', new ValidTimezone()));
+        $this->assertEmpty($this->validator->validate('', new ValidTimezone()));
     }
 
-//    public function testValidateInvalidConstraint() : void
-//    {
-//        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
-//        $this->validTimezoneValidator->validate('', new ConstraintA());
-//    }
-
-    public function testValidateNotString() : void
+    public function testValidateIncorrectContraint(): void
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedValueException');
-        $this->validTimezoneValidator->validate(new \stdClass(), new ValidTimezone());
+        $this->expectException(UnexpectedValueException::class);
+        $this->assertEmpty($this->validator->validate('', new NotBlank()));
+    }
+
+    public function testValidateNotString(): void
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->validator->validate(new stdClass(), new ValidTimezone());
+    }
+
+    public function testTimezoneNotInArray(): void
+    {
+        $this->validator->validate('Europe/Antarctica', new ValidTimezone());
+        $this->buildViolation('"{{ string }}" is not a recognised timezone')
+            ->setParameter('{{ string }}', 'Europe/Antarctica')
+            ->assertRaised();
+    }
+
+    public function testValidate(): void
+    {
+        $this->validator->validate('Europe/London', new ValidTimezone());
+        $this->assertNoViolation();
     }
 }

@@ -62,42 +62,44 @@ $image-tile-background: #eee;
 $pagination-border-radius: 5px;
 
 // tables
-//$spacer: 1rem !default;
-//$white:    #fff !default;
-//$gray-200: #e9ecef !default;
-//$gray-300: #dee2e6 !default;
-//$gray-600: #6c757d !default;
-//$gray-700: #495057 !default;
-//$gray-800: #343a40 !default;
-//$gray-900: #212529 !default;
-//$black:    #000 !default;
-//$text-muted:                  $gray-600 !default;
-//$body-color:                $gray-900 !default;
-//$border-width:                1px !default;
-//$border-color:                $gray-300 !default;
-//$table-cell-padding:          .75rem !default;
-//$table-cell-padding-sm:       .3rem !default;
-//$table-color:                 $body-color !default;
-//$table-bg:                    null !default;
-//$table-accent-bg:             rgba($black, .05) !default;
-//$table-hover-color:           $table-color !default;
-//$table-hover-bg:              rgba($black, .075) !default;
-//$table-active-bg:             $table-hover-bg !default;
-//$table-border-width:          $border-width !default;
-//$table-border-color:          $border-color !default;
-//$table-head-bg:               $gray-200 !default;
-//$table-head-color:            $gray-700 !default;
-//$table-dark-color:            $white !default;
-//$table-dark-bg:               $gray-800 !default;
-//$table-dark-accent-bg:        rgba($white, .05) !default;
-//$table-dark-hover-color:      $table-dark-color !default;
-//$table-dark-hover-bg:         rgba($white, .075) !default;
-//$table-dark-border-color:     color.adjust($table-dark-bg, $lightness: 7.5%) !default;
-//$table-dark-color:            $white !default;
-//$table-striped-order:         odd !default;
-//$table-caption-color:         $text-muted !default;
-//$table-bg-level:              -9 !default;
-//$table-border-level:          -6 !default;
+$spacer: 1rem !default;
+$white:    #fff !default;
+$gray-200: #e9ecef !default;
+$gray-300: #dee2e6 !default;
+$gray-600: #6c757d !default;
+$gray-700: #495057 !default;
+$gray-800: #343a40 !default;
+$gray-900: #212529 !default;
+$black:    #000 !default;
+$text-muted:                  $gray-600 !default;
+$body-color:                $gray-900 !default;
+$border-width:                1px !default;
+$border-color:                $gray-300 !default;
+$table-cell-padding:          .75rem !default;
+$table-cell-padding-sm:       .3rem !default;
+$table-color:                 $body-color !default;
+$table-bg:                    null !default;
+$table-accent-bg:             rgba($black, .05) !default;
+$table-hover-color:           $table-color !default;
+$table-hover-bg:              rgba($black, .075) !default;
+$table-active-bg:             $table-hover-bg !default;
+$table-border-width:          $border-width !default;
+$table-border-color:          $border-color !default;
+$table-head-bg:               $gray-200 !default;
+$table-head-dark-bg:          #069;
+$table-head-dark-color:       #fff;
+$table-head-color:            $gray-700 !default;
+$table-dark-color:            $white !default;
+$table-dark-bg:               $gray-800 !default;
+$table-dark-accent-bg:        rgba($white, .05) !default;
+$table-dark-hover-color:      $table-dark-color !default;
+$table-dark-hover-bg:         rgba($white, .075) !default;
+$table-dark-border-color:     color.adjust($table-dark-bg, $lightness: 7.5%) !default;
+$table-dark-color:            $white !default;
+$table-striped-order:         odd !default;
+$table-caption-color:         $text-muted !default;
+$table-bg-level:              -9 !default;
+$table-border-level:          -6 !default;
 
 // tabs
 $admin__tabs__highlighted-color: #069;
@@ -106,16 +108,20 @@ $admin__tabs-background: #fff;
 // admonitions
 $admonition-tip__border-color: #069;
 $admonition-tip__background-color: color.adjust($admonition-tip__border-color, $lightness: 65%);
+$admonition-warning__border-color: #f60;
+$admonition-warning__background-color: color.adjust($admonition-warning__border-color, $lightness: 35%);
 
 // forms
 $button--positive--active-color: #393;
-$button--positive--hover-color: color.adjust($button--positive--active-color, $lightness: 10%);
+$button--positive--hover-color: color.adjust($button--positive--active-color, $lightness: -10%);
 $button--negative--active-color: #900;
 $button--negative--hover-color: color.adjust($button--negative--active-color, $lightness: 10%);
 $button--info--active-color: #999;
 $button--info--hover-color: color.adjust($button--info--active-color, $lightness: -10%);
 $button--default-active-color: #d9e7cb;
 $button--default-hover-color: color.adjust($button--default-active-color, $lightness: -10%);
+$button--add--active-color: #069;
+$button--add--hover-color: color.adjust($button--add--active-color, $lightness: 10%);
 
 // dialogs
 //$dialog__background: #303030;
@@ -129,3 +135,16 @@ $form-label__light: #bbb;
 $form-input__complete: #090;
 $form-link: #ddd;
 $form-link__hover: #fff;
+
+// badges
+$badge-colors: (
+  default: (bg: #E0E0E0, text: #000),
+  draft: (bg: #F6C343, text: #000),
+  scheduled: (bg: #007BFF, text: #fff),
+  private: (bg: #6C757D, text: #fff),
+  hotlinked: (bg: #E83E8C, text: #fff),
+  issue: (bg: #DC3545, text: #fff),
+  active: (bg: #28A745, text: #fff),
+  newuser: (bg: #17A2B8, text: #fff),
+  disabled: (bg: #A0A0A0, text: #fff),
+);

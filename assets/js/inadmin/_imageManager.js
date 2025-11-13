@@ -23,11 +23,11 @@ var InachisImageManager = {
             $('.ui-dialog-secondary-bar').toggle();
             this.toggleUploadImage();
         } else {
-            $('.gallery input[type=radio]').change(InachisImageManager.enableChooseButton);
+            InachisImageManager.buttons[0].disabled = true;
             $('#ui-dialog-search-input').on('input', function (event) {
                 InachisImageManager.searchImages();
             });
-            this.addPaginationLinks();
+            InachisImageManager.searchImages();
         }
         this.updateDialogButtons();
         $('.ui-dialog-secondary-bar a').click(this.toggleUploadImage);
@@ -35,14 +35,15 @@ var InachisImageManager = {
             event.preventDefault();
             event.stopPropagation();
             dropzone.on('success', file => {
-                $('#ui-dialog-search-input').val($('#image_title').val());
+                let image_title = $('#image_title').val();
                 if (InachisDialog.view === 'upload') {
-                    $('#filter__keyword').val($('#image_title').val());
+                    $('#filter__keyword').val(image_title);
                     $('#dialog__imageManager').dialog('destroy');
                     $('form.form__images').submit();
                 } else {
+                    $('#ui-dialog-search-input').val(image_title);
                     InachisImageManager.toggleUploadImage();
-                    InachisImageManager.addPaginationLinks();
+                    InachisImageManager.searchImages();
                 }
             });
             dropzone.on('error', file => {
@@ -56,7 +57,7 @@ var InachisImageManager = {
     {
         $('nav .pagination li a').on('click', function(event) {
             event.preventDefault();
-            InachisImageManager.offset = $(event.currentTarget).html() * (InachisImageManager.limit - 1);
+            InachisImageManager.offset = ($(event.currentTarget).html() - 1) * InachisImageManager.limit;
             InachisImageManager.searchImages();
             return false;
         });
@@ -70,10 +71,20 @@ var InachisImageManager = {
 
     chooseImageAction: function()
     {
-        var selectedImage = $('.gallery input[type=radio]:checked'),
-            imageTarget = $('.image_preview .dialog__link').data('target');
-        $('#' + imageTarget).val(selectedImage.val());
-        $('.image_preview img').prop('src', selectedImage.siblings().first().children('img').prop('src'));
+        let selectedImage = $('.gallery input[type=radio]:checked'),
+            imageTargetId = $('.image_preview .dialog__link').data('target'),
+            $imagePreview =  $('.image_preview'),
+            $imagePreviewImage = $imagePreview.find('img')
+        ;
+        $('#' + imageTargetId).val(selectedImage.val());
+        if ($imagePreviewImage.length) {
+            $imagePreviewImage.prop('src', selectedImage.siblings().first().children('img').prop('src'));
+        } else {
+            $('<img>', {
+                alt: 'Preview of chosen image',
+                src: selectedImage.siblings().first().children('img').prop('src'),
+            }).insertAfter('#' + imageTargetId);
+        }
         $('#dialog__imageManager').dialog('close');
     },
 
@@ -81,6 +92,7 @@ var InachisImageManager = {
     {
         if(InachisImageManager.saveTimeout) clearTimeout(InachisImageManager.saveTimeout);
         InachisImageManager.saveTimeout = setTimeout(function() {
+            $('.gallery').html('<p/><div class="loader"></div><p/>');
             $('.gallery').load(
                 Inachis.prefix + '/ax/imageManager/getImages/' + InachisImageManager.offset +'/' + InachisImageManager.limit,
                 {
@@ -93,7 +105,16 @@ var InachisImageManager = {
                     InachisImageManager.offset = 0;
                     $('.gallery').animate({ scrollTop:0}, 100);
                     InachisImageManager.addPaginationLinks();
-                    $('#images_count').html($('.gallery ol').attr('data-total'));
+                    $('.gallery input[type=radio]').on('change', InachisImageManager.enableChooseButton);
+                    const $ol = $('.gallery ol');
+                    const values = [
+                        $ol.attr('data-start'),
+                        $ol.attr('data-end'),
+                        $ol.attr('data-total')
+                    ];
+                    $('#images_count strong').each(function(i) {
+                        $(this).html(values[i]);
+                    });
                 }
             );
         }, 500);

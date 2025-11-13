@@ -14,6 +14,7 @@
 @use 'structure/bottom-bar';
 
 // Structural components
+@use 'components/admonitions';
 @use 'components/badge';
 @use 'components/bonsai';
 @use 'components/data-list';
@@ -25,7 +26,7 @@
 @use 'components/progressbar';
 @use 'components/sortby';
 @use 'components/switch';
-//@use 'components/tables';
+@use 'components/tables';
 @use 'components/tabs';
 @use 'components/toggle_password';
 

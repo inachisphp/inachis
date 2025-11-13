@@ -1,0 +1,20 @@
+{{ include('inadmin/partials/tabs.html.twig', {
+    displayTabsCondition: user.username is defined and user.username is not empty,
+    page: { tab: activeTab, },
+    tabs: [
+        {
+            id: 'profile',
+            title: 'Profile',
+            url: path('incc_admin_edit', { 'id': user.username } ),
+        },
+        {
+            id: 'change-password',
+            title: 'Security',
+            url: path('incc_admin_change_password', { 'id': user.username }),
+            displayCondition: app.user.username == user.username,
+        }
+    ]
+}) }}
+    <!-- li{% if activeTab == 'access' %} class="ui-state-active"{% endif %}>
+        <a href="">Access</a>
+    </li -->

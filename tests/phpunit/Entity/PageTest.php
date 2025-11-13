@@ -1,47 +1,64 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ * 
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Tests\phpunit\Entity;
 
 use App\Entity\Category;
+use App\Entity\Image;
 use App\Entity\Page;
+use App\Entity\Series;
 use App\Entity\Tag;
 use App\Entity\Url;
 use App\Entity\User;
 use App\Exception\InvalidTimezoneException;
+use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Exception;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 
 class PageTest extends TestCase
 {
-    protected $page;
+    protected Page $page;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->page = new Page();
 
         parent::setUp();
     }
 
-    public function testSetAndGetLatlong()
+    public function testSetAndGetLatlong(): void
     {
         $this->page->setLatlong('100,100');
         $this->assertEquals('100,100', $this->page->getLatlong());
     }
 
-    public function testIsDraft()
+    public function testIsDraft(): void
     {
-        $this->page->setStatus(Page::DRAFT);
+        $this->page->setStatus();
         $this->assertTrue($this->page->isDraft());
         $this->page->setStatus(Page::PUBLISHED);
         $this->assertFalse($this->page->isDraft());
     }
 
-    public function testSetAndGetContent()
+    public function testSetAndGetContent(): void
     {
         $this->page->setContent('test');
         $this->assertEquals('test', $this->page->getContent());
     }
 
-    public function testSetAndGetTimezone()
+    /**
+     * @throws InvalidTimezoneException
+     */
+    public function testSetAndGetTimezone(): void
     {
         $this->page->setTimezone('Europe/London');
         $this->assertEquals('Europe/London', $this->page->getTimezone());
@@ -49,139 +66,150 @@ class PageTest extends TestCase
         $this->page->setTimezone('test');
     }
 
-    public function testSetAndGetFeatureImage()
+    public function testSetAndGetFeatureImage(): void
     {
-        $this->page->setFeatureImage('test');
-        $this->assertEquals('test', $this->page->getFeatureImage());
+        $image = new Image();
+        $this->page->setFeatureImage($image);
+        $this->assertEquals($image, $this->page->getFeatureImage());
+        $this->page->setFeatureImage(null);
+        $this->assertEquals(null, $this->page->getFeatureImage());
     }
 
-    public function testSetAndGetPassword()
+    public function testSetAndGetPassword(): void
     {
         $this->page->setPassword('test');
         $this->assertEquals('test', $this->page->getPassword());
     }
 
-    public function testIsValidVisibility()
-    {
-        $this->assertTrue($this->page->isValidVisibility(Page::VIS_PRIVATE));
-        $this->assertTrue($this->page->isValidVisibility(Page::VIS_PUBLIC));
-        $this->assertFalse($this->page->isValidVisibility('test'));
-    }
-
-    public function testSetAndGetTitle()
+    public function testSetAndGetTitle(): void
     {
         $this->page->setTitle('test');
         $this->assertEquals('test', $this->page->getTitle());
     }
 
-    public function testSetAndGetCreateDate()
+    public function testSetAndGetCreateDate(): void
     {
-        $currentTime = new \DateTime('now');
+        $currentTime = new DateTime('now');
         $this->page->setCreateDate($currentTime);
         $this->assertEquals($currentTime, $this->page->getCreateDate());
     }
 
-    public function testIsScheduledPage()
+    /**
+     * @throws Exception
+     */
+    public function testIsScheduledPage(): void
     {
-        $currentTime = new \DateTime('yesterday');
+        $currentTime = new DateTime('yesterday');
         $this->page->setPostDate($currentTime);
+        $this->page->setStatus(Page::PUBLISHED);
         $this->assertFalse($this->page->isScheduledPage());
-        $currentTime = new \DateTime('tomorrow');
+        $currentTime = new DateTime('tomorrow');
         $this->page->setPostDate($currentTime);
         $this->assertTrue($this->page->isScheduledPage());
     }
 
-    public function testSetAndGetVisibility()
+    public function testSetAndGetVisibility(): void
     {
-        $this->page->setVisibility(Page::VIS_PRIVATE);
-        $this->assertEquals(Page::VIS_PRIVATE, $this->page->getVisibility());
+        $this->page->setVisibility();
+        $this->assertEquals(Page::PRIVATE, $this->page->getVisibility());
+        $this->page->setVisibility(Page::PUBLIC);
+        $this->assertEquals(Page::PUBLIC, $this->page->getVisibility());
     }
 
-    public function testSetAndGetModDate()
+    public function testSetAndGetModDate(): void
     {
-        $currentTime = new \DateTime('now');
+        $currentTime = new DateTime('now');
         $this->page->setModDate($currentTime);
         $this->assertEquals($currentTime, $this->page->getModDate());
     }
 
-    public function testIsAllowComments()
+    public function testIsAllowComments(): void
     {
-        $this->page->setAllowComments(true);
+        $this->page->setAllowComments();
         $this->assertTrue($this->page->isAllowComments());
     }
 
-    public function testSetAndGetType()
+    /**
+     * @throws Exception
+     */
+    public function testSetAndGetType(): void
     {
         $this->page->setType(Page::TYPE_PAGE);
         $this->assertEquals(Page::TYPE_PAGE, $this->page->getType());
         $this->page->setType(Page::TYPE_POST);
         $this->assertEquals(Page::TYPE_POST, $this->page->getType());
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->page->setType('test');
     }
 
-    public function testSetAndGetSharingMessage()
+    public function testSetAndGetSharingMessage(): void
     {
         $this->page->setSharingMessage('test');
         $this->assertEquals('test', $this->page->getSharingMessage());
     }
 
-    public function testSetAndGetSubTitle()
+    public function testSetAndGetSubTitle(): void
     {
         $this->page->setSubTitle('test');
         $this->assertEquals('test', $this->page->getSubTitle());
     }
 
-    public function testSetAndGetId()
+    public function testSetAndGetId(): void
     {
-        $this->page->setId('test');
-        $this->assertEquals('test', $this->page->getId());
+        $uuid = Uuid::uuid1();
+        $this->page->setId($uuid);
+        $this->assertEquals($uuid, $this->page->getId());
     }
 
-    public function testSetAndGetStatus()
+    public function testSetAndGetStatus(): void
     {
-        $this->page->setStatus(Page::DRAFT);
+        $this->page->setStatus();
         $this->assertEquals(Page::DRAFT, $this->page->getStatus());
+        $this->page->setStatus(Page::PUBLISHED);
+        $this->assertEquals(Page::PUBLISHED, $this->page->getStatus());
     }
 
-    public function testSetAndGetFeatureSnippet()
+    public function testSetAndGetFeatureSnippet(): void
     {
         $this->page->setFeatureSnippet('test');
         $this->assertEquals('test', $this->page->getFeatureSnippet());
     }
 
-    public function testIsValidStatus()
+    public function testIsValidStatus(): void
     {
         $this->assertFalse($this->page->isValidStatus('test'));
         $this->assertTrue($this->page->isValidStatus(Page::DRAFT));
         $this->assertTrue($this->page->isValidStatus(Page::PUBLISHED));
     }
 
-    public function testSetAndGetPostDate()
+    public function testSetAndGetPostDate(): void
     {
-        $currentTime = new \DateTime('now');
+        $currentTime = new DateTime('now');
         $this->page->setPostDate($currentTime);
         $this->assertEquals($currentTime, $this->page->getPostDate());
     }
 
-    public function testSetAndGetAuthor()
+    public function testSetAndGetAuthor(): void
     {
         $this->page->setAuthor(new User('test'));
         $this->assertInstanceOf(User::class, $this->page->getAuthor());
         $this->assertEquals('test', $this->page->getAuthor()->getUsername());
     }
 
-    public function testAddAndGetUrls()
+    /**
+     * @throws Exception
+     */
+    public function testAddAndGetUrls(): void
     {
+        $this->assertNull($this->page->getUrl());
         $this->page->addUrl(new Url($this->page, 'test', true));
         $this->assertNotEmpty($this->page->getUrls());
-        $this->assertNull($this->page->getUrl());
-        $this->assertInstanceOf('\App\Entity\Url', $this->page->getUrl(0));
-        $this->expectException(\InvalidArgumentException::class);
+        $this->assertInstanceOf('\App\Entity\Url', $this->page->getUrl());
+        $this->expectException(InvalidArgumentException::class);
         $this->page->getUrl(100);
     }
 
-    public function testAddAndGetCategories()
+    public function testAddAndGetCategories(): void
     {
         $this->page->addCategory(new Category('test-category'));
         $this->assertNotEmpty($this->page->getCategories());
@@ -189,7 +217,7 @@ class PageTest extends TestCase
         $this->assertEmpty($this->page->getCategories());
     }
 
-    public function testAddAndGetTags()
+    public function testAddAndGetTags(): void
     {
         $this->page->addTag(new Tag('test-tag'));
         $this->assertNotEmpty($this->page->getTags());
@@ -197,11 +225,50 @@ class PageTest extends TestCase
         $this->assertEmpty($this->page->getTags());
     }
 
-    public function testGetPostDateAsLink()
+    public function testGetPostDateAsLink(): void
     {
-        $this->page->setPostDate(new \DateTime('1970-01-01'));
+        $this->page->setPostDate(new DateTime('1970-01-01'));
         $this->assertEquals('1970/01/01', $this->page->getPostDateAsLink());
-        $this->page->setPostDate(null);
+        $this->page->setPostDate();
         $this->assertEquals('', $this->page->getPostDateAsLink());
+    }
+
+    public function testHasHotlinkedImages(): void
+    {
+        $this->assertFalse($this->page->hasHotlinkedImages());
+        $this->page->setContent('![test](/imgs/test.png)');
+        $this->assertFalse($this->page->hasHotlinkedImages());
+        $this->page->setContent('[test](https://example.com/imgs/test.png)');
+        $this->assertFalse($this->page->hasHotlinkedImages());
+        $this->page->setContent('![test](https://example.com/imgs/test.png)');
+        $this->assertTrue($this->page->hasHotlinkedImages());
+    }
+
+    public function testIsExportable(): void
+    {
+        $this->assertTrue($this->page->isExportable());
+    }
+
+    public function testGetName(): void
+    {
+        $this->assertEquals('Pages and Posts', $this->page->getName());
+    }
+
+    public function testSetAndGetLanguage(): void
+    {
+        $this->page->setLanguage('en');
+        $this->assertEquals('en', $this->page->getLanguage());
+        $this->page->setLanguage('cn');
+        $this->assertEquals('cn', $this->page->getLanguage());
+    }
+
+    public function testSetAndGetSeries(): void
+    {
+        $this->assertEmpty($this->page->getSeries());
+        $series = new Series();
+        $collection = new ArrayCollection();
+        $collection->add($series);
+        $this->page->setSeries($collection);
+        $this->assertTrue($this->page->getSeries()->contains($series));
     }
 }

@@ -8,10 +8,6 @@
     {{ include('inadmin/partials/filters.html.twig') }}
 
     <section class="paginated-list{%- if zebra|default(false) %} zebra{% endif %}">
-        <p class="pagination--info">
-            Showing {{ offset + 1 }} to {{ min(offset + limit, total) }} of {{ total }}
-        </p>
-
         {% for item in dataset.iterator %}
             {% if slug is defined %}
                 {% if '.' in slug %}
@@ -20,13 +16,21 @@
                     {% for part in slug_exploded %}
                         {% if '[' in part %}
                             {% set part = part|split('[')[0] %}
-                            {% set slug_object = attribute(slug_object, part)[0] %}
-                        {% else %}
+                            {% if attribute(slug_object, part)[0] is defined %}
+                                {% set slug_object = attribute(slug_object, part)[0] %}
+                            {% else %}
+                                {% set slug_object = '' %}
+                            {% endif %}
+                        {% elseif attribute(slug_object, part) is defined %}
                             {% set slug_object = attribute(slug_object, part) %}
+                        {% else %}
+                            {% set slug_object = '' %}
                         {% endif %}
                     {% endfor %}
-                {% else %}
+                {% elseif attribute(item, slug) is defined %}
                     {% set slug_object = attribute(item, slug) %}
+                {% else %}
+                    {% set slug_object = '' %}
                 {% endif %}
             {% endif %}
         <article id="{{ type ~ '-' ~ item.id }}" class="{{ type }} {{ additional_classes|default(null) }} hentry">
@@ -92,16 +96,16 @@
             <span class="date">
                 {% endif %}
                 {% if item.postDate|default(false) %}
-                <span class="material-icons">schedule</span>
+                <span class="material-icons">event</span>
                  Post date: <em>{{ item.postDate|date('jS F Y \\a\\t H:i', timezone) }}</em>
                 {% endif %}
                 {% if item.items is defined %}
                     {% if item.firstDate is not empty %}
-                <span class="material-icons">schedule</span>{{ item.firstDate|date("F j, Y") }} to {{ item.lastDate|date("F j, Y") }}
+                <span class="material-icons">date_range</span>{{ item.firstDate|date("F j, Y") }} to {{ item.lastDate|date("F j, Y") }}
                     {% endif %}
                 <span class="material-icons">library_books</span> <strong>{{ item.items|length }}</strong> posts
                 {% endif %}
-                <span class="material-icons">schedule</span>
+                <span class="material-icons">history</span>
                  Last modified: <em>{{ item.modDate|date('jS F Y \\a\\t H:i', timezone) }}</em>
                 {% if inline|default(false) == false %}
             </p>
@@ -117,7 +121,8 @@
             limit: limit,
             maxResults: total,
             maxPagesToShow: 4,
-            result_url: url_result
+            result_url: url_result,
+            total: total,
         }) }}
         {% if actions|default(null) is not empty %}
             {% include 'inadmin/partials/action_bar.html.twig' %}
@@ -130,20 +135,22 @@
         'filter_values': filter_values,
         'show_search': show_search
     } only %}
-
-    <p class="content-warning">
-        <i class="material-icons">info_outline</i>
-        <span>Oops! Your filter didn't find anything!</span>
-        <a href="{{ url_result }}">Remove filter</a>
-    </p>
+    <section class="paginated-list">
+        <p class="content-warning">
+            <i class="material-icons">info_outline</i>
+            <span>Oops! Your filter didn't find anything!</span>
+        </p>
+    </section>
 {% else %}
-    <p class="content-warning">
-        <i class="material-icons">info_outline</i>
-        <span>You don't have any content yet!</span>
-    {% if url_add|default(null) is not empty %}
-        <a href="{{ url_add }}">Add some now!</a>
-    {% endif %}
-    </p>
+    <section class="paginated-list">
+        <p class="content-warning">
+            <i class="material-icons">info_outline</i>
+            <span>You don't have any content yet!</span>
+        {% if add_button is defined and add_button.url is defined %}
+            <a href="{{ add_button.url }}">Add some now!</a>
+        {% endif %}
+        </p>
+    </section>
 {% endif %}
     {{ form_end(form, render_rest: false) }}
 

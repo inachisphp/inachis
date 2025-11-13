@@ -5,10 +5,6 @@
   position: absolute;
   z-index: 110 !important;
 
-  &.ui-dialog-loading {
-    background: #fff url(/assets/imgs/incc/loading.gif) no-repeat center;
-  }
-
   .ui-dialog-titlebar {
     button {
       background-color: #fff;
@@ -27,8 +23,12 @@
   }
 
   .ui-dialog-secondary-bar {
+    align-items: center;
     background-color: #eee;
     border: 1px solid #ddd;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
     margin: 10px 0 0 0;
     padding: 5px;
 
@@ -36,9 +36,6 @@
       text-decoration: none;
     }
     .search {
-      float: right;
-      margin-top: 0.75em;
-
       button {
         vertical-align: middle;
       }
@@ -79,7 +76,7 @@
   }
 
   .gallery {
-    max-height: 330px;
+    height: 330px;
     overflow-y: scroll;
 
     img {
@@ -133,4 +130,35 @@
   padding: 5px;
   position: absolute;
   right: 0;
+}
+
+#dialog__contentSelector {
+  ol {
+    list-style-type: none;
+
+    li {
+      margin: 0.5em;
+    }
+
+    input {
+      margin: 0 1em 0 0;
+      width: auto;
+    }
+  }
+}
+
+.loader {
+  margin: 5em auto;
+  width: 40px;
+  height: 40px;
+  --c:no-repeat linear-gradient(#006699 0 0);
+  background: var(--c),var(--c),var(--c),var(--c);
+  background-size: 21px 21px;
+  animation: l5 1.5s infinite cubic-bezier(0.3,1,0,1);
+}
+@keyframes l5 {
+  0%   {background-position: 0    0,100% 0   ,100% 100%,0 100%}
+  33%  {background-position: 0    0,100% 0   ,100% 100%,0 100%;width:60px;height: 60px}
+  66%  {background-position: 100% 0,100% 100%,0    100%,0 0   ;width:60px;height: 60px}
+  100% {background-position: 100% 0,100% 100%,0    100%,0 0   }
 }

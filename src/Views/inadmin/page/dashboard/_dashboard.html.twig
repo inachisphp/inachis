@@ -1,0 +1,28 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <span>{% trans %}admin.dashboard.title{% endtrans %}</span>
+{% endblock pagetitle %}
+
+{% block content %}
+
+    {% block dashboard_pre %}{% endblock dashboard_pre %}
+
+    {% block dashboard %}
+
+        <div class="col span_4_of_8">
+            {% include "inadmin/page/dashboard/activity.html.twig" %}
+        </div>
+
+        <div class="col span_4_of_8">
+            <!--
+            {% include "inadmin/page/dashboard/alerts.html.twig" %}
+            {% include "inadmin/page/dashboard/stats.html.twig" %}
+            -->
+        </div>
+
+    {% endblock dashboard %}
+
+
+    {% block dashboard_post %}{% endblock dashboard_post %}
+{% endblock content %}

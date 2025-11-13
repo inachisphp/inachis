@@ -2,16 +2,23 @@
 
 section.paginated-list {
   background-color: #fff;
+  border: 1px solid #eee;
   clear: left;
   margin-bottom: 4em;
   padding: 1em;
+}
+
+section.pagination--row {
+  align-items: center;
+  clear: both;
+  display: flex;
+  justify-content: space-between;
 }
 
 .pagination {
   display: flex;
   list-style-type: none;
   padding-left: 15px;
-  margin-bottom: 50px;
 
   .material-icons { vertical-align: middle; }
 

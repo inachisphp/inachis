@@ -1,11 +1,9 @@
 <section>
     <form class="form">
-        <div class="flash">
-
-        </div>
+        <div class="flash"></div>
         <fieldset class="col span_1_of_2">
             <p>
-                <button class="button button--positive" id="dialog__imageManager__addnew" type="button"><span class="material-icons">add</span> Add new category</button>
+                <button class="button button--add" id="dialog__imageManager__addnew" type="button"><span class="material-icons">add</span> Add new category</button>
             </p>
             <p class="visually-hidden" id="dialog__categoryManager__top-level-category">
                 <label for="dialog__categoryManager__existing_-1">
@@ -18,6 +16,20 @@
                 {{ include("inadmin/dialog/category-manager-list.html.twig", { 'categories': categories }) }}
             </ol>
 {% endif %}
+        </fieldset>
+        <fieldset class="col span_1_of_2" id="dialog__categoryManager__exportimport">
+            <p>
+                <button class="button button--secondary" data-action="export_categories" type="button">
+                    <span class="material-icons">download</span>
+                    Export categories
+                </button>
+            </p>
+            <p>
+                <button class="button button--secondary" data-action="import_categories" type="button">
+                    <span class="material-icons">upload_file</span>
+                    Import categories
+                </button>
+            </p>
         </fieldset>
         <fieldset class="col span_1_of_2 visually-hidden" id="dialog__categoryManager__add-edit-category">
             <input id="dialog__categoryManager__id" type="hidden" />

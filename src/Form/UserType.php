@@ -1,27 +1,46 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Form;
 
 use App\Entity\User;
 use App\Util\RandomColorPicker;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserType extends AbstractType
 {
+    private TranslatorInterface $translator;
+    private Security $security;
+
+    public function __construct(TranslatorInterface $translator, Security $security)
+    {
+        $this->translator = $translator;
+        $this->security = $security;
+    }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $newUser = $options['data']->getUsername() === '';
+        $newUser = !isset($options['data']) || !($options['data'] instanceof User) || $options['data']->getId() === null;
         $builder
             ->add('username', $newUser ? TextType::class : HiddenType::class, [
                 'attr' => [
                     'aria-labelledby' => 'user__username__label',
-                    'autofocus' => 'true',
+                    'autofocus' => $newUser,
                     'class' => 'text inline_label',
                     'placeholder' => 'Enter a unique username',
                     'readOnly' => !$newUser,
@@ -36,7 +55,6 @@ class UserType extends AbstractType
             ->add('displayName', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'user__displayName__label',
-                    'data-tip-content' => 'How the user will be known',
                     'class' => 'text inline_label',
                 ],
                 'label' => 'Display Name',
@@ -61,7 +79,6 @@ class UserType extends AbstractType
             ->add('timezone', ChoiceType::class, [
                 'attr' => [
                     'aria-labelledby' => 'user__timezone__label',
-                    'data-tip-content' => 'How the user will be known',
                     'class' => 'text inline_label',
                 ],
                 'choices' => array_combine(timezone_identifiers_list(), timezone_identifiers_list()),
@@ -72,6 +89,17 @@ class UserType extends AbstractType
                 ],
             ])
             ->add('avatar', HiddenType::class)
+            ->add('submit', SubmitType::class, [
+                'attr' => [
+                    'class' => 'button button--positive',
+                ],
+                'label' => sprintf(
+                    '<span class="material-icons">%s</span> %s',
+                    'save',
+                    $this->translator->trans('admin.button.save', [], 'messages')
+                ),
+                'label_html' => true,
+            ])
         ;
         if (!$newUser) {
             $builder->add('color', ChoiceType::class, [
@@ -89,6 +117,38 @@ class UserType extends AbstractType
                 ],
                 'multiple' => false,
             ]);
+            if ($options['data']->getId() !== $this->security->getUser()->getId()) {
+                $builder
+                    ->add('delete', SubmitType::class, [
+                        'attr' => [
+                            'class' => 'button button--negative button--confirm',
+                            'data-entity' => 'user',
+                            'data-title' => sprintf(
+                                '%s (%s)',
+                                $options['data']->getDisplayName(),
+                                $options['data']->getUsername(),
+                            ),
+                            'data-warning' => 'This action cannot be undone, and will result in the user no longer being able to access this system.',
+                        ],
+                        'label' => sprintf(
+                            '<span class="material-icons">%s</span> %s',
+                            'delete',
+                            $this->translator->trans('admin.button.delete', [], 'messages')
+                        ),
+                        'label_html' => true,
+                    ])
+                    ->add('enableDisable', SubmitType::class, [
+                        'attr' => [
+                            'class' => 'button button--secondary',
+                        ],
+                        'label' => sprintf(
+                            '<span class="material-icons">%s</span> %s',
+                            $options['data']->isEnabled() ? 'person_off' : 'person_outline',
+                            $this->translator->trans($options['data']->isEnabled() ? 'admin.button.disable' : 'admin.button.enable', [], 'messages')
+                        ),
+                        'label_html' => true,
+                    ]);
+            }
         }
     }
 

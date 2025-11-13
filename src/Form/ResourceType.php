@@ -1,9 +1,17 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Form;
 
 use App\Form\DataTransformer\ArrayCollectionToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -18,10 +26,18 @@ class ResourceType extends AbstractType
 {
     private TranslatorInterface $translator;
 
+    /**
+     * @param TranslatorInterface $translator
+     */
     public function __construct(TranslatorInterface $translator) {
         $this->translator = $translator;
     }
 
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -30,7 +46,7 @@ class ResourceType extends AbstractType
                     'aria-labelledby' => 'resource__title__label',
                     'class' => 'text full-width',
                 ],
-                'label' => 'Title',
+                'label' => $this->translator->trans('admin.resources.title.label', [], 'messages'),
                 'label_attr' => [
                     'id' => 'resource__title__label'
                 ],
@@ -40,10 +56,9 @@ class ResourceType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'resource__altText__label',
                     'class' => 'full-width',
-                    'data-tip-content' => 'This is important as it is used by screen readers to improve accessibility',
                     'rows' => 2,
                 ],
-                'label' => 'Alt Text',
+                'label' => $this->translator->trans('admin.resources.altText.label', [], 'messages'),
                 'label_attr' => [
                     'id' => 'resource__altText__label'
                 ],
@@ -55,27 +70,50 @@ class ResourceType extends AbstractType
                     'class' => 'full-width',
                     'rows' => 5,
                 ],
-                'label' => 'Caption',
+                'label' => $this->translator->trans('admin.resources.caption.label', [], 'messages'),
                 'label_attr' => [
                     'id' => 'resource__description__label'
                 ],
 
             ])
+            ->add('generate_alt_text', ButtonType::class, [
+                'attr' => [
+                    'class' => 'button button--ai',
+                    'id' => 'generate_alt_text',
+                ],
+                'label' => sprintf(
+                    '<span class="material-icons">%s</span> <span>%s</span>',
+                    'auto_awesome',
+                    $this->translator->trans('admin.resources.generateAlt.label', [], 'messages'),
+                ),
+                'label_html' => true,
+            ])
             ->add('submit', SubmitType::class, [
                 'attr' => [
                     'class' => 'button button--positive',
                 ],
-                'label' => $this->translator->trans('admin.button.save', [], 'messages'),
+                'label' => sprintf(
+                    '<span class="material-icons">%s</span> <span>%s</span>',
+                    'save',
+                    $this->translator->trans('admin.button.save', [], 'messages')
+                ),
+                'label_html' => true,
             ])
             ->add('delete', SubmitType::class, [
                 'attr' => [
-                    'class' => 'button button--negative',
+                    'class' => 'button button--negative button--confirm',
+                    'data-entity' => 'image',
+                    'data-title' => $options['data']->getTitle(),
                 ],
                 'label' => $this->translator->trans('admin.button.delete', [], 'messages'),
             ])
         ;
     }
 
+    /**
+     * @param OptionsResolver $resolver
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

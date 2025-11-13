@@ -1,203 +1,221 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Entity;
 
+use DateTime;
+use DateTimeZone;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
+use InvalidArgumentException;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use App\Exception\InvalidTimezoneException;
-//use phpDocumentor\Reflection\Types\Collection;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Object for handling pages of a site.
  */
 #[ORM\Entity(repositoryClass: 'App\Repository\PageRepository', readOnly: false)]
-#[ORM\Index(name: 'search_idx', columns: ['title', 'author_id', 'image_id'])]
+#[ORM\Index(columns: ['title', 'author_id', 'image_id'], name: 'search_idx')]
+#[ORM\Index(columns: ['title', 'sub_title', 'content'], name: "fulltext_title_content", flags: ["fulltext"])]
 class Page
 {
     /**
      * @const string Indicates a Page is currently in draft
      */
-    const DRAFT = 'draft';
+    public const DRAFT = 'draft';
 
     /**
      * @const string Indicates a Page has been published
      */
-    const PUBLISHED = 'published';
+    public const PUBLISHED = 'published';
 
     /**
      * @const string Indicates a Page is public
      */
-    const VIS_PUBLIC = true;
+    public const PUBLIC = true;
 
     /**
      * @const string Indicates a Page is private
      */
-    const VIS_PRIVATE = false;
+    public const PRIVATE = false;
 
     /**
      * @const string Indicates a Page is standalone
      */
-    const TYPE_PAGE = 'page';
+    public const TYPE_PAGE = 'page';
 
     /**
      * @const string Indicates a Page is a blog post
      */
-    const TYPE_POST = 'post';
+    public const TYPE_POST = 'post';
 
     /**
-     * @var \Ramsey\Uuid\UuidInterface
+     * @var UuidInterface|null
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected $id;
+    protected ?UuidInterface $id = null;
 
     /**
-     * @var string The title of the {@link Page}
+     * @var string|null The title of the {@link Page}
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    protected $title;
+    protected ?string $title = null;
 
     /**
-     * @var string An optional subtitle for the {@link Page}
+     * @var string|null An optional subtitle for the {@link Page}
      */
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    protected $subTitle = null;
+    protected ?string $subTitle = null;
 
     /**
-     * @var string The contents of the {@link Page}
+     * @var string|null The contents of the {@link Page}
      */
     #[ORM\Column(type: 'text', nullable: true)]
-    protected $content = null;
+    protected ?string $content = null;
 
     /**
-     * @var string The UUID of the author for the {@link Page}
+     * @var User|null The UUID of the author for the {@link Page}
      */
     #[ORM\ManyToOne(targetEntity: 'App\Entity\User', cascade: [ 'detach' ])]
     #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id')]
-    protected $author;
+    protected ?User $author = null;
 
     /**
-     * @var Image The featured {@link Image} for the {@link Page}
+     * @var Image|null The featured {@link Image} for the {@link Page}
      */
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Image', cascade: [ 'detach' ])]
     #[ORM\JoinColumn(name: 'image_id', referencedColumnName: 'id')]
-    protected $featureImage;
+    protected ?Image $featureImage = null;
 
     /**
-     * @var string A short excerpt describing the contents of the {@link Page}
+     * @var string|null A short excerpt describing the contents of the {@link Page}
      */
     #[ORM\Column(type: 'text', nullable: true)]
-    protected $featureSnippet;
+    protected ?string $featureSnippet = '';
 
     /**
-     * @var string Current status of the {@link Page}, defaults to {@link DRAFT}
+     * @var string|null Current status of the {@link Page}, defaults to {@link DRAFT}
      */
     #[ORM\Column(type: 'string', length:20)]
-    protected $status = self::DRAFT;
+    protected ?string $status = self::DRAFT;
 
     /**
-     * @var string Determining if a {@link Page} is visible to the public
+     * @var bool Determining if a {@link Page} is visible to the public
      */
     #[ORM\Column(type: 'boolean', length: 20)]
-    protected $visibility = self::VIS_PUBLIC;
+    protected bool $visibility = self::PUBLIC;
 
     /**
-     * @var string The date the {@link Page} was created
+     * @var DateTime|null The date the {@link Page} was created
      */
     #[ORM\Column(type: 'datetime')]
-    protected $createDate;
+    protected ?DateTime $createDate;
 
     /**
-     * @var string The date the {@link Page} was published; a future date
+     * @var DateTime|null The date the {@link Page} was published; a future date
      *             indicates the content is scheduled
      */
     #[ORM\Column(type: 'datetime')]
-    protected $postDate;
+    protected ?DateTime $postDate;
 
     /**
-     * @var string The date the {@link Page} was last modified
+     * @var DateTime|null The date the {@link Page} was last modified
      */
     #[ORM\Column(type: 'datetime')]
-    protected $modDate;
+    protected ?DateTime $modDate;
 
     /**
-     * @var string The timezone for the publication date; defaults to UTC
+     * @var string|null The timezone for the publication date; defaults to UTC
      */
     #[ORM\Column(type: 'string', length: 50)]
-    protected $timezone = 'UTC';
+    protected ?string $timezone = 'UTC';
 
     /**
-     * @var string A password to protect the {@link Page} with if required
+     * @var string|null A password to protect the {@link Page} with if required
      */
     #[ORM\Column(type: 'string', length:255, nullable: true)]
-    protected $password;
+    protected ?string $password = '';
 
     /**
      * @var bool Flag determining if the {@link Page} allows comments
      */
     #[ORM\Column(type: 'boolean', nullable: false)]
-    protected $allowComments = false;
+    protected bool $allowComments = false;
 
     /**
      * @var string The type of page. Default: {@link self::TYPE_POST}
      */
     #[ORM\Column(type: 'string', nullable: false)]
-    protected $type = self::TYPE_POST;
+    protected string $type = self::TYPE_POST;
 
     /**
-     * @var string A location for geo-context aware content
+     * @var string|null A location for geo-context aware content
      */
     #[ORM\Column(type: 'string', nullable: true)]
-    protected $latlong;
+    protected ?string $latlong = '';
 
     /**
-     * @var string A short 140 character message to use when sharing content
+     * @var string|null A short 140-character message to use when sharing content
      */
     #[ORM\Column(type: 'string', length: 140, nullable: true)]
-    protected $sharingMessage;
+    protected ?string $sharingMessage = '';
 
     /**
-     * @var ArrayCollection|Url[] The array of URLs for the content
+     * @var Collection|null The array of URLs for the content
      */
-    #[ORM\OneToMany(targetEntity: 'App\Entity\Url', mappedBy: 'content', cascade: [ 'persist' ])]
+    #[ORM\OneToMany(mappedBy: 'content', targetEntity: 'App\Entity\Url', cascade: [ 'persist' ])]
     #[ORM\OrderBy(['default' => 'DESC'])]
-    protected $urls;
+    protected ?Collection $urls;
 
     /**
-     * @var ArrayCollection|Category[] The array of categories assigned to the post/page
+     * @var Collection|null The array of categories assigned to the post/page
      */
     #[ORM\ManyToMany(targetEntity: 'App\Entity\Category')]
     #[ORM\JoinTable(name: 'Page_categories')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'category_id', referencedColumnName: 'id')]
     #[ORM\OrderBy([ 'title' => 'ASC' ])]
-    protected $categories;
+    protected ?Collection $categories;
 
     /**
-     * @var ArrayCollection|Tag[] The array of tags assigned to the post/page
+     * @var Collection|null The array of tags assigned to the post/page
      */
     #[ORM\ManyToMany(targetEntity: 'App\Entity\Tag', cascade: [ 'persist' ])]
     #[ORM\JoinTable(name: 'Page_tags')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'tag_id', referencedColumnName: 'id')]
     #[ORM\OrderBy([ 'title' => 'ASC' ])]
-    protected $tags;
+    protected ?Collection $tags;
 
     /**
-     * @var Collection|Series[]  The array of Series that contains this page
+     * @var Collection|null  The array of Series that contains this page
      */
     #[ORM\ManyToMany(targetEntity: 'App\Entity\Series', inversedBy: 'items')]
-    protected $series;
+    protected ?Collection $series;
 
     /**
-     * @var string The two character language code this content uses, empty means unknown
+     * @var string|null The two character language code this content uses, empty means unknown
      */
     #[ORM\Column(type: 'string', length: 15, nullable: true)]
-    protected $language;
+    protected ?string $language;
+
+    #[ORM\Column(type: 'boolean')]
+    protected ?bool $noindex = false;
+
+    #[ORM\Column(type: 'boolean')]
+    protected ?bool $nofollow = false;
 
     /**
      * Default constructor for {@link Page}.
@@ -206,7 +224,7 @@ class Page
      * @param string    $content The content for the {@link Page}
      * @param User|null $author  The {@link User} that authored the {@link Page}
      * @param string    $type    The type of {@link Page} - post or page
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct(
         string $title = '',
@@ -217,7 +235,7 @@ class Page
         $this->setTitle($title);
         $this->setContent($content);
         $this->setAuthor($author);
-        $currentTime = new \DateTime('now');
+        $currentTime = new DateTime('now');
         $this->setCreateDate($currentTime);
         $this->setPostDate($currentTime);
         $this->setModDate($currentTime);
@@ -231,9 +249,9 @@ class Page
     /**
      * Returns the value of {@link id}.
      *
-     * @return string The UUID of the {@link Page}
+     * @return UuidInterface|null The UUID of the {@link Page}
      */
-    public function getId(): ?string
+    public function getId(): ?UuidInterface
     {
         return $this->id;
     }
@@ -241,7 +259,7 @@ class Page
     /**
      * Returns the value of {@link title}.
      *
-     * @return string The title of the {@link Page} - cannot be empty
+     * @return string|null The title of the {@link Page} - cannot be empty
      */
     public function getTitle(): ?string
     {
@@ -251,7 +269,7 @@ class Page
     /**
      * Returns the value of {@link subTitle}.
      *
-     * @return string The Sub-title of the {@link Page}
+     * @return string|null The Sub-title of the {@link Page}
      */
     public function getSubTitle(): ?string
     {
@@ -261,7 +279,7 @@ class Page
     /**
      * Returns the value of {@link content}.
      *
-     * @return string The contents of the {@link Page}
+     * @return string|null The contents of the {@link Page}
      */
     public function getContent(): ?string
     {
@@ -271,7 +289,7 @@ class Page
     /**
      * Returns the value of {@link author}.
      *
-     * @return string The UUID of the {@link Page} author
+     * @return User|null The UUID of the {@link Page} author
      */
     public function getAuthor(): ?User
     {
@@ -281,7 +299,7 @@ class Page
     /**
      * Returns the value of {@link featureImage}.
      *
-     * @return Image The feature image object
+     * @return Image|null The feature image object
      */
     public function getFeatureImage(): ?Image
     {
@@ -291,7 +309,7 @@ class Page
     /**
      * Returns the value of {@link featureSnippet}.
      *
-     * @return string The short excerpt to used as the feature
+     * @return string|null The short excerpt to used as the feature
      */
     public function getFeatureSnippet(): ?string
     {
@@ -301,7 +319,7 @@ class Page
     /**
      * Returns the value of {@link status}.
      *
-     * @return string The current publishing status of the {@link Page}
+     * @return string|null The current publishing status of the {@link Page}
      */
     public function getStatus(): ?string
     {
@@ -321,9 +339,9 @@ class Page
     /**
      * Returns the value of {@link createDate}.
      *
-     * @return string The creation date of the {@link Page}
+     * @return DateTime The creation date of the {@link Page}
      */
-    public function getCreateDate(): \DateTime
+    public function getCreateDate(): DateTime
     {
         return $this->createDate;
     }
@@ -331,9 +349,9 @@ class Page
     /**
      * Returns the value of {@link postDate}.
      *
-     * @return string The publication date of the {@link Page}
+     * @return DateTime|null The publication date of the {@link Page}
      */
-    public function getPostDate(): \DateTime
+    public function getPostDate(): ?DateTime
     {
         return $this->postDate;
     }
@@ -341,9 +359,9 @@ class Page
     /**
      * Returns the value of {@link modDate}.
      *
-     * @return string The date the {@link Page} was last modified
+     * @return DateTime The date the {@link Page} was last modified
      */
-    public function getModDate(): \DateTime
+    public function getModDate(): DateTime
     {
         return $this->modDate;
     }
@@ -351,7 +369,7 @@ class Page
     /**
      * Returns the value of {@link timezone}.
      *
-     * @return string The timezone for {@link post_date}
+     * @return string|null The timezone for {@link Page::post_date}
      */
     public function getTimezone(): ?string
     {
@@ -361,7 +379,7 @@ class Page
     /**
      * Returns the value of {@link password}.
      *
-     * @return string The hash of the password protecting the {@link Page}
+     * @return string|null The hash of the password protecting the {@link Page}
      */
     public function getPassword(): ?string
     {
@@ -381,7 +399,7 @@ class Page
     /**
      * Returns the type of the current {@link Page} entity.
      *
-     * @return string The current type
+     * @return string|null The current type
      */
     public function getType(): ?string
     {
@@ -391,7 +409,7 @@ class Page
     /**
      * Returns the latlong for the current {@link Page} entity.
      *
-     * @return string The latitude and longitude of the content
+     * @return string|null The latitude and longitude of the content
      */
     public function getLatlong(): ?string
     {
@@ -401,7 +419,7 @@ class Page
     /**
      * Returns the sharingMessage for the current {@link Page} entity.
      *
-     * @return string The latitude and longitude of the content
+     * @return string|null The latitude and longitude of the content
      */
     public function getSharingMessage(): ?string
     {
@@ -412,7 +430,7 @@ class Page
      * Returns an array of URLs assigned to the page. The default URL will
      * always be first.
      *
-     * @return Url[] The array of {$link Url} entities for the {@link Page}
+     * @return Collection|null The array of {$link Url} entities for the {@link Page}
      */
     public function getUrls(): ?Collection
     {
@@ -422,9 +440,9 @@ class Page
     /**
      * Returns an array of {@link Category)s assigned to the page.
      *
-     * @return Category[] The array of {$link Category} entities for the {@link Page}
+     * @return Collection|null The array of {$link Category} entities for the {@link Page}
      */
-    public function getCategories(): ?Collection
+    public function getCategories()
     {
         return $this->categories;
     }
@@ -432,30 +450,29 @@ class Page
     /**
      * Returns an array of {@link Tag)s assigned to the page.
      *
-     * @return Tag[] The array of {$link Category} entities for the {@link Page}
+     * @return Collection|null The array of {$link Category} entities for the {@link Page}
      */
-    public function getTags(): ?Collection
+    public function getTags()
     {
         return $this->tags;
     }
 
     /**
-     * Returns the Url with a specific index within the array.
+     * Returns the Url with a specific index within the array. Default returns the first
      *
-     * @param mixed $key The index of the item to return
-     * @return Url The requested {@link Url} entry
+     * @param int $key The index of the item to return
+     * @return Url|null The requested {@link Url} entry
      */
-    public function getUrl($key = null): ?Collection
+    public function getUrl(int $key = 0): ?Url
     {
         if ($key && !isset($this->urls[$key])) {
-            throw new \InvalidArgumentException(sprintf('Url `%s` does not exist', $key));
+            throw new InvalidArgumentException(sprintf('Url `%s` does not exist', $key));
         }
-
         return $this->urls[$key];
     }
 
     /**
-     * @return Collection
+     * @return Collection|null
      */
     public function getSeries(): ?Collection
     {
@@ -463,177 +480,181 @@ class Page
     }
 
     /**
-     * @return string The language used by this content
+     * @return string|null The language used by this content
      */
-    public function getLanguage(): string
+    public function getLanguage(): ?string
     {
         return $this->language;
     }
 
     /**
+     * @return bool|null
+     */
+    public function getNoindex(): ?bool
+    {
+        return $this->noindex;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getNofollow(): ?bool
+    {
+        return $this->nofollow;
+    }
+
+    /**
      * Sets the value of {@link id}.
      *
-     * @param string $value The UUID of the {@link Page}
+     * @param UuidInterface $value The UUID of the {@link Page}
      * @return $this
      */
-    public function setId(string $value): self
+    public function setId(UuidInterface $value): self
     {
         $this->id = $value;
-
         return $this;
     }
 
     /**
      * Sets the value of {@link title}.
      *
-     * @param string $value The title of the {@link Page}
-     * @return $this
+     * @param string|null $value The title of the {@link Page}
+     * @return Page
      */
-    public function setTitle(string $value): self
+    public function setTitle(?string $value): self
     {
         $this->title = $value;
-
         return $this;
     }
 
     /**
      * Sets the value of {@link subTitle}.
      *
-     * @param string|null $value The optional sub-title of the {@link Page}
-     * @return $this
+     * @param string|null $value The optional subtitle of the {@link Page}
+     * @return Page
      */
     public function setSubTitle(?string $value = null): self
     {
         $this->subTitle = $value;
-
         return $this;
     }
 
     /**
      * Sets the value of {@link content}.
      *
-     * @param string $value The contents of the {@link Page}
-     * @return $this
+     * @param string|null $value The contents of the {@link Page}
+     * @return Page
      */
     public function setContent(?string $value): self
     {
         $this->content = $value;
-
         return $this;
     }
 
     /**
      * Sets the value of {@link author}.
      *
-     * @param User $value The UUID of the {@link Page} author
-     * @return $this
+     * @param User|null $value The {@link User} to set as the {@link Page} author
+     * @return Page
      */
-    public function setAuthor(User $value = null): self
+    public function setAuthor(?User $value = null): self
     {
         $this->author = $value;
-
         return $this;
     }
 
     /**
      * Sets the value of {@link featureImage}.
      *
-     * @param Image $value The UUID or URL to use for the {@link feature_image}
-     * @return $this
+     * @param Image|null $value The UUID or URL to use for the {@link feature_image}
+     * @return Page
      */
     public function setFeatureImage(?Image $value): self
     {
         $this->featureImage = $value;
-
         return $this;
     }
 
     /**
      * Sets the value of {@link featureSnippet}.
      *
-     * @param string $value Short excerpt to use with the {@link feature_image}
-     * @return $this
+     * @param string|null $value Short excerpt to use with the {@link feature_image}
+     * @return Page
      */
     public function setFeatureSnippet(?string $value): self
     {
         $this->featureSnippet = $value;
-
         return $this;
     }
 
     /**
      * Sets the value of {@link status}.
      *
-     * @param string $value The new publishing status of the {@link Page}
-     * @return $this
+     * @param string|null $value The new publishing status of the {@link Page}
+     * @return Page
      */
-    public function setStatus(string $value): self
+    public function setStatus(?string $value = self::DRAFT): self
     {
         $this->status = $this->isValidStatus($value) ? $value : self::DRAFT;
-
         return $this;
     }
 
     /**
-     * Sets the value of {@link visibility}.
+     * Sets the value of {@link visibility}. Default 'Private'
      *
      * @param bool $value The visibility of the {@link Page}
-     * @return $this
+     * @return Page
      */
-    public function setVisibility(bool $value): self
+    public function setVisibility(bool $value = self::PRIVATE): self
     {
-        $this->visibility = (bool) $value;
-
+        $this->visibility = $value;
         return $this;
     }
 
     /**
      * Sets the value of {@link createDate}.
      *
-     * @param \DateTime $value The date to be set
-     * @return $this
+     * @param DateTime|null $value The date to be set
+     * @return Page
      */
-    public function setCreateDate(\DateTime $value = null): self
+    public function setCreateDate(?DateTime $value = null): self
     {
         $this->createDate = $value;
-
         return $this;
     }
 
     /**
      * Sets the value of {@link postDate}.
      *
-     * @param \DateTime $value The date to be set
-     * @return $this
+     * @param DateTime|null $value The date to be set
+     * @return Page
      */
-    public function setPostDate(\DateTime $value = null): self
+    public function setPostDate(?DateTime $value = null): self
     {
         $this->postDate = $value;
-
         return $this;
     }
 
     /**
      * Sets the value of {@link modDate}.
      *
-     * @param \DateTime $value The date to set
-     * @return $this
+     * @param DateTime|null $value The date to set
+     * @return Page
      */
-    public function setModDate(\DateTime $value = null): self
+    public function setModDate(?DateTime $value = null): self
     {
         $this->modDate = $value;
-
         return $this;
     }
 
     /**
      * Sets the value of {@link timezone}.
      *
-     * @param string $value The timezone for the post_date
-     * @return $this
+     * @param string|null $value The timezone for the post_date
+     * @return Page
      * @throws InvalidTimezoneException
      */
-    public function setTimezone(string $value): self
+    public function setTimezone(?string $value): self
     {
         if (!$this->isValidTimezone($value)) {
             throw new InvalidTimezoneException(
@@ -641,20 +662,18 @@ class Page
             );
         }
         $this->timezone = $value;
-
         return $this;
     }
 
     /**
      * Sets the value of {@link password}.
      *
-     * @param string $value The password to protect the {@link Page} with
-     * @return $this
+     * @param string|null $value The password to protect the {@link Page} with
+     * @return Page
      */
     public function setPassword(?string $value): self
     {
         $this->password = $value;
-
         return $this;
     }
 
@@ -662,12 +681,11 @@ class Page
      * Sets the value of {@link allowComments}.
      *
      * @param bool $value Flag specifying if comments allowed on {@link Page}
-     * @return $this
+     * @return Page
      */
     public function setAllowComments(?bool $value = true): self
     {
         $this->allowComments = (bool) $value;
-
         return $this;
     }
 
@@ -676,12 +694,12 @@ class Page
      *
      * @param string $type The type of page
      * @return $this
-     * @throws \Exception
+     * @throws Exception
      */
     public function setType(string $type): self
     {
         if (!in_array($type, [self::TYPE_POST, self::TYPE_PAGE])) {
-            throw new \Exception(sprintf('`%s` is not a valid page type', $type));
+            throw new Exception(sprintf('`%s` is not a valid page type', $type));
         }
         $this->type = $type;
 
@@ -691,54 +709,69 @@ class Page
     /**
      * Sets the current latitude and longitude of {@link Page} entity.
      *
-     * @param string $value The latitude and longitude of the content
-     * @return $this
+     * @param string|null $value The latitude and longitude of the content
+     * @return Page
      */
     public function setLatlong(?string $value): self
     {
         $this->latlong = $value;
-
         return $this;
     }
 
     /**
      * Sets the current sharingMessage of {@link Page} entity.
      *
-     * @param string $value The sharingMessage of the content
-     * @return $this
+     * @param string|null $value The sharingMessage of the content
+     * @return Page
      */
     public function setSharingMessage(?string $value): self
     {
         $this->sharingMessage = $value;
-
         return $this;
     }
 
     /**
-     * @param array $series
+     * @param Collection|null $series
+     * @return Page
      */
-    public function setSeries(array $series): void
+    public function setSeries(?Collection $series): self
     {
         $this->series = $series;
+        return $this;
     }
 
     /**
      * @param string $language
-     * @return void
+     * @return Page
      */
-    public function setLanguage(string $language): void
+    public function setLanguage(string $language): self
     {
         $this->language = $language;
+        return $this;
+    }
+
+    public function setNoindex(bool $value = false): self
+    {
+        $this->noindex = $value;
+        return $this;
+    }
+
+    public function setNofollow(bool $value = false): self
+    {
+        $this->nofollow = $value;
+        return $this;
     }
 
     /**
      * Adds a {@link Url} to the {@link Page}.
      *
      * @param Url $url The new {@link Url} to add to the {@link Page}
+     * @return Page
      */
-    public function addUrl(Url $url): void
+    public function addUrl(Url $url): self
     {
         $this->urls[] = $url;
+        return $this;
     }
 
     /**
@@ -746,9 +779,10 @@ class Page
      *
      * @param Category $category The new {@link Category} to add to the {@link Page}
      */
-    public function addCategory(Category $category): void
+    public function addCategory(Category $category): self
     {
         $this->categories[] = $category;
+        return $this;
     }
 
     /**
@@ -757,7 +791,6 @@ class Page
     public function removeCategories(): self
     {
         $this->categories->clear();
-
         return $this;
     }
 
@@ -766,9 +799,10 @@ class Page
      *
      * @param Tag $tag The new {@link Tag} to add to the {@link Page}
      */
-    public function addTag(Tag $tag): void
+    public function addTag(Tag $tag): self
     {
         $this->tags[] = $tag;
+        return $this;
     }
 
     /**
@@ -777,7 +811,6 @@ class Page
     public function removeTags(): self
     {
         $this->tags->clear();
-
         return $this;
     }
 
@@ -791,31 +824,20 @@ class Page
         if (empty($this->postDate)) {
             return '';
         }
-        return $this->postDate->format('Y').
-            '/'.$this->postDate->format('m').
-            '/'.$this->postDate->format('d');
+        return $this->postDate->format('Y') .
+            '/' . $this->postDate->format('m') .
+            '/' . $this->postDate->format('d');
     }
 
     /**
      * Confirms the status being set to the {@link Page} is valid.
      *
-     * @param string $value The string to test as being a valid status
+     * @param string|null $value The string to test as being a valid status
      * @return bool Result of testing if string is draft or published
      */
-    public function isValidStatus($value): bool
+    public function isValidStatus(?string $value): bool
     {
         return $value === self::DRAFT || $value === self::PUBLISHED;
-    }
-
-    /**
-     * Confirms the visibility being set to the {@link Page} is valid.
-     *
-     * @param string $value The visibility to test as being valid
-     * @return bool Result of testing of the visibility is public or private
-     */
-    public function isValidVisibility($value): bool
-    {
-        return $value === self::VIS_PRIVATE || $value === self::VIS_PUBLIC;
     }
 
     /**
@@ -824,23 +846,23 @@ class Page
      * @param string $timezone The string to test
      * @return bool The result of testing if string is a valid Timezone
      */
-    public function isValidTimezone($timezone): bool
+    public function isValidTimezone(string $timezone): bool
     {
-        return in_array($timezone, \DateTimeZone::listIdentifiers());
+        return in_array($timezone, DateTimeZone::listIdentifiers());
     }
 
     /**
      * Determines if current page is scheduled for publishing.
      *
      * @return bool Result of testing if {@link post_date} is in the future
-     * @throws \Exception
+     * @throws Exception
      */
     public function isScheduledPage(): bool
     {
-        $today = new \DateTime('now', new \DateTimeZone($this->getTimezone()));
-        $postDate = new \DateTime(
+        $today = new DateTime('now', new DateTimeZone($this->getTimezone()));
+        $postDate = new DateTime(
             $this->getPostDate()->format('Y-m-d H:i:s'),
-            new \DateTimeZone($this->getTimezone())
+            new DateTimeZone($this->getTimezone())
         );
 
         return $this->getStatus() == Page::PUBLISHED && $postDate->format('YmdHis') > $today->format('YmdHis');
@@ -856,17 +878,26 @@ class Page
         return $this->status === self::DRAFT;
     }
 
+    /**
+     * @return bool Check if {@link Page::$content} contains external images
+     */
     public function hasHotlinkedImages(): bool
     {
-        preg_match('/\!\\[[^\\]]*\\]\\(https?:/', $this->getContent(), $matches);
+        preg_match('/!\[[^]]*]\(https?:/', $this->getContent(), $matches);
         return !empty($matches);
     }
 
+    /**
+     * @return bool Flag indicating if this content type can be exported
+     */
     public static function isExportable(): bool
     {
         return true;
     }
 
+    /**
+     * @return string The name to use for this content type when referred to by export, etc.
+     */
     public static function getName(): string
     {
         return 'Pages and Posts';

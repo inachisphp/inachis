@@ -4,6 +4,8 @@
 	clear: left;
 
 	div.ui-tabs-panel {
+		background-color: #fff;
+		border: 1px solid #eee;
 		padding: 30px 20px 60px 20px;
 	}
 
@@ -15,6 +17,12 @@
 
 	.zebra article:nth-of-type(2n) {
 		background-color: #f2f2f2;
+	}
+
+	ol.ui-widget-content {
+		background-color: #fff;
+		border: 1px solid #eee;
+		margin: 0;
 	}
 
 	ol.ui-widget-content, .post, .page, .series {
@@ -54,7 +62,10 @@
 
 			&.date {
 				margin-top: 10px;
-				font-size: 0.85em;
+				font-size: 0.8em;
+			}
+			&.date span.material-icons:not(:first-of-type) {
+				margin-left: 0.75em;
 			}
 		}
 		span {

@@ -1,11 +1,21 @@
 <?php
+
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Service;
 
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\PasswordResetRequest;
 use App\Repository\UserRepository;
 use App\Repository\PasswordResetRequestRepository;
 use Doctrine\ORM\NonUniqueResultException;
+use Exception;
 use Random\RandomException;
 
 /**
@@ -57,7 +67,7 @@ class PasswordResetTokenService
 
     /**
      * @throws RandomException
-     * @throws \Exception
+     * @throws Exception
      */
     public function createResetRequestForEmail(string $email): ?array
     {
@@ -73,7 +83,7 @@ class PasswordResetTokenService
 
         $raw = bin2hex(random_bytes(32));
         $hash = hash_hmac('sha256', $raw, $this->appSecret);
-        $expires = new \DateTimeImmutable(sprintf('+%d seconds', $this->ttlSeconds));
+        $expires = new DateTimeImmutable(sprintf('+%d seconds', $this->ttlSeconds));
 
         $passwordResetRequest = new PasswordResetRequest($user, $hash, $expires);
         $this->em->persist($passwordResetRequest);
@@ -101,10 +111,10 @@ class PasswordResetTokenService
         if (!$candidate) {
             return null;
         }
-        $now = new \DateTimeImmutable();
-//        if ($candidate->getExpiresAt() < $now) {
-//            return null;
-//        }
+        $now = new DateTimeImmutable();
+        if ($candidate->getExpiresAt() < $now) {
+            return null;
+        }
         if (!hash_equals($candidate->getTokenHash(), $hash)) {
             return null;
         }
@@ -112,6 +122,10 @@ class PasswordResetTokenService
         return $candidate;
     }
 
+    /**
+     * @param PasswordResetRequest $request
+     * @return void
+     */
     public function markAsUsed(PasswordResetRequest $request): void
     {
         $request->markUsed();

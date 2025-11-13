@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Util;
 
 class ContentRevisionCompare
@@ -9,7 +16,7 @@ class ContentRevisionCompare
      * @param $revision
      * @return bool
      */
-    public function doesPageMatchRevision($page, $revision): bool
+    public static function doesPageMatchRevision($page, $revision): bool
     {
         return
             $revision->getContent() === $page->getContent() &&

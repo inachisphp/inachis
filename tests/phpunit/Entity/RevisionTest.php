@@ -1,76 +1,88 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ * 
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Tests\phpunit\Entity;
 
 use App\Entity\Revision;
 use App\Entity\User;
+use DateTime;
+use Exception;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 
 class RevisionTest extends TestCase
 {
-    protected $revision;
+    protected Revision $revision;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->revision = new Revision();
-
         parent::setUp();
     }
 
-    public function testGetAndSetId()
+    public function testGetAndSetId(): void
     {
-        $this->revision->setId('test');
-        $this->assertEquals('test', $this->revision->getId());
+        $uuid = Uuid::uuid1();
+        $this->revision->setId($uuid);
+        $this->assertEquals($uuid, $this->revision->getId());
     }
 
-    public function testGetAndSetPageId()
+    public function testGetAndSetPageId(): void
     {
         $this->revision->setPageId('test');
         $this->assertEquals('test', $this->revision->getPageId());
     }
 
-    public function testGetAndSetVersionNumber()
+    /**
+     * @throws Exception
+     */
+    public function testGetAndSetVersionNumber(): void
     {
         $this->revision->setVersionNumber(223);
         $this->assertEquals(223, $this->revision->getVersionNumber());
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->revision->setVersionNumber(-1);
     }
 
-    public function testGetAndSetModDate()
+    public function testGetAndSetModDate(): void
     {
-        $testDate = new \DateTime();
+        $testDate = new DateTime();
         $this->revision->setModDate($testDate);
         $this->assertEquals($testDate, $this->revision->getModDate());
     }
 
-    public function testGetAndSetUser()
+    public function testGetAndSetUser(): void
     {
         $testUser = new User();
         $this->revision->setUser($testUser);
         $this->assertEquals($testUser, $this->revision->getUser());
     }
 
-    public function testGetAndSetAction()
+    public function testGetAndSetAction(): void
     {
-        $testUser = new User();
         $this->revision->setAction('Updated content');
         $this->assertEquals('Updated content', $this->revision->getAction());
     }
 
-    public function testGetAndSetTitle()
+    public function testGetAndSetTitle(): void
     {
         $this->revision->setTitle('Test');
         $this->assertEquals('Test', $this->revision->getTitle());
     }
 
-    public function testGetAndSetSubTitle()
+    public function testGetAndSetSubTitle(): void
     {
         $this->revision->setSubTitle('Test');
         $this->assertEquals('Test', $this->revision->getSubTitle());
     }
 
-    public function testGetAndSetContent()
+    public function testGetAndSetContent(): void
     {
         $this->revision->setContent('Test');
         $this->assertEquals('Test', $this->revision->getContent());

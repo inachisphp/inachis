@@ -1,92 +1,109 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
-use App\Exception\InvalidTimezoneException;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Object for handling {@link Page} revisions
  */
 #[ORM\Entity(repositoryClass: 'App\Repository\RevisionRepository', readOnly: false)]
-#[ORM\Index(name: 'search_idx', columns: [ 'page_id', 'user_id' ])]
+#[ORM\Index(columns: [ 'page_id', 'user_id' ], name: 'search_idx')]
 class Revision
 {
     /**
-     * @var \Ramsey\Uuid\UuidInterface
+     * @var UuidInterface|null
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    private $id;
+    protected ?UuidInterface $id = null;
 
     /**
-     * @var
+     * @var string|null
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    private $page_id;
+    protected ?string $page_id;
 
     /**
-     * @var inr
+     * @var int
      */
     #[ORM\Column(type: 'integer', nullable: false)]
-    private $versionNumber = 0;
+    protected int $versionNumber = 0;
 
     /**
      * @var string
      */
     #[ORM\Column(type: 'string', length: 255)]
-    private $action;
+    protected string $action;
 
     /**
      * @var string The title of the {@link Page}
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    protected $title;
+    protected string $title;
 
     /**
-     * @var string An optional sub-title for the {@link Page}
+     * @var string|null An optional sub-title for the {@link Page}
      */
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    protected $subTitle = null;
+    protected ?string $subTitle = null;
 
     /**
-     * @var text The contents of the revision
+     * @var string|null The contents of the revision
      */
     #[ORM\Column(type: 'text', nullable: true)]
-    private $content;
+    protected ?string $content;
 
     /**
-     * @var User The author for the {@link Page}
+     * @var User|null The author for the {@link Page}
      */
     #[ORM\ManyToOne(targetEntity: 'App\Entity\User', cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
-    private $user;
+    protected ?User $user;
 
     /**
-     * @var string The date the {@link Page} was last modified
+     * @var DateTime|null The date the {@link Page} was last modified
      */
     #[ORM\Column(type: 'datetime')]
-    protected $modDate;
+    protected ?DateTime $modDate;
+
+    public function __construct()
+    {
+        $this->modDate = new DateTime();
+    }
 
     /**
-     * @return string|null
+     * Returns the value of {@link id}.
+     *
+     * @return UuidInterface|null The UUID of the {@link Revision}
      */
-    public function getId(): ?string
+    public function getId(): ?UuidInterface
     {
         return $this->id;
     }
 
     /**
-     * @param string $id
+     * Sets the value of {@link id}.
+     *
+     * @param UuidInterface $value The UUID of the {@link Revision}
      * @return $this
      */
-    public function setId(string $id): self
+    public function setId(UuidInterface $value): self
     {
-        $this->id = $id;
-
+        $this->id = $value;
         return $this;
     }
 
@@ -120,12 +137,12 @@ class Revision
     /**
      * @param int $versionNumber
      * @return Revision
-     * @throws \Exception
+     * @throws Exception
      */
     public function setVersionNumber(int $versionNumber): self
     {
         if ($versionNumber < 1) {
-            throw new \Exception('Invalid version number');
+            throw new Exception('Invalid version number');
         }
         $this->versionNumber = $versionNumber;
 
@@ -134,21 +151,19 @@ class Revision
 
     /**
      * Returns the value of {@link modDate}.
-     *
-     * @return string The date the {@link Page} was last modified
+     * @return DateTime The date the {@link Page} was last modified
      */
-    public function getModDate() : \DateTime
+    public function getModDate(): DateTime
     {
         return $this->modDate;
     }
 
     /**
      * Sets the value of {@link modDate}.
-     *
-     * @param \DateTime $value The date to set
+     * @param DateTime|null $value The date to set
      * @return Revision
      */
-    public function setModDate(\DateTime $value = null): self
+    public function setModDate(?DateTime $value): self
     {
         $this->modDate = $value;
 
@@ -165,22 +180,28 @@ class Revision
 
     /**
      * Sets the value of {@link author}.
-     *
-     * @param User $value The UUID of the {@link Page} author
+     * @param User|null $value The UUID of the {@link Page} author
      * @return Revision
      */
-    public function setUser(User $value = null): self
+    public function setUser(?User $value = null): self
     {
         $this->user = $value;
 
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getAction(): ?string
     {
         return $this->action;
     }
 
+    /**
+     * @param string $action
+     * @return $this
+     */
     public function setAction(string $action): self
     {
         $this->action = $action;
@@ -188,11 +209,18 @@ class Revision
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getTitle(): ?string
     {
         return $this->title;
     }
 
+    /**
+     * @param string $title
+     * @return $this
+     */
     public function setTitle(string $title): self
     {
         $this->title = $title;
@@ -200,11 +228,18 @@ class Revision
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getSubTitle(): ?string
     {
         return $this->subTitle;
     }
 
+    /**
+     * @param string|null $subTitle
+     * @return $this
+     */
     public function setSubTitle(?string $subTitle = null): self
     {
         $this->subTitle = $subTitle;
@@ -212,11 +247,18 @@ class Revision
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getContent(): ?string
     {
         return $this->content;
     }
 
+    /**
+     * @param string|null $content
+     * @return $this
+     */
     public function setContent(?string $content): self
     {
         $this->content = $content;
