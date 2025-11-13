@@ -27,11 +27,7 @@ class SearchRepository extends AbstractRepository
     /**
      * @throws Exception
      */
-    public function search(?string $keyword,
-                           int     $offset = 0,
-                           int     $limit = 25,
-                           string  $orderBy = 'relevance DESC, contentDate DESC'
-    ): SearchResult {
+    public function search(?string $keyword, int $offset = 0, int $limit = 25, string  $orderBy = 'relevance DESC, contentDate DESC'): SearchResult {
         $sql = sprintf('%s ORDER BY %s LIMIT :limit OFFSET :offset;',
             $this->getSQLUnion([
                 'p.id, p.title, p.sub_title, p.content, CONCAT(UCASE(LEFT(type, 1)), LCASE(SUBSTRING(type, 2))) AS type, p.post_date AS contentDate, p.mod_date, p.author_id as author,
@@ -67,7 +63,7 @@ class SearchRepository extends AbstractRepository
             ->fetchOne();
     }
 
-    private function getSQLUnion($fieldLists)
+    protected function getSQLUnion($fieldLists)
     {
         return sprintf('
             (SELECT %s FROM page p WHERE %s)
@@ -80,7 +76,7 @@ class SearchRepository extends AbstractRepository
         );
     }
 
-    private function getWhereConditions($type)
+    protected function getWhereConditions($type)
     {
         return match($type) {
             'page' => 'MATCH(p.title, p.sub_title, p.content) AGAINST(:kw IN NATURAL LANGUAGE MODE)',
