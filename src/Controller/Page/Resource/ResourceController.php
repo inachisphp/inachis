@@ -41,7 +41,7 @@ class ResourceController extends AbstractInachisController
             "offset" => "\d+",
             "limit" => "\d+"
         ],
-        defaults: [ "offset" => 0, "limit" => 10 ],
+        defaults: [ "offset" => 0, "limit" => 25 ],
         methods: [ "GET", "POST" ],
     )]
     public function list(Request $request): Response
@@ -179,8 +179,8 @@ class ResourceController extends AbstractInachisController
                 $fullImagePath = $imageDirectory . $fullImagePath;
             }
             $sizes = getimagesize($fullImagePath);
-            $this->data['channels'] = $sizes['channels'];
-            $this->data['bits'] = $sizes['bits'];
+            $this->data['channels'] = $sizes['channels'] ?? '';
+            $this->data['bits'] = $sizes['bits'] ?? '';
             $this->data['limitKByte'] = Image::WARNING_FILESIZE;
             $this->data['limitSize'] = Image::WARNING_DIMENSIONS;
         }

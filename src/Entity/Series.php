@@ -20,6 +20,7 @@ use Ramsey\Uuid\UuidInterface;
  */
 #[ORM\Entity(repositoryClass: 'App\Repository\SeriesRepository', readOnly: false)]
 #[ORM\Index(columns: ['title'], name: 'search_idx')]
+#[ORM\Index(columns: ['title', 'sub_title', 'description'], name: "fulltext_title_content", flags: ["fulltext"])]
 class Series
 {
     /**

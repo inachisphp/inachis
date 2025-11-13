@@ -58,20 +58,28 @@
                     {% if column.slug is defined %}
                         <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incc/{{ slug_prefix }}/{{ slug_object }}">
                     {% endif %}
+                    {% if column.url is defined and column.url is not empty %}
+                            <a aria-label="Edit {{ attribute(item, 'title') }}" href="{{ attribute(item, column.url) }}">
+                    {% endif %}
                     {% if column.source is defined and attribute(item, column.source) is defined %}
                         {% if column.source_type is defined and column.source_type == 'date' %}
                             {{ attribute(item, column.source)|date('d/m/Y') }}
                         {% elseif column.source_type is defined and column.source_type == 'title' %}
                             {{ attribute(attribute(item, column.source), 'title') }}
                         {% else %}
-                            {{ attribute(item, column.source) }}
+                            {% if column.maxLength is defined %}
+                                {{ attribute(item, column.source)|slice(0, column.maxLength) }}
+                                {% if attribute(item, column.source)|length > 300 %}…{% endif %}
+                            {% else %}
+                                {{ attribute(item, column.source) }}
+                            {% endif %}
                         {% endif %}
                     {% elseif column.badges|default(null) is not empty %}
                         {% include 'inadmin/partials/badge.html.twig' with {
                             badges: column.badges,
                         } %}
                     {% endif %}
-                    {% if column.slug is defined %}
+                    {% if column.slug is defined or (column.url is defined and column.url is not empty) %}
                         </a>
                     {% endif %}
                 </{% if column.header is defined and column.header %}th{% else %}td{% endif %}>

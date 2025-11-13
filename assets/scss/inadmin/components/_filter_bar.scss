@@ -6,9 +6,26 @@
   background-color: #ccc;
   display: flex;
   flex-direction: row-reverse;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   font-size: 0.9em;
   justify-content: space-between;
+
+  @media #{$information-medium} {
+    flex-wrap: nowrap;
+    //justify-content: space-between;
+    padding-right: 1em;
+  }
+
+  & > p:last-child {
+    display: block;
+    text-align: left;
+    width: 100%;
+
+    @media #{$information-medium} {
+      display: inline-block;
+      width: auto;
+    }
+  }
 
   input[name=selectAllNone] {
     margin: 0 1.4em;
@@ -18,20 +35,27 @@
     display: none;
   }
 
+  .button--add {
+    margin-right: 0.5em;
+    @media #{$information-medium} {
+      margin-right: 0;
+    }
+  }
+
   .filter__controls {
     align-items: center;
     display: flex;
     flex-direction: row-reverse;
-  }
+    flex-wrap: wrap;
 
-  @media #{$information-medium} {
-    flex-wrap: nowrap;
-    //justify-content: space-between;
-    padding-right: 1em;
+    @media #{$information-medium} {
+      flex-wrap: nowrap;
+    }
   }
 
   .filter__section-keyword {
     margin: 1em auto;
+    position: relative;
 
     @media #{$information-medium} {
       margin: 1em 0;
@@ -41,12 +65,17 @@
       border: 1px solid #eee;
       border-radius: .5em;
       padding: 0.55em 0.55em 0.55em 2em;
+      width: 13em;
+
+      @media #{$information-medium} {
+        width: 15em;
+      }
     }
     label {
       color: gray;
-      //left: 1.8em;
-      position: relative;
-      //top: 1em;
+      position: absolute;
+      right: 8.4em;
+      top: 0.3em;
 
       @media #{$information-medium} {
         position: relative;
@@ -74,9 +103,13 @@
       border: 1px solid transparent;
       color: $admin__filter_button-color;
       display: inline-block;
-      margin-left: 1em;
+      margin: 0 1em;
       padding: .5em 1em;
       text-decoration: none;
+
+      @media #{$information-medium} {
+        margin: 0 0 0 1em;
+      }
     }
     a.filter__toggle:hover {
       background-color: color.adjust($admin__filter_button-background, $lightness: -20%);

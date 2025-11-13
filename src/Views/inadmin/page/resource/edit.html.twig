@@ -13,7 +13,7 @@
         {{ form_start(form, {'attr': { 'class': 'form form__post form__resource' }}) }}
         <div class="col span_5_of_8 content__edit">
         <fieldset id="post__edit">
-            <h3>Details</h3>
+            <h3>{{ 'admin.resources.details.title'|trans }}</h3>
             <p>
                 {{ form_label(form.title) }}
                 {{ form_errors(form.title) }}
@@ -31,16 +31,19 @@
             </p>
         </fieldset>
         <fieldset id="post__properties">
-            <h3>Properties</h3>
+            <h3>{{ 'admin.resources.properties.title'|trans }}</h3>
             {% if page.type == 'images' %}
-            <p><strong>Dimensions:</strong> {{ resource.dimensionX ~ ' (w) x ' ~ resource.dimensionY ~ ' (h)' }}</p>
-            <p><strong>Colour Depth:</strong> {{ bits }}-bit {% if channels == 3 %}RGB{% else %}CMYK{% endif %}</p>
+            <p><strong>{{ 'admin.resources.properties.dimensions'|trans }}:</strong> {{ resource.dimensionX ~ ' (w) x ' ~ resource.dimensionY ~ ' (h)' }}</p>
+                {% if channels is not empty or bits is not empty %}
+            <p><strong>{{ 'admin.resources.properties.colourDepth'|trans }}:</strong> {% if bits is not empty %}{{ bits }}-bit{% endif %} {% if channels == 3 %}RGB{% elseif channels == 4 %}CMYK{% endif %}</p>
+                    {% endif %}
             {% endif %}
-            <p><strong>File name:</strong> {{ resource.filename }}</p>
-            <p><strong>File type:</strong> {{ resource.filetype }}</p>
+            <p><strong>{{ 'admin.resources.properties.filename'|trans }}:</strong> {{ resource.filename }}</p>
+            <p><strong>{{ 'admin.resources.properties.filetype'|trans }}:</strong> {{ resource.filetype }}</p>
             {% if not (resource.filename starts with 'http')  %}
-            <p><strong>Size:</strong> {{ resource.filesize }} bytes ({{ (resource.filesize / 1024 / 1024) }} Mb)</p>
+            <p><strong>{{ 'admin.resources.properties.filesize'|trans }}:</strong> {{ resource.filesize }} bytes ({{ (resource.filesize / 1024 / 1024)|round(2) }} Mb)</p>
             {% endif %}
+            <p><strong>{{ 'admin.resources.properties.modDate'|trans }}:</strong> {{ resource.modDate|date('d F Y') }}</p>
             <p>&nbsp;</p>
         </fieldset>
         </div>
@@ -52,9 +55,18 @@
                     name: '',
                     show_gallery_button: 0,
                 }) }}
+                <input class="visually-hidden"
+                       id="image_markdown"
+                       type="text"
+                       value="![{{ resource.altText }}]({% if not (resource.filename starts with 'http')  %}/imgs/{% endif %}{{ resource.filename }})" />
+                <input class="visually-hidden"
+                       id="image_link"
+                       type="text"
+                       value="{% if not (resource.filename starts with 'http')  %}/imgs/{% endif %}{{ resource.filename }}" />
             {% endif %}
+
             <fieldset id="post_usages">
-                <h3>Usages</h3>
+                <h3>{{ 'admin.resources.usages.title'|trans }}</h3>
                 {% if usages.posts|default(null) is not empty or usages.series|default(null) is not empty %}
                     <ol>
                         {% for content_type,content_uses in usages %}
@@ -66,22 +78,34 @@
                                     {% set link = '/incc/' ~ image_use.type ~ '/' ~ image_use.urls[0].link %}
                                 {% endif %}
                                 <li>
-                                    <a href="{{ link }}">{{ image_use.title }} {% if image_use.subTitle is not empty %} &mdash; {{ image_use.subTitle }}{% endif %}</a>
+                                    {{ content_type|title }}: <a href="{{ link }}">{{ image_use.title }} {% if image_use.subTitle is not empty %} &mdash; {{ image_use.subTitle }}{% endif %}</a>
                                 </li>
                             {% endfor %}
                         {% endfor %}
                     </ol>
                 {% else %}
-                    <p>Image is not in known use.</p>
+                    <p>{{ 'admin.resources.usages.notInUse'|trans }}</p>
                 {% endif %}
             </fieldset>
         </div>
         <div class="fixed-bottom-bar">
             <p>
+                {{ form_widget(form.submit) }}
                 {% if openai_api is defined and open_ai|default(false) %}
                     {{ form_widget(form.generate_alt_text) }}
                 {% endif %}
-                {{ form_widget(form.submit) }}
+
+                <button aria-label="{{ 'admin.resources.images.copyMarkdown.help'|trans }}"
+                        data-target="image_markdown"
+                        class="button button--secondary button--copy"
+                        type="button"
+                >{{ 'admin.resources.images.copyMarkdown.label'|trans }}</button>
+                <button aria-label="{{ 'admin.resources.images.copyLink.help'|trans }}"
+                        data-target="image_link"
+                        class="button button--secondary button--copy"
+                        type="button"
+                >{{ 'admin.resources.images.copyLink.label'|trans }}</button>
+
             {% if resource.id is not null and usages.posts|default(null) is empty and usages.series|default(null) is empty %}
                 {{ form_widget(form.delete) }}
             {% endif %}

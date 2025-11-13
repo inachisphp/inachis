@@ -16,6 +16,12 @@
   display: flex;
   flex-wrap: wrap;
   list-style-type: none;
+  margin: auto;
+  padding: 0;
+
+  @media #{$information-medium} {
+    padding: 0 40px;
+  }
 
   li {
     display: inline-block;
@@ -30,7 +36,11 @@
       height: 14.5em;
       padding: 1em;
       text-decoration: none;
-      width: 150px;
+      width: 145px;
+
+      @media #{$information-medium} {
+        width: 150px;
+      }
     }
 
     a:hover {

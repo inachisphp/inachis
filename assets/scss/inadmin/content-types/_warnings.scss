@@ -27,19 +27,3 @@
     display: block;
   }
 }
-
-.ui-help {
-  span {
-    display: none;
-  }
-  &:hover span {
-    background-color: #eee;
-    border: 1px solid #333;
-    display: block;
-    font-size: 0.8em;
-    font-weight: normal;
-    padding: 10px;
-    position: absolute;
-    width: auto;
-  }
-}

@@ -1,0 +1,7 @@
+<form class="form">
+    <p>Are you sure you want to delete <strong>{{ title }}</strong>?</p>
+    {{ include('inadmin/partials/admonition.html.twig', {
+        'type': 'warning',
+        'text': warning,
+    }) }}
+</form>

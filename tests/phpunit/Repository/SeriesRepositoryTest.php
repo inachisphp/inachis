@@ -154,6 +154,7 @@ class SeriesRepositoryTest extends TestCase
         $filters = ['keyword' => 'test'];
         $offset = 0;
         $limit = 10;
+        $sort = 'modDate asc';
 
         $paginator = $this->createMock(Paginator::class);
 
@@ -162,11 +163,11 @@ class SeriesRepositoryTest extends TestCase
                 $offset,
                 $limit,
                 $this->callback(fn($where) => is_array($where) && strpos($where[0], 'LIKE :keyword') !== false),
-                $this->anything()
+                [['q.modDate', 'ASC']],
             )
             ->willReturn($paginator);
 
-        $result = $this->repository->getFiltered($filters, $offset, $limit);
+        $result = $this->repository->getFiltered($filters, $offset, $limit, $sort);
         $this->assertInstanceOf(Paginator::class, $result);
     }
 
@@ -175,6 +176,7 @@ class SeriesRepositoryTest extends TestCase
         $filters = [];
         $offset = 0;
         $limit = 5;
+        $sort = 'modDate asc';
 
         $paginator = $this->createMock(Paginator::class);
 
@@ -183,11 +185,11 @@ class SeriesRepositoryTest extends TestCase
                 $offset,
                 $limit,
                 [],
-                $this->anything()
+                [['q.modDate', 'ASC']],
             )
             ->willReturn($paginator);
 
-        $result = $this->repository->getFiltered($filters, $offset, $limit);
+        $result = $this->repository->getFiltered($filters, $offset, $limit, $sort);
         $this->assertInstanceOf(Paginator::class, $result);
     }
 

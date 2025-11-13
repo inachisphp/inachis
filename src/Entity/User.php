@@ -97,7 +97,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column(type: "string", length: 512)]
     #[Assert\NotBlank]
-    protected string $displayName;
+    protected string $displayName = '';
 
     /**
      * @var array The roles assigned to this user. Currently, not in use.

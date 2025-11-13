@@ -46,9 +46,9 @@
             </ul>
         </section>
         <section class="admin__search">
-            <form action="{{ path('incc_post_list', {'type': 'post'}) }}" method="post">
+            <form action="{{ path('incc_search_results', { 'keyword': ' '}) }}" method="post">
                 <label for="q" class="material-icons">{% trans %}admin.search.label{% endtrans %}</label>
-                <input id="q" name="filter[keyword]" placeholder="{% trans %}admin.search.placeholder{% endtrans %}" type="search" />
+                <input id="q" name="keyword" placeholder="{% trans %}admin.search.placeholder{% endtrans %}" type="search" />
                 <button class="clear-search material-icons" data-target="#q" type="button">cancel</button>
             </form>
         </section>

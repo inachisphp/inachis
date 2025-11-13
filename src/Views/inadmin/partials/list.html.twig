@@ -96,16 +96,16 @@
             <span class="date">
                 {% endif %}
                 {% if item.postDate|default(false) %}
-                <span class="material-icons">schedule</span>
+                <span class="material-icons">event</span>
                  Post date: <em>{{ item.postDate|date('jS F Y \\a\\t H:i', timezone) }}</em>
                 {% endif %}
                 {% if item.items is defined %}
                     {% if item.firstDate is not empty %}
-                <span class="material-icons">schedule</span>{{ item.firstDate|date("F j, Y") }} to {{ item.lastDate|date("F j, Y") }}
+                <span class="material-icons">date_range</span>{{ item.firstDate|date("F j, Y") }} to {{ item.lastDate|date("F j, Y") }}
                     {% endif %}
                 <span class="material-icons">library_books</span> <strong>{{ item.items|length }}</strong> posts
                 {% endif %}
-                <span class="material-icons">schedule</span>
+                <span class="material-icons">history</span>
                  Last modified: <em>{{ item.modDate|date('jS F Y \\a\\t H:i', timezone) }}</em>
                 {% if inline|default(false) == false %}
             </p>
