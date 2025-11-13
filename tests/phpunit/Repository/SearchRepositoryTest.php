@@ -57,19 +57,15 @@ class SearchRepositoryTest extends TestCase
             ['id' => 2, 'title' => 'Second result']
         ];
 
-        // Mock the Statement for the main search query
         $mainStmt = $this->createMock(Result::class);
         $mainStmt->expects($this->once())
             ->method('fetchAllAssociative')
             ->willReturn($fetchedRows);
-
-        // Mock the Statement for the total count query
         $countStmt = $this->createMock(Result::class);
         $countStmt->expects($this->once())
             ->method('fetchOne')
             ->willReturn($totalResults);
 
-        // Mock prepare() calls for both queries
         $this->connection
             ->expects($this->exactly(2))
             ->method('prepare')
@@ -81,11 +77,8 @@ class SearchRepositoryTest extends TestCase
                     'executeQuery' => $countStmt
                 ])
             );
-
-        // Run the search
         $result = $this->repository->search($keyword, $offset, $limit);
 
-        // Assertions
         $this->assertInstanceOf(SearchResult::class, $result);
         $this->assertSame($fetchedRows, $result->getResults());
         $this->assertSame($totalResults, $result->getTotal());
