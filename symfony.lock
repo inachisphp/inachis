@@ -101,9 +101,6 @@
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
     },
-    "jedi58/versioning-bundle": {
-        "version": "5.0.1"
-    },
     "karser/karser-recaptcha3-bundle": {
         "version": "0.1",
         "recipe": {
@@ -236,6 +233,9 @@
             "./phpunit.xml.dist",
             "./tests/bootstrap.php"
         ]
+    },
+    "shivas/versioning-bundle": {
+        "version": "4.1.1"
     },
     "squizlabs/php_codesniffer": {
         "version": "3.8",
