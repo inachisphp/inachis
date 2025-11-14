@@ -113,11 +113,11 @@ class PageController extends AbstractInachisController
         $filters = array_filter($request->request->all('filter', []));
         $sort = $request->request->get('sort', 'postDate desc');
         if ($request->isMethod('post')) {
-            $_SESSION['post_filters'] = $filters;
-            $_SESSION['post_sort'] = $sort;
-        } elseif (isset($_SESSION['post_filters'])) {
-            $filters = $_SESSION['post_filters'];
-            $sort = $_SESSION['post_sort'];
+            $request->getSession()->set('post_filters', $filters);
+            $request->getSession()->set('post_sort', $sort);
+        } elseif ($request->getSession()->has('post_filters')) {
+            $filters = $request->getSession()->get('post_filters', '');
+            $sort = $request->getSession()->get('post_sort', '');
         }
 
         $offset = (int) $request->attributes->get('offset', 0);

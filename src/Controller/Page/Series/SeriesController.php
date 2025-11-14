@@ -69,11 +69,11 @@ class SeriesController extends AbstractInachisController
         $filters = array_filter($request->request->all('filter', []));
         $sort = $request->get('sort', 'lastDate desc');
         if ($request->isMethod('post')) {
-            $_SESSION['series_filters'] = $filters;
-            $_SESSION['series_sort'] = $sort;
-        } elseif (isset($_SESSION['series_filters'])) {
-            $filters = $_SESSION['series_filters'];
-            $sort = $_SESSION['series_sort'];
+            $request->getSession()->set('series_filters', $filters);
+            $request->getSession()->set('series_sort', $sort);
+        } elseif ($request->getSession()->has('series_filters')) {
+            $filters = $request->getSession()->get('series_sort', '');
+            $sort = $request->getSession()->get('series_sort', '');
         }
         $offset = (int) $request->attributes->get('offset', 0);
         $limit = (int) $request->attributes->get(
