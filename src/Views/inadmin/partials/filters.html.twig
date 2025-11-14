@@ -1,6 +1,6 @@
 {% block filter %}
 
-{% if filters is defined and filters is not empty or show_search|default(false) %}
+{% if filters is defined and filters is not empty or show_search|default(false) or (sort_options is defined and sort_options is not empty) %}
 <section class="filter">
     <div class="filter__controls">
     {% if add_button is defined and add_button is not empty %}

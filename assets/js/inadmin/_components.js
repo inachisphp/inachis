@@ -19,6 +19,10 @@ let InachisComponents = {
 			$imagePreview.find('button.button--confirm').remove();
 		});
 
+		$('.ui-sortby select#sort').on('change', function () {
+			$(this).closest('form').trigger('submit');
+		});
+
 		// jQuery Tabs
 		$('.ui-tabbed').tabs();
 		$('.error-select').hide();

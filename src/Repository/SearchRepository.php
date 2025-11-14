@@ -28,13 +28,23 @@ class SearchRepository extends AbstractRepository
      * @throws Exception
      */
     public function search(?string $keyword, int $offset = 0, int $limit = 25, string  $orderBy = 'relevance DESC, contentDate DESC'): SearchResult {
+        $orderBy = match ($orderBy) {
+            'contentDate asc' => 'contentDate ASC',
+            'contentDate desc' => 'contentDate DESC',
+            'relevance asc' => 'relevance ASC, contentDate DESC',
+            'title desc' => 'title DESC',
+            'title asc' => 'title ASC',
+            'type desc' => 'type DESC',
+            'type asc' => 'type ASC',
+            default => 'relevance DESC, contentDate DESC',
+        };
         $sql = sprintf('%s ORDER BY %s LIMIT :limit OFFSET :offset;',
             $this->getSQLUnion([
-                'p.id, p.title, p.sub_title, p.content, CONCAT(UCASE(LEFT(type, 1)), LCASE(SUBSTRING(type, 2))) AS type, p.post_date AS contentDate, p.mod_date, p.author_id as author,
+                'p.id, p.title as title, p.sub_title, p.content, CONCAT(UCASE(LEFT(type, 1)), LCASE(SUBSTRING(type, 2))) AS type, p.post_date AS contentDate, p.mod_date, p.author_id as author,
                 MATCH(p.title, p.sub_title, p.content) AGAINST(:kw IN NATURAL LANGUAGE MODE) AS relevance',
-                's.id, s.title, s.sub_title, s.description AS content, \'Series\' AS type, s.last_date AS contentDate, s.mod_date, s.author_id AS author, 
+                's.id, s.title as title, s.sub_title, s.description AS content, \'Series\' AS type, s.last_date AS contentDate, s.mod_date, s.author_id AS author, 
                 MATCH(s.title, s.sub_title, s.description) AGAINST(:kw IN NATURAL LANGUAGE MODE) AS relevance',
-                'i.id, i.title, i.filename as sub_title, i.alt_text as content, \'Image\' as type, mod_date as contentDate, i.mod_date, i.author_id as author,
+                'i.id, i.title as title, i.filename as sub_title, i.alt_text as content, \'Image\' as type, mod_date as contentDate, i.mod_date, i.author_id as author,
                 MATCH(i.title, i.alt_text, i.description) AGAINST(:kw IN NATURAL LANGUAGE MODE) AS relevance',
             ]),
             $orderBy,

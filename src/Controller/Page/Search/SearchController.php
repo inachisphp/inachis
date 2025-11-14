@@ -48,14 +48,17 @@ class SearchController extends AbstractInachisController
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
+        $sort = $request->request->get('sort', '');
+
         $results = $repo->search(
             $request->attributes->get('keyword'),
             $request->attributes->get('offset'),
-            $request->attributes->get('limit')
+            $request->attributes->get('limit'),
+            $sort,
         );
 
         $this->data['form'] = $form->createView();
-//        $this->data['page']['sort'] = $sort;
+        $this->data['page']['sort'] = $sort;
         $this->data['page']['offset'] = $results->getOffset();
         $this->data['page']['limit'] = $results->getLimit();
         $this->data['page']['title'] =  sprintf('\'%s\' results', $request->attributes->get('keyword'));
