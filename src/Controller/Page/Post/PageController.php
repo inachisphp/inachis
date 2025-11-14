@@ -20,6 +20,7 @@ use App\Form\PostType;
 use App\Repository\RevisionRepository;
 use App\Util\ContentRevisionCompare;
 use App\Util\ReadingTime;
+use App\Util\UrlNormaliser;
 use DateTime;
 use Exception;
 use Ramsey\Uuid\Uuid;
@@ -70,6 +71,25 @@ class PageController extends AbstractInachisController
                         );
                         $post->setModDate(new DateTime('now'));
                         $this->entityManager->persist($post);
+                    }
+                }
+                if ($request->request->has('rebuild')) {
+                    $post = $this->entityManager->getRepository(Page::class)->findOneById($item);
+                    if ($post !== null) {
+                        if (!empty($post->getUrls())) {
+                            foreach ($post->getUrls() as $url) {
+                                $this->entityManager->getRepository(Url::class)->remove($url);
+                            }
+                        }
+                        $link = $post->getPostDateAsLink() . '/' . UrlNormaliser::toUri($post->getTitle());
+                        if ($post->getSubTitle() !== null) {
+                            $link .= '-' . UrlNormaliser::toUri($post->getSubTitle());
+                        }
+                        $url = new Url($post, $link);
+                        $this->entityManager->persist($url);
+                        $post->setModDate(new DateTime('now'));
+                        $this->entityManager->persist($post);
+                        $this->entityManager->flush();
                     }
                 }
 //                if ($request->request->has('export')) {
