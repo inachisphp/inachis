@@ -1,3 +1,9 @@
+{% if post.featureImage|default('') is not empty %}
+    {% set featureImage = post.featureImage %}
+{% elseif series.image|default('') is not empty %}
+    {% set featureImage = series.image %}
+{% endif %}
+
     <meta name="twitter:card" content="summary_large_image">
 {% if settings.twitter|default('') is not empty %}
     <meta name="twitter:site" content="@{{ settings.twitter }}">
@@ -5,9 +11,9 @@
 {% endif %}
     <meta name="twitter:title" content="{{ page.title }}{% if page.title != '' %} / {% endif %}{{ settings.siteTitle }}">
     <meta name="twitter:description" content="{{ page.description }}">
-{% if post.featureImage|default('') is not empty %}
-    <meta name="twitter:image" content="{{ post.featureImage.filename }}">
-    <meta name="twitter:image:alt" content="{{ post.featureImage.altText }}">
+{% if featureImage|default('') is not empty %}
+    <meta name="twitter:image" content="{{ featureImage.filename }}">
+    <meta name="twitter:image:alt" content="{{ featureImage.altText }}">
 {% endif %}
 
 
@@ -16,12 +22,13 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="{{ page.title }}{% if page.title != '' %} / {% endif %}{{ settings.siteTitle }}">
     <meta property="og:description" content="{{ page.description }}">
-{% if post.featureImage|default('') is not empty %}
-    <meta property="og:image" content="{{ post.featureImage.filename }}">
+{% if featureImage|default('') is not empty %}
+    <meta property="og:image" content="{{ featureImage.filename }}">
     <!-- meta property="og:image:type" content="image/jpeg" -->
-    <meta property="og:image:alt" content="{{ post.featureImage.altText }}">
+    <meta property="og:image:alt" content="{{ featureImage.altText }}">
 {% endif %}
     <meta property="og:article:author" content="David G. Paul">
+    <meta property="og:locale" content="en_GB" />
     <meta property="og:article:published_time" content="">
 {% if settings.fb_app_id|default('') is not empty %}
     <meta property="fb:app_id" content="{{ settings.fb_app_id }}">
