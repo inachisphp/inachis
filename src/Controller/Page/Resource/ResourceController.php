@@ -154,6 +154,7 @@ class ResourceController extends AbstractInachisController
                     }
                 }
             }
+            $resource->setAuthor($this->getUser());
             $resource->setModDate(new \DateTime('now'));
             $this->entityManager->persist($resource);
             $this->entityManager->flush();

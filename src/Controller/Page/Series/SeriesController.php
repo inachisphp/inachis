@@ -138,6 +138,7 @@ class SeriesController extends AbstractInachisController
                 return $this->redirect($this->generateUrl('incc_series_list'));
             }
 
+            $series->setAuthor($this->getUser());
             $series->setModDate(new DateTime('now'));
             $this->entityManager->persist($series);
             $this->entityManager->flush();
