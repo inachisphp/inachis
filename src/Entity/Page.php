@@ -25,6 +25,7 @@ use Ramsey\Uuid\UuidInterface;
  */
 #[ORM\Entity(repositoryClass: 'App\Repository\PageRepository', readOnly: false)]
 #[ORM\Index(columns: ['title', 'author_id', 'image_id'], name: 'search_idx')]
+#[ORM\Index(columns: ['title', 'sub_title', 'content'], name: "fulltext_title_content", flags: ["fulltext"])]
 class Page
 {
     /**
@@ -209,6 +210,12 @@ class Page
      */
     #[ORM\Column(type: 'string', length: 15, nullable: true)]
     protected ?string $language;
+
+    #[ORM\Column(type: 'boolean')]
+    protected ?bool $noindex = false;
+
+    #[ORM\Column(type: 'boolean')]
+    protected ?bool $nofollow = false;
 
     /**
      * Default constructor for {@link Page}.
@@ -481,6 +488,22 @@ class Page
     }
 
     /**
+     * @return bool|null
+     */
+    public function getNoindex(): ?bool
+    {
+        return $this->noindex;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getNofollow(): ?bool
+    {
+        return $this->nofollow;
+    }
+
+    /**
      * Sets the value of {@link id}.
      *
      * @param UuidInterface $value The UUID of the {@link Page}
@@ -724,6 +747,18 @@ class Page
     public function setLanguage(string $language): self
     {
         $this->language = $language;
+        return $this;
+    }
+
+    public function setNoindex(bool $value = false): self
+    {
+        $this->noindex = $value;
+        return $this;
+    }
+
+    public function setNofollow(bool $value = false): self
+    {
+        $this->nofollow = $value;
         return $this;
     }
 

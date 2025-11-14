@@ -31,12 +31,15 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PageControllerTest extends WebTestCase
 {
     private PageController $controller;
     private EntityManagerInterface|MockObject $entityManager;
     private Security|MockObject $security;
+
+    private TranslatorInterface $translator;
 
     /**
      * @throws \ReflectionException
@@ -45,7 +48,8 @@ class PageControllerTest extends WebTestCase
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->security = $this->createMock(Security::class);
-        $this->controller = new PageController($this->entityManager, $this->security);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->controller = new PageController($this->entityManager, $this->security, $this->translator);
 
         $ref = new ReflectionClass($this->controller);
         foreach (['entityManager', 'security'] as $prop) {
@@ -65,7 +69,7 @@ class PageControllerTest extends WebTestCase
         $request = new Request();
 
         $controller = $this->getMockBuilder(PageController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security])
+            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
             ->onlyMethods(['denyAccessUnlessGranted', 'render'])
             ->getMock();
         $formFactory = $this->createMock(FormFactoryInterface::class);
@@ -127,7 +131,7 @@ class PageControllerTest extends WebTestCase
             ->willReturn($urlRepository);
 
         $controller = $this->getMockBuilder(PageController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security])
+            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
             ->onlyMethods(['denyAccessUnlessGranted', 'redirectToRoute'])
             ->getMock();
         $controller->expects($this->once())
@@ -180,7 +184,7 @@ class PageControllerTest extends WebTestCase
         $form->method('isSubmitted')->willReturn(false);
 
         $controller = $this->getMockBuilder(PageController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security])
+            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
             ->onlyMethods(['denyAccessUnlessGranted', 'createForm', 'render'])
             ->getMock();
 

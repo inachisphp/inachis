@@ -29,10 +29,9 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class AccountController.
@@ -74,10 +73,9 @@ class AccountController extends AbstractInachisController
 
     /**
      * @param Request $request
-     * @param TranslatorInterface $translator
      * @param PasswordResetTokenService $tokenService
-     * @param RateLimiterFactory $forgotPasswordIpLimiter
-     * @param RateLimiterFactory $forgotPasswordAccountLimiter
+     * @param RateLimiterFactoryInterface $forgotPasswordIpLimiter
+     * @param RateLimiterFactoryInterface $forgotPasswordAccountLimiter
      * @param MailerInterface $mailer
      * @return Response
      * @throws RandomException
@@ -85,10 +83,9 @@ class AccountController extends AbstractInachisController
     #[Route("/incc/forgot-password", name: "incc_account_forgot-password", methods: [ "GET", "POST" ])]
     public function forgotPassword(
         Request $request,
-        TranslatorInterface $translator,
         PasswordResetTokenService $tokenService,
-        RateLimiterFactory $forgotPasswordIpLimiter,
-        RateLimiterFactory $forgotPasswordAccountLimiter,
+        RateLimiterFactoryInterface $forgotPasswordIpLimiter,
+        RateLimiterFactoryInterface $forgotPasswordAccountLimiter,
         MailerInterface $mailer,
     ): Response {
         $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();
@@ -162,10 +159,9 @@ class AccountController extends AbstractInachisController
 
     /**
      * @param Request $request
-     * @param TranslatorInterface $translator
      * @param PasswordResetTokenService $tokenService
      * @param UserPasswordHasherInterface $hasher
-     * @param RateLimiterFactory $forgotPasswordIpLimiter
+     * @param RateLimiterFactoryInterface $forgotPasswordIpLimiter
      * @param string $token
      * @return Response
      * @throws NonUniqueResultException
@@ -173,10 +169,9 @@ class AccountController extends AbstractInachisController
     #[Route("/incc/new-password/{token}", name: "incc_account_new-password", methods: [ "GET", "POST" ])]
     public function newPassword(
         Request $request,
-        TranslatorInterface $translator,
         PasswordResetTokenService $tokenService,
         UserPasswordHasherInterface $hasher,
-        RateLimiterFactory $forgotPasswordIpLimiter,
+        RateLimiterFactoryInterface $forgotPasswordIpLimiter,
         string $token,
     ): Response {
         $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();

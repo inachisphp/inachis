@@ -114,10 +114,10 @@ class PageController extends AbstractInachisController
         $sort = $request->request->get('sort', 'postDate desc');
         if ($request->isMethod('post')) {
             $_SESSION['post_filters'] = $filters;
-            $_SESSION['sort'] = $sort;
+            $_SESSION['post_sort'] = $sort;
         } elseif (isset($_SESSION['post_filters'])) {
             $filters = $_SESSION['post_filters'];
-            $sort = $_SESSION['sort'];
+            $sort = $_SESSION['post_sort'];
         }
 
         $offset = (int) $request->attributes->get('offset', 0);
@@ -201,8 +201,8 @@ class PageController extends AbstractInachisController
 
         if ($form->isSubmitted()) {//} && $form->isValid()) {
             if ($form->has('delete') && $form->get('delete')->isClicked()) {
-                $this->entityManager->getRepository(Page::class)->remove($post);
                 $this->entityManager->getRepository(Revision::class)->deleteAndRecordByPage($post);
+                $this->entityManager->getRepository(Page::class)->remove($post);
                 return $this->redirectToRoute(
                     'incc_dashboard',
                     [],

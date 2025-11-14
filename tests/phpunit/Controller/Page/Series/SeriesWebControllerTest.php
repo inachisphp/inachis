@@ -23,12 +23,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SeriesWebControllerTest extends WebTestCase
 {
     private SeriesWebController $controller;
     private EntityManagerInterface|MockObject $entityManager;
     private Security|MockObject $security;
+
+    private TranslatorInterface $translator;
 
     /**
      * @throws \ReflectionException
@@ -37,7 +40,8 @@ class SeriesWebControllerTest extends WebTestCase
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->security = $this->createMock(Security::class);
-        $this->controller = new SeriesWebController($this->entityManager, $this->security);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->controller = new SeriesWebController($this->entityManager, $this->security, $this->translator);
 
         $ref = new ReflectionClass($this->controller);
         foreach (['entityManager', 'security'] as $prop) {
@@ -66,7 +70,7 @@ class SeriesWebControllerTest extends WebTestCase
                 [Series::class, $seriesRepo],
             ]);
         $controller = $this->getMockBuilder(SeriesWebController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security])
+            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
             ->onlyMethods(['render'])
             ->getMock();
         $ref = new ReflectionClass($controller);

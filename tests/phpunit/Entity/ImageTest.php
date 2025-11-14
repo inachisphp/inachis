@@ -10,6 +10,7 @@
 namespace App\Tests\phpunit\Entity;
 
 use App\Entity\Image;
+use App\Entity\User;
 use DateTime;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -84,7 +85,14 @@ class ImageTest extends TestCase
         $this->assertFalse($this->image->verifyChecksum('test123'));
     }
 
-    public function testSetAndGetCreateDate(): void
+    public function testSetAndGetAuthor(): void
+    {
+        $this->image->setAuthor(new User('test'));
+        $this->assertInstanceOf(User::class, $this->image->getAuthor());
+        $this->assertEquals('test', $this->image->getAuthor()->getUsername());
+    }
+
+        public function testSetAndGetCreateDate(): void
     {
         $this->image->setCreateDate(new DateTime('1970-01-02 01:34:56'));
         $this->assertEquals('1970-01-02 01:34:56', $this->image->getCreateDate()->format('Y-m-d H:i:s'));

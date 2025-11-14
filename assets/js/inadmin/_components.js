@@ -1,6 +1,7 @@
 let InachisComponents = {
 	initialize: function() {
 		this.initClearSearch('');
+		this.initCopyPaste('');
 		this.initDatePicker();
 		this.initFilterBar();
 		this.initSelect2('');
@@ -8,6 +9,19 @@ let InachisComponents = {
 		this.initSeriesControls();
 		this.initSwitches('');
 		this.initUIToggle();
+
+		$('.image_preview .button--confirm').on('click', function(event)
+		{
+			event.preventDefault();
+			const $imagePreview = $('.image_preview');
+			$imagePreview.find('input[type=hidden]').val('');
+			$imagePreview.find('img').remove();
+			$imagePreview.find('button.button--confirm').remove();
+		});
+
+		$('.ui-sortby select#sort').on('change', function () {
+			$(this).closest('form').trigger('submit');
+		});
 
 		// jQuery Tabs
 		$('.ui-tabbed').tabs();
@@ -27,6 +41,19 @@ let InachisComponents = {
 			let $searchBox = $($(this).attr('data-target'));
 			$searchBox.val('');
 			$searchBox.closest('form').trigger('submit');
+		});
+	},
+	initCopyPaste: function (selector)
+	{
+		$(selector + '.button--copy').on('click', async function ()
+		{
+			const $textSource = $('#' + $(this).attr('data-target')),
+				copyText = ($(this).attr('data-prefix') ?? '') + $textSource.val();
+			try {
+				await navigator.clipboard.writeText(copyText);
+			} catch (err) {
+				console.error('Failed to copy: ', err)
+			}
 		});
 	},
 	initDatePicker: function ()
@@ -71,7 +98,7 @@ let InachisComponents = {
 			let $properties = {
 				allowClear: true,
 				maximumInputLength: 20,
-				width: '40%'
+				width: 'element',
 			};
 			if ($(this).attr('data-tags')) {
 				$properties.tags = 'true';

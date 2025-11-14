@@ -35,7 +35,16 @@ class AdminProfileController extends AbstractInachisController
      * @return Response
      * @throws Exception
      */
-    #[Route("/incc/admin-management", name: "incc_admin_list", methods: [ 'GET', 'POST' ])]
+    #[Route(
+        "/incc/admin/list/{offset}/{limit}",
+        name: 'incc_admin_list',
+        requirements: [
+            "offset" => "\d+",
+            "limit" => "\d+"
+        ],
+        defaults: [ "offset" => 0, "limit" => 25 ],
+        methods: [ "GET", "POST" ]
+    )]
     public function list(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -92,7 +101,6 @@ class AdminProfileController extends AbstractInachisController
      * @throws RandomException
      */
     #[Route("/incc/admin/{id}", name: "incc_admin_edit", methods: [ "GET", "POST" ])]
-    #[Route("/incc/admin/new", name: "incc_admin_new", methods: [ "GET", "POST" ])]
     public function edit(
         Request $request,
         ImageTransformer $imageTransformer,
@@ -102,7 +110,11 @@ class AdminProfileController extends AbstractInachisController
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $user = $request->attributes->get('id') !== 'new' ? $this->entityManager->getRepository(User::class)->findOneBy(['username' => $request->attributes->get('id')]) : new User();
+        $user = $request->attributes->get('id') !== 'new' ?
+            $this->entityManager->getRepository(User::class)->findOneBy(
+                [ 'username' => $request->attributes->get('id') ]
+            ):
+            new User();
         $form = $this->createForm(UserType::class, $user, [
             'validation_groups' => [ '' ],
         ]);

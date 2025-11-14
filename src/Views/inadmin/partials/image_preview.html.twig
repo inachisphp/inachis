@@ -11,7 +11,12 @@
         endif %} src="{{ filename }}" />
     {% endif %}
     {% if show_gallery_button|default(true) %}
-    <button href="#" class="button button--info dialog__link"
+        {% if filename is not empty %}
+            <button class="button button--info button--confirm"
+
+            ><span class="material-icons">hide_image</span> Remove Image</button>
+        {% endif %}
+    <button class="button button--info dialog__link"
             data-class-name="dialog__imageManager"
             data-target="{{ id }}"
             data-template-name="image-manager"

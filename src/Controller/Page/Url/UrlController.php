@@ -69,11 +69,11 @@ class UrlController extends AbstractInachisController
         $filters = array_filter($request->request->all('filter', []));
         $sort = $request->request->get('sort', 'contentDate asc');
         if ($request->isMethod('post')) {
-            $_SESSION['series_filters'] = $filters;
-            $_SESSION['sort'] = $sort;
-        } elseif (isset($_SESSION['series_filters'])) {
-            $filters = $_SESSION['series_filters'];
-            $sort = $_SESSION['sort'];
+            $_SESSION['url_filters'] = $filters;
+            $_SESSION['url_sort'] = $sort;
+        } elseif (isset($_SESSION['url_filters'])) {
+            $filters = $_SESSION['url_filters'];
+            $sort = $_SESSION['url_sort'];
         }
         $offset = (int) $request->attributes->get('offset', 0);
         $limit = (int) $request->attributes->get(

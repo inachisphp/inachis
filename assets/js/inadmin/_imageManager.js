@@ -71,10 +71,20 @@ var InachisImageManager = {
 
     chooseImageAction: function()
     {
-        var selectedImage = $('.gallery input[type=radio]:checked'),
-            imageTarget = $('.image_preview .dialog__link').data('target');
-        $('#' + imageTarget).val(selectedImage.val());
-        $('.image_preview img').prop('src', selectedImage.siblings().first().children('img').prop('src'));
+        let selectedImage = $('.gallery input[type=radio]:checked'),
+            imageTargetId = $('.image_preview .dialog__link').data('target'),
+            $imagePreview =  $('.image_preview'),
+            $imagePreviewImage = $imagePreview.find('img')
+        ;
+        $('#' + imageTargetId).val(selectedImage.val());
+        if ($imagePreviewImage.length) {
+            $imagePreviewImage.prop('src', selectedImage.siblings().first().children('img').prop('src'));
+        } else {
+            $('<img>', {
+                alt: 'Preview of chosen image',
+                src: selectedImage.siblings().first().children('img').prop('src'),
+            }).insertAfter('#' + imageTargetId);
+        }
         $('#dialog__imageManager').dialog('close');
     },
 
