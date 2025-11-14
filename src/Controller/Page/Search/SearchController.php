@@ -49,6 +49,11 @@ class SearchController extends AbstractInachisController
         $form->handleRequest($request);
 
         $sort = $request->request->get('sort', '');
+        if ($request->isMethod('post')) {
+            $_SESSION['search_sort'] = $sort;
+        } elseif (isset($_SESSION['search_sort'])) {
+            $sort = $_SESSION['search_sort'];
+        }
 
         $results = $repo->search(
             $request->attributes->get('keyword'),

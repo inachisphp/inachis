@@ -66,6 +66,11 @@ class ResourceController extends AbstractInachisController
             $this->entityManager->getRepository($typeClass)->getMaxItemsToShow()
         );
         $sort = $request->request->get('sort', 'title asc');
+        if ($request->isMethod('post')) {
+            $_SESSION[$type . '_sort'] = $sort;
+        } elseif (isset($_SESSION[$type . '_sort'])) {
+            $sort = $_SESSION[$type . '_sort'];
+        }
         $this->data['dataset'] = $this->entityManager->getRepository($typeClass)->getFiltered(
             $filters,
             $offset,
