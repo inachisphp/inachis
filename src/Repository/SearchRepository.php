@@ -32,8 +32,10 @@ class SearchRepository extends AbstractRepository
             $this->getSQLUnion([
                 'p.id, p.title, p.sub_title, p.content, CONCAT(UCASE(LEFT(type, 1)), LCASE(SUBSTRING(type, 2))) AS type, p.post_date AS contentDate, p.mod_date, p.author_id as author,
                 MATCH(p.title, p.sub_title, p.content) AGAINST(:kw IN NATURAL LANGUAGE MODE) AS relevance',
-                's.id, s.title, s.sub_title, s.description AS content, \'Series\' AS type, s.last_date AS contentDate, s.mod_date, \'\' AS author, 
+                's.id, s.title, s.sub_title, s.description AS content, \'Series\' AS type, s.last_date AS contentDate, s.mod_date, s.author_id AS author, 
                 MATCH(s.title, s.sub_title, s.description) AGAINST(:kw IN NATURAL LANGUAGE MODE) AS relevance',
+                'i.id, i.title, i.filename as sub_title, i.alt_text as content, \'Image\' as type, mod_date as contentDate, i.mod_date, i.author_id as author,
+                MATCH(i.title, i.alt_text, i.description) AGAINST(:kw IN NATURAL LANGUAGE MODE) AS relevance',
             ]),
             $orderBy,
         );
@@ -56,7 +58,7 @@ class SearchRepository extends AbstractRepository
     private function getSearchTotalResults($keyword): int
     {
         $sql = sprintf('SELECT COUNT(*) AS total FROM (%s) AS all_results;',
-            $this->getSQLUnion([ 'id', 'id' ])
+            $this->getSQLUnion([ 'id', 'id', 'id' ])
         );
         return $this->connection->prepare($sql)
             ->executeQuery([ 'kw' => '%' . $keyword . '%' ])
@@ -68,17 +70,22 @@ class SearchRepository extends AbstractRepository
         return sprintf('
             (SELECT %s FROM page p WHERE %s)
             UNION ALL
-            (SELECT %s FROM series s WHERE %s)',
+            (SELECT %s FROM series s WHERE %s)
+            UNION ALL
+            (SELECT %s FROM image i WHERE %s)',
             $fieldLists[0],
             $this->getWhereConditions('page'),
             $fieldLists[1],
             $this->getWhereConditions('series'),
+            $fieldLists[2],
+            $this->getWhereConditions('image'),
         );
     }
 
     protected function getWhereConditions($type)
     {
         return match($type) {
+            'image' => 'MATCH(i.title, i.alt_text, i.description) AGAINST(:kw IN NATURAL LANGUAGE MODE)',
             'page' => 'MATCH(p.title, p.sub_title, p.content) AGAINST(:kw IN NATURAL LANGUAGE MODE)',
             'series' => 'MATCH(s.title, s.sub_title, s.description) AGAINST(:kw IN NATURAL LANGUAGE MODE)',
         };

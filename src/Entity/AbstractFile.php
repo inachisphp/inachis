@@ -67,6 +67,13 @@ abstract class AbstractFile
     protected string $checksum;
 
     /**
+     * @var User|null The UUID of the {@link User} that uploaded the file
+     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\User', cascade: [ 'detach' ])]
+    #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id')]
+    protected ?User $author = null;
+
+    /**
      * @var DateTime
      */
     #[ORM\Column(type: 'datetime')]
@@ -146,6 +153,16 @@ abstract class AbstractFile
     public function getChecksum(): ?string
     {
         return $this->checksum;
+    }
+
+    /**
+     * Returns the value of {@link author}.
+     *
+     * @return User|null The UUID of the {@link AbstractFile} author
+     */
+    public function getAuthor(): ?User
+    {
+        return $this->author;
     }
 
     /**
@@ -274,6 +291,18 @@ abstract class AbstractFile
     {
         $this->checksum = $value;
 
+        return $this;
+    }
+
+    /**
+     * Sets the value of {@link author}.
+     *
+     * @param User|null $value The {@link User} to set as the author
+     * @return AbstractFile
+     */
+    public function setAuthor(?User $value = null): self
+    {
+        $this->author = $value;
         return $this;
     }
 

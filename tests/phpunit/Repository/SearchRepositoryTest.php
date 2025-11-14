@@ -89,7 +89,7 @@ class SearchRepositoryTest extends TestCase
 
     public function testGetSQLUnionGeneratesCorrectSQL(): void
     {
-        $fields = ['p.id, p.title', 's.id, s.title'];
+        $fields = ['p.id, p.title', 's.id, s.title', 'i.id, i.title'];
 
         $reflection = new \ReflectionClass($this->repository);
         $method = $reflection->getMethod('getSQLUnion');
@@ -99,6 +99,7 @@ class SearchRepositoryTest extends TestCase
 
         $this->assertStringContainsString('SELECT p.id, p.title FROM page p WHERE', $sql);
         $this->assertStringContainsString('SELECT s.id, s.title FROM series s WHERE', $sql);
+        $this->assertStringContainsString('SELECT i.id, i.title FROM image i WHERE', $sql);
         $this->assertStringContainsString('UNION ALL', $sql);
     }
 }

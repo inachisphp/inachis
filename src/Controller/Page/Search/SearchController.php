@@ -66,7 +66,26 @@ class SearchController extends AbstractInachisController
                 'relevance',
                 number_format($result['relevance'], 2)
             );
+            $author = $this->entityManager->getRepository(User::class)->findOneBy([
+                'id' => $result['author'],
+            ]);
+            $this->data['results']->updateResultPropertyByKey(
+                $key,
+                'author',
+                $author->getDisplayName(),
+            );
             switch ($result['type']) {
+                case 'Image':
+                    $this->data['results']->updateResultPropertyByKey(
+                        $key,
+                        'url',
+                        $this->generateUrl('incc_resource_edit', [
+                            'type' => 'images',
+                            'filename' => $result['sub_title']]
+                        )
+                    );
+                    break;
+
                 case 'Series':
                     $this->data['results']->updateResultPropertyByKey(
                         $key,
@@ -81,9 +100,6 @@ class SearchController extends AbstractInachisController
                         'content' => $result['id'],
                         'default' => true,
                     ]);
-                    $author = $this->entityManager->getRepository(User::class)->findOneBy([
-                        'id' => $result['author'],
-                    ]);
                     $this->data['results']->updateResultPropertyByKey(
                         $key,
                         'url',
@@ -92,11 +108,6 @@ class SearchController extends AbstractInachisController
                             strtolower($result['type']),
                             !empty($link) ? $link->getLink() : ''
                         ),
-                    );
-                    $this->data['results']->updateResultPropertyByKey(
-                        $key,
-                        'author',
-                        $author->getDisplayName(),
                     );
             }
         }
