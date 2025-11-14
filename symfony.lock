@@ -74,18 +74,6 @@
             "config/packages/google_apiclient.yaml"
         ]
     },
-    "google/recaptcha": {
-        "version": "1.3",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "1.1",
-            "ref": "e5a4aa21f2e98d7440ae9aab6b56e307f99dd084"
-        },
-        "files": [
-            "./config/packages/google_recaptcha.yaml"
-        ]
-    },
     "guzzlehttp/guzzle": {
         "version": "6.3.3"
     },
@@ -103,18 +91,6 @@
     },
     "jedi58/versioning-bundle": {
         "version": "5.0.1"
-    },
-    "karser/karser-recaptcha3-bundle": {
-        "version": "0.1",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "0.1",
-            "ref": "c51ce07c10331d506762efe25b6f5843c1a5ea17"
-        },
-        "files": [
-            "./config/packages/karser_recaptcha3.yaml"
-        ]
     },
     "michelf/php-markdown": {
         "version": "1.8.0"
