@@ -40,7 +40,9 @@ class SearchController extends AbstractInachisController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         if ($request->attributes->get('keyword') === ' ' && !empty($request->request->get('keyword', ''))) {
-            return $this->redirectToRoute('incc_search_results', ['keyword' => $request->request->get('keyword')]);
+            $keyword = str_replace('/', '', $request->request->get('keyword', ''));
+            $keyword = preg_replace('/(?:%25)*2[fF]/', '', $keyword);
+            return $this->redirectToRoute('incc_search_results', ['keyword' => $keyword]);
         }
 
         $form = $this->createFormBuilder()->getForm();
