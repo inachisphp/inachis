@@ -47,6 +47,8 @@ trait DefaultResourceRepository
             'title desc'      => ['q.title', 'DESC'],
             'createDate asc'  => ['q.createDate', 'ASC'],
             'createDate desc' => ['q.createDate', 'DESC'],
+            'filesize asc'    => ['q.filesize', 'ASC'],
+            'filesize desc'   => ['q.filesize', 'DESC'],
             'modDate asc'     => ['q.modDate', 'ASC'],
             'modDate desc'    => ['q.modDate', 'DESC'],
             default           => ['q.title', 'ASC'],

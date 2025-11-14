@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Entity(repositoryClass: 'App\Repository\ImageRepository', readOnly: false)]
 #[ORM\Index(columns: ['title', 'filename', 'filetype'], name: 'search_idx')]
+#[ORM\Index(columns: ['title', 'alt_text', 'description'], name: "fulltext_title_content", flags: ["fulltext"])]
 class Image extends AbstractFile
 {
     /**
