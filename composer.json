@@ -6,13 +6,7 @@
     "authors": [
         { "name": "David G. Paul" }
     ],
-    "version": "0.0.5",
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/jedi58/versioning-bundle"
-        }
-    ],
+    "version": "1.0.0",
     "require": {
         "php": ">=8.4",
         "ext-fileinfo": "*",

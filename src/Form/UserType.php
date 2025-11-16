@@ -11,6 +11,7 @@ namespace App\Form;
 
 use App\Entity\User;
 use App\Util\RandomColorPicker;
+use App\Util\TimezoneChoices;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -81,7 +82,7 @@ class UserType extends AbstractType
                     'aria-labelledby' => 'user__timezone__label',
                     'class' => 'text inline_label',
                 ],
-                'choices' => array_combine(timezone_identifiers_list(), timezone_identifiers_list()),
+                'choices' => (new TimezoneChoices)->getTimezones(),
                 'label' => 'Timezone',
                 'label_attr' => [
                     'class' => 'inline_label',
