@@ -11,6 +11,7 @@ namespace App\Repository;
 
 use App\Entity\Page;
 use App\Entity\Url;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -75,10 +76,8 @@ class UrlRepository extends AbstractRepository
                 )
             )
             ->orderBy('u.link', 'DESC')
-            ->setParameters([
-                'url' => $url . '%',
-                'id' => $id,
-            ])
+            ->setParameter('url', $url . '%')
+            ->setParameter('id', $id)
             ->setMaxResults(1);
         return $qb
             ->getQuery()

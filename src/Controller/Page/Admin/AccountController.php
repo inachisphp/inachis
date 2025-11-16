@@ -29,7 +29,7 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
@@ -74,8 +74,8 @@ class AccountController extends AbstractInachisController
     /**
      * @param Request $request
      * @param PasswordResetTokenService $tokenService
-     * @param RateLimiterFactory $forgotPasswordIpLimiter
-     * @param RateLimiterFactory $forgotPasswordAccountLimiter
+     * @param RateLimiterFactoryInterface $forgotPasswordIpLimiter
+     * @param RateLimiterFactoryInterface $forgotPasswordAccountLimiter
      * @param MailerInterface $mailer
      * @return Response
      * @throws RandomException
@@ -84,8 +84,8 @@ class AccountController extends AbstractInachisController
     public function forgotPassword(
         Request $request,
         PasswordResetTokenService $tokenService,
-        RateLimiterFactory $forgotPasswordIpLimiter,
-        RateLimiterFactory $forgotPasswordAccountLimiter,
+        RateLimiterFactoryInterface $forgotPasswordIpLimiter,
+        RateLimiterFactoryInterface $forgotPasswordAccountLimiter,
         MailerInterface $mailer,
     ): Response {
         $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();
@@ -161,7 +161,7 @@ class AccountController extends AbstractInachisController
      * @param Request $request
      * @param PasswordResetTokenService $tokenService
      * @param UserPasswordHasherInterface $hasher
-     * @param RateLimiterFactory $forgotPasswordIpLimiter
+     * @param RateLimiterFactoryInterface $forgotPasswordIpLimiter
      * @param string $token
      * @return Response
      * @throws NonUniqueResultException
@@ -171,7 +171,7 @@ class AccountController extends AbstractInachisController
         Request $request,
         PasswordResetTokenService $tokenService,
         UserPasswordHasherInterface $hasher,
-        RateLimiterFactory $forgotPasswordIpLimiter,
+        RateLimiterFactoryInterface $forgotPasswordIpLimiter,
         string $token,
     ): Response {
         $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();

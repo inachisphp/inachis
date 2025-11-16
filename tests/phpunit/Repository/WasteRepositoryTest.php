@@ -26,7 +26,6 @@ class WasteRepositoryTest extends TestCase
 {
     private EntityManagerInterface $entityManager;
     private ManagerRegistry $registry;
-    private EntityRepository $repository;
 
     public function setUp(): void
     {
@@ -36,7 +35,7 @@ class WasteRepositoryTest extends TestCase
 
     public function testDeleteWasteByUser()
     {
-        $this->repository = $this->getMockBuilder(WasteRepository::class)
+        $repository = $this->getMockBuilder(WasteRepository::class)
             ->setConstructorArgs([$this->registry])
             ->onlyMethods([ 'getEntityManager', 'createQueryBuilder' ])
             ->addMethods([ 'getRepository' ])
@@ -50,9 +49,9 @@ class WasteRepositoryTest extends TestCase
         $query->method('execute')->willReturn(3);
         $qb->method('getQuery')->willReturn($query);
 
-        $this->repository->method('createQueryBuilder')->willReturn($qb);
+        $repository->method('createQueryBuilder')->willReturn($qb);
         $user = new User();
-        $result = $this->repository->deleteWasteByUser($user);
+        $result = $repository->deleteWasteByUser($user);
         $this->assertIsInt($result);
     }
 }

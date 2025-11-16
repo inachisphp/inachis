@@ -19,6 +19,10 @@ let InachisComponents = {
 			$imagePreview.find('button.button--confirm').remove();
 		});
 
+		$('.ui-sortby select#sort').on('change', function () {
+			$(this).closest('form').trigger('submit');
+		});
+
 		// jQuery Tabs
 		$('.ui-tabbed').tabs();
 		$('.error-select').hide();
@@ -94,7 +98,7 @@ let InachisComponents = {
 			let $properties = {
 				allowClear: true,
 				maximumInputLength: 20,
-				width: '40%'
+				width: 'element',
 			};
 			if ($(this).attr('data-tags')) {
 				$properties.tags = 'true';

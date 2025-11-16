@@ -12,6 +12,7 @@ namespace App\Tests\phpunit\Entity;
 use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Series;
+use App\Entity\User;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
@@ -82,6 +83,13 @@ class SeriesTest extends TestCase
         $this->assertCount(2, $this->series->getItems());
         $this->series->addItem(new Page('test'));
         $this->assertCount(3, $this->series->getItems());
+    }
+
+    public function testSetAndGetAuthor(): void
+    {
+        $this->series->setAuthor(new User('test'));
+        $this->assertInstanceOf(User::class, $this->series->getAuthor());
+        $this->assertEquals('test', $this->series->getAuthor()->getUsername());
     }
 
     public function testSetAndGetCreateDate(): void

@@ -20,6 +20,7 @@ use Ramsey\Uuid\UuidInterface;
  */
 #[ORM\Entity(repositoryClass: 'App\Repository\SeriesRepository', readOnly: false)]
 #[ORM\Index(columns: ['title'], name: 'search_idx')]
+#[ORM\Index(columns: ['title', 'sub_title', 'description'], name: "fulltext_title_content", flags: ["fulltext"])]
 class Series
 {
     /**
@@ -93,6 +94,13 @@ class Series
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Image', cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'image_id', referencedColumnName: 'id')]
     protected ?Image $image = null;
+
+    /**
+     * @var User|null The UUID of the {@link User} that created the {@link Series}
+     */
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\User', cascade: [ 'detach' ])]
+    #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id')]
+    protected ?User $author = null;
 
     /**
      * @var DateTime
@@ -297,6 +305,28 @@ class Series
     public function setImage(?Image $image = null): self
     {
         $this->image = $image;
+        return $this;
+    }
+
+    /**
+     * Returns the value of {@link author}.
+     *
+     * @return User|null The UUID of the {@link Series} author
+     */
+    public function getAuthor(): ?User
+    {
+        return $this->author;
+    }
+
+    /**
+     * Sets the value of {@link author}.
+     *
+     * @param User|null $value The {@link User} to set as the author
+     * @return Series
+     */
+    public function setAuthor(?User $value = null): self
+    {
+        $this->author = $value;
         return $this;
     }
 

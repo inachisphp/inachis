@@ -80,11 +80,13 @@
                     {{ form_widget(form.postDate) }}
 				</span>
             </p>
+            {% if post.id is not empty %}
             <p>
                 {{ form_label(form.modDate) }}
                 {{ form_errors(form.modDate) }}
                 {{ form_widget(form.modDate) }}
             </p>
+            {% endif %}
             <p>
                 {{ form_label(form.categories) }}
                 {{ form_errors(form.categories) }}

@@ -20,6 +20,7 @@ use App\Form\PostType;
 use App\Repository\RevisionRepository;
 use App\Util\ContentRevisionCompare;
 use App\Util\ReadingTime;
+use App\Util\UrlNormaliser;
 use DateTime;
 use Exception;
 use Ramsey\Uuid\Uuid;
@@ -72,6 +73,25 @@ class PageController extends AbstractInachisController
                         $this->entityManager->persist($post);
                     }
                 }
+                if ($request->request->has('rebuild')) {
+                    $post = $this->entityManager->getRepository(Page::class)->findOneById($item);
+                    if ($post !== null) {
+                        if (!empty($post->getUrls())) {
+                            foreach ($post->getUrls() as $url) {
+                                $this->entityManager->getRepository(Url::class)->remove($url);
+                            }
+                        }
+                        $link = $post->getPostDateAsLink() . '/' . UrlNormaliser::toUri($post->getTitle());
+                        if ($post->getSubTitle() !== null) {
+                            $link .= '-' . UrlNormaliser::toUri($post->getSubTitle());
+                        }
+                        $url = new Url($post, $link);
+                        $this->entityManager->persist($url);
+                        $post->setModDate(new DateTime('now'));
+                        $this->entityManager->persist($post);
+                        $this->entityManager->flush();
+                    }
+                }
 //                if ($request->request->has('export')) {
 //                    echo 'export';
 //                    die;
@@ -93,11 +113,11 @@ class PageController extends AbstractInachisController
         $filters = array_filter($request->request->all('filter', []));
         $sort = $request->request->get('sort', 'postDate desc');
         if ($request->isMethod('post')) {
-            $_SESSION['post_filters'] = $filters;
-            $_SESSION['sort'] = $sort;
-        } elseif (isset($_SESSION['post_filters'])) {
-            $filters = $_SESSION['post_filters'];
-            $sort = $_SESSION['sort'];
+            $request->getSession()->set('post_filters', $filters);
+            $request->getSession()->set('post_sort', $sort);
+        } elseif ($request->getSession()->has('post_filters')) {
+            $filters = $request->getSession()->get('post_filters', '');
+            $sort = $request->getSession()->get('post_sort', '');
         }
 
         $offset = (int) $request->attributes->get('offset', 0);
@@ -152,7 +172,7 @@ class PageController extends AbstractInachisController
         Request $request,
         ContentRevisionCompare $contentRevisionCompare,
         string $type = 'post',
-        string $title = null
+        ?string $title = null
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
