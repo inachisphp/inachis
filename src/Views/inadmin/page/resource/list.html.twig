@@ -74,15 +74,15 @@
                     {{ item.title|u.truncate(35, '...', false) }}
                 </a>
                 {% if item.filesize / 1024 > limitKByte %}
-                    <a href="#" class="ui-help">
+                    <span class="ui-help help--warning">
                         <em class="material-icons">warning</em>
-                        <span>This image is larger than {{ limitKByte/1024 }} kb</span>
-                    </a>
-                {% elseif item.dimensionX > limitSize or item.dimensionY > limitSize %}
-                    <a href="#" class="ui-help">
+                        This file is larger than {{ limitKByte/1024 }} kb
+                    </span>
+                {% elseif item.dimensionX|default(0) > limitSize or item.dimensionY|default(0) > limitSize %}
+                    <span href="#" class="ui-help help--warning">
                         <em class="material-icons">warning</em>
-                        <span>This image is larger than {{ limitSize }} on at least one side</span>
-                    </a>
+                        This image is larger than {{ limitSize }} on at least one side
+                    </span>
                 {% endif %}
             </li>
             {% endfor %}
