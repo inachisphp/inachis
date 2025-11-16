@@ -172,7 +172,7 @@ class PageController extends AbstractInachisController
         Request $request,
         ContentRevisionCompare $contentRevisionCompare,
         string $type = 'post',
-        string $title = null
+        ?string $title = null
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
