@@ -21,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LoginType extends AbstractType
 {
-    private $translator;
+    private ?TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator = null)
     {
@@ -57,7 +57,7 @@ class LoginType extends AbstractType
                 'label_attr' => [
                     'id' => 'form-login__password-label',
                 ],
-//                'toggle' => true,
+                'toggle_password' => true,
             ])
 //            ->add('rememberMe', CheckboxType::class, [
 //                'attr' => [

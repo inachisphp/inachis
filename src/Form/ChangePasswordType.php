@@ -53,7 +53,7 @@ class ChangePasswordType extends AbstractType
                     'attr' => [
                         'aria-labelledby' => 'user__current_password__label',
                         'autocomplete' => 'current-password',
-                        'class' => 'text full-width',
+                        'class' => 'text',
                         'placeholder' => 'Enter your current password',
                         'required' => true,
                     ],
@@ -67,6 +67,7 @@ class ChangePasswordType extends AbstractType
                         'id' => 'user__current_password__label'
                     ],
                     'mapped' => false,
+                    'toggle_password' => true,
                 ])
             ;
         } else {
@@ -105,7 +106,7 @@ class ChangePasswordType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'user__new_password__label',
                     'autocomplete' => 'new-password',
-                    'class' => 'text full-width',
+                    'class' => 'text',
                     'minlength' => 8,
                     'placeholder' => 'Enter a new password',
                     'required' => true,
@@ -127,6 +128,7 @@ class ChangePasswordType extends AbstractType
                     'id' => 'user__new_password__label'
                 ],
                 'mapped' => false,
+                'toggle_password' => true,
             ])
         ;
     }
