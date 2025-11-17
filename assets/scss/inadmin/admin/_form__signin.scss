@@ -65,6 +65,9 @@ body.type_login {
 			margin-bottom: 1.3em;
 			width: 90%;
 		}
+		input[data-controller=toggle-password] {
+			width: 80%;
+		}
 		.input:active {
 			border-bottom-color: #069;
 		}
@@ -113,5 +116,11 @@ body.type_login {
 			color: $form-link__hover;
 			text-decoration: underline;
 		}
+	}
+
+	.button--password-toggle {
+		background: transparent;
+		border: none;
+		color: #fff;
 	}
 }
