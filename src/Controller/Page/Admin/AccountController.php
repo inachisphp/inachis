@@ -100,6 +100,7 @@ class AccountController extends AbstractInachisController
                 'X-RateLimit-Retry-After' => $limit->getRetryAfter()->getTimestamp() - time(),
                 'X-RateLimit-Limit' => $limit->getLimit(),
             ];
+            // @todo replace with something better - throw new TooManyRequestsHttpException();
             return new Response('Too many attempts from this IP. Try again later.', 429, $headers);
         }
         $this->entityManager->getRepository(PasswordResetRequest::class)->purgeExpiredHashes();
@@ -120,6 +121,7 @@ class AccountController extends AbstractInachisController
                         'X-RateLimit-Retry-After' => $limit->getRetryAfter()->getTimestamp() - time(),
                         'X-RateLimit-Limit' => $limit->getLimit(),
                     ];
+                    // @todo replace with something better - throw new TooManyRequestsHttpException();
                     return new Response('Too many reset attempts for this account. Try again later.', 429, $headers);
                 }
             }
@@ -202,6 +204,7 @@ class AccountController extends AbstractInachisController
                     'X-RateLimit-Retry-After' => $limit->getRetryAfter()->getTimestamp() - time(),
                     'X-RateLimit-Limit' => $limit->getLimit(),
                 ];
+                // @todo replace with something better - throw new TooManyRequestsHttpException();
                 return new Response('Too many password reset attempts from this IP. Try again later.', 429, $headers);
             };
             $user = $this->entityManager->getRepository(User::class)->findOneBy(
