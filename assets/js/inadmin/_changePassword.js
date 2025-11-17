@@ -23,7 +23,8 @@ let InachisPasswordManager = {
                             3: 'Strong',
                             4: 'Very strong',
                         }
-                        $passwordStrength.html('Strength: ' + strength[data]);
+                        $passwordStrength.html('Password strength: ' + strength[data]);
+                        $('#password-strength-help').html('Password strength: ' + strength[data]);
                     });
                 }
             }, 500);

@@ -99,10 +99,10 @@ let InachisComponents = {
 				$input = $('input[data-controller=' + $button.data('action') + ']');
 			if ($input.attr('type') === "password") {
 				$input.attr('type', 'text');
-				$button.html('visibility_off');
+				$button.html('visibility');
 			} else {
 				$input.attr('type', 'password');
-				$button.html('visibility');
+				$button.html('visibility_off');
 			}
 		});
 	},
