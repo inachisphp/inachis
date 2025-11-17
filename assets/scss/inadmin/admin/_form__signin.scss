@@ -78,6 +78,9 @@ body.type_login {
 			margin-right: .5em;
 			width: auto;
 		}
+		input#change_password_new_password {
+			margin-bottom: 0;
+		}
 
 		label {
 			color: $form-label__light;
@@ -90,6 +93,11 @@ body.type_login {
 
 		legend {
 			display: none;
+		}
+
+		.password-strength {
+			margin-bottom: 1.3em;
+			width: 85%;
 		}
 	}
 
