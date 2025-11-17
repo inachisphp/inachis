@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-
 class SearchController extends AbstractInachisController
 {
     /**
@@ -50,9 +49,9 @@ class SearchController extends AbstractInachisController
 
         $sort = $request->request->get('sort', '');
         if ($request->isMethod('post')) {
-            $_SESSION['search_sort'] = $sort;
-        } elseif (isset($_SESSION['search_sort'])) {
-            $sort = $_SESSION['search_sort'];
+            $request->getSession()->set('search_sort', $sort);
+        } elseif ($request->getSession()->has('search_sort')) {
+            $sort = $request->getSession()->get('search_sort', '');
         }
 
         $results = $repo->search(

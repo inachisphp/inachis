@@ -67,9 +67,9 @@ class ResourceController extends AbstractInachisController
         );
         $sort = $request->request->get('sort', 'title asc');
         if ($request->isMethod('post')) {
-            $_SESSION[$type . '_sort'] = $sort;
-        } elseif (isset($_SESSION[$type . '_sort'])) {
-            $sort = $_SESSION[$type . '_sort'];
+            $request->getSession()->set($type . '_sort', $sort);
+        } elseif ($request->getSession()->has($type . '_sort')) {
+            $sort = $request->getSession()->get($type . '_sort', '');
         }
         $this->data['dataset'] = $this->entityManager->getRepository($typeClass)->getFiltered(
             $filters,

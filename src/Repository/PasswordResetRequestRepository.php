@@ -12,6 +12,7 @@ namespace App\Repository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use App\Entity\PasswordResetRequest;
 use App\Entity\User;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
@@ -31,7 +32,8 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
             ->andWhere('r.user = :user')
             ->andWhere('r.used = false')
             ->andWhere('r.expiresAt > :now')
-            ->setParameters(['user' => $user, 'now' => new DateTimeImmutable()])
+            ->setParameter('user', $user)
+            ->setParameter('now', new DateTimeImmutable())
             ->getQuery()
             ->getResult();
     }

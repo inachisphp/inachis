@@ -4,6 +4,7 @@ let InachisComponents = {
 		this.initCopyPaste('');
 		this.initDatePicker();
 		this.initFilterBar();
+		this.initPasswordToggle();
 		this.initSelect2('');
 		this.initSelectAllNone('');
 		this.initSeriesControls();
@@ -89,6 +90,21 @@ let InachisComponents = {
 			$('#filter__options').toggle();
 			$filterOptions.toggleClass('selected');
 		}
+	},
+	initPasswordToggle: function ()
+	{
+		$('button.button--password-toggle').on('click', function ()
+		{
+			const $button = $(this),
+				$input = $('input[data-controller=' + $button.data('action') + ']');
+			if ($input.attr('type') === "password") {
+				$input.attr('type', 'text');
+				$button.html('visibility_off');
+			} else {
+				$input.attr('type', 'password');
+				$button.html('visibility');
+			}
+		});
 	},
 	// See https://select2.github.io/examples.html
 	initSelect2: function (selector)

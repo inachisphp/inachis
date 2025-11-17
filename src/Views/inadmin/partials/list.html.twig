@@ -73,7 +73,7 @@
                     {% set snippet_parts = snippet_description|split('.') %}
                     {% set snippet_text =attribute(attribute(item, snippet_parts[0]), snippet_parts[1])|markdown|striptags %}
                 {% else %}
-                    {% set snippet_text = attribute(item, snippet_description|default('content'))|markdown|striptags %}
+                    {% set snippet_text = attribute(item, snippet_description|default('content'))|default('')|markdown|striptags %}
                 {% endif %}
                 {% if inline|default(false) == false %}
             <p>
