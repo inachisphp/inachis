@@ -13,9 +13,9 @@ use App\Entity\PasswordResetRequest;
 use App\Entity\User;
 use App\Repository\PasswordResetRequestRepository;
 use DateTimeImmutable;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
@@ -23,17 +23,15 @@ use PHPUnit\Framework\TestCase;
 class PasswordResetRequestRepositoryTest extends TestCase
 {
     private EntityManagerInterface $entityManager;
-    private ManagerRegistry $registry;
     private EntityRepository $repository;
 
     public function setUp(): void
     {
-        $this->registry = $this->createMock(ManagerRegistry::class);
+        $registry = $this->createMock(ManagerRegistry::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->repository = $this->getMockBuilder(PasswordResetRequestRepository::class)
-            ->setConstructorArgs([$this->registry])
-            ->onlyMethods([ 'getEntityManager', 'createQueryBuilder' ])
-            ->addMethods([ 'getRepository' ])
+            ->setConstructorArgs([$registry])
+            ->onlyMethods([ 'createQueryBuilder' ])
             ->getMock();
     }
 
@@ -47,7 +45,7 @@ class PasswordResetRequestRepositoryTest extends TestCase
         $user = new User();
         $date = new DateTimeImmutable('now');
         $passwordHash = new PasswordResetRequest($user, 'token-hash', $date);
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->method('getResult')->willReturn([$passwordHash]);
         $qb->method('getQuery')->willReturn($query);
 
@@ -67,7 +65,7 @@ class PasswordResetRequestRepositoryTest extends TestCase
         $user = new User();
         $date = new DateTimeImmutable('now');
         $passwordHash = new PasswordResetRequest($user, 'token-hash', $date);
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->method('getOneOrNullResult')->willReturn($passwordHash);
         $qb->method('getQuery')->willReturn($query);
 
@@ -87,7 +85,7 @@ class PasswordResetRequestRepositoryTest extends TestCase
         $user = new User();
         $date = new DateTimeImmutable('now');
         $passwordHash = new PasswordResetRequest($user, 'token-hash', $date);
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->method('getOneOrNullResult')->willReturn($passwordHash);
         $qb->method('getQuery')->willReturn($query);
 
@@ -102,7 +100,7 @@ class PasswordResetRequestRepositoryTest extends TestCase
         $qb->method('delete')->willReturnSelf();
         $qb->method('andWhere')->willReturnSelf();
         $qb->method('setParameter')->willReturnSelf();
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->method('execute')->willReturn(5);
         $qb->method('getQuery')->willReturn($query);
 

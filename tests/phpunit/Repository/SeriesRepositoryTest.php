@@ -16,6 +16,7 @@ use App\Repository\SeriesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -25,9 +26,9 @@ use Ramsey\Uuid\Uuid;
 
 class SeriesRepositoryTest extends TestCase
 {
-    private $registry;
-    private $em;
-    private $repository;
+    private ManagerRegistry $registry;
+    private EntityManagerInterface $em;
+    private SeriesRepository $repository;
 
     protected function setUp(): void
     {
@@ -58,7 +59,7 @@ class SeriesRepositoryTest extends TestCase
         $page = $this->createMock(Page::class);
         $page->method('getId')->willReturn(Uuid::uuid1());
 
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->method('getOneOrNullResult')->willReturn(new Series());
 
         $qb = $this->mockQueryBuilder($query);
@@ -74,7 +75,7 @@ class SeriesRepositoryTest extends TestCase
         $page = $this->createMock(Page::class);
         $page->method('getId')->willReturn(Uuid::uuid1());
 
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->method('getOneOrNullResult')->willReturn(null);
 
         $qb = $this->mockQueryBuilder($query);
@@ -89,7 +90,7 @@ class SeriesRepositoryTest extends TestCase
         $page = $this->createMock(Page::class);
         $page->method('getId')->willReturn(Uuid::uuid1());
 
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->method('getOneOrNullResult')->willReturn(new Series());
 
         $qb = $this->mockQueryBuilder($query);
@@ -104,7 +105,7 @@ class SeriesRepositoryTest extends TestCase
         $year = '2025';
         $url = 'my-series';
 
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->method('getOneOrNullResult')->willReturn(new Series());
 
         $expr = $this->createMock(Expr::class);
@@ -129,7 +130,7 @@ class SeriesRepositoryTest extends TestCase
         $year = '2025';
         $url = 'non-existent';
 
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->method('getOneOrNullResult')->willReturn(null);
 
         $expr = $this->createMock(Expr::class);
@@ -211,7 +212,7 @@ class SeriesRepositoryTest extends TestCase
         $page = $this->createMock(Page::class);
         $page->method('getId')->willReturn(Uuid::uuid1());
 
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->method('getOneOrNullResult')->willThrowException(new NonUniqueResultException());
 
         $qb = $this->mockQueryBuilder($query);

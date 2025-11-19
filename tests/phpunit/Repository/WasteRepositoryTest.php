@@ -11,16 +11,11 @@ namespace App\Tests\phpunit\Repository;
 
 use App\Entity\User;
 use App\Repository\WasteRepository;
-use DateTime;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Uuid;
 
 class WasteRepositoryTest extends TestCase
 {
@@ -37,15 +32,14 @@ class WasteRepositoryTest extends TestCase
     {
         $repository = $this->getMockBuilder(WasteRepository::class)
             ->setConstructorArgs([$this->registry])
-            ->onlyMethods([ 'getEntityManager', 'createQueryBuilder' ])
-            ->addMethods([ 'getRepository' ])
+            ->onlyMethods([ 'createQueryBuilder' ])
             ->getMock();
         $qb = $this->createMock(QueryBuilder::class);
         $qb->method('delete')->willReturnSelf();
         $qb->method('where')->willReturnSelf();
         $qb->method('setParameter')->willReturnSelf();
 
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->method('execute')->willReturn(3);
         $qb->method('getQuery')->willReturn($query);
 
@@ -53,5 +47,6 @@ class WasteRepositoryTest extends TestCase
         $user = new User();
         $result = $repository->deleteWasteByUser($user);
         $this->assertIsInt($result);
+        $this->assertEquals(3, $result);
     }
 }

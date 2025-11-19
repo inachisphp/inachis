@@ -58,7 +58,6 @@ class SeriesWebControllerTest extends WebTestCase
         $request = new Request();
         $series = $this->createMock(Series::class);
         $seriesRepo = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods([ 'findOneByTitle', 'getSeriesByYearAndUrl' ])
             ->disableOriginalConstructor()
             ->getMock();
         $seriesRepo->expects($this->once())
@@ -93,7 +92,6 @@ class SeriesWebControllerTest extends WebTestCase
     {
         $request = new Request();
         $seriesRepo = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods([ 'findOneByTitle', 'getSeriesByYearAndUrl' ])
             ->disableOriginalConstructor()
             ->getMock();
         $seriesRepo->expects($this->once())

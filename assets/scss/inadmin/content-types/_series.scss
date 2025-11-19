@@ -1,9 +1,25 @@
 .edit__list {
+  h2 span.badge {
+    font-size: 0.6em;
+  }
+  & p:first-of-type {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    align-items: center;
+  }
   p:first-child {
     //margin: -5px 20px 0 0;
     
     button {
       font-size: 0.9em;
     }
+  }
+  table td label {
+    display: inline;
+  }
+  .table--selectable tr td:last-child,
+  .table--selectable tr th:last-child {
+    width: .8em;
   }
 }

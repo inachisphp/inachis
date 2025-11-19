@@ -56,7 +56,7 @@ class BulkCreateController extends AbstractInachisController
     public function saveContent(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $series = $this->entityManager->getRepository(Series::class)->findOneById($request->request->get('seriesId'));
+        $series = $this->entityManager->getRepository(Series::class)->findOneBy(['id' => $request->request->get('seriesId')]);
         if ($series !== null && !empty($request->request->all('form')['title'])
             && !empty($request->request->all('form')['startDate']) && !empty($request->request->all('form')['endDate'])
         ) {
@@ -76,7 +76,7 @@ class BulkCreateController extends AbstractInachisController
                     foreach($request->request->all('form')['tags'] as $newTag) {
                         $tag = null;
                         if (Uuid::isValid($newTag)) {
-                            $tag = $this->entityManager->getRepository(Tag::class)->findOneById($newTag);
+                            $tag = $this->entityManager->getRepository(Tag::class)->findOneBy(['id' => $newTag]);
                         }
                         if (empty($tag)) {
                             $tag = new Tag($newTag);
@@ -88,7 +88,7 @@ class BulkCreateController extends AbstractInachisController
                     foreach($request->request->all('form')['categories'] as $newCategory) {
                         $category = null;
                         if (Uuid::isValid($newCategory)) {
-                            $category = $this->entityManager->getRepository(Category::class)->findOneById($newCategory);
+                            $category = $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $newCategory]);
                         }
                         if (!empty($category)) {
                             $post->getCategories()->add($category);

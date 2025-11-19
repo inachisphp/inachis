@@ -1,35 +1,45 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
 namespace App\Tests\phpunit\Command;
 
 use App\Command\LocaliseImagesCommand;
 use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Series;
+use App\Repository\ImageRepository;
+use App\Repository\PageRepository;
+use App\Repository\PageRepositoryInterface;
+use App\Repository\SeriesRepository;
+use App\Service\Image\ContentImageUpdater;
 use App\Service\Image\ImageExtractor;
 use App\Service\Image\ImageLocaliser;
-use App\Service\Image\ContentImageUpdater;
+use ArrayIterator;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Command\Command;
-
-class DummyRepo
-{
-    public function getAll(int $a, int $b, array $c): array
-    {
-        return [];
-    }
-}
+use Symfony\Component\Console\Tester\CommandTester;
 
 class LocaliseImagesCommandTest extends TestCase
 {
-    private $em;
-    private $extractor;
-    private $localiser;
-    private $updater;
-    private $command;
-    private $commandTester;
+    private EntityManagerInterface $em;
+    private ImageExtractor $extractor;
+    private ImageLocaliser $localiser;
+    private ContentImageUpdater $updater;
+
+    private ImageRepository $imageRepo;
+    private PageRepository $pageRepo;
+    private SeriesRepository $seriesRepo;
+
+    private CommandTester $commandTester;
 
     protected function setUp(): void
     {
@@ -37,52 +47,61 @@ class LocaliseImagesCommandTest extends TestCase
         $this->extractor = $this->createMock(ImageExtractor::class);
         $this->localiser = $this->createMock(ImageLocaliser::class);
         $this->updater = $this->createMock(ContentImageUpdater::class);
-
-        $this->command = new LocaliseImagesCommand(
+        $command = new LocaliseImagesCommand(
             $this->em,
             $this->extractor,
             $this->localiser,
             $this->updater
         );
+        $this->commandTester = new CommandTester($command);
 
-        $this->commandTester = new CommandTester($this->command);
+        $this->imageRepo = $this->getMockBuilder(ImageRepository::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getAll'])
+            ->getMock();
+        $this->pageRepo = $this->getMockBuilder(PageRepository::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getAll'])
+            ->getMock();
+        $this->seriesRepo = $this->getMockBuilder(SeriesRepository::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getAll'])
+            ->getMock();
     }
 
     public function testExecuteWithDryRun(): void
     {
-        // Mock different repositories for each entity type
-        $imageRepo  = $this->createMock(DummyRepo::class);
-        $pageRepo   = $this->createMock(DummyRepo::class);
-        $seriesRepo = $this->createMock(DummyRepo::class);
+        $iterableMock = $this->getMockBuilder(ArrayIterator::class)
+            ->setConstructorArgs([[]])
+            ->getMock();
+        $paginatorMock = $this->getMockBuilder(Paginator::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getIterator'])
+            ->getMock();
+        $paginatorMock->method('getIterator')->willReturn($iterableMock);
 
-        // Image entity mock (single field)
         $imageEntity = $this->createMock(Image::class);
         $imageEntity->method('getFilename')->willReturn('https://example.com/img1.jpg');
-        $imageRepo->method('getAll')->willReturn([$imageEntity]);
+        $this->imageRepo->method('getAll')->willReturn($paginatorMock);
 
-        // Page entity mock (content field)
         $pageEntity = $this->createMock(Page::class);
         $pageEntity->method('getContent')->willReturn('<img src="https://example.com/foo.jpg" />');
-        $pageRepo->method('getAll')->willReturn([$pageEntity]);
+        $this->pageRepo->method('getAll')->willReturn($paginatorMock);
 
-        // Series entity mock (description field)
         $seriesEntity = $this->createMock(Series::class);
         $seriesEntity->method('getDescription')->willReturn('<img src="https://example.com/bar.jpg" />');
-        $seriesRepo->method('getAll')->willReturn([$seriesEntity]);
+        $this->seriesRepo->method('getAll')->willReturn($paginatorMock);
 
-        // Configure EntityManager to return correct repo depending on class name
         $this->em->method('getRepository')->willReturnMap([
-            [Image::class, $imageRepo],
-            [Page::class, $pageRepo],
-            [Series::class, $seriesRepo],
+            [Image::class,  $this->imageRepo],
+            [Page::class,   $this->pageRepo],
+            [Series::class, $this->seriesRepo],
         ]);
 
-        // Extractor called twice (for Page and Series, both non-single)
         $this->extractor->expects($this->exactly(2))
             ->method('extractFromContent')
             ->willReturn(['https://example.com/foo.jpg']);
 
-        // Localiser never called in dry-run
         $this->localiser->expects($this->never())->method('downloadToLocal');
         $this->updater->expects($this->never())->method('updateEntity');
 
@@ -98,22 +117,24 @@ class LocaliseImagesCommandTest extends TestCase
 
     public function testExecuteWithoutDryRun(): void
     {
-        // Mock different repositories again
-        $imageRepo  = $this->createMock(DummyRepo::class);
-        $pageRepo   = $this->createMock(DummyRepo::class);
-        $seriesRepo = $this->createMock(DummyRepo::class);
-
-        // Only test Page entity real logic
+        $iterableMock = $this->getMockBuilder(ArrayIterator::class)
+            ->setConstructorArgs([[]])
+            ->getMock();
+        $paginatorMock = $this->getMockBuilder(Paginator::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getIterator'])
+            ->getMock();
+        $paginatorMock->method('getIterator')->willReturn($iterableMock);
         $entity = $this->createMock(Page::class);
         $entity->method('getContent')->willReturn('<img src="https://example.com/image.jpg" />');
-        $pageRepo->method('getAll')->willReturn([$entity]);
-        $imageRepo->method('getAll')->willReturn([]); // no images
-        $seriesRepo->method('getAll')->willReturn([]);
+        $this->pageRepo->method('getAll')->willReturn($paginatorMock);
+        $this->imageRepo->method('getAll')->willReturn($paginatorMock);
+        $this->seriesRepo->method('getAll')->willReturn($paginatorMock);
 
         $this->em->method('getRepository')->willReturnMap([
-            [Image::class, $imageRepo],
-            [Page::class, $pageRepo],
-            [Series::class, $seriesRepo],
+            [Image::class,  $this->imageRepo],
+            [Page::class,   $this->pageRepo],
+            [Series::class, $this->seriesRepo],
         ]);
 
         $this->extractor->expects($this->once())
@@ -132,16 +153,15 @@ class LocaliseImagesCommandTest extends TestCase
                 $entity,
                 'content',
                 [
-                    'source' => ['https://example.com/image.jpg'],
-                    'destination' => ['/var/www/public/imgs/image.jpg']
+                    'source'      => ['https://example.com/image.jpg'],
+                    'destination' => ['/var/www/public/imgs/image.jpg'],
                 ],
                 true
             );
 
         $exitCode = $this->commandTester->execute([]);
-        $this->assertSame(Command::SUCCESS, $exitCode);
 
-        $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('done.', $output);
+        $this->assertSame(Command::SUCCESS, $exitCode);
+        $this->assertStringContainsString('done.', $this->commandTester->getDisplay());
     }
 }

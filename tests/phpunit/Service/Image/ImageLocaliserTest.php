@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Exception;
 
-class ImageLocaliserMockedTest extends TestCase
+class ImageLocaliserTest extends TestCase
 {
     private $filesystem;
     private $localiser;

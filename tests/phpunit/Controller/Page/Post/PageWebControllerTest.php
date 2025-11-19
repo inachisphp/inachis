@@ -63,7 +63,6 @@ class PageWebControllerTest extends WebTestCase
             'REQUEST_URI' => '/2025/10/10/sample-post'
         ]);
         $urlRepo = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods(['findOneByLink'])
             ->disableOriginalConstructor()
             ->getMock();
         $urlRepo->expects($this->once())
@@ -87,7 +86,6 @@ class PageWebControllerTest extends WebTestCase
         $url = $this->createMock(Url::class);
         $url->method('getContent')->willReturn($page);
         $urlRepository = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods(['findOneByLink', 'getDefaultUrl'])
             ->disableOriginalConstructor()
             ->getMock();
         $urlRepository->expects($this->once())
@@ -130,7 +128,6 @@ class PageWebControllerTest extends WebTestCase
         $url2 = $this->createMock(Url::class);
         $url2->method('isDefault')->willReturn(true);
         $urlRepository = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods(['findOneByLink', 'getDefaultUrl'])
             ->disableOriginalConstructor()
             ->getMock();
         $urlRepository->expects($this->once())
@@ -173,7 +170,6 @@ class PageWebControllerTest extends WebTestCase
         $url = $this->createMock(Url::class);
         $url->method('getContent')->willReturn($page);
         $urlRepository = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods(['findOneByLink', 'getDefaultUrl'])
             ->disableOriginalConstructor()
             ->getMock();
         $urlRepository->expects($this->once())
@@ -184,7 +180,6 @@ class PageWebControllerTest extends WebTestCase
         $seriesByPostResult = $this->createMock(Series::class);
         $seriesByPostResult->method('getItems')->willReturn(new ArrayCollection([$page2, $page, $page2]));
         $seriesRepository = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods(['getPublishedSeriesByPost'])
             ->disableOriginalConstructor()
             ->getMock();
         $seriesRepository->expects($this->once())
@@ -236,7 +231,6 @@ class PageWebControllerTest extends WebTestCase
     {
         $request = new Request();
         $tagRepository = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods(['findOneByTitle'])
             ->disableOriginalConstructor()
             ->getMock();
         $this->entityManager->method('getRepository')
@@ -253,7 +247,6 @@ class PageWebControllerTest extends WebTestCase
         $tag = $this->createMock(Tag::class);
         $pages = [$this->createMock(Page::class)];
         $tagRepo = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods(['findOneByTitle'])
             ->disableOriginalConstructor()
             ->getMock();
         $tagRepo->expects($this->once())
@@ -261,7 +254,6 @@ class PageWebControllerTest extends WebTestCase
             ->with('existing-tag')
             ->willReturn($tag);
         $pageRepo = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods(['getPagesWithTag'])
             ->disableOriginalConstructor()
             ->getMock();
         $pageRepo->expects($this->once())
@@ -297,7 +289,6 @@ class PageWebControllerTest extends WebTestCase
     {
         $request = new Request();
         $categoryRepo = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods(['findOneByTitle'])
             ->disableOriginalConstructor()
             ->getMock();
         $this->entityManager->method('getRepository')
@@ -314,7 +305,6 @@ class PageWebControllerTest extends WebTestCase
         $category = $this->createMock(Category::class);
         $pages = [$this->createMock(Page::class)];
         $categoryRepository = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods(['findOneByTitle'])
             ->disableOriginalConstructor()
             ->getMock();
         $categoryRepository->expects($this->once())
@@ -322,7 +312,6 @@ class PageWebControllerTest extends WebTestCase
             ->with('category-name')
             ->willReturn($category);
         $pageRepository = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods(['getPagesWithCategory'])
             ->disableOriginalConstructor()
             ->getMock();
         $pageRepository->expects($this->once())

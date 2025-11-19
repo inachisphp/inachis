@@ -37,15 +37,15 @@ class RevisionController extends AbstractInachisController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $revision = $this->entityManager->getRepository(Revision::class)->findOneById(
-            $request->attributes->get('id')
-        );
+        $revision = $this->entityManager->getRepository(Revision::class)->findOneBy([
+            'id' => $request->attributes->get('id')
+        ]);
         if (empty($revision) || empty($revision->getPageId())) {
             throw new NotFoundHttpException(
                 sprintf('Version history could not be found for %s', $request->attributes->get('id'))
             );
         }
-        $page = $this->entityManager->getRepository(Page::class)->findOneById($revision->getPageId());
+        $page = $this->entityManager->getRepository(Page::class)->findOneBy(['id' => $revision->getPageId()]);
         if (empty($page) || empty($page->getId())) {
             throw new NotFoundHttpException(
                 sprintf('Page could not be found for revision %s', $request->attributes->get('id'))
@@ -98,15 +98,15 @@ class RevisionController extends AbstractInachisController
     public function doRevert(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $revision = $this->entityManager->getRepository(Revision::class)->findOneById(
-            $request->attributes->get('id')
-        );
+        $revision = $this->entityManager->getRepository(Revision::class)->findOneBy([
+            'id' => $request->attributes->get('id')
+        ]);
         if (empty($revision) || empty($revision->getPageId())) {
             throw new NotFoundHttpException(
                 sprintf('Version history could not be found for %s', $request->attributes->get('id'))
             );
         }
-        $page = $this->entityManager->getRepository(Page::class)->findOneById($revision->getPageId());
+        $page = $this->entityManager->getRepository(Page::class)->findOneBy(['id' => $revision->getPageId()]);
         if (empty($page) || empty($page->getId())) {
             throw new NotFoundHttpException(
                 sprintf('Page could not be found for revision %s', $request->attributes->get('id'))
@@ -142,9 +142,9 @@ class RevisionController extends AbstractInachisController
     public function download(Request $request, SerializerInterface $serializer): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $revision = $this->entityManager->getRepository(Revision::class)->findOneById(
-            $request->attributes->get('id')
-        );
+        $revision = $this->entityManager->getRepository(Revision::class)->findOneBy([
+            'id' => $request->attributes->get('id')
+        ]);
         if (empty($revision) || empty($revision->getPageId())) {
             throw new NotFoundHttpException(
                 sprintf('Version history could not be found for %s', $request->attributes->get('id'))

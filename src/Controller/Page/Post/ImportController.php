@@ -111,7 +111,7 @@ class ImportController extends AbstractInachisController
                     );
                 if (
                     !empty(
-                        $this->entityManager->getRepository(Url::class)->findOneByLink($newLink)
+                        $this->entityManager->getRepository(Url::class)->findOneBy(['link' => $newLink])
                     )
                 ) {
                     // @todo should it prompt to rename?
