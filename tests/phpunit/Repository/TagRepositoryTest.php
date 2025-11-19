@@ -11,17 +11,12 @@ namespace App\Tests\phpunit\Repository;
 
 use App\Entity\Tag;
 use App\Repository\TagRepository;
-use Doctrine\DBAL\Connection;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
-use Ramsey\Uuid\Uuid;
 
 class TagRepositoryTest extends TestCase
 {
@@ -43,7 +38,6 @@ class TagRepositoryTest extends TestCase
         $this->repository = $this->getMockBuilder(TagRepository::class)
             ->setConstructorArgs([$registry])
             ->onlyMethods([ 'getEntityManager', 'getAll', ])
-            ->addMethods([ 'getRepository', ])
             ->getMock();
 
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);

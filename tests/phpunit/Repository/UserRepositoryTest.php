@@ -9,7 +9,6 @@
 
 namespace App\Tests\phpunit\Repository;
 
-use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -30,7 +29,6 @@ class UserRepositoryTest extends TestCase
         $this->repository = $this->getMockBuilder(UserRepository::class)
             ->setConstructorArgs([$registry])
             ->onlyMethods([ 'getEntityManager', 'getAll' ])
-            ->addMethods([ 'getRepository' ])
             ->getMock();
 
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);

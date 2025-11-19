@@ -119,11 +119,10 @@ class PageControllerTest extends WebTestCase
             'REQUEST_URI' => '/incc/post/some-post'
         ]);
         $urlRepository = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods(['findByLink'])
             ->disableOriginalConstructor()
             ->getMock();
         $urlRepository->expects($this->once())
-            ->method('findByLink')
+            ->method('findBy')
             ->with('some-post')
             ->willReturn(null);
         $this->entityManager->method('getRepository')
@@ -162,12 +161,10 @@ class PageControllerTest extends WebTestCase
         ]);
 
         $urlRepository = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods(['findByLink'])
             ->disableOriginalConstructor()
             ->getMock();
-        $urlRepository->method('findByLink')->willReturn(null);
+        $urlRepository->method('findBy')->willReturn(null);
         $revisionRepository = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods(['getAll'])
             ->disableOriginalConstructor()
             ->getMock();
         $revisionRepository->expects($this->any())

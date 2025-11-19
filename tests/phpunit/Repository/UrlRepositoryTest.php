@@ -12,10 +12,10 @@ namespace App\Tests\phpunit\Repository;
 use App\Entity\Page;
 use App\Entity\Url;
 use App\Repository\UrlRepository;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -45,7 +45,6 @@ class UrlRepositoryTest extends TestCase
         $this->repository = $this->getMockBuilder(UrlRepository::class)
             ->setConstructorArgs([$registry])
             ->onlyMethods([ 'getEntityManager', 'getAll', 'findOneBy' ])
-            ->addMethods([ 'getRepository' ])
             ->getMock();
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);
         parent::setUp();
@@ -90,7 +89,7 @@ class UrlRepositoryTest extends TestCase
         $expectedUrl = $this->createMock(Url::class);
         $uuid = Uuid::uuid1();
 
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->method('getResult')->willReturn([$expectedUrl]);
         $expr = $this->createMock(Expr::class);
 

@@ -23,7 +23,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Series[] findAll()
  * @method Series[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SeriesRepository extends AbstractRepository
+class SeriesRepository extends AbstractRepository implements SeriesRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {

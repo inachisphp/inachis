@@ -13,6 +13,7 @@ use App\Entity\Category;
 use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -31,8 +32,7 @@ class CategoryRepositoryTest extends TestCase
 
         $this->repository = $this->getMockBuilder(CategoryRepository::class)
             ->setConstructorArgs([$registry])
-            ->onlyMethods(['getEntityManager', 'getAll'])
-            ->addMethods(['getRepository'])
+            ->onlyMethods(['getEntityManager', 'createQueryBuilder', 'getAll'])
             ->getMock();
 
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);
@@ -58,13 +58,7 @@ class CategoryRepositoryTest extends TestCase
     public function testGetRootCategoriesBuildsCorrectQuery(): void
     {
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $query = $this->createMock(AbstractQuery::class);
-
-        $doctrineRepo = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['createQueryBuilder'])
-            ->getMock();
-        $this->repository->method('getRepository')->willReturn($doctrineRepo);
+        $query = $this->createMock(Query::class);
 
         $queryBuilder->expects($this->once())
             ->method('where')
@@ -79,7 +73,7 @@ class CategoryRepositoryTest extends TestCase
             ->method('getResult')
             ->willReturn(['mock_result']);
 
-        $doctrineRepo->method('createQueryBuilder')->willReturn($queryBuilder);
+        $this->repository->method('createQueryBuilder')->willReturn($queryBuilder);
         $result = $this->repository->getRootCategories();
         $this->assertEquals(['mock_result'], $result);
     }

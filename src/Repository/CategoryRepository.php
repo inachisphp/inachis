@@ -13,7 +13,7 @@ use App\Entity\Category;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
-class CategoryRepository extends AbstractRepository
+class CategoryRepository extends AbstractRepository implements CategoryRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
