@@ -1,0 +1,104 @@
+@use '../definitions' as *;
+@use 'sass:color';
+
+section.paginated-list {
+  background-color: #fff;
+  border: 1px solid #eee;
+  clear: left;
+  margin-bottom: 4em;
+  padding: 1em;
+}
+
+.widget-posts {
+  clear: left;
+
+  div.ui-tabs-panel {
+    background-color: #fff;
+    border: 1px solid #eee;
+    padding: 30px 20px 60px 20px;
+  }
+
+  .post, .page, .series {
+    a, a:visited {
+      padding: 0 0 0 25px;
+    }
+  }
+
+  article {
+    transition: background 0.15s ease;
+
+    &:hover {
+      background-color: $table-row-hover-bg;
+    }
+  }
+
+  .zebra article:nth-of-type(2n) {
+    background-color: $table-zebra-bg;
+  }
+
+  .zebra article:nth-of-type(odd).selected {
+    background-color: $table-selected-row-bg !important;
+  }
+  .zebra article:nth-child(even).selected {
+    background-color: color.adjust($table-selected-row-bg, $lightness: -5%) !important;
+  }
+
+  ol.ui-widget-content {
+    background-color: #fff;
+    border: 1px solid #eee;
+    margin: 0;
+  }
+
+  ol.ui-widget-content, .post, .page, .series {
+    clear: left;
+    list-style-type: none;
+    padding: 15px 5px;
+
+    @media #{$information-medium} {
+      padding: 15px 5px;
+    }
+
+    a, a:visited {
+      color: #069;
+      display: block;
+      text-decoration: none;
+      vertical-align: middle;
+    }
+    li {
+      margin:25px 10px 40px 0;
+    }
+    h2 {
+      font-size: 1.2em;
+      margin: 0;
+      padding: 0;
+    }
+    input {
+      float: left;
+      margin:5px 0 0 0;
+    }
+    p {
+      color: #666;
+      line-height: 1.7em;
+
+      form & {
+        margin: 0 0 0 1.5em;
+      }
+
+      &.date {
+        margin-top: 10px;
+        font-size: 0.8em;
+      }
+      &.date span.material-icons:not(:first-of-type) {
+        margin-left: 0.75em;
+      }
+    }
+    span {
+      vertical-align: middle;
+    }
+
+    .badge {
+      font-size: 0.5em;
+      margin-left: 20px;
+    }
+  }
+}

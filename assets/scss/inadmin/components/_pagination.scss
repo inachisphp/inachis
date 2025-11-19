@@ -1,13 +1,5 @@
 @use '../definitions' as *;
 
-section.paginated-list {
-  background-color: #fff;
-  border: 1px solid #eee;
-  clear: left;
-  margin-bottom: 4em;
-  padding: 1em;
-}
-
 section.pagination--row {
   align-items: center;
   clear: both;
