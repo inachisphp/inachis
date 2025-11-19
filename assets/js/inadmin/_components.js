@@ -203,8 +203,12 @@ let InachisComponents = {
 
 	toggleActionBar: function ()
 	{
-		let anyUnchecked = $('input[name^="items"]:not(:checked)').length > 0;
-		let anyChecked = $('input[name^="items"]:checked').length > 0;
+		const uncheckedItems = $('input[name^="items"]:not(:checked)'),
+			checkedItems = $('input[name^="items"]:checked'),
+			anyUnchecked = uncheckedItems.length > 0,
+			anyChecked = checkedItems.length > 0;
+		checkedItems.closest('tr').addClass('selected');
+		uncheckedItems.closest('tr').removeClass('selected');
 		$('.fixed-bottom-bar').toggleClass('visually-hidden', !anyChecked);
 		$('.selectAllNone').prop('checked', !anyUnchecked);
 	}

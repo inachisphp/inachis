@@ -1,185 +1,141 @@
 @use 'sass:color';
-@use '../definitions' as *;
 
-.table {
-  width: 100%;
-  margin-bottom: $spacer;
-  color: $table-color;
-  background-color: $table-bg; // Reset for nesting within parents with `background-color`.
+// ============================================================================
+//  TABLE SYSTEM
+// ============================================================================
 
-  th,
-  td {
-    padding: $table-cell-padding;
-    vertical-align: middle;
-    border-top: $table-border-width solid $table-border-color;
-  }
+// ---------------------------------------------------------------------------
+// 1. VARIABLES
+// ---------------------------------------------------------------------------
 
-  thead th {
-    vertical-align: middle;
-    border-bottom: (2 * $table-border-width) solid $table-border-color;
-  }
+$table-background-bg: #fff;
 
-  tbody + tbody {
-    border-top: (2 * $table-border-width) solid $table-border-color;
-  }
-}
+$table-header-bg: #069 !default;
+$table-header-color: #fff !default;
 
-.table-sm {
-  th,
-  td {
-    padding: $table-cell-padding-sm;
-  }
-}
+$table-border-color: #ddd !default;
+$table-row-hover-bg: #f7f9fb !default;
+$table-zebra-bg: #f2f6f8 !default;
 
-.table-darkhead thead {
-  background-color: $table-head-dark-bg;
-  color: $table-head-dark-color;
-}
+$table-selected-row-bg: #d8e7f0 !default;
+$table-sort-indicator-color: rgba(255, 255, 255, 0.8) !default;
 
-// Border versions
-.table-bordered {
-  border: $table-border-width solid $table-border-color;
-
-  th,
-  td {
-    border: $table-border-width solid $table-border-color;
-  }
-
-  thead {
-    th,
-    td {
-      border-bottom-width: 2 * $table-border-width;
-    }
-  }
-}
-
-.table-borderless {
-  th,
-  td,
-  thead th,
-  tbody + tbody {
-    border: 0;
-  }
-}
-
-// Zebra-striping
-//
-// Default zebra-stripe styles (alternating gray and transparent backgrounds)
-
-.table-striped {
-  tbody tr:nth-of-type(#{$table-striped-order}) {
-    background-color: $table-accent-bg;
-  }
-}
+$table-mobile-break: 600px !default;
 
 
-// Hover effect
-//
-// Placed here since it has to come after the potential zebra striping
-
-//.table-hover {
-//  tbody tr {
-//    @include hover {
-//      color: $table-hover-color;
-//      background-color: $table-hover-bg;
-//    }
-//  }
-//}
-
-
-// Table backgrounds
-//
-// Exact selectors below required to override `.table-striped` and prevent
-// inheritance to nested tables.
-
-//@each $color, $value in $theme-colors {
-//  @include table-row-variant($color, theme-color-level($color, $table-bg-level), theme-color-level($color, $table-border-level));
-//}
-//
-//@include table-row-variant(active, $table-active-bg);
-
-
-// Dark styles
-//
-// Same table markup, but inverted color scheme: dark background and light text.
-
-// stylelint-disable-next-line no-duplicate-selectors
-.table {
-  .thead-dark {
-    th {
-      color: $table-dark-color;
-      background-color: $table-dark-bg;
-      border-color: $table-dark-border-color;
-    }
-  }
-
-  .thead-light {
-    th {
-      color: $table-head-color;
-      background-color: $table-head-bg;
-      border-color: $table-border-color;
-    }
-  }
-}
-
-.table-dark {
-  color: $table-dark-color;
-  background-color: $table-dark-bg;
-
-  th,
-  td,
-  thead th {
-    border-color: $table-dark-border-color;
-  }
-
-  &.table-bordered {
-    border: 0;
-  }
-
-  &.table-striped {
-    tbody tr:nth-of-type(odd) {
-      background-color: $table-dark-accent-bg;
-    }
-  }
-
-  &.table-hover {
-    tbody tr {
-      //@include hover {
-      //  color: $table-dark-hover-color;
-      //  background-color: $table-dark-hover-bg;
-      //}
-    }
-  }
-}
-
-
-// Responsive tables
-//
-// Generate series of `.table-responsive-*` classes for configuring the screen
-// size of where your table will overflow.
+// ---------------------------------------------------------------------------
+// 2. RESPONSIVE WRAPPER
+// ---------------------------------------------------------------------------
 
 .table-responsive {
-  //@each $breakpoint in map-keys($grid-breakpoints) {
-  //  $next: breakpoint-next($breakpoint, $grid-breakpoints);
-  //  $infix: breakpoint-infix($next, $grid-breakpoints);
-  //
-  //  &#{$infix} {
-  //    @include media-breakpoint-down($breakpoint) {
-  //      display: block;
-  //      width: 100%;
-  //      overflow-x: auto;
-  //      -webkit-overflow-scrolling: touch;
-  //
-  //      // Prevent double border on horizontal scroll due to use of `display: block;`
-  //      > .table-bordered {
-  //        border: 0;
-  //      }
-  //    }
-  //  }
-  //}
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+  }
 }
 
-form table.table-selectable {
+
+// ---------------------------------------------------------------------------
+// 3. BASE TABLE STYLING
+// ---------------------------------------------------------------------------
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: $table-background-bg;
+  font-size: 0.95rem;
+  line-height: 1.4;
+
+  // Head
+  thead {
+    background: $table-header-bg;
+    color: $table-header-color;
+
+    th {
+      padding: 0.75rem 1rem;
+      font-weight: 600;
+      text-align: left;
+      white-space: nowrap;
+    }
+  }
+
+  // Body
+  tbody {
+    tr {
+      transition: background 0.15s ease;
+
+      &:hover {
+        background: $table-row-hover-bg;
+      }
+    }
+
+    td, th {
+      padding: 0.75rem 1rem;
+      vertical-align: middle;
+      border-bottom: 1px solid $table-border-color;
+    }
+  }
+}
+
+
+// ---------------------------------------------------------------------------
+// 4. MODIFIERS
+// ---------------------------------------------------------------------------
+
+// Borderless table
+.table--borderless {
+  tbody td, tbody th {
+    border: none !important;
+  }
+}
+
+// Zebra striping
+.table--striped {
+  tbody tr:nth-child(even) {
+    background: $table-zebra-bg;
+
+    &:hover, &:focus,
+    td:hover,
+    th:hover {
+      background: color.adjust($table-zebra-bg, $lightness: -5%);
+    }
+  }
+}
+
+// Borders only between rows
+.table--row-borders {
+  border: none;
+
+  thead th {
+    border-bottom: 2px solid $table-border-color;
+  }
+
+  tbody td, tbody th {
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid $table-border-color;
+  }
+}
+
+// Compact mode
+.table--compact {
+  thead th,
+  tbody td {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+// Selectable options table
+form .table--selectable {
   table-layout: fixed;
 
   input {
@@ -194,11 +150,167 @@ form table.table-selectable {
     text-align: left;
   }
 }
-.table__flex {
+
+.table--flex {
   display: flex;
   flex-wrap: wrap;
   column-gap: 0.6em;
   row-gap: 0.6em;
   align-items: flex-start;
   padding: 0.5em;
+}
+
+// ---------------------------------------------------------------------------
+// 5. STICKY HEADER
+// ---------------------------------------------------------------------------
+
+.table--sticky-header {
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  thead {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  }
+}
+
+
+// ---------------------------------------------------------------------------
+// 6. SORTABLE COLUMNS (visual only)
+// ---------------------------------------------------------------------------
+
+.table--sortable {
+  th {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-right: 1.75rem;
+
+    &::after {
+      content: "⇅";
+      position: absolute;
+      right: 0.75rem;
+      font-size: 0.7rem;
+      opacity: 0.5;
+      color: $table-sort-indicator-color;
+    }
+
+    &.sorted-asc::after {
+      content: "↑";
+      opacity: 1;
+    }
+
+    &.sorted-desc::after {
+      content: "↓";
+      opacity: 1;
+    }
+  }
+}
+
+
+// ---------------------------------------------------------------------------
+// 7. COLUMN HOVER HIGHLIGHT
+// ---------------------------------------------------------------------------
+
+.table--column-hover {
+  td,
+  th {
+    position: relative;
+  }
+
+  tbody td:hover,
+  thead th:hover {
+    background: lighten($table-header-bg, 40%);
+  }
+
+  tbody td:hover::before,
+  thead th:hover::before {
+    content: "";
+    position: absolute;
+    top: -999px;
+    bottom: -999px;
+    left: 0;
+    right: 0;
+    background: lighten($table-header-bg, 40%);
+    z-index: -1;
+  }
+}
+
+
+// ---------------------------------------------------------------------------
+// 8. ROW SELECTION (JS-friendly)
+// ---------------------------------------------------------------------------
+
+.table--selectable {
+  tbody tr.selected {
+    background: $table-selected-row-bg !important;
+  }
+  tbody tr:nth-child(even).selected {
+    background: color.adjust($table-selected-row-bg, $lightness: -5%) !important;
+  }
+}
+
+
+// ---------------------------------------------------------------------------
+// 9. MOBILE CARD LAYOUT
+// ---------------------------------------------------------------------------
+
+.table--cards {
+  @media (max-width: $table-mobile-break) {
+    thead {
+      display: none;
+    }
+
+    tbody tr {
+      display: block;
+      margin-bottom: 1rem;
+      border: 1px solid $table-border-color;
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+    }
+
+    tbody td {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+
+      &::before {
+        content: attr(data-label);
+        font-weight: 600;
+        margin-right: 1rem;
+        color: $table-header-bg;
+      }
+    }
+  }
+}
+
+
+// ---------------------------------------------------------------------------
+// 10. EXPANDABLE ROWS
+// ---------------------------------------------------------------------------
+
+.table--expandable {
+  tbody tr {
+    transition: background 0.2s ease;
+
+    &.expanded {
+      background: lighten($table-header-bg, 45%);
+    }
+  }
+
+  .row-details {
+    display: none;
+
+    td {
+      padding: 1rem;
+      border-top: none;
+      background: #f9fbfc;
+    }
+  }
+
+  tr.expanded + .row-details {
+    display: table-row;
+  }
 }

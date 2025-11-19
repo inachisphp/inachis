@@ -8,13 +8,13 @@
     {{ include('inadmin/partials/filters.html.twig', {
         'show_select_deselect': false,
     }) }}
-    <section class="paginated-list{%- if zebra|default(false) %} zebra{% endif %}">
+    <section class="paginated-list">
     {% if table_desc|default('') is not empty %}
     <p id="table-desc" class="visually-hidden">
         {{ table_desc }}
     </p>
     {% endif %}
-    <table {%- if table_desc|default('') is not empty %} aria-describedby="table-desc"{% endif %} class="table{%- if table_class %} {{ table_class }}{% endif %}{%- if zebra|default(false) %}  table-striped{% endif %}">
+    <table {%- if table_desc|default('') is not empty %} aria-describedby="table-desc"{% endif %} class="table{%- if table_class %} {{ table_class }}{% endif %}{%- if zebra|default(false) %}  table--striped{% endif %}">
         <caption class="visually-hidden">{{ table_name }}</caption>
         <thead>
         <tr>
@@ -54,7 +54,7 @@
                         {% set slug_object = attribute(item, column.slug) %}
                     {% endif %}
                 {% endif %}
-                <{% if column.header is defined and column.header %}th scope="row"{% else %}td{% if column.flex|default(false) %} class="table__flex"{% endif %}{% endif %}>
+                <{% if column.header is defined and column.header %}th scope="row"{% else %}td{% if column.flex|default(false) %} class="table--flex"{% endif %}{% endif %}>
                     {% if column.slug is defined %}
                         <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incc/{{ slug_prefix }}/{{ slug_object }}">
                     {% endif %}
