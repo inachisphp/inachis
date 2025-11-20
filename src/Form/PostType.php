@@ -61,9 +61,9 @@ class PostType extends AbstractType
                     'aria-required'    => 'true',
                     'autofocus'        => 'true',
                     'class'            => 'editor__title text',
-                    'placeholder'      => $this->translator->trans('admin.post.title.placeholder', [], 'messages'),
+                    'placeholder'      => 'admin.post.title.placeholder',
                 ],
-                'label'      => $this->translator->trans('admin.post.title.label', [], 'messages'),
+                'label'      => 'admin.post.title.label',
                 'label_attr' => [
                     'id' => 'title_label',
                     'class' => 'inline_label',
@@ -74,9 +74,9 @@ class PostType extends AbstractType
                     'aria-labelledby' => 'subTitle_label',
                     'aria-required'   => 'false',
                     'class' => 'editor__sub-title text inline_label',
-                    'placeholder'     => $this->translator->trans('admin.post.subTitle.placeholder', [], 'messages'),
+                    'placeholder'     => 'admin.post.subTitle.placeholder',
                 ],
-                'label'      => $this->translator->trans('admin.post.subTitle.label', [], 'messages'),
+                'label'      => 'admin.post.subTitle.label',
                 'label_attr' => [
                     'id' => 'subTitle_label',
                     'class' => 'inline_label',
@@ -89,7 +89,7 @@ class PostType extends AbstractType
                     'aria-required'   => 'false',
                     'class' => 'field__wide',
                 ],
-                'label'      => $this->translator->trans('admin.post.url.label', [], 'messages'),
+                'label'      => 'admin.post.url.label',
                 'label_attr' => [
                     'id' => 'url_label',
                 ],
@@ -102,7 +102,7 @@ class PostType extends AbstractType
                     'aria-required'   => 'false',
                     'class' => 'mde_editor',
                 ],
-                'label'      => $this->translator->trans('admin.post.content.label', [], 'messages'),
+                'label'      => 'admin.post.content.label',
                 'label_attr' => [
                     'class' => 'hidden',
                     'id'    => 'content_label',
@@ -114,10 +114,10 @@ class PostType extends AbstractType
                     'aria-labelledby' => 'visibility_label',
                     'aria-required'   => 'false',
                     'class'           => 'ui-switch',
-                    'data-label-off'  => $this->translator->trans('admin.post.properties.visibility.private', [], 'messages'),
-                    'data-label-on'   => $this->translator->trans('admin.post.properties.visibility.public', [], 'messages'),
+                    'data-label-off'  => $this->translator->trans('admin.post.properties.visibility.private'),
+                    'data-label-on'   => $this->translator->trans('admin.post.properties.visibility.public'),
                 ],
-                'label'      => $this->translator->trans('admin.post.properties.visibility.label', [], 'messages'),
+                'label'      => 'admin.post.properties.visibility.label',
                 'label_attr' => [
                     'id' => 'visibility_label',
                     'class' => 'inline_label',
@@ -132,8 +132,8 @@ class PostType extends AbstractType
                 'format' => 'dd/MM/yyyy HH:mm',
                 'html5'  => false,
                 'label'  => isset($options['data']) && $options['data']->getPostDate() < new DateTime() ?
-                    $this->translator->trans('admin.post.properties.postDate-past.label', [], 'messages') :
-                    $this->translator->trans('admin.post.properties.postDate-future.label', [], 'messages'),
+                    'admin.post.properties.postDate-past.label' :
+                    'admin.post.properties.postDate-future.label',
                 'label_attr' => [
                     'id' => 'postDate_label',
                     'class' => 'inline_label',
@@ -153,10 +153,10 @@ class PostType extends AbstractType
                     'aria-labelledby'  => 'categories_label',
                     'aria-required'    => 'false',
                     'class'            => 'js-select halfwidth',
-                    'data-placeholder' => $this->translator->trans('admin.post.properties.categories.placeholder', [], 'messages'),
+                    'data-placeholder' => $this->translator->trans('admin.post.properties.categories.placeholder'),
                     'data-url'         => $this->router->generate('app_dialog_categorydialog_getcategorymanagerlistcontent'),
                 ],
-                'label'      => $this->translator->trans('admin.post.properties.categories.label', [], 'messages'),
+                'label'      => 'admin.post.properties.categories.label',
                 'label_attr' => [
                     'id' => 'categories_label',
                 ],
@@ -178,7 +178,7 @@ class PostType extends AbstractType
                     return ['selected' => 'selected'];
                 },
                 'class'      => Tag::class,
-                'label'      => $this->translator->trans('admin.post.properties.tags.label', [], 'messages'),
+                'label'      => 'admin.post.properties.tags.label',
                 'label_attr' => [
                     'id' => 'tags_label',
                 ],
@@ -203,7 +203,7 @@ class PostType extends AbstractType
                     'class' => 'ui-map',
                     'data-google-key' => '{{ settings.google.key }}',
                 ],
-                'label' => $this->translator->trans('admin.post.properties.location.label', [], 'messages'),
+                'label' => 'admin.post.properties.location.label',
                 'label_attr' => [
                     'id' => 'latlong_label'
                 ],
@@ -216,7 +216,7 @@ class PostType extends AbstractType
                     'class' => 'full-width',
                     'rows' => 3,
                 ],
-                'label'      => $this->translator->trans('admin.post.sharing.featureSnippet.label', [], 'messages'),
+                'label'      => 'admin.post.sharing.featureSnippet.label',
                 'label_attr' => [
                     'id'    => 'teaser_label',
                 ],
@@ -228,7 +228,7 @@ class PostType extends AbstractType
                     'aria-required' => 'false',
                     'class' => 'checkbox',
                 ],
-                'label' => $this->translator->trans('admin.post.sharing.noindex.label', [], 'messages'),
+                'label' => 'admin.post.sharing.noindex.label',
                 'label_attr' => [
                     'id' => 'noindex_label',
                 ],
@@ -240,7 +240,7 @@ class PostType extends AbstractType
                     'aria-required' => 'false',
                     'class' => 'checkbox',
                 ],
-                'label' => $this->translator->trans('admin.post.sharing.nofollow.label', [], 'messages'),
+                'label' => 'admin.post.sharing.nofollow.label',
                 'label_attr' => [
                     'id' => 'nofollow_label',
                 ],
@@ -253,7 +253,7 @@ class PostType extends AbstractType
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> <span>%s</span>',
                     'save',
-                    $this->translator->trans('admin.button.save', [], 'messages')
+                    $this->translator->trans('admin.button.save'),
                 ),
                 'label_html' => true,
             ])
@@ -268,7 +268,7 @@ class PostType extends AbstractType
                     ],
                     'format' => 'dd/MM/yyyy HH:mm',
                     'html5'  => false,
-                    'label'  => $this->translator->trans('admin.post.properties.modDate.label', [], 'messages'),
+                    'label'  => 'admin.post.properties.modDate.label',
                     'label_attr' => [
                         'id' => 'modDate_label',
                         'class' => 'inline_label',
@@ -282,7 +282,7 @@ class PostType extends AbstractType
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> <span>%s</span>',
                         'publish',
-                        $this->translator->trans('admin.button.publish', [], 'messages')
+                        $this->translator->trans('admin.button.publish'),
                     ),
                     'label_html' => true,
                 ])
@@ -295,7 +295,7 @@ class PostType extends AbstractType
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> <span>%s</span>',
                         'delete_forever',
-                        $this->translator->trans('admin.button.delete', [], 'messages')
+                        $this->translator->trans('admin.button.delete'),
                     ),
                     'label_html' => true,
                 ])

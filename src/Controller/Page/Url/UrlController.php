@@ -37,12 +37,10 @@ class UrlController extends AbstractInachisController
 
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
             foreach ($request->request->all('items') as $item) {
-                $link = $this->entityManager->getRepository(Url::class)->findOneBy(
-                    [
-                        'id' => $item,
-                        'default' => false,
-                    ]
-                );
+                $link = $this->entityManager->getRepository(Url::class)->findOneBy([
+                    'id' => $item,
+                    'default' => false,
+                ]);
                 if ($link !== null) {
                     if ($request->request->has('delete')) {
                         $this->entityManager->getRepository(Url::class)->remove($link);

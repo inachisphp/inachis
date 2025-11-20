@@ -11,21 +11,17 @@ namespace App\Tests\phpunit\Repository;
 
 use App\Entity\Page;
 use App\Entity\Revision;
-use App\Entity\User;
 use App\Repository\RevisionRepository;
 use DateTime;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Rfc4122\UuidV1;
 use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
 
 class RevisionRepositoryTest extends TestCase
 {
@@ -47,7 +43,6 @@ class RevisionRepositoryTest extends TestCase
         $this->repository = $this->getMockBuilder(RevisionRepository::class)
             ->setConstructorArgs([$this->registry])
             ->onlyMethods([ 'getEntityManager', 'createQueryBuilder', 'getNextVersionNumberForPageId' ])
-            ->addMethods([ 'getRepository' ])
             ->getMock();
 
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);
@@ -84,11 +79,10 @@ class RevisionRepositoryTest extends TestCase
         $this->repository = $this->getMockBuilder(RevisionRepository::class)
             ->setConstructorArgs([$this->registry])
             ->onlyMethods([ 'getEntityManager', 'createQueryBuilder' ])
-            ->addMethods([ 'getRepository' ])
             ->getMock();
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);
 
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->method('getSingleScalarResult')->willReturn(1);
         $qb = $this->createMock(QueryBuilder::class);
         $qb->method('select')->willReturnSelf();
@@ -115,11 +109,10 @@ class RevisionRepositoryTest extends TestCase
         $this->repository = $this->getMockBuilder(RevisionRepository::class)
             ->setConstructorArgs([$this->registry])
             ->onlyMethods([ 'getEntityManager', 'createQueryBuilder' ])
-            ->addMethods([ 'getRepository' ])
             ->getMock();
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);
 
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $qb = $this->createMock(QueryBuilder::class);
         $qb->method('delete')->willReturnSelf();
         $qb->method('where')->willReturnSelf();

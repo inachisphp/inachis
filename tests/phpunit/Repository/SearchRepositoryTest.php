@@ -9,14 +9,11 @@
 
 namespace App\Tests\phpunit\Repository;
 
-
 use App\Model\SearchResult;
 use App\Repository\SearchRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 

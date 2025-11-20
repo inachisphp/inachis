@@ -14,15 +14,13 @@ use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Tag;
 use App\Entity\Url;
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Repository for retrieving {@link Page} entities
  */
-final class PageRepository extends AbstractRepository implements PageRepositoryInterface
+class PageRepository extends AbstractRepository implements PageRepositoryInterface
 {
     /**
      * The maximum number of items to show in the admin interface

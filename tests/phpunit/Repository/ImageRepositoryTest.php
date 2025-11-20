@@ -30,7 +30,6 @@ class ImageRepositoryTest extends TestCase
         $this->repository = $this->getMockBuilder(ImageRepository::class)
             ->setConstructorArgs([$registry])
             ->onlyMethods([ 'getEntityManager', 'getAll' ])
-            ->addMethods([ 'getRepository' ])
             ->getMock();
 
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);

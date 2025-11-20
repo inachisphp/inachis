@@ -65,10 +65,10 @@ class ContentSelectorController extends AbstractInachisController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         if (!empty($request->request->all('ids'))) {
-            $series = $this->entityManager->getRepository(Series::class)->findOneById($request->request->get('seriesId'));
+            $series = $this->entityManager->getRepository(Series::class)->findOneBy(['id' => $request->request->get('seriesId')]);
             if ($series !== null) {
                 foreach ($request->request->all('ids') as $pageId) {
-                    $page = $this->entityManager->getRepository(Page::class)->findOneById($pageId);
+                    $page = $this->entityManager->getRepository(Page::class)->findOneBy(['id' => $pageId]);
                     if (empty($page) || empty($page->getId())) {
                         continue;
                     }

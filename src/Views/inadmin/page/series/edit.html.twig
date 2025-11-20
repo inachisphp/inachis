@@ -69,6 +69,10 @@
                 {%  if series.id is not empty and series.items|length > 0 %}
                     <a class="button button--secondary" href="{{ path('app_series_view', { 'year': series.lastDate|date('Y'), 'title': series.url}) }}" target="_blank" title="View Live"><span class="material-icons">exit_to_app</span> View Live</a>
                 {%  endif %}
+                    <span class="series__controls visually-hidden">
+                    with selected:
+                    {{ form_widget(form.remove) }}
+                </span>
             </p>
         </div>
         {{ form_row(form._token) }}

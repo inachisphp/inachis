@@ -114,8 +114,8 @@ class UserTypeTest extends TypeTestCase
         $choices = $form->get('timezone')->getConfig()->getOption('choices');
 
         $this->assertNotEmpty($choices);
-        $this->assertArrayHasKey('UTC', $choices);
-        $this->assertSame('UTC', $choices['UTC']);
+        $this->assertArrayHasKey('(GMT+00:00) UTC', $choices);
+        $this->assertSame('UTC', $choices['(GMT+00:00) UTC']);
     }
 
     public function testFormSubmissionPopulatesEntityCorrectly(): void

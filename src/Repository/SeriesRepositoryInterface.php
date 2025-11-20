@@ -9,10 +9,9 @@
 
 namespace App\Repository;
 
-use App\Entity\AbstractFile;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
-interface ResourceRepositoryInterface
+interface SeriesRepositoryInterface
 {
     public function getAll(
         int $offset = 0,
@@ -22,20 +21,8 @@ interface ResourceRepositoryInterface
         array|string $groupBy = [],
         array $join = []
     ): Paginator;
-
     /**
-     * @param AbstractFile $download
-     * @return void
+     * @return int
      */
-    public function remove(AbstractFile $download): void;
-
-    /**
-     * @param $filters
-     * @param $offset
-     * @param $limit
-     * @param string|null $sortBy
-     * @return Paginator
-     */
-    public function getFiltered($filters, $offset, $limit, ?string $sortBy = 'title asc'): Paginator;
+    public function getMaxItemsToShow(): int;
 }
-

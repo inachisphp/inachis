@@ -12,19 +12,20 @@ namespace App\Tests\phpunit\Controller;
 use App\Controller\DefaultController;
 use App\Entity\Page;
 use App\Entity\Series;
+use App\Repository\PageRepository;
+use App\Repository\PageRepositoryInterface;
+use App\Repository\SeriesRepository;
+use ArrayIterator;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use PHPUnit\Framework\MockObject\MockObject;
 use Ramsey\Uuid\Uuid;
 use ReflectionClass;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DefaultControllerTest extends WebTestCase
@@ -57,6 +58,15 @@ class DefaultControllerTest extends WebTestCase
 
     public function testViewRendersTemplate(): void
     {
+        $iterableMock = $this->getMockBuilder(ArrayIterator::class)
+            ->setConstructorArgs([[]])
+            ->getMock();
+        $paginatorMock = $this->getMockBuilder(Paginator::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getIterator'])
+            ->getMock();
+        $paginatorMock->method('getIterator')->willReturn($iterableMock);
+
         $uuid = Uuid::uuid1();
         $uuid2 = Uuid::uuid1();
         $uuid3 = Uuid::uuid1();
@@ -65,21 +75,24 @@ class DefaultControllerTest extends WebTestCase
         $page3 = (new Page())->setId($uuid3);
         $series = (new Series())->addItem($page1)->addItem($page3);
         $series->setFirstDate(new DateTime('now'))->setLastDate(new DateTime('now'));
-        $seriesRepo = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods([ 'findOneByTitle', 'getAll' ])
+        $paginator = $this->getMockBuilder(Paginator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $seriesRepo = $this->getMockBuilder(SeriesRepository::class)
+            ->onlyMethods([ 'getAll' ])
             ->disableOriginalConstructor()
             ->getMock();
         $seriesRepo->expects($this->once())
             ->method('getAll')
-            ->willReturn([ $series ]);
-        $pageRepo = $this->getMockBuilder(EntityRepository::class)
-            ->addMethods([ 'findOneByTitle', 'getAll' ])
+            ->willReturn($paginator);
+        $pageRepo = $this->getMockBuilder(PageRepository::class)
+            ->onlyMethods([ 'getAll' ])
             ->disableOriginalConstructor()
             ->getMock();
         $pageRepo->expects($this->once())
             ->method('getAll')
             ->with()
-            ->willReturn([ $page1, $page2, $page3 ]);
+            ->willReturn($paginator);
         $this->entityManager->method('getRepository')
             ->willReturnMap([
                 [Series::class, $seriesRepo],

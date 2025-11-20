@@ -53,7 +53,7 @@ class AdminProfileController extends AbstractInachisController
 
         if ($form->isSubmitted() && !empty($request->request->all('items'))) {
             foreach ($request->request->all('items') as $item) {
-                $selectedItem = $this->entityManager->getRepository(User::class)->findOneById($item);
+                $selectedItem = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $item]);
                 if ($selectedItem !== null) {
                     if ($request->request->get('delete') !== null) {
                         $selectedItem->setRemoved(true);

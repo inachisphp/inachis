@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" backupGlobals="false" bootstrap="config/bootstrap.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true">
-  <coverage processUncoveredFiles="false">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"
+         backupGlobals="false"
+         bootstrap="config/bootstrap.php"
+         colors="true">
+  <source>
     <include>
       <directory suffix=".php">./src/</directory>
     </include>
+  </source>
+  <coverage>
     <report>
       <html outputDirectory="tests/logs/coverage-report" />
-      <clover outputFile="tests/logs/clover.xml"/>
-      <!-- text outputFile="php://stdout" / -->
+      <clover outputFile="tests/logs/clover.xml" />
     </report>
   </coverage>
   <php>
@@ -22,8 +27,5 @@
       <directory>./tests/phpunit/</directory>
     </testsuite>
   </testsuites>
-  <listeners>
-    <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
-  </listeners>
   <logging/>
 </phpunit>

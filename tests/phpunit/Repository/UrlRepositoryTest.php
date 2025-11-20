@@ -12,10 +12,10 @@ namespace App\Tests\phpunit\Repository;
 use App\Entity\Page;
 use App\Entity\Url;
 use App\Repository\UrlRepository;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -37,7 +37,8 @@ class UrlRepositoryTest extends TestCase
             ->method('getManagerForClass')
             ->with(Url::class)
             ->willReturn($this->entityManager);
-        $metadata = $this->createMock(ClassMetadata::class);
+        $metadata = new ClassMetadata(Url::class);
+
         $this->entityManager
             ->method('getClassMetadata')
             ->with(Url::class)
@@ -45,7 +46,6 @@ class UrlRepositoryTest extends TestCase
         $this->repository = $this->getMockBuilder(UrlRepository::class)
             ->setConstructorArgs([$registry])
             ->onlyMethods([ 'getEntityManager', 'getAll', 'findOneBy' ])
-            ->addMethods([ 'getRepository' ])
             ->getMock();
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);
         parent::setUp();
@@ -90,17 +90,17 @@ class UrlRepositoryTest extends TestCase
         $expectedUrl = $this->createMock(Url::class);
         $uuid = Uuid::uuid1();
 
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->method('getResult')->willReturn([$expectedUrl]);
         $expr = $this->createMock(Expr::class);
 
         $queryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['select', 'where', 'setParameters', 'getQuery', 'expr'])
+            ->onlyMethods(['select', 'where', 'setParameter', 'getQuery', 'expr'])
             ->getMock();
         $queryBuilder->method('select')->willReturnSelf();
         $queryBuilder->method('where')->willReturnSelf();
-        $queryBuilder->method('setParameters')->willReturnSelf();
+        $queryBuilder->method('setParameter')->willReturnSelf();
         $queryBuilder->method('expr')->willReturn($expr);
         $queryBuilder->method('getQuery')->willReturn($query);
         $this->entityManager->method('createQueryBuilder')->willReturn($queryBuilder);
