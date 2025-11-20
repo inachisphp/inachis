@@ -19,8 +19,8 @@ use Ramsey\Uuid\UuidInterface;
 /**
  */
 #[ORM\Entity(repositoryClass: 'App\Repository\SeriesRepository', readOnly: false)]
-#[ORM\Index(columns: ['title'], name: 'search_idx')]
-#[ORM\Index(columns: ['title', 'sub_title', 'description'], name: "fulltext_title_content", flags: ["fulltext"])]
+#[ORM\Index(name: 'search_idx', columns: ['title'])]
+#[ORM\Index(name: "fulltext_title_content", columns: ['title', 'sub_title', 'description'], flags: ["fulltext"])]
 class Series
 {
     /**
@@ -236,7 +236,7 @@ class Series
      * @param DateTime|null $firstDate
      * @return $this
      */
-    public function setFirstDate(DateTime $firstDate = null): self
+    public function setFirstDate(?DateTime $firstDate): self
     {
         $this->firstDate = $firstDate;
         return $this;
@@ -255,7 +255,7 @@ class Series
      *
      * @return Series
      */
-    public function setLastDate(DateTime $lastDate = null): self
+    public function setLastDate(?DateTime $lastDate): self
     {
         $this->lastDate = $lastDate;
         return $this;

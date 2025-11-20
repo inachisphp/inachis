@@ -312,7 +312,7 @@ abstract class AbstractFile
      * @param DateTime|null $value The date to be set
      * @return $this
      */
-    public function setCreateDate(DateTime $value = null): self
+    public function setCreateDate(?DateTime $value): self
     {
         $this->createDate = $value;
 
@@ -325,7 +325,7 @@ abstract class AbstractFile
      * @param DateTime|null $value Specifies the mod date for the {@link Page}
      * @return $this
      */
-    public function setModDate(DateTime $value = null): self
+    public function setModDate(?DateTime $value): self
     {
         $this->modDate = $value;
 
