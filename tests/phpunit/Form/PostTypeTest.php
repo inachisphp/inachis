@@ -62,11 +62,7 @@ final class PostTypeTest extends TestCase
             $this->transformer()
         );
 
-        // Ensure "new item" branch => getId() must return null
         $page = new Page();
-        // if your Page entity needs setters, call them here:
-        // $page->setId(null);
-
         $builder = $this->createMock(FormBuilderInterface::class);
 
         $expected = [
@@ -104,17 +100,8 @@ final class PostTypeTest extends TestCase
             $this->transformer()
         );
 
-        // Ensure "existing item" branch => getId() must return non-null
         $page = (new Page())->setId(Uuid::uuid1());
-        // If Page doesn't take ID in constructor, call setter:
-        // $page->setId(123);
-        // Otherwise simulate ID using reflection if needed:
-//        $ref = new ReflectionProperty($page, 'id');
-//        $ref->setAccessible(true);
-//        $ref->setValue($page, 123);
-
         $builder = $this->createMock(FormBuilderInterface::class);
-
         $expected = [
             ['title', TextType::class, $this->anything()],
             ['subTitle', TextType::class, $this->anything()],
@@ -167,13 +154,17 @@ final class PostTypeTest extends TestCase
         $builder->expects($this->exactly(count($expectedCalls)))
             ->method('add')
             ->willReturnCallback(function ($name, $type, $options) use (&$callIndex, $expectedCalls, $builder) {
-                [$expName, $expType] = $expectedCalls[$callIndex];
+                [$expectedName, $expectedType] = $expectedCalls[$callIndex];
+                $this->assertSame($expectedName, $name);
+                $this->assertSame($expectedType, $type);
 
-                TestCase::assertSame($expName, $name, "Field #$callIndex name mismatch");
-                TestCase::assertSame($expType, $type, "Field #$callIndex type mismatch");
+                if (isset($options['choice_attr']) && is_callable($options['choice_attr'])) {
+                    $result = $options['choice_attr']('fakeChoice', 'fakeKey', 'fakeValue');
+                    $this->assertSame(['selected' => 'selected'], $result);
+                }
 
                 $callIndex++;
-                return $builder; // mimic builder behavior
+                return $builder;
             });
     }
 }
