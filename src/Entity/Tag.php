@@ -17,7 +17,7 @@ use Ramsey\Uuid\UuidInterface;
  * Object for handling tags that are mapped to content.
  */
 #[ORM\Entity(repositoryClass: 'App\Repository\TagRepository', readOnly: false)]
-#[ORM\Index(columns: [ "title" ], name: "search_idx")]
+#[ORM\Index(name: "search_idx", columns: [ "title" ])]
 class Tag
 {
     /**
@@ -44,9 +44,9 @@ class Tag
     }
 
     /**
-     * @return string
+     * @return UuidInterface|null
      */
-    public function getId(): string
+    public function getId(): ?UuidInterface
     {
         return $this->id;
     }

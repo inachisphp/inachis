@@ -11,6 +11,7 @@ namespace App\Tests\phpunit\Controller\Page\Series;
 
 use App\Controller\Page\Series\SeriesWebController;
 use App\Entity\Series;
+use App\Repository\SeriesRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -57,7 +58,7 @@ class SeriesWebControllerTest extends WebTestCase
     {
         $request = new Request();
         $series = $this->createMock(Series::class);
-        $seriesRepo = $this->getMockBuilder(EntityRepository::class)
+        $seriesRepo = $this->getMockBuilder(SeriesRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
         $seriesRepo->expects($this->once())
@@ -91,7 +92,7 @@ class SeriesWebControllerTest extends WebTestCase
     public function testViewThrowsNotFound(): void
     {
         $request = new Request();
-        $seriesRepo = $this->getMockBuilder(EntityRepository::class)
+        $seriesRepo = $this->getMockBuilder(SeriesRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
         $seriesRepo->expects($this->once())
