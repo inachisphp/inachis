@@ -30,16 +30,15 @@
                             {{ item.title }}{% if item.subTitle is not empty %} - {{ item.subTitle }}{% endif %}</label>
                     </td>
                     <td>
-                        <a aria-label="Edit item" href="/incc/{{ item.type }}/{{ item.urls|first.link }}"><span class="material-icons">edit_note</span></a>
+                        <span class="material-icons">{% if item.status == 'published' %}visibility{% else %}visibility_off{% endif %}</span>
+                    </td>
+                    <td>
+                        <a aria-label="Edit item" href="/incc/{{ item.type }}/{{ item.urls|first.link }}" title="Edit {{ item.title }}"><span class="material-icons">edit_note</span></a>
                     </td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
-        <p class="series__controls visually-hidden">
-            with selected:
-            {{ form_widget(form.remove) }}
-        </p>
     {% else %}
         <p class="content-warning">
             <i class="material-icons">info_outline</i>

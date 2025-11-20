@@ -2,12 +2,14 @@
   h2 span.badge {
     font-size: 0.6em;
   }
+
   & p:first-of-type {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
     align-items: center;
   }
+
   p:first-child {
     //margin: -5px 20px 0 0;
     
@@ -15,11 +17,19 @@
       font-size: 0.9em;
     }
   }
-  table td label {
-    display: inline;
+
+  table {
+    margin-bottom: 7em;
+
+    td label {
+      color: #666;
+      display: inline;
+    }
   }
-  .table--selectable tr td:last-child,
-  .table--selectable tr th:last-child {
+
+  .table--selectable tr td:nth-last-child(-n+2),
+  .table--selectable tr th:nth-last-child(-n+2) {
+    color: #aaa;
     width: .8em;
   }
 }
