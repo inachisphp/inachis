@@ -56,7 +56,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      * @param int $offset
      * @return mixed
      */
-    public function getPagesWithCategory(Category $category, int $maxDisplayCount = null, int $offset = 0)
+    public function getPagesWithCategory(Category $category, int $maxDisplayCount = 0, int $offset = 0)
     {
         $qb = $this->createQueryBuilder('p');
         $qb = $qb
@@ -102,7 +102,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      * @param int $offset
      * @return mixed
      */
-    public function getPagesWithTag(Tag $tag, int $maxDisplayCount = null, int $offset = 0)
+    public function getPagesWithTag(Tag $tag, int $maxDisplayCount = 0, int $offset = 0)
     {
         $qb = $this->createQueryBuilder('p');
         $qb = $qb

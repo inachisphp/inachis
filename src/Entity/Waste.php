@@ -19,7 +19,7 @@ use Ramsey\Uuid\UuidInterface;
  * Object for handling {@link Waste} contents
  */
 #[ORM\Entity(repositoryClass: 'App\Repository\WasteRepository', readOnly: false)]
-#[ORM\Index(columns: ['source_type', 'user_id'], name: 'search_idx')]
+#[ORM\Index(name: 'search_idx', columns: ['source_type', 'user_id'])]
 class Waste
 {
     /**
@@ -170,7 +170,7 @@ class Waste
      * @param DateTime|null $value
      * @return $this
      */
-    public function setModDate(DateTime $value = null): self
+    public function setModDate(?DateTime $value): self
     {
         $this->modDate = $value;
 
@@ -191,7 +191,7 @@ class Waste
      * @param User|null $value The UUID of user adding the {@link Waste}
      * @return $this
      */
-    public function setUser(User $value = null): self
+    public function setUser(?User $value): self
     {
         $this->user = $value;
 

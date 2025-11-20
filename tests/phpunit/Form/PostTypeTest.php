@@ -9,136 +9,162 @@
 
 namespace App\Tests\phpunit\Form;
 
-use App\Entity\Category;
 use App\Entity\Page;
-use App\Entity\Tag;
-use App\Form\DataTransformer\ArrayCollectionToArrayTransformer;
 use App\Form\PostType;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\Persistence\ManagerRegistry;
-use PHPUnit\Framework\MockObject\MockObject;
+use App\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use DateTime;
+use PHPUnit\Framework\MockObject\Exception;
+use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
-use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
+use ReflectionProperty;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use ReflectionClass;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class PostTypeTest extends TypeTestCase
+final class PostTypeTest extends TestCase
 {
-    protected function getExtensions(): array
+    private function translator(): TranslatorInterface
     {
-        /** @var RouterInterface|MockObject $router */
-        $router = $this->createMock(RouterInterface::class);
-        /** @var TranslatorInterface|MockObject $translator */
-        $translator = $this->createMock(TranslatorInterface::class);
-        /** @var ArrayCollectionToArrayTransformer|MockObject $transformer */
-        $transformer = $this->createMock(ArrayCollectionToArrayTransformer::class);
+        $m = $this->createMock(TranslatorInterface::class);
+        $m->method('trans')->willReturnCallback(fn ($s) => (string) $s);
+        return $m;
+    }
 
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->method('getClassMetadata')->willReturnCallback(fn($class) => $this->createMetadata($class));
-        $entityManager->method('contains')->willReturn(true);
+    private function router(): RouterInterface
+    {
+        $m = $this->createMock(RouterInterface::class);
+        $m->method('generate')->willReturn('/fake/url');
+        return $m;
+    }
 
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $managerRegistry->method('getManagerForClass')->willReturn($entityManager);
-
-        return [
-            new PreloadedExtension(
-                [
-                    new PostType($translator, $router, $transformer),
-                    EntityType::class => new EntityType($managerRegistry),
-                ],
-                []
-            ),
-            new DoctrineOrmExtension($managerRegistry),
-        ];
+    private function transformer(): ArrayCollectionToArrayTransformer
+    {
+        return $this->createMock(ArrayCollectionToArrayTransformer::class);
     }
 
     /**
-     * Create simplified ClassMetadata with string ID for form testing.
+     * @throws \IntlException
+     * @throws Exception
      */
-    private function createMetadata(string $class): ClassMetadata
+    public function testBuildFormForNewItem(): void
     {
-        $metadata = new ClassMetadata($class);
-        $metadata->identifier = ['id'];
-        $metadata->isIdentifierComposite = false;
+        $postType = new PostType(
+            $this->translator(),
+            $this->router(),
+            $this->transformer()
+        );
 
-        $metadata->fieldMappings['id'] = [
-            'fieldName' => 'id',
-            'type' => 'uuid',
-            'id' => true,
-            'nullable' => false,
-        ];
-        $metadata->fieldNames['id'] = 'id';
-        $metadata->columnNames['id'] = 'id';
-        $metadata->associationMappings = [];
-
-        $ref = new ReflectionClass($class);
-
-        if ($ref->hasProperty('id')) {
-            $prop = $ref->getProperty('id');
-            $prop->setAccessible(true);
-            $metadata->reflFields['id'] = $prop; // MUST be a ReflectionProperty, not null
-        } else {
-            throw new \RuntimeException("$class must have a property 'id'");
-        }
-
-        return $metadata;
-    }
-
-
-
-    public function testConfigureOptionsSetsDataClass(): void
-    {
-        $form = $this->factory->create(PostType::class, new Page());
-        $options = $form->getConfig()->getOptions();
-
-        $this->assertSame(Page::class, $options['data_class']);
-        $this->assertSame(['class' => 'form form__post'], $options['attr']);
-    }
-
-    public function testBuildFormForNewPage(): void
-    {
         $page = new Page();
-        $form = $this->factory->create(PostType::class, $page);
-        $view = $form->createView();
+        $builder = $this->createMock(FormBuilderInterface::class);
 
-        $expectedFields = [
-            'title', 'subTitle', 'url', 'content', 'visibility', 'postDate',
-            'categories', 'tags', 'language', 'latlong', 'featureSnippet',
-            'noindex', 'nofollow', 'submit',
+        $expected = [
+            ['title', TextType::class, $this->anything()],
+            ['subTitle', TextType::class, $this->anything()],
+            ['url', TextType::class, $this->anything()],
+            ['content', TextareaType::class, $this->anything()],
+            ['visibility', CheckboxType::class, $this->anything()],
+            ['postDate', DateTimeType::class, $this->anything()],
+            ['categories', EntityType::class, $this->anything()],
+            ['tags', EntityType::class, $this->anything()],
+            ['language', ChoiceType::class, $this->anything()],
+            ['latlong', TextType::class, $this->anything()],
+            ['featureSnippet', TextareaType::class, $this->anything()],
+            ['noindex', CheckboxType::class, $this->anything()],
+            ['nofollow', CheckboxType::class, $this->anything()],
+            ['submit', SubmitType::class, $this->anything()],
         ];
 
-        $this->assertSame($expectedFields, array_keys($view->children));
+        $this->expectAddCallsInOrder($builder, $expected);
+
+        $postType->buildForm($builder, ['data' => $page]);
     }
 
-    public function testBuildFormForExistingPage(): void
+    /**
+     * @throws \IntlException
+     * @throws \ReflectionException
+     * @throws Exception
+     */
+    public function testBuildFormForExistingItem(): void
     {
+        $postType = new PostType(
+            $this->translator(),
+            $this->router(),
+            $this->transformer()
+        );
+
         $page = (new Page())->setId(Uuid::uuid1());
-        $tag = (new Tag('Tag One'))->setId(Uuid::uuid1());
-        $category = (new Category('Category One'))->setId(Uuid::uuid1());
-
-        $page->addTag($tag);
-        $page->addCategory($category);
-
-
-        $form = $this->factory->create(PostType::class, $page);
-        $view = $form->createView();
-
-        $expectedFields = [
-            'title', 'subTitle', 'url', 'content', 'visibility', 'postDate',
-            'categories', 'tags', 'language', 'latlong', 'featureSnippet',
-            'noindex', 'nofollow', 'submit', 'modDate', 'publish', 'delete',
+        $builder = $this->createMock(FormBuilderInterface::class);
+        $expected = [
+            ['title', TextType::class, $this->anything()],
+            ['subTitle', TextType::class, $this->anything()],
+            ['url', TextType::class, $this->anything()],
+            ['content', TextareaType::class, $this->anything()],
+            ['visibility', CheckboxType::class, $this->anything()],
+            ['postDate', DateTimeType::class, $this->anything()],
+            ['categories', EntityType::class, $this->anything()],
+            ['tags', EntityType::class, $this->anything()],
+            ['language', ChoiceType::class, $this->anything()],
+            ['latlong', TextType::class, $this->anything()],
+            ['featureSnippet', TextareaType::class, $this->anything()],
+            ['noindex', CheckboxType::class, $this->anything()],
+            ['nofollow', CheckboxType::class, $this->anything()],
+            ['submit', SubmitType::class, $this->anything()],
+            // Extra fields added only for existing item:
+            ['modDate', DateTimeType::class, $this->anything()],
+            ['publish', SubmitType::class, $this->anything()],
+            ['delete', SubmitType::class, $this->anything()],
         ];
 
-        $this->assertSame($expectedFields, array_keys($view->children));
+        $this->expectAddCallsInOrder($builder, $expected);
+        $postType->buildForm($builder, ['data' => $page]);
+    }
 
-        $tagView = $view['tags'];
-        $choices = $tagView->vars['choices'];
-        $this->assertSame('selected', $choices[0]->attr['selected']);
+    public function testConfigureOptions(): void
+    {
+        $postType = new PostType(
+            $this->translator(),
+            $this->router(),
+            $this->transformer()
+        );
+
+        $resolver = new OptionsResolver();
+        $postType->configureOptions($resolver);
+
+        $options = $resolver->resolve();
+
+        $this->assertSame('form form__post', $options['attr']['class']);
+        $this->assertSame(Page::class, $options['data_class']);
+    }
+
+    /**
+     * Helper to assert add() calls in exact order
+     */
+    private function expectAddCallsInOrder(FormBuilderInterface $builder, array $expectedCalls): void
+    {
+        $callIndex = 0;
+
+        $builder->expects($this->exactly(count($expectedCalls)))
+            ->method('add')
+            ->willReturnCallback(function ($name, $type, $options) use (&$callIndex, $expectedCalls, $builder) {
+                [$expectedName, $expectedType] = $expectedCalls[$callIndex];
+                $this->assertSame($expectedName, $name);
+                $this->assertSame($expectedType, $type);
+
+                if (isset($options['choice_attr']) && is_callable($options['choice_attr'])) {
+                    $result = $options['choice_attr']('fakeChoice', 'fakeKey', 'fakeValue');
+                    $this->assertSame(['selected' => 'selected'], $result);
+                }
+
+                $callIndex++;
+                return $builder;
+            });
     }
 }
-

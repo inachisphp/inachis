@@ -35,7 +35,7 @@ class ChangePasswordType extends AbstractType
     /**
      * @param TranslatorInterface|null $translator Translator for getting UI text from.
      */
-    public function __construct(TranslatorInterface $translator = null)
+    public function __construct(?TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
