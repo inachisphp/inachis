@@ -3,7 +3,12 @@
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"
          backupGlobals="false"
          bootstrap="config/bootstrap.php"
-         colors="true">
+         colors="true"
+         failOnDeprecation="true"
+         failOnNotice="true"
+         failOnPhpunitDeprecation="true"
+         failOnWarning="true"
+>
   <source>
     <include>
       <directory suffix=".php">./src/</directory>

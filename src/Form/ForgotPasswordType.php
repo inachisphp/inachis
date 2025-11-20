@@ -23,7 +23,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ForgotPasswordType extends AbstractType
 {
     private ?TranslatorInterface $translator;
-    public function __construct(TranslatorInterface $translator = null)
+    public function __construct(?TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }

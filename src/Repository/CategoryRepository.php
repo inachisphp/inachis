@@ -35,7 +35,7 @@ class CategoryRepository extends AbstractRepository implements CategoryRepositor
      */
     public function getRootCategories(): array
     {
-        return $this->getRepository()->createQueryBuilder('q')
+        return $this->createQueryBuilder('q')
             ->where('q.parent is null')
             ->getQuery()
             ->getResult();
