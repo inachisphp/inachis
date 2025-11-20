@@ -75,13 +75,16 @@ class DefaultControllerTest extends WebTestCase
         $page3 = (new Page())->setId($uuid3);
         $series = (new Series())->addItem($page1)->addItem($page3);
         $series->setFirstDate(new DateTime('now'))->setLastDate(new DateTime('now'));
+        $paginator = $this->getMockBuilder(Paginator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $seriesRepo = $this->getMockBuilder(SeriesRepository::class)
             ->onlyMethods([ 'getAll' ])
             ->disableOriginalConstructor()
             ->getMock();
         $seriesRepo->expects($this->once())
             ->method('getAll')
-            ->willReturn([$series]);
+            ->willReturn($paginator);
         $pageRepo = $this->getMockBuilder(PageRepository::class)
             ->onlyMethods([ 'getAll' ])
             ->disableOriginalConstructor()
@@ -89,7 +92,7 @@ class DefaultControllerTest extends WebTestCase
         $pageRepo->expects($this->once())
             ->method('getAll')
             ->with()
-            ->willReturn([ $page1, $page2, $page3 ]);
+            ->willReturn($paginator);
         $this->entityManager->method('getRepository')
             ->willReturnMap([
                 [Series::class, $seriesRepo],

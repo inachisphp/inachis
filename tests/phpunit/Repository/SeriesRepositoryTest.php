@@ -18,38 +18,39 @@ use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
 class SeriesRepositoryTest extends TestCase
 {
-    private ManagerRegistry $registry;
-    private EntityManagerInterface $em;
+    private EntityManagerInterface $entityManager;
     private SeriesRepository $repository;
 
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManagerInterface::class);
-        $this->registry = $this->createMock(ManagerRegistry::class);
-        $this->registry->method('getManagerForClass')->willReturn($this->em);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $registry = $this->createMock(ManagerRegistry::class);
+        $registry->method('getManagerForClass')->willReturn($this->entityManager);
 
         $this->repository = $this->getMockBuilder(SeriesRepository::class)
-            ->setConstructorArgs([$this->registry])
+            ->setConstructorArgs([$registry])
             ->onlyMethods(['getEntityManager', 'createQueryBuilder', 'getAll'])
             ->getMock();
 
-        $this->repository->method('getEntityManager')->willReturn($this->em);
+        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
     }
 
     public function testRemoveCallsEntityManager(): void
     {
         $series = new Series();
 
-        $this->em->expects($this->once())->method('remove')->with($series);
-        $this->em->expects($this->once())->method('flush');
+        $this->entityManager->expects($this->once())->method('remove')->with($series);
+        $this->entityManager->expects($this->once())->method('flush');
 
         $this->repository->remove($series);
     }
@@ -100,6 +101,9 @@ class SeriesRepositoryTest extends TestCase
         $this->assertInstanceOf(Series::class, $result);
     }
 
+    /**
+     * @throws Exception
+     */
     public function testGetSeriesByYearAndUrl(): void
     {
         $year = '2025';
@@ -109,13 +113,13 @@ class SeriesRepositoryTest extends TestCase
         $query->method('getOneOrNullResult')->willReturn(new Series());
 
         $expr = $this->createMock(Expr::class);
-        $expr->method('like')->willReturn('LIKE_EXPRESSION');
+        $expr->method('like')->willReturn($this->createMock(Comparison::class));
 
         $qb = $this->createMock(QueryBuilder::class);
         $qb->method('select')->willReturnSelf();
         $qb->method('where')->willReturnSelf();
         $qb->method('andWhere')->willReturnSelf();
-        $qb->method('setParameters')->willReturnSelf();
+        $qb->method('setParameter')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
         $qb->method('expr')->willReturn($expr);
 
@@ -125,6 +129,9 @@ class SeriesRepositoryTest extends TestCase
         $this->assertInstanceOf(Series::class, $result);
     }
 
+    /**
+     * @throws Exception
+     */
     public function testGetSeriesByYearAndUrlReturnsNull(): void
     {
         $year = '2025';
@@ -134,13 +141,13 @@ class SeriesRepositoryTest extends TestCase
         $query->method('getOneOrNullResult')->willReturn(null);
 
         $expr = $this->createMock(Expr::class);
-        $expr->method('like')->willReturn('LIKE_EXPRESSION');
+        $expr->method('like')->willReturn($this->createMock(Comparison::class));
 
         $qb = $this->createMock(QueryBuilder::class);
         $qb->method('select')->willReturnSelf();
         $qb->method('where')->willReturnSelf();
         $qb->method('andWhere')->willReturnSelf();
-        $qb->method('setParameters')->willReturnSelf();
+        $qb->method('setParameter')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
         $qb->method('expr')->willReturn($expr);
 
@@ -192,6 +199,34 @@ class SeriesRepositoryTest extends TestCase
 
         $result = $this->repository->getFiltered($filters, $offset, $limit, $sort);
         $this->assertInstanceOf(Paginator::class, $result);
+    }
+
+    public function testGetFilteredSortOptions(): void
+    {
+
+        $sortOptions = [
+            'title desc' => [
+                ['q.title', 'DESC'],
+                ['q.subTitle', 'DESC'],
+            ],
+            'modDate desc' => [['q.modDate', 'DESC']],
+            'lastDate asc' => [['q.lastDate', 'ASC']],
+            'lastDate desc' => [
+                ['CASE WHEN q.lastDate IS NULL THEN 1 ELSE 0 END', 'DESC'],
+                ['q.lastDate', 'DESC'],
+            ],
+            'default' => [
+                ['q.title', 'ASC'],
+                ['q.subTitle', 'ASC'],
+            ],
+        ];
+        foreach ($sortOptions as $key => $sortOption) {
+            $paginator = $this->createMock(Paginator::class);
+            $this->repository->method('getAll')
+                ->willReturn($paginator);
+            $result = $this->repository->getFiltered([], 0, 5, $key);
+            $this->assertInstanceOf(Paginator::class, $result);
+        }
     }
 
     public function testGetSeriesUsingImage(): void

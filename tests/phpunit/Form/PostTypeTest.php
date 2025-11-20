@@ -17,64 +17,79 @@ use App\Form\PostType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
-use IntlException;
+use PHPUnit\Framework\MockObject\MockObject;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Emoji\EmojiTransliterator;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use ReflectionClass;
 
 class PostTypeTest extends TypeTestCase
 {
-    /**
-     * @throws IntlException
-     */
     protected function getExtensions(): array
     {
+        /** @var RouterInterface|MockObject $router */
         $router = $this->createMock(RouterInterface::class);
+        /** @var TranslatorInterface|MockObject $translator */
         $translator = $this->createMock(TranslatorInterface::class);
+        /** @var ArrayCollectionToArrayTransformer|MockObject $transformer */
         $transformer = $this->createMock(ArrayCollectionToArrayTransformer::class);
 
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
         $entityManager = $this->createMock(EntityManagerInterface::class);
-
-        $entityManager->method('getClassMetadata')->willReturnCallback(function ($class) {
-            $metadata = new ClassMetadata($class);
-            $metadata->identifier = ['id'];
-
-            $reflectionClass = new \ReflectionClass($class);
-            if ($reflectionClass->hasProperty('id')) {
-                $metadata->reflFields['id'] = $reflectionClass->getProperty('id');
-                $metadata->reflFields['id']->setAccessible(true);
-            }
-            return $metadata;
-        });
+        $entityManager->method('getClassMetadata')->willReturnCallback(fn($class) => $this->createMetadata($class));
         $entityManager->method('contains')->willReturn(true);
 
-        $managerRegistry->method('getManagerForClass')->willReturnCallback(function ($class) use ($entityManager) {
-            if (in_array($class, [Category::class, Tag::class], true)) {
-                return $entityManager;
-            }
-            return null;
-        });
-
-        $doctrineExtension = new DoctrineOrmExtension($managerRegistry);
-        $entityType = new EntityType($managerRegistry);
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry->method('getManagerForClass')->willReturn($entityManager);
 
         return [
             new PreloadedExtension(
                 [
                     new PostType($translator, $router, $transformer),
-                    EntityType::class => $entityType,
+                    EntityType::class => new EntityType($managerRegistry),
                 ],
                 []
             ),
-            $doctrineExtension,
+            new DoctrineOrmExtension($managerRegistry),
         ];
     }
+
+    /**
+     * Create simplified ClassMetadata with string ID for form testing.
+     */
+    private function createMetadata(string $class): ClassMetadata
+    {
+        $metadata = new ClassMetadata($class);
+        $metadata->identifier = ['id'];
+        $metadata->isIdentifierComposite = false;
+
+        $metadata->fieldMappings['id'] = [
+            'fieldName' => 'id',
+            'type' => 'uuid',
+            'id' => true,
+            'nullable' => false,
+        ];
+        $metadata->fieldNames['id'] = 'id';
+        $metadata->columnNames['id'] = 'id';
+        $metadata->associationMappings = [];
+
+        $ref = new ReflectionClass($class);
+
+        if ($ref->hasProperty('id')) {
+            $prop = $ref->getProperty('id');
+            $prop->setAccessible(true);
+            $metadata->reflFields['id'] = $prop; // MUST be a ReflectionProperty, not null
+        } else {
+            throw new \RuntimeException("$class must have a property 'id'");
+        }
+
+        return $metadata;
+    }
+
+
 
     public function testConfigureOptionsSetsDataClass(): void
     {
@@ -91,28 +106,39 @@ class PostTypeTest extends TypeTestCase
         $form = $this->factory->create(PostType::class, $page);
         $view = $form->createView();
 
-        $expectedFields = [ 'title', 'subTitle', 'url', 'content', 'visibility', 'postDate', 'categories',
-            'tags', 'language', 'latlong', 'featureSnippet', 'noindex', 'nofollow', 'submit' ];
+        $expectedFields = [
+            'title', 'subTitle', 'url', 'content', 'visibility', 'postDate',
+            'categories', 'tags', 'language', 'latlong', 'featureSnippet',
+            'noindex', 'nofollow', 'submit',
+        ];
+
         $this->assertSame($expectedFields, array_keys($view->children));
     }
 
     public function testBuildFormForExistingPage(): void
     {
         $page = (new Page())->setId(Uuid::uuid1());
-        $tag = (new Tag())->setTitle('Tag One');
+        $tag = (new Tag('Tag One'))->setId(Uuid::uuid1());
+        $category = (new Category('Category One'))->setId(Uuid::uuid1());
+
         $page->addTag($tag);
-        $category = (new Category())->setTitle('Category One');
         $page->addCategory($category);
+
 
         $form = $this->factory->create(PostType::class, $page);
         $view = $form->createView();
-        $tagView = $view['tags'];
-        $tagViews = $tagView->vars['choices'];
-        $expectedFields = [ 'title', 'subTitle', 'url', 'content', 'visibility', 'postDate', 'categories',
-            'tags', 'language', 'latlong', 'featureSnippet', 'noindex', 'nofollow', 'submit', 'modDate', 'publish',
-            'delete'
+
+        $expectedFields = [
+            'title', 'subTitle', 'url', 'content', 'visibility', 'postDate',
+            'categories', 'tags', 'language', 'latlong', 'featureSnippet',
+            'noindex', 'nofollow', 'submit', 'modDate', 'publish', 'delete',
         ];
+
         $this->assertSame($expectedFields, array_keys($view->children));
-        $this->assertSame('selected', $tagViews[0]->attr['selected']);
+
+        $tagView = $view['tags'];
+        $choices = $tagView->vars['choices'];
+        $this->assertSame('selected', $choices[0]->attr['selected']);
     }
 }
+

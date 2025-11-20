@@ -13,7 +13,10 @@ use App\Controller\Page\Post\PageController;
 use App\Entity\Page;
 use App\Entity\Revision;
 use App\Entity\Url;
+use App\Repository\PageRepository;
 use App\Repository\PageRepositoryInterface;
+use App\Repository\RevisionRepository;
+use App\Repository\UrlRepository;
 use App\Util\ContentRevisionCompare;
 use ArrayIterator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,6 +34,8 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PageControllerTest extends WebTestCase
@@ -67,6 +72,7 @@ class PageControllerTest extends WebTestCase
     public function testGetPostListAdminRequiresAuthentication(): void
     {
         $request = new Request();
+        $request->setSession(new Session(new MockArraySessionStorage()));
 
         $controller = $this->getMockBuilder(PageController::class)
             ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
@@ -91,7 +97,7 @@ class PageControllerTest extends WebTestCase
             ->getMock();
         $paginatorMock->method('getIterator')->willReturn($iterableMock);
 
-        $pageRepositoryMock = $this->createMock(PageRepositoryInterface::class);
+        $pageRepositoryMock = $this->createMock(PageRepository::class);
         $pageRepositoryMock->method('getFilteredOfTypeByPostDate')->willReturn($paginatorMock);
         $pageRepositoryMock->method('getMaxItemsToShow')->willReturn(10);
         $this->entityManager->method('getRepository')
@@ -118,13 +124,14 @@ class PageControllerTest extends WebTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incc/post/some-post'
         ]);
-        $urlRepository = $this->getMockBuilder(EntityRepository::class)
+        $request->setSession(new Session(new MockArraySessionStorage()));
+        $urlRepository = $this->getMockBuilder(UrlRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
         $urlRepository->expects($this->once())
             ->method('findBy')
-            ->with('some-post')
-            ->willReturn(null);
+            ->with(['link' => 'some-post'])
+            ->willReturn([]);
         $this->entityManager->method('getRepository')
             ->with(Url::class)
             ->willReturn($urlRepository);
@@ -159,17 +166,21 @@ class PageControllerTest extends WebTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incc/post/new'
         ]);
+        $request->setSession(new Session(new MockArraySessionStorage()));
 
         $urlRepository = $this->getMockBuilder(EntityRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $urlRepository->method('findBy')->willReturn(null);
-        $revisionRepository = $this->getMockBuilder(EntityRepository::class)
+        $urlRepository->method('findBy')->willReturn([]);
+        $paginator = $this->getMockBuilder(Paginator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $revisionRepository = $this->getMockBuilder(RevisionRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
         $revisionRepository->expects($this->any())
             ->method('getAll')
-            ->willReturn([]);
+            ->willReturn($paginator);
         $this->entityManager->method('getRepository')
             ->willReturnMap([
                 [Url::class, $urlRepository],
@@ -204,9 +215,5 @@ class PageControllerTest extends WebTestCase
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals('Rendered form', $response->getContent());
-    }
-
-    private function renderTestHelper(): void
-    {
     }
 }

@@ -40,7 +40,7 @@ class PasswordResetRequestRepositoryTest extends TestCase
         $qb = $this->createMock(QueryBuilder::class);
         $qb->method('where')->willReturnSelf();
         $qb->method('andWhere')->willReturnSelf();
-        $qb->method('setParameters')->willReturnSelf();
+        $qb->method('setParameter')->willReturnSelf();
 
         $user = new User();
         $date = new DateTimeImmutable('now');

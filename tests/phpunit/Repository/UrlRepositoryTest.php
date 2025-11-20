@@ -37,7 +37,8 @@ class UrlRepositoryTest extends TestCase
             ->method('getManagerForClass')
             ->with(Url::class)
             ->willReturn($this->entityManager);
-        $metadata = $this->createMock(ClassMetadata::class);
+        $metadata = new ClassMetadata(Url::class);
+
         $this->entityManager
             ->method('getClassMetadata')
             ->with(Url::class)
@@ -95,11 +96,11 @@ class UrlRepositoryTest extends TestCase
 
         $queryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['select', 'where', 'setParameters', 'getQuery', 'expr'])
+            ->onlyMethods(['select', 'where', 'setParameter', 'getQuery', 'expr'])
             ->getMock();
         $queryBuilder->method('select')->willReturnSelf();
         $queryBuilder->method('where')->willReturnSelf();
-        $queryBuilder->method('setParameters')->willReturnSelf();
+        $queryBuilder->method('setParameter')->willReturnSelf();
         $queryBuilder->method('expr')->willReturn($expr);
         $queryBuilder->method('getQuery')->willReturn($query);
         $this->entityManager->method('createQueryBuilder')->willReturn($queryBuilder);

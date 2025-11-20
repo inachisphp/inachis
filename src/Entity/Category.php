@@ -70,7 +70,7 @@ class Category
     /**
      * @var Collection|null The array of child categories if applicable
      */
-    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: 'App\Entity\Category')]
+    #[ORM\OneToMany(targetEntity: 'App\Entity\Category', mappedBy: 'parent')]
     #[ORM\OrderBy(['title' => 'ASC'])]
     protected ?Collection $children;
 
@@ -90,9 +90,9 @@ class Category
     /**
      * Returns the value of {@link id}.
      *
-     * @return string The UUID of the {@link Category}
+     * @return UuidInterface|null The UUID of the {@link Category}
      */
-    public function getId(): string
+    public function getId(): ?UuidInterface
     {
         return $this->id;
     }
@@ -168,10 +168,10 @@ class Category
     /**
      * Sets the value of {@link id}.
      *
-     * @param UuidInterface $value The UUID of the {@link Category}
+     * @param UuidInterface|null $value The UUID of the {@link Category}
      * @return $this
      */
-    public function setId(UuidInterface $value): self
+    public function setId(?UuidInterface $value): self
     {
         $this->id = $value;
 

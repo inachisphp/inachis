@@ -10,7 +10,9 @@
 namespace App\Tests\phpunit\Form;
 
 use App\Form\ChangePasswordType;
+use App\Form\Extension\TogglePasswordTypeExtension;
 use PHPUnit\Framework\Attributes\Test;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormFactoryBuilderInterface;
 use Symfony\Component\Form\Forms;
@@ -26,11 +28,20 @@ class ChangePasswordTypeTest extends TypeTestCase
     protected function getExtensions(): array
     {
         $translator = $this->createMock(TranslatorInterface::class);
-        $validator = Validation::createValidator();
+        $validator  = Validation::createValidator();
 
         return [
             new ValidatorExtension($validator),
-            new PreloadedExtension([new ChangePasswordType($translator)], []),
+            new PreloadedExtension(
+                [
+                    new ChangePasswordType($translator),
+                ],
+                [
+                    PasswordType::class => [
+                        new TogglePasswordTypeExtension(),
+                    ],
+                ]
+            ),
         ];
     }
 

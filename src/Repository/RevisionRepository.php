@@ -22,7 +22,7 @@ use DateTime;
  * @method Revision[]    findAll()
  * @method Revision[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class RevisionRepository extends AbstractRepository
+class RevisionRepository extends AbstractRepository implements RevisionRepositoryInterface
 {
     public const DELETED = 'Deleted';
     public const PUBLISHED = 'Published';
