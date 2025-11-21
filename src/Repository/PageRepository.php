@@ -56,7 +56,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      * @param int $offset
      * @return mixed
      */
-    public function getPagesWithCategory(Category $category, int $maxDisplayCount = 0, int $offset = 0)
+    public function getPagesWithCategory(Category $category, int $limit = 0, int $offset = 0)
     {
         $qb = $this->createQueryBuilder('p');
         $qb = $qb
@@ -76,7 +76,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             $qb = $qb->setFirstResult($offset);
         }
         return $qb
-            ->setMaxResults($maxDisplayCount)
+            ->setMaxResults($limit)
             ->getQuery()
             ->execute();
     }
@@ -91,7 +91,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         $qb = $qb
             ->select('COUNT(p) AS numPages')
             ->leftJoin('p.categories', 'Page_categories')
-            ->andWhere('Page_categories.id = :categoryId')
+            ->where('Page_categories.id = :categoryId')
             ->setParameter('categoryId', $category);
         return $qb->getQuery()->getSingleScalarResult();
     }
@@ -139,6 +139,28 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
     }
 
     /**
+     * @param string $orderBy
+     * @return array[]
+     */
+    protected function determineOrderBy(string $orderBy): array
+    {
+        return match ($orderBy) {
+            'title asc' => [
+                ['q.title', 'ASC'],
+                ['q.subTitle', 'ASC'],
+            ],
+            'title desc' => [
+                ['q.title', 'DESC'],
+                ['q.subTitle', 'DESC'],
+            ],
+            'modDate asc' => [['q.modDate', 'ASC']],
+            'modDate desc' => [['q.modDate', 'DESC']],
+            'postDate asc' => [['q.postDate', 'ASC']],
+            default => [['q.postDate', 'DESC']],
+        };
+    }
+
+    /**
      * @param $filters
      * @param string $type
      * @param int $offset
@@ -181,25 +203,11 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         if (!empty($filters['excludeIds'])) {
             $where[0] .= ' AND q.id NOT IN (:excludeIds)';
         }
-        $sort = match ($sort) {
-            'title asc' => [
-                ['q.title', 'ASC'],
-                ['q.subTitle', 'ASC'],
-            ],
-            'title desc' => [
-                ['q.title', 'DESC'],
-                ['q.subTitle', 'DESC'],
-            ],
-            'modDate asc' => [['q.modDate', 'ASC']],
-            'modDate desc' => [['q.modDate', 'DESC']],
-            'postDate asc' => [['q.postDate', 'ASC']],
-            default => [['q.postDate', 'DESC']],
-        };
         return $this->getAll(
             $offset,
             $limit,
             $where,
-            $sort,
+            $this->determineOrderBy($sort),
         );
     }
 

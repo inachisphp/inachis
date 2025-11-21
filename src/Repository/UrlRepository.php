@@ -85,6 +85,30 @@ class UrlRepository extends AbstractRepository
     }
 
     /**
+     * @param string $orderBy
+     * @return array[]
+     */
+    protected function determineOrderBy(string $orderBy): array
+    {
+        return match ($orderBy) {
+            'contentDate desc' => [
+                [ 'substring(q.link, 1, 10)', 'desc' ],
+                [ 'q.default', 'desc' ],
+                [ 'q.createDate', 'desc' ],
+            ],
+            'link asc' => [['q.link', 'ASC']],
+            'link desc' => [['q.link', 'DESC']],
+            'content asc' => [['p.title', 'ASC']],
+            'content desc' => [['p.title', 'DESC']],
+            default => [
+                [ 'substring(q.link, 1, 10)', 'asc' ],
+                [ 'q.default', 'desc' ],
+                [ 'q.createDate', 'desc' ],
+            ],
+        };
+    }
+
+    /**
      * @param $filters
      * @param int $offset
      * @param int $limit
@@ -106,27 +130,11 @@ class UrlRepository extends AbstractRepository
                 ]
             ];
         }
-        $sort = match ($sort) {
-            'contentDate desc' => [
-                [ 'substring(q.link, 1, 10)', 'desc' ],
-                [ 'q.default', 'desc' ],
-                [ 'q.createDate', 'desc' ],
-            ],
-            'link asc' => [['q.link', 'ASC']],
-            'link desc' => [['q.link', 'DESC']],
-            'content asc' => [['p.title', 'ASC']],
-            'content desc' => [['p.title', 'DESC']],
-            default => [
-                [ 'substring(q.link, 1, 10)', 'asc' ],
-                [ 'q.default', 'desc' ],
-                [ 'q.createDate', 'desc' ],
-            ],
-        };
         return $this->getAll(
             $offset,
             $limit,
             $where,
-            $sort,
+            $this->determineOrderBy($sort),
             [],
             ['q.content', 'p']
         );

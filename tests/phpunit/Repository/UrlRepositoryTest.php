@@ -23,6 +23,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
+use ReflectionClass;
 
 class UrlRepositoryTest extends TestCase
 {
@@ -154,5 +155,31 @@ class UrlRepositoryTest extends TestCase
             ->willReturn($paginator);
         $result = $this->repository->getFiltered([ 'keyword' => 'test' ], 0, 25);
         $this->assertEquals($paginator, $result);
+    }
+
+    public function testDetermineOrderBy(): void
+    {
+        $orders = [
+            'contentDate desc' => [
+                [ 'substring(q.link, 1, 10)', 'desc' ],
+                [ 'q.default', 'desc' ],
+                [ 'q.createDate', 'desc' ],
+            ],
+            'link asc' => [['q.link', 'ASC']],
+            'link desc' => [['q.link', 'DESC']],
+            'content asc' => [['p.title', 'ASC']],
+            'content desc' => [['p.title', 'DESC']],
+            'default' => [
+                [ 'substring(q.link, 1, 10)', 'asc' ],
+                [ 'q.default', 'desc' ],
+                [ 'q.createDate', 'desc' ],
+            ]
+        ];
+        $reflection = new ReflectionClass($this->repository);
+        $method = $reflection->getMethod('determineOrderBy');
+        $method->setAccessible(true);
+        foreach($orders as $key => $order) {
+            $this->assertEquals($order, $method->invokeArgs($this->repository, [$key]));
+        }
     }
 }
