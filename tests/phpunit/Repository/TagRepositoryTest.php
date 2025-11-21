@@ -14,6 +14,8 @@ use App\Repository\TagRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
@@ -37,7 +39,7 @@ class TagRepositoryTest extends TestCase
 
         $this->repository = $this->getMockBuilder(TagRepository::class)
             ->setConstructorArgs([$registry])
-            ->onlyMethods([ 'getEntityManager', 'getAll', ])
+            ->onlyMethods([ 'getEntityManager', 'getAll', 'createQueryBuilder', ])
             ->getMock();
 
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);
@@ -51,113 +53,68 @@ class TagRepositoryTest extends TestCase
         $this->assertEquals('test-tag', $result->getTitle());
     }
 
-//    public function testGetAllCount():  void
-//    {
-//        $result = $this->repository->getAllCount();
-//    }
+    public function testHydrateNonObject(): void
+    {
+        $this->assertEquals(
+            ['title' => 'test-tag'],
+            $this->repository->hydrate(['title' => 'test-tag'], ['title' => 'new-tag'])
+        );
+    }
 
-//    public function testGetAll(): void
-//    {
-//        $qb = $this->createMock(QueryBuilder::class);
-//        $qb->method('select')->willReturnSelf();
-//        $qb->method('from')->willReturnSelf();
-//        $qb->method('join')->willReturnSelf();
-//        $qb->method('where')->willReturnSelf();
-//        $qb->method('addOrderBy')->willReturnSelf();
-//        $qb->method('setParameters')->willReturnSelf();
-//        $qb->method('addGroupBy')->willReturnSelf();
-//        $qb->method('setFirstResult')->willReturnSelf();
-//        $qb->method('setMaxResults')->willReturnSelf();
-//
-//        $query = $this->createMock(AbstractQuery::class);
-//
-//        $tag = new Tag('test-tag');
-//        $qb->method('getQuery')->willReturn($query);
-//
-//        $this->repository->method('createQueryBuilder')->willReturn($qb);
-//        $result = $this->repository->getAll(
-//            0,
-//            25,
-//            [
-//                'something',
-//                [ 'foo' => 'bar', ]
-//            ],
-//            [
-//                [ 'orderColumn', 'ASC', ]
-//            ],
-//            [
-//                'groupBy',
-//            ],
-//            [
-//                'join', 'join',
-//            ]
-//        );
-//    }
+    public function testGetAllCount(): void
+    {
+        $query = $this->createMock(Query::class);
+        $query->method('getSingleScalarResult')->willReturn(3);
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->method('select')->willReturnSelf();
+        $qb->method('from')->willReturnSelf();
+        $qb->method('where')->willReturnSelf();
+        $qb->method('setParameter')->willReturnSelf();
+        $qb->method('getQuery')->willReturn($query);
+        $this->repository->method('createQueryBuilder')->willReturn($qb);
+
+        $result = $this->repository->getAllCount([
+            'q.title = :title',
+            ['title' => 'test-tag']
+        ]);
+        $this->assertIsInt($result);
+        $this->assertEquals(3, $result);
+    }
+
+    public function testGetAll(): void
+    {
+        $paginator = $this->createMock(Paginator::class);
+        $query = $this->createMock(Query::class);
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->method('select')->willReturnSelf();
+        $qb->method('from')->willReturnSelf();
+//        $qb->method('leftJoin')->willReturnSelf();
+        $qb->method('where')->willReturnSelf();
+        $qb->method('addOrderBy')->willReturnSelf();
+        $qb->method('addGroupBy')->willReturnSelf();
+        $qb->method('setParameter')->willReturnSelf();
+        $qb->method('setFirstResult')->willReturnSelf();
+        $qb->method('setMaxResults')->willReturnSelf();
+        $qb->method('getQuery')->willReturn($query);
+        $this->repository->method('createQueryBuilder')->willReturn($qb);
+
+        $result = $this->repository->getAll(
+            50,
+            25,
+            [
+                'q.title = :title',
+                [ 'title' => 'test-tag' ]
+            ],
+            'q.title',
+            'title',
+        );
+        $this->assertEquals(new Paginator($qb, false), $result);
+    }
 
     public function testGetMaxItemsToShow(): void
     {
         $this->assertEquals(10, $this->repository->getMaxItemsToShow());
     }
-
-//    public function testWipeSuccessful(): void
-//    {
-//        $connection = $this->createMock(Connection::class);
-//        $connection->expects($this->once())->method('beginTransaction');
-//        $connection->expects($this->exactly(3))->method('query')->withConsecutive(
-//            ['SET FOREIGN_KEY_CHECKS=0'],
-//            [$this->stringContains('DELETE FROM')],
-//            ['SET FOREIGN_KEY_CHECKS=1']
-//        );
-//        $connection->expects($this->once())->method('commit');
-//        $connection->expects($this->never())->method('rollBack');
-//
-//        $classMetadata = $this->createMock(ClassMetadata::class);
-//        $classMetadata->method('getTableName')->willReturn('my_table');
-//
-//        $entityManager = $this->createMock(EntityManagerInterface::class);
-//        $entityManager->method('getConnection')->willReturn($connection);
-//        $entityManager->method('getClassMetadata')->willReturn($classMetadata);
-//
-//        $logger = $this->createMock(LoggerInterface::class);
-//        $logger->expects($this->never())->method('error');
-//
-//        $repo = $this->getMockBuilder(TagRepository::class)
-//            ->onlyMethods(['getEntityManager', 'getClassName'])
-//            ->getMock();
-//        $repo->method('getEntityManager')->willReturn($entityManager);
-//        $repo->method('getClassName')->willReturn(new Tag());
-//
-//        $repo->wipe($logger);
-//    }
-
-//    public function testWipeHandlesException()
-//    {
-//        $connection = $this->createMock(Connection::class);
-//        $connection->expects($this->once())->method('beginTransaction');
-//        $connection->method('query')->willThrowException(new \Exception('DB error'));
-//        $connection->expects($this->once())->method('rollBack');
-//        $connection->expects($this->never())->method('commit');
-//
-//        $classMetadata = $this->createMock(ClassMetadata::class);
-//        $classMetadata->method('getTableName')->willReturn('my_table');
-//
-//        $entityManager = $this->createMock(EntityManagerInterface::class);
-//        $entityManager->method('getConnection')->willReturn($connection);
-//        $entityManager->method('getClassMetadata')->willReturn($classMetadata);
-//
-//        $logger = $this->createMock(LoggerInterface::class);
-//        $logger->expects($this->once())
-//            ->method('error')
-//            ->with($this->stringContains('Failed to wipe table'));
-//
-//        $repo = $this->getMockBuilder(TagRepository::class)
-//            ->onlyMethods(['getEntityManager', 'getClassName'])
-//            ->getMock();
-//        $repo->method('getEntityManager')->willReturn($entityManager);
-//        $repo->method('getClassName')->willReturn(new Tag());
-//
-//        $repo->wipe($logger);
-//    }
 
     public function testFindByTitleLike(): void
     {

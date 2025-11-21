@@ -23,7 +23,7 @@ class TagRepository extends AbstractRepository
 
     /**
      * @param $title
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return Paginator
      */
     public function findByTitleLike($title): Paginator
     {
@@ -39,17 +39,4 @@ class TagRepository extends AbstractRepository
             'q.title'
         );
     }
-
-    /*
-    public function findBySomething($value)
-    {
-        return $this->createQueryBuilder('t')
-            ->where('t.something = :value')->setParameter('value', $value)
-            ->orderBy('t.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
 }

@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class ImageRepositoryTest extends TestCase
 {
@@ -89,83 +90,23 @@ class ImageRepositoryTest extends TestCase
         $this->assertEquals($paginator, $result);
     }
 
-    public function testSortByTitleDesc(): void
+    public function testDetermineOrderBy(): void
     {
-        $paginator = $this->createMock(Paginator::class);
-        $this->repository->expects($this->once())
-            ->method('getAll')
-            ->with(
-                0,
-                25,
-                [],
-                [['q.title', 'DESC']]
-            )
-            ->willReturn($paginator);
-        $result = $this->repository->getFiltered([], 0, 25, 'title desc');
-        $this->assertEquals($paginator, $result);
-    }
-
-    public function testSortByCreateDateAsc(): void
-    {
-        $paginator = $this->createMock(Paginator::class);
-        $this->repository->expects($this->once())
-            ->method('getAll')
-            ->with(
-                0,
-                25,
-                [],
-                [['q.createDate', 'ASC']]
-            )
-            ->willReturn($paginator);
-        $result = $this->repository->getFiltered([], 0, 25, 'createDate asc');
-        $this->assertEquals($paginator, $result);
-    }
-
-    public function testSortByCreateDateDesc(): void
-    {
-        $paginator = $this->createMock(Paginator::class);
-        $this->repository->expects($this->once())
-            ->method('getAll')
-            ->with(
-                0,
-                25,
-                [],
-                [['q.createDate', 'DESC']]
-            )
-            ->willReturn($paginator);
-        $result = $this->repository->getFiltered([], 0, 25, 'createDate desc');
-        $this->assertEquals($paginator, $result);
-    }
-
-    public function testSortByModDateDesc(): void
-    {
-        $paginator = $this->createMock(Paginator::class);
-        $this->repository->expects($this->once())
-            ->method('getAll')
-            ->with(
-                0,
-                25,
-                [],
-                [['q.modDate', 'DESC']]
-            )
-            ->willReturn($paginator);
-        $result = $this->repository->getFiltered([], 0, 25, 'modDate desc');
-        $this->assertEquals($paginator, $result);
-    }
-
-    public function testSortByModDateAsc(): void
-    {
-        $paginator = $this->createMock(Paginator::class);
-        $this->repository->expects($this->once())
-            ->method('getAll')
-            ->with(
-                0,
-                25,
-                [],
-                [['q.modDate', 'ASC']]
-            )
-            ->willReturn($paginator);
-        $result = $this->repository->getFiltered([], 0, 25, 'modDate asc');
-        $this->assertEquals($paginator, $result);
+        $orders = [
+            'title desc' => ['q.title', 'DESC'],
+            'createDate asc' => ['q.createDate', 'ASC'],
+            'createDate desc' => ['q.createDate', 'DESC'],
+            'filesize asc' => ['q.filesize', 'ASC'],
+            'filesize desc' => ['q.filesize', 'DESC'],
+            'modDate asc' => ['q.modDate', 'ASC'],
+            'modDate desc' => ['q.modDate', 'DESC'],
+            'default' => ['q.title', 'ASC'],
+        ];
+        $reflection = new ReflectionClass($this->repository);
+        $method = $reflection->getMethod('determineOrderBy');
+        $method->setAccessible(true);
+        foreach($orders as $key => $order) {
+            $this->assertEquals($order, $method->invokeArgs($this->repository, [$key]));
+        }
     }
 }
