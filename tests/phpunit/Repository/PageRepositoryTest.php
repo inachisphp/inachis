@@ -28,6 +28,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 /**
  * @covers \App\Repository\PageRepository
@@ -47,7 +48,14 @@ class PageRepositoryTest extends TestCase
     {
         $registry = $this->createMock(ManagerRegistry::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->repository = new PageRepository($registry);
+
+        $this->repository = $this->getMockBuilder(PageRepository::class)
+            ->setConstructorArgs([$registry])
+            ->onlyMethods(['getEntityManager', 'createQueryBuilder', 'getAll'])
+            ->getMock();
+
+        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
+        parent::setUp();
     }
 
     public function testGetMaxItemsToShow(): void
@@ -55,25 +63,40 @@ class PageRepositoryTest extends TestCase
         $this->assertEquals(10, $this->repository->getMaxItemsToShow());
     }
 
-//    public function testGetFilteredOfTypeByPostDate(): void
-//    {
-//        dump($this->repository->getFilteredOfTypeByPostDate([], 'post', 0, 25));
-//    }
+    public function testRemove(): void
+    {
+        $page = new Page();
+        $this->entityManager
+            ->expects($this->once())
+            ->method('remove')
+            ->with($page);
+        $this->entityManager
+            ->expects($this->once())
+            ->method('flush');
+        $this->repository->remove($page);
+    }
 
-//    public function testRemove(): void
-//    {
-//        $repository = $this->getMockBuilder(PageRepository::class)
-//            ->setConstructorArgs([$this->registry])
-//            ->onlyMethods([ 'getEntityManager', 'createQueryBuilder' ])
-//            ->getMock();
-//        $qb = $this->createMock(QueryBuilder::class);
-//        $qb->method('remove')->willReturnSelf();
-//        $qb->method('flush')->willReturnSelf();
-//
-//        $repository->method('createQueryBuilder')->willReturn($qb);
-//        $result = $repository->remove(new Page());
-//        $this->assertIsInt($result);
-//    }
-
-
+    public function testDetermineOrderBy(): void
+    {
+        $orders = [
+            'title asc' => [
+                ['q.title', 'ASC'],
+                ['q.subTitle', 'ASC'],
+            ],
+            'title desc' => [
+                ['q.title', 'DESC'],
+                ['q.subTitle', 'DESC'],
+            ],
+            'modDate asc' => [['q.modDate', 'ASC']],
+            'modDate desc' => [['q.modDate', 'DESC']],
+            'postDate asc' => [['q.postDate', 'ASC']],
+            'default' => [['q.postDate', 'DESC']],
+        ];
+        $reflection = new ReflectionClass($this->repository);
+        $method = $reflection->getMethod('determineOrderBy');
+        $method->setAccessible(true);
+        foreach($orders as $key => $order) {
+            $this->assertEquals($order, $method->invokeArgs($this->repository, [$key]));
+        }
+    }
 }

@@ -139,6 +139,28 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
     }
 
     /**
+     * @param string $orderBy
+     * @return array[]
+     */
+    protected function determineOrderBy(string $orderBy): array
+    {
+        return match ($orderBy) {
+            'title asc' => [
+                ['q.title', 'ASC'],
+                ['q.subTitle', 'ASC'],
+            ],
+            'title desc' => [
+                ['q.title', 'DESC'],
+                ['q.subTitle', 'DESC'],
+            ],
+            'modDate asc' => [['q.modDate', 'ASC']],
+            'modDate desc' => [['q.modDate', 'DESC']],
+            'postDate asc' => [['q.postDate', 'ASC']],
+            default => [['q.postDate', 'DESC']],
+        };
+    }
+
+    /**
      * @param $filters
      * @param string $type
      * @param int $offset
@@ -181,25 +203,11 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         if (!empty($filters['excludeIds'])) {
             $where[0] .= ' AND q.id NOT IN (:excludeIds)';
         }
-        $sort = match ($sort) {
-            'title asc' => [
-                ['q.title', 'ASC'],
-                ['q.subTitle', 'ASC'],
-            ],
-            'title desc' => [
-                ['q.title', 'DESC'],
-                ['q.subTitle', 'DESC'],
-            ],
-            'modDate asc' => [['q.modDate', 'ASC']],
-            'modDate desc' => [['q.modDate', 'DESC']],
-            'postDate asc' => [['q.postDate', 'ASC']],
-            default => [['q.postDate', 'DESC']],
-        };
         return $this->getAll(
             $offset,
             $limit,
             $where,
-            $sort,
+            $this->determineOrderBy($sort),
         );
     }
 
