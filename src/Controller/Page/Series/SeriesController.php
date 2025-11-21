@@ -44,13 +44,13 @@ class SeriesController extends AbstractInachisController
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
             foreach ($request->request->all('items') as $item) {
                 if ($request->request->get('delete') !== null) {
-                    $deleteItem = $this->entityManager->getRepository(Series::class)->findOneById($item);
+                    $deleteItem = $this->entityManager->getRepository(Series::class)->findOneBy(['id' => $item]);
                     if ($deleteItem !== null) {
                         $this->entityManager->getRepository(Series::class)->remove($deleteItem);
                     }
                 }
                 if ($request->request->has('private') || $request->request->has('public')) {
-                    $series = $this->entityManager->getRepository(Series::class)->findOneById($item);
+                    $series = $this->entityManager->getRepository(Series::class)->findOneBy(['id' => $item]);
                     if ($series !== null) {
                         $series->setVisibility(
                             $request->request->has('private') ? Page::PRIVATE : Page::PUBLIC
@@ -69,11 +69,11 @@ class SeriesController extends AbstractInachisController
         $filters = array_filter($request->request->all('filter', []));
         $sort = $request->get('sort', 'lastDate desc');
         if ($request->isMethod('post')) {
-            $_SESSION['series_filters'] = $filters;
-            $_SESSION['series_sort'] = $sort;
-        } elseif (isset($_SESSION['series_filters'])) {
-            $filters = $_SESSION['series_filters'];
-            $sort = $_SESSION['series_sort'];
+            $request->getSession()->set('series_filters', $filters);
+            $request->getSession()->set('series_sort', $sort);
+        } elseif ($request->getSession()->has('series_filters')) {
+            $filters = $request->getSession()->get('series_sort', '');
+            $sort = $request->getSession()->get('series_sort', '');
         }
         $offset = (int) $request->attributes->get('offset', 0);
         $limit = (int) $request->attributes->get(
@@ -105,16 +105,20 @@ class SeriesController extends AbstractInachisController
     public function edit(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $series = $request->attributes->get('id') !== null ? $this->entityManager->getRepository(Series::class)->findOneById($request->attributes->get('id')) : new Series();
+        $series = $request->attributes->get('id') !== null ?
+            $this->entityManager->getRepository(Series::class)->findOneBy([
+                'id' => $request->attributes->get('id')
+            ]) :
+            new Series();
         $form = $this->createForm(SeriesType::class, $series);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {//} && $form->isValid()) {
             if (!empty($request->request->all('series')['image'])) {
                 $series->setImage(
-                    $this->entityManager->getRepository(Image::class)->findOneById(
-                        $request->request->all('series')['image']
-                    )
+                    $this->entityManager->getRepository(Image::class)->findOneBy([
+                        'id' => $request->request->all('series')['image'],
+                    ])
                 );
             }
             if (empty($request->request->all('series')['url'])) {
@@ -138,6 +142,7 @@ class SeriesController extends AbstractInachisController
                 return $this->redirect($this->generateUrl('incc_series_list'));
             }
 
+            $series->setAuthor($this->getUser());
             $series->setModDate(new DateTime('now'));
             $this->entityManager->persist($series);
             $this->entityManager->flush();
@@ -167,7 +172,7 @@ class SeriesController extends AbstractInachisController
     public function contents(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $series = $this->entityManager->getRepository(Series::class)->findOneById($request->attributes->get('id'));
+        $series = $this->entityManager->getRepository(Series::class)->findOneBy(['id' => $request->attributes->get('id')]);
         $form = $this->createForm(SeriesType::class, $series);
         $form->handleRequest($request);
 

@@ -51,12 +51,14 @@
 
                 show_search: true,
                 sort_options: {
-                    'title asc': 'Title A-Z',
-                    'title desc': 'Title Z-A',
-                    'modDate desc': 'Modified dates closest to now',
-                    'modDate asc': 'Modified dates farthest from now',
                     'createDate desc': 'Uploaded dates closest to now',
                     'createDate asc': 'Uploaded dates farthest from now',
+                    'modDate desc': 'Modified dates closest to now',
+                    'modDate asc': 'Modified dates farthest from now',
+                    'filesize asc': 'Size, smallest to largest',
+                    'filesize desc': 'Size, largest to smallest',
+                    'title asc': 'Title A-Z',
+                    'title desc': 'Title Z-A',
                 }
             }) }}
     <section class="paginated-list">
@@ -72,15 +74,15 @@
                     {{ item.title|u.truncate(35, '...', false) }}
                 </a>
                 {% if item.filesize / 1024 > limitKByte %}
-                    <a href="#" class="ui-help">
+                    <span class="ui-help help--warning">
                         <em class="material-icons">warning</em>
-                        <span>This image is larger than {{ limitKByte/1024 }} kb</span>
-                    </a>
-                {% elseif item.dimensionX > limitSize or item.dimensionY > limitSize %}
-                    <a href="#" class="ui-help">
+                        This file is larger than {{ limitKByte/1024 }} kb
+                    </span>
+                {% elseif item.dimensionX|default(0) > limitSize or item.dimensionY|default(0) > limitSize %}
+                    <span href="#" class="ui-help help--warning">
                         <em class="material-icons">warning</em>
-                        <span>This image is larger than {{ limitSize }} on at least one side</span>
-                    </a>
+                        This image is larger than {{ limitSize }} on at least one side
+                    </span>
                 {% endif %}
             </li>
             {% endfor %}

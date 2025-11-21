@@ -23,7 +23,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ForgotPasswordType extends AbstractType
 {
     private ?TranslatorInterface $translator;
-    public function __construct(TranslatorInterface $translator = null)
+    public function __construct(?TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
@@ -31,9 +31,6 @@ class ForgotPasswordType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-//                ->addComponent(new FieldsetType(array(
-//                    'legend' => 'Enter your Email address / Username'
-//                )))
             ->add('forgot_email', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'form-login__username-label',
@@ -48,15 +45,6 @@ class ForgotPasswordType extends AbstractType
                     'id' => 'forgot__email-label',
                 ],
             ])
-//            ->add('captcha', Recaptcha3Type::class, [
-//                'constraints' => new Recaptcha3([
-//                    'message' => 'karser_recaptcha3.message',
-//                    'messageMissingValue' => 'karser_recaptcha3.message_missing_value',
-//                ]),
-//                'action_name' => 'homepage',
-////                'script_nonce_csp' => $nonceCSP,
-//                'locale' => $_ENV['APP_LOCALE'] ?: 'en',
-//            ])
             ->add('resetPassword', SubmitType::class, [
                 'label' => $this->translator->trans('admin.reset_password'),
                 'attr'  => [
@@ -64,13 +52,5 @@ class ForgotPasswordType extends AbstractType
                 ],
             ])
         ;
-    }
-
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            // uncomment if you want to bind to a class
-            //'data_class' => Login::class,
-        ]);
     }
 }

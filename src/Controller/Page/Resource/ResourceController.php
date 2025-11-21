@@ -66,6 +66,11 @@ class ResourceController extends AbstractInachisController
             $this->entityManager->getRepository($typeClass)->getMaxItemsToShow()
         );
         $sort = $request->request->get('sort', 'title asc');
+        if ($request->isMethod('post')) {
+            $request->getSession()->set($type . '_sort', $sort);
+        } elseif ($request->getSession()->has($type . '_sort')) {
+            $sort = $request->getSession()->get($type . '_sort', '');
+        }
         $this->data['dataset'] = $this->entityManager->getRepository($typeClass)->getFiltered(
             $filters,
             $offset,
@@ -111,7 +116,9 @@ class ResourceController extends AbstractInachisController
             default => Image::class,
         };
         $type = substr(strrchr($typeClass, '\\'), 1);
-        $resource = $this->entityManager->getRepository($typeClass)->find($request->attributes->get('filename'));
+        $resource = $this->entityManager->getRepository($typeClass)->findOneBy([
+            'id' => $request->attributes->get('filename'),
+        ]);
         if (empty($resource)) {
             return $this->redirectToRoute(
                 'incc_resource_list',
@@ -154,6 +161,7 @@ class ResourceController extends AbstractInachisController
                     }
                 }
             }
+            $resource->setAuthor($this->getUser());
             $resource->setModDate(new \DateTime('now'));
             $this->entityManager->persist($resource);
             $this->entityManager->flush();

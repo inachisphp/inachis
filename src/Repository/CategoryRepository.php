@@ -13,7 +13,7 @@ use App\Entity\Category;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
-class CategoryRepository extends AbstractRepository
+class CategoryRepository extends AbstractRepository implements CategoryRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -35,7 +35,7 @@ class CategoryRepository extends AbstractRepository
      */
     public function getRootCategories(): array
     {
-        return $this->getRepository()->createQueryBuilder('q')
+        return $this->createQueryBuilder('q')
             ->where('q.parent is null')
             ->getQuery()
             ->getResult();

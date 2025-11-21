@@ -9,8 +9,9 @@
 
 namespace App\Tests\phpunit\Form;
 
+use App\Form\Extension\TogglePasswordTypeExtension;
 use App\Form\LoginType;
-use PHPUnit\Framework\Attributes\Test;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -22,7 +23,13 @@ class LoginTypeTest extends TypeTestCase
     {
         $translator = $this->createMock(TranslatorInterface::class);
         return [
-            new PreloadedExtension([new LoginType($translator)], [])
+            new PreloadedExtension([
+                new LoginType($translator)
+            ], [
+                PasswordType::class => [               // type extensions keyed by type FQCN
+                    new TogglePasswordTypeExtension(),
+                ],
+            ])
         ];
     }
 

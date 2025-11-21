@@ -1,0 +1,42 @@
+{% if post.items is defined %}
+    {% set post_url = post.items|first.urls|first.link %}
+{% elseif post.urls is defined %}
+    {% set post_url = post.urls|first.link %}
+{% endif %}
+{% if post.featureImage is defined %}
+    {% set post_image = post.featureImage %}
+{% elseif post.image is defined %}
+    {% set post_image = post.image %}
+{% endif %}
+
+<article class="{% if post_image is not empty %}{{ cycle(['right', 'left'], loop.index0) }}{% endif%}" id="post{{ loop.index }}" tabindex="0" role="article" aria-labelledby="post{{ loop.index }}-title">
+    {% if post_image is not empty %}
+        <a href="/{{ post_url }}" class="blogbox_image">
+            <img alt="{{ post_image.altText }}" fetchpriority="low" {% if lazyload|default(false) -%}
+                class="lazyload" data-{% endif -%}
+                 src="{% if not (post_image.filename starts with 'http') %}/imgs/{% endif %}{{ post_image.filename }}" />
+        </a>
+    {% endif %}
+    <h2 id="post{{ loop.index }}-title"><a href="/{{ post_url }}">{{ post.title }}</a></h2>
+    {% if post.subTitle is not empty %}
+    <h3>{{ post.subTitle }}</h3>
+    {% endif %}
+    <p>
+        {%- if post.description is defined and post.description is not empty %}
+            {{ post.description|markdown|striptags }}
+        {% elseif post.featureSnippet is defined and post.featureSnippet is not empty %}
+            {{ post.featureSnippet }}
+        {% elseif post.content is defined and post.content is not empty %}
+            {{ post.content|markdown|striptags|slice(0, 400) }}
+            {% if post.content|markdown|striptags|length > 400 %}…{% endif %}
+        {% endif -%}
+    </p>
+    <p class="post-details">
+        {% if post.items is defined %}
+            <time datetime="YYY-mm-dd">{{ post.firstDate|date("F j, Y") }} to {{ post.lastDate|date("F j, Y") }}</time> |
+            <strong>{{ post.items|length }}</strong> posts
+        {% else %}
+            <time datetime="YYYY-MM-DD">{{ post.postDate|date("F j, Y") }}</time>
+        {% endif %}
+    </p>
+</article>

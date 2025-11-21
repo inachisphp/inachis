@@ -271,4 +271,20 @@ class PageTest extends TestCase
         $this->page->setSeries($collection);
         $this->assertTrue($this->page->getSeries()->contains($series));
     }
+
+    public function testSetAndGetNoindex(): void
+    {
+        $this->page->setNoindex(true);
+        $this->assertTrue($this->page->getNoindex());
+        $this->page->setNoindex(false);
+        $this->assertFalse($this->page->getNoindex());
+    }
+
+    public function testSetAndGetNofollow(): void
+    {
+        $this->page->setNofollow(true);
+        $this->assertTrue($this->page->getNofollow());
+        $this->page->setNofollow(false);
+        $this->assertFalse($this->page->getNofollow());
+    }
 }

@@ -12,10 +12,10 @@ namespace App\Repository;
 use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Series;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
-use http\Env\Response;
 
 /**
  * @method Series|null find($id, $lockMode = null, $lockVersion = null)
@@ -23,7 +23,7 @@ use http\Env\Response;
  * @method Series[] findAll()
  * @method Series[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SeriesRepository extends AbstractRepository
+class SeriesRepository extends AbstractRepository implements SeriesRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -84,10 +84,8 @@ class SeriesRepository extends AbstractRepository
             ->select('s')
             ->where($qb->expr()->like('s.lastDate', ':year'))
             ->andWhere($qb->expr()->like('s.url', ':url'))
-            ->setParameters([
-                'year' => $year . '%',
-                'url' => $url,
-            ])
+            ->setParameter('year', $year . '%')
+            ->setParameter('url', $url)
             ->getQuery()
             ->getOneOrNullResult();
     }

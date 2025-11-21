@@ -1,7 +1,8 @@
 twig:
     default_path: '%kernel.project_dir%/src/Views'
     form_themes:
-        - 'form/fieldset.html.twig'
+        - 'inadmin/form/fieldset.html.twig'
+        - 'inadmin/form/toggle_password.html.twig'
     paths:
         '%kernel.project_dir%/templates': ~
         '%kernel.project_dir%/src/Views': ~

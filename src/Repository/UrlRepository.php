@@ -11,6 +11,7 @@ namespace App\Repository;
 
 use App\Entity\Page;
 use App\Entity\Url;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -75,14 +76,36 @@ class UrlRepository extends AbstractRepository
                 )
             )
             ->orderBy('u.link', 'DESC')
-            ->setParameters([
-                'url' => $url . '%',
-                'id' => $id,
-            ])
+            ->setParameter('url', $url . '%')
+            ->setParameter('id', $id)
             ->setMaxResults(1);
         return $qb
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @param string $orderBy
+     * @return array[]
+     */
+    protected function determineOrderBy(string $orderBy): array
+    {
+        return match ($orderBy) {
+            'contentDate desc' => [
+                [ 'substring(q.link, 1, 10)', 'desc' ],
+                [ 'q.default', 'desc' ],
+                [ 'q.createDate', 'desc' ],
+            ],
+            'link asc' => [['q.link', 'ASC']],
+            'link desc' => [['q.link', 'DESC']],
+            'content asc' => [['p.title', 'ASC']],
+            'content desc' => [['p.title', 'DESC']],
+            default => [
+                [ 'substring(q.link, 1, 10)', 'asc' ],
+                [ 'q.default', 'desc' ],
+                [ 'q.createDate', 'desc' ],
+            ],
+        };
     }
 
     /**
@@ -107,27 +130,11 @@ class UrlRepository extends AbstractRepository
                 ]
             ];
         }
-        $sort = match ($sort) {
-            'contentDate desc' => [
-                [ 'substring(q.link, 1, 10)', 'desc' ],
-                [ 'q.default', 'desc' ],
-                [ 'q.createDate', 'desc' ],
-            ],
-            'link asc' => [['q.link', 'ASC']],
-            'link desc' => [['q.link', 'DESC']],
-            'content asc' => [['p.title', 'ASC']],
-            'content desc' => [['p.title', 'DESC']],
-            default => [
-                [ 'substring(q.link, 1, 10)', 'asc' ],
-                [ 'q.default', 'desc' ],
-                [ 'q.createDate', 'desc' ],
-            ],
-        };
         return $this->getAll(
             $offset,
             $limit,
             $where,
-            $sort,
+            $this->determineOrderBy($sort),
             [],
             ['q.content', 'p']
         );

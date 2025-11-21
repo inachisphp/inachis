@@ -1,146 +1,26 @@
 <!DOCTYPE html>
-<html class="no-js" lang="{{ settings.locale|default('en') }}">
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>{% if post.title|default('') is not empty -%}
-        {{ post.title }} / {% endif %}{{ settings.siteTitle }}</title>
-
-    {% include "web/structure/metadata.html.twig" %}
-
-    <link type="text/css" rel="stylesheet" href="{{ settings.domain }}/assets/css/style.min.css?v={{ 1 }}" media="screen" />
-    <!--[if lt IE 9]>
-    <link type="text/css" rel="stylesheet" href="{{ settings.domain }}/assets/css/ie.min.css?v={{ 1 }}" media="screen" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js" integrity="sha384-qFIkRsVO/J5orlMvxK1sgAt2FXT67og+NyFTITYzvbIP1IJavVEKZM7YWczXkwpB" crossorigin="anonymous"></script>
-    <![endif]-->
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ settings.siteTitle }}</title>
+    {% include 'web/structure/metadata.html.twig' %}
 </head>
-<body>
-<!-- googleoff: snippet -->
-<!--[if lt IE 9]>
-<p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> or <a href="https://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
-<![endif]-->
-<div id="skiptomain"><a href="#maincontent">skip to main content</a></div>
+<body class="{{ pageClass|default('') }} {% if showReadProgress|default(false) %}progress-enabled{% endif %}">
+<a href="#main-content" class="skip-link">Skip to content</a>
 
-<div id="wrapper">
-    <div id="headcontainer" class="expanded">
-        <header>
-            <h1><span>Wandering the World</span></h1>
-            <p class="introtext">Stories and tips from around the world.</p>
-            {%
-            include "web/structure/nav.html.twig" with {
-                'tabs': {
-                        'Blog':     { 'url': '/' },
-                    'Books':    { 'url': '/books' },
-                    'Photos':   { 'url': 'https://500px.com/jedi58' },
-                    'Videos':   { 'url': 'https://www.youtube.com/user/jedi58' },
-                    'Me':       { 'url': '/me' }
-                }
-            }
-            %}
-        </header>
-    </div>
-    <!-- googleon: snippet -->
-
-    <div id="maincontentcontainer">
-        <div id="maincontent">
-
-            {% block content %}{% endblock content %}
-
-        </div>
-    </div>
-
-    <!-- googleoff: snippet -->
-    <div id="footercontainer">
-        <footer class="group">
-            <div class="backtotop col span_8_of_8">
-                <a href="#">Top &uarr;</a>
-            </div>
-            {{  render(controller(
-                'App\\Controller\\WidgetController::getRecentTrips', {
-                    'maxDisplayCount': 5
-                }
-            )) }}
-            {{  render(controller(
-                'App\\Controller\\WidgetController::getRecentRunning', {
-                    'maxDisplayCount': 5
-                }
-            )) }}
-            {{  render(controller(
-                'App\\Controller\\WidgetController::getRecentArticles', {
-                    'maxDisplayCount': 5
-                }
-            )) }}
-            <div class="col span_2_of_8 subscribe">
-                <h4>Subscribe to…</h4>
-                <ul>
-                    <li><a href="#">All posts</a></li>
-                    <li><a href="#">Web development posts</a></li>
-                    <li><a href="#">Travel posts</a></li>
-                    <li><a href="#">Running posts</a></li>
-                </ul>
-            </div>
-
-            <br class="breaker" />
-
-            <div id="smallprint">
-                <p id="social_follow">
-{% if settings is defined and settings.twitter is defined and settings.twitter is not empty %}
-                    <a href="https://twitter.com/{{ settings.twitter }}" class="twitter-follow-button" data-show-count="false"><span>Follow @{{ settings.twitter }}</span></a>
+{% if showReadProgress|default(false) %}
+    {% include 'web/partials/reading_progress.html.twig' %}
 {% endif %}
-{% if settings.facebookUrl is defined and settings.facebookUrl is not empty %}
-                    <a href="https://www.facebook.com/{{ settings.facebookUrl }}" class="facebook-follow-button" data-show-count="false"><span>Facebook</span></a>
-{% endif %}
-{% if settings.pinterest is defined and settings.pinterest is not empty %}
-                    <a href="http://www.pinterest.com/{{ settings.pinterest }}/" class="pinterest-follow-button" data-show-count="false"><span>Pinterest</span></a>
-{% endif %}
-{% if settings.googleplus is defined and settings.googleplus is not empty %}
-                    <a href="https://plus.google.com/u/0/{{ settings.googleplus }}/" class="googleplus-follow-button" data-show-count="false"><span>Google+</span></a>
-{% endif %}
-{% if settings.instagram is defined and settings.instagram is not empty %}
-                    <a href="https://instagram.com/{{ settings.instagram }}/" class="googleplus-follow-button" data-show-count="false"><span>Instagram</span></a>
-{% endif %}
-                </p>
-                <span class="copy">&copy;</span> David G. Paul
-            </div>
-        </footer>
-    </div>
-    <!-- googleon: snippet -->
-</div>
 
-    <script>
-        var _gaq=[['_setAccount',''],['_trackPageview']];
-        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-            g.src='//www.google-analytics.com/ga.js';
-            s.parentNode.insertBefore(g,s)}(document,'script'));
-    </script>
-    <script type="application/ld+json">
-        { "@context" : "http://schema.org",
-          "@type" : "Person",
-          "name" : "your name",
-          "url" : "http://www.your-site.com",
-          "sameAs" : [ "http://www.facebook.com/your-profile",
-              "http://instagram.com/yourProfile",
-              "http://www.linkedin.com/in/yourprofile",
-              "http://plus.google.com/your_profile"]
-        }
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.js"></script>
-    <script>
-        window.addEventListener("load", function(){
-            window.cookieconsent.initialise({
-                "palette": {
-                    "popup": {
-                        "background": "#edeff5",
-                        "text": "#838391"
-                    },
-                    "button": {
-                        "background": "#4b81e8"
-                    }
-                },
-                "theme": "classic"
-            })
-        });
-    </script>
+{% include 'web/structure/_header.html.twig' %}
+
+<main id="main-content" role="main">
+    {% block pre_content %}{% endblock pre_content %}
+    {% block content %}{% endblock content %}
+    {% block post_content %}{% endblock post_content %}
+</main>
+
+{% include 'web/structure/_footer.html.twig' %}
 </body>
 </html>

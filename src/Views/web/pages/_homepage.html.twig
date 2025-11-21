@@ -1,0 +1,21 @@
+{% extends "web/structure/main.html.twig" %}
+
+{% set pageClass = 'homepage' %}
+
+{% block pre_content %}{% endblock pre_content %}
+
+{% block content %}
+<div class="posts list">
+    {% if content is not empty %}
+    {% set lazyload = false %}
+    {% for post in content %}
+        {% include 'web/partials/post_summary.html.twig' %}
+        {% set lazyload = true %}
+    {% endfor %}
+    {% else %}
+        <p>No content yet.</p>
+    {% endif %}
+</div>
+{% endblock content %}
+
+{% block post_content %}{% endblock post_content %}

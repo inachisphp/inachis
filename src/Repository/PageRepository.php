@@ -14,15 +14,13 @@ use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Tag;
 use App\Entity\Url;
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Repository for retrieving {@link Page} entities
  */
-final class PageRepository extends AbstractRepository implements PageRepositoryInterface
+class PageRepository extends AbstractRepository implements PageRepositoryInterface
 {
     /**
      * The maximum number of items to show in the admin interface
@@ -58,7 +56,7 @@ final class PageRepository extends AbstractRepository implements PageRepositoryI
      * @param int $offset
      * @return mixed
      */
-    public function getPagesWithCategory(Category $category, int $maxDisplayCount = null, int $offset = 0)
+    public function getPagesWithCategory(Category $category, int $limit = 0, int $offset = 0)
     {
         $qb = $this->createQueryBuilder('p');
         $qb = $qb
@@ -78,7 +76,7 @@ final class PageRepository extends AbstractRepository implements PageRepositoryI
             $qb = $qb->setFirstResult($offset);
         }
         return $qb
-            ->setMaxResults($maxDisplayCount)
+            ->setMaxResults($limit)
             ->getQuery()
             ->execute();
     }
@@ -93,7 +91,7 @@ final class PageRepository extends AbstractRepository implements PageRepositoryI
         $qb = $qb
             ->select('COUNT(p) AS numPages')
             ->leftJoin('p.categories', 'Page_categories')
-            ->andWhere('Page_categories.id = :categoryId')
+            ->where('Page_categories.id = :categoryId')
             ->setParameter('categoryId', $category);
         return $qb->getQuery()->getSingleScalarResult();
     }
@@ -104,7 +102,7 @@ final class PageRepository extends AbstractRepository implements PageRepositoryI
      * @param int $offset
      * @return mixed
      */
-    public function getPagesWithTag(Tag $tag, int $maxDisplayCount = null, int $offset = 0)
+    public function getPagesWithTag(Tag $tag, int $maxDisplayCount = 0, int $offset = 0)
     {
         $qb = $this->createQueryBuilder('p');
         $qb = $qb
@@ -138,6 +136,28 @@ final class PageRepository extends AbstractRepository implements PageRepositoryI
     public function getAllOfTypeByPostDate($type, $offset, $limit): Paginator
     {
         return $this->getFilteredOfTypeByPostDate([], $type, $offset, $limit);
+    }
+
+    /**
+     * @param string $orderBy
+     * @return array[]
+     */
+    protected function determineOrderBy(string $orderBy): array
+    {
+        return match ($orderBy) {
+            'title asc' => [
+                ['q.title', 'ASC'],
+                ['q.subTitle', 'ASC'],
+            ],
+            'title desc' => [
+                ['q.title', 'DESC'],
+                ['q.subTitle', 'DESC'],
+            ],
+            'modDate asc' => [['q.modDate', 'ASC']],
+            'modDate desc' => [['q.modDate', 'DESC']],
+            'postDate asc' => [['q.postDate', 'ASC']],
+            default => [['q.postDate', 'DESC']],
+        };
     }
 
     /**
@@ -183,25 +203,11 @@ final class PageRepository extends AbstractRepository implements PageRepositoryI
         if (!empty($filters['excludeIds'])) {
             $where[0] .= ' AND q.id NOT IN (:excludeIds)';
         }
-        $sort = match ($sort) {
-            'title asc' => [
-                ['q.title', 'ASC'],
-                ['q.subTitle', 'ASC'],
-            ],
-            'title desc' => [
-                ['q.title', 'DESC'],
-                ['q.subTitle', 'DESC'],
-            ],
-            'modDate asc' => [['q.modDate', 'ASC']],
-            'modDate desc' => [['q.modDate', 'DESC']],
-            'postDate asc' => [['q.postDate', 'ASC']],
-            default => [['q.postDate', 'DESC']],
-        };
         return $this->getAll(
             $offset,
             $limit,
             $where,
-            $sort,
+            $this->determineOrderBy($sort),
         );
     }
 

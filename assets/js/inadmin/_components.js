@@ -4,6 +4,7 @@ let InachisComponents = {
 		this.initCopyPaste('');
 		this.initDatePicker();
 		this.initFilterBar();
+		this.initPasswordToggle();
 		this.initSelect2('');
 		this.initSelectAllNone('');
 		this.initSeriesControls();
@@ -17,6 +18,10 @@ let InachisComponents = {
 			$imagePreview.find('input[type=hidden]').val('');
 			$imagePreview.find('img').remove();
 			$imagePreview.find('button.button--confirm').remove();
+		});
+
+		$('.ui-sortby select#sort').on('change', function () {
+			$(this).closest('form').trigger('submit');
 		});
 
 		// jQuery Tabs
@@ -86,6 +91,21 @@ let InachisComponents = {
 			$filterOptions.toggleClass('selected');
 		}
 	},
+	initPasswordToggle: function ()
+	{
+		$('button.button--password-toggle').on('click', function ()
+		{
+			const $button = $(this),
+				$input = $('input[data-controller=' + $button.data('action') + ']');
+			if ($input.attr('type') === "password") {
+				$input.attr('type', 'text');
+				$button.html('visibility');
+			} else {
+				$input.attr('type', 'password');
+				$button.html('visibility_off');
+			}
+		});
+	},
 	// See https://select2.github.io/examples.html
 	initSelect2: function (selector)
 	{
@@ -141,8 +161,13 @@ let InachisComponents = {
 	initSeriesControls: function ()
 	{
 		$('input[name=series\\[itemList\\]\\[\\]]').on('change', function() {
-			let anyChecked = $('input[name=series\\[itemList\\]\\[\\]]:checked').length > 0;
+			const uncheckedItems = $('input[name=series\\[itemList\\]\\[\\]]:not(:checked)'),
+				checkedItems = $('input[name=series\\[itemList\\]\\[\\]]:checked'),
+				anyChecked = checkedItems.length > 0;
 			$('.series__controls').toggleClass('visually-hidden', !anyChecked);
+
+			checkedItems.closest('tr').addClass('selected');
+			uncheckedItems.closest('tr').removeClass('selected');
 		});
 	},
 	initSwitches: function (selector)
@@ -183,8 +208,14 @@ let InachisComponents = {
 
 	toggleActionBar: function ()
 	{
-		let anyUnchecked = $('input[name^="items"]:not(:checked)').length > 0;
-		let anyChecked = $('input[name^="items"]:checked').length > 0;
+		const uncheckedItems = $('input[name^="items"]:not(:checked)'),
+			checkedItems = $('input[name^="items"]:checked'),
+			anyUnchecked = uncheckedItems.length > 0,
+			anyChecked = checkedItems.length > 0;
+		checkedItems.closest('tr').addClass('selected');
+		checkedItems.closest('article').addClass('selected');
+		uncheckedItems.closest('tr').removeClass('selected');
+		uncheckedItems.closest('article').removeClass('selected');
 		$('.fixed-bottom-bar').toggleClass('visually-hidden', !anyChecked);
 		$('.selectAllNone').prop('checked', !anyUnchecked);
 	}

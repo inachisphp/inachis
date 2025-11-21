@@ -66,11 +66,12 @@ class WidgetController extends AbstractController
 
     /**
      * @param $categoryName
+     * @param int $maxDisplayCount
      * @return Page[]
      */
-    private function getPagesWithCategoryName($categoryName, int $maxDisplayCount = null): array
+    private function getPagesWithCategoryName($categoryName, int $maxDisplayCount = 0): array
     {
-        $category = $this->entityManager->getRepository(Category::class)->findOneByTitle($categoryName);
+        $category = $this->entityManager->getRepository(Category::class)->findOneBy(['title' => $categoryName]);
         if ($category instanceof Category) {
             return $this->entityManager->getRepository(Page::class)->getPagesWithCategory(
                 $category,
@@ -81,10 +82,10 @@ class WidgetController extends AbstractController
     }
 
     /**
-     * @param int|null $maxDisplayCount
+     * @param int $maxDisplayCount
      * @return Series[]
      */
-    private function getRecentSeries(int $maxDisplayCount = null): array
+    private function getRecentSeries(int $maxDisplayCount = 0): array
     {
         return $this->entityManager->getRepository(Series::class)->findBy([], ['lastDate' => 'DESC'], $maxDisplayCount);
     }

@@ -14,6 +14,15 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 interface ResourceRepositoryInterface
 {
+    public function getAll(
+        int $offset = 0,
+        int $limit = 25,
+        array $where = [],
+        array|string $order = [],
+        array|string $groupBy = [],
+        array $join = []
+    ): Paginator;
+
     /**
      * @param AbstractFile $download
      * @return void

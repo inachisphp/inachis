@@ -64,37 +64,14 @@ fieldset.multisection.content__edit {
   }
 }
 
-.strength {
-  background-color: #ccc;
+.password-strength {
   display: block;
-  height: 0.25em;
+  height: 2em;
   margin: 0 1.55em 0 0.4em;
-
-  span {
-    display: block;
-    margin: 0;
-    height: 0.5em;
-    &.percent20 {
-      width: 20%;
-      background-color: #de1616;
-    }
-    &.percent40 {
-      width: 40%;
-      background-color: #f0620a;
-    }
-    &.percent60 {
-      width: 60%;
-      background-color: #ffa200;
-    }
-    &.percent80 {
-      width: 80%;
-      background-color: #8eaf03;
-    }
-    &.percent100 {
-      width: 100%;
-      background-color: #06bf06;
-    }
-  }
+  width: 90%;
+}
+meter::-webkit-meter-optimum-value {
+  transition: width .4s linear;
 }
 #user_color {
   input[type=radio] {

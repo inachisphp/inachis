@@ -9,12 +9,11 @@
         },
         {
             id: 'change-password',
-            title: 'Security',
+            title: 'Change Password',
             url: path('incc_admin_change_password', { 'id': user.username }),
             displayCondition: app.user.username == user.username,
         }
     ]
 }) }}
-    <!-- li{% if activeTab == 'access' %} class="ui-state-active"{% endif %}>
-        <a href="">Access</a>
-    </li -->
+<!-- Two-factor authentication -->
+<!-- Access -->

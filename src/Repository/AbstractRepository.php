@@ -10,7 +10,9 @@
 namespace App\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ConnectionException;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Psr\Log\LoggerInterface;
 use Exception;
@@ -70,7 +72,9 @@ abstract class AbstractRepository extends ServiceEntityRepository
         if (!empty($where)) {
             $qb->where($where[0]);
             if (isset($where[1])) {
-                $qb->setParameters($where[1]);
+                foreach ($where[1] as $field => $value) {
+                    $qb->setParameter($field, $value);
+                }
             }
         }
 
@@ -119,7 +123,9 @@ abstract class AbstractRepository extends ServiceEntityRepository
             }
         }
         if (!empty($where[1])) {
-            $qb = $qb->setParameters($where[1]);
+            foreach ($where[1] as $key => $value) {
+                $qb = $qb->setParameter($key, $value);
+            }
         }
         if (!empty($groupBy)) {
             foreach ($groupBy as $group) {

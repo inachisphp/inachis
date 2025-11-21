@@ -20,6 +20,7 @@ use App\Form\PostType;
 use App\Repository\RevisionRepository;
 use App\Util\ContentRevisionCompare;
 use App\Util\ReadingTime;
+use App\Util\UrlNormaliser;
 use DateTime;
 use Exception;
 use Ramsey\Uuid\Uuid;
@@ -56,20 +57,39 @@ class PageController extends AbstractInachisController
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
             foreach ($request->request->all('items') as $item) {
                 if ($request->request->has('delete')) {
-                    $post = $this->entityManager->getRepository(Page::class)->findOneById($item);
+                    $post = $this->entityManager->getRepository(Page::class)->findOneBy(['id' => $item]);
                     if ($post !== null) {
                         $this->entityManager->getRepository(Revision::class)->deleteAndRecordByPage($post);
                         $this->entityManager->getRepository(Page::class)->remove($post);
                     }
                 }
                 if ($request->request->has('private') || $request->request->has('public')) {
-                    $post = $this->entityManager->getRepository(Page::class)->findOneById($item);
+                    $post = $this->entityManager->getRepository(Page::class)->findOneBy(['id' => $item]);
                     if ($post !== null) {
                         $post->setVisibility(
                             $request->request->has('private') ? Page::PRIVATE : Page::PUBLIC
                         );
                         $post->setModDate(new DateTime('now'));
                         $this->entityManager->persist($post);
+                    }
+                }
+                if ($request->request->has('rebuild')) {
+                    $post = $this->entityManager->getRepository(Page::class)->findOneBy(['id' => $item]);
+                    if ($post !== null) {
+                        if (!empty($post->getUrls())) {
+                            foreach ($post->getUrls() as $url) {
+                                $this->entityManager->getRepository(Url::class)->remove($url);
+                            }
+                        }
+                        $link = $post->getPostDateAsLink() . '/' . UrlNormaliser::toUri($post->getTitle());
+                        if ($post->getSubTitle() !== null) {
+                            $link .= '-' . UrlNormaliser::toUri($post->getSubTitle());
+                        }
+                        $url = new Url($post, $link);
+                        $this->entityManager->persist($url);
+                        $post->setModDate(new DateTime('now'));
+                        $this->entityManager->persist($post);
+                        $this->entityManager->flush();
                     }
                 }
 //                if ($request->request->has('export')) {
@@ -93,11 +113,11 @@ class PageController extends AbstractInachisController
         $filters = array_filter($request->request->all('filter', []));
         $sort = $request->request->get('sort', 'postDate desc');
         if ($request->isMethod('post')) {
-            $_SESSION['post_filters'] = $filters;
-            $_SESSION['sort'] = $sort;
-        } elseif (isset($_SESSION['post_filters'])) {
-            $filters = $_SESSION['post_filters'];
-            $sort = $_SESSION['sort'];
+            $request->getSession()->set('post_filters', $filters);
+            $request->getSession()->set('post_sort', $sort);
+        } elseif ($request->getSession()->has('post_filters')) {
+            $filters = $request->getSession()->get('post_filters', '');
+            $sort = $request->getSession()->get('post_sort', '');
         }
 
         $offset = (int) $request->attributes->get('offset', 0);
@@ -152,12 +172,12 @@ class PageController extends AbstractInachisController
         Request $request,
         ContentRevisionCompare $contentRevisionCompare,
         string $type = 'post',
-        string $title = null
+        ?string $title = null
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $url = preg_replace('/\/?incc\/(page|post)\/?/', '', $request->getRequestUri());
-        $url = $this->entityManager->getRepository(Url::class)->findByLink($url);
+        $url = $this->entityManager->getRepository(Url::class)->findBy(['link' => $url]);
         $title = $title === 'new' ? null : $title;
         // If content with this URL doesn't exist, then redirect
         if (empty($url) && null !== $title) {
@@ -167,7 +187,7 @@ class PageController extends AbstractInachisController
             );
         }
         $post = null !== $title ?
-            $this->entityManager->getRepository(Page::class)->findOneById($url[0]->getContent()->getId()) :
+            $this->entityManager->getRepository(Page::class)->findOneBy(['id' => $url[0]->getContent()->getId()]) :
             $post = new Page();
         if ($post->getId() === null) {
             $post->setType($type);
@@ -222,7 +242,7 @@ class PageController extends AbstractInachisController
                     foreach ($newCategories as $newCategory) {
                         $category = null;
                         if (Uuid::isValid($newCategory)) {
-                            $category = $this->entityManager->getRepository(Category::class)->findOneById($newCategory);
+                            $category = $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $newCategory]);
                         }
                         if (!empty($category)) {
                             $post->getCategories()->add($category);
@@ -236,7 +256,7 @@ class PageController extends AbstractInachisController
                     foreach ($newTags as $newTag) {
                         $tag = null;
                         if (Uuid::isValid($newTag)) {
-                            $tag = $this->entityManager->getRepository(Tag::class)->findOneById($newTag);
+                            $tag = $this->entityManager->getRepository(Tag::class)->findOneBy(['id' => $newTag]);
                         }
                         if (empty($tag)) {
                             $tag = new Tag($newTag);
@@ -247,9 +267,9 @@ class PageController extends AbstractInachisController
             }
             if (!empty($request->request->all('post')['featureImage'])) {
                 $post->setFeatureImage(
-                    $this->entityManager->getRepository(Image::class)->findOneById(
-                        $request->request->all('post')['featureImage']
-                    )
+                    $this->entityManager->getRepository(Image::class)->findOneBy([
+                        'id' => $request->request->all('post')['featureImage']
+                    ])
                 );
             }
 

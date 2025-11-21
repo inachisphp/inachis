@@ -28,7 +28,7 @@ class CategoryDialogController extends AbstractInachisController
     public function getCategoryManagerContent(): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $this->data['categories'] = $this->entityManager->getRepository(Category::class)->findByParent(null);
+        $this->data['categories'] = $this->entityManager->getRepository(Category::class)->findBy(['parent' => null]);
 
         return $this->render('inadmin/dialog/category-manager.html.twig', $this->data);
     }
@@ -41,7 +41,7 @@ class CategoryDialogController extends AbstractInachisController
     public function getCategoryManagerList(): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $this->data['categories'] = $this->entityManager->getRepository(Category::class)->findByParent(null);
+        $this->data['categories'] = $this->entityManager->getRepository(Category::class)->findBy(['parent' => null]);
 
         return $this->render('inadmin/dialog/category-manager-list.html.twig', $this->data);
     }
@@ -56,7 +56,7 @@ class CategoryDialogController extends AbstractInachisController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $categories = empty($request->request->get('q')) ?
-            $this->entityManager->getRepository(Category::class)->findByParent(null) :
+            $this->entityManager->getRepository(Category::class)->findBy(['parent' => null]) :
             $this->entityManager->getRepository(Category::class)->findByTitleLike($request->request->get('q'));
         $result = [];
         // Below code is used to handle where categories exist with the same name under multiple locations
@@ -97,12 +97,12 @@ class CategoryDialogController extends AbstractInachisController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $category = $request->request->get('id') !== '-1' ?
-            $this->entityManager->getRepository(Category::class)->findOneById($request->request->get('id')) :
+            $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $request->request->get('id')]) :
             new Category();
         $this->entityManager->getRepository(Category::class)->hydrate($category, $request->request->all());
         $category->setParent(
             $request->request->get('parentID') !== '-1' ?
-                $this->entityManager->getRepository(Category::class)->findOneById($request->request->get('parentID')) :
+                $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $request->request->get('parentID')]) :
                 null
         );
         $this->entityManager->persist($category);
@@ -119,7 +119,7 @@ class CategoryDialogController extends AbstractInachisController
     public function getCategoryUsages(Request $request): JsonResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $category = $this->entityManager->getRepository(Category::class)->findOneById($request->request->get('id'));
+        $category = $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $request->request->get('id')]);
         $count = $this->entityManager->getRepository(Page::class)->getPagesWithCategoryCount($category);
         foreach ($category->getChildren() as $child) {
             $count += $this->entityManager->getRepository(Page::class)->getPagesWithCategoryCount($child);
@@ -131,7 +131,7 @@ class CategoryDialogController extends AbstractInachisController
     public function deleteCategory(Request $request): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $category = $this->entityManager->getRepository(Category::class)->findOneById($request->request->get('id'));
+        $category = $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $request->request->get('id')]);
         $count = $this->entityManager->getRepository(Page::class)->getPagesWithCategoryCount($category);
 
         if ($count > 0) {

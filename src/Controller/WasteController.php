@@ -42,7 +42,7 @@ class WasteController extends AbstractInachisController
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
             foreach ($request->request->all('items') as $item) {
                 if ($request->request->get('delete') !== null) {
-                    $deleteItem = $this->entityManager->getRepository(Waste::class)->findOneById($item);
+                    $deleteItem = $this->entityManager->getRepository(Waste::class)->findOneBy(['id' => $item]);
                     if ($deleteItem !== null) {
                         $this->entityManager->getRepository(Waste::class)->remove($deleteItem);
                     }

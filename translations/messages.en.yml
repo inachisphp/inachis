@@ -92,8 +92,8 @@ admin.post.revision.revert: 'Revert'
 
 admin.series.title: 'Series'
 admin.series.help: 'View list of series'
-admin.series.bulk.label: 'Create'
-admin.series.add.label: 'Add'
+admin.series.bulk.label: 'Bulk Create'
+admin.series.add.label: 'Add Existing'
 admin.series.contents.title: 'Contents'
 admin.series.contents.not_saved: 'You must save the series before you can add items.'
 admin.series.contents.no_content: "You haven't added any content yet!"

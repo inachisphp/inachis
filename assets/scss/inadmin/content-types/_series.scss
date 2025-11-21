@@ -1,9 +1,31 @@
 .edit__list {
-  p:first-child {
-    //margin: -5px 20px 0 0;
-    
+  h2 span.badge {
+    font-size: 0.6em;
+  }
+
+  .series__controls {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    align-items: center;
+
     button {
       font-size: 0.9em;
     }
+  }
+
+  table {
+    margin-bottom: 7em;
+
+    td label {
+      color: #666;
+      display: inline;
+    }
+  }
+
+  .table--selectable tr td:nth-last-child(-n+2),
+  .table--selectable tr th:nth-last-child(-n+2) {
+    color: #aaa;
+    width: .8em;
   }
 }

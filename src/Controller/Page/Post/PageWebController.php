@@ -22,6 +22,7 @@ use App\Repository\RevisionRepository;
 use App\Util\ContentRevisionCompare;
 use App\Util\ReadingTime;
 use DateTime;
+use Exception;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -39,7 +40,7 @@ class PageWebController extends AbstractInachisController
      * @param int $day
      * @param string $title
      * @return Response
-     * @throws NotFoundHttpException
+     * @throws NotFoundHttpException|Exception
      */
     #[Route(
         "/{year}/{month}/{day}/{title}",
@@ -52,9 +53,9 @@ class PageWebController extends AbstractInachisController
     )]
     public function getPost(Request $request, int $year, int $month, int $day, string $title): Response
     {
-        $url = $this->entityManager->getRepository(Url::class)->findOneByLink(
-            ltrim(strtok($request->getRequestUri(), '?'), '/')
-        );
+        $url = $this->entityManager->getRepository(Url::class)->findOneBy([
+            'link' => ltrim(strtok($request->getRequestUri(), '?'), '/')
+        ]);
         if (empty($url)) {
             throw new NotFoundHttpException(
                 sprintf(
@@ -102,7 +103,7 @@ class PageWebController extends AbstractInachisController
         if (!$crawlerDetect->isCrawler()) {
             // @todo record page hit by day
         }
-        return $this->render('web/post.html.twig', $this->data);
+        return $this->render('web/pages/post.html.twig', $this->data);
     }
 
     /**
@@ -129,7 +130,7 @@ class PageWebController extends AbstractInachisController
     #[Route("/tag/{tagName}", methods: [ "GET" ])]
     public function getPostsByTag(Request $request, string $tagName): Response
     {
-        $tag = $this->entityManager->getRepository(Tag::class)->findOneByTitle($tagName);
+        $tag = $this->entityManager->getRepository(Tag::class)->findOneBy(['title' => $tagName]);
 
         if (!$tag instanceof Tag) {
             throw new NotFoundHttpException(
@@ -143,7 +144,7 @@ class PageWebController extends AbstractInachisController
         $this->data['filterValue'] = $tagName;
         $this->data['content'] = $this->entityManager->getRepository(Page::class)->getPagesWithTag($tag);
 
-        return $this->render('web/homepage.html.twig', $this->data);
+        return $this->render('web/pages/homepage.html.twig', $this->data);
     }
 
     /**
@@ -154,7 +155,7 @@ class PageWebController extends AbstractInachisController
     #[Route("/category/{categoryName}", methods: [ "GET" ])]
     public function getPostsByCategory(Request $request, string $categoryName): Response
     {
-        $category = $this->entityManager->getRepository(Category::class)->findOneByTitle($categoryName);
+        $category = $this->entityManager->getRepository(Category::class)->findOneBy(['title' => $categoryName]);
         if (!$category instanceof Category) {
             throw new NotFoundHttpException(
                 sprintf(
@@ -167,6 +168,6 @@ class PageWebController extends AbstractInachisController
         $this->data['filterValue'] = $categoryName;
         $this->data['content'] = $this->entityManager->getRepository(Page::class)->getPagesWithCategory($category);
 
-        return $this->render('web/homepage.html.twig', $this->data);
+        return $this->render('web/pages/homepage.html.twig', $this->data);
     }
 }

@@ -21,14 +21,17 @@
 @use 'components/dropzone';
 @use 'components/filter_bar';
 @use 'components/flash_messages';
+@use 'components/list';
 @use 'components/map';
 @use 'components/pagination';
+@use 'components/password_toggle';
 @use 'components/progressbar';
 @use 'components/sortby';
 @use 'components/switch';
 @use 'components/tables';
 @use 'components/tabs';
 @use 'components/toggle_password';
+@use 'components/ui-help';
 
 // content types
 @use 'content-types/code';
@@ -38,7 +41,6 @@
 @use 'content-types/warnings';
 @use 'widgets/widgets';
   @use 'widgets/alerts';
-  @use 'widgets/posts';
   @use 'widgets/stats';
 
 @use 'forms';
