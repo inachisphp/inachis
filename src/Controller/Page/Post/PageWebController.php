@@ -22,6 +22,7 @@ use App\Repository\RevisionRepository;
 use App\Util\ContentRevisionCompare;
 use App\Util\ReadingTime;
 use DateTime;
+use Exception;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -39,7 +40,7 @@ class PageWebController extends AbstractInachisController
      * @param int $day
      * @param string $title
      * @return Response
-     * @throws NotFoundHttpException
+     * @throws NotFoundHttpException|Exception
      */
     #[Route(
         "/{year}/{month}/{day}/{title}",
@@ -102,7 +103,7 @@ class PageWebController extends AbstractInachisController
         if (!$crawlerDetect->isCrawler()) {
             // @todo record page hit by day
         }
-        return $this->render('web/post.html.twig', $this->data);
+        return $this->render('web/pages/post.html.twig', $this->data);
     }
 
     /**
@@ -143,7 +144,7 @@ class PageWebController extends AbstractInachisController
         $this->data['filterValue'] = $tagName;
         $this->data['content'] = $this->entityManager->getRepository(Page::class)->getPagesWithTag($tag);
 
-        return $this->render('web/homepage.html.twig', $this->data);
+        return $this->render('web/pages/homepage.html.twig', $this->data);
     }
 
     /**
@@ -167,6 +168,6 @@ class PageWebController extends AbstractInachisController
         $this->data['filterValue'] = $categoryName;
         $this->data['content'] = $this->entityManager->getRepository(Page::class)->getPagesWithCategory($category);
 
-        return $this->render('web/homepage.html.twig', $this->data);
+        return $this->render('web/pages/homepage.html.twig', $this->data);
     }
 }

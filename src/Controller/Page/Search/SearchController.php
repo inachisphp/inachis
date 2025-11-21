@@ -81,7 +81,7 @@ class SearchController extends AbstractInachisController
             $this->data['results']->updateResultPropertyByKey(
                 $key,
                 'author',
-                $author->getDisplayName(),
+                !empty($author) ? $author->getDisplayName() : 'Unknown',
             );
             switch ($result['type']) {
                 case 'Image':

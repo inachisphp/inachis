@@ -5,7 +5,7 @@
 // RESPONSIVE WRAPPER
 // ---------------------------------------------------------------------------
 
-.table-responsive {
+.table--responsive {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -19,6 +19,24 @@
   &::-webkit-scrollbar-thumb {
     border-radius: 4px;
   }
+
+  &::before,
+  &::after {
+    content: "";
+    position: sticky;
+    top: 0;
+    width: 20px;
+    pointer-events: none;
+  }
+
+  &::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.15), transparent);
+  }
+  &::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(0,0,0,0.15), transparent);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -31,6 +49,15 @@ table {
   background-color: $table-background-bg;
   font-size: 0.95rem;
   line-height: 1.4;
+
+  // Caption
+  caption {
+    caption-side: top;
+    text-align: left;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: darken($table-header-bg, 15%);
+  }
 
   // Head
   thead {
@@ -104,6 +131,14 @@ table {
   }
 }
 
+// Dense mode
+.table--dense {
+  thead th,
+  tbody td {
+    padding: 0.35rem 0.5rem;
+  }
+}
+
 // Selectable options table
 form .table--selectable {
   table-layout: fixed;
@@ -121,6 +156,26 @@ form .table--selectable {
   }
 }
 
+// hide excess content until hover
+.table--truncate {
+  td,
+  th {
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &:hover {
+      overflow: visible;
+      white-space: normal;
+      background: #fff;
+      z-index: 10;
+      position: relative;
+    }
+  }
+}
+
+// For handling table cells with badges
 .table--flex {
   display: flex;
   flex-wrap: wrap;
@@ -130,7 +185,7 @@ form .table--selectable {
 }
 
 // ---------------------------------------------------------------------------
-// STICKY HEADER
+// STICKY HEADER / COLUMN
 // ---------------------------------------------------------------------------
 
 .table--sticky-header {
@@ -143,6 +198,22 @@ form .table--selectable {
   thead {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   }
+}
+
+.table--sticky-col {
+  tbody td:first-child,
+  thead th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    background: inherit;
+  }
+}
+
+[dir="rtl"] .table--sticky-col td:first-child,
+[dir="rtl"] .table--sticky-col th:first-child {
+  left: auto;
+  right: 0;
 }
 
 
@@ -215,10 +286,19 @@ form .table--selectable {
 .table--selectable {
   tbody tr.selected {
     background-color: $table-selected-row-bg !important;
+    outline: 2px solid $table-selected-row-bg;
+
   }
   tbody tr:nth-child(even).selected {
     background-color: color.adjust($table-selected-row-bg, $lightness: -5%) !important;
+    outline: 2px solid color.adjust($table-selected-row-bg, $lightness: -5%);
   }
+}
+
+.table--focusable td:focus,
+.table--focusable th:focus {
+  outline: 3px solid $table-focus-color;
+  outline-offset: 2px;
 }
 
 

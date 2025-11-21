@@ -11,6 +11,7 @@ namespace App\Controller;
 
 use App\Entity\Page;
 use App\Entity\Series;
+use App\Util\TextCleaner;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use DateTime;
@@ -52,6 +53,10 @@ class DefaultController extends AbstractInachisController
                         $excludePages[] = $page->getId();
                     }
                 }
+                $group->setDescription(TextCleaner::strip(
+                    $group->getDescription(),
+                    TextCleaner::REMOVE_BLOCKQUOTE_CONTENT|TextCleaner::REMOVE_IMAGE_ALT
+                ));
                 $this->data['content'][$group->getLastDate()->format('Ymd')] = $group;
             }
             unset($series);
@@ -80,6 +85,6 @@ class DefaultController extends AbstractInachisController
             krsort($this->data['content']);
         }
 
-        return $this->render('web/homepage.html.twig', $this->data);
+        return $this->render('web/pages/homepage.html.twig', $this->data);
     }
 }
