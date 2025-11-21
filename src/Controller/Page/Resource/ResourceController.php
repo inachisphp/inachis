@@ -117,7 +117,7 @@ class ResourceController extends AbstractInachisController
         };
         $type = substr(strrchr($typeClass, '\\'), 1);
         $resource = $this->entityManager->getRepository($typeClass)->findOneBy([
-            'filename' => $request->attributes->get('filename'),
+            'id' => $request->attributes->get('filename'),
         ]);
         if (empty($resource)) {
             return $this->redirectToRoute(
