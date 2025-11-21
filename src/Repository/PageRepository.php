@@ -56,7 +56,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      * @param int $offset
      * @return mixed
      */
-    public function getPagesWithCategory(Category $category, int $maxDisplayCount = 0, int $offset = 0)
+    public function getPagesWithCategory(Category $category, int $limit = 0, int $offset = 0)
     {
         $qb = $this->createQueryBuilder('p');
         $qb = $qb
@@ -76,7 +76,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             $qb = $qb->setFirstResult($offset);
         }
         return $qb
-            ->setMaxResults($maxDisplayCount)
+            ->setMaxResults($limit)
             ->getQuery()
             ->execute();
     }
@@ -91,7 +91,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         $qb = $qb
             ->select('COUNT(p) AS numPages')
             ->leftJoin('p.categories', 'Page_categories')
-            ->andWhere('Page_categories.id = :categoryId')
+            ->where('Page_categories.id = :categoryId')
             ->setParameter('categoryId', $category);
         return $qb->getQuery()->getSingleScalarResult();
     }
