@@ -1,23 +1,27 @@
-<h2>
-    {% trans %}admin.series.contents.title{% endtrans %}
-    <span class="badge">{{ series.items|length }}</span>
-</h2>
+{% if series.items is not empty %}
+    <h2>Date Range</h2>
+    <p>
+        {{ form_label(form.firstDate) }}
+        {{ form_errors(form.firstDate) }}
+        {{ form_widget(form.firstDate) }}
+    </p>
+    <p>
+        {{ form_label(form.lastDate) }}
+        {{ form_errors(form.lastDate) }}
+        {{ form_widget(form.lastDate) }}
+    </p>
+{% endif %}
+
+    <h2>
+        {% trans %}admin.series.contents.title{% endtrans %}
+        <span class="badge">{{ series.items|length }}</span>
+    </h2>
 {% if series.id is not empty %}
-        <p>
-            {{ form_widget(form.bulkCreate) }}
-            {{ form_widget(form.addItem) }}
-        </p>
+    <p class="series__controls">
+        {{ form_widget(form.bulkCreate) }}
+        {{ form_widget(form.addItem) }}
+    </p>
     {% if series.items is not empty %}
-        <p>
-            {{ form_label(form.firstDate) }}
-            {{ form_errors(form.firstDate) }}
-            {{ form_widget(form.firstDate) }}
-        </p>
-        <p>
-            {{ form_label(form.lastDate) }}
-            {{ form_errors(form.lastDate) }}
-            {{ form_widget(form.lastDate) }}
-        </p>
         <table class="table table--compact table--row-borders table--selectable table--striped">
             <tbody>
             {% for item in series.items %}
