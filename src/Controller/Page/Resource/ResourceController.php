@@ -116,7 +116,9 @@ class ResourceController extends AbstractInachisController
             default => Image::class,
         };
         $type = substr(strrchr($typeClass, '\\'), 1);
-        $resource = $this->entityManager->getRepository($typeClass)->find($request->attributes->get('filename'));
+        $resource = $this->entityManager->getRepository($typeClass)->findOneBy([
+            'filename' => $request->attributes->get('filename'),
+        ]);
         if (empty($resource)) {
             return $this->redirectToRoute(
                 'incc_resource_list',

@@ -38,9 +38,11 @@ section.paginated-list {
 
   .zebra article:nth-of-type(odd).selected {
     background-color: $table-selected-row-bg !important;
+    outline: 2px solid $table-selected-row-bg;
   }
   .zebra article:nth-child(even).selected {
     background-color: color.adjust($table-selected-row-bg, $lightness: -5%) !important;
+    outline: 2px solid color.adjust($table-selected-row-bg, $lightness: -5%);
   }
 
   ol.ui-widget-content {

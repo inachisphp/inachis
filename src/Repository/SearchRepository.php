@@ -56,13 +56,12 @@ class SearchRepository extends AbstractRepository
             $orderBy,
         );
 
-        $stmt = $this->connection->prepare($sql);
-        $stmt->bindValue('kw', '%' . strtolower($keyword) . '%');
-        $stmt->bindValue('plainKw', strtolower($keyword));
-        $stmt->bindValue('limit', $limit, \PDO::PARAM_INT);
-        $stmt->bindValue('offset', $offset, \PDO::PARAM_INT);
+        $statement = $this->connection->prepare($sql);
+        $statement->bindValue('kw', strtolower($keyword), 'string');
+        $statement->bindValue('limit', $limit, 'integer');
+        $statement->bindValue('offset', $offset,  'integer');
 
-        $results = $stmt->executeQuery()->fetchAllAssociative();
+        $results = $statement->executeQuery()->fetchAllAssociative();
         $total = $this->getSearchTotalResults($keyword);
 
         return new SearchResult($results, (int) $total, $offset, $limit);
@@ -76,12 +75,12 @@ class SearchRepository extends AbstractRepository
         $sql = sprintf('SELECT COUNT(*) AS total FROM (%s) AS all_results;',
             $this->getSQLUnion([ 'id', 'id', 'id' ])
         );
-        return $this->connection->prepare($sql)
-            ->executeQuery([ 'kw' => '%' . $keyword . '%' ])
-            ->fetchOne();
+        $statement = $this->connection->prepare($sql);
+        $statement->bindValue('kw', strtolower($keyword), 'string');
+        return $statement->executeQuery()->fetchOne();
     }
 
-    protected function getSQLUnion($fieldLists)
+    protected function getSQLUnion($fieldLists): string
     {
         return sprintf('
             (SELECT %s FROM page p WHERE %s)
@@ -98,7 +97,7 @@ class SearchRepository extends AbstractRepository
         );
     }
 
-    protected function getWhereConditions($type)
+    protected function getWhereConditions($type): string
     {
         return match($type) {
             'image' => 'MATCH(i.title, i.alt_text, i.description) AGAINST(:kw IN NATURAL LANGUAGE MODE)',

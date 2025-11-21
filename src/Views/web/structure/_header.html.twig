@@ -1,0 +1,19 @@
+<div class="headercontainer">
+    <header>
+        <h1>{{ settings.siteTitle }}</h1>
+        {% include "web/partials/nav.html.twig" with {
+                'tabs': {
+                    'Home': {
+                        'url': '/'
+                    },
+                    'About': {
+                        'url': '/about'
+                    },
+                    'Contact': {
+                        'url': '/contact'
+                    },
+                }
+            }
+        %}
+    </header>
+</div>
