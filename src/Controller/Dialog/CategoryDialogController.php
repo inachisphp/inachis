@@ -13,6 +13,8 @@ use App\Controller\AbstractInachisController;
 use App\Controller\ZipStream;
 use App\Entity\Category;
 use App\Entity\Page;
+use App\Repository\CategoryRepository;
+use App\Repository\PageRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,39 +27,40 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class CategoryDialogController extends AbstractInachisController
 {
     /**
+     * @param CategoryRepository $categoryRepository
      * @return Response
      */
     #[Route("/incc/ax/categoryManager/get", methods: [ "POST" ])]
-    public function getCategoryManagerContent(): Response
+    public function getCategoryManagerContent(CategoryRepository $categoryRepository): Response
     {
-        $this->data['categories'] = $this->entityManager->getRepository(Category::class)->findBy(['parent' => null]);
+        $this->data['categories'] = $categoryRepository->findBy(['parent' => null]);
 
         return $this->render('inadmin/dialog/category-manager.html.twig', $this->data);
     }
 
-
     /**
+     * @param CategoryRepository $categoryRepository
      * @return Response
      */
     #[Route("/incc/ax/categoryManager/list", methods: [ "POST" ])]
-    public function getCategoryManagerList(): Response
+    public function getCategoryManagerList(CategoryRepository $categoryRepository): Response
     {
-        $this->data['categories'] = $this->entityManager->getRepository(Category::class)->findBy(['parent' => null]);
+        $this->data['categories'] = $categoryRepository->findBy(['parent' => null]);
 
         return $this->render('inadmin/dialog/category-manager-list.html.twig', $this->data);
     }
 
     /**
-     * @param Request         $request
-     * @param LoggerInterface $logger
+     * @param Request $request
+     * @param CategoryRepository $categoryRepository
      * @return Response
      */
     #[Route("incc/ax/categoryList/get", methods: [ "POST" ])]
-    public function getCategoryManagerListContent(Request $request, LoggerInterface $logger): Response
+    public function getCategoryManagerListContent(Request $request, CategoryRepository $categoryRepository): Response
     {
         $categories = empty($request->request->get('q')) ?
-            $this->entityManager->getRepository(Category::class)->findBy(['parent' => null]) :
-            $this->entityManager->getRepository(Category::class)->findByTitleLike($request->request->get('q'));
+            $categoryRepository->findBy(['parent' => null]) :
+            $categoryRepository->findByTitleLike($request->request->get('q'));
         $result = [];
         // Below code is used to handle where categories exist with the same name under multiple locations
         if (!empty($categories)) {
@@ -90,18 +93,21 @@ class CategoryDialogController extends AbstractInachisController
 
     /**
      * @param Request $request
+     * @param CategoryRepository $categoryRepository
      * @return Response
      */
     #[Route("incc/ax/categoryManager/save", methods: [ "POST" ])]
-    public function saveCategoryManagerContent(Request $request): Response
-    {
+    public function saveCategoryManagerContent(
+        Request $request,
+        CategoryRepository $categoryRepository
+    ): Response {
         $category = $request->request->get('id') !== '-1' ?
-            $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $request->request->get('id')]) :
+            $categoryRepository->findOneBy(['id' => $request->request->get('id')]) :
             new Category();
-        $this->entityManager->getRepository(Category::class)->hydrate($category, $request->request->all());
+        $categoryRepository->hydrate($category, $request->request->all());
         $category->setParent(
             $request->request->get('parentID') !== '-1' ?
-                $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $request->request->get('parentID')]) :
+                $categoryRepository->findOneBy(['id' => $request->request->get('parentID')]) :
                 null
         );
         $this->entityManager->persist($category);
@@ -114,27 +120,49 @@ class CategoryDialogController extends AbstractInachisController
         );
     }
 
+    /**
+     * @param Request $request
+     * @param CategoryRepository $categoryRepository
+     * @param PageRepository $pageRepository
+     * @return JsonResponse
+     */
     #[Route("incc/ax/categoryManager/usage", methods: [ "POST" ])]
-    public function getCategoryUsages(Request $request): JsonResponse
-    {
-        $category = $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $request->request->get('id')]);
-        $count = $this->entityManager->getRepository(Page::class)->getPagesWithCategoryCount($category);
+    public function getCategoryUsages(
+        Request $request,
+        CategoryRepository $categoryRepository,
+        PageRepository $pageRepository
+    ): JsonResponse {
+        $category = $categoryRepository->findOneBy(['id' => $request->request->get('id')]);
+        $count = $pageRepository->getPagesWithCategoryCount($category);
         foreach ($category->getChildren() as $child) {
-            $count += $this->entityManager->getRepository(Page::class)->getPagesWithCategoryCount($child);
+            $count += $pageRepository->getPagesWithCategoryCount($child);
         }
         return new JsonResponse([ 'count' => $count]);
     }
 
+    /**
+     * @param Request $request
+     * @param CategoryRepository $categoryRepository
+     * @param PageRepository $pageRepository
+     * @return Response
+     */
     #[Route("incc/ax/categoryManager/delete", methods: [ "POST" ])]
-    public function deleteCategory(Request $request): Response
+    public function deleteCategory(
+        Request $request,
+        CategoryRepository $categoryRepository,
+        PageRepository $pageRepository
+    ): Response
     {
-        $category = $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $request->request->get('id')]);
-        $count = $this->entityManager->getRepository(Page::class)->getPagesWithCategoryCount($category);
+        $category = $categoryRepository->findOneBy(['id' => $request->request->get('id')]);
+        $count = $pageRepository->getPagesWithCategoryCount($category);
 
         if ($count > 0) {
             return new JsonResponse(
                 [
-                    'error' => sprintf('<span class="material-icons">warning</span> %d categories present', $count)
+                    'error' => sprintf(
+                        '<span class="material-icons">warning</span> %d categories present',
+                        $count,
+                    )
                 ],
                 Response::HTTP_BAD_REQUEST
             );

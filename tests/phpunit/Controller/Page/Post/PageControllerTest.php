@@ -75,6 +75,7 @@ class PageControllerTest extends WebTestCase
             'REQUEST_URI' => '/incc/post/some-post'
         ]);
         $request->setSession(new Session(new MockArraySessionStorage()));
+        $pageRepository = $this->createMock(PageRepository::class);
         $urlRepository = $this->getMockBuilder(UrlRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -98,6 +99,7 @@ class PageControllerTest extends WebTestCase
         $response = $controller->edit(
             $request,
             $this->createMock(ContentRevisionCompare::class),
+            $pageRepository,
             'post',
             'ome-post'
         );
@@ -107,6 +109,7 @@ class PageControllerTest extends WebTestCase
 
     /**
      * @throws Exception
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     public function testGetPostAdminWithNewPostRendersForm(): void
     {
@@ -115,6 +118,7 @@ class PageControllerTest extends WebTestCase
         ]);
         $request->setSession(new Session(new MockArraySessionStorage()));
 
+        $pageRepository = $this->createMock(PageRepository::class);
         $urlRepository = $this->getMockBuilder(EntityRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -151,6 +155,7 @@ class PageControllerTest extends WebTestCase
         $response = $controller->edit(
             $request,
             $this->createMock(ContentRevisionCompare::class),
+            $pageRepository,
             'post',
             'new'
         );

@@ -29,7 +29,7 @@ class ContentQueryParameters
     ): array {
         $this->filters = array_filter($request->request->all('filter', []));
         $this->sort = $request->request->get('sort', $sortDefault);
-        if ($request->isMethod('post')) {
+        if ($request->isMethod(Request::METHOD_POST)) {
             $request->getSession()->set($prefix . '_filters', $this->filters);
             $request->getSession()->set($prefix . '_sort', $this->sort);
         } elseif ($request->getSession()->has($prefix . '_filters')) {
@@ -39,7 +39,7 @@ class ContentQueryParameters
         $this->offset = (int) $request->attributes->get('offset', 0);
         $this->limit = (int) $request->attributes->get(
             'limit',
-            $repository->getMaxItemsToShow()
+            $repository->getMaxItemsToShow(),
         );
 
         return [
