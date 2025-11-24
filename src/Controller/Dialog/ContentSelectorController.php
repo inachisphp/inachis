@@ -16,7 +16,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use DateTime;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class ContentSelectorController extends AbstractInachisController
 {
     protected array $errors = [];
@@ -29,7 +31,6 @@ class ContentSelectorController extends AbstractInachisController
     #[Route("/incc/ax/contentSelector/get", methods: [ "POST" ])]
     public function contentList(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $filters = array_filter($request->request->all('filters', []));
         if ($request->request->get('seriesId', '') !== '') {
             $series = $this->entityManager->getRepository(Series::class)->find($request->request->get('seriesId'));
@@ -62,8 +63,6 @@ class ContentSelectorController extends AbstractInachisController
     #[Route("/incc/ax/contentSelector/save", methods: [ "POST" ])]
     public function saveContent(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         if (!empty($request->request->all('ids'))) {
             $series = $this->entityManager->getRepository(Series::class)->findOneBy(['id' => $request->request->get('seriesId')]);
             if ($series !== null) {

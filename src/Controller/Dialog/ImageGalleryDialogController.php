@@ -23,11 +23,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
+#[IsGranted('ROLE_ADMIN')]
 class ImageGalleryDialogController extends AbstractInachisController
 {
     /**
@@ -36,7 +38,6 @@ class ImageGalleryDialogController extends AbstractInachisController
     #[Route('/incc/ax/imageManager/get', methods: [ 'POST' ])]
     public function getImageManagerList(): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->data['form'] = $this->createForm(ImageType::class)->createView();
         $this->data['allowedTypes'] = Image::ALLOWED_TYPES;
         $this->data['dataset'] = [];
@@ -57,7 +58,6 @@ class ImageGalleryDialogController extends AbstractInachisController
     )]
     public function getImageList(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $filters = array_filter($request->request->all('filter', []));
         $offset = (int) $request->attributes->get('offset', 0);
         $limit = (int) $request->attributes->get(

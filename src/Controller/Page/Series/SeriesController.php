@@ -19,7 +19,9 @@ use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class SeriesController extends AbstractInachisController
 {
     /**
@@ -38,7 +40,6 @@ class SeriesController extends AbstractInachisController
     )]
     public function list(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
@@ -104,7 +105,6 @@ class SeriesController extends AbstractInachisController
     #[Route("/incc/series/new", name: "incc_series_new", methods: [ "GET", "POST" ])]
     public function edit(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $series = $request->attributes->get('id') !== null ?
             $this->entityManager->getRepository(Series::class)->findOneBy([
                 'id' => $request->attributes->get('id')
@@ -171,7 +171,6 @@ class SeriesController extends AbstractInachisController
     #[Route("/incc/series/contents/{id}", name: "incc_series_contents", methods: [ "POST" ])]
     public function contents(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $series = $this->entityManager->getRepository(Series::class)->findOneBy(['id' => $request->attributes->get('id')]);
         $form = $this->createForm(SeriesType::class, $series);
         $form->handleRequest($request);

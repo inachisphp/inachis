@@ -202,7 +202,7 @@ class PageWebControllerTest extends WebTestCase
             ->getMock();
         $controller->expects($this->once())
             ->method('render')
-            ->with('web/post.html.twig')
+            ->with('web/pages/post.html.twig')
             ->willReturn(new Response('Rendered OK', 200));
         $response = $controller->getPost($request, '2025', '10', '10', 'sample-post');
         $this->assertInstanceOf(Response::class, $response);
@@ -282,7 +282,7 @@ class PageWebControllerTest extends WebTestCase
         }
         $controller->expects($this->once())
             ->method('render')
-            ->with('web/homepage.html.twig')
+            ->with('web/pages/homepage.html.twig')
             ->willReturn(new Response('Rendered OK', 200));
         $response = $controller->getPostsByTag($request, 'existing-tag');
         $this->assertInstanceOf(Response::class, $response);
@@ -340,7 +340,7 @@ class PageWebControllerTest extends WebTestCase
         }
         $controller->expects($this->once())
             ->method('render')
-            ->with('web/homepage.html.twig')
+            ->with('web/pages/homepage.html.twig')
             ->willReturn(new Response('Rendered OK', 200));
         $response = $controller->getPostsByCategory($request, 'category-name');
         $this->assertInstanceOf(Response::class, $response);

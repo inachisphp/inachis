@@ -26,8 +26,10 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+#[IsGranted('ROLE_ADMIN')]
 class AdminProfileController extends AbstractInachisController
 {
     /**
@@ -47,7 +49,6 @@ class AdminProfileController extends AbstractInachisController
     )]
     public function list(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
@@ -108,8 +109,6 @@ class AdminProfileController extends AbstractInachisController
         PasswordResetTokenService $tokenService,
         ValidatorInterface $validator,
     ): Response {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $user = $request->attributes->get('id') !== 'new' ?
             $this->entityManager->getRepository(User::class)->findOneBy(
                 [ 'username' => $request->attributes->get('id') ]

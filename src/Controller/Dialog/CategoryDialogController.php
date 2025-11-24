@@ -18,7 +18,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+
+#[IsGranted('ROLE_ADMIN')]
 class CategoryDialogController extends AbstractInachisController
 {
     /**
@@ -27,7 +30,6 @@ class CategoryDialogController extends AbstractInachisController
     #[Route("/incc/ax/categoryManager/get", methods: [ "POST" ])]
     public function getCategoryManagerContent(): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->data['categories'] = $this->entityManager->getRepository(Category::class)->findBy(['parent' => null]);
 
         return $this->render('inadmin/dialog/category-manager.html.twig', $this->data);
@@ -40,7 +42,6 @@ class CategoryDialogController extends AbstractInachisController
     #[Route("/incc/ax/categoryManager/list", methods: [ "POST" ])]
     public function getCategoryManagerList(): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->data['categories'] = $this->entityManager->getRepository(Category::class)->findBy(['parent' => null]);
 
         return $this->render('inadmin/dialog/category-manager-list.html.twig', $this->data);
@@ -54,7 +55,6 @@ class CategoryDialogController extends AbstractInachisController
     #[Route("incc/ax/categoryList/get", methods: [ "POST" ])]
     public function getCategoryManagerListContent(Request $request, LoggerInterface $logger): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $categories = empty($request->request->get('q')) ?
             $this->entityManager->getRepository(Category::class)->findBy(['parent' => null]) :
             $this->entityManager->getRepository(Category::class)->findByTitleLike($request->request->get('q'));
@@ -95,7 +95,6 @@ class CategoryDialogController extends AbstractInachisController
     #[Route("incc/ax/categoryManager/save", methods: [ "POST" ])]
     public function saveCategoryManagerContent(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $category = $request->request->get('id') !== '-1' ?
             $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $request->request->get('id')]) :
             new Category();
@@ -118,7 +117,6 @@ class CategoryDialogController extends AbstractInachisController
     #[Route("incc/ax/categoryManager/usage", methods: [ "POST" ])]
     public function getCategoryUsages(Request $request): JsonResponse
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $category = $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $request->request->get('id')]);
         $count = $this->entityManager->getRepository(Page::class)->getPagesWithCategoryCount($category);
         foreach ($category->getChildren() as $child) {
@@ -130,7 +128,6 @@ class CategoryDialogController extends AbstractInachisController
     #[Route("incc/ax/categoryManager/delete", methods: [ "POST" ])]
     public function deleteCategory(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $category = $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $request->request->get('id')]);
         $count = $this->entityManager->getRepository(Page::class)->getPagesWithCategoryCount($category);
 

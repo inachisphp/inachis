@@ -23,9 +23,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
+#[IsGranted('ROLE_ADMIN')]
 class RevisionController extends AbstractInachisController
 {
     /**
@@ -35,8 +37,6 @@ class RevisionController extends AbstractInachisController
     #[Route("/incc/page/diff/{id}", methods: [ "GET" ])]
     public function diff(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $revision = $this->entityManager->getRepository(Revision::class)->findOneBy([
             'id' => $request->attributes->get('id')
         ]);
@@ -97,7 +97,6 @@ class RevisionController extends AbstractInachisController
     #[Route("/incc/page/diff/{id}", methods: [ "POST" ])]
     public function doRevert(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $revision = $this->entityManager->getRepository(Revision::class)->findOneBy([
             'id' => $request->attributes->get('id')
         ]);
@@ -141,7 +140,6 @@ class RevisionController extends AbstractInachisController
     #[Route("/incc/page/download/{id}", name: "incc_post_download", methods: [ "GET" ])]
     public function download(Request $request, SerializerInterface $serializer): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $revision = $this->entityManager->getRepository(Revision::class)->findOneBy([
             'id' => $request->attributes->get('id')
         ]);

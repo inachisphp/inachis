@@ -15,7 +15,9 @@ use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class UrlController extends AbstractInachisController
 {
     /**
@@ -31,7 +33,6 @@ class UrlController extends AbstractInachisController
     )]
     public function list(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
@@ -104,7 +105,6 @@ class UrlController extends AbstractInachisController
     )]
     public function checkUrlUsage(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $url = $request->request->get('url');
         $urls = $this->entityManager->getRepository(Url::class)->findSimilarUrlsExcludingId(
             $url,

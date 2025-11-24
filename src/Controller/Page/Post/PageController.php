@@ -17,6 +17,7 @@ use App\Entity\Revision;
 use App\Entity\Tag;
 use App\Entity\Url;
 use App\Form\PostType;
+use App\Repository\PageRepository;
 use App\Repository\RevisionRepository;
 use App\Util\ContentRevisionCompare;
 use App\Util\ReadingTime;
@@ -27,7 +28,9 @@ use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class PageController extends AbstractInachisController
 {
     public const ITEMS_TO_SHOW = 20;
@@ -49,22 +52,26 @@ class PageController extends AbstractInachisController
         defaults: [ "offset" => 0, "limit" => 10 ],
         methods: [ "GET", "POST" ]
     )]
-    public function list(Request $request, string $type = 'post'): Response
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+    public function list(
+        Request $request,
+        PageRepository $pageRepository,
+        string $type = 'post',
+
+    ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
             foreach ($request->request->all('items') as $item) {
                 if ($request->request->has('delete')) {
-                    $post = $this->entityManager->getRepository(Page::class)->findOneBy(['id' => $item]);
+                    $post = $pageRepository->findOneBy(['id' => $item]);
                     if ($post !== null) {
                         $this->entityManager->getRepository(Revision::class)->deleteAndRecordByPage($post);
-                        $this->entityManager->getRepository(Page::class)->remove($post);
+                        $pageRepository->remove($post);
                     }
                 }
                 if ($request->request->has('private') || $request->request->has('public')) {
-                    $post = $this->entityManager->getRepository(Page::class)->findOneBy(['id' => $item]);
+                    $post = $pageRepository->findOneBy(['id' => $item]);
                     if ($post !== null) {
                         $post->setVisibility(
                             $request->request->has('private') ? Page::PRIVATE : Page::PUBLIC
@@ -74,7 +81,7 @@ class PageController extends AbstractInachisController
                     }
                 }
                 if ($request->request->has('rebuild')) {
-                    $post = $this->entityManager->getRepository(Page::class)->findOneBy(['id' => $item]);
+                    $post = $pageRepository->findOneBy(['id' => $item]);
                     if ($post !== null) {
                         if (!empty($post->getUrls())) {
                             foreach ($post->getUrls() as $url) {
@@ -171,11 +178,10 @@ class PageController extends AbstractInachisController
     public function edit(
         Request $request,
         ContentRevisionCompare $contentRevisionCompare,
+        PageRepository $pageRepository,
         string $type = 'post',
         ?string $title = null
     ): Response {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $url = preg_replace('/\/?incc\/(page|post)\/?/', '', $request->getRequestUri());
         $url = $this->entityManager->getRepository(Url::class)->findBy(['link' => $url]);
         $title = $title === 'new' ? null : $title;
@@ -187,7 +193,7 @@ class PageController extends AbstractInachisController
             );
         }
         $post = null !== $title ?
-            $this->entityManager->getRepository(Page::class)->findOneBy(['id' => $url[0]->getContent()->getId()]) :
+            $pageRepository->findOneBy(['id' => $url[0]->getContent()->getId()]) :
             $post = new Page();
         if ($post->getId() === null) {
             $post->setType($type);

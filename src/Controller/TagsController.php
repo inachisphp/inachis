@@ -10,24 +10,26 @@
 namespace App\Controller;
 
 use App\Entity\Tag;
+use App\Repository\TagRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class TagsController extends AbstractInachisController
 {
     /**
-     * @param Request         $request
-     * @param LoggerInterface $logger
+     * @param Request $request
+     * @param TagRepository $tagRepository
      * @return Response
      */
     #[Route("incc/ax/tagList/get", methods: [ "POST" ])]
-    public function getTagManagerListContent(Request $request, LoggerInterface $logger): Response
+    public function getTagManagerListContent(Request $request, TagRepository $tagRepository): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $tags = $this->entityManager->getRepository(Tag::class)->findByTitleLike($request->request->get('q'));
+        $tags = $tagRepository->findByTitleLike($request->request->get('q'));
         $result = [];
         // Below code is used to handle where tags exist with the same name under multiple locations
         if (!empty($tags)) {

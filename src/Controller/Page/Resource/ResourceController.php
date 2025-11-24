@@ -23,10 +23,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 //use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+#[IsGranted('ROLE_ADMIN')]
 class ResourceController extends AbstractInachisController
 {
     /**
@@ -46,7 +48,6 @@ class ResourceController extends AbstractInachisController
     )]
     public function list(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $typeClass = match ($request?->get('type')) {
             'downloads' => Download::class,
             default => Image::class,
@@ -109,7 +110,6 @@ class ResourceController extends AbstractInachisController
         Filesystem $filesystem,
         #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory
     ): Response {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 //            "filename" => "[a-zA-Z0-9\-\_]\.(jpe?g|heic|png)",
         $typeClass = match ($request->attributes->get('type')) {
             'downloads' => Download::class,
@@ -208,7 +208,6 @@ class ResourceController extends AbstractInachisController
         SluggerInterface $slugger,
         #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory): JsonResponse
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         if (empty($request->files->get("image"))) {
             return new JsonResponse(['error' => 'No file provided'], 400);
         } elseif (empty($request->request->all('image')['title'])) {

@@ -28,7 +28,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use DateTime;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class BulkCreateController extends AbstractInachisController
 {
     protected array $errors = [];
@@ -41,7 +43,6 @@ class BulkCreateController extends AbstractInachisController
     #[Route("/incc/ax/bulkCreate/get", methods: [ "POST" ])]
     public function contentList(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         return $this->render('inadmin/dialog/bulk-create.html.twig', $this->data);
     }
 
@@ -55,7 +56,6 @@ class BulkCreateController extends AbstractInachisController
     #[Route("/incc/ax/bulkCreate/save", methods: [ "POST" ])]
     public function saveContent(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $series = $this->entityManager->getRepository(Series::class)->findOneBy(['id' => $request->request->get('seriesId')]);
         if ($series !== null && !empty($request->request->all('form')['title'])
             && !empty($request->request->all('form')['startDate']) && !empty($request->request->all('form')['endDate'])

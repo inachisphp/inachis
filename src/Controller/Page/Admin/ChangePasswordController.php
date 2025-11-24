@@ -19,8 +19,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints\PasswordStrengthValidator;
 
+#[IsGranted('ROLE_ADMIN')]
 class ChangePasswordController extends AbstractInachisController
 {
     /**
@@ -33,7 +35,6 @@ class ChangePasswordController extends AbstractInachisController
     #[Route("/incc/admin/{id}/change-password", name: "incc_admin_change_password", methods: [ "GET", "POST" ])]
     public function changePasswordTab(UserPasswordHasherInterface $passwordHasher, Request $request, string $id): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $request->attributes->get('id')]);
         $form = $this->createForm(
             ChangePasswordType::class,
