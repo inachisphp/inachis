@@ -11,6 +11,8 @@ namespace App\Controller\Page\Url;
 
 use App\Controller\AbstractInachisController;
 use App\Entity\Url;
+use App\Model\ContentQueryParameters;
+use App\Repository\UrlRepository;
 use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,23 +33,26 @@ class UrlController extends AbstractInachisController
         defaults: [ "offset" => 0, "limit" => 20 ],
         methods: [ "GET", "POST" ]
     )]
-    public function list(Request $request): Response
-    {
+    public function list(
+        Request $request,
+        ContentQueryParameters $contentQueryParameters,
+        UrlRepository $urlRepository,
+    ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
             foreach ($request->request->all('items') as $item) {
-                $link = $this->entityManager->getRepository(Url::class)->findOneBy([
+                $link = $urlRepository->findOneBy([
                     'id' => $item,
                     'default' => false,
                 ]);
                 if ($link !== null) {
                     if ($request->request->has('delete')) {
-                        $this->entityManager->getRepository(Url::class)->remove($link);
+                        $urlRepository->remove($link);
                     }
                     if ($request->request->has('make_default')) {
-                        $previous_default = $this->entityManager->getRepository(Url::class)->findOneBy(
+                        $previous_default = $urlRepository->findOneBy(
                             [
                                 'content' => $link->getContent(),
                                 'default' => true,
@@ -65,31 +70,20 @@ class UrlController extends AbstractInachisController
             }
             return $this->redirectToRoute('incc_url_list');
         }
-        $filters = array_filter($request->request->all('filter', []));
-        $sort = $request->request->get('sort', 'contentDate asc');
-        if ($request->isMethod('post')) {
-            $_SESSION['url_filters'] = $filters;
-            $_SESSION['url_sort'] = $sort;
-        } elseif (isset($_SESSION['url_filters'])) {
-            $filters = $_SESSION['url_filters'];
-            $sort = $_SESSION['url_sort'];
-        }
-        $offset = (int) $request->attributes->get('offset', 0);
-        $limit = (int) $request->attributes->get(
-            'limit',
-            $this->entityManager->getRepository(Url::class)->getMaxItemsToShow()
+        $contentQuery = $contentQueryParameters->process(
+            $request,
+            $urlRepository,
+            'url',
+            'contentDate asc',
         );
         $this->data['dataset'] = $this->entityManager->getRepository(Url::class)->getFiltered(
-            $filters,
-            $offset,
-            $limit,
-            $sort
+            $contentQuery['filters'],
+            $contentQuery['offset'],
+            $contentQuery['limit'],
+            $contentQuery['sort'],
         );
         $this->data['form'] = $form->createView();
-        $this->data['filters'] = $filters;
-        $this->data['page']['sort'] = $sort;
-        $this->data['page']['offset'] = $offset;
-        $this->data['page']['limit'] = $limit;
+        $this->data['query'] = $contentQuery;
         $this->data['page']['title'] = 'URLs';
 
         return $this->render('inadmin/page/url/list.html.twig', $this->data);

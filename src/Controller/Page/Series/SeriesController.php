@@ -14,6 +14,8 @@ use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Series;
 use App\Form\SeriesType;
+use App\Model\ContentQueryParameters;
+use App\Repository\SeriesRepository;
 use App\Util\UrlNormaliser;
 use DateTime;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,20 +40,23 @@ class SeriesController extends AbstractInachisController
         defaults: [ "offset" => 0, "limit" => 10 ],
         methods: [ "GET", "POST" ]
     )]
-    public function list(Request $request): Response
-    {
+    public function list(
+        Request $request,
+        ContentQueryParameters $contentQueryParameters,
+        SeriesRepository $seriesRepository
+    ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
             foreach ($request->request->all('items') as $item) {
                 if ($request->request->get('delete') !== null) {
-                    $deleteItem = $this->entityManager->getRepository(Series::class)->findOneBy(['id' => $item]);
+                    $deleteItem = $seriesRepository->findOneBy(['id' => $item]);
                     if ($deleteItem !== null) {
                         $this->entityManager->getRepository(Series::class)->remove($deleteItem);
                     }
                 }
                 if ($request->request->has('private') || $request->request->has('public')) {
-                    $series = $this->entityManager->getRepository(Series::class)->findOneBy(['id' => $item]);
+                    $series = $seriesRepository->findOneBy(['id' => $item]);
                     if ($series !== null) {
                         $series->setVisibility(
                             $request->request->has('private') ? Page::PRIVATE : Page::PUBLIC
@@ -67,32 +72,21 @@ class SeriesController extends AbstractInachisController
             return $this->redirectToRoute('incc_series_list');
         }
 
-        $filters = array_filter($request->request->all('filter', []));
-        $sort = $request->get('sort', 'lastDate desc');
-        if ($request->isMethod('post')) {
-            $request->getSession()->set('series_filters', $filters);
-            $request->getSession()->set('series_sort', $sort);
-        } elseif ($request->getSession()->has('series_filters')) {
-            $filters = $request->getSession()->get('series_sort', '');
-            $sort = $request->getSession()->get('series_sort', '');
-        }
-        $offset = (int) $request->attributes->get('offset', 0);
-        $limit = (int) $request->attributes->get(
-            'limit',
-            $this->entityManager->getRepository(Series::class)->getMaxItemsToShow()
+        $contentQuery = $contentQueryParameters->process(
+            $request,
+            $seriesRepository,
+            'series',
+            'lastDate desc',
         );
         $this->data['form'] = $form->createView();
         $this->data['dataset'] = $this->entityManager->getRepository(Series::class)->getFiltered(
-            $filters,
-            $offset,
-            $limit,
-            $sort
+            $contentQuery['filters'],
+            $contentQuery['offset'],
+            $contentQuery['limit'],
+            $contentQuery['sort'],
         );
-        $this->data['filters'] = $filters;
-        $this->data['page']['sort'] = $sort;
+        $this->data['query'] = $contentQuery;
         $this->data['page']['tab'] = 'series';
-        $this->data['page']['offset'] = $offset;
-        $this->data['page']['limit'] = $limit;
         return $this->render('inadmin/page/series/list.html.twig', $this->data);
     }
 

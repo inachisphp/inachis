@@ -71,8 +71,8 @@ class WasteController extends AbstractInachisController
                 [ 'q.modDate', 'DESC' ]
             ]
         );
-        $this->data['page']['offset'] = $offset;
-        $this->data['page']['limit'] = $limit;
+        $this->data['query']['offset'] = $offset;
+        $this->data['query']['limit'] = $limit;
         return $this->render('inadmin/waste.html.twig', $this->data);
     }
 }

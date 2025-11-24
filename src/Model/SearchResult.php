@@ -9,10 +9,14 @@
 
 namespace App\Model;
 
+use ArrayIterator;
+use IteratorAggregate;
+use Traversable;
+
 /**
  * Model for containing search result items
  */
-class SearchResult implements \IteratorAggregate
+class SearchResult implements IteratorAggregate
 {
     public function __construct(
         private array $results,
@@ -22,11 +26,11 @@ class SearchResult implements \IteratorAggregate
     ) {}
 
     /**
-     * @return \Traversable
+     * @return Traversable
      */
-    public function getIterator(): \Traversable
+    public function getIterator(): Traversable
     {
-        return new \ArrayIterator($this->results);
+        return new ArrayIterator($this->results);
     }
 
     /**

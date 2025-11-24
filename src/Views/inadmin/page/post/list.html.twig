@@ -53,8 +53,8 @@
                 'type': 'post',
                 'dataset': posts,
 
-                'offset': page.offset,
-                'limit': page.limit,
+                'offset': query.offset,
+                'limit': query.limit,
                 'total': posts.count,
 
                 'snippet_description': 'content',
@@ -132,7 +132,7 @@
                     }
                 },
 
-                'filter_values': filters,
+                'filter_values': query.filters,
 
                 'sort_options': {
                     'postDate asc': 'Published dates oldest to newest',

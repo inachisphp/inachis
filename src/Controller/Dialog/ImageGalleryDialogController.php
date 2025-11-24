@@ -69,8 +69,8 @@ class ImageGalleryDialogController extends AbstractInachisController
             $offset,
             $limit
         );
-        $this->data['page']['offset'] = $offset;
-        $this->data['page']['limit'] = $limit;
+        $this->data['query']['offset'] = $offset;
+        $this->data['query']['limit'] = $limit;
         return $this->render('inadmin/partials/gallery.html.twig', $this->data);
     }
 }

@@ -50,9 +50,9 @@ class ContentSelectorController extends AbstractInachisController
             $limit,
             'title asc'
         );
-        $this->data['filters'] = $filters;
-        $this->data['page']['offset'] = $offset;
-        $this->data['page']['limit'] = $limit;
+        $this->data['query']['filters'] = $filters;
+        $this->data['query']['offset'] = $offset;
+        $this->data['query']['limit'] = $limit;
         return $this->render('inadmin/dialog/content-selector.html.twig', $this->data);
     }
 

@@ -42,8 +42,8 @@
                     },
                 ],
 
-                limit: page.limit,
-                offset: page.offset,
+                limit: query.limit,
+                offset: query.offset,
                 total: dataset.count,
                 url_result: path('incc_url_list'),
 
@@ -59,7 +59,7 @@
                     'content desc': 'Content Z-A',
                 },
                 filters: [],
-                filter_values: filters,
+                filter_values: query.filters,
 
                 actions: {
                     make_default: {

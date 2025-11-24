@@ -17,6 +17,7 @@ use App\Entity\Revision;
 use App\Entity\Tag;
 use App\Entity\Url;
 use App\Form\PostType;
+use App\Model\ContentQueryParameters;
 use App\Repository\PageRepository;
 use App\Repository\RevisionRepository;
 use App\Util\ContentRevisionCompare;
@@ -55,6 +56,7 @@ class PageController extends AbstractInachisController
     public function list(
         Request $request,
         PageRepository $pageRepository,
+        ContentQueryParameters $contentQueryParameters,
         string $type = 'post',
 
     ): Response {
@@ -117,33 +119,22 @@ class PageController extends AbstractInachisController
                 [ 'type' => $type ]
             );
         }
-        $filters = array_filter($request->request->all('filter', []));
-        $sort = $request->request->get('sort', 'postDate desc');
-        if ($request->isMethod('post')) {
-            $request->getSession()->set('post_filters', $filters);
-            $request->getSession()->set('post_sort', $sort);
-        } elseif ($request->getSession()->has('post_filters')) {
-            $filters = $request->getSession()->get('post_filters', '');
-            $sort = $request->getSession()->get('post_sort', '');
-        }
 
-        $offset = (int) $request->attributes->get('offset', 0);
-        $limit = (int) $request->attributes->get(
-            'limit',
-            $this->entityManager->getRepository(Page::class)->getMaxItemsToShow()
+        $contentQuery = $contentQueryParameters->process(
+            $request,
+            $pageRepository,
+            'post',
+            'postDate desc',
         );
         $this->data['form'] = $form->createView();
-        $this->data['posts'] = $this->entityManager->getRepository(Page::class)->getFilteredOfTypeByPostDate(
-            $filters,
+        $this->data['posts'] = $pageRepository->getFilteredOfTypeByPostDate(
+            $contentQuery['filters'],
             $type,
-            $offset,
-            $limit,
-            $sort
+            $contentQuery['offset'],
+            $contentQuery['limit'],
+            $contentQuery['sort'],
         );
-        $this->data['filters'] = $filters;
-        $this->data['page']['offset'] = $offset;
-        $this->data['page']['limit'] = $limit;
-        $this->data['page']['sort'] = $sort;
+        $this->data['query'] = $contentQuery;
         $this->data['page']['tab'] = $type;
         $this->data['page']['title'] = ucfirst($type) . 's';
         return $this->render('inadmin/page/post/list.html.twig', $this->data);
