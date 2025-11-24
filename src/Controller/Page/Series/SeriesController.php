@@ -14,12 +14,16 @@ use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Series;
 use App\Form\SeriesType;
+use App\Model\ContentQueryParameters;
+use App\Repository\SeriesRepository;
 use App\Util\UrlNormaliser;
 use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class SeriesController extends AbstractInachisController
 {
     /**
@@ -36,21 +40,23 @@ class SeriesController extends AbstractInachisController
         defaults: [ "offset" => 0, "limit" => 10 ],
         methods: [ "GET", "POST" ]
     )]
-    public function list(Request $request): Response
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+    public function list(
+        Request $request,
+        ContentQueryParameters $contentQueryParameters,
+        SeriesRepository $seriesRepository
+    ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
             foreach ($request->request->all('items') as $item) {
                 if ($request->request->get('delete') !== null) {
-                    $deleteItem = $this->entityManager->getRepository(Series::class)->findOneBy(['id' => $item]);
+                    $deleteItem = $seriesRepository->findOneBy(['id' => $item]);
                     if ($deleteItem !== null) {
                         $this->entityManager->getRepository(Series::class)->remove($deleteItem);
                     }
                 }
                 if ($request->request->has('private') || $request->request->has('public')) {
-                    $series = $this->entityManager->getRepository(Series::class)->findOneBy(['id' => $item]);
+                    $series = $seriesRepository->findOneBy(['id' => $item]);
                     if ($series !== null) {
                         $series->setVisibility(
                             $request->request->has('private') ? Page::PRIVATE : Page::PUBLIC
@@ -66,32 +72,21 @@ class SeriesController extends AbstractInachisController
             return $this->redirectToRoute('incc_series_list');
         }
 
-        $filters = array_filter($request->request->all('filter', []));
-        $sort = $request->get('sort', 'lastDate desc');
-        if ($request->isMethod('post')) {
-            $request->getSession()->set('series_filters', $filters);
-            $request->getSession()->set('series_sort', $sort);
-        } elseif ($request->getSession()->has('series_filters')) {
-            $filters = $request->getSession()->get('series_sort', '');
-            $sort = $request->getSession()->get('series_sort', '');
-        }
-        $offset = (int) $request->attributes->get('offset', 0);
-        $limit = (int) $request->attributes->get(
-            'limit',
-            $this->entityManager->getRepository(Series::class)->getMaxItemsToShow()
+        $contentQuery = $contentQueryParameters->process(
+            $request,
+            $seriesRepository,
+            'series',
+            'lastDate desc',
         );
         $this->data['form'] = $form->createView();
         $this->data['dataset'] = $this->entityManager->getRepository(Series::class)->getFiltered(
-            $filters,
-            $offset,
-            $limit,
-            $sort
+            $contentQuery['filters'],
+            $contentQuery['offset'],
+            $contentQuery['limit'],
+            $contentQuery['sort'],
         );
-        $this->data['filters'] = $filters;
-        $this->data['page']['sort'] = $sort;
+        $this->data['query'] = $contentQuery;
         $this->data['page']['tab'] = 'series';
-        $this->data['page']['offset'] = $offset;
-        $this->data['page']['limit'] = $limit;
         return $this->render('inadmin/page/series/list.html.twig', $this->data);
     }
 
@@ -104,7 +99,6 @@ class SeriesController extends AbstractInachisController
     #[Route("/incc/series/new", name: "incc_series_new", methods: [ "GET", "POST" ])]
     public function edit(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $series = $request->attributes->get('id') !== null ?
             $this->entityManager->getRepository(Series::class)->findOneBy([
                 'id' => $request->attributes->get('id')
@@ -171,7 +165,6 @@ class SeriesController extends AbstractInachisController
     #[Route("/incc/series/contents/{id}", name: "incc_series_contents", methods: [ "POST" ])]
     public function contents(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $series = $this->entityManager->getRepository(Series::class)->findOneBy(['id' => $request->attributes->get('id')]);
         $form = $this->createForm(SeriesType::class, $series);
         $form->handleRequest($request);

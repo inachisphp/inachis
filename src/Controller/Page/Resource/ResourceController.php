@@ -15,6 +15,7 @@ use App\Entity\Image;
 use App\Entity\Page;
 use App\Entity\Series;
 use App\Form\ResourceType;
+use App\Model\ContentQueryParameters;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -23,10 +24,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 //use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+#[IsGranted('ROLE_ADMIN')]
 class ResourceController extends AbstractInachisController
 {
     /**
@@ -44,9 +47,10 @@ class ResourceController extends AbstractInachisController
         defaults: [ "offset" => 0, "limit" => 25 ],
         methods: [ "GET", "POST" ],
     )]
-    public function list(Request $request): Response
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+    public function list(
+        Request $request,
+        ContentQueryParameters $contentQueryParameters,
+    ): Response {
         $typeClass = match ($request?->get('type')) {
             'downloads' => Download::class,
             default => Image::class,
@@ -59,30 +63,21 @@ class ResourceController extends AbstractInachisController
             ->getForm()
         ;
         $form->handleRequest($request);
-        $filters = array_filter($request->request->all('filter', []));
-        $offset = (int) $request->attributes->get('offset', 0);
-        $limit = (int) $request->attributes->get(
-            'limit',
-            $this->entityManager->getRepository($typeClass)->getMaxItemsToShow()
+        $contentQuery = $contentQueryParameters->process(
+            $request,
+            $this->entityManager->getRepository($typeClass),
+            $type,
+            'title asc',
         );
-        $sort = $request->request->get('sort', 'title asc');
-        if ($request->isMethod('post')) {
-            $request->getSession()->set($type . '_sort', $sort);
-        } elseif ($request->getSession()->has($type . '_sort')) {
-            $sort = $request->getSession()->get($type . '_sort', '');
-        }
         $this->data['dataset'] = $this->entityManager->getRepository($typeClass)->getFiltered(
-            $filters,
-            $offset,
-            $limit,
-            $sort,
+            $contentQuery['filters'],
+            $contentQuery['offset'],
+            $contentQuery['limit'],
+            $contentQuery['sort'],
         );
         $this->data['form'] = $form->createView();
-        $this->data['filters'] = $filters;
+        $this->data['query'] = $contentQuery;
         $this->data['page']['type'] = $request->attributes->get('type');
-        $this->data['page']['offset'] = $offset;
-        $this->data['page']['limit'] = $limit;
-        $this->data['page']['sort'] = $sort;
         $this->data['page']['tab'] = $type;
         $this->data['page']['title'] = $type . 's';
         $this->data['limitKByte'] = Image::WARNING_FILESIZE;
@@ -109,7 +104,6 @@ class ResourceController extends AbstractInachisController
         Filesystem $filesystem,
         #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory
     ): Response {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 //            "filename" => "[a-zA-Z0-9\-\_]\.(jpe?g|heic|png)",
         $typeClass = match ($request->attributes->get('type')) {
             'downloads' => Download::class,
@@ -208,7 +202,6 @@ class ResourceController extends AbstractInachisController
         SluggerInterface $slugger,
         #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory): JsonResponse
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         if (empty($request->files->get("image"))) {
             return new JsonResponse(['error' => 'No file provided'], 400);
         } elseif (empty($request->request->all('image')['title'])) {

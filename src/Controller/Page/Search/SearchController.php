@@ -18,7 +18,9 @@ use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class SearchController extends AbstractInachisController
 {
     /**
@@ -37,7 +39,6 @@ class SearchController extends AbstractInachisController
     )]
     public function results(SearchRepository $repo, Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         if ($request->attributes->get('keyword') === ' ' && !empty($request->request->get('keyword', ''))) {
             $keyword = str_replace('/', '', $request->request->get('keyword', ''));
             $keyword = preg_replace('/(?:%25)*2[fF]/', '', $keyword);
@@ -62,9 +63,9 @@ class SearchController extends AbstractInachisController
         );
 
         $this->data['form'] = $form->createView();
-        $this->data['page']['sort'] = $sort;
-        $this->data['page']['offset'] = $results->getOffset();
-        $this->data['page']['limit'] = $results->getLimit();
+        $this->data['query']['sort'] = $sort;
+        $this->data['query']['offset'] = $results->getOffset();
+        $this->data['query']['limit'] = $results->getLimit();
         $this->data['page']['title'] =  sprintf('\'%s\' results', $request->attributes->get('keyword'));
 
         $this->data['results'] = $results;

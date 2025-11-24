@@ -1,9 +1,9 @@
-{% set page_start = page.offset + 1 %}
+{% set page_start = query.offset + 1 %}
 {% set page_end = page_start + pages.getIterator|length - 1 %}
 <section class="ui-dialog-secondary-bar">
     <form class="search">
         <label for="ui-dialog-search-input">Search</label>
-        <input class="text ui-icon-search" id="ui-dialog-search-input" placeholder="Filter by name" type="search" value="{{ filters.keyword|default('') }}" />
+        <input class="text ui-icon-search" id="ui-dialog-search-input" placeholder="Filter by name" type="search" value="{{ query.filters.keyword|default('') }}" />
     </form>
     <p>
         Showing <strong>{{ page_start|number_format }}</strong>-<strong>{{ page_end|number_format }}</strong> of <strong id="content_count">{{ pages.count }}</strong> posts and pages
@@ -20,8 +20,8 @@
             {% endfor %}
         </ol>
         {{ include('inadmin/partials/pagination.html.twig', {
-            offset: page.offset,
-            limit: page.limit,
+            offset: query.offset,
+            limit: query.limit,
             maxResults: pages.count,
             maxPagesToShow: 5,
             result_url: '#',

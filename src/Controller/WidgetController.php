@@ -15,7 +15,6 @@ use App\Entity\Series;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
 
 class WidgetController extends AbstractController
 {
@@ -71,7 +70,9 @@ class WidgetController extends AbstractController
      */
     private function getPagesWithCategoryName($categoryName, int $maxDisplayCount = 0): array
     {
-        $category = $this->entityManager->getRepository(Category::class)->findOneBy(['title' => $categoryName]);
+        $category = $this->entityManager->getRepository(Category::class)->findOneBy([
+            'title' => $categoryName,
+        ]);
         if ($category instanceof Category) {
             return $this->entityManager->getRepository(Page::class)->getPagesWithCategory(
                 $category,
