@@ -83,7 +83,7 @@ class AdminProfileController extends AbstractInachisController
             'displayName asc',
         );
         $this->data['form'] = $form->createView();
-        $this->data['dataset'] = $this->entityManager->getRepository(User::class)->getFiltered(
+        $this->data['dataset'] = $userRepository->getFiltered(
             $contentQuery['filters'],
             $contentQuery['offset'],
             $contentQuery['limit'],

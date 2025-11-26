@@ -68,7 +68,7 @@ class BulkCreateController extends AbstractInachisController
             $count = $bulkCreatePost->create($data, $this->getUser());
 
             if ($count === 0) {
-                new Response('No change', Response::HTTP_NO_CONTENT);
+                return new Response('No change', Response::HTTP_NO_CONTENT);
             }
             return new Response('Saved', Response::HTTP_CREATED);
         } catch (InvalidArgumentException $e) {

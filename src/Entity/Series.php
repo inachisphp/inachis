@@ -70,13 +70,13 @@ class Series
      * @var DateTime|null
      */
     #[ORM\Column(type: 'datetime', nullable: true)]
-    protected ?DateTime $firstDate;
+    protected ?DateTime $firstDate = null;
 
     /**
      * @var DateTime|null
      */
     #[ORM\Column(type: 'datetime', nullable: true)]
-    protected ?DateTime $lastDate;
+    protected ?DateTime $lastDate = null;
 
     /**
      * @var Collection|null The array of pages in the series
