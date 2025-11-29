@@ -12,6 +12,8 @@ namespace App\Controller\Page\Admin;
 use App\Controller\AbstractInachisController;
 use App\Entity\User;
 use App\Form\UserType;
+use App\Model\ContentQueryParameters;
+use App\Repository\UserRepository;
 use App\Service\PasswordResetTokenService;
 use App\Transformer\ImageTransformer;
 use App\Util\Base64EncodeFile;
@@ -26,8 +28,10 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+#[IsGranted('ROLE_ADMIN')]
 class AdminProfileController extends AbstractInachisController
 {
     /**
@@ -45,15 +49,17 @@ class AdminProfileController extends AbstractInachisController
         defaults: [ "offset" => 0, "limit" => 25 ],
         methods: [ "GET", "POST" ]
     )]
-    public function list(Request $request): Response
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+    public function list(
+        Request $request,
+        UserRepository $userRepository,
+        ContentQueryParameters $contentQueryParameters,
+    ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && !empty($request->request->all('items'))) {
             foreach ($request->request->all('items') as $item) {
-                $selectedItem = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $item]);
+                $selectedItem = $userRepository->findOneBy(['id' => $item]);
                 if ($selectedItem !== null) {
                     if ($request->request->get('delete') !== null) {
                         $selectedItem->setRemoved(true);
@@ -70,23 +76,19 @@ class AdminProfileController extends AbstractInachisController
             return $this->redirectToRoute('incc_admin_list');
         }
 
-        $filters = array_filter($request->request->all('filter', []));
-        if ($request->isMethod('post')) {
-            $_SESSION['admin_filters'] = $filters;
-        } elseif (isset($_SESSION['admin_filters'])) {
-            $filters = $_SESSION['admin_filters'];
-        }
-        $offset = (int) $request->request->get('offset', 0);
-        $limit = $this->entityManager->getRepository(User::class)->getMaxItemsToShow();
+        $contentQuery = $contentQueryParameters->process(
+            $request,
+            $userRepository,
+            'admin',
+            'displayName asc',
+        );
         $this->data['form'] = $form->createView();
         $this->data['dataset'] = $this->entityManager->getRepository(User::class)->getFiltered(
-            $filters,
-            $offset,
-            $limit
+            $contentQuery['filters'],
+            $contentQuery['offset'],
+            $contentQuery['limit'],
         );
-        $this->data['filters'] = $filters;
-        $this->data['page']['offset'] = $offset;
-        $this->data['page']['limit'] = $limit;
+        $this->data['query'] = $contentQuery;
         $this->data['page']['title'] = 'Users';
         return $this->render('inadmin/page/admin/list.html.twig', $this->data);
     }
@@ -108,8 +110,6 @@ class AdminProfileController extends AbstractInachisController
         PasswordResetTokenService $tokenService,
         ValidatorInterface $validator,
     ): Response {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $user = $request->attributes->get('id') !== 'new' ?
             $this->entityManager->getRepository(User::class)->findOneBy(
                 [ 'username' => $request->attributes->get('id') ]

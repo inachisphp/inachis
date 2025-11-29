@@ -15,6 +15,11 @@ use App\Entity\Page;
 use App\Entity\Series;
 use App\Entity\Tag;
 use App\Entity\Url;
+use App\Model\BulkCreateData;
+use App\Repository\CategoryRepository;
+use App\Repository\SeriesRepository;
+use App\Repository\TagRepository;
+use App\Service\Content\BulkCreatePost;
 use App\Util\UrlNormaliser;
 use DateInterval;
 use DateMalformedPeriodStringException;
@@ -22,13 +27,16 @@ use DateMalformedStringException;
 use DatePeriod;
 use DateTimeImmutable;
 use Exception;
+use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 use ReCaptcha\RequestMethod\Post;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use DateTime;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class BulkCreateController extends AbstractInachisController
 {
     protected array $errors = [];
@@ -41,70 +49,30 @@ class BulkCreateController extends AbstractInachisController
     #[Route("/incc/ax/bulkCreate/get", methods: [ "POST" ])]
     public function contentList(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         return $this->render('inadmin/dialog/bulk-create.html.twig', $this->data);
     }
 
     /**
      * @param Request $request
+     * @param BulkCreatePost $bulkCreatePost
      * @return Response
-     * @throws DateMalformedPeriodStringException
-     * @throws DateMalformedStringException
      * @throws Exception
      */
     #[Route("/incc/ax/bulkCreate/save", methods: [ "POST" ])]
-    public function saveContent(Request $request): Response
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $series = $this->entityManager->getRepository(Series::class)->findOneBy(['id' => $request->request->get('seriesId')]);
-        if ($series !== null && !empty($request->request->all('form')['title'])
-            && !empty($request->request->all('form')['startDate']) && !empty($request->request->all('form')['endDate'])
-        ) {
-            $startDate = DateTime::createFromFormat('d/m/Y', $request->request->all('form')['startDate']);
-            $endDate = DateTime::createFromFormat('d/m/Y', $request->request->all('form')['endDate']);
+    public function saveContent(
+        Request $request,
+        BulkCreatePost $bulkCreatePost,
+    ): Response {
+        try {
+            $data = BulkCreateData::fromRequest($request);
+            $count = $bulkCreatePost->create($data, $this->getUser());
 
-            $period = new DatePeriod($startDate, new DateInterval('P1D'), $endDate->modify('+1 day'));
-            $counter = 0;
-            foreach ($period as $date) {
-                ++$counter;
-                $title = $request->request->all('form')['title'] . (!empty($request->request->all('form')['addDay']) ? ' Day ' . $counter : '');
-                $post = new Page($title);
-                $post->setPostDate($date);
-                $post->addUrl(new Url($post, $post->getPostDateAsLink() . '/' . UrlNormaliser::toUri($title)));
-                $post->setAuthor($this->getUser());
-                if (!empty($request->request->all('form')['tags'])) {
-                    foreach($request->request->all('form')['tags'] as $newTag) {
-                        $tag = null;
-                        if (Uuid::isValid($newTag)) {
-                            $tag = $this->entityManager->getRepository(Tag::class)->findOneBy(['id' => $newTag]);
-                        }
-                        if (empty($tag)) {
-                            $tag = new Tag($newTag);
-                        }
-                        $post->getTags()->add($tag);
-                    }
-                }
-                if(!empty($request->request->all('form')['categories'])) {
-                    foreach($request->request->all('form')['categories'] as $newCategory) {
-                        $category = null;
-                        if (Uuid::isValid($newCategory)) {
-                            $category = $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $newCategory]);
-                        }
-                        if (!empty($category)) {
-                            $post->getCategories()->add($category);
-                        }
-                    }
-                }
-                $post->setModDate(new DateTime('now'));
-                $series->addItem($post);
-                $this->entityManager->persist($post);
+            if ($count === 0) {
+                new Response('No change', Response::HTTP_NO_CONTENT);
             }
-            if ($counter > 0) {
-                $this->entityManager->persist($series);
-                $this->entityManager->flush();
-                return new Response('Saved', Response::HTTP_CREATED);
-            }
+            return new Response('Saved', Response::HTTP_CREATED);
+        } catch (InvalidArgumentException $e) {
+            return new Response($e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
-        return new Response('No change', Response::HTTP_NO_CONTENT);
     }
 }

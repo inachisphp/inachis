@@ -66,11 +66,24 @@ $table-background-bg: #fff;
 $table-header-bg: #069 !default;
 $table-header-color: #fff !default;
 $table-border-color: #ddd !default;
+$table-focus-color: #ffbf47 !default;
 $table-row-hover-bg: #f7f9fb !default;
 $table-zebra-bg: #f2f6f8 !default;
 $table-selected-row-bg: #d8e7f0 !default;
 $table-sort-indicator-color: rgba(255, 255, 255, 0.8) !default;
 $table-mobile-break: 600px !default;
+
+@media (prefers-color-scheme: dark) {
+  $table-background-bg: #1e1e1e !default;
+  $table-header-bg: #0a84ff !default;
+  $table-header-color: #fff !default;
+  $table-border-color: #444 !default;
+  $table-row-hover-bg: #2c2c2c !default;
+  $table-zebra-bg: #292929 !default;
+  $table-selected-row-bg: #3a3a3a !default;
+  $table-sort-indicator-color: rgba(255, 255, 255, 0.8) !default;
+  $table-focus-color: #0a84ff !default;
+}
 
 // tabs
 $admin__tabs__highlighted-color: #069;

@@ -20,11 +20,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
+#[IsGranted('ROLE_ADMIN')]
 class ExportDialogController extends AbstractInachisController
 {
     /**
@@ -34,7 +36,6 @@ class ExportDialogController extends AbstractInachisController
     #[Route("/incc/ax/export/get", methods: [ "POST" ])]
     public function export(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         return $this->render('inadmin/dialog/export.html.twig', $this->data);
     }
 
@@ -47,9 +48,6 @@ class ExportDialogController extends AbstractInachisController
     #[Route("/incc/ax/export/output", name: "incc_dialog_export_perform", methods: [ "POST" ])]
     public function performExport(Request $request, SerializerInterface $serializer): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
-        $posts = [];
         if (empty($request->request->all('postId'))) {
             return new Response(null, Response::HTTP_EXPECTATION_FAILED);
         }

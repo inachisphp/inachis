@@ -14,8 +14,8 @@
                 'className': 'form__series',
                 'type': 'series',
 
-                'offset': page.offset,
-                'limit': page.limit,
+                'offset': query.offset,
+                'limit': query.limit,
                 'total': dataset.count,
 
                 'snippet_description': 'description',
@@ -29,7 +29,7 @@
                 'url_result': path('incc_series_list'),
 
                 'filters': [],
-                'filter_values': filters,
+                'filter_values': query.filters,
                 'show_select_deselect': true,
                 'show_search': true,
                 showSummary: true,

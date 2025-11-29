@@ -13,7 +13,9 @@ use App\Controller\AbstractInachisController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class ConfirmationController extends AbstractInachisController
 {
     /**
@@ -23,7 +25,6 @@ class ConfirmationController extends AbstractInachisController
     #[Route("/incc/ax/confirmation/get", methods: [ "POST" ])]
     public function contentList(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->data['title'] = $request->request->get('title', '') ?: sprintf(
             '<%s>',
             $this->translator->trans('admin.dialog.confirm.default.title', [], 'messages'),

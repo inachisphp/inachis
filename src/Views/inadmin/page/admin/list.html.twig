@@ -60,14 +60,14 @@
                 },
             ],
 
-            offset: page.offset,
-            limit: page.limit,
+            offset: query.offset,
+            limit: query.limit,
             total: dataset.count,
 
             slug_prefix: 'admin',
 
             filters: [],
-            filter_values: filters,
+            filter_values: query.filters,
             show_search: true,
             show_select_deselect: true,
 

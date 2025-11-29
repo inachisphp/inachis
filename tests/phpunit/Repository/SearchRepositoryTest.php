@@ -16,6 +16,7 @@ use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class SearchRepositoryTest extends TestCase
 {
@@ -98,5 +99,25 @@ class SearchRepositoryTest extends TestCase
         $this->assertStringContainsString('SELECT s.id, s.title FROM series s WHERE', $sql);
         $this->assertStringContainsString('SELECT i.id, i.title FROM image i WHERE', $sql);
         $this->assertStringContainsString('UNION ALL', $sql);
+    }
+
+    public function testDetermineOrderBy(): void
+    {
+        $orders = [
+            'contentDate asc' => 'contentDate ASC',
+            'contentDate desc' => 'contentDate DESC',
+            'relevance asc' => 'relevance ASC, contentDate DESC',
+            'title desc' => 'title DESC',
+            'title asc' => 'title ASC',
+            'type desc' => 'type DESC',
+            'type asc' => 'type ASC',
+            'default' => 'relevance DESC, contentDate DESC',
+        ];
+        $reflection = new ReflectionClass($this->repository);
+        $method = $reflection->getMethod('determineOrderBy');
+        $method->setAccessible(true);
+        foreach($orders as $key => $order) {
+            $this->assertEquals($order, $method->invokeArgs($this->repository, [$key]));
+        }
     }
 }

@@ -24,11 +24,9 @@ class SearchRepository extends AbstractRepository
         parent::__construct($registry, SearchResult::class);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function search(?string $keyword, int $offset = 0, int $limit = 25, string  $orderBy = 'relevance DESC, contentDate DESC'): SearchResult {
-        $orderBy = match ($orderBy) {
+    protected function determineOrderBy(string $orderBy): string
+    {
+        return match ($orderBy) {
             'contentDate asc' => 'contentDate ASC',
             'contentDate desc' => 'contentDate DESC',
             'relevance asc' => 'relevance ASC, contentDate DESC',
@@ -38,6 +36,14 @@ class SearchRepository extends AbstractRepository
             'type asc' => 'type ASC',
             default => 'relevance DESC, contentDate DESC',
         };
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function search(?string $keyword, int $offset = 0, int $limit = 25, string  $orderBy = 'relevance DESC, contentDate DESC'): SearchResult
+    {
+        $orderBy = $this->determineOrderBy($orderBy);
         $sql = sprintf('%s ORDER BY %s LIMIT :limit OFFSET :offset;',
             $this->getSQLUnion([
                 'p.id, p.title as title, p.sub_title, p.content, CONCAT(UCASE(LEFT(type, 1)), LCASE(SUBSTRING(type, 2))) AS type, p.post_date AS contentDate, p.mod_date, p.author_id as author,
@@ -50,13 +56,12 @@ class SearchRepository extends AbstractRepository
             $orderBy,
         );
 
-        $stmt = $this->connection->prepare($sql);
-        $stmt->bindValue('kw', '%' . strtolower($keyword) . '%');
-        $stmt->bindValue('plainKw', strtolower($keyword));
-        $stmt->bindValue('limit', $limit, \PDO::PARAM_INT);
-        $stmt->bindValue('offset', $offset, \PDO::PARAM_INT);
+        $statement = $this->connection->prepare($sql);
+        $statement->bindValue('kw', strtolower($keyword), 'string');
+        $statement->bindValue('limit', $limit, 'integer');
+        $statement->bindValue('offset', $offset,  'integer');
 
-        $results = $stmt->executeQuery()->fetchAllAssociative();
+        $results = $statement->executeQuery()->fetchAllAssociative();
         $total = $this->getSearchTotalResults($keyword);
 
         return new SearchResult($results, (int) $total, $offset, $limit);
@@ -70,12 +75,12 @@ class SearchRepository extends AbstractRepository
         $sql = sprintf('SELECT COUNT(*) AS total FROM (%s) AS all_results;',
             $this->getSQLUnion([ 'id', 'id', 'id' ])
         );
-        return $this->connection->prepare($sql)
-            ->executeQuery([ 'kw' => '%' . $keyword . '%' ])
-            ->fetchOne();
+        $statement = $this->connection->prepare($sql);
+        $statement->bindValue('kw', strtolower($keyword), 'string');
+        return $statement->executeQuery()->fetchOne();
     }
 
-    protected function getSQLUnion($fieldLists)
+    protected function getSQLUnion($fieldLists): string
     {
         return sprintf('
             (SELECT %s FROM page p WHERE %s)
@@ -92,7 +97,7 @@ class SearchRepository extends AbstractRepository
         );
     }
 
-    protected function getWhereConditions($type)
+    protected function getWhereConditions($type): string
     {
         return match($type) {
             'image' => 'MATCH(i.title, i.alt_text, i.description) AGAINST(:kw IN NATURAL LANGUAGE MODE)',
