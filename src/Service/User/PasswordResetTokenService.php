@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Service;
+namespace App\Service\User;
 
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

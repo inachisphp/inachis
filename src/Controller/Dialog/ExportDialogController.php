@@ -14,6 +14,7 @@ use App\Controller\ZipStream;
 use App\Entity\Page;
 use App\Entity\Tag;
 use App\Parser\ArrayToMarkdown;
+use App\Repository\PageRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,12 +47,15 @@ class ExportDialogController extends AbstractInachisController
      * @throws ExceptionInterface
      */
     #[Route("/incc/ax/export/output", name: "incc_dialog_export_perform", methods: [ "POST" ])]
-    public function performExport(Request $request, SerializerInterface $serializer): Response
-    {
+    public function performExport(
+        Request $request,
+        SerializerInterface $serializer,
+        PageRepository $pageRepository,
+    ): Response {
         if (empty($request->request->all('postId'))) {
             return new Response(null, Response::HTTP_EXPECTATION_FAILED);
         }
-        $posts = $this->entityManager->getRepository(Page::class)->getFilteredIds(
+        $posts = $pageRepository->getFilteredIds(
             $request->request->all('postId')
         )->getIterator()->getArrayCopy();
         if (empty($posts)) {

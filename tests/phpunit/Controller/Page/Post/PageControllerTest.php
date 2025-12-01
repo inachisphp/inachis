@@ -25,6 +25,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionClass;
+use ReflectionException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -40,34 +41,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PageControllerTest extends WebTestCase
 {
-    private PageController $controller;
     private EntityManagerInterface|MockObject $entityManager;
     private Security|MockObject $security;
 
     private TranslatorInterface $translator;
 
     /**
-     * @throws \ReflectionException
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->security = $this->createMock(Security::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->controller = new PageController($this->entityManager, $this->security, $this->translator);
-
-        $ref = new ReflectionClass($this->controller);
-        foreach (['entityManager', 'security'] as $prop) {
-            $property = $ref->getProperty($prop);
-            $property->setValue($this->controller, $this->$prop);
-        }
-        $container = $this->createMock(ContainerInterface::class);
-        $container->method('get')->willReturn(null);
-        $this->controller->setContainer($container);
     }
 
     /**
-     * @throws Exception
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     public function testGetPostAdminRedirectsWhenUrlMissing(): void
     {

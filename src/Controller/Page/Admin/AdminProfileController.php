@@ -14,7 +14,8 @@ use App\Entity\User;
 use App\Form\UserType;
 use App\Model\ContentQueryParameters;
 use App\Repository\UserRepository;
-use App\Service\PasswordResetTokenService;
+use App\Service\User\UserBulkActionService;
+use App\Service\User\PasswordResetTokenService;
 use App\Transformer\ImageTransformer;
 use App\Util\Base64EncodeFile;
 use App\Util\RandomColorPicker;
@@ -29,7 +30,6 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[IsGranted('ROLE_ADMIN')]
 class AdminProfileController extends AbstractInachisController
@@ -51,28 +51,24 @@ class AdminProfileController extends AbstractInachisController
     )]
     public function list(
         Request $request,
-        UserRepository $userRepository,
         ContentQueryParameters $contentQueryParameters,
+        UserBulkActionService $userBulkActionService,
+        UserRepository $userRepository,
     ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && !empty($request->request->all('items'))) {
-            foreach ($request->request->all('items') as $item) {
-                $selectedItem = $userRepository->findOneBy(['id' => $item]);
-                if ($selectedItem !== null) {
-                    if ($request->request->get('delete') !== null) {
-                        $selectedItem->setRemoved(true);
-                    } elseif ($request->request->get('enable') !== null) {
-                        $selectedItem->setActive(true);
-                    } elseif ($request->request->get('disable') !== null) {
-                        $selectedItem->setActive(false);
-                    }
-                    $selectedItem->setModDate(new DateTime('now'));
-                    $this->entityManager->persist($selectedItem);
-                }
+            $items  = $request->request->all('items') ?? [];
+            $action = $request->request->get('delete')  ? 'delete' :
+                ($request->request->get('enable') ? 'enable' :
+                ($request->request->get('disable') ? 'disable' : null));
+
+            if ($action !== null && !empty($items)) {
+                $count = $userBulkActionService->apply($action, $items);
+                $this->addFlash('success', "Action '$action' applied to $count users.");
             }
-            $this->entityManager->flush();
+
             return $this->redirectToRoute('incc_admin_list');
         }
 
@@ -83,7 +79,7 @@ class AdminProfileController extends AbstractInachisController
             'displayName asc',
         );
         $this->data['form'] = $form->createView();
-        $this->data['dataset'] = $this->entityManager->getRepository(User::class)->getFiltered(
+        $this->data['dataset'] = $userRepository->getFiltered(
             $contentQuery['filters'],
             $contentQuery['offset'],
             $contentQuery['limit'],
@@ -98,7 +94,6 @@ class AdminProfileController extends AbstractInachisController
      * @param ImageTransformer $imageTransformer
      * @param MailerInterface $mailer
      * @param PasswordResetTokenService $tokenService
-     * @param ValidatorInterface $validator
      * @return Response
      * @throws RandomException
      */
@@ -108,10 +103,10 @@ class AdminProfileController extends AbstractInachisController
         ImageTransformer $imageTransformer,
         MailerInterface $mailer,
         PasswordResetTokenService $tokenService,
-        ValidatorInterface $validator,
+        UserRepository $userRepository,
     ): Response {
         $user = $request->attributes->get('id') !== 'new' ?
-            $this->entityManager->getRepository(User::class)->findOneBy(
+            $userRepository->findOneBy(
                 [ 'username' => $request->attributes->get('id') ]
             ):
             new User();

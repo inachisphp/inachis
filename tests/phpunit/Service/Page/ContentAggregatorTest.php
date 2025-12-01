@@ -7,17 +7,16 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\Service\Content;
+namespace App\Tests\Service\Page;
 
 use App\Entity\Page;
 use App\Entity\Series;
 use App\Repository\PageRepository;
 use App\Repository\SeriesRepository;
-use App\Service\Content\ContentAggregator;
+use App\Service\Page\ContentAggregator;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;

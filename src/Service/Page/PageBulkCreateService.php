@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Service\Content;
+namespace App\Service\Page;
 
 use App\Entity\Page;
 use App\Entity\Tag;
@@ -26,7 +26,7 @@ use Exception;
 use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 
-class BulkCreatePost
+class PageBulkCreateService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
