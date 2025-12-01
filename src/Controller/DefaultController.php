@@ -9,7 +9,7 @@
 
 namespace App\Controller;
 
-use App\Service\Content\ContentAggregator;
+use App\Service\Page\ContentAggregator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 

@@ -30,7 +30,7 @@ services:
         arguments:
             $publicImgPath: '%app.public_img_path%'
 
-    App\Service\PasswordResetTokenService:
+    App\Service\User\PasswordResetTokenService:
         arguments:
             $appSecret: '%env(APP_SECRET)%'
             $ttlSeconds: '%password_reset.ttl%'

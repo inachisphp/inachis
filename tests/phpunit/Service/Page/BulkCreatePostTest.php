@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Model;
+namespace App\Tests\phpunit\Service\Page;
 
 use App\Entity\Category;
 use App\Entity\Series;
@@ -16,13 +16,12 @@ use App\Model\BulkCreateData;
 use App\Repository\CategoryRepository;
 use App\Repository\SeriesRepository;
 use App\Repository\TagRepository;
-use App\Service\Content\BulkCreatePost;
+use App\Service\Page\PageBulkCreateService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
-use Symfony\Component\HttpFoundation\Request;
 
 class BulkCreatePostTest extends TestCase
 {
@@ -57,7 +56,7 @@ class BulkCreatePostTest extends TestCase
      */
     public function testCreateInvalidSeries(): void
     {
-        $bulkCreatePost = new BulkCreatePost(
+        $bulkCreatePost = new PageBulkCreateService(
             $this->entityManager,
             $this->seriesRepository,
             $this->tagRepository,
@@ -75,7 +74,7 @@ class BulkCreatePostTest extends TestCase
         $series = (new Series())->setId(Uuid::fromString($this->bulkCreateData->seriesId));
         $this->seriesRepository->method('find')->willReturn($series);
         $this->categoryRepository->method('findOneBy')->willReturn(new Category());
-        $bulkCreatePost = new BulkCreatePost(
+        $bulkCreatePost = new PageBulkCreateService(
             $this->entityManager,
             $this->seriesRepository,
             $this->tagRepository,

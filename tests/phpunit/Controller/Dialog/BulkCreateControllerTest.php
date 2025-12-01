@@ -11,7 +11,7 @@ namespace App\Tests\phpunit\Controller\Dialog;
 
 use App\Controller\Dialog\BulkCreateController;
 use App\Entity\User;
-use App\Service\Content\BulkCreatePost;
+use App\Service\Page\PageBulkCreateService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use Ramsey\Uuid\Uuid;
@@ -60,7 +60,7 @@ class BulkCreateControllerTest extends WebTestCase
         ], [], [], [], [
             'REQUEST_URI' => '/incc/ax/bulkCreate/get'
         ]);
-        $bulkCreatePost = $this->createMock(BulkCreatePost::class);
+        $bulkCreatePost = $this->createMock(PageBulkCreateService::class);
         $this->controller = $this->getMockBuilder(BulkCreateController::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getUser', 'render'])
@@ -89,7 +89,7 @@ class BulkCreateControllerTest extends WebTestCase
         ], [], [], [], [
             'REQUEST_URI' => '/incc/ax/bulkCreate/get'
         ]);
-        $bulkCreatePost = $this->createMock(BulkCreatePost::class);
+        $bulkCreatePost = $this->createMock(PageBulkCreateService::class);
         $this->controller = $this->getMockBuilder(BulkCreateController::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getUser', 'render'])
@@ -117,7 +117,7 @@ class BulkCreateControllerTest extends WebTestCase
         ], [], [], [], [
             'REQUEST_URI' => '/incc/ax/bulkCreate/get'
         ]);
-        $bulkCreatePost = $this->createMock(BulkCreatePost::class);
+        $bulkCreatePost = $this->createMock(PageBulkCreateService::class);
         $bulkCreatePost->method('create')->willReturn(7);
         $this->controller = $this->getMockBuilder(BulkCreateController::class)
             ->disableOriginalConstructor()
