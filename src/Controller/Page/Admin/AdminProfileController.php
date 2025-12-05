@@ -59,10 +59,10 @@ class AdminProfileController extends AbstractInachisController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && !empty($request->request->all('items'))) {
-            $items  = $request->request->all('items') ?? [];
-            $action = $request->request->get('delete')  ? 'delete' :
-                ($request->request->get('enable') ? 'enable' :
-                ($request->request->get('disable') ? 'disable' : null));
+            $items = $request->request->all('items') ?? [];
+            $action = $request->request->has('delete')  ? 'delete' :
+                ($request->request->has('enable') ? 'enable' :
+                ($request->request->has('disable') ? 'disable' : null));
 
             if ($action !== null && !empty($items)) {
                 $count = $userBulkActionService->apply($action, $items);

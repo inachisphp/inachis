@@ -85,11 +85,13 @@ class PageControllerTest extends WebTestCase
             ->method('redirectToRoute')
             ->with('incc_post_list', ['type' => 'post'])
             ->willReturn(new RedirectResponse('/redirected'));
+        $revisionRepository = $this->createMock(RevisionRepository::class);
 
         $response = $controller->edit(
             $request,
             $this->createMock(ContentRevisionCompare::class),
             $pageRepository,
+            $revisionRepository,
             'post',
             'ome-post'
         );
@@ -142,10 +144,12 @@ class PageControllerTest extends WebTestCase
         $controller->expects($this->once())
             ->method('render')
             ->willReturn(new Response('Rendered form'));
+        $revisionRepository = $this->createMock(RevisionRepository::class);
         $response = $controller->edit(
             $request,
             $this->createMock(ContentRevisionCompare::class),
             $pageRepository,
+            $revisionRepository,
             'post',
             'new'
         );
