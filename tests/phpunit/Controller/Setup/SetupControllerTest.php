@@ -13,55 +13,65 @@ use App\Controller\Setup\SetupController;
 use App\Repository\UserRepository;
 use App\Service\Page\ContentAggregator;
 use Doctrine\ORM\EntityManager;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\Translator;
 
 class SetupControllerTest extends TestCase
 {
+    /**
+     * @throws Exception
+     */
     public function testStage1RedirectsIfSetup(): void
     {
         $userRepository = $this->getMockBuilder(UserRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getAllCount'])
             ->getMock();
-        $userRepository->expects($this->once())->method('getAllCount')->willReturn(0);
-        $controller = new SetupController(
-            $this->createMock(EntityManager::class),
-            $this->createMock(Security::class),
-            $this->createMock(Translator::class),
-        );
-        $result = $controller->stage1(new Request(), $userRepository);
+        $userRepository->expects($this->once())->method('getAllCount')->willReturn(5);
+        $controller = $this->getMockBuilder(SetupController::class)
+            ->setConstructorArgs([
+                $this->createMock(EntityManager::class),
+                $this->createMock(Security::class),
+                $this->createMock(Translator::class),
+            ])
+            ->onlyMethods(['redirectToRoute'])
+            ->getMock();
+        $controller
+            ->method('redirectToRoute')
+            ->with('incc_dashboard')
+            ->willReturn(new RedirectResponse('/'));
+        $result = $controller->stage1($userRepository);
+        $this->assertInstanceOf(RedirectResponse::class, $result);
+        $this->assertEquals('/', $result->headers->get('Location'));
     }
 
-
-    public function testHomepageRendersWithContent(): void
+    /**
+     * @throws Exception
+     */
+    public function testStage1(): void
     {
-        $mockContent = [
-            '20240101' => 'test value'
-        ];
-        $contentProvider = $this->createMock(ContentAggregator::class);
-        $contentProvider->expects($this->once())
-            ->method('getHomepageContent')
-            ->willReturn($mockContent);
-
-        $controller = $this->getMockBuilder(DefaultController::class)
+        $userRepository = $this->getMockBuilder(UserRepository::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['render'])
+            ->onlyMethods(['getAllCount'])
             ->getMock();
-
+        $userRepository->expects($this->once())->method('getAllCount')->willReturn(0);
+        $controller = $this->getMockBuilder(SetupController::class)
+            ->setConstructorArgs([
+                $this->createMock(EntityManager::class),
+                $this->createMock(Security::class),
+                $this->createMock(Translator::class),
+            ])
+            ->onlyMethods(['createFormBuilder', 'render'])
+            ->getMock();
         $controller->method('render')
-            ->with(
-                'web/pages/homepage.html.twig',
-                ['content' => $mockContent]
-            )
-            ->willReturn(new Response('OK'));
-
-        $response = $controller->homepage($contentProvider);
-
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertSame('OK', $response->getContent());
+            ->willReturnCallback(function (string $template, array $data) {
+                return new Response('rendered:' . $template);
+            });
+        $result = $controller->stage1($userRepository);
+        $this->assertEquals('rendered:setup/stage-1.html.twig', $result->getContent());
     }
 }
