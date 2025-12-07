@@ -23,10 +23,10 @@ use Doctrine\ORM\EntityManagerInterface;
 readonly class UserRegistrationService
 {
     public function __construct(
-        private MailerInterface           $mailer,
+        private MailerInterface $mailer,
         private PasswordResetTokenService $tokenService,
-        private EntityManagerInterface    $entityManager,
-        private array                     $settings,
+        private EntityManagerInterface $entityManager,
+        private array $settings,
     ) {}
 
     /**
@@ -47,11 +47,11 @@ readonly class UserRegistrationService
             ->htmlTemplate('inadmin/emails/registration.html.twig')
             ->textTemplate('inadmin/emails/registration.txt.twig')
             ->context([
-                'name'      => $user->getDisplayName(),
-                'url'       => $urlGenerator($data['token']),
+                'name' => $user->getDisplayName(),
+                'url' => $urlGenerator($data['token']),
                 'expiresAt' => $data['expiresAt']->format('l jS F Y \a\\t H:i'),
-                'settings'  => $this->settings,
-                'logo'      => Base64EncodeFile::encode('public/assets/imgs/incc/inachis.png'),
+                'settings' => $this->settings,
+                'logo' => Base64EncodeFile::encode('public/assets/imgs/incc/inachis.png'),
             ])
         ;
         $this->mailer->send($email);
