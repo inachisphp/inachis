@@ -42,7 +42,7 @@ class SessionTimeoutDialogController extends AbstractInachisController
      * @return Response
      */
     #[Route('/incc/ax/sessionTimeout/get', methods: [ 'POST' ])]
-    public function export(Request $request): Response
+    public function showDialog(Request $request): Response
     {
         return $this->render('inadmin/dialog/session_timeout.html.twig', $this->data);
     }

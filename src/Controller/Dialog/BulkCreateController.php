@@ -19,7 +19,7 @@ use App\Model\BulkCreateData;
 use App\Repository\CategoryRepository;
 use App\Repository\SeriesRepository;
 use App\Repository\TagRepository;
-use App\Service\Content\BulkCreatePost;
+use App\Service\Page\PageBulkCreateService;
 use App\Util\UrlNormaliser;
 use DateInterval;
 use DateMalformedPeriodStringException;
@@ -54,21 +54,21 @@ class BulkCreateController extends AbstractInachisController
 
     /**
      * @param Request $request
-     * @param BulkCreatePost $bulkCreatePost
+     * @param PageBulkCreateService $bulkCreatePost
      * @return Response
      * @throws Exception
      */
     #[Route("/incc/ax/bulkCreate/save", methods: [ "POST" ])]
     public function saveContent(
-        Request $request,
-        BulkCreatePost $bulkCreatePost,
+        Request               $request,
+        PageBulkCreateService $bulkCreatePost,
     ): Response {
         try {
             $data = BulkCreateData::fromRequest($request);
             $count = $bulkCreatePost->create($data, $this->getUser());
 
             if ($count === 0) {
-                new Response('No change', Response::HTTP_NO_CONTENT);
+                return new Response('No change', Response::HTTP_NO_CONTENT);
             }
             return new Response('Saved', Response::HTTP_CREATED);
         } catch (InvalidArgumentException $e) {

@@ -7,13 +7,13 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Service;
+namespace App\Tests\phpunit\Service\User;
 
 use App\Entity\PasswordResetRequest;
 use App\Entity\User;
 use App\Repository\PasswordResetRequestRepository;
 use App\Repository\UserRepository;
-use App\Service\PasswordResetTokenService;
+use App\Service\User\PasswordResetTokenService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;

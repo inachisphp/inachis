@@ -10,7 +10,7 @@
 namespace App\Tests\phpunit\Controller;
 
 use App\Controller\DefaultController;
-use App\Service\Content\ContentAggregator;
+use App\Service\Page\ContentAggregator;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
