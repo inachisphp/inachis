@@ -25,6 +25,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionClass;
+use ReflectionException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -40,84 +41,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PageControllerTest extends WebTestCase
 {
-    private PageController $controller;
     private EntityManagerInterface|MockObject $entityManager;
     private Security|MockObject $security;
 
     private TranslatorInterface $translator;
 
     /**
-     * @throws \ReflectionException
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->security = $this->createMock(Security::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->controller = new PageController($this->entityManager, $this->security, $this->translator);
-
-        $ref = new ReflectionClass($this->controller);
-        foreach (['entityManager', 'security'] as $prop) {
-            $property = $ref->getProperty($prop);
-            $property->setValue($this->controller, $this->$prop);
-        }
-        $container = $this->createMock(ContainerInterface::class);
-        $container->method('get')->willReturn(null);
-        $this->controller->setContainer($container);
     }
 
     /**
-     * @throws Exception
-     */
-    public function testGetPostListAdminRequiresAuthentication(): void
-    {
-        $request = new Request();
-        $request->setSession(new Session(new MockArraySessionStorage()));
-
-        $controller = $this->getMockBuilder(PageController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
-            ->onlyMethods(['denyAccessUnlessGranted', 'render'])
-            ->getMock();
-        $formFactory = $this->createMock(FormFactoryInterface::class);
-        $formBuilder = $this->createMock(FormBuilderInterface::class);
-        $formFactory->method('createBuilder')->willReturn($formBuilder);
-
-        $container = $this->createMock(ContainerInterface::class);
-        $container->method('get')->willReturnMap([
-            ['form.factory', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $formFactory],
-        ]);
-        $controller->setContainer($container);
-
-        $iterableMock = $this->getMockBuilder(ArrayIterator::class)
-            ->setConstructorArgs([[]])
-            ->getMock();
-        $paginatorMock = $this->getMockBuilder(Paginator::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getIterator'])
-            ->getMock();
-        $paginatorMock->method('getIterator')->willReturn($iterableMock);
-
-        $pageRepositoryMock = $this->createMock(PageRepository::class);
-        $pageRepositoryMock->method('getFilteredOfTypeByPostDate')->willReturn($paginatorMock);
-        $pageRepositoryMock->method('getMaxItemsToShow')->willReturn(10);
-        $this->entityManager->method('getRepository')
-            ->willReturnMap([
-                [Page::class, $pageRepositoryMock]
-            ]);
-
-        $controller->expects($this->once())
-            ->method('denyAccessUnlessGranted')
-            ->with('IS_AUTHENTICATED_FULLY');
-        $controller->expects($this->once())
-            ->method('render')
-            ->willReturn(new Response('Rendered OK', 200));
-        $response = $controller->list($request);
-        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertEquals('Rendered OK', $response->getContent());
-    }
-
-    /**
-     * @throws Exception
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     public function testGetPostAdminRedirectsWhenUrlMissing(): void
     {
@@ -125,6 +65,7 @@ class PageControllerTest extends WebTestCase
             'REQUEST_URI' => '/incc/post/some-post'
         ]);
         $request->setSession(new Session(new MockArraySessionStorage()));
+        $pageRepository = $this->createMock(PageRepository::class);
         $urlRepository = $this->getMockBuilder(UrlRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -141,9 +82,6 @@ class PageControllerTest extends WebTestCase
             ->onlyMethods(['denyAccessUnlessGranted', 'redirectToRoute'])
             ->getMock();
         $controller->expects($this->once())
-            ->method('denyAccessUnlessGranted')
-            ->with('IS_AUTHENTICATED_FULLY');
-        $controller->expects($this->once())
             ->method('redirectToRoute')
             ->with('incc_post_list', ['type' => 'post'])
             ->willReturn(new RedirectResponse('/redirected'));
@@ -151,6 +89,7 @@ class PageControllerTest extends WebTestCase
         $response = $controller->edit(
             $request,
             $this->createMock(ContentRevisionCompare::class),
+            $pageRepository,
             'post',
             'ome-post'
         );
@@ -160,6 +99,7 @@ class PageControllerTest extends WebTestCase
 
     /**
      * @throws Exception
+     * @throws \PHPUnit\Framework\MockObject\Exception
      */
     public function testGetPostAdminWithNewPostRendersForm(): void
     {
@@ -168,6 +108,7 @@ class PageControllerTest extends WebTestCase
         ]);
         $request->setSession(new Session(new MockArraySessionStorage()));
 
+        $pageRepository = $this->createMock(PageRepository::class);
         $urlRepository = $this->getMockBuilder(EntityRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -195,11 +136,6 @@ class PageControllerTest extends WebTestCase
             ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
             ->onlyMethods(['denyAccessUnlessGranted', 'createForm', 'render'])
             ->getMock();
-
-        $controller->expects($this->once())
-            ->method('denyAccessUnlessGranted')
-            ->with('IS_AUTHENTICATED_FULLY');
-
         $controller->expects($this->once())
             ->method('createForm')
             ->willReturn($form);
@@ -209,6 +145,7 @@ class PageControllerTest extends WebTestCase
         $response = $controller->edit(
             $request,
             $this->createMock(ContentRevisionCompare::class),
+            $pageRepository,
             'post',
             'new'
         );

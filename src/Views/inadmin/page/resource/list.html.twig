@@ -47,7 +47,7 @@
                         'notinuse': 'Not in use',
                     }
                 },
-                filter_values: filters,
+                filter_values: query.filters,
 
                 show_search: true,
                 sort_options: {
@@ -88,8 +88,8 @@
             {% endfor %}
         </ul>
         {{ include('inadmin/partials/pagination.html.twig', {
-            offset: page.offset,
-            limit: page.limit,
+            offset: query.offset,
+            limit: query.limit,
             maxResults: dataset.count,
             maxPagesToShow: 5,
             result_url: path('incc_resource_list', { type: page.type }),

@@ -20,18 +20,14 @@ use Symfony\Flex\Response;
 
 abstract class AbstractInachisController extends AbstractController
 {
-    protected Security $security;
-    protected EntityManagerInterface $entityManager;
-    protected TranslatorInterface $translator;
     protected array $errors = [];
     protected array $data = [];
 
-    public function __construct(EntityManagerInterface $entityManager, Security $security, TranslatorInterface $translator)
-    {
-        $this->entityManager = $entityManager;
-        $this->security = $security;
-        $this->translator = $translator;
-    }
+    public function __construct(
+        protected EntityManagerInterface $entityManager,
+        protected Security $security,
+        protected TranslatorInterface $translator
+    ) {}
 
     /**
      * @return void

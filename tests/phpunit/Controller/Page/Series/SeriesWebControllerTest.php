@@ -82,7 +82,7 @@ class SeriesWebControllerTest extends WebTestCase
         }
         $controller->expects($this->once())
             ->method('render')
-            ->with('web/series.html.twig')
+            ->with('web/pages/series.html.twig')
             ->willReturn(new Response('Rendered OK', 200));
         $response = $controller->view($request, '2025', 'test');
         $this->assertInstanceOf(Response::class, $response);

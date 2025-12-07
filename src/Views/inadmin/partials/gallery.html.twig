@@ -1,5 +1,5 @@
 {% if images is not empty %}
-    {% set page_start = page.offset + 1 %}
+    {% set page_start = query.offset + 1 %}
     {% set page_end = page_start + images.getIterator|length - 1 %}
 
     <ol data-end="{{ page_end }}" data-start="{{ page_start }}" data-total="{{ images.count }}">
@@ -17,8 +17,8 @@
         {% endfor %}
     </ol>
     {{ include('inadmin/partials/pagination.html.twig', {
-        offset: page.offset,
-        limit: page.limit,
+        offset: query.offset,
+        limit: query.limit,
         maxPagesToShow: 5,
         result_url: path('incc_resource_list', { type: 'images' }),
         showSummary: false,

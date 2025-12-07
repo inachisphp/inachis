@@ -12,7 +12,10 @@ namespace App\Controller\Page\Admin;
 use App\Controller\AbstractInachisController;
 use App\Entity\User;
 use App\Form\UserType;
-use App\Service\PasswordResetTokenService;
+use App\Model\ContentQueryParameters;
+use App\Repository\UserRepository;
+use App\Service\User\UserBulkActionService;
+use App\Service\User\PasswordResetTokenService;
 use App\Transformer\ImageTransformer;
 use App\Util\Base64EncodeFile;
 use App\Util\RandomColorPicker;
@@ -26,8 +29,9 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class AdminProfileController extends AbstractInachisController
 {
     /**
@@ -45,48 +49,42 @@ class AdminProfileController extends AbstractInachisController
         defaults: [ "offset" => 0, "limit" => 25 ],
         methods: [ "GET", "POST" ]
     )]
-    public function list(Request $request): Response
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+    public function list(
+        Request $request,
+        ContentQueryParameters $contentQueryParameters,
+        UserBulkActionService $userBulkActionService,
+        UserRepository $userRepository,
+    ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && !empty($request->request->all('items'))) {
-            foreach ($request->request->all('items') as $item) {
-                $selectedItem = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $item]);
-                if ($selectedItem !== null) {
-                    if ($request->request->get('delete') !== null) {
-                        $selectedItem->setRemoved(true);
-                    } elseif ($request->request->get('enable') !== null) {
-                        $selectedItem->setActive(true);
-                    } elseif ($request->request->get('disable') !== null) {
-                        $selectedItem->setActive(false);
-                    }
-                    $selectedItem->setModDate(new DateTime('now'));
-                    $this->entityManager->persist($selectedItem);
-                }
+            $items  = $request->request->all('items') ?? [];
+            $action = $request->request->get('delete')  ? 'delete' :
+                ($request->request->get('enable') ? 'enable' :
+                ($request->request->get('disable') ? 'disable' : null));
+
+            if ($action !== null && !empty($items)) {
+                $count = $userBulkActionService->apply($action, $items);
+                $this->addFlash('success', "Action '$action' applied to $count users.");
             }
-            $this->entityManager->flush();
+
             return $this->redirectToRoute('incc_admin_list');
         }
 
-        $filters = array_filter($request->request->all('filter', []));
-        if ($request->isMethod('post')) {
-            $_SESSION['admin_filters'] = $filters;
-        } elseif (isset($_SESSION['admin_filters'])) {
-            $filters = $_SESSION['admin_filters'];
-        }
-        $offset = (int) $request->request->get('offset', 0);
-        $limit = $this->entityManager->getRepository(User::class)->getMaxItemsToShow();
-        $this->data['form'] = $form->createView();
-        $this->data['dataset'] = $this->entityManager->getRepository(User::class)->getFiltered(
-            $filters,
-            $offset,
-            $limit
+        $contentQuery = $contentQueryParameters->process(
+            $request,
+            $userRepository,
+            'admin',
+            'displayName asc',
         );
-        $this->data['filters'] = $filters;
-        $this->data['page']['offset'] = $offset;
-        $this->data['page']['limit'] = $limit;
+        $this->data['form'] = $form->createView();
+        $this->data['dataset'] = $userRepository->getFiltered(
+            $contentQuery['filters'],
+            $contentQuery['offset'],
+            $contentQuery['limit'],
+        );
+        $this->data['query'] = $contentQuery;
         $this->data['page']['title'] = 'Users';
         return $this->render('inadmin/page/admin/list.html.twig', $this->data);
     }
@@ -96,7 +94,6 @@ class AdminProfileController extends AbstractInachisController
      * @param ImageTransformer $imageTransformer
      * @param MailerInterface $mailer
      * @param PasswordResetTokenService $tokenService
-     * @param ValidatorInterface $validator
      * @return Response
      * @throws RandomException
      */
@@ -106,12 +103,10 @@ class AdminProfileController extends AbstractInachisController
         ImageTransformer $imageTransformer,
         MailerInterface $mailer,
         PasswordResetTokenService $tokenService,
-        ValidatorInterface $validator,
+        UserRepository $userRepository,
     ): Response {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $user = $request->attributes->get('id') !== 'new' ?
-            $this->entityManager->getRepository(User::class)->findOneBy(
+            $userRepository->findOneBy(
                 [ 'username' => $request->attributes->get('id') ]
             ):
             new User();

@@ -18,16 +18,16 @@ use App\Form\ContentType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use PHPStan\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_SUPER_ADMIN')]
 class SettingsController extends AbstractInachisController
 {
     #[Route("/incc/settings")]
     public function index(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $available_space = disk_free_space(dirname($request->server->get('SCRIPT_FILENAME')));
         $total_space = disk_total_space(dirname($request->server->get('SCRIPT_FILENAME')));
         $this->data['storage']['percent'] = ($total_space - $available_space) / $total_space * 100;
@@ -57,7 +57,6 @@ class SettingsController extends AbstractInachisController
     #[Route("/incc/settings/check")]
     public function check(): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->data['check'] = [
             'app' => [
                 'name' => '',
@@ -113,7 +112,6 @@ class SettingsController extends AbstractInachisController
     #[Route("/incc/settings/wipe", methods: [ "POST" ])]
     public function wipe(LoggerInterface $logger, Request $request): RedirectResponse
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         if ($request->request->get('confirm', false)) {
             $logger->info('Wiping all content');
             $this->entityManager->getRepository(Image::class)->wipe($logger);
