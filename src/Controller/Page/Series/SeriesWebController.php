@@ -10,7 +10,7 @@
 namespace App\Controller\Page\Series;
 
 use App\Controller\AbstractInachisController;
-use App\Entity\Series;
+use App\Repository\SeriesRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -19,14 +19,19 @@ class SeriesWebController extends AbstractInachisController
 {
     /**
      * @param Request $request
+     * @param SeriesRepository $seriesRepository
      * @param int $year
      * @param string $title
      * @return Response
      */
     #[Route("/{year}-{title}", name: "app_series_view", methods: [ "GET" ])]
-    public function view(Request $request, int $year, string $title): Response
-    {
-        $this->data['series'] = $this->entityManager->getRepository(Series::class)->getSeriesByYearAndUrl(
+    public function view(
+        Request $request,
+        SeriesRepository $seriesRepository,
+        int $year,
+        string $title
+    ): Response {
+        $this->data['series'] = $seriesRepository->getPublicSeriesByYearAndUrl(
             $year,
             $title
         );

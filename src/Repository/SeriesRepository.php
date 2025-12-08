@@ -77,13 +77,14 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Doctrine\ORM\NoResultException
      */
-    public function getSeriesByYearAndUrl($year, $url)
+    public function getPublicSeriesByYearAndUrl($year, $url)
     {
         $qb = $this->createQueryBuilder('s');
         return $qb
             ->select('s')
             ->where($qb->expr()->like('s.lastDate', ':year'))
             ->andWhere($qb->expr()->like('s.url', ':url'))
+            ->andWhere('s.visibility = \'' . Series::PUBLIC . '\'')
             ->setParameter('year', $year . '%')
             ->setParameter('url', $url)
             ->getQuery()
