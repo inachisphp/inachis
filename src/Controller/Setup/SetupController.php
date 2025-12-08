@@ -11,6 +11,7 @@ namespace App\Controller\Setup;
 
 use App\Controller\AbstractInachisController;
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -22,9 +23,9 @@ class SetupController extends AbstractInachisController
      * @return Response
      */
     #[Route("/setup", name: 'incc_setup_stage1', methods: [ "GET", "POST" ])]
-    public function stage1(Request $request): Response
+    public function stage1(UserRepository $userRepository): Response
     {
-        if ($this->entityManager->getRepository(User::class)->getAllCount() > 0) {
+        if ($userRepository->getAllCount() > 0) {
             return $this->redirectToRoute(
                 'incc_dashboard',
                 [],

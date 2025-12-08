@@ -25,18 +25,18 @@ class ContentAggregatorTest extends TestCase
 {
     public function testGetHomepageContent(): void
     {
-        $seriesRepo = $this->getMockBuilder(SeriesRepository::class)
+        $seriesRepository = $this->getMockBuilder(SeriesRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getAll'])
             ->getMock();
-        $pageRepo = $this->getMockBuilder(PageRepository::class)
+        $pageRepository = $this->getMockBuilder(PageRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getAll'])
             ->getMock();
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->method('getRepository')
-            ->willReturnCallback(function ($class) use ($seriesRepo, $pageRepo) {
-                return $class === Series::class ? $seriesRepo : $pageRepo;
+            ->willReturnCallback(function ($class) use ($seriesRepository, $pageRepository) {
+                return $class === Series::class ? $seriesRepository : $pageRepository;
             });
         $seriesItemPage = $this->createConfiguredMock(Page::class, [
             'getId' => Uuid::uuid1(),
@@ -47,15 +47,15 @@ class ContentAggregatorTest extends TestCase
         $seriesGroup->method('getLastDate')->willReturn(new DateTime('2024-01-02'));
         $seriesGroup->method('getDescription')->willReturn('Some <blockquote>test</blockquote>');
         $seriesGroup->expects($this->once())->method('setDescription');
-        $seriesRepo->method('getAll')
+        $seriesRepository->method('getAll')
             ->willReturn($this->createMockPaginator([$seriesGroup]));
 
         $pageResult = $this->createMock(Page::class);
         $pageResult->method('getPostDate')->willReturn(new DateTime('2024-01-01'));
-        $pageRepo->method('getAll')
+        $pageRepository->method('getAll')
             ->willReturn($this->createMockPaginator([$pageResult]));
 
-        $aggregator = new ContentAggregator($entityManager);
+        $aggregator = new ContentAggregator($pageRepository, $seriesRepository);
 
         $result = $aggregator->getHomepageContent();
 

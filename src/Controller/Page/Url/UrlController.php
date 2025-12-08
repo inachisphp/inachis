@@ -13,6 +13,7 @@ use App\Controller\AbstractInachisController;
 use App\Entity\Url;
 use App\Model\ContentQueryParameters;
 use App\Repository\UrlRepository;
+use App\Service\Url\UrlBulkActionService;
 use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,37 +37,20 @@ class UrlController extends AbstractInachisController
     public function list(
         Request $request,
         ContentQueryParameters $contentQueryParameters,
+        UrlBulkActionService $urlBulkActionService,
         UrlRepository $urlRepository,
     ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
-            foreach ($request->request->all('items') as $item) {
-                $link = $urlRepository->findOneBy([
-                    'id' => $item,
-                    'default' => false,
-                ]);
-                if ($link !== null) {
-                    if ($request->request->has('delete')) {
-                        $urlRepository->remove($link);
-                    }
-                    if ($request->request->has('make_default')) {
-                        $previous_default = $urlRepository->findOneBy(
-                            [
-                                'content' => $link->getContent(),
-                                'default' => true,
-                            ]
-                        );
-                        if ($previous_default !== null) {
-                            $previous_default->setDefault(false)->setModDate(new DateTime('now'));
-                            $this->entityManager->persist($previous_default);
-                        }
-                        $link->setDefault(true)->setModDate(new DateTime('now'));
-                        $this->entityManager->persist($link);
-                        $this->entityManager->flush();
-                    }
-                }
+            $items = $request->request->all('items') ?? [];
+            $action = $request->request->has('delete')  ? 'delete' :
+                ($request->request->has('make_default') ? 'make_default' : null);
+
+            if ($action !== null && !empty($items)) {
+                $count = $urlBulkActionService->apply($action, $items);
+                $this->addFlash('success', "Action '$action' applied to $count urls.");
             }
             return $this->redirectToRoute('incc_url_list');
         }
@@ -76,7 +60,7 @@ class UrlController extends AbstractInachisController
             'url',
             'contentDate asc',
         );
-        $this->data['dataset'] = $this->entityManager->getRepository(Url::class)->getFiltered(
+        $this->data['dataset'] = $urlRepository->getFiltered(
             $contentQuery['filters'],
             $contentQuery['offset'],
             $contentQuery['limit'],
@@ -97,12 +81,14 @@ class UrlController extends AbstractInachisController
         "/incc/ax/check-url-usage",
         methods: [ "POST" ]
     )]
-    public function checkUrlUsage(Request $request): Response
-    {
+    public function checkUrlUsage(
+        Request $request,
+        UrlRepository $urlRepository,
+    ): Response {
         $url = $request->request->get('url');
-        $urls = $this->entityManager->getRepository(Url::class)->findSimilarUrlsExcludingId(
+        $urls = $urlRepository->findSimilarUrlsExcludingId(
             $url,
-            $request->attributes->get('id')
+            $request->request->get('id')
         );
         if (!empty($urls)) {
             preg_match('/\-([0-9]+)$/', $urls[0]['link'], $matches);
