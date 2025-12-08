@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -104,7 +104,7 @@ class SeriesRepositoryTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testGetSeriesByYearAndUrl(): void
+    public function testGetPublishedSeriesByYearAndUrl(): void
     {
         $year = '2025';
         $url = 'my-series';
@@ -125,14 +125,14 @@ class SeriesRepositoryTest extends TestCase
 
         $this->repository->method('createQueryBuilder')->willReturn($qb);
 
-        $result = $this->repository->getSeriesByYearAndUrl($year, $url);
+        $result = $this->repository->getPublishedSeriesByYearAndUrl($year, $url);
         $this->assertInstanceOf(Series::class, $result);
     }
 
     /**
      * @throws Exception
      */
-    public function testGetSeriesByYearAndUrlReturnsNull(): void
+    public function testGetPublishedSeriesByYearAndUrlReturnsNull(): void
     {
         $year = '2025';
         $url = 'non-existent';
@@ -147,13 +147,14 @@ class SeriesRepositoryTest extends TestCase
         $qb->method('select')->willReturnSelf();
         $qb->method('where')->willReturnSelf();
         $qb->method('andWhere')->willReturnSelf();
+        $qb->method('andWhere')->willReturnSelf();
         $qb->method('setParameter')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
         $qb->method('expr')->willReturn($expr);
 
         $this->repository->method('createQueryBuilder')->willReturn($qb);
 
-        $result = $this->repository->getSeriesByYearAndUrl($year, $url);
+        $result = $this->repository->getPublishedSeriesByYearAndUrl($year, $url);
         $this->assertNull($result);
     }
 
