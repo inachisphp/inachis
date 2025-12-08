@@ -13,6 +13,8 @@ use App\Controller\AbstractInachisController;
 use App\Entity\Url;
 use App\Entity\User;
 use App\Repository\SearchRepository;
+use App\Repository\UrlRepository;
+use App\Repository\UserRepository;
 use DateTime;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +28,7 @@ class SearchController extends AbstractInachisController
     /**
      * @param Request $request
      * @return Response
-     * @throws Exception
+     * @throws Exception|\Doctrine\DBAL\Exception
      */
     #[Route("/incc/search/results/{keyword}/{offset}/{limit}",
         name: "incc_search_results",
@@ -37,8 +39,12 @@ class SearchController extends AbstractInachisController
         defaults: [ "keyword" => null, "offset" => 0, "limit" => 25 ],
         methods: [ "GET", "POST" ],
     )]
-    public function results(SearchRepository $repo, Request $request): Response
-    {
+    public function results(
+        Request $request,
+        SearchRepository $searchRepository,
+        UrlRepository $urlRepository,
+        UserRepository $userRepository,
+    ): Response {
         if ($request->attributes->get('keyword') === ' ' && !empty($request->request->get('keyword', ''))) {
             $keyword = str_replace('/', '', $request->request->get('keyword', ''));
             $keyword = preg_replace('/(?:%25)*2[fF]/', '', $keyword);
@@ -55,7 +61,7 @@ class SearchController extends AbstractInachisController
             $sort = $request->getSession()->get('search_sort', '');
         }
 
-        $results = $repo->search(
+        $results = $searchRepository->search(
             $request->attributes->get('keyword'),
             $request->attributes->get('offset'),
             $request->attributes->get('limit'),
@@ -76,7 +82,7 @@ class SearchController extends AbstractInachisController
                 'relevance',
                 number_format($result['relevance'], 2)
             );
-            $author = $this->entityManager->getRepository(User::class)->findOneBy([
+            $author = $userRepository->findOneBy([
                 'id' => $result['author'],
             ]);
             $this->data['results']->updateResultPropertyByKey(
@@ -106,7 +112,7 @@ class SearchController extends AbstractInachisController
 
                 case 'Page':
                 case 'Post':
-                    $link = $this->entityManager->getRepository(Url::class)->findOneBy([
+                    $link = $urlRepository->findOneBy([
                         'content' => $result['id'],
                         'default' => true,
                     ]);
