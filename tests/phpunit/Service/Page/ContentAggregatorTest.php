@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\Service\Page;
+namespace App\Tests\phpunit\Service\Page;
 
 use App\Entity\Page;
 use App\Entity\Series;
