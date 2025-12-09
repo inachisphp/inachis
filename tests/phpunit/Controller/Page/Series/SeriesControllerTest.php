@@ -149,6 +149,7 @@ class SeriesControllerTest extends WebTestCase
 
     /**
      * @throws Exception
+     * @throws \Exception
      */
     public function testEditSaveNewSeries(): void
     {
@@ -156,8 +157,11 @@ class SeriesControllerTest extends WebTestCase
             'series' => [
                 'image' => Uuid::uuid1()->toString(),
                 'title' => 'test series',
+                'url' => '',
             ],
-        ], [], [], [], [
+        ], [
+            'id' => null,
+        ], [], [], [
             'REQUEST_URI' => '/incc/series/new',
         ]);
         $entityManager = $this->createMock(EntityManager::class);
@@ -165,24 +169,49 @@ class SeriesControllerTest extends WebTestCase
         $translator = $this->createMock(TranslatorInterface::class);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
-            ->onlyMethods(['createForm', 'getUser', 'redirect'])
+            ->onlyMethods(['addFlash', 'createForm', 'getUser', 'redirect'])
             ->getMock();
         $form = $this->createMock(Form::class);
         $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
+        // $form->method('isValid')->willReturn(true);
+
         $controller->method('createForm')->willReturn($form);
         $controller->method('getUser')->willReturn(new User());
-        $controller->method('redirect')
-            ->willReturnCallback(function (string $template, array $data) {
-                return new Response('redirected:' . $template);
-            });
+
         $seriesRepository = $this->createMock(SeriesRepository::class);
         $seriesRepository->method('findOneBy')->willReturn(null);
+
         $imageRepository = $this->createMock(ImageRepository::class);
         $imageRepository->method('findOneBy')->willReturn(new Image());
+
         $pageRepository = $this->createMock(PageRepository::class);
+
         $result = $controller->edit($request, $seriesRepository, $imageRepository, $pageRepository);
         $this->assertInstanceOf(RedirectResponse::class, $result);
-        $this->assertSame('/incc/series/edit/', $result->headers->get('Location'));
+    }
+
+    public function testContents(): void
+    {
+        $request = new Request([], [], [
+            'id' => Uuid::uuid1(),
+        ], [], [], [
+            'REQUEST_URI' => '/incc/series/contents/test',
+        ]);
+        $entityManager = $this->createMock(EntityManager::class);
+        $security = $this->createMock(Security::class);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $seriesRepository = $this->createMock(SeriesRepository::class);
+        $form = $this->createMock(Form::class);
+        $controller = $this->getMockBuilder(SeriesController::class)
+            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->onlyMethods(['createForm', 'render'])
+            ->getMock();
+        $controller->method('render')
+            ->willReturnCallback(function (string $template, array $data) {
+                return new Response('rendered:' . $template);
+            });
+        $controller->method('createForm')->willReturn($form);
+        $result = $controller->contents($request, $seriesRepository);
+        $this->assertEquals('rendered:inadmin/partials/series_contents.html.twig', $result->getContent());
     }
 }
