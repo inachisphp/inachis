@@ -118,15 +118,15 @@ class AdminProfileController extends AbstractInachisController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($form->has('enableDisable') && $form->get('enableDisable')->isClicked()) {
+            if ($form->getClickedButton()->getName() === 'enableDisable') {
                 $user->setActive(!$user->isEnabled());
             }
-            if ($form->has('delete') && $form->get('delete')->isClicked()) {
+            if ($form->getClickedButton()->getName() === 'delete') {
                 $user->setRemoved(true);
             }
             $user->setModDate(new DateTime('now'));
 
-            if ($request->attributes->get('id') === 'new') {
+            if ($isNew) {
                 $userRegistrationService->registerNewUser(
                     $user,
                     $this->data,

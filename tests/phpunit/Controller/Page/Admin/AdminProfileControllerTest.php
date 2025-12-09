@@ -15,30 +15,21 @@ use App\Form\UserType;
 use App\Model\ContentQueryParameters;
 use App\Repository\UserRepository;
 use App\Service\User\UserBulkActionService;
-use App\Service\User\PasswordResetTokenService;
 use App\Service\User\UserRegistrationService;
 use App\Transformer\ImageTransformer;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Uuid;
 use Random\RandomException;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Button;
 use Symfony\Component\Form\ClickableInterface;
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Forms;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AdminProfileControllerTest extends WebTestCase
@@ -164,7 +155,7 @@ class AdminProfileControllerTest extends WebTestCase
      * @throws Exception
      * @throws RandomException
      */
-    public function testEditSave(): void
+    public function testEditSaveEnableDisable(): void
     {
         $formData = [
             'user' => [
@@ -187,13 +178,56 @@ class AdminProfileControllerTest extends WebTestCase
         $userRepository = $this->createMock(UserRepository::class);
         $userRepository->method('findOneBy')->willReturn($user);
 
+        $button = $this->createMock(Button::class);
+        $button->method('getName')->willReturn('enableDisable');
+
         $form = $this->createMock(Form::class);
         $form->method('isSubmitted')->willReturn(true);
         $form->method('isValid')->willReturn(true);
-        $form->method('has')->willReturnMap([
-            [ 'enableDisable', false ],
-            [ 'delete', false ],
+        $form->method('getClickedButton')->willReturn($button);
+        $this->controller->method('createForm')->willReturn($form);
+
+        $result = $this->controller->edit(
+            $request,
+            $imageTransformer,
+            $userRegistrationService,
+            $userRepository
+        );
+        $this->assertInstanceOf(RedirectResponse::class, $result);
+    }
+
+    /**
+     * @throws Exception
+     * @throws RandomException
+     */
+    public function testEditDelete(): void
+    {
+        $formData = [
+            'user' => [
+                'username' => 'test-user',
+                'displayName' => 'Test user',
+                'email' => 'test-user@example.com',
+                'timezone' => 'UTC',
+            ],
+        ];
+        $request = new Request([], [ $formData, ], [], [], [], [
+            'REQUEST_URI' => '/incc/admin/test-user'
         ]);
+        $request->setMethod(Request::METHOD_POST);
+
+        $imageTransformer = $this->createMock(ImageTransformer::class);
+        $userRegistrationService = $this->createMock(UserRegistrationService::class);
+        $user = (new User())->setEmail('test-user@example.com');
+        $userRepository = $this->createMock(UserRepository::class);
+        $userRepository->method('findOneBy')->willReturn($user);
+
+        $button = $this->createMock(Button::class);
+        $button->method('getName')->willReturn('delete');
+
+        $form = $this->createMock(Form::class);
+        $form->method('isSubmitted')->willReturn(true);
+        $form->method('isValid')->willReturn(true);
+        $form->method('getClickedButton')->willReturn($button);
         $this->controller->method('createForm')->willReturn($form);
 
         $result = $this->controller->edit(
