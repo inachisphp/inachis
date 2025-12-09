@@ -11,7 +11,6 @@ namespace App\Tests\phpunit\Controller\Page\Admin;
 
 use App\Controller\Page\Admin\AdminProfileController;
 use App\Entity\User;
-use App\Form\UserType;
 use App\Model\ContentQueryParameters;
 use App\Repository\UserRepository;
 use App\Service\User\UserBulkActionService;
@@ -24,7 +23,6 @@ use Random\RandomException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Button;
-use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -34,6 +32,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AdminProfileControllerTest extends WebTestCase
 {
+    /**
+     * @var AdminProfileController&MockObject $controller
+     */
     protected AdminProfileController $controller;
 
     /**
@@ -52,6 +53,7 @@ class AdminProfileControllerTest extends WebTestCase
                 'createFormBuilder',
                 'generateUrl',
                 'redirect',
+                'redirectToRoute',
                 'render',
             ])
             ->getMock();
@@ -88,15 +90,13 @@ class AdminProfileControllerTest extends WebTestCase
         $this->assertEquals('rendered:inadmin/page/admin/list.html.twig', $result->getContent());
     }
 
-
-
     /**
      * @throws Exception
      */
-    public function testListDeleteAction(): void
+    public function testListDisableAction(): void
     {
         $request = new Request([], [
-            'delete' => '',
+            'disable' => '',
             'items' => [
                 Uuid::uuid1()->toString(),
             ],
@@ -106,20 +106,37 @@ class AdminProfileControllerTest extends WebTestCase
         ], [], [], [
             'REQUEST_URI' => '/incc/admin/list/50/25'
         ]);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $security = $this->createMock(Security::class);
+        $translator = $this->createMock(TranslatorInterface::class);
         $userBulkActionService = $this->createMock(UserBulkActionService::class);
+        $userBulkActionService->method('apply')->willReturn(1);
         $userRepository = $this->createMock(UserRepository::class);
         $contentQueryParameters = $this->createMock(ContentQueryParameters::class);
-        $contentQueryParameters->method('process')->willReturn([
-            'filters' => [],
-            'offset' => 50,
-            'limit' => 25,
-        ]);
+                $this->controller = $this->getMockBuilder(AdminProfileController::class)
+            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->onlyMethods([
+                'addFlash',
+                'createForm',
+                'createFormBuilder',
+                'generateUrl',
+                'redirect',
+                'redirectToRoute',
+                'render',
+            ])
+            ->getMock();
+        $this->controller
+            ->method('redirectToRoute')
+            ->with('incc_admin_list')
+            ->willReturn(new RedirectResponse('/incc/admin/list/50/25'));
+        $formBuilder = $this->createMock(FormBuilder::class);
         $form = $this->createMock(Form::class);
         $form->method('isSubmitted')->willReturn(true);
-        $this->controller->method('createForm')->willReturn($form);
+        $formBuilder->method('getForm')->willReturn($form);
+        $this->controller->method('createFormBuilder')->willReturn($formBuilder);
 
         $result = $this->controller->list($request, $contentQueryParameters, $userBulkActionService, $userRepository);
-        $this->assertEquals('rendered:inadmin/page/admin/list.html.twig', $result->getContent());
+        $this->assertInstanceOf(RedirectResponse::class, $result);
     }
 
     /**
