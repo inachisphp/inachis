@@ -39,10 +39,11 @@ class TagRepositoryTest extends TestCase
 
         $this->repository = $this->getMockBuilder(TagRepository::class)
             ->setConstructorArgs([$registry])
-            ->onlyMethods([ 'getEntityManager', 'getAll', 'createQueryBuilder', ])
+            ->onlyMethods([ 'getEntityManager', 'getAll', 'getClassName', 'createQueryBuilder', ])
             ->getMock();
 
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);
+        $this->repository->method('getClassName')->willReturn(Tag::class);
         parent::setUp();
     }
 
@@ -65,13 +66,16 @@ class TagRepositoryTest extends TestCase
     {
         $query = $this->createMock(Query::class);
         $query->method('getSingleScalarResult')->willReturn(3);
+
         $qb = $this->createMock(QueryBuilder::class);
         $qb->method('select')->willReturnSelf();
         $qb->method('from')->willReturnSelf();
         $qb->method('where')->willReturnSelf();
         $qb->method('setParameter')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
-        $this->repository->method('createQueryBuilder')->willReturn($qb);
+
+        $this->entityManager->method('createQueryBuilder')->willReturn($qb);
+        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
 
         $result = $this->repository->getAllCount([
             'q.title = :title',
@@ -83,32 +87,83 @@ class TagRepositoryTest extends TestCase
 
     public function testGetAll(): void
     {
-        $paginator = $this->createMock(Paginator::class);
         $query = $this->createMock(Query::class);
+        $query->method('setFirstResult')->willReturnSelf();
+        $query->method('setMaxResults')->willReturnSelf();
+
         $qb = $this->createMock(QueryBuilder::class);
         $qb->method('select')->willReturnSelf();
         $qb->method('from')->willReturnSelf();
-//        $qb->method('leftJoin')->willReturnSelf();
+        $qb->method('join')->willReturnSelf();
         $qb->method('where')->willReturnSelf();
         $qb->method('addOrderBy')->willReturnSelf();
-        $qb->method('addGroupBy')->willReturnSelf();
         $qb->method('setParameter')->willReturnSelf();
-        $qb->method('setFirstResult')->willReturnSelf();
-        $qb->method('setMaxResults')->willReturnSelf();
+        $qb->method('addGroupBy')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
-        $this->repository->method('createQueryBuilder')->willReturn($qb);
+
+        $registry = $this->createMock(ManagerRegistry::class);
+        $registry->method('getManagerForClass')
+            ->willReturn($this->entityManager);
+        $this->repository = $this->getMockBuilder(TagRepository::class)
+            ->setConstructorArgs([$registry])
+            ->onlyMethods([ 'getEntityManager', 'getClassName', 'createQueryBuilder', ])
+            ->getMock();
+
+        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
+        $this->repository->method('getClassName')->willReturn(Tag::class);
+
+        $this->entityManager->method('createQueryBuilder')->willReturn($qb);
+        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
 
         $result = $this->repository->getAll(
             50,
             25,
             [
                 'q.title = :title',
-                [ 'title' => 'test-tag' ]
+                ['title' => 'test-tag']
             ],
-            'q.title',
-            'title',
+            [
+                [ 'title', 'asc' ],
+            ],
+            [ 'id' ],
+            [ 'table', 'fields' ],
         );
-        $this->assertEquals(new Paginator($qb, false), $result);
+        $this->assertInstanceOf(Paginator::class, $result);
+    }
+
+    public function testGetAllOrderByString(): void
+    {
+        $query = $this->createMock(Query::class);
+        $query->method('setFirstResult')->willReturnSelf();
+        $query->method('setMaxResults')->willReturnSelf();
+
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->method('select')->willReturnSelf();
+        $qb->method('from')->willReturnSelf();
+        $qb->method('addOrderBy')->willReturnSelf();
+        $qb->method('getQuery')->willReturn($query);
+
+        $registry = $this->createMock(ManagerRegistry::class);
+        $registry->method('getManagerForClass')
+            ->willReturn($this->entityManager);
+        $this->repository = $this->getMockBuilder(TagRepository::class)
+            ->setConstructorArgs([$registry])
+            ->onlyMethods([ 'getEntityManager', 'getClassName', 'createQueryBuilder', ])
+            ->getMock();
+
+        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
+        $this->repository->method('getClassName')->willReturn(Tag::class);
+
+        $this->entityManager->method('createQueryBuilder')->willReturn($qb);
+        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
+
+        $result = $this->repository->getAll(
+            50,
+            25,
+            [],
+            'title ASC',
+        );
+        $this->assertInstanceOf(Paginator::class, $result);
     }
 
     public function testGetMaxItemsToShow(): void

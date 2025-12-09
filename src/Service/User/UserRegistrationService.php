@@ -26,14 +26,13 @@ readonly class UserRegistrationService
         private MailerInterface $mailer,
         private PasswordResetTokenService $tokenService,
         private EntityManagerInterface $entityManager,
-        private array $settings,
     ) {}
 
     /**
      * @throws RandomException
      * @throws TransportExceptionInterface
      */
-    public function registerNewUser(User $user, callable $urlGenerator): void
+    public function registerNewUser(User $user, array $settings, callable $urlGenerator): void
     {
         $data = $this->tokenService->createResetRequestForEmail($user->getEmail());
 
@@ -43,14 +42,14 @@ readonly class UserRegistrationService
 
         $email = (new TemplatedEmail())
             ->to(new Address($user->getEmail()))
-            ->subject('Welcome to ' . $this->settings['siteTitle'])
+            ->subject('Welcome to ' . $settings['siteTitle'])
             ->htmlTemplate('inadmin/emails/registration.html.twig')
             ->textTemplate('inadmin/emails/registration.txt.twig')
             ->context([
                 'name' => $user->getDisplayName(),
                 'url' => $urlGenerator($data['token']),
                 'expiresAt' => $data['expiresAt']->format('l jS F Y \a\\t H:i'),
-                'settings' => $this->settings,
+                'settings' => $settings,
                 'logo' => Base64EncodeFile::encode('public/assets/imgs/incc/inachis.png'),
             ])
         ;

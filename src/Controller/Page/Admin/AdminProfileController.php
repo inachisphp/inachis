@@ -16,6 +16,7 @@ use App\Model\ContentQueryParameters;
 use App\Repository\UserRepository;
 use App\Service\User\UserBulkActionService;
 use App\Service\User\PasswordResetTokenService;
+use App\Service\User\UserRegistrationService;
 use App\Transformer\ImageTransformer;
 use App\Util\Base64EncodeFile;
 use App\Util\RandomColorPicker;
@@ -101,55 +102,42 @@ class AdminProfileController extends AbstractInachisController
     public function edit(
         Request $request,
         ImageTransformer $imageTransformer,
-        MailerInterface $mailer,
-        PasswordResetTokenService $tokenService,
+        UserRegistrationService $userRegistrationService,
         UserRepository $userRepository,
     ): Response {
-        $user = $request->attributes->get('id') !== 'new' ?
+        $id = $request->attributes->get('id');
+        $isNew = ($id === 'new');
+
+        $user = $isNew ? new User(): 
             $userRepository->findOneBy(
                 [ 'username' => $request->attributes->get('id') ]
-            ):
-            new User();
+            );
         $form = $this->createForm(UserType::class, $user, [
             'validation_groups' => [ '' ],
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($form->has('enableDisable') && $form->get('enableDisable')->isClicked()) {
+            if ($form->getClickedButton()->getName() === 'enableDisable') {
                 $user->setActive(!$user->isEnabled());
             }
-            if ($form->has('delete') && $form->get('delete')->isClicked()) {
+            if ($form->getClickedButton()->getName() === 'delete') {
                 $user->setRemoved(true);
             }
             $user->setModDate(new DateTime('now'));
+
+            if ($isNew) {
+                $userRegistrationService->registerNewUser(
+                    $user,
+                    $this->data,
+                    fn (string $token) => $this->generateUrl(
+                        'incc_account_new-password',
+                        [ 'token' => $token ]
+                    )
+                );
+            }
             $this->entityManager->persist($user);
             $this->entityManager->flush();
-
-            if ($request->attributes->get('id') === 'new') {
-                $data = $tokenService->createResetRequestForEmail($user->getEmail());
-                $user->setColor(RandomColorPicker::generate());
-                try {
-                    $email = (new TemplatedEmail())
-                        ->to(new Address($user->getEmail()))
-                        ->subject('Welcome to ' . $this->data['settings']['siteTitle'])
-                        ->htmlTemplate('inadmin/emails/registration.html.twig')
-                        ->textTemplate('inadmin/emails/registration.txt.twig')
-                        ->context([
-                            'name' => $user->getDisplayName(),
-                            'url' => $this->generateUrl('incc_account_new-password', [ 'token' => $data['token']]),
-                            'expiresAt' => $data['expiresAt']->format('l jS F Y \a\\t H:i'),
-                            'settings' => $this->data['settings'],
-                            'logo' => Base64EncodeFile::encode('public/assets/imgs/incc/inachis.png'),
-                        ])
-                    ;
-                    $mailer->send($email);
-                    $this->entityManager->persist($user);
-                    $this->entityManager->flush();
-                } catch (TransportExceptionInterface $e) {
-                    $this->addFlash('warning', 'Error while sending mail: ' . $e->getMessage());
-                }
-            }
 
             $this->addFlash('success', 'User details saved.');
             return $this->redirect($this->generateUrl('incc_admin_edit', [

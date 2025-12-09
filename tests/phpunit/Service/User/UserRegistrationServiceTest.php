@@ -91,7 +91,10 @@ class UserRegistrationServiceTest extends TestCase
         );
 
         $urlGenerator = fn(string $token) => "https://site/reset/$token";
+        $settings = [
+            'siteTitle' => 'ExampleSite',
+        ];
 
-        $service->registerNewUser($user, $urlGenerator);
+        $service->registerNewUser($user, $settings, $urlGenerator);
     }
 }
