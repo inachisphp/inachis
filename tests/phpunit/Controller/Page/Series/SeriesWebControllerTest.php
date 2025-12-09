@@ -56,18 +56,17 @@ class SeriesWebControllerTest extends WebTestCase
 
     public function testViewRendersTemplate(): void
     {
-        $request = new Request();
         $series = $this->createMock(Series::class);
-        $seriesRepo = $this->getMockBuilder(SeriesRepository::class)
+        $seriesRepository = $this->getMockBuilder(SeriesRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $seriesRepo->expects($this->once())
-            ->method('getSeriesByYearAndUrl')
+        $seriesRepository->expects($this->once())
+            ->method('getPublicSeriesByYearAndUrl')
             ->with('2025', 'test')
             ->willReturn($series);
         $this->entityManager->method('getRepository')
             ->willReturnMap([
-                [Series::class, $seriesRepo],
+                [Series::class, $seriesRepository],
             ]);
         $controller = $this->getMockBuilder(SeriesWebController::class)
             ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
@@ -84,26 +83,25 @@ class SeriesWebControllerTest extends WebTestCase
             ->method('render')
             ->with('web/pages/series.html.twig')
             ->willReturn(new Response('Rendered OK', 200));
-        $response = $controller->view($request, '2025', 'test');
+        $response = $controller->view($seriesRepository, '2025', 'test');
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }
 
     public function testViewThrowsNotFound(): void
     {
-        $request = new Request();
-        $seriesRepo = $this->getMockBuilder(SeriesRepository::class)
+        $seriesRepository = $this->getMockBuilder(SeriesRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $seriesRepo->expects($this->once())
-            ->method('getSeriesByYearAndUrl')
+        $seriesRepository->expects($this->once())
+            ->method('getPublicSeriesByYearAndUrl')
             ->with('2025', 'test')
             ->willReturn(null);
         $this->entityManager->method('getRepository')
             ->willReturnMap([
-                [Series::class, $seriesRepo]
+                [Series::class, $seriesRepository]
             ]);
         $this->expectException(NotFoundHttpException::class);
-        $this->controller->view($request, '2025', 'test');
+        $this->controller->view($seriesRepository, '2025', 'test');
     }
 }

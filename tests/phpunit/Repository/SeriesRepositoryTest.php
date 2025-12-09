@@ -104,7 +104,7 @@ class SeriesRepositoryTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testGetPublishedSeriesByYearAndUrl(): void
+    public function testGetPublicSeriesByYearAndUrl(): void
     {
         $year = '2025';
         $url = 'my-series';
@@ -125,14 +125,14 @@ class SeriesRepositoryTest extends TestCase
 
         $this->repository->method('createQueryBuilder')->willReturn($qb);
 
-        $result = $this->repository->getPublishedSeriesByYearAndUrl($year, $url);
+        $result = $this->repository->getPublicSeriesByYearAndUrl($year, $url);
         $this->assertInstanceOf(Series::class, $result);
     }
 
     /**
      * @throws Exception
      */
-    public function testGetPublishedSeriesByYearAndUrlReturnsNull(): void
+    public function testGetPublicSeriesByYearAndUrlReturnsNull(): void
     {
         $year = '2025';
         $url = 'non-existent';
@@ -147,14 +147,13 @@ class SeriesRepositoryTest extends TestCase
         $qb->method('select')->willReturnSelf();
         $qb->method('where')->willReturnSelf();
         $qb->method('andWhere')->willReturnSelf();
-        $qb->method('andWhere')->willReturnSelf();
         $qb->method('setParameter')->willReturnSelf();
         $qb->method('getQuery')->willReturn($query);
         $qb->method('expr')->willReturn($expr);
 
         $this->repository->method('createQueryBuilder')->willReturn($qb);
 
-        $result = $this->repository->getPublishedSeriesByYearAndUrl($year, $url);
+        $result = $this->repository->getPublicSeriesByYearAndUrl($year, $url);
         $this->assertNull($result);
     }
 

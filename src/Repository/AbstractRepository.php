@@ -133,15 +133,15 @@ abstract class AbstractRepository extends ServiceEntityRepository
             }
         }
 
-        $qb = $qb->getQuery();
+        $query = $qb->getQuery();
         if ($offset > 0) {
-            $qb = $qb->setFirstResult($offset);
+            $query = $query->setFirstResult($offset);
         }
         if ($limit > 0) {
-            $qb = $qb->setMaxResults($limit);
+            $query = $query->setMaxResults($limit);
         }
 
-        return new Paginator($qb, false);
+        return new Paginator($query, false);
     }
 
     /**
@@ -151,28 +151,5 @@ abstract class AbstractRepository extends ServiceEntityRepository
     {
         // @todo check if an alternative is set in yaml config
         return defined('static::MAX_ITEMS_TO_SHOW_ADMIN') ? (int) static::MAX_ITEMS_TO_SHOW_ADMIN : 10;
-    }
-
-    /**
-     * @param LoggerInterface $logger
-     * @throws ConnectionException|Exception
-     */
-    public function wipe(LoggerInterface $logger): void
-    {
-        $connection = $this->getEntityManager()->getConnection();
-        $connection->beginTransaction();
-
-        try {
-            $connection->query('SET FOREIGN_KEY_CHECKS=0');
-            $connection->query(
-                'DELETE FROM ' .
-                $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName()
-            );
-            $connection->query('SET FOREIGN_KEY_CHECKS=1');
-            $connection->commit();
-        } catch (Exception $e) {
-            $logger->error(sprintf('Failed to wipe table: %s', $e->getTraceAsString()));
-            $connection->rollBack();
-        }
     }
 }

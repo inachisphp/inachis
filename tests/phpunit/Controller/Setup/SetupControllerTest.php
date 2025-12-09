@@ -74,4 +74,25 @@ class SetupControllerTest extends TestCase
         $result = $controller->stage1($userRepository);
         $this->assertEquals('rendered:setup/stage-1.html.twig', $result->getContent());
     }
+
+    public function testGetErrors(): void
+    {
+        $controller = new SetupController(
+            $this->createMock(EntityManager::class),
+            $this->createMock(Security::class),
+            $this->createMock(Translator::class),
+        );
+        $this->assertEmpty($controller->getErrors());
+    }
+
+    public function testAddAndGetError(): void
+    {
+        $controller = new SetupController(
+            $this->createMock(EntityManager::class),
+            $this->createMock(Security::class),
+            $this->createMock(Translator::class),
+        );
+        $controller->addError('test', 'Something went wrong');
+        $this->assertEquals('Something went wrong', $controller->getError('test'));
+    }
 }
