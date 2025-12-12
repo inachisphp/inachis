@@ -11,7 +11,7 @@ namespace App\Tests\phpunit\Service\User;
 
 use App\Entity\User;
 use App\Service\User\PasswordResetTokenService;
-use App\Service\User\UserRegistrationService;
+use App\Service\User\UserAccountEmailService;
 use App\Util\Base64EncodeFile;
 use App\Util\RandomColorPicker;
 use Doctrine\ORM\EntityManagerInterface;
@@ -83,7 +83,7 @@ class UserRegistrationServiceTest extends TestCase
                 return true;
             }));
 
-        $service = new UserRegistrationService(
+        $service = new UserAccountEmailService(
             $this->mailer,
             $this->tokenService,
             $this->entityManager,

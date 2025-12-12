@@ -10,22 +10,21 @@
 namespace App\Tests\phpunit\Controller\Page\Series;
 
 use App\Controller\Page\Series\SeriesController;
-use App\Controller\Page\Url\UrlController;
 use App\Entity\Image;
+use App\Entity\Page;
 use App\Entity\Series;
 use App\Entity\User;
 use App\Model\ContentQueryParameters;
 use App\Repository\ImageRepository;
 use App\Repository\PageRepository;
 use App\Repository\SeriesRepository;
-use App\Repository\UrlRepository;
 use App\Service\Series\SeriesBulkActionService;
-use App\Service\Url\UrlBulkActionService;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Form\Button;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -100,6 +99,9 @@ class SeriesControllerTest extends WebTestCase
         $form = $this->createMock(Form::class);
         $form->method('isSubmitted')->willReturn(true);
         $form->method('isValid')->willReturn(true);
+        $button = $this->createMock(Button::class);
+        $button->method('getName')->willReturn('submit');
+        $form->method('getClickedButton')->willReturn($button);
         $formBuilder = $this->createMock(FormBuilder::class);
         $formBuilder->method('getForm')->willReturn($form);
         $controller->method('createFormBuilder')->willReturn($formBuilder);
@@ -173,18 +175,114 @@ class SeriesControllerTest extends WebTestCase
             ->getMock();
         $form = $this->createMock(Form::class);
         $form->method('isSubmitted')->willReturn(true);
-        // $form->method('isValid')->willReturn(true);
+        $form->method('isValid')->willReturn(true);
+        $button = $this->createMock(Button::class);
+        $button->method('getName')->willReturn('submit');
+        $form->method('getClickedButton')->willReturn($button);
 
         $controller->method('createForm')->willReturn($form);
         $controller->method('getUser')->willReturn(new User());
 
         $seriesRepository = $this->createMock(SeriesRepository::class);
         $seriesRepository->method('findOneBy')->willReturn(null);
-
         $imageRepository = $this->createMock(ImageRepository::class);
         $imageRepository->method('findOneBy')->willReturn(new Image());
-
         $pageRepository = $this->createMock(PageRepository::class);
+
+        $result = $controller->edit($request, $seriesRepository, $imageRepository, $pageRepository);
+        $this->assertInstanceOf(RedirectResponse::class, $result);
+    }
+
+    /**
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function testEditDeleteSeries(): void
+    {
+        $request = new Request([],
+            [
+                'series' => [
+                    'image' => Uuid::uuid1()->toString(),
+                    'title' => 'test series',
+                    'url' => '',
+                'delete' => '',
+            ],
+        ], [
+            'id' => null,
+        ], [], [], [
+            'REQUEST_URI' => '/incc/series/new',
+        ]);
+        $entityManager = $this->createMock(EntityManager::class);
+        $security = $this->createMock(Security::class);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $controller = $this->getMockBuilder(SeriesController::class)
+            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirect'])
+            ->getMock();
+        $form = $this->createMock(Form::class);
+        $form->method('isSubmitted')->willReturn(true);
+        $form->method('isValid')->willReturn(true);
+        $button = $this->createMock(Button::class);
+        $button->method('getName')->willReturn('delete');
+        $form->method('getClickedButton')->willReturn($button);
+
+        $controller->method('createForm')->willReturn($form);
+        $seriesRepository = $this->createMock(SeriesRepository::class);
+        $imageRepository = $this->createMock(ImageRepository::class);
+        $pageRepository = $this->createMock(PageRepository::class);
+
+        $result = $controller->edit($request, $seriesRepository, $imageRepository, $pageRepository);
+        $this->assertInstanceOf(RedirectResponse::class, $result);
+    }
+
+    /**
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function testEditRemoveContentFromSeries(): void
+    {
+        $request = new Request([],
+            [
+                'series' => [
+                    'image' => Uuid::uuid1()->toString(),
+                    'title' => 'test series',
+                    'url' => '',
+                    'itemList' => [
+
+                    ],
+                    'remove' => '',
+                ],
+            ], [
+                'id' => null,
+            ], [], [], [
+                'REQUEST_URI' => '/incc/series/new',
+            ]);
+        $entityManager = $this->createMock(EntityManager::class);
+        $security = $this->createMock(Security::class);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $controller = $this->getMockBuilder(SeriesController::class)
+            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirect'])
+            ->getMock();
+        $form = $this->createMock(Form::class);
+        $form->method('isSubmitted')->willReturn(true);
+        $form->method('isValid')->willReturn(true);
+        $button = $this->createMock(Button::class);
+        $button->method('getName')->willReturn('remove');
+        $form->method('getClickedButton')->willReturn($button);
+
+        $controller->method('createForm')->willReturn($form);
+        $controller->method('getUser')->willReturn(new User());
+
+        $page = new Page();
+        $series = new Series();
+
+        $seriesRepository = $this->createMock(SeriesRepository::class);
+        $seriesRepository->method('findOneBy')->willReturn($series);
+        $imageRepository = $this->createMock(ImageRepository::class);
+        $imageRepository->method('findOneBy')->willReturn(new Image());
+        $pageRepository = $this->createMock(PageRepository::class);
+        $pageRepository->method('findBy')->willReturn([$page]);
 
         $result = $controller->edit($request, $seriesRepository, $imageRepository, $pageRepository);
         $this->assertInstanceOf(RedirectResponse::class, $result);

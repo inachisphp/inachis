@@ -14,7 +14,7 @@ use App\Entity\User;
 use App\Model\ContentQueryParameters;
 use App\Repository\UserRepository;
 use App\Service\User\UserBulkActionService;
-use App\Service\User\UserRegistrationService;
+use App\Service\User\UserAccountEmailService;
 use App\Transformer\ImageTransformer;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
@@ -151,7 +151,7 @@ class AdminProfileControllerTest extends WebTestCase
             'REQUEST_URI' => '/incc/admin/test-user'
         ]);
         $imageTransformer = $this->createMock(ImageTransformer::class);
-        $userRegistrationService = $this->createMock(UserRegistrationService::class);
+        $userRegistrationService = $this->createMock(UserAccountEmailService::class);
         $user = new User();
         $userRepository = $this->createMock(UserRepository::class);
         $userRepository->method('findOneBy')->willReturn($user);
@@ -190,7 +190,7 @@ class AdminProfileControllerTest extends WebTestCase
         $request->setMethod(Request::METHOD_POST);
 
         $imageTransformer = $this->createMock(ImageTransformer::class);
-        $userRegistrationService = $this->createMock(UserRegistrationService::class);
+        $userRegistrationService = $this->createMock(UserAccountEmailService::class);
         $user = (new User())->setEmail('test-user@example.com');
         $userRepository = $this->createMock(UserRepository::class);
         $userRepository->method('findOneBy')->willReturn($user);
@@ -233,7 +233,7 @@ class AdminProfileControllerTest extends WebTestCase
         $request->setMethod(Request::METHOD_POST);
 
         $imageTransformer = $this->createMock(ImageTransformer::class);
-        $userRegistrationService = $this->createMock(UserRegistrationService::class);
+        $userRegistrationService = $this->createMock(UserAccountEmailService::class);
         $user = (new User())->setEmail('test-user@example.com');
         $userRepository = $this->createMock(UserRepository::class);
         $userRepository->method('findOneBy')->willReturn($user);
