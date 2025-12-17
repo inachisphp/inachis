@@ -45,14 +45,15 @@ class SeriesControllerTest extends WebTestCase
         ], [], [], [
             'REQUEST_URI' => '/incc/series/list/50/25'
         ]);
-        $entityManager = $this->createMock(EntityManager::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $entityManager = $this->createStub(EntityManager::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods(['createFormBuilder', 'render'])
             ->getMock();
-        $controller->method('render')
+        $controller->expects($this->once())
+            ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
@@ -65,8 +66,9 @@ class SeriesControllerTest extends WebTestCase
                 'limit' => '25',
                 'sort' => 'lastDate desc',
             ]);
-        $seriesBulkActionService = $this->createMock(SeriesBulkActionService::class);
-        $seriesRepository = $this->createMock(SeriesRepository::class);
+        $seriesBulkActionService = $this->createStub(SeriesBulkActionService::class);
+        $seriesRepository = $this->createStub(SeriesRepository::class);
+
         $result = $controller->list($request, $contentQueryParameters, $seriesBulkActionService, $seriesRepository);
         $this->assertEquals('rendered:inadmin/page/series/list.html.twig', $result->getContent());
     }
@@ -89,30 +91,32 @@ class SeriesControllerTest extends WebTestCase
         ], [], [], [
             'REQUEST_URI' => '/incc/series/list/50/25'
         ]);
-        $entityManager = $this->createMock(EntityManager::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $entityManager = $this->createStub(EntityManager::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods(['addFlash', 'createFormBuilder', 'redirectToRoute'])
             ->getMock();
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(true);
         $button = $this->createMock(Button::class);
-        $button->method('getName')->willReturn('submit');
-        $form->method('getClickedButton')->willReturn($button);
+        $button->expects($this->atLeast(0))->method('getName')->willReturn('submit');
+        $form->expects($this->atLeast(0))->method('getClickedButton')->willReturn($button);
         $formBuilder = $this->createMock(FormBuilder::class);
-        $formBuilder->method('getForm')->willReturn($form);
-        $controller->method('createFormBuilder')->willReturn($formBuilder);
-        $controller
+        $formBuilder->expects($this->once())->method('getForm')->willReturn($form);
+        $controller->expects($this->once())->method('createFormBuilder')->willReturn($formBuilder);
+        $controller->expects($this->once())
             ->method('redirectToRoute')
             ->with('incc_series_list')
             ->willReturn(new RedirectResponse('/incc/series/list/50/25'));
-        $contentQueryParameters = $this->createMock(ContentQueryParameters::class);
+        $contentQueryParameters = $this->createStub(ContentQueryParameters::class);
         $seriesBulkActionService = $this->createMock(SeriesBulkActionService::class);
-        $seriesBulkActionService->method('apply')->willReturn(1);
-        $seriesRepository = $this->createMock(SeriesRepository::class);
+        $seriesBulkActionService->expects($this->once())
+            ->method('apply')->willReturn(1);
+        $seriesRepository = $this->createStub(SeriesRepository::class);
+
         $result = $controller->list($request, $contentQueryParameters, $seriesBulkActionService, $seriesRepository);
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertSame('/incc/series/list/50/25', $result->headers->get('Location'));
@@ -129,22 +133,24 @@ class SeriesControllerTest extends WebTestCase
         ], [], [], [
             'REQUEST_URI' => '/incc/series/edit/' . $uuid->toString(),
         ]);
-        $entityManager = $this->createMock(EntityManager::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $entityManager = $this->createStub(EntityManager::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods(['createForm', 'render'])
             ->getMock();
-        $controller->method('render')
+        $controller->expects($this->once())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
         $series = (new Series())->setId($uuid)->setTitle('test series');
         $seriesRepository = $this->createMock(SeriesRepository::class);
-        $seriesRepository->method('findOneBy')->willReturn($series);
-        $imageRepository = $this->createMock(ImageRepository::class);
-        $pageRepository = $this->createMock(PageRepository::class);
+        $seriesRepository->expects($this->once())
+            ->method('findOneBy')->willReturn($series);
+        $imageRepository = $this->createStub(ImageRepository::class);
+        $pageRepository = $this->createStub(PageRepository::class);
+
         $result = $controller->edit($request, $seriesRepository, $imageRepository, $pageRepository);
         $this->assertEquals('rendered:inadmin/page/series/edit.html.twig', $result->getContent());
     }
@@ -166,28 +172,28 @@ class SeriesControllerTest extends WebTestCase
         ], [], [], [
             'REQUEST_URI' => '/incc/series/new',
         ]);
-        $entityManager = $this->createMock(EntityManager::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $entityManager = $this->createStub(EntityManager::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods(['addFlash', 'createForm', 'getUser', 'redirect'])
             ->getMock();
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->atLeast(0))->method('isValid')->willReturn(true);
         $button = $this->createMock(Button::class);
-        $button->method('getName')->willReturn('submit');
-        $form->method('getClickedButton')->willReturn($button);
+        $button->expects($this->atLeastOnce())->method('getName')->willReturn('submit');
+        $form->expects($this->atLeastOnce())->method('getClickedButton')->willReturn($button);
 
-        $controller->method('createForm')->willReturn($form);
-        $controller->method('getUser')->willReturn(new User());
+        $controller->expects($this->once())->method('createForm')->willReturn($form);
+        $controller->expects($this->once())->method('getUser')->willReturn(new User());
 
         $seriesRepository = $this->createMock(SeriesRepository::class);
-        $seriesRepository->method('findOneBy')->willReturn(null);
+        $seriesRepository->expects($this->atLeast(0))->method('findOneBy')->willReturn(null);
         $imageRepository = $this->createMock(ImageRepository::class);
-        $imageRepository->method('findOneBy')->willReturn(new Image());
-        $pageRepository = $this->createMock(PageRepository::class);
+        $imageRepository->expects($this->atLeast(0))->method('findOneBy')->willReturn(new Image());
+        $pageRepository = $this->createStub(PageRepository::class);
 
         $result = $controller->edit($request, $seriesRepository, $imageRepository, $pageRepository);
         $this->assertInstanceOf(RedirectResponse::class, $result);
@@ -212,24 +218,24 @@ class SeriesControllerTest extends WebTestCase
         ], [], [], [
             'REQUEST_URI' => '/incc/series/new',
         ]);
-        $entityManager = $this->createMock(EntityManager::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $entityManager = $this->createStub(EntityManager::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirect'])
             ->getMock();
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->atLeast(0))->method('isValid')->willReturn(true);
         $button = $this->createMock(Button::class);
-        $button->method('getName')->willReturn('delete');
+        $button->expects($this->atLeastOnce())->method('getName')->willReturn('delete');
         $form->method('getClickedButton')->willReturn($button);
 
-        $controller->method('createForm')->willReturn($form);
-        $seriesRepository = $this->createMock(SeriesRepository::class);
-        $imageRepository = $this->createMock(ImageRepository::class);
-        $pageRepository = $this->createMock(PageRepository::class);
+        $controller->expects($this->once())->method('createForm')->willReturn($form);
+        $seriesRepository = $this->createStub(SeriesRepository::class);
+        $imageRepository = $this->createStub(ImageRepository::class);
+        $pageRepository = $this->createStub(PageRepository::class);
 
         $result = $controller->edit($request, $seriesRepository, $imageRepository, $pageRepository);
         $this->assertInstanceOf(RedirectResponse::class, $result);
@@ -257,32 +263,34 @@ class SeriesControllerTest extends WebTestCase
             ], [], [], [
                 'REQUEST_URI' => '/incc/series/new',
             ]);
-        $entityManager = $this->createMock(EntityManager::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $entityManager = $this->createStub(EntityManager::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirect'])
             ->getMock();
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->any())->method('isValid')->willReturn(true);
         $button = $this->createMock(Button::class);
-        $button->method('getName')->willReturn('remove');
-        $form->method('getClickedButton')->willReturn($button);
+        $button->expects($this->atLeastOnce())->method('getName')->willReturn('remove');
+        $form->expects($this->atLeastOnce())->method('getClickedButton')->willReturn($button);
 
-        $controller->method('createForm')->willReturn($form);
-        $controller->method('getUser')->willReturn(new User());
+        $controller->expects($this->once())->method('createForm')->willReturn($form);
+        $controller->expects($this->once())->method('getUser')->willReturn(new User());
 
         $page = new Page();
         $series = new Series();
 
         $seriesRepository = $this->createMock(SeriesRepository::class);
-        $seriesRepository->method('findOneBy')->willReturn($series);
+        $seriesRepository->expects($this->atLeast(0))
+            ->method('findOneBy')->willReturn($series);
         $imageRepository = $this->createMock(ImageRepository::class);
-        $imageRepository->method('findOneBy')->willReturn(new Image());
+        $imageRepository->expects($this->atLeast(0))
+            ->method('findOneBy')->willReturn(new Image());
         $pageRepository = $this->createMock(PageRepository::class);
-        $pageRepository->method('findBy')->willReturn([$page]);
+        $pageRepository->expects($this->once())->method('findBy')->willReturn([$page]);
 
         $result = $controller->edit($request, $seriesRepository, $imageRepository, $pageRepository);
         $this->assertInstanceOf(RedirectResponse::class, $result);
@@ -295,16 +303,17 @@ class SeriesControllerTest extends WebTestCase
         ], [], [], [
             'REQUEST_URI' => '/incc/series/contents/test',
         ]);
-        $entityManager = $this->createMock(EntityManager::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(TranslatorInterface::class);
-        $seriesRepository = $this->createMock(SeriesRepository::class);
-        $form = $this->createMock(Form::class);
+        $entityManager = $this->createStub(EntityManager::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
+        $seriesRepository = $this->createStub(SeriesRepository::class);
+        $form = $this->createStub(Form::class);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods(['createForm', 'render'])
             ->getMock();
-        $controller->method('render')
+        $controller->expects($this->once())
+            ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });

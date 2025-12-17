@@ -11,17 +11,19 @@ namespace App\Tests\phpunit\Form;
 
 use App\Entity\Image;
 use App\Form\ImageType;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class ImageTypeTest extends TypeTestCase
 {
 
     protected function getExtensions(): array
     {
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         return [
             new PreloadedExtension([new ImageType($translator)], [])
         ];

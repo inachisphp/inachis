@@ -40,7 +40,7 @@ readonly class UserAccountEmailService
             ->textTemplate('inadmin/emails/forgot-password.txt.twig')
             ->context([
                 'ipAddress' => $settings['clientIP'],
-                'url' => $urlGenerator('incc_account_new-password', [ 'token' => $data['token']]),
+                'url' => $urlGenerator($data['token']),
                 'expiresAt' => $data['expiresAt']->format('l jS F Y \a\\t H:i'),
                 'settings' => $settings,
                 'logo' => Base64EncodeFile::encode('public/assets/imgs/incc/inachis.png'),
