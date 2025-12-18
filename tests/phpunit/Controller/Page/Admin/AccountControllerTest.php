@@ -46,9 +46,9 @@ class AccountControllerTest extends WebTestCase
 
     public function setUp(): void
     {
-        $entityManager = $this->createMock(EntityManager::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(Translator::class);
+        $entityManager = $this->createStub(EntityManager::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(Translator::class);
         $this->controller = $this->getMockBuilder(AccountController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods([
@@ -56,7 +56,7 @@ class AccountControllerTest extends WebTestCase
                 'redirectToRoute', 'render'
             ])
             ->getMock();
-        $this->controller->method('render')
+        $this->controller->expects($this->atLeast(0))->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
@@ -67,8 +67,10 @@ class AccountControllerTest extends WebTestCase
         $request = new Request([], [], [], [], [], [
                 'REQUEST_URI' => '/incc/login',
             ]);
-        $this->controller->method('redirectIfAuthenticatedOrNoAdmins')->willReturn('');
-        $authenticationUtils = $this->createMock(AuthenticationUtils::class);
+        $this->controller->expects($this->once())
+            ->method('redirectIfAuthenticatedOrNoAdmins')
+            ->willReturn('');
+        $authenticationUtils = $this->createStub(AuthenticationUtils::class);
         $result = $this->controller->login($request, $authenticationUtils);
         $this->assertEquals('rendered:inadmin/page/admin/signin.html.twig', $result->getContent());
 
@@ -79,9 +81,13 @@ class AccountControllerTest extends WebTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incc/login',
         ]);
-        $this->controller->method('redirectIfAuthenticatedOrNoAdmins')->willReturn('incc_dashboard');
-        $this->controller->method('redirectToRoute')->willReturn(new RedirectResponse('/incc/'));
-        $authenticationUtils = $this->createMock(AuthenticationUtils::class);
+        $this->controller->expects($this->once())
+            ->method('redirectIfAuthenticatedOrNoAdmins')
+            ->willReturn('incc_dashboard');
+        $this->controller->expects($this->once())
+            ->method('redirectToRoute')
+            ->willReturn(new RedirectResponse('/incc/'));
+        $authenticationUtils = $this->createStub(AuthenticationUtils::class);
         $result = $this->controller->login($request, $authenticationUtils);
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/incc/', $result->getTargetUrl());
@@ -108,22 +114,26 @@ class AccountControllerTest extends WebTestCase
         ]);
         $forgotPasswordIpLimiter = $this->createMock(RateLimiterFactoryInterface::class);
         $forgotPasswordAccountLimiter = $this->createMock(RateLimiterFactoryInterface::class);
-        $passwordResetRequestRepository = $this->createMock(PasswordResetRequestRepository::class);
+        $passwordResetRequestRepository = $this->createStub(PasswordResetRequestRepository::class);
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->method('findOneBy')->willReturn(new User());
-        $userAccountEmailService = $this->createMock(UserAccountEmailService::class);
+        $userRepository->expects($this->never())->method('findOneBy')->willReturn(new User());
+        $userAccountEmailService = $this->createStub(UserAccountEmailService::class);
 
         $limit = $this->createMock(RateLimit::class);
-        $limit->method('isAccepted')->willReturn(true);
+        $limit->expects($this->once())->method('isAccepted')->willReturn(true);
         $limiter = $this->createMock(LimiterInterface::class);
-        $limiter->method('consume')->willReturn($limit);
-        $forgotPasswordIpLimiter->method('create')->willReturn($limiter);
-        $forgotPasswordAccountLimiter->method('create')->willReturn($limiter);
+        $limiter->expects($this->once())->method('consume')->willReturn($limit);
+        $forgotPasswordIpLimiter->expects($this->once())
+            ->method('create')
+            ->willReturn($limiter);
+        $forgotPasswordAccountLimiter->expects($this->never())
+            ->method('create')
+            ->willReturn($limiter);
 
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(false);
-        $form->method('isValid')->willReturn(false);
-        $this->controller->method('createForm')->willReturn($form);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(false);
+        $form->expects($this->never())->method('isValid')->willReturn(false);
+        $this->controller->expects($this->once())->method('createForm')->willReturn($form);
 
         $result = $this->controller->forgotPassword(
             $request, $passwordResetRequestRepository, $forgotPasswordIpLimiter,
@@ -147,25 +157,31 @@ class AccountControllerTest extends WebTestCase
         ]);
         $forgotPasswordIpLimiter = $this->createMock(RateLimiterFactoryInterface::class);
         $forgotPasswordAccountLimiter = $this->createMock(RateLimiterFactoryInterface::class);
-        $passwordResetRequestRepository = $this->createMock(PasswordResetRequestRepository::class);
+        $passwordResetRequestRepository = $this->createStub(PasswordResetRequestRepository::class);
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->method('findOneBy')->willReturn(new User());
-        $userAccountEmailService = $this->createMock(UserAccountEmailService::class);
+        $userRepository->expects($this->once())->method('findOneBy')->willReturn(new User());
+        $userAccountEmailService = $this->createStub(UserAccountEmailService::class);
 
         $limit = $this->createMock(RateLimit::class);
-        $limit->method('isAccepted')->willReturn(true);
+        $limit->expects($this->atLeastOnce())->method('isAccepted')->willReturn(true);
         $limiter = $this->createMock(LimiterInterface::class);
-        $limiter->method('consume')->willReturn($limit);
-        $forgotPasswordIpLimiter->method('create')->willReturn($limiter);
-        $forgotPasswordAccountLimiter->method('create')->willReturn($limiter);
+        $limiter->expects($this->atLeastOnce())->method('consume')->willReturn($limit);
+        $forgotPasswordIpLimiter->expects($this->once())
+            ->method('create')
+            ->willReturn($limiter);
+        $forgotPasswordAccountLimiter->expects($this->once())
+            ->method('create')
+            ->willReturn($limiter);
 
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(true);
         $formBuilder = $this->createMock(FormBuilder::class);
-        $formBuilder->method('getForm')->willReturn($form);
-        $this->controller->method('createForm')->willReturn($form);
-        $this->controller->method('createFormBuilder')->willReturn($formBuilder);
+        $formBuilder->expects($this->once())->method('getForm')->willReturn($form);
+        $this->controller->expects($this->once())->method('createForm')->willReturn($form);
+        $this->controller->expects($this->once())
+            ->method('createFormBuilder')
+            ->willReturn($formBuilder);
 
         $result = $this->controller->forgotPassword(
             $request, $passwordResetRequestRepository, $forgotPasswordIpLimiter,
@@ -188,17 +204,17 @@ class AccountControllerTest extends WebTestCase
             'REQUEST_URI' => '/incc/forgot-password',
         ]);
         $forgotPasswordIpLimiter = $this->createMock(RateLimiterFactoryInterface::class);
-        $forgotPasswordAccountLimiter = $this->createMock(RateLimiterFactoryInterface::class);
-        $passwordResetRequestRepository = $this->createMock(PasswordResetRequestRepository::class);
+        $forgotPasswordAccountLimiter = $this->createStub(RateLimiterFactoryInterface::class);
+        $passwordResetRequestRepository = $this->createStub(PasswordResetRequestRepository::class);
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->method('findOneBy')->willReturn(new User());
-        $userAccountEmailService = $this->createMock(UserAccountEmailService::class);
+        $userRepository->expects($this->never())->method('findOneBy')->willReturn(new User());
+        $userAccountEmailService = $this->createStub(UserAccountEmailService::class);
 
         $limit = $this->createMock(RateLimit::class);
-        $limit->method('isAccepted')->willReturn(false);
+        $limit->expects($this->once())->method('isAccepted')->willReturn(false);
         $limiter = $this->createMock(LimiterInterface::class);
-        $limiter->method('consume')->willReturn($limit);
-        $forgotPasswordIpLimiter->method('create')->willReturn($limiter);
+        $limiter->expects($this->once())->method('consume')->willReturn($limit);
+        $forgotPasswordIpLimiter->expects($this->once())->method('create')->willReturn($limiter);
 
         $result = $this->controller->forgotPassword(
             $request, $passwordResetRequestRepository, $forgotPasswordIpLimiter,
@@ -222,29 +238,33 @@ class AccountControllerTest extends WebTestCase
         ]);
         $forgotPasswordIpLimiter = $this->createMock(RateLimiterFactoryInterface::class);
         $forgotPasswordAccountLimiter = $this->createMock(RateLimiterFactoryInterface::class);
-        $passwordResetRequestRepository = $this->createMock(PasswordResetRequestRepository::class);
+        $passwordResetRequestRepository = $this->createStub(PasswordResetRequestRepository::class);
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->method('findOneBy')->willReturn(new User());
-        $userAccountEmailService = $this->createMock(UserAccountEmailService::class);
+        $userRepository->expects($this->never())->method('findOneBy')->willReturn(new User());
+        $userAccountEmailService = $this->createStub(UserAccountEmailService::class);
 
         $limit = $this->createMock(RateLimit::class);
-        $limit->method('isAccepted')->willReturn(true);
+        $limit->expects($this->atLeastOnce())->method('isAccepted')->willReturn(true);
         $limiter = $this->createMock(LimiterInterface::class);
-        $limiter->method('consume')->willReturn($limit);
-        $forgotPasswordIpLimiter->method('create')->willReturn($limiter);
+        $limiter->expects($this->atLeastOnce())->method('consume')->willReturn($limit);
+        $forgotPasswordIpLimiter->expects($this->once())->method('create')->willReturn($limiter);
         $limit = $this->createMock(RateLimit::class);
-        $limit->method('isAccepted')->willReturn(false);
+        $limit->expects($this->atLeastOnce())->method('isAccepted')->willReturn(false);
         $limiter = $this->createMock(LimiterInterface::class);
-        $limiter->method('consume')->willReturn($limit);
-        $forgotPasswordAccountLimiter->method('create')->willReturn($limiter);
+        $limiter->expects($this->atLeastOnce())->method('consume')->willReturn($limit);
+        $forgotPasswordAccountLimiter->expects($this->once())
+            ->method('create')
+            ->willReturn($limiter);
 
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(true);
         $formBuilder = $this->createMock(FormBuilder::class);
-        $formBuilder->method('getForm')->willReturn($form);
-        $this->controller->method('createForm')->willReturn($form);
-        $this->controller->method('createFormBuilder')->willReturn($formBuilder);
+        $formBuilder->expects($this->never())->method('getForm')->willReturn($form);
+        $this->controller->expects($this->once())->method('createForm')->willReturn($form);
+        $this->controller->expects($this->never())
+            ->method('createFormBuilder')
+            ->willReturn($formBuilder);
 
         $result = $this->controller->forgotPassword(
             $request, $passwordResetRequestRepository, $forgotPasswordIpLimiter,
@@ -262,15 +282,17 @@ class AccountControllerTest extends WebTestCase
         ], [], [], [], [
             'REQUEST_URI' => '/incc/forgot-password',
         ]);
-        $forgotPasswordIpLimiter = $this->createMock(RateLimiterFactoryInterface::class);
-        $forgotPasswordAccountLimiter = $this->createMock(RateLimiterFactoryInterface::class);
-        $passwordResetRequestRepository = $this->createMock(PasswordResetRequestRepository::class);
+        $forgotPasswordIpLimiter = $this->createStub(RateLimiterFactoryInterface::class);
+        $forgotPasswordAccountLimiter = $this->createStub(RateLimiterFactoryInterface::class);
+        $passwordResetRequestRepository = $this->createStub(PasswordResetRequestRepository::class);
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->method('findOneBy')->willReturn(new User());
-        $userAccountEmailService = $this->createMock(UserAccountEmailService::class);
+        $userRepository->expects($this->never())->method('findOneBy')->willReturn(new User());
+        $userAccountEmailService = $this->createStub(UserAccountEmailService::class);
 
-        $this->controller->method('redirectIfAuthenticatedOrNoAdmins')->willReturn('/incc/');
-        $this->controller
+        $this->controller->expects($this->once())
+            ->method('redirectIfAuthenticatedOrNoAdmins')
+            ->willReturn('/incc/');
+        $this->controller->expects($this->once())
             ->method('redirectToRoute')
             ->with('/incc/')
             ->willReturn(new RedirectResponse('/incc/'));
@@ -297,34 +319,43 @@ class AccountControllerTest extends WebTestCase
         $request->setSession($session);
         $forgotPasswordIpLimiter = $this->createMock(RateLimiterFactoryInterface::class);
         $forgotPasswordAccountLimiter = $this->createMock(RateLimiterFactoryInterface::class);
-        $passwordResetRequestRepository = $this->createMock(PasswordResetRequestRepository::class);
+        $passwordResetRequestRepository = $this->createStub(PasswordResetRequestRepository::class);
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->method('findOneBy')->willReturn(new User());
+        $userRepository->expects($this->once())->method('findOneBy')->willReturn(new User());
         $userAccountEmailService = $this->createMock(UserAccountEmailService::class);
-        $userAccountEmailService
+        $userAccountEmailService->expects($this->once())
             ->method('sendForgotPasswordEmail')
             ->willThrowException(new TransportException('Mailer broken'));
 
         $limit = $this->createMock(RateLimit::class);
-        $limit->method('isAccepted')->willReturn(true);
+        $limit->expects($this->atLeastOnce())->method('isAccepted')->willReturn(true);
         $limiter = $this->createMock(LimiterInterface::class);
-        $limiter->method('consume')->willReturn($limit);
-        $forgotPasswordIpLimiter->method('create')->willReturn($limiter);
-        $forgotPasswordAccountLimiter->method('create')->willReturn($limiter);
+        $limiter->expects($this->atLeastOnce())->method('consume')->willReturn($limit);
+        $forgotPasswordIpLimiter->expects($this->once())
+            ->method('create')
+            ->willReturn($limiter);
+        $forgotPasswordAccountLimiter->expects($this->once())
+            ->method('create')
+            ->willReturn($limiter);
 
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(true);
         $formBuilder = $this->createMock(FormBuilder::class);
-        $formBuilder->method('getForm')->willReturn($form);
-        $this->controller->method('createForm')->willReturn($form);
-        $this->controller->method('createFormBuilder')->willReturn($formBuilder);
+        $formBuilder->expects($this->once())->method('getForm')->willReturn($form);
+        $this->controller->expects($this->once())->method('createForm')->willReturn($form);
+        $this->controller->expects($this->once())
+            ->method('createFormBuilder')
+            ->willReturn($formBuilder);
 
         $result = $this->controller->forgotPassword(
             $request, $passwordResetRequestRepository, $forgotPasswordIpLimiter,
             $forgotPasswordAccountLimiter, $userAccountEmailService, $userRepository
         );
-        $this->assertEquals('rendered:inadmin/page/admin/forgot-password-sent.html.twig', $result->getContent());
+        $this->assertEquals(
+            'rendered:inadmin/page/admin/forgot-password-sent.html.twig',
+            $result->getContent()
+        );
     }
 
     /**
@@ -336,11 +367,11 @@ class AccountControllerTest extends WebTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incc/new-password',
         ]);
-        $forgotPasswordIpLimiter = $this->createMock(RateLimiterFactoryInterface::class);
-        $tokenService = $this->createMock(PasswordResetTokenService::class);
-        $passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
+        $forgotPasswordIpLimiter = $this->createStub(RateLimiterFactoryInterface::class);
+        $tokenService = $this->createStub(PasswordResetTokenService::class);
+        $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->method('findOneBy')->willReturn(new User());
+        $userRepository->expects($this->never())->method('findOneBy')->willReturn(new User());
 
         $result = $this->controller->newPassword(
             $request, $tokenService, $forgotPasswordIpLimiter, $passwordHasher,
@@ -358,13 +389,15 @@ class AccountControllerTest extends WebTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incc/new-password',
         ]);
-        $forgotPasswordIpLimiter = $this->createMock(RateLimiterFactoryInterface::class);
-        $tokenService = $this->createMock(PasswordResetTokenService::class);
-        $passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
-        $userRepository = $this->createMock(UserRepository::class);
+        $forgotPasswordIpLimiter = $this->createStub(RateLimiterFactoryInterface::class);
+        $tokenService = $this->createStub(PasswordResetTokenService::class);
+        $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
+        $userRepository = $this->createStub(UserRepository::class);
 
-        $this->controller->method('redirectIfAuthenticatedOrNoAdmins')->willReturn('/incc/');
-        $this->controller
+        $this->controller->expects($this->once())
+            ->method('redirectIfAuthenticatedOrNoAdmins')
+            ->willReturn('/incc/');
+        $this->controller->expects($this->once())
             ->method('redirectToRoute')
             ->with('/incc/')
             ->willReturn(new RedirectResponse('/incc/'));
@@ -386,12 +419,12 @@ class AccountControllerTest extends WebTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incc/new-password',
         ]);
-        $forgotPasswordIpLimiter = $this->createMock(RateLimiterFactoryInterface::class);
-        $tokenService = $this->createMock(PasswordResetTokenService::class);
-        $passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
-        $userRepository = $this->createMock(UserRepository::class);
+        $forgotPasswordIpLimiter = $this->createStub(RateLimiterFactoryInterface::class);
+        $tokenService = $this->createStub(PasswordResetTokenService::class);
+        $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
+        $userRepository = $this->createStub(UserRepository::class);
 
-        $this->controller
+        $this->controller->expects($this->once())
             ->method('redirectToRoute')
             ->with('incc_account_forgot-password')
             ->willReturn(new RedirectResponse('/incc/forgot-password'));
@@ -409,16 +442,16 @@ class AccountControllerTest extends WebTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incc/new-password',
         ]);
-        $forgotPasswordIpLimiter = $this->createMock(RateLimiterFactoryInterface::class);
-        $tokenService = $this->createMock(PasswordResetTokenService::class);
-        $passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
+        $forgotPasswordIpLimiter = $this->createStub(RateLimiterFactoryInterface::class);
+        $tokenService = $this->createStub(PasswordResetTokenService::class);
+        $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->method('findOneBy')->willReturn(new User());
+        $userRepository->expects($this->atLeast(0))->method('findOneBy')->willReturn(new User());
 
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
-        $this->controller->method('createForm')->willReturn($form);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(true);
+        $this->controller->expects($this->once())->method('createForm')->willReturn($form);
 
         $result = $this->controller->newPassword(
             $request, $tokenService, $forgotPasswordIpLimiter, $passwordHasher,
@@ -442,24 +475,28 @@ class AccountControllerTest extends WebTestCase
             'REQUEST_URI' => '/incc/new-password',
         ]);
         $forgotPasswordIpLimiter = $this->createMock(RateLimiterFactoryInterface::class);
-        $tokenService = $this->createMock(PasswordResetTokenService::class);
-        $passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
+        $tokenService = $this->createStub(PasswordResetTokenService::class);
+        $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->method('findOneBy')->willReturn(null);
+        $userRepository->expects($this->once())->method('findOneBy')->willReturn(null);
 
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
-        $form->method('getData')->willReturn($formData);
-        $this->controller->method('createForm')->willReturn($form);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(true);
+        $form->expects($this->atLeastOnce())->method('getData')->willReturn($formData);
+        $this->controller->expects($this->once())->method('createForm')->willReturn($form);
 
         $limit = $this->createMock(RateLimit::class);
-        $limit->method('isAccepted')->willReturn(true);
+        $limit->expects($this->once())->method('isAccepted')->willReturn(true);
         $limiter = $this->createMock(LimiterInterface::class);
-        $limiter->method('consume')->willReturn($limit);
-        $forgotPasswordIpLimiter->method('create')->willReturn($limiter);
+        $limiter->expects($this->once())->method('consume')->willReturn($limit);
+        $forgotPasswordIpLimiter->expects($this->once())
+            ->method('create')
+            ->willReturn($limiter);
 
-        $this->controller->method('redirectToRoute')->willReturn(new RedirectResponse('/incc/forgot-password'));
+        $this->controller->expects($this->once())
+            ->method('redirectToRoute')
+            ->willReturn(new RedirectResponse('/incc/forgot-password'));
 
         $result = $this->controller->newPassword(
             $request, $tokenService, $forgotPasswordIpLimiter, $passwordHasher,
@@ -480,24 +517,28 @@ class AccountControllerTest extends WebTestCase
             'REQUEST_URI' => '/incc/new-password',
         ]);
         $forgotPasswordIpLimiter = $this->createMock(RateLimiterFactoryInterface::class);
-        $tokenService = $this->createMock(PasswordResetTokenService::class);
-        $passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
+        $tokenService = $this->createStub(PasswordResetTokenService::class);
+        $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->method('findOneBy')->willReturn(new User());
+        $userRepository->expects($this->once())->method('findOneBy')->willReturn(new User());
 
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
-        $form->method('getData')->willReturn($formData);
-        $this->controller->method('createForm')->willReturn($form);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(true);
+        $form->expects($this->atLeastOnce())->method('getData')->willReturn($formData);
+        $this->controller->expects($this->once())->method('createForm')->willReturn($form);
 
         $limit = $this->createMock(RateLimit::class);
-        $limit->method('isAccepted')->willReturn(true);
+        $limit->expects($this->once())->method('isAccepted')->willReturn(true);
         $limiter = $this->createMock(LimiterInterface::class);
-        $limiter->method('consume')->willReturn($limit);
-        $forgotPasswordIpLimiter->method('create')->willReturn($limiter);
+        $limiter->expects($this->once())->method('consume')->willReturn($limit);
+        $forgotPasswordIpLimiter->expects($this->once())
+            ->method('create')
+            ->willReturn($limiter);
 
-        $this->controller->method('redirectToRoute')->willReturn(new RedirectResponse('/incc/forgot-password'));
+        $this->controller->expects($this->once())
+            ->method('redirectToRoute')
+            ->willReturn(new RedirectResponse('/incc/forgot-password'));
 
         $result = $this->controller->newPassword(
             $request, $tokenService, $forgotPasswordIpLimiter, $passwordHasher,
@@ -521,25 +562,29 @@ class AccountControllerTest extends WebTestCase
         ]);
         $forgotPasswordIpLimiter = $this->createMock(RateLimiterFactoryInterface::class);
         $tokenService = $this->createMock(PasswordResetTokenService::class);
-        $passwordResetRequest = $this->createMock(PasswordResetRequest::class);
-        $tokenService->method('validateTokenForUser')->willReturn($passwordResetRequest);
-        $passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
+        $passwordResetRequest = $this->createStub(PasswordResetRequest::class);
+        $tokenService->expects($this->once())
+            ->method('validateTokenForUser')
+            ->willReturn($passwordResetRequest);
+        $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->method('findOneBy')->willReturn(new User());
+        $userRepository->expects($this->once())->method('findOneBy')->willReturn(new User());
 
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
-        $form->method('getData')->willReturn($formData);
-        $this->controller->method('createForm')->willReturn($form);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(true);
+        $form->expects($this->atLeastOnce())->method('getData')->willReturn($formData);
+        $this->controller->expects($this->once())->method('createForm')->willReturn($form);
 
         $limit = $this->createMock(RateLimit::class);
-        $limit->method('isAccepted')->willReturn(true);
+        $limit->expects($this->once())->method('isAccepted')->willReturn(true);
         $limiter = $this->createMock(LimiterInterface::class);
-        $limiter->method('consume')->willReturn($limit);
-        $forgotPasswordIpLimiter->method('create')->willReturn($limiter);
+        $limiter->expects($this->once())->method('consume')->willReturn($limit);
+        $forgotPasswordIpLimiter->expects($this->once())
+            ->method('create')
+            ->willReturn($limiter);
 
-        $this->controller
+        $this->controller->expects($this->once())
             ->method('redirectToRoute')
             ->with('app_account_login')
             ->willReturn(new RedirectResponse('/incc/login'));

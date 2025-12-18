@@ -22,8 +22,10 @@ use App\Repository\UrlRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionClass;
+use ReflectionException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -42,13 +44,14 @@ class PageWebControllerTest extends WebTestCase
     private TranslatorInterface $translator;
 
     /**
-     * @throws \ReflectionException
+     * @throws ReflectionException
+     * @throws Exception
      */
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->security = $this->createMock(Security::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->security = $this->createStub(Security::class);
+        $this->translator = $this->createStub(TranslatorInterface::class);
         $this->controller = new PageWebController($this->entityManager, $this->security, $this->translator);
 
         $ref = new ReflectionClass($this->controller);
@@ -56,8 +59,7 @@ class PageWebControllerTest extends WebTestCase
             $property = $ref->getProperty($prop);
             $property->setValue($this->controller, $this->$prop);
         }
-        $container = $this->createMock(ContainerInterface::class);
-        $container->method('get')->willReturn(null);
+        $container = $this->createStub(ContainerInterface::class);
         $this->controller->setContainer($container);
     }
 
@@ -66,16 +68,16 @@ class PageWebControllerTest extends WebTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/2025/10/10/sample-post'
         ]);
-        $urlRepo = $this->getMockBuilder(EntityRepository::class)
+        $urlRepository = $this->getMockBuilder(EntityRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $urlRepo->expects($this->once())
+        $urlRepository->expects($this->once())
             ->method('findOneBy')
             ->with(['link' => '2025/10/10/sample-post'])
             ->willReturn(null);
-        $this->entityManager->method('getRepository')
+        $this->entityManager->expects($this->once())->method('getRepository')
             ->with(Url::class)
-            ->willReturn($urlRepo);
+            ->willReturn($urlRepository);
         $this->expectException(NotFoundHttpException::class);
         $this->controller->getPost($request, 2025, 10, 10, 'sample-post');
     }
@@ -86,9 +88,10 @@ class PageWebControllerTest extends WebTestCase
             'REQUEST_URI' => '/2025/10/10/sample-post'
         ]);
         $page = $this->createMock(Page::class);
-        $page->method('isScheduledPage')->willReturn(true);
+        $page->expects($this->atLeastOnce())
+            ->method('isScheduledPage')->willReturn(true);
         $url = $this->createMock(Url::class);
-        $url->method('getContent')->willReturn($page);
+        $url->expects($this->atLeastOnce())->method('getContent')->willReturn($page);
         $urlRepository = $this->getMockBuilder(UrlRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -98,25 +101,30 @@ class PageWebControllerTest extends WebTestCase
             ->willReturn($url);
         $urlRepository->method('getDefaultUrl')->willReturn($url);
 
-        $this->entityManager->method('getRepository')
+        $this->entityManager->expects($this->atLeastOnce())->method('getRepository')
             ->willReturnMap([
                 [Url::class, $urlRepository],
             ]);
 
-        $controller = $this->getMockBuilder(PageWebController::class)
+        $controller = $this->getStubBuilder(PageWebController::class)
             ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
             ->onlyMethods(['render'])
-            ->getMock();
+            ->getStub();
         $router = $this->createMock(RouterInterface::class);
-        $router->method('generate')->willReturn('/');
+        $router->expects($this->atLeast(0))->method('generate')->willReturn('/');
         $container = $this->createMock(ContainerInterface::class);
-        $container->method('get')->willReturnCallback(function (string $id) use ($router) {
-            if (str_contains($id, 'router')) {
-                return $router;
+        $container->expects($this->atLeastOnce())
+            ->method('get')
+            ->willReturnCallback(function (string $id) use ($router)
+            {
+                if (str_contains($id, 'router')) {
+                    return $router;
+                }
+                return null;
             }
-            return null;
-        });
+        );
         $controller->setContainer($container);
+
         $response = $controller->getPost($request, '2025', '10', '10', 'sample-post');
         $this->assertTrue($response->isRedirect());
         $this->assertEquals('/', $response->headers->get('Location'));
@@ -128,9 +136,9 @@ class PageWebControllerTest extends WebTestCase
             'REQUEST_URI' => '/2025/10/10/sample-post'
         ]);
         $url = $this->createMock(Url::class);
-        $url->method('isDefault')->willReturn(false);
+        $url->expects($this->once())->method('isDefault')->willReturn(false);
         $url2 = $this->createMock(Url::class);
-        $url2->method('isDefault')->willReturn(true);
+        $url2->expects($this->once())->method('isDefault')->willReturn(true);
         $urlRepository = $this->getMockBuilder(UrlRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -138,21 +146,24 @@ class PageWebControllerTest extends WebTestCase
             ->method('findOneBy')
             ->with([ 'link' => '2025/10/10/sample-post' ])
             ->willReturn($url);
-        $urlRepository->method('getDefaultUrl')->willReturn($url2);
+        $urlRepository->expects($this->atLeastOnce())
+            ->method('getDefaultUrl')->willReturn($url2);
 
-        $this->entityManager->method('getRepository')
+        $this->entityManager->expects($this->atLeastOnce())
+            ->method('getRepository')
             ->willReturnMap([
                 [Url::class, $urlRepository],
             ]);
 
-        $controller = $this->getMockBuilder(PageWebController::class)
+        $controller = $this->getStubBuilder(PageWebController::class)
             ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
             ->onlyMethods(['render'])
-            ->getMock();
+            ->getStub();
         $router = $this->createMock(RouterInterface::class);
-        $router->method('generate')->willReturn('/');
+        $router->expects($this->atLeast(0))->method('generate')->willReturn('/');
         $container = $this->createMock(ContainerInterface::class);
-        $container->method('get')->willReturnCallback(function (string $id) use ($router) {
+        $container->expects($this->atLeast(0))
+            ->method('get')->willReturnCallback(function (string $id) use ($router) {
             if (str_contains($id, 'router')) {
                 return $router;
             }
@@ -169,10 +180,10 @@ class PageWebControllerTest extends WebTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/2025/10/10/sample-post'
         ]);
-        $page = $this->createMock(Page::class);
-        $page2 = $this->createMock(Page::class);
+        $page = $this->createStub(Page::class);
+        $page2 = $this->createStub(Page::class);
         $url = $this->createMock(Url::class);
-        $url->method('getContent')->willReturn($page);
+        $url->expects($this->atLeastOnce())->method('getContent')->willReturn($page);
         $urlRepository = $this->getMockBuilder(UrlRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -180,17 +191,17 @@ class PageWebControllerTest extends WebTestCase
             ->method('findOneBy')
             ->with([ 'link' => '2025/10/10/sample-post' ])
             ->willReturn($url);
-        $urlRepository->method('getDefaultUrl')->willReturn($url);
+        $urlRepository->expects($this->atLeastOnce())->method('getDefaultUrl')->willReturn($url);
         $seriesByPostResult = $this->createMock(Series::class);
-        $seriesByPostResult->method('getItems')->willReturn(new ArrayCollection([$page2, $page, $page2]));
+        $seriesByPostResult->expects($this->atLeastOnce())
+            ->method('getItems')->willReturn(new ArrayCollection([$page2, $page, $page2]));
         $seriesRepository = $this->getMockBuilder(SeriesRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
         $seriesRepository->expects($this->once())
             ->method('getPublishedSeriesByPost')
             ->willReturn($seriesByPostResult);
-
-        $this->entityManager->method('getRepository')
+        $this->entityManager->expects($this->atLeastOnce())->method('getRepository')
             ->willReturnMap([
                 [Url::class, $urlRepository],
                 [Series::class, $seriesRepository],
@@ -211,6 +222,7 @@ class PageWebControllerTest extends WebTestCase
 
     public function testGetPageDelegatesToGetPost(): void
     {
+        $this->entityManager->expects($this->never())->method('getRepository');
         $controller = $this->getMockBuilder(PageWebController::class)
             ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
             ->onlyMethods(['getPost'])
@@ -234,10 +246,11 @@ class PageWebControllerTest extends WebTestCase
     public function testGetPostsByTagThrowsNotFound(): void
     {
         $request = new Request();
-        $tagRepository = $this->getMockBuilder(EntityRepository::class)
+        $tagRepository = $this->getStubBuilder(EntityRepository::class)
             ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityManager->method('getRepository')
+            ->getStub();
+        $this->entityManager->expects($this->atLeastOnce())
+            ->method('getRepository')
             ->willReturnMap([
                 [Tag::class, $tagRepository]
             ]);
@@ -245,29 +258,33 @@ class PageWebControllerTest extends WebTestCase
         $this->controller->getPostsByTag($request, 'nonexistent-tag');
     }
 
+    /**
+     * @throws Exception
+     */
     public function testGetPostsByTagRendersTemplate(): void
     {
         $request = new Request();
-        $tag = $this->createMock(Tag::class);
-        $pages = [$this->createMock(Page::class)];
-        $tagRepo = $this->getMockBuilder(TagRepository::class)
+        $tag = $this->createStub(Tag::class);
+        $pages = [$this->createStub(Page::class)];
+        $tagRepository = $this->getMockBuilder(TagRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $tagRepo->expects($this->once())
+        $tagRepository->expects($this->once())
             ->method('findOneBy')
             ->with(['title' => 'existing-tag'])
             ->willReturn($tag);
-        $pageRepo = $this->getMockBuilder(PageRepository::class)
+        $pageRepository = $this->getMockBuilder(PageRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $pageRepo->expects($this->once())
+        $pageRepository->expects($this->once())
             ->method('getPagesWithTag')
             ->with($tag)
             ->willReturn($pages);
-        $this->entityManager->method('getRepository')
+        $this->entityManager->expects($this->atLeastOnce())
+            ->method('getRepository')
             ->willReturnMap([
-                [Tag::class, $tagRepo],
-                [Page::class, $pageRepo]
+                [Tag::class, $tagRepository],
+                [Page::class, $pageRepository]
             ]);
         $controller = $this->getMockBuilder(PageWebController::class)
             ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
@@ -292,12 +309,12 @@ class PageWebControllerTest extends WebTestCase
     public function testGetPostsByCategoryThrowsNotFound(): void
     {
         $request = new Request();
-        $categoryRepo = $this->getMockBuilder(EntityRepository::class)
+        $categoryRepository = $this->getStubBuilder(EntityRepository::class)
             ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityManager->method('getRepository')
+            ->getStub();
+        $this->entityManager->expects($this->atLeastOnce())->method('getRepository')
             ->willReturnMap([
-                [Category::class, $categoryRepo]
+                [Category::class, $categoryRepository]
             ]);
         $this->expectException(NotFoundHttpException::class);
         $this->controller->getPostsByCategory($request, 'missing-category');
@@ -306,8 +323,8 @@ class PageWebControllerTest extends WebTestCase
     public function testGetPostsByCategoryRendersTemplate(): void
     {
         $request = new Request();
-        $category = $this->createMock(Category::class);
-        $pages = [$this->createMock(Page::class)];
+        $category = $this->createStub(Category::class);
+        $pages = [$this->createStub(Page::class)];
         $categoryRepository = $this->getMockBuilder(EntityRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -322,7 +339,8 @@ class PageWebControllerTest extends WebTestCase
             ->method('getPagesWithCategory')
             ->with($category)
             ->willReturn($pages);
-        $this->entityManager->method('getRepository')
+        $this->entityManager->expects($this->atLeastOnce())
+            ->method('getRepository')
             ->willReturnMap([
                 [Category::class, $categoryRepository],
                 [Page::class, $pageRepository]

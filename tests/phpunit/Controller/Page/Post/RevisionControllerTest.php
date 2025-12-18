@@ -25,13 +25,13 @@ class RevisionControllerTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $entityManager = $this->createMock(EntityManager::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(Translator::class);
-        $this->controller = $this->getMockBuilder(RevisionController::class)
+        $entityManager = $this->createStub(EntityManager::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(Translator::class);
+        $this->controller = $this->getStubBuilder(RevisionController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods([])
-            ->getMock();
+            ->getStub();
     }
 
     public function testDiffEmptyRevision()
@@ -39,7 +39,7 @@ class RevisionControllerTest extends WebTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incc/page/diff/{id}'
         ]);
-        $pageRepository = $this->createMock(PageRepository::class);
+        $pageRepository = $this->createStub(PageRepository::class);
         $revisionRepository = $this->createMock(RevisionRepository::class);
         $revisionRepository->expects($this->once())->method('findOneBy')->willReturn(null);
         $this->expectException(NotFoundHttpException::class);
