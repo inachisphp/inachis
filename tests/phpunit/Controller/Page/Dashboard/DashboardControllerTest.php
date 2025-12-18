@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Page\Url;
+namespace App\Tests\phpunit\Controller\Page\Dashboard;
 
 use App\Controller\Page\Dashboard\DashboardController;
 use App\Repository\PageRepository;
@@ -30,20 +30,20 @@ class DashboardControllerTest extends WebTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incc/'
         ]);
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $controller = $this->getMockBuilder(DashboardController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods(['render'])
             ->getMock();
-        $controller->method('render')
+        $controller->expects($this->once())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
-        $paginator = $this->createMock(Paginator::class);
+        $paginator = $this->createStub(Paginator::class);
         $pageRepository = $this->createMock(PageRepository::class);
-        $pageRepository->method('getAll')->willReturn($paginator);
+        $pageRepository->expects($this->atLeastOnce())->method('getAll')->willReturn($paginator);
         
         $result = $controller->default($request, $pageRepository);
         $this->assertEquals(

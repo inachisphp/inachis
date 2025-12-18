@@ -38,8 +38,10 @@ class BulkCreateControllerTest extends WebTestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['getUser', 'render'])
             ->getMock();
-        $this->controller->method('getUser')->willReturn(new User());
-        $this->controller->method('render')
+        $this->controller->expects($this->never())
+            ->method('getUser')->willReturn(new User());
+        $this->controller->expects($this->once())
+            ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
@@ -60,13 +62,15 @@ class BulkCreateControllerTest extends WebTestCase
         ], [], [], [], [
             'REQUEST_URI' => '/incc/ax/bulkCreate/get'
         ]);
-        $bulkCreatePost = $this->createMock(PageBulkCreateService::class);
+        $bulkCreatePost = $this->createStub(PageBulkCreateService::class);
         $this->controller = $this->getMockBuilder(BulkCreateController::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getUser', 'render'])
             ->getMock();
-        $this->controller->method('getUser')->willReturn(new User());
-        $this->controller->method('render')
+        $this->controller->expects($this->never())
+            ->method('getUser')->willReturn(new User());
+        $this->controller->expects($this->never())
+            ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
@@ -89,13 +93,16 @@ class BulkCreateControllerTest extends WebTestCase
         ], [], [], [], [
             'REQUEST_URI' => '/incc/ax/bulkCreate/get'
         ]);
-        $bulkCreatePost = $this->createMock(PageBulkCreateService::class);
+        $bulkCreatePost = $this->createStub(PageBulkCreateService::class);
         $this->controller = $this->getMockBuilder(BulkCreateController::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getUser', 'render'])
             ->getMock();
-        $this->controller->method('getUser')->willReturn(new User());
-        $this->controller->method('render')
+        $this->controller->expects($this->once())
+            ->method('getUser')
+            ->willReturn(new User());
+        $this->controller->expects($this->never())
+            ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
@@ -118,13 +125,16 @@ class BulkCreateControllerTest extends WebTestCase
             'REQUEST_URI' => '/incc/ax/bulkCreate/get'
         ]);
         $bulkCreatePost = $this->createMock(PageBulkCreateService::class);
-        $bulkCreatePost->method('create')->willReturn(7);
+        $bulkCreatePost->expects($this->once())->method('create')->willReturn(7);
         $this->controller = $this->getMockBuilder(BulkCreateController::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getUser', 'render'])
             ->getMock();
-        $this->controller->method('getUser')->willReturn(new User());
-        $this->controller->method('render')
+        $this->controller->expects($this->once())
+            ->method('getUser')
+            ->willReturn(new User());
+        $this->controller->expects($this->never())
+            ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });

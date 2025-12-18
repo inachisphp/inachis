@@ -34,13 +34,13 @@ class SetupControllerTest extends TestCase
         $userRepository->expects($this->once())->method('getAllCount')->willReturn(5);
         $controller = $this->getMockBuilder(SetupController::class)
             ->setConstructorArgs([
-                $this->createMock(EntityManager::class),
-                $this->createMock(Security::class),
-                $this->createMock(Translator::class),
+                $this->createStub(EntityManager::class),
+                $this->createStub(Security::class),
+                $this->createStub(Translator::class),
             ])
             ->onlyMethods(['redirectToRoute'])
             ->getMock();
-        $controller
+        $controller->expects($this->once())
             ->method('redirectToRoute')
             ->with('incc_dashboard')
             ->willReturn(new RedirectResponse('/'));
@@ -61,13 +61,14 @@ class SetupControllerTest extends TestCase
         $userRepository->expects($this->once())->method('getAllCount')->willReturn(0);
         $controller = $this->getMockBuilder(SetupController::class)
             ->setConstructorArgs([
-                $this->createMock(EntityManager::class),
-                $this->createMock(Security::class),
-                $this->createMock(Translator::class),
+                $this->createStub(EntityManager::class),
+                $this->createStub(Security::class),
+                $this->createStub(Translator::class),
             ])
             ->onlyMethods(['createFormBuilder', 'render'])
             ->getMock();
-        $controller->method('render')
+        $controller->expects($this->once())
+            ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
@@ -78,9 +79,9 @@ class SetupControllerTest extends TestCase
     public function testGetErrors(): void
     {
         $controller = new SetupController(
-            $this->createMock(EntityManager::class),
-            $this->createMock(Security::class),
-            $this->createMock(Translator::class),
+            $this->createStub(EntityManager::class),
+            $this->createStub(Security::class),
+            $this->createStub(Translator::class),
         );
         $this->assertEmpty($controller->getErrors());
     }
@@ -88,9 +89,9 @@ class SetupControllerTest extends TestCase
     public function testAddAndGetError(): void
     {
         $controller = new SetupController(
-            $this->createMock(EntityManager::class),
-            $this->createMock(Security::class),
-            $this->createMock(Translator::class),
+            $this->createStub(EntityManager::class),
+            $this->createStub(Security::class),
+            $this->createStub(Translator::class),
         );
         $controller->addError('test', 'Something went wrong');
         $this->assertEquals('Something went wrong', $controller->getError('test'));

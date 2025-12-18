@@ -36,9 +36,9 @@ class UrlBulkActionServiceTest extends TestCase
         $page = new Page();
         $this->url = (new Url($page))
             ->setId(Uuid::uuid4());
-        $this->urlRepository = $this->createMock(UrlRepository::class);
+        $this->urlRepository = $this->createStub(UrlRepository::class);
         $this->urlRepository->method('findOneBy')->willReturn($this->url);
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createStub(EntityManager::class);
 
         $this->urlBulkActionService = new UrlBulkActionService(
             $this->urlRepository,
@@ -51,7 +51,7 @@ class UrlBulkActionServiceTest extends TestCase
      */
     public function testApplyUrlNotFound(): void
     {
-        $this->urlRepository = $this->createMock(UrlRepository::class);
+        $this->urlRepository = $this->createStub(UrlRepository::class);
         $this->urlRepository->method('findOneBy')->willReturn(null);
         $this->urlBulkActionService = new UrlBulkActionService(
             $this->urlRepository,

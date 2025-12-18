@@ -36,10 +36,10 @@ class BulkCreatePostTest extends TestCase
      */
     public function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->seriesRepository = $this->createMock(SeriesRepository::class);
-        $this->tagRepository = $this->createMock(TagRepository::class);
-        $this->categoryRepository = $this->createMock(CategoryRepository::class);
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->seriesRepository = $this->createStub(SeriesRepository::class);
+        $this->tagRepository = $this->createStub(TagRepository::class);
+        $this->categoryRepository = $this->createStub(CategoryRepository::class);
         $this->bulkCreateData = new BulkCreateData(
             'some title',
             DateTime::createFromFormat('d/m/Y', '01/11/2025'),

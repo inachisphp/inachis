@@ -13,6 +13,7 @@ use App\Entity\Image;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Util\RandomColorPicker;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -21,6 +22,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class UserTypeTest extends TypeTestCase
 {
     protected UuidInterface $uuid;
@@ -28,8 +30,8 @@ class UserTypeTest extends TypeTestCase
     protected function getExtensions(): array
     {
         $this->uuid = Uuid::uuid1();
-        $translator = $this->createMock(TranslatorInterface::class);
-        $security = $this->createMock(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
+        $security = $this->createStub(Security::class);
         $security->method('getUser')->willReturn((new User())->setId($this->uuid));
         return [new PreloadedExtension([new UserType($translator, $security)], [])];
     }

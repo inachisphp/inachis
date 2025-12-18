@@ -25,8 +25,8 @@ class SearchRepositoryTest extends TestCase
 
     public function setUp(): void
     {
-        $registry = $this->createMock(ManagerRegistry::class);
-        $this->connection = $this->createMock(Connection::class);
+        $registry = $this->createStub(ManagerRegistry::class);
+        $this->connection = $this->createStub(Connection::class);
         $this->repository = new SearchRepository($registry, $this->connection);
     }
 
@@ -65,13 +65,12 @@ class SearchRepositoryTest extends TestCase
             ->willReturn($totalResults);
 
         $this->connection
-            ->expects($this->exactly(2))
             ->method('prepare')
             ->willReturnOnConsecutiveCalls(
-                $this->createConfiguredMock(Statement::class, [
+                $this->createConfiguredStub(Statement::class, [
                     'executeQuery' => $mainStmt
                 ]),
-                $this->createConfiguredMock(Statement::class, [
+                $this->createConfiguredStub(Statement::class, [
                     'executeQuery' => $countStmt
                 ])
             );

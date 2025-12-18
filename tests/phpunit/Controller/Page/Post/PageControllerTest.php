@@ -52,8 +52,8 @@ class PageControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->security = $this->createMock(Security::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->security = $this->createStub(Security::class);
+        $this->translator = $this->createStub(TranslatorInterface::class);
     }
 
     /**
@@ -65,7 +65,7 @@ class PageControllerTest extends WebTestCase
             'REQUEST_URI' => '/incc/post/some-post'
         ]);
         $request->setSession(new Session(new MockArraySessionStorage()));
-        $pageRepository = $this->createMock(PageRepository::class);
+        $pageRepository = $this->createStub(PageRepository::class);
         $urlRepository = $this->getMockBuilder(UrlRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -73,7 +73,8 @@ class PageControllerTest extends WebTestCase
             ->method('findBy')
             ->with(['link' => 'some-post'])
             ->willReturn([]);
-        $this->entityManager->method('getRepository')
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
             ->with(Url::class)
             ->willReturn($urlRepository);
 
@@ -85,11 +86,11 @@ class PageControllerTest extends WebTestCase
             ->method('redirectToRoute')
             ->with('incc_post_list', ['type' => 'post'])
             ->willReturn(new RedirectResponse('/redirected'));
-        $revisionRepository = $this->createMock(RevisionRepository::class);
+        $revisionRepository = $this->createStub(RevisionRepository::class);
 
         $response = $controller->edit(
             $request,
-            $this->createMock(ContentRevisionCompare::class),
+            $this->createStub(ContentRevisionCompare::class),
             $pageRepository,
             $revisionRepository,
             'post',
@@ -110,29 +111,30 @@ class PageControllerTest extends WebTestCase
         ]);
         $request->setSession(new Session(new MockArraySessionStorage()));
 
-        $pageRepository = $this->createMock(PageRepository::class);
+        $pageRepository = $this->createStub(PageRepository::class);
         $urlRepository = $this->getMockBuilder(EntityRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $urlRepository->method('findBy')->willReturn([]);
-        $paginator = $this->getMockBuilder(Paginator::class)
+        $urlRepository->expects($this->once())->method('findBy')->willReturn([]);
+        $paginator = $this->getStubBuilder(Paginator::class)
             ->disableOriginalConstructor()
-            ->getMock();
+            ->getStub();
         $revisionRepository = $this->getMockBuilder(RevisionRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $revisionRepository->expects($this->any())
+        $revisionRepository->expects($this->atLeast(0))
             ->method('getAll')
             ->willReturn($paginator);
-        $this->entityManager->method('getRepository')
+        $this->entityManager->expects($this->atLeastOnce())
+            ->method('getRepository')
             ->willReturnMap([
                 [Url::class, $urlRepository],
                 [Revision::class, $revisionRepository],
             ]);
 
         $form = $this->createMock(Form::class);
-        $form->method('handleRequest');
-        $form->method('isSubmitted')->willReturn(false);
+        $form->expects($this->once())->method('handleRequest');
+        $form->expects($this->once())->method('isSubmitted')->willReturn(false);
 
         $controller = $this->getMockBuilder(PageController::class)
             ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
@@ -144,16 +146,16 @@ class PageControllerTest extends WebTestCase
         $controller->expects($this->once())
             ->method('render')
             ->willReturn(new Response('Rendered form'));
-        $revisionRepository = $this->createMock(RevisionRepository::class);
+        $revisionRepository = $this->createStub(RevisionRepository::class);
+
         $response = $controller->edit(
             $request,
-            $this->createMock(ContentRevisionCompare::class),
+            $this->createStub(ContentRevisionCompare::class),
             $pageRepository,
             $revisionRepository,
             'post',
             'new'
         );
-
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals('Rendered form', $response->getContent());
     }

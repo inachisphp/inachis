@@ -27,7 +27,7 @@ class CategoryRepositoryTest extends TestCase
 
     public function setUp(): void
     {
-        $registry = $this->createMock(ManagerRegistry::class);
+        $registry = $this->createStub(ManagerRegistry::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
 
         $this->repository = $this->getMockBuilder(CategoryRepository::class)
@@ -35,7 +35,8 @@ class CategoryRepositoryTest extends TestCase
             ->onlyMethods(['getEntityManager', 'createQueryBuilder', 'getAll'])
             ->getMock();
 
-        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
+        $this->repository->expects($this->atLeast(0))
+            ->method('getEntityManager')->willReturn($this->entityManager);
         parent::setUp();
     }
 
@@ -43,13 +44,10 @@ class CategoryRepositoryTest extends TestCase
     {
         $category = new Category();
 
-        $this->entityManager
-            ->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('remove')
             ->with($category);
-
-        $this->entityManager
-            ->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('flush');
 
         $this->repository->remove($category);
@@ -57,6 +55,7 @@ class CategoryRepositoryTest extends TestCase
 
     public function testGetRootCategoriesBuildsCorrectQuery(): void
     {
+        $this->entityManager->expects($this->never())->method('getRepository');
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $query = $this->createMock(Query::class);
 
@@ -80,7 +79,8 @@ class CategoryRepositoryTest extends TestCase
 
     public function testFindByTitleLikeDelegatesToGetAll(): void
     {
-        $paginator = $this->createMock(Paginator::class);
+        $this->entityManager->expects($this->never())->method('getRepository');
+        $paginator = $this->createStub(Paginator::class);
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(

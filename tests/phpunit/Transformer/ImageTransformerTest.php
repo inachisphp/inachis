@@ -11,6 +11,7 @@ namespace App\Tests\phpunit\Transformer;
 
 use App\Transformer\ImageTransformer;
 use Imagick;
+use ImagickException;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -38,7 +39,7 @@ class ImageTransformerTest extends TestCase
     }
 
     /**
-     * @throws \ImagickException
+     * @throws ImagickException
      * @throws Exception
      */
     public function testConvertHeicToJpegWithAutoOrient(): void
@@ -73,7 +74,7 @@ class ImageTransformerTest extends TestCase
     }
 
     /**
-     * @throws \ImagickException
+     * @throws ImagickException
      * @throws Exception
      */
     public function testConvertHeicToJpegWithAutoRotateImageAndResize(): void
@@ -117,10 +118,14 @@ class ImageTransformerTest extends TestCase
         $service->convertHeicToJpeg('/input.heic', '/out.jpg', 70, 1200, 900);
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Exception
+     */
     public function testConvertHeicToJpegWhenHeicIsNotSupported(): void
     {
         // Imagick should NOT be created or called.
-        $imagick = $this->createMock(\Imagick::class);
+        $imagick = $this->createStub(Imagick::class);
 
         // Anonymous subclass overrides isHEICSupported() to force false
         $service = new class($imagick) extends ImageTransformer {
@@ -133,7 +138,7 @@ class ImageTransformerTest extends TestCase
             }
 
             // ensure Imagick is never actually requested
-            protected function createImagick(): \Imagick
+            protected function createImagick(): Imagick
             {
                 $this->fail('createImagick() should not be called when HEIC is unsupported.');
             }

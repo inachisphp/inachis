@@ -15,20 +15,14 @@ use App\Form\UserType;
 use App\Model\ContentQueryParameters;
 use App\Repository\UserRepository;
 use App\Service\User\UserBulkActionService;
-use App\Service\User\PasswordResetTokenService;
-use App\Service\User\UserRegistrationService;
+use App\Service\User\UserAccountEmailService;
 use App\Transformer\ImageTransformer;
-use App\Util\Base64EncodeFile;
-use App\Util\RandomColorPicker;
 use DateTime;
-use Exception;
 use Random\RandomException;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -37,8 +31,10 @@ class AdminProfileController extends AbstractInachisController
 {
     /**
      * @param Request $request
+     * @param ContentQueryParameters $contentQueryParameters
+     * @param UserBulkActionService $userBulkActionService
+     * @param UserRepository $userRepository
      * @return Response
-     * @throws Exception
      */
     #[Route(
         "/incc/admin/list/{offset}/{limit}",
@@ -93,16 +89,17 @@ class AdminProfileController extends AbstractInachisController
     /**
      * @param Request $request
      * @param ImageTransformer $imageTransformer
-     * @param MailerInterface $mailer
-     * @param PasswordResetTokenService $tokenService
+     * @param UserAccountEmailService $userAccountEmailService
+     * @param UserRepository $userRepository
      * @return Response
      * @throws RandomException
+     * @throws TransportExceptionInterface
      */
     #[Route("/incc/admin/{id}", name: "incc_admin_edit", methods: [ "GET", "POST" ])]
     public function edit(
         Request $request,
         ImageTransformer $imageTransformer,
-        UserRegistrationService $userRegistrationService,
+        UserAccountEmailService $userAccountEmailService,
         UserRepository $userRepository,
     ): Response {
         $id = $request->attributes->get('id');
@@ -112,6 +109,7 @@ class AdminProfileController extends AbstractInachisController
             $userRepository->findOneBy(
                 [ 'username' => $request->attributes->get('id') ]
             );
+        /** @var Form $form */
         $form = $this->createForm(UserType::class, $user, [
             'validation_groups' => [ '' ],
         ]);
@@ -127,7 +125,7 @@ class AdminProfileController extends AbstractInachisController
             $user->setModDate(new DateTime('now'));
 
             if ($isNew) {
-                $userRegistrationService->registerNewUser(
+                $userAccountEmailService->registerNewUser(
                     $user,
                     $this->data,
                     fn (string $token) => $this->generateUrl(

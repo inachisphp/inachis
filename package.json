@@ -4,6 +4,11 @@
   "description": "JS requirements for inachis framework",
   "license": "MIT",
   "type": "module",
+  "dependencies": {
+    "jquery-datetimepicker": "^2.5.20",
+    "npm-check-updates": "^19.1.1",
+    "easymde": "^2.20"
+  },
   "devDependencies": {
     "cypress": "^13.4.0",
     "gulp": "*",
@@ -23,11 +28,6 @@
     "pump": "*",
     "require-dir": "*",
     "sass": "*"
-  },
-  "dependencies": {
-    "jquery-datetimepicker": "^2.5.20",
-    "npm-check-updates": "^19.1.1",
-    "simplemde": "*"
   },
   "scripts": {}
 }

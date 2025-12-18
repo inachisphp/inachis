@@ -24,7 +24,7 @@ class DownloadRepositoryTest extends TestCase
 
     public function setUp(): void
     {
-        $registry = $this->createMock(ManagerRegistry::class);
+        $registry = $this->createStub(ManagerRegistry::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
 
         $this->repository = $this->getMockBuilder(DownloadRepository::class)
@@ -32,7 +32,8 @@ class DownloadRepositoryTest extends TestCase
             ->onlyMethods([ 'getEntityManager', 'getAll' ])
             ->getMock();
 
-        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
+        $this->repository->expects($this->atLeast(0))
+            ->method('getEntityManager')->willReturn($this->entityManager);
         parent::setUp();
     }
 
@@ -40,13 +41,10 @@ class DownloadRepositoryTest extends TestCase
     {
         $download = new Download();
 
-        $this->entityManager
-            ->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('remove')
             ->with($download);
-
-        $this->entityManager
-            ->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('flush');
 
         $this->repository->remove($download);
@@ -54,7 +52,8 @@ class DownloadRepositoryTest extends TestCase
 
     public function testGetFilteredWithoutKeyword(): void
     {
-        $paginator = $this->createMock(Paginator::class);
+        $this->entityManager->expects($this->never())->method('getRepository');
+        $paginator = $this->createStub(Paginator::class);
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
@@ -70,7 +69,8 @@ class DownloadRepositoryTest extends TestCase
 
     public function testGetFilteredWithKeyword(): void
     {
-        $paginator = $this->createMock(Paginator::class);
+        $this->entityManager->expects($this->never())->method('getRepository');
+        $paginator = $this->createStub(Paginator::class);
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
@@ -91,7 +91,8 @@ class DownloadRepositoryTest extends TestCase
 
     public function testSortByTitleDesc(): void
     {
-        $paginator = $this->createMock(Paginator::class);
+        $this->entityManager->expects($this->never())->method('getRepository');
+        $paginator = $this->createStub(Paginator::class);
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
@@ -107,7 +108,8 @@ class DownloadRepositoryTest extends TestCase
 
     public function testSortByCreateDateAsc(): void
     {
-        $paginator = $this->createMock(Paginator::class);
+        $this->entityManager->expects($this->never())->method('getRepository');
+        $paginator = $this->createStub(Paginator::class);
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
@@ -123,7 +125,8 @@ class DownloadRepositoryTest extends TestCase
 
     public function testSortByCreateDateDesc(): void
     {
-        $paginator = $this->createMock(Paginator::class);
+        $this->entityManager->expects($this->never())->method('getRepository');
+        $paginator = $this->createStub(Paginator::class);
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
@@ -139,7 +142,8 @@ class DownloadRepositoryTest extends TestCase
 
     public function testSortByModDateDesc(): void
     {
-        $paginator = $this->createMock(Paginator::class);
+        $this->entityManager->expects($this->never())->method('getRepository');
+        $paginator = $this->createStub(Paginator::class);
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
@@ -155,7 +159,8 @@ class DownloadRepositoryTest extends TestCase
 
     public function testSortByModDateAsc(): void
     {
-        $paginator = $this->createMock(Paginator::class);
+        $this->entityManager->expects($this->never())->method('getRepository');
+        $paginator = $this->createStub(Paginator::class);
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(

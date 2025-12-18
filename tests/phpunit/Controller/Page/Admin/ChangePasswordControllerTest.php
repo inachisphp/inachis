@@ -14,6 +14,7 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\Exception;
+use PHPUnit\Framework\MockObject\MockObject;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -44,29 +45,30 @@ class ChangePasswordControllerTest extends WebTestCase
             'REQUEST_URI' => '/incc/admin/{id}/change-password'
         ]);
         $user = (new User('test-user'))->setId(Uuid::uuid1());
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createStub(EntityManager::class);
         $security = $this->createMock(Security::class);
-        $security->method('getUser')->willReturn($user);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $security->expects($this->atLeastOnce())->method('getUser')->willReturn($user);
+        $translator = $this->createStub(TranslatorInterface::class);
 
         /** @var ChangePasswordController&MockObject $controller */
         $controller = $this->getMockBuilder(ChangePasswordController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods(['addFlash', 'createForm', 'render'])
             ->getMock();
-        $controller->method('render')
+        $controller->expects($this->once())
+            ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
-        $controller->method('createForm')->willReturn($form);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(true);
+        $controller->expects($this->once())->method('createForm')->willReturn($form);
 
         $passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
-        $passwordHasher->method('isPasswordValid')->willReturn(true);
+        $passwordHasher->expects($this->once())->method('isPasswordValid')->willReturn(true);
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->method('findOneBy')->willReturn($user);
+        $userRepository->expects($this->once())->method('findOneBy')->willReturn($user);
 
         $result = $controller->changePasswordTab($request, $passwordHasher, $userRepository);
         $this->assertEquals('rendered:inadmin/page/admin/change-password.html.twig', $result->getContent());
@@ -84,10 +86,10 @@ class ChangePasswordControllerTest extends WebTestCase
             'REQUEST_URI' => '/incc/admin/{id}/change-password'
         ]);
         $user = (new User('test-user'))->setId(Uuid::uuid1());
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createStub(EntityManager::class);
         $security = $this->createMock(Security::class);
-        $security->method('getUser')->willReturn($user);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $security->expects($this->atLeastOnce())->method('getUser')->willReturn($user);
+        $translator = $this->createStub(TranslatorInterface::class);
 
         /** @var ChangePasswordController&MockObject $controller */
         $controller = $this->getMockBuilder(ChangePasswordController::class)
@@ -99,14 +101,14 @@ class ChangePasswordControllerTest extends WebTestCase
                 return new Response('rendered:' . $template);
             });
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
-        $controller->method('createForm')->willReturn($form);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(true);
+        $controller->expects($this->once())->method('createForm')->willReturn($form);
 
         $passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
-        $passwordHasher->method('isPasswordValid')->willReturn(false);
+        $passwordHasher->expects($this->once())->method('isPasswordValid')->willReturn(false);
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->method('findOneBy')->willReturn($user);
+        $userRepository->expects($this->once())->method('findOneBy')->willReturn($user);
 
         $this->expectException(AccessDeniedHttpException::class);
         $controller->changePasswordTab($request, $passwordHasher, $userRepository);
@@ -119,9 +121,9 @@ class ChangePasswordControllerTest extends WebTestCase
         ], [], [], [], [
             'REQUEST_URI' => '/incc/ax/calculate-password-strength'
         ]);
-        $entityManager = $this->createMock(EntityManager::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $entityManager = $this->createStub(EntityManager::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $controller = new ChangePasswordController($entityManager, $security, $translator);
 
         $result = $controller->calculatePasswordStrength($request);

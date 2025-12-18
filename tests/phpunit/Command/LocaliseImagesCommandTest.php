@@ -28,26 +28,26 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class LocaliseImagesCommandTest extends TestCase
 {
-    private EntityManagerInterface $em;
+    private EntityManagerInterface $entityManager;
     private ImageExtractor $extractor;
     private ImageLocaliser $localiser;
     private ContentImageUpdater $updater;
 
-    private ImageRepository $imageRepo;
-    private PageRepository $pageRepo;
-    private SeriesRepository $seriesRepo;
+    private ImageRepository $imageRepository;
+    private PageRepository $pageRepository;
+    private SeriesRepository $seriesRepository;
 
     private CommandTester $commandTester;
 
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->extractor = $this->createMock(ImageExtractor::class);
         $this->localiser = $this->createMock(ImageLocaliser::class);
         $this->updater = $this->createMock(ContentImageUpdater::class);
 
         $command = new LocaliseImagesCommand(
-            $this->em,
+            $this->entityManager,
             $this->extractor,
             $this->localiser,
             $this->updater
@@ -55,23 +55,23 @@ class LocaliseImagesCommandTest extends TestCase
 
         $this->commandTester = new CommandTester($command);
 
-        $this->imageRepo = $this->getMockBuilder(ImageRepository::class)
+        $this->imageRepository = $this->getMockBuilder(ImageRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getAll'])
             ->getMock();
-        $this->pageRepo = $this->getMockBuilder(PageRepository::class)
+        $this->pageRepository = $this->getMockBuilder(PageRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getAll'])
             ->getMock();
-        $this->seriesRepo = $this->getMockBuilder(SeriesRepository::class)
+        $this->seriesRepository = $this->getMockBuilder(SeriesRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getAll'])
             ->getMock();
 
-        $this->em->method('getRepository')->willReturnMap([
-            [Image::class,  $this->imageRepo],
-            [Page::class,   $this->pageRepo],
-            [Series::class, $this->seriesRepo],
+        $this->entityManager->expects($this->atLeast(1))->method('getRepository')->willReturnMap([
+            [Image::class,  $this->imageRepository],
+            [Page::class,   $this->pageRepository],
+            [Series::class, $this->seriesRepository],
         ]);
     }
 
@@ -82,7 +82,9 @@ class LocaliseImagesCommandTest extends TestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['getIterator'])
             ->getMock();
-        $paginator->method('getIterator')->willReturn(new ArrayIterator($entities));
+        $paginator->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new ArrayIterator($entities));
 
         return $paginator;
     }
@@ -91,17 +93,32 @@ class LocaliseImagesCommandTest extends TestCase
     private function prepareEntities(): array
     {
         $page = $this->createMock(Page::class);
-        $page->method('getContent')->willReturn('<img src="https://example.com/page.jpg" />');
+        $page->expects($this->once())
+            ->method('getContent')
+            ->willReturn('<img src="https://example.com/page.jpg" />');
 
         $series = $this->createMock(Series::class);
-        $series->method('getDescription')->willReturn('<img src="https://example.com/series.jpg" />');
+        $series->expects($this->once())
+            ->method('getDescription')
+            ->willReturn('<img src="https://example.com/series.jpg" />');
 
         $image = $this->createMock(Image::class);
-        $image->method('getFilename')->willReturn('https://example.com/image.jpg');
+        $image->expects($this->once())
+            ->method('getFilename')
+            ->willReturn('https://example.com/image.jpg');
 
-        $this->pageRepo->method('getAll')->willReturn($this->createPaginatorMock([$page]));
-        $this->seriesRepo->method('getAll')->willReturn($this->createPaginatorMock([$series]));
-        $this->imageRepo->method('getAll')->willReturn($this->createPaginatorMock([$image]));
+        $this->pageRepository
+            ->expects($this->once())
+            ->method('getAll')
+            ->willReturn($this->createPaginatorMock([$page]));
+        $this->seriesRepository
+            ->expects($this->once())
+            ->method('getAll')
+            ->willReturn($this->createPaginatorMock([$series]));
+        $this->imageRepository
+            ->expects($this->once())
+            ->method('getAll')
+            ->willReturn($this->createPaginatorMock([$image]));
 
         return [$page, $series, $image];
     }

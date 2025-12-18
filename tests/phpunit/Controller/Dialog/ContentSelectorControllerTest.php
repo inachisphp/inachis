@@ -36,22 +36,22 @@ class ContentSelectorControllerTest extends WebTestCase
         ], [], [], [], [
             'REQUEST_URI' => '/incc/ax/contentSelector/get'
         ]);
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $controller = $this->getMockBuilder(ContentSelectorController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods(['render'])
             ->getMock();
-        $controller->method('render')
+        $controller->expects($this->once())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
         $series = (new Series())->setId(Uuid::uuid1());
         $series->addItem(new Page());
         $seriesRepository = $this->createMock(SeriesRepository::class);
-        $seriesRepository->method('find')->willReturn($series);
-        $pageRepository = $this->createMock(PageRepository::class);
+        $seriesRepository->expects($this->once())->method('find')->willReturn($series);
+        $pageRepository = $this->createStub(PageRepository::class);
 
         $result = $controller->contentList($request, $seriesRepository, $pageRepository);
         $this->assertEquals('rendered:inadmin/dialog/content-selector.html.twig', $result->getContent());
@@ -68,19 +68,19 @@ class ContentSelectorControllerTest extends WebTestCase
         ], [], [], [], [
             'REQUEST_URI' => '/incc/ax/contentSelector/save'
         ]);
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $controller = $this->getMockBuilder(ContentSelectorController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods(['render'])
             ->getMock();
-        $controller->method('render')
+        $controller->expects($this->never())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
-        $seriesRepository = $this->createMock(SeriesRepository::class);
-        $pageRepository = $this->createMock(PageRepository::class);
+        $seriesRepository = $this->createStub(SeriesRepository::class);
+        $pageRepository = $this->createStub(PageRepository::class);
 
         $result = $controller->saveContent($request, $seriesRepository, $pageRepository);
         $this->assertEquals('No change', $result->getContent());
@@ -100,22 +100,22 @@ class ContentSelectorControllerTest extends WebTestCase
         ], [], [], [], [
             'REQUEST_URI' => '/incc/ax/contentSelector/save'
         ]);
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $controller = $this->getMockBuilder(ContentSelectorController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods(['render'])
             ->getMock();
-        $controller->method('render')
+        $controller->expects($this->never())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
         $series = (new Series())->setId(Uuid::uuid1());
         $series->addItem(new Page());
         $seriesRepository = $this->createMock(SeriesRepository::class);
-        $seriesRepository->method('findOneBy')->willReturn($series);
-        $pageRepository = $this->createMock(PageRepository::class);
+        $seriesRepository->expects($this->once())->method('findOneBy')->willReturn($series);
+        $pageRepository = $this->createStub(PageRepository::class);
 
         $result = $controller->saveContent($request, $seriesRepository, $pageRepository);
         $this->assertEquals('Saved', $result->getContent());
@@ -136,14 +136,15 @@ class ContentSelectorControllerTest extends WebTestCase
         ], [], [], [], [
             'REQUEST_URI' => '/incc/ax/contentSelector/save'
         ]);
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $controller = $this->getMockBuilder(ContentSelectorController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods(['render'])
             ->getMock();
-        $controller->method('render')
+        $controller->expects($this->never())
+            ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
@@ -151,9 +152,9 @@ class ContentSelectorControllerTest extends WebTestCase
         $series = (new Series())->setId(Uuid::uuid1());
         $series->addItem($page);
         $seriesRepository = $this->createMock(SeriesRepository::class);
-        $seriesRepository->method('findOneBy')->willReturn($series);
+        $seriesRepository->expects($this->once())->method('findOneBy')->willReturn($series);
         $pageRepository = $this->createMock(PageRepository::class);
-        $pageRepository->method('findOneBy')->willReturn($page);
+        $pageRepository->expects($this->once())->method('findOneBy')->willReturn($page);
 
         $result = $controller->saveContent($request, $seriesRepository, $pageRepository);
         $this->assertEquals('Saved', $result->getContent());

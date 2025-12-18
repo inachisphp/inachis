@@ -10,17 +10,19 @@
 namespace App\Tests\phpunit\Form;
 
 use App\Form\ForgotPasswordType;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class ForgotPasswordTypeTest extends TypeTestCase
 {
 
     protected function getExtensions(): array
     {
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         return [
             new PreloadedExtension([new ForgotPasswordType($translator)], [])
         ];

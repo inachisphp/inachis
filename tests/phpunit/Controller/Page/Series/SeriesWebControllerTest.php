@@ -40,8 +40,8 @@ class SeriesWebControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->security = $this->createMock(Security::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->security = $this->createStub(Security::class);
+        $this->translator = $this->createStub(TranslatorInterface::class);
         $this->controller = new SeriesWebController($this->entityManager, $this->security, $this->translator);
 
         $ref = new ReflectionClass($this->controller);
@@ -49,14 +49,14 @@ class SeriesWebControllerTest extends WebTestCase
             $property = $ref->getProperty($prop);
             $property->setValue($this->controller, $this->$prop);
         }
-        $container = $this->createMock(ContainerInterface::class);
+        $container = $this->createStub(ContainerInterface::class);
         $container->method('get')->willReturn(null);
         $this->controller->setContainer($container);
     }
 
     public function testViewRendersTemplate(): void
     {
-        $series = $this->createMock(Series::class);
+        $series = $this->createStub(Series::class);
         $seriesRepository = $this->getMockBuilder(SeriesRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -64,7 +64,8 @@ class SeriesWebControllerTest extends WebTestCase
             ->method('getPublicSeriesByYearAndUrl')
             ->with('2025', 'test')
             ->willReturn($series);
-        $this->entityManager->method('getRepository')
+        $this->entityManager->expects($this->never())
+            ->method('getRepository')
             ->willReturnMap([
                 [Series::class, $seriesRepository],
             ]);
@@ -97,7 +98,8 @@ class SeriesWebControllerTest extends WebTestCase
             ->method('getPublicSeriesByYearAndUrl')
             ->with('2025', 'test')
             ->willReturn(null);
-        $this->entityManager->method('getRepository')
+        $this->entityManager->expects($this->never())
+            ->method('getRepository')
             ->willReturnMap([
                 [Series::class, $seriesRepository]
             ]);

@@ -37,8 +37,8 @@ class DefaultControllerTest extends TestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['render'])
             ->getMock();
-
-        $controller->method('render')
+        $controller->expects($this->once())
+            ->method('render')
             ->with(
                 'web/pages/homepage.html.twig',
                 ['content' => $mockContent]

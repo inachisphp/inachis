@@ -20,11 +20,11 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class PurgeExpiredResetRequestsCommandTest extends TestCase
 {
-    private $em;
+    private $entityManager;
 
     public function setUp(): void
     {
-        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
     }
     public function testExecuteCreatesAdminUserSuccessfully(): void
     {
@@ -33,8 +33,10 @@ class PurgeExpiredResetRequestsCommandTest extends TestCase
             ->expects($this->once())
             ->method('purgeExpiredHashes')
             ->willReturn(3);
-        $this->em->method('getRepository')->willReturn($passwordResetRequestRepository);
-        $command = new PurgeExpiredResetRequestsCommand($this->em);
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($passwordResetRequestRepository);
+        $command = new PurgeExpiredResetRequestsCommand($this->entityManager);
         $tester = new CommandTester($command);
         $tester->execute([]);
         $output = $tester->getDisplay();

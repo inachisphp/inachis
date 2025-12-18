@@ -12,6 +12,7 @@ namespace App\Tests\phpunit\Form;
 use App\Entity\Page;
 use App\Form\PostType;
 use App\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -27,25 +28,26 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+#[AllowMockObjectsWithoutExpectations]
 final class PostTypeTest extends TestCase
 {
     private function translator(): TranslatorInterface
     {
-        $m = $this->createMock(TranslatorInterface::class);
+        $m = $this->createStub(TranslatorInterface::class);
         $m->method('trans')->willReturnCallback(fn ($s) => (string) $s);
         return $m;
     }
 
     private function router(): RouterInterface
     {
-        $m = $this->createMock(RouterInterface::class);
+        $m = $this->createStub(RouterInterface::class);
         $m->method('generate')->willReturn('/fake/url');
         return $m;
     }
 
     private function transformer(): ArrayCollectionToArrayTransformer
     {
-        return $this->createMock(ArrayCollectionToArrayTransformer::class);
+        return $this->createStub(ArrayCollectionToArrayTransformer::class);
     }
 
     /**
