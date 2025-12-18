@@ -39,14 +39,14 @@ class PageBulkActionServiceTest extends TestCase
             ->setTitle('test')
             ->setSubTitle('sub-title');
         $url = new Url($this->page);
-        $this->pageRepository = $this->createMock(PageRepository::class);
+        $this->pageRepository = $this->createStub(PageRepository::class);
         $this->pageRepository->method('findOneBy')->willReturn($this->page);
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createStub(EntityManager::class);
 
         $this->pageBulkActionService = new PageBulkActionService(
             $this->pageRepository,
-            $this->createMock(RevisionRepository::class),
-            $this->createMock(UrlRepository::class),
+            $this->createStub(RevisionRepository::class),
+            $this->createStub(UrlRepository::class),
             $this->entityManager
         );
     }
@@ -57,12 +57,12 @@ class PageBulkActionServiceTest extends TestCase
     public function testApplyPageNotFound(): void
     {
         $this->page = new Page();
-        $this->pageRepository = $this->createMock(PageRepository::class);
+        $this->pageRepository = $this->createStub(PageRepository::class);
         $this->pageRepository->method('findOneBy')->willReturn($this->page);
         $this->pageBulkActionService = new PageBulkActionService(
             $this->pageRepository,
-            $this->createMock(RevisionRepository::class),
-            $this->createMock(UrlRepository::class),
+            $this->createStub(RevisionRepository::class),
+            $this->createStub(UrlRepository::class),
             $this->entityManager
         );
         $result = $this->pageBulkActionService->apply('', [Uuid::uuid1()->toString()]);

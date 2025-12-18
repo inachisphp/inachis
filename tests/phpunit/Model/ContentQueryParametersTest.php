@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 class ContentQueryParametersTest extends TestCase
 {
     protected ContentQueryParameters $contentQueryParameters;
-    protected PageRepository $pageRepository;
     protected Request $request;
 
     public function setUp(): void
@@ -36,7 +35,6 @@ class ContentQueryParametersTest extends TestCase
         ], [], [], [
             'REQUEST_URI' => '/incc/post/list',
         ]);
-        $this->pageRepository = $this->createMock(PageRepository::class);
 
         parent::setUp();
     }
@@ -65,9 +63,10 @@ class ContentQueryParametersTest extends TestCase
 
     private function processHelper(): array
     {
+        $pageRepository = $this->createStub(PageRepository::class);
         $result = $this->contentQueryParameters->process(
             $this->request,
-            $this->pageRepository,
+            $pageRepository,
             'test',
             'myField asc'
         );

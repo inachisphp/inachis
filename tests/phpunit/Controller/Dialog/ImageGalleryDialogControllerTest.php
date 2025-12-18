@@ -24,7 +24,7 @@ class ImageGalleryDialogControllerTest extends WebTestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['createForm', 'render'])
             ->getMock();
-        $controller->method('render')
+        $controller->expects($this->once())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
@@ -38,19 +38,19 @@ class ImageGalleryDialogControllerTest extends WebTestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['render'])
             ->getMock();
-        $controller->method('render')
+        $controller->expects($this->once())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incc/ax/imageManager/getImages/50/25'
         ]);
-        $paginator = $this->createMock(Paginator::class);
+        $paginator = $this->createStub(Paginator::class);
         $imageRepository = $this->getMockBuilder(ImageRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getFiltered'])
             ->getMock();
-        $imageRepository->method('getFiltered')->willReturn($paginator);
+        $imageRepository->expects($this->once())->method('getFiltered')->willReturn($paginator);
         $result = $controller->getImageList($request, $imageRepository);
         $this->assertEquals('rendered:inadmin/partials/gallery.html.twig', $result->getContent());
     }

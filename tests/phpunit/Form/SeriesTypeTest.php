@@ -12,6 +12,7 @@ namespace App\Tests\phpunit\Form;
 use App\Entity\Series;
 use App\Form\DataTransformer\ArrayCollectionToArrayTransformer;
 use App\Form\SeriesType;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -19,14 +20,15 @@ use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class SeriesTypeTest extends TypeTestCase
 {
 
     protected function getExtensions(): array
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-        $router = $this->createMock(RouterInterface::class);
-        $transformer = $this->createMock(ArrayCollectionToArrayTransformer::class);
+        $translator = $this->createStub(TranslatorInterface::class);
+        $router = $this->createStub(RouterInterface::class);
+        $transformer = $this->createStub(ArrayCollectionToArrayTransformer::class);
         return [
             new PreloadedExtension([new SeriesType($translator, $router, $transformer)], [])
         ];

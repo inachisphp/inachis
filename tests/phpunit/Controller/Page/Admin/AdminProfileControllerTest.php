@@ -14,10 +14,11 @@ use App\Entity\User;
 use App\Model\ContentQueryParameters;
 use App\Repository\UserRepository;
 use App\Service\User\UserBulkActionService;
-use App\Service\User\UserRegistrationService;
+use App\Service\User\UserAccountEmailService;
 use App\Transformer\ImageTransformer;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
+use PHPUnit\Framework\MockObject\MockObject;
 use Ramsey\Uuid\Uuid;
 use Random\RandomException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -42,9 +43,9 @@ class AdminProfileControllerTest extends WebTestCase
      */
     public function setUp(): void
     {
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $this->controller = $this->getMockBuilder(AdminProfileController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods([
@@ -57,11 +58,12 @@ class AdminProfileControllerTest extends WebTestCase
                 'render',
             ])
             ->getMock();
-        $this->controller->method('render')
+        $this->controller->expects($this->atLeast(0))
+            ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
-        $formBuilder = $this->createMock(FormBuilder::class);
+        $formBuilder = $this->createStub(FormBuilder::class);
         $this->controller->method('createFormBuilder')->willReturn($formBuilder);
 
         parent::setUp();
@@ -78,10 +80,10 @@ class AdminProfileControllerTest extends WebTestCase
         ], [], [], [
             'REQUEST_URI' => '/incc/admin/list/50/25'
         ]);
-        $userBulkActionService = $this->createMock(UserBulkActionService::class);
-        $userRepository = $this->createMock(UserRepository::class);
+        $userBulkActionService = $this->createStub(UserBulkActionService::class);
+        $userRepository = $this->createStub(UserRepository::class);
         $contentQueryParameters = $this->createMock(ContentQueryParameters::class);
-        $contentQueryParameters->method('process')->willReturn([
+        $contentQueryParameters->expects($this->once())->method('process')->willReturn([
             'filters' => [],
             'offset' => 50,
             'limit' => 25,
@@ -106,14 +108,14 @@ class AdminProfileControllerTest extends WebTestCase
         ], [], [], [
             'REQUEST_URI' => '/incc/admin/list/50/25'
         ]);
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $userBulkActionService = $this->createMock(UserBulkActionService::class);
-        $userBulkActionService->method('apply')->willReturn(1);
-        $userRepository = $this->createMock(UserRepository::class);
-        $contentQueryParameters = $this->createMock(ContentQueryParameters::class);
-                $this->controller = $this->getMockBuilder(AdminProfileController::class)
+        $userBulkActionService->expects($this->once())->method('apply')->willReturn(1);
+        $userRepository = $this->createStub(UserRepository::class);
+        $contentQueryParameters = $this->createStub(ContentQueryParameters::class);
+        $this->controller = $this->getMockBuilder(AdminProfileController::class)
             ->setConstructorArgs([$entityManager, $security, $translator])
             ->onlyMethods([
                 'addFlash',
@@ -125,15 +127,15 @@ class AdminProfileControllerTest extends WebTestCase
                 'render',
             ])
             ->getMock();
-        $this->controller
+        $this->controller->expects($this->once())
             ->method('redirectToRoute')
             ->with('incc_admin_list')
             ->willReturn(new RedirectResponse('/incc/admin/list/50/25'));
         $formBuilder = $this->createMock(FormBuilder::class);
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(true);
-        $formBuilder->method('getForm')->willReturn($form);
-        $this->controller->method('createFormBuilder')->willReturn($formBuilder);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $formBuilder->expects($this->once())->method('getForm')->willReturn($form);
+        $this->controller->expects($this->once())->method('createFormBuilder')->willReturn($formBuilder);
 
         $result = $this->controller->list($request, $contentQueryParameters, $userBulkActionService, $userRepository);
         $this->assertInstanceOf(RedirectResponse::class, $result);
@@ -150,14 +152,14 @@ class AdminProfileControllerTest extends WebTestCase
         ], [], [], [
             'REQUEST_URI' => '/incc/admin/test-user'
         ]);
-        $imageTransformer = $this->createMock(ImageTransformer::class);
-        $userRegistrationService = $this->createMock(UserRegistrationService::class);
+        $imageTransformer = $this->createStub(ImageTransformer::class);
+        $userRegistrationService = $this->createStub(UserAccountEmailService::class);
         $user = new User();
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->method('findOneBy')->willReturn($user);
+        $userRepository->expects($this->atLeastOnce())->method('findOneBy')->willReturn($user);
 
-        $form = $this->createMock(Form::class);
-        $this->controller->method('createForm')->willReturn($form);
+        $form = $this->createStub(Form::class);
+        $this->controller->expects($this->once())->method('createForm')->willReturn($form);
 
         $result = $this->controller->edit(
             $request,
@@ -189,20 +191,20 @@ class AdminProfileControllerTest extends WebTestCase
         ]);
         $request->setMethod(Request::METHOD_POST);
 
-        $imageTransformer = $this->createMock(ImageTransformer::class);
-        $userRegistrationService = $this->createMock(UserRegistrationService::class);
+        $imageTransformer = $this->createStub(ImageTransformer::class);
+        $userRegistrationService = $this->createStub(UserAccountEmailService::class);
         $user = (new User())->setEmail('test-user@example.com');
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->method('findOneBy')->willReturn($user);
+        $userRepository->expects($this->atLeast(0))->method('findOneBy')->willReturn($user);
 
         $button = $this->createMock(Button::class);
-        $button->method('getName')->willReturn('enableDisable');
+        $button->expects($this->atLeastOnce())->method('getName')->willReturn('enableDisable');
 
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
-        $form->method('getClickedButton')->willReturn($button);
-        $this->controller->method('createForm')->willReturn($form);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(true);
+        $form->expects($this->atLeastOnce())->method('getClickedButton')->willReturn($button);
+        $this->controller->expects($this->once())->method('createForm')->willReturn($form);
 
         $result = $this->controller->edit(
             $request,
@@ -232,20 +234,20 @@ class AdminProfileControllerTest extends WebTestCase
         ]);
         $request->setMethod(Request::METHOD_POST);
 
-        $imageTransformer = $this->createMock(ImageTransformer::class);
-        $userRegistrationService = $this->createMock(UserRegistrationService::class);
+        $imageTransformer = $this->createStub(ImageTransformer::class);
+        $userRegistrationService = $this->createStub(UserAccountEmailService::class);
         $user = (new User())->setEmail('test-user@example.com');
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->method('findOneBy')->willReturn($user);
+        $userRepository->expects($this->once())->method('findOneBy')->willReturn($user);
 
         $button = $this->createMock(Button::class);
-        $button->method('getName')->willReturn('delete');
+        $button->expects($this->atLeastOnce())->method('getName')->willReturn('delete');
 
         $form = $this->createMock(Form::class);
-        $form->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
-        $form->method('getClickedButton')->willReturn($button);
-        $this->controller->method('createForm')->willReturn($form);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
+        $form->expects($this->once())->method('isValid')->willReturn(true);
+        $form->expects($this->atLeastOnce())->method('getClickedButton')->willReturn($button);
+        $this->controller->expects($this->once())->method('createForm')->willReturn($form);
 
         $result = $this->controller->edit(
             $request,
