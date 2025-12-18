@@ -31,8 +31,8 @@ class RevisionRepositoryTest extends TestCase
 
     public function setUp(): void
     {
-        $this->registry = $this->createMock(ManagerRegistry::class);
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->registry = $this->createStub(ManagerRegistry::class);
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
     }
 
     /**
@@ -44,9 +44,8 @@ class RevisionRepositoryTest extends TestCase
             ->setConstructorArgs([$this->registry])
             ->onlyMethods([ 'getEntityManager', 'createQueryBuilder', 'getNextVersionNumberForPageId' ])
             ->getMock();
-
-        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
-
+        $this->repository->expects($this->atMost(1))
+            ->method('getEntityManager')->willReturn($this->entityManager);
 
         $uuid = Uuid::uuid1();
         $date = new DateTime('now');
@@ -80,17 +79,18 @@ class RevisionRepositoryTest extends TestCase
             ->setConstructorArgs([$this->registry])
             ->onlyMethods([ 'getEntityManager', 'createQueryBuilder' ])
             ->getMock();
-        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
+        $this->repository->expects($this->atMost(1))
+            ->method('getEntityManager')->willReturn($this->entityManager);
 
         $query = $this->createMock(Query::class);
-        $query->method('getSingleScalarResult')->willReturn(1);
+        $query->expects($this->once())->method('getSingleScalarResult')->willReturn(1);
         $qb = $this->createMock(QueryBuilder::class);
-        $qb->method('select')->willReturnSelf();
-        $qb->method('where')->willReturnSelf();
-        $qb->method('setParameter')->willReturnSelf();
-        $qb->method('getQuery')->willReturn($query);
+        $qb->expects($this->once())->method('select')->willReturnSelf();
+        $qb->expects($this->once())->method('where')->willReturnSelf();
+        $qb->expects($this->once())->method('setParameter')->willReturnSelf();
+        $qb->expects($this->once())->method('getQuery')->willReturn($query);
 
-        $this->repository->method('createQueryBuilder')->willReturn($qb);
+        $this->repository->expects($this->once())->method('createQueryBuilder')->willReturn($qb);
 
         $result = $this->repository->getNextVersionNumberForPageId($uuid);
         $this->assertEquals(2, $result);
@@ -110,15 +110,15 @@ class RevisionRepositoryTest extends TestCase
             ->setConstructorArgs([$this->registry])
             ->onlyMethods([ 'getEntityManager', 'createQueryBuilder' ])
             ->getMock();
-        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
+        $this->repository->expects($this->atMost(1))
+            ->method('getEntityManager')->willReturn($this->entityManager);
 
-        $query = $this->createMock(Query::class);
         $qb = $this->createMock(QueryBuilder::class);
-        $qb->method('delete')->willReturnSelf();
-        $qb->method('where')->willReturnSelf();
-        $qb->method('setParameter')->willReturnSelf();
+        $qb->expects($this->atLeast(1))->method('delete')->willReturnSelf();
+        $qb->expects($this->atLeast(1))->method('where')->willReturnSelf();
+        $qb->expects($this->atLeast(1))->method('setParameter')->willReturnSelf();
 
-        $this->repository->method('createQueryBuilder')->willReturn($qb);
+        $this->repository->expects($this->once())->method('createQueryBuilder')->willReturn($qb);
 
         $result = $this->repository->deleteAndRecordByPage($page);
         $this->assertEquals(RevisionRepository::DELETED, $result->getAction());

@@ -8,7 +8,7 @@
     {% block results_pre %}{% endblock results_pre %}
     {% block results_list %}
 
-        <p>Showing <strong>{{ page.offset + 1 }}</strong>-<strong>{{ min(page.offset + page.limit,total) }}</strong> of <strong>{{ total }}</strong> results</p>
+        <p>Showing <strong>{{ query.offset + 1 }}</strong>-<strong>{{ min(query.offset + query.limit,total) }}</strong> of <strong>{{ total }}</strong> results</p>
 
         {% include 'inadmin/partials/table.html.twig' with {
             className: 'form__search_results',
@@ -52,8 +52,8 @@
                     source: 'relevance',
                 }
             ],
-            limit: page.limit,
-            offset: page.offset,
+            limit: query.limit,
+            offset: query.offset,
             total: total,
             url_result: path('incc_search_results', { keyword: keyword }),
 

@@ -15,12 +15,14 @@ use App\Entity\User;
 use App\Form\ChangePasswordType;
 use App\Form\ForgotPasswordType;
 use App\Form\LoginType;
-use App\Service\PasswordResetTokenService;
+use App\Repository\PasswordResetRequestRepository;
+use App\Repository\UserRepository;
+use App\Service\User\PasswordResetTokenService;
+use App\Service\User\UserAccountEmailService;
 use App\Util\Base64EncodeFile;
 use DateTime;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;
-use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3Validator;
 use Random\RandomException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
@@ -73,20 +75,23 @@ class AccountController extends AbstractInachisController
 
     /**
      * @param Request $request
+     * @param MailerInterface $mailer
+     * @param PasswordResetRequestRepository $passwordResetRequestRepository
      * @param PasswordResetTokenService $tokenService
      * @param RateLimiterFactoryInterface $forgotPasswordIpLimiter
      * @param RateLimiterFactoryInterface $forgotPasswordAccountLimiter
-     * @param MailerInterface $mailer
+     * @param UserRepository $userRepository
      * @return Response
      * @throws RandomException
      */
     #[Route("/incc/forgot-password", name: "incc_account_forgot-password", methods: [ "GET", "POST" ])]
     public function forgotPassword(
         Request $request,
-        PasswordResetTokenService $tokenService,
+        PasswordResetRequestRepository $passwordResetRequestRepository,
         RateLimiterFactoryInterface $forgotPasswordIpLimiter,
         RateLimiterFactoryInterface $forgotPasswordAccountLimiter,
-        MailerInterface $mailer,
+        UserAccountEmailService $userRegistrationService,
+        UserRepository $userRepository,
     ): Response {
         $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();
         if (!empty($redirectTo)) {
@@ -103,7 +108,7 @@ class AccountController extends AbstractInachisController
             // @todo replace with something better - throw new TooManyRequestsHttpException();
             return new Response('Too many attempts from this IP. Try again later.', 429, $headers);
         }
-        $this->entityManager->getRepository(PasswordResetRequest::class)->purgeExpiredHashes();
+        $passwordResetRequestRepository->purgeExpiredHashes();
 
         $this->data['page']['title'] = 'Request a password reset';
         $form = $this->createForm(ForgotPasswordType::class, [
@@ -125,27 +130,20 @@ class AccountController extends AbstractInachisController
                     return new Response('Too many reset attempts for this account. Try again later.', 429, $headers);
                 }
             }
-            $user = $this->entityManager->getRepository(User::class)->findOneBy([
+            $user = $userRepository->findOneBy([
                 'email' => $emailAddress,
             ]);
             if (null !== $user) {
-                $data = $tokenService->createResetRequestForEmail($emailAddress);
+                $this->data['clientIP'] = $request->getClientIp();
                 try {
-                    $email = (new TemplatedEmail())
-                        ->to(new Address($user->getEmail()))
-                        ->subject('Reset your password for ' . $this->data['settings']['siteTitle'])
-                        ->htmlTemplate('inadmin/emails/forgot-password.html.twig')
-                        ->textTemplate('inadmin/emails/forgot-password.txt.twig')
-                        ->context([
-                            'ipAddress' => $request->getClientIp(),
-                            'url' => $this->generateUrl('incc_account_new-password', [ 'token' => $data['token']]),
-                            'expiresAt' => $data['expiresAt']->format('l jS F Y \a\\t H:i'),
-                            'settings' => $this->data['settings'],
-                            'logo' => Base64EncodeFile::encode('public/assets/imgs/incc/inachis.png'),
-                        ]);
-                    $mailer->send($email);
-                    $this->entityManager->persist($user);
-                    $this->entityManager->flush();
+                    $userRegistrationService->sendForgotPasswordEmail(
+                        $user,
+                        $this->data,
+                        fn (string $token) => $this->generateUrl(
+                            'incc_account_new-password',
+                            [ 'token' => $token ]
+                        )
+                    );
                 } catch (TransportExceptionInterface $e) {
                     $this->addFlash('warning', 'Error while sending mail: ' . $e->getMessage());
                 }
@@ -162,18 +160,19 @@ class AccountController extends AbstractInachisController
     /**
      * @param Request $request
      * @param PasswordResetTokenService $tokenService
-     * @param UserPasswordHasherInterface $hasher
      * @param RateLimiterFactoryInterface $forgotPasswordIpLimiter
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @param UserRepository $userRepository
      * @param string $token
      * @return Response
-     * @throws NonUniqueResultException
      */
     #[Route("/incc/new-password/{token}", name: "incc_account_new-password", methods: [ "GET", "POST" ])]
     public function newPassword(
         Request $request,
         PasswordResetTokenService $tokenService,
-        UserPasswordHasherInterface $hasher,
         RateLimiterFactoryInterface $forgotPasswordIpLimiter,
+        UserPasswordHasherInterface $passwordHasher,
+        UserRepository $userRepository,
         string $token,
     ): Response {
         $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();
@@ -207,7 +206,7 @@ class AccountController extends AbstractInachisController
                 // @todo replace with something better - throw new TooManyRequestsHttpException();
                 return new Response('Too many password reset attempts from this IP. Try again later.', 429, $headers);
             };
-            $user = $this->entityManager->getRepository(User::class)->findOneBy(
+            $user = $userRepository->findOneBy(
                 [ 'username' => $form->getData()['change_password']['username'] ]
             );
             if (!$user) {
@@ -220,7 +219,7 @@ class AccountController extends AbstractInachisController
                 return $this->redirectToRoute('incc_account_forgot-password');
             }
             $plainPassword = $form->getData()['change_password']['new_password'];
-            $hashed = $hasher->hashPassword($user, $plainPassword);
+            $hashed = $passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashed);
             $user->setPasswordModDate(new DateTime('now'));
             $tokenService->markAsUsed($resetRequest);

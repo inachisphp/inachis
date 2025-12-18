@@ -11,11 +11,16 @@ namespace App\Controller\Page\Url;
 
 use App\Controller\AbstractInachisController;
 use App\Entity\Url;
+use App\Model\ContentQueryParameters;
+use App\Repository\UrlRepository;
+use App\Service\Url\UrlBulkActionService;
 use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class UrlController extends AbstractInachisController
 {
     /**
@@ -29,66 +34,40 @@ class UrlController extends AbstractInachisController
         defaults: [ "offset" => 0, "limit" => 20 ],
         methods: [ "GET", "POST" ]
     )]
-    public function list(Request $request): Response
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+    public function list(
+        Request $request,
+        ContentQueryParameters $contentQueryParameters,
+        UrlBulkActionService $urlBulkActionService,
+        UrlRepository $urlRepository,
+    ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
-            foreach ($request->request->all('items') as $item) {
-                $link = $this->entityManager->getRepository(Url::class)->findOneBy([
-                    'id' => $item,
-                    'default' => false,
-                ]);
-                if ($link !== null) {
-                    if ($request->request->has('delete')) {
-                        $this->entityManager->getRepository(Url::class)->remove($link);
-                    }
-                    if ($request->request->has('make_default')) {
-                        $previous_default = $this->entityManager->getRepository(Url::class)->findOneBy(
-                            [
-                                'content' => $link->getContent(),
-                                'default' => true,
-                            ]
-                        );
-                        if ($previous_default !== null) {
-                            $previous_default->setDefault(false)->setModDate(new DateTime('now'));
-                            $this->entityManager->persist($previous_default);
-                        }
-                        $link->setDefault(true)->setModDate(new DateTime('now'));
-                        $this->entityManager->persist($link);
-                        $this->entityManager->flush();
-                    }
-                }
+            $items = $request->request->all('items') ?? [];
+            $action = $request->request->has('delete')  ? 'delete' :
+                ($request->request->has('make_default') ? 'make_default' : null);
+
+            if ($action !== null && !empty($items)) {
+                $count = $urlBulkActionService->apply($action, $items);
+                $this->addFlash('success', "Action '$action' applied to $count urls.");
             }
             return $this->redirectToRoute('incc_url_list');
         }
-        $filters = array_filter($request->request->all('filter', []));
-        $sort = $request->request->get('sort', 'contentDate asc');
-        if ($request->isMethod('post')) {
-            $_SESSION['url_filters'] = $filters;
-            $_SESSION['url_sort'] = $sort;
-        } elseif (isset($_SESSION['url_filters'])) {
-            $filters = $_SESSION['url_filters'];
-            $sort = $_SESSION['url_sort'];
-        }
-        $offset = (int) $request->attributes->get('offset', 0);
-        $limit = (int) $request->attributes->get(
-            'limit',
-            $this->entityManager->getRepository(Url::class)->getMaxItemsToShow()
+        $contentQuery = $contentQueryParameters->process(
+            $request,
+            $urlRepository,
+            'url',
+            'contentDate asc',
         );
-        $this->data['dataset'] = $this->entityManager->getRepository(Url::class)->getFiltered(
-            $filters,
-            $offset,
-            $limit,
-            $sort
+        $this->data['dataset'] = $urlRepository->getFiltered(
+            $contentQuery['filters'],
+            $contentQuery['offset'],
+            $contentQuery['limit'],
+            $contentQuery['sort'],
         );
         $this->data['form'] = $form->createView();
-        $this->data['filters'] = $filters;
-        $this->data['page']['sort'] = $sort;
-        $this->data['page']['offset'] = $offset;
-        $this->data['page']['limit'] = $limit;
+        $this->data['query'] = $contentQuery;
         $this->data['page']['title'] = 'URLs';
 
         return $this->render('inadmin/page/url/list.html.twig', $this->data);
@@ -102,13 +81,14 @@ class UrlController extends AbstractInachisController
         "/incc/ax/check-url-usage",
         methods: [ "POST" ]
     )]
-    public function checkUrlUsage(Request $request): Response
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+    public function checkUrlUsage(
+        Request $request,
+        UrlRepository $urlRepository,
+    ): Response {
         $url = $request->request->get('url');
-        $urls = $this->entityManager->getRepository(Url::class)->findSimilarUrlsExcludingId(
+        $urls = $urlRepository->findSimilarUrlsExcludingId(
             $url,
-            $request->attributes->get('id')
+            $request->request->get('id')
         );
         if (!empty($urls)) {
             preg_match('/\-([0-9]+)$/', $urls[0]['link'], $matches);

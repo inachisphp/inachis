@@ -13,25 +13,18 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Flex\Response;
 
 abstract class AbstractInachisController extends AbstractController
 {
-    protected Security $security;
-    protected EntityManagerInterface $entityManager;
-    protected TranslatorInterface $translator;
     protected array $errors = [];
     protected array $data = [];
 
-    public function __construct(EntityManagerInterface $entityManager, Security $security, TranslatorInterface $translator)
-    {
-        $this->entityManager = $entityManager;
-        $this->security = $security;
-        $this->translator = $translator;
-    }
+    public function __construct(
+        protected EntityManagerInterface $entityManager,
+        protected Security $security,
+        protected TranslatorInterface $translator
+    ) {}
 
     /**
      * @return void
@@ -179,27 +172,5 @@ abstract class AbstractInachisController extends AbstractController
     public function redirectIfAuthenticatedOrNoAdmins(): ?string
     {
         return $this->redirectIfAuthenticated() ?: $this->redirectIfNoAdmins();
-    }
-
-    /**
-     * If the user has a referrer set they will be redirected to it otherwise they will be redirected to
-     * the dashboard.
-     *
-     * @param Request  $request
-     * @param Response $response The response object from the router
-     *
-     * @return Response
-     */
-    public function redirectToReferrerOrDashboard(Request $request, Response $response): Response
-    {
-        $referrer = $request->getSession()->get('referrer');
-        if (!empty($referrer)) {
-//            return $response->redirect($referrer)->send();
-        }
-//        return $response->redirect('/incc/')->send();
-
-        $response->prepare($request);
-
-        return $response->send();
     }
 }

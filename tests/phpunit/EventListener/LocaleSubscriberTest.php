@@ -22,7 +22,7 @@ class LocaleSubscriberTest extends TestCase
 {
     private function createEvent(Request $request): RequestEvent
     {
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = $this->createStub(HttpKernelInterface::class);
         return new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
     }
 
@@ -35,7 +35,8 @@ class LocaleSubscriberTest extends TestCase
             ->getMock();
         $request->setSession($session);
         $request->attributes->set('_locale', 'fr');
-        $request->method('hasPreviousSession')->willReturn(true);
+        $request->expects($this->once())
+            ->method('hasPreviousSession')->willReturn(true);
         $subscriber = new LocaleSubscriber('en');
         $event = $this->createEvent($request);
         $subscriber->onKernelRequest($event);
@@ -52,7 +53,8 @@ class LocaleSubscriberTest extends TestCase
             ->getMock();
         $request->setSession($session);
         $request->attributes->set('_locale', 'fr');
-        $request->method('hasPreviousSession')->willReturn(false);
+        $request->expects($this->once())
+            ->method('hasPreviousSession')->willReturn(false);
         $subscriber = new LocaleSubscriber('en');
         $event = $this->createEvent($request);
         $subscriber->onKernelRequest($event);
@@ -68,7 +70,8 @@ class LocaleSubscriberTest extends TestCase
             ->getMockBuilder(Request::class)
             ->onlyMethods(['hasPreviousSession'])
             ->getMock();
-        $request->method('hasPreviousSession')->willReturn(true);
+        $request->expects($this->once())
+            ->method('hasPreviousSession')->willReturn(true);
         $request->setSession($session);
         $subscriber = new LocaleSubscriber();
         $event = $this->createEvent($request);
@@ -85,7 +88,8 @@ class LocaleSubscriberTest extends TestCase
             ->onlyMethods(['hasPreviousSession'])
             ->getMock();
         $request->setSession($session);
-        $request->method('hasPreviousSession')->willReturn(true);
+        $request->expects($this->once())
+            ->method('hasPreviousSession')->willReturn(true);
 
         $subscriber = new LocaleSubscriber('it');
         $event = $this->createEvent($request);

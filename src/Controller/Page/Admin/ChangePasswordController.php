@@ -10,8 +10,8 @@
 namespace App\Controller\Page\Admin;
 
 use App\Controller\AbstractInachisController;
-use App\Entity\User;
 use App\Form\ChangePasswordType;
+use App\Repository\UserRepository;
 use DateTime;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,22 +19,26 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints\PasswordStrengthValidator;
 
+#[IsGranted('ROLE_ADMIN')]
 class ChangePasswordController extends AbstractInachisController
 {
     /**
      * Controller for the change-password tab in the admin interface
-     * @param UserPasswordHasherInterface $passwordHasher
      * @param Request $request
-     * @param string $id
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @param UserRepository $userRepository
      * @return Response
      */
     #[Route("/incc/admin/{id}/change-password", name: "incc_admin_change_password", methods: [ "GET", "POST" ])]
-    public function changePasswordTab(UserPasswordHasherInterface $passwordHasher, Request $request, string $id): Response
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $request->attributes->get('id')]);
+    public function changePasswordTab(
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        UserRepository $userRepository,
+    ): Response {
+        $user = $userRepository->findOneBy(['username' => $request->attributes->get('id')]);
         $form = $this->createForm(
             ChangePasswordType::class,
             null,
@@ -43,7 +47,7 @@ class ChangePasswordController extends AbstractInachisController
             ]
         );
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $user->getId() === $this->security->getUser()->getId() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid() && $user->getId() === $this->security->getUser()->getId()) {
             $plaintextPassword = $request->request->all('change_password')['new_password'];
             $hashedPassword = $passwordHasher->hashPassword($user, $plaintextPassword);
             $user->setPassword($hashedPassword);
