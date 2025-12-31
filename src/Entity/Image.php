@@ -11,6 +11,7 @@ namespace App\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
  * Object for handling images on a site.
@@ -113,5 +114,21 @@ class Image extends AbstractFile
         $this->altText = $value;
 
         return $this;
+    }
+
+    /**
+     * @param $imageDirectory
+     * @return array
+     */
+    public function getImageProperties($imageDirectory): array
+    {
+        $fullImagePath = self::getFilename();
+        if (!empty($imageDirectory) && !str_starts_with($fullImagePath, 'http')) {
+            $fullImagePath = $imageDirectory . $fullImagePath;
+        }
+        if (!file_exists($fullImagePath) || !is_file($fullImagePath)) {
+            throw new FileNotFoundException();
+        }
+        return getimagesize($fullImagePath);
     }
 }

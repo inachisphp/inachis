@@ -12,12 +12,16 @@ namespace App\Controller\Page\Resource;
 use App\Controller\AbstractInachisController;
 use App\Entity\Download;
 use App\Entity\Image;
-use App\Entity\Page;
-use App\Entity\Series;
 use App\Form\ResourceType;
 use App\Model\ContentQueryParameters;
+use App\Repository\DownloadRepository;
+use App\Repository\ImageRepository;
+use App\Repository\PageRepository;
+use App\Repository\SeriesRepository;
+use App\Service\Resource\ImageFileService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -50,26 +54,31 @@ class ResourceController extends AbstractInachisController
     public function list(
         Request $request,
         ContentQueryParameters $contentQueryParameters,
+        DownloadRepository $downloadRepository,
+        ImageRepository $imageRepository,
     ): Response {
-        $typeClass = match ($request?->get('type')) {
+        $typeClass = match($request->attributes->get('type')) {
             'downloads' => Download::class,
             default => Image::class,
         };
         $type = substr(strrchr($typeClass, '\\'), 1);
+        $repository = match($type) {
+            'Download' => $downloadRepository,
+            default => $imageRepository,
+        };
         $form = $this->createFormBuilder()
             ->setAction($this->generateUrl('incc_resource_list', [
-                'type' => $request->attributes->get('type'),
+                'type' => strtolower($type) . 's',
             ]))
-            ->getForm()
-        ;
+            ->getForm();
         $form->handleRequest($request);
         $contentQuery = $contentQueryParameters->process(
             $request,
-            $this->entityManager->getRepository($typeClass),
-            $type,
+            $repository,
+            strtolower($type),
             'title asc',
         );
-        $this->data['dataset'] = $this->entityManager->getRepository($typeClass)->getFiltered(
+        $this->data['dataset'] = $repository->getFiltered(
             $contentQuery['filters'],
             $contentQuery['offset'],
             $contentQuery['limit'],
@@ -77,8 +86,8 @@ class ResourceController extends AbstractInachisController
         );
         $this->data['form'] = $form->createView();
         $this->data['query'] = $contentQuery;
-        $this->data['page']['type'] = $request->attributes->get('type');
-        $this->data['page']['tab'] = $type;
+        $this->data['page']['type'] = strtolower($type) . 's';
+        $this->data['page']['tab'] = strtolower($type);
         $this->data['page']['title'] = $type . 's';
         $this->data['limitKByte'] = Image::WARNING_FILESIZE;
         $this->data['limitSize'] = Image::WARNING_DIMENSIONS;
@@ -102,6 +111,10 @@ class ResourceController extends AbstractInachisController
     public function edit(
         Request $request,
         Filesystem $filesystem,
+        DownloadRepository $downloadRepository,
+        ImageRepository $imageRepository,
+        PageRepository $pageRepository,
+        SeriesRepository $seriesRepository,
         #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory
     ): Response {
 //            "filename" => "[a-zA-Z0-9\-\_]\.(jpe?g|heic|png)",
@@ -110,7 +123,11 @@ class ResourceController extends AbstractInachisController
             default => Image::class,
         };
         $type = substr(strrchr($typeClass, '\\'), 1);
-        $resource = $this->entityManager->getRepository($typeClass)->findOneBy([
+        $repository = match($type) {
+            'Download' => $downloadRepository,
+            default => $imageRepository,
+        };
+        $resource = $repository->findOneBy([
             'id' => $request->attributes->get('filename'),
         ]);
         if (empty($resource)) {
@@ -126,8 +143,8 @@ class ResourceController extends AbstractInachisController
         $form = $this->createForm(ResourceType::class, $resource);
         $form->handleRequest($request);
         if ($type === 'Image') {
-            $this->data['usages']['posts'] = $this->entityManager->getRepository(Page::class)->getPostsUsingImage($resource);
-            $this->data['usages']['series'] = $this->entityManager->getRepository(Series::class)->getSeriesUsingImage($resource);
+            $this->data['usages']['posts'] = $pageRepository->getPostsUsingImage($resource);
+            $this->data['usages']['series'] = $seriesRepository->getSeriesUsingImage($resource);
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -140,7 +157,7 @@ class ResourceController extends AbstractInachisController
                     $filesystem->exists($filename)) {
                     try {
                         $filesystem->remove($filename);
-                        $this->entityManager->getRepository($typeClass)->remove($resource);
+                        $repository->remove($resource);
                         $this->addFlash('success', 'Resource deleted.');
                         return $this->redirectToRoute(
                             'incc_resource_list',
@@ -150,8 +167,14 @@ class ResourceController extends AbstractInachisController
                             ],
                             Response::HTTP_PERMANENTLY_REDIRECT
                         );
-                    } catch (IOExceptionInterface $e) {
+                    } catch (IOException $e) {
                         $this->addFlash('error', 'Failed to remove file.');
+                        return $this->redirectToRoute(
+                            'incc_resource_edit', [
+                                'type' => $request->attributes->get('type'),
+                                'filename' => $resource->getId(),
+                            ]
+                        );
                     }
                 }
             }
@@ -174,13 +197,11 @@ class ResourceController extends AbstractInachisController
         $this->data['page']['title'] = sprintf('%s: %s', $type, $resource->getTitle());
         $this->data['resource'] = $resource;
         if ($type === 'Image') {
-            $this->data['usages']['posts'] = $this->entityManager->getRepository(Page::class)->getPostsUsingImage($resource);
-            $this->data['usages']['series'] = $this->entityManager->getRepository(Series::class)->getSeriesUsingImage($resource);
-            $fullImagePath = $resource->getFilename();
-            if (!str_starts_with($fullImagePath, 'http')) {
-                $fullImagePath = $imageDirectory . $fullImagePath;
+            try {
+                $sizes = $resource->getImageProperties($imageDirectory);
+            } catch (FileNotFoundException $exception) {
+                $this->addFlash('error', 'Associated image file could not be found');
             }
-            $sizes = getimagesize($fullImagePath);
             $this->data['channels'] = $sizes['channels'] ?? '';
             $this->data['bits'] = $sizes['bits'] ?? '';
             $this->data['limitKByte'] = Image::WARNING_FILESIZE;
@@ -199,6 +220,7 @@ class ResourceController extends AbstractInachisController
     #[Route("/incc/resource/image/upload", name: "incc_resource_upload_image", methods: [ "POST", "PUT" ])]
     public function uploadImage(
         Request $request,
+        ImageFileService $imageFileService,
         SluggerInterface $slugger,
         #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory): JsonResponse
     {
@@ -207,16 +229,12 @@ class ResourceController extends AbstractInachisController
         } elseif (empty($request->request->all('image')['title'])) {
             return new JsonResponse(['error' => 'No title provided'], 400);
         }
-        $uploadedFile = $request->files->get("image")['imageFile'];
-        // @todo handle optimise image which reduces to Image::WARNING_SIZE max and 85% compression if JPEG
-        // @todo if HEIC, and HEIC supported, convert to JPEG
-        $dimensions = getimagesize($uploadedFile->getRealPath());
-        $ctx = hash_init('sha256');
-        $fp = fopen($uploadedFile->getRealPath(), 'rb');
-        while (!feof($fp)) {
-            hash_update($ctx, fread($fp, 8192));
+        $uploadedFile = $imageFileService->convertHEICToJPEG($request->files->get("image")['imageFile']);
+        if (!empty($request->request->all('image')['optimise'])) {
+            $uploadedFile = $imageFileService->optimise($uploadedFile);
         }
-        fclose($fp);
+        $dimensions = $imageFileService->getImageDimensions($uploadedFile);
+
         // @todo change filename to use the title for better SEO
         $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
         $safeFilename = $slugger->slug($originalFilename);
@@ -230,7 +248,7 @@ class ResourceController extends AbstractInachisController
             ->setFilesize($uploadedFile->getSize())
             ->setFiletype($uploadedFile->getMimeType())
             ->setFilename($newFilename)
-            ->setChecksum(hash_final($ctx))
+            ->setChecksum($imageFileService->createChecksum($uploadedFile))
             ->setDimensionX($dimensions[0])
             ->setDimensionY($dimensions[1])
         ;
