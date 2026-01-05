@@ -73,10 +73,10 @@ class CreateAdminCommandTest extends TestCase
         $command = new CreateAdminCommand($this->entityManager, $this->passwordHasher);
         $command->setHelperSet(new HelperSet(['question' => new QuestionHelper()]));
         $tester = new CommandTester($command);
-        $tester->setInputs(['test-user', 'test@example.com', '']);
+        $tester->setInputs(['test-user', 'test@example.com', '' ,'']);
 
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Aborted.');
+        $this->expectExceptionMessage('The password cannot be empty');
         $tester->execute([]);
     }
 

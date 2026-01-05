@@ -81,6 +81,7 @@ class CreateAdminCommand extends Command
             return $value;
         });
         $question->setHidden(true);
+        $question->setMaxAttempts(2);
         $plaintextPassword = $helper->ask($input, $output, $question);
 
         $user = new User($username, $plaintextPassword, $emailAddress);
