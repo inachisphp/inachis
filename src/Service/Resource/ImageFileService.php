@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Service\Resource;
+namespace Inachis\Service\Resource;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 

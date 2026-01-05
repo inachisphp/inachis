@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Command;
+namespace Inachis\Tests\phpunit\Command;
 
-use App\Command\PurgeExpiredResetRequestsCommand;
-use App\Repository\PasswordResetRequestRepository;
+use Inachis\Command\PurgeExpiredResetRequestsCommand;
+use Inachis\Repository\PasswordResetRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;

@@ -7,17 +7,17 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Page\Post;
+namespace Inachis\Tests\phpunit\Controller\Page\Post;
 
-use App\Controller\Page\Post\PageController;
-use App\Entity\Page;
-use App\Entity\Revision;
-use App\Entity\Url;
-use App\Repository\PageRepository;
-use App\Repository\PageRepositoryInterface;
-use App\Repository\RevisionRepository;
-use App\Repository\UrlRepository;
-use App\Util\ContentRevisionCompare;
+use Inachis\Controller\Page\Post\PageController;
+use Inachis\Entity\Page;
+use Inachis\Entity\Revision;
+use Inachis\Entity\Url;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\PageRepositoryInterface;
+use Inachis\Repository\RevisionRepository;
+use Inachis\Repository\UrlRepository;
+use Inachis\Util\ContentRevisionCompare;
 use ArrayIterator;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;

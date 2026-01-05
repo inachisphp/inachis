@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Entity;
+namespace Inachis\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,7 +16,7 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 /**
  * Object for handling images on a site.
  */
-#[ORM\Entity(repositoryClass: 'App\Repository\ImageRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\ImageRepository', readOnly: false)]
 #[ORM\Index(columns: ['title', 'filename', 'filetype'], name: 'search_idx')]
 #[ORM\Index(columns: ['title', 'alt_text', 'description'], name: "fulltext_title_content", flags: ["fulltext"])]
 class Image extends AbstractFile

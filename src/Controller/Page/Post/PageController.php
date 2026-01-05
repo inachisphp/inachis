@@ -7,23 +7,23 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Post;
+namespace Inachis\Controller\Page\Post;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\Category;
-use App\Entity\Image;
-use App\Entity\Page;
-use App\Entity\Revision;
-use App\Entity\Tag;
-use App\Entity\Url;
-use App\Form\PostType;
-use App\Model\ContentQueryParameters;
-use App\Repository\PageRepository;
-use App\Repository\RevisionRepository;
-use App\Service\Page\PageBulkActionService;
-use App\Util\ContentRevisionCompare;
-use App\Util\ReadingTime;
-use App\Util\UrlNormaliser;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Category;
+use Inachis\Entity\Image;
+use Inachis\Entity\Page;
+use Inachis\Entity\Revision;
+use Inachis\Entity\Tag;
+use Inachis\Entity\Url;
+use Inachis\Form\PostType;
+use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\RevisionRepository;
+use Inachis\Service\Page\PageBulkActionService;
+use Inachis\Util\ContentRevisionCompare;
+use Inachis\Util\ReadingTime;
+use Inachis\Util\UrlNormaliser;
 use DateTime;
 use Exception;
 use Ramsey\Uuid\Uuid;

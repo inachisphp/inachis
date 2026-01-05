@@ -7,14 +7,14 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Page\Post;
+namespace Inachis\Tests\phpunit\Controller\Page\Post;
 
-use App\Controller\Page\Post\RevisionController;
-use App\Entity\Page;
-use App\Entity\Revision;
-use App\Entity\Url;
-use App\Repository\PageRepository;
-use App\Repository\RevisionRepository;
+use Inachis\Controller\Page\Post\RevisionController;
+use Inachis\Entity\Page;
+use Inachis\Entity\Revision;
+use Inachis\Entity\Url;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\RevisionRepository;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Uuid;

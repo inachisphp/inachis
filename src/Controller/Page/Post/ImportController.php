@@ -7,14 +7,14 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Post;
+namespace Inachis\Controller\Page\Post;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\Page;
-use App\Entity\Url;
-use App\Parser\MarkdownFileParser;
-use App\Service\Page\PageFileImportService;
-use App\Util\UrlNormaliser;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Page;
+use Inachis\Entity\Url;
+use Inachis\Parser\MarkdownFileParser;
+use Inachis\Service\Page\PageFileImportService;
+use Inachis\Util\UrlNormaliser;
 use DateTimeInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use function App\Controller\gettype;
+use function Inachis\Controller\gettype;
 
 #[IsGranted('ROLE_ADMIN')]
 class ImportController extends AbstractInachisController

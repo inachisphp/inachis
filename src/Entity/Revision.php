@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Entity;
+namespace Inachis\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
@@ -18,7 +18,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * Object for handling {@link Page} revisions
  */
-#[ORM\Entity(repositoryClass: 'App\Repository\RevisionRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\RevisionRepository', readOnly: false)]
 #[ORM\Index(columns: [ 'page_id', 'user_id' ], name: 'search_idx')]
 class Revision
 {
@@ -70,7 +70,7 @@ class Revision
     /**
      * @var User|null The author for the {@link Page}
      */
-    #[ORM\ManyToOne(targetEntity: 'App\Entity\User', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User', cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
     protected ?User $user;
 

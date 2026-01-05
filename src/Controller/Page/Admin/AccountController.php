@@ -7,19 +7,19 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Admin;
+namespace Inachis\Controller\Page\Admin;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\PasswordResetRequest;
-use App\Entity\User;
-use App\Form\ChangePasswordType;
-use App\Form\ForgotPasswordType;
-use App\Form\LoginType;
-use App\Repository\PasswordResetRequestRepository;
-use App\Repository\UserRepository;
-use App\Service\User\PasswordResetTokenService;
-use App\Service\User\UserAccountEmailService;
-use App\Util\Base64EncodeFile;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\PasswordResetRequest;
+use Inachis\Entity\User;
+use Inachis\Form\ChangePasswordType;
+use Inachis\Form\ForgotPasswordType;
+use Inachis\Form\LoginType;
+use Inachis\Repository\PasswordResetRequestRepository;
+use Inachis\Repository\UserRepository;
+use Inachis\Service\User\PasswordResetTokenService;
+use Inachis\Service\User\UserAccountEmailService;
+use Inachis\Util\Base64EncodeFile;
 use DateTime;
 use Doctrine\ORM\NonUniqueResultException;
 use Exception;

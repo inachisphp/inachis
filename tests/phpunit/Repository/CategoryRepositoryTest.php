@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Repository;
+namespace Inachis\Tests\phpunit\Repository;
 
-use App\Entity\Category;
-use App\Repository\CategoryRepository;
+use Inachis\Entity\Category;
+use Inachis\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;

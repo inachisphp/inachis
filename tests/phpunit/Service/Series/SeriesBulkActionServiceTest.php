@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Service\Series;
+namespace Inachis\Tests\phpunit\Service\Series;
 
-use App\Entity\Series;
-use App\Repository\SeriesRepository;
-use App\Service\Series\SeriesBulkActionService;
+use Inachis\Entity\Series;
+use Inachis\Repository\SeriesRepository;
+use Inachis\Service\Series\SeriesBulkActionService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;

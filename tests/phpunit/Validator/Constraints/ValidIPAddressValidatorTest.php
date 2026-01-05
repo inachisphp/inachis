@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Validator\Constraints;
+namespace Inachis\Tests\phpunit\Validator\Constraints;
 
-use App\Validator\Constraints\ValidIPAddress;
-use App\Validator\Constraints\ValidIPAddressValidator;
+use Inachis\Validator\Constraints\ValidIPAddress;
+use Inachis\Validator\Constraints\ValidIPAddressValidator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\NotBlank;

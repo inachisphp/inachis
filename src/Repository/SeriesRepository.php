@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Repository;
+namespace Inachis\Repository;
 
-use App\Entity\Image;
-use App\Entity\Page;
-use App\Entity\Series;
+use Inachis\Entity\Image;
+use Inachis\Entity\Page;
+use Inachis\Entity\Series;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;

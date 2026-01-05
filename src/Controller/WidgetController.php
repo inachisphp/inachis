@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller;
+namespace Inachis\Controller;
 
-use App\Entity\Category;
-use App\Entity\Page;
-use App\Entity\Series;
+use Inachis\Entity\Category;
+use Inachis\Entity\Page;
+use Inachis\Entity\Series;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

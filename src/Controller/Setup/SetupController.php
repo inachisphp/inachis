@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Setup;
+namespace Inachis\Controller\Setup;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\User;
-use App\Repository\UserRepository;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\User;
+use Inachis\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

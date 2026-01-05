@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Command;
+namespace Inachis\Tests\phpunit\Command;
 
-use App\Command\CreateAdminCommand;
-use App\Entity\User;
+use Inachis\Command\CreateAdminCommand;
+use Inachis\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use PHPUnit\Framework\TestCase;
@@ -75,9 +75,9 @@ class CreateAdminCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->setInputs(['test-user', 'test@example.com', '']);
 
-//        $this->expectException(Exception::class);
-//        $this->expectExceptionMessage('Aborted.');
-//        $tester->execute([]);
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Aborted.');
+        $tester->execute([]);
     }
 
     public function testExecuteValidatorReturnsValueForNonEmptyPassword(): void

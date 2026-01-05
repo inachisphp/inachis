@@ -4,7 +4,9 @@
     "description": "A basic framework for use in producing simple post/page driven websites",
     "license": "proprietary",
     "authors": [
-        { "name": "David G. Paul" }
+        {
+            "name": "David G. Paul"
+        }
     ],
     "version": "1.0.0",
     "require": {
@@ -86,12 +88,12 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "Inachis\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "App\\Tests\\": "tests/"
+            "Inachis\\Tests\\": "tests/"
         }
     },
     "replace": {
@@ -108,7 +110,7 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "create-skeleton": [
-            "cp -R vendor/jedi58/inachis/{bin,config,public} .",
+            "cp -R vendor/jedi58/inachis/{bin,config,public,templates} .",
             "cp -R vendor/jedi58/inachis/.env.dist .env"
         ],
         "setup-git-hook": [

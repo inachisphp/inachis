@@ -7,12 +7,12 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Post;
+namespace Inachis\Controller\Page\Post;
 
-use App\Controller\AbstractInachisController;
-use App\Parser\ArrayToMarkdown;
-use App\Repository\PageRepository;
-use App\Repository\RevisionRepository;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Parser\ArrayToMarkdown;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\RevisionRepository;
 use DateTime;
 use Exception;
 use Jfcherng\Diff\DiffHelper;

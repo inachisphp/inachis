@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Util;
+namespace Inachis\Tests\phpunit\Util;
 
-use App\Util\RandomColorPicker;
+use Inachis\Util\RandomColorPicker;
 use PHPUnit\Framework\TestCase;
 
 class RandomColorPickerTest extends TestCase

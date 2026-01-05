@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Service\User;
+namespace Inachis\Tests\phpunit\Service\User;
 
-use App\Entity\User;
-use App\Repository\UserRepository;
-use App\Service\User\UserBulkActionService;
+use Inachis\Entity\User;
+use Inachis\Repository\UserRepository;
+use Inachis\Service\User\UserBulkActionService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;

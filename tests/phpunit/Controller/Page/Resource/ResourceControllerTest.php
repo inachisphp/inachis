@@ -7,16 +7,16 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Page\Resource;
+namespace Inachis\Tests\phpunit\Controller\Page\Resource;
 
-use App\Controller\Page\Resource\ResourceController;
-use App\Entity\Image;
-use App\Model\ContentQueryParameters;
-use App\Repository\DownloadRepository;
-use App\Repository\ImageRepository;
-use App\Repository\PageRepository;
-use App\Repository\SeriesRepository;
-use App\Service\Resource\ImageFileService;
+use Inachis\Controller\Page\Resource\ResourceController;
+use Inachis\Entity\Image;
+use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\DownloadRepository;
+use Inachis\Repository\ImageRepository;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\SeriesRepository;
+use Inachis\Service\Resource\ImageFileService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use PHPUnit\Framework\MockObject\Exception;

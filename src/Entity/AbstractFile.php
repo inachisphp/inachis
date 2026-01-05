@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Entity;
+namespace Inachis\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
@@ -70,7 +70,7 @@ abstract class AbstractFile
     /**
      * @var User|null The UUID of the {@link User} that uploaded the file
      */
-    #[ORM\ManyToOne(targetEntity: 'App\Entity\User', cascade: [ 'detach' ])]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User', cascade: [ 'detach' ])]
     #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id')]
     protected ?User $author = null;
 

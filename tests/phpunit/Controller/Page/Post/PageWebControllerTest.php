@@ -7,18 +7,18 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Page\Post;
+namespace Inachis\Tests\phpunit\Controller\Page\Post;
 
-use App\Controller\Page\Post\PageWebController;
-use App\Entity\Category;
-use App\Entity\Page;
-use App\Entity\Series;
-use App\Entity\Tag;
-use App\Entity\Url;
-use App\Repository\PageRepository;
-use App\Repository\SeriesRepository;
-use App\Repository\TagRepository;
-use App\Repository\UrlRepository;
+use Inachis\Controller\Page\Post\PageWebController;
+use Inachis\Entity\Category;
+use Inachis\Entity\Page;
+use Inachis\Entity\Series;
+use Inachis\Entity\Tag;
+use Inachis\Entity\Url;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\TagRepository;
+use Inachis\Repository\UrlRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;

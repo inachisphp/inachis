@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Service\Series;
+namespace Inachis\Service\Series;
 
-use App\Entity\Series;
-use App\Repository\SeriesRepository;
+use Inachis\Entity\Series;
+use Inachis\Repository\SeriesRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 

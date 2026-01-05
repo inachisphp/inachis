@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Page\Post;
+namespace Inachis\Tests\phpunit\Controller\Page\Post;
 
-use App\Controller\Page\Post\ImportController;
-use App\Service\Page\PageFileImportService;
+use Inachis\Controller\Page\Post\ImportController;
+use Inachis\Service\Page\PageFileImportService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

@@ -7,13 +7,13 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Service\Page;
+namespace Inachis\Service\Page;
 
-use App\Entity\Page;
-use App\Entity\Url;
-use App\Parser\MarkdownFileParser;
-use App\Repository\UrlRepository;
-use App\Util\UrlNormaliser;
+use Inachis\Entity\Page;
+use Inachis\Entity\Url;
+use Inachis\Parser\MarkdownFileParser;
+use Inachis\Repository\UrlRepository;
+use Inachis\Util\UrlNormaliser;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;

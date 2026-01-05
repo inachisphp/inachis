@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Service\Image;
+namespace Inachis\Tests\phpunit\Service\Image;
 
-use App\Service\Image\ImageExtractor;
+use Inachis\Service\Image\ImageExtractor;
 use PHPUnit\Framework\TestCase;
 
 class ImageExtractorTest extends TestCase

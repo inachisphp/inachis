@@ -7,16 +7,16 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Entity;
+namespace Inachis\Tests\phpunit\Entity;
 
-use App\Entity\Category;
-use App\Entity\Image;
-use App\Entity\Page;
-use App\Entity\Series;
-use App\Entity\Tag;
-use App\Entity\Url;
-use App\Entity\User;
-use App\Exception\InvalidTimezoneException;
+use Inachis\Entity\Category;
+use Inachis\Entity\Image;
+use Inachis\Entity\Page;
+use Inachis\Entity\Series;
+use Inachis\Entity\Tag;
+use Inachis\Entity\Url;
+use Inachis\Entity\User;
+use Inachis\Exception\InvalidTimezoneException;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
@@ -204,7 +204,7 @@ class PageTest extends TestCase
         $this->assertNull($this->page->getUrl());
         $this->page->addUrl(new Url($this->page, 'test', true));
         $this->assertNotEmpty($this->page->getUrls());
-        $this->assertInstanceOf('\App\Entity\Url', $this->page->getUrl());
+        $this->assertInstanceOf('\Inachis\Entity\Url', $this->page->getUrl());
         $this->expectException(InvalidArgumentException::class);
         $this->page->getUrl(100);
     }

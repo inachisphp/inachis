@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Dialog;
+namespace Inachis\Controller\Dialog;
 
-use App\Controller\AbstractInachisController;
-use App\Repository\PageRepository;
-use App\Repository\SeriesRepository;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\SeriesRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

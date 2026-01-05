@@ -7,18 +7,18 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Resource;
+namespace Inachis\Controller\Page\Resource;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\Download;
-use App\Entity\Image;
-use App\Form\ResourceType;
-use App\Model\ContentQueryParameters;
-use App\Repository\DownloadRepository;
-use App\Repository\ImageRepository;
-use App\Repository\PageRepository;
-use App\Repository\SeriesRepository;
-use App\Service\Resource\ImageFileService;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Download;
+use Inachis\Entity\Image;
+use Inachis\Form\ResourceType;
+use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\DownloadRepository;
+use Inachis\Repository\ImageRepository;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\SeriesRepository;
+use Inachis\Service\Resource\ImageFileService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Exception\IOException;

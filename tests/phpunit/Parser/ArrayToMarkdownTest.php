@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Parser;
+namespace Inachis\Tests\phpunit\Parser;
 
-use App\Parser\ArrayToMarkdown;
+use Inachis\Parser\ArrayToMarkdown;
 use PHPUnit\Framework\TestCase;
 
 class ArrayToMarkdownTest extends TestCase

@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Exception;
+namespace Inachis\Exception;
 
 use Exception;
 

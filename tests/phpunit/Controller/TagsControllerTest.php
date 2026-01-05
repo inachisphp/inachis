@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller;
+namespace Inachis\Tests\phpunit\Controller;
 
-use App\Controller\TagsController;
-use App\Entity\Tag;
-use App\Repository\TagRepository;
+use Inachis\Controller\TagsController;
+use Inachis\Entity\Tag;
+use Inachis\Repository\TagRepository;
 use ArrayIterator;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;

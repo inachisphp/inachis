@@ -7,12 +7,12 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Dialog;
+namespace Inachis\Controller\Dialog;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\Image;
-use App\Form\ImageType;
-use App\Repository\ImageRepository;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Image;
+use Inachis\Form\ImageType;
+use Inachis\Repository\ImageRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

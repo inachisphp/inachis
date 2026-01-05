@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Repository;
+namespace Inachis\Tests\phpunit\Repository;
 
-use App\Entity\Page;
-use App\Entity\Revision;
-use App\Repository\RevisionRepository;
+use Inachis\Entity\Page;
+use Inachis\Entity\Revision;
+use Inachis\Repository\RevisionRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;

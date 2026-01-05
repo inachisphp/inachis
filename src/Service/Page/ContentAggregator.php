@@ -7,13 +7,13 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Service\Page;
+namespace Inachis\Service\Page;
 
-use App\Entity\Page;
-use App\Entity\Series;
-use App\Repository\PageRepository;
-use App\Repository\SeriesRepository;
-use App\Util\TextCleaner;
+use Inachis\Entity\Page;
+use Inachis\Entity\Series;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\SeriesRepository;
+use Inachis\Util\TextCleaner;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 

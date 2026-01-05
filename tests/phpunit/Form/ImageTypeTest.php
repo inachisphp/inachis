@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Form;
+namespace Inachis\Tests\phpunit\Form;
 
-use App\Entity\Image;
-use App\Form\ImageType;
+use Inachis\Entity\Image;
+use Inachis\Form\ImageType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Form\Test\TypeTestCase;

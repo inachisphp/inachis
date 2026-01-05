@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Service\User;
+namespace Inachis\Tests\phpunit\Service\User;
 
-use App\Entity\User;
-use App\Service\User\PasswordResetTokenService;
-use App\Service\User\UserAccountEmailService;
+use Inachis\Entity\User;
+use Inachis\Service\User\PasswordResetTokenService;
+use Inachis\Service\User\UserAccountEmailService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;

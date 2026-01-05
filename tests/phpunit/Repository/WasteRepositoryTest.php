@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Repository;
+namespace Inachis\Tests\phpunit\Repository;
 
-use App\Entity\User;
-use App\Repository\WasteRepository;
+use Inachis\Entity\User;
+use Inachis\Repository\WasteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;

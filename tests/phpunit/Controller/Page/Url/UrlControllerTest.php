@@ -7,12 +7,12 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Page\Url;
+namespace Inachis\Tests\phpunit\Controller\Page\Url;
 
-use App\Controller\Page\Url\UrlController;
-use App\Model\ContentQueryParameters;
-use App\Repository\UrlRepository;
-use App\Service\Url\UrlBulkActionService;
+use Inachis\Controller\Page\Url\UrlController;
+use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\UrlRepository;
+use Inachis\Service\Url\UrlBulkActionService;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Uuid;

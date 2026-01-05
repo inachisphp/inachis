@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Admin;
+namespace Inachis\Controller\Page\Admin;
 
-use App\Controller\AbstractInachisController;
-use App\Form\ChangePasswordType;
-use App\Repository\UserRepository;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Form\ChangePasswordType;
+use Inachis\Repository\UserRepository;
 use DateTime;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

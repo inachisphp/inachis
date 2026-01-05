@@ -7,15 +7,15 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Repository;
+namespace Inachis\Tests\phpunit\Repository;
 
-use App\Entity\Category;
-use App\Entity\Image;
-use App\Entity\Page;
-use App\Entity\Tag;
-use App\Entity\Url;
-use App\Repository\PageRepository;
-use App\Repository\UrlRepository;
+use Inachis\Entity\Category;
+use Inachis\Entity\Image;
+use Inachis\Entity\Page;
+use Inachis\Entity\Tag;
+use Inachis\Entity\Url;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\UrlRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
@@ -28,12 +28,12 @@ use Ramsey\Uuid\Uuid;
 use ReflectionClass;
 
 /**
- * @covers \App\Repository\PageRepository
- * @uses \App\Entity\Page
- * @uses \App\Entity\Category
- * @uses \App\Entity\Tag
- * @uses \App\Entity\Url
- * @uses \App\Entity\Image
+ * @covers \Inachis\Repository\PageRepository
+ * @uses \Inachis\Entity\Page
+ * @uses \Inachis\Entity\Category
+ * @uses \Inachis\Entity\Tag
+ * @uses \Inachis\Entity\Url
+ * @uses \Inachis\Entity\Image
  */
 class PageRepositoryTest extends TestCase
 {

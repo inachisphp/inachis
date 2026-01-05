@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Service\User;
+namespace Inachis\Service\User;
 
-use App\Entity\User;
-use App\Util\Base64EncodeFile;
-use App\Util\RandomColorPicker;
+use Inachis\Entity\User;
+use Inachis\Util\Base64EncodeFile;
+use Inachis\Util\RandomColorPicker;
 use Random\RandomException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
