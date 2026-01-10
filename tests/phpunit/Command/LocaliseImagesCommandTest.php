@@ -7,18 +7,18 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Command;
+namespace Inachis\Tests\phpunit\Command;
 
-use App\Command\LocaliseImagesCommand;
-use App\Entity\Image;
-use App\Entity\Page;
-use App\Entity\Series;
-use App\Repository\ImageRepository;
-use App\Repository\PageRepository;
-use App\Repository\SeriesRepository;
-use App\Service\Image\ContentImageUpdater;
-use App\Service\Image\ImageExtractor;
-use App\Service\Image\ImageLocaliser;
+use Inachis\Command\LocaliseImagesCommand;
+use Inachis\Entity\Image;
+use Inachis\Entity\Page;
+use Inachis\Entity\Series;
+use Inachis\Repository\ImageRepository;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\SeriesRepository;
+use Inachis\Service\Image\ContentImageUpdater;
+use Inachis\Service\Image\ImageExtractor;
+use Inachis\Service\Image\ImageLocaliser;
 use ArrayIterator;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;

@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Transformer;
+namespace Inachis\Transformer;
 
 use Imagick;
 use ImagickException;

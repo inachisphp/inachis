@@ -7,12 +7,12 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Service\Image;
+namespace Inachis\Tests\phpunit\Service\Image;
 
-use App\Entity\Page;
-use App\Entity\Revision;
-use App\Repository\RevisionRepository;
-use App\Service\Image\ContentImageUpdater;
+use Inachis\Entity\Page;
+use Inachis\Entity\Revision;
+use Inachis\Repository\RevisionRepository;
+use Inachis\Service\Image\ContentImageUpdater;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;

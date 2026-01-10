@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Page\Dashboard;
+namespace Inachis\Tests\phpunit\Controller\Page\Dashboard;
 
-use App\Controller\Page\Dashboard\DashboardController;
-use App\Repository\PageRepository;
+use Inachis\Controller\Page\Dashboard\DashboardController;
+use Inachis\Repository\PageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use PHPUnit\Framework\MockObject\Exception;

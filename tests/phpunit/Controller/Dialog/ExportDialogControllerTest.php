@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Dialog;
+namespace Inachis\Tests\phpunit\Controller\Dialog;
 
-use App\Controller\Dialog\ExportDialogController;
-use App\Entity\Page;
-use App\Repository\PageRepository;
+use Inachis\Controller\Dialog\ExportDialogController;
+use Inachis\Entity\Page;
+use Inachis\Repository\PageRepository;
 use ArrayIterator;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use PHPUnit\Framework\MockObject\Exception;

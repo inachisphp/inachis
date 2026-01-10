@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\EventListener;
+namespace Inachis\Tests\phpunit\EventListener;
 
-use App\EventListener\LocaleSubscriber;
+use Inachis\EventListener\LocaleSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;

@@ -7,14 +7,14 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Page\Search;
+namespace Inachis\Tests\phpunit\Controller\Page\Search;
 
-use App\Controller\Page\Search\SearchController;
-use App\Entity\User;
-use App\Model\SearchResult;
-use App\Repository\SearchRepository;
-use App\Repository\UrlRepository;
-use App\Repository\UserRepository;
+use Inachis\Controller\Page\Search\SearchController;
+use Inachis\Entity\User;
+use Inachis\Model\SearchResult;
+use Inachis\Repository\SearchRepository;
+use Inachis\Repository\UrlRepository;
+use Inachis\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;

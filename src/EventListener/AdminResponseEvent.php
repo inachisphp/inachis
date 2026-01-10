@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\EventListener;
+namespace Inachis\EventListener;
 
-use App\Security\ContentSecurityPolicy;
+use Inachis\Security\ContentSecurityPolicy;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;

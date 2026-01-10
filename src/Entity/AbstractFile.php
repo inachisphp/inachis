@@ -7,11 +7,12 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Entity;
+namespace Inachis\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
@@ -69,7 +70,7 @@ abstract class AbstractFile
     /**
      * @var User|null The UUID of the {@link User} that uploaded the file
      */
-    #[ORM\ManyToOne(targetEntity: 'App\Entity\User', cascade: [ 'detach' ])]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User', cascade: [ 'detach' ])]
     #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id')]
     protected ?User $author = null;
 
@@ -88,9 +89,9 @@ abstract class AbstractFile
     /**
      * Returns the value of {@link id}.
      *
-     * @return string The UUID of the record
+     * @return ?UuidInterface The UUID of the record
      */
-    public function getId(): string
+    public function getId(): ?UuidInterface
     {
         return $this->id;
     }
@@ -188,10 +189,10 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link id}.
      *
-     * @param UuidInterface $value The id to set
+     * @param ?UuidInterface $value The id to set
      * @return $this
      */
-    public function setId(UuidInterface $value): self
+    public function setId(?UuidInterface $value): self
     {
         $this->id = $value;
 

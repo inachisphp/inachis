@@ -7,19 +7,19 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Series;
+namespace Inachis\Controller\Page\Series;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\Image;
-use App\Entity\Page;
-use App\Entity\Series;
-use App\Form\SeriesType;
-use App\Model\ContentQueryParameters;
-use App\Repository\ImageRepository;
-use App\Repository\PageRepository;
-use App\Repository\SeriesRepository;
-use App\Service\Series\SeriesBulkActionService;
-use App\Util\UrlNormaliser;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Image;
+use Inachis\Entity\Page;
+use Inachis\Entity\Series;
+use Inachis\Form\SeriesType;
+use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\ImageRepository;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\SeriesRepository;
+use Inachis\Service\Series\SeriesBulkActionService;
+use Inachis\Util\UrlNormaliser;
 use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

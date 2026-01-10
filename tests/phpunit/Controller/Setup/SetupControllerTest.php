@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Setup;
+namespace Inachis\Tests\phpunit\Controller\Setup;
 
-use App\Controller\Setup\SetupController;
-use App\Repository\UserRepository;
-use App\Service\Page\ContentAggregator;
+use Inachis\Controller\Setup\SetupController;
+use Inachis\Repository\UserRepository;
+use Inachis\Service\Page\ContentAggregator;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;

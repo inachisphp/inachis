@@ -7,13 +7,13 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Dialog;
+namespace Inachis\Tests\phpunit\Controller\Dialog;
 
-use App\Controller\Dialog\CategoryDialogController;
-use App\Controller\Dialog\ImageGalleryDialogController;
-use App\Entity\Category;
-use App\Repository\CategoryRepository;
-use App\Repository\PageRepository;
+use Inachis\Controller\Dialog\CategoryDialogController;
+use Inachis\Controller\Dialog\ImageGalleryDialogController;
+use Inachis\Entity\Category;
+use Inachis\Repository\CategoryRepository;
+use Inachis\Repository\PageRepository;
 use ArrayIterator;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;

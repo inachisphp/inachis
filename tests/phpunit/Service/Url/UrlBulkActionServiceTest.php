@@ -7,12 +7,12 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Service\Url;
+namespace Inachis\Tests\phpunit\Service\Url;
 
-use App\Entity\Page;
-use App\Entity\Url;
-use App\Repository\UrlRepository;
-use App\Service\Url\UrlBulkActionService;
+use Inachis\Entity\Page;
+use Inachis\Entity\Url;
+use Inachis\Repository\UrlRepository;
+use Inachis\Service\Url\UrlBulkActionService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;

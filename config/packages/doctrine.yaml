@@ -21,7 +21,7 @@ doctrine:
             App:
                 is_bundle: false
                 dir: '%kernel.project_dir%/src/Entity'
-                prefix: 'App\Entity'
+                prefix: 'Inachis\Entity'
                 alias: App
                 type: attribute
 

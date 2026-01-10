@@ -7,13 +7,13 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Service\Page;
+namespace Inachis\Tests\phpunit\Service\Page;
 
-use App\Entity\Page;
-use App\Entity\Series;
-use App\Repository\PageRepository;
-use App\Repository\SeriesRepository;
-use App\Service\Page\ContentAggregator;
+use Inachis\Entity\Page;
+use Inachis\Entity\Series;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\SeriesRepository;
+use Inachis\Service\Page\ContentAggregator;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;

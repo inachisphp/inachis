@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Model;
+namespace Inachis\Tests\phpunit\Model;
 
-use App\Model\BulkCreateData;
+use Inachis\Model\BulkCreateData;
 use DateTime;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;

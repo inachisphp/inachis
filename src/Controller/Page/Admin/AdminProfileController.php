@@ -7,16 +7,16 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Admin;
+namespace Inachis\Controller\Page\Admin;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\User;
-use App\Form\UserType;
-use App\Model\ContentQueryParameters;
-use App\Repository\UserRepository;
-use App\Service\User\UserBulkActionService;
-use App\Service\User\UserAccountEmailService;
-use App\Transformer\ImageTransformer;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\User;
+use Inachis\Form\UserType;
+use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\UserRepository;
+use Inachis\Service\User\UserBulkActionService;
+use Inachis\Service\User\UserAccountEmailService;
+use Inachis\Transformer\ImageTransformer;
 use DateTime;
 use Random\RandomException;
 use Symfony\Component\Form\Form;

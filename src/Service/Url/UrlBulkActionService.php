@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Service\Url;
+namespace Inachis\Service\Url;
 
 
-use App\Repository\UrlRepository;
+use Inachis\Repository\UrlRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;

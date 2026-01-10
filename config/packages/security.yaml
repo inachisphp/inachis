@@ -6,7 +6,7 @@ security:
     providers:
         app_user_provider:
             entity:
-                class: App\Entity\User
+                class: Inachis\Entity\User
                 property: username
 
     firewalls:
@@ -16,7 +16,7 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            user_checker: App\Security\UserChecker
+            user_checker: Inachis\Security\UserChecker
 
             form_login:
                 login_path: app_account_login

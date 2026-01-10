@@ -7,18 +7,18 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Page\Series;
+namespace Inachis\Tests\phpunit\Controller\Page\Series;
 
-use App\Controller\Page\Series\SeriesController;
-use App\Entity\Image;
-use App\Entity\Page;
-use App\Entity\Series;
-use App\Entity\User;
-use App\Model\ContentQueryParameters;
-use App\Repository\ImageRepository;
-use App\Repository\PageRepository;
-use App\Repository\SeriesRepository;
-use App\Service\Series\SeriesBulkActionService;
+use Inachis\Controller\Page\Series\SeriesController;
+use Inachis\Entity\Image;
+use Inachis\Entity\Page;
+use Inachis\Entity\Series;
+use Inachis\Entity\User;
+use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\ImageRepository;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\SeriesRepository;
+use Inachis\Service\Series\SeriesBulkActionService;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Uuid;

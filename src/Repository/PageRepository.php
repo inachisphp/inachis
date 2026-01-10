@@ -7,13 +7,13 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Repository;
+namespace Inachis\Repository;
 
-use App\Entity\Category;
-use App\Entity\Image;
-use App\Entity\Page;
-use App\Entity\Tag;
-use App\Entity\Url;
+use Inachis\Entity\Category;
+use Inachis\Entity\Image;
+use Inachis\Entity\Page;
+use Inachis\Entity\Tag;
+use Inachis\Entity\Url;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 

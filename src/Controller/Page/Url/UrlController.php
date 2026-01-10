@@ -7,13 +7,13 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Url;
+namespace Inachis\Controller\Page\Url;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\Url;
-use App\Model\ContentQueryParameters;
-use App\Repository\UrlRepository;
-use App\Service\Url\UrlBulkActionService;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Url;
+use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\UrlRepository;
+use Inachis\Service\Url\UrlBulkActionService;
 use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

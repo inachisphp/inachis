@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Security;
+namespace Inachis\Tests\phpunit\Security;
 
-use App\Entity\User;
-use App\Security\UserChecker;
+use Inachis\Entity\User;
+use Inachis\Security\UserChecker;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;
 use Symfony\Component\Security\Core\User\UserInterface;

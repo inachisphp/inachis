@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Form;
+namespace Inachis\Tests\phpunit\Form;
 
-use App\Entity\Series;
-use App\Form\DataTransformer\ArrayCollectionToArrayTransformer;
-use App\Form\SeriesType;
+use Inachis\Entity\Series;
+use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use Inachis\Form\SeriesType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use Ramsey\Uuid\Uuid;

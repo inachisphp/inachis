@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Page\Admin;
+namespace Inachis\Tests\phpunit\Controller\Page\Admin;
 
-use App\Controller\Page\Admin\ChangePasswordController;
-use App\Entity\User;
-use App\Repository\UserRepository;
+use Inachis\Controller\Page\Admin\ChangePasswordController;
+use Inachis\Entity\User;
+use Inachis\Repository\UserRepository;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;

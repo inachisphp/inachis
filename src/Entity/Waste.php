@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Entity;
+namespace Inachis\Entity;
 
 use DateTime;
 use DateTimeInterface;
@@ -18,7 +18,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * Object for handling {@link Waste} contents
  */
-#[ORM\Entity(repositoryClass: 'App\Repository\WasteRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\WasteRepository', readOnly: false)]
 #[ORM\Index(name: 'search_idx', columns: ['source_type', 'user_id'])]
 class Waste
 {

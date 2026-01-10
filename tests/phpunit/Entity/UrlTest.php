@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Entity;
+namespace Inachis\Tests\phpunit\Entity;
 
-use App\Entity\Page;
-use App\Entity\Url;
+use Inachis\Entity\Page;
+use Inachis\Entity\Url;
 use DateTime;
 use Exception;
 use PHPUnit\Framework\TestCase;

@@ -7,14 +7,14 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller;
+namespace Inachis\Controller;
 
-use App\Entity\Image;
-use App\Entity\Page;
-use App\Entity\Series;
-use App\Entity\Tag;
-use App\Entity\Url;
-use App\Form\ContentType;
+use Inachis\Entity\Image;
+use Inachis\Entity\Page;
+use Inachis\Entity\Series;
+use Inachis\Entity\Tag;
+use Inachis\Entity\Url;
+use Inachis\Form\ContentType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
