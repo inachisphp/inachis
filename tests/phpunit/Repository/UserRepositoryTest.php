@@ -23,8 +23,8 @@ class UserRepositoryTest extends TestCase
 
     public function setUp(): void
     {
-        $registry = $this->createMock(ManagerRegistry::class);
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $registry = $this->createStub(ManagerRegistry::class);
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
 
         $this->repository = $this->getMockBuilder(UserRepository::class)
             ->setConstructorArgs([$registry])
@@ -37,7 +37,7 @@ class UserRepositoryTest extends TestCase
 
     public function testGetFilteredWithoutKeyword(): void
     {
-        $paginator = $this->createMock(Paginator::class);
+        $paginator = $this->createStub(Paginator::class);
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
@@ -56,7 +56,7 @@ class UserRepositoryTest extends TestCase
 
     public function testGetFilteredWithKeyword(): void
     {
-        $paginator = $this->createMock(Paginator::class);
+        $paginator = $this->createStub(Paginator::class);
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(

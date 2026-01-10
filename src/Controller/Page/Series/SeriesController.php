@@ -105,6 +105,10 @@ class SeriesController extends AbstractInachisController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {//} && $form->isValid()) {
+            if ($form->getClickedButton()->getName() === 'delete') {
+                $seriesRepository->remove($series);
+                return $this->redirect($this->generateUrl('incc_series_list'));
+            }
             if (!empty($request->request->all('series')['image'])) {
                 $series->setImage(
                     $imageRepository->findOneBy([
@@ -117,7 +121,7 @@ class SeriesController extends AbstractInachisController
                     UrlNormaliser::toUri($series->getTitle())
                 );
             }
-            if ($form->has('remove') && $form->get('remove')->isClicked()) {
+            if ($form->getClickedButton()->getName() === 'remove') {
                 $deleteItems = $pageRepository->findBy([
                     'id' => $request->request->all('series')['itemList']
                 ]);
@@ -127,10 +131,6 @@ class SeriesController extends AbstractInachisController
                 if (empty($series->getItems())) {
                     $series->setFirstDate(null)->setLastDate(null);
                 }
-            }
-            if ($form->has('delete') && $form->get('delete')->isClicked()) {
-                $seriesRepository->remove($series);
-                return $this->redirect($this->generateUrl('incc_series_list'));
             }
 
             $series->setAuthor($this->getUser());

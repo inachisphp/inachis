@@ -23,9 +23,9 @@ class SessionTimeoutDialogControllerTest extends WebTestCase
 
     public function setUp(): void
     {
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $security = $this->createMock(Security::class);
-        $translator = $this->createMock(TranslatorInterface::class);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $security = $this->createStub(Security::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $this->controller = new SessionTimeoutDialogController($entityManager, $security, $translator);
         parent::setUp();
     }
@@ -47,7 +47,7 @@ class SessionTimeoutDialogControllerTest extends WebTestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['getUser', 'render'])
             ->getMock();
-        $this->controller->method('render')
+        $this->controller->expects($this->once())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });

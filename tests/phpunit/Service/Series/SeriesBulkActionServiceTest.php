@@ -35,9 +35,9 @@ class SeriesBulkActionServiceTest extends TestCase
             ->setId(Uuid::uuid4())
             ->setTitle('test')
             ->setSubTitle('sub-title');
-        $this->seriesRepository = $this->createMock(SeriesRepository::class);
+        $this->seriesRepository = $this->createStub(SeriesRepository::class);
         $this->seriesRepository->method('findOneBy')->willReturn($this->series);
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createStub(EntityManager::class);
 
         $this->seriesBulkActionService = new SeriesBulkActionService(
             $this->seriesRepository,
@@ -51,7 +51,7 @@ class SeriesBulkActionServiceTest extends TestCase
     public function testApplyPageNotFound(): void
     {
         $this->series = new Series();
-        $this->seriesRepository = $this->createMock(SeriesRepository::class);
+        $this->seriesRepository = $this->createStub(SeriesRepository::class);
         $this->seriesRepository->method('findOneBy')->willReturn($this->series);
         $this->seriesBulkActionService = new SeriesBulkActionService(
             $this->seriesRepository,

@@ -16,13 +16,13 @@ use PHPUnit\Framework\TestCase;
 
 class ArrayCollectionToArrayTransformerTest extends TestCase
 {
-    private EntityManagerInterface $em;
+    private EntityManagerInterface $entityManager;
     private ArrayCollectionToArrayTransformer $transformer;
 
     public function setUp(): void
     {
-        $this->em = $this->createMock(EntityManagerInterface::class);
-        $this->transformer = new ArrayCollectionToArrayTransformer($this->em);
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->transformer = new ArrayCollectionToArrayTransformer($this->entityManager);
     }
 
     public function testTransformEmpty(): void
