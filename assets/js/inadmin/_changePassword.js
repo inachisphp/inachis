@@ -1,4 +1,4 @@
-let InachisPasswordManager = {
+window.Inachis.PasswordManager = {
     _init: function ()
     {
         let saveTimeout = false;
@@ -9,9 +9,9 @@ let InachisPasswordManager = {
             saveTimeout = setTimeout(function() {
                 let currentPassword = $('#change_password_current_password').val();
                 let newPassword = $('#change_password_new_password').val();
-                if (currentPassword !== newPassword && InachisPasswordManager.basicValidatePassword(newPassword)) {
+                if (currentPassword !== newPassword && window.Inachis.PasswordManager.basicValidatePassword(newPassword)) {
                     $.ajax({
-                        url: Inachis.prefix + '/ax/calculate-password-strength',
+                        url: window.Inachis.prefix + '/ax/calculate-password-strength',
                         data: { password: $($passwordStrength.data('source')).val() },
                         method: 'POST',
                     }).done(function(data) {

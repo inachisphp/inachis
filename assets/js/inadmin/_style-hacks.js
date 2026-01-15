@@ -1,4 +1,4 @@
-var InachisStyle = {
+window.Inachis.Style = {
     _init: function () {
         $('.material-icons').filter(function() {
             return $(this).text() === 'check_box';
@@ -7,5 +7,5 @@ var InachisStyle = {
 };
 
 $(document).ready(function () {
-    InachisStyle._init();
+    window.Inachis.Style._init();
 });

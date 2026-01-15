@@ -1,4 +1,4 @@
-let InachisSessionTimeout = {
+window.Inachis.SessionTimeout = {
     countdown: null,
     countdownDate: null,
     options: {
@@ -11,7 +11,7 @@ let InachisSessionTimeout = {
     {
         this.options = Object.assign(this.options, options);
         setTimeout(function () {
-            InachisSessionTimeout.showAlert();
+            window.Inachis.SessionTimeout.showAlert();
         }, 1000 * (this.options.sessionTimeout - this.options.warnBeforeTimeout));
     },
     showAlert: function ()
@@ -21,7 +21,7 @@ let InachisSessionTimeout = {
                 text: 'Keep me signed-in',
                 class: 'button button--positive',
                 click: function () {
-                    InachisSessionTimeout.continue();
+                    window.Inachis.SessionTimeout.continue();
                     $(this).dialog('close');
                 }
             },
@@ -29,12 +29,12 @@ let InachisSessionTimeout = {
                 text: 'Log off now',
                 class: 'button button--negative',
                 click: () => {
-                    InachisSessionTimeout.logOff();
+                    window.Inachis.SessionTimeout.logOff();
                 }
             }
         ];
         InachisDialog.className = 'dialog__sessionTimeout';
-        InachisDialog.preloadContent = atob(InachisSessionTimeout.options.templateEncoded);
+        InachisDialog.preloadContent = atob(window.Inachis.SessionTimeout.options.templateEncoded);
         InachisDialog.title = 'Session time-out';
         InachisDialog.createDialog(null);
         let $placeholderText = $('#dialog__sessionTimeout form > p').first();
@@ -47,8 +47,8 @@ let InachisSessionTimeout = {
             type: 'post',
             url: Inachis.prefix + '/keep-alive',
             success: function (data, textStatus, jqXHR) {
-                clearInterval(InachisSessionTimeout.countdown);
-                InachisSessionTimeout._init({
+                clearInterval(window.Inachis.SessionTimeout.countdown);
+                window.Inachis.SessionTimeout._init({
                     sessionEndTime: data.time,
                 });
             },
@@ -65,13 +65,13 @@ let InachisSessionTimeout = {
 
         this.countdown = setInterval(function () {
             let now = Date.now(),
-                distance = InachisSessionTimeout.countdownDate - now,
+                distance = window.Inachis.SessionTimeout.countdownDate - now,
                 hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
                 minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
                 seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            InachisSessionTimeout.formatCountdown(hours, minutes, seconds);
+            window.Inachis.SessionTimeout.formatCountdown(hours, minutes, seconds);
             if (distance <= 0) {
-                clearInterval(InachisSessionTimeout.countdown);
+                clearInterval(window.Inachis.SessionTimeout.countdown);
                 $('p.countdown').html('Session has now expired.');
                 window.location.reload();
             }

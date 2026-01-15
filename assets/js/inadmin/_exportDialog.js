@@ -1,4 +1,4 @@
-var InachisExport = {
+window.Inachis.Export = {
     buttons: [
         {
             class: 'button button--positive',
@@ -43,7 +43,7 @@ var InachisExport = {
 
     updateDialogButtons: function()
     {
-        $('#dialog__export').dialog('option', 'buttons', this.buttons.concat(InachisDialog.buttons));
+        $('#dialog__export').dialog('option', 'buttons', this.buttons.concat(window.Inachis.Dialog.buttons));
     },
 
     listify: function(listItem)

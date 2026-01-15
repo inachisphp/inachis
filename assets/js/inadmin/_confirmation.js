@@ -1,4 +1,4 @@
-let InachisConfirmationPrompt = {
+window.Inachis.ConfirmationPrompt = {
     buttons: [
         {
             class: 'button button--info',
@@ -14,11 +14,11 @@ let InachisConfirmationPrompt = {
             click: function ()
             {
                 $('#dialog__confirmationPrompt').dialog('close');
-                const $form = InachisConfirmationPrompt.$target.closest('form');
+                const $form = window.Inachis.ConfirmationPrompt.$target.closest('form');
 
                 $('<input type="hidden">')
-                    .attr('name', InachisConfirmationPrompt.$target.attr('name'))
-                    .val(InachisConfirmationPrompt.$target.val())
+                    .attr('name', window.Inachis.ConfirmationPrompt.$target.attr('name'))
+                    .val(window.Inachis.ConfirmationPrompt.$target.val())
                     .appendTo($form);
                 $form[0].submit();
             }
@@ -31,9 +31,9 @@ let InachisConfirmationPrompt = {
     {
         $('button.button--confirm').on('click', function (event) {
             event.preventDefault();
-            InachisConfirmationPrompt.originalEvent = event;
-            InachisConfirmationPrompt.$target = $(event.currentTarget);
-            InachisConfirmationPrompt.createDialog();
+            window.Inachis.ConfirmationPrompt.originalEvent = event;
+            window.Inachis.ConfirmationPrompt.$target = $(event.currentTarget);
+            window.Inachis.ConfirmationPrompt.createDialog();
         });
     },
 
@@ -68,10 +68,10 @@ let InachisConfirmationPrompt = {
     getConfirm: function()
     {
         let $confirmationPrompt = $('#dialog__confirmationPrompt');
-        $confirmationPrompt.load(Inachis.prefix + '/ax/confirmation/get', {
-            'title': InachisConfirmationPrompt.$target.data('title') ?? '',
-            'entity': InachisConfirmationPrompt.$target.data('entity') ?? '',
-            'warning': InachisConfirmationPrompt.$target.data('warning') ?? '',
+        $confirmationPrompt.load(window.Inachis.prefix + '/ax/confirmation/get', {
+            'title': window.Inachis.ConfirmationPrompt.$target.data('title') ?? '',
+            'entity': window.Inachis.ConfirmationPrompt.$target.data('entity') ?? '',
+            'warning': window.Inachis.ConfirmationPrompt.$target.data('warning') ?? '',
         }, function(responseText, status)
         {
             if (status === 'success') {
@@ -81,5 +81,5 @@ let InachisConfirmationPrompt = {
     },
 };
 $(document).ready(function () {
-    InachisConfirmationPrompt._init();
+    window.Inachis.ConfirmationPrompt._init();
 });

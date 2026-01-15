@@ -1,4 +1,4 @@
-let InachisComponents = {
+window.Inachis.Components = {
 	initialize: function() {
 		this.initClearSearch('');
 		this.initCopyPaste('');
@@ -70,9 +70,9 @@ let InachisComponents = {
 				validateOnBlue: false,
 				onChangeDateTime: function(dp,$input)
 				{
-					if (InachisPostEdit) {
+					if (window.Inachis.PostEdit) {
 						// @todo Need to update JS so that it only updates URL if previously set URL matches the auto-generated pattern
-						$('input#post_url').val(InachisPostEdit.getUrlFromTitle());
+						$('input#post_url').val(window.Inachis.PostEdit.getUrlFromTitle());
 					}
 				}
 			});
@@ -154,7 +154,7 @@ let InachisComponents = {
 		$(selector + '.selectAllNone').on('click', function()
 		{
 			$(this).closest('form').first().find('input[type=checkbox]').prop('checked', $(this).prop('checked'));
-			InachisComponents.toggleActionBar();
+			window.Inachis.Components.toggleActionBar();
 		});
 		$('input[name^="items"]').on('change', this.toggleActionBar);
 	},
@@ -222,5 +222,5 @@ let InachisComponents = {
 };
 
 $(document).ready(function() {
-	InachisComponents.initialize();
+	window.Inachis.Components.initialize();
 });

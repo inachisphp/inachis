@@ -1,5 +1,5 @@
 //http://webdesign.tutsplus.com/tutorials/how-to-display-update-notifications-in-the-browser-tab--cms-23458
-var InachisNotifications = {
+window.Inachis.Notifications = {
 	_pageTitle: '',
 
 	_init: function()
@@ -21,5 +21,5 @@ var InachisNotifications = {
 };
 
 $(document).ready(function () {
-	InachisNotifications._init();
+	window.Inachis.Notifications._init();
 });

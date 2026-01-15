@@ -1,4 +1,4 @@
-let InachisBulkCreateDialog = {
+window.Inachis.BulkCreateDialog = {
     $submitButton: null,
 
     _init: function ()
@@ -54,7 +54,7 @@ let InachisBulkCreateDialog = {
     getForm: function ()
     {
         let $bulkCreateForm = $('#dialog__bulkCreate');
-        $bulkCreateForm.load(Inachis.prefix + '/ax/bulkCreate/get', {},function(responseText, status)
+        $bulkCreateForm.load(window.Inachis.prefix + '/ax/bulkCreate/get', {},function(responseText, status)
         {
             if (status === 'success') {
                 let seriesTitle = $('#series_title').val();
@@ -62,7 +62,7 @@ let InachisBulkCreateDialog = {
                     $('#bulk_title').val(seriesTitle);
                     $('#bulk_addDay').prop('checked', true);
                 }
-                InachisBulkCreateDialog.initInputs();
+                window.Inachis.BulkCreateDialog.initInputs();
                 $('.ui-dialog').position({ my: 'center', at: 'center', of: window });
             }
         }, $bulkCreateForm);
@@ -70,7 +70,7 @@ let InachisBulkCreateDialog = {
 
     initInputs: function ()
     {
-        InachisComponents.initSelect2('.ui-dialog ');
+        window.Inachis.Components.initSelect2('.ui-dialog ');
         $('#bulk_title').on('keyup', this.validateInputs);
         $('#dialog__bulkCreate input[type=date]').each(function ()
         {
@@ -87,7 +87,7 @@ let InachisBulkCreateDialog = {
                 },
                 onChangeDateTime: function (dp,$input)
                 {
-                    InachisBulkCreateDialog.validateInputs();
+                    window.Inachis.BulkCreateDialog.validateInputs();
                 },
             });
         });
@@ -114,7 +114,7 @@ let InachisBulkCreateDialog = {
             return this.value;
         }).get();
         $.ajax(
-            Inachis.prefix + '/ax/bulkCreate/save',
+            window.Inachis.prefix + '/ax/bulkCreate/save',
             {
                 complete: $.proxy(function() {
 
@@ -147,5 +147,5 @@ let InachisBulkCreateDialog = {
 };
 
 $(document).ready(function () {
-    InachisBulkCreateDialog._init();
+    window.Inachis.BulkCreateDialog._init();
 });

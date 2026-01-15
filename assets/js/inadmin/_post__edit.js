@@ -1,4 +1,4 @@
-var InachisPostEdit = {
+window.Inachis.PostEdit = {
 	_pageTitle: '',
 	_postOrPage: 'post',
 	categoryList: '',
@@ -38,8 +38,8 @@ var InachisPostEdit = {
 	{
 		$(document).on('input', '#post_title, #post_subTitle', $.proxy(function(event)
 		{
-			if (InachisPostEdit.ajaxTimeout) clearTimeout(InachisPostEdit.ajaxTimeout);
-			InachisPostEdit.ajaxTimeout = setTimeout(function() {
+			if (window.Inachis.PostEdit.ajaxTimeout) clearTimeout(window.Inachis.PostEdit.ajaxTimeout);
+			window.Inachis.PostEdit.ajaxTimeout = setTimeout(function() {
 				if ([
 					13, // enter
 					16, // shift
@@ -85,7 +85,7 @@ var InachisPostEdit = {
 					return;
 				}
 				var urlInput = $('input#post_url');
-				urlInput.val(InachisPostEdit.getUrlFromTitle());
+				urlInput.val(window.Inachis.PostEdit.getUrlFromTitle());
 			}, 500);
 		}, this));
 	},
@@ -140,7 +140,7 @@ var InachisPostEdit = {
 				url: title
 			},
 			method: 'post',
-			url: Inachis.prefix + '/ax/check-url-usage',
+			url: window.Inachis.prefix + '/ax/check-url-usage',
 		}).done(function (jqXHR) {
 
 			$('input#post_url').val(jqXHR)
@@ -149,5 +149,5 @@ var InachisPostEdit = {
 };
 
 $(document).ready(function () {
-	InachisPostEdit._init();
+	window.Inachis.PostEdit._init();
 });

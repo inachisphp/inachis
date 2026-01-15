@@ -1,4 +1,4 @@
-var Setup = {
+window.Setup = {
 	_init: function()
 	{
 		$('.form__setup input').on('keyup blur change', function(e) {
@@ -12,6 +12,6 @@ var Setup = {
 
 $(document).ready(function () {
 	if ($('.form__setup')) {
-		Setup._init();
+		window.Setup._init();
 	}
 });

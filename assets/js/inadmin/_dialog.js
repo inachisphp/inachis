@@ -1,4 +1,4 @@
-var InachisDialog = {
+window.Inachis.Dialog = {
     //alreadyInitialised: false,
     className: '',
     buttons: [
@@ -69,7 +69,7 @@ var InachisDialog = {
         $('.ui-dialog-titlebar-close').addClass('material-icons').html('close');
         if (templateName !== '') {
             $('.ui-dialog-content').load(
-                Inachis.prefix + '/ax/' + this.hyphenToCamel(templateName) + '/get', {
+                window.Inachis.prefix + '/ax/' + this.hyphenToCamel(templateName) + '/get', {
                     selectedImage: ''
                 }, function() // response, status, xhr
                 {
@@ -92,5 +92,5 @@ var InachisDialog = {
 };
 
 $(document).ready(function () {
-    InachisDialog._init();
+    window.Inachis.Dialog._init();
 });

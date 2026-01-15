@@ -1,4 +1,4 @@
-var InachisMap = {
+window.Inachis.Map = {
 	key: null,
 	showGeoLocation: false,
 	retina: false,
@@ -40,7 +40,7 @@ var InachisMap = {
 			var mapClear = $('<a class="material-icons ui-cross" href="#">clear</a>');
 			$(mapElement).after(mapClear);
 			$(mapBox).empty();
-			$(mapBox).append($('<img src="' + InachisMap._generateGoogleMapsImage(mapName, mapElement) + '" />'));
+			$(mapBox).append($('<img src="' + window.Inachis.Map._generateGoogleMapsImage(mapName, mapElement) + '" />'));
 		} else {
 			this.addNoMapMessage(mapBox);
 		}
@@ -55,7 +55,7 @@ var InachisMap = {
 	updateMap: function (mapElement, mapName, mapBox)
 	{
 		if (mapElement.val() !== '') {
-			$(mapBox).find('img').attr('src', InachisMap._generateGoogleMapsImage(mapName, mapElement));
+			$(mapBox).find('img').attr('src', window.Inachis.Map._generateGoogleMapsImage(mapName, mapElement));
 		}
 	},
 
@@ -122,7 +122,7 @@ var InachisMap = {
 	_processGeocodeResult: function (result)
 	{
 		if (result.status !== 'OK') {
-			Inachis._log(result.status + ': ' + result.error_message);
+			window.Inachis._log(result.status + ': ' + result.error_message);
 			return;
 		}
 		var $targetMap = $('#' + this.targetMap);
@@ -145,5 +145,5 @@ var InachisMap = {
 };
 
 $(document).ready(function () {
-	InachisMap._init();
+	window.Inachis.Map._init();
 });

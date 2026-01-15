@@ -1,4 +1,4 @@
-let InachisContentSelectorDialog = {
+window.Inachis.ContentSelectorDialog = {
     offset: 0,
     limit: 25,
     saveTimeout: false,
@@ -57,17 +57,17 @@ let InachisContentSelectorDialog = {
     {
         $('#dialog__contentSelector .pagination li a').on('click', function(event) {
             event.preventDefault();
-            InachisContentSelectorDialog.offset = ($(event.currentTarget).html() - 1) * InachisContentSelectorDialog.limit;
-            InachisContentSelectorDialog.getContentList();
+            window.Inachis.ContentSelectorDialog.offset = ($(event.currentTarget).html() - 1) * window.Inachis.ContentSelectorDialog.limit;
+            window.Inachis.ContentSelectorDialog.getContentList();
             return false;
         });
         $('#ui-dialog-search-input').on('input', function (event) {
-            if(InachisContentSelectorDialog.saveTimeout) {
-                clearTimeout(InachisContentSelectorDialog.saveTimeout);
+            if(window.Inachis.ContentSelectorDialog.saveTimeout) {
+                clearTimeout(window.Inachis.ContentSelectorDialog.saveTimeout);
             }
-            InachisContentSelectorDialog.saveTimeout = setTimeout(function() {
-                InachisContentSelectorDialog.offset = 0;
-                InachisContentSelectorDialog.getContentList();
+            window.Inachis.ContentSelectorDialog.saveTimeout = setTimeout(function() {
+                window.Inachis.ContentSelectorDialog.offset = 0;
+                window.Inachis.ContentSelectorDialog.getContentList();
             }, 500);
         });
         $(document).on('change', '#dialog__contentSelector input[type=checkbox]', function ()
@@ -88,7 +88,7 @@ let InachisContentSelectorDialog = {
         });
         $choseContent.prop('disabled', true).html('Saving…');
         $.ajax(
-            Inachis.prefix + '/ax/contentSelector/save',
+            window.Inachis.prefix + '/ax/contentSelector/save',
             {
                 complete: $.proxy(function()
                 {
@@ -133,14 +133,14 @@ let InachisContentSelectorDialog = {
         $contentSelector.find('.form').html('<p/><div class="loader"></div><p/>');
         $contentSelector.load(Inachis.prefix + '/ax/contentSelector/get',
             {
-                offset: InachisContentSelectorDialog.offset,
-                limit: InachisContentSelectorDialog.limit,
+                offset: window.Inachis.ContentSelectorDialog.offset,
+                limit: window.Inachis.ContentSelectorDialog.limit,
                 filters: { keyword: $('#ui-dialog-search-input').val() },
                 seriesId: easymde.options.autosave.uniqueId,
             }, function(responseText, status) {
                 let $uiDialog = $('.ui-dialog');
                 if (status === 'success') {
-                    InachisContentSelectorDialog.initInputs();
+                    window.Inachis.ContentSelectorDialog.initInputs();
                     $uiDialog.position({ my: 'center', at: 'center', of: window });
                     return;
                 }
@@ -150,5 +150,5 @@ let InachisContentSelectorDialog = {
 };
 
 $(document).ready(function () {
-    InachisContentSelectorDialog._init();
+    window.Inachis.ContentSelectorDialog._init();
 });
