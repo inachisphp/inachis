@@ -92,10 +92,10 @@
                     <a href="#admin__nav-settings" title="{% trans %}admin.menu.more.help{% endtrans %}"><i class="material-icons">more_horiz</i><span> {% trans %}admin.menu.more.title{% endtrans %}</span></a>
                 </li>
 
-                <li class="menu__collapsed {{ page.tab|activeMenu('url') }}"><a href="{{ settings.domain ~ path('incc_url_list') }}" title="{% trans %}admin.urls.help{% endtrans %}">
+                <li class="menu__collapsed visually-hidden {{ page.tab|activeMenu('url') }}"><a href="{{ settings.domain ~ path('incc_url_list') }}" title="{% trans %}admin.urls.help{% endtrans %}">
                         <i class="material-icons">insert_link</i><span> {% trans %}admin.urls.title{% endtrans %}</span></a>
                 </li>
-                <li class="menu__collapsed{{ page.tab|activeMenu('users') }}"><a href="{{ settings.domain ~ path('incc_admin_list') }}" title="{% trans %}admin.user.help{% endtrans %}">
+                <li class="menu__collapsed visually-hidden {{ page.tab|activeMenu('users') }}"><a href="{{ settings.domain ~ path('incc_admin_list') }}" title="{% trans %}admin.user.help{% endtrans %}">
                         <i class="material-icons">people</i><span> {% trans %}admin.user.title{% endtrans %}</span></a>
 {#                        </li>#}
 {#                        <li class="{{ page.tab|activeMenu('tools') }}"><a href="{{ settings.domain ~ path('app_tools_index') }}" title="Tools">#}
