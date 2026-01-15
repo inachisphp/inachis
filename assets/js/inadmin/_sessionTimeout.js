@@ -16,7 +16,7 @@ window.Inachis.SessionTimeout = {
     },
     showAlert: function ()
     {
-        InachisDialog.buttons = [
+        window.Inachis.Dialog.buttons = [
             {
                 text: 'Keep me signed-in',
                 class: 'button button--positive',
@@ -33,10 +33,10 @@ window.Inachis.SessionTimeout = {
                 }
             }
         ];
-        InachisDialog.className = 'dialog__sessionTimeout';
-        InachisDialog.preloadContent = atob(window.Inachis.SessionTimeout.options.templateEncoded);
-        InachisDialog.title = 'Session time-out';
-        InachisDialog.createDialog(null);
+        window.Inachis.Dialog.className = 'dialog__sessionTimeout';
+        window.Inachis.Dialog.preloadContent = atob(window.Inachis.SessionTimeout.options.templateEncoded);
+        window.Inachis.Dialog.title = 'Session time-out';
+        window.Inachis.Dialog.createDialog(null);
         let $placeholderText = $('#dialog__sessionTimeout form > p').first();
         $placeholderText.html($placeholderText.html().replace('%TIMEOUT%', this.options.sessionTimeout / 60));
         this.startCountdown();
