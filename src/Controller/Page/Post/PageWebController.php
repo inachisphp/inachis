@@ -69,7 +69,7 @@ class PageWebController extends AbstractInachisController
             && !$this->security->isGranted('IS_AUTHENTICATED_FULLY')
         ) {
             return $this->redirectToRoute(
-                'app_default_homepage',
+                'inachis_default_homepage',
                 []
             );
         }
@@ -115,8 +115,9 @@ class PageWebController extends AbstractInachisController
         requirements: [
             'page' => '^(?!setup$)(?!\d{4}-[a-zA-Z\-]+$)[^/]+$'
         ],
-        methods: [ "GET" ])
-    ]
+        methods: [ "GET" ],
+        priority: -100
+    )]
     public function getPage(Request $request): Response
     {
         return $this->getPost($request, 0, 0, 0, '');
