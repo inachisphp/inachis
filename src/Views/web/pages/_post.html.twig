@@ -37,7 +37,7 @@
         </header>
 
         <div class="entry-content">
-            {% if post.content is not empty %}{{ post.content|markdown }}{% endif %}
+            {% if post.content is not empty %}{{ post.content|markdown_to_html }}{% endif %}
         </div>
 
         {% if series is defined and series is not empty %}
