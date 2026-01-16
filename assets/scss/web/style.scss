@@ -481,16 +481,27 @@ article.post {
 }
 
 .series {
+  background-color: #eee;
   display: inline-flex;
   height: 267px;
-  width: 400px;
   overflow: hidden;
+  width: 400px;
 
   a, a:visited {
     color: #fff;
     position: relative;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.55);
 
+    span.image_container {
+      height: 267px;
+      width: 400px;
+      overflow: hidden;
+    }
     img {
+      //display: block;
+      max-height: 267px;
+      max-width: 400px;
+      object-fit: fill;
     }
     span.series--year {
       position: absolute;
