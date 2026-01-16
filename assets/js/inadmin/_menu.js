@@ -1,85 +1,112 @@
-let InachisNavMenu = {
-	_navNewVisible: false,
-	_navUserVisible: false,
-	_contextMenuVisible: false,
+window.Inachis.NavMenu = {
+	navNewVisible: false,
+	navUserVisible: false,
 
-	_init: function()
-	{
+	init() {
 		// Add menu
-		$('.admin__add-content').click($.proxy(function() {
-			$('.admin__nav-new').toggle();
-			this._navNewVisible = !this._navNewVisible;
-			Inachis._log('New menu visible: ' + this._navNewVisible);
-			if (this._navNewVisible) {
-				$(document).mouseup($.proxy(this.newNavMouseOut, this));
-			}
-			return false;
-		}, this));
-		// settings menu
-		$('a[href*=admin__nav-settings]').click(function() {
-			$('li.menu__collapsed').toggle();
-		});
-		// collapse/expand links
-		$('.admin__nav-expand a, .admin__nav-collapse a').click(function () {
-			$('.admin__container').toggleClass('admin__container--collapsed admin__container--expanded');
-		});
-		// menu link (mobile only)
-		$('.admin__nav-main__link a').click($.proxy(function() {
-			$('.admin__container').toggleClass('admin__container--collapsed admin__container--expanded');
-			$('.admin__nav-main__list').toggle('slide');
-			this._navNewVisible = !this._navNewVisible;
-			Inachis._log('New menu visible: ' + this._navNewVisible);
-			if (this._navNewVisible) {
-				$(document).mouseup($.proxy(this.newNavMouseOut, this));
-			}
-			return false;
-		}, this));
-		// user menu
-		$('.admin__user > a').click($.proxy(function() {
-			$('#admin__user__options').toggle();
-			this._navUserVisible = !this._navUserVisible;
-			Inachis._log('User menu visible: ' + this._navUserVisible);
-			if (this._navUserVisible) {
-				$(document).mouseup($.proxy(this.userNavMouseOut, this));
-			}
-			return false;
-		}, this));
-	},
+		this.bindToggle(
+			'.admin__add-content',
+			'.admin__nav-new',
+			'navNewVisible',
+			'New'
+		);
 
-	newNavMouseOut: function(e)
-	{
-        this.genericNavMouseOut(
-        	e,
-            $('.admin__nav-new'),
-            '_navNewVisible',
-            'New',
-            InachisNavMenu.newNavMouseOut
-        );
-	},
+		// Settings menu
+		document
+			.querySelectorAll('a[href*="admin__nav-settings"]')
+			.forEach(el =>
+				el.addEventListener('click', () => {
+					document
+						.querySelectorAll('li.menu__collapsed')
+						.forEach(li => li.classList.toggle('visually-hidden'));
+				})
+			);
 
-	userNavMouseOut: function(e)
-	{
-		this.genericNavMouseOut(
-			e,
-			$('#admin__user__options'),
-			'_navUserVisible',
-			'User',
-            InachisNavMenu.userNavMouseOut
+		// Collapse / expand links
+		document
+			.querySelectorAll('.admin__nav-expand a, .admin__nav-collapse a')
+			.forEach(el =>
+				el.addEventListener('click', () => {
+					document
+						.querySelector('.admin__container')
+						?.classList.toggle('admin__container--collapsed');
+					document
+						.querySelector('.admin__container')
+						?.classList.toggle('admin__container--expanded');
+				})
+			);
+
+		// Mobile menu link
+		this.bindToggle(
+			'.admin__nav-main__link a',
+			'.admin__nav-new',
+			'navNewVisible',
+			'New',
+			() => {
+				document
+					.querySelector('.admin__container')
+					?.classList.toggle('admin__container--collapsed');
+				document
+					.querySelector('.admin__container')
+					?.classList.toggle('admin__container--expanded');
+
+				document
+					.querySelector('.admin__nav-main__list')
+					?.classList.toggle('is-visible');
+			}
+		);
+
+		// User menu
+		this.bindToggle(
+			'.admin__user > a',
+			'#admin__user__options',
+			'navUserVisible',
+			'User'
 		);
 	},
 
-	// use this for handling menus that disappear when clicking away
-	genericNavMouseOut: function(e, container, navProperty, menuLabel, callback)
-	{
-        if (!container.is(e.target) && container.has(e.target).length === 0)  {
-            container.hide();
-            this[navProperty] = !this[navProperty];
-            Inachis._log(menuLabel + ' menu visible: ' + this[navProperty]);
-            $(document).unbind('mouseup', callback);
-        }
-	}
+	bindToggle(triggerSelector, menuSelector, stateProp, label, beforeToggle) {
+		const trigger = document.querySelector(triggerSelector);
+		const menu = document.querySelector(menuSelector);
+
+		if (!trigger || !menu) {
+			return;
+		}
+
+		const onDocumentClick = event => {
+			if (!menu.contains(event.target) && event.target !== trigger) {
+				this.hideMenu(menu, stateProp, label);
+				document.removeEventListener('mousedown', onDocumentClick);
+			}
+		};
+
+		trigger.addEventListener('click', event => {
+			event.preventDefault();
+
+			if (beforeToggle) {
+				beforeToggle();
+			}
+
+			const isVisible = !this[stateProp];
+			this[stateProp] = isVisible;
+
+			menu.style.display = isVisible ? 'block' : 'none';
+
+			window.Inachis._log(`${label} menu visible: ${isVisible}`);
+
+			if (isVisible) {
+				document.addEventListener('mousedown', onDocumentClick);
+			}
+		});
+	},
+
+	hideMenu(menu, stateProp, label) {
+		menu.style.display = 'none';
+		this[stateProp] = false;
+		window.Inachis._log(`${label} menu visible: false`);
+	},
 };
 
 $(document).ready(function () {
-	InachisNavMenu._init();
+	window.Inachis.NavMenu.init();
 });

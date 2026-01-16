@@ -1,10 +1,11 @@
 @use '../definitions' as *;
 @use 'sass:color';
+@use 'sass:map';
 
 .badge {
-	background-color: map-get(map-get($badge-colors, default), bg);
-	color: map-get(map-get($badge-colors, default), text);
-	border: 1px solid color.adjust(map-get(map-get($badge-colors, default), bg), $lightness:-20%);
+	background-color: map.get(map.get($badge-colors, default), bg);
+	color: map.get(map.get($badge-colors, default), text);
+	border: 1px solid color.adjust(map.get(map.get($badge-colors, default), bg), $lightness:-20%);
 	border-radius: 40px;
 	display: inline-flex;
 	align-items: center;
@@ -30,9 +31,9 @@
 
 	@each $name, $colors in $badge-colors {
 		&.badge__#{$name} {
-			background-color: map-get($colors, bg);
-			border-color: color.adjust(map-get($colors, bg), $lightness:-20%);
-			color: map-get($colors, text);
+			background-color: map.get($colors, bg);
+			border-color: color.adjust(map.get($colors, bg), $lightness:-20%);
+			color: map.get($colors, text);
 		}
 	}
 }

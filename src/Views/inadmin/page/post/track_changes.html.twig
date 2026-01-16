@@ -17,15 +17,15 @@
             {% else %}
                 {% if content_block.tag is defined and content_block.tag == 'del' %}
                     {% set skip_lines = content_block.old.lines|length - 1 %}
-                    <del>{{ content_block.old.lines|join|markdown }}</del>
+                    <del>{{ content_block.old.lines|join|markdown_to_html }}</del>
                 {% elseif content_block.tag is defined and content_block.tag == 'rep' %}
                     {% set skip_lines = content_block.old.lines|length - 1 %}
                     <div class="change_block">
-                        <del>{{ content_block.old.lines|join|markdown }}</del>
-                        <ins>{{ content_block.new.lines|join|markdown }}</ins>
+                        <del>{{ content_block.old.lines|join|markdown_to_html }}</del>
+                        <ins>{{ content_block.new.lines|join|markdown_to_html }}</ins>
                     </div>
                 {% else %}
-                    {{ content_block|markdown }}
+                    {{ content_block|markdown_to_html }}
                 {% endif %}
             {% endif %}
         {% endfor %}

@@ -9,6 +9,7 @@
 
 namespace Inachis\Controller\Page\Url;
 
+use Doctrine\ORM\OptimisticLockException;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Url;
 use Inachis\Model\ContentQueryParameters;
@@ -25,7 +26,11 @@ class UrlController extends AbstractInachisController
 {
     /**
      * @param Request $request
+     * @param ContentQueryParameters $contentQueryParameters
+     * @param UrlBulkActionService $urlBulkActionService
+     * @param UrlRepository $urlRepository
      * @return Response
+     * @throws OptimisticLockException
      */
     #[Route(
         "/incc/url/list/{offset}/{limit}",
@@ -75,6 +80,7 @@ class UrlController extends AbstractInachisController
 
     /**
      * @param Request $request
+     * @param UrlRepository $urlRepository
      * @return Response
      */
     #[Route(

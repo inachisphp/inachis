@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Service\System\Domain;
+namespace Inachis\Service\System\Domain;
 
 class DNSFetcherService
 {

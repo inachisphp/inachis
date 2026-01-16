@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/highlight.js/latest/styles/github.min.css">
         {% endif %}
     <script>
-        var easymde = new EasyMDE({
+        let easymde = new EasyMDE({
             element: $('.mde_editor')[0],
             autosave: {
                 enabled: true,
@@ -31,7 +31,7 @@
     </script>
     {% endif %}
     <script>
-        InachisSessionTimeout._init({
+        window.Inachis.SessionTimeout.init({
             sessionTimeout: {{ session_timeout|default(1440) }},
             sessionEndTime: '{{ session_timeout_time }}Z',
             templateEncoded: '{{ timeout_template }}',

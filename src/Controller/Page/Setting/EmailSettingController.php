@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Setting;
+namespace Inachis\Controller\Page\Setting;
 
-use App\Controller\AbstractInachisController;
-use App\Service\System\Domain\DNSFetcherService;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Service\System\Domain\DNSFetcherService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

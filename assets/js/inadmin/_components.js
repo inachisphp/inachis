@@ -1,5 +1,5 @@
-let InachisComponents = {
-	initialize: function() {
+window.Inachis.Components = {
+	initialize() {
 		this.initClearSearch('');
 		this.initCopyPaste('');
 		this.initDatePicker();
@@ -11,8 +11,7 @@ let InachisComponents = {
 		this.initSwitches('');
 		this.initUIToggle();
 
-		$('.image_preview .button--confirm').on('click', function(event)
-		{
+		$('.image_preview .button--confirm').on('click', (event) => {
 			event.preventDefault();
 			const $imagePreview = $('.image_preview');
 			$imagePreview.find('input[type=hidden]').val('');
@@ -28,28 +27,24 @@ let InachisComponents = {
 		$('.ui-tabbed').tabs();
 		$('.error-select').hide();
 
-		$(function() {
+		$(() => {
 			$('#progressbar').progressbar({
 				value: $('#progressbar').data('percentage')
 			});
 		});
 	},
 
-	initClearSearch: function (selector)
-	{
-		$(selector + '.clear-search').on('click', function()
-		{
-			let $searchBox = $($(this).attr('data-target'));
+	initClearSearch(selector) {
+		$(`${selector}.clear-search`).on('click', function () {
+			const $searchBox = $($(this).attr('data-target'));
 			$searchBox.val('');
 			$searchBox.closest('form').trigger('submit');
 		});
 	},
-	initCopyPaste: function (selector)
-	{
-		$(selector + '.button--copy').on('click', async function ()
-		{
-			const $textSource = $('#' + $(this).attr('data-target')),
-				copyText = ($(this).attr('data-prefix') ?? '') + $textSource.val();
+	initCopyPaste(selector) {
+		$(`${selector}.button--copy`).on('click', async function () {
+			const $textSource = $(`#${$(this).attr('data-target')}`);
+			const copyText = ($(this).attr('data-prefix') ?? '') + $textSource.val();
 			try {
 				await navigator.clipboard.writeText(copyText);
 			} catch (err) {
@@ -57,32 +52,27 @@ let InachisComponents = {
 			}
 		});
 	},
-	initDatePicker: function ()
-	{
+	initDatePicker() {
 		// http://xdsoft.net/jqplugins/datetimepicker/
 		// if ($('html').attr('lang')) {
 		// 	$.datetimepicker.setLocale($('html').attr('lang'));
 		// }
-		$('#post_postDate').each(function ()
-		{
+		$('#post_postDate').each(function () {
 			$(this).datetimepicker({
 				format: 'd/m/Y H:i',
 				validateOnBlue: false,
-				onChangeDateTime: function(dp,$input)
-				{
-					if (InachisPostEdit) {
+				onChangeDateTime: function (dp, $input) {
+					if (window.Inachis.PostEdit) {
 						// @todo Need to update JS so that it only updates URL if previously set URL matches the auto-generated pattern
-						$('input#post_url').val(InachisPostEdit.getUrlFromTitle());
+						$('input#post_url').val(window.Inachis.PostEdit.getUrlFromTitle());
 					}
 				}
 			});
 		});
 	},
-	initFilterBar: function()
-	{
-		let $filterOptions = $('.filter .filter__toggle');
-		$filterOptions.on('click', function()
-		{
+	initFilterBar() {
+		const $filterOptions = $('.filter .filter__toggle');
+		$filterOptions.on('click', function () {
 			$('#filter__options').toggle();
 			$(this).toggleClass('selected');
 		});
@@ -91,12 +81,10 @@ let InachisComponents = {
 			$filterOptions.toggleClass('selected');
 		}
 	},
-	initPasswordToggle: function ()
-	{
-		$('button.button--password-toggle').on('click', function ()
-		{
-			const $button = $(this),
-				$input = $('input[data-controller=' + $button.data('action') + ']');
+	initPasswordToggle() {
+		$('button.button--password-toggle').on('click', function () {
+			const $button = $(this);
+			const $input = $(`input[data-controller=${$button.data('action')}]`);
 			if ($input.attr('type') === "password") {
 				$input.attr('type', 'text');
 				$button.html('visibility');
@@ -107,25 +95,22 @@ let InachisComponents = {
 		});
 	},
 	// See https://select2.github.io/examples.html
-	initSelect2: function (selector)
-	{
-		$(selector + '.js-select').each(function ()
-		{
-			let $properties = {
+	initSelect2(selector) {
+		$(`${selector}.js-select`).each(function () {
+			const $properties = {
 				allowClear: true,
 				maximumInputLength: 20,
 				width: 'element',
 			};
 			if ($(this).attr('data-tags')) {
 				$properties.tags = 'true';
-				$properties.tokenSeparators = [ ',' ];
+				$properties.tokenSeparators = [','];
 			}
 			if ($(this).attr('data-url')) {
 				$properties.ajax = {
 					url: $(this).attr('data-url'),
 					dataType: 'json',
-					data: function (params)
-					{
+					data: function (params) {
 						return {
 							q: params.term,
 							page: params.page
@@ -133,8 +118,7 @@ let InachisComponents = {
 					},
 					delay: 250,
 					method: 'POST',
-					processResults: function (data, params)
-					{
+					processResults: function (data, params) {
 						params.page = params.page || 1;
 						return {
 							results: data.items,
@@ -149,32 +133,27 @@ let InachisComponents = {
 			$(this).select2($properties);
 		});
 	},
-	initSelectAllNone: function (selector)
-	{
-		$(selector + '.selectAllNone').on('click', function()
-		{
+	initSelectAllNone(selector) {
+		$(`${selector}.selectAllNone`).on('click', function () {
 			$(this).closest('form').first().find('input[type=checkbox]').prop('checked', $(this).prop('checked'));
-			InachisComponents.toggleActionBar();
+			window.Inachis.Components.toggleActionBar();
 		});
 		$('input[name^="items"]').on('change', this.toggleActionBar);
 	},
-	initSeriesControls: function ()
-	{
-		$('input[name=series\\[itemList\\]\\[\\]]').on('change', function() {
-			const uncheckedItems = $('input[name=series\\[itemList\\]\\[\\]]:not(:checked)'),
-				checkedItems = $('input[name=series\\[itemList\\]\\[\\]]:checked'),
-				anyChecked = checkedItems.length > 0;
+	initSeriesControls() {
+		$('input[name=series\\[itemList\\]\\[\\]]').on('change', function () {
+			const uncheckedItems = $('input[name=series\\[itemList\\]\\[\\]]:not(:checked)');
+			const checkedItems = $('input[name=series\\[itemList\\]\\[\\]]:checked');
+			const anyChecked = checkedItems.length > 0;
 			$('.series__controls').toggleClass('visually-hidden', !anyChecked);
 
 			checkedItems.closest('tr').addClass('selected');
 			uncheckedItems.closest('tr').removeClass('selected');
 		});
 	},
-	initSwitches: function (selector)
-	{
-		$(selector + ' .ui-switch').each(function ()
-		{
-			var $properties = {
+	initSwitches(selector) {
+		$(`${selector} .ui-switch`).each(function () {
+			const $properties = {
 				checked: this.checked,
 				clear: true,
 				height: 20,
@@ -189,29 +168,25 @@ let InachisComponents = {
 			$(this).switchButton($properties);
 		});
 	},
-	initUIToggle: function ()
-	{
-		let $uiToggle = $('.ui-toggle');
-		$uiToggle.each(function()
-		{
-			var targetElement = $(this).attr('data-target'),
-				targetDefaultState = $(this).attr('data-target-state');
+	initUIToggle() {
+		const $uiToggle = $('.ui-toggle');
+		$uiToggle.each(function () {
+			const targetElement = $(this).attr('data-target');
+			const targetDefaultState = $(this).attr('data-target-state');
 			if (targetDefaultState === 'hidden') {
 				$(targetElement).hide();
 			}
 		});
-		$uiToggle.on('click', function()
-		{
+		$uiToggle.on('click', function () {
 			$($(this).attr('data-target')).toggle();
 		});
 	},
 
-	toggleActionBar: function ()
-	{
-		const uncheckedItems = $('input[name^="items"]:not(:checked)'),
-			checkedItems = $('input[name^="items"]:checked'),
-			anyUnchecked = uncheckedItems.length > 0,
-			anyChecked = checkedItems.length > 0;
+	toggleActionBar() {
+		const uncheckedItems = $('input[name^="items"]:not(:checked)');
+		const checkedItems = $('input[name^="items"]:checked');
+		const anyUnchecked = uncheckedItems.length > 0;
+		const anyChecked = checkedItems.length > 0;
 		checkedItems.closest('tr').addClass('selected');
 		checkedItems.closest('article').addClass('selected');
 		uncheckedItems.closest('tr').removeClass('selected');
@@ -221,6 +196,6 @@ let InachisComponents = {
 	}
 };
 
-$(document).ready(function() {
-	InachisComponents.initialize();
+$(document).ready(() => {
+	window.Inachis.Components.initialize();
 });

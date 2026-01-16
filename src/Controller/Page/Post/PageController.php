@@ -39,8 +39,9 @@ class PageController extends AbstractInachisController
 
     /**
      * @param Request $request
-     * @param PageRepository $pageRepository
      * @param ContentQueryParameters $contentQueryParameters
+     * @param PageBulkActionService $pageBulkActionService
+     * @param PageRepository $pageRepository
      * @param string $type
      * @return Response
      * @throws Exception
