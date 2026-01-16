@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Entity;
+namespace Inachis\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
@@ -15,7 +15,7 @@ use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: 'App\Repository\LoginActivityRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\LoginActivityRepository', readOnly: false)]
 class LoginActivity
 {
     /**

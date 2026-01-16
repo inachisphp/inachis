@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Entity;
+namespace Inachis\Tests\phpunit\Entity;
 
-use App\Entity\Image;
-use App\Entity\User;
-use App\Exception\InvalidTimezoneException;
+use Inachis\Entity\Image;
+use Inachis\Entity\User;
+use Inachis\Exception\InvalidTimezoneException;
 use DateTime;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;

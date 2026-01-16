@@ -86,10 +86,6 @@
       display: none;
     }
 
-    .menu__collapsed {
-      display: none;
-    }
-
     .button.admin__add-content {
       background-color: $admin__container-add-button;
       border: 1px solid color.adjust($admin__container-add-button, $lightness: -10%);

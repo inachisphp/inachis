@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Entity;
+namespace Inachis\Entity;
 
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\PasswordResetRequestRepository;
+use Inachis\Repository\PasswordResetRequestRepository;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 
@@ -32,7 +32,7 @@ class PasswordResetRequest
     /**
      * @var User The User this token relates to
      */
-    #[ORM\ManyToOne(targetEntity: 'App\Entity\User')]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User')]
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
 

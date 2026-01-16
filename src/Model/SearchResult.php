@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Model;
+namespace Inachis\Model;
 
 use ArrayIterator;
 use IteratorAggregate;

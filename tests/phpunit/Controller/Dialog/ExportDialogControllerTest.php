@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Dialog;
+namespace Inachis\Tests\phpunit\Controller\Dialog;
 
-use App\Controller\Dialog\ExportDialogController;
-use App\Entity\Page;
-use App\Repository\PageRepository;
+use Inachis\Controller\Dialog\ExportDialogController;
+use Inachis\Entity\Page;
+use Inachis\Repository\PageRepository;
 use ArrayIterator;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use PHPUnit\Framework\MockObject\Exception;
@@ -36,7 +36,7 @@ class ExportDialogControllerTest extends WebTestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['render'])
             ->getMock();
-        $this->controller->method('render')
+        $this->controller->expects($this->atLeast(0))->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
@@ -62,8 +62,8 @@ class ExportDialogControllerTest extends WebTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incc/ax/export/output'
         ]);
-        $pageRepository = $this->createMock(PageRepository::class);
-        $serializer = $this->createMock(SerializerInterface::class);
+        $pageRepository = $this->createStub(PageRepository::class);
+        $serializer = $this->createStub(SerializerInterface::class);
 
         $result = $this->controller->performExport($request, $serializer, $pageRepository);
 
@@ -84,16 +84,19 @@ class ExportDialogControllerTest extends WebTestCase
         ], [], [], [], [
             'REQUEST_URI' => '/incc/ax/export/output'
         ]);
-        $post = (new Page('test-page'))->setId($uuid);
         $paginator = $this->getMockBuilder(Paginator::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getIterator'])
             ->getMock();
-        $paginator->method('getIterator')->willReturn(new ArrayIterator([]));
+        $paginator->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new ArrayIterator([]));
 
         $pageRepository = $this->createMock(PageRepository::class);
-        $pageRepository->method('getFilteredIds')->willReturn($paginator);
-        $serializer = $this->createMock(SerializerInterface::class);
+        $pageRepository->expects($this->once())
+            ->method('getFilteredIds')
+            ->willReturn($paginator);
+        $serializer = $this->createStub(SerializerInterface::class);
 
         $result = $this->controller->performExport($request, $serializer, $pageRepository);
         $this->assertEmpty($result->getContent());
@@ -163,15 +166,21 @@ class ExportDialogControllerTest extends WebTestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['getIterator'])
             ->getMock();
-        $paginator->method('getIterator')->willReturn(new ArrayIterator([$post, $post]));
+        $paginator->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new ArrayIterator([$post, $post]));
 
         $pageRepository = $this->createMock(PageRepository::class);
-        $pageRepository->method('getFilteredIds')->willReturn($paginator);
+        $pageRepository->expects($this->once())
+            ->method('getFilteredIds')
+            ->willReturn($paginator);
         $serializer = $this->getMockBuilder(Serializer::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['normalize'])
             ->getMock();
-        $serializer->method('normalize')->willReturn('test-page');
+        $serializer->expects($this->once())
+            ->method('normalize')
+            ->willReturn('test-page');
 
         return $this->controller->performExport($request, $serializer, $pageRepository);
     }

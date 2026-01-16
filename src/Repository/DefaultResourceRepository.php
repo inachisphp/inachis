@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Repository;
+namespace Inachis\Repository;
 
-use App\Entity\AbstractFile;
+use Inachis\Entity\AbstractFile;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 trait DefaultResourceRepository

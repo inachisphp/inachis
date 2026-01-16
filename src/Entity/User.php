@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Entity;
+namespace Inachis\Entity;
 
-use App\Exception\InvalidTimezoneException;
-use App\Validator\DateValidator;
+use Inachis\Exception\InvalidTimezoneException;
+use Inachis\Validator\DateValidator;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Object for handling User entity.
  */
-#[ORM\Entity(repositoryClass: 'App\Repository\UserRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\UserRepository', readOnly: false)]
 #[ORM\Index(columns: [ 'usernameCanonical', 'emailCanonical' ], name: 'search_idx')]
 #[UniqueEntity(fields: ['email'], message: 'This email address is already used.')]
 #[UniqueEntity(fields: ['username'], message: 'This username is already taken.')]

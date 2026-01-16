@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller;
+namespace Inachis\Controller;
 
-use App\Entity\Tag;
-use App\Repository\TagRepository;
+use Inachis\Entity\Tag;
+use Inachis\Repository\TagRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

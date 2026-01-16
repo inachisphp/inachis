@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller;
+namespace Inachis\Tests\phpunit\Controller;
 
-use App\Controller\TagsController;
-use App\Entity\Tag;
-use App\Repository\TagRepository;
+use Inachis\Controller\TagsController;
+use Inachis\Entity\Tag;
+use Inachis\Repository\TagRepository;
 use ArrayIterator;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -36,8 +36,8 @@ class TagsControllerTest extends TestCase
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->security = $this->createMock(Security::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->security = $this->createStub(Security::class);
+        $this->translator = $this->createStub(TranslatorInterface::class);
     }
 
     private function makeController(): TagsController
@@ -53,15 +53,14 @@ class TagsControllerTest extends TestCase
     {
         $controller = $this->makeController();
         $request = new Request([], ['q' => 'test']);
-        $this->security->method('isGranted')
-            ->with('IS_AUTHENTICATED_FULLY')
-            ->willReturn(true);
 
-        $tagRepo = $this->createMock(TagRepository::class);
-        $tagRepo->method('findByTitleLike')->willReturn($this->createMockPaginator([]));
-        $this->entityManager->method('getRepository')->willReturn($tagRepo);
+        $tagRepository = $this->createMock(TagRepository::class);
+        $tagRepository->expects($this->once())
+            ->method('findByTitleLike')->willReturn($this->createMockPaginator([]));
+        $this->entityManager->expects($this->atLeast(0))
+            ->method('getRepository')->willReturn($tagRepository);
 
-        $response = $controller->getTagManagerListContent($request, $tagRepo);
+        $response = $controller->getTagManagerListContent($request, $tagRepository);
         $data = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
@@ -73,29 +72,28 @@ class TagsControllerTest extends TestCase
     {
         $controller = $this->makeController();
         $request = new Request([], ['q' => 'abc']);
-        $this->security->method('isGranted')
-            ->with('IS_AUTHENTICATED_FULLY')
-            ->willReturn(true);
 
-        $tag1 = $this->createConfiguredMock(Tag::class, [
+        $tag1 = $this->createConfiguredStub(Tag::class, [
             'getId' => Uuid::uuid1(),
             'getTitle' => 'Foo'
         ]);
-        $tag2 = $this->createConfiguredMock(Tag::class, [
+        $tag2 = $this->createConfiguredStub(Tag::class, [
             'getId' => Uuid::uuid1(),
             'getTitle' => 'Foo' // duplicate title
         ]);
-        $tag3 = $this->createConfiguredMock(Tag::class, [
+        $tag3 = $this->createConfiguredStub(Tag::class, [
             'getId' => Uuid::uuid1(),
             'getTitle' => 'Bar'
         ]);
 
-        $tagRepo = $this->createMock(TagRepository::class);
-        $tagRepo->method('findByTitleLike')
+        $tagRepository = $this->createMock(TagRepository::class);
+        $tagRepository->expects($this->once())
+            ->method('findByTitleLike')
             ->willReturn($this->createMockPaginator([$tag1, $tag2, $tag3]));
-        $this->entityManager->method('getRepository')->willReturn($tagRepo);
+        $this->entityManager->expects($this->atLeast(0))
+            ->method('getRepository')->willReturn($tagRepository);
 
-        $response = $controller->getTagManagerListContent($request, $tagRepo);
+        $response = $controller->getTagManagerListContent($request, $tagRepository);
         $data = json_decode($response->getContent(), true, JSON_THROW_ON_ERROR);
         $titles = array_column($data['items'], 'text');
         sort($titles);
@@ -112,11 +110,9 @@ class TagsControllerTest extends TestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['getIterator', 'count'])
             ->getMock();
-
-        $paginator->method('getIterator')
+        $paginator->expects($this->once())->method('getIterator')
             ->willReturn(new ArrayIterator($items));
-
-        $paginator->method('count')
+        $paginator->expects($this->atLeast(0))->method('count')
             ->willReturn(count($items));
 
         return $paginator;

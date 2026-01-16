@@ -7,27 +7,22 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Admin;
+namespace Inachis\Controller\Page\Admin;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\User;
-use App\Form\UserType;
-use App\Model\ContentQueryParameters;
-use App\Repository\UserRepository;
-use App\Service\User\UserBulkActionService;
-use App\Service\User\PasswordResetTokenService;
-use App\Transformer\ImageTransformer;
-use App\Util\Base64EncodeFile;
-use App\Util\RandomColorPicker;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\User;
+use Inachis\Form\UserType;
+use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\UserRepository;
+use Inachis\Service\User\UserBulkActionService;
+use Inachis\Service\User\UserAccountEmailService;
+use Inachis\Transformer\ImageTransformer;
 use DateTime;
-use Exception;
 use Random\RandomException;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -36,8 +31,10 @@ class AdminProfileController extends AbstractInachisController
 {
     /**
      * @param Request $request
+     * @param ContentQueryParameters $contentQueryParameters
+     * @param UserBulkActionService $userBulkActionService
+     * @param UserRepository $userRepository
      * @return Response
-     * @throws Exception
      */
     #[Route(
         "/incc/admin/list/{offset}/{limit}",
@@ -59,10 +56,10 @@ class AdminProfileController extends AbstractInachisController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && !empty($request->request->all('items'))) {
-            $items  = $request->request->all('items') ?? [];
-            $action = $request->request->get('delete')  ? 'delete' :
-                ($request->request->get('enable') ? 'enable' :
-                ($request->request->get('disable') ? 'disable' : null));
+            $items = $request->request->all('items') ?? [];
+            $action = $request->request->has('delete')  ? 'delete' :
+                ($request->request->has('enable') ? 'enable' :
+                ($request->request->has('disable') ? 'disable' : null));
 
             if ($action !== null && !empty($items)) {
                 $count = $userBulkActionService->apply($action, $items);
@@ -92,64 +89,53 @@ class AdminProfileController extends AbstractInachisController
     /**
      * @param Request $request
      * @param ImageTransformer $imageTransformer
-     * @param MailerInterface $mailer
-     * @param PasswordResetTokenService $tokenService
+     * @param UserAccountEmailService $userAccountEmailService
+     * @param UserRepository $userRepository
      * @return Response
      * @throws RandomException
+     * @throws TransportExceptionInterface
      */
     #[Route("/incc/admin/{id}", name: "incc_admin_edit", methods: [ "GET", "POST" ])]
     public function edit(
         Request $request,
         ImageTransformer $imageTransformer,
-        MailerInterface $mailer,
-        PasswordResetTokenService $tokenService,
+        UserAccountEmailService $userAccountEmailService,
         UserRepository $userRepository,
     ): Response {
-        $user = $request->attributes->get('id') !== 'new' ?
+        $id = $request->attributes->get('id');
+        $isNew = ($id === 'new');
+
+        $user = $isNew ? new User(): 
             $userRepository->findOneBy(
                 [ 'username' => $request->attributes->get('id') ]
-            ):
-            new User();
+            );
+        /** @var Form $form */
         $form = $this->createForm(UserType::class, $user, [
             'validation_groups' => [ '' ],
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($form->has('enableDisable') && $form->get('enableDisable')->isClicked()) {
+            if ($form->getClickedButton()->getName() === 'enableDisable') {
                 $user->setActive(!$user->isEnabled());
             }
-            if ($form->has('delete') && $form->get('delete')->isClicked()) {
+            if ($form->getClickedButton()->getName() === 'delete') {
                 $user->setRemoved(true);
             }
             $user->setModDate(new DateTime('now'));
+
+            if ($isNew) {
+                $userAccountEmailService->registerNewUser(
+                    $user,
+                    $this->data,
+                    fn (string $token) => $this->generateUrl(
+                        'incc_account_new-password',
+                        [ 'token' => $token ]
+                    )
+                );
+            }
             $this->entityManager->persist($user);
             $this->entityManager->flush();
-
-            if ($request->attributes->get('id') === 'new') {
-                $data = $tokenService->createResetRequestForEmail($user->getEmail());
-                $user->setColor(RandomColorPicker::generate());
-                try {
-                    $email = (new TemplatedEmail())
-                        ->to(new Address($user->getEmail()))
-                        ->subject('Welcome to ' . $this->data['settings']['siteTitle'])
-                        ->htmlTemplate('inadmin/emails/registration.html.twig')
-                        ->textTemplate('inadmin/emails/registration.txt.twig')
-                        ->context([
-                            'name' => $user->getDisplayName(),
-                            'url' => $this->generateUrl('incc_account_new-password', [ 'token' => $data['token']]),
-                            'expiresAt' => $data['expiresAt']->format('l jS F Y \a\\t H:i'),
-                            'settings' => $this->data['settings'],
-                            'logo' => Base64EncodeFile::encode('public/assets/imgs/incc/inachis.png'),
-                        ])
-                    ;
-                    $mailer->send($email);
-                    $this->entityManager->persist($user);
-                    $this->entityManager->flush();
-                } catch (TransportExceptionInterface $e) {
-                    $this->addFlash('warning', 'Error while sending mail: ' . $e->getMessage());
-                }
-            }
 
             $this->addFlash('success', 'User details saved.');
             return $this->redirect($this->generateUrl('incc_admin_edit', [

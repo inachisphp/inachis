@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller;
+namespace Inachis\Tests\phpunit\Controller;
 
-use App\Controller\DefaultController;
-use App\Service\Page\ContentAggregator;
+use Inachis\Controller\DefaultController;
+use Inachis\Service\Page\ContentAggregator;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -37,8 +37,8 @@ class DefaultControllerTest extends TestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['render'])
             ->getMock();
-
-        $controller->method('render')
+        $controller->expects($this->once())
+            ->method('render')
             ->with(
                 'web/pages/homepage.html.twig',
                 ['content' => $mockContent]

@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Form;
+namespace Inachis\Form;
 
-use App\Entity\User;
-use App\Util\RandomColorPicker;
-use App\Util\TimezoneChoices;
+use Inachis\Entity\User;
+use Inachis\Util\RandomColorPicker;
+use Inachis\Util\TimezoneChoices;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;

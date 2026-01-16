@@ -7,14 +7,14 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Dialog;
+namespace Inachis\Controller\Dialog;
 
-use App\Controller\AbstractInachisController;
-use App\Controller\ZipStream;
-use App\Entity\Page;
-use App\Entity\Tag;
-use App\Parser\ArrayToMarkdown;
-use App\Repository\PageRepository;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Controller\ZipStream;
+use Inachis\Entity\Page;
+use Inachis\Entity\Tag;
+use Inachis\Parser\ArrayToMarkdown;
+use Inachis\Repository\PageRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

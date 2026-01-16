@@ -7,12 +7,12 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Form;
+namespace Inachis\Form;
 
-use App\Entity\Category;
-use App\Entity\Page;
-use App\Entity\Tag;
-use App\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use Inachis\Entity\Category;
+use Inachis\Entity\Page;
+use Inachis\Entity\Tag;
+use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
 use IntlException;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Emoji\EmojiTransliterator;

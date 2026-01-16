@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Service\User;
+namespace Inachis\Tests\phpunit\Service\User;
 
-use App\Entity\User;
-use App\Repository\UserRepository;
-use App\Service\User\UserBulkActionService;
+use Inachis\Entity\User;
+use Inachis\Repository\UserRepository;
+use Inachis\Service\User\UserBulkActionService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
@@ -20,9 +20,9 @@ use Ramsey\Uuid\Uuid;
 
 class UserBulkActionServiceTest extends TestCase
 {
+    private EntityManagerInterface $entityManager;
     private User $user;
     private UserRepository $userRepository;
-    private EntityManagerInterface $entityManager;
 
     private UserBulkActionService $userBulkActionService;
 
@@ -33,19 +33,31 @@ class UserBulkActionServiceTest extends TestCase
     {
         $this->user = (new User())->setId(Uuid::uuid4());
         $this->user->setUsername('test-user');
-        $this->userRepository = $this->createMock(UserRepository::class);
-        $this->userRepository->method('find')->willReturn($this->user);
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->userRepository = $this->createStub(UserRepository::class);
+        $this->userRepository
+            ->method('find')
+            ->willReturn($this->user);
+        $this->entityManager = $this->createStub(EntityManager::class);
 
         $this->userBulkActionService = new UserBulkActionService($this->userRepository, $this->entityManager);
     }
 
+    /**
+     * @throws Exception
+     */
     public function testApplyUserNotFound(): void
     {
+        $uuid = Uuid::uuid1()->toString();
         $this->user->setUsername('');
         $this->userRepository = $this->createMock(UserRepository::class);
-        $this->userRepository->method('find')->willReturn($this->user);
-        $result = $this->userBulkActionService->apply('', [Uuid::uuid1()->toString()]);
+        $this->userRepository
+            ->expects($this->once())
+            ->method('find')
+            ->with($uuid)
+            ->willReturn($this->user);
+        $this->userBulkActionService = new UserBulkActionService($this->userRepository, $this->entityManager);
+
+        $result = $this->userBulkActionService->apply('', [$uuid]);
         $this->assertEquals(0, $result);
     }
 

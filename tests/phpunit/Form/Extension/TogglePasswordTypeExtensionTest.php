@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Form\Extension;
+namespace Inachis\Tests\phpunit\Form\Extension;
 
-use App\Form\Extension\TogglePasswordTypeExtension;
+use Inachis\Form\Extension\TogglePasswordTypeExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 

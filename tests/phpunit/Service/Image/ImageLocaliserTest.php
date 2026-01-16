@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Service\Image;
+namespace Inachis\Tests\phpunit\Service\Image;
 
-use App\Service\Image\ImageLocaliser;
+use Inachis\Service\Image\ImageLocaliser;
 use PHPUnit\Framework\MockObject\MockClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
@@ -22,15 +22,20 @@ class ImageLocaliserTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->filesystem = $this->createMock(Filesystem::class);
+        $this->filesystem = $this->createStub(Filesystem::class);
         $this->localiser = new ImageLocaliser($this->filesystem, '/fake/public/imgs');
     }
 
     public function testCreatesDirectoryIfNotExists(): void
     {
         $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects($this->once())->method('exists')->with('/fake/path')->willReturn(false);
-        $filesystem->expects($this->once())->method('mkdir')->with('/fake/path', 0777);
+        $filesystem->expects($this->once())
+            ->method('exists')
+            ->with('/fake/path')
+            ->willReturn(false);
+        $filesystem->expects($this->once())
+            ->method('mkdir')
+            ->with('/fake/path', 0777);
 
         new ImageLocaliser($filesystem, '/fake/path');
     }
@@ -90,7 +95,6 @@ class ImageLocaliserTest extends TestCase
         $tmpFile = sys_get_temp_dir() . '/test/testfile2.txt';
         $this->prepareTestFile($tmpFile, 'abc123');
         $this->filesystem
-            ->expects($this->once())
             ->method('rename')
             ->willThrowException(new Exception('rename failed'));
         $this->expectException(Exception::class);

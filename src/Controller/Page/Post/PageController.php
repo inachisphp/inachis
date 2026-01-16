@@ -7,22 +7,23 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Post;
+namespace Inachis\Controller\Page\Post;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\Category;
-use App\Entity\Image;
-use App\Entity\Page;
-use App\Entity\Revision;
-use App\Entity\Tag;
-use App\Entity\Url;
-use App\Form\PostType;
-use App\Model\ContentQueryParameters;
-use App\Repository\PageRepository;
-use App\Repository\RevisionRepository;
-use App\Util\ContentRevisionCompare;
-use App\Util\ReadingTime;
-use App\Util\UrlNormaliser;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Category;
+use Inachis\Entity\Image;
+use Inachis\Entity\Page;
+use Inachis\Entity\Revision;
+use Inachis\Entity\Tag;
+use Inachis\Entity\Url;
+use Inachis\Form\PostType;
+use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\RevisionRepository;
+use Inachis\Service\Page\PageBulkActionService;
+use Inachis\Util\ContentRevisionCompare;
+use Inachis\Util\ReadingTime;
+use Inachis\Util\UrlNormaliser;
 use DateTime;
 use Exception;
 use Ramsey\Uuid\Uuid;
@@ -38,6 +39,9 @@ class PageController extends AbstractInachisController
 
     /**
      * @param Request $request
+     * @param ContentQueryParameters $contentQueryParameters
+     * @param PageBulkActionService $pageBulkActionService
+     * @param PageRepository $pageRepository
      * @param string $type
      * @return Response
      * @throws Exception
@@ -55,8 +59,9 @@ class PageController extends AbstractInachisController
     )]
     public function list(
         Request $request,
-        PageRepository $pageRepository,
         ContentQueryParameters $contentQueryParameters,
+        PageBulkActionService $pageBulkActionService,
+        PageRepository $pageRepository,
         string $type = 'post',
 
     ): Response {
@@ -64,55 +69,14 @@ class PageController extends AbstractInachisController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
-            foreach ($request->request->all('items') as $item) {
-                if ($request->request->has('delete')) {
-                    $post = $pageRepository->findOneBy(['id' => $item]);
-                    if ($post !== null) {
-                        $this->entityManager->getRepository(Revision::class)->deleteAndRecordByPage($post);
-                        $pageRepository->remove($post);
-                    }
-                }
-                if ($request->request->has('private') || $request->request->has('public')) {
-                    $post = $pageRepository->findOneBy(['id' => $item]);
-                    if ($post !== null) {
-                        $post->setVisibility(
-                            $request->request->has('private') ? Page::PRIVATE : Page::PUBLIC
-                        );
-                        $post->setModDate(new DateTime('now'));
-                        $this->entityManager->persist($post);
-                    }
-                }
-                if ($request->request->has('rebuild')) {
-                    $post = $pageRepository->findOneBy(['id' => $item]);
-                    if ($post !== null) {
-                        if (!empty($post->getUrls())) {
-                            foreach ($post->getUrls() as $url) {
-                                $this->entityManager->getRepository(Url::class)->remove($url);
-                            }
-                        }
-                        $link = $post->getPostDateAsLink() . '/' . UrlNormaliser::toUri($post->getTitle());
-                        if ($post->getSubTitle() !== null) {
-                            $link .= '-' . UrlNormaliser::toUri($post->getSubTitle());
-                        }
-                        $url = new Url($post, $link);
-                        $this->entityManager->persist($url);
-                        $post->setModDate(new DateTime('now'));
-                        $this->entityManager->persist($post);
-                        $this->entityManager->flush();
-                    }
-                }
-//                if ($request->request->has('export')) {
-//                    echo 'export';
-//                    die;
-//                }
-            }
-            if ($request->request->has('private') || $request->request->has('public')) {
-                $revision = $this->entityManager->getRepository(Revision::class)->hydrateNewRevisionFromPage($post);
-                $revision = $revision
-                    ->setContent('')
-                    ->setAction(sprintf(RevisionRepository::VISIBILITY_CHANGE, $post->getVisibility()));
-                $this->entityManager->persist($revision);
-                $this->entityManager->flush();
+            $items = $request->request->all('items') ?? [];
+            $action = $request->request->has('delete')  ? 'delete' :
+                ($request->request->has('private') ? 'private' :
+                ($request->request->has('public') ? 'public' : null));
+
+            if ($action !== null && !empty($items)) {
+                $count = $pageBulkActionService->apply($action, $items);
+                $this->addFlash('success', "Action '$action' applied to $count $type.");
             }
             return $this->redirectToRoute(
                 'incc_post_list',
@@ -170,6 +134,7 @@ class PageController extends AbstractInachisController
         Request $request,
         ContentRevisionCompare $contentRevisionCompare,
         PageRepository $pageRepository,
+        RevisionRepository $revisionRepository,
         string $type = 'post',
         ?string $title = null
     ): Response {
@@ -190,7 +155,7 @@ class PageController extends AbstractInachisController
             $post->setType($type);
         }
         if (!empty($post->getId())) {
-            $revision = $this->entityManager->getRepository(Revision::class)->hydrateNewRevisionFromPage($post);
+            $revision = $revisionRepository->hydrateNewRevisionFromPage($post);
             $revision = $revision->setAction(RevisionRepository::UPDATED);
         }
         $form = $this->createForm(PostType::class, $post);
@@ -198,8 +163,8 @@ class PageController extends AbstractInachisController
 
         if ($form->isSubmitted()) {//} && $form->isValid()) {
             if ($form->has('delete') && $form->get('delete')->isClicked()) {
-                $this->entityManager->getRepository(Revision::class)->deleteAndRecordByPage($post);
-                $this->entityManager->getRepository(Page::class)->remove($post);
+                $revisionRepository->deleteAndRecordByPage($post);
+                $pageRepository->remove($post);
                 return $this->redirectToRoute(
                     'incc_dashboard',
                     [],
@@ -301,14 +266,17 @@ class PageController extends AbstractInachisController
         $this->data['includeEditorId'] = $post->getId();
         $this->data['includeDatePicker'] = true;
         $this->data['post'] = $post;
-        $this->data['revisions'] = $this->entityManager->getRepository(Revision::class)
-            ->getAll(0, 25, [
+        $this->data['revisions'] = $revisionRepository->getAll(
+            0,
+            25,
+            [
                 'q.page_id = :pageId', [
                     'pageId' => $post->getId(),
                 ]
             ], [
                 [ 'q.versionNumber', 'DESC']
-            ]);
+            ]
+        );
         if ($post->getId() !== null) {
             $this->data['textStats'] = ReadingTime::getWordCountAndReadingTime($this->data['post']->getContent());
         }

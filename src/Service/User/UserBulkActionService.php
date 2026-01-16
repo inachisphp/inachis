@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Service\User;
+namespace Inachis\Service\User;
 
 
-use App\Repository\UserRepository;
+use Inachis\Repository\UserRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 

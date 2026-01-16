@@ -7,20 +7,20 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Post;
+namespace Inachis\Controller\Page\Post;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\Category;
-use App\Entity\Image;
-use App\Entity\Page;
-use App\Entity\Revision;
-use App\Entity\Series;
-use App\Entity\Tag;
-use App\Entity\Url;
-use App\Form\PostType;
-use App\Repository\RevisionRepository;
-use App\Util\ContentRevisionCompare;
-use App\Util\ReadingTime;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Category;
+use Inachis\Entity\Image;
+use Inachis\Entity\Page;
+use Inachis\Entity\Revision;
+use Inachis\Entity\Series;
+use Inachis\Entity\Tag;
+use Inachis\Entity\Url;
+use Inachis\Form\PostType;
+use Inachis\Repository\RevisionRepository;
+use Inachis\Util\ContentRevisionCompare;
+use Inachis\Util\ReadingTime;
 use DateTime;
 use Exception;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
@@ -69,7 +69,7 @@ class PageWebController extends AbstractInachisController
             && !$this->security->isGranted('IS_AUTHENTICATED_FULLY')
         ) {
             return $this->redirectToRoute(
-                'app_default_homepage',
+                'inachis_default_homepage',
                 []
             );
         }
@@ -115,8 +115,9 @@ class PageWebController extends AbstractInachisController
         requirements: [
             'page' => '^(?!setup$)(?!\d{4}-[a-zA-Z\-]+$)[^/]+$'
         ],
-        methods: [ "GET" ])
-    ]
+        methods: [ "GET" ],
+        priority: -100
+    )]
     public function getPage(Request $request): Response
     {
         return $this->getPost($request, 0, 0, 0, '');

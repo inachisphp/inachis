@@ -7,16 +7,18 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Util;
+namespace Inachis\Tests\phpunit\Validator\Constraints;
 
-use App\Validator\Constraints\ValidIPAddress;
-use App\Validator\Constraints\ValidIPAddressValidator;
+use Inachis\Validator\Constraints\ValidIPAddress;
+use Inachis\Validator\Constraints\ValidIPAddressValidator;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class ValidIPAddressValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator(): ConstraintValidatorInterface
@@ -26,16 +28,19 @@ class ValidIPAddressValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidate(): void
     {
-        $this->assertEmpty($this->validator->validate('', new ValidIPAddress()));
-        $this->assertEmpty($this->validator->validate('127.0.0.1', new ValidIPAddress()));
-        $this->assertEmpty($this->validator->validate(
+        $this->validator->validate('', new ValidIPAddress());
+        $this->assertNoViolation();
+        $this->validator->validate('127.0.0.1', new ValidIPAddress());
+        $this->assertNoViolation();
+        $this->validator->validate(
             '2001:0db8:85a3:0000:0000:8a2e:0370:7334', // full-format
             new ValidIPAddress()
-        ));
-        $this->assertEmpty($this->validator->validate(
+        );
+        $this->assertNoViolation();
+        $this->validator->validate(
             '2001:db8:3333:4444:5555:6666:7777:8888', // omit leading zeroes
             new ValidIPAddress()
-        ));
+        );
         $this->assertNoViolation();
     }
 

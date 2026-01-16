@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Admin;
+namespace Inachis\Controller\Page\Admin;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\User;
-use App\Form\ChangePasswordType;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Form\ChangePasswordType;
+use Inachis\Repository\UserRepository;
 use DateTime;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,15 +27,18 @@ class ChangePasswordController extends AbstractInachisController
 {
     /**
      * Controller for the change-password tab in the admin interface
-     * @param UserPasswordHasherInterface $passwordHasher
      * @param Request $request
-     * @param string $id
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @param UserRepository $userRepository
      * @return Response
      */
     #[Route("/incc/admin/{id}/change-password", name: "incc_admin_change_password", methods: [ "GET", "POST" ])]
-    public function changePasswordTab(UserPasswordHasherInterface $passwordHasher, Request $request, string $id): Response
-    {
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $request->attributes->get('id')]);
+    public function changePasswordTab(
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        UserRepository $userRepository,
+    ): Response {
+        $user = $userRepository->findOneBy(['username' => $request->attributes->get('id')]);
         $form = $this->createForm(
             ChangePasswordType::class,
             null,
@@ -44,7 +47,7 @@ class ChangePasswordController extends AbstractInachisController
             ]
         );
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $user->getId() === $this->security->getUser()->getId() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid() && $user->getId() === $this->security->getUser()->getId()) {
             $plaintextPassword = $request->request->all('change_password')['new_password'];
             $hashedPassword = $passwordHasher->hashPassword($user, $plaintextPassword);
             $user->setPassword($hashedPassword);

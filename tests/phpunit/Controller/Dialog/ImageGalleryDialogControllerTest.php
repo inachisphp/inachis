@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Dialog;
+namespace Inachis\Tests\phpunit\Controller\Dialog;
 
-use App\Controller\Dialog\ImageGalleryDialogController;
-use App\Repository\ImageRepository;
+use Inachis\Controller\Dialog\ImageGalleryDialogController;
+use Inachis\Repository\ImageRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +24,7 @@ class ImageGalleryDialogControllerTest extends WebTestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['createForm', 'render'])
             ->getMock();
-        $controller->method('render')
+        $controller->expects($this->once())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
@@ -38,19 +38,19 @@ class ImageGalleryDialogControllerTest extends WebTestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['render'])
             ->getMock();
-        $controller->method('render')
+        $controller->expects($this->once())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incc/ax/imageManager/getImages/50/25'
         ]);
-        $paginator = $this->createMock(Paginator::class);
+        $paginator = $this->createStub(Paginator::class);
         $imageRepository = $this->getMockBuilder(ImageRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getFiltered'])
             ->getMock();
-        $imageRepository->method('getFiltered')->willReturn($paginator);
+        $imageRepository->expects($this->once())->method('getFiltered')->willReturn($paginator);
         $result = $controller->getImageList($request, $imageRepository);
         $this->assertEquals('rendered:inadmin/partials/gallery.html.twig', $result->getContent());
     }

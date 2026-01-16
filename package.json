@@ -1,33 +1,28 @@
 {
-  "name": "inachis",
-  "version": "1.0.0",
-  "description": "JS requirements for inachis framework",
-  "license": "MIT",
-  "type": "module",
-  "devDependencies": {
-    "cypress": "^13.4.0",
-    "gulp": "*",
-    "gulp-autoprefixer": "*",
-    "gulp-babel-minify": "*",
-    "gulp-clean": "*",
-    "gulp-concat": "*",
-    "gulp-cssnano": "*",
-    "gulp-exec": "*",
-    "gulp-imagemin": "*",
-    "gulp-jshint": "*",
-    "gulp-json-editor": "*",
-    "gulp-plumber": "*",
-    "gulp-rename": "*",
-    "gulp-sass": "*",
-    "jshint": "*",
-    "pump": "*",
-    "require-dir": "*",
-    "sass": "*"
-  },
-  "dependencies": {
-    "jquery-datetimepicker": "^2.5.20",
-    "npm-check-updates": "^19.1.1",
-    "simplemde": "*"
-  },
-  "scripts": {}
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "dev": "node build.js --watch",
+        "build": "node build.js"
+    },
+    "dependencies": {
+        "dropzone": "^6.0.0-beta.2",
+        "easymde": "^2.20",
+        "jquery": "^3.7.1",
+        "jquery-datetimepicker": "^2.5.21",
+        "jquery-ui-dist": "^1.13.3",
+        "npm-check-updates": "^19.3.1",
+        "select2": "^4.0.13"
+    },
+    "devDependencies": {
+        "esbuild": "^0.27.2",
+        "esbuild-sass-plugin": "^3.6.0",
+        "glob": "^13.0.0",
+        "imagemin": "^9.0.1",
+        "imagemin-gifsicle": "^7.0.0",
+        "imagemin-mozjpeg": "^10.0.0",
+        "imagemin-pngquant": "^10.0.0",
+        "imagemin-svgo": "^11.0.0",
+        "sass": "^1.97.2"
+    }
 }

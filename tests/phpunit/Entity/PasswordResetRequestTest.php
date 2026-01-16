@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Entity;
+namespace Inachis\Tests\phpunit\Entity;
 
-use App\Entity\PasswordResetRequest;
-use App\Entity\User;
+use Inachis\Entity\PasswordResetRequest;
+use Inachis\Entity\User;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 

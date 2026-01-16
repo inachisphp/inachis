@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Repository;
+namespace Inachis\Repository;
 
-use App\Entity\Image;
-use App\Entity\Page;
-use App\Entity\Series;
+use Inachis\Entity\Image;
+use Inachis\Entity\Page;
+use Inachis\Entity\Series;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -77,13 +77,14 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Doctrine\ORM\NoResultException
      */
-    public function getSeriesByYearAndUrl($year, $url)
+    public function getPublicSeriesByYearAndUrl($year, $url)
     {
         $qb = $this->createQueryBuilder('s');
         return $qb
             ->select('s')
             ->where($qb->expr()->like('s.lastDate', ':year'))
             ->andWhere($qb->expr()->like('s.url', ':url'))
+            ->andWhere('s.visibility = \'' . Series::PUBLIC . '\'')
             ->setParameter('year', $year . '%')
             ->setParameter('url', $url)
             ->getQuery()

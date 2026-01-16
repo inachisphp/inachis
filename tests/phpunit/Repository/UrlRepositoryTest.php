@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Repository;
+namespace Inachis\Tests\phpunit\Repository;
 
-use App\Entity\Page;
-use App\Entity\Url;
-use App\Repository\UrlRepository;
+use Inachis\Entity\Page;
+use Inachis\Entity\Url;
+use Inachis\Repository\UrlRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -32,7 +32,7 @@ class UrlRepositoryTest extends TestCase
 
     public function setUp(): void
     {
-        $registry = $this->createMock(ManagerRegistry::class);
+        $registry = $this->createStub(ManagerRegistry::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $registry
             ->method('getManagerForClass')
@@ -46,9 +46,14 @@ class UrlRepositoryTest extends TestCase
             ->willReturn($metadata);
         $this->repository = $this->getMockBuilder(UrlRepository::class)
             ->setConstructorArgs([$registry])
-            ->onlyMethods([ 'getEntityManager', 'getAll', 'findOneBy' ])
+            ->onlyMethods([ 'getClassName', 'getEntityManager', 'getAll', 'findOneBy' ])
             ->getMock();
-        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
+        $this->repository->expects($this->atLeast(0))
+            ->method('getClassName')
+            ->willReturn(Url::class);
+        $this->repository->expects($this->atLeast(0))
+            ->method('getEntityManager')
+            ->willReturn($this->entityManager);
         parent::setUp();
     }
 
@@ -75,7 +80,8 @@ class UrlRepositoryTest extends TestCase
     {
         $page = (new Page())->setTitle('test');
         $url = (new Url($page))->setDefault(true)->setLink('/test');
-        $this->repository
+        $this->entityManager->expects($this->never())->method('createQueryBuilder');
+        $this->repository->expects($this->once())
             ->method('findOneBy')
             ->with([ 'content' => $page, 'default' => true, ])
             ->willReturn($url);
@@ -88,23 +94,23 @@ class UrlRepositoryTest extends TestCase
      */
     public function testFindSimilarUrlsExcludingId(): void
     {
-        $expectedUrl = $this->createMock(Url::class);
+        $expectedUrl = $this->createStub(Url::class);
         $uuid = Uuid::uuid1();
 
         $query = $this->createMock(Query::class);
-        $query->method('getResult')->willReturn([$expectedUrl]);
-        $expr = $this->createMock(Expr::class);
+        $query->expects($this->atLeast(1))->method('getResult')->willReturn([$expectedUrl]);
+        $expr = $this->createStub(Expr::class);
 
         $queryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['select', 'where', 'setParameter', 'getQuery', 'expr'])
             ->getMock();
-        $queryBuilder->method('select')->willReturnSelf();
-        $queryBuilder->method('where')->willReturnSelf();
-        $queryBuilder->method('setParameter')->willReturnSelf();
-        $queryBuilder->method('expr')->willReturn($expr);
-        $queryBuilder->method('getQuery')->willReturn($query);
-        $this->entityManager->method('createQueryBuilder')->willReturn($queryBuilder);
+        $queryBuilder->expects($this->atLeast(1))->method('select')->willReturnSelf();
+        $queryBuilder->expects($this->atLeast(1))->method('where')->willReturnSelf();
+        $queryBuilder->expects($this->atLeast(1))->method('setParameter')->willReturnSelf();
+        $queryBuilder->expects($this->atLeast(1))->method('expr')->willReturn($expr);
+        $queryBuilder->expects($this->atLeast(1))->method('getQuery')->willReturn($query);
+        $this->entityManager->expects($this->atLeast(1))->method('createQueryBuilder')->willReturn($queryBuilder);
 
         $result = $this->repository->findSimilarUrlsExcludingId('test', $uuid);
         $this->assertIsArray($result);
@@ -114,7 +120,8 @@ class UrlRepositoryTest extends TestCase
 
     public function testGetFilteredWithoutKeyword(): void
     {
-        $paginator = $this->createMock(Paginator::class);
+        $paginator = $this->createStub(Paginator::class);
+        $this->entityManager->expects($this->never())->method('remove');
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
@@ -134,7 +141,8 @@ class UrlRepositoryTest extends TestCase
 
     public function testGetFilteredWithKeyword(): void
     {
-        $paginator = $this->createMock(Paginator::class);
+        $this->entityManager->expects($this->never())->method('remove');
+        $paginator = $this->createStub(Paginator::class);
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
@@ -159,6 +167,8 @@ class UrlRepositoryTest extends TestCase
 
     public function testDetermineOrderBy(): void
     {
+        $this->entityManager->expects($this->never())->method('remove');
+        $this->repository->expects($this->never())->method('findOneBy');
         $orders = [
             'contentDate desc' => [
                 [ 'substring(q.link, 1, 10)', 'desc' ],

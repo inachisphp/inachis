@@ -1,4 +1,4 @@
-// var InachisDashboard = {
+// window.Inachis.Dashboard = {
 //
 // 	_init: function()
 // 	{
@@ -16,6 +16,6 @@
 // };
 //
 // $(document).ready(function () {
-// 		InachisDashboard._init();
+// 		window.Inachis.Dashboard._init();
 // });
 

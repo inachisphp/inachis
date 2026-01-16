@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller;
+namespace Inachis\Controller;
 
-use App\Entity\Waste;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\WasteRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -21,6 +21,8 @@ class WasteController extends AbstractInachisController
 {
     /**
      * @param Request $request
+     * @param ContentQueryParameters $contentQueryParameters
+     * @param WasteRepository $wasteRepository
      * @return Response
      */
     #[Route(
@@ -35,8 +37,11 @@ class WasteController extends AbstractInachisController
         ],
         methods: [ 'GET', 'POST' ]
     )]
-    public function list(Request $request): Response
-    {
+    public function list(
+        Request $request,
+        ContentQueryParameters $contentQueryParameters,
+        WasteRepository $wasteRepository,
+    ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
@@ -44,9 +49,9 @@ class WasteController extends AbstractInachisController
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
             foreach ($request->request->all('items') as $item) {
                 if ($request->request->get('delete') !== null) {
-                    $deleteItem = $this->entityManager->getRepository(Waste::class)->findOneBy(['id' => $item]);
+                    $deleteItem = $wasteRepository->findOneBy(['id' => $item]);
                     if ($deleteItem !== null) {
-                        $this->entityManager->getRepository(Waste::class)->remove($deleteItem);
+                        $wasteRepository->remove($deleteItem);
                     }
                 }
             }
@@ -57,22 +62,20 @@ class WasteController extends AbstractInachisController
             );
         }
 
-        $offset = (int) $request->attributes->get('offset', 0);
-        $limit = (int) $request->attributes->get(
-            'limit',
-            $this->entityManager->getRepository(Waste::class)->getMaxItemsToShow()
+        $contentQuery = $contentQueryParameters->process(
+            $request,
+            $wasteRepository,
+            'waste',
+            'modDate desc',
         );
         $this->data['form'] = $form->createView();
-        $this->data['dataset'] = $this->entityManager->getRepository(Waste::class)->getAll(
-            $offset,
-            $limit,
-            [],
-            [
-                [ 'q.modDate', 'DESC' ]
-            ]
+        $this->data['dataset'] = $wasteRepository->getFiltered(
+            $contentQuery['filters'],
+            $contentQuery['offset'],
+            $contentQuery['limit'],
+            $contentQuery['sort'],
         );
-        $this->data['query']['offset'] = $offset;
-        $this->data['query']['limit'] = $limit;
+        $this->data['query'] = $contentQuery;
         return $this->render('inadmin/waste.html.twig', $this->data);
     }
 }

@@ -7,20 +7,20 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Dialog;
+namespace Inachis\Controller\Dialog;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\Category;
-use App\Entity\Page;
-use App\Entity\Series;
-use App\Entity\Tag;
-use App\Entity\Url;
-use App\Model\BulkCreateData;
-use App\Repository\CategoryRepository;
-use App\Repository\SeriesRepository;
-use App\Repository\TagRepository;
-use App\Service\Page\PageBulkCreateService;
-use App\Util\UrlNormaliser;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Category;
+use Inachis\Entity\Page;
+use Inachis\Entity\Series;
+use Inachis\Entity\Tag;
+use Inachis\Entity\Url;
+use Inachis\Model\BulkCreateData;
+use Inachis\Repository\CategoryRepository;
+use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\TagRepository;
+use Inachis\Service\Page\PageBulkCreateService;
+use Inachis\Util\UrlNormaliser;
 use DateInterval;
 use DateMalformedPeriodStringException;
 use DateMalformedStringException;

@@ -7,14 +7,14 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Twig;
+namespace Inachis\Twig;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 /**
  * Class AppExtension
- * @package App\Twig
+ * @package Inachis\Twig
  */
 class AppExtension extends AbstractExtension
 {

@@ -7,22 +7,22 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Form\DataTransformer;
+namespace Inachis\Tests\phpunit\Form\DataTransformer;
 
-use App\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 
 class ArrayCollectionToArrayTransformerTest extends TestCase
 {
-    private EntityManagerInterface $em;
+    private EntityManagerInterface $entityManager;
     private ArrayCollectionToArrayTransformer $transformer;
 
     public function setUp(): void
     {
-        $this->em = $this->createMock(EntityManagerInterface::class);
-        $this->transformer = new ArrayCollectionToArrayTransformer($this->em);
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->transformer = new ArrayCollectionToArrayTransformer($this->entityManager);
     }
 
     public function testTransformEmpty(): void

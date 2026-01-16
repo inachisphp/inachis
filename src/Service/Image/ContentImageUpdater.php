@@ -7,12 +7,12 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Service\Image;
+namespace Inachis\Service\Image;
 
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Revision;
-use App\Repository\RevisionRepository;
+use Inachis\Entity\Revision;
+use Inachis\Repository\RevisionRepository;
 
 class ContentImageUpdater
 {

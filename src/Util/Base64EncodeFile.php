@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Util;
+namespace Inachis\Util;
 
 class Base64EncodeFile
 {

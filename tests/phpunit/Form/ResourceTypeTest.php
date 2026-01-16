@@ -7,21 +7,23 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Form;
+namespace Inachis\Tests\phpunit\Form;
 
-use App\Entity\Image;
-use App\Form\ResourceType;
+use Inachis\Entity\Image;
+use Inachis\Form\ResourceType;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class ResourceTypeTest extends TypeTestCase
 {
 
     protected function getExtensions(): array
     {
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         return [
             new PreloadedExtension([new ResourceType($translator)], [])
         ];

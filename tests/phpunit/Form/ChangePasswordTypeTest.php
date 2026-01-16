@@ -7,10 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Form;
+namespace Inachis\Tests\phpunit\Form;
 
-use App\Form\ChangePasswordType;
-use App\Form\Extension\TogglePasswordTypeExtension;
+use Inachis\Form\ChangePasswordType;
+use Inachis\Form\Extension\TogglePasswordTypeExtension;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -21,13 +22,14 @@ use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class ChangePasswordTypeTest extends TypeTestCase
 {
     private FormFactoryBuilderInterface $formFactory;
 
     protected function getExtensions(): array
     {
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $validator  = Validation::createValidator();
 
         return [

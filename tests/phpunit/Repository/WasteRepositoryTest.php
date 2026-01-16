@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Repository;
+namespace Inachis\Tests\phpunit\Repository;
 
-use App\Entity\User;
-use App\Repository\WasteRepository;
+use Inachis\Entity\User;
+use Inachis\Repository\WasteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -24,22 +24,22 @@ class WasteRepositoryTest extends TestCase
 
     public function setUp(): void
     {
-        $this->registry = $this->createMock(ManagerRegistry::class);
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->registry = $this->createStub(ManagerRegistry::class);
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
     }
 
     public function testDeleteWasteByUser()
     {
-        $repository = $this->getMockBuilder(WasteRepository::class)
+        $repository = $this->getStubBuilder(WasteRepository::class)
             ->setConstructorArgs([$this->registry])
             ->onlyMethods([ 'createQueryBuilder' ])
-            ->getMock();
-        $qb = $this->createMock(QueryBuilder::class);
+            ->getStub();
+        $qb = $this->createStub(QueryBuilder::class);
         $qb->method('delete')->willReturnSelf();
         $qb->method('where')->willReturnSelf();
         $qb->method('setParameter')->willReturnSelf();
 
-        $query = $this->createMock(Query::class);
+        $query = $this->createStub(Query::class);
         $query->method('execute')->willReturn(3);
         $qb->method('getQuery')->willReturn($query);
 

@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Parser;
+namespace Inachis\Tests\phpunit\Parser;
 
-use App\Entity\Category;
-use App\Entity\Page;
-use App\Parser\MarkdownFileParser;
+use Inachis\Entity\Category;
+use Inachis\Entity\Page;
+use Inachis\Parser\MarkdownFileParser;
 use DateTime;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
@@ -22,16 +22,17 @@ use ReflectionException;
 
 class MarkdownFileParserTest extends TestCase
 {
-    private ObjectManager $em;
-    private ObjectRepository $repo;
+    private ObjectManager $entityManager;
+    private ObjectRepository $repository;
     private MarkdownFileParser $parser;
 
     public function setUp(): void
     {
-        $this->em = $this->createMock(ObjectManager::class);
-        $this->repo = $this->createMock(ObjectRepository::class);
-        $this->em->method('getRepository')->with(Category::class)->willReturn($this->repo);
-        $this->parser  = new MarkdownFileParser($this->em);
+        $this->entityManager = $this->createStub(ObjectManager::class);
+        $this->repository = $this->createStub(ObjectRepository::class);
+        $this->entityManager->method('getRepository')
+            ->with(Category::class)->willReturn($this->repository);
+        $this->parser  = new MarkdownFileParser($this->entityManager);
 
         parent::setUp();
     }
@@ -54,7 +55,7 @@ MD;
         $category2 = (new Category())->setTitle('Europe')->setParent($category1);
         $category3 = (new Category())->setTitle('Wales')->setParent($category2);
 
-        $this->repo
+        $this->repository
             ->method('findOneBy')
             ->willReturnCallback(function ($criteria) use ($category1, $category2, $category3) {
                 return match ($criteria['title']) {
@@ -88,7 +89,7 @@ Trips
 Post body.
 MD;
         $category = (new Category())->setTitle('Trips');
-        $this->repo->method('findOneBy')->willReturn($category);
+        $this->repository->method('findOneBy')->willReturn($category);
 
         $page = $this->parser->parse($markdown);
 
@@ -110,7 +111,7 @@ tech
 Post content.
 MD;
         $category = (new Category())->setTitle('tech');
-        $this->repo->method('findOneBy')->willReturn($category);
+        $this->repository->method('findOneBy')->willReturn($category);
 
         $page = $this->parser->parse($markdown);
 
@@ -129,7 +130,7 @@ MD;
 nonexistent
 Post content.
 MD;
-        $this->repo->method('findOneBy')->willReturn(null);
+        $this->repository->method('findOneBy')->willReturn(null);
 
         $page = $this->parser->parse($markdown);
 
@@ -159,7 +160,7 @@ MD;
         $category2 = (new Category())->setTitle('Europe')->setParent($category1);
 
         // "frameworks" missing — should return deepest valid parent (php)
-        $this->repo->method('findOneBy')->willReturnCallback(function ($criteria) use ($category1, $category2) {
+        $this->repository->method('findOneBy')->willReturnCallback(function ($criteria) use ($category1, $category2) {
             return match ($criteria['title']) {
                 'Trips' => $category1,
                 'Europe' => ($criteria['parent'] === $category1) ? $category2 : null,

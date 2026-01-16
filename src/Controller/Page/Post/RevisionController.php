@@ -7,24 +7,21 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Post;
+namespace Inachis\Controller\Page\Post;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\Page;
-use App\Entity\Revision;
-use App\Parser\ArrayToMarkdown;
-use App\Repository\RevisionRepository;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Parser\ArrayToMarkdown;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\RevisionRepository;
 use DateTime;
-use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Jfcherng\Diff\DiffHelper;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 #[IsGranted('ROLE_ADMIN')]
@@ -32,25 +29,17 @@ class RevisionController extends AbstractInachisController
 {
     /**
      * @param Request $request
+     * @param PageRepository $pageRepository
+     * @param RevisionRepository $revisionRepository
      * @return Response
      */
     #[Route("/incc/page/diff/{id}", methods: [ "GET" ])]
-    public function diff(Request $request): Response
-    {
-        $revision = $this->entityManager->getRepository(Revision::class)->findOneBy([
-            'id' => $request->attributes->get('id')
-        ]);
-        if (empty($revision) || empty($revision->getPageId())) {
-            throw new NotFoundHttpException(
-                sprintf('Version history could not be found for %s', $request->attributes->get('id'))
-            );
-        }
-        $page = $this->entityManager->getRepository(Page::class)->findOneBy(['id' => $revision->getPageId()]);
-        if (empty($page) || empty($page->getId())) {
-            throw new NotFoundHttpException(
-                sprintf('Page could not be found for revision %s', $request->attributes->get('id'))
-            );
-        }
+    public function diff(
+        Request $request,
+        PageRepository $pageRepository,
+        RevisionRepository $revisionRepository
+    ): Response {
+        [$revision, $page] = $this->loadPageWithRevision($request, $revisionRepository, $pageRepository);
         $trackChanges = [
             'content' => json_decode(DiffHelper::calculate(
                 $revision->getContent() ?? '',
@@ -67,10 +56,16 @@ class RevisionController extends AbstractInachisController
 
         $this->data['page']['title'] = 'Compare Revisions';
         $this->data['title'] = json_decode(
-            DiffHelper::calculate($revision->getTitle() ?? '', $page->getTitle() ?? '', 'Json', [], [
-                'detailLevel' => 'word',
-                'outputTagAsString' => true,
-            ])
+            DiffHelper::calculate(
+                $revision->getTitle() ?? '',
+                $page->getTitle() ?? '',
+                'Json',
+                [],
+                [
+                    'detailLevel' => 'word',
+                    'outputTagAsString' => true,
+                ]
+            )
         );
         if (empty($this->data['title'])) {
             $this->data['title'] = $page->getTitle();
@@ -94,31 +89,23 @@ class RevisionController extends AbstractInachisController
         return $this->render('inadmin/page/post/track_changes.html.twig', $this->data);
     }
 
+    /**
+     * @throws Exception
+     */
     #[Route("/incc/page/diff/{id}", methods: [ "POST" ])]
-    public function doRevert(Request $request): Response
-    {
-        $revision = $this->entityManager->getRepository(Revision::class)->findOneBy([
-            'id' => $request->attributes->get('id')
-        ]);
-        if (empty($revision) || empty($revision->getPageId())) {
-            throw new NotFoundHttpException(
-                sprintf('Version history could not be found for %s', $request->attributes->get('id'))
-            );
-        }
-        $page = $this->entityManager->getRepository(Page::class)->findOneBy(['id' => $revision->getPageId()]);
-        if (empty($page) || empty($page->getId())) {
-            throw new NotFoundHttpException(
-                sprintf('Page could not be found for revision %s', $request->attributes->get('id'))
-            );
-        }
+    public function doRevert(
+        Request $request,
+        PageRepository $pageRepository,
+        RevisionRepository $revisionRepository,
+    ): Response {
+        [$revision, $page] = $this->loadPageWithRevision($request, $revisionRepository, $pageRepository);
         $page->setTitle($revision->getTitle())
             ->setSubTitle($revision->getSubTitle())
             ->setContent($revision->getContent())
             ->setModDate(new DateTime('now'))
-            ->setAuthor($this->getUser())
-        ;
+            ->setAuthor($this->getUser());
 
-        $newRevision = $this->entityManager->getRepository(Revision::class)->hydrateNewRevisionFromPage($page);
+        $newRevision = $revisionRepository->hydrateNewRevisionFromPage($page);
         $newRevision->setAction(sprintf(RevisionRepository::REVERTED, $revision->getVersionNumber()));
 
         $this->entityManager->persist($newRevision);
@@ -135,12 +122,17 @@ class RevisionController extends AbstractInachisController
 
     /**
      * @param Request $request
+     * @param RevisionRepository $revisionRepository
+     * @param SerializerInterface $serializer
      * @return Response
      */
     #[Route("/incc/page/download/{id}", name: "incc_post_download", methods: [ "GET" ])]
-    public function download(Request $request, SerializerInterface $serializer): Response
-    {
-        $revision = $this->entityManager->getRepository(Revision::class)->findOneBy([
+    public function download(
+        Request $request,
+        RevisionRepository $revisionRepository,
+        SerializerInterface $serializer
+    ): Response {
+        $revision = $revisionRepository->findOneBy([
             'id' => $request->attributes->get('id')
         ]);
         if (empty($revision) || empty($revision->getPageId())) {
@@ -148,14 +140,6 @@ class RevisionController extends AbstractInachisController
                 sprintf('Version history could not be found for %s', $request->attributes->get('id'))
             );
         }
-        $normalisedAttributes = [
-            'title',
-            'subTitle',
-            'postDate',
-            'content',
-            'featureSnippet',
-            'featureImage',
-        ];
         $post = [
             'title' => $revision->getTitle(),
             'subTitle' => $revision->getSubTitle(),
@@ -175,5 +159,31 @@ class RevisionController extends AbstractInachisController
         );
 
         return $response;
+    }
+
+    /**
+     * @param Request $request
+     * @param RevisionRepository $revisionRepository
+     * @param PageRepository $pageRepository
+     * @return array
+     */
+    private function loadPageWithRevision(Request $request, RevisionRepository $revisionRepository, PageRepository $pageRepository): array
+    {
+        $revision = $revisionRepository->findOneBy([
+            'id' => $request->attributes->get('id')
+        ]);
+        if (empty($revision) || empty($revision->getPageId())) {
+            throw new NotFoundHttpException(
+                sprintf('Version history could not be found for %s', $request->attributes->get('id'))
+            );
+        }
+        $page = $pageRepository->findOneBy(['id' => $revision->getPageId()]);
+        if (empty($page) || empty($page->getId())) {
+            throw new NotFoundHttpException(
+                sprintf('Page could not be found for revision %s', $request->attributes->get('id'))
+            );
+        }
+
+        return [$revision, $page];
     }
 }

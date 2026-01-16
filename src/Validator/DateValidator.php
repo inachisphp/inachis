@@ -7,14 +7,14 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Validator;
+namespace Inachis\Validator;
 
-use App\Exception\InvalidTimezoneException;
+use Inachis\Exception\InvalidTimezoneException;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
  * Class DateValidator
- * @package App\Validator
+ * @package Inachis\Validator
  */
 class DateValidator
 {

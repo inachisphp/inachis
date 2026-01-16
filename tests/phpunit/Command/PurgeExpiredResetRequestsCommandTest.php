@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Command;
+namespace Inachis\Tests\phpunit\Command;
 
-use App\Command\PurgeExpiredResetRequestsCommand;
-use App\Repository\PasswordResetRequestRepository;
+use Inachis\Command\PurgeExpiredResetRequestsCommand;
+use Inachis\Repository\PasswordResetRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -20,11 +20,11 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class PurgeExpiredResetRequestsCommandTest extends TestCase
 {
-    private $em;
+    private $entityManager;
 
     public function setUp(): void
     {
-        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
     }
     public function testExecuteCreatesAdminUserSuccessfully(): void
     {
@@ -33,8 +33,10 @@ class PurgeExpiredResetRequestsCommandTest extends TestCase
             ->expects($this->once())
             ->method('purgeExpiredHashes')
             ->willReturn(3);
-        $this->em->method('getRepository')->willReturn($passwordResetRequestRepository);
-        $command = new PurgeExpiredResetRequestsCommand($this->em);
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($passwordResetRequestRepository);
+        $command = new PurgeExpiredResetRequestsCommand($this->entityManager);
         $tester = new CommandTester($command);
         $tester->execute([]);
         $output = $tester->getDisplay();

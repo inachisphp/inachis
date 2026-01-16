@@ -7,16 +7,16 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Service\Page;
+namespace Inachis\Tests\phpunit\Service\Page;
 
-use App\Entity\Category;
-use App\Entity\Series;
-use App\Entity\User;
-use App\Model\BulkCreateData;
-use App\Repository\CategoryRepository;
-use App\Repository\SeriesRepository;
-use App\Repository\TagRepository;
-use App\Service\Page\PageBulkCreateService;
+use Inachis\Entity\Category;
+use Inachis\Entity\Series;
+use Inachis\Entity\User;
+use Inachis\Model\BulkCreateData;
+use Inachis\Repository\CategoryRepository;
+use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\TagRepository;
+use Inachis\Service\Page\PageBulkCreateService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -36,10 +36,10 @@ class BulkCreatePostTest extends TestCase
      */
     public function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->seriesRepository = $this->createMock(SeriesRepository::class);
-        $this->tagRepository = $this->createMock(TagRepository::class);
-        $this->categoryRepository = $this->createMock(CategoryRepository::class);
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->seriesRepository = $this->createStub(SeriesRepository::class);
+        $this->tagRepository = $this->createStub(TagRepository::class);
+        $this->categoryRepository = $this->createStub(CategoryRepository::class);
         $this->bulkCreateData = new BulkCreateData(
             'some title',
             DateTime::createFromFormat('d/m/Y', '01/11/2025'),

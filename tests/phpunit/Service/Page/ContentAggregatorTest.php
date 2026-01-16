@@ -7,13 +7,13 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\Service\Page;
+namespace Inachis\Tests\phpunit\Service\Page;
 
-use App\Entity\Page;
-use App\Entity\Series;
-use App\Repository\PageRepository;
-use App\Repository\SeriesRepository;
-use App\Service\Page\ContentAggregator;
+use Inachis\Entity\Page;
+use Inachis\Entity\Series;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\SeriesRepository;
+use Inachis\Service\Page\ContentAggregator;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,37 +25,37 @@ class ContentAggregatorTest extends TestCase
 {
     public function testGetHomepageContent(): void
     {
-        $seriesRepo = $this->getMockBuilder(SeriesRepository::class)
+        $seriesRepository = $this->getStubBuilder(SeriesRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getAll'])
-            ->getMock();
-        $pageRepo = $this->getMockBuilder(PageRepository::class)
+            ->getStub();
+        $pageRepository = $this->getStubBuilder(PageRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getAll'])
-            ->getMock();
-        $entityManager = $this->createMock(EntityManagerInterface::class);
+            ->getStub();
+        $entityManager = $this->createStub(EntityManagerInterface::class);
         $entityManager->method('getRepository')
-            ->willReturnCallback(function ($class) use ($seriesRepo, $pageRepo) {
-                return $class === Series::class ? $seriesRepo : $pageRepo;
+            ->willReturnCallback(function ($class) use ($seriesRepository, $pageRepository) {
+                return $class === Series::class ? $seriesRepository : $pageRepository;
             });
-        $seriesItemPage = $this->createConfiguredMock(Page::class, [
+        $seriesItemPage = $this->createConfiguredStub(Page::class, [
             'getId' => Uuid::uuid1(),
         ]);
-        $seriesGroup = $this->createMock(Series::class);
+        $seriesGroup = $this->createStub(Series::class);
         $seriesGroup->method('getItems')
             ->willReturn(new ArrayCollection([$seriesItemPage]));
         $seriesGroup->method('getLastDate')->willReturn(new DateTime('2024-01-02'));
         $seriesGroup->method('getDescription')->willReturn('Some <blockquote>test</blockquote>');
-        $seriesGroup->expects($this->once())->method('setDescription');
-        $seriesRepo->method('getAll')
+        $seriesGroup->method('setDescription');
+        $seriesRepository->method('getAll')
             ->willReturn($this->createMockPaginator([$seriesGroup]));
 
-        $pageResult = $this->createMock(Page::class);
+        $pageResult = $this->createStub(Page::class);
         $pageResult->method('getPostDate')->willReturn(new DateTime('2024-01-01'));
-        $pageRepo->method('getAll')
+        $pageRepository->method('getAll')
             ->willReturn($this->createMockPaginator([$pageResult]));
 
-        $aggregator = new ContentAggregator($entityManager);
+        $aggregator = new ContentAggregator($pageRepository, $seriesRepository);
 
         $result = $aggregator->getHomepageContent();
 
@@ -67,10 +67,10 @@ class ContentAggregatorTest extends TestCase
 
     private function createMockPaginator(array $items): Paginator
     {
-        $paginator = $this->getMockBuilder(Paginator::class)
+        $paginator = $this->getStubBuilder(Paginator::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getIterator', 'count'])
-            ->getMock();
+            ->getStub();
 
         $paginator->method('getIterator')
             ->willReturn(new \ArrayIterator($items));

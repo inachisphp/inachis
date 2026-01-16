@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Repository;
+namespace Inachis\Tests\phpunit\Repository;
 
-use App\Model\SearchResult;
-use App\Repository\SearchRepository;
+use Inachis\Model\SearchResult;
+use Inachis\Repository\SearchRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
@@ -25,8 +25,8 @@ class SearchRepositoryTest extends TestCase
 
     public function setUp(): void
     {
-        $registry = $this->createMock(ManagerRegistry::class);
-        $this->connection = $this->createMock(Connection::class);
+        $registry = $this->createStub(ManagerRegistry::class);
+        $this->connection = $this->createStub(Connection::class);
         $this->repository = new SearchRepository($registry, $this->connection);
     }
 
@@ -65,13 +65,12 @@ class SearchRepositoryTest extends TestCase
             ->willReturn($totalResults);
 
         $this->connection
-            ->expects($this->exactly(2))
             ->method('prepare')
             ->willReturnOnConsecutiveCalls(
-                $this->createConfiguredMock(Statement::class, [
+                $this->createConfiguredStub(Statement::class, [
                     'executeQuery' => $mainStmt
                 ]),
-                $this->createConfiguredMock(Statement::class, [
+                $this->createConfiguredStub(Statement::class, [
                     'executeQuery' => $countStmt
                 ])
             );

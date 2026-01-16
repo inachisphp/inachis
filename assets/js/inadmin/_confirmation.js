@@ -1,24 +1,22 @@
-let InachisConfirmationPrompt = {
+window.Inachis.ConfirmationPrompt = {
     buttons: [
         {
             class: 'button button--info',
             text: 'No, Cancel',
-            click: function ()
-            {
+            click() {
                 $('#dialog__confirmationPrompt').dialog('close');
             }
         },
         {
             class: 'button button--negative',
             text: 'Yes, Delete',
-            click: function ()
-            {
+            click() {
                 $('#dialog__confirmationPrompt').dialog('close');
-                const $form = InachisConfirmationPrompt.$target.closest('form');
+                const $form = window.Inachis.ConfirmationPrompt.$target.closest('form');
 
                 $('<input type="hidden">')
-                    .attr('name', InachisConfirmationPrompt.$target.attr('name'))
-                    .val(InachisConfirmationPrompt.$target.val())
+                    .attr('name', window.Inachis.ConfirmationPrompt.$target.attr('name'))
+                    .val(window.Inachis.ConfirmationPrompt.$target.val())
                     .appendTo($form);
                 $form[0].submit();
             }
@@ -27,59 +25,58 @@ let InachisConfirmationPrompt = {
     originalEvent: null,
     $target: null,
 
-    _init: function()
-    {
-        $('button.button--confirm').on('click', function (event) {
+    _init() {
+        $('button.button--confirm').on('click', (event) => {
             event.preventDefault();
-            InachisConfirmationPrompt.originalEvent = event;
-            InachisConfirmationPrompt.$target = $(event.currentTarget);
-            InachisConfirmationPrompt.createDialog();
+            window.Inachis.ConfirmationPrompt.originalEvent = event;
+            window.Inachis.ConfirmationPrompt.$target = $(event.currentTarget);
+            window.Inachis.ConfirmationPrompt.createDialog();
         });
     },
 
-    createDialog: function ()
-    {
-        let dialogWidth =  420;
+    createDialog() {
+        let dialogWidth = 420;
         if (dialogWidth > $(window).width()) {
             dialogWidth = $(window).width() * 0.795;
         }
         $('<div id="dialog__confirmationPrompt"><p/><div class="loader"></div><p/><p/><p/></div>').dialog({
             buttons: this.buttons,
-            close: function()
-            {
+            close: function () {
                 $(this).dialog('destroy');
                 $(this).parent().remove();
                 $('.fixed-bottom-bar').toggle();
             },
             draggable: false,
             modal: true,
-            open: $.proxy(function()
-            {
+            open: () => {
                 $('.fixed-bottom-bar').toggle();
                 $('.ui-dialog-titlebar-close').addClass('material-icons').html('close');
-                this.getConfirm()
-            }, this),
+                this.getConfirm();
+            },
             resizable: false,
             title: '',
             width: dialogWidth
         });
     },
 
-    getConfirm: function()
-    {
-        let $confirmationPrompt = $('#dialog__confirmationPrompt');
-        $confirmationPrompt.load(Inachis.prefix + '/ax/confirmation/get', {
-            'title': InachisConfirmationPrompt.$target.data('title') ?? '',
-            'entity': InachisConfirmationPrompt.$target.data('entity') ?? '',
-            'warning': InachisConfirmationPrompt.$target.data('warning') ?? '',
-        }, function(responseText, status)
-        {
-            if (status === 'success') {
-                $('.ui-dialog').position({ my: 'center', at: 'center', of: window });
-            }
-        }, $confirmationPrompt);
+    getConfirm() {
+        const $confirmationPrompt = $('#dialog__confirmationPrompt');
+        $confirmationPrompt.load(
+            `${window.Inachis.prefix}/ax/confirmation/get`,
+            {
+                'title': window.Inachis.ConfirmationPrompt.$target.data('title') ?? '',
+                'entity': window.Inachis.ConfirmationPrompt.$target.data('entity') ?? '',
+                'warning': window.Inachis.ConfirmationPrompt.$target.data('warning') ?? '',
+            },
+            (responseText, status) => {
+                if (status === 'success') {
+                    $('.ui-dialog').position({ my: 'center', at: 'center', of: window });
+                }
+            },
+            $confirmationPrompt
+        );
     },
 };
-$(document).ready(function () {
-    InachisConfirmationPrompt._init();
+$(document).ready(() => {
+    window.Inachis.ConfirmationPrompt._init();
 });

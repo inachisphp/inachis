@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Entity;
+namespace Inachis\Tests\phpunit\Entity;
 
-use App\Entity\Tag;
+use Inachis\Entity\Tag;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 

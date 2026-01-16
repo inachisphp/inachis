@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Parser;
+namespace Inachis\Parser;
 
-use App\Entity\Category;
-use App\Entity\Page;
+use Inachis\Entity\Category;
+use Inachis\Entity\Page;
 use DateTime;
 use Doctrine\Persistence\ObjectManager;
 use Exception;

@@ -7,11 +7,13 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Service\Page;
+namespace Inachis\Service\Page;
 
-use App\Entity\Page;
-use App\Entity\Series;
-use App\Util\TextCleaner;
+use Inachis\Entity\Page;
+use Inachis\Entity\Series;
+use Inachis\Repository\PageRepository;
+use Inachis\Repository\SeriesRepository;
+use Inachis\Util\TextCleaner;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -19,19 +21,25 @@ class ContentAggregator
 {
     public const ITEMS_TO_SHOW = 10;
 
-    public function __construct(private readonly EntityManagerInterface $em) {}
+    public function __construct(
+        private readonly PageRepository $pageRepository,
+        private readonly SeriesRepository $seriesRepository,
+    ) {}
 
     public function getHomepageContent(): array
     {
         $data = [];
         $excludePages = [];
 
-        $series = $this->em->getRepository(Series::class)->getAll(
+        $series = $this->seriesRepository->getAll(
             0,
             self::ITEMS_TO_SHOW,
             [
-                'q.lastDate < :postDate',
-                ['postDate' => new DateTime()]
+                'q.lastDate < :postDate AND q.visibility = :visibility',
+                [
+                    'postDate' => new DateTime(),
+                    'visibility' => Series::PUBLIC,
+                ],
             ],
             [['q.lastDate', 'DESC']]
         );
@@ -62,7 +70,7 @@ class ContentAggregator
             $pageParameters['excludedPages'] = $excludePages;
         }
 
-        $pages = $this->em->getRepository(Page::class)->getAll(
+        $pages = $this->pageRepository->getAll(
             0,
             self::ITEMS_TO_SHOW,
             [$pageQuery, $pageParameters],

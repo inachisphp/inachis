@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Security;
+namespace Inachis\Security;
 
-use App\Exception\InvalidContentSecurityPolicyException;
+use Inachis\Exception\InvalidContentSecurityPolicyException;
 
 /**
  * Object for managing CSP headers which should be valid

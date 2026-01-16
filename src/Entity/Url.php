@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Entity;
+namespace Inachis\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
@@ -18,7 +18,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * Object for handling custom URLs that are mapped to content.
  */
-#[ORM\Entity(repositoryClass: 'App\Repository\UrlRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\UrlRepository', readOnly: false)]
 #[ORM\Index(columns: [ 'linkCanonical' ], name: 'search_idx')]
 class Url
 {
@@ -39,7 +39,7 @@ class Url
     /**
      * @var Page The UUID of the content of the type specified by @see
      */
-    #[ORM\ManyToOne(targetEntity: 'App\Entity\Page', fetch: 'EAGER', inversedBy: 'urls')]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\Page', fetch: 'EAGER', inversedBy: 'urls')]
     #[ORM\JoinColumn(name: 'content_id', referencedColumnName: 'id')]
     protected Page $content;
 
