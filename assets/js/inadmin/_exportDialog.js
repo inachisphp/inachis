@@ -12,12 +12,13 @@ window.Inachis.Export = {
         }
     ],
 
-    _init: function()
-    {
+    init() {
         this.updateDialogButtons();
-        const $exportList = $('.export__options ul'),
-            $selectedItems = $('.content__list input.checkbox:checked');
-        if ($selectedItems.length == 0) {
+
+        const $exportList = $('.export__options ul');
+        const $selectedItems = $('.content__list input.checkbox:checked');
+
+        if ($selectedItems.length === 0) {
             $('#dialog__export').dialog('close');
         }
         for (let i = 0; i < $selectedItems.length; i++) {
@@ -31,32 +32,38 @@ window.Inachis.Export = {
                 height: 20,
                 width: 40
             };
-            if ($(this).attr('data-label-on')) {
-                $properties.on_label = $(this).attr('data-label-on');
-            }
-            if ($(this).attr('data-label-off')) {
-                $properties.off_label = $(this).attr('data-label-off');
-            }
+            const $el = $(this);
+            const data = $(this).data();
+
+            if (data.labelOn)  $properties.on_label  = data.labelOn;
+            if (data.labelOff) $properties.off_label = data.labelOff;
+
             $(this).switchButton($properties);
         });
     },
 
-    updateDialogButtons: function()
-    {
+    updateDialogButtons() {
         $('#dialog__export').dialog('option', 'buttons', this.buttons.concat(window.Inachis.Dialog.buttons));
     },
 
-    listify: function(listItem)
-    {
+    listify(listItem) {
         try {
-            let listItem__Title = listItem.nextElementSibling.children[0].innerText.replace(/ draft/, ''),
-                listItem__Id =  listItem.value;
-            return '<li><input type="hidden" name="postId[]" value="' + listItem__Id + '" />' + listItem__Title  + '</li>';
-        } catch (err) {
-            if (console) {
-                console.log('Unable to find title for export item:');
-                console.log(listItem);
+            const labelEl = listItem.nextElementSibling?.children?.[0];
+            if (!labelEl) {
+                throw new Error('Missing label element');
             }
+            const title = labelEl.textContent.replace(/ draft$/, '');
+            const id = listItem.value;
+
+            return `
+                <li>
+                    <input type="hidden" name="postId[]" value="${id}" />
+                    ${title}
+                </li>
+            `;
+        } catch (err) {
+            console.warn('Unable to find title for export item:', listItem);
+            return null;
         }
     }
 };
