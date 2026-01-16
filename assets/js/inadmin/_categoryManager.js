@@ -1,15 +1,13 @@
 window.Inachis.CategoryManager = {
-    buttons: [ ],
+    buttons: [],
     saveUrl: '',
 
-    _init: function()
-    {
-        let $categoryManager = $('#dialog__categoryManager'),
-            $categoryMangerTree = $categoryManager.find('ol');
-        $(document).on('keyup', '#dialog__categoryManager__new', function(event)
-        {
-            let $targetElement = $(event.currentTarget),
-                $createButton = $('.ui-dialog-buttonset').find('.button--positive').first();
+    _init() {
+        const $categoryManager = $('#dialog__categoryManager');
+        const $categoryMangerTree = $categoryManager.find('ol');
+        $(document).on('keyup', '#dialog__categoryManager__new', (event) => {
+            const $targetElement = $(event.currentTarget);
+            const $createButton = $('.ui-dialog-buttonset').find('.button--positive').first();
             if ($targetElement.val() === '' || /[^a-z0-9\s\-_'"]/i.test($targetElement.val().normalize('NFD').replace(/[\u0300-\u036f]/g, ''))) {
                 $createButton.prop('disabled', true);
                 return;
@@ -31,8 +29,7 @@ window.Inachis.CategoryManager = {
         $('[data-action=import_categories]').on('click', this.import);
     },
 
-    showHideAddCategory: function()
-    {
+    showHideAddCategory() {
         window.Inachis.CategoryManager.toggleAreasForEditing();
         $('#dialog__categoryManager__new').val('');
         $('#dialog__categoryManager__description').val('');
@@ -42,9 +39,8 @@ window.Inachis.CategoryManager = {
         $('#dialog__categoryManager .info').hide();
     },
 
-    showEditCategory: function(event)
-    {
-        let target = $(event.currentTarget);
+    showEditCategory(event) {
+        const target = $(event.currentTarget);
         window.Inachis.CategoryManager.toggleAreasForEditing();
         $('#dialog__categoryManager__new').val(target.data('title'));
         $('#dialog__categoryManager__description').val(target.data('description'));
@@ -59,23 +55,20 @@ window.Inachis.CategoryManager = {
         window.Inachis.CategoryManager.checkCategoryUsed(target.data('id'));
     },
 
-    checkCategoryUsed: function(categoryId)
-    {
+    checkCategoryUsed(categoryId) {
         $.ajax(
-            window.Inachis.prefix + '/ax/categoryManager/usage',
+            `${window.Inachis.prefix}/ax/categoryManager/usage`,
             {
                 data: { 'id': categoryId, },
-                error: function(xhr, textStatus, errorThrown)
-                {
+                error: (xhr, textStatus, errorThrown) => {
                     $('#dialog__categoryManager .flash')
                         .html(errorThrown)
                         .removeClass('flash-success')
                         .addClass('flash-warning')
-                    ;
+                        ;
                 },
                 method: 'POST',
-                success: function(data)
-                {
+                success: (data) => {
                     if (data.count === 0) {
                         $('#dialog__categoryManager__delete')
                             .prop('disabled', false).prop('aria-disabled', false);
@@ -87,8 +80,7 @@ window.Inachis.CategoryManager = {
         );
     },
 
-    toggleAreasForEditing: function()
-    {
+    toggleAreasForEditing() {
         $('#dialog__categoryManager ol input[type=radio]').toggle();
         $('#dialog__categoryManager__top-level-category').toggle();
         $('#dialog__categoryManager__as-subcat').toggle();
@@ -96,30 +88,28 @@ window.Inachis.CategoryManager = {
         $('#dialog__categoryManager__add-edit-category').toggle();
         $('#dialog__categoryManager li>span>a').toggle();
         $('#dialog__imageManager__addnew').toggle();
-        $('#dialog__categoryManager').animate({ scrollTop:0}, 100);
+        $('#dialog__categoryManager').animate({ scrollTop: 0 }, 100);
         $('#dialog__categoryManager__delete')
             .prop('disabled', true)
             .prop('aria-disabled', true);
     },
 
-    saveNewCategory: function(event)
-    {
+    saveNewCategory(event) {
         event.preventDefault();
         $('#dialog__categoryManager form')[0].reportValidity();
-        let $newCategory = {
+        const $newCategory = {
             id: $('#dialog__categoryManager__id').first(),
             title: $('#dialog__categoryManager__new').first(),
             description: $('#dialog__categoryManager__description').first(),
             visible: $('#dialog__categoryManager__visible')[0].checked,
-            },
-        $parentCategory = $('input[name="catParent\[\]"]:checked'),
-        $createCategory = $('#dialog__categoryManager__save').first();
+        };
+        const $parentCategory = $('input[name="catParent\\[\\]"]:checked');
+        const $createCategory = $('#dialog__categoryManager__save').first();
         $createCategory.prop('disabled', true).html('Saving…');
         $.ajax(
-            Inachis.prefix + '/ax/categoryManager/save',
+            `${Inachis.prefix}/ax/categoryManager/save`,
             {
-                complete: function()
-                {
+                complete: () => {
                     $('#dialog__categoryManager__save').first().prop('disabled', false).html('Save');
                 },
                 data: {
@@ -129,46 +119,41 @@ window.Inachis.CategoryManager = {
                     'visible': $newCategory.visible,
                     'parentID': $parentCategory.val(),
                 },
-                error: function(xhr, textStatus, errorThrown)
-                {
+                error: (xhr, textStatus, errorThrown) => {
                     $('#dialog__categoryManager .flash')
                         .html(errorThrown)
                         .removeClass('flash-success')
                         .addClass('flash-warning');
                 },
                 method: 'POST',
-                success: function(data)
-                {
+                success: (data) => {
                     window.Inachis.CategoryManager.showHideAddCategory();
                     window.Inachis.CategoryManager.fetchCategoryList();
                     $('#dialog__categoryManager .flash')
                         .html(data.success)
                         .removeClass('flash-warning')
                         .addClass('flash-success')
-                    ;
+                        ;
                 },
             }
         );
     },
 
-    removeCategory: function()
-    {
+    removeCategory() {
         $.ajax(
-            window.Inachis.prefix + '/ax/categoryManager/delete',
+            `${window.Inachis.prefix}/ax/categoryManager/delete`,
             {
                 data: {
                     'id': $('#dialog__categoryManager__id').val(),
                 },
-                error: function(xhr, textStatus, errorThrown)
-                {
+                error: (xhr, textStatus, errorThrown) => {
                     $('#dialog__categoryManager .flash')
                         .html(errorThrown)
                         .removeClass('flash-success')
                         .addClass('flash-warning');
                 },
                 method: 'POST',
-                success: function()
-                {
+                success: () => {
                     $('#dialog__categoryManager .flash')
                         .html('Category removed')
                         .removeClass('flash-success')
@@ -180,24 +165,21 @@ window.Inachis.CategoryManager = {
         );
     },
 
-    fetchCategoryList: function()
-    {
+    fetchCategoryList() {
         $.ajax(
-            window.Inachis.prefix + '/ax/categoryManager/list',
+            `${window.Inachis.prefix}/ax/categoryManager/list`,
             {
-                data: { },
-                error: function(xhr, textStatus, errorThrown)
-                {
+                data: {},
+                error: (xhr, textStatus, errorThrown) => {
                     $('#dialog__categoryManager .flash')
                         .html(errorThrown)
                         .removeClass('flash-success')
                         .addClass('flash-warning')
-                    ;
+                        ;
                 },
                 method: 'POST',
-                success: function(data)
-                {
-                    let $categoryMangerTree = $('#dialog__categoryManager ol');
+                success: (data) => {
+                    const $categoryMangerTree = $('#dialog__categoryManager ol');
                     $categoryMangerTree.html(data);
                     $categoryMangerTree.data('bonsai').update();
                     $categoryMangerTree.data('bonsai').collapseAll();
@@ -210,13 +192,11 @@ window.Inachis.CategoryManager = {
         );
     },
 
-    export: function()
-    {
+    export() {
         // download a json file
     },
 
-    import: function()
-    {
+    import() {
         // @todo show dropzone dialog for uploading a json file
     },
 };

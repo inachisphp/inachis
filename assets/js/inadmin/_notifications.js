@@ -2,24 +2,22 @@
 window.Inachis.Notifications = {
 	_pageTitle: '',
 
-	_init: function()
-	{
+	_init() {
 		this._pageTitle = document.title;
 
 		// add event handler for checking for updates
 	},
 
-	updateTitle: function (notificationCount)
-	{
+	updateTitle(notificationCount) {
 		if (notificationCount > 0) {
-			document.title = '(' + notificationCount + ') ' + document.title;
+			document.title = `(${notificationCount}) ${document.title}`;
 		} else {
 			//document.title = document.title;
 		}
-		
+
 	}
 };
 
-$(document).ready(function () {
+$(document).ready(() => {
 	window.Inachis.Notifications._init();
 });

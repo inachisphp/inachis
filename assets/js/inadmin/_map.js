@@ -4,74 +4,67 @@ window.Inachis.Map = {
 	retina: false,
 	targetMap: null,
 
-	_init: function ()
-	{
+	_init() {
 		this.showGeoLocation = location.protocol === 'https:' && 'geolocation' in navigator;
-		$('.ui-map').each($.proxy(this._initMap, this));
-		$(document).on('click', '.ui-cross', $.proxy(this.clear, this));
-		$(document).on('click', '.ui-geo', $.proxy(this.getGeoLocation, this));
+		$('.ui-map').each((i, el) => this._initMap(i, el));
+		$(document).on('click', '.ui-cross', (e) => this.clear(e));
+		$(document).on('click', '.ui-geo', (e) => this.getGeoLocation(e));
 	},
 
-	_initMap: function (index, mapElement)
-	{
+	_initMap(index, mapElement) {
 		if (this.key === null) {
 			this.key = $(mapElement).attr('data-google-key')
 		}
 		mapElement.type = 'hidden';
-		var mapName = (mapElement.name || mapElement.id);
-		var mapBox = $('<div class="mapbox" id="' + mapName + '__map"></div>');
+		const mapName = (mapElement.name || mapElement.id);
+		const mapBox = $(`<div class="mapbox" id="${mapName}__map"></div>`);
 		$(mapElement).after(mapBox);
 
 		this.addMap($(mapElement), mapName, mapBox);
 
-		var searchBox = $('<label class="material-icons" for="' + mapName + '__search"><span>search<span></label><input class="search" id="' + mapName + '__search" placeholder="Search for location…" type="search" />');
+		const searchBox = $(`<label class="material-icons" for="${mapName}__search"><span>search<span></label><input class="search" id="${mapName}__search" placeholder="Search for location…" type="search" />`);
 		$(mapBox).after(searchBox);
-		$(document).on('keyup', '#' + mapName + '__search', $.proxy(this.search, this));
+		$(document).on('keyup', `#${mapName}__search`, (e) => this.search(e));
 
 		if (this.showGeoLocation) {
-			var getGeoButton = $('<a href="#" class="material-icons ui-geo" data-map-element="' + mapName + '">my_location</a>');
+			const getGeoButton = $(`<a href="#" class="material-icons ui-geo" data-map-element="${mapName}">my_location</a>`);
 			$(mapBox).after(getGeoButton);
 		}
 	},
 
-	addMap: function (mapElement, mapName, mapBox)
-	{
+	addMap(mapElement, mapName, mapBox) {
 		if (mapElement.val() !== '') {
-			var mapClear = $('<a class="material-icons ui-cross" href="#">clear</a>');
+			const mapClear = $('<a class="material-icons ui-cross" href="#">clear</a>');
 			$(mapElement).after(mapClear);
 			$(mapBox).empty();
-			$(mapBox).append($('<img src="' + window.Inachis.Map._generateGoogleMapsImage(mapName, mapElement) + '" />'));
+			$(mapBox).append($(`<img src="${window.Inachis.Map._generateGoogleMapsImage(mapName, mapElement)}" />`));
 		} else {
 			this.addNoMapMessage(mapBox);
 		}
 	},
 
-	addNoMapMessage: function (mapBox)
-	{
+	addNoMapMessage(mapBox) {
 		$(mapBox).empty();
 		$(mapBox).append($('<p>This content doesn\'t appear on the map! Search for a location to add it.</p>'));
 	},
 
-	updateMap: function (mapElement, mapName, mapBox)
-	{
+	updateMap(mapElement, mapName, mapBox) {
 		if (mapElement.val() !== '') {
 			$(mapBox).find('img').attr('src', window.Inachis.Map._generateGoogleMapsImage(mapName, mapElement));
 		}
 	},
 
-	addUpdateMap: function (mapElement, mapName, mapBox)
-	{
+	addUpdateMap(mapElement, mapName, mapBox) {
 		if (mapElement.val() === '') {
 			return;
 		}
-		if ($(mapBox ).has('img').length === 0) {
+		if ($(mapBox).has('img').length === 0) {
 			return this.addMap(mapElement, mapName, mapBox);
 		}
 		this.updateMap(mapElement, mapName, mapBox);
 	},
 
-	search: function (event)
-	{
+	search(event) {
 		if (event.keyCode !== 13) {
 			return;
 		}
@@ -81,69 +74,61 @@ window.Inachis.Map = {
 		return false;
 	},
 
-	clear: function (event)
-	{
+	clear(event) {
 		event.preventDefault();
 		$(event.currentTarget).prev().val('');
-		this.addNoMapMessage($('#' + $(event.currentTarget).prev().attr('id') + '__map'));
+		this.addNoMapMessage($(`#${$(event.currentTarget).prev().attr('id')}__map`));
 		$(event.currentTarget).remove();
 	},
 
-	_generateGoogleMapsImage: function (mapName, mapElement)
-	{
-		var baseUri = 'https://maps.googleapis.com/maps/api/staticmap?',
-			size = this._getMapDimensionsAsString('#' + mapName + '__map'),
-			center = mapElement.val(),
-			zoom = 15,
-			key = this.key;
+	_generateGoogleMapsImage(mapName, mapElement) {
+		let baseUri = 'https://maps.googleapis.com/maps/api/staticmap?';
+		const size = this._getMapDimensionsAsString(`#${mapName}__map`);
+		const center = mapElement.val();
+		const zoom = 15;
+		const key = this.key;
 		baseUri += this.retina ? 'scale=2&' : '';
-		return baseUri + 'center=' + center + '&zoom=' + zoom + '&size=' + size + '&markers=' + mapElement.val() + '&key=' + key;
+		return `${baseUri}center=${center}&zoom=${zoom}&size=${size}&markers=${mapElement.val()}&key=${key}`;
 	},
 
-	_getMapDimensions: function (mapElement)
-	{
-		return [ $(mapElement).innerWidth(), $(mapElement).innerHeight() ];
+	_getMapDimensions(mapElement) {
+		return [$(mapElement).innerWidth(), $(mapElement).innerHeight()];
 	},
 
-	_getMapDimensionsAsString: function (mapElement)
-	{
-		return $(mapElement).innerWidth() + 'x' + $(mapElement).innerHeight();
+	_getMapDimensionsAsString(mapElement) {
+		return `${$(mapElement).innerWidth()}x${$(mapElement).innerHeight()}`;
 	},
 
-	getGoogleGeocode: function (location)
-	{
-		var baseUri = 'https://maps.googleapis.com/maps/api/geocode/json?';
+	getGoogleGeocode(location) {
+		const baseUri = 'https://maps.googleapis.com/maps/api/geocode/json?';
 		$.ajax({
-			url: baseUri + 'address=' + location + '&key=' + this.key,
+			url: `${baseUri}address=${location}&key=${this.key}`,
 
-		}).done($.proxy(this._processGeocodeResult, this));
+		}).done((result) => this._processGeocodeResult(result));
 	},
 
-	_processGeocodeResult: function (result)
-	{
+	_processGeocodeResult(result) {
 		if (result.status !== 'OK') {
-			window.Inachis._log(result.status + ': ' + result.error_message);
+			window.Inachis._log(`${result.status}: ${result.error_message}`);
 			return;
 		}
-		var $targetMap = $('#' + this.targetMap);
-		$targetMap.attr('value', result.results[0].geometry.location.lat + ',' + result.results[0].geometry.location.lng);
-		this.addUpdateMap($targetMap, this.targetMap, $('#' + this.targetMap + '__map'));
+		const $targetMap = $(`#${this.targetMap}`);
+		$targetMap.attr('value', `${result.results[0].geometry.location.lat},${result.results[0].geometry.location.lng}`);
+		this.addUpdateMap($targetMap, this.targetMap, $(`#${this.targetMap}__map`));
 	},
 
-	getGeoLocation: function (event)
-	{
+	getGeoLocation(event) {
 		event.preventDefault();
 
-		navigator.geolocation.getCurrentPosition($.proxy(function (position)
-		{
-			var mapName = $(event.currentTarget).attr('data-map-element');
-			var mapElement = $('#' + mapName);
-			mapName.val(position.coords.latitude + ',' + position.coords.longitude);
-			this.addUpdateMap(mapElement, mapName, $(mapName + '__map'));
-		}, event));
+		navigator.geolocation.getCurrentPosition((position) => {
+			const mapName = $(event.currentTarget).attr('data-map-element');
+			const mapElement = $(`#${mapName}`);
+			mapName.val(`${position.coords.latitude},${position.coords.longitude}`);
+			this.addUpdateMap(mapElement, mapName, $(`${mapName}__map`));
+		});
 	}
 };
 
-$(document).ready(function () {
+$(document).ready(() => {
 	window.Inachis.Map._init();
 });

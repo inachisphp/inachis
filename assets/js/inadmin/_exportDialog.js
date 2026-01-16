@@ -4,8 +4,7 @@ window.Inachis.Export = {
             class: 'button button--positive',
             text: 'Export',
             type: 'submit',
-            click: function (event)
-            {
+            click(event) {
                 $('#dialog__export form').submit();
                 $('#dialog__export').dialog('close');
             }
@@ -24,8 +23,7 @@ window.Inachis.Export = {
         for (let i = 0; i < $selectedItems.length; i++) {
             $exportList.append(this.listify($selectedItems[i]));
         }
-        $('.ui-switch').each(function ()
-        {
+        $('.ui-switch').each(function () {
             let $properties = {
                 checked: this.checked,
                 clear: true,
@@ -35,7 +33,7 @@ window.Inachis.Export = {
             const $el = $(this);
             const data = $(this).data();
 
-            if (data.labelOn)  $properties.on_label  = data.labelOn;
+            if (data.labelOn) $properties.on_label = data.labelOn;
             if (data.labelOff) $properties.off_label = data.labelOff;
 
             $(this).switchButton($properties);
