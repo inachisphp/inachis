@@ -171,7 +171,7 @@
                         <td>{{ revision.user.displayName }}</td>
                         <td>{{ revision.action }}</td>
                         <td>
-                            <a href="{{ path('app_page_post_revision_diff', { 'id': revision.id}) }}" class="button button--info"><span class="material-icons">compare_arrows</span> {% trans %}admin.post.revision.view{% endtrans %}</a>
+                            <a href="{{ path('inachis_page_post_revision_diff', { 'id': revision.id}) }}" class="button button--info"><span class="material-icons">compare_arrows</span> {% trans %}admin.post.revision.view{% endtrans %}</a>
                             <a href="{{ path('incc_post_download', { 'id': revision.id }) }}" class="button button--info"><span class="material-icons">save_alt</span> {% trans %}admin.post.revision.download{% endtrans %}</a>
                             <button class="button button--negative" type="button"><span class="material-icons">undo</span> {% trans %}admin.post.revision.revert{% endtrans %}</button>
                         </td>

@@ -9,9 +9,7 @@
 
 namespace Inachis\Form;
 
-use Inachis\Entity\Category;
-use Inachis\Entity\Page;
-use Inachis\Entity\Tag;
+use Inachis\Entity\{Category,Page,Tag};
 use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
 use IntlException;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -150,11 +148,12 @@ class PostType extends AbstractType
                     $options['data']->getCategories()->toArray() : [],
                 'class'        => Category::class,
                 'attr'         => [
-                    'aria-labelledby'  => 'categories_label',
-                    'aria-required'    => 'false',
-                    'class'            => 'js-select halfwidth',
-                    'data-placeholder' => $this->translator->trans('admin.post.properties.categories.placeholder'),
-                    'data-url'         => $this->router->generate('app_dialog_categorydialog_getcategorymanagerlistcontent'),
+                    'aria-labelledby' => 'categories_label',
+                    'aria-required' => 'false',
+                    'class' => 'js-select halfwidth',
+                    'placeholder' => $this->translator->trans('admin.post.properties.categories.placeholder'),
+                    'data-url' => $this->router->generate('inachis_dialog_categorydialog_getcategorymanagerlistcontent'),
+                    'data-render-description-field' => 'path',
                 ],
                 'label'      => 'admin.post.properties.categories.label',
                 'label_attr' => [
@@ -170,7 +169,7 @@ class PostType extends AbstractType
                     'aria-required'    => 'false',
                     'class'            => 'js-select halfwidth',
                     'data-tags'        => 'true',
-                    'data-url'         => $this->router->generate('app_tags_gettagmanagerlistcontent'),
+                    'data-url'         => $this->router->generate('inachis_tags_gettagmanagerlistcontent'),
                 ],
                 'choices'      => isset($options['data']) ? $options['data']->getTags()->toArray() : [],
                 'choice_label' => 'title',
