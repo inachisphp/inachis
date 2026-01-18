@@ -66,7 +66,7 @@ window.Inachis.BulkCreateDialog = {
     },
 
     initInputs() {
-        window.Inachis.Components.initSelect2('.ui-dialog ');
+        window.Inachis.Components.initTomSelect('.ui-dialog ');
         $('#bulk_title').on('keyup', this.validateInputs);
         $('#dialog__bulkCreate input[type=date]').each(function () {
             $(this).prop('type', 'text');

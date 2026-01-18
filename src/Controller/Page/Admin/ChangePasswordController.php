@@ -22,7 +22,6 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints\PasswordStrengthValidator;
 
-#[IsGranted('ROLE_ADMIN')]
 class ChangePasswordController extends AbstractInachisController
 {
     /**
@@ -33,6 +32,7 @@ class ChangePasswordController extends AbstractInachisController
      * @return Response
      */
     #[Route("/incc/admin/{id}/change-password", name: "incc_admin_change_password", methods: [ "GET", "POST" ])]
+    #[IsGranted('ROLE_ADMIN')]
     public function changePasswordTab(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
