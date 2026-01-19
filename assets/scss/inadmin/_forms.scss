@@ -29,10 +29,19 @@
 	}
 
 	.js-select {
+		display: inline-block;
 		width: 100%;
 
 		@media #{$information-medium} {
-			width: 40%;
+			width: 60%;
+		}
+	}
+	.ts-dropdown-content {
+		input {
+			width: auto;
+		}
+		small {
+			display: block;
 		}
 	}
 }

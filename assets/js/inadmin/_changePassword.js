@@ -13,7 +13,14 @@ window.Inachis.PasswordManager = {
                         data: { password: $($passwordStrength.data('source')).val() },
                         method: 'POST',
                     }).done((data) => {
-                        $passwordStrength.val(data + 1);
+                        const strengthValue = Number(data);
+
+                        if (!Number.isFinite(strengthValue)) {
+                            console.error('Invalid password strength value:', data);
+                            return;
+                        }
+
+                        $passwordStrength.val(strengthValue + 1);
                         const strength = {
                             0: 'Very weak',
                             1: 'Weak',
@@ -21,8 +28,11 @@ window.Inachis.PasswordManager = {
                             3: 'Strong',
                             4: 'Very strong',
                         }
-                        $passwordStrength.html(`Password strength: ${strength[data]}`);
-                        $('#password-strength-help').html(`Password strength: ${strength[data]}`);
+
+                        const label = strength[strengthValue] ?? 'Unknown';
+
+                        $passwordStrength.html(`Password strength: ${label}`);
+                        $('#password-strength-help').html(`Password strength: ${label}`);
                     });
                 }
             }, 500);

@@ -37,7 +37,7 @@
                         <span class="material-icons">{% if item.status == 'published' %}visibility{% else %}visibility_off{% endif %}</span>
                     </td>
                     <td>
-                        <a aria-label="Edit item" href="/incc/{{ item.type }}/{{ item.urls|first.link }}" title="Edit {{ item.title }}"><span class="material-icons">edit_note</span></a>
+                        <a aria-label="Edit item" href="/incc/{{ item.type }}/{{ item.urls|first.link|default('') }}" title="Edit {{ item.title }}"><span class="material-icons">edit_note</span></a>
                     </td>
                 </tr>
             {% endfor %}

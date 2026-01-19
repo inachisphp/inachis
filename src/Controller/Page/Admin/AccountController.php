@@ -75,9 +75,7 @@ class AccountController extends AbstractInachisController
 
     /**
      * @param Request $request
-     * @param MailerInterface $mailer
      * @param PasswordResetRequestRepository $passwordResetRequestRepository
-     * @param PasswordResetTokenService $tokenService
      * @param RateLimiterFactoryInterface $forgotPasswordIpLimiter
      * @param RateLimiterFactoryInterface $forgotPasswordAccountLimiter
      * @param UserRepository $userRepository

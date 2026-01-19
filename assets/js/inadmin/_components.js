@@ -1,3 +1,5 @@
+const { default: TomSelect } = require("tom-select");
+
 window.Inachis.Components = {
 	initialize() {
 		this.initClearSearch('');
@@ -5,7 +7,7 @@ window.Inachis.Components = {
 		this.initDatePicker();
 		this.initFilterBar();
 		this.initPasswordToggle();
-		this.initSelect2('');
+		this.initTomSelect('');
 		this.initSelectAllNone('');
 		this.initSeriesControls();
 		this.initSwitches('');
@@ -94,43 +96,80 @@ window.Inachis.Components = {
 			}
 		});
 	},
-	// See https://select2.github.io/examples.html
-	initSelect2(selector) {
-		$(`${selector}.js-select`).each(function () {
-			const $properties = {
-				allowClear: true,
-				maximumInputLength: 20,
-				width: 'element',
+	initTomSelect(selector) {
+		document.querySelectorAll(selector + '.js-select').forEach(el => {
+			const descriptionField = el.dataset.renderDescriptionField;
+			const isTags = el.dataset.tags === 'true';
+			const minQueryLength = 2;
+
+			const options = {
+				maxItems: isTags ? null : 1,
+				valueField: 'id',
+				labelField: 'text',
+				searchField: 'text',
+				sortField: 'text',
+				create: isTags,
+				persist: isTags ? false : undefined,
+				loadThrottle: 300,
+
+				plugins: {
+					clear_button: { title: 'Remove all selected options' },
+					...(isTags
+						? {
+							checkbox_options: {
+								checkedClassNames: ['ts-checked'],
+								uncheckedClassNames: ['ts-unchecked']
+							},
+							remove_button: { title: 'Remove this item' }
+						}
+						: {}
+					)
+				},
+
+				load: el.dataset.url
+				? function(query, callback) {
+					query = query.trim();
+					if (query.length < minQueryLength) return callback([]);
+					fetch(el.dataset.url, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+						body: new URLSearchParams({ q: query })
+					})
+						.then(res => res.json())
+						.then(json => callback(json.items || []))
+						.catch(err => {
+							console.error('TomSelect load error:', err);
+							callback([]);
+						});
+					}
+				: undefined,
+
+				shouldLoad: query => query.trim().length >= minQueryLength,
+
+				render: {
+					option: function(item, escape) {
+						let desc = descriptionField ? item[descriptionField] || '' : '';
+						if (desc.length > 50) desc = desc.slice(0, 47) + '…';
+						return `<div role="option" aria-label="${escape(item.text)}${desc ? ' ' + escape(desc) : ''}">
+								${escape(item.text)}
+								${desc ? `<small>${escape(desc)}</small>` : ''}
+								</div>`;
+					},
+					item: function(item, escape) {
+						return `<div>${escape(item.text)}</div>`;
+					},
+					no_results: function() {
+						return '<div class="no-results" role="alert" aria-live="polite">No matching options</div>';
+					}
+				},
+
+				maxOptions: 100
 			};
-			if ($(this).attr('data-tags')) {
-				$properties.tags = 'true';
-				$properties.tokenSeparators = [','];
-			}
-			if ($(this).attr('data-url')) {
-				$properties.ajax = {
-					url: $(this).attr('data-url'),
-					dataType: 'json',
-					data: function (params) {
-						return {
-							q: params.term,
-							page: params.page
-						};
-					},
-					delay: 250,
-					method: 'POST',
-					processResults: function (data, params) {
-						params.page = params.page || 1;
-						return {
-							results: data.items,
-							pagination: {
-								more: (params.page * 25) < data.totalCount
-							}
-						};
-					},
-					cache: false
-				};
-			}
-			$(this).select2($properties);
+
+			if (!el.placeholder) el.setAttribute('aria-label', 'Select an option');
+			el.classList.add('wcag-select');
+
+			new TomSelect(el, options);
 		});
 	},
 	initSelectAllNone(selector) {

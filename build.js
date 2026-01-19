@@ -40,8 +40,6 @@ const builds = [
         entryPoints: ["assets/js/inadmin.js"],
         outfile: "public/assets/js/incc/scripts.min.js"
     },
-    // add process to copy dropzone.min.js, jquery.datetimepicker.full.min.js, and jquery.switchButton.js
-    // as well as easymde and select2 from node_modules
 
     {
         ...jsBaseConfig,
@@ -101,7 +99,7 @@ async function copyExtraLibraries() {
         "assets/js/inadmin/jquery.switchButton.js",
         "assets/scss/inadmin/jquery.switchButton.css",
         "node_modules/easymde/dist/easymde.min.js",
-        "node_modules/select2/dist/js/select2.min.js"
+        "node_modules/tom-select/dist/js/tom-select.complete.min.js"
     ];
 
     const destDirJs = "public/assets/js/incc/";
