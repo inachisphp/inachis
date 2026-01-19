@@ -1,8 +1,17 @@
 window.Inachis.CategoryManager = {
     buttons: [],
+    penzaiTree: null,
     saveUrl: '',
 
     _init() {
+        const categoryManager = document.getElementById('dialog__categoryManager');
+        const categoryManagerTree = categoryManager.querySelector('ol');
+
+        this.penzaiTree = penzai(categoryManagerTree, {
+            checkboxes: false,
+            expandAll: false,
+        });
+
         const $categoryManager = $('#dialog__categoryManager');
         const $categoryMangerTree = $categoryManager.find('ol');
         $(document).on('keyup', '#dialog__categoryManager__new', (event) => {
@@ -14,12 +23,8 @@ window.Inachis.CategoryManager = {
             }
             $createButton.removeAttr('disabled');
         });
-        $categoryMangerTree.bonsai({
-            expandAll: true
-        });
-        $categoryMangerTree.bonsai('collapseAll');
 
-        window.Inachis.CategoryManager.initSwitches('#dialog__categoryManager');
+        window.Inachis.Components.initSwitches('#dialog__categoryManager');
         $('#dialog__imageManager__addnew').on('click', this.showHideAddCategory);
         $('#dialog__categoryManager__cancel').on('click', this.showHideAddCategory);
         $('#dialog__categoryManager__save').on('click', this.saveNewCategory);
@@ -181,8 +186,8 @@ window.Inachis.CategoryManager = {
                 success: (data) => {
                     const $categoryMangerTree = $('#dialog__categoryManager ol');
                     $categoryMangerTree.html(data);
-                    $categoryMangerTree.data('bonsai').update();
-                    $categoryMangerTree.data('bonsai').collapseAll();
+                    this.penzaiTree.update();
+                    this.penzaiTree.collapseAll();
                     $('#dialog__categoryManager li>span>a').on(
                         'click',
                         window.Inachis.CategoryManager.showEditCategory

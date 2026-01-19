@@ -1,0 +1,88 @@
+#dialog__categoryManager .info {font-size:0.8em;}
+
+.penzai {
+  margin: 0;
+  padding: 0;
+
+  &, ul, ol {
+    list-style: none;
+    overflow: hidden;
+  }
+  ul, ol {
+    margin: 0;
+    padding-left: 18px;
+    display: none;
+  }
+  li {
+    position: relative;
+    padding: 2px 0;
+    line-height: 18px;
+    white-space: nowrap;
+
+    &[aria-expanded="true"] > ul,
+    &[aria-expanded="true"] > ol {
+      display: block;
+    }
+    &>span {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.2em;
+
+      &:hover { background-color: #eee; }
+    }
+  }
+  a, a:visited {
+    font-size: 0.9em;
+    vertical-align: middle;
+  }
+  input {
+    width: auto;
+  }
+  label, .ui-dialog & label {
+    margin-left: 10px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .all, .none {
+    cursor: pointer;
+  }
+  .material-icons {
+    font-size: 1.3em;
+    vertical-align: middle;
+  }
+}
+
+/* disclosure triangle */
+.penzai-disclosure {
+  cursor: pointer;
+  margin: 0.15em 0 0 0em;
+  position: absolute;
+  text-align: center;
+  vertical-align: middle;
+
+  &::before {
+    content: "▶";
+    font-size: 11px;
+    line-height: 16px;
+  }
+}
+
+.penzai li[aria-expanded="true"] > .penzai-disclosure::before {
+  content: "▼";
+}
+
+.penzai-leaf > .penzai-disclosure {
+  visibility: hidden;
+}
+
+/* checkboxes */
+.penzai-checkbox {
+  margin: 0 4px 0 0;
+  vertical-align: middle;
+}
+
+/* focus highlight */
+.penzai li:focus-visible {
+  background-color: #e8f2ff;
+}
