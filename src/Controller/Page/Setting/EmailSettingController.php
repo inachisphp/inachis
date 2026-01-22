@@ -20,13 +20,14 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class EmailSettingController extends AbstractInachisController
 {
-    #[Route("/incc/settings/email")]
+    #[Route("/incc/settings/email", name: "incc_settings_email")]
     public function index(
 		Request $request,
 		DNSFetcherService $dnsFetcherService,
 	): Response {
         $domain = $_ENV['APP_DOMAIN'] ?? 'example.com';
 
+		$this->data['page']['title'] = 'Email settings';
 		$this->data['domain'] = $domain;
 		$this->data['mx_records'] = $dnsFetcherService->fetchMXRecords($domain);
         $this->data['dmarc'] = $dnsFetcherService->fetchDMARCRecords($domain);

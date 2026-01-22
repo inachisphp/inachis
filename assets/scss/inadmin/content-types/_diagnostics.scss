@@ -1,0 +1,64 @@
+/* Container spacing */
+.diagnostics-summary {
+    display: flex;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.card {
+    background: #eee;
+    min-width: 200px;
+    padding: 0.05em 0.5em;
+}
+
+/* Card status border */
+.card.border-ok {
+    border-left: 4px solid #28a745; /* Green */
+}
+
+.card.border-warning {
+    border-left: 4px solid #ffc107; /* Yellow */
+}
+
+.card.border-error {
+    border-left: 4px solid #dc3545; /* Red */
+}
+
+/* Status text inside card */
+.diagnostics-status {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.diagnostics-status-ok {
+    color: #28a745;
+}
+
+.diagnostics-status-warning {
+    color: #ffc107;
+}
+
+.diagnostics-status-error {
+    color: #dc3545;
+}
+
+/* Optional: adjust the list under each card */
+.diagnostics-summary ul {
+    list-style-type: none;
+    margin-bottom: 0;
+    padding-left: 0;
+}
+
+.diagnostics-summary ul li {
+    font-size: 0.875rem;
+    color: #6c757d; /* muted gray for counts */
+}
+
+/* Responsive spacing: small gutter between columns */
+@media (min-width: 768px) {
+    .diagnostics-summary .col-md-3 {
+        margin-bottom: 1rem;
+    }
+}

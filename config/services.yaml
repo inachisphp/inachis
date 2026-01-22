@@ -26,6 +26,14 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    Inachis\Diagnostics\Check\:
+        resource: '../src/Diagnostics/Check/*/*'
+        tags: ['app.diagnostic_check']
+
+    Inachis\Diagnostics\DiagnosticsCollector:
+        arguments:
+            $checks: !tagged_iterator app.diagnostic_check
+
     Inachis\Service\Image\ImageLocaliser:
         arguments:
             $publicImgPath: '%app.public_img_path%'

@@ -1,4 +1,6 @@
-{% for label, messages in app.flashes(['success', 'warning', 'notice', 'error']) %}
+{% set flashMessages = flashMessages ?? app.flashes(['success', 'warning', 'notice', 'error']) %}
+
+{% for label, messages in flashMessages %}
     {% for message in messages %}
         <div class="flash-{{ label }}">
             {% if label == 'success' %}

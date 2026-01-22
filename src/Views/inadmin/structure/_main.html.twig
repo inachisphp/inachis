@@ -101,10 +101,10 @@
 {#                        <li class="{{ page.tab|activeMenu('tools') }}"><a href="{{ settings.domain ~ path('app_tools_index') }}" title="Tools">#}
 {#                                <i class="material-icons">build</i><span> Tools</span></a>#}
 {#                        </li>#}
-{#                        <li class="{{ page.tab|activeMenu('settings') }}"><a href="{{ settings.domain ~ path('app_settings_index') }}" title="Change advanced settings">#}
-{#                                <i class="material-icons">settings</i><span> Settings</span></a>#}
-{#                        </li>#}
 {#                        <li><a href="{{ settings.domain ~ path('app_waste_list') }}" title="Manage deleted content">#}
+                <li class="menu__collapsed visually-hidden {{ page.tab|activeMenu('settings') }}"><a href="{{ settings.domain ~ path('inachis_settings_index') }}" title="Change advanced settings">
+                        <i class="material-icons">settings</i><span> Settings</span></a>
+                </li>
 {#                                <i class="material-icons">delete</i><span> Bin</span></a>#}
 {#                        </li>#}
 
