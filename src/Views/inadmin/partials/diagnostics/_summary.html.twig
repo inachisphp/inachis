@@ -1,0 +1,29 @@
+<div class="row g-3 mb-4 diagnostics-summary">
+    {% for key, item in summary %}
+        {% set status =
+            item.error > 0 ? 'error' :
+            item.warning > 0 ? 'warning' :
+            'ok'
+        %}
+
+        <div class="col-md-3">
+            <div class="card border-{{ status }}">
+                <div class="card-body">
+                    <h5 class="card-title text-capitalize">
+                        {{ key }}
+                    </h5>
+
+                    <div class="diagnostics-status diagnostics-status-{{ status }}">
+                        {{ status|upper }}
+                    </div>
+
+                    <ul class="list-unstyled mb-0 small text-muted">
+                        <li>OK: {{ item.ok }}</li>
+                        <li>Warnings: {{ item.warning }}</li>
+                        <li>Errors: {{ item.error }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
