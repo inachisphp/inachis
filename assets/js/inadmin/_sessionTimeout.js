@@ -5,8 +5,8 @@ window.Inachis.SessionTimeout = {
     countdownEl: null,
 
     options: {
-        sessionTimeout: 1440,      // seconds
-        warnBeforeTimeout: 120,    // seconds
+        sessionTimeout: 1440, // seconds
+        warnBeforeTimeout: 120, // seconds
         sessionEndTime: '',
         templateEncoded: '',
     },

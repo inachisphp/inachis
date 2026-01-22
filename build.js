@@ -96,8 +96,6 @@ async function copyExtraLibraries() {
         "node_modules//jquery-ui-dist/jquery-ui.min.js",
         "node_modules/jquery-datetimepicker/build/jquery.datetimepicker.full.min.js",
         "node_modules/jquery-datetimepicker/build/jquery.datetimepicker.min.css",
-        "assets/js/inadmin/jquery.switchButton.js",
-        "assets/scss/inadmin/jquery.switchButton.css",
         "node_modules/easymde/dist/easymde.min.js",
         "node_modules/tom-select/dist/js/tom-select.complete.min.js"
     ];

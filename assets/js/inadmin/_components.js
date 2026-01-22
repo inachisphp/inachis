@@ -191,21 +191,14 @@ window.Inachis.Components = {
 		});
 	},
 	initSwitches(selector) {
-		$(`${selector} .ui-switch`).each(function () {
-			const $properties = {
-				checked: this.checked,
-				clear: true,
-				height: 20,
-				width: 40
-			};
-			if ($(this).attr('data-label-on')) {
-				$properties.on_label = $(this).attr('data-label-on');
-			}
-			if ($(this).attr('data-label-off')) {
-				$properties.off_label = $(this).attr('data-label-off');
-			}
-			$(this).switchButton($properties);
-		});
+		document
+			.querySelectorAll(`${selector} .ui-switch`)
+			.forEach((checkbox) => {
+				window.Inachis.SwitchButton.create(checkbox, {
+					onLabel: checkbox.dataset.labelOn || 'On',
+					offLabel: checkbox.dataset.labelOff || 'Off',
+				});
+			});
 	},
 	initUIToggle() {
 		const $uiToggle = $('.ui-toggle');

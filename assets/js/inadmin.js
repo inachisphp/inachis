@@ -18,3 +18,4 @@ import './inadmin/_post__edit.js';
 import './inadmin/_sessionTimeout.js';
 import './inadmin/_setup.js';
 import './inadmin/_style-hacks.js';
+import './inadmin/_switchButton.js';
