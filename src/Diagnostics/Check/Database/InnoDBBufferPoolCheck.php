@@ -72,7 +72,7 @@ final class InnoDBBufferPoolCheck implements CheckInterface
                 ? 'InnoDB buffer pool size is sufficient.'
                 : 'InnoDB buffer pool is smaller than recommended; may affect performance.',
             $status !== 'ok'
-                ? "Consider increasing innodb_buffer_pool_size to 50–70% of available RAM for dedicated DB servers."
+                ? "Consider increasing innodb_buffer_pool_size to 50–70% of available RAM for dedicated DB servers, and 20-40% for shared servers."
                 : null,
             $this->getSection(),
             $severity

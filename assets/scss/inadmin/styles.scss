@@ -16,7 +16,6 @@
 // Structural components
 @use 'components/admonitions';
 @use 'components/badge';
-@use 'components/bonsai';
 @use 'components/data-list';
 @use 'components/dropzone';
 @use 'components/filter_bar';
@@ -25,9 +24,11 @@
 @use 'components/map';
 @use 'components/pagination';
 @use 'components/password_toggle';
+@use 'components/penzai';
 @use 'components/progressbar';
 @use 'components/sortby';
 @use 'components/switch';
+@use 'components/switchButton';
 @use 'components/tables';
 @use 'components/tabs';
 @use 'components/toggle_password';
