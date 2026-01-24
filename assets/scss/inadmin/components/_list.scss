@@ -57,6 +57,7 @@ section.paginated-list {
     padding: 15px 5px;
 
     @media #{$information-medium} {
+      margin: 0.5em 0;
       padding: 15px 5px;
     }
 
@@ -70,7 +71,9 @@ section.paginated-list {
       margin:25px 10px 40px 0;
     }
     h2 {
+      display: flex;
       font-size: 1.2em;
+      justify-content: space-between;
       margin: 0;
       padding: 0;
     }
@@ -81,6 +84,7 @@ section.paginated-list {
     p {
       color: #666;
       line-height: 1.7em;
+      margin-left: 2em;
 
       form & {
         margin: 0 0 0 1.5em;

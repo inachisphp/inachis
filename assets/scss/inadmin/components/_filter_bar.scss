@@ -3,7 +3,9 @@
 
 .filter {
   align-items: center;
-  background-color: #ccc;
+  background-color: transparent;
+  border: 1px solid #eee;
+  border-bottom: none;
   display: flex;
   flex-direction: row-reverse;
   flex-wrap: wrap;
@@ -27,8 +29,16 @@
     }
   }
 
+  .selectall_button {
+    background: #eee;
+    padding: 0.75em;
+    border: 1px solid #999;
+    border-radius: 0.5em;
+    margin-left: 0.6em;
+  }
+
   input[name=selectAllNone] {
-    margin: 0 1.4em;
+    margin: 0;
   }
 
   input[type=checkbox]+label.visually-hidden {
