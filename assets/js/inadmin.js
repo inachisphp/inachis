@@ -19,3 +19,4 @@ import './inadmin/_sessionTimeout.js';
 import './inadmin/_setup.js';
 import './inadmin/_style-hacks.js';
 import './inadmin/_switchButton.js';
+import './inadmin/_tabs.js';
