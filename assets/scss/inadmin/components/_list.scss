@@ -73,9 +73,14 @@ section.paginated-list {
     h2 {
       display: flex;
       font-size: 1.2em;
+      font-weight: 600;
       justify-content: space-between;
       margin: 0;
       padding: 0;
+
+      .badge {
+        margin: 0 0.25em 0 0;
+      }
     }
     input {
       float: left;
@@ -83,6 +88,7 @@ section.paginated-list {
     }
     p {
       color: #666;
+      font-size: 0.85em;
       line-height: 1.7em;
       margin-left: 2em;
 
@@ -91,7 +97,6 @@ section.paginated-list {
       }
 
       &.date {
-        margin-top: 10px;
         font-size: 0.8em;
       }
       &.date span.material-icons:not(:first-of-type) {
