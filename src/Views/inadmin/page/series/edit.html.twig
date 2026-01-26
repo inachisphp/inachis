@@ -6,79 +6,98 @@
 {% endblock pagetitle %}
 
 {% block content %}
+{% block series_edit_pre %}{% endblock series_edit_pre %}
+{% block series_edit %}
 
-    {% block series_edit_pre %}{% endblock series_edit_pre %}
+{{ form_start(form, {'attr': { 'class': 'form form__post form__series' }}) }}
+<div class="col span_8_of_8 ui-tabbed content__edit">
+    <ul>
+        <li>
+            <a href="#series__overview">Overview</a>
+        </li>
+        {% if series.id is not empty %}
+        <li>
+            <a href="#series__contents">
+                {% trans %}admin.series.contents.title{% endtrans %} 
+                <span class="badge">{{ series.items|length }}</span></a>
+        </li>
+        {% endif %}
+    </ul>
 
-    {% block series_edit %}
+    <fieldset id="series__overview">
+        <legend>Overview</legend>
+        {{
+            include('inadmin/partials/image_preview.html.twig', {
+                'id': 'series_image',
+                'name': 'series[image]',
+                'value': series.image,
+                'additionalClass': 'preview__small'
+            })
+        }}
+        <p>
+            <a class="material-icons ui-toggle" href="#" data-target=".post__link__edit" data-target-state="hidden">link</a>
+            {{ form_label(form.title) }}
+            {{ form_errors(form.title) }}
+            {{ form_widget(form.title) }}
+        </p>
+        <p>
+            {{ form_label(form.subTitle) }}
+            {{ form_errors(form.subTitle) }}
+            {{ form_widget(form.subTitle) }}
+        </p>
+        <p class="post__link__edit">
+            {{ form_label(form.url) }}
+            {{ form_errors(form.url) }}
+            {{ settings.domain -}}/{{ series.firstDate|date('Y') }}-{{ form_widget(form.url) }}
+        </p>
+        {% if series.items is not empty %}
+        <p>
+            {{ form_label(form.visibility) }}
+            {{ form_errors(form.visibility) }}
+            <span class="switch-wrapper">
+                {{ form_widget(form.visibility) }}
+            </span>
+        </p>
+        <p>
+        <p>
+            {{ form_label(form.firstDate) }}
+            {{ form_errors(form.firstDate) }}
+            {{ form_widget(form.firstDate) }}
+            {{ form_label(form.lastDate) }}
+            {{ form_errors(form.lastDate) }}
+            {{ form_widget(form.lastDate) }}
+        </p>
+        {% endif %}
+        <p>
+            {{ form_label(form.description) }}
+            {{ form_errors(form.description) }}
+            {{ form_widget(form.description) }}
+        </p>
+    </fieldset>
 
-        {{ form_start(form, {'attr': { 'class': 'form form__post form__series' }}) }}
-        <div class="col span_6_of_8 content__edit">
-            <fieldset id="post__edit">
-                <legend>{% trans %}admin.series.legend{% endtrans %}</legend>
+    <fieldset id="series__contents" class="content__edit edit__list">
+        {{  include('inadmin/partials/series_contents.html.twig') }}
+    </fieldset>
+</div>
 
-                {{
-                include('inadmin/partials/image_preview.html.twig', {
-                    'id': 'series_image',
-                    'name': 'series[image]',
-                    'value': series.image,
-                    'additionalClass': 'preview__small'
-                })
-                }}
-                <p>
-                    {{ form_label(form.title) }}
-                    {{ form_errors(form.title) }}
-                    {{ form_widget(form.title) }}
-                </p>
-                <p>
-                    {{ form_label(form.subTitle) }}
-                    {{ form_errors(form.subTitle) }}
-                    {{ form_widget(form.subTitle) }}
-                </p>
-                {% if series.id is not empty %}
-                <p>
-                    {{ form_label(form.url) }}
-                    {{ form_errors(form.url) }}
-                    /{{ series.firstDate|date('Y') }}-{{ form_widget(form.url) }}
-                </p>
-                <p>
-                    {{ form_label(form.visibility) }}
-                    {{ form_errors(form.visibility) }}
-                    <span class="switch-wrapper">
-                        {{ form_widget(form.visibility) }}
-				    </span>
-                </p>
-                {% else %}
-                    {{ form_widget(form.url, {'type': 'hidden', 'attr': {'pattern': ''}}) }}
-                {% endif %}
-                <p>
-                    {{ form_label(form.description) }}
-                    {{ form_errors(form.description) }}
-                    {{ form_widget(form.description) }}
-                </p>
-            </fieldset>
-        </div>
-        <div class="col span_2_of_8 content__edit edit__list">
-            {{  include('inadmin/partials/series_contents.html.twig') }}
-        </div>
-        <div class="fixed-bottom-bar">
-            <p>
-                {{ form_widget(form.submit) }}
-                {%  if series.id is not empty %}
-                {{ form_widget(form.delete) }}
-                {% endif %}
-                {%  if series.id is not empty and series.items|length > 0 %}
-                    <a class="button button--secondary" href="{{ path('app_series_view', { 'year': series.lastDate|date('Y'), 'title': series.url}) }}" target="_blank" title="View Live"><span class="material-icons">exit_to_app</span> View Live</a>
-                {%  endif %}
-                    <span class="series__controls visually-hidden">
-                    with selected:
-                    {{ form_widget(form.remove) }}
-                </span>
-            </p>
-        </div>
-        {{ form_row(form._token) }}
-        {{ form_end(form, {render_rest: false}) }}
-    {% endblock series_edit %}
+<div class="fixed-bottom-bar">
+    <p>
+        {{ form_widget(form.submit) }}
+        {%  if series.id is not empty %}
+        {{ form_widget(form.delete) }}
+        {% endif %}
+        {%  if series.id is not empty and series.items|length > 0 %}
+            <a class="button button--secondary" href="{{ path('app_series_view', { 'year': series.lastDate|date('Y'), 'title': series.url}) }}" target="_blank" title="View Live"><span class="material-icons">exit_to_app</span> View Live</a>
+            <span class="series__controls visually-hidden">
+            with selected:
+            {{ form_widget(form.remove) }}
+        {%  endif %}
+        </span>
+    </p>
+</div>
 
-
-    {% block series_edit_post %}{% endblock series_edit_post %}
+{{ form_row(form._token) }}
+{{ form_end(form, {render_rest: false}) }}
+{% endblock series_edit %}
+{% block series_edit_post %}{% endblock series_edit_post %}
 {% endblock content %}
