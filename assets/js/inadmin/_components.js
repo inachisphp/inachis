@@ -25,8 +25,7 @@ window.Inachis.Components = {
 			$(this).closest('form').trigger('submit');
 		});
 
-		// jQuery Tabs
-		$('.ui-tabbed').tabs();
+		tabs('.ui-tabbed');
 		$('.error-select').hide();
 
 		$(() => {
