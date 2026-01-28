@@ -10,18 +10,18 @@
 {% block settings_pre %}{% endblock settings_pre %}
 
 {% block settings %}
-
+<div class="col-12">
 {% if spf_errors or dmarc_errors %}
-<div class="admonition admonition__warning">
+<section class="admonition admonition__warning">
 	<ul class="error-list">
 		{% for error in dmarc_errors|merge(spf_errors) %}
 			<li>{{ error }}</li>
 		{% endfor %}
 	</ul>
-</div>
+</section>
 {% endif %}
 
-<div class="admonition admonition__info">
+<section class="admonition admonition__info">
 	<h3 class="admonition__title">Mail Authentication</h3>
 	<p><strong>Domain:</strong> {{ domain }}</p>
 	<p><strong>MX:</strong>
@@ -39,9 +39,9 @@
 	<p><strong>SPF:</strong>
 		{{ spf|default(['Not configured'])|join(' | ') }}
 	</p>
-</div>
+</section>
 
-<div>
+<section>
 	<h3>Notes</h3>
 	<p>DMARC and SPF settings are important to ensure the deliverability of emails.</p>
 
@@ -60,8 +60,8 @@
 	<p><code>v=DMARC1; p=none; rua=mailto:dmarc@{{ domain }};</code></p>
 	<p><code>none</code> tells mailservers to do nothing, so is useful when making sure there are no issues. After a period of time, you can then change this to <code>quarantine</code>, or <code>reject</code>.</p>
 	<p><code>rua</code> is an email address to receive reports to</p>
+</section>
 </div>
-
 {% endblock settings %}
 
 {% block settings_post %}{% endblock settings_post %}

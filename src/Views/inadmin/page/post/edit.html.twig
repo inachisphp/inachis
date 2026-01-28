@@ -7,8 +7,8 @@
 
 {% block content %}
 
-    {{ form_start(form, {'attr': { 'class': 'form form__post' }}) }}
-    <div class="col span_8_of_8 ui-tabbed content__edit">
+    {{ form_start(form, {'attr': { 'class': 'col-12 form form__post' }}) }}
+    <div class="ui-tabbed content__edit">
         <ul>
             <li>
                 <a href="#post__edit">{% trans %}admin.posts.tabs.content{% endtrans %}</a>
@@ -121,33 +121,35 @@
         </fieldset>
 
         <fieldset id="post__sharing">
-            <section class="col span_4_of_8">
-                <p>
-                    {{ form_label(form.featureSnippet) }}
-                    {{ form_errors(form.featureSnippet) }}
-                    {{ form_widget(form.featureSnippet) }}
-                    {% trans %}admin.post.sharing.featureSnippet.help{% endtrans %}
-                </p>
-                <p>
-                    {{ form_errors(form.noindex) }}
-                    {{ form_widget(form.noindex) }}
-                    {{ form_label(form.noindex) }}
-                </p>
-                <p>
-                    {{ form_errors(form.nofollow) }}
-                    {{ form_widget(form.nofollow) }}
-                    {{ form_label(form.nofollow) }}
-                </p>
-            </section>
-            <section class="col span_3_of_8">
-            {{
-                include('inadmin/partials/image_preview.html.twig', {
-                    'id': 'featureImage',
-                    'name': 'post[featureImage]',
-                    'value': post.featureImage
-                })
-            }}
-            </section>
+            <div class="nested-grid">
+                <section class="col-6">
+                    <p>
+                        {{ form_label(form.featureSnippet) }}
+                        {{ form_errors(form.featureSnippet) }}
+                        {{ form_widget(form.featureSnippet) }}
+                        {% trans %}admin.post.sharing.featureSnippet.help{% endtrans %}
+                    </p>
+                    <p>
+                        {{ form_errors(form.noindex) }}
+                        {{ form_widget(form.noindex) }}
+                        {{ form_label(form.noindex) }}
+                    </p>
+                    <p>
+                        {{ form_errors(form.nofollow) }}
+                        {{ form_widget(form.nofollow) }}
+                        {{ form_label(form.nofollow) }}
+                    </p>
+                </section>
+                <section class="col-6">
+                {{
+                    include('inadmin/partials/image_preview.html.twig', {
+                        'id': 'featureImage',
+                        'name': 'post[featureImage]',
+                        'value': post.featureImage
+                    })
+                }}
+                </section>
+            </div>
         </fieldset>
 
         {%  if revisions is defined and revisions is not empty %}
