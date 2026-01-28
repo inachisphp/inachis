@@ -10,9 +10,9 @@
     {% block resources_pre %}{% endblock resources_pre %}
 
     {% block resources %}
-        {{ form_start(form, {'attr': { 'class': 'form form__post form__resource' }}) }}
-        <div class="col span_5_of_8 content__edit">
-        <fieldset id="post__edit">
+        {{ form_start(form, {'attr': { 'class': 'col-12 form form__post form__resource' }}) }}
+        <div class="nested-grid content__edit">
+        <fieldset class="col-8" id="post__edit">
             <h3>{{ 'admin.resources.details.title'|trans }}</h3>
             <p>
                 {{ form_label(form.title) }}
@@ -30,7 +30,7 @@
                 {{ form_widget(form.description) }}
             </p>
         </fieldset>
-        <fieldset id="post__properties">
+        <fieldset class="col-4" id="post__properties">
             <h3>{{ 'admin.resources.properties.title'|trans }}</h3>
             {% if page.type == 'images' %}
             <p><strong>{{ 'admin.resources.properties.dimensions'|trans }}:</strong> {{ resource.dimensionX ~ ' (w) x ' ~ resource.dimensionY ~ ' (h)' }}</p>
@@ -47,7 +47,7 @@
             <p>&nbsp;</p>
         </fieldset>
         </div>
-        <div class="col span_3_of_8">
+        <div class="col-12">
             {% if page.type == 'images' %}
                 {{ include('inadmin/partials/image_preview.html.twig', {
                     id: resource.id,

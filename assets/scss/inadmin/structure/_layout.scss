@@ -1,0 +1,63 @@
+@use '../definitions' as *;
+
+@mixin col-span($n) {
+  grid-column: span $n;
+}
+
+* { box-sizing: border-box; }
+
+.layout {
+  display: grid;
+  grid-template-columns: $sidebar-collapsed 1fr;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+  transition: grid-template-columns .3s ease;
+
+  &.expanded {
+    grid-template-columns: $sidebar-expanded 1fr;
+
+    .sidebar ul span { display: inline; }
+  }
+
+  @media (max-width: $mobile) {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+@media (max-width: $mobile) {
+  .content {
+    grid-column: 1;
+    grid-row: auto; // content flows below if needed
+  }
+}
+
+.content {
+  padding: 24px;
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $gutter;
+
+  // Desktop placement
+  grid-column: 2;
+  grid-row: 2;
+
+  @for $i from 1 through $columns {
+    .col-#{$i} { @include col-span($i); }
+  }
+
+  @media (max-width: $mobile) {
+    grid-column: 1;
+    > * { grid-column: 1 / -1; }
+  }
+}
+
+.nested-grid {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $gutter;
+
+  @for $i from 1 through $columns {
+    .col-#{$i} { @include col-span($i); }
+  }
+}

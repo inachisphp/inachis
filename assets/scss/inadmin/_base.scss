@@ -10,3 +10,24 @@ body {
 body .visually-hidden {
   display: none;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior :auto !important;
+  }
+}
+.reduce-motion * {
+  transition: none !important;
+  animation: none !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-contrast: more) {
+  body { --bg:#000; --hover:#1f1f1f; --active:#ff0; --text:#fff; }
+}
+.high-contrast { --bg:#000; --hover:#1f1f1f; --active:#ff0; --text:#fff; }
+.high-contrast a:focus, .high-contrast button:focus { outline:3px solid #ff0; outline-offset:2px; }
+.high-contrast .badge { background:#ff0; color:#000; }
+.high-contrast .layout:not(.expanded) a[data-tooltip]::after { background:#fff; color:#000; }

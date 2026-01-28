@@ -5,71 +5,71 @@
 {% endblock pagetitle %}
 
 {% block content %}
-    {% block results_pre %}{% endblock results_pre %}
-    {% block results_list %}
+{% block results_pre %}{% endblock results_pre %}
+{% block results_list %}
+<div class="col-12">
+    <p>Showing <strong>{{ query.offset + 1 }}</strong>-<strong>{{ min(query.offset + query.limit,total) }}</strong> of <strong>{{ total }}</strong> results</p>
 
-        <p>Showing <strong>{{ query.offset + 1 }}</strong>-<strong>{{ min(query.offset + query.limit,total) }}</strong> of <strong>{{ total }}</strong> results</p>
+    {% include 'inadmin/partials/table.html.twig' with {
+        className: 'form__search_results',
+        type: 'search_results',
+        dataset: results,
 
-        {% include 'inadmin/partials/table.html.twig' with {
-            className: 'form__search_results',
-            type: 'search_results',
-            dataset: results,
+        table_name: 'Search results',
+        table_class: 'table-responsive table-borderless table-darkhead',
+        table_desc: 'This table lists URLs used by pages and posts. The first column contains checkboxes allowing users to select one or more tasks.',
 
-            table_name: 'Search results',
-            table_class: 'table-responsive table-borderless table-darkhead',
-            table_desc: 'This table lists URLs used by pages and posts. The first column contains checkboxes allowing users to select one or more tasks.',
-
-            columns: [
-                {
-                    title: 'Type',
-                    source: 'type',
-                },
-                {
-                    title: 'Title',
-                    source: 'title',
-                    url: 'url',
-                },
-                {
-                    title: 'Sub Title',
-                    source: 'sub_title',
-                },
-                {
-                    title: 'Content',
-                    source: 'content',
-                    maxLength: 150,
-                },
-                {
-                    title: 'Date',
-                    source: 'contentDate',
-                    source_type: 'date',
-                },
-                {
-                    title: 'Author',
-                    source: 'author',
-                },
-                {
-                    title: 'Relevance Score',
-                    source: 'relevance',
-                }
-            ],
-            limit: query.limit,
-            offset: query.offset,
-            total: total,
-            url_result: path('incc_search_results', { keyword: keyword }),
-
-            zebra: true,
-            sort_options: {
-                'relevance desc': 'Relevance (most)',
-                'relevance asc': 'Relevance (least)',
-                'title asc': 'Title A-Z',
-                'title desc': 'Title Z-A',
-                'type asc': 'Type A-Z',
-                'type desc': 'Type Z-A',
-                'contentDate asc': 'Date Old to New',
-                'contentDate desc': 'Date New to Old',
+        columns: [
+            {
+                title: 'Type',
+                source: 'type',
+            },
+            {
+                title: 'Title',
+                source: 'title',
+                url: 'url',
+            },
+            {
+                title: 'Sub Title',
+                source: 'sub_title',
+            },
+            {
+                title: 'Content',
+                source: 'content',
+                maxLength: 150,
+            },
+            {
+                title: 'Date',
+                source: 'contentDate',
+                source_type: 'date',
+            },
+            {
+                title: 'Author',
+                source: 'author',
+            },
+            {
+                title: 'Relevance Score',
+                source: 'relevance',
             }
-        } %}
-    {% endblock results_list %}
+        ],
+        limit: query.limit,
+        offset: query.offset,
+        total: total,
+        url_result: path('incc_search_results', { keyword: keyword }),
 
-    {% block result_post %}{% endblock result_post %}
+        zebra: true,
+        sort_options: {
+            'relevance desc': 'Relevance (most)',
+            'relevance asc': 'Relevance (least)',
+            'title asc': 'Title A-Z',
+            'title desc': 'Title Z-A',
+            'type asc': 'Type A-Z',
+            'type desc': 'Type Z-A',
+            'contentDate asc': 'Date Old to New',
+            'contentDate desc': 'Date New to Old',
+        }
+    } %}
+</div>
+{% endblock results_list %}
+{% block result_post %}{% endblock result_post %}
 {% endblock %}
