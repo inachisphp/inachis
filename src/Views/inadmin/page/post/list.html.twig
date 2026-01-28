@@ -46,7 +46,7 @@
             {% set link_new = path('incc_post_edit', {'type': 'page'}) ~ '/new' %}
         {% endif %}
 
-        <div class="col span_8_of_8 widget-posts ui-tabs-external">
+        <div class="col-12 widget-posts ui-tabs-external">
             {% include 'inadmin/partials/tab-sets/posts.html.twig' %}
             {% include 'inadmin/partials/list.html.twig' with {
                 'className': 'form__posts',

@@ -9,7 +9,7 @@
 {% block content %}
 {% block server_check_pre %}{% endblock server_check_pre %}
 {% block server_check %}
-
+<div class="col-12">
 {% if environment != 'prod' %}
     {% include 'inadmin/partials/flashes.html.twig' with {
         flashMessages: {
@@ -69,9 +69,7 @@
         </table>
     </section>
 {% endfor %}
-
-<p>&nbsp;</p>
-
+</div>
 {% endblock server_check %}
 {% block server_check_post %}{% endblock server_check_post %}
 {% endblock content %}

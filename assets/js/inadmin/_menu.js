@@ -1,112 +1,84 @@
 window.Inachis.NavMenu = {
-	navNewVisible: false,
-	navUserVisible: false,
-
-	init() {
-		// Add menu
-		this.bindToggle(
-			'.admin__add-content',
-			'.admin__nav-new',
-			'navNewVisible',
-			'New'
-		);
-
-		// Settings menu
-		document
-			.querySelectorAll('a[href*="admin__nav-settings"]')
-			.forEach(el =>
-				el.addEventListener('click', () => {
-					document
-						.querySelectorAll('li.menu__collapsed')
-						.forEach(li => li.classList.toggle('visually-hidden'));
-				})
-			);
-
-		// Collapse / expand links
-		document
-			.querySelectorAll('.admin__nav-expand a, .admin__nav-collapse a')
-			.forEach(el =>
-				el.addEventListener('click', () => {
-					document
-						.querySelector('.admin__container')
-						?.classList.toggle('admin__container--collapsed');
-					document
-						.querySelector('.admin__container')
-						?.classList.toggle('admin__container--expanded');
-				})
-			);
-
-		// Mobile menu link
-		this.bindToggle(
-			'.admin__nav-main__link a',
-			'.admin__nav-new',
-			'navNewVisible',
-			'New',
-			() => {
-				document
-					.querySelector('.admin__container')
-					?.classList.toggle('admin__container--collapsed');
-				document
-					.querySelector('.admin__container')
-					?.classList.toggle('admin__container--expanded');
-
-				document
-					.querySelector('.admin__nav-main__list')
-					?.classList.toggle('is-visible');
-			}
-		);
-
-		// User menu
-		this.bindToggle(
-			'.admin__user > a',
-			'#admin__user__options',
-			'navUserVisible',
-			'User'
-		);
-	},
-
-	bindToggle(triggerSelector, menuSelector, stateProp, label, beforeToggle) {
-		const trigger = document.querySelector(triggerSelector);
-		const menu = document.querySelector(menuSelector);
-
-		if (!trigger || !menu) {
-			return;
+	init: function () {
+		const layout = document.querySelector('.layout');
+		const sidebar = document.querySelector('.sidebar');
+		const mobileBtn = document.querySelector('.mobile-menu-toggle');
+		const desktopBtn = document.querySelector('.desktop-menu-toggle');
+		const overlay = document.querySelector('.sidebar-overlay');
+		const savedState = localStorage.getItem('sidebarExpanded');
+		if (savedState === 'true') {
+			// layout.style.transition = 'none';
+			layout.classList.add('expanded');
+			// void layout.offsetWidth;
+			// layout.style.transition = '';
+		} else {
+			layout.classList.remove('expanded');
 		}
 
-		const onDocumentClick = event => {
-			if (!menu.contains(event.target) && event.target !== trigger) {
-				this.hideMenu(menu, stateProp, label);
-				document.removeEventListener('mousedown', onDocumentClick);
-			}
-		};
-
-		trigger.addEventListener('click', event => {
-			event.preventDefault();
-
-			if (beforeToggle) {
-				beforeToggle();
-			}
-
-			const isVisible = !this[stateProp];
-			this[stateProp] = isVisible;
-
-			menu.style.display = isVisible ? 'block' : 'none';
-
-			window.Inachis._log(`${label} menu visible: ${isVisible}`);
-
-			if (isVisible) {
-				document.addEventListener('mousedown', onDocumentClick);
-			}
+		// Desktop toggle
+		desktopBtn.addEventListener('click', () => {
+			layout.classList.toggle('expanded');
+			const isExpanded = layout.classList.contains('expanded');
+			localStorage.setItem('sidebarExpanded', isExpanded ? 'true' : 'false');
 		});
-	},
 
-	hideMenu(menu, stateProp, label) {
-		menu.style.display = 'none';
-		this[stateProp] = false;
-		window.Inachis._log(`${label} menu visible: false`);
-	},
-};
+		// Mobile toggle
+		mobileBtn.addEventListener('click', () => {
+			layout.classList.add('expanded');
+			overlay.classList.add('active');
+			body.style.overflow = 'hidden';
+		});
 
-$(document).ready(function () {
+		overlay.addEventListener('click', closeMenu);
+
+		function closeMenu() {
+			layout.classList.remove('expanded');
+			overlay.classList.remove('active');
+			body.style.overflow = '';
+		}
+
+		document.querySelector('.admin__user a').addEventListener('click', e => {
+			e.preventDefault();
+			const userMenu = document.querySelector('#admin__user__options');
+			const open = userMenu.classList.toggle('open');
+			userMenu.setAttribute('aria-expanded', open);
+		});
+
+		document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+			toggle.addEventListener('click', e => {
+				e.preventDefault();
+				const parent = toggle.closest('.has-submenu');
+				const open = parent.classList.toggle('open');
+				toggle.setAttribute('aria-expanded', open);
+			});
+		});
+
+		let touchStartX = 0;
+		let touchEndX = 0;
+
+		sidebar.addEventListener('touchstart', e => {
+		if (window.innerWidth <= 768 && layout.classList.contains('expanded')) {
+			touchStartX = e.changedTouches[0].screenX;
+		}
+		});
+
+		sidebar.addEventListener('touchmove', e => {
+		if (window.innerWidth <= 768 && layout.classList.contains('expanded')) {
+			touchEndX = e.changedTouches[0].screenX;
+		}
+		});
+
+		sidebar.addEventListener('touchend', e => {
+		if (window.innerWidth <= 768 && layout.classList.contains('expanded')) {
+			if (touchEndX - touchStartX < -50) { // swipe left
+			closeMenu();
+			}
+			touchStartX = touchEndX = 0;
+		}
+		});
+	}
+}
+
+document.addEventListener('DOMContentLoaded', () => {
 	window.Inachis.NavMenu.init();
 });

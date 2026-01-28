@@ -1,16 +1,11 @@
 @use '../shared/_reset';
 
-// Page structures
-@use '../shared/_col';
-@use '../shared/_8cols' as eightcols;
-@use '../shared/_3cols' as threecols;
-@use '../shared/_2cols' as twocols;
 @use 'base';
+@use 'structure/layout';
+@use 'structure/sidebar';
 @use 'structure/header';
   @use 'structure/search';
   @use 'structure/user-menu';
-  @use 'structure/menu';
-    @use 'structure/contextual';
 @use 'structure/bottom-bar';
 
 // Structural components
