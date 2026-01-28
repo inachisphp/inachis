@@ -47,8 +47,17 @@ window.Inachis.NavMenu = {
 		document.querySelectorAll('.submenu-toggle').forEach(toggle => {
 			toggle.addEventListener('click', e => {
 				e.preventDefault();
-				const parent = toggle.closest('.has-submenu');
-				const open = parent.classList.toggle('open');
+				const current = toggle.closest('.has-submenu');
+
+				document.querySelectorAll('.has-submenu.open').forEach(item => {
+					if (item !== current) {
+						item.classList.remove('open');
+						item.querySelector('.submenu-toggle')
+							?.setAttribute('aria-expanded', 'false');
+					}
+				});
+
+				const open = current.classList.toggle('open');
 				toggle.setAttribute('aria-expanded', open);
 			});
 		});

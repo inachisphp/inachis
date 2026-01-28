@@ -21,6 +21,21 @@
         span {
             display:none;
         }
+
+        &.menu-view-site {
+            margin: auto 0 8px 0;
+
+            a, a:visited {
+                text-wrap: nowrap;
+            }
+            span {
+                display: none;
+            }
+
+            .layout.expanded & span {
+                display: inline;
+            }
+        }
     }
 
     a, a:visited {
@@ -93,23 +108,6 @@
 
     .label {
         white-space: nowrap;
-    }
-}
-
-
-.menu-view-site {
-    background-color: transparent;
-    border: none;
-    color: #fff;
-    margin: auto 8px 8px 8px;
-    overflow: hidden;
-
-    span {
-        display: none;
-    }
-
-    .layout.expanded & span {
-        display:none;
     }
 }
 

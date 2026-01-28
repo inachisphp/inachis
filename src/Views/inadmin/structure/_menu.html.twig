@@ -73,6 +73,7 @@
                 title="{% trans %}admin.menu.more.help{% endtrans %}">
                 <i class="material-icons">more_horiz</i> 
                 <span>{% trans %}admin.menu.more.title{% endtrans %}</span>
+                <span class="material-icons arrow">chevron_right</span>
             </a>
             <ul class="submenu">
                 <li class="{{ page.tab|activeMenu('url') }}">
@@ -107,10 +108,14 @@
         </li>
     </ul>
 
-    <button class="menu-view-site">
-        <i class="material-icons">exit_to_app</i>
-        <span>{% trans %}admin.menu.view_site{% endtrans %}</span>
-    </button>
+    <ul class="menu-view-site">
+        <li>
+            <a href="/">
+                <i class="material-icons">exit_to_app</i>
+                <span>{% trans %}admin.menu.view_site{% endtrans %}</span>
+            </a>
+        </li>
+    </ul>
     <button class="menu-toggle desktop-menu-toggle" aria-label="Toggle sidebar">
       <i class="material-icons chevron">chevron_right</i>
     </button>
