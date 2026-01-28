@@ -1,4 +1,6 @@
+{% if helpText|default('') %}
 <p><label for="{{ paramName }}">{{ helpText }}</label></p>
+{% endif %}
 <div class="fallback">
     <input id="{{ paramName|replace({'[': '_', ']': ''}) }}" name="{{ paramName }}" type="file" multiple />
 </div>

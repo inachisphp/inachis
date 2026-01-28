@@ -27,12 +27,6 @@ window.Inachis.Components = {
 
 		tabs('.ui-tabbed');
 		$('.error-select').hide();
-
-		$(() => {
-			$('#progressbar').progressbar({
-				value: $('#progressbar').data('percentage')
-			});
-		});
 	},
 
 	initClearSearch(selector) {
@@ -96,7 +90,7 @@ window.Inachis.Components = {
 		});
 	},
 	initTomSelect(selector) {
-		document.querySelectorAll(selector + '.js-select').forEach(el => {
+		document.querySelectorAll(selector + ' .js-select').forEach(el => {
 			const descriptionField = el.dataset.renderDescriptionField;
 			const isTags = el.dataset.tags === 'true';
 			const minQueryLength = 2;

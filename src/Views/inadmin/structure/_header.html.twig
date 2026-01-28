@@ -13,7 +13,7 @@
             <li><a href="{{ path('incc_admin_edit', {'id': session.username }) }}" title="Edit profile for {{ session.displayName }}">Edit your profile <span class="material-icons">perm_identity</span></a></li>
             <li><a href="#" title="Change your appearance settings">Appearance <span class="material-icons">brush</span></a></li>
             <!-- li><a href="/incc/settings/releases">Update available <span class="material-icons">new_releases</span></a></li -->
-            <li><form action="{{ path('inachis_logout') }}" method="post"><button>Log out <span class="material-icons">logout</span></button></form></li>
+            <li><form action="{{ path('app_logout') }}" method="post"><button>Log out <span class="material-icons">logout</span></button></form></li>
         </ul>
     </section>
     <section class="admin__search">

@@ -1,9 +1,0 @@
-/*  GRID OF THREE  */
-.span_2_of_2 { width: 100%; }
-.span_1_of_2 { width: 48.4%; }
-
-/*  GO FULL WIDTH BELOW 480 PIXELS */
-@media only screen and (max-width: 480px) {
-  .col {  margin: 1% 0 1% 0; }
-  .span_2_of_2, .span_1_of_2 { width: 100%; }
-}
