@@ -23,6 +23,7 @@
     {% include "inadmin/structure/javascript__top.html.twig" %}
 </head>
 <body{% if page_type|default('default') != 'default' %} class="type_{{ page_type }}"{% endif %}>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
 {%- if is_granted('ROLE_USER') %}
 <button class="menu-toggle mobile-menu-toggle" aria-label="Toggle menu">
