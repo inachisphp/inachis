@@ -76,6 +76,7 @@ class RevisionController extends AbstractInachisController
         if (empty($this->data['subTitle'])) {
             $this->data['subTitle'] = $page->getSubTitle();
         }
+        $this->data['revision_id'] = $revision->getId();
         $this->data['content'] = mb_split(PHP_EOL, $revision->getContent());
         foreach ($trackChanges['content'] as $changeGroup) {
             foreach ($changeGroup as $change) {

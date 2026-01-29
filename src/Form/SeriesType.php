@@ -97,7 +97,7 @@ class SeriesType extends AbstractType
                     'attr' => [
                         'aria-labelledby'  => 'firstDate_label',
                         'aria-required'    => 'false',
-                        'class' => 'halfwidth',
+                        'class' => 'date-width',
                         'readOnly' => true,
                     ],
                     'format' => 'dd/MM/yyyy', // HH:mm,
@@ -115,7 +115,7 @@ class SeriesType extends AbstractType
                     'attr' => [
                         'aria-labelledby'  => 'lastDate_label',
                         'aria-required'    => 'false',
-                        'class' => 'halfwidth',
+                        'class' => 'date-width',
                         'readOnly' => true,
                     ],
                     'format' => 'dd/MM/yyyy', // HH:mm,

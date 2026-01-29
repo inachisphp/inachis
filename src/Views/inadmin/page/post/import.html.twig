@@ -8,11 +8,16 @@
         {% include 'inadmin/partials/tab-sets/posts.html.twig' %}
         <section class="paginated-list">
             <h2>Import Posts</h2>
+            <p>Transfer your content from other platforms. Supported formats:</p>
+            <ul class="format-tags">
+                <li class="badge">Markdown (.md)</li>
+                <li class="badge">XML (.xml)</li>
+                <li class="badge">JSON (.json)</li>
+            </ul>
             <form action="{{ path('incc_post_import') }}" class="dropzone" method="post">
             {{
                 include('inadmin/partials/dropzone.html.twig', {
                     'dropzoneUrl': path('incc_post_import'),
-                    'helpText': 'Upload posts using markdown files (.md), XML (.xml), or JSON files (.json).',
                     'paramName': 'markdownFiles',
                     'uploadMultiple': true,
                     'maxFilesize': 2,
