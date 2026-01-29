@@ -1,11 +1,12 @@
 window.Inachis.NavMenu = {
 	init: function () {
-		const layout = document.querySelector('.layout');
-		const sidebar = document.querySelector('.sidebar');
-		const mobileBtn = document.querySelector('.mobile-menu-toggle');
 		const desktopBtn = document.querySelector('.desktop-menu-toggle');
+		const layout = document.querySelector('.layout');
+		const mobileBtn = document.querySelector('.mobile-menu-toggle');
 		const overlay = document.querySelector('.sidebar-overlay');
 		const savedState = localStorage.getItem('sidebarExpanded');
+		const sidebar = document.querySelector('.sidebar');
+		const submenuToggles = document.querySelectorAll('.submenu-toggle');
 		if (savedState === 'true') {
 			// layout.style.transition = 'none';
 			layout.classList.add('expanded');
@@ -28,15 +29,21 @@ window.Inachis.NavMenu = {
 			overlay.classList.add('active');
 			body.style.overflow = 'hidden';
 		});
-
 		overlay.addEventListener('click', closeMenu);
-
+		document.querySelectorAll('.sidebar a').forEach(link => {
+			link.addEventListener('click', () => {
+				if (window.innerWidth <= 768) {
+					layout.classList.remove('expanded');
+				}
+			});
+		});
 		function closeMenu() {
 			layout.classList.remove('expanded');
 			overlay.classList.remove('active');
 			body.style.overflow = '';
 		}
 
+		// User menu toggle
 		document.querySelector('.admin__user a').addEventListener('click', e => {
 			e.preventDefault();
 			const userMenu = document.querySelector('#admin__user__options');
@@ -44,46 +51,56 @@ window.Inachis.NavMenu = {
 			userMenu.setAttribute('aria-expanded', open);
 		});
 
-		document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+		// Sub menu toggles
+		submenuToggles.forEach(toggle => {
 			toggle.addEventListener('click', e => {
 				e.preventDefault();
 				const current = toggle.closest('.has-submenu');
-
-				document.querySelectorAll('.has-submenu.open').forEach(item => {
-					if (item !== current) {
-						item.classList.remove('open');
-						item.querySelector('.submenu-toggle')
-							?.setAttribute('aria-expanded', 'false');
-					}
-				});
-
 				const open = current.classList.toggle('open');
 				toggle.setAttribute('aria-expanded', open);
 			});
 		});
+		document.addEventListener('click', e => {
+			closeSubMenus(e.target);
+		});
+		// @todo review the below - need to get it working with LIs instead
+		document.querySelectorAll('.submenu a[aria-current="page"]').forEach(link => {
+			const parent = link.closest('.has-submenu');
+			parent.classList.add('open');
+			parent.querySelector('.submenu-toggle')
+					?.setAttribute('aria-expanded', 'true');
+		});
+		function closeSubMenus(current) {
+			document.querySelectorAll('.has-submenu.open').forEach(item => {
+				if (!item.contains(current)) {
+					item.classList.remove('open');
+					item.querySelector('.submenu-toggle')
+						?.setAttribute('aria-expanded', 'false');
+				}
+			});
+		}
 
+		// Mobile actions
 		let touchStartX = 0;
 		let touchEndX = 0;
-
 		sidebar.addEventListener('touchstart', e => {
-		if (window.innerWidth <= 768 && layout.classList.contains('expanded')) {
-			touchStartX = e.changedTouches[0].screenX;
-		}
-		});
-
-		sidebar.addEventListener('touchmove', e => {
-		if (window.innerWidth <= 768 && layout.classList.contains('expanded')) {
-			touchEndX = e.changedTouches[0].screenX;
-		}
-		});
-
-		sidebar.addEventListener('touchend', e => {
-		if (window.innerWidth <= 768 && layout.classList.contains('expanded')) {
-			if (touchEndX - touchStartX < -50) { // swipe left
-			closeMenu();
+			if (window.innerWidth <= 768 && layout.classList.contains('expanded')) {
+				touchStartX = e.changedTouches[0].screenX;
 			}
-			touchStartX = touchEndX = 0;
-		}
+			});
+
+			sidebar.addEventListener('touchmove', e => {
+			if (window.innerWidth <= 768 && layout.classList.contains('expanded')) {
+				touchEndX = e.changedTouches[0].screenX;
+			}
+			});
+			sidebar.addEventListener('touchend', e => {
+			if (window.innerWidth <= 768 && layout.classList.contains('expanded')) {
+				if (touchEndX - touchStartX < -50) { // swipe left
+					closeMenu();
+				}
+				touchStartX = touchEndX = 0;
+			}
 		});
 	}
 }

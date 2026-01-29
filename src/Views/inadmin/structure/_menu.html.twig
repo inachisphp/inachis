@@ -12,7 +12,8 @@
             <ul class="submenu">
                 <li>
                     <a href="{{ settings.domain ~ path('incc_post_edit', { type: 'post'}) }}/post/new"
-                        data-tooltip="{% trans %}admin.menu.add.post.title{% endtrans %}"
+                        data-action="new-post"
+                        data-tooltip="{% trans %}admin.menu.add.post.help{% endtrans %}"
                         title="{% trans %}admin.menu.add.post.help{% endtrans %}">
                         <i class="material-icons">short_text</i>
                         <span>{% trans %}admin.menu.add.post.title{% endtrans %}</span>
@@ -20,7 +21,7 @@
                 </li>
                 <li>
                     <a href="{{ settings.domain ~ path('incc_post_edit', { type: 'page'}) }}/new"
-                        data-tooltip="{% trans %}admin.menu.add.page.title{% endtrans %}"
+                        data-tooltip="{% trans %}admin.menu.add.page.help{% endtrans %}"
                         title="{% trans %}admin.menu.add.page.help{% endtrans %}">
                         <i class="material-icons">content_copy</i> 
                         <span>{% trans %}admin.menu.add.page.title{% endtrans %}</span>
@@ -31,7 +32,7 @@
 
         <li class="{{ page.tab|activeMenu('dashboard') }}">
             <a href="{{ settings.domain ~ path('incc_dashboard') }}"
-                data-tooltip="{% trans %}admin.dashboard.title{% endtrans %}"
+                data-tooltip="{% trans %}admin.dashboard.help{% endtrans %}"
                 title="{% trans %}admin.dashboard.help{% endtrans %}">
                 <i class="material-icons">home</i> 
                 <span>{% trans %}admin.dashboard.title{% endtrans %}</span>
@@ -39,7 +40,7 @@
         </li>
         <li class="{{ page.tab|activeMenu('post') }}">
             <a href="{{ settings.domain ~ path('incc_post_list', {'type': 'post'}) }}" 
-                data-tooltip="{% trans %}admin.posts.title{% endtrans %}" 
+                data-tooltip="{% trans %}admin.posts.help{% endtrans %}" 
                 title="{% trans %}admin.posts.help{% endtrans %}">
                 <i class="material-icons">library_books</i> 
                 <span>{% trans %}admin.posts.title{% endtrans %}</span></a>
@@ -47,7 +48,7 @@
         </li>
         <li class="{{ page.tab|activeMenu('series') }}">
             <a href="{{ settings.domain ~ path('incc_series_list') }}" 
-                data-tooltip="{% trans %}admin.series.title{% endtrans %}"
+                data-tooltip="{% trans %}admin.series.help{% endtrans %}"
                 title="{% trans %}admin.series.help{% endtrans %}">
                 <i class="material-icons">chrome_reader_mode</i>
                 <span>{% trans %}admin.series.title{% endtrans %}</span>
@@ -56,7 +57,7 @@
         </li>
         <li class="{{ page.tab|activeMenu('Image') }}">
             <a href="{{ settings.domain ~ path('incc_resource_list', { type: 'images' }) }}"
-                data-tooltip="{% trans %}admin.resources.title{% endtrans %}"   
+                data-tooltip="{% trans %}admin.resources.help{% endtrans %}"   
                 title="{% trans %}admin.resources.help{% endtrans %}">
                 <i class="material-icons">wallpaper</i>
                 <span>{% trans %}admin.resources.title{% endtrans %}</span>
@@ -69,7 +70,7 @@
                 role="button" aria-haspopup="true"
                 aria-expanded="false"
                 tabindex="0"
-                data-tooltip="{% trans %}admin.menu.more.title{% endtrans %}"
+                data-tooltip="{% trans %}admin.menu.more.help{% endtrans %}"
                 title="{% trans %}admin.menu.more.help{% endtrans %}">
                 <i class="material-icons">more_horiz</i> 
                 <span>{% trans %}admin.menu.more.title{% endtrans %}</span>
@@ -78,14 +79,14 @@
             <ul class="submenu">
                 <li class="{{ page.tab|activeMenu('url') }}">
                     <a href="{{ settings.domain ~ path('incc_url_list') }}"
-                        data-tooltop="{% trans %}admin.urls.title{% endtrans %}" 
+                        data-tooltop="{% trans %}admin.urls.help{% endtrans %}" 
                         title="{% trans %}admin.urls.help{% endtrans %}">
                         <i class="material-icons">insert_link</i> 
                         <span>{% trans %}admin.urls.title{% endtrans %}</span></a>
                 </li>
                 <li class="{{ page.tab|activeMenu('users') }}">
                     <a href="{{ settings.domain ~ path('incc_admin_list') }}" 
-                        data-tooltip="{% trans %}admin.user.title{% endtrans %}"
+                        data-tooltip="{% trans %}admin.user.help{% endtrans %}"
                         title="{% trans %}admin.user.help{% endtrans %}">
                         <i class="material-icons">people</i> 
                         <span>{% trans %}admin.user.title{% endtrans %}</span>
@@ -110,7 +111,7 @@
 
     <ul class="menu-view-site">
         <li>
-            <a href="/">
+            <a href="/" data-tooltip="View site">
                 <i class="material-icons">exit_to_app</i>
                 <span>{% trans %}admin.menu.view_site{% endtrans %}</span>
             </a>
