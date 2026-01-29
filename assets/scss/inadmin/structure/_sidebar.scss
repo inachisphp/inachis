@@ -6,9 +6,11 @@
     color: #fff;
     display: flex;
     flex-direction: column;
+    height: 100vh;
+    inset-inline-start: 0;
     position: sticky;
     top: 0;
-    height: 100vh;
+    z-index: 150;
 
     grid-column: 1;
     grid-row: 1 / 3;
@@ -111,6 +113,22 @@
     }
 }
 
+.layout:not(.expanded) .sidebar a::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 4.25em;
+  background: #111827;
+  color: #fff;
+  padding: 4px 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2000;
+}
+
+.layout:not(.expanded) .sidebar a:hover::after {
+  opacity: 1;
+}
 
 .desktop-menu-toggle {
     background: #334155;
