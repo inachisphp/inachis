@@ -101,9 +101,15 @@ class UserPreferenceType extends AbstractType
                     'Dyslexic' => 'dyslexic'
                 ],
                 'choice_attr' => function($choice, $key, $value) {
+                    $icons = [
+                        'sans' => 'font_download',
+                        'serif' => 'font_download',
+                        'mono' => 'font_download',
+                        'dyslexic' => 'accessibility_new',
+                    ];
                     return [
                         'class' => 'fontFamilyPreview-' . $value, 
-                        'data-icon' => 'format_size',
+                        'data-icon' => $icons[$value],
                     ];
                 },
                 'expanded' => true,
@@ -123,7 +129,7 @@ class UserPreferenceType extends AbstractType
                 'choice_attr' => function($choice, $key, $value) {
                     return [
                         'class' => 'lineHeightPreview-' . $value, 
-                        'data-icon' => 'format_size',
+                        'data-icon' => 'line_weight',
                     ];
                 },
                 'expanded' => true,
