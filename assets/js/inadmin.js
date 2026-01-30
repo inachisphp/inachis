@@ -1,5 +1,7 @@
 import './inadmin/Inachis.js';
 
+import './inadmin/components/optionSelector.js';
+
 import './inadmin/_bulkCreate.js';
 import './inadmin/_categoryManager.js';
 import './inadmin/_changePassword.js';

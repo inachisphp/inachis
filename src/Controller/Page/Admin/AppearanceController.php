@@ -10,6 +10,7 @@
 namespace Inachis\Controller\Page\Admin;
 
 use Inachis\Controller\AbstractInachisController;
+use Inachis\Form\UserPreferenceType;
 use Inachis\Service\User\UserPreferenceProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,6 +29,8 @@ class AppearanceController extends AbstractInachisController
     public function edit(Request $request, UserPreferenceProvider $userPreferenceProvider): Response
     {
         $preferences = $userPreferenceProvider->get();
+        $form = $this->createForm(UserPreferenceType::class, $preferences);
+        $form->handleRequest($request);
 
         if ($request->isMethod('POST')) {
             $preferences->setTheme($request->request->get('theme', $preferences->getTheme()));
@@ -40,6 +43,7 @@ class AppearanceController extends AbstractInachisController
             return $this->redirectToRoute('incc_admin_theme'); 
         }
 
+        $this->data['form'] = $form->createView();
         $this->data['user']['preferences'] = $preferences;
         $this->data['page']['title'] = 'Appearance';
         

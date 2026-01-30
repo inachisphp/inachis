@@ -249,9 +249,9 @@ class UserPreference
     /**
      * Returns the highContrast flag for the {@link UserPreference}
      *
-     * @return string
+     * @return bool
      */
-    public function getHighContrast(): string
+    public function getHighContrast(): bool
     {
         return $this->highContrast;
     }
