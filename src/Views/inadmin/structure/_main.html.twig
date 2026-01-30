@@ -22,7 +22,10 @@
     {% include "inadmin/structure/stylesheets.html.twig" %}
     {% include "inadmin/structure/javascript__top.html.twig" %}
 </head>
-<body{% if page_type|default('default') != 'default' %} class="type_{{ page_type }}"{% endif %}>
+<body class="theme-{{ userPreference.theme }} font-{{ userPreference.fontSize }} font-{{ userPreference.fontFamily }} line-{{ userPreference.lineHeight }}{%
+    if page_type|default('default') != 'default' %} type_{{ page_type }}"{% endif 
+%}">
+
 <a href="#main-content" class="skip-link">Skip to content</a>
 
 {%- if is_granted('ROLE_USER') %}
