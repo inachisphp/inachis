@@ -14,8 +14,8 @@
         {{ table_desc }}
     </p>
     {% endif %}
-    <table {%- if table_desc|default('') is not empty %} aria-describedby="table-desc"{% endif %} class="table{%- if table_class %} {{ table_class }}{% endif %}{%- if zebra|default(false) %}  table--striped{% endif %}">
-        <caption class="visually-hidden">{{ table_name }}</caption>
+    <table {%- if table_desc|default('') is not empty %} aria-describedby="table-desc"{% endif %} class="table{%- if table_class|default(null) %} {{ table_class }}{% endif %}{%- if zebra|default(false) %}{% endif %}">
+        {%if table_name|default(null) %}<caption class="visually-hidden">{{ table_name }}</caption>{% endif %}
         <thead>
         <tr>
         {% if actions|default(null) is not empty %}

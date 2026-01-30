@@ -9,8 +9,9 @@
 
 namespace Inachis\Entity;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Inachis\Entity\User;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -18,15 +19,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\LoginActivityRepository', readOnly: false)]
 class LoginActivity
 {
-    /**
-     *
-     */
-    public const STATUS_UNBLOCKED = false;
-    /**
-     *
-     */
-    public const STATUS_BLOCKED = true;
-
     /**
      * @var UuidInterface|null
      */
@@ -37,17 +29,29 @@ class LoginActivity
     private ?UuidInterface $id;
 
     /**
-     * @var string|null The username being logged in as
+     * @var User|null A link to the user if successful
      */
-    #[ORM\Column(type: 'string', length: 512, nullable: false)]
-    #[Assert\NotBlank]
-    private ?string $username = '';
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $user = null;
+
+    /**
+     * @var string The result of the login (success|failure)
+     */
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $type;
+
+    /**
+     * @var DateTime|null The date and time of the attempt
+     */
+    #[ORM\Column]
+    private ?DateTimeImmutable $loggedAt;
 
     /**
      * @var string|null The source IP of the login-in attempt
      */
     #[ORM\Column(type: 'string', length: 50)]
-    private ?string $remoteIp = '';
+    private ?string $ipAddress = '';
 
     /**
      * @var string|null A hash of the user-agent detected by the log-in attempt
@@ -56,20 +60,53 @@ class LoginActivity
     private ?string $userAgent = '';
 
     /**
-     * @var integer The number of attempts at sign-in during the given period
+     * @var string|null
      */
-    #[ORM\Column(type: 'integer')]
-    private int $attemptCount = 1;
+     #[ORM\Column(type: 'string', length: 64, nullable: true)]
+    private ?string $sessionHash = null;
 
     /**
-     * @var DateTime|null The date and time of the attempt
+     * @var string|null The username failed login attempt was for
      */
-    #[ORM\Column(type: 'datetime')]
-    private ?DateTime $timestamp;
+    #[ORM\Column(type: 'string', length: 512, nullable: true)]
+    #[Assert\NotBlank]
+    private ?string $username = '';
 
-    public function __construct()
-    {
-        $this->timestamp = new DateTime('now');
+    /**
+     * @var array|null Anything else worth noting about the login attempt
+     */
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $extraData = null;
+
+    /**
+     * {@link LoginActivity} requires success|failure status as a minimum to
+     * record login attempts.
+     *
+     * @param User|null $user
+     * @param string $type
+     * @param string|null $ip
+     * @param string|null $userAgent
+     * @param string|null $sessionId
+     * @param string|null $username
+     * @param array|null $extraData
+     */
+    public function __construct(
+        ?User $user,
+        string $type,
+        ?string $ip = null,
+        ?string $userAgent = null,
+        ?string $sessionId = null,
+        ?string $username = null,
+        ?array $extraData = null
+    ) {
+        $this->user = $user;
+        $this->type = $type;
+        $this->loggedAt = new DateTimeImmutable();
+        $this->ipAddress = $ip;
+        $this->userAgent = $userAgent;
+        $this->sessionHash = $sessionId ? hash('sha256', $sessionId) : null;
+        $this->username = $username ?? $user?->getUserIdentifier();
+        $this->extraData = $extraData;
     }
 
     /**
@@ -81,49 +118,35 @@ class LoginActivity
     }
 
     /**
-     * @param UuidInterface|null $id
-     * @return LoginActivity
+     * @return User|null
      */
-    public function setId(?UuidInterface $id): self
+    public function getUser(): ?User
     {
-        $this->id = $id;
-        return $this;
+        return $this->user;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getLoggedAt(): ?DateTimeImmutable
+    {
+        return $this->loggedAt;
     }
 
     /**
      * @return string|null
      */
-    public function getUsername(): ?string
+    public function getIpAddress(): ?string
     {
-        return $this->username;
-    }
-
-    /**
-     * @param string|null $username
-     * @return LoginActivity
-     */
-    public function setUsername(?string $username): self
-    {
-        $this->username = $username;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getRemoteIp(): ?string
-    {
-        return $this->remoteIp;
-    }
-
-    /**
-     * @param string|null $remoteIp
-     * @return LoginActivity
-     */
-    public function setRemoteIp(?string $remoteIp): self
-    {
-        $this->remoteIp = $remoteIp;
-        return $this;
+        return $this->ipAddress;
     }
 
     /**
@@ -135,8 +158,82 @@ class LoginActivity
     }
 
     /**
+     * @return string|null
+     */
+    public function getSessionHash(): ?string
+    {
+        return $this->sessionHash;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUsername(): ?string
+    {
+        return $this->username;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getExtraData(): ?array
+    {
+        return $this->extraData;
+    }
+
+    /**
+     * @param UuidInterface|null $id
+     * @return self
+     */
+    public function setId(?UuidInterface $id): self
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @param User|null $user
+     * @return self
+     */
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * @param string $type
+     * @return self
+     */
+    public function setType(string $type): self
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $loggedAt
+     * @return self
+     */
+    public function setLoggedAt(?DateTimeImmutable $loggedAt): self
+    {
+        $this->loggedAt = $loggedAt;
+        return $this;
+    }
+
+    /**
+     * @param string|null $ipAddress
+     * @return self
+     */
+    public function setIpAddress(?string $ipAddress): self
+    {
+        $this->ipAddress = $ipAddress;
+        return $this;
+    }
+
+    /**
      * @param string|null $userAgent
-     * @return LoginActivity
+     * @return self
      */
     public function setUserAgent(?string $userAgent): self
     {
@@ -145,38 +242,32 @@ class LoginActivity
     }
 
     /**
-     * @return int
+     * @param string|null $sessionHash
+     * @return self
      */
-    public function getAttemptCount(): int
+    public function setSessionHash(?string $sessionHash): self
     {
-        return $this->attemptCount;
-    }
-
-    /**
-     * @param int $attemptCount
-     * @return LoginActivity
-     */
-    public function setAttemptCount(int $attemptCount = 0): self
-    {
-        $this->attemptCount = $attemptCount;
+        $this->sessionHash = $sessionHash;
         return $this;
     }
 
     /**
-     * @return DateTime|null
+     * @param string|null $username
+     * @return self
      */
-    public function getTimestamp(): ?DateTime
+    public function setUsername(?string $username): self
     {
-        return $this->timestamp;
+        $this->username = $username;
+        return $this;
     }
 
     /**
-     * @param DateTime|null $timestamp
-     * @return LoginActivity
+     * @param array|null $extraData
+     * @return self
      */
-    public function setTimestamp(?DateTime $timestamp): self
+    public function setExtraData(?array $extraData): self
     {
-        $this->timestamp = $timestamp;
+        $this->extraData = $extraData;
         return $this;
     }
 }
