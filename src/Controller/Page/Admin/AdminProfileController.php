@@ -95,7 +95,7 @@ class AdminProfileController extends AbstractInachisController
      * @throws RandomException
      * @throws TransportExceptionInterface
      */
-    #[Route("/incc/admin/{id}", name: "incc_admin_edit", methods: [ "GET", "POST" ])]
+    #[Route("/incc/admin/{id}", name: "incc_admin_edit", methods: [ "GET", "POST" ], priority: -100)]
     public function edit(
         Request $request,
         ImageTransformer $imageTransformer,

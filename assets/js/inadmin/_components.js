@@ -6,6 +6,7 @@ window.Inachis.Components = {
 		this.initCopyPaste('');
 		this.initDatePicker();
 		this.initFilterBar();
+		this.initOptionSelectors();
 		this.initPasswordToggle();
 		this.initTomSelect('');
 		this.initSelectAllNone('');
@@ -75,6 +76,11 @@ window.Inachis.Components = {
 			$('#filter__options').toggle();
 			$filterOptions.toggleClass('selected');
 		}
+	},
+	initOptionSelectors() {
+		document.querySelectorAll('.option-selector').forEach(element => {
+			optionSelector(element);
+		});
 	},
 	initPasswordToggle() {
 		$('button.button--password-toggle').on('click', function () {

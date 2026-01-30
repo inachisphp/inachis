@@ -1,0 +1,84 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <span>Appearance</span>
+{% endblock pagetitle %}
+
+{% block content %}
+{% block theme_pre %}{% endblock theme_pre %}
+{% block theme %}
+
+{% set themeIcons = {
+    'light': 'light_mode',
+    'dark': 'dark_mode',
+    'auto': 'brightness_auto'
+} %}
+
+<form name="post" method="post" class="col-12 nested-grid form form__post">
+<section class="col-6 paginated-list">
+    <h2>Theme</h2>
+    <p>Select your preferred theme:</p>
+
+    <div class="option-selector" role="radiogroup" aria-label="Theme selection">
+    {% for choice in form.theme %}
+        {{ form_widget(choice) }}
+        <label for="{{ choice.vars.id }}" tabindex="0" class="theme-option" aria-checked="{{ choice.vars.checked ? 'true' : 'false' }}">
+            <span class="material-icons">{{ choice.vars.attr['data-icon'] }}</span>
+            {{ choice.vars.label|default(choice.vars.value|capitalize) }}
+        </label>
+    {% endfor %}
+    </div>
+</section>
+<section class="col-6 paginated-list">
+    <h2>Accessibility</h2>
+    <p>
+        {{ form_label(form.highContrast) }}
+        <span class="switch-wrapper">
+            {{ form_widget(form.highContrast) }}
+        </span>
+    </p>
+
+    <p>Font size</p>
+    <div class="option-selector" role="radiogroup" aria-label="Font size selection">
+    {% for choice in form.fontSize %}
+        {{ form_widget(choice) }}
+        <label for="{{ choice.vars.id }}" tabindex="0" aria-checked="{{ choice.vars.checked ? 'true' : 'false' }}">
+            <span class="material-icons">{{ choice.vars.attr['data-icon'] }}</span>
+            {{ choice.vars.label|default(choice.vars.value|capitalize) }}
+        </label>
+    {% endfor %}
+    </div>
+
+    <p>Font family</p>
+    <div class="option-selector" role="radiogroup" aria-label="Font family selection">
+    {% for choice in form.fontFamily %}
+        {{ form_widget(choice) }}
+        <label for="{{ choice.vars.id }}" tabindex="0" aria-checked="{{ choice.vars.checked ? 'true' : 'false' }}">
+            <span class="material-icons">{{ choice.vars.attr['data-icon'] }}</span>
+            {{ choice.vars.label|default(choice.vars.value|capitalize) }}
+        </label>
+    {% endfor %}
+    </div>
+
+    <p>Line height</p>
+    <div class="option-selector" role="radiogroup" aria-label="Line height selection">
+    {% for choice in form.lineHeight %}
+        {{ form_widget(choice) }}
+        <label for="{{ choice.vars.id }}" tabindex="0" aria-checked="{{ choice.vars.checked ? 'true' : 'false' }}">
+            <span class="material-icons">{{ choice.vars.attr['data-icon'] }}</span>
+            {{ choice.vars.label|default(choice.vars.value|capitalize) }}
+        </label>
+    {% endfor %}
+    </div>
+
+    <div class="fixed-bottom-bar">
+        <p>
+            <button type="submit" class="button button--positive">Save</button>
+        </p>
+    </div>
+</section>
+</form>
+
+{% endblock theme %}
+{% block theme_post %}{% endblock theme_post %}
+{% endblock content %}

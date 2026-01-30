@@ -43,6 +43,11 @@ services:
             $appSecret: '%env(APP_SECRET)%'
             $ttlSeconds: '%password_reset.ttl%'
 
+    Inachis\Twig\:
+        resource: '../src/Twig'
+        tags: [ 'twig.extension' ]
+        autoconfigure: true
+
     Inachis\EventListener\AdminResponseEvent:
         arguments:
             $csp: '%csp%'
