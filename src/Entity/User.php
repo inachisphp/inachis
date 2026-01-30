@@ -9,8 +9,6 @@
 
 namespace Inachis\Entity;
 
-use Inachis\Exception\InvalidTimezoneException;
-use Inachis\Validator\DateValidator;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
@@ -141,19 +139,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected ?DateTime $passwordModDate = null;
 
     /**
-     * @InachisAssert\ValidTimezone()
-     * @var string The local timezone for the user
+     * @var UserPreference|null Preferences for the current {@link User}
      */
-    #[ORM\Column(type: "string", length: 32, options: ["default" => "UTC" ])]
-    #[Assert\NotBlank]
-    protected string $timezone;
-
-    /**
-     * @var string
-     */
-    #[ORM\Column(type: "string", length: 10, nullable: false)]
-    #[Assert\NotBlank]
-    protected string $color = '#099bdd';
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?UserPreference $preferences = null;
 
     /**
      * Default constructor for {@link User}. If a password is passed into
@@ -175,7 +164,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $currentTime = new DateTime('now');
         $this->setCreateDate($currentTime);
         $this->setModDate($currentTime);
-        $this->setTimezone('UTC');
     }
 
     /**
@@ -237,6 +225,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * Returns the role(s) for the current {@link User}
+     * @return array
+     */
+    public function getRoles(): array
+    {
+//        $roles = $this->roles;
+        $roles = [ 'ROLE_ADMIN' ];
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    /**
      * Returns the {@link avatar} for the {@link User}.
      *
      * @return string|null The avatar for the user
@@ -287,16 +289,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Returns the {@link timezone} for the {@link User}.
-     *
-     * @return string The local timezone for the user
-     */
-    public function getTimezone(): string
-    {
-        return $this->timezone;
-    }
-
-    /**
      * Returns the {@link passwordModDate} for the {@link User}.
      *
      * @return DateTime The password last modification date for the user
@@ -304,6 +296,45 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getPasswordModDate(): DateTime
     {
         return $this->passwordModDate;
+    }
+
+    /**
+     * Gets the preferences for the current {@link User}
+     *
+     * @return UserPreference
+     */
+    public function getPreferences(): UserPreference
+    {
+        if ($this->preferences === null) {
+            $this->preferences = new UserPreference($this);
+        }
+
+        return $this->preferences;
+    }
+
+    /**
+     * Returns the identifier (in this case, username) for the  {@link User}
+     *
+     * @return string
+     */
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
+
+    /**
+     * Returns the initials for the {@link User} based on their {@link User.displayName}
+     *
+     * @return string
+     */
+    public function getInitials(): string
+    {
+        $initials = '';
+        $nameWords = explode(' ', $this->getDisplayName());
+        foreach ($nameWords as $nameWord) {
+            $initials .= ucfirst($nameWord[0]);
+        }
+        return $initials;
     }
 
     /**
@@ -387,6 +418,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * Sets the role(s) for the current {@link User}
+     *
+     * @param array $roles
+     * @return self
+     */
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
      * Sets the value of {@link avatar}.
      *
      * @param string|null $value The value to set
@@ -465,13 +509,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @param string|null $value
-     * @return $this
-     * @throws InvalidTimezoneException
+     * Applies preference settings to the {@link User}
+     *
+     * @param UserPreference $preferences
+     * @return self
      */
-    public function setTimezone(?string $value): self
+    public function setPreferences(UserPreference $preferences): self
     {
-        $this->timezone = DateValidator::validateTimezone($value);
+        $this->preferences = $preferences;
+        if ($preferences->getUser() !== $this) {
+            $preferences->setUser($this);
+        }
 
         return $this;
     }
@@ -526,60 +574,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return array
+     * Removes the password for this {@link User}
+     *
+     * @return void
      */
-    public function getRoles(): array
-    {
-//        $roles = $this->roles;
-        $roles = [ 'ROLE_ADMIN' ];
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
-    }
-
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
-
-        return $this;
-    }
-
     public function eraseCredentials(): void
     {
         $this->plainPassword = null;
-    }
-
-    public function getUserIdentifier(): string
-    {
-        return $this->username;
-    }
-
-    public function getInitials(): string
-    {
-        $initials = '';
-        $nameWords = explode(' ', $this->getDisplayName());
-        foreach ($nameWords as $nameWord) {
-            $initials .= ucfirst($nameWord[0]);
-        }
-        return $initials;
-    }
-
-    /**
-     * @param string $color
-     * @return $this
-     */
-    public function setColor(string $color): self
-    {
-        $this->color = $color;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getColor(): string
-    {
-        return $this->color;
     }
 }

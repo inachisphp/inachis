@@ -1,0 +1,76 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <span>Appearance</span>
+{% endblock pagetitle %}
+
+{% block content %}
+{% block theme_pre %}{% endblock theme_pre %}
+{% block theme %}
+
+<form name="post" method="post" class="col-12 form form__post">
+    <h2>Theme</h2>
+    <p>Select your preferred theme:</p>
+
+    <div class="option-selector" role="radiogroup" aria-label="Theme selection">
+        <input type="radio" id="theme-light" name="theme" value="light">
+        <label for="theme-light" class="theme-option" tabindex="0" aria-checked="false">
+            <span class="material-icons">light_mode</span>
+            Light
+        </label>
+
+        <input type="radio" id="theme-dark" name="theme" value="dark">
+        <label for="theme-dark" class="theme-option" tabindex="0" aria-checked="false">
+            <span class="material-icons">dark_mode</span>
+            Dark
+        </label>
+
+        <input type="radio" id="theme-auto" name="theme" value="auto" checked>
+        <label for="theme-auto" class="theme-option" tabindex="0" aria-checked="false">
+            <span class="material-icons">brightness_auto</span>
+            Auto
+        </label>
+    </div>
+
+    <h2>Accessibility</h2>
+    <p>
+        <label class="inline-label" id="high_contrast_label" for="high_contrast">High Contrast</label>
+        <span class="switch-wrapper">
+            <input type="checkbox" id="high_contrast" name="high_contrast" aria-labelledby="high_contrast_label" aria-required="false" class="ui-switch switch-button-input" data-label-off="disabled" data-label-on="enabled" value="1">
+        </span>
+    </p>
+
+    <p>Font size</p>
+    <div class="option-selector" role="radiogroup" aria-label="Font size selection">
+        <input type="radio" id="font_size_default" name="font_size" value="default" checked>
+        <label for="font_size_default" tabindex="0" aria-checked="true">
+            <span class="material-icons">format_size</span>
+            Default
+        </label>
+
+        <input type="radio" id="font_size_large" name="font_size" value="large">
+        <label for="font_size_large" tabindex="0" aria-checked="false">
+            <span class="material-icons">format_size</span>
+            Larger
+        </label>
+
+        <input type="radio" id="font_size_largest" name="font_size" value="largest">
+        <label for="font_size_largest" tabindex="0" aria-checked="false">
+            <span class="material-icons">format_size</span>
+            Largest
+        </label>
+    </div>
+
+    <p>Font family (incl OpenDyslexia font)</p>
+    <p>Line height</p>
+
+    <div class="fixed-bottom-bar">
+        <p>
+            <button type="submit" class="button button--positive">Save</button>
+        </p>
+    </div>
+</form>
+
+{% endblock theme %}
+{% block theme_post %}{% endblock theme_post %}
+{% endblock content %}
