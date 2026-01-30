@@ -88,6 +88,25 @@ async function optimizeImages() {
     );
 }
 
+async function copyIconsAndManifests() {
+    const srcDir = 'assets/imgs/incc';
+    const destDir = 'public/assets/imgs/incc';
+    const filesToCopy = ['.ico', 'browserconfig.xml', 'site.webmanifest'];
+
+    fs.mkdirSync(destDir, { recursive: true });
+
+    fs.readdirSync(srcDir)
+        .filter(file => 
+            file.endsWith('.ico') || 
+            filesToCopy.includes(file)
+        )
+        .forEach(file => {
+            fs.copyFileSync(path.join(srcDir, file), path.join(destDir, file));
+            console.log(`📄 Copied: ${file} to ${destDir}`);
+        }
+    );
+}
+
 
 async function copyExtraLibraries() {
     const libs = [
@@ -127,6 +146,8 @@ async function run() {
         } else {
             await optimizeImages();
             console.log("✅ Images optimized");
+            await copyIconsAndManifests();
+            console.log("✅ FavIcons and Manifests copied");
 
             await Promise.all(builds.map(config => esbuild.build(config)));
             await copyExtraLibraries();
