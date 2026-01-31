@@ -44,7 +44,7 @@ class UserPreferenceType extends AbstractType
                         'auto' => 'brightness_auto',
                     ];
                     return [
-                        'class' => 'theme-option', 
+                        'class' => 'theme-option',
                         // 'id' => 'theme-' . $value,
                         'data-icon' => $icons[$value] ?? '',
                     ];
@@ -81,7 +81,7 @@ class UserPreferenceType extends AbstractType
                 ],
                 'choice_attr' => function($choice, $key, $value) {
                     return [
-                        'class' => 'fontSizePreview-' . $value, 
+                        'class' => 'fontSizePreview-' . $value,
                         'data-icon' => 'format_size',
                     ];
                 },
@@ -108,7 +108,7 @@ class UserPreferenceType extends AbstractType
                         'dyslexic' => 'accessibility_new',
                     ];
                     return [
-                        'class' => 'fontFamilyPreview-' . $value, 
+                        'class' => 'fontFamilyPreview-' . $value,
                         'data-icon' => $icons[$value],
                     ];
                 },
@@ -123,12 +123,12 @@ class UserPreferenceType extends AbstractType
             ->add('lineHeight', ChoiceType::class, [
                 'choices' => [
                     'default' => 'default',
-                    'Comfort' => 'comfortable',
+                    'Comfort' => 'comfort',
                     'Spacious' => 'spacious',
                 ],
                 'choice_attr' => function($choice, $key, $value) {
                     return [
-                        'class' => 'lineHeightPreview-' . $value, 
+                        'class' => 'lineHeightPreview-' . $value,
                         'data-icon' => 'line_weight',
                     ];
                 },
