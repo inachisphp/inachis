@@ -32,7 +32,7 @@
 		display: inline-block;
 		width: 100%;
 
-		@media #{$information-medium} {
+		@media (min-width: $breakpoint-medium) {
 			width: 60%;
 		}
 	}

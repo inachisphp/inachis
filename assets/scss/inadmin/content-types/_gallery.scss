@@ -19,7 +19,7 @@
   margin: auto;
   padding: 0;
 
-  @media #{$information-medium} {
+  @media (min-width: $breakpoint-medium) {
     padding: 0 40px;
   }
 
@@ -38,7 +38,7 @@
       text-decoration: none;
       width: 145px;
 
-      @media #{$information-medium} {
+      @media (min-width: $breakpoint-medium) {
         width: 150px;
       }
     }

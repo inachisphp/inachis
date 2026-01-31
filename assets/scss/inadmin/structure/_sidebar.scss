@@ -148,7 +148,7 @@
         transform: rotate(180deg);
     }
 
-    @media (min-width: $mobile + 1) {
+    @media (min-width: $breakpoint-medium + 1) {
         display: block;
     }
 }
@@ -173,7 +173,7 @@
 .mobile-menu-toggle {
     display: none;
 
-    @media (max-width: $mobile) {
+    @media (max-width: $breakpoint-medium) {
         & {
             background: #2563eb;
             border: none;
@@ -189,7 +189,7 @@
     }
 }
 
-@media (max-width: $mobile) {
+@media (max-width: $breakpoint-medium) {
     .sidebar {
         position: fixed;
         inset: 0 auto 0 0;

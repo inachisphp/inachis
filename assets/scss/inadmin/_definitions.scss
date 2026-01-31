@@ -4,13 +4,11 @@ $columns: 12;
 $gutter: 16px;
 $sidebar-collapsed: 60px;
 $sidebar-expanded: 220px;
-$mobile: 768px;
-
 
 // media queries
-$information-small: "screen and (min-width: 320px)";
-$information-medium: "screen and (min-width: 480px)";
-$information-large: "screen and (min-width: 480px)";
+$breakpoint-small: 480px;
+$breakpoint-medium: 768px;
+$breakpoint-large: 1024px;
 
 // Global styles
 $admin__background-color: #fafafa;

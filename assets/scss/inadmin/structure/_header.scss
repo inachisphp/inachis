@@ -2,11 +2,11 @@
 
 .content-header {
     background: #f1f5f9;
-    padding: 16px 24px;
+    padding: 3px 0px;
     border-bottom: 1px solid #cbd5e1;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -18,12 +18,18 @@
     h1 {
         display: none;
     }
+
+    .admin__actions {
+        display: flex;
+        flex-direction: row-reverse;
+    }
 }
 
-@media #{$information-medium} {
+@media (min-width: $breakpoint-medium) {
     .content-header {
         grid-column: 2;
         grid-row: 1;
+        justify-content: space-between;
         padding: 0.25em 0;
         width: auto;
 
@@ -51,11 +57,6 @@
             & > span:first-child {
                 margin-left: 0;
             }
-        }
-
-        .admin__actions {
-            display: flex;
-            flex-direction: row-reverse;
         }
     }
 }

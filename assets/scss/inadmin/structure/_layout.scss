@@ -19,13 +19,13 @@
     .sidebar ul span { display: inline; }
   }
 
-  @media (max-width: $mobile) {
+  @media (max-width: $breakpoint-medium) {
     grid-template-columns: 1fr;
   }
 }
 
 
-@media (max-width: $mobile) {
+@media (max-width: $breakpoint-medium) {
   .content {
     grid-column: 1;
     grid-row: auto; // content flows below if needed
@@ -48,7 +48,7 @@
     .col-#{$i} { @include col-span($i); }
   }
 
-  @media (max-width: $mobile) {
+  @media (max-width: $breakpoint-medium) {
     grid-column: 1;
     > * { grid-column: 1 / -1; }
   }
