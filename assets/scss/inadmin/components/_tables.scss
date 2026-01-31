@@ -39,6 +39,45 @@
   }
 }
 
+@media (max-width: $breakpoint-medium) {
+  .table.table-responsive {
+    thead, tbody, th, td, tr {
+      display: block;
+    }
+    th.hide-on-mobile,
+    td.hide-on-mobile {
+      display: none;
+    }
+    thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+    tbody tr {
+      border-bottom: 2px solid #000;
+    }
+    td {
+      border: none;
+      border-bottom: 1px solid #eee;
+      position: relative;
+      padding-left: 50%;
+      text-align: right;
+
+      &:before {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+        content: attr(data-label);
+      }
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // BASE TABLE STYLING
 // ---------------------------------------------------------------------------

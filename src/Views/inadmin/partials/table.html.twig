@@ -25,7 +25,7 @@
             </th>
         {% endif %}
         {% for column in columns %}
-            <th scope="col">{{ column.title }}</th>
+            <th scope="col"{% if column.hideOnMobile|default(false) %} class="hide-on-mobile"{% endif %}>{{ column.title }}</th>
         {% endfor %}
         </tr>
         </thead>
@@ -54,7 +54,7 @@
                         {% set slug_object = attribute(item, column.slug) %}
                     {% endif %}
                 {% endif %}
-                <{% if column.header is defined and column.header %}th scope="row"{% else %}td{% if column.flex|default(false) %} class="table--flex"{% endif %}{% endif %}>
+                <{% if column.header is defined and column.header %}th scope="row"{% else %}td{% if column.flex|default(false) %} class="table--flex"{% endif %}{% if column.hideOnMobile|default(false) %} class="hide-on-mobile"{% endif %}{% endif %}>
                     {% if column.slug is defined %}
                         <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incc/{{ slug_prefix }}/{{ slug_object }}">
                     {% endif %}
