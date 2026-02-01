@@ -33,13 +33,14 @@
       background: $image-tile-background;
       color: #333;
       display: block;
-      height: 14.5em;
-      padding: 1em;
+      height: 16em;
+      padding: 0.5rem;
       text-decoration: none;
-      width: 145px;
+      width: 12.5em;
 
       @media (min-width: $breakpoint-medium) {
-        width: 150px;
+        padding: 1em;
+        width: 13em;
       }
     }
 
@@ -71,5 +72,32 @@
   }
   a:hover {
     background-color: #ccc;
+  }
+}
+
+.edit-grid {
+  display: grid;
+  gap: $gutter;
+
+  // mobile default
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "image"
+    "details"
+    "properties"
+    "usages";
+}
+
+.edit-image      { grid-area: image; }
+.edit-details    { grid-area: details; }
+.edit-properties { grid-area: properties; }
+.edit-usages     { grid-area: usages; }
+
+@media (min-width: $breakpoint-medium) {
+  .edit-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      "details image"
+      "properties usages";
   }
 }

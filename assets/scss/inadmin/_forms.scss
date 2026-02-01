@@ -138,14 +138,14 @@
 
 		&:hover {
 			background: linear-gradient(90deg,
-							color.adjust(#069, $lightness: 10%),
-							color.adjust(#0063a7, $lightness:10%),
-							color.adjust(#005fb4, $lightness:10%),
-							color.adjust(#0059c0, $lightness:10%),
-							color.adjust(#1751c9, $lightness:10%),
-							color.adjust(#3e46ce, $lightness:10%),
-							color.adjust(#5d35cf, $lightness:10%),
-							color.adjust(#7914cc, $lightness:10%));
+				color.adjust(#069, $lightness: 10%),
+				color.adjust(#0063a7, $lightness:10%),
+				color.adjust(#005fb4, $lightness:10%),
+				color.adjust(#0059c0, $lightness:10%),
+				color.adjust(#1751c9, $lightness:10%),
+				color.adjust(#3e46ce, $lightness:10%),
+				color.adjust(#5d35cf, $lightness:10%),
+				color.adjust(#7914cc, $lightness:10%));
 			border-color: #f60;
 		}
 	}

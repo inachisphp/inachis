@@ -16,7 +16,7 @@
             type: 'users',
 
             table_name: 'Administrator list',
-            table_class: 'table--responsive table--row-borders table--darkhead table--selectable',
+            table_class: 'table-responsive table--row-borders table--darkhead table--selectable',
             table_desc: 'This table lists administrators. The first column contains checkboxes allowing users to select one or more tasks.',
             columns: [
                 {
@@ -52,11 +52,13 @@
                 {
                     title: 'Last Login',
                     source: '',
+                    hideOnMobile: true,
                 },
                 {
                     title: 'Password Last Modified',
                     source: 'passwordModDate',
                     source_type: 'date',
+                    hideOnMobile: true,
                 },
             ],
 

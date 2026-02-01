@@ -1,24 +1,109 @@
 @use '../definitions' as *;
 
-.flash-notice, .flash-success, .flash-warning {
-  background-color: $admin__flash-background;
-  border-radius: 0.5em;
-  color: $admin__flash-color;
+// Light theme tokens (Material Design 3)
+$md-sys-color-info-container-light:      #E3F2FD;
+$md-sys-color-on-info-container-light:   #0D47A1;
+
+$md-sys-color-success-container-light:   #E8F5E9;
+$md-sys-color-on-success-container-light:#1B5E20;
+
+$md-sys-color-warning-container-light:   #FFF4E5;
+$md-sys-color-on-warning-container-light:#E65100;
+
+$md-sys-color-error-container-light:     #FDECEA;
+$md-sys-color-on-error-container-light:  #B71C1C;
+
+$md-sys-color-info-container-dark:        #1E3A5F;
+$md-sys-color-on-info-container-dark:     #BBDEFB;
+
+$md-sys-color-success-container-dark:     #1B3A24;
+$md-sys-color-on-success-container-dark:  #C8E6C9;
+
+$md-sys-color-warning-container-dark:     #4E342E;
+$md-sys-color-on-warning-container-dark:  #FFD180;
+
+$md-sys-color-error-container-dark:       #4A1C1C;
+$md-sys-color-on-error-container-dark:    #F2B8B5;
+
+.flash-notice,
+.flash-success,
+.flash-warning,
+.flash-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+
   padding: 1em;
   margin: 0.5em 0;
+  border-radius: 0.5em;
 
-  span {
-    vertical-align: middle;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 
-    &.material-icons {
-      margin-right: 0.5em;
-    }
+  span.material-icons {
+    font-size: 1.25em;
   }
 }
-.flash-success {
-  background-color: #d9e7cb;
+
+.flash-notice {
+  background-color: $md-sys-color-info-container-light;
+  color: $md-sys-color-on-info-container-light;
 }
+
+.flash-success {
+  background-color: $md-sys-color-success-container-light;
+  color: $md-sys-color-on-success-container-light;
+}
+
 .flash-warning {
-  background-color: #f00000;
-  color: #fff;
+  background-color: $md-sys-color-warning-container-light;
+  color: $md-sys-color-on-warning-container-light;
+}
+
+.flash-error {
+  background-color: $md-sys-color-error-container-light;
+  color: $md-sys-color-on-error-container-light;
+  border-left: 4px solid currentColor;
+}
+
+// @media (prefers-color-scheme: dark) {
+//   .flash-notice {
+//     background-color: $md-sys-color-info-container-dark;
+//     color: $md-sys-color-on-info-container-dark;
+//   }
+
+//   .flash-success {
+//     background-color: $md-sys-color-success-container-dark;
+//     color: $md-sys-color-on-success-container-dark;
+//   }
+
+//   .flash-warning {
+//     background-color: $md-sys-color-warning-container-dark;
+//     color: $md-sys-color-on-warning-container-dark;
+//   }
+
+//   .flash-error {
+//     background-color: $md-sys-color-error-container-dark;
+//     color: $md-sys-color-on-error-container-dark;
+//   }
+// }
+
+
+@media (prefers-reduced-motion: no-preference) {
+  .flash-notice,
+  .flash-success,
+  .flash-warning,
+  .flash-error {
+    animation: flash-in 150ms ease-out;
+  }
+
+  @keyframes flash-in {
+    from {
+      opacity: 0;
+      transform: translateY(-2px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }

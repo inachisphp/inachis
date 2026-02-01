@@ -96,8 +96,8 @@ async function copyIconsAndManifests() {
     fs.mkdirSync(destDir, { recursive: true });
 
     fs.readdirSync(srcDir)
-        .filter(file => 
-            file.endsWith('.ico') || 
+        .filter(file =>
+            file.endsWith('.ico') ||
             filesToCopy.includes(file)
         )
         .forEach(file => {
@@ -153,7 +153,7 @@ async function run() {
             await copyExtraLibraries();
             console.log("✅ JS and CSS complete");
 
-            console.log("✅ Build complete")
+            console.log("✅ Build complete");
         }
     } catch (err) {
         console.error("❌ Build failed:", err);
