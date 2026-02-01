@@ -2,6 +2,7 @@ const { default: TomSelect } = require("tom-select");
 
 window.Inachis.Components = {
 	initialize() {
+		this.initBackToTop();
 		this.initClearSearch('');
 		this.initCopyPaste('');
 		this.initDatePicker();
@@ -28,6 +29,17 @@ window.Inachis.Components = {
 
 		tabs('.ui-tabbed');
 		$('.error-select').hide();
+	},
+
+	initBackToTop() {
+		const backToTop = document.getElementById('back-to-top');
+
+		window.addEventListener('scroll', () => {
+			backToTop.hidden = window.scrollY < 300;
+		});
+		backToTop.addEventListener('click', () => {
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		});
 	},
 
 	initClearSearch(selector) {
@@ -67,15 +79,30 @@ window.Inachis.Components = {
 		});
 	},
 	initFilterBar() {
-		const $filterOptions = $('.filter .filter__toggle');
-		$filterOptions.on('click', function () {
-			$('#filter__options').toggle();
-			$(this).toggleClass('selected');
-		});
-		if ($('#filter__keyword').val() !== '') {
-			$('#filter__options').toggle();
-			$filterOptions.toggleClass('selected');
+		const toggle = document.querySelector('.filter__toggle');
+		const panel  = document.getElementById('filter__options');
+
+		if (!toggle || !panel) {
+			return;
 		}
+
+		toggle.addEventListener('click', () => {
+			const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+			toggle.setAttribute('aria-expanded', String(!isOpen));
+
+			if (isOpen) {
+				panel.classList.remove('is-open');
+				panel.addEventListener('transitionend', () =>
+					panel.setAttribute('hidden', ''),
+					{ once: true }
+				);
+			} else {
+				panel.removeAttribute('hidden');
+				panel.offsetHeight;
+				panel.classList.add('is-open');
+				panel.querySelector('input, select, button')?.focus();
+			}
+		});
 	},
 	initOptionSelectors() {
 		document.querySelectorAll('.option-selector').forEach(element => {

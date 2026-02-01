@@ -171,21 +171,19 @@
 }
 
 .mobile-menu-toggle {
-    display: none;
+    background: #2563eb;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: block;
+    left: 12px;
+    padding: 10px;
+    position: fixed;
+    top: 12px;
+    z-index: 1100;
 
-    @media (max-width: $breakpoint-medium) {
-        & {
-            background: #2563eb;
-            border: none;
-            color: white;
-            cursor: pointer;
-            display: block;
-            left: 12px;
-            padding: 10px;
-            position: fixed;
-            top: 12px;
-            z-index: 1100;
-        }
+    @media (min-width: $breakpoint-medium) {
+        display: none;
     }
 }
 

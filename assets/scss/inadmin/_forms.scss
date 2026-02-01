@@ -55,6 +55,10 @@
 	text-wrap-mode: nowrap;
 	transition: background-color 0.2s ease;
 
+	.btn-text {
+		display: none;
+	}
+
 	&:hover {
 		background-color: color.adjust(#fff, $lightness: -10%);
 	}
@@ -145,4 +149,10 @@
 			border-color: #f60;
 		}
 	}
+
+	@media (min-width: $breakpoint-medium) {
+        .btn-text {
+            display: inline;
+        }
+    }
 }
