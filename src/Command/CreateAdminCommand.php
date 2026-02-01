@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Command;
+namespace Inachis\Command;
 
-use App\Entity\User;
+use Inachis\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -81,6 +81,7 @@ class CreateAdminCommand extends Command
             return $value;
         });
         $question->setHidden(true);
+        $question->setMaxAttempts(2);
         $plaintextPassword = $helper->ask($input, $output, $question);
 
         $user = new User($username, $plaintextPassword, $emailAddress);

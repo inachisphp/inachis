@@ -1,10 +1,17 @@
 @use '../definitions' as *;
 
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+	display: none;
+}
+
 .admin__search {
 	margin-right: 1em;
 	padding: 15px 0 10px 0;
 
-	@media #{$information-medium} {
+	@media (min-width: $breakpoint-medium) {
 		padding: 15px 10px 10px 0;
 	}
 
@@ -32,15 +39,41 @@
 	}
 }
 
-.clear-search {
-	background: transparent;
-	border: none;
-	color: $admin__search_color;
-	position: absolute;
-	right: 3.5em;
-	top: 0.8em;
+.input-icon-wrapper {
+	position: relative; flex: 1; display: flex; align-items: center;
+	background: #f3f4f6; padding: 0 0.75rem;
+	border-radius: 0.5rem;
+	border: 1px solid transparent; transition: all 0.2s;
 
-	@media #{$information-medium} {
-		right: 4em;
+	input {
+		border: none;
+		background: transparent;
+		padding: 0.75rem 2rem 0.75rem 0.5rem;
+		width: 100%;
+		font-size: 1rem;
+		outline: none;
+	}
+	&:focus-within {
+		background: #fff;
+		border-color: #069;
+		box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+	}
+}
+
+.clear-search {
+	background: none;
+	border: none;
+	color: #6b7280;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	position: absolute;
+	right: 0.5rem;
+	padding: 4px;
+	border-radius: 50%;
+
+	&::hover {
+		background: rgba(0,0,0,0.05);
+		color: #111827;
 	}
 }

@@ -39,6 +39,45 @@
   }
 }
 
+@media (max-width: $breakpoint-medium) {
+  .table.table-responsive {
+    thead, tbody, th, td, tr {
+      display: block;
+    }
+    th.hide-on-mobile,
+    td.hide-on-mobile {
+      display: none;
+    }
+    thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+    tbody tr {
+      border-bottom: 2px solid #000;
+    }
+    td {
+      border: none;
+      border-bottom: 1px solid #eee;
+      position: relative;
+      padding-left: 50%;
+      text-align: right;
+
+      &:before {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+        content: attr(data-label);
+      }
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // BASE TABLE STYLING
 // ---------------------------------------------------------------------------
@@ -56,7 +95,7 @@ table {
     text-align: left;
     font-weight: 600;
     margin-bottom: 0.5rem;
-    color: darken($table-header-bg, 15%);
+    color: color.adjust($table-header-bg, $lightness: -15%);
   }
 
   // Head
@@ -262,7 +301,7 @@ form .table--selectable {
 
   tbody td:hover,
   thead th:hover {
-    background-color: lighten($table-header-bg, 40%);
+    background-color: color.adjust($table-header-bg, $lightness: 40%);
   }
 
   tbody td:hover::before,
@@ -273,7 +312,7 @@ form .table--selectable {
     bottom: -999px;
     left: 0;
     right: 0;
-    background-color: lighten($table-header-bg, 40%);
+    background-color: color.adjust($table-header-bg, $lightness: 40%);
     z-index: -1;
   }
 }
@@ -344,7 +383,7 @@ form .table--selectable {
     transition: background 0.2s ease;
 
     &.expanded {
-      background-color: lighten($table-header-bg, 45%);
+      background-color: color.adjust($table-header-bg, $lightness: 45%);
     }
   }
 

@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Service\User;
+namespace Inachis\Service\User;
 
-use App\Entity\User;
-use App\Util\Base64EncodeFile;
-use App\Util\RandomColorPicker;
+use Inachis\Entity\User;
+use Inachis\Util\Base64EncodeFile;
+use Inachis\Util\RandomColorPicker;
 use Random\RandomException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -27,22 +27,22 @@ readonly class UserAccountEmailService
         private EntityManagerInterface $entityManager,
     ) {}
 
-    public function sendForgotPasswordEmail(User $user, array $settings, callable $urlGenerator): void
+    public function sendForgotPasswordEmail(User $user, array $data, callable $urlGenerator): void
     {
-        $data = $this->tokenService->createResetRequestForEmail($user->getEmail());
+        $tokenData = $this->tokenService->createResetRequestForEmail($user->getEmail());
 //        $this->entityManager->persist($user);
 //        $this->entityManager->flush();
 
         $email = (new TemplatedEmail())
             ->to(new Address($user->getEmail()))
-            ->subject('Reset your password for ' . $settings['siteTitle'])
+            ->subject('Reset your password for ' . $data['settings']['siteTitle'])
             ->htmlTemplate('inadmin/emails/forgot-password.html.twig')
             ->textTemplate('inadmin/emails/forgot-password.txt.twig')
             ->context([
-                'ipAddress' => $settings['clientIP'],
-                'url' => $urlGenerator($data['token']),
-                'expiresAt' => $data['expiresAt']->format('l jS F Y \a\\t H:i'),
-                'settings' => $settings,
+                'ipAddress' => $data['clientIP'],
+                'url' => $urlGenerator($tokenData['token']),
+                'expiresAt' => $tokenData['expiresAt']->format('l jS F Y \a\\t H:i'),
+                'settings' => $data['settings'],
                 'logo' => Base64EncodeFile::encode('public/assets/imgs/incc/inachis.png'),
             ]);
         $this->mailer->send($email);
@@ -62,7 +62,7 @@ readonly class UserAccountEmailService
 
         $email = (new TemplatedEmail())
             ->to(new Address($user->getEmail()))
-            ->subject('Welcome to ' . $settings['siteTitle'])
+            ->subject('Welcome to ' . $settings['settings']['siteTitle'])
             ->htmlTemplate('inadmin/emails/registration.html.twig')
             ->textTemplate('inadmin/emails/registration.txt.twig')
             ->context([

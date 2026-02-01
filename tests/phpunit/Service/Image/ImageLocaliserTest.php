@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Service\Image;
+namespace Inachis\Tests\phpunit\Service\Image;
 
-use App\Service\Image\ImageLocaliser;
+use Inachis\Service\Image\ImageLocaliser;
 use PHPUnit\Framework\MockObject\MockClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;

@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Dialog;
+namespace Inachis\Tests\phpunit\Controller\Dialog;
 
-use App\Controller\Dialog\ConfirmationController;
+use Inachis\Controller\Dialog\ConfirmationController;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

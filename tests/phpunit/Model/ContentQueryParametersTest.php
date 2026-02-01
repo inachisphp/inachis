@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Model;
+namespace Inachis\Tests\phpunit\Model;
 
-use App\Model\ContentQueryParameters;
-use App\Repository\PageRepository;
+use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\PageRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;

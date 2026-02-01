@@ -1,0 +1,43 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+{% block pagetitle %}
+    <span>Settings</span>
+{% endblock pagetitle %}
+
+{% block content %}
+{% block settings_pre %}{% endblock settings_pre %}
+{% block settings %}
+<div class="col-12 widget-container">
+
+<section class="widget widget-settings">
+    <p><span class="material-icons">dns</span></p>
+    <h2>Server Configuration</h2>
+    <p><span>Check your server and application settings.</span></p>
+    <p><a href="{{ settings.domain ~ path('incc_settings_diagnostics') }}" class="button button--secondary">Review Server Settings</a></p>
+</section>
+
+<section class="widget widget-settings">
+    <p><span class="material-icons">email</span></p>
+    <h2>Email DNS Configuration</h2>
+    <p><span>Check your email DNS configuration for DKIM/DMARC/SPF settings.</span></p>
+    <p><a href="{{ settings.domain ~ path('incc_settings_email') }}" class="button button--secondary">Review Email DNS</a></p>
+</section>
+
+<section class="widget widget-settings">
+    <p><span class="material-icons">file_download</span></p>
+    <h2>Data Export</h2>
+    <p><span>Export your data (pages/posts/categories/etc.).</span></p>
+    <p><a href="{{ settings.domain }}" class="button button--secondary">Export Data</a></p>
+</section>
+
+<section class="widget widget-settings">
+    <p><span class="material-icons">delete_forever</span></p>
+    <h2>Data Purge</h2>
+    <p><span><strong>Danger:</strong> Delete all content from your site.</span></p>
+    <p><a href="{{ settings.domain }}" class="button button--negative">Purge Data</a></p>
+</section>
+
+</div>
+{% endblock settings %}
+{% block settings_post %}{% endblock settings_post %}
+{% endblock content %}
+

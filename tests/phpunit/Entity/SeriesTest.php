@@ -7,12 +7,12 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Entity;
+namespace Inachis\Tests\phpunit\Entity;
 
-use App\Entity\Image;
-use App\Entity\Page;
-use App\Entity\Series;
-use App\Entity\User;
+use Inachis\Entity\Image;
+use Inachis\Entity\Page;
+use Inachis\Entity\Series;
+use Inachis\Entity\User;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;

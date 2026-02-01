@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Util;
+namespace Inachis\Tests\phpunit\Util;
 
-use App\Util\UrlNormaliser;
+use Inachis\Util\UrlNormaliser;
 use PHPUnit\Framework\TestCase;
 use TypeError;
 

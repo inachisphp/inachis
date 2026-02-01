@@ -7,16 +7,16 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\EventListener;
+namespace Inachis\EventListener;
 
-use App\Entity\User;
+use Inachis\Entity\User;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 
 /**
  * Class HashPasswordListener
- * @package App\EventListener
+ * @package Inachis\EventListener
  */
 class HashPasswordListener implements EventSubscriber
 {

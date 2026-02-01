@@ -1,7 +1,9 @@
 {% block javascript_top %}
-    <script type="text/javascript" src="/assets/js/incc/scripts.min.js"></script>
+    <script src="/assets/js/incc/jquery.min.js"></script>
+    <script src="/assets/js/incc/jquery-ui.min.js"></script>
+    <script src="/assets/js/incc/scripts.min.js"></script>
 
     {%- if is_granted('ROLE_USER') %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous"></script>
+    <script src="/assets/js/incc/tom-select.complete.min.js"></script>
     {% endif %}
 {% endblock javascript_top %}

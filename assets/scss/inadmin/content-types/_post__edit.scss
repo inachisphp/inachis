@@ -15,17 +15,19 @@ div.content__edit, .ui-dialog form {
         vertical-align: middle;
     }
     input {
-        border: none;
-        border-bottom: 2px solid transparent;
+        border: 1px solid #eee;
         outline: none;
 
         &:focus, &:active {
-            outline: 1px solid #eee;
-            border-bottom: 2px solid #999;
+            outline: 1px solid #069;
+            border-bottom: 1px solid #069;
         }
     }
 
     input, textarea {
+        &.date-width {
+            width: 7.5em;
+        }
         &.halfwidth {
             width: 40%;
         }

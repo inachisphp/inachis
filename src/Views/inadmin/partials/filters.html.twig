@@ -1,10 +1,23 @@
 {% block filter %}
+    {% set isEmptyFilterValues = (filter_values|default(null)) is empty %}
 
 {% if filters is defined and filters is not empty or show_search|default(false) or (sort_options is defined and sort_options is not empty) %}
-<section class="filter">
-    <div class="filter__controls">
-    {% if add_button is defined and add_button is not empty %}
-        {% set tagname = add_button.type|default('a') %}
+
+<section class="filter-bar sticky-nav" aria-label="Filter and sort content list">
+<div id="toolbar-form" class="toolbar-container">
+    {% if add_button|default(null) is not empty or show_search|default(false) %}
+    <div class="row main-actions">
+        {% if show_search|default(false) %}
+            {% include('/inadmin/partials/search.html.twig') with {
+                placeholder: 'Search posts…',
+                ariaLabel: 'Search posts',
+                enterKeyHint: 'search',
+                id: 'filter__keyword',
+                clearBtn: true,
+            } %}
+        {% endif %}
+        {% if add_button is defined and add_button is not empty %}
+            {% set tagname = add_button.type|default('a') %}
         <p>
             <{{ tagname }}
                 class="button button--add {{ add_button.class|default('') }}"
@@ -13,33 +26,33 @@
         {% endfor %}
                 href="{{ add_button.url }}"
                 {% if add_button.type|default('a') == 'button' %} type="button"{% endif %}
-            ><span class="material-icons">{{ add_button.image|default('add') }}</span> {{ add_button.text }}</{{ tagname }}>
+            ><span class="material-icons">{{ add_button.image|default('add') }}</span>
+            <span class="btn-text">{{ add_button.text }}</span>
+            </{{ tagname }}>
         </p>
-    {% endif %}
-    {% if show_search|default(false) %}
-    <p class="filter__section-keyword">
-        <label class="material-icons" for="filter__keyword">search</label>
-        <input id="filter__keyword" name="filter[keyword]" placeholder="filter by keyword" type="search" value="{{ filter_values['keyword']|default('') }}" />
-        <button class="clear-search material-icons" data-target="#filter__keyword" type="button">cancel</button>
-    </p>
-    {% endif %}
-    {% if filters is defined and filters is not empty %}
-    <p><a href="#" class="filter__toggle" title="Show filter options"><span class="material-icons">filter_list</span> Filters</a></p>
-    {% endif %}
-    {% if sort_options is defined and sort_options is not empty %}
-        {{ include('/inadmin/partials/sort-by.html.twig') }}
-    {% endif %}
+        {% endif %}
     </div>
-    {% if show_select_deselect is defined and show_select_deselect %}
-        <p>
-            <input aria-labelledby="selectAllNone_label" class="checkbox selectAllNone" name="selectAllNone" type="checkbox" />
-            <label class="mobile-only" id="selectAllNone_label" for="selectAllNone">Select all on this page</label>
-        </p>
     {% endif %}
-</section>
-{% endif %}
-{% if filters is defined and filters is not empty %}
-<div id="filter__options"{% if filter_values is not defined or filter_values is empty %} class="visually-hidden{% endif %}">
+
+    {% if filters|default(null) is not empty or sort_options|default(null) is not empty %}
+    <div class="row secondary-controls">
+        {% if filters|default(null) is not empty %}
+        <button type="button" class="filter__toggle icon-badge-wrapper" id="toggle-filters" aria-expanded="{{ isEmptyFilterValues ? 'false' : 'true' }}" aria-controls="filter__options">
+            <span class="material-icons">filter_list</span>
+            <span id="global-filter-dot" class="filter-indicator"{% if isEmptyFilterValues %} hidden{% endif %}></span>
+            <span>Filters</span>
+        </button>
+        {% endif %}
+        {% if sort_options|default(null) is not empty %}
+            {{ include('/inadmin/partials/sort-by.html.twig') }}
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+{% if filters|default(null) is not empty %}
+<div id="filter__options" class="collapsible{% if not isEmptyFilterValues %} is-open"{% else %}" hidden{% endif %}>
+<div class="filter__inner">
     {% for filter_name, filter in filters %}
     <span class="filter__section-{{ filter_name|lower }}">
         <label for="filter__{{ filter_name|lower }}">{{ filter_name }}</label>
@@ -51,6 +64,18 @@
     </span>
     {% endfor %}
 </div>
+</div>
 {% endif %}
 
+{% if show_select_deselect is defined and show_select_deselect %}
+<div class="row">
+    <p class="button button--selectAllNone">
+        <input aria-labelledby="selectAllNone_label" class="checkbox selectAllNone" id="selectAllNone" name="selectAllNone" type="checkbox" />
+        <label class="" id="selectAllNone_label" for="selectAllNone">Select all items</label>
+    </p>
+</div>
+{% endif %}
+</section>
+
+{% endif %}
 {% endblock %}

@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Transformer;
+namespace Inachis\Tests\phpunit\Transformer;
 
-use App\Transformer\ImageTransformer;
+use Inachis\Transformer\ImageTransformer;
 use Imagick;
 use ImagickException;
 use PHPUnit\Framework\MockObject\Exception;

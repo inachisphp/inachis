@@ -18,7 +18,7 @@ services:
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         public: false
 
-    App\:
+    Inachis\:
         resource: '../src/'
         exclude:
             - '../src/DependencyInjection/'
@@ -26,37 +26,42 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    App\Service\Image\ImageLocaliser:
+    Inachis\Diagnostics\Check\:
+        resource: '../src/Diagnostics/Check/*/*'
+        tags: ['app.diagnostic_check']
+
+    Inachis\Diagnostics\DiagnosticsCollector:
+        arguments:
+            $checks: !tagged_iterator app.diagnostic_check
+
+    Inachis\Service\Image\ImageLocaliser:
         arguments:
             $publicImgPath: '%app.public_img_path%'
 
-    App\Service\User\PasswordResetTokenService:
+    Inachis\Service\User\PasswordResetTokenService:
         arguments:
             $appSecret: '%env(APP_SECRET)%'
             $ttlSeconds: '%password_reset.ttl%'
 
-    App\EventListener\AdminResponseEvent:
+    Inachis\Twig\:
+        resource: '../src/Twig'
+        tags: [ 'twig.extension' ]
+        autoconfigure: true
+
+    Inachis\EventListener\AdminResponseEvent:
         arguments:
             $csp: '%csp%'
 
-#    App\Service\CryptoService:
+#    Inachis\Service\CryptoService:
 #        arguments:
 #            $masterKey: '%env(APP_ENCRYPTION_KEY)%'
 
-#    App\EntityListener\SettingListener:
+#    Inachis\EntityListener\SettingListener:
 #        tags:
 #            - { name: doctrine.orm.entity_listener }
 
-#    App\Service\ImageResizer\GdImageResizer: ~
-#    App\Service\ImageResizer\ImagickResizer: ~
-    App\Service\ImageResizer\ImageResizerInterface:
-        factory: ['App\Service\ImageResizer\ImageResizerFactory', 'create']
+#    Inachis\Service\ImageResizer\GdImageResizer: ~
+#    Inachis\Service\ImageResizer\ImagickResizer: ~
+    Inachis\Service\ImageResizer\ImageResizerInterface:
+        factory: ['Inachis\Service\ImageResizer\ImageResizerFactory', 'create']
         public: true
-
-    markdown.engine:
-        class: Aptoma\Twig\Extension\MarkdownEngine\MichelfMarkdownEngine
-    twig.markdown:
-        class: Aptoma\Twig\Extension\MarkdownExtension
-        arguments: ['@markdown.engine']
-        tags:
-            - { name: twig.extension }

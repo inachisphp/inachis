@@ -1,12 +1,11 @@
-var InachisImageManager = {
+window.Inachis.ImageManager = {
     buttons: [
         {
             class: 'button button--positive',
             disabled: true,
             text: 'Choose Image',
-            click: function ()
-            {
-                InachisImageManager.chooseImageAction();
+            click() {
+                window.Inachis.ImageManager.chooseImageAction();
             }
         }
     ],
@@ -16,18 +15,17 @@ var InachisImageManager = {
     limit: 25,
     saveTimeout: false,
 
-    _init: function()
-    {
-        if (InachisDialog.view === 'upload') {
+    _init() {
+        if (window.Inachis.Dialog.view === 'upload') {
             this.buttons = [];
             $('.ui-dialog-secondary-bar').toggle();
             this.toggleUploadImage();
         } else {
-            InachisImageManager.buttons[0].disabled = true;
+            window.Inachis.ImageManager.buttons[0].disabled = true;
             $('#ui-dialog-search-input').on('input', function (event) {
-                InachisImageManager.searchImages();
+                window.Inachis.ImageManager.searchImages();
             });
-            InachisImageManager.searchImages();
+            window.Inachis.ImageManager.searchImages();
         }
         this.updateDialogButtons();
         $('.ui-dialog-secondary-bar a').click(this.toggleUploadImage);
@@ -35,15 +33,15 @@ var InachisImageManager = {
             event.preventDefault();
             event.stopPropagation();
             dropzone.on('success', file => {
-                let image_title = $('#image_title').val();
-                if (InachisDialog.view === 'upload') {
+                const image_title = $('#image_title').val();
+                if (window.Inachis.Dialog.view === 'upload') {
                     $('#filter__keyword').val(image_title);
                     $('#dialog__imageManager').dialog('destroy');
                     $('form.form__images').submit();
                 } else {
                     $('#ui-dialog-search-input').val(image_title);
-                    InachisImageManager.toggleUploadImage();
-                    InachisImageManager.searchImages();
+                    window.Inachis.ImageManager.toggleUploadImage();
+                    window.Inachis.ImageManager.searchImages();
                 }
             });
             dropzone.on('error', file => {
@@ -53,29 +51,26 @@ var InachisImageManager = {
         });
     },
 
-    addPaginationLinks: function()
-    {
-        $('nav .pagination li a').on('click', function(event) {
+    addPaginationLinks() {
+        $('nav .pagination li a').on('click', function (event) {
             event.preventDefault();
-            InachisImageManager.offset = ($(event.currentTarget).html() - 1) * InachisImageManager.limit;
-            InachisImageManager.searchImages();
+            window.Inachis.ImageManager.offset = ($(event.currentTarget).html() - 1) * window.Inachis.ImageManager.limit;
+            window.Inachis.ImageManager.searchImages();
             return false;
         });
     },
 
-    enableChooseButton: function()
-    {
-        InachisImageManager.buttons[0].disabled = false;
-        InachisImageManager.updateDialogButtons();
+    enableChooseButton() {
+        window.Inachis.ImageManager.buttons[0].disabled = false;
+        window.Inachis.ImageManager.updateDialogButtons();
     },
 
-    chooseImageAction: function()
-    {
-        let selectedImage = $('.gallery input[type=radio]:checked'),
-            imageTargetId = $('.image_preview .dialog__link').data('target'),
-            $imagePreview =  $('.image_preview'),
-            $imagePreviewImage = $imagePreview.find('img')
-        ;
+    chooseImageAction() {
+        const selectedImage = $('.gallery input[type=radio]:checked');
+        const imageTargetId = $('.image_preview .dialog__link').data('target');
+        const $imagePreview = $('.image_preview');
+        const $imagePreviewImage = $imagePreview.find('img');
+
         $('#' + imageTargetId).val(selectedImage.val());
         if ($imagePreviewImage.length) {
             $imagePreviewImage.prop('src', selectedImage.siblings().first().children('img').prop('src'));
@@ -88,31 +83,29 @@ var InachisImageManager = {
         $('#dialog__imageManager').dialog('close');
     },
 
-    searchImages: function ()
-    {
-        if(InachisImageManager.saveTimeout) clearTimeout(InachisImageManager.saveTimeout);
-        InachisImageManager.saveTimeout = setTimeout(function() {
+    searchImages() {
+        if (window.Inachis.ImageManager.saveTimeout) clearTimeout(window.Inachis.ImageManager.saveTimeout);
+        window.Inachis.ImageManager.saveTimeout = setTimeout(() => {
             $('.gallery').html('<p/><div class="loader"></div><p/>');
             $('.gallery').load(
-                Inachis.prefix + '/ax/imageManager/getImages/' + InachisImageManager.offset +'/' + InachisImageManager.limit,
+                `${window.Inachis.prefix}/ax/imageManager/getImages/${window.Inachis.ImageManager.offset}/${window.Inachis.ImageManager.limit}`,
                 {
                     filter: {
                         keyword: $('#ui-dialog-search-input').val(),
                     },
                 },
-                function ()
-                {
-                    InachisImageManager.offset = 0;
-                    $('.gallery').animate({ scrollTop:0}, 100);
-                    InachisImageManager.addPaginationLinks();
-                    $('.gallery input[type=radio]').on('change', InachisImageManager.enableChooseButton);
+                function () {
+                    window.Inachis.ImageManager.offset = 0;
+                    $('.gallery').animate({ scrollTop: 0 }, 100);
+                    window.Inachis.ImageManager.addPaginationLinks();
+                    $('.gallery input[type=radio]').on('change', window.Inachis.ImageManager.enableChooseButton);
                     const $ol = $('.gallery ol');
                     const values = [
                         $ol.attr('data-start'),
                         $ol.attr('data-end'),
                         $ol.attr('data-total')
                     ];
-                    $('#images_count strong').each(function(i) {
+                    $('#images_count strong').each(function (i) {
                         $(this).html(values[i]);
                     });
                 }
@@ -120,15 +113,13 @@ var InachisImageManager = {
         }, 500);
     },
 
-    toggleUploadImage: function()
-    {
+    toggleUploadImage() {
         $('.ui-dialog-image-uploader form').trigger('reset');
         $('.ui-dialog-image-uploader').toggle();
         $('.gallery').toggle();
     },
 
-    updateDialogButtons: function()
-    {
-        $('#dialog__imageManager').dialog('option', 'buttons', this.buttons.concat(InachisDialog.buttons));
+    updateDialogButtons() {
+        $('#dialog__imageManager').dialog('option', 'buttons', this.buttons.concat(window.Inachis.Dialog.buttons));
     }
 };

@@ -1,46 +1,45 @@
 {% extends "inadmin/structure/main.html.twig" %}
 {% block content %}
+{% block track_changes_pre %}{% endblock track_changes_pre %}
 
-    {% block track_changes_pre %}{% endblock track_changes_pre %}
+{% block track_changes %}
+    <section class="col-12" id="track_changes">
+        <h2>{% if title[0][0].tag is defined %}{{ title[0][0].new.lines[0]|raw }}{% else %}{{ title }}{% endif %}</h2>
+    {% if subTitle is not empty %}
+        <h3>{% if subTitle[0][0].tag is defined %}{{ subTitle[0][0].new.lines[0]|raw }}{% else %}{{ subTitle }}{% endif %}</h3>
+    {% endif %}
+    {% set skip_lines = 0 %}
 
-    {% block track_changes %}
-        <section id="track_changes">
-            <h2>{% if title[0][0].tag is defined %}{{ title[0][0].new.lines[0]|raw }}{% else %}{{ title }}{% endif %}</h2>
-        {% if subTitle is not empty %}
-            <h3>{% if subTitle[0][0].tag is defined %}{{ subTitle[0][0].new.lines[0]|raw }}{% else %}{{ subTitle }}{% endif %}</h3>
-        {% endif %}
-        {% set skip_lines = 0 %}
-
-        {% for content_block in content %}
-            {% if skip_lines > 0 %}
-                {% set skip_lines = skip_lines - 1 %}
+    {% for content_block in content %}
+        {% if skip_lines > 0 %}
+            {% set skip_lines = skip_lines - 1 %}
+        {% else %}
+            {% if content_block.tag is defined and content_block.tag == 'del' %}
+                {% set skip_lines = content_block.old.lines|length - 1 %}
+                <del>{{ content_block.old.lines|join|markdown_to_html }}</del>
+            {% elseif content_block.tag is defined and content_block.tag == 'rep' %}
+                {% set skip_lines = content_block.old.lines|length - 1 %}
+                <div class="change_block">
+                    <del>{{ content_block.old.lines|join|markdown_to_html }}</del>
+                    <ins>{{ content_block.new.lines|join|markdown_to_html }}</ins>
+                </div>
             {% else %}
-                {% if content_block.tag is defined and content_block.tag == 'del' %}
-                    {% set skip_lines = content_block.old.lines|length - 1 %}
-                    <del>{{ content_block.old.lines|join|markdown }}</del>
-                {% elseif content_block.tag is defined and content_block.tag == 'rep' %}
-                    {% set skip_lines = content_block.old.lines|length - 1 %}
-                    <div class="change_block">
-                        <del>{{ content_block.old.lines|join|markdown }}</del>
-                        <ins>{{ content_block.new.lines|join|markdown }}</ins>
-                    </div>
-                {% else %}
-                    {{ content_block|markdown }}
-                {% endif %}
+                {{ content_block|markdown_to_html }}
             {% endif %}
-        {% endfor %}
-        </section>
+        {% endif %}
+    {% endfor %}
+    </section>
 
-        <div class="fixed-bottom-bar">
-            <form method="post">
-                <p>
-                    <button class="button button--negative" name="doRevert" type="submit"><span class="material-icons">undo</span> Revert</button>
-                    <a href="/incc/post/{{ link }}" class="button button--info">Cancel</a>
-                </p>
-            </form>
-        </div>
+    <div class="fixed-bottom-bar">
+        <form method="post">
+            <p>
+                <button class="button button--negative" name="doRevert" type="submit"><span class="material-icons">undo</span> Revert</button>
+                <a href="{{ path('incc_post_download', { 'id': revision_id }) }}" class="button button--secondary"><span class="material-icons">save_alt</span> {% trans %}admin.post.revision.download{% endtrans %}</a>
+                <a href="/incc/post/{{ link }}" class="button button--info">Cancel</a>
+            </p>
+        </form>
+    </div>
 
-    {% endblock track_changes %}
-
-    {% block track_changes_post %}{% endblock track_changes_post %}
+{% endblock track_changes %}
+{% block track_changes_post %}{% endblock track_changes_post %}
 {% endblock content %}

@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Page\Series;
+namespace Inachis\Tests\phpunit\Controller\Page\Series;
 
-use App\Controller\Page\Series\SeriesWebController;
-use App\Entity\Series;
-use App\Repository\SeriesRepository;
+use Inachis\Controller\Page\Series\SeriesWebController;
+use Inachis\Entity\Series;
+use Inachis\Repository\SeriesRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;

@@ -7,21 +7,23 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Post;
+namespace Inachis\Controller\Page\Post;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\Page;
-use App\Entity\Url;
-use App\Parser\MarkdownFileParser;
-use App\Util\UrlNormaliser;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Page;
+use Inachis\Entity\Url;
+use Inachis\Parser\MarkdownFileParser;
+use Inachis\Service\Page\PageFileImportService;
+use Inachis\Util\UrlNormaliser;
 use DateTimeInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use function App\Controller\gettype;
+use function Inachis\Controller\gettype;
 
 #[IsGranted('ROLE_ADMIN')]
 class ImportController extends AbstractInachisController
@@ -37,100 +39,34 @@ class ImportController extends AbstractInachisController
     /**
      * @param Request $request
      * @return JsonResponse
-     * @throws \Exception
+     * @throws Exception
      */
     #[Route("/incc/import", name: "incc_post_process", methods: [ "POST", "PUT" ])]
-    public function process(Request $request): JsonResponse
-    {
+    public function process(
+        Request $request,
+        PageFileImportService $pageFileImportService,
+    ): JsonResponse {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
         $lastResponse = $this->json('success', 200);
-
-        foreach ($request->files->get('markdownFiles') as $file) {
-            if ($file->getError() != UPLOAD_ERR_OK) {
-                return $this->json('error', 400);
+        $files = $request->files->get('markdownFiles');
+        if(!empty($files) && !is_array($files)) {
+            $files = [ $files ];
+        }
+        if(!empty($files)) {
+            foreach ($files as $file) {
+                if ($file->getError() != UPLOAD_ERR_OK) {
+                    return $this->json('error', 400);
+                }
+                $lastResponseCode = $pageFileImportService->processFile($file);
+                if ($lastResponseCode > 299) {
+                    $this->json('error', $lastResponseCode);
+                    break;
+                }
             }
-            $lastResponse = $this->processFile($file);
-            if ($lastResponse->getStatusCode() > 299) {
-                break;
-            }
+        } else {
+            $lastResponse = $this->json('error', 400);
         }
         return $lastResponse;
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function processFile($file): string
-    {
-        $postObjects = [];
-        switch ($file->getMimeType()) {
-            case 'application/json':
-                $postObjects = array_merge(
-                    [],
-                    json_decode(file_get_contents($file->getRealPath()))
-                );
-                break;
-
-            case 'application/zip':
-                // @todo: Implement ZIP parser
-                break;
-
-            default:
-                // parse just MD file
-                $parser = new MarkdownFileParser();
-                $postObjects = array_merge(
-                    [],
-                    $parser->parse(
-                        $this->entityManager,
-                        file_get_contents($file->getRealPath())
-                    )
-                );
-        }
-
-        foreach ($postObjects as $object) {
-            $post = $object;
-            if (gettype($object) === 'object' && get_class($object) !== 'Page') {
-                $post = new Page(
-                    $object->title ?? '',
-                    $object->content ?? '',
-                    null,
-                    $object->type ?? Page::TYPE_POST
-                );
-                $post->setSubTitle($object->subTitle ?? '');
-                $post->setPostDate(
-                    date_create_from_format(
-                        DateTimeInterface::ISO8601,
-                        $object->postDate
-                    ) ?? time()
-                );
-            }
-            if ($post->getTitle() !== '' && $post->getContent() !== '') {
-                $newLink = $post->getPostDateAsLink() . '/' .
-                    UrlNormaliser::toUri(
-                        $post->getTitle() .
-                        ($post->getSubTitle() !== '' ? ' ' . $post->getSubTitle() : '')
-                    );
-                if (
-                    !empty(
-                        $this->entityManager->getRepository(Url::class)->findOneBy(['link' => $newLink])
-                    )
-                ) {
-                    // @todo should it prompt to rename?
-                    return $this->json('error', 409);
-                }
-                $post->setAuthor($this->get('security.token_storage')->getToken()->getUser());
-                new Url(
-                    $post,
-                    $newLink
-                );
-                $this->entityManager->persist($post);
-                $this->entityManager->flush();
-            } else {
-                return $this->json('error', 400);
-            }
-        }
-
-        return $this->json('success', 200);
     }
 }

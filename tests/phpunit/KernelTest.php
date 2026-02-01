@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit;
+namespace Inachis\Tests\phpunit;
 
-use App\Kernel;
+use Inachis\Kernel;
 use PHPUnit\Framework\TestCase;
 
 class KernelTest extends TestCase

@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Entity;
+namespace Inachis\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
@@ -16,7 +16,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * Object for handling tags that are mapped to content.
  */
-#[ORM\Entity(repositoryClass: 'App\Repository\TagRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\TagRepository', readOnly: false)]
 #[ORM\Index(name: "search_idx", columns: [ "title" ])]
 class Tag
 {

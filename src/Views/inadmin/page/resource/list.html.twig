@@ -9,7 +9,7 @@
     {% block resources_pre %}{% endblock resources_pre %}
 
     {% block resources %}
-    <div class="col span_8_of_8 widget-posts ui-tabs-external">
+    <div class="col-12 widget-posts ui-tabs-external">
         <ul class="ui-tabs-nav ui-corner-all ui-helper-reset ui-helper-clearfix ui-widget-header">
             <li role="tab" class="ui-tabs-tab ui-corner-top ui-state-default ui-tab ui-tabs-active{% if page.tab == 'Image' %} ui-state-active{% endif %}">
                 <a href="{{ settings.domain ~ path('incc_resource_list', { type: 'images' }) }}">Images</a>
@@ -51,14 +51,14 @@
 
                 show_search: true,
                 sort_options: {
-                    'createDate desc': 'Uploaded dates closest to now',
-                    'createDate asc': 'Uploaded dates farthest from now',
-                    'modDate desc': 'Modified dates closest to now',
-                    'modDate asc': 'Modified dates farthest from now',
-                    'filesize asc': 'Size, smallest to largest',
-                    'filesize desc': 'Size, largest to smallest',
-                    'title asc': 'Title A-Z',
-                    'title desc': 'Title Z-A',
+                    'createDate desc': 'Uploaded: Newest',
+                    'createDate asc': 'Uploaded: Oldest',
+                    'modDate desc': 'Modified: Newest',
+                    'modDate asc': 'Modified: Oldest',
+                    'filesize asc': 'Size: Smallest',
+                    'filesize desc': 'Size: Largest',
+                    'title asc': 'Title: A-Z',
+                    'title desc': 'Title: Z-A',
                 }
             }) }}
     <section class="paginated-list">

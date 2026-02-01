@@ -7,16 +7,16 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Page\Admin;
+namespace Inachis\Tests\phpunit\Controller\Page\Admin;
 
 
-use App\Controller\Page\Admin\AccountController;
-use App\Entity\PasswordResetRequest;
-use App\Entity\User;
-use App\Repository\PasswordResetRequestRepository;
-use App\Repository\UserRepository;
-use App\Service\User\PasswordResetTokenService;
-use App\Service\User\UserAccountEmailService;
+use Inachis\Controller\Page\Admin\AccountController;
+use Inachis\Entity\PasswordResetRequest;
+use Inachis\Entity\User;
+use Inachis\Repository\PasswordResetRequestRepository;
+use Inachis\Repository\UserRepository;
+use Inachis\Service\User\PasswordResetTokenService;
+use Inachis\Service\User\UserAccountEmailService;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;

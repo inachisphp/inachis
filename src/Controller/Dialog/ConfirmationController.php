@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Dialog;
+namespace Inachis\Controller\Dialog;
 
-use App\Controller\AbstractInachisController;
+use Inachis\Controller\AbstractInachisController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

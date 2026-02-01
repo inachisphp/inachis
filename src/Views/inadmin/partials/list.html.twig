@@ -71,9 +71,9 @@
             {% if snippet_description|default('true') != 'false' %}
                 {% if '.' in snippet_description %}
                     {% set snippet_parts = snippet_description|split('.') %}
-                    {% set snippet_text =attribute(attribute(item, snippet_parts[0]), snippet_parts[1])|markdown|striptags %}
+                    {% set snippet_text =attribute(attribute(item, snippet_parts[0]), snippet_parts[1])|markdown_to_html|striptags %}
                 {% else %}
-                    {% set snippet_text = attribute(item, snippet_description|default('content'))|default('')|markdown|striptags %}
+                    {% set snippet_text = attribute(item, snippet_description|default('content'))|default('')|markdown_to_html|striptags %}
                 {% endif %}
                 {% if inline|default(false) == false %}
             <p>
@@ -97,16 +97,16 @@
                 {% endif %}
                 {% if item.postDate|default(false) %}
                 <span class="material-icons">event</span>
-                 Post date: <em>{{ item.postDate|date('jS F Y \\a\\t H:i', timezone) }}</em>
+                <em>{{ item.postDate|date('jS M Y \\a\\t H:i', timezone) }}</em>
                 {% endif %}
                 {% if item.items is defined %}
                     {% if item.firstDate is not empty %}
-                <span class="material-icons">date_range</span>{{ item.firstDate|date("F j, Y") }} to {{ item.lastDate|date("F j, Y") }}
+                <span class="material-icons">date_range</span>{{ item.firstDate|date("M j, Y") }} to {{ item.lastDate|date("M j, Y") }}
                     {% endif %}
                 <span class="material-icons">library_books</span> <strong>{{ item.items|length }}</strong> posts
                 {% endif %}
                 <span class="material-icons">history</span>
-                 Last modified: <em>{{ item.modDate|date('jS F Y \\a\\t H:i', timezone) }}</em>
+                 Updated: <em>{{ item.modDate|date('jS M Y \\a\\t H:i', timezone) }}</em>
                 {% if inline|default(false) == false %}
             </p>
                 {% else %}

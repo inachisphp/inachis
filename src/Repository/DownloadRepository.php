@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Repository;
+namespace Inachis\Repository;
 
-use App\Entity\Download;
+use Inachis\Entity\Download;
 use Doctrine\Persistence\ManagerRegistry;
 
 class DownloadRepository extends AbstractRepository implements ResourceRepositoryInterface

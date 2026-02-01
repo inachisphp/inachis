@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Command;
+namespace Inachis\Command;
 
-use App\Entity\PasswordResetRequest;
+use Inachis\Entity\PasswordResetRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;

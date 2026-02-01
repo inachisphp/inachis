@@ -7,10 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Form;
+namespace Inachis\Form;
 
-use App\Entity\Series;
-use App\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use Inachis\Entity\Series;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -20,7 +19,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SeriesType extends AbstractType
@@ -47,6 +45,7 @@ class SeriesType extends AbstractType
                 ],
                 'label'      => $this->translator->trans('admin.series.title.label', [], 'messages'),
                 'label_attr' => [
+                    'class' => 'inline_label',
                     'id' => 'title_label',
                 ],
             ])
@@ -59,6 +58,7 @@ class SeriesType extends AbstractType
                 ],
                 'label'      => $this->translator->trans('admin.series.subTitle.label', [], 'messages'),
                 'label_attr' => [
+                    'class' => 'inline_label',
                     'id' => 'subTitle_label',
                 ],
                 'required' => false,
@@ -97,14 +97,14 @@ class SeriesType extends AbstractType
                     'attr' => [
                         'aria-labelledby'  => 'firstDate_label',
                         'aria-required'    => 'false',
-                        'class' => 'halfwidth',
+                        'class' => 'date-width',
                         'readOnly' => true,
                     ],
                     'format' => 'dd/MM/yyyy', // HH:mm,
                     'html5'  => false,
                     'label'  => $this->translator->trans('admin.series.firstDate.label', [], 'messages'),
                     'label_attr' => [
-                        'class' => 'date-range__label',
+                        'class' => 'inline_label',
                         'id' => 'firstDate_label',
                     ],
                     'required' => false,
@@ -115,14 +115,14 @@ class SeriesType extends AbstractType
                     'attr' => [
                         'aria-labelledby'  => 'lastDate_label',
                         'aria-required'    => 'false',
-                        'class' => 'halfwidth',
+                        'class' => 'date-width',
                         'readOnly' => true,
                     ],
                     'format' => 'dd/MM/yyyy', // HH:mm,
                     'html5'  => false,
                     'label'  => $this->translator->trans('admin.series.lastDate.label', [], 'messages'),
                     'label_attr' => [
-                        'class' => 'date-range__label',
+                        'class' => 'inline_label',
                         'id' => 'lastDate_label',
                     ],
                     'required' => false,

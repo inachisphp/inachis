@@ -7,15 +7,15 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Page\Admin;
+namespace Inachis\Tests\phpunit\Controller\Page\Admin;
 
-use App\Controller\Page\Admin\AdminProfileController;
-use App\Entity\User;
-use App\Model\ContentQueryParameters;
-use App\Repository\UserRepository;
-use App\Service\User\UserBulkActionService;
-use App\Service\User\UserAccountEmailService;
-use App\Transformer\ImageTransformer;
+use Inachis\Controller\Page\Admin\AdminProfileController;
+use Inachis\Entity\User;
+use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\UserRepository;
+use Inachis\Service\User\UserBulkActionService;
+use Inachis\Service\User\UserAccountEmailService;
+use Inachis\Transformer\ImageTransformer;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;

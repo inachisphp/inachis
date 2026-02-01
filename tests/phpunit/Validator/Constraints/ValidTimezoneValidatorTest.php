@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Validator\Constraints;
+namespace Inachis\Tests\phpunit\Validator\Constraints;
 
-use App\Validator\Constraints\ValidTimezone;
-use App\Validator\Constraints\ValidTimezoneValidator;
+use Inachis\Validator\Constraints\ValidTimezone;
+use Inachis\Validator\Constraints\ValidTimezoneValidator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ConstraintValidatorInterface;

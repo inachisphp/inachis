@@ -1,0 +1,26 @@
+<div class="admin__actions">
+    <section class="admin__user">
+        <a href="#admin__user__options">
+            {% if session.avatar is not empty %}
+            <img alt="{% trans %}admin.actions.avatar{% endtrans %}" height="40" src="{{ session.avatar.filename }}" width="40" />
+            {% else %}
+            <span data-color="{{ userPreference.color }}" data-initials="{{ session.initials }}"></span>
+            {% endif %}
+            {%- if notifications|length > 0 %}<span class="admin__user__notifications">{{ notifications|length }}</span>{% endif %}
+        </a>
+        <ul id="admin__user__options">
+            <li><p><strong>Welcome,</strong> {{ session.displayName }}</p></li>
+            <li><a href="{{ path('incc_admin_edit', {'id': session.username }) }}" title="Edit profile for {{ session.displayName }}">Edit your profile <span class="material-icons">perm_identity</span></a></li>
+            <li><a href="{{ path('incc_admin_theme') }}" title="Change your appearance settings">Appearance <span class="material-icons">brush</span></a></li>
+            <!-- li><a href="/incc/settings/releases">Update available <span class="material-icons">new_releases</span></a></li -->
+            <li><form action="{{ path('app_logout') }}" method="post"><button>Log out <span class="material-icons">logout</span></button></form></li>
+        </ul>
+    </section>
+    <section class="admin__search">
+        <form action="{{ path('incc_search_results', { 'keyword': ' '}) }}" aria-label="Search content" method="post" role="search">
+            <label for="q" class="material-icons">{% trans %}admin.search.label{% endtrans %}</label>
+            <input id="q" name="keyword" placeholder="{% trans %}admin.search.placeholder{% endtrans %}" type="search" value="{{ keyword|default('') }}" />
+            <button class="clear-search material-icons" data-target="#q" type="button">cancel</button>
+        </form>
+    </section>
+</div>

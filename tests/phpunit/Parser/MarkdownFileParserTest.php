@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Parser;
+namespace Inachis\Tests\phpunit\Parser;
 
-use App\Entity\Category;
-use App\Entity\Page;
-use App\Parser\MarkdownFileParser;
+use Inachis\Entity\Category;
+use Inachis\Entity\Page;
+use Inachis\Parser\MarkdownFileParser;
 use DateTime;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;

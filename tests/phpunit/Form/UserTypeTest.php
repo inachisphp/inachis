@@ -7,12 +7,12 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Form;
+namespace Inachis\Tests\phpunit\Form;
 
-use App\Entity\Image;
-use App\Entity\User;
-use App\Form\UserType;
-use App\Util\RandomColorPicker;
+use Inachis\Entity\Image;
+use Inachis\Entity\User;
+use Inachis\Form\UserType;
+use Inachis\Util\RandomColorPicker;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use Ramsey\Uuid\Uuid;

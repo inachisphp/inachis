@@ -4,15 +4,20 @@
     {% block import_main_pre %}{% endblock import_main_pre %}
 
     {% block import_main %}
-    <div class="col span_8_of_8 widget-posts ui-tabs-external">
+    <div class="col-12 widget-posts ui-tabs-external">
         {% include 'inadmin/partials/tab-sets/posts.html.twig' %}
         <section class="paginated-list">
             <h2>Import Posts</h2>
+            <p>Transfer your content from other platforms. Supported formats:</p>
+            <ul class="format-tags">
+                <li class="badge">Markdown (.md)</li>
+                <li class="badge">XML (.xml)</li>
+                <li class="badge">JSON (.json)</li>
+            </ul>
             <form action="{{ path('incc_post_import') }}" class="dropzone" method="post">
             {{
                 include('inadmin/partials/dropzone.html.twig', {
                     'dropzoneUrl': path('incc_post_import'),
-                    'helpText': 'Upload posts using markdown files (.md), XML (.xml), or JSON files (.json).',
                     'paramName': 'markdownFiles',
                     'uploadMultiple': true,
                     'maxFilesize': 2,

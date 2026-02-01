@@ -1,8 +1,10 @@
+{% if helpText|default('') %}
 <p><label for="{{ paramName }}">{{ helpText }}</label></p>
+{% endif %}
 <div class="fallback">
     <input id="{{ paramName|replace({'[': '_', ']': ''}) }}" name="{{ paramName }}" type="file" multiple />
 </div>
-<script src="/assets/js/incc/dropzone.min.js"></script>
+<script src="/assets/js/incc/dropzone-min.js"></script>
 <script>
     var dropzone = new Dropzone(".dropzone", {
         url: '{{ dropzoneUrl }}',

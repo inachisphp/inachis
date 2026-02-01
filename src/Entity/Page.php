@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Entity;
+namespace Inachis\Entity;
 
 use DateTime;
 use DateTimeZone;
@@ -17,13 +17,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Exception;
 use InvalidArgumentException;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
-use App\Exception\InvalidTimezoneException;
+use Inachis\Exception\InvalidTimezoneException;
 use Ramsey\Uuid\UuidInterface;
 
 /**
  * Object for handling pages of a site.
  */
-#[ORM\Entity(repositoryClass: 'App\Repository\PageRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\PageRepository', readOnly: false)]
 #[ORM\Index(columns: ['title', 'author_id', 'image_id'], name: 'search_idx')]
 #[ORM\Index(columns: ['title', 'sub_title', 'content'], name: "fulltext_title_content", flags: ["fulltext"])]
 class Page
@@ -88,14 +88,14 @@ class Page
     /**
      * @var User|null The UUID of the author for the {@link Page}
      */
-    #[ORM\ManyToOne(targetEntity: 'App\Entity\User', cascade: [ 'detach' ])]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User', cascade: [ 'detach' ])]
     #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id')]
     protected ?User $author = null;
 
     /**
      * @var Image|null The featured {@link Image} for the {@link Page}
      */
-    #[ORM\ManyToOne(targetEntity: 'App\Entity\Image', cascade: [ 'detach' ])]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\Image', cascade: [ 'detach' ])]
     #[ORM\JoinColumn(name: 'image_id', referencedColumnName: 'id')]
     protected ?Image $featureImage = null;
 
@@ -175,14 +175,14 @@ class Page
     /**
      * @var Collection|null The array of URLs for the content
      */
-    #[ORM\OneToMany(mappedBy: 'content', targetEntity: 'App\Entity\Url', cascade: [ 'persist' ])]
+    #[ORM\OneToMany(mappedBy: 'content', targetEntity: 'Inachis\Entity\Url', cascade: [ 'persist' ])]
     #[ORM\OrderBy(['default' => 'DESC'])]
     protected ?Collection $urls;
 
     /**
      * @var Collection|null The array of categories assigned to the post/page
      */
-    #[ORM\ManyToMany(targetEntity: 'App\Entity\Category')]
+    #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Category')]
     #[ORM\JoinTable(name: 'Page_categories')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'category_id', referencedColumnName: 'id')]
@@ -192,7 +192,7 @@ class Page
     /**
      * @var Collection|null The array of tags assigned to the post/page
      */
-    #[ORM\ManyToMany(targetEntity: 'App\Entity\Tag', cascade: [ 'persist' ])]
+    #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Tag', cascade: [ 'persist' ])]
     #[ORM\JoinTable(name: 'Page_tags')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'tag_id', referencedColumnName: 'id')]
@@ -202,7 +202,7 @@ class Page
     /**
      * @var Collection|null  The array of Series that contains this page
      */
-    #[ORM\ManyToMany(targetEntity: 'App\Entity\Series', inversedBy: 'items')]
+    #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Series', inversedBy: 'items')]
     protected ?Collection $series;
 
     /**

@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Model;
+namespace Inachis\Model;
 
 use DateTime;
 use DateTimeInterface;

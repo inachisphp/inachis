@@ -1,9 +1,14 @@
 @use 'sass:color';
 
+$columns: 12;
+$gutter: 16px;
+$sidebar-collapsed: 60px;
+$sidebar-expanded: 220px;
+
 // media queries
-$information-small: "screen and (min-width: 320px)";
-$information-medium: "screen and (min-width: 480px)";
-$information-large: "screen and (min-width: 480px)";
+$breakpoint-small: 480px;
+$breakpoint-medium: 768px;
+$breakpoint-large: 1024px;
 
 // Global styles
 $admin__background-color: #fafafa;
@@ -34,7 +39,7 @@ $menubar-button__background-color: #069;
 $menubar-button__background-color--hover: $menubar__color--hover;
 
 // dropzone
-$admin__dropzone__background: rgb(223, 232, 238);
+$admin__dropzone__background: #f8fafc;
 $admin__dropzone__background_hover: rgb(189, 209, 216);
 $admin__dropzone__border_hover: $admin__container-add-button;
 $admin__dropzone__image_color: rgb(124, 156, 160);
@@ -131,4 +136,7 @@ $badge-colors: (
   active: (bg: #28A745, text: #fff),
   newuser: (bg: #17A2B8, text: #fff),
   disabled: (bg: #A0A0A0, text: #fff),
+  error: (bg: #DC3545, text: #fff),
+  warning: (bg: #ffc107, text: #333),
+  ok: (bg: #28A745, text: #fff),
 );

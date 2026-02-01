@@ -1,0 +1,75 @@
+{% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('inachis_settings_index') }}">Settings</a>
+    <span>Server settings</span>
+{% endblock pagetitle %}
+
+
+{% block content %}
+{% block server_check_pre %}{% endblock server_check_pre %}
+{% block server_check %}
+<div class="col-12">
+{% if environment != 'prod' %}
+    {% include 'inadmin/partials/flashes.html.twig' with {
+        flashMessages: {
+            notice: [
+                "This is a #{environment} environment so may be configured to output errors.",
+            ]
+        }
+    } %}
+{% endif %}
+
+<p><a href="{{ settings.domain ~ path('incc_settings_diagnostics_json') }}" class="button button--secondary"><span class="material-icons">download</span> Download Report</a></p>
+
+{% include 'inadmin/partials/diagnostics/_summary.html.twig' with { summary: summary } %}
+
+{% for section in sections %}
+    <section>
+        <h2>{{ section.label }}</h2>
+
+        <table class="table table-sm">
+            <thead>
+            <tr>
+                <th>Check</th>
+                <th>Status</th>
+                <th>Value</th>
+{% if section.label == 'Security' %}
+                <th>Severity</th>
+{% endif %}
+                <th>Details</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for check in section.checks %}
+                <tr class="status-{{ check.status }}">
+                    <td>{{ check.label }}</td>
+                    <td>
+                        <span class="badge badge__{{ check.status }}">
+                            {{ check.status|upper }}
+                        </span>
+                    </td>
+                    <td>{{ check.value ?? '—' }}</td>
+{% if section.label == 'Security' %}
+                    <td{% if check.severity is defined %} class"severity-{{ check.severity }}"{% endif %}>
+                        {{ check.severity|default('—') }}
+                    </td>
+{% endif %}
+                    <td>
+                        {{ check.details }}
+                        {% if check.recommendation %}
+                            <div class="text-muted small mt-1">
+                                Recommendation: {{ check.recommendation }}
+                            </div>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+{% endfor %}
+</div>
+{% endblock server_check %}
+{% block server_check_post %}{% endblock server_check_post %}
+{% endblock content %}

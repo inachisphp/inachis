@@ -1,7 +1,31 @@
+div.widget-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 section.widget {
   h2 {
     color: #666;
     font-size: 0.85em;
     text-transform: uppercase;
   }
+}
+
+section.widget-settings {
+    background: #fff;
+    border: 1px solid #ddd;
+    margin: 1em;
+    max-width: 225px;
+    padding: 1em;
+    text-align: center;
+    width: 25%;
+
+    .material-icons {
+      font-size: 5em;
+    }
+
+    p span {
+      font-size: 0.85em;
+    }
 }

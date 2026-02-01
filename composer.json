@@ -4,7 +4,9 @@
     "description": "A basic framework for use in producing simple post/page driven websites",
     "license": "proprietary",
     "authors": [
-        { "name": "David G. Paul" }
+        {
+            "name": "David G. Paul"
+        }
     ],
     "version": "1.0.0",
     "require": {
@@ -14,7 +16,6 @@
         "ext-intl": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
-        "aptoma/twig-markdown": "^3.0",
         "composer/package-versions-deprecated": "1.11.99.4",
         "doctrine/doctrine-bundle": "^2.11.1",
         "doctrine/doctrine-migrations-bundle": "^3.7",
@@ -39,6 +40,7 @@
         "symfony/http-client": "7.*",
         "symfony/http-kernel": "^7.2",
         "symfony/mailer": "7.*",
+        "symfony/messenger": "7.*",
         "symfony/monolog-bundle": "^3.8",
         "symfony/password-hasher": "7.*",
         "symfony/property-access": "^7.2",
@@ -53,6 +55,7 @@
         "symfony/validator": "^7.2",
         "symfony/yaml": "^7.2",
         "twig/extra-bundle": "^3.21",
+        "twig/markdown-extra": "^3.22",
         "twig/string-extra": "^3.21"
     },
     "require-dev": {
@@ -86,12 +89,12 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "Inachis\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "App\\Tests\\": "tests/"
+            "Inachis\\Tests\\": "tests/"
         }
     },
     "replace": {
@@ -108,7 +111,7 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "create-skeleton": [
-            "cp -R vendor/jedi58/inachis/{bin,config,public} .",
+            "cp -R vendor/jedi58/inachis/{bin,config,public,templates} .",
             "cp -R vendor/jedi58/inachis/.env.dist .env"
         ],
         "setup-git-hook": [

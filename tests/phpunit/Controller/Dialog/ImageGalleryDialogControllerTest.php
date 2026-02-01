@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Dialog;
+namespace Inachis\Tests\phpunit\Controller\Dialog;
 
-use App\Controller\Dialog\ImageGalleryDialogController;
-use App\Repository\ImageRepository;
+use Inachis\Controller\Dialog\ImageGalleryDialogController;
+use Inachis\Repository\ImageRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;

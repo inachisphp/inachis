@@ -1,8 +1,7 @@
-var Setup = {
-	_init: function()
-	{
-		$('.form__setup input').on('keyup blur change', function(e) {
-			var input = $(this);
+window.Setup = {
+	_init() {
+		$('.form__setup input').on('keyup blur change', (e) => {
+			const input = $(e.currentTarget);
 			if (input.val() != '' && input[0].checkValidity()) {
 				input.addClass('input__complete');
 			}
@@ -10,8 +9,8 @@ var Setup = {
 	}
 };
 
-$(document).ready(function () {
+$(document).ready(() => {
 	if ($('.form__setup')) {
-		Setup._init();
+		window.Setup._init();
 	}
 });

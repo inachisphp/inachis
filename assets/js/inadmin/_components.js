@@ -1,18 +1,21 @@
-let InachisComponents = {
-	initialize: function() {
+const { default: TomSelect } = require("tom-select");
+
+window.Inachis.Components = {
+	initialize() {
+		this.initBackToTop();
 		this.initClearSearch('');
 		this.initCopyPaste('');
 		this.initDatePicker();
 		this.initFilterBar();
+		this.initOptionSelectors();
 		this.initPasswordToggle();
-		this.initSelect2('');
+		this.initTomSelect('');
 		this.initSelectAllNone('');
 		this.initSeriesControls();
 		this.initSwitches('');
 		this.initUIToggle();
 
-		$('.image_preview .button--confirm').on('click', function(event)
-		{
+		$('.image_preview .button--confirm').on('click', (event) => {
 			event.preventDefault();
 			const $imagePreview = $('.image_preview');
 			$imagePreview.find('input[type=hidden]').val('');
@@ -24,32 +27,32 @@ let InachisComponents = {
 			$(this).closest('form').trigger('submit');
 		});
 
-		// jQuery Tabs
-		$('.ui-tabbed').tabs();
+		tabs('.ui-tabbed');
 		$('.error-select').hide();
+	},
 
-		$(function() {
-			$('#progressbar').progressbar({
-				value: $('#progressbar').data('percentage')
-			});
+	initBackToTop() {
+		const backToTop = document.getElementById('back-to-top');
+
+		window.addEventListener('scroll', () => {
+			backToTop.hidden = window.scrollY < 300;
+		});
+		backToTop.addEventListener('click', () => {
+			window.scrollTo({ top: 0, behavior: 'smooth' });
 		});
 	},
 
-	initClearSearch: function (selector)
-	{
-		$(selector + '.clear-search').on('click', function()
-		{
-			let $searchBox = $($(this).attr('data-target'));
+	initClearSearch(selector) {
+		$(`${selector}.clear-search`).on('click', function () {
+			const $searchBox = $($(this).attr('data-target'));
 			$searchBox.val('');
 			$searchBox.closest('form').trigger('submit');
 		});
 	},
-	initCopyPaste: function (selector)
-	{
-		$(selector + '.button--copy').on('click', async function ()
-		{
-			const $textSource = $('#' + $(this).attr('data-target')),
-				copyText = ($(this).attr('data-prefix') ?? '') + $textSource.val();
+	initCopyPaste(selector) {
+		$(`${selector}.button--copy`).on('click', async function () {
+			const $textSource = $(`#${$(this).attr('data-target')}`);
+			const copyText = ($(this).attr('data-prefix') ?? '') + $textSource.val();
 			try {
 				await navigator.clipboard.writeText(copyText);
 			} catch (err) {
@@ -57,46 +60,59 @@ let InachisComponents = {
 			}
 		});
 	},
-	initDatePicker: function ()
-	{
+	initDatePicker() {
 		// http://xdsoft.net/jqplugins/datetimepicker/
 		// if ($('html').attr('lang')) {
 		// 	$.datetimepicker.setLocale($('html').attr('lang'));
 		// }
-		$('#post_postDate').each(function ()
-		{
+		$('#post_postDate').each(function () {
 			$(this).datetimepicker({
 				format: 'd/m/Y H:i',
 				validateOnBlue: false,
-				onChangeDateTime: function(dp,$input)
-				{
-					if (InachisPostEdit) {
+				onChangeDateTime: function (dp, $input) {
+					if (window.Inachis.PostEdit) {
 						// @todo Need to update JS so that it only updates URL if previously set URL matches the auto-generated pattern
-						$('input#post_url').val(InachisPostEdit.getUrlFromTitle());
+						$('input#post_url').val(window.Inachis.PostEdit.getUrlFromTitle());
 					}
 				}
 			});
 		});
 	},
-	initFilterBar: function()
-	{
-		let $filterOptions = $('.filter .filter__toggle');
-		$filterOptions.on('click', function()
-		{
-			$('#filter__options').toggle();
-			$(this).toggleClass('selected');
-		});
-		if ($('#filter__keyword').val() !== '') {
-			$('#filter__options').toggle();
-			$filterOptions.toggleClass('selected');
+	initFilterBar() {
+		const toggle = document.querySelector('.filter__toggle');
+		const panel  = document.getElementById('filter__options');
+
+		if (!toggle || !panel) {
+			return;
 		}
+
+		toggle.addEventListener('click', () => {
+			const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+			toggle.setAttribute('aria-expanded', String(!isOpen));
+
+			if (isOpen) {
+				panel.classList.remove('is-open');
+				panel.addEventListener('transitionend', () =>
+					panel.setAttribute('hidden', ''),
+					{ once: true }
+				);
+			} else {
+				panel.removeAttribute('hidden');
+				panel.offsetHeight;
+				panel.classList.add('is-open');
+				panel.querySelector('input, select, button')?.focus();
+			}
+		});
 	},
-	initPasswordToggle: function ()
-	{
-		$('button.button--password-toggle').on('click', function ()
-		{
-			const $button = $(this),
-				$input = $('input[data-controller=' + $button.data('action') + ']');
+	initOptionSelectors() {
+		document.querySelectorAll('.option-selector').forEach(element => {
+			optionSelector(element);
+		});
+	},
+	initPasswordToggle() {
+		$('button.button--password-toggle').on('click', function () {
+			const $button = $(this);
+			const $input = $(`input[data-controller=${$button.data('action')}]`);
 			if ($input.attr('type') === "password") {
 				$input.attr('type', 'text');
 				$button.html('visibility');
@@ -106,112 +122,129 @@ let InachisComponents = {
 			}
 		});
 	},
-	// See https://select2.github.io/examples.html
-	initSelect2: function (selector)
-	{
-		$(selector + '.js-select').each(function ()
-		{
-			let $properties = {
-				allowClear: true,
-				maximumInputLength: 20,
-				width: 'element',
+	initTomSelect(selector) {
+		document.querySelectorAll(selector + ' .js-select').forEach(el => {
+			const descriptionField = el.dataset.renderDescriptionField;
+			const isTags = el.dataset.tags === 'true';
+			const minQueryLength = 2;
+
+			const options = {
+				maxItems: isTags ? null : 1,
+				valueField: 'id',
+				labelField: 'text',
+				searchField: 'text',
+				sortField: 'text',
+				create: isTags,
+				persist: isTags ? false : undefined,
+				loadThrottle: 300,
+
+				plugins: {
+					clear_button: { title: 'Remove all selected options' },
+					...(isTags
+						? {
+							checkbox_options: {
+								checkedClassNames: ['ts-checked'],
+								uncheckedClassNames: ['ts-unchecked']
+							},
+							remove_button: { title: 'Remove this item' }
+						}
+						: {}
+					)
+				},
+
+				load: el.dataset.url
+				? function(query, callback) {
+					query = query.trim();
+					if (query.length < minQueryLength) return callback([]);
+					fetch(el.dataset.url, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+						body: new URLSearchParams({ q: query })
+					})
+						.then(res => res.json())
+						.then(json => callback(json.items || []))
+						.catch(err => {
+							console.error('TomSelect load error:', err);
+							callback([]);
+						});
+					}
+				: undefined,
+
+				shouldLoad: query => query.trim().length >= minQueryLength,
+
+				render: {
+					option: function(item, escape) {
+						let desc = descriptionField ? item[descriptionField] || '' : '';
+						if (desc.length > 50) desc = desc.slice(0, 47) + '…';
+						return `<div role="option" aria-label="${escape(item.text)}${desc ? ' ' + escape(desc) : ''}">
+								${escape(item.text)}
+								${desc ? `<small>${escape(desc)}</small>` : ''}
+								</div>`;
+					},
+					item: function(item, escape) {
+						return `<div>${escape(item.text)}</div>`;
+					},
+					no_results: function() {
+						return '<div class="no-results" role="alert" aria-live="polite">No matching options</div>';
+					}
+				},
+
+				maxOptions: 100
 			};
-			if ($(this).attr('data-tags')) {
-				$properties.tags = 'true';
-				$properties.tokenSeparators = [ ',' ];
-			}
-			if ($(this).attr('data-url')) {
-				$properties.ajax = {
-					url: $(this).attr('data-url'),
-					dataType: 'json',
-					data: function (params)
-					{
-						return {
-							q: params.term,
-							page: params.page
-						};
-					},
-					delay: 250,
-					method: 'POST',
-					processResults: function (data, params)
-					{
-						params.page = params.page || 1;
-						return {
-							results: data.items,
-							pagination: {
-								more: (params.page * 25) < data.totalCount
-							}
-						};
-					},
-					cache: false
-				};
-			}
-			$(this).select2($properties);
+
+			if (!el.placeholder) el.setAttribute('aria-label', 'Select an option');
+			el.classList.add('wcag-select');
+
+			new TomSelect(el, options);
 		});
 	},
-	initSelectAllNone: function (selector)
-	{
-		$(selector + '.selectAllNone').on('click', function()
-		{
+	initSelectAllNone(selector) {
+		$(`${selector}.selectAllNone`).on('click', function () {
 			$(this).closest('form').first().find('input[type=checkbox]').prop('checked', $(this).prop('checked'));
-			InachisComponents.toggleActionBar();
+			window.Inachis.Components.toggleActionBar();
 		});
 		$('input[name^="items"]').on('change', this.toggleActionBar);
 	},
-	initSeriesControls: function ()
-	{
-		$('input[name=series\\[itemList\\]\\[\\]]').on('change', function() {
-			const uncheckedItems = $('input[name=series\\[itemList\\]\\[\\]]:not(:checked)'),
-				checkedItems = $('input[name=series\\[itemList\\]\\[\\]]:checked'),
-				anyChecked = checkedItems.length > 0;
+	initSeriesControls() {
+		$('input[name=series\\[itemList\\]\\[\\]]').on('change', function () {
+			const uncheckedItems = $('input[name=series\\[itemList\\]\\[\\]]:not(:checked)');
+			const checkedItems = $('input[name=series\\[itemList\\]\\[\\]]:checked');
+			const anyChecked = checkedItems.length > 0;
 			$('.series__controls').toggleClass('visually-hidden', !anyChecked);
 
 			checkedItems.closest('tr').addClass('selected');
 			uncheckedItems.closest('tr').removeClass('selected');
 		});
 	},
-	initSwitches: function (selector)
-	{
-		$(selector + ' .ui-switch').each(function ()
-		{
-			var $properties = {
-				checked: this.checked,
-				clear: true,
-				height: 20,
-				width: 40
-			};
-			if ($(this).attr('data-label-on')) {
-				$properties.on_label = $(this).attr('data-label-on');
-			}
-			if ($(this).attr('data-label-off')) {
-				$properties.off_label = $(this).attr('data-label-off');
-			}
-			$(this).switchButton($properties);
-		});
+	initSwitches(selector) {
+		document
+			.querySelectorAll(`${selector} .ui-switch`)
+			.forEach((checkbox) => {
+				window.Inachis.SwitchButton.create(checkbox, {
+					onLabel: checkbox.dataset.labelOn || 'On',
+					offLabel: checkbox.dataset.labelOff || 'Off',
+				});
+			});
 	},
-	initUIToggle: function ()
-	{
-		let $uiToggle = $('.ui-toggle');
-		$uiToggle.each(function()
-		{
-			var targetElement = $(this).attr('data-target'),
-				targetDefaultState = $(this).attr('data-target-state');
+	initUIToggle() {
+		const $uiToggle = $('.ui-toggle');
+		$uiToggle.each(function () {
+			const targetElement = $(this).attr('data-target');
+			const targetDefaultState = $(this).attr('data-target-state');
 			if (targetDefaultState === 'hidden') {
 				$(targetElement).hide();
 			}
 		});
-		$uiToggle.on('click', function()
-		{
+		$uiToggle.on('click', function () {
 			$($(this).attr('data-target')).toggle();
 		});
 	},
 
-	toggleActionBar: function ()
-	{
-		const uncheckedItems = $('input[name^="items"]:not(:checked)'),
-			checkedItems = $('input[name^="items"]:checked'),
-			anyUnchecked = uncheckedItems.length > 0,
-			anyChecked = checkedItems.length > 0;
+	toggleActionBar() {
+		const uncheckedItems = $('input[name^="items"]:not(:checked)');
+		const checkedItems = $('input[name^="items"]:checked');
+		const anyUnchecked = uncheckedItems.length > 0;
+		const anyChecked = checkedItems.length > 0;
 		checkedItems.closest('tr').addClass('selected');
 		checkedItems.closest('article').addClass('selected');
 		uncheckedItems.closest('tr').removeClass('selected');
@@ -221,6 +254,6 @@ let InachisComponents = {
 	}
 };
 
-$(document).ready(function() {
-	InachisComponents.initialize();
+$(document).ready(() => {
+	window.Inachis.Components.initialize();
 });

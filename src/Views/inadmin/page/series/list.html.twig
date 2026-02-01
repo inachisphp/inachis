@@ -9,7 +9,7 @@
     {% block series_list_pre %}{% endblock series_list_pre %}
 
     {% block series_list %}
-        <div class="col span_8_of_8 widget-posts">
+        <div class="col-12 widget-posts">
         {% include 'inadmin/partials/list.html.twig' with {
                 'className': 'form__series',
                 'type': 'series',
@@ -66,12 +66,12 @@
                 },
 
                 'sort_options': {
-                    'lastDate asc': 'End date oldest to newest',
-                    'lastDate desc': 'End date newest from oldest',
-                    'modDate asc': 'Modified dates oldest from newest',
-                    'modDate desc': 'Modified dates newest to oldest',
-                    'title asc': 'Title A-Z',
-                    'title desc': 'Title Z-A',
+                    'lastDate asc': 'Newest',
+                    'lastDate desc': 'Oldest',
+                    'modDate asc': 'Modfied: Newest',
+                    'modDate desc': 'Modfiied: Oldest',
+                    'title asc': 'Title: A-Z',
+                    'title desc': 'Title: Z-A',
                 },
 
                 'badges': {

@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Dialog;
+namespace Inachis\Tests\phpunit\Controller\Dialog;
 
-use App\Controller\Dialog\SessionTimeoutDialogController;
+use Inachis\Controller\Dialog\SessionTimeoutDialogController;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\Security;

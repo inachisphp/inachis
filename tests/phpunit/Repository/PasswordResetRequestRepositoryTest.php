@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Repository;
+namespace Inachis\Tests\phpunit\Repository;
 
-use App\Entity\PasswordResetRequest;
-use App\Entity\User;
-use App\Repository\PasswordResetRequestRepository;
+use Inachis\Entity\PasswordResetRequest;
+use Inachis\Entity\User;
+use Inachis\Repository\PasswordResetRequestRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;

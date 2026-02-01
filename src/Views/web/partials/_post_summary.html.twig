@@ -23,12 +23,12 @@
     {% endif %}
     <p>
         {%- if post.description is defined and post.description is not empty %}
-            {{ post.description|markdown|striptags }}
+            {{ post.description|markdown_to_html|striptags }}
         {% elseif post.featureSnippet is defined and post.featureSnippet is not empty %}
             {{ post.featureSnippet }}
         {% elseif post.content is defined and post.content is not empty %}
-            {{ post.content|markdown|striptags|slice(0, 400) }}
-            {% if post.content|markdown|striptags|length > 400 %}…{% endif %}
+            {{ post.content|markdown_to_html|striptags|slice(0, 400) }}
+            {% if post.content|markdown_to_html|striptags|length > 400 %}…{% endif %}
         {% endif -%}
     </p>
     <p class="post-details">

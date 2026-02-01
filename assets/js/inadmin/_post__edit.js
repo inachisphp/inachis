@@ -1,153 +1,153 @@
-var InachisPostEdit = {
-	_pageTitle: '',
-	_postOrPage: 'post',
-	categoryList: '',
-	ajaxTimeout: false,
+window.Inachis.PostEdit = {
+	pageTitle: '',
+	postOrPage: 'post',
+	ajaxTimeout: null,
 
-	_init: function()
-	{
-		var currentContentType = window.location.href.match(/(post|page)/gi);
-		if (null !== currentContentType) {
-			this._postOrPage = currentContentType[0].toLowerCase();
+	init() {
+		const match = window.location.href.match(/(post|page)/i);
+		if (match) {
+			this.postOrPage = match[0].toLowerCase();
 		}
-        // if ($('.sf-toolbarreset').length && $('.fixed-bottom-bar').length) {
-        // 	var _BarHeight = $('.sf-toolbarreset').css('height');
-        // 	$('.fixed-bottom-bar').css('bottom', _BarHeight);
-        // 	$('.ui-tabs-panel').css('margin-bottom', _BarHeight);
-        // }
+
 		this.initTitleChange();
+
 		if (this.hasAutosavedValue()) {
-			$('#subTitle_label').parent().after(
-				$('<p>', {'class': 'autosave-notification'})
-					.text('The below content has been recovered from an auto-save and must be saved before publishing.')
-					.append(
-						$('<button>', {'class': 'button button--negative', 'type': 'button'})
-							.text('Clear auto-save')
-							.on('click',function(event)
-							{
-								event.preventDefault();
-								easymde.clearAutosavedValue();
-								location.reload();
-							})
-					)
-			);
+			this.showAutosaveNotification();
 		}
 	},
 
-	initTitleChange: function()
-	{
-		$(document).on('input', '#post_title, #post_subTitle', $.proxy(function(event)
-		{
-			if (InachisPostEdit.ajaxTimeout) clearTimeout(InachisPostEdit.ajaxTimeout);
-			InachisPostEdit.ajaxTimeout = setTimeout(function() {
-				if ([
-					13, // enter
-					16, // shift
-					17, // ctrl
-					18, // alt
-					19, // pause
-					20, // capslock
-					27, // esc
-					33, // page up
-					34, // page down
-					35, // end
-					36, // home
-					37, // left
-					38, // up
-					39, // right
-					40, // down
-					45, // insert
-					91, // left-window / apple
-					92, // right-window / apple
-					93, // select key
-					112, // f1
-					113, // f2
-					114, // f3
-					115, // f4
-					116, // f5
-					117, // f6
-					118, // f7
-					119, // f8
-					120, // f9
-					121, // f10
-					122, // f11
-					123, // f12
-					124, // f13
-					125, // f14
-					126, // f15
-					127, // f16
-					128, // f17
-					129, // f18
-					130, // f19
-					144, // num lock
-					145 // scroll lock
-				].indexOf(event.which) >= 0) {
-					return;
-				}
-				var urlInput = $('input#post_url');
-				urlInput.val(InachisPostEdit.getUrlFromTitle());
-			}, 500);
-		}, this));
+	initTitleChange() {
+		const inputs = document.querySelectorAll('#post_title, #post_subTitle');
+
+		inputs.forEach(input =>
+			input.addEventListener('input', event => {
+				if (this.ajaxTimeout) clearTimeout(this.ajaxTimeout);
+
+				const excludedKeys = new Set([
+					13, 16, 17, 18, 19, 20, 27, 33, 34, 35, 36,
+					37, 38, 39, 40, 45, 91, 92, 93,
+					112, 113, 114, 115, 116, 117, 118, 119,
+					120, 121, 122, 123, 124, 125, 126, 127,
+					128, 129, 130, 145
+				]);
+
+				this.ajaxTimeout = setTimeout(() => {
+					if (excludedKeys.has(event.which)) return;
+
+					const urlInput = document.querySelector('input#post_url');
+					if (urlInput) urlInput.value = this.getUrlFromTitle();
+				}, 500);
+			})
+		);
 	},
 
-	getUrlFromTitle: function()
-	{
-		let $originalTitle = $('input#post_url').val();
-		if ($originalTitle === '' || $originalTitle.match(/\d{4}\/\d{2}\/\d{2}\/[a-z0-9\-]+/)) {
-			let $postContainer = $('#post__edit'),
-				title = this.urlify($postContainer.find('#post_title').val()),
-				subTitle = this.urlify($postContainer.find('#post_subTitle').val());
-			if (title.length > 0 && subTitle.length > 0) {
+	getUrlFromTitle() {
+		const urlInput = document.querySelector('input#post_url');
+		const originalTitle = urlInput?.value || '';
+
+		if (
+			originalTitle === '' ||
+			/\d{4}\/\d{2}\/\d{2}\/[a-z0-9\-]+/.test(originalTitle)
+		) {
+			const postContainer = document.querySelector('#post__edit');
+			if (!postContainer) return originalTitle;
+
+			let title = this.urlify(
+				postContainer.querySelector('#post_title')?.value
+			);
+			const subTitle = this.urlify(
+				postContainer.querySelector('#post_subTitle')?.value
+			);
+
+			if (title && subTitle) {
 				title += '-';
 			}
 			title += subTitle;
-			if (this._postOrPage === 'post') {
-				title = this.convertDate($('#post_postDate').val().substring(0,10)) + '/' + title.substring(0, 255);
+
+			if (this.postOrPage === 'post') {
+				const postDate = document.querySelector('#post_postDate')?.value;
+				if (postDate) {
+					title = this.convertDate(postDate.substring(0, 10)) + '/' + title.substring(0, 255);
+				}
 			}
+
 			this.ensureUniqueUrl(title);
 			return title;
 		}
-		return $originalTitle;
+
+		return originalTitle;
 	},
 
-	convertDate: function(value)
-	{
-		value = value.split('/');
-		if (value[0] == null || value[1] == null || value[2] == null) {
-			return '';
-		}
-		return value[2] + '/' + value[1] + '/' + value[0];
+	convertDate(value) {
+		const parts = value.split('/');
+		if (parts.length < 3) return '';
+		return `${parts[2]}/${parts[1]}/${parts[0]}`;
 	},
 
-	urlify: function(value)
-	{
-		if (typeof value === 'undefined') {
-			return;
-		}
-		return value.toLowerCase().replace(/&/g, 'and').replace(/[_\s]/g, '-').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\-]/gi, '')
+	urlify(value) {
+		if (!value) return '';
+		return value
+			.toLowerCase()
+			.replace(/&/g, 'and')
+			.replace(/[_\s]/g, '-')
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '')
+			.replace(/[^a-z0-9\-]/gi, '');
 	},
 
-	hasAutosavedValue: function()
-	{
-		return "easymde" in window && easymde.options.element.defaultValue !== easymde.value();
+	hasAutosavedValue() {
+		return 'easymde' in window && easymde.options.element.defaultValue !== easymde.value();
 	},
 
-	ensureUniqueUrl: function(title)
-	{
-		$.ajax({
-			data: {
-				id: easymde.options.autosave.uniqueId,
-				url: title
-			},
-			method: 'post',
-			url: Inachis.prefix + '/ax/check-url-usage',
-		}).done(function (jqXHR) {
+	showAutosaveNotification() {
+		const postTitleInput = document.querySelector('#subTitle_label');
+		if (!postTitleInput?.parentNode) return;
 
-			$('input#post_url').val(jqXHR)
+		const container = postTitleInput.parentNode;
+
+		const p = document.createElement('p');
+		p.className = 'autosave-notification';
+		p.textContent = 'The below content has been recovered from an auto-save and must be saved before publishing.';
+
+		const button = document.createElement('button');
+		button.type = 'button';
+		button.className = 'button button--negative';
+		button.textContent = 'Clear auto-save';
+
+		button.addEventListener('click', event => {
+			event.preventDefault();
+			easymde.clearAutosavedValue();
+			location.reload();
 		});
-	}
+
+		p.appendChild(button);
+		container.after(p);
+	},
+
+	async ensureUniqueUrl(title) {
+		try {
+			const params = new URLSearchParams();
+			params.append('id', easymde.options.autosave.uniqueId);
+			params.append('url', title);
+
+			const response = await fetch(`${window.Inachis.prefix}/ax/check-url-usage`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: params.toString(),
+			});
+
+			if (!response.ok) throw new Error('Failed to check URL');
+
+			const uniqueUrl = await response.text();
+
+			const urlInput = document.querySelector('input#post_url');
+			if (urlInput) urlInput.value = uniqueUrl;
+		} catch (err) {
+			console.error('PostEdit ensureUniqueUrl failed:', err);
+		}
+	},
 };
 
 $(document).ready(function () {
-	InachisPostEdit._init();
+	window.Inachis.PostEdit.init();
 });

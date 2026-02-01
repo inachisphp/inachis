@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Repository;
+namespace Inachis\Repository;
 
-use App\Entity\User;
-use App\Entity\Waste;
+use Inachis\Entity\User;
+use Inachis\Entity\Waste;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\NonUniqueResultException;

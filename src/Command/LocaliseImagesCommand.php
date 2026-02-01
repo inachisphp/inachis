@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Command;
+namespace Inachis\Command;
 
-use App\Entity\{Image, Page, Series};
-use App\Service\Image\{ImageExtractor, ImageLocaliser, ContentImageUpdater};
+use Inachis\Entity\{Image, Page, Series};
+use Inachis\Service\Image\{ImageExtractor, ImageLocaliser, ContentImageUpdater};
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;

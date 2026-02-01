@@ -2,6 +2,7 @@
 {% set page_type = 'login' %}
 
 {% block content %}
+<div class="col-12">
 <div class="container__login">
     {{ form_start(form, {attr: {class: 'form form__login', autocomplete: false}}) }}
     <img src="/assets/imgs/incc/inachis.png" height="56.9" title="inachis logo" width="80" />
@@ -24,5 +25,6 @@
     {% endif %}
 
     {{ form_end(form) }}
+</div>
 </div>
 {% endblock content %}

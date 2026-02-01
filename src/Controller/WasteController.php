@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller;
+namespace Inachis\Controller;
 
-use App\Model\ContentQueryParameters;
-use App\Repository\WasteRepository;
+use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\WasteRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

@@ -7,14 +7,14 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Search;
+namespace Inachis\Controller\Page\Search;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\Url;
-use App\Entity\User;
-use App\Repository\SearchRepository;
-use App\Repository\UrlRepository;
-use App\Repository\UserRepository;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Url;
+use Inachis\Entity\User;
+use Inachis\Repository\SearchRepository;
+use Inachis\Repository\UrlRepository;
+use Inachis\Repository\UserRepository;
 use DateTime;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;

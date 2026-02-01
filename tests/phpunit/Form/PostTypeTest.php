@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Form;
+namespace Inachis\Tests\phpunit\Form;
 
-use App\Entity\Page;
-use App\Form\PostType;
-use App\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use Inachis\Entity\Page;
+use Inachis\Form\PostType;
+use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;

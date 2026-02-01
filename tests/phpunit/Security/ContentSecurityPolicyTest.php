@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Security;
+namespace Inachis\Tests\phpunit\Security;
 
-use App\Exception\InvalidContentSecurityPolicyException;
-use App\Security\ContentSecurityPolicy;
+use Inachis\Exception\InvalidContentSecurityPolicyException;
+use Inachis\Security\ContentSecurityPolicy;
 use PHPUnit\Framework\TestCase;
 use Exception;
 

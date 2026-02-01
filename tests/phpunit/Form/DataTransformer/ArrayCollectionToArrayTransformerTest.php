@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Form\DataTransformer;
+namespace Inachis\Tests\phpunit\Form\DataTransformer;
 
-use App\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;

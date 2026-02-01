@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Series;
+namespace Inachis\Controller\Page\Series;
 
-use App\Controller\AbstractInachisController;
-use App\Repository\SeriesRepository;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Repository\SeriesRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 

@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Util;
+namespace Inachis\Tests\phpunit\Util;
 
-use App\Util\Base64EncodeFile;
+use Inachis\Util\Base64EncodeFile;
 use PHPUnit\Framework\TestCase;
 
 class Base64EncodeFileTest extends TestCase

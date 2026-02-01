@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Controller\Dialog;
+namespace Inachis\Tests\phpunit\Controller\Dialog;
 
-use App\Controller\Dialog\BulkCreateController;
-use App\Entity\User;
-use App\Service\Page\PageBulkCreateService;
+use Inachis\Controller\Dialog\BulkCreateController;
+use Inachis\Entity\User;
+use Inachis\Service\Page\PageBulkCreateService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use Ramsey\Uuid\Uuid;

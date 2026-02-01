@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Util;
+namespace Inachis\Tests\phpunit\Util;
 
-use App\Entity\Page;
-use App\Entity\Revision;
-use App\Util\ContentRevisionCompare;
+use Inachis\Entity\Page;
+use Inachis\Entity\Revision;
+use Inachis\Util\ContentRevisionCompare;
 use PHPUnit\Framework\TestCase;
 
 class ContentRevisionCompareTest extends TestCase

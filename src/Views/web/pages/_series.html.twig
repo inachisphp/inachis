@@ -19,7 +19,7 @@
                     </header>
 
                     <div class="entry-content">
-                        {{ series.description|default('')|markdown }}
+                        {{ series.description|default('')|markdown_to_html }}
 
                         {% if series.image.filename|default('') is not empty %}
                         <p><img alt="{{ series.image.altText }}" class="align_centre" src="{% if not (series.image.filename starts with 'http') %}/imgs/{% endif %}{{ series.image.filename }}" /></p>

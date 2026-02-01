@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Controller\Page\Dashboard;
+namespace Inachis\Controller\Page\Dashboard;
 
-use App\Controller\AbstractInachisController;
-use App\Entity\Page;
-use App\Repository\PageRepository;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Page;
+use Inachis\Repository\PageRepository;
 use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

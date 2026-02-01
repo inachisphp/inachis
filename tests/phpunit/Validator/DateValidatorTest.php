@@ -7,12 +7,12 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace App\Tests\phpunit\Util;
+namespace Inachis\Tests\phpunit\Util;
 
-use App\Utils\UrlNormaliser;
-use App\Validator\DateValidator;
+use Inachis\Utils\UrlNormaliser;
+use Inachis\Validator\DateValidator;
 use PHPUnit\Framework\TestCase;
-use App\Exception\InvalidTimezoneException;
+use Inachis\Exception\InvalidTimezoneException;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 class DateValidatorTest extends TestCase

@@ -1,21 +1,3 @@
-{% if series.items is not empty %}
-    <h2>Date Range</h2>
-    <p>
-        {{ form_label(form.firstDate) }}
-        {{ form_errors(form.firstDate) }}
-        {{ form_widget(form.firstDate) }}
-    </p>
-    <p>
-        {{ form_label(form.lastDate) }}
-        {{ form_errors(form.lastDate) }}
-        {{ form_widget(form.lastDate) }}
-    </p>
-{% endif %}
-
-    <h2>
-        {% trans %}admin.series.contents.title{% endtrans %}
-        <span class="badge">{{ series.items|length }}</span>
-    </h2>
 {% if series.id is not empty %}
     <p class="series__controls">
         {{ form_widget(form.bulkCreate) }}
@@ -37,7 +19,7 @@
                         <span class="material-icons">{% if item.status == 'published' %}visibility{% else %}visibility_off{% endif %}</span>
                     </td>
                     <td>
-                        <a aria-label="Edit item" href="/incc/{{ item.type }}/{{ item.urls|first.link }}" title="Edit {{ item.title }}"><span class="material-icons">edit_note</span></a>
+                        <a aria-label="Edit item" href="/incc/{{ item.type }}/{{ item.urls|first.link|default('') }}" title="Edit {{ item.title }}"><span class="material-icons">edit_note</span></a>
                     </td>
                 </tr>
             {% endfor %}

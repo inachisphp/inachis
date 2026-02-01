@@ -1,0 +1,44 @@
+// font-sizes
+.font-larger {
+	font-size: 1.25rem;
+}
+.font-largest {
+	font-size: 1.5rem;
+
+	.option-selector label {
+		width: 6.5rem;
+	}
+}
+
+// font-families
+.font-mono {
+	font-family: Roboto Mono, monospace;
+}
+.font-serif {
+	font-family: Georgia, serif;
+}
+.font-dyslexic {
+	font-family: OpenDyslexic, sans-serif;
+
+	.option-selector label {
+		width: 6.5rem;
+	}
+	&.font-larger {
+		.option-selector label {
+			width: 8rem;
+		}
+	}
+	&.font-largest {
+		.option-selector label {
+			width: 9.5rem;
+		}
+	}
+}
+
+// line-heights
+.line-comfort {
+	line-height: 2;
+}
+.line-spacious {
+	line-height: 2.5;
+}
