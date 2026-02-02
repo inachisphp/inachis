@@ -2,10 +2,10 @@
 @use '../definitions' as *;
 
 .filter-bar {
-  background-color: #fff;
-  padding: 0 .5em .5rem;
-  border: 1px solid #eee;
-  border-bottom: none;
+	background-color: var(--bg-surface);
+	padding: 0 .5em .5rem;
+	border: 1px solid var(--color-neutral-300);
+	border-bottom: none;
 }
 
 
@@ -16,16 +16,17 @@
 	margin: 0 auto;
 	max-width: 1400px;
 
-	input[type=Search], select {
+	input[type=Search],
+	select {
 		border-color: transparent;
 		width: auto;
 	}
 
 	.filter__toggle {
 		align-items: center;
-		border: 1px solid #e5e7eb;
+		border: 1px solid var(--color-neutral-400); // e5e7eb
 		border-radius: $radius-standard;
-		color: #111827;
+		color: var(--color-neutral-900); // 111827
 		cursor: pointer;
 		display: flex;
 		gap: 0.5rem;
@@ -33,8 +34,17 @@
 		padding: 0 0.5rem;
 		text-decoration: none;
 
-		&.icon-badge-wrapper { position: relative; display: flex; margin-right: 4px; }
-		&.is-active { border-color: #2563eb; background: #f0f7ff; color: #2563eb; }
+		&.icon-badge-wrapper {
+			position: relative;
+			display: flex;
+			margin-right: 4px;
+		}
+
+		&.is-active {
+			border-color: var(--color-brand-500);
+			background: var(--color-brand-050);
+			color: var(--color-brand-500);
+		}
 
 		.filter-indicator {
 			position: absolute;
@@ -42,21 +52,26 @@
 			right: -3px;
 			width: 10px;
 			height: 10px;
-			background: #ef4444;
-			border: 2px solid #fff;
+			background: var(--color-danger-500);
+			border: 2px solid var(--bg-surface);
 			border-radius: $radius-round;
 		}
 	}
 
-	.row { display: flex; gap: 0.5rem; align-items: center; }
+	.row {
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+	}
 
 	.ui-sortby {
 		align-items: center;
-		border: 1px solid #e5e7eb;
+		border: 1px solid var(--color-neutral-400);
 		border-radius: $radius-standard;
 		display: flex;
 		max-width: 225px;
-		padding: 0 0.5rem; flex: 1;
+		padding: 0 0.5rem;
+		flex: 1;
 
 		select {
 			border: none;
@@ -68,16 +83,33 @@
 	}
 
 	@media (min-width: $breakpoint-medium) {
-		flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: center;
 
-		.main-actions { order: 2; flex: 0 1 500px; justify-content: flex-end; }
-		.secondary-controls { order: 1; flex: 0 1 auto; }
-		.selection-row { order: 3; width: 100%; border-top: 1px solid #e5e7eb; padding-top: 0.5rem; }
+		.main-actions {
+			order: 2;
+			flex: 0 1 500px;
+			justify-content: flex-end;
+		}
+
+		.secondary-controls {
+			order: 1;
+			flex: 0 1 auto;
+		}
+
+		.selection-row {
+			order: 3;
+			width: 100%;
+			border-top: 1px solid var(--color-neutral-400);
+			padding-top: 0.5rem;
+		}
 	}
 }
 
 .button.button--selectAllNone {
-	background: #eee;
+	background: var(--color-neutral-300);
 	border: 1px solid transparent;
 	display: inline-block;
 	padding: 0.5em;
@@ -87,46 +119,47 @@
 }
 
 div#filter__options {
-  span {
-    background-color: #eee;
-    border: 1px solid transparent;
-    border-radius: $radius-standard;
-    color: #333;
-    font-size: 0.9em;
-    margin-right: 1em;
-    padding: 0.4em 0.4em 0.4em 1em;
+	span {
+		background-color: var(--color-neutral-300);
+		border: 1px solid transparent;
+		border-radius: $radius-standard;
+		color: var(--color-neutral-800);
+		font-size: 0.9em;
+		margin-right: 1em;
+		padding: 0.4em 0.4em 0.4em 1em;
 
-    label::after {
-      content: ':';
-    }
+		label::after {
+			content: ':';
+		}
 
-    select::before, select::after {
-      box-sizing: border-box;
-    }
+		select::before,
+		select::after {
+			box-sizing: border-box;
+		}
 
-    select {
-      background: transparent;
-      border: none;
-      color: #333;
-      padding: 0;
-      margin: 0;
-      width: auto;
-      font-family: inherit;
-      font-size: inherit;
-      cursor: inherit;
-      line-height: inherit;
-      outline: none;
-    }
+		select {
+			background: transparent;
+			border: none;
+			color: var(--color-neutral-800);
+			padding: 0;
+			margin: 0;
+			width: auto;
+			font-family: inherit;
+			font-size: inherit;
+			cursor: inherit;
+			line-height: inherit;
+			outline: none;
+		}
 
-    option {
-      background-color: #fff;
-      color: #000;
-    }
-  }
+		option {
+			background-color: var(--bg-surface);
+			color: var(--color-neutral-900);
+		}
+	}
 }
 
 .collapsible {
-	background-color: #f9fafb;
+	background-color: var(--color-neutral-100);
 	display: grid;
 	grid-template-rows: 0fr;
 	height: 0;
@@ -135,12 +168,12 @@ div#filter__options {
 	transition: grid-template-rows 250ms ease, height 250ms ease, opacity 200ms ease, padding 200ms ease;
 	padding: 0;
 
-	.collapsible > * {
+	.collapsible>* {
 		overflow: hidden;
 	}
 
 	&.is-open {
-		border: 1px dashed #eee;
+		border: 1px dashed var(--color-neutral-300);
 		border-radius: $radius-standard;
 		grid-template-rows: 1fr;
 		height: auto;
@@ -152,4 +185,3 @@ div#filter__options {
 		transition: none;
 	}
 }
-

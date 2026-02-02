@@ -2,20 +2,26 @@
 @use 'sass:color';
 
 .form {
-	input, textarea, select {
-	    border: 1px solid #999;
+
+	input,
+	textarea,
+	select {
+		border: 1px solid var(--color-neutral-500);
 		font-size: 1em;
-	    line-height: 1.5em;
-	    padding: 5px 10px;
-	    width: 15em;
+		line-height: 1.5em;
+		padding: 5px 10px;
+		width: 15em;
 	}
+
 	input.checkbox {
 		margin-right: 0.5em;
 		width: auto;
 	}
+
 	fieldset {
 		border: none;
 	}
+
 	legend {
 		display: none;
 	}
@@ -36,19 +42,22 @@
 			width: 60%;
 		}
 	}
+
 	.ts-dropdown-content {
 		input {
 			width: auto;
 		}
+
 		small {
 			display: block;
 		}
 	}
 }
 
-.button, .button:visited {
-	background-color: #fff;
-	border: 3px solid #fff;
+.button,
+.button:visited {
+	background-color: var(--bg-surface);
+	border: 3px solid var(--bg-surface);
 	border-radius: $radius-standard;
 	padding: 0.5em 0.75em;
 	text-decoration: none;
@@ -60,58 +69,60 @@
 	}
 
 	&:hover {
-		background-color: color.adjust(#fff, $lightness: -10%);
+		background-color: var(--color-neutral-250);
 	}
 
 	&:disabled {
 		opacity: 0.5;
 	}
 
-	span:nth-of-type(2), i:nth-last-of-type(1) {
+	span:nth-of-type(2),
+	i:nth-last-of-type(1) {
 		margin-top: 0.2em;
 	}
 
-	span, i {
+	span,
+	i {
 		display: inline-block;
 		vertical-align: middle;
 	}
 
 	&.button--secondary {
-		background-color: $button--default-active-color;
-		border-color: $button--default-active-color;
+		background-color: var(--color-button-default-bg);
+		border-color: var(--color-button-default-bg);
 
 		&:hover {
-			background-color: $button--default-hover-color;
+			background-color: var(--color-button-default-hover);
 		}
 	}
 
 	&.button--positive {
-		background-color: $button--positive--active-color;
-		border-color: $button--positive--active-color;
-		color: #fff;
+		background-color: var(--color-success-500);
+		border-color: var(--color-success-500);
+		color: var(--color-neutral-000);
 
 		&:hover {
-			background-color: $button--positive--hover-color;
+			background-color: var(--color-success-700);
 		}
 	}
 
 	&.button--negative {
-		background-color: $button--negative--active-color;
-		border-color: $button--negative--active-color;
-		color: #fff;
+		background-color: var(--color-danger-500);
+		border-color: var(--color-danger-500);
+		color: var(--color-neutral-000);
 
 		&:hover {
-			background-color: $button--negative--hover-color;
+			background-color: var(--color-danger-300);
 		}
 	}
 
 	&.button--info {
-		background-color: $button--info--active-color;
-		border-color: $button--info--active-color;
-		color: #fff;
+		background-color: var(--color-info-500);
+		border-color: var(--color-info-500);
+		color: var(--color-neutral-000);
 
 		&:hover {
-			background-color: $button--info--hover-color;
+			background-color: var(--color-info-700);
 		}
 	}
 
@@ -121,38 +132,38 @@
 	}
 
 	&.button--add {
-		background-color: $button--add--active-color;
-		border-color: $button--add--active-color;
-		color: #fff;
+		background-color: var(--color-brand-500);
+		border-color: var(--color-brand-500);
+		color: var(--color-neutral-000);
 
 		&:hover {
-			background-color: $button--add--hover-color;
+			background-color: var(--color-brand-400);
 		}
 	}
 
 	&.button--ai {
-		background: linear-gradient(90deg, #069, #0063a7, #005fb4, #0059c0, #1751c9, #3e46ce, #5d35cf, #7914cc);
+		background: linear-gradient(90deg, #069, #0063a7, #005fb4, #0059c0, #1751c9, #3e46ce, #5d35cf, #7914cc); // Keeping as specific gradient unless requested otherwise
 		border-color: #470099;
-		color: #fff;
+		color: var(--color-neutral-000);
 		transition: background 0.3s ease;
 
 		&:hover {
 			background: linear-gradient(90deg,
-				color.adjust(#069, $lightness: 10%),
-				color.adjust(#0063a7, $lightness:10%),
-				color.adjust(#005fb4, $lightness:10%),
-				color.adjust(#0059c0, $lightness:10%),
-				color.adjust(#1751c9, $lightness:10%),
-				color.adjust(#3e46ce, $lightness:10%),
-				color.adjust(#5d35cf, $lightness:10%),
-				color.adjust(#7914cc, $lightness:10%));
-			border-color: #f60;
+					var(--color-brand-400),
+					color.adjust(#0063a7, $lightness: 10%),
+					color.adjust(#005fb4, $lightness: 10%),
+					color.adjust(#0059c0, $lightness: 10%),
+					color.adjust(#1751c9, $lightness: 10%),
+					color.adjust(#3e46ce, $lightness: 10%),
+					color.adjust(#5d35cf, $lightness: 10%),
+					color.adjust(#7914cc, $lightness: 10%));
+			border-color: var(--color-warning-500);
 		}
 	}
 
 	@media (min-width: $breakpoint-medium) {
-        .btn-text {
-            display: inline;
-        }
-    }
+		.btn-text {
+			display: inline;
+		}
+	}
 }

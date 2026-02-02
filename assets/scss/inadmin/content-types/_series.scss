@@ -9,14 +9,14 @@
     margin-bottom: 7em;
 
     td label {
-      color: #666;
+      color: var(--color-neutral-600);
       display: inline;
     }
   }
 
   .table--selectable tr td:nth-last-child(-n+2),
   .table--selectable tr th:nth-last-child(-n+2) {
-    color: #aaa;
+    color: var(--color-neutral-450);
     width: .8em;
   }
 }

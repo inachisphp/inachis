@@ -1,4 +1,5 @@
 @use '../definitions' as *;
+@use 'sass:color';
 
 .admonition {
   border-left: 3px solid transparent;
@@ -20,11 +21,11 @@
 }
 
 .admonition__info {
-  background-color: $admonition-tip__background-color;
-  border-left-color: $admonition-tip__border-color;
+  background-color: var(--color-brand-050);
+  border-left-color: var(--color-brand-500);
 }
 
 .admonition__warning {
-  background-color: $admonition-warning__background-color;
-  border-left-color: $admonition-warning__border-color;
+  background-color: var(--color-warning-100);
+  border-left-color: var(--color-warning-500);
 }

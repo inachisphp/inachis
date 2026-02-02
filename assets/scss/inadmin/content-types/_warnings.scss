@@ -6,21 +6,22 @@
   margin-bottom: 0.5em;
   text-align: center;
 
-  a:link, a:visited {
-    color: #069;
+  a:link,
+  a:visited {
+    color: var(--color-brand-500);
     font-size: 0.5em;
   }
 
   a:hover {
-    color: $admin__container-button--hover;
+    color: var(--color-accent-500);
   }
 
   i.material-icons {
-    color: #eee;
+    color: var(--color-neutral-300);
     display: block;
     font-size: 3.5em;
     -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: #ddd;
+    -webkit-text-stroke-color: var(--color-neutral-400);
   }
 
   span {

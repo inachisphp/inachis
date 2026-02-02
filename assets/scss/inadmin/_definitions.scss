@@ -2,6 +2,11 @@
 
 $columns: 12;
 $gutter: 16px;
+
+$breakpoint-small: 480px;
+$breakpoint-medium: 768px;
+$breakpoint-large: 1024px;
+
 $sidebar-collapsed: 60px;
 $sidebar-expanded: 220px;
 
@@ -9,138 +14,149 @@ $radius-standard: 0.5rem;
 $radius-round: 50%;
 
 
-// media queries
-$breakpoint-small: 480px;
-$breakpoint-medium: 768px;
-$breakpoint-large: 1024px;
+/** -----------------------------------------
+ Colours
+--------------------------------------------- **/
+:root {
+    // Primitives - Neutrals
+    --color-neutral-000: #ffffff;
+    --color-neutral-050: #fafafa;
+    --color-neutral-100: #f7f9fb;
+    --color-neutral-200: #f2f6f8;
+    --color-neutral-250: #e6e6e6;
+    --color-neutral-300: #eeeeee;
+    --color-neutral-400: #dddddd;
+    --color-neutral-450: #bbbbbb;
+    --color-neutral-500: #999999;
+    --color-neutral-550: #808080;
+    --color-neutral-600: #666666;
+    --color-neutral-700: #334155;
+    --color-neutral-800: #333333;
+    --color-neutral-850: #222222;
+    --color-neutral-900: #000000;
 
-// Global styles
-$admin__background-color: #fafafa;
+    // Primitives - Brand
+    --color-brand-050: #e5f7ff;
+    --color-brand-100: #b3e0ff;
+    --color-brand-200: #80d4ff;
+    --color-brand-300: #66ccff;
+    --color-brand-400: #0088cc;
+    --color-brand-500: #006699;
+    --color-brand-600: #005c8a;
+    --color-brand-700: #004466;
+    --color-brand-900: #00334d;
+
+    --color-accent-500: #00ccff;
+
+    // Primitives - Semantic Colors
+    --color-success-500: #339933;
+    --color-success-700: #267326;
+
+    --color-danger-500: #990000;
+    --color-danger-300: #cc0000;
+    --color-danger-100: #ffcccc;
+
+    --color-warning-500: #ff6600;
+    --color-warning-200: #fac19d;
+    --color-warning-100: #ffe0cc;
+    --color-warning-700: #b34700;
+
+    --color-info-500: #999999;
+    --color-info-700: #808080;
+
+    // Specific
+    --color-button-default-bg: #d9e7cb;
+    --color-button-default-hover: #c0d6aa;
+
+    --color-table-selected: #d8e7f0;
+    --color-table-selected-zebra: #c5dae8;
+
+    --color-focus: #ffbf47;
+    --color-notification: #b01c3f;
+
+    // Flash Messages
+    --color-flash-notice-bg: #E3F2FD;
+    --color-flash-notice-text: #0B3C91;
+    --color-flash-success-bg: #E8F5E9;
+    --color-flash-success-text: #1B4D1F;
+    --color-flash-warning-bg: #FFF1D6;
+    --color-flash-warning-text: #8A3B00;
+    --color-flash-error-bg: #F9E2E0;
+    --color-flash-error-text: #7A1414;
+
+    // Dropzone
+    --color-dropzone-bg: #f8fafc;
+    --color-dropzone-border: #cbd5e1;
+    --color-dropzone-text: #7c9ca0;
+    --color-dropzone-hover-bg: #bdd1d8;
+
+    // Profile Palette
+    --color-profile-blue: #099bdd;
+    --color-profile-orange: #f90;
+    --color-profile-green: #090;
+    --color-profile-red: #dd0909;
+    --color-profile-purple: #8409dd;
+    --color-profile-amber: #dd8709;
+
+    // Signin
+    --color-signin-overlay: rgba(48, 48, 48, 0.75);
+    --color-signin-input-bg: #252525;
+    --color-signin-input-border: #353535;
+
+    // Diagnostics
+    --color-diagnostic-ok: #28a745;
+    --color-diagnostic-warning: #ffc107;
+    --color-diagnostic-error: #dc3545;
+    --color-diagnostic-muted: #6c757d;
+
+    // Track Changes
+    --color-track-ins-bg: #b5efdb;
+    --color-track-del-bg: #ffc4c1;
+
+    // Progress Bar
+    --color-progress-good: #bfd255;
+    --color-progress-warn: #f09246;
+    --color-progress-bad: #d9235c;
+
+    // Semantic mappings
+    --bg-body: var(--color-neutral-050);
+    --bg-surface: var(--color-neutral-000);
+    --text-main: var(--color-neutral-800);
+    --text-muted: var(--color-neutral-600);
+    --border-color: var(--color-neutral-300);
+
+    --link-color: var(--color-brand-500);
+    --link-hover: var(--color-accent-500);
+    --sidebar-bg: #1e293b;
+    --sidebar-hover: var(--color-neutral-700);
+}
+
+/** -----------------------------------------
+ Semantic mappings
+--------------------------------------------- **/
+
+
+
 
 // header
 $admin__container--collapsed-width: 45px;
 $admin__container--expanded-width: 200px;
-
-// bottom-bar
-$admin__button-bar-background-color: #eee;
-
-// search area
-$admin__search_color: gray;
-
-// user menu
-$admin__user__notification__colour: #b01c3f;
-
-// menu
-$admin__container--collapsed-width: 45px;
-$admin__container--expanded-width: 200px;
-$admin__container-button--hover: #0cf;
-$admin__container-add-button: #069;
-$menubar__background-color: #222;
-$menubar__background-color--is-active: color.adjust($menubar__background-color, $lightness: 6.67%);
-$menubar__background-color--hover: hsla(0, 0%, 100%, .15);
-$menubar__color--hover: #0cf;
-$menubar-button__background-color: #069;
-$menubar-button__background-color--hover: $menubar__color--hover;
-
-// dropzone
-$admin__dropzone__background: #f8fafc;
-$admin__dropzone__background_hover: rgb(189, 209, 216);
-$admin__dropzone__border_hover: $admin__container-add-button;
-$admin__dropzone__image_color: rgb(124, 156, 160);
-
-// editor
-//$notification--autosave-background: #069;
-//$notification--autosave-color: #fff;
-
-// filter bar
-$admin__filter_button-background: #eee;
-$admin__filter_button-color: #333;
-$admin__filter_button-background--selected: #069;
-$admin__filter_button-color--selected: #fff;
-$admin__filter_button-background--hover: #0cf;
-$admin__filter_button-color--hover: #fff;
-
-// flash messages
-$admin__flash-background: #ffa07a;
-$admin__flash-color: #000;
-
-// gallery
-$image-tile-background: #eee;
-
-// pagination
 $pagination-border-radius: 5px;
-
-// tables
-$table-background-bg: #fff;
-$table-header-bg: #069 !default;
-$table-header-color: #fff !default;
-$table-border-color: #ddd !default;
-$table-focus-color: #ffbf47 !default;
-$table-row-hover-bg: #f7f9fb !default;
-$table-zebra-bg: #f2f6f8 !default;
-$table-selected-row-bg: #d8e7f0 !default;
-$table-sort-indicator-color: rgba(255, 255, 255, 0.8) !default;
 $table-mobile-break: 600px !default;
 
-@media (prefers-color-scheme: dark) {
-  $table-background-bg: #1e1e1e !default;
-  $table-header-bg: #0a84ff !default;
-  $table-header-color: #fff !default;
-  $table-border-color: #444 !default;
-  $table-row-hover-bg: #2c2c2c !default;
-  $table-zebra-bg: #292929 !default;
-  $table-selected-row-bg: #3a3a3a !default;
-  $table-sort-indicator-color: rgba(255, 255, 255, 0.8) !default;
-  $table-focus-color: #0a84ff !default;
-}
-
-// tabs
-$admin__tabs__highlighted-color: #069;
-$admin__tabs-background: #fff;
-
-// admonitions
-$admonition-tip__border-color: #069;
-$admonition-tip__background-color: color.adjust($admonition-tip__border-color, $lightness: 65%);
-$admonition-warning__border-color: #f60;
-$admonition-warning__background-color: color.adjust($admonition-warning__border-color, $lightness: 35%);
-
-// forms
-$button--positive--active-color: #393;
-$button--positive--hover-color: color.adjust($button--positive--active-color, $lightness: -10%);
-$button--negative--active-color: #900;
-$button--negative--hover-color: color.adjust($button--negative--active-color, $lightness: 10%);
-$button--info--active-color: #999;
-$button--info--hover-color: color.adjust($button--info--active-color, $lightness: -10%);
-$button--default-active-color: #d9e7cb;
-$button--default-hover-color: color.adjust($button--default-active-color, $lightness: -10%);
-$button--add--active-color: #069;
-$button--add--hover-color: color.adjust($button--add--active-color, $lightness: 10%);
-
-// dialogs
-//$dialog__background: #303030;
-//$dialog_color: #fff;
-
-// Unauthenticated pages
 $signin_background-image__dark: url(/assets/imgs/incc/bg-signin.png);
 
-$form-background__light: #dde8ed;
-$form-label__light: #bbb;
-$form-input__complete: #090;
-$form-link: #ddd;
-$form-link__hover: #fff;
-
-// badges
 $badge-colors: (
-  default: (bg: #E0E0E0, text: #000),
-  draft: (bg: #F6C343, text: #000),
-  scheduled: (bg: #007BFF, text: #fff),
-  private: (bg: #6C757D, text: #fff),
-  hotlinked: (bg: #E83E8C, text: #fff),
-  issue: (bg: #DC3545, text: #fff),
-  active: (bg: #28A745, text: #fff),
-  newuser: (bg: #17A2B8, text: #fff),
-  disabled: (bg: #A0A0A0, text: #fff),
-  error: (bg: #DC3545, text: #fff),
-  warning: (bg: #ffc107, text: #333),
-  ok: (bg: #28A745, text: #fff),
+    default: (bg: #E0E0E0, text: #000),
+    draft: (bg: #F6C343, text: #000),
+    scheduled: (bg: #007BFF, text: #fff),
+    private: (bg: #6C757D, text: #fff),
+    hotlinked: (bg: #E83E8C, text: #fff),
+    issue: (bg: #DC3545, text: #fff),
+    active: (bg: #28A745, text: #fff),
+    newuser: (bg: #17A2B8, text: #fff),
+    disabled: (bg: #A0A0A0, text: #fff),
+    error: (bg: #DC3545, text: #fff),
+    warning: (bg: #ffc107, text: #333),
+    ok: (bg: #28A745, text: #fff),
 );

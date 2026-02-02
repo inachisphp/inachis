@@ -9,13 +9,15 @@
       margin-right: 1em;
       text-transform: uppercase;
     }
+
     &.alert_priority__high {
-      background-color: #fcc;
-      border-bottom: 3px solid #f00;
+      background-color: var(--color-danger-100);
+      border-bottom: 3px solid var(--color-danger-500); // Using standard danger
     }
+
     &.alert_priority__medium {
-      background-color: #fac19dff;
-      border-bottom: 3px solid orange;
+      background-color: var(--color-warning-200);
+      border-bottom: 3px solid var(--color-warning-500); // Using standard warning
     }
   }
 }

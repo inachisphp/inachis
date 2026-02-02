@@ -5,8 +5,8 @@ fieldset.multisection.content__edit {
   //border: 1px solid #f3f3f3;
   //border-radius: 1em;
   display: grid;
-  grid-template-columns: auto 1fr; /* label size + flexible input */
-  gap: 0.5rem 1rem; /* row and column gaps */
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem 1rem;
   max-width: 600px;
 
   @media (max-width: 500px) {
@@ -29,7 +29,7 @@ fieldset.multisection.content__edit {
 }
 
 .profile-photo {
-  border: 1px solid #333;
+  border: 1px solid var(--color-neutral-800);
   border-radius: $radius-round;
   height: 106px;
   float: left;
@@ -37,7 +37,7 @@ fieldset.multisection.content__edit {
   width: 106px;
 
   img {
-    background: #fff;
+    background: var(--bg-surface);
     border-radius: $radius-round;
     height: 100px;
     max-height: 100%;
@@ -49,16 +49,20 @@ fieldset.multisection.content__edit {
 
 .form__profile fieldset {
   input {
-    border: 2px solid #eee;
+    border: 2px solid var(--color-neutral-300);
     border-radius: $radius-standard;
     width: 90%;
   }
+
   .input:active {
-    border-bottom-color: #069;
+    border-bottom-color: var(--color-brand-500);
   }
-  input[value^=""], .input__complete {
-    border-color: $form-input__complete;
+
+  input[value^=""],
+  .input__complete {
+    border-color: var(--color-palette-green);
   }
+
   p {
     margin-bottom: 2em;
   }
@@ -70,18 +74,22 @@ fieldset.multisection.content__edit {
   margin: 0 1.55em 0 0.4em;
   width: 90%;
 }
+
 meter::-webkit-meter-optimum-value {
   transition: width .4s linear;
 }
+
 #user_color {
   input[type=radio] {
     margin: 0 1em 0 0;
-    width:auto;
+    width: auto;
     visibility: hidden;
   }
+
   input:checked+label {
-    border: 4px solid #333;
+    border: 4px solid var(--color-neutral-800);
   }
+
   label {
     border: 4px solid transparent;
     border-radius: $radius-round;
@@ -90,29 +98,35 @@ meter::-webkit-meter-optimum-value {
     overflow: hidden;
     width: 3em;
   }
+
   input[data-color="#099bdd"]+label {
-    background-color: #099bdd;
-    color: #099bdd;
+    background-color: var(--color-profile-blue);
+    color: var(--color-profile-blue);
   }
+
   input[data-color="#f90"]+label {
-    background-color: #f90;
-    color: #f90;
+    background-color: var(--color-profile-orange);
+    color: var(--color-profile-orange);
   }
+
   input[data-color="#090"]+label {
-    background-color: #090;
-    color: #090;
+    background-color: var(--color-profile-green);
+    color: var(--color-profile-green);
   }
+
   input[data-color="#dd0909"]+label {
-    background-color: #dd0909;
-    color: #dd0909;
+    background-color: var(--color-profile-red);
+    color: var(--color-profile-red);
   }
+
   input[data-color="#8409dd"]+label {
-    background-color: #8409dd;
-    color: #8409dd;
+    background-color: var(--color-profile-purple);
+    color: var(--color-profile-purple);
   }
+
   input[data-color="#dd8709"]+label {
-    background-color: #dd8709;
-    color: #dd8709;
+    background-color: var(--color-profile-amber);
+    color: var(--color-profile-amber);
   }
 }
 

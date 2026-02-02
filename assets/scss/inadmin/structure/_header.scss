@@ -1,9 +1,9 @@
 @use '../definitions' as *;
 
 .content-header {
-    background: #f2f6f8;
+    background: var(--color-neutral-200);
     padding: 3px 0px;
-    border-bottom: 1px solid #cbd5e1;
+    border-bottom: 1px solid var(--color-neutral-400);
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -39,7 +39,8 @@
             margin: 0;
             font-size: 1rem;
 
-            a, a:visited {
+            a,
+            a:visited {
                 background-color: #333;
                 border: 1px solid transparent;
                 border-top-right-radius: 2em;
@@ -48,14 +49,17 @@
                 padding: 1em 2em 1em 1em;
                 text-decoration: none;
             }
+
             a:hover {
                 background-color: #999;
                 color: #333;
             }
+
             span {
                 padding: 1em;
             }
-            & > span:first-child {
+
+            &>span:first-child {
                 margin-left: 0;
             }
         }

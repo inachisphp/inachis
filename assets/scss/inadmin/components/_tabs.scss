@@ -1,20 +1,22 @@
 @use 'sass:color';
 @use '../definitions' as *;
 
-.ui-tabs, .ui-tabs-external {
+.ui-tabs,
+.ui-tabs-external {
 	clear: both;
 
 	fieldset {
 		clear: both;
 	}
 
-	ol, div:not(.switch-wrapper div) {
+	ol,
+	div:not(.switch-wrapper div) {
 		clear: left;
 	}
 
 	.ui-tabs-nav {
-		background-color: $admin__tabs-background;
-		border: 1px solid #eee;
+		background-color: var(--bg-surface);
+		border: 1px solid var(--color-neutral-300);
 		border-top-left-radius: 1em;
 		border-top-right-radius: 1em;
 		border-bottom: none;
@@ -31,8 +33,9 @@
 			display: block;
 		}
 
-		a, a:visited {
-			color: #000;
+		a,
+		a:visited {
+			color: var(--color-neutral-900);
 			text-decoration: none;
 		}
 
@@ -43,16 +46,17 @@
 			padding: 10px;
 
 			&:hover {
-				background-color: #eee;
-				border-bottom-color: color.adjust($admin__tabs__highlighted-color, $lightness: 10%);
+				background-color: var(--color-neutral-300);
+				border-bottom-color: var(--color-brand-400); // 10% lightness
 			}
 		}
 
 		.ui-state-active {
-		    border-bottom: 3px solid $admin__tabs__highlighted-color;
+			border-bottom: 3px solid var(--color-brand-500);
 
-			a, a:visited {
-				color: $admin__tabs__highlighted-color;
+			a,
+			a:visited {
+				color: var(--color-brand-500);
 				font-weight: bold;
 			}
 		}
@@ -60,7 +64,7 @@
 }
 
 .form__post fieldset.ui-tabs-panel {
-	background-color: #fff;
-	border: 1px solid #eee;
+	background-color: var(--bg-surface);
+	border: 1px solid var(--color-neutral-300);
 	margin: 0;
 }

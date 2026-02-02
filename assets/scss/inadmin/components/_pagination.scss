@@ -12,7 +12,9 @@ section.pagination--row {
   list-style-type: none;
   padding-left: 15px;
 
-  .material-icons { vertical-align: middle; }
+  .material-icons {
+    vertical-align: middle;
+  }
 
   .page-item {
     display: table-cell;
@@ -25,6 +27,7 @@ section.pagination--row {
         border-bottom-left-radius: $pagination-border-radius;
       }
     }
+
     &:last-child {
       .page-link {
         border-top-right-radius: $pagination-border-radius;
@@ -33,41 +36,42 @@ section.pagination--row {
     }
 
     &.active .page-link {
-      background-color: $admin__tabs__highlighted-color;
-      color: $admin__tabs-background;
+      background-color: var(--color-brand-500);
+      color: var(--color-neutral-000);
     }
 
-    &.disabled .page-link {
-    }
 
-    &.current a, &.current a:visited {
-      background-color: $admin__tabs__highlighted-color;
-      color: $admin__tabs-background;
+    &.current a,
+    &.current a:visited {
+      background-color: var(--color-brand-500);
+      color: var(--color-neutral-000);
     }
   }
+
   .page-link {
-    border: 1px solid #999;
-    color: #333;
+    border: 1px solid var(--color-neutral-500);
+    color: var(--color-neutral-800);
     display: block;
     padding: .5em .75em;
     text-decoration: none;
 
     &:hover {
-      background-color: #333;
-      color: #fff;
+      background-color: var(--color-neutral-800);
+      color: var(--color-neutral-000);
     }
 
     &:focus {
-      background-color: $admin__tabs__highlighted-color;
-      color: $admin__tabs-background;
+      background-color: var(--color-brand-500);
+      color: var(--color-neutral-000);
     }
 
     &:not(:disabled):not(.disabled) {
       cursor: pointer;
     }
   }
+
   .pagination-spacer {
-    color: #999;
+    color: var(--color-neutral-500);
     display: block;
     padding: .5em .75em;
   }

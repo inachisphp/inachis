@@ -1,6 +1,6 @@
 .widget-data-list {
   article {
-    background-color: #eee;
+    background-color: var(--color-neutral-300);
     margin: 1px 20px;
     padding: 10px;
     width: 90%;
@@ -8,15 +8,19 @@
     strong {
       padding-left: 10px;
     }
+
     span {
       padding: 0 10px;
     }
+
     em.date {
       text-align: right;
     }
   }
+
   .url-not-default {
-    color: #333;
+    color: var(--color-neutral-800);
+
     input {
       margin-left: 25px;
     }
@@ -24,11 +28,11 @@
 }
 
 .checkbox__checked {
-  color: #3a3;
+  color: var(--color-success-500);
 }
 
 .pagination--info {
-  color: #333;
+  color: var(--color-neutral-800);
   font-size: 0.95em;
 }
 
@@ -42,7 +46,10 @@
 .form__users {
   article {
     display: table-row;
-    a, a:visited, span {
+
+    a,
+    a:visited,
+    span {
       display: table-cell;
       padding: 0.5em 1em;
     }

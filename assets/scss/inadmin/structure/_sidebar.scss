@@ -2,8 +2,8 @@
 @use 'sass:color';
 
 .sidebar {
-    background: #1e293b;
-    color: #fff;
+    background: var(--sidebar-bg);
+    color: var(--color-neutral-000);
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -21,15 +21,17 @@
         margin: 0;
 
         span {
-            display:none;
+            display: none;
         }
 
         &.menu-view-site {
             margin: auto 0 8px 0;
 
-            a, a:visited {
+            a,
+            a:visited {
                 text-wrap: nowrap;
             }
+
             span {
                 display: none;
             }
@@ -40,7 +42,8 @@
         }
     }
 
-    a, a:visited {
+    a,
+    a:visited {
         border-left: 2px solid transparent;
         color: inherit;
         text-decoration: none;
@@ -51,38 +54,44 @@
 
         &:hover,
         &:focus-visible {
-            background-color: #334155;
+            background-color: var(--sidebar-hover);
             outline: none;
         }
     }
 
     .menu-add {
-        a, a:visited {
-            background-color: #069;
-            border: 1px solid #046;
+
+        a,
+        a:visited {
+            background-color: var(--color-brand-500);
+            border: 1px solid var(--color-brand-700);
             border-radius: $radius-standard;
             margin: .3em .3em 2em .3em;
 
             &:hover {
-                background-color: color.adjust($color: #069, $lightness: 10%);
+                background-color: var(--color-brand-400);
             }
         }
+
         ul {
-            background: #1e293b;
+            background: var(--sidebar-bg);
             left: 3px;
             padding: 0.5em 0;
             position: absolute;
             top: 140px;
 
-            a, a:visited {
+            a,
+            a:visited {
                 background-color: transparent;
                 border: none;
                 border-radius: 0;
                 margin: 0;
             }
+
             a:hover {
-                background-color: #334155;
+                background-color: var(--sidebar-hover);
             }
+
             span {
                 display: inline;
                 text-wrap: nowrap;
@@ -90,9 +99,10 @@
         }
     }
 
-    .menu__active a, .menu__active a:visited {
-        background-color: $menubar__background-color--is-active;
-        border-color: #069;
+    .menu__active a,
+    .menu__active a:visited {
+        background-color: var(--color-neutral-800);
+        border-color: var(--color-brand-500);
     }
 
     .admin__identity {
@@ -100,7 +110,7 @@
         background-size: contain;
         display: block;
         height: 3em;
-        margin:0 auto 40px auto;
+        margin: 0 auto 40px auto;
         width: 3em;
 
         span {
@@ -114,20 +124,20 @@
 }
 
 .layout:not(.expanded) .sidebar a::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  left: 4.25em;
-  background: #111827;
-  color: #fff;
-  padding: 4px 8px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 2000;
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 4.25em;
+    background: #111827;
+    color: #fff;
+    padding: 4px 8px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2000;
 }
 
 .layout:not(.expanded) .sidebar a:hover::after {
-  opacity: 1;
+    opacity: 1;
 }
 
 .desktop-menu-toggle {
@@ -208,7 +218,7 @@
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,.4);
+        background: rgba(0, 0, 0, .4);
         z-index: 900;
     }
 

@@ -1,13 +1,13 @@
 @use '../definitions' as *;
 
 .ui-dialog {
-  background: #fff;
+  background: var(--bg-surface);
   position: absolute;
   z-index: 110 !important;
 
   .ui-dialog-titlebar {
     button {
-      background-color: #fff;
+      background-color: var(--bg-surface);
       border: none;
       float: right;
       margin: 5px;
@@ -24,26 +24,30 @@
 
   .ui-dialog-secondary-bar {
     align-items: center;
-    background-color: #eee;
-    border: 1px solid #ddd;
+    background-color: var(--color-neutral-300);
+    border: 1px solid var(--color-neutral-400);
     display: flex;
     flex-direction: row-reverse;
     justify-content: space-between;
     margin: 10px 0 0 0;
     padding: 5px;
 
-    a, a:visited {
+    a,
+    a:visited {
       text-decoration: none;
     }
+
     .search {
       button {
         vertical-align: middle;
       }
+
       input {
         font-size: 1.2em;
         padding: 5px;
         vertical-align: middle;
       }
+
       label {
         display: none;
       }
@@ -66,7 +70,7 @@
   }
 
   .ui-dialog-buttonpane {
-    background-color: $admin__button-bar-background-color;
+    background-color: var(--color-neutral-300);
     padding: 5px;
     text-align: right;
 
@@ -84,30 +88,35 @@
       object-fit: cover;
       width: 150px;
     }
+
     input {
       position: absolute;
       right: 0.5em;
       top: 0.5em;
     }
+
     label span {
       display: none;
     }
+
     li {
       float: left;
       position: relative;
     }
-    ol, li {
+
+    ol,
+    li {
       list-style-type: none;
       margin: 0;
       padding: 0;
     }
 
     .material-icons {
-      color: #fff;
+      color: var(--color-neutral-000);
       bottom: 0.1em;
       position: absolute;
       right: 0.1em;
-      text-shadow: 1px 1px 3px #333;
+      text-shadow: 1px 1px 3px var(--color-neutral-800);
     }
   }
 }
@@ -123,7 +132,7 @@
 }
 
 .ui-cross {
-  background-color: #fff;
+  background-color: var(--bg-surface);
   border: 1px solid #ccc;
   border-radius: 50%;
   margin: 20px 10px;
@@ -151,14 +160,30 @@
   margin: 5em auto;
   width: 40px;
   height: 40px;
-  --c:no-repeat linear-gradient(#006699 0 0);
-  background: var(--c),var(--c),var(--c),var(--c);
+  --c: no-repeat linear-gradient(#006699 0 0);
+  background: var(--c), var(--c), var(--c), var(--c);
   background-size: 21px 21px;
-  animation: l5 1.5s infinite cubic-bezier(0.3,1,0,1);
+  animation: l5 1.5s infinite cubic-bezier(0.3, 1, 0, 1);
 }
+
 @keyframes l5 {
-  0%   {background-position: 0    0,100% 0   ,100% 100%,0 100%}
-  33%  {background-position: 0    0,100% 0   ,100% 100%,0 100%;width:60px;height: 60px}
-  66%  {background-position: 100% 0,100% 100%,0    100%,0 0   ;width:60px;height: 60px}
-  100% {background-position: 100% 0,100% 100%,0    100%,0 0   }
+  0% {
+    background-position: 0 0, 100% 0, 100% 100%, 0 100%
+  }
+
+  33% {
+    background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+    width: 60px;
+    height: 60px
+  }
+
+  66% {
+    background-position: 100% 0, 100% 100%, 0 100%, 0 0;
+    width: 60px;
+    height: 60px
+  }
+
+  100% {
+    background-position: 100% 0, 100% 100%, 0 100%, 0 0
+  }
 }

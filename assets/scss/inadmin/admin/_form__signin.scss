@@ -9,24 +9,25 @@ body.type_login {
 	.content {
 		align-items: center;
 		display: flex;
-  		justify-content: center;
+		justify-content: center;
 		padding: 0;
 	}
 }
 
-.container__login, .setup {
-	background-color: rgba(48, 48, 48, 0.75);
+.container__login,
+.setup {
+	background-color: var(--color-signin-overlay);
 	border: 1px solid transparent;
-	border-top: 10px solid #069;
+	border-top: 10px solid var(--color-brand-500);
 	border-radius: $radius-standard;
-	color: #fff;
+	color: var(--color-neutral-000);
 	margin: auto;
 	width: 25em;
 
-	@include box-shadow(5px, 7px, 14px, 0, rgba(0,0,0,0.26));
+	@include box-shadow(5px, 7px, 14px, 0, rgba(0, 0, 0, 0.26));
 
-	& > div {
-		margin:3em 0;
+	&>div {
+		margin: 3em 0;
 	}
 
 	h2 {
@@ -60,32 +61,38 @@ body.type_login {
 		}
 
 		input {
-			background-color: #252525;
-			border: 2px solid #353535;
+			background-color: var(--color-signin-input-bg);
+			border: 2px solid var(--color-signin-input-border);
 			border-radius: $radius-standard;
-			color: #fff;
+			color: var(--color-neutral-000);
 			margin-bottom: 1.3em;
 			width: 90%;
 		}
+
 		input[data-controller=toggle-password] {
 			width: 80%;
 		}
+
 		.input:active {
-			border-bottom-color: #069;
+			border-bottom-color: var(--color-brand-500);
 		}
-		input[value^=""], .input__complete {
-			border-color: $form-input__complete;
+
+		input[value^=""],
+		.input__complete {
+			border-color: var(--color-palette-green);
 		}
+
 		input.checkbox {
 			margin-right: .5em;
 			width: auto;
 		}
+
 		input#change_password_new_password {
 			margin-bottom: 0;
 		}
 
 		label {
-			color: $form-label__light;
+			color: var(--color-neutral-450);
 			display: block;
 			font-size: 0.85em;
 			margin-bottom: 0.3em;
@@ -103,12 +110,14 @@ body.type_login {
 		}
 	}
 
-	a, a:visited {
+	a,
+	a:visited {
 		&.button {
 			display: inline;
 		}
+
 		& {
-			color: $form-link;
+			color: var(--color-neutral-400);
 			display: block;
 			font-size: 0.9em;
 			margin-right: 1em;
@@ -117,13 +126,15 @@ body.type_login {
 			text-decoration: none;
 		}
 	}
+
 	a:hover {
 		&.button {
-			color: #fff;
+			color: var(--color-neutral-000);
 			text-decoration: none;
 		}
+
 		& {
-			color: $form-link__hover;
+			color: var(--color-neutral-000);
 			text-decoration: underline;
 		}
 	}
@@ -131,6 +142,6 @@ body.type_login {
 	.button--password-toggle {
 		background: transparent;
 		border: none;
-		color: #fff;
+		color: var(--color-neutral-000);
 	}
 }
