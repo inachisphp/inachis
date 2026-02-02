@@ -15,8 +15,8 @@
 	}
 
 	.ui-tabs-nav {
-		background-color: var(--bg-surface);
-		border: 1px solid var(--color-neutral-300);
+		background: $bg-surface;
+		border: 1px solid $border-color;
 		border-top-left-radius: 1em;
 		border-top-right-radius: 1em;
 		border-bottom: none;
@@ -35,7 +35,7 @@
 
 		a,
 		a:visited {
-			color: var(--color-neutral-900);
+			color: $text-muted;
 			text-decoration: none;
 		}
 
@@ -46,17 +46,17 @@
 			padding: 10px;
 
 			&:hover {
-				background-color: var(--color-neutral-300);
-				border-bottom-color: var(--color-brand-400); // 10% lightness
+				background-color: $border-color;
+				border-bottom-color: $action-primary-hover;
 			}
 		}
 
 		.ui-state-active {
-			border-bottom: 3px solid var(--color-brand-500);
+			border-bottom: 3px solid $action-primary;
 
 			a,
 			a:visited {
-				color: var(--color-brand-500);
+				color: $action-primary;
 				font-weight: bold;
 			}
 		}
@@ -64,7 +64,7 @@
 }
 
 .form__post fieldset.ui-tabs-panel {
-	background-color: var(--bg-surface);
-	border: 1px solid var(--color-neutral-300);
+	background: $bg-surface;
+	border: 1px solid $border-color;
 	margin: 0;
 }

@@ -1,7 +1,7 @@
 @use 'definitions' as *;
 
 body {
-  background-color: var(--bg-body);
+  background-color: $bg-body;
   font-family: Roboto, Helvetica Neue, Helvetica, Arial, sans-serif;
   font-display: swap;
   overflow-x: hidden;

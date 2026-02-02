@@ -12,9 +12,9 @@
         width: 0;
 
         &:checked+label {
-            background: var(--color-brand-500);
+            background: $action-primary;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            color: var(--bg-surface);
+            color: $bg-surface;
             transform: translateY(-3px);
 
             &:hover {
@@ -23,14 +23,14 @@
             }
 
             .material-icons {
-                color: var(--bg-surface);
+                color: $bg-surface;
             }
         }
     }
 
     label {
         align-items: center;
-        background: var(--color-neutral-200); // f0f0f0 approx
+        background: $bg-panel;
         border-radius: $radius-standard;
         cursor: pointer;
         display: flex;
@@ -47,12 +47,12 @@
 
         &:hover,
         &:focus {
-            background: var(--color-neutral-250); // e0e0e0
+            background: $color-neutral-250;
             transform: translateY(-2px);
         }
 
         &:focus-visible {
-            outline: 3px solid var(--color-brand-500);
+            outline: 3px solid $action-primary;
             outline-offset: 2px;
         }
 

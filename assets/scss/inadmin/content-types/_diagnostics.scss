@@ -1,3 +1,5 @@
+@use '../definitions' as *;
+
 /* Container spacing */
 .diagnostics-summary {
     display: flex;
@@ -7,24 +9,24 @@
 }
 
 .card {
-    background: var(--color-neutral-300);
+    background: $border-color;
     min-width: 200px;
     padding: 0.05em 0.5em;
 }
 
 /* Card status border */
 .card.border-ok {
-    border-left: 4px solid var(--color-diagnostic-ok);
+    border-left: 4px solid $diagnostic-ok;
     /* Green */
 }
 
 .card.border-warning {
-    border-left: 4px solid var(--color-diagnostic-warning);
+    border-left: 4px solid $diagnostic-warning;
     /* Yellow */
 }
 
 .card.border-error {
-    border-left: 4px solid var(--color-diagnostic-error);
+    border-left: 4px solid $diagnostic-error;
     /* Red */
 }
 
@@ -36,15 +38,15 @@
 }
 
 .diagnostics-status-ok {
-    color: var(--color-diagnostic-ok);
+    color: $diagnostic-ok;
 }
 
 .diagnostics-status-warning {
-    color: var(--color-diagnostic-warning);
+    color: $diagnostic-warning;
 }
 
 .diagnostics-status-error {
-    color: var(--color-diagnostic-error);
+    color: $diagnostic-error;
 }
 
 /* Optional: adjust the list under each card */
@@ -56,7 +58,7 @@
 
 .diagnostics-summary ul li {
     font-size: 0.875rem;
-    color: var(--color-diagnostic-muted);
+    color: $diagnostic-muted;
     /* muted gray for counts */
 }
 

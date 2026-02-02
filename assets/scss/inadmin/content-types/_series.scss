@@ -1,3 +1,5 @@
+@use '../definitions' as *;
+
 .edit__list {
   .series__controls {
     button {
@@ -8,15 +10,15 @@
   table {
     margin-bottom: 7em;
 
-    td label {
-      color: var(--color-neutral-600);
-      display: inline;
+    label {
+      color: $text-muted;
+      display: block;
     }
   }
 
   .table--selectable tr td:nth-last-child(-n+2),
   .table--selectable tr th:nth-last-child(-n+2) {
-    color: var(--color-neutral-450);
-    width: .8em;
+    color: $color-neutral-450;
+    width: 3rem;
   }
 }

@@ -2,8 +2,8 @@
 @use '../definitions' as *;
 
 section.widget-stats article {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--color-neutral-300);
+  background-color: $bg-surface;
+  border: 1px solid $border-color;
   padding: 0.6em;
   margin-bottom: 2em;
 

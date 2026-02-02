@@ -2,9 +2,9 @@
 @use '../definitions' as *;
 
 .filter-bar {
-	background-color: var(--bg-surface);
+	background-color: $bg-surface;
 	padding: 0 .5em .5rem;
-	border: 1px solid var(--color-neutral-300);
+	border: 1px solid $border-color;
 	border-bottom: none;
 }
 
@@ -24,9 +24,9 @@
 
 	.filter__toggle {
 		align-items: center;
-		border: 1px solid var(--color-neutral-400); // e5e7eb
+		border: 1px solid $border-color-dark; // e5e7eb
 		border-radius: $radius-standard;
-		color: var(--color-neutral-900); // 111827
+		color: $color-neutral-900; // 111827
 		cursor: pointer;
 		display: flex;
 		gap: 0.5rem;
@@ -41,9 +41,9 @@
 		}
 
 		&.is-active {
-			border-color: var(--color-brand-500);
-			background: var(--color-brand-050);
-			color: var(--color-brand-500);
+			border-color: $action-primary;
+			background: $input-focus-ring;
+			color: $action-primary;
 		}
 
 		.filter-indicator {
@@ -52,8 +52,8 @@
 			right: -3px;
 			width: 10px;
 			height: 10px;
-			background: var(--color-danger-500);
-			border: 2px solid var(--bg-surface);
+			background: $alert-danger-border;
+			border: 2px solid $bg-surface;
 			border-radius: $radius-round;
 		}
 	}
@@ -66,7 +66,7 @@
 
 	.ui-sortby {
 		align-items: center;
-		border: 1px solid var(--color-neutral-400);
+		border: 1px solid $border-color-dark;
 		border-radius: $radius-standard;
 		display: flex;
 		max-width: 225px;
@@ -102,14 +102,14 @@
 		.selection-row {
 			order: 3;
 			width: 100%;
-			border-top: 1px solid var(--color-neutral-400);
+			border-top: 1px solid $border-color-dark;
 			padding-top: 0.5rem;
 		}
 	}
 }
 
 .button.button--selectAllNone {
-	background: var(--color-neutral-300);
+	background: $border-color;
 	border: 1px solid transparent;
 	display: inline-block;
 	padding: 0.5em;
@@ -120,10 +120,10 @@
 
 div#filter__options {
 	span {
-		background-color: var(--color-neutral-300);
+		background-color: $border-color;
 		border: 1px solid transparent;
 		border-radius: $radius-standard;
-		color: var(--color-neutral-800);
+		color: $text-main;
 		font-size: 0.9em;
 		margin-right: 1em;
 		padding: 0.4em 0.4em 0.4em 1em;
@@ -140,7 +140,7 @@ div#filter__options {
 		select {
 			background: transparent;
 			border: none;
-			color: var(--color-neutral-800);
+			color: $text-main;
 			padding: 0;
 			margin: 0;
 			width: auto;
@@ -152,14 +152,14 @@ div#filter__options {
 		}
 
 		option {
-			background-color: var(--bg-surface);
-			color: var(--color-neutral-900);
+			background-color: $bg-surface;
+			color: $color-neutral-900;
 		}
 	}
 }
 
 .collapsible {
-	background-color: var(--color-neutral-100);
+	background-color: $color-neutral-100;
 	display: grid;
 	grid-template-rows: 0fr;
 	height: 0;
@@ -173,7 +173,7 @@ div#filter__options {
 	}
 
 	&.is-open {
-		border: 1px dashed var(--color-neutral-300);
+		border: 1px dashed $border-color;
 		border-radius: $radius-standard;
 		grid-template-rows: 1fr;
 		height: auto;

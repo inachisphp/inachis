@@ -1,3 +1,5 @@
+@use '../definitions' as *;
+
 div.content__edit {
     margin-bottom: 45px;
 
@@ -15,19 +17,19 @@ div.content__edit,
 
     a,
     a:visited {
-        color: var(--color-neutral-600);
+        color: $text-muted;
         text-decoration: none;
         vertical-align: middle;
     }
 
     input {
-        border: 1px solid var(--color-neutral-300);
+        border: 1px solid $border-color;
         outline: none;
 
         &:focus,
         &:active {
-            outline: 1px solid var(--color-brand-500);
-            border-bottom: 1px solid var(--color-brand-500);
+            outline: 1px solid $input-focus-border;
+            border-bottom: 1px solid $input-focus-border;
         }
     }
 
@@ -47,7 +49,7 @@ div.content__edit,
     }
 
     label {
-        color: var(--color-neutral-500);
+        color: $border-color-input;
         display: block;
 
         &.date-range__label {
@@ -70,7 +72,7 @@ div.content__edit,
         padding: 0;
 
         li {
-            background: var(--color-neutral-300);
+            background: $border-color;
             margin: 5px 0;
             padding: 5px;
 
@@ -88,7 +90,7 @@ div.content__edit,
 
 .ui-dialog form {
     input {
-        border: 1px solid var(--color-neutral-500);
+        border: 1px solid $border-color-input;
     }
 }
 
@@ -100,7 +102,7 @@ div.content__edit,
     }
 
     img {
-        border: 1px solid var(--color-neutral-500);
+        border: 1px solid $border-color-input;
         display: block;
         margin: 0 auto 10px auto;
         padding: 2px;
@@ -113,7 +115,7 @@ div.content__edit,
 }
 
 #track_changes {
-    border: 1px solid var(--color-neutral-300);
+    border: 1px solid $border-color;
     margin: 10px;
 
     p {
@@ -126,7 +128,7 @@ div.content__edit,
 
         &,
         p {
-            background-color: var(--color-track-ins-bg);
+            background-color: $track-ins-bg;
         }
 
         & p:before {
@@ -139,7 +141,7 @@ div.content__edit,
 
         &,
         p {
-            background-color: var(--color-track-del-bg);
+            background-color: $track-del-bg;
         }
 
         & p:before {
@@ -148,7 +150,7 @@ div.content__edit,
     }
 
     .change_block {
-        background-color: var(--color-neutral-300);
+        background-color: $border-color;
         margin: 10px 3px;
         padding: 3px 0;
     }

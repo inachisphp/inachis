@@ -21,11 +21,11 @@
 }
 
 .admonition__info {
-  background-color: var(--color-brand-050);
-  border-left-color: var(--color-brand-500);
+  background-color: $color-brand-050;
+  border-left-color: $action-primary;
 }
 
 .admonition__warning {
-  background-color: var(--color-warning-100);
-  border-left-color: var(--color-warning-500);
+  background-color: $alert-warning-bg;
+  border-left-color: $alert-warning-border;
 }

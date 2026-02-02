@@ -1,5 +1,5 @@
-@use 'sass:color';
 @use '../definitions' as *;
+@use 'sass:color';
 
 // ---------------------------------------------------------------------------
 // RESPONSIVE WRAPPER
@@ -11,7 +11,7 @@
   -webkit-overflow-scrolling: touch;
 
   scrollbar-width: thin;
-  scrollbar-color: var(--color-neutral-300) transparent;
+  scrollbar-color: $border-color transparent;
 
   &::-webkit-scrollbar {
     height: 8px;
@@ -64,12 +64,12 @@
     }
 
     tbody tr {
-      border-bottom: 2px solid var(--color-neutral-900);
+      border-bottom: 2px solid $color-neutral-900;
     }
 
     td {
       border: none;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid $border-color;
       position: relative;
       padding-left: 50%;
       text-align: right;
@@ -96,7 +96,7 @@
 table {
   width: 100%;
   border-collapse: collapse;
-  background-color: var(--bg-surface);
+  background-color: $bg-surface;
   font-size: 0.95rem;
   line-height: 1.4;
 
@@ -106,13 +106,13 @@ table {
     text-align: left;
     font-weight: 600;
     margin-bottom: 0.5rem;
-    color: var(--color-brand-900);
+    color: $text-muted;
   }
 
   // Head
   thead {
-    background-color: var(--color-brand-500);
-    color: var(--color-neutral-000);
+    background-color: $action-primary;
+    color: $text-inverse;
 
     th {
       padding: 0.75rem 1rem;
@@ -128,7 +128,7 @@ table {
       transition: background 0.15s ease;
 
       &:hover {
-        background-color: var(--color-neutral-100);
+        background-color: $color-neutral-100;
       }
     }
 
@@ -136,7 +136,7 @@ table {
     th {
       padding: 0.75rem 1rem;
       vertical-align: middle;
-      border-bottom: 1px solid var(--color-neutral-400);
+      border-bottom: 1px solid $border-color-dark;
     }
   }
 }
@@ -157,7 +157,7 @@ table {
 // Zebra striping
 .table--striped {
   tbody tr:nth-child(even) {
-    background-color: var(--color-neutral-200);
+    background-color: $bg-panel;
   }
 }
 
@@ -166,14 +166,14 @@ table {
   border: none;
 
   thead th {
-    border-bottom: 2px solid var(--color-neutral-400);
+    border-bottom: 2px solid $border-color-dark;
   }
 
   tbody td,
   tbody th {
     border-left: none;
     border-right: none;
-    border-bottom: 1px solid var(--color-neutral-400);
+    border-bottom: 1px solid $border-color-dark;
   }
 }
 
@@ -294,7 +294,6 @@ form .table--selectable {
       right: 0.75rem;
       font-size: 0.7rem;
       opacity: 0.5;
-      color: $table-sort-indicator-color;
       color: rgba(255, 255, 255, 0.8);
     }
 
@@ -312,33 +311,32 @@ form .table--selectable {
 
 
 // ---------------------------------------------------------------------------
-// COLUMN HOVER HIGHLIGHT
+// COLUMN HOVER HIGHLIGHT - WIP - DO NOT USE
 // ---------------------------------------------------------------------------
 
-.table--column-hover {
+// .table--column-hover {
+//   td,
+//   th {
+//     position: relative;
+//   }
 
-  td,
-  th {
-    position: relative;
-  }
+//   tbody td:hover,
+//   thead th:hover {
+//     background-color: $color-brand-300;
+//   }
 
-  tbody td:hover,
-  thead th:hover {
-    background-color: var(--color-brand-300);
-  }
-
-  tbody td:hover::before,
-  thead th:hover::before {
-    content: "";
-    position: absolute;
-    top: -9999px; // Fixed to match
-    bottom: -9999px; // Fixed to match
-    left: 0;
-    right: 0;
-    background-color: var(--color-brand-300);
-    z-index: -1;
-  }
-}
+//   tbody td:hover::before,
+//   thead th:hover::before {
+//     content: "";
+//     position: absolute;
+//     top: -9999px; // Fixed to match
+//     bottom: -9999px; // Fixed to match
+//     left: 0;
+//     right: 0;
+//     background-color: $color-brand-300;
+//     z-index: -1;
+//   }
+// }
 
 
 // ---------------------------------------------------------------------------
@@ -347,20 +345,19 @@ form .table--selectable {
 
 .table--selectable {
   tbody tr.selected {
-    background-color: var(--color-table-selected) !important;
-    outline: 2px solid var(--color-table-selected);
+    background-color: $table-selected-zebra !important;
+    outline: 2px solid $table-selected-zebra;
 
   }
 
   tbody tr:nth-child(even).selected {
-    background-color: var(--color-table-selected-zebra) !important;
-    outline: 2px solid var(--color-table-selected-zebra);
+    outline: 2px solid $table-selected-zebra;
   }
 }
 
 .table--focusable td:focus,
 .table--focusable th:focus {
-  outline: 3px solid var(--color-focus);
+  outline: 3px solid $color-focus;
   outline-offset: 2px;
 }
 
@@ -378,7 +375,7 @@ form .table--selectable {
     tbody tr {
       display: block;
       margin-bottom: 1rem;
-      border: 1px solid var(--color-neutral-400);
+      border: 1px solid $border-color-dark;
       border-radius: $radius-standard;
       padding: 0.5rem;
     }
@@ -392,7 +389,7 @@ form .table--selectable {
         content: attr(data-label);
         font-weight: 600;
         margin-right: 1rem;
-        color: var(--color-brand-500);
+        color: $action-primary;
       }
     }
   }
@@ -407,7 +404,7 @@ form .table--selectable {
     transition: background 0.2s ease;
 
     &.expanded {
-      background-color: var(--color-brand-200);
+      background-color: $table-expandable--expanded;
     }
   }
 
@@ -417,7 +414,7 @@ form .table--selectable {
     td {
       padding: 1rem;
       border-top: none;
-      background-color: var(--color-neutral-100);
+      background-color: $color-neutral-100;
     }
   }
 

@@ -19,8 +19,8 @@
   }
 
   .dz-default {
-    background-color: var(--color-dropzone-bg);
-    border: 2px dashed var(--color-dropzone-border);
+    background: $dropzone-bg;
+    border: 2px dashed $dropzone-border;
     border-radius: 25px;
     font-size: 1.5em;
     margin: 1.5em;
@@ -28,12 +28,12 @@
     text-align: center;
 
     span {
-      color: var(--color-dropzone-text); //rgb(2, 30, 41);
+      color: $dropzone-text;
     }
   }
 
   .dz-message:before {
-    color: var(--color-dropzone-text);
+    color: $dropzone-text;
     content: '\E2C3';
     display: block;
     font-family: "Material Icons";
@@ -72,13 +72,13 @@
 
       .dz-image {
         border-radius: 20px;
-        background: var(--color-neutral-500);
-        background: linear-gradient(to bottom, var(--color-neutral-300), var(--color-neutral-400));
+        background: $border-color-input;
+        background: linear-gradient(to bottom, $border-color, $border-color-dark);
       }
     }
 
     &.dz-image-preview {
-      background: var(--bg-surface);
+      background: $bg-surface;
 
       .dz-details {
         -webkit-transition: opacity 0.2s linear;
@@ -168,16 +168,14 @@
 }
 
 .dz-drag-hover {
-
-  .dz-default,
-  .dz-default span {
-    border-color: var(--color-brand-500);
-    color: var(--color-brand-500);
-    background-color: var(--color-dropzone-hover-bg);
+  .dz-default {
+    background: $dropzone-hover-bg;
+    border-color: $action-primary;
+    color: $text-main;
   }
 
   .dz-message:before {
-    color: var(--color-brand-500);
+    color: $action-primary;
   }
 
 }

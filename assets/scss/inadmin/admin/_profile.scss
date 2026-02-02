@@ -29,7 +29,7 @@ fieldset.multisection.content__edit {
 }
 
 .profile-photo {
-  border: 1px solid var(--color-neutral-800);
+  border: 1px solid $text-main;
   border-radius: $radius-round;
   height: 106px;
   float: left;
@@ -37,7 +37,7 @@ fieldset.multisection.content__edit {
   width: 106px;
 
   img {
-    background: var(--bg-surface);
+    background: $bg-surface;
     border-radius: $radius-round;
     height: 100px;
     max-height: 100%;
@@ -49,18 +49,18 @@ fieldset.multisection.content__edit {
 
 .form__profile fieldset {
   input {
-    border: 2px solid var(--color-neutral-300);
+    border: 1px solid $text-main;
     border-radius: $radius-standard;
     width: 90%;
   }
 
   .input:active {
-    border-bottom-color: var(--color-brand-500);
+    border-bottom-color: $action-primary;
   }
 
   input[value^=""],
   .input__complete {
-    border-color: var(--color-palette-green);
+    border-color: $profile-green;
   }
 
   p {
@@ -87,7 +87,7 @@ meter::-webkit-meter-optimum-value {
   }
 
   input:checked+label {
-    border: 4px solid var(--color-neutral-800);
+    border: 4px solid $text-main;
   }
 
   label {
@@ -100,33 +100,33 @@ meter::-webkit-meter-optimum-value {
   }
 
   input[data-color="#099bdd"]+label {
-    background-color: var(--color-profile-blue);
-    color: var(--color-profile-blue);
+    background-color: $profile-blue;
+    color: $profile-blue;
   }
 
   input[data-color="#f90"]+label {
-    background-color: var(--color-profile-orange);
-    color: var(--color-profile-orange);
+    background-color: $profile-orange;
+    color: $profile-orange;
   }
 
   input[data-color="#090"]+label {
-    background-color: var(--color-profile-green);
-    color: var(--color-profile-green);
+    background-color: $profile-green;
+    color: $profile-green;
   }
 
   input[data-color="#dd0909"]+label {
-    background-color: var(--color-profile-red);
-    color: var(--color-profile-red);
+    background-color: $profile-red;
+    color: $profile-red;
   }
 
   input[data-color="#8409dd"]+label {
-    background-color: var(--color-profile-purple);
-    color: var(--color-profile-purple);
+    background-color: $profile-purple;
+    color: $profile-purple;
   }
 
   input[data-color="#dd8709"]+label {
-    background-color: var(--color-profile-amber);
-    color: var(--color-profile-amber);
+    background-color: $profile-amber;
+    color: $profile-amber;
   }
 }
 

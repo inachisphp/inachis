@@ -11,8 +11,8 @@ input[type="search"]::-webkit-search-results-decoration {
 	margin-right: 1em;
 
 	.input-icon-wrapper {
-		background-color: var(--bg-surface);
-		border: 1px solid var(--color-neutral-300);
+		background-color: $bg-surface;
+		border: 1px solid $border-color;
 
 		input {
 			font-size: 0.9rem;
@@ -25,7 +25,7 @@ input[type="search"]::-webkit-search-results-decoration {
 	flex: 1;
 	display: flex;
 	align-items: center;
-	background: var(--color-neutral-200);
+	background: $bg-panel;
 	padding: 0 0.75rem;
 	border-radius: $radius-standard;
 	border: 1px solid transparent;
@@ -41,16 +41,16 @@ input[type="search"]::-webkit-search-results-decoration {
 	}
 
 	&:focus-within {
-		background: var(--bg-surface);
-		border-color: var(--color-brand-500);
-		box-shadow: 0 0 0 3px var(--color-brand-050);
+		background: $bg-surface;
+		border-color: $input-focus-border;
+		box-shadow: 0 0 0 3px $input-focus-ring;
 	}
 }
 
 .clear-search {
 	background: none;
 	border: none;
-	color: var(--color-neutral-600);
+	color: $text-muted;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
@@ -60,7 +60,7 @@ input[type="search"]::-webkit-search-results-decoration {
 	border-radius: $radius-round;
 
 	&::hover {
-		background: var(--color-neutral-200);
-		color: var(--color-neutral-900);
+		background: $bg-panel;
+		color: $color-neutral-900;
 	}
 }

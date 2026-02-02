@@ -1,3 +1,5 @@
+@use '../definitions' as *;
+
 #dialog__sessionTimeout {
   .material-icons {
     vertical-align: middle;
@@ -5,7 +7,7 @@
 
   p.countdown {
     font-size: 3em;
-    color: var(--color-danger-500);
+    color: $color-danger-500;
     text-align: center;
   }
 }

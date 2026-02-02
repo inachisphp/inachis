@@ -1,3 +1,5 @@
+@use '../definitions' as *;
+
 div.widget-container {
   display: flex;
   flex-wrap: wrap;
@@ -6,15 +8,15 @@ div.widget-container {
 
 section.widget {
   h2 {
-    color: var(--color-neutral-600);
+    color: $text-muted;
     font-size: 0.85em;
     text-transform: uppercase;
   }
 }
 
 section.widget-settings {
-  background: var(--bg-surface);
-  border: 1px solid var(--color-neutral-300);
+  background: $bg-surface;
+  border: 1px solid $border-color;
   margin: 1em;
   max-width: 225px;
   padding: 1em;

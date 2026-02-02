@@ -31,8 +31,11 @@
 
     a,
     a:visited {
-      background: var(--color-neutral-300);
-      color: var(--color-neutral-800);
+      background: $border-color;
+      background-position: center bottom;
+      background-repeat: no-repeat;
+      background-size: cover;
+      color: $text-main;
       display: block;
       height: 16em;
       padding: 0.5rem;
@@ -46,8 +49,8 @@
     }
 
     a:hover {
-      background-color: var(--color-neutral-250);
-      color: var(--color-neutral-900);
+      background-color: $color-neutral-250;
+      color: $color-neutral-900;
     }
 
     img {

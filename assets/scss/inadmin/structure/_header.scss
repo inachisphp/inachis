@@ -1,9 +1,9 @@
 @use '../definitions' as *;
 
 .content-header {
-    background: var(--color-neutral-200);
+    background: $bg-panel;
     padding: 3px 0px;
-    border-bottom: 1px solid var(--color-neutral-400);
+    border-bottom: 1px solid $border-color-dark;
     display: flex;
     align-items: center;
     justify-content: flex-end;

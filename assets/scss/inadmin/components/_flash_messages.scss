@@ -20,33 +20,33 @@
 }
 
 .flash-notice {
-  background-color: var(--color-flash-notice-bg);
-  color: var(--color-flash-notice-text);
+  background-color: $flash-notice-bg;
+  color: $flash-notice-text;
 }
 
-.fl.admonition__info {
-  background-color: var(--color-brand-050);
-  border-left-color: var(--color-brand-500);
+.flash-notice.info {
+  background-color: $color-brand-050;
+  border-left-color: $action-primary;
 }
 
-.admonition__warning {
-  background-color: var(--color-warning-100);
-  border-left-color: var(--color-warning-500);
+.flash-notice.warning {
+  background-color: $alert-warning-bg;
+  border-left-color: $alert-warning-border;
 }
 
 .flash-success {
-  background-color: var(--color-flash-success-bg);
-  color: var(--color-flash-success-text);
+  background-color: $flash-success-bg;
+  color: $flash-success-text;
 }
 
 .flash-warning {
-  background-color: var(--color-flash-warning-bg);
-  color: var(--color-flash-warning-text);
+  background-color: $flash-warning-bg;
+  color: $flash-warning-text;
 }
 
 .flash-error {
-  background-color: var(--color-flash-error-bg);
-  color: var(--color-flash-error-text);
+  background-color: $flash-error-bg;
+  color: $flash-error-text;
   border-left: 4px solid currentColor;
 }
 

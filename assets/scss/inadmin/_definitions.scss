@@ -117,32 +117,138 @@ $radius-round: 50%;
     --color-progress-good: #bfd255;
     --color-progress-warn: #f09246;
     --color-progress-bad: #d9235c;
-
-    // Semantic mappings
-    --bg-body: var(--color-neutral-050);
-    --bg-surface: var(--color-neutral-000);
-    --text-main: var(--color-neutral-800);
-    --text-muted: var(--color-neutral-600);
-    --border-color: var(--color-neutral-300);
-
-    --link-color: var(--color-brand-500);
-    --link-hover: var(--color-accent-500);
-    --sidebar-bg: #1e293b;
-    --sidebar-hover: var(--color-neutral-700);
 }
 
 /** -----------------------------------------
- Semantic mappings
+ Semantic mappings (SCSS Variables)
 --------------------------------------------- **/
 
+// -- Layout
+$bg-body: var(--color-neutral-050);
+$bg-surface: var(--color-neutral-000);
+$bg-panel: var(--color-neutral-200);
 
+// -- Text
+$text-main: var(--color-neutral-800);
+$text-muted: var(--color-neutral-600);
+$text-inverse: var(--color-neutral-000);
 
+// -- Borders
+$border-color: var(--color-neutral-300);
+$border-color-dark: var(--color-neutral-400);
+$border-color-input: var(--color-neutral-500);
 
-// header
-$admin__container--collapsed-width: 45px;
-$admin__container--expanded-width: 200px;
+// -- Links
+$link-color: var(--color-brand-500);
+$link-hover: var(--color-accent-500);
+
+// -- Actions/Buttons
+$action-primary: var(--color-brand-500);
+$action-primary-hover: var(--color-brand-400);
+$action-primary-border: var(--color-brand-700);
+
+// -- Sidebar
+$sidebar-bg: #1e293b;
+$sidebar-hover: var(--color-neutral-700);
+$sidebar-active: var(--color-brand-500);
+$sidebar-text: var(--color-neutral-000);
+
+// -- Alerts
+$alert-danger-bg: var(--color-danger-100);
+$alert-danger-border: var(--color-danger-500);
+$alert-warning-bg: var(--color-warning-200);
+$alert-warning-border: var(--color-warning-500);
+$alert-success-text: var(--color-success-500);
+
+// -- Diagnostics
+$diagnostic-ok: var(--color-diagnostic-ok);
+$diagnostic-warning: var(--color-diagnostic-warning);
+$diagnostic-error: var(--color-diagnostic-error);
+$diagnostic-muted: var(--color-diagnostic-muted);
+
+// -- Track Changes
+$track-ins-bg: var(--color-track-ins-bg);
+$track-del-bg: var(--color-track-del-bg);
+
+// -- Progress Bar
+$progress-good: var(--color-progress-good);
+$progress-warn: var(--color-progress-warn);
+$progress-bad: var(--color-progress-bad);
+
+// -- Dropzone
+$dropzone-bg: var(--color-dropzone-bg);
+$dropzone-border: var(--color-dropzone-border);
+$dropzone-text: var(--color-dropzone-text);
+$dropzone-hover-bg: var(--color-dropzone-hover-bg);
+
+// -- Signin
+$signin-overlay: var(--color-signin-overlay);
+$signin-input-bg: var(--color-signin-input-bg);
+$signin-input-border: var(--color-signin-input-border);
+
+// -- Profiles
+$profile-blue: var(--color-profile-blue);
+$profile-orange: var(--color-profile-orange);
+$profile-green: var(--color-profile-green);
+$profile-red: var(--color-profile-red);
+$profile-purple: var(--color-profile-purple);
+$profile-amber: var(--color-profile-amber);
+
+// -- Palette Wrappers
+$color-neutral-000: var(--color-neutral-000);
+$color-neutral-050: var(--color-neutral-050);
+$color-neutral-100: var(--color-neutral-100);
+$color-neutral-200: var(--color-neutral-200);
+$color-neutral-250: var(--color-neutral-250);
+$color-neutral-300: var(--color-neutral-300);
+$color-neutral-400: var(--color-neutral-400);
+$color-neutral-450: var(--color-neutral-450);
+$color-neutral-500: var(--color-neutral-500);
+$color-neutral-550: var(--color-neutral-550);
+$color-neutral-600: var(--color-neutral-600);
+$color-neutral-700: var(--color-neutral-700);
+$color-neutral-800: var(--color-neutral-800);
+$color-neutral-850: var(--color-neutral-850);
+$color-neutral-900: var(--color-neutral-900);
+
+$color-brand-050: var(--color-brand-050);
+$color-brand-100: var(--color-brand-100);
+$color-brand-300: var(--color-brand-300);
+$color-brand-500: var(--color-brand-500);
+$color-brand-400: var(--color-brand-400);
+$color-brand-700: var(--color-brand-700);
+
+$color-danger-500: var(--color-danger-500);
+$color-info-500: var(--color-info-500);
+$color-info-700: var(--color-info-700);
+$color-notification: var(--color-notification);
+
+// -- Specific
+$color-button-default-bg: var(--color-button-default-bg);
+$color-button-default-hover: var(--color-button-default-hover);
+
+$table-selected: var(--color-table-selected);
+$table-selected-zebra: var(--color-table-selected-zebra);
+
+$color-focus: var(--color-focus);
+
+// -- Flash Messages
+$flash-notice-bg: var(--color-flash-notice-bg);
+$flash-notice-text: var(--color-flash-notice-text);
+$flash-success-bg: var(--color-flash-success-bg);
+$flash-success-text: var(--color-flash-success-text);
+$flash-warning-bg: var(--color-flash-warning-bg);
+$flash-warning-text: var(--color-flash-warning-text);
+$flash-error-bg: var(--color-flash-error-bg);
+$flash-error-text: var(--color-flash-error-text);
+
+$input-focus-border: var(--color-brand-500);
+$input-focus-ring: var(--color-brand-050);
+
 $pagination-border-radius: 5px;
 $table-mobile-break: 600px !default;
+$success-color: var(--color-success-500);
+$table-expandable--expanded: var(--color-brand-200);
 
 $signin_background-image__dark: url(/assets/imgs/incc/bg-signin.png);
 

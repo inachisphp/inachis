@@ -2,8 +2,8 @@
 @use 'sass:color';
 
 section.paginated-list {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--color-neutral-300);
+  background-color: $bg-surface;
+  border: 1px solid $border-color;
   clear: left;
   margin-bottom: 4em;
   padding: 1em;
@@ -13,8 +13,8 @@ section.paginated-list {
   clear: left;
 
   div.ui-tabs-panel {
-    background-color: var(--bg-surface);
-    border: 1px solid var(--color-neutral-300);
+    background-color: $bg-surface;
+    border: 1px solid $border-color;
     padding: 30px 20px 60px 20px;
   }
 
@@ -32,27 +32,27 @@ section.paginated-list {
     transition: background 0.15s ease;
 
     &:hover {
-      background-color: var(--color-neutral-100);
+      background-color: $color-neutral-100;
     }
   }
 
   .zebra article:nth-of-type(2n) {
-    background-color: var(--color-neutral-200);
+    background-color: $bg-panel;
   }
 
   .zebra article:nth-of-type(odd).selected {
-    background-color: var(--color-table-selected) !important;
-    outline: 2px solid var(--color-table-selected);
+    background-color: $table-selected !important;
+    outline: 2px solid $table-selected;
   }
 
   .zebra article:nth-child(even).selected {
-    background-color: var(--color-table-selected-zebra) !important;
-    outline: 2px solid var(--color-table-selected-zebra);
+    background-color: $table-selected-zebra !important;
+    outline: 2px solid $table-selected-zebra;
   }
 
   ol.ui-widget-content {
-    background-color: var(--bg-surface);
-    border: 1px solid var(--color-neutral-300);
+    background-color: $bg-surface;
+    border: 1px solid $border-color;
     margin: 0;
   }
 
@@ -70,7 +70,7 @@ section.paginated-list {
 
     a,
     a:visited {
-      color: var(--color-brand-500);
+      color: $action-primary;
       display: block;
       text-decoration: none;
     }
@@ -98,7 +98,7 @@ section.paginated-list {
     }
 
     p {
-      color: var(--color-neutral-600);
+      color: $text-muted;
       font-size: 0.85em;
       line-height: 1.7em;
       margin-left: 2em;

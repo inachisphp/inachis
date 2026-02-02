@@ -23,46 +23,46 @@ section.pagination--row {
 
     &:first-child {
       .page-link {
-        border-top-left-radius: $pagination-border-radius;
-        border-bottom-left-radius: $pagination-border-radius;
+        border-top-left-radius: $radius-standard;
+        border-bottom-left-radius: $radius-standard;
       }
     }
 
     &:last-child {
       .page-link {
-        border-top-right-radius: $pagination-border-radius;
-        border-bottom-right-radius: $pagination-border-radius;
+        border-top-right-radius: $radius-standard;
+        border-bottom-right-radius: $radius-standard;
       }
     }
 
     &.active .page-link {
-      background-color: var(--color-brand-500);
-      color: var(--color-neutral-000);
+      background-color: $action-primary;
+      color: $text-inverse;
     }
 
 
     &.current a,
     &.current a:visited {
-      background-color: var(--color-brand-500);
-      color: var(--color-neutral-000);
+      background-color: $action-primary;
+      color: $text-inverse;
     }
   }
 
   .page-link {
-    border: 1px solid var(--color-neutral-500);
-    color: var(--color-neutral-800);
+    border: 1px solid $border-color-input;
+    color: $text-main;
     display: block;
     padding: .5em .75em;
     text-decoration: none;
 
     &:hover {
-      background-color: var(--color-neutral-800);
-      color: var(--color-neutral-000);
+      background-color: $text-main;
+      color: $text-inverse;
     }
 
     &:focus {
-      background-color: var(--color-brand-500);
-      color: var(--color-neutral-000);
+      background-color: $action-primary;
+      color: $text-inverse;
     }
 
     &:not(:disabled):not(.disabled) {
@@ -71,7 +71,7 @@ section.pagination--row {
   }
 
   .pagination-spacer {
-    color: var(--color-neutral-500);
+    color: $border-color-input;
     display: block;
     padding: .5em .75em;
   }

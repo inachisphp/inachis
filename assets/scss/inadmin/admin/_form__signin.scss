@@ -16,11 +16,11 @@ body.type_login {
 
 .container__login,
 .setup {
-	background-color: var(--color-signin-overlay);
+	background-color: $signin-overlay;
 	border: 1px solid transparent;
-	border-top: 10px solid var(--color-brand-500);
+	border-top: 10px solid $action-primary;
 	border-radius: $radius-standard;
-	color: var(--color-neutral-000);
+	color: $text-inverse;
 	margin: auto;
 	width: 25em;
 
@@ -61,10 +61,10 @@ body.type_login {
 		}
 
 		input {
-			background-color: var(--color-signin-input-bg);
-			border: 2px solid var(--color-signin-input-border);
+			background: $signin-input-bg;
+			border: 2px solid $signin-input-border;
 			border-radius: $radius-standard;
-			color: var(--color-neutral-000);
+			color: $text-inverse;
 			margin-bottom: 1.3em;
 			width: 90%;
 		}
@@ -74,12 +74,12 @@ body.type_login {
 		}
 
 		.input:active {
-			border-bottom-color: var(--color-brand-500);
+			border-bottom-color: $action-primary;
 		}
 
 		input[value^=""],
 		.input__complete {
-			border-color: var(--color-palette-green);
+			border-color: $profile-green;
 		}
 
 		input.checkbox {
@@ -92,7 +92,7 @@ body.type_login {
 		}
 
 		label {
-			color: var(--color-neutral-450);
+			color: $color-neutral-450;
 			display: block;
 			font-size: 0.85em;
 			margin-bottom: 0.3em;
@@ -117,7 +117,7 @@ body.type_login {
 		}
 
 		& {
-			color: var(--color-neutral-400);
+			color: $border-color-dark;
 			display: block;
 			font-size: 0.9em;
 			margin-right: 1em;
@@ -129,12 +129,12 @@ body.type_login {
 
 	a:hover {
 		&.button {
-			color: var(--color-neutral-000);
+			color: $text-inverse;
 			text-decoration: none;
 		}
 
 		& {
-			color: var(--color-neutral-000);
+			color: $text-inverse;
 			text-decoration: underline;
 		}
 	}
@@ -142,6 +142,6 @@ body.type_login {
 	.button--password-toggle {
 		background: transparent;
 		border: none;
-		color: var(--color-neutral-000);
+		color: $text-inverse;
 	}
 }

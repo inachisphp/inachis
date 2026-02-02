@@ -10,7 +10,7 @@
 			content: "";
 			border-style: solid;
 			border-width: 5px 5px 0 5px;
-			border-color: var(--color-neutral-500) transparent transparent transparent;
+			border-color: $border-color-input transparent transparent transparent;
 			position: relative;
 			top: 1em;
 			right: -0.5em;
@@ -22,21 +22,21 @@
 	button {
 		background-color: transparent;
 		border: none;
-		color: var(--color-neutral-600);
+		color: $text-muted;
 		cursor: pointer;
 		text-decoration: none;
 	}
 
 	img {
-		background-color: var(--bg-surface);
-		border: 1px solid var(--color-neutral-300);
+		background-color: $bg-surface;
+		border: 1px solid $border-color;
 		border-radius: $radius-round;
 		padding: 2px;
 		vertical-align: middle;
 	}
 
 	[data-initials]:before {
-		background-color: var(--color-profile-blue);
+		background-color: $profile-blue;
 		color: white;
 		opacity: 1;
 		content: attr(data-initials);
@@ -73,8 +73,8 @@
 	ul {
 		@include box-shadow(10px, 10px, 39px, -12px, rgba(0, 0, 0, 0.61));
 
-		background-color: var(--bg-surface);
-		border: 1px solid var(--color-neutral-300);
+		background-color: $bg-surface;
+		border: 1px solid $border-color;
 		display: none;
 		font-size: 0.85em;
 		list-style-type: none;
@@ -92,7 +92,7 @@
 			text-align: right;
 
 			&.divider {
-				border-top: 1px solid var(--color-neutral-300);
+				border-top: 1px solid $border-color;
 			}
 
 			a,
@@ -109,11 +109,11 @@
 
 			a:hover,
 			button:hover {
-				background-color: var(--color-neutral-300);
+				background-color: $border-color;
 			}
 
 			button {
-				border: 1px solid var(--color-neutral-300);
+				border: 1px solid $border-color;
 				border-radius: $radius-standard;
 				display: block;
 				margin: 0.5em auto;
@@ -128,9 +128,10 @@
 	}
 
 	.admin__user__notifications {
-		background-color: var(--color-notification);
+		background-color: $color-notification;
 		border-radius: $radius-round;
-		color: var(--color-neutral-000);
+		color: transparent;
+		color: $text-inverse;
 		font-size: 0.7em;
 		right: 65px;
 		padding: 2px 5px;

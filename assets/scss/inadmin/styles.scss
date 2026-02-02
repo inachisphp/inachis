@@ -4,13 +4,14 @@
 @use 'structure/layout';
 @use 'structure/sidebar';
 @use 'structure/header';
-  @use 'structure/search';
-  @use 'structure/user-menu';
+@use 'structure/search';
+@use 'structure/user-menu';
 @use 'structure/bottom-bar';
 
 // Structural components
 @use 'components/admonitions';
 @use 'components/badge';
+@use 'components/buttons';
 @use 'components/data-list';
 @use 'components/dropzone';
 @use 'components/filter_bar';
@@ -37,8 +38,8 @@
 @use 'content-types/series';
 @use 'content-types/warnings';
 @use 'widgets/widgets';
-  @use 'widgets/alerts';
-  @use 'widgets/stats';
+@use 'widgets/alerts';
+@use 'widgets/stats';
 
 @use 'forms';
 
@@ -46,7 +47,7 @@
 
 // dialogs
 @use 'dialogs/dialog';
-  @use 'dialogs/sessionTimeout';
+@use 'dialogs/sessionTimeout';
 
 // Unauthenticated pages
 @use 'admin/form__signin';
