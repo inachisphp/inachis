@@ -1,52 +1,71 @@
-#dialog__categoryManager .info {font-size:0.8em;}
+@use '../definitions' as *;
+
+#dialog__categoryManager .info {
+  font-size: 0.8em;
+}
 
 .penzai {
   margin: 0;
   padding: 0;
 
-  &, ul, ol {
+  &,
+  ul,
+  ol {
     list-style: none;
     overflow: hidden;
   }
-  ul, ol {
+
+  ul,
+  ol {
     margin: 0;
     padding-left: 18px;
     display: none;
   }
+
   li {
     position: relative;
     padding: 2px 0;
     line-height: 18px;
     white-space: nowrap;
 
-    &[aria-expanded="true"] > ul,
-    &[aria-expanded="true"] > ol {
+    &[aria-expanded="true"]>ul,
+    &[aria-expanded="true"]>ol {
       display: block;
     }
+
     &>span {
       display: flex;
       justify-content: space-between;
       padding: 0.2em;
 
-      &:hover { background-color: #eee; }
+      &:hover {
+        background-color: $border-color;
+      }
     }
   }
-  a, a:visited {
+
+  a,
+  a:visited {
     font-size: 0.9em;
     vertical-align: middle;
   }
+
   input {
     width: auto;
   }
-  label, .ui-dialog & label {
+
+  label,
+  .ui-dialog & label {
     margin-left: 10px;
     display: inline-block;
     vertical-align: middle;
   }
 
-  .all, .none {
+  .all,
+  .none {
     cursor: pointer;
   }
+
   .material-icons {
     font-size: 1.3em;
     vertical-align: middle;
@@ -68,11 +87,11 @@
   }
 }
 
-.penzai li[aria-expanded="true"] > .penzai-disclosure::before {
+.penzai li[aria-expanded="true"]>.penzai-disclosure::before {
   content: "▼";
 }
 
-.penzai-leaf > .penzai-disclosure {
+.penzai-leaf>.penzai-disclosure {
   visibility: hidden;
 }
 
@@ -84,5 +103,5 @@
 
 /* focus highlight */
 .penzai li:focus-visible {
-  background-color: #e8f2ff;
+  background-color: $color-brand-050;
 }

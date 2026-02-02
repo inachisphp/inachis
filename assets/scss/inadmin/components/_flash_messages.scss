@@ -1,15 +1,5 @@
 @use '../definitions' as *;
 
-// Light theme tokens (Material Design 3)
-$flash-info-bg-light:    #E3F2FD;
-$flash-info-fg-light:    #0B3C91;
-$flash-success-bg-light: #E8F5E9;
-$flash-success-fg-light: #1B4D1F;
-$flash-warning-bg-light: #FFF1D6;
-$flash-warning-fg-light: #8A3B00;
-$flash-error-bg-light:   #F9E2E0;
-$flash-error-fg-light:   #7A1414;
-
 .flash-notice,
 .flash-success,
 .flash-warning,
@@ -30,27 +20,38 @@ $flash-error-fg-light:   #7A1414;
 }
 
 .flash-notice {
-  background-color: $flash-info-bg-light;
-  color: $flash-info-fg-light;
+  background-color: $flash-notice-bg;
+  color: $flash-notice-text;
+}
+
+.flash-notice.info {
+  background-color: $color-brand-050;
+  border-left-color: $action-primary;
+}
+
+.flash-notice.warning {
+  background-color: $alert-warning-bg;
+  border-left-color: $alert-warning-border;
 }
 
 .flash-success {
-  background-color: $flash-success-bg-light;
-  color: $flash-success-fg-light;
+  background-color: $flash-success-bg;
+  color: $flash-success-text;
 }
 
 .flash-warning {
-  background-color: $flash-warning-bg-light;
-  color: $flash-warning-fg-light;
+  background-color: $flash-warning-bg;
+  color: $flash-warning-text;
 }
 
 .flash-error {
-  background-color: $flash-error-bg-light;
-  color: $flash-error-fg-light;
+  background-color: $flash-error-bg;
+  color: $flash-error-text;
   border-left: 4px solid currentColor;
 }
 
 @media (prefers-reduced-motion: no-preference) {
+
   .flash-notice,
   .flash-success,
   .flash-warning,
@@ -63,6 +64,7 @@ $flash-error-fg-light:   #7A1414;
       opacity: 0;
       transform: translateY(-2px);
     }
+
     to {
       opacity: 1;
       transform: none;

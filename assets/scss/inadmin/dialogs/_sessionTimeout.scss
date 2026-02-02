@@ -1,8 +1,13 @@
+@use '../definitions' as *;
+
 #dialog__sessionTimeout {
-  .material-icons { vertical-align: middle; }
+  .material-icons {
+    vertical-align: middle;
+  }
+
   p.countdown {
     font-size: 3em;
-    color: #900;
+    color: $color-danger-500;
     text-align: center;
   }
 }

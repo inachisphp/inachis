@@ -8,7 +8,7 @@
   }
 }
 
-.form input[type="checkbox"] + label {
+.form input[type="checkbox"]+label {
   display: inline;
 }
 
@@ -29,9 +29,13 @@
     margin: 0.2em;
     text-align: center;
 
-    a, a:visited {
-      background: $image-tile-background;
-      color: #333;
+    a,
+    a:visited {
+      background: $border-color;
+      background-position: center bottom;
+      background-repeat: no-repeat;
+      background-size: cover;
+      color: $text-main;
       display: block;
       height: 16em;
       padding: 0.5rem;
@@ -45,14 +49,15 @@
     }
 
     a:hover {
-      background-color: color.scale($image-tile-background, $lightness: -10%);
-      color: #000;
+      background-color: $color-neutral-250;
+      color: $color-neutral-900;
     }
 
     img {
       max-height: 150px;
       max-width: 150px;
     }
+
     span {
       display: block;
       height: 150px;
@@ -65,11 +70,14 @@
   li {
     margin-bottom: 1em;
   }
-  a, a:visited {
+
+  a,
+  a:visited {
     line-height: 2em;
     margin-bottom: 1em;
     padding: 0.5em 0.25em;
   }
+
   a:hover {
     background-color: #ccc;
   }
@@ -88,10 +96,21 @@
     "usages";
 }
 
-.edit-image      { grid-area: image; }
-.edit-details    { grid-area: details; }
-.edit-properties { grid-area: properties; }
-.edit-usages     { grid-area: usages; }
+.edit-image {
+  grid-area: image;
+}
+
+.edit-details {
+  grid-area: details;
+}
+
+.edit-properties {
+  grid-area: properties;
+}
+
+.edit-usages {
+  grid-area: usages;
+}
 
 @media (min-width: $breakpoint-medium) {
   .edit-grid {

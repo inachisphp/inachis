@@ -2,8 +2,8 @@
 @use 'sass:color';
 
 section.paginated-list {
-  background-color: #fff;
-  border: 1px solid #eee;
+  background-color: $bg-surface;
+  border: 1px solid $border-color;
   clear: left;
   margin-bottom: 4em;
   padding: 1em;
@@ -13,13 +13,17 @@ section.paginated-list {
   clear: left;
 
   div.ui-tabs-panel {
-    background-color: #fff;
-    border: 1px solid #eee;
+    background-color: $bg-surface;
+    border: 1px solid $border-color;
     padding: 30px 20px 60px 20px;
   }
 
-  .post, .page, .series {
-    a, a:visited {
+  .post,
+  .page,
+  .series {
+
+    a,
+    a:visited {
       padding: 0 0 0 25px;
     }
   }
@@ -28,30 +32,34 @@ section.paginated-list {
     transition: background 0.15s ease;
 
     &:hover {
-      background-color: $table-row-hover-bg;
+      background-color: $color-neutral-100;
     }
   }
 
   .zebra article:nth-of-type(2n) {
-    background-color: $table-zebra-bg;
+    background-color: $bg-panel;
   }
 
   .zebra article:nth-of-type(odd).selected {
-    background-color: $table-selected-row-bg !important;
-    outline: 2px solid $table-selected-row-bg;
+    background-color: $table-selected !important;
+    outline: 2px solid $table-selected;
   }
+
   .zebra article:nth-child(even).selected {
-    background-color: color.adjust($table-selected-row-bg, $lightness: -5%) !important;
-    outline: 2px solid color.adjust($table-selected-row-bg, $lightness: -5%);
+    background-color: $table-selected-zebra !important;
+    outline: 2px solid $table-selected-zebra;
   }
 
   ol.ui-widget-content {
-    background-color: #fff;
-    border: 1px solid #eee;
+    background-color: $bg-surface;
+    border: 1px solid $border-color;
     margin: 0;
   }
 
-  ol.ui-widget-content, .post, .page, .series {
+  ol.ui-widget-content,
+  .post,
+  .page,
+  .series {
     clear: left;
     list-style-type: none;
     padding: 15px 5px;
@@ -60,15 +68,17 @@ section.paginated-list {
       padding: 15px 5px;
     }
 
-    a, a:visited {
-      color: #069;
+    a,
+    a:visited {
+      color: $action-primary;
       display: block;
       text-decoration: none;
-      vertical-align: middle;
     }
+
     li {
-      margin:25px 10px 40px 0;
+      margin: 25px 10px 40px 0;
     }
+
     h2 {
       display: flex;
       font-size: 1.2em;
@@ -81,12 +91,14 @@ section.paginated-list {
         margin: 0 0.25em 0 0;
       }
     }
+
     input {
       float: left;
-      margin:5px 0 0 0;
+      margin: 5px 0 0 0;
     }
+
     p {
-      color: #666;
+      color: $text-muted;
       font-size: 0.85em;
       line-height: 1.7em;
       margin-left: 2em;
@@ -98,10 +110,12 @@ section.paginated-list {
       &.date {
         font-size: 0.8em;
       }
+
       &.date span.material-icons:not(:first-of-type) {
         margin-left: 0.75em;
       }
     }
+
     span {
       vertical-align: middle;
     }
@@ -114,7 +128,11 @@ section.paginated-list {
 }
 
 @media (min-width: $breakpoint-medium) {
-  .content__list ol.ui-widget-content, .content__list .post, .content__list .page, .content__list .series {
+
+  .content__list ol.ui-widget-content,
+  .content__list .post,
+  .content__list .page,
+  .content__list .series {
     margin: 0.5em 0;
   }
 }

@@ -1,3 +1,5 @@
+@use '../definitions' as *;
+
 /* Visually hidden but accessible checkbox */
 .switch-button-input {
     position: absolute;
@@ -19,7 +21,8 @@
     width: 44px;
     height: 24px;
     border-radius: 999px;
-    background: #ccc;
+    background: $border-color-dark;
+    /* #ccc is closer to ddd (400) */
     border: none;
     cursor: pointer;
     transition: background 0.2s ease;
@@ -33,13 +36,13 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: white;
+    background: $bg-surface;
     transition: transform 0.2s ease;
 }
 
 /* Checked state */
 .switch-button.checked .switch-button-control {
-    background: #2563eb;
+    background: $action-primary;
 }
 
 .switch-button.checked .switch-button-control::after {
@@ -53,16 +56,17 @@
 }
 
 .switch-button-label:focus-visible {
-    outline: 2px solid #93c5fd;
+    outline: 2px solid $color-brand-300;
+    /* 93c5fd is blue-300 */
     outline-offset: 2px;
 }
 
 .switch-button-label.on {
-    color: #2563eb;
+    color: $action-primary;
 }
 
 /* Focus */
 .switch-button-control:focus-visible {
-    outline: 3px solid #93c5fd;
+    outline: 3px solid $color-brand-300;
     outline-offset: 2px;
 }

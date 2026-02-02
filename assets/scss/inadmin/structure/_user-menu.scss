@@ -7,34 +7,36 @@
 
 	a[href="#admin__user__options"] {
 		&:after {
-		    content: "";
-		    border-style: solid;
-		    border-width: 5px 5px 0 5px;
-		    border-color: #aaa transparent transparent transparent;
-		    position: relative;
+			content: "";
+			border-style: solid;
+			border-width: 5px 5px 0 5px;
+			border-color: $border-color-input transparent transparent transparent;
+			position: relative;
 			top: 1em;
 			right: -0.5em;
 		}
 	}
 
-	a, a:visited, button {
+	a,
+	a:visited,
+	button {
 		background-color: transparent;
 		border: none;
-		color: #666;
+		color: $text-muted;
 		cursor: pointer;
 		text-decoration: none;
 	}
 
 	img {
-		background-color: #fff;
-		border: 1px solid #aaa;
+		background-color: $bg-surface;
+		border: 1px solid $border-color;
 		border-radius: $radius-round;
 		padding: 2px;
 		vertical-align: middle;
 	}
 
 	[data-initials]:before {
-		background-color: #099bdd;
+		background-color: $profile-blue;
 		color: white;
 		opacity: 1;
 		content: attr(data-initials);
@@ -51,24 +53,28 @@
 	[data-color="#f90"]:before {
 		background-color: #f90;
 	}
+
 	[data-color="#090"]:before {
 		background-color: #090;
 	}
+
 	[data-color="#dd0909"]:before {
 		background-color: #dd0909;
 	}
+
 	[data-color="#8409dd"]:before {
 		background-color: #8409dd;
 	}
+
 	[data-color="#dd8709"]:before {
 		background-color: #dd8709;
 	}
 
 	ul {
-		@include box-shadow(10px, 10px, 39px, -12px, rgba(0,0,0,0.61));
+		@include box-shadow(10px, 10px, 39px, -12px, rgba(0, 0, 0, 0.61));
 
-		background-color: #fff;
-		border: 1px solid #eee;
+		background-color: $bg-surface;
+		border: 1px solid $border-color;
 		display: none;
 		font-size: 0.85em;
 		list-style-type: none;
@@ -86,23 +92,28 @@
 			text-align: right;
 
 			&.divider {
-				border-top: 1px solid #eee;
+				border-top: 1px solid $border-color;
 			}
 
-			a, a:visited, button, p {
+			a,
+			a:visited,
+			button,
+			p {
 				padding: 5px;
 			}
 
-			a, a:visited{
+			a,
+			a:visited {
 				display: block;
 			}
 
-			a:hover, button:hover {
-				background-color: #eee;
+			a:hover,
+			button:hover {
+				background-color: $border-color;
 			}
 
 			button {
-				border: 1px solid #eee;
+				border: 1px solid $border-color;
 				border-radius: $radius-standard;
 				display: block;
 				margin: 0.5em auto;
@@ -117,13 +128,14 @@
 	}
 
 	.admin__user__notifications {
-	    background-color: $admin__user__notification__colour;
-	    border-radius: $radius-round;
-	    color: #fff;
-	    font-size: 0.7em;
-	    right: 65px;
-	    padding: 2px 5px;
-	    position: absolute;
-	    top: 35px;
+		background-color: $color-notification;
+		border-radius: $radius-round;
+		color: transparent;
+		color: $text-inverse;
+		font-size: 0.7em;
+		right: 65px;
+		padding: 2px 5px;
+		position: absolute;
+		top: 35px;
 	}
 }

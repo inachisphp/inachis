@@ -1,3 +1,5 @@
+@use '../definitions' as *;
+
 div.widget-container {
   display: flex;
   flex-wrap: wrap;
@@ -6,26 +8,26 @@ div.widget-container {
 
 section.widget {
   h2 {
-    color: #666;
+    color: $text-muted;
     font-size: 0.85em;
     text-transform: uppercase;
   }
 }
 
 section.widget-settings {
-    background: #fff;
-    border: 1px solid #ddd;
-    margin: 1em;
-    max-width: 225px;
-    padding: 1em;
-    text-align: center;
-    width: 25%;
+  background: $bg-surface;
+  border: 1px solid $border-color;
+  margin: 1em;
+  max-width: 225px;
+  padding: 1em;
+  text-align: center;
+  width: 25%;
 
-    .material-icons {
-      font-size: 5em;
-    }
+  .material-icons {
+    font-size: 5em;
+  }
 
-    p span {
-      font-size: 0.85em;
-    }
+  p span {
+    font-size: 0.85em;
+  }
 }

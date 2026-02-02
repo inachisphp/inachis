@@ -1,8 +1,9 @@
 @use '../definitions' as *;
+@use 'sass:color';
 
 .fixed-bottom-bar {
-  background-color: $admin__button-bar-background-color;
-  border-top: 1px solid #ddd;
+  background-color: $bg-panel;
+  border-top: 1px solid $border-color-dark;
   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.15);
   bottom: 0;
   padding-left: 20px;

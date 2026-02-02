@@ -1,3 +1,5 @@
+@use '../definitions' as *;
+
 .widget-alerts {
   article {
     margin-bottom: 2em;
@@ -9,13 +11,15 @@
       margin-right: 1em;
       text-transform: uppercase;
     }
+
     &.alert_priority__high {
-      background-color: #fcc;
-      border-bottom: 3px solid #f00;
+      background-color: $alert-danger-bg;
+      border-bottom: 3px solid $alert-danger-border;
     }
+
     &.alert_priority__medium {
-      background-color: #fac19dff;
-      border-bottom: 3px solid orange;
+      background-color: $alert-warning-bg;
+      border-bottom: 3px solid $alert-warning-border;
     }
   }
 }

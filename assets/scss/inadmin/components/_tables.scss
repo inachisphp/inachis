@@ -1,5 +1,5 @@
-@use 'sass:color';
 @use '../definitions' as *;
+@use 'sass:color';
 
 // ---------------------------------------------------------------------------
 // RESPONSIVE WRAPPER
@@ -11,11 +11,12 @@
   -webkit-overflow-scrolling: touch;
 
   scrollbar-width: thin;
-  scrollbar-color: #ccc transparent;
+  scrollbar-color: $border-color transparent;
 
   &::-webkit-scrollbar {
     height: 8px;
   }
+
   &::-webkit-scrollbar-thumb {
     border-radius: 4px;
   }
@@ -31,34 +32,44 @@
 
   &::before {
     left: 0;
-    background: linear-gradient(to right, rgba(0,0,0,0.15), transparent);
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.15), transparent);
   }
+
   &::after {
     right: 0;
-    background: linear-gradient(to left, rgba(0,0,0,0.15), transparent);
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.15), transparent);
   }
 }
 
 @media (max-width: $breakpoint-medium) {
   .table.table-responsive {
-    thead, tbody, th, td, tr {
+
+    thead,
+    tbody,
+    th,
+    td,
+    tr {
       display: block;
     }
+
     th.hide-on-mobile,
     td.hide-on-mobile {
       display: none;
     }
+
     thead tr {
       position: absolute;
       top: -9999px;
       left: -9999px;
     }
+
     tbody tr {
-      border-bottom: 2px solid #000;
+      border-bottom: 2px solid $color-neutral-900;
     }
+
     td {
       border: none;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid $border-color;
       position: relative;
       padding-left: 50%;
       text-align: right;
@@ -85,7 +96,7 @@
 table {
   width: 100%;
   border-collapse: collapse;
-  background-color: $table-background-bg;
+  background-color: $bg-surface;
   font-size: 0.95rem;
   line-height: 1.4;
 
@@ -95,13 +106,13 @@ table {
     text-align: left;
     font-weight: 600;
     margin-bottom: 0.5rem;
-    color: color.adjust($table-header-bg, $lightness: -15%);
+    color: $text-muted;
   }
 
   // Head
   thead {
-    background-color: $table-header-bg;
-    color: $table-header-color;
+    background-color: $action-primary;
+    color: $text-inverse;
 
     th {
       padding: 0.75rem 1rem;
@@ -117,14 +128,15 @@ table {
       transition: background 0.15s ease;
 
       &:hover {
-        background-color: $table-row-hover-bg;
+        background-color: $color-neutral-100;
       }
     }
 
-    td, th {
+    td,
+    th {
       padding: 0.75rem 1rem;
       vertical-align: middle;
-      border-bottom: 1px solid $table-border-color;
+      border-bottom: 1px solid $border-color-dark;
     }
   }
 }
@@ -135,7 +147,9 @@ table {
 
 // Borderless table
 .table--borderless {
-  tbody td, tbody th {
+
+  tbody td,
+  tbody th {
     border: none !important;
   }
 }
@@ -143,7 +157,7 @@ table {
 // Zebra striping
 .table--striped {
   tbody tr:nth-child(even) {
-    background-color: $table-zebra-bg;
+    background-color: $bg-panel;
   }
 }
 
@@ -152,18 +166,20 @@ table {
   border: none;
 
   thead th {
-    border-bottom: 2px solid $table-border-color;
+    border-bottom: 2px solid $border-color-dark;
   }
 
-  tbody td, tbody th {
+  tbody td,
+  tbody th {
     border-left: none;
     border-right: none;
-    border-bottom: 1px solid $table-border-color;
+    border-bottom: 1px solid $border-color-dark;
   }
 }
 
 // Compact mode
 .table--compact {
+
   thead th,
   tbody td {
     padding: 0.5rem 0.75rem;
@@ -172,6 +188,7 @@ table {
 
 // Dense mode
 .table--dense {
+
   thead th,
   tbody td {
     padding: 0.35rem 0.5rem;
@@ -186,9 +203,11 @@ form .table--selectable {
     width: auto;
   }
 
-  tr td:nth-child(1), tr th:nth-child(1) {
+  tr td:nth-child(1),
+  tr th:nth-child(1) {
     width: 0.8em;
   }
+
   th[scope="row"] {
     font-weight: bold;
     text-align: left;
@@ -197,6 +216,7 @@ form .table--selectable {
 
 // hide excess content until hover
 .table--truncate {
+
   td,
   th {
     max-width: 180px;
@@ -240,6 +260,7 @@ form .table--selectable {
 }
 
 .table--sticky-col {
+
   tbody td:first-child,
   thead th:first-child {
     position: sticky;
@@ -273,7 +294,7 @@ form .table--selectable {
       right: 0.75rem;
       font-size: 0.7rem;
       opacity: 0.5;
-      color: $table-sort-indicator-color;
+      color: rgba(255, 255, 255, 0.8);
     }
 
     &.sorted-asc::after {
@@ -290,32 +311,32 @@ form .table--selectable {
 
 
 // ---------------------------------------------------------------------------
-// COLUMN HOVER HIGHLIGHT
+// COLUMN HOVER HIGHLIGHT - WIP - DO NOT USE
 // ---------------------------------------------------------------------------
 
-.table--column-hover {
-  td,
-  th {
-    position: relative;
-  }
+// .table--column-hover {
+//   td,
+//   th {
+//     position: relative;
+//   }
 
-  tbody td:hover,
-  thead th:hover {
-    background-color: color.adjust($table-header-bg, $lightness: 40%);
-  }
+//   tbody td:hover,
+//   thead th:hover {
+//     background-color: $color-brand-300;
+//   }
 
-  tbody td:hover::before,
-  thead th:hover::before {
-    content: "";
-    position: absolute;
-    top: -999px;
-    bottom: -999px;
-    left: 0;
-    right: 0;
-    background-color: color.adjust($table-header-bg, $lightness: 40%);
-    z-index: -1;
-  }
-}
+//   tbody td:hover::before,
+//   thead th:hover::before {
+//     content: "";
+//     position: absolute;
+//     top: -9999px; // Fixed to match
+//     bottom: -9999px; // Fixed to match
+//     left: 0;
+//     right: 0;
+//     background-color: $color-brand-300;
+//     z-index: -1;
+//   }
+// }
 
 
 // ---------------------------------------------------------------------------
@@ -324,19 +345,19 @@ form .table--selectable {
 
 .table--selectable {
   tbody tr.selected {
-    background-color: $table-selected-row-bg !important;
-    outline: 2px solid $table-selected-row-bg;
+    background-color: $table-selected-zebra !important;
+    outline: 2px solid $table-selected-zebra;
 
   }
+
   tbody tr:nth-child(even).selected {
-    background-color: color.adjust($table-selected-row-bg, $lightness: -5%) !important;
-    outline: 2px solid color.adjust($table-selected-row-bg, $lightness: -5%);
+    outline: 2px solid $table-selected-zebra;
   }
 }
 
 .table--focusable td:focus,
 .table--focusable th:focus {
-  outline: 3px solid $table-focus-color;
+  outline: 3px solid $color-focus;
   outline-offset: 2px;
 }
 
@@ -354,7 +375,7 @@ form .table--selectable {
     tbody tr {
       display: block;
       margin-bottom: 1rem;
-      border: 1px solid $table-border-color;
+      border: 1px solid $border-color-dark;
       border-radius: $radius-standard;
       padding: 0.5rem;
     }
@@ -368,7 +389,7 @@ form .table--selectable {
         content: attr(data-label);
         font-weight: 600;
         margin-right: 1rem;
-        color: $table-header-bg;
+        color: $action-primary;
       }
     }
   }
@@ -383,7 +404,7 @@ form .table--selectable {
     transition: background 0.2s ease;
 
     &.expanded {
-      background-color: color.adjust($table-header-bg, $lightness: 45%);
+      background-color: $table-expandable--expanded;
     }
   }
 
@@ -393,11 +414,11 @@ form .table--selectable {
     td {
       padding: 1rem;
       border-top: none;
-      background-color: #f9fbfc;
+      background-color: $color-neutral-100;
     }
   }
 
-  tr.expanded + .row-details {
+  tr.expanded+.row-details {
     display: table-row;
   }
 }
