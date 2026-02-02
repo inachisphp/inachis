@@ -60,7 +60,7 @@
         a, a:visited {
             background-color: #069;
             border: 1px solid #046;
-            border-radius: 0.5em;
+            border-radius: $radius-standard;
             margin: .3em .3em 2em .3em;
 
             &:hover {

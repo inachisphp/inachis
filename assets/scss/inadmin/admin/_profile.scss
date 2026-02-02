@@ -30,7 +30,7 @@ fieldset.multisection.content__edit {
 
 .profile-photo {
   border: 1px solid #333;
-  border-radius: 50%;
+  border-radius: $radius-round;
   height: 106px;
   float: left;
   margin-right: 2em;
@@ -38,7 +38,7 @@ fieldset.multisection.content__edit {
 
   img {
     background: #fff;
-    border-radius: 50%;
+    border-radius: $radius-round;
     height: 100px;
     max-height: 100%;
     object-fit: cover;
@@ -50,7 +50,7 @@ fieldset.multisection.content__edit {
 .form__profile fieldset {
   input {
     border: 2px solid #eee;
-    border-radius: 0.5em;
+    border-radius: $radius-standard;
     width: 90%;
   }
   .input:active {
@@ -84,7 +84,7 @@ meter::-webkit-meter-optimum-value {
   }
   label {
     border: 4px solid transparent;
-    border-radius: 50%;
+    border-radius: $radius-round;
     display: inline-block;
     height: 3em;
     overflow: hidden;
@@ -118,7 +118,7 @@ meter::-webkit-meter-optimum-value {
 
 /*p.profile-photo, p.profile-photo:visited {
   border: 1px solid #000;
-  border-radius: 50%;
+  border-radius: $radius-round;
   display: block;
   height: 75px;
   margin: auto;

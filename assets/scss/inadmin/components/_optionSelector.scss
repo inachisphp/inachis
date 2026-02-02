@@ -1,3 +1,5 @@
+@use '../definitions' as *;
+
 .option-selector {
     display: flex;
     flex-wrap: wrap;
@@ -29,7 +31,7 @@
     label {
         align-items: center;
         background: #f0f0f0;
-        border-radius: 0.5rem;
+        border-radius: $radius-standard;
         cursor: pointer;
         display: flex;
         flex-direction: column;
@@ -61,7 +63,7 @@
 .ripple {
     animation: ripple-animation 0.6s linear;
     background: rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
+    border-radius: $radius-round;
     pointer-events: none;
     position: absolute;
     transform: scale(0);

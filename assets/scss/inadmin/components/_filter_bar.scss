@@ -24,7 +24,7 @@
 	.filter__toggle {
 		align-items: center;
 		border: 1px solid #e5e7eb;
-		border-radius: 0.5rem;
+		border-radius: $radius-standard;
 		color: #111827;
 		cursor: pointer;
 		display: flex;
@@ -44,7 +44,7 @@
 			height: 10px;
 			background: #ef4444;
 			border: 2px solid #fff;
-			border-radius: 50%;
+			border-radius: $radius-round;
 		}
 	}
 
@@ -53,7 +53,7 @@
 	.ui-sortby {
 		align-items: center;
 		border: 1px solid #e5e7eb;
-		border-radius: 0.5rem;
+		border-radius: $radius-standard;
 		display: flex;
 		max-width: 225px;
 		padding: 0 0.5rem; flex: 1;
@@ -81,7 +81,7 @@
 	border: 1px solid transparent;
 	display: inline-block;
 	padding: 0.5em;
-	border-radius: 0.5rem;
+	border-radius: $radius-standard;
 	margin: 1rem 0 0.5rem 0.6rem;
 	width: auto;
 }
@@ -90,7 +90,7 @@ div#filter__options {
   span {
     background-color: #eee;
     border: 1px solid transparent;
-    border-radius: 0.5em;
+    border-radius: $radius-standard;
     color: #333;
     font-size: 0.9em;
     margin-right: 1em;
@@ -141,7 +141,7 @@ div#filter__options {
 
 	&.is-open {
 		border: 1px dashed #eee;
-		border-radius: 0.5rem;
+		border-radius: $radius-standard;
 		grid-template-rows: 1fr;
 		height: auto;
 		opacity: 1;

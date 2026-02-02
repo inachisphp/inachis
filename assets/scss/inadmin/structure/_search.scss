@@ -23,7 +23,7 @@ input[type="search"]::-webkit-search-results-decoration {
 .input-icon-wrapper {
 	position: relative; flex: 1; display: flex; align-items: center;
 	background: #f3f4f6; padding: 0 0.75rem;
-	border-radius: 0.5rem;
+	border-radius: $radius-standard;
 	border: 1px solid transparent; transition: all 0.2s;
 
 	input {
@@ -51,7 +51,7 @@ input[type="search"]::-webkit-search-results-decoration {
 	position: absolute;
 	right: 0.5rem;
 	padding: 4px;
-	border-radius: 50%;
+	border-radius: $radius-round;
 
 	&::hover {
 		background: rgba(0,0,0,0.05);

@@ -29,7 +29,7 @@ body .visually-hidden {
   align-items: center;
   background-color: #069;
   border: none;
-  border-radius: 50%;
+  border-radius: $radius-round;
   bottom: 2rem;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   color: #fff;

@@ -355,7 +355,7 @@ form .table--selectable {
       display: block;
       margin-bottom: 1rem;
       border: 1px solid $table-border-color;
-      border-radius: 0.5rem;
+      border-radius: $radius-standard;
       padding: 0.5rem;
     }
 

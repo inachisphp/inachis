@@ -2,281 +2,275 @@
 @use 'sass:color';
 
 @mixin dark-theme {
-	background-color: #121212;
-	color: #e0e0e0;
+	// Core colors
+	$bg-main: #121212;
+	$bg-surface: #1e1e1e;
+	$bg-muted: #1f1f1f;
+	$bg-hover: #2a2a2a;
+	$bg-hover-strong: #3d3d3d;
 
-  // Links
-  a, a:visited {
-    color: #8ab4f8; // Accessible blue
-  }
+	$text-main: #e0e0e0;
+	$text-muted: #888;
+	$text-strong: #fff;
 
-  a:hover {
-    color: #fff;
-  }
+	$border-main: #333;
+	$border-muted: #555;
 
-  // Headers & Text
-  h1, h2, h3, h4, h5, h6 {
-    color: #fff;
-  }
+	// Accent colors
+	$accent-primary: #8ab4f8;
+	$accent-focus: #93c5fd;
 
-  // Layout Areas
-  .content-header {
-    background: #1e1e1e;
-    border-bottom: 1px solid #333;
+	// State colors
+	$positive: #1b5e20;
+	$positive-hover: #2e7d32;
 
-    h1 {
-        a, a:visited {
-            background-color: #333;
-            color: #fff;
-        }
-        a:hover {
-            background-color: #555;
-        }
-    }
-  }
+	$negative: #b71c1c;
+	$negative-hover: #c62828;
 
-  .sidebar {
-      background: #1e1e1e;
-      border-right: 1px solid #333;
-  }
+	$info: #0d47a1;
+	$info-hover: #1565c0;
 
-  .fixed-bottom-bar {
-	background-color: #333;
-	border-color: #333;
-  }
+	$add: #006064;
+	$add-hover: #00838f;
 
-  .admin__user ul {
-    background-color: #1e1e1e;
-	border-color: #000;
-    color: #fff;
-  }
+	// Utility
+	$ripple-light: rgba(255, 255, 255, 0.15);
 
+	background-color: $bg-main;
+	color: $text-main;
+
+	$flash-info-bg-dark:        #1E3A5F;
+	$flash-info-fg-dark:     #BBDEFB;
+	$flash-success-bg-dark:     #162F1E;
+	$flash-success-fg-dark:  #C8E6C9;
+	$flash-warning-bg-dark:     #3E2723;
+	$flash-warning-fg-dark:  #FFD180;
+	$flash-error-bg-dark:       #3B1515;
+	$flash-error-fg-dark:    #F6C7C5;
+
+	// --------------------------------
+	// Typography & Links
+	// --------------------------------
+	a, a:visited { color: $accent-primary; }
+	a:hover { color: $text-strong; }
+
+	h1, h2, h3, h4, h5, h6 {
+		color: $text-strong;
+	}
+
+	// --------------------------------
+	// Layout
+	// --------------------------------
+	.content-header,
+	.sidebar,
+	section.paginated-list,
+	.image-tile,
+	table {
+		background-color: $bg-surface;
+		border-color: $border-main;
+	}
+
+	.content-header {
+		border-bottom: 1px solid $border-main;
+
+		h1 a {
+			background-color: $border-main;
+			color: $text-strong;
+
+			&:hover {
+				background-color: $border-muted;
+			}
+		}
+	}
+
+	.sidebar {
+		border-right: 1px solid $border-main;
+	}
+
+	.fixed-bottom-bar {
+		background-color: $border-main;
+		border-color: $border-main;
+	}
+
+  // --------------------------------
   // Forms
+  // --------------------------------
   .form {
-    input, textarea, select, .ts-dropdown .ts-control {
-      background-color: #2d2d2d;
-      border: 1px solid #555;
-      color: #e0e0e0;
+	input,
+	textarea,
+	select,
+	.ts-dropdown .ts-control {
+		background-color: $bg-hover;
+		border: 1px solid $border-muted;
+		color: $text-main;
 
-      &:focus {
-          border-color: #8ab4f8;
-          outline: 1px solid #8ab4f8;
-      }
-    }
-
-    input[disabled], select[disabled], textarea[disabled] {
-        background-color: #1f1f1f;
-        color: #888;
-    }
-
-    // Tom Select specific
-    .ts-dropdown {
-        background-color: #2d2d2d;
-        border: 1px solid #555;
-        color: #e0e0e0;
-
-        .active {
-            background-color: #3d3d3d;
-            color: #fff;
-        }
-    }
-  }
-
-  .option-selector {
-	input[type="radio"] {
-		&:checked + label {
-			background: #2563eb;
-			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-			color: #ffffff;
-		}
-		&:hover {
-			box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
-		}
-		.material-icons {
-			color: #ffffff;
-		}
-	}
-	label {
-		background: #1f1f1f;
-		color: #e0e0e0;
-		&:hover,
 		&:focus {
-			background: #2c2c2c;
+			border-color: $accent-primary;
+			outline: 1px solid $accent-primary;
 		}
-		&:focus-visible {
-			outline: 3px solid #93c5fd;
+	}
+
+	input[disabled],
+	textarea[disabled],
+	select[disabled] {
+		background-color: $bg-muted;
+		color: $text-muted;
+	}
+
+	.ts-dropdown {
+		background-color: $bg-hover;
+		border: 1px solid $border-muted;
+
+		.active {
+			background-color: $bg-hover-strong;
+			color: $text-strong;
 		}
 	}
   }
 
-  .ripple {
-	background: rgba(255, 255, 255, 0.15);
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  textarea {
+    background-color: #252526;
+    border: 1px solid #3f3f3f;
+    color: #d4d4d4;
   }
 
-  // Buttons
-  .button, .button:visited {
-    background-color: #333;
-    border-color: #555;
-    color: #e0e0e0;
-
-    &:hover {
-      background-color: #444;
-      color: #fff;
-    }
-
-    &.button--positive {
-      background-color: #1b5e20; // Dark Green
-      border-color: #1b5e20;
-      color: #fff;
-
-      &:hover {
-        background-color: #2e7d32;
-      }
-    }
-
-    &.button--negative {
-      background-color: #b71c1c; // Dark Red
-      border-color: #b71c1c;
-      color: #fff;
-
-      &:hover {
-        background-color: #c62828;
-      }
-    }
-
-    &.button--info {
-        background-color: #0d47a1; // Dark Blue
-        border-color: #0d47a1;
-        color: #fff;
-
-        &:hover {
-            background-color: #1565c0;
-        }
-    }
-
-    &.button--add {
-        background-color: #006064; // Dark Cyan
-        border-color: #006064;
-        color: #fff;
-
-        &:hover {
-            background-color: #00838f;
-        }
-    }
-  }
-
+  // --------------------------------
   // Tables
+  // --------------------------------
   table {
-      background-color: #1e1e1e;
-      color: #e0e0e0;
+    thead th {
+      background-color: $border-main;
+      color: $text-strong;
+      border-bottom: 1px solid $border-muted;
+    }
 
-      thead {
-          th {
-              background-color: #333;
-              color: #fff;
-              border-bottom: 1px solid #555;
-          }
-      }
+    td {
+      border-bottom: 1px solid $border-main;
+    }
 
-      td {
-          border-bottom: 1px solid #333;
-      }
+    tr:hover td {
+      background-color: $bg-hover;
+    }
 
-      tr:hover td {
-          background-color: #2a2a2a;
-      }
-
-      // Zebra striping if used
-      tr:nth-child(even) td {
-          background-color: #1a1a1a;
-      }
+    tr:nth-child(even) td {
+      background-color: #1a1a1a;
+    }
   }
 
-  // Cards / Panels / Tiles
-  .image-tile {
-      background: #1e1e1e;
-      border: 1px solid #333;
+	// --------------------------------
+	// Widgets / UI
+	// --------------------------------
+	.ui-tabs,
+	.ui-tabs-external,
+	.widget-posts ol.ui-widget-content,
+	ul.ui-widget-header {
+		background-color: $bg-main;
+		color: $text-strong;
+		border-color: $border-main;
 
-      p {
-          color: #e0e0e0;
-      }
-  }
+		.ui-tabs-nav a {
+			color: $text-strong;
+			text-decoration: none;
+		}
 
-  // Pagination
-  .pagination {
-      a {
-          background-color: #2d2d2d;
-          border-color: #444;
-          color: #e0e0e0;
-
-          &:hover {
-              background-color: #3d3d3d;
-              color: #fff;
-          }
-
-          &.current {
-              background-color: #0d47a1;
-              color: #fff;
-              border-color: #0d47a1;
-          }
-      }
-  }
-
-	input[type="text"],
-	input[type="email"],
-	input[type="password"],
-	input[type="search"],
-	textarea {
-		background-color: #252526;
-		color: #d4d4d4;
-		border: 1px solid #3f3f3f;
-	}
-
-	img {
-		opacity: .75;
-		transition: opacity .5s ease-in-out;
-
-		&:hover {
-		opacity: 1;
+		.ui-tabs-nav li:hover {
+			background-color: $bg-hover;
 		}
 	}
 
 	.widget-posts ol.ui-widget-content {
-		border-color: #333;
+		border-color: $border-main;
 	}
 
-	.ui-tabs, .ui-tabs-external, .widget-posts ol.ui-widget-content, ul.ui-widget-header {
-      background-color: #121212;
-      color: #fff;
-		border-color: #333;
+	.flash-notice {
+		background-color: $flash-info-bg-dark;
+		color: $flash-info-fg-dark;
+	}
 
-      .ui-tabs-nav {
-        a, a:visited {
-          color: #fff;
-          text-decoration: none;
-        }
+	.flash-success {
+		background-color: $flash-success-bg-dark;
+		color: $flash-success-fg-dark;
+	}
+
+	.flash-warning {
+		background-color: $flash-warning-bg-dark;
+		color: $flash-warning-fg-dark;
+	}
+
+	.flash-error {
+		background-color: $flash-error-bg-dark;
+		color: $flash-error-fg-dark;
+	}
+
+	// --------------------------------
+	// Option Selector
+	// --------------------------------
+	.option-selector {
+    label {
+      background: $bg-muted;
+      color: $text-main;
+
+      &:hover,
+      &:focus {
+        background: #2c2c2c;
       }
+
+      &:focus-visible {
+        outline: 3px solid $accent-focus;
+      }
+    }
+
+    input[type="radio"] {
+      &:checked + label {
+        background: #2563eb;
+        color: $text-strong;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      }
+
+      &:hover {
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
+      }
+
+      .material-icons {
+        color: $text-strong;
+      }
+    }
+  }
+
+
+  .ripple { background: $ripple-light; }
+
+  img {
+    opacity: .75;
+    transition: opacity .5s ease-in-out;
+
+    &:hover { opacity: 1; }
+  }
+
+  .admin__user {
+	ul {
+		background-color: $bg-surface;
+		border-color: #000;
+		color: $text-strong;
 	}
 
-	section.paginated-list {
-		background-color: #1e1e1e;
-		border-color: #333;
-	}
+	button {
+		background-color: $bg-surface;
+		border-color: $border-muted;
+		color: $text-main;
 
-  // Badges
-  .badge {
-      &.badge-default { background-color: #424242; color: #fff; }
-      &.badge-draft { background-color: #f57f17; color: #000; } // Dark Orange/Yellow
-      &.badge-scheduled { background-color: #1565c0; color: #fff; }
-      &.badge-private { background-color: #616161; color: #fff; }
-      &.badge-hotlinked { background-color: #ad1457; color: #fff; }
-      &.badge-issue { background-color: #c62828; color: #fff; }
-      &.badge-active { background-color: #2e7d32; color: #fff; }
-      &.badge-newuser { background-color: #00838f; color: #fff; }
-      &.badge-disabled { background-color: #757575; color: #fff; }
-      &.badge-error { background-color: #c62828; color: #fff; }
-      &.badge-warning { background-color: #fb8c00; color: #000; }
-      &.badge-ok { background-color: #2e7d32; color: #fff; }
+		&:hover {
+			background-color: $bg-hover;
+		}
+	}
+  }
+
+  #admin__user__options a:hover {
+    background-color: $bg-hover;
   }
 }
 
