@@ -28,16 +28,16 @@
     <section>
         <h2>{{ section.label }}</h2>
 
-        <table class="table table-sm">
+        <table class="table table--responsive table--striped">
             <thead>
             <tr>
                 <th>Check</th>
                 <th>Status</th>
-                <th>Value</th>
+                <th class="hide-on-mobile">Value</th>
 {% if section.label == 'Security' %}
-                <th>Severity</th>
+                <th class="hide-on-mobile">Severity</th>
 {% endif %}
-                <th>Details</th>
+                <th class="hide-on-mobile">Details</th>
             </tr>
             </thead>
             <tbody>
@@ -51,11 +51,11 @@
                     </td>
                     <td>{{ check.value ?? '—' }}</td>
 {% if section.label == 'Security' %}
-                    <td{% if check.severity is defined %} class"severity-{{ check.severity }}"{% endif %}>
+                    <td class="hide-on-mobile{% if check.severity is defined %} severity-{{ check.severity }}{% endif %}">
                         {{ check.severity|default('—') }}
                     </td>
 {% endif %}
-                    <td>
+                    <td class="hide-on-mobile">
                         {{ check.details }}
                         {% if check.recommendation %}
                             <div class="text-muted small mt-1">

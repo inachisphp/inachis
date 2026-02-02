@@ -25,9 +25,9 @@
 }
 
 .content {
+  align-items: start;
   padding: 0;
   display: grid;
-
   grid-template-columns: 1fr;
   gap: $gutter;
   grid-column: 1;
