@@ -12,7 +12,7 @@
         width: 0;
 
         &:checked+label {
-            background: $action-primary;
+            background: $button-bright-focus;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             color: $bg-surface;
             transform: translateY(-3px);
@@ -52,7 +52,7 @@
         }
 
         &:focus-visible {
-            outline: 3px solid $action-primary;
+            outline: 3px solid $button-bright-focus;
             outline-offset: 2px;
         }
 

@@ -74,6 +74,8 @@ $radius-round: 50%;
     --color-focus: #ffbf47;
     --color-notification: #b01c3f;
 
+    --color-button-bright-focus: #2196f3;
+
     // Flash Messages
     --color-flash-notice-bg: #E3F2FD;
     --color-flash-notice-text: #0B3C91;
@@ -146,6 +148,8 @@ $link-hover: var(--color-accent-500);
 $action-primary: var(--color-brand-500);
 $action-primary-hover: var(--color-brand-400);
 $action-primary-border: var(--color-brand-700);
+
+$button-bright-focus: var(--color-button-bright-focus);
 
 // -- Sidebar
 $sidebar-bg: #1e293b;
