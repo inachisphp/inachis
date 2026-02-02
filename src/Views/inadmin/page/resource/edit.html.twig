@@ -6,13 +6,12 @@
 {% endblock pagetitle %}
 
 {% block content %}
+{% block resources_pre %}{% endblock resources_pre %}
 
-    {% block resources_pre %}{% endblock resources_pre %}
-
-    {% block resources %}
-        {{ form_start(form, {'attr': { 'class': 'col-12 form form__post form__resource' }}) }}
-        <div class="nested-grid content__edit">
-        <fieldset class="col-8" id="post__edit">
+{% block resources %}
+{{ form_start(form, {'attr': { 'class': 'col-12 form form__post form__resource' }}) }}
+<div class="content__edit edit-grid">
+        <fieldset class="edit-details" id="post__edit">
             <h3>{{ 'admin.resources.details.title'|trans }}</h3>
             <p>
                 {{ form_label(form.title) }}
@@ -30,24 +29,8 @@
                 {{ form_widget(form.description) }}
             </p>
         </fieldset>
-        <fieldset class="col-4" id="post__properties">
-            <h3>{{ 'admin.resources.properties.title'|trans }}</h3>
-            {% if page.type == 'images' %}
-            <p><strong>{{ 'admin.resources.properties.dimensions'|trans }}:</strong> {{ resource.dimensionX ~ ' (w) x ' ~ resource.dimensionY ~ ' (h)' }}</p>
-                {% if channels is not empty or bits is not empty %}
-            <p><strong>{{ 'admin.resources.properties.colourDepth'|trans }}:</strong> {% if bits is not empty %}{{ bits }}-bit{% endif %} {% if channels == 3 %}RGB{% elseif channels == 4 %}CMYK{% endif %}</p>
-                    {% endif %}
-            {% endif %}
-            <p><strong>{{ 'admin.resources.properties.filename'|trans }}:</strong> {{ resource.filename }}</p>
-            <p><strong>{{ 'admin.resources.properties.filetype'|trans }}:</strong> {{ resource.filetype }}</p>
-            {% if not (resource.filename starts with 'http')  %}
-            <p><strong>{{ 'admin.resources.properties.filesize'|trans }}:</strong> {{ resource.filesize }} bytes ({{ (resource.filesize / 1024 / 1024)|round(2) }} Mb)</p>
-            {% endif %}
-            <p><strong>{{ 'admin.resources.properties.modDate'|trans }}:</strong> {{ resource.modDate|date('d F Y') }}</p>
-            <p>&nbsp;</p>
-        </fieldset>
-        </div>
-        <div class="col-12">
+
+        <fieldset class="edit-image">
             {% if page.type == 'images' %}
                 {{ include('inadmin/partials/image_preview.html.twig', {
                     id: resource.id,
@@ -64,57 +47,77 @@
                        type="text"
                        value="{% if not (resource.filename starts with 'http')  %}/imgs/{% endif %}{{ resource.filename }}" />
             {% endif %}
+        </fieldset>
 
-            <fieldset id="post_usages">
-                <h3>{{ 'admin.resources.usages.title'|trans }}</h3>
-                {% if usages.posts|default(null) is not empty or usages.series|default(null) is not empty %}
-                    <ol>
-                        {% for content_type,content_uses in usages %}
-                            {% for image_use in content_uses %}
-                                {% set link = '' %}
-                                {% if content_type == 'series' %}
-                                    {% set link = path('incc_series_edit', {id: image_use.id}) %}
-                                {% elseif content_type == 'posts' %}
-                                    {% set link = '/incc/' ~ image_use.type ~ '/' ~ image_use.urls[0].link %}
-                                {% endif %}
-                                <li>
-                                    {{ content_type|title }}: <a href="{{ link }}">{{ image_use.title }} {% if image_use.subTitle is not empty %} &mdash; {{ image_use.subTitle }}{% endif %}</a>
-                                </li>
-                            {% endfor %}
-                        {% endfor %}
-                    </ol>
-                {% else %}
-                    <p>{{ 'admin.resources.usages.notInUse'|trans }}</p>
-                {% endif %}
-            </fieldset>
-        </div>
-        <div class="fixed-bottom-bar">
-            <p>
-                {{ form_widget(form.submit) }}
-                {% if openai_api is defined and open_ai|default(false) %}
-                    {{ form_widget(form.generate_alt_text) }}
-                {% endif %}
-
-                <button aria-label="{{ 'admin.resources.images.copyMarkdown.help'|trans }}"
-                        data-target="image_markdown"
-                        class="button button--secondary button--copy"
-                        type="button"
-                ><span class="material-icons">content_paste</span> {{ 'admin.resources.images.copyMarkdown.label'|trans }}</button>
-                <button aria-label="{{ 'admin.resources.images.copyLink.help'|trans }}"
-                        data-target="image_link"
-                        class="button button--secondary button--copy"
-                        type="button"
-                ><span class="material-icons">content_paste</span> {{ 'admin.resources.images.copyLink.label'|trans }}</button>
-
-            {% if resource.id is not null and usages.posts|default(null) is empty and usages.series|default(null) is empty %}
-                {{ form_widget(form.delete) }}
+        <fieldset class="edit-properties" id="post__properties">
+            <h3>{{ 'admin.resources.properties.title'|trans }}</h3>
+            {% if page.type == 'images' %}
+            <p><strong>{{ 'admin.resources.properties.dimensions'|trans }}:</strong> {{ resource.dimensionX ~ ' (w) x ' ~ resource.dimensionY ~ ' (h)' }}</p>
+                {% if channels is not empty or bits is not empty %}
+            <p><strong>{{ 'admin.resources.properties.colourDepth'|trans }}:</strong> {% if bits is not empty %}{{ bits }}-bit{% endif %} {% if channels == 3 %}RGB{% elseif channels == 4 %}CMYK{% endif %}</p>
+                    {% endif %}
             {% endif %}
-            </p>
-        </div>
+            <p><strong>{{ 'admin.resources.properties.filename'|trans }}:</strong> {{ resource.filename }}</p>
+            <p><strong>{{ 'admin.resources.properties.filetype'|trans }}:</strong> {{ resource.filetype }}</p>
+            {% if not (resource.filename starts with 'http')  %}
+            <p><strong>{{ 'admin.resources.properties.filesize'|trans }}:</strong> {{ resource.filesize }} bytes ({{ (resource.filesize / 1024 / 1024)|round(2) }} Mb)</p>
+            {% endif %}
+            <p><strong>{{ 'admin.resources.properties.modDate'|trans }}:</strong> {{ resource.modDate|date('d F Y') }}</p>
+            <p>&nbsp;</p>
+        </fieldset>
 
-        {{ form_row(form._token) }}
-        {{ form_end(form, {render_rest: false}) }}
-    {% endblock resources %}
+        <fieldset class="edit-usages" id="post_usages">
+            <details>
+            <summary>{{ 'admin.resources.usages.title'|trans }}</summary>
+            {% if usages.posts|default(null) is not empty or usages.series|default(null) is not empty %}
+                <ol>
+                    {% for content_type,content_uses in usages %}
+                        {% for image_use in content_uses %}
+                            {% set link = '' %}
+                            {% if content_type == 'series' %}
+                                {% set link = path('incc_series_edit', {id: image_use.id}) %}
+                            {% elseif content_type == 'posts' %}
+                                {% set link = '/incc/' ~ image_use.type ~ '/' ~ image_use.urls[0].link %}
+                            {% endif %}
+                            <li>
+                                {{ content_type|title }}: <a href="{{ link }}">{{ image_use.title }} {% if image_use.subTitle is not empty %} &mdash; {{ image_use.subTitle }}{% endif %}</a>
+                            </li>
+                        {% endfor %}
+                    {% endfor %}
+                </ol>
+            {% else %}
+                <p>{{ 'admin.resources.usages.notInUse'|trans }}</p>
+            {% endif %}
+            </details>
+        </fieldset>
+</div>
 
-    {% block resources_post %}{% endblock resources_post %}
+<div class="fixed-bottom-bar">
+    <p>
+        {{ form_widget(form.submit) }}
+        {% if openai_api is defined and open_ai|default(false) %}
+            {{ form_widget(form.generate_alt_text) }}
+        {% endif %}
+
+        <button aria-label="{{ 'admin.resources.images.copyMarkdown.help'|trans }}"
+                data-target="image_markdown"
+                class="button button--secondary button--copy"
+                type="button"
+        ><span class="material-icons">content_paste</span> {{ 'admin.resources.images.copyMarkdown.label'|trans }}</button>
+        <button aria-label="{{ 'admin.resources.images.copyLink.help'|trans }}"
+                data-target="image_link"
+                class="button button--secondary button--copy"
+                type="button"
+        ><span class="material-icons">content_paste</span> {{ 'admin.resources.images.copyLink.label'|trans }}</button>
+
+    {% if resource.id is not null and usages.posts|default(null) is empty and usages.series|default(null) is empty %}
+        {{ form_widget(form.delete) }}
+    {% endif %}
+    </p>
+</div>
+
+{{ form_row(form._token) }}
+{{ form_end(form, {render_rest: false}) }}
+{% endblock resources %}
+{% block resources_post %}{% endblock resources_post %}
 {% endblock content %}

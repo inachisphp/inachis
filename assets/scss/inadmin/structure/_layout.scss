@@ -8,7 +8,7 @@
 
 .layout {
   display: grid;
-  grid-template-columns: $sidebar-collapsed 1fr;
+  grid-template-columns: 1fr;
   grid-template-rows: auto 1fr;
   min-height: 100vh;
   transition: grid-template-columns .3s ease;
@@ -19,47 +19,44 @@
     .sidebar ul span { display: inline; }
   }
 
-  @media (max-width: $mobile) {
-    grid-template-columns: 1fr;
-  }
-}
-
-
-@media (max-width: $mobile) {
-  .content {
-    grid-column: 1;
-    grid-row: auto; // content flows below if needed
+  @media (min-width: $breakpoint-medium) {
+    grid-template-columns: $sidebar-collapsed 1fr;
   }
 }
 
 .content {
-  padding: 24px;
+  padding: 0;
   display: grid;
-  grid-template-columns: repeat($columns, 1fr);
+
+  grid-template-columns: 1fr;
   gap: $gutter;
+  grid-column: 1;
+  grid-row: auto;
 
-  // Desktop placement
-  grid-column: 2;
-  grid-row: 2;
-
-  padding-inline: 24px;
-
-  @for $i from 1 through $columns {
-    .col-#{$i} { @include col-span($i); }
+  @media (min-width: $breakpoint-medium) {
+    grid-template-columns: repeat($columns, 1fr);
+    grid-column: 2;
+    grid-row: 2;
+    padding: 24px;
   }
 
-  @media (max-width: $mobile) {
-    grid-column: 1;
-    > * { grid-column: 1 / -1; }
+  @for $i from 1 through $columns {
+    .col-#{$i} {
+      @include col-span($i);
+    }
   }
 }
 
 .nested-grid {
   display: grid;
-  grid-template-columns: repeat($columns, 1fr);
+  grid-template-columns: 1fr;
   gap: $gutter;
 
   @for $i from 1 through $columns {
     .col-#{$i} { @include col-span($i); }
+  }
+
+  @media (min-width: $breakpoint-medium) {
+    grid-template-columns: repeat($columns, 1fr);
   }
 }

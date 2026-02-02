@@ -17,17 +17,17 @@
     <table {%- if table_desc|default('') is not empty %} aria-describedby="table-desc"{% endif %} class="table{%- if table_class|default(null) %} {{ table_class }}{% endif %}{%- if zebra|default(false) %}{% endif %}">
         {%if table_name|default(null) %}<caption class="visually-hidden">{{ table_name }}</caption>{% endif %}
         <thead>
-        <tr>
-        {% if actions|default(null) is not empty %}
-            <th scope="col">
-                <label for="select-all" class="visually-hidden">Select all rows</label>
-                <input aria-label="Select all rows" class="selectAllNone" id="select-all" name="selectAllNone" type="checkbox"  />
-            </th>
-        {% endif %}
-        {% for column in columns %}
-            <th scope="col">{{ column.title }}</th>
-        {% endfor %}
-        </tr>
+            <tr>
+            {% if actions|default(null) is not empty %}
+                <th scope="col">
+                    <label for="select-all" class="visually-hidden">Select all rows</label>
+                    <input aria-label="Select all rows" class="selectAllNone" id="select-all" name="selectAllNone" type="checkbox"  />
+                </th>
+            {% endif %}
+            {% for column in columns %}
+                <th scope="col"{% if column.hideOnMobile|default(false) %} class="hide-on-mobile"{% endif %}>{{ column.title }}</th>
+            {% endfor %}
+            </tr>
         </thead>
         <tbody>
         {% for item in dataset.iterator %}
@@ -54,7 +54,7 @@
                         {% set slug_object = attribute(item, column.slug) %}
                     {% endif %}
                 {% endif %}
-                <{% if column.header is defined and column.header %}th scope="row"{% else %}td{% if column.flex|default(false) %} class="table--flex"{% endif %}{% endif %}>
+                <{% if column.header is defined and column.header %}th scope="row"{% else %}td{% if column.flex|default(false) %} class="table--flex"{% endif %}{% if column.hideOnMobile|default(false) %} class="hide-on-mobile"{% endif %}{% endif %}>
                     {% if column.slug is defined %}
                         <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incc/{{ slug_prefix }}/{{ slug_object }}">
                     {% endif %}

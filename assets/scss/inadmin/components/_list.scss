@@ -56,7 +56,7 @@ section.paginated-list {
     list-style-type: none;
     padding: 15px 5px;
 
-    @media #{$information-medium} {
+    @media (min-width: $breakpoint-medium) {
       padding: 15px 5px;
     }
 
@@ -113,7 +113,7 @@ section.paginated-list {
   }
 }
 
-@media #{$information-medium} {
+@media (min-width: $breakpoint-medium) {
   .content__list ol.ui-widget-content, .content__list .post, .content__list .page, .content__list .series {
     margin: 0.5em 0;
   }

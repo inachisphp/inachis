@@ -1,0 +1,231 @@
+@use '../definitions' as *;
+@use 'sass:color';
+
+@mixin high-contrast-theme {
+    // Global
+    background-color: #000;
+    color: #fff;
+
+    // Links
+    a, a:visited {
+        color: #ff0; // Yellow
+        text-decoration: underline;
+    }
+
+    a:hover {
+        background-color: #ff0;
+        color: #000;
+        text-decoration: none;
+    }
+
+    // Headers
+    h1, h2, h3, h4, h5, h6 {
+        color: #fff;
+    }
+
+    // Layout Areas
+    .content-header {
+        background: #000;
+        border-bottom: 2px solid #fff;
+
+        h1 {
+            a, a:visited {
+                background-color: #000;
+                border: 2px solid #fff;
+                color: #fff;
+            }
+            a:hover {
+                background-color: #fff;
+                color: #000;
+            }
+        }
+    }
+
+    .sidebar {
+        background: #000;
+        border-right: 2px solid #fff;
+
+        a, a:visited {
+            color: #fff;
+
+            &:hover {
+                background-color: #fff;
+                color: #000;
+            }
+        }
+    }
+
+    .fixed-bottom-bar {
+        background-color: #000;
+        border-top: 2px solid #fff;
+    }
+
+    .admin__user ul {
+        background-color: #000;
+        border: 2px solid #fff;
+        color: #fff;
+    }
+
+    // Forms
+    .form {
+        input, textarea, select, .ts-dropdown .ts-control {
+            background-color: #000;
+            border: 2px solid #fff;
+            color: #fff;
+
+            &:focus {
+                background-color: #000;
+                border: 4px solid #fff; // Thicker border for focus
+                outline: 2px solid #ff0;
+            }
+        }
+
+        input[disabled], select[disabled], textarea[disabled] {
+            border-style: dashed;
+            color: #aaa;
+        }
+
+        // Tom Select specific
+        .ts-dropdown {
+            background-color: #000;
+            border: 2px solid #fff;
+            color: #fff;
+
+            .active {
+                background-color: #ff0;
+                color: #000;
+                border: 2px solid #000; // Visible border inside highlight
+            }
+        }
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="search"],
+    textarea {
+        background-color: #000;
+        color: #fff;
+        border: 2px solid #fff;
+    }
+
+    // Buttons
+    .button, .button:visited {
+        background-color: #000;
+        border: 2px solid #fff;
+        color: #fff;
+        font-weight: bold;
+
+        &:hover {
+            background-color: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+
+        // unify all buttons to black/white for max contrast, relying on text/icon for meaning
+        &.button--positive,
+        &.button--negative,
+        &.button--info,
+        &.button--add {
+            background-color: #000;
+            border-color: #fff;
+            color: #fff;
+
+            &:hover {
+                background-color: #fff;
+                color: #000;
+            }
+        }
+    }
+
+    // Tables
+    table {
+        background-color: #000;
+        color: #fff;
+        border: 2px solid #fff;
+
+        thead {
+            th {
+                background-color: #000;
+                color: #fff;
+                border-bottom: 2px solid #fff;
+            }
+        }
+
+        td {
+            border: 1px solid #fff;
+        }
+
+        tr:hover td {
+            background-color: #fff;
+            color: #000;
+
+            a {
+                color: #000;
+            }
+        }
+    }
+
+    img {
+        opacity: 1;
+        filter: grayscale(100%) contrast(120%);
+    }
+
+    // Pagination
+    .pagination {
+        a {
+            background-color: #000;
+            border: 2px solid #fff;
+            color: #fff;
+
+            &:hover {
+                background-color: #fff;
+                color: #000;
+            }
+
+            &.current {
+                background-color: #fff;
+                color: #000;
+                border: 2px solid #fff;
+                font-weight: bold;
+            }
+        }
+    }
+
+    // Badges
+    .badge {
+        background-color: #000 !important;
+        border: 2px solid #fff;
+        color: #fff !important;
+        font-weight: bold;
+    }
+
+    .ui-tabs, .ui-tabs-external {
+      background-color: #000;
+      color: #fff;
+      border: 2px solid #fff;
+
+      .ui-tabs-nav {
+        a, a:visited {
+          color: #ff0;
+          text-decoration: underline;
+        }
+
+        li.ui-tabs-active a {
+            background-color: #fff;
+            color: #000;
+            text-decoration: none;
+        }
+      }
+    }
+}
+
+.theme-contrast {
+    @include high-contrast-theme();
+}
+
+@media (prefers-contrast: more) {
+	body {
+		@include high-contrast-theme();
+	}
+}

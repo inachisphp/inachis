@@ -1,5 +1,6 @@
 window.Inachis.NavMenu = {
 	init: function () {
+		const body = document.body;
 		const desktopBtn = document.querySelector('.desktop-menu-toggle');
 		const layout = document.querySelector('.layout');
 		const mobileBtn = document.querySelector('.mobile-menu-toggle');
@@ -32,6 +33,7 @@ window.Inachis.NavMenu = {
 		overlay.addEventListener('click', closeMenu);
 		document.querySelectorAll('.sidebar a').forEach(link => {
 			link.addEventListener('click', () => {
+				if (link.classList.contains('submenu-toggle')) return;
 				if (window.innerWidth <= 768) {
 					layout.classList.remove('expanded');
 				}
@@ -81,27 +83,27 @@ window.Inachis.NavMenu = {
 		}
 
 		// Mobile actions
-		let touchStartX = 0;
-		let touchEndX = 0;
-		sidebar.addEventListener('touchstart', e => {
-			if (window.innerWidth <= 768 && layout.classList.contains('expanded')) {
-				touchStartX = e.changedTouches[0].screenX;
-			}
-			});
+		// let touchStartX = 0;
+		// let touchEndX = 0;
+		// sidebar.addEventListener('touchstart', e => {
+		// 	if (window.innerWidth <= 768 && layout.classList.contains('expanded')) {
+		// 		touchStartX = e.changedTouches[0].screenX;
+		// 	}
+		// 	});
 
-			sidebar.addEventListener('touchmove', e => {
-			if (window.innerWidth <= 768 && layout.classList.contains('expanded')) {
-				touchEndX = e.changedTouches[0].screenX;
-			}
-			});
-			sidebar.addEventListener('touchend', e => {
-			if (window.innerWidth <= 768 && layout.classList.contains('expanded')) {
-				if (touchEndX - touchStartX < -50) { // swipe left
-					closeMenu();
-				}
-				touchStartX = touchEndX = 0;
-			}
-		});
+		// 	sidebar.addEventListener('touchmove', e => {
+		// 	if (window.innerWidth <= 768 && layout.classList.contains('expanded')) {
+		// 		touchEndX = e.changedTouches[0].screenX;
+		// 	}
+		// 	});
+		// 	sidebar.addEventListener('touchend', e => {
+		// 	if (window.innerWidth <= 768 && layout.classList.contains('expanded')) {
+		// 		if (touchEndX - touchStartX < -50) {
+		// 			closeMenu();
+		// 		}
+		// 		touchStartX = touchEndX = 0;
+		// 	}
+		// });
 	}
 }
 

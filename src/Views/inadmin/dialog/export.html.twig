@@ -1,11 +1,11 @@
 <section class="export__options">
-<form action="{{ path('incc_dialog_export_perform') }}" class="form" method="post" name="export">
-    <fieldset class="col span_1_of_2">
+<form action="{{ path('incc_dialog_export_perform') }}" class="form nested-grid" method="post" name="export">
+    <fieldset class="col-6">
         <p>The export will include:</p>
         <ul>
         </ul>
     </fieldset>
-    <fieldset class="col span_1_of_2">
+    <fieldset class="col-6">
         <p>
             <label for="export_format">Format</label>
             <select class="text full-width" id="export_format" name="export_format">

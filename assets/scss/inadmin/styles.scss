@@ -22,7 +22,6 @@
 @use 'components/password_toggle';
 @use 'components/penzai';
 @use 'components/progressbar';
-@use 'components/sortby';
 @use 'components/switch';
 @use 'components/switchButton';
 @use 'components/tables';
@@ -52,3 +51,8 @@
 // Unauthenticated pages
 @use 'admin/form__signin';
 @use 'admin/form__setup';
+
+// themes
+@use 'themes/_darkmode';
+@use 'themes/highcontrast';
+@use 'themes/_accessibility';

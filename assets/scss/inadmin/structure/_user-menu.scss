@@ -28,7 +28,7 @@
 	img {
 		background-color: #fff;
 		border: 1px solid #aaa;
-		border-radius: 50%;
+		border-radius: $radius-round;
 		padding: 2px;
 		vertical-align: middle;
 	}
@@ -40,7 +40,7 @@
 		content: attr(data-initials);
 		display: inline-block;
 		font-weight: bold;
-		border-radius: 50%;
+		border-radius: $radius-round;
 		vertical-align: middle;
 		width: 45px;
 		height: 45px;
@@ -81,7 +81,7 @@
 		&.open {
 			display: block;
 		}
-		
+
 		li {
 			text-align: right;
 
@@ -103,7 +103,7 @@
 
 			button {
 				border: 1px solid #eee;
-				border-radius: .5em;
+				border-radius: $radius-standard;
 				display: block;
 				margin: 0.5em auto;
 				text-align: center;
@@ -118,7 +118,7 @@
 
 	.admin__user__notifications {
 	    background-color: $admin__user__notification__colour;
-	    border-radius: 50%;
+	    border-radius: $radius-round;
 	    color: #fff;
 	    font-size: 0.7em;
 	    right: 65px;

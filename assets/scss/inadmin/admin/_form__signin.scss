@@ -18,7 +18,7 @@ body.type_login {
 	background-color: rgba(48, 48, 48, 0.75);
 	border: 1px solid transparent;
 	border-top: 10px solid #069;
-	border-radius: 0.5em;
+	border-radius: $radius-standard;
 	color: #fff;
 	margin: auto;
 	width: 25em;
@@ -62,7 +62,7 @@ body.type_login {
 		input {
 			background-color: #252525;
 			border: 2px solid #353535;
-			border-radius: 0.5em;
+			border-radius: $radius-standard;
 			color: #fff;
 			margin-bottom: 1.3em;
 			width: 90%;

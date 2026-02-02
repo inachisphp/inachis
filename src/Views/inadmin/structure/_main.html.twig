@@ -21,11 +21,22 @@
     {% include "inadmin/structure/metadata.html.twig" %}
     {% include "inadmin/structure/stylesheets.html.twig" %}
     {% include "inadmin/structure/javascript__top.html.twig" %}
+    {% if userPreference.fontFamily == 'dyslexic' %}
+    <style>
+    	@font-face {
+        font-family: 'OpenDyslexic';
+        src: url('/assets/fonts/incc/OpenDyslexic-Regular.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+        }
+    </style>
+    {% endif %}
 </head>
-<body class="{%if userPreference|default(null) 
-    %}theme-{{ userPreference.theme }} font-{{ userPreference.fontSize }} font-{{ userPreference.fontFamily }} line-{{ userPreference.lineHeight }}{% 
-    endif %}{%
-    if page_type|default('default') != 'default' %} type_{{ page_type }}"{% endif 
+<body class="{%if userPreference|default(null)
+    %}theme-{{ userPreference.theme }} font-{{ userPreference.fontSize }} font-{{ userPreference.fontFamily }} line-{{ userPreference.lineHeight }}{%
+    endif %}{%if userPreference.highContrast %} theme-contrast{% endif %}{%
+    if page_type|default('default') != 'default' %} type_{{ page_type }}"{% endif
 %}">
 
 <a href="#main-content" class="skip-link">Skip to content</a>
@@ -59,6 +70,11 @@
 
     {% block content %}{% endblock content %}
   </main>
+
+
+    <button type="button" id="back-to-top" class="back-to-top" aria-label="Back to top" hidden>
+        <span class="material-icons">arrow_upward</span>
+    </button>
 </div>
 
 
