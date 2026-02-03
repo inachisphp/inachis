@@ -96,7 +96,7 @@ window.Inachis.PostEdit = {
 	},
 
 	hasAutosavedValue() {
-		return 'easymde' && easymde.options.element.defaultValue !== easymde.value();
+		return typeof easymde !== 'undefined' && easymde.options.element.defaultValue !== easymde.value();
 	},
 
 	showAutosaveNotification() {
