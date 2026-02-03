@@ -97,9 +97,12 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      * @param $limit
      * @return Paginator
      */
-    public function getFiltered($filters, $offset, $limit, $sort): Paginator
+    public function getFiltered(array $filters, int $offset, int $limit, string $sort): Paginator
     {
-        $where = [];
+        $where = [
+            '1=1',
+            $filters,
+        ];
         if (!empty($filters['keyword'])) {
             $where = [
                 '(q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.description LIKE :keyword )',
@@ -107,6 +110,9 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
                     'keyword' => '%' . $filters['keyword']  . '%',
                 ],
             ];
+        }
+        if (!empty($filters['visibility'])) {
+            $where[0] .= ' AND q.visibility = :visibility';
         }
         $sort = match ($sort) {
             'title desc' => [

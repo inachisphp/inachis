@@ -28,7 +28,13 @@
                 },
                 'url_result': path('incc_series_list'),
 
-                'filters': [],
+                'filters': {
+                    'Visibility': {
+                        '': 'All',
+                        'private': 'Private',
+                        'public': 'Public',
+                    }
+                },
                 'filter_values': query.filters,
                 'show_select_deselect': true,
                 'show_search': true,
