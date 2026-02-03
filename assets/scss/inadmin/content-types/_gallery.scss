@@ -83,17 +83,23 @@
   }
 }
 
-.edit-grid {
+div.edit-grid {
   display: grid;
   gap: $gutter;
-
-  // mobile default
   grid-template-columns: 1fr;
   grid-template-areas:
     "image"
     "details"
     "properties"
     "usages";
+  margin-bottom: 8rem;
+
+  @media (min-width: $breakpoint-medium) {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      "details image"
+      "properties usages";
+  }
 }
 
 .edit-image {
@@ -110,13 +116,4 @@
 
 .edit-usages {
   grid-area: usages;
-}
-
-@media (min-width: $breakpoint-medium) {
-  .edit-grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-areas:
-      "details image"
-      "properties usages";
-  }
 }
