@@ -36,14 +36,15 @@
 		a,
 		a:visited {
 			color: $text-muted;
+			display: inline-block;
 			text-decoration: none;
+			padding: 0.6rem;
 		}
 
 		li {
 			border-bottom: 3px solid transparent;
 			float: left;
 			margin: 0 5px 0;
-			padding: 10px;
 
 			&:hover {
 				background-color: $border-color;
