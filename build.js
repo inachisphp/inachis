@@ -31,34 +31,39 @@ const scssBaseConfig = {
     ]
 };
 
-
-
-const builds = [
-    // JS
-    {
-        ...jsBaseConfig,
-        entryPoints: ["assets/js/inadmin.js"],
-        outfile: "public/assets/js/incc/scripts.min.js"
+const builds = {
+    inadmin: {
+        js: {
+            ...jsBaseConfig,
+            entryPoints: ["assets/js/inadmin.js"],
+            outfile: "public/assets/js/incc/scripts.min.js"
+        },
+        scss: {
+            ...scssBaseConfig,
+            entryPoints: ["assets/scss/inadmin/styles.scss"],
+            outfile: "public/assets/css/incc/styles.min.css"
+        }
     },
-
-    {
-        ...jsBaseConfig,
-        entryPoints: ["assets/js/web.js"],
-        outfile: "public/assets/js/scripts.min.js"
-    },
-
-    // SCSS
-    {
-        ...scssBaseConfig,
-        entryPoints: ["assets/scss/inadmin/styles.scss"],
-        outfile: "public/assets/css/incc/styles.min.css"
-    // },
-    // {
-    //     ...scssBaseConfig,
-    //     entryPoints: ["assets/scss/web/styles.scss"],
-    //     outfile: "public/assets/css/styles.min.css"
+    web: {
+        // js: {
+        //     ...jsBaseConfig,
+        //     entryPoints: ["assets/js/web.js"],
+        //     outfile: "public/assets/js/scripts.min.js"
+        // },
+        // scss: {
+        //     ...scssBaseConfig,
+        //     entryPoints: ["assets/scss/web/styles.scss"],
+        //     outfile: "public/assets/css/styles.min.css"
+        // }
     }
-];
+};
+
+const color = {
+    js: txt => `\x1b[36m${txt}\x1b[0m`,
+    css: txt => `\x1b[35m${txt}\x1b[0m`,
+    ok: txt => `\x1b[32m${txt}\x1b[0m`,
+    err: txt => `\x1b[31m${txt}\x1b[0m`,
+};
 
 async function optimizeImages() {
     const inputDir = "assets/imgs/incc";
@@ -107,7 +112,6 @@ async function copyIconsAndManifests() {
     );
 }
 
-
 async function copyExtraLibraries() {
     const libs = [
         "node_modules/dropzone/dist/dropzone-min.js",
@@ -132,29 +136,113 @@ async function copyExtraLibraries() {
     });
 }
 
+function debounce(fn, delay = 100) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), delay);
+    };
+}
+
+function withTiming(label, fn) {
+    return async () => {
+        const start = performance.now();
+        console.log(`🔄 Rebuilding ${label}...`);
+
+        try {
+            await fn();
+            const ms = Math.round(performance.now() - start);
+            console.log(`✅ ${label} rebuilt in ${ms}ms`);
+        } catch (err) {
+            console.error(`❌ ${label} rebuild failed`);
+            console.error(err);
+        }
+    };
+}
+
+function watchLogger(label, paint) {
+    const log = debounce((ms, ok = true) => {
+        const msg = ok
+            ? color.ok(`✅ ${label} rebuilt in ${ms}ms`)
+            : color.err(`❌ ${label} rebuild failed`);
+
+        console.log(paint(msg));
+    });
+
+    return {
+        name: `${label}-watch-logger`,
+        setup(build) {
+            build.onStart(() => {
+                build.__start = performance.now();
+                console.log(paint(`🔄 Rebuilding ${label}...`));
+            });
+
+            build.onEnd(result => {
+                const ms = Math.round(performance.now() - build.__start);
+                log(ms, result.errors.length === 0);
+            });
+        }
+    };
+}
+
+
+async function runWatchMode() {
+    console.log("👀 Watch mode enabled\n");
+
+    const inadminJsCtx = await esbuild.context({
+        ...builds.inadmin.js,
+        plugins: [
+            ...(builds.inadmin.js.plugins || []),
+            watchLogger("Admin Panel JS", color.js)
+        ]
+    });
+
+    const inadminScssCtx = await esbuild.context({
+        ...builds.inadmin.scss,
+        plugins: [
+            ...(builds.inadmin.scss.plugins || []),
+            watchLogger("Admin Panel SCSS", color.css)
+        ]
+    });
+
+    await Promise.all([
+        inadminJsCtx.watch(),
+        inadminScssCtx.watch()
+    ]);
+
+    console.log(color.js("📂 assets/js/inadmin/** → JS rebuild"));
+    console.log(color.css("🎨 assets/scss/inadmin/** → CSS rebuild"));
+    console.log("\n⏳ Waiting for changes...\n");
+}
+
+async function runProdBuild() {
+    await optimizeImages();
+    console.log("✅ Images optimized");
+
+    await copyIconsAndManifests();
+    console.log("✅ FavIcons and Manifests copied");
+
+    await Promise.all([
+        esbuild.build(builds.inadmin.js),
+        esbuild.build(builds.inadmin.scss),
+        // esbuild.build(builds.web.js),
+        // esbuild.build(builds.web.scss),
+    ]);
+
+    await copyExtraLibraries();
+    console.log("✅ JS and CSS complete");
+}
+
 
 async function run() {
     try {
         console.log("🚀 Starting build...");
 
         if (isWatch) {
-            const contexts = await Promise.all(
-                builds.map(config => esbuild.context(config))
-            );
-            await Promise.all(contexts.map(ctx => ctx.watch()));
-            console.log("👀 Watching for changes...");
-        } else {
-            await optimizeImages();
-            console.log("✅ Images optimized");
-            await copyIconsAndManifests();
-            console.log("✅ FavIcons and Manifests copied");
-
-            await Promise.all(builds.map(config => esbuild.build(config)));
-            await copyExtraLibraries();
-            console.log("✅ JS and CSS complete");
-
-            console.log("✅ Build complete");
+            await runWatchMode();
+            return;
         }
+        await runProdBuild();
     } catch (err) {
         console.error("❌ Build failed:", err);
         process.exit(1);
