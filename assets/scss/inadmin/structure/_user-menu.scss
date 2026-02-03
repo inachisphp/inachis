@@ -75,17 +75,20 @@
 
 		background-color: $bg-surface;
 		border: 1px solid $border-color;
-		display: none;
 		font-size: 0.85em;
+		height: 0;
 		list-style-type: none;
 		min-width: 17em;
+		opacity: 0;
 		padding: 0;
 		position: absolute;
 		right: 1em;
 		top: 45px;
+		transition: 200ms opacity ease, 200ms height ease;
 
 		&.open {
-			display: block;
+			height: auto;
+			opacity: 1
 		}
 
 		li {

@@ -19,17 +19,12 @@ use Inachis\Repository\PasswordResetRequestRepository;
 use Inachis\Repository\UserRepository;
 use Inachis\Service\User\PasswordResetTokenService;
 use Inachis\Service\User\UserAccountEmailService;
-use Inachis\Util\Base64EncodeFile;
 use DateTime;
-use Doctrine\ORM\NonUniqueResultException;
 use Exception;
 use Random\RandomException;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -54,6 +49,8 @@ class AccountController extends AbstractInachisController
         }
         $form = $this->createForm(LoginType::class, [
             'loginUsername' => $authenticationUtils->getLastUsername(),
+        ], [
+            // 'action' => '/incc/login_check',
         ]);
         $form->handleRequest($request);
         $this->data['page']['title'] = 'Sign In';
@@ -64,13 +61,18 @@ class AccountController extends AbstractInachisController
         return $this->render('inadmin/page/admin/signin.html.twig', $this->data);
     }
 
+    #[Route('/incc/login_check', name: 'app_account_login_check')]
+    public function dummyCheck(): void
+    {
+        throw new \LogicException('This route is handled by Symfony firewall and should never be called.');
+    }
+
     /**
      * @throws \Exception
      */
-    #[Route("/incc/logout", name: "app_logout", methods: [ "GET", "POST" ])]
-    public function logout(): never
+    #[Route("/incc/logout", name: "incc_logout", methods: [ "GET", "POST" ])]
+    public function logout(): void
     {
-        throw new Exception('Don\'t forget to activate logout in security.yaml');
     }
 
     /**

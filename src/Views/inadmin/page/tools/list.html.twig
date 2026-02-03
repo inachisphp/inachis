@@ -1,6 +1,6 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 {% block pagetitle %}
-    <span>Settings</span>
+    <span>Tools</span>
 {% endblock pagetitle %}
 
 {% block content %}
@@ -12,14 +12,14 @@
     <p><span class="material-icons" aria-hidden="true">dns</span></p>
     <h2>Server Configuration</h2>
     <p><span>Check your server and application settings.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_settings_diagnostics') }}" class="button button--secondary">Review Server Settings</a></p>
+    <p><a href="{{ settings.domain ~ path('incc_tools_diagnostics') }}" class="button button--secondary">Review Server Settings</a></p>
 </section>
 
 <section class="widget widget-settings">
     <p><span class="material-icons" aria-hidden="true">email</span></p>
     <h2>Email DNS Configuration</h2>
     <p><span>Check your email DNS configuration for DKIM/DMARC/SPF settings.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_settings_email') }}" class="button button--secondary">Review Email DNS</a></p>
+    <p><a href="{{ settings.domain ~ path('incc_tools_email') }}" class="button button--secondary">Review Email DNS</a></p>
 </section>
 
 <section class="widget widget-settings">

@@ -11,9 +11,9 @@ namespace Inachis\Repository;
 
 use Inachis\Entity\User;
 use Inachis\Entity\Waste;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Inachis\Repository\WasteRepositoryInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\ORM\NonUniqueResultException;
 
 /**
  * @method Waste|null find($id, $lockMode = null, $lockVersion = null)
@@ -21,13 +21,12 @@ use Doctrine\ORM\NonUniqueResultException;
  * @method Waste[]    findAll()
  * @method Waste[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class WasteRepository extends AbstractRepository
+class WasteRepository extends AbstractRepository implements WasteRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Waste::class);
     }
-
     /**
      * @param User $user
      * @return int
@@ -41,5 +40,47 @@ class WasteRepository extends AbstractRepository
             ->getQuery()
             ->execute()
         ;
+    }
+
+        /**
+     * @param $filters
+     * @param $offset
+     * @param $limit
+     * @return Paginator
+     */
+    public function getFiltered($filters, $offset, $limit, $sort): Paginator
+    {
+        $where = [];
+        if (!empty($filters['keyword'])) {
+            $where = [
+                '(q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.description LIKE :keyword )',
+                [
+                    'keyword' => '%' . $filters['keyword']  . '%',
+                ],
+            ];
+        }
+        $sort = match ($sort) {
+            'title desc' => [
+                ['q.title', 'DESC'],
+                ['q.subTitle', 'DESC'],
+            ],
+            'modDate asc' => [['q.modDate', 'ASC']],
+            'modDate desc' => [['q.modDate', 'DESC']],
+            'lastDate asc' => [['q.lastDate', 'ASC']],
+            'lastDate desc' => [
+                ['CASE WHEN q.lastDate IS NULL THEN 1 ELSE 0 END', 'DESC'],
+                ['q.lastDate', 'DESC']
+            ],
+            default => [
+                ['q.title', 'ASC'],
+                ['q.subTitle', 'ASC'],
+            ],
+        };
+        return $this->getAll(
+            $offset,
+            $limit,
+            $where,
+            $sort
+        );
     }
 }

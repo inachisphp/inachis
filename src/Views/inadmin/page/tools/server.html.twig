@@ -1,7 +1,7 @@
 {% extends "inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('inachis_settings_index') }}">Settings</a>
+    <a href="{{ path('incc_tools_index') }}">Tools</a>
     <span>Server settings</span>
 {% endblock pagetitle %}
 
@@ -20,7 +20,7 @@
     } %}
 {% endif %}
 
-<p><a href="{{ settings.domain ~ path('incc_settings_diagnostics_json') }}" class="button button--secondary"><span class="material-icons">download</span> Download Report</a></p>
+<p><a href="{{ settings.domain ~ path('incc_tools_diagnostics_json') }}" class="button button--secondary"><span class="material-icons" aria-hidden="true">download</span> Download Report</a></p>
 
 {% include 'inadmin/partials/diagnostics/_summary.html.twig' with { summary: summary } %}
 

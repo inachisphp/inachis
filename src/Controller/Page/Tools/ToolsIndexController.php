@@ -7,25 +7,23 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Controller\Page\Setting;
+namespace Inachis\Controller\Page\Tools;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\{Image,Page,Series,Tag,Url};
-// use Inachis\Form\ContentType;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]
-class SettingsController extends AbstractInachisController
+class ToolsIndexController extends AbstractInachisController
 {
-    #[Route("/incc/settings", name: 'inachis_settings_index')]
+    #[Route("/incc/tools", name: 'incc_tools_index')]
     public function index(): Response
     {
-        return $this->render('inadmin/page/setting/list.html.twig', $this->data);
+        $this->data['page']['title'] = 'Tools';
+        $this->data['page']['tab'] = 'tools';
+        return $this->render('inadmin/page/tools/list.html.twig', $this->data);
     }
 
     // 

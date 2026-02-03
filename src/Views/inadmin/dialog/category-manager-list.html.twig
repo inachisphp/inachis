@@ -10,7 +10,7 @@
                    data-description="{{ category.description }}"
                    data-parent-id="{{ category.parent.id|default('-1') }}"
                    data-visible="{{ category.visible }}"
-                   title="Edit category '{{ category.title }}'"><span class="material-icons">edit</span> Edit</a>
+                   title="Edit category '{{ category.title }}'"><span class="material-icons" aria-hidden="true">edit</span> Edit</a>
             </span>
             {%-  if category.children is not empty %}
                 <ol>

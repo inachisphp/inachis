@@ -87,7 +87,7 @@
         {{ form_widget(form.delete) }}
         {% endif %}
         {%  if series.id is not empty and series.items|length > 0 %}
-            <a class="button button--secondary" href="{{ path('app_series_view', { 'year': series.lastDate|date('Y'), 'title': series.url}) }}" target="_blank" title="View Live"><span class="material-icons">exit_to_app</span> View Live</a>
+            <a class="button button--secondary" href="{{ path('app_series_view', { 'year': series.lastDate|date('Y'), 'title': series.url}) }}" target="_blank" title="View Live"><span class="material-icons" aria-hidden="true">exit_to_app</span> View Live</a>
             <span class="series__controls visually-hidden">
             with selected:
             {{ form_widget(form.remove) }}

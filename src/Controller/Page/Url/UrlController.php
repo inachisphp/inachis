@@ -74,6 +74,7 @@ class UrlController extends AbstractInachisController
         $this->data['form'] = $form->createView();
         $this->data['query'] = $contentQuery;
         $this->data['page']['title'] = 'URLs';
+        $this->data['page']['tab'] = 'url';
 
         return $this->render('inadmin/page/url/list.html.twig', $this->data);
     }
