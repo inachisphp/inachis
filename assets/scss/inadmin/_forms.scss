@@ -6,7 +6,9 @@
 	input,
 	textarea,
 	select {
+		background-color: $color-neutral-000;
 		border: 1px solid $border-color-input;
+		color: $color-neutral-700;
 		font-size: 1em;
 		line-height: 1.5em;
 		padding: 5px 10px;

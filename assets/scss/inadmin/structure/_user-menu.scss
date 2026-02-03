@@ -88,10 +88,15 @@
 
 		&.open {
 			height: auto;
-			opacity: 1
+			opacity: 1;
+
+			li {
+				display: block;
+			}
 		}
 
 		li {
+			display:none;
 			text-align: right;
 
 			&.divider {

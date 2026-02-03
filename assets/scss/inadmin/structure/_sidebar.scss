@@ -100,7 +100,7 @@
 
     .menu__active a,
     .menu__active a:visited {
-        background-color: $text-main;
+        background-color: $sidebar-active-bg;
         border-color: $sidebar-active;
     }
 

@@ -21,7 +21,7 @@
     {% include "inadmin/structure/metadata.html.twig" %}
     {% include "inadmin/structure/stylesheets.html.twig" %}
     {% include "inadmin/structure/javascript__top.html.twig" %}
-    {% if userPreference.fontFamily == 'dyslexic' %}
+    {% if userPreference|default(null) and userPreference.fontFamily == 'dyslexic' %}
     <style>
     	@font-face {
         font-family: 'OpenDyslexic';
@@ -34,8 +34,9 @@
     {% endif %}
 </head>
 <body class="{%if userPreference|default(null)
-    %}theme-{{ userPreference.theme }} font-{{ userPreference.fontSize }} font-{{ userPreference.fontFamily }} line-{{ userPreference.lineHeight }}{%
-    endif %}{%if userPreference.highContrast %} theme-contrast{% endif %}{%
+    %}theme-{{ userPreference.theme }} font-{{ userPreference.fontSize }} font-{{ userPreference.fontFamily }} line-{{ userPreference.lineHeight
+    }}{%if userPreference.highContrast %} theme-contrast{% endif %}{%
+    endif %}{%
     if page_type|default('default') != 'default' %} type_{{ page_type }}"{% endif
 %}">
 

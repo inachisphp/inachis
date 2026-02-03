@@ -28,7 +28,7 @@ body .visually-hidden {
 
 .back-to-top {
   align-items: center;
-  background-color: #069;
+  background-color: $color-brand-500;
   border: none;
   border-radius: $radius-round;
   bottom: 2rem;
@@ -65,34 +65,34 @@ body .visually-hidden {
   scroll-behavior: auto !important;
 }
 
-@media (prefers-contrast: more) {
-  body {
-    --bg: #000;
-    --hover: #1f1f1f;
-    --active: #ff0;
-    --text: #fff;
-  }
-}
+// @media (prefers-contrast: more) {
+//   body {
+//     --bg: #000;
+//     --hover: #1f1f1f;
+//     --active: #ff0;
+//     --text: #fff;
+//   }
+// }
 
-.high-contrast {
-  --bg: #000;
-  --hover: #1f1f1f;
-  --active: #ff0;
-  --text: #fff;
-}
+// .high-contrast {
+//   --bg: #000;
+//   --hover: #1f1f1f;
+//   --active: #ff0;
+//   --text: #fff;
+// }
 
-.high-contrast a:focus,
-.high-contrast button:focus {
-  outline: 3px solid #ff0;
-  outline-offset: 2px;
-}
+// .high-contrast a:focus,
+// .high-contrast button:focus {
+//   outline: 3px solid #ff0;
+//   outline-offset: 2px;
+// }
 
-.high-contrast .badge {
-  background: #ff0;
-  color: #000;
-}
+// .high-contrast .badge {
+//   background: #ff0;
+//   color: #000;
+// }
 
-.high-contrast .layout:not(.expanded) a[data-tooltip]::after {
-  background: #fff;
-  color: #000;
-}
+// .high-contrast .layout:not(.expanded) a[data-tooltip]::after {
+//   background: #fff;
+//   color: #000;
+// }
