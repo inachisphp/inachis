@@ -103,12 +103,12 @@
                 data-target="image_markdown"
                 class="button button--secondary button--copy"
                 type="button"
-        ><span class="material-icons">content_paste</span> {{ 'admin.resources.images.copyMarkdown.label'|trans }}</button>
+        ><span class="material-icons" aria-hidden="true">content_paste</span> {{ 'admin.resources.images.copyMarkdown.label'|trans }}</button>
         <button aria-label="{{ 'admin.resources.images.copyLink.help'|trans }}"
                 data-target="image_link"
                 class="button button--secondary button--copy"
                 type="button"
-        ><span class="material-icons">content_paste</span> {{ 'admin.resources.images.copyLink.label'|trans }}</button>
+        ><span class="material-icons" aria-hidden="true">content_paste</span> {{ 'admin.resources.images.copyLink.label'|trans }}</button>
 
     {% if resource.id is not null and usages.posts|default(null) is empty and usages.series|default(null) is empty %}
         {{ form_widget(form.delete) }}

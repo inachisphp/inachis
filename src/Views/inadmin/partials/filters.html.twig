@@ -26,7 +26,7 @@
         {% endfor %}
                 href="{{ add_button.url }}"
                 {% if add_button.type|default('a') == 'button' %} type="button"{% endif %}
-            ><span class="material-icons">{{ add_button.image|default('add') }}</span>
+            ><span class="material-icons" aria-hidden="true">{{ add_button.image|default('add') }}</span>
             <span class="btn-text">{{ add_button.text }}</span>
             </{{ tagname }}>
         </p>
@@ -38,7 +38,7 @@
     <div class="row secondary-controls">
         {% if filters|default(null) is not empty %}
         <button type="button" class="filter__toggle icon-badge-wrapper" id="toggle-filters" aria-expanded="{{ isEmptyFilterValues ? 'false' : 'true' }}" aria-controls="filter__options">
-            <span class="material-icons">filter_list</span>
+            <span class="material-icons" aria-hidden="true">filter_list</span>
             <span id="global-filter-dot" class="filter-indicator"{% if isEmptyFilterValues %} hidden{% endif %}></span>
             <span>Filters</span>
         </button>

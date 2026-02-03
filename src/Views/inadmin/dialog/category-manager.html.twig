@@ -3,7 +3,10 @@
         <div class="col-12 flash"></div>
         <fieldset class="col-6">
             <p>
-                <button class="button button--add" id="dialog__imageManager__addnew" type="button"><span class="material-icons">add</span> Add new category</button>
+                <button class="button button--add" id="dialog__imageManager__addnew" type="button">
+                    <span class="material-icons" aria-hidden="true">add</span> 
+                    <span class="btn-text">Add new category</span>
+                </button>
             </p>
             <p class="visually-hidden" id="dialog__categoryManager__top-level-category">
                 <label for="dialog__categoryManager__existing_-1">
@@ -20,14 +23,14 @@
         <fieldset class="col-6" id="dialog__categoryManager__exportimport">
             <p>
                 <button class="button button--secondary" data-action="export_categories" type="button">
-                    <span class="material-icons">download</span>
-                    Export categories
+                    <span class="material-icons" aria-hidden="true">download</span>
+                    <span class="btn-text">Export categories</span>
                 </button>
             </p>
             <p>
                 <button class="button button--secondary" data-action="import_categories" type="button">
-                    <span class="material-icons">upload_file</span>
-                    Import categories
+                    <span class="material-icons" aria-hidden="true">upload_file</span>
+                    <span class="btn-text">Import categories</span>
                 </button>
             </p>
         </fieldset>

@@ -20,7 +20,7 @@
     } %}
 {% endif %}
 
-<p><a href="{{ settings.domain ~ path('incc_settings_diagnostics_json') }}" class="button button--secondary"><span class="material-icons">download</span> Download Report</a></p>
+<p><a href="{{ settings.domain ~ path('incc_settings_diagnostics_json') }}" class="button button--secondary"><span class="material-icons" aria-hidden="true">download</span> Download Report</a></p>
 
 {% include 'inadmin/partials/diagnostics/_summary.html.twig' with { summary: summary } %}
 

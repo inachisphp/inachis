@@ -4,11 +4,11 @@
     {% for message in messages %}
         <div aria-live="polite" class="col-12 flash-{{ label }}">
             {% if label == 'success' %}
-                <span class="material-icons">check_circle</span>
+                <span class="material-icons" aria-hidden="true">check_circle</span>
             {% elseif label == 'warning' or label == 'error' %}
-                <span class="material-icons">warning</span>
+                <span class="material-icons" aria-hidden="true">warning</span>
             {% elseif label == 'notice' %}
-                <span class="material-icons">info</span>
+                <span class="material-icons" aria-hidden="true">info</span>
             {% endif %}
             {{ message }}
         </div>
