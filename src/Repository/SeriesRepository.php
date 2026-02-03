@@ -104,12 +104,8 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             $filters,
         ];
         if (!empty($filters['keyword'])) {
-            $where = [
-                '(q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.description LIKE :keyword )',
-                [
-                    'keyword' => '%' . $filters['keyword']  . '%',
-                ],
-            ];
+            $where[0] .= ' AND (q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.description LIKE :keyword )';
+            $where[1]['keyword'] = '%' . $where[1]['keyword'] . '%';
         }
         if (!empty($filters['visibility'])) {
             $where[0] .= ' AND q.visibility = :visibility';
