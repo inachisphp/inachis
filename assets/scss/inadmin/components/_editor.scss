@@ -1,20 +1,25 @@
-.editor-toolbar, .CodeMirror, .editor-preview-side, .editor-statusbar {
-	margin-right: 15px;
+@use '../definitions' as *;
+
+// Fix to make sure easymde sits in front of sidebar/header/bottom-bar
+div.EasyMDEContainer {
+	div.fullscreen.editor-toolbar {
+		border-top: 2px solid $color-brand-500;
+	}
+	div.fullscreen.editor-toolbar, & div.CodeMirror-fullscreen, & div.editor-preview-side {
+		z-index: 150;
+	}
 }
 
-.CodeMirror .CodeMirror-code .cm-url {
-	max-width: 100px;
-	overflow: hidden;
-	width: 100px;
+.autosave-notification {
+	align-items: flex-end;
+	background: $flash-notice-bg;
+	color: $flash-notice-text;
+	display: flex;
+	padding: 1em;
+
+	button {
+		float: right;
+		margin: -0.7em 0 0 0;
+	}
 }
 
-//.autosave-notification {
-//	background: $notification--autosave-background;
-//	color: $notification--autosave-color;
-//	padding: 1em;
-//
-//	button {
-//		float: right;
-//		margin: -0.7em 0 0 0;
-//	}
-//}
