@@ -60,6 +60,8 @@ class ChangePasswordController extends AbstractInachisController
         }
         $this->data['user'] = $user;
         $this->data['form'] = $form->createView();
+        $this->data['page']['title'] = 'Change Password';
+        $this->data['page']['tab'] = 'users';
         return $this->render('inadmin/page/admin/change-password.html.twig', $this->data);
     }
 

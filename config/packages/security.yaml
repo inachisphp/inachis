@@ -30,7 +30,7 @@ security:
                 default_target_path: incc_dashboard
 
             logout:
-                path: app_logout
+                path: incc_logout
                 target: app_account_login
 #                clear_site_data: *
 

@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Controller\Page\Setting;
+namespace Inachis\Controller\Page\Tools;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Diagnostics\DiagnosticsCollector;
@@ -25,16 +25,17 @@ class DiagnosticsController extends AbstractInachisController
      * @param DiagnosticsCollector $collector
      * @return Response
      */
-    #[Route('/incc/settings/server', name: 'incc_settings_diagnostics')]
+    #[Route('/incc/tools/server', name: 'incc_tools_diagnostics')]
     public function index(DiagnosticsCollector $collector): Response {
         $results = $collector->collect();
 
         $this->data['page']['title'] = 'Server settings';
+        $this->data['page']['tab'] = 'tools';
         $this->data['sections'] = $collector->grouped();
         $this->data['environment'] = $this->getParameter('kernel.environment');
         $this->data['summary'] = $this->buildSummary($results);
 
-		return $this->render('inadmin/page/setting/server.html.twig', $this->data);
+		return $this->render('inadmin/page/tools/server.html.twig', $this->data);
 	}
 
     /**
@@ -81,7 +82,7 @@ class DiagnosticsController extends AbstractInachisController
      * @param DiagnosticsCollector $collector
      * @return JsonResponse
      */
-    #[Route('/incc/settings/server.json', name: 'incc_settings_diagnostics_json')]
+    #[Route('/incc/tools/server.json', name: 'incc_tools_diagnostics_json')]
     public function serverJson(DiagnosticsCollector $collector): JsonResponse {
         return $this->json([
             'generated_at' => (new \DateTimeImmutable())->format(DATE_ATOM),

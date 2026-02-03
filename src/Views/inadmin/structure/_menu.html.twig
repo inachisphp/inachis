@@ -92,19 +92,28 @@
                         <span>{% trans %}admin.user.title{% endtrans %}</span>
                     </a>
                 </li>
+                <li class="{{ page.tab|activeMenu('waste') }}">
+                    <a href="{{ settings.domain ~ path('incc_waste_list') }}"
+                        data-tooltip="Manage deleted content"
+                        title="Manage deleted content">
+                        <i class="material-icons" aria-hidden="true">delete</i> 
+                        <span>Bin</span>
+                    </a>
+                </li>
+                <li class="{{ page.tab|activeMenu('tools') }}">
+                    <a href="{{ settings.domain ~ path('incc_tools_index') }}"
+                        data-tooltip="System Tools"
+                        title="Use system tools">
+                        <i class="material-icons" aria-hidden="true">build</i>
+                        <span>Tools</span></a>
+                </li>
                 <li class="{{ page.tab|activeMenu('settings') }}">
-                    <a href="{{ settings.domain ~ path('inachis_settings_index') }}"
+                    <a href="{{ settings.domain ~ path('incc_settings_index') }}"
                         data-tooltip="Settings"
                         title="Change advanced settings">
                         <i class="material-icons" aria-hidden="true">settings</i>
                         <span>Settings</span></a>
                 </li>
-                {# <li class="{{ page.tab|activeMenu('tools') }}"><a href="{{ settings.domain ~ path('inachis_tools_index') }}" title="Tools"> #}
-                    {# <i class="material-icons" aria-hidden="true">build</i><span> Tools</span></a> #}
-                {# </li> #}
-                {# <li><a href="{{ settings.domain ~ path('inachis_waste_list') }}" title="Manage deleted content"> #}
-                {# <i class="material-icons" aria-hidden="true">delete</i><span> Bin</span></a> #}
-                {# </li> #}
             </ul>
         </li>
     </ul>

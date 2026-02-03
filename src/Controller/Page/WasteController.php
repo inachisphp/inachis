@@ -7,8 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Controller;
+namespace Inachis\Controller\Page;
 
+use Inachis\Controller\AbstractInachisController;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\WasteRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,7 +36,8 @@ class WasteController extends AbstractInachisController
             "offset" => 0,
             "limit" => 10
         ],
-        methods: [ 'GET', 'POST' ]
+        methods: [ 'GET', 'POST' ],
+        name: "incc_waste_list"
     )]
     public function list(
         Request $request,
@@ -56,7 +58,7 @@ class WasteController extends AbstractInachisController
                 }
             }
             return $this->redirectToRoute(
-                'app_waste_list',
+                'incc_waste_list',
                 [],
                 Response::HTTP_PERMANENTLY_REDIRECT
             );
@@ -76,6 +78,7 @@ class WasteController extends AbstractInachisController
             $contentQuery['sort'],
         );
         $this->data['query'] = $contentQuery;
-        return $this->render('inadmin/waste.html.twig', $this->data);
+        $this->data['page']['tab'] = 'waste';
+        return $this->render('inadmin/page/waste/list.html.twig', $this->data);
     }
 }
