@@ -9,6 +9,7 @@ window.Inachis.Components = {
 		this.initFilterBar();
 		this.initOptionSelectors();
 		this.initPasswordToggle();
+		this.initReadingProgress();
 		this.initTomSelect('');
 		this.initSelectAllNone('');
 		this.initSeriesControls();
@@ -121,6 +122,32 @@ window.Inachis.Components = {
 				$button.html('visibility_off');
 			}
 		});
+	},
+	initReadingProgress() {
+		const bar = document.querySelector('.reading-progress__bar');
+		if (!bar) return;
+
+		if (document.documentElement.scrollHeight <= window.innerHeight) {
+			bar.style.display = 'none';
+			return;
+		}
+
+		function updateProgress() {
+			const doc = document.documentElement;
+			const scrollTop = doc.scrollTop || document.body.scrollTop;
+			const scrollHeight = doc.scrollHeight - doc.clientHeight;
+
+			const progress = scrollHeight > 0
+			? (scrollTop / scrollHeight) * 100
+			: 0;
+
+			bar.style.width = `${progress}%`;
+		}
+
+		window.addEventListener('scroll', updateProgress, { passive: true });
+		window.addEventListener('resize', updateProgress);
+		window.addEventListener('load', updateProgress);
+		document.addEventListener('DOMContentLoaded', updateProgress);
 	},
 	initTomSelect(selector) {
 		document.querySelectorAll(selector + ' .js-select').forEach(el => {
