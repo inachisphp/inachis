@@ -1,0 +1,61 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+{% block pagetitle %}
+    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    Export Pages and Posts
+{% endblock pagetitle %}
+
+{% block content %}
+<form method="post" action="{{ path('incc_tools_export_page') }}">
+    <fieldset>
+        <legend>Select Pages</legend>
+        <label>
+            <input type="checkbox" name="all" value="1" checked id="select-all">
+            Export All Pages
+        </label>
+
+        <table class="table table--responsive table--striped table--compact">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Categories</th>
+                    <th>Tags</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for page in pages %}
+                <tr>
+                    <td><input type="checkbox" name="selected[]" value="{{ page.id }}"></td>
+                    <td>{{ page.title }}</td>
+                    <td>{{ page.type }}</td>
+                    <td>{{ page.status }}</td>
+                    <td>{{ page.categories|map(c => c.title)|join(', ') }}</td>
+                    <td>{{ page.tags|map(t => t.title)|join(', ') }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </fieldset>
+
+    <fieldset>
+        <legend>Format</legend>
+        <label>
+            <input type="radio" name="format" value="json" checked> JSON
+        </label>
+        <label>
+            <input type="radio" name="format" value="xml"> XML
+        </label>
+    </fieldset>
+
+    <button type="submit">Export</button>
+</form>
+
+<script>
+//document.getElementById('select-all').addEventListener('change', function(e) {
+//    const checked = e.target.checked;
+//    document.querySelectorAll('input[name="selected[]"]').forEach(cb => cb.checked = !checked);
+//});
+</script>
+{% endblock content %}
