@@ -10,8 +10,7 @@
     {% endif %}
 
     {% if includeEditor|default(false) %}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css" />
-    <link rel="stylesheet" href="https://raw.githubusercontent.com/hjzheng/markdown-electron/main/src/renderer/src/assets/easymde.dark.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css" integrity="sha512-t4MrGnTFsJau0FVbOqg4kLvyFLpJqcEulXUSn5FlPX1ld4FBWUcAXRXxJiZ1Lm1gen7WEJDEI9minZkCiXFZKA==" crossorigin="anonymous" />
     {% endif %}
 {% endif %}
 {% endblock stylesheets %}

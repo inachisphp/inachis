@@ -5,11 +5,9 @@
 // RESPONSIVE WRAPPER
 // ---------------------------------------------------------------------------
 
-.table-responsive {
+.table--responsive {
   width: 100%;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-
   scrollbar-width: thin;
   scrollbar-color: $border-color transparent;
 

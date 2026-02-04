@@ -15,17 +15,18 @@ input[type="search"]::-webkit-search-results-decoration {
 		border: 1px solid $border-color;
 
 		input {
+			background-color: $bg-surface;
 			font-size: 0.9rem;
 		}
 	}
 }
 
-.input-icon-wrapper {
+form .input-icon-wrapper {
 	position: relative;
 	flex: 1;
 	display: flex;
 	align-items: center;
-	background: $bg-panel;
+	background-color: $bg-panel;
 	padding: 0 0.75rem;
 	border-radius: $radius-standard;
 	border: 1px solid transparent;
@@ -33,7 +34,7 @@ input[type="search"]::-webkit-search-results-decoration {
 
 	input {
 		border: none;
-		background: transparent;
+		background-color: $bg-panel;
 		padding: 0.75rem 2rem 0.75rem 0.5rem;
 		width: 100%;
 		font-size: 1rem;
@@ -41,9 +42,13 @@ input[type="search"]::-webkit-search-results-decoration {
 	}
 
 	&:focus-within {
-		background: $bg-surface;
+		background-color: $bg-surface;
 		border-color: $input-focus-border;
 		box-shadow: 0 0 0 3px $input-focus-ring;
+
+		input {
+			background-color: $bg-surface;
+		}
 	}
 }
 
@@ -60,7 +65,7 @@ input[type="search"]::-webkit-search-results-decoration {
 	border-radius: $radius-round;
 
 	&::hover {
-		background: $bg-panel;
+		background-color: $bg-panel;
 		color: $color-neutral-900;
 	}
 }

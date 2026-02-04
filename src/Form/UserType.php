@@ -88,6 +88,7 @@ class UserType extends AbstractType
                     'class' => 'inline_label',
                     'id' => 'user__timezone__label',
                 ],
+                'property_path' => 'preferences.timezone',
             ])
             ->add('avatar', HiddenType::class)
             ->add('submit', SubmitType::class, [
@@ -117,6 +118,7 @@ class UserType extends AbstractType
                     'id' => 'user__color__label'
                 ],
                 'multiple' => false,
+                'property_path' => 'preferences.color',
             ]);
             if ($options['data']->getId() !== $this->security->getUser()->getId()) {
                 $builder

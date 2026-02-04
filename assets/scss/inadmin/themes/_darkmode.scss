@@ -2,276 +2,36 @@
 @use 'sass:color';
 
 @mixin dark-theme {
-	// Core colors
-	$bg-main: #121212;
-	$bg-surface: #1e1e1e;
-	$bg-muted: #1f1f1f;
-	$bg-hover: #2a2a2a;
-	$bg-hover-strong: #3d3d3d;
+	/* Primitives - Neutrals */
+    --color-neutral-000: #1a1e23; /* Deep Slate Background */
+    --color-neutral-050: #222931; /* Toolbar/Card Surface */
+    --color-neutral-100: #2b333e; /* Main Surface (Matches image) */
+    --color-neutral-200: #333c4a; /* Elevated Surface */
+    --color-neutral-250: #3f4a5a; /* Borders / Dividers */
+    --color-neutral-300: #4a5669; /* Muted Borders */
+    --color-neutral-400: #64748b; /* Slate Gray Text */
+    --color-neutral-500: #94a3b8; /* Muted Hint Text */
+    --color-neutral-600: #cbd5e1; /* Secondary Text */
+    --color-neutral-700: #e2e8f0; /* Body Text */
+    --color-neutral-800: #f1f5f9; /* High Emphasis Text */
+    --color-neutral-900: #ffffff;
 
-	$text-main: #e0e0e0;
-	$text-muted: #888;
-	$text-strong: #fff;
+    /* Primitives - Brand (Slate-Blue Accents) */
+    --color-brand-400: #9cdcfe; /* Light "Glow" Blue from image */
+    --color-brand-500: #38bdf8; /* Vibrant Sky Blue */
+    --color-brand-600: #0ea5e9;
 
-	$border-main: #333;
-	$border-muted: #555;
+    --color-accent-500: #4fc3f7;
 
-	// Accent colors
-	$accent-primary: #8ab4f8;
-	$accent-focus: #93c5fd;
+    /* Semantic - Adjusted to sit on Slate */
+    --color-success-500: #b5cea8; /* Sage green from image */
+    --color-danger-500: #f87171; /* Soft coral */
+    --color-warning-500: #ce9178; /* Peach/Copper from image */
+    --color-info-500: #7dd3fc;
 
-	// State colors
-	$positive: #1b5e20;
-	$positive-hover: #2e7d32;
-
-	$negative: #b71c1c;
-	$negative-hover: #c62828;
-
-	$info: #0d47a1;
-	$info-hover: #1565c0;
-
-	$add: #006064;
-	$add-hover: #00838f;
-
-	// Utility
-	$ripple-light: rgba(255, 255, 255, 0.15);
-
-	background-color: $bg-main;
-	color: $text-main;
-
-	$flash-info-bg-dark:        #1E3A5F;
-	$flash-info-fg-dark:     #BBDEFB;
-	$flash-success-bg-dark:     #162F1E;
-	$flash-success-fg-dark:  #C8E6C9;
-	$flash-warning-bg-dark:     #3E2723;
-	$flash-warning-fg-dark:  #FFD180;
-	$flash-error-bg-dark:       #3B1515;
-	$flash-error-fg-dark:    #F6C7C5;
-
-	// --------------------------------
-	// Typography & Links
-	// --------------------------------
-	a, a:visited { color: $accent-primary; }
-	a:hover { color: $text-strong; }
-
-	h1, h2, h3, h4, h5, h6 {
-		color: $text-strong;
-	}
-
-	// --------------------------------
-	// Layout
-	// --------------------------------
-	.content-header,
-	.sidebar,
-	section.paginated-list,
-	.image-tile,
-	table {
-		background-color: $bg-surface;
-		border-color: $border-main;
-	}
-
-	.content-header {
-		border-bottom: 1px solid $border-main;
-
-		h1 a {
-			background-color: $border-main;
-			color: $text-strong;
-
-			&:hover {
-				background-color: $border-muted;
-			}
-		}
-	}
-
-	.sidebar {
-		border-right: 1px solid $border-main;
-	}
-
-	.fixed-bottom-bar {
-		background-color: $border-main;
-		border-color: $border-main;
-	}
-
-  // --------------------------------
-  // Forms
-  // --------------------------------
-  .form {
-	input,
-	textarea,
-	select,
-	.ts-dropdown .ts-control {
-		background-color: $bg-hover;
-		border: 1px solid $border-muted;
-		color: $text-main;
-
-		&:focus {
-			border-color: $accent-primary;
-			outline: 1px solid $accent-primary;
-		}
-	}
-
-	input[disabled],
-	textarea[disabled],
-	select[disabled] {
-		background-color: $bg-muted;
-		color: $text-muted;
-	}
-
-	.ts-dropdown {
-		background-color: $bg-hover;
-		border: 1px solid $border-muted;
-
-		.active {
-			background-color: $bg-hover-strong;
-			color: $text-strong;
-		}
-	}
-  }
-
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="search"],
-  textarea {
-    background-color: #252526;
-    border: 1px solid #3f3f3f;
-    color: #d4d4d4;
-  }
-
-  // --------------------------------
-  // Tables
-  // --------------------------------
-  table {
-    thead th {
-      background-color: $border-main;
-      color: $text-strong;
-      border-bottom: 1px solid $border-muted;
-    }
-
-    td {
-      border-bottom: 1px solid $border-main;
-    }
-
-    tr:hover td {
-      background-color: $bg-hover;
-    }
-
-    tr:nth-child(even) td {
-      background-color: #1a1a1a;
-    }
-  }
-
-	// --------------------------------
-	// Widgets / UI
-	// --------------------------------
-	.ui-tabs,
-	.ui-tabs-external,
-	.widget-posts ol.ui-widget-content,
-	ul.ui-widget-header {
-		background-color: $bg-main;
-		color: $text-strong;
-		border-color: $border-main;
-
-		.ui-tabs-nav a {
-			color: $text-strong;
-			text-decoration: none;
-		}
-
-		.ui-tabs-nav li:hover {
-			background-color: $bg-hover;
-		}
-	}
-
-	.widget-posts ol.ui-widget-content {
-		border-color: $border-main;
-	}
-
-	.flash-notice {
-		background-color: $flash-info-bg-dark;
-		color: $flash-info-fg-dark;
-	}
-
-	.flash-success {
-		background-color: $flash-success-bg-dark;
-		color: $flash-success-fg-dark;
-	}
-
-	.flash-warning {
-		background-color: $flash-warning-bg-dark;
-		color: $flash-warning-fg-dark;
-	}
-
-	.flash-error {
-		background-color: $flash-error-bg-dark;
-		color: $flash-error-fg-dark;
-	}
-
-	// --------------------------------
-	// Option Selector
-	// --------------------------------
-	.option-selector {
-    label {
-      background: $bg-muted;
-      color: $text-main;
-
-      &:hover,
-      &:focus {
-        background: #2c2c2c;
-      }
-
-      &:focus-visible {
-        outline: 3px solid $accent-focus;
-      }
-    }
-
-    input[type="radio"] {
-      &:checked + label {
-        background: #2563eb;
-        color: $text-strong;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-      }
-
-      &:hover {
-        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
-      }
-
-      .material-icons {
-        color: $text-strong;
-      }
-    }
-  }
-
-
-  .ripple { background: $ripple-light; }
-
-  img {
-    opacity: .75;
-    transition: opacity .5s ease-in-out;
-
-    &:hover { opacity: 1; }
-  }
-
-  .admin__user {
-	ul {
-		background-color: $bg-surface;
-		border-color: #000;
-		color: $text-strong;
-	}
-
-	button {
-		background-color: $bg-surface;
-		border-color: $border-muted;
-		color: $text-main;
-
-		&:hover {
-			background-color: $bg-hover;
-		}
-	}
-  }
-
-  #admin__user__options a:hover {
-    background-color: $bg-hover;
-  }
+    /* Track Changes (Cooler Tones) */
+    --color-track-ins-bg: #1e3a3a; /* Deep Teal */
+    --color-track-del-bg: #4a2b2b; /* Deep Rose */
 }
 
 .theme-dark {

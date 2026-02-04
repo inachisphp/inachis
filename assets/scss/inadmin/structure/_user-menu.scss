@@ -1,5 +1,4 @@
 @use '../definitions' as *;
-@use '../mixins/box-shadow' as *;
 
 .admin__user {
 	margin: 0.5em 1em 0.5em 0;
@@ -71,7 +70,7 @@
 	}
 
 	ul {
-		@include box-shadow(10px, 10px, 39px, -12px, rgba(0, 0, 0, 0.61));
+		box-shadow: 10px 10px 39px -12px rgba(0, 0, 0, 0.61);
 
 		background-color: $bg-surface;
 		border: 1px solid $border-color;
@@ -88,10 +87,15 @@
 
 		&.open {
 			height: auto;
-			opacity: 1
+			opacity: 1;
+
+			li {
+				display: block;
+			}
 		}
 
 		li {
+			display:none;
 			text-align: right;
 
 			&.divider {

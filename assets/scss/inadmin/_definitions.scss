@@ -153,9 +153,10 @@ $button-bright-focus: var(--color-button-bright-focus);
 
 // -- Sidebar
 $sidebar-bg: #1e293b;
-$sidebar-hover: var(--color-neutral-700);
-$sidebar-active: var(--color-brand-500);
-$sidebar-text: var(--color-neutral-000);
+$sidebar-hover: #334155;
+$sidebar-active: #069;
+$sidebar-active-bg: #333;
+$sidebar-text: #fff;
 
 // -- Alerts
 $alert-danger-bg: var(--color-danger-100);

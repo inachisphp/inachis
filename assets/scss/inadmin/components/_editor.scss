@@ -1,20 +1,303 @@
-.editor-toolbar, .CodeMirror, .editor-preview-side, .editor-statusbar {
-	margin-right: 15px;
+@use '../definitions' as *;
+@use 'sass:color';
+
+// Fix to make sure easymde sits in front of sidebar/header/bottom-bar
+div.EasyMDEContainer {
+	div.fullscreen.editor-toolbar {
+		border-top: 2px solid $color-brand-500;
+	}
+	div.fullscreen.editor-toolbar, & div.CodeMirror-fullscreen, & div.editor-preview-side {
+		z-index: 150;
+	}
 }
 
-.CodeMirror .CodeMirror-code .cm-url {
-	max-width: 100px;
-	overflow: hidden;
-	width: 100px;
+.autosave-notification {
+	align-items: flex-end;
+	background: $flash-notice-bg;
+	color: $flash-notice-text;
+	display: flex;
+	padding: 1em;
+
+	button {
+		float: right;
+		margin: -0.7em 0 0 0;
+	}
 }
 
-//.autosave-notification {
-//	background: $notification--autosave-background;
-//	color: $notification--autosave-color;
-//	padding: 1em;
-//
-//	button {
-//		float: right;
-//		margin: -0.7em 0 0 0;
-//	}
-//}
+/* -----------------------------------------
+ EasyMDE Dark Theme
+--------------------------------------------- */
+
+.theme-dark,
+.theme-auto {
+  .EasyMDEContainer {
+    background: $bg-body;
+    color: $text-main;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* -----------------------------------------
+   Editor Core
+  --------------------------------------------- */
+
+  .CodeMirror {
+    background: $bg-surface;
+    color: $text-main;
+    border: 1px solid $border-color-dark;
+    caret-color: $color-brand-400;
+
+    transition:
+      box-shadow 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  /* Focus glow (VS Code–ish) */
+  .CodeMirror-focused {
+    border-color: $color-brand-500;
+    box-shadow: 0 0 0 1px color.mix(#38bdf8, transparent, 70%),
+                0 0 12px color.mix(#38bdf8, transparent, 85%);
+  }
+
+  .CodeMirror-scroll {
+    background: $bg-surface;
+  }
+
+  /* Gutters */
+  .CodeMirror-gutters {
+    background: $bg-panel;
+    border-right: 1px solid $border-color;
+  }
+
+  .CodeMirror-linenumber {
+    color: $text-muted;
+  }
+
+  /* Cursor */
+  .CodeMirror-cursor {
+    border-left: 2px solid $color-brand-400;
+  }
+
+  /* Selection */
+  .CodeMirror-selected {
+    background: color.mix(#38bdf8, transparent, 20%);
+  }
+
+  .CodeMirror-focused .CodeMirror-selected {
+    background: color.mix(#38bdf8, transparent, 30%);
+  }
+
+  /* Active line */
+  .CodeMirror-activeline-background {
+    background: color.mix(#333c4a, transparent, 50%);
+  }
+
+  /* Matching brackets */
+  .CodeMirror-matchingbracket {
+    color: $color-brand-400;
+    background: color.mix(#38bdf8, transparent, 15%);
+    font-weight: 600;
+  }
+
+  /* Placeholder */
+  .CodeMirror-empty {
+    color: $text-muted;
+  }
+
+  /* -----------------------------------------
+   Markdown Syntax Highlighting
+  --------------------------------------------- */
+
+  .cm-header {
+    color: $color-brand-400;
+    font-weight: 600;
+  }
+
+  .cm-strong {
+    color: $color-neutral-800;
+    font-weight: 700;
+  }
+
+  .cm-em {
+    color: $color-neutral-700;
+    font-style: italic;
+  }
+
+  .cm-link {
+    color: $link-color;
+  }
+
+  .cm-url {
+    color: $color-brand-400;
+  }
+
+  .cm-quote {
+    color: $text-muted;
+    font-style: italic;
+  }
+
+  .cm-comment {
+    color: $text-muted;
+  }
+
+  .cm-variable-2 {
+    color: --color-warning-500--color-danger-500;
+  }
+
+  .cm-hr {
+    color: $border-color;
+  }
+
+  .cm-tag {
+    color: --color-danger-500;
+  }
+
+  .cm-attribute {
+    color: --color-danger-500;
+  }
+
+  /* Inline code */
+  .cm-inline-code,
+  .cm-code {
+    background: $color-neutral-100;
+    color: $color-neutral-800;
+    border-radius: $radius-standard;
+    padding: 0.1em 0.3em;
+  }
+
+  /* -----------------------------------------
+   Toolbar
+  --------------------------------------------- */
+
+  .editor-toolbar {
+    background: $bg-panel;
+    border: 1px solid $border-color;
+  }
+
+  .editor-toolbar button {
+    color: $text-muted;
+    border-radius: $radius-standard;
+    transition:
+      background 0.15s ease,
+      color 0.15s ease;
+
+    &:hover,
+    &.active {
+      background: color.mix(#38bdf8, transparent, 15%);
+      color: $text-inverse;
+    }
+  }
+
+  .editor-toolbar i.separator {
+    border-left: 1px solid $border-color;
+  }
+
+  .editor-toolbar.fullscreen {
+    background: $bg-panel;
+  }
+
+  /* -----------------------------------------
+   Status Bar
+  --------------------------------------------- */
+
+  .editor-statusbar {
+    background: $bg-panel;
+    border-top: 1px solid $border-color;
+    color: $text-muted;
+  }
+
+  /* -----------------------------------------
+   Preview
+  --------------------------------------------- */
+
+  .editor-preview,
+  .editor-preview-side {
+    background: $bg-surface;
+    color: $text-main;
+    border-left: 1px solid $border-color;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      color: $color-brand-400;
+      border-bottom-color: $border-color;
+    }
+
+    a {
+      color: $link-color;
+
+      &:hover {
+        color: $link-hover;
+      }
+    }
+
+    blockquote {
+      border-left: 4px solid $color-brand-500;
+      background: $bg-panel;
+      color: $text-muted;
+    }
+
+    hr {
+      border-color: $border-color;
+    }
+
+    table {
+      border-color: $border-color;
+
+      th {
+        background: $bg-panel;
+        color: $text-main;
+      }
+
+      td {
+        border-color: $border-color;
+      }
+    }
+  }
+
+  /* -----------------------------------------
+   Code Blocks (Preview)
+  --------------------------------------------- */
+
+  .editor-preview pre {
+    background: $color-neutral-100;
+    color: $color-neutral-800;
+    padding: 1rem;
+    border-radius: $radius-standard;
+    border: 1px solid $border-color-dark;
+  }
+
+  .editor-preview code {
+    background: $color-neutral-100;
+    color: $color-neutral-800;
+    padding: 0.15em 0.4em;
+    border-radius: $radius-standard;
+  }
+
+  /* -----------------------------------------
+   Fullscreen
+  --------------------------------------------- */
+
+  .EasyMDEContainer.fullscreen {
+    background: $bg-body;
+  }
+}
+
+/* -----------------------------------------
+ Mobile Tweaks
+--------------------------------------------- */
+
+@media (max-width: $breakpoint-small) {
+  .editor-toolbar button {
+    padding: 6px;
+  }
+
+  .editor-preview-side {
+    border-left: none;
+    border-top: 1px solid $border-color;
+  }
+}

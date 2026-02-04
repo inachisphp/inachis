@@ -96,18 +96,22 @@ window.Inachis.PostEdit = {
 	},
 
 	hasAutosavedValue() {
-		return 'easymde' in window && easymde.options.element.defaultValue !== easymde.value();
+		return typeof easymde !== 'undefined' && easymde.options.element.defaultValue !== easymde.value();
 	},
 
 	showAutosaveNotification() {
-		const postTitleInput = document.querySelector('#subTitle_label');
-		if (!postTitleInput?.parentNode) return;
+		const editor = document.querySelector('.EasyMDEContainer');
+		if (!editor?.parentNode) return;
 
-		const container = postTitleInput.parentNode;
+		const container = editor.parentNode;
 
 		const p = document.createElement('p');
 		p.className = 'autosave-notification';
-		p.textContent = 'The below content has been recovered from an auto-save and must be saved before publishing.';
+		p.ariaLive = 'polite';
+
+		const span = document.createElement('span');
+		span.textContent = 'The below content has been recovered from an auto-save and must be saved before publishing.';
+		p.appendChild(span);
 
 		const button = document.createElement('button');
 		button.type = 'button';
@@ -121,7 +125,7 @@ window.Inachis.PostEdit = {
 		});
 
 		p.appendChild(button);
-		container.after(p);
+		container.before(p);
 	},
 
 	async ensureUniqueUrl(title) {
