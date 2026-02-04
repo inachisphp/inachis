@@ -58,13 +58,9 @@ final class PageExportService
             throw new InvalidArgumentException(sprintf('Unsupported export format: %s', $format));
         }
 
-        // If no pages provided, fetch all
-        $pages ??= $this->pageRepository->findAll();
-
-        // Normalize entities to DTOs
+        $pages ??= $this->getAllPages();
         $dtos = $this->normaliser->normaliseCollection($pages);
 
-        // Serialize
         return $this->writers[$format]->write($dtos);
     }
 
@@ -88,4 +84,25 @@ final class PageExportService
     {
         return $this->pageRepository->findAll();
     }
+
+    /**
+     * Get filtered pages via the repository.
+     * 
+     * @param PageExportFilterDto $filter The filter to use.
+     * @return iterable<Page> The pages.
+     */
+    public function getFilteredPages(PageExportFilterDto $filter): iterable
+    {
+        return $this->pageRepository->findFilteredForExport($filter);
+    }
+
+    /**
+     * Get the count of all pages via the repository.
+     * 
+     * @return int The count of pages.
+     */
+    public function getAllCount(): int
+    {
+        return $this->pageRepository->getAllCount();
+    }   
 }

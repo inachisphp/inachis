@@ -9,7 +9,13 @@
 
 namespace Inachis\Model\Page;
 
+/**
+ * Data Transfer Object for tag
+     */
 final class TagDto
 {
+    /**
+     * @var string
+     */
     public string $title;
 }

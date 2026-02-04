@@ -1,22 +1,105 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 {% block pagetitle %}
     <a href="{{ path('incc_tools_index') }}">Tools</a>
-    Export Pages and Posts
+    <span>Export Pages and Posts</span>
 {% endblock pagetitle %}
 
 {% block content %}
-<form method="post" action="{{ path('incc_tools_export_page') }}">
-    <fieldset>
-        <legend>Select Pages</legend>
-        <label>
-            <input type="checkbox" name="all" value="1" checked id="select-all">
-            Export All Pages
-        </label>
+<div class="col-12 widget-posts">
+<section class="paginated-list">
 
-        <table class="table table--responsive table--striped table--compact">
+{% if previewCount is defined and previewCount > 0 %}
+    <p class="admonition admonition__info">
+        {{ previewCount|default(0) }} pages will be exported.
+    </p>
+{% endif %}
+
+<p>Select the scope of your export. You can export all pages, filtered pages, or select pages manually.</p>
+
+<form class="form nested-grid" method="post" action="{{ path('incc_tools_export_page') }}">
+    <fieldset class="col-6">
+        <legend>What do you want to export?</legend>
+        <p>
+            <label>
+                <input class="checkbox" type="radio" name="scope" value="all" checked>
+                All pages and posts
+            </label>
+        </p>
+        <p>
+            <label>
+                <input class="checkbox" type="radio" name="scope" value="filtered">
+                Filtered pages and posts
+            </label>
+        </p>
+        <p>
+            <label>
+                <input class="checkbox" type="radio" name="scope" value="manual">
+                Select manually
+            </label>
+        </p>
+    </fieldset>
+    <fieldset class="col-6">
+        <legend>Format</legend>
+        <p>
+            <label><input class="checkbox" type="radio" name="format" value="json" checked> JSON</label>
+        </p>
+        <p> 
+            <label><input class="checkbox" type="radio" name="format" value="md"> Markdown</label>
+        </p>
+        <p>
+            <label><input class="checkbox" type="radio" name="format" value="xml"> XML</label>
+        </p>
+    </fieldset>
+
+    <fieldset id="filter__options" class="col-12" aria-hidden="true" hidden>
+        <legend>Filters</legend>
+
+        <p>
+            <label>Type</label>
+            <select name="filter[type]">
+                <option value="*">Any</option>
+                <option value="post">Post</option>
+                <option value="page">Page</option>
+            </select>
+        </p>
+
+        <p>
+            <label>Status</label>
+            <select name="filter[status]">
+                <option value="">Any</option>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
+            </select>
+        </p>
+
+        <p>
+            <label>From</label>
+            <input type="date" name="filter[fromDate]"> 
+            <label>To</label>
+            <input type="date" name="filter[toDate]">
+        </p>
+    </fieldset>
+
+    <fieldset id="manual__options" class="col-12" {% if scope != 'manual' %}aria-hidden="true" hidden{% endif %}>
+        <legend>Select Pages and Posts</legend>
+        <p>
+            {% include 'inadmin/partials/search.html.twig' with {
+                placeholder: 'Search pages and posts…',
+                ariaLabel: 'Search pages and posts',
+                enterKeyHint: 'search',
+                id: 'filter__keyword',
+                name: 'filter[keyword]',
+                value: filterKeyword|default('')
+            } %}
+        </p>
+        {% if manualPages|default(null) is not empty %}
+        <table class="table table--responsive table--striped table--compact table--selectable">
             <thead>
                 <tr>
-                    <th>Select</th>
+                    <th scope="col">
+                        <label for="select-all" class="visually-hidden">Select all rows</label>
+                        <input aria-label="Select all rows" class="selectAllNone" id="select-all" name="selectAllNone" type="checkbox"  />
+                    </th>
                     <th>Title</th>
                     <th>Type</th>
                     <th>Status</th>
@@ -25,37 +108,42 @@
                 </tr>
             </thead>
             <tbody>
-            {% for page in pages %}
+            {% for page in manualPages %}
                 <tr>
-                    <td><input type="checkbox" name="selected[]" value="{{ page.id }}"></td>
+                    <td>
+                        <input class="checkbox" type="checkbox" name="selected[]" value="{{ page.id }}"
+                            {% if page.id in selectedIds %}checked{% endif %}>
+                    </td>
                     <td>{{ page.title }}</td>
                     <td>{{ page.type }}</td>
-                    <td>{{ page.status }}</td>
+                    <td><span class="badge badge__{{ page.status }}">{{ page.status }}</span></td>
                     <td>{{ page.categories|map(c => c.title)|join(', ') }}</td>
                     <td>{{ page.tags|map(t => t.title)|join(', ') }}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
+        {% endif %}
     </fieldset>
 
-    <fieldset>
-        <legend>Format</legend>
-        <label>
-            <input type="radio" name="format" value="json" checked> JSON
-        </label>
-        <label>
-            <input type="radio" name="format" value="xml"> XML
-        </label>
-    </fieldset>
-
-    <button type="submit">Export</button>
+    <div class="fixed-bottom-bar">
+        <p>
+            <button class="button button--positive" name="export" value="1">Export</button>
+            <button class="button button--secondary" name="preview" value="1">Preview</button>
+        </p>
+    </div>
 </form>
-
 <script>
-//document.getElementById('select-all').addEventListener('change', function(e) {
-//    const checked = e.target.checked;
-//    document.querySelectorAll('input[name="selected[]"]').forEach(cb => cb.checked = !checked);
-//});
+    document.querySelectorAll('input[name="scope"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            document.getElementById('filter__options').hidden =
+                radio.value !== 'filtered';
+            document.getElementById('manual__options').hidden =
+                radio.value !== 'manual';
+        });
+    });
 </script>
+
+</section>
+</div>
 {% endblock content %}

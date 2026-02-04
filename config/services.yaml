@@ -46,6 +46,10 @@ services:
         tags:
             - { name: 'page_export_writer', format: 'json' }
 
+    Inachis\Service\Page\Export\PageMdWriter:
+        tags:
+            - { name: 'page_export_writer', format: 'md' }
+
     Inachis\Service\Page\Export\PageXmlWriter:
         tags:
             - { name: 'page_export_writer', format: 'xml' }

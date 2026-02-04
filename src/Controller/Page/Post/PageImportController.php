@@ -12,7 +12,7 @@ namespace Inachis\Controller\Page\Post;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\User;
 use Inachis\Model\Import\ImportOptionsDto;
-use Inachis\Model\Page\PageExportDto;
+use Inachis\Model\Page\{CategoryPathDto,PageExportDto,TagDto};
 use Inachis\Service\Page\Import\PageImportService;
 use Inachis\Service\Page\Import\PageImportValidator;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,7 +27,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class PageImportController extends AbstractInachisController
 {
     /**
-     * Step 1: Upload file and show preview
+     * @param Request $request
+     * @param PageImportService $pageImportService
+     * @param PageImportValidator $pageImportValidator
+     * @return Response
      */
     #[Route('/incc/import', name: 'incc_post_import', methods: ['GET', 'POST'])]
     public function import(
@@ -83,14 +86,14 @@ class PageImportController extends AbstractInachisController
 
                 $dto->categories = [];
                 foreach ($page['categories'] ?? [] as $cat) {
-                    $catDto = new \Inachis\Model\Page\CategoryPathDto();
+                    $catDto = new CategoryPathDto();
                     $catDto->path = $cat['path'] ?? '';
                     $dto->categories[] = $catDto;
                 }
 
                 $dto->tags = [];
                 foreach ($page['tags'] ?? [] as $tag) {
-                    $tagDto = new \Inachis\Model\Page\TagDto();
+                    $tagDto = new TagDto();
                     $tagDto->title = $tag['title'] ?? '';
                     $dto->tags[] = $tagDto;
                 }
@@ -116,7 +119,9 @@ class PageImportController extends AbstractInachisController
     }
 
     /**
-     * Step 2: Execute import
+     * @param Request $request
+     * @param PageImportService $pageImportService
+     * @return Response
      */
     #[Route('/incc/import/execute', name: 'incc_post_process', methods: ['POST'])]
     public function importExecute(

@@ -9,7 +9,13 @@
 
 namespace Inachis\Model\Page;
 
+/**
+ * Data Transfer Object for category path
+ */
 final class CategoryPathDto
 {
+    /**
+     * @var string
+     */
     public string $path;
 }
