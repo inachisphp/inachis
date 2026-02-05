@@ -1,7 +1,7 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 {% block pagetitle %}
-    <a href="{{ path('incc_tools_index') }}">Tools</a>
-    <span>Export Pages and Posts</span>
+    <a href="{{ path('incc_post_list', { type: 'post' }) }}">Posts</a>
+    <span>Export</span>
 {% endblock pagetitle %}
 
 {% block content %}
@@ -16,7 +16,7 @@
 
 <p>Select the scope of your export. You can export all pages, filtered pages, or select pages manually.</p>
 
-<form class="form nested-grid" method="post" action="{{ path('incc_tools_export_page') }}">
+<form class="form nested-grid" method="post" action="{{ path('incc_post_export') }}">
     <fieldset class="col-6">
         <legend>What do you want to export?</legend>
         <p>
@@ -111,8 +111,8 @@
             {% for page in manualPages %}
                 <tr>
                     <td>
-                        <input class="checkbox" type="checkbox" name="selected[]" value="{{ page.id }}"
-                            {% if page.id in selectedIds %}checked{% endif %}>
+                        <input class="checkbox" type="checkbox" name="items[]" value="{{ page.id }}"
+                            {% if page.id in items %}checked{% endif %}>
                     </td>
                     <td>{{ page.title }}</td>
                     <td>{{ page.type }}</td>
@@ -128,8 +128,14 @@
 
     <div class="fixed-bottom-bar">
         <p>
-            <button class="button button--positive" name="export" value="1">Export</button>
-            <button class="button button--secondary" name="preview" value="1">Preview</button>
+            <button class="button button--secondary" name="preview" value="1">
+                <span class="material-icons">preview</span>
+                Preview
+            </button>
+            <button class="button button--positive" name="export" value="1">
+                <span class="material-icons">file_download</span>
+                Export
+            </button>
         </p>
     </div>
 </form>
@@ -142,6 +148,13 @@
                 radio.value !== 'manual';
         });
     });
+//    document.querySelectorAll('input[name="mode"]').forEach(radio => {
+//    radio.addEventListener('change', () => {
+//        document
+//            .querySelectorAll('[data-export-mode]')
+//            .forEach(el => el.hidden = el.dataset.exportMode !== radio.value);
+//    });
+//});
 </script>
 
 </section>

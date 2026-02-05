@@ -117,7 +117,8 @@ class PageController extends AbstractInachisController
         name: "incc_post_edit",
         requirements: [ "type" => "page|post"],
         defaults: [ "type" => "post" ],
-        methods: [ "GET", "POST" ]
+        methods: [ "GET", "POST" ],
+        priority: -10,
     )]
     #[Route(
         "/incc/{type}/{year}/{month}/{day}/{title}",

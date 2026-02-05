@@ -32,7 +32,7 @@ class PageImportController extends AbstractInachisController
      * @param PageImportValidator $pageImportValidator
      * @return Response
      */
-    #[Route('/incc/import', name: 'incc_post_import', methods: ['GET', 'POST'])]
+    #[Route('/incc/post/import', name: 'incc_post_import', methods: ['GET', 'POST'])]
     public function import(
         Request $request,
         PageImportService $pageImportService,

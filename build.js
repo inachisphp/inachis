@@ -83,7 +83,7 @@ async function optimizeImages() {
                 destination: outputDir,
                 plugins: [
                     imageminMozjpeg({ quality: 75 }),
-                    imageminPngquant({ quality: [ 0.7, 0.85 ] }),
+                    imageminPngquant({ quality: [0.7, 0.85] }),
                     imageminGifsicle({ optimizationLevel: 2 }),
                     imageminSvgo()
                 ]
@@ -109,12 +109,17 @@ async function copyIconsAndManifests() {
             fs.copyFileSync(path.join(srcDir, file), path.join(destDir, file));
             console.log(`📄 Copied: ${file} to ${destDir}`);
         }
-    );
+        );
 }
 
 async function copyExtraLibraries() {
     const libs = [
-        "node_modules/dropzone/dist/dropzone-min.js",
+        "node_modules/filepond/dist/filepond.min.js",
+        "node_modules/filepond/dist/filepond.min.css",
+        "node_modules/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js",
+        "node_modules/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css",
+        "node_modules/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.min.js",
+        "node_modules/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js",
         "node_modules/jquery/dist/jquery.min.js",
         "node_modules//jquery-ui-dist/jquery-ui.min.js",
         "node_modules/jquery-datetimepicker/build/jquery.datetimepicker.full.min.js",

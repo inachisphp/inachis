@@ -1,0 +1,94 @@
+<input class="filepond"
+    id="{{ paramName|replace({'[': '_', ']': ''}) }}" 
+    name="{{ paramName }}" 
+    required 
+    type="file" 
+{% if uploadMultiple ?? false %}
+    multiple
+{% endif %}
+/>
+
+<link rel="stylesheet" href="/assets/css/incc/filepond.min.css">
+<link rel="stylesheet" href="/assets/css/incc/filepond-plugin-image-preview.min.css">
+<script src="/assets/js/incc/filepond.min.js"></script>
+<script src="/assets/js/incc/filepond-plugin-image-preview.min.js"></script>
+<script src="/assets/js/incc/filepond-plugin-file-validate-size.min.js"></script>
+<script src="/assets/js/incc/filepond-plugin-file-validate-type.min.js"></script>
+<script>
+    // https://pqina.nl/filepond/docs/api/instance/properties/
+document.addEventListener('DOMContentLoaded', function() {
+    if (FilePond) {
+        FilePond.registerPlugin(FilePondPluginImagePreview);
+        FilePond.registerPlugin(FilePondPluginFileValidateSize);
+        FilePond.registerPlugin(FilePondPluginFileValidateType);
+
+        const form = document.querySelector('{{ selector|default('') }}form.filepond');
+
+        if (form) {
+            const inputElement = form.querySelector('input[type="file"]');
+            const pond = FilePond.create(inputElement);
+            const submitButton = form.querySelector('button[type=submit]');
+            submitButton.disabled = true;
+            submitButton.setAttribute('aria-disabled', true);
+
+            pond.setOptions({
+                allowMultiple: {{ (uploadMultiple ?? true) ? 'true' : 'false' }},
+{% if not (autoUpload ?? true) %}
+                instantUpload: false,
+                server: null,
+                storeAsFile: true,
+{% endif %}
+                maxFiles: {{ maxFiles|default(1) }},
+                name: '{{ paramName }}',
+{% if maxFileSize|default('') is not empty %}
+                maxFilesize: '{{ maxFileSize }}',
+{% endif %}
+{% if acceptedFiles|default([]) is not empty %}
+                acceptedFileTypes: {{ acceptedFiles|default([])|json_encode()|raw }},
+    {% if acceptedFilesMap|default({}) is not empty %}
+                fileValidateTypeLabelExpectedTypesMap: {{ acceptedFilesMap|default({})|json_encode()|raw }},
+    {% endif %}
+{% endif %}  
+            });
+{% if not (autoUpload ?? true) %}
+            pond.on('addfile', (error, file) => {
+                if (!error) {
+                    submitButton.disabled = false;
+                    submitButton.setAttribute('aria-disabled', false);
+                }
+            });
+            pond.on('removefile', (file) => {
+                if (pond.getFiles().length === 0) {
+                    submitButton.disabled = true;
+                    submitButton.setAttribute('aria-disabled', true);
+                }
+            });
+
+
+//                pond.processFiles().then(() => {
+//                    form.submit();
+//                });
+//            const formData = new FormData(form);
+//            const files = pond.getFiles();
+//            files.forEach(file => {
+//                formData.append(paramName, file);
+//            });
+//            const xhr = new XMLHttpRequest();
+//            xhr.open('POST', form.action);
+//            xhr.onload = function() {
+//                if (xhr.status === 200) {
+//                    window.location.href = xhr.responseText;
+//                }
+//            };
+//            xhr.send(formData);
+//            output.append('filesize', file.size);
+//            const additionalFormData = new FormData(document.querySelector('{{ selector|default('') }}'));
+//            for (const key of additionalFormData.keys()) {
+//                output.append(key, additionalFormData.get(key));
+//            }
+//            $('{{ selector|default('') }} button[type=submit]').prop('disabled', true);
+{% endif %}
+        }
+    }
+});
+</script>

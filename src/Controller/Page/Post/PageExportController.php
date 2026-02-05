@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Controller\Page\Tools;
+namespace Inachis\Controller\Page\Post;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Repository\PageRepository;
@@ -23,7 +23,7 @@ class PageExportController extends AbstractInachisController
      * @param PageExportService $pageExportService
      * @return Response
      */
-    #[Route('incc/tools/export/page', name: 'incc_tools_export_page', methods: ['GET', 'POST'])]
+    #[Route('incc/post/export', name: 'incc_post_export', methods: ['GET', 'POST'])]
     public function export(
         Request $request,
         PageExportService $pageExportService,
@@ -71,7 +71,7 @@ class PageExportController extends AbstractInachisController
             } elseif ($scope === 'manual') {
                 if (empty($selectedIds)) {
                     $this->addFlash('error', 'No pages selected for export.');
-                    return $this->redirectToRoute('incc_tools_export_page');
+                    return $this->redirectToRoute('incc_post_export');
                 }
                 $pages = $pageExportService->getPagesByIds($selectedIds);
             }  elseif ($scope === 'filtered') {
@@ -82,7 +82,7 @@ class PageExportController extends AbstractInachisController
                 $exportedData = $pageExportService->export($pages, $format);
             } catch (\InvalidArgumentException $e) {
                 $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('incc_tools_export_page');
+                return $this->redirectToRoute('incc_post_export');
             }
 
             $filename = 'pages-export-' . date('Y-m-d') . '.' . $format;
@@ -114,6 +114,6 @@ class PageExportController extends AbstractInachisController
         $this->data['filterEndDate'] = $filterEndDate;
         $this->data['filterKeyword'] = $filterKeyword;
 
-        return $this->render('inadmin/page/tools/export.html.twig', $this->data);
+        return $this->render('inadmin/page/post/export.html.twig', $this->data);
     }
 }

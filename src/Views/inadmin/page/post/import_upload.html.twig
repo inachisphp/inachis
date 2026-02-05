@@ -18,10 +18,23 @@
             <li class="badge">XML (.xml)</li>
             <li class="badge">JSON (.json)</li>
         </ul>
-        <form action="{{ path('incc_post_import') }}" class="dropzone" enctype="multipart/form-data" method="post">
+        <form action="{{ path('incc_post_import') }}" class="filepond form" enctype="multipart/form-data" method="post">
             <p>
                 <label for="import_file">Import File</label>
-                <input type="file" name="import_file" id="import_file" accept=".md,.xml,.json" required />
+
+                {% include 'inadmin/partials/components/file-upload.html.twig' with {
+                    paramName: 'import_file',
+                    maxFiles: 1,
+                    maxFileSize: '3MB',
+                    uploadMultiple: false,
+                    autoUpload: false,
+                    acceptedFiles: ['text/markdown','application/xml','application/json'],
+                    acceptedFilesMap: {
+                        'text/markdown': ['.md'],
+                        'application/xml': ['.xml'],
+                        'application/json': ['.json']
+                    },
+                } only %}
             </p>
             <p>
                 <button type="submit" class="button button--positive">Preview Import</button>
