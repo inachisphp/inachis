@@ -15,7 +15,12 @@ use Inachis\Service\Page\Export\PageExportService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Controller for exporting pages and posts
+ */
+#[IsGranted('ROLE_ADMIN')]
 class PageExportController extends AbstractInachisController
 {
     /**
@@ -36,7 +41,7 @@ class PageExportController extends AbstractInachisController
         $filterType = $filter['type'] ?? null;
         $filterStatus = $filter['status'] ?? null;
         $filterStartDate = $filter['start_date'] ?? null;
-        $filterEndDate = $filter['end_date'] ?? null; 
+        $filterEndDate = $filter['end_date'] ?? null;
         $filterKeyword = $filter['keyword'] ?? null;
 
         $pagesPreview = null;
@@ -60,8 +65,8 @@ class PageExportController extends AbstractInachisController
         }
 
         if ($request->isMethod('POST') && $request->request->has('preview')) {
-            $previewCount = $scope === 'all' 
-                ? $pageExportService->getAllCount() 
+            $previewCount = $scope === 'all'
+                ? $pageExportService->getAllCount()
                 : count($pagesPreview ?? $selectedIds);
         }
 

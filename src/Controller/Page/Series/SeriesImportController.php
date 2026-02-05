@@ -15,7 +15,12 @@ use Inachis\Service\Page\Export\PageExportService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Controller for importing series
+ */
+#[IsGranted('ROLE_ADMIN')]
 class SeriesImportController extends AbstractInachisController
 {
     /**
@@ -29,6 +34,6 @@ class SeriesImportController extends AbstractInachisController
         PageExportService $pageExportService,
         PageRepository $pageRepository,
     ): Response {
-        return $this->render('inadmin/page/series/import.html.twig', $this->data);
+        return $this->render('inadmin/page/series/import_upload.html.twig', $this->data);
     }
 }
