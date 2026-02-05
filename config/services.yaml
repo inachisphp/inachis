@@ -38,6 +38,26 @@ services:
         arguments:
             $publicImgPath: '%app.public_img_path%'
 
+    Inachis\Service\Page\Export\PageExportService:
+        arguments:
+            $writers: !tagged_iterator page_export_writer
+
+    Inachis\Service\Page\Export\PageJsonWriter:
+        tags:
+            - { name: 'page_export_writer', format: 'json' }
+
+    Inachis\Service\Page\Export\PageMdWriter:
+        tags:
+            - { name: 'page_export_writer', format: 'md' }
+
+    Inachis\Service\Page\Export\PageXmlWriter:
+        tags:
+            - { name: 'page_export_writer', format: 'xml' }
+
+    Inachis\Service\Series\Export\SeriesMdWriter:
+        tags:
+            - { name: 'series_export_writer', format: 'md' }
+
     Inachis\Service\User\PasswordResetTokenService:
         arguments:
             $appSecret: '%env(APP_SECRET)%'

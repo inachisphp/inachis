@@ -38,7 +38,7 @@
                 <span>{% trans %}admin.dashboard.title{% endtrans %}</span>
             </a>
         </li>
-        <li class="{{ page.tab|activeMenu('post') }}">
+        <li class="{{ page.tab|activeMenu('post') ~ page.tab|activeMenu('page') ~ page.tab|activeMenu('import') }}">
             <a href="{{ settings.domain ~ path('incc_post_list', {'type': 'post'}) }}" 
                 data-tooltip="{% trans %}admin.posts.help{% endtrans %}" 
                 title="{% trans %}admin.posts.help{% endtrans %}">

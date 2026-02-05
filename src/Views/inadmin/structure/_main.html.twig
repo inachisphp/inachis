@@ -24,11 +24,11 @@
     {% if userPreference|default(null) and userPreference.fontFamily == 'dyslexic' %}
     <style>
     	@font-face {
-        font-family: 'OpenDyslexic';
-        src: url('/assets/fonts/incc/OpenDyslexic-Regular.woff') format('woff');
-        font-weight: normal;
-        font-style: normal;
-        font-display: swap;
+            font-family: 'OpenDyslexic';
+            src: url('/assets/fonts/incc/OpenDyslexic-Regular.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
         }
     </style>
     {% endif %}
@@ -50,7 +50,9 @@
 
 {%- if is_granted('ROLE_USER') %}
     {% include "inadmin/structure/_menu.html.twig" %}
-
+    <div class="reading-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="reading-progress__bar"></div>
+    </div>
     <header class="content-header">
         <h1>{% block pagetitle %}{% endblock pagetitle %}</h1>
         {% include 'inadmin/structure/_header.html.twig' %}

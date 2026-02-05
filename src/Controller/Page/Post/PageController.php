@@ -9,6 +9,8 @@
 
 namespace Inachis\Controller\Page\Post;
 
+use DateTime;
+use Exception;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Category;
 use Inachis\Entity\Image;
@@ -24,8 +26,6 @@ use Inachis\Service\Page\PageBulkActionService;
 use Inachis\Util\ContentRevisionCompare;
 use Inachis\Util\ReadingTime;
 use Inachis\Util\UrlNormaliser;
-use DateTime;
-use Exception;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -117,7 +117,8 @@ class PageController extends AbstractInachisController
         name: "incc_post_edit",
         requirements: [ "type" => "page|post"],
         defaults: [ "type" => "post" ],
-        methods: [ "GET", "POST" ]
+        methods: [ "GET", "POST" ],
+        priority: -10,
     )]
     #[Route(
         "/incc/{type}/{year}/{month}/{day}/{title}",

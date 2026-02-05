@@ -1,0 +1,19 @@
+{{ include('inadmin/partials/tabs.html.twig', {
+    tabs: [
+        {
+            id: 'series',
+            title: 'Series',
+            url: path('incc_series_list'),
+        },
+        {
+            id: 'import',
+            title: 'Import',
+            url: path('incc_series_import'),
+        },
+        {
+            id: 'export',
+            title: 'Export',
+            url: path('incc_series_export'),
+        }
+    ]
+}) }}
