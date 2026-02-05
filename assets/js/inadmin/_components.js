@@ -82,10 +82,17 @@ window.Inachis.Components = {
 	initFilterBar() {
 		const toggle = document.querySelector('.filter__toggle');
 		const panel  = document.getElementById('filter__options');
+		const filterSelects = panel.querySelectorAll('select');
 
 		if (!toggle || !panel) {
 			return;
 		}
+
+		filterSelects.forEach(select => {
+			select.addEventListener('change', () => {
+				select.closest('form').requestSubmit();
+			});
+		});
 
 		toggle.addEventListener('click', () => {
 			const isOpen = toggle.getAttribute('aria-expanded') === 'true';
