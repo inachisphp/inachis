@@ -82,6 +82,6 @@ services:
 
 #    Inachis\Service\ImageResizer\GdImageResizer: ~
 #    Inachis\Service\ImageResizer\ImagickResizer: ~
-    Inachis\Service\ImageResizer\ImageResizerInterface:
-        factory: ['Inachis\Service\ImageResizer\ImageResizerFactory', 'create']
-        public: true
+    # Inachis\Service\ImageResizer\ImageResizerInterface:
+    #     factory: ['Inachis\Service\ImageResizer\ImageResizerFactory', 'create']
+    #     public: true

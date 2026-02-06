@@ -8,13 +8,12 @@
 namespace Inachis\Service\MenuBuilder;
 
 use Inachis\Plugin\PluginManager;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
 final class MenuBuilder
 {
     public function __construct(
         private PluginManager $pluginManager,
-        #[TaggedIterator('cms.menu_provider')]
+        /** @var iterable<MenuProviderInterface> $menuProviders */
         private iterable $menuProviders
     ) {}
 

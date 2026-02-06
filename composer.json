@@ -27,7 +27,6 @@
         "phpdocumentor/reflection-docblock": "^5.2",
         "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.0",
-        "shivas/versioning-bundle": "^4.1",
         "symfony/config": "^7.2",
         "symfony/console": "^7.2",
         "symfony/dependency-injection": "^7.2",
