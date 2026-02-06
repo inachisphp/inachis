@@ -9,6 +9,29 @@ div.EasyMDEContainer {
 	div.fullscreen.editor-toolbar, & div.CodeMirror-fullscreen, & div.editor-preview-side {
 		z-index: 150;
 	}
+  .CodeMirror-lines {
+    line-height: 1.6rem;
+  }
+  /* ---------------- Toolbar ---------------- */
+
+  div.editor-toolbar, div.editor-toolbar.fullscreen {
+    background: $bg-panel;
+    border-bottom: 1px solid $border-color;
+    border-radius: $radius-standard $radius-standard 0 0;
+
+    button, a {
+      color: $text-main;
+      transition: background 0.15s ease, color 0.15s ease;
+
+      &:hover, &.active {
+        background: $sidebar-hover;
+        color: $text-inverse;
+      }
+      &.active {
+        background: $action-primary;
+      }
+    }
+  }
 }
 
 .autosave-notification {
@@ -24,280 +47,185 @@ div.EasyMDEContainer {
 	}
 }
 
-/* -----------------------------------------
- EasyMDE Dark Theme
---------------------------------------------- */
+/* ======================================================
+   EasyMDE – Base + Light Theme
+====================================================== */
 
-.theme-dark,
-.theme-auto {
-  .EasyMDEContainer {
-    background: $bg-body;
-    color: $text-main;
+.EasyMDEContainer {
+  background: $bg-surface;
+  color: $text-main;
+  border: 1px solid $border-color;
+  border-radius: $radius-standard;
+  transition: opacity 0.2s ease, filter 0.2s ease;
 
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  /* -----------------------------------------
-   Editor Core
-  --------------------------------------------- */
-
-  .CodeMirror {
-    background: $bg-surface;
-    color: $text-main;
-    border: 1px solid $border-color-dark;
-    caret-color: $color-brand-400;
-
-    transition:
-      box-shadow 0.2s ease,
-      border-color 0.2s ease;
-  }
-
-  /* Focus glow (VS Code–ish) */
-  .CodeMirror-focused {
-    border-color: $color-brand-500;
-    box-shadow: 0 0 0 1px color.mix(#38bdf8, transparent, 70%),
-                0 0 12px color.mix(#38bdf8, transparent, 85%);
-  }
-
-  .CodeMirror-scroll {
-    background: $bg-surface;
-  }
-
-  /* Gutters */
-  .CodeMirror-gutters {
-    background: $bg-panel;
-    border-right: 1px solid $border-color;
-  }
-
-  .CodeMirror-linenumber {
-    color: $text-muted;
-  }
-
-  /* Cursor */
-  .CodeMirror-cursor {
-    border-left: 2px solid $color-brand-400;
-  }
-
-  /* Selection */
-  .CodeMirror-selected {
-    background: color.mix(#38bdf8, transparent, 20%);
-  }
-
-  .CodeMirror-focused .CodeMirror-selected {
-    background: color.mix(#38bdf8, transparent, 30%);
-  }
-
-  /* Active line */
-  .CodeMirror-activeline-background {
-    background: color.mix(#333c4a, transparent, 50%);
-  }
-
-  /* Matching brackets */
-  .CodeMirror-matchingbracket {
-    color: $color-brand-400;
-    background: color.mix(#38bdf8, transparent, 15%);
-    font-weight: 600;
-  }
-
-  /* Placeholder */
-  .CodeMirror-empty {
-    color: $text-muted;
-  }
-
-  /* -----------------------------------------
-   Markdown Syntax Highlighting
-  --------------------------------------------- */
-
-  .cm-header {
-    color: $color-brand-400;
-    font-weight: 600;
-  }
-
-  .cm-strong {
-    color: $color-neutral-800;
-    font-weight: 700;
-  }
-
-  .cm-em {
-    color: $color-neutral-700;
-    font-style: italic;
-  }
-
-  .cm-link {
-    color: $link-color;
-  }
-
-  .cm-url {
-    color: $color-brand-400;
-  }
-
-  .cm-quote {
-    color: $text-muted;
-    font-style: italic;
-  }
-
-  .cm-comment {
-    color: $text-muted;
-  }
-
-  .cm-variable-2 {
-    color: --color-warning-500--color-danger-500;
-  }
-
-  .cm-hr {
-    color: $border-color;
-  }
-
-  .cm-tag {
-    color: --color-danger-500;
-  }
-
-  .cm-attribute {
-    color: --color-danger-500;
-  }
-
-  /* Inline code */
-  .cm-inline-code,
-  .cm-code {
-    background: $color-neutral-100;
-    color: $color-neutral-800;
-    border-radius: $radius-standard;
-    padding: 0.1em 0.3em;
-  }
-
-  /* -----------------------------------------
-   Toolbar
-  --------------------------------------------- */
-
-  .editor-toolbar {
-    background: $bg-panel;
-    border: 1px solid $border-color;
-  }
-
-  .editor-toolbar button {
-    color: $text-muted;
-    border-radius: $radius-standard;
-    transition:
-      background 0.15s ease,
-      color 0.15s ease;
-
-    &:hover,
-    &.active {
-      background: color.mix(#38bdf8, transparent, 15%);
-      color: $text-inverse;
-    }
-  }
-
-  .editor-toolbar i.separator {
-    border-left: 1px solid $border-color;
-  }
-
-  .editor-toolbar.fullscreen {
-    background: $bg-panel;
-  }
-
-  /* -----------------------------------------
-   Status Bar
-  --------------------------------------------- */
-
-  .editor-statusbar {
-    background: $bg-panel;
-    border-top: 1px solid $border-color;
-    color: $text-muted;
-  }
-
-  /* -----------------------------------------
-   Preview
-  --------------------------------------------- */
-
-  .editor-preview,
-  .editor-preview-side {
-    background: $bg-surface;
-    color: $text-main;
-    border-left: 1px solid $border-color;
-
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-      color: $color-brand-400;
-      border-bottom-color: $border-color;
-    }
-
-    a {
-      color: $link-color;
-
-      &:hover {
-        color: $link-hover;
-      }
-    }
-
-    blockquote {
-      border-left: 4px solid $color-brand-500;
-      background: $bg-panel;
-      color: $text-muted;
-    }
-
-    hr {
-      border-color: $border-color;
-    }
-
-    table {
-      border-color: $border-color;
-
-      th {
-        background: $bg-panel;
-        color: $text-main;
-      }
-
-      td {
-        border-color: $border-color;
-      }
-    }
-  }
-
-  /* -----------------------------------------
-   Code Blocks (Preview)
-  --------------------------------------------- */
-
-  .editor-preview pre {
-    background: $color-neutral-100;
-    color: $color-neutral-800;
-    padding: 1rem;
-    border-radius: $radius-standard;
-    border: 1px solid $border-color-dark;
-  }
-
-  .editor-preview code {
-    background: $color-neutral-100;
-    color: $color-neutral-800;
-    padding: 0.15em 0.4em;
-    border-radius: $radius-standard;
-  }
-
-  /* -----------------------------------------
-   Fullscreen
-  --------------------------------------------- */
-
-  .EasyMDEContainer.fullscreen {
-    background: $bg-body;
+  &.is-inactive {
+    opacity: 0.65;
+    filter: grayscale(0.15);
   }
 }
 
-/* -----------------------------------------
- Mobile Tweaks
---------------------------------------------- */
+/* ---------------- Editor ---------------- */
 
-@media (max-width: $breakpoint-small) {
-  .editor-toolbar button {
-    padding: 6px;
+.CodeMirror {
+  background: $bg-panel;
+  color: $text-main;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  border-radius: $radius-standard;
+}
+
+/* Focus glow */
+.CodeMirror-focused {
+  outline: none;
+  box-shadow:
+    0 0 0 2px $input-focus-ring,
+    0 6px 20px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(2px);
+}
+
+/* ---------------- Status Bar ---------------- */
+
+.editor-statusbar {
+  color: $text-muted;
+  border-top: 1px solid $border-color;
+}
+
+/* ======================================================
+   Syntax Highlighting (Markdown)
+====================================================== */
+
+.cm-header {
+  color: $action-primary;
+  font-weight: 600;
+}
+
+.cm-strong {
+  font-weight: 600;
+}
+
+.cm-em {
+  font-style: italic;
+}
+
+.cm-link {
+  color: $link-color;
+}
+
+.cm-url {
+  color: $link-hover;
+}
+
+.cm-quote {
+  color: $text-muted;
+  border-left: 3px solid $border-color;
+  padding-left: 0.75rem;
+}
+
+.cm-code,
+.cm-inline-code {
+  background: $color-neutral-200;
+  color: $color-brand-700;
+  padding: 0.1rem 0.25rem;
+  border-radius: 4px;
+}
+
+.cm-comment {
+  color: $text-muted;
+  opacity: 0.85;
+}
+
+/* ======================================================
+   Cursor + Active Line
+====================================================== */
+
+.CodeMirror-cursor {
+  border-left: 2px solid $action-primary;
+}
+
+.CodeMirror-activeline-background {
+  background: rgba(0, 102, 153, 0.06);
+  transition: background 0.15s ease;
+}
+
+/* ---------------- Gutter ---------------- */
+
+.CodeMirror-gutters {
+  border-right: 1px solid $border-color;
+  background: transparent;
+}
+
+.CodeMirror-linenumber {
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.CodeMirror-activeline-gutter .CodeMirror-linenumber {
+  color: $action-primary;
+  background: rgba(0, 102, 153, 0.06);
+  border-radius: 4px;
+}
+
+/* ======================================================
+   Selection (Feathered)
+====================================================== */
+
+.CodeMirror-selected {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0, 102, 153, 0.08),
+      rgba(0, 102, 153, 0.18) 12%,
+      rgba(0, 102, 153, 0.18) 88%,
+      rgba(0, 102, 153, 0.08)
+    );
+  transition: background 0.15s ease;
+}
+
+/* ======================================================
+   Scrollbars
+====================================================== */
+
+.CodeMirror-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: $color-neutral-500 transparent;
+}
+
+.CodeMirror-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.CodeMirror-scroll::-webkit-scrollbar-thumb {
+  background-color: $color-neutral-400;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+/* ======================================================
+   Preview
+====================================================== */
+
+.editor-preview,
+.editor-preview-side {
+  background: $bg-panel;
+  color: $text-main;
+  padding: 1.5rem 2rem;
+  line-height: 1.7;
+
+  ::selection {
+    background: rgba(0, 102, 153, 0.22);
   }
+}
 
-  .editor-preview-side {
-    border-left: none;
-    border-top: 1px solid $border-color;
+/* ======================================================
+   Font smoothing (Light)
+====================================================== */
+
+.theme-light {
+  .EasyMDEContainer,
+  .CodeMirror {
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
   }
 }

@@ -1,8 +1,8 @@
 <input class="filepond"
-    id="{{ paramName|replace({'[': '_', ']': ''}) }}" 
-    name="{{ paramName }}" 
-    required 
-    type="file" 
+    id="{{ paramName|replace({'[': '_', ']': ''}) }}"
+    name="{{ paramName }}"
+    required
+    type="file"
 {% if uploadMultiple ?? false %}
     multiple
 {% endif %}
@@ -30,6 +30,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const submitButton = form.querySelector('button[type=submit]');
             submitButton.disabled = true;
             submitButton.setAttribute('aria-disabled', true);
+            const label = inputElement.closest('label') || form.querySelector(`label[for="${inputElement.id}"]`);
+            if (label) {
+                label.style.display = 'none';
+            }
 
             pond.setOptions({
                 allowMultiple: {{ (uploadMultiple ?? true) ? 'true' : 'false' }},
@@ -48,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
     {% if acceptedFilesMap|default({}) is not empty %}
                 fileValidateTypeLabelExpectedTypesMap: {{ acceptedFilesMap|default({})|json_encode()|raw }},
     {% endif %}
-{% endif %}  
+{% endif %}
             });
 {% if not (autoUpload ?? true) %}
             pond.on('addfile', (error, file) => {

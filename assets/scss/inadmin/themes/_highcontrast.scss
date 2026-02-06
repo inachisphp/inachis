@@ -90,6 +90,219 @@
       }
     }
   }
+
+  .EasyMDEContainer {
+    background: var(--color-neutral-000) !important;
+    border: 3px solid var(--color-neutral-300) !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  /* Inactive must still be fully readable */
+  .EasyMDEContainer.is-inactive {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  /* ---------------- Editor ---------------- */
+
+  .CodeMirror {
+    background: var(--color-neutral-000) !important;
+    color: var(--color-neutral-900) !important;
+    border: 2px solid var(--color-neutral-300) !important;
+    box-shadow: none !important;
+  }
+
+  /* Kill all glow / blur / animation */
+  .CodeMirror-focused {
+    outline: var(--hc-focus-outline) !important;
+    outline-offset: 3px;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* ---------------- Cursor ---------------- */
+
+  .CodeMirror-cursor {
+    border-left: 3px solid var(--color-brand-500) !important;
+    animation: none !important;
+  }
+
+  /* ---------------- Active Line ---------------- */
+
+  .CodeMirror-activeline-background {
+    background: var(--color-neutral-200) !important;
+    box-shadow: none !important;
+  }
+
+  /* ---------------- Gutter ---------------- */
+
+  .CodeMirror-gutters {
+    background: var(--color-neutral-000) !important;
+    border-right: 3px solid var(--color-neutral-300) !important;
+  }
+
+  .CodeMirror-linenumber {
+    color: var(--color-neutral-900) !important;
+    opacity: 1 !important;
+  }
+
+  .CodeMirror-activeline-gutter .CodeMirror-linenumber {
+    background: var(--color-brand-500) !important;
+    color: #000000 !important;
+    font-weight: 900;
+    border-radius: 0;
+  }
+
+  /* ---------------- Selection ---------------- */
+
+  .CodeMirror-selected {
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+  }
+
+  /* Selection on active line */
+  .CodeMirror-activeline .CodeMirror-selected {
+    background: #ffff00 !important;
+    color: #000000 !important;
+  }
+
+  /* ---------------- Markdown Syntax ---------------- */
+
+  .cm-header {
+    color: var(--color-brand-500) !important;
+    font-weight: 900 !important;
+    text-decoration: underline;
+  }
+
+  .cm-strong {
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    text-decoration: underline;
+  }
+
+  .cm-em {
+    color: #ffffff !important;
+    font-style: italic;
+    border-bottom: 2px dashed #ffffff;
+  }
+
+  .cm-link,
+  .cm-url {
+    color: var(--color-brand-400) !important;
+    text-decoration: underline !important;
+    font-weight: 700;
+  }
+
+  .cm-code,
+  .cm-inline-code {
+    background: var(--color-neutral-200) !important;
+    color: #ffffff !important;
+    border: 1px solid #ffffff;
+  }
+
+  .cm-comment {
+    color: #ffffff !important;
+    opacity: 1 !important;
+  }
+
+  /* ---------------- Toolbar ---------------- */
+
+  .editor-toolbar {
+    background: var(--color-neutral-000) !important;
+    border-bottom: 3px solid var(--color-neutral-300) !important;
+    box-shadow: none !important;
+
+    a,
+    button {
+      color: #ffffff !important;
+      opacity: 1 !important;
+      border: 2px solid transparent;
+      transition: none !important;
+
+      &:hover,
+      &:focus-visible {
+        background: #ffffff !important;
+        color: #000000 !important;
+        border-color: #ffffff !important;
+      }
+
+      &.active {
+        background: var(--color-brand-500) !important;
+        color: #000000 !important;
+        border-color: #ffffff !important;
+      }
+    }
+  }
+
+  /* ---------------- Status Bar ---------------- */
+
+  .editor-statusbar {
+    color: #ffffff !important;
+    border-top: 3px solid var(--color-neutral-300) !important;
+  }
+
+  /* ---------------- Preview Pane ---------------- */
+
+  .editor-preview,
+  .editor-preview-side {
+    background: var(--color-neutral-000) !important;
+    color: #ffffff !important;
+    border-left: 3px solid var(--color-neutral-300) !important;
+
+    ::selection {
+      background: #ffffff !important;
+      color: #000000 !important;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--color-brand-500) !important;
+      text-decoration: underline;
+    }
+
+    a {
+      color: var(--color-brand-400) !important;
+      text-decoration: underline !important;
+      font-weight: 700;
+    }
+
+    code,
+    pre {
+      background: var(--color-neutral-200) !important;
+      color: #ffffff !important;
+      border: 2px solid #ffffff;
+    }
+  }
+
+  /* ---------------- Scrollbars ---------------- */
+
+  .CodeMirror-scroll {
+    scrollbar-width: auto;
+    scrollbar-color: #ffffff #000000;
+  }
+
+  .CodeMirror-scroll::-webkit-scrollbar {
+    width: 14px;
+  }
+
+  .CodeMirror-scroll::-webkit-scrollbar-thumb {
+    background: #ffffff !important;
+    border: 3px solid #000000;
+  }
+
+  .CodeMirror-scroll::-webkit-scrollbar-track {
+    background: #000000 !important;
+  }
+
+  /* ---------------- Font Rendering ---------------- */
+
+  .CodeMirror,
+  .editor-toolbar,
+  .editor-preview {
+    -webkit-font-smoothing: auto !important;
+    -moz-osx-font-smoothing: auto !important;
+  }
 }
 
 .theme-contrast {

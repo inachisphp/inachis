@@ -32,6 +32,101 @@
     /* Track Changes (Cooler Tones) */
     --color-track-ins-bg: #1e3a3a; /* Deep Teal */
     --color-track-del-bg: #4a2b2b; /* Deep Rose */
+
+  div.EasyMDEContainer {
+    background: $bg-body;
+    color: $text-main;
+
+    .CodeMirror {
+      background: $bg-surface;
+      caret-color: $color-brand-400;
+      color: $text-main;
+    }
+
+    .CodeMirror-focused {
+      box-shadow:
+        0 0 0 2px rgba(56, 189, 248, 0.35),
+        0 10px 35px rgba(0, 0, 0, 0.45);
+    }
+
+    @keyframes caret-glow {
+      0% { box-shadow: 0 0 2px rgba(56, 189, 248, 0.4); }
+      50% { box-shadow: 0 0 8px rgba(56, 189, 248, 0.85); }
+      100% { box-shadow: 0 0 2px rgba(56, 189, 248, 0.4); }
+    }
+
+    .CodeMirror-cursor {
+      border-left-color: $color-brand-500;
+      animation: caret-glow 1.6s ease-in-out infinite;
+    }
+    .CodeMirror-activeline-background {
+      background:
+        linear-gradient(
+          90deg,
+          rgba(56, 189, 248, 0.12),
+          rgba(56, 189, 248, 0.04) 60%,
+          rgba(56, 189, 248, 0.02)
+        );
+      box-shadow:
+        inset 0 0 0 1px rgba(56, 189, 248, 0.08),
+        inset 0 0 14px rgba(56, 189, 248, 0.14);
+    }
+    .CodeMirror-gutters {
+      border-right-color: $color-neutral-250;
+    }
+
+    .CodeMirror-activeline-gutter .CodeMirror-linenumber {
+      color: $color-brand-400;
+      background:
+        linear-gradient(
+          90deg,
+          rgba(56, 189, 248, 0.22),
+          rgba(56, 189, 248, 0.06)
+        );
+      box-shadow:
+        inset 0 0 0 1px rgba(56, 189, 248, 0.18),
+        inset 0 0 10px rgba(56, 189, 248, 0.2);
+    }
+    .CodeMirror-selected {
+      background:
+        linear-gradient(
+          90deg,
+          rgba(56, 189, 248, 0.08),
+          rgba(56, 189, 248, 0.22) 14%,
+          rgba(56, 189, 248, 0.22) 86%,
+          rgba(56, 189, 248, 0.08)
+        );
+      box-shadow:
+        inset 0 0 0 1px rgba(56, 189, 248, 0.16),
+        inset 0 0 18px rgba(56, 189, 248, 0.24);
+    }
+    .editor-preview,
+    .editor-preview-side {
+      background: $color-neutral-100;
+      color: $color-neutral-800;
+
+      ::selection {
+        background: rgba(56, 189, 248, 0.28);
+      }
+    }
+    .CodeMirror,
+    .editor-toolbar,
+    .editor-statusbar {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    &.is-inactive {
+      .CodeMirror-cursor {
+        animation: none;
+        opacity: 0.5;
+      }
+      .CodeMirror-activeline-background,
+      .CodeMirror-selected {
+        background: transparent;
+        box-shadow: none;
+      }
+    }
+  }
 }
 
 .theme-dark {
