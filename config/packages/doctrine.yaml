@@ -1,7 +1,6 @@
 doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
-        use_savepoints: true
         driver: 'pdo_mysql'
         server_version: 'mariadb-11.1.2'
 
@@ -11,9 +10,7 @@ doctrine:
 
         profiling_collect_backtrace: '%kernel.debug%'
     orm:
-        auto_generate_proxy_classes: true
         enable_native_lazy_objects: true
-        report_fields_where_declared: true
         validate_xml_mapping: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true
@@ -36,7 +33,6 @@ when@prod:
         orm:
             controller_resolver:
                 auto_mapping: true
-            auto_generate_proxy_classes: false
             proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
             metadata_cache_driver:
                 type: pool
