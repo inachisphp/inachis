@@ -9,7 +9,8 @@
     {% block user_list_pre %}{% endblock user_list_pre %}
 
     {% block user_list %}
-    <div class="col-12 widget-posts">
+    <div class="col-12 widget-posts ui-tabs-external">
+        {% include 'inadmin/partials/tab-sets/users.html.twig' %}
 
         {% include 'inadmin/partials/table.html.twig' with {
             className: 'form__users',

@@ -10,13 +10,13 @@
 namespace Inachis\Service\Page\Export;
 
 use Inachis\Model\Page\PageExportDto;
-use Inachis\Service\Page\Export\PageExportWriterInterface;
+use Inachis\Service\Export\ExportWriterInterface;
 use SimpleXMLElement;
 
 /**
  * XML writer for pages.
  */
-class PageXmlWriter implements PageExportWriterInterface
+class PageXmlWriter implements ExportWriterInterface
 {
     /**
      * Checks if the writer supports the given format.

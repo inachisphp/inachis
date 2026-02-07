@@ -10,22 +10,40 @@
 namespace Inachis\Service\Series\Export;
 
 use Inachis\Model\Series\SeriesExportDto;
+use Inachis\Service\Export\ExportWriterInterface;
 
-final class SeriesMdWriter
+/**
+ * Markdown writer for series.
+ */
+final class SeriesMdWriter implements ExportWriterInterface
 {
-    public function write(SeriesExportDto $dto): string
+    /**
+     * Checks if the writer supports the given format.
+     */
+    public function supports(string $format): bool
     {
-        $content = "---\n";
-        $content .= "title: " . $dto->title . "\n";
-        $content .= "subtitle: " . $dto->subTitle . "\n";
-        $content .= "url: " . $dto->url . "\n";
-        $content .= "description: " . $dto->description . "\n";
-        $content .= "firstDate: " . $dto->firstDate . "\n";
-        $content .= "lastDate: " . $dto->lastDate . "\n";
-        $content .= "visibility: " . $dto->visibility . "\n";
-        $content .= "items: " . implode(", ", $dto->items) . "\n";
-        $content .= "---\n";
+        return $format === 'md';
+    }
 
-        return $content;
+    /**
+     * Writes the given series to the specified format.
+     */
+    public function write(iterable $items): string
+    {
+        $output = '';
+
+        foreach ($items as $item) {
+            $output .= "---\n";
+            $output .= "title: " . $item->title . "\n";
+            $output .= "subtitle: " . $item->subTitle . "\n";
+            $output .= "url: " . $item->url . "\n";
+            $output .= "description: " . $item->description . "\n";
+            $output .= "firstDate: " . $item->firstDate . "\n";
+            $output .= "lastDate: " . $item->lastDate . "\n";
+            $output .= "visibility: " . $item->visibility . "\n";
+            $output .= "items: " . implode(", ", $item->items) . "\n";
+            $output .= "---\n";
+        }
+        return $output;
     }
 }

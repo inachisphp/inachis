@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Controller\Page\Post;
+namespace Inachis\Controller\Page\Tools;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\User;
@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * Controller for importing pages and posts
  */
 #[IsGranted('ROLE_ADMIN')]
-class PageImportController extends AbstractInachisController
+class ImportController extends AbstractInachisController
 {
     /**
      * @param Request $request
@@ -32,13 +32,13 @@ class PageImportController extends AbstractInachisController
      * @param PageImportValidator $pageImportValidator
      * @return Response
      */
-    #[Route('/incc/post/import', name: 'incc_post_import', methods: ['GET', 'POST'])]
+    #[Route('/incc/tools/import', name: 'incc_tools_import', methods: ['GET', 'POST'])]
     public function import(
         Request $request,
         PageImportService $pageImportService,
         PageImportValidator $pageImportValidator
     ): Response {
-        $this->data['page']['title'] = 'Import Pages and Posts';
+        $this->data['page']['title'] = 'Import';
         $this->data['page']['tab'] = 'import';
 
         if ($request->isMethod('POST')) {
@@ -46,7 +46,7 @@ class PageImportController extends AbstractInachisController
 
             if (!$uploadedFile) {
                 $this->addFlash('error', 'No file uploaded.');
-                return $this->redirectToRoute('incc_post_import');
+                return $this->redirectToRoute('incc_tools_import');
             }
 
             $content = file_get_contents($uploadedFile->getPathname());
@@ -66,7 +66,7 @@ class PageImportController extends AbstractInachisController
                 }
             } catch (\Throwable $e) {
                 $this->addFlash('error', 'Error parsing file: ' . $e->getMessage());
-                return $this->redirectToRoute('incc_post_import');
+                return $this->redirectToRoute('incc_tools_import');
             }
 
             $pageDtos = [];
@@ -112,10 +112,10 @@ class PageImportController extends AbstractInachisController
             ]);
             $this->data['pages'] = $pageDtos;
             $this->data['warnings'] = $warnings;
-            return $this->render('inadmin/page/post/import_preview.html.twig', $this->data);
+            return $this->render('inadmin/page/tools/import_preview.html.twig', $this->data);
         }
 
-        return $this->render('inadmin/page/post/import_upload.html.twig', $this->data);
+        return $this->render('inadmin/page/tools/import_upload.html.twig', $this->data);
     }
 
     /**
@@ -123,7 +123,7 @@ class PageImportController extends AbstractInachisController
      * @param PageImportService $pageImportService
      * @return Response
      */
-    #[Route('/incc/import/execute', name: 'incc_post_process', methods: ['POST'])]
+    #[Route('/incc/tools/import/execute', name: 'incc_tools_import_process', methods: ['POST'])]
     public function importExecute(
         Request $request,
         PageImportService $pageImportService,
@@ -133,7 +133,7 @@ class PageImportController extends AbstractInachisController
 
         if (!$pageDtos) {
             $this->addFlash('error', 'No pages to import.');
-            return $this->redirectToRoute('incc_post_import');
+            return $this->redirectToRoute('incc_tools_import');
         }
 
         /** @var PageExportDto[] $pageDtos */
@@ -168,6 +168,6 @@ class PageImportController extends AbstractInachisController
 
         $session->remove('page_import_preview');
 
-        return $this->redirectToRoute('incc_post_list');
+        return $this->redirectToRoute('incc_tools_index');
     }
 }

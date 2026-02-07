@@ -38,7 +38,7 @@
                 <span>{% trans %}admin.dashboard.title{% endtrans %}</span>
             </a>
         </li>
-        <li class="{{ page.tab|activeMenu('post') ~ page.tab|activeMenu('page') ~ page.tab|activeMenu('import') }}">
+        <li class="{{ page.tab|activeMenu('post') ~ page.tab|activeMenu('page') }}">
             <a href="{{ settings.domain ~ path('incc_post_list', {'type': 'post'}) }}" 
                 data-tooltip="{% trans %}admin.posts.help{% endtrans %}" 
                 title="{% trans %}admin.posts.help{% endtrans %}">
@@ -84,7 +84,7 @@
                         <i class="material-icons" aria-hidden="true">insert_link</i> 
                         <span>{% trans %}admin.urls.title{% endtrans %}</span></a>
                 </li>
-                <li class="{{ page.tab|activeMenu('users') }}">
+                <li class="{{ page.tab|activeMenu('users') ~ page.tab|activeMenu('audit-logs') ~ page.tab|activeMenu('policies') }}">
                     <a href="{{ settings.domain ~ path('incc_admin_list') }}" 
                         data-tooltip="{% trans %}admin.user.help{% endtrans %}"
                         title="{% trans %}admin.user.help{% endtrans %}">
@@ -100,7 +100,7 @@
                         <span>Bin</span>
                     </a>
                 </li>
-                <li class="{{ page.tab|activeMenu('tools') }}">
+                <li class="{{ page.tab|activeMenu('tools') ~ page.tab|activeMenu('import') ~ page.tab|activeMenu('export') }}">
                     <a href="{{ settings.domain ~ path('incc_tools_index') }}"
                         data-tooltip="System Tools"
                         title="Use system tools">

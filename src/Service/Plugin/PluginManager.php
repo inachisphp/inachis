@@ -6,11 +6,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Plugin;
+namespace Inachis\Service\Plugin;
 
 use Psr\Container\ContainerInterface;
 use Doctrine\DBAL\Connection;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
 final class PluginManager
 {
@@ -18,6 +17,7 @@ final class PluginManager
 
     public function __construct(
         #[TaggedIterator('cms.plugin_installer')]
+        /** @var iterable<PluginInstallerInterface> $installers */
         private iterable $installers
     ) {
         foreach ($installers as $installer) {

@@ -9,14 +9,14 @@
 
 namespace Inachis\Service\Page\Export;
 
-use Inachis\Model\Page\PageExportDto;
-use Inachis\Service\Page\Export\PageExportWriterInterface;
+use Inachis\Model\PageExportDto;
+use Inachis\Service\Export\ExportWriterInterface;
 use SimpleXMLElement;
 
 /**
  * XML writer for pages.
  */
-class PageMdWriter implements PageExportWriterInterface
+class PageMdWriter implements ExportWriterInterface
 {
     /**
      * Checks if the writer supports the given format.

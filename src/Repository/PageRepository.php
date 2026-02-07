@@ -203,6 +203,12 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         if (!empty($filters['excludeIds'])) {
             $where[0] .= ' AND q.id NOT IN (:excludeIds)';
         }
+        if (!empty($filters['fromDate'])) {
+            $where[0] .= ' AND q.postDate >= :fromDate';
+        }
+        if (!empty($filters['toDate'])) {
+            $where[0] .= ' AND q.postDate <= :toDate';
+        }
         return $this->getAll(
             $offset,
             $limit,

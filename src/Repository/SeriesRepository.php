@@ -40,6 +40,24 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
     }
 
     /**
+     * @param $ids
+     * @return Paginator
+     */
+    public function getFilteredIds($ids): Paginator
+    {
+        return $this->getAll(
+            0,
+            0,
+            [
+                'q.id IN (:ids)',
+                [
+                    'ids' => $ids,
+                ]
+            ]
+        );
+    }
+
+    /**
      * @throws NonUniqueResultException
      */
     public function getSeriesByPost(Page $page): mixed
@@ -97,7 +115,7 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      * @param $limit
      * @return Paginator
      */
-    public function getFiltered(array $filters, int $offset, int $limit, string $sort): Paginator
+    public function getFiltered(array $filters, int $offset, int $limit, string $sort = ''): Paginator
     {
         $where = [
             '1=1',

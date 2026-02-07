@@ -82,11 +82,11 @@ window.Inachis.Components = {
 	initFilterBar() {
 		const toggle = document.querySelector('.filter__toggle');
 		const panel  = document.getElementById('filter__options');
-		const filterSelects = panel.querySelectorAll('select');
 
 		if (!toggle || !panel) {
 			return;
 		}
+		const filterSelects = panel.querySelectorAll('select');
 
 		filterSelects.forEach(select => {
 			select.addEventListener('change', () => {

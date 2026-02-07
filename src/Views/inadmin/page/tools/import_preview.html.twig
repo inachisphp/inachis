@@ -1,8 +1,8 @@
 {% extends "inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_post_list', { type: 'post' }) }}">Posts</a>
-    <a href="{{ path('incc_post_import') }}">Import</a>
+    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <a href="{{ path('incc_tools_import') }}">Import</a>
     <span>Preview</span>
 {% endblock pagetitle %}
 
@@ -11,7 +11,7 @@
 <section class="paginated-list">
     <p>{{ pages|length }} pages detected in file. Imported content will be created with status 'draft'.</p>
 
-    <form class="form nested-grid" method="post" action="{{ path('incc_post_process') }}">
+    <form class="form nested-grid" method="post" action="{{ path('incc_tools_import_process') }}">
         <table class="table table--responsive table--striped table--compact col-8">
             <thead>
                 <tr>
@@ -73,8 +73,8 @@
         <div class="fixed-bottom-bar">
             <p>
                 <button class="button button--positive" type="submit">
-                    <span class="material-icons" aria-hidden="true">start</span>
-                    <span class="button--text">Import</span>
+                    <span class="material-icons" aria-hidden="true">sync</span>
+                    <span class="button--text">Process Import</span>
                 </button>
             </p>
         </div>

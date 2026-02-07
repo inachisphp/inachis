@@ -11,6 +11,26 @@ import imageminSvgo from "imagemin-svgo";
 const isWatch = process.argv.includes("--watch");
 const isProd = !isWatch;
 
+(() => {
+    const composerJson = JSON.parse(fs.readFileSync(path.resolve('composer.json'), 'utf-8'));
+    const versionFilePath = path.resolve('config/version.php');
+
+    const version = composerJson.version || 'dev';
+    const commit = process.env.GIT_COMMIT || 'dev';
+    const buildDate = new Date().toISOString();
+
+    const versionFileContent = `<?php
+return [
+    'version' => '${version}',
+    'commit' => '${commit}',
+    'build_date' => '${buildDate}',
+];
+`;
+
+    fs.writeFileSync(versionFilePath, versionFileContent);
+    console.log(`📄 Generated version file: ${versionFilePath}`);
+})();
+
 const jsBaseConfig = {
     bundle: true,
     minify: isProd,

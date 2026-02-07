@@ -7,14 +7,12 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Service\Page\Export;
-
-use Inachis\Model\Page\PageExportDto;
+namespace Inachis\Service\Export;
 
 /**
- * Interface for page export writers.
+ * Interface for export writers.
  */
-interface PageExportWriterInterface
+interface ExportWriterInterface
 {
     /**
      * Checks if the writer supports the given format.
@@ -25,10 +23,10 @@ interface PageExportWriterInterface
     public function supports(string $format): bool;
 
     /**
-     * Writes the given pages to the specified format.
+     * Writes the given content to the specified format.
      *
-     * @param iterable $pages The pages to write.
-     * @return string The exported pages.
+     * @param iterable $items The content to write.
+     * @return string The exported content.
      */
-    public function write(iterable $pages): string;
+    public function write(iterable $items): string;
 }

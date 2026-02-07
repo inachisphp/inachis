@@ -85,9 +85,6 @@
             "config/packages/ramsey_uuid_doctrine.yaml"
         ]
     },
-    "shivas/versioning-bundle": {
-        "version": "4.1.1"
-    },
     "squizlabs/php_codesniffer": {
         "version": "4.0",
         "recipe": {

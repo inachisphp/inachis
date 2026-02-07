@@ -40,37 +40,42 @@ services:
 
     Inachis\Service\Page\Export\PageExportService:
         arguments:
-            $writers: !tagged_iterator page_export_writer
+            $writers: !tagged_iterator inachis.export_writer
 
     Inachis\Service\Page\Export\PageJsonWriter:
         tags:
-            - { name: 'page_export_writer', format: 'json' }
+            - { name: 'inachis.export_writer', format: 'json' }
 
     Inachis\Service\Page\Export\PageMdWriter:
         tags:
-            - { name: 'page_export_writer', format: 'md' }
+            - { name: 'inachis.export_writer', format: 'md' }
 
     Inachis\Service\Page\Export\PageXmlWriter:
         tags:
-            - { name: 'page_export_writer', format: 'xml' }
+            - { name: 'inachis.export_writer', format: 'xml' }
+
+    Inachis\Service\Series\Export\SeriesExportService:
+        arguments:
+            $writers: !tagged_iterator inachis.series_export_writer
 
     Inachis\Service\Series\Export\SeriesMdWriter:
         tags:
-            - { name: 'series_export_writer', format: 'md' }
+            - { name: 'inachis.series_export_writer', format: 'md' }
 
     Inachis\Service\User\PasswordResetTokenService:
         arguments:
             $appSecret: '%env(APP_SECRET)%'
             $ttlSeconds: '%password_reset.ttl%'
+            
+    Inachis\Service\VersionService:
+        arguments:
+            $versionFile: '%kernel.project_dir%/config/version.php'
 
     Inachis\Twig\:
         resource: '../src/Twig'
         tags: [ 'twig.extension' ]
         autoconfigure: true
 
-    Inachis\EventListener\AdminResponseEvent:
-        arguments:
-            $csp: '%csp%'
 
 #    Inachis\Service\CryptoService:
 #        arguments:
@@ -82,6 +87,6 @@ services:
 
 #    Inachis\Service\ImageResizer\GdImageResizer: ~
 #    Inachis\Service\ImageResizer\ImagickResizer: ~
-    Inachis\Service\ImageResizer\ImageResizerInterface:
-        factory: ['Inachis\Service\ImageResizer\ImageResizerFactory', 'create']
-        public: true
+    # Inachis\Service\ImageResizer\ImageResizerInterface:
+    #     factory: ['Inachis\Service\ImageResizer\ImageResizerFactory', 'create']
+    #     public: true
