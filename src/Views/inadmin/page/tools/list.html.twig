@@ -10,17 +10,38 @@
 
 <section class="widget widget-settings">
     <p><span class="material-icons" aria-hidden="true">dns</span></p>
-    <h2>Server Configuration</h2>
-    <p><span>Check your server and application settings.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_tools_diagnostics') }}" class="button button--secondary">Review Server Settings</a></p>
+    <h2>System Status</h2>
+    <p><span>Check your current server and application settings.</span></p>
+    <p><a href="{{ settings.domain ~ path('incc_tools_diagnostics') }}" class="button button--secondary">Review System Status</a></p>
 </section>
 
 <section class="widget widget-settings">
     <p><span class="material-icons" aria-hidden="true">email</span></p>
-    <h2>Email DNS Configuration</h2>
+    <h2>Email DNS Status</h2>
     <p><span>Check your email DNS configuration for DKIM/DMARC/SPF settings.</span></p>
     <p><a href="{{ settings.domain ~ path('incc_tools_email') }}" class="button button--secondary">Review Email DNS</a></p>
 </section>
+
+<section class="widget widget-settings">
+    <p><span class="material-icons" aria-hidden="true">import_export</span></p>
+    <h2>Import / Export</h2>
+    <p><span>Import or export your site data.</span></p>
+    <p><a href="{{ settings.domain ~ '' }}" class="button button--secondary">Import / Export</a></p>
+</section>
+
+<!-- section class="widget widget-settings">
+    <p><span class="material-icons" aria-hidden="true">backup</span></p>
+    <h2>Backup / Restore</h2>
+    <p><span>Backup your site and restore from a backup.</span></p>
+    <p><a href="{{ settings.domain }}" class="button button--secondary">Backup / Restore</a></p>
+</section>
+
+<section class="widget widget-settings">
+    <p><span class="material-icons" aria-hidden="true">construction</span></p>
+    <h2>Maintenance Mode</h2>
+    <p><span>Put your site in maintenance mode.</span></p>
+    <p><a href="{{ settings.domain }}" class="button button--secondary">Maintenance Mode</a></p>
+</section -->
 
 <section class="widget widget-settings widget-settings--danger">
     <p><span class="material-icons" aria-hidden="true">delete_forever</span></p>

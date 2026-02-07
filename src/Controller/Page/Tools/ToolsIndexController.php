@@ -26,35 +26,6 @@ class ToolsIndexController extends AbstractInachisController
         return $this->render('inadmin/page/tools/list.html.twig', $this->data);
     }
 
-    // 
-    // public function index(Request $request): Response
-    // {
-    //     $available_space = disk_free_space(dirname($request->server->get('SCRIPT_FILENAME')));
-    //     $total_space = disk_total_space(dirname($request->server->get('SCRIPT_FILENAME')));
-    //     $this->data['storage']['percent'] = ($total_space - $available_space) / $total_space * 100;
-    //     $this->data['counts']['page'] = $this->entityManager->getRepository(Page::class)->getAllCount();
-    //     $this->data['counts']['series'] = $this->entityManager->getRepository(Series::class)->getAllCount();
-    //     $this->data['counts']['tag'] = $this->entityManager->getRepository(Tag::class)->getAllCount();
-    //     $this->data['counts']['url'] = $this->entityManager->getRepository(Url::class)->getAllCount();
-    //     $form = $this->createForm(ContentType::class);
-    //     $form->handleRequest($request);
-    //     $this->data['form'] = $form->createView();
-
-    //     $this->data['data_types'] = [
-    //         'raw' => $this->entityManager->getConfiguration()->getMetadataDriverImpl()->getAllClassNames()
-    //     ];
-    //     if (!empty($this->data['data_types']['raw'])) {
-    //         foreach ($this->data['data_types']['raw'] as $type) {
-    //             if (class_exists($type) && method_exists($type, 'isExportable') && $type::isExportable()) {
-    //                 $this->data['data_types'][$type] = $type::getName();
-    //             }
-    //         }
-    //         unset($this->data['data_types']['raw']);
-    //     }
-
-    //     return $this->render('inadmin/settings.html.twig', $this->data);
-    // }
-
     // /**
     //  * @param LoggerInterface $logger
     //  * @param Request $request
