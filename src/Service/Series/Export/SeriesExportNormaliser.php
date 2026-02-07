@@ -18,7 +18,10 @@ use Inachis\Model\Series\SeriesExportDto;
 final class SeriesExportNormaliser
 {
     /**
-     * 
+     * Normalises a series for export.
+     *
+     * @param Series $series The series to normalise.
+     * @return SeriesExportDto The normalised series.
      */
     public function normalise(Series $series): SeriesExportDto
     {

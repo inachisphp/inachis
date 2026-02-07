@@ -26,6 +26,17 @@ final class SeriesMdWriter implements ExportWriterInterface
     }
 
     /**
+     * Checks if the writer supports the given content domain.
+     *
+     * @param string|null $domain The content domain to check.
+     * @return bool True if the writer supports the domain, false otherwise.
+     */
+    public function supportsDomain(?string $domain): bool
+    {
+        return $domain === 'series';
+    }
+
+    /**
      * Writes the given series to the specified format.
      */
     public function write(iterable $items): string

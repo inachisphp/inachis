@@ -3,6 +3,7 @@ window.Inachis.Export = {
     typeRadios: null,
     scopeRadios: null,
     scopeOptions: null,
+    formatOptions: null,
     filterOptions: null,
     keyword: null,
     manualOptions: null,
@@ -10,6 +11,12 @@ window.Inachis.Export = {
     selectAllNone: null,
     currentController: null,
     selectedIds: [],
+
+    supportedFormats: {
+        'category': ['json', 'xml'],
+        'post': ['json', 'md', 'xml'],
+        'series': ['json', 'xml'],
+    },
 
     url: null,
 
@@ -19,6 +26,7 @@ window.Inachis.Export = {
         this.typeRadios = document.querySelectorAll('input[name="content_type"]');
         this.scopeRadios = document.querySelectorAll('input[name="scope"]');
         this.scopeOptions = document.querySelectorAll('fieldset[data-content-type]');
+        this.formatOptions = document.getElementById('format__options');
         this.filterOptions = document.getElementById('filter__options');
         this.keyword = document.getElementById('filter__keyword');
         this.manualOptions = document.getElementById('manual__options');
@@ -46,6 +54,7 @@ window.Inachis.Export = {
             radio.addEventListener('change', () => {
                 this.showScopeOptions(radio.value);
                 this.showFilterOptions('');
+                this.showFormatOptions(radio.value);
             });
         });
     },
@@ -102,6 +111,18 @@ window.Inachis.Export = {
     syncIds() {
         document.getElementById('selectedIds').value = this.selectedIds.join(',');
         this.admonition.innerHTML = `<strong>${this.selectedIds.length}</strong> items will be exported.`;
+    },
+
+    showFormatOptions(type) {
+        this.formatOptions.querySelectorAll('input[type=radio]').forEach(radio => {
+            if (this.supportedFormats[type].includes(radio.value)) {
+                radio.parentNode.removeAttribute('hidden');
+                radio.parentNode.removeAttribute('aria-hidden');
+            } else {
+                radio.parentNode.setAttribute('hidden', 'true');
+                radio.parentNode.setAttribute('aria-hidden', 'true');
+            }
+        });
     },
 
     showScopeOptions(type) {

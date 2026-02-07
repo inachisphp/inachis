@@ -23,6 +23,14 @@ interface ExportWriterInterface
     public function supports(string $format): bool;
 
     /**
+     * Checks if the writer supports the given content domain.
+     *
+     * @param string|null $domain The content domain to check.
+     * @return bool True if the writer supports the domain, false otherwise.
+     */
+    public function supportsDomain(?string $domain): bool;
+
+    /**
      * Writes the given content to the specified format.
      *
      * @param iterable $items The content to write.

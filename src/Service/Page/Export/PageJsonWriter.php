@@ -28,6 +28,17 @@ class PageJsonWriter implements ExportWriterInterface
     }
 
     /**
+     * Checks if the writer supports the given content domain.
+     *
+     * @param string|null $domain The content domain to check.
+     * @return bool True if the writer supports the domain, false otherwise.
+     */
+    public function supportsDomain(?string $domain): bool
+    {
+        return true;
+    }
+
+    /**
      * Writes the given pages to JSON format.
      *
      * @param iterable $pages The pages to write.
