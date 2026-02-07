@@ -12,9 +12,15 @@ namespace Inachis\Service\Series\Export;
 use Inachis\Entity\Series;
 use Inachis\Model\Series\SeriesExportDto;
 
+/**
+ * Normalises a series for export.
+ */
 final class SeriesExportNormaliser
 {
-    public function normalize(Series $series): SeriesExportDto
+    /**
+     * 
+     */
+    public function normalise(Series $series): SeriesExportDto
     {
         $dto = new SeriesExportDto();
 

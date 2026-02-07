@@ -10,10 +10,25 @@
 namespace Inachis\Service\Series\Export;
 
 use Inachis\Model\Series\SeriesExportDto;
+use Inachis\Service\Export\ExportWriterInterface;
 
-final class SeriesMdWriter
+/**
+ * Markdown writer for series.
+ */
+final class SeriesMdWriter implements ExportWriterInterface
 {
-    public function write(SeriesExportDto $dto): string
+    /**
+     * Checks if the writer supports the given format.
+     */
+    public function supports(string $format): bool
+    {
+        return $format === 'md';
+    }
+
+    /**
+     * Writes the given series to the specified format.
+     */
+    public function write(iterable $items): string
     {
         $content = "---\n";
         $content .= "title: " . $dto->title . "\n";

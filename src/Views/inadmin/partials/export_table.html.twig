@@ -1,0 +1,46 @@
+{% if dataset|default([]) is not empty %}
+<table class="table table--responsive table--striped table--compact table--selectable">
+    <thead>
+        <tr>
+            <th scope="col"><input aria-label="Select all rows" class="selectAllNone" type="checkbox"></th>
+            {% if content_type != 'series' %}
+                <th>Title</th><th>Type</th><th>Status</th><th>Categories</th><th>Tags</th>
+            {% else %}
+                <th>Title</th><th>Sub Title</th><th>Number of Posts</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in dataset %}
+        <tr>
+            <td>
+                <input type="checkbox" class="checkbox" name="items[]" value="{{ item.id }}"
+                    {% if item.id.toString() in selectedIds|default([]) %}checked{% endif %}>
+            </td>
+            {% if content_type != 'series' %}
+                <td>{{ item.title }}</td>
+                <td>{{ item.type }}</td>
+                <td><span class="badge badge__{{ item.status }}">{{ item.status }}</span></td>
+                <td>{{ item.categories|map(c => c.title)|join(', ') }}</td>
+                <td>{{ item.tags|map(t => t.title)|join(', ') }}</td>
+            {% else %}
+                <td>{{ item.title }}</td>
+                <td>{{item.subTitle }}</td>
+                <td>{{ item.items|length }}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if pagination is defined and false %}
+<nav class="pagination">
+    {% if pagination.prevPage %}
+        <a href="#" class="pagination-link" data-page="{{ pagination.prevPage }}">« Prev</a>
+    {% endif %}
+    <span>Page {{ pagination.currentPage }} of {{ pagination.totalPages }}</span>
+    {% if pagination.nextPage %}
+        <a href="#" class="pagination-link" data-page="{{ pagination.nextPage }}">Next »</a>
+    {% endif %}
+</nav>
+{% endif %}
+{% endif %}

@@ -9,13 +9,12 @@
 
 namespace Inachis\Service\Page\Export;
 
-use Inachis\Model\Page\PageExportDto;
-use Inachis\Service\Page\Export\PageExportWriterInterface;
+use Inachis\Service\Export\ExportWriterInterface;
 
 /**
  * JSON writer for pages.
  */
-class PageJsonWriter implements PageExportWriterInterface
+class PageJsonWriter implements ExportWriterInterface
 {
     /**
      * Checks if the writer supports the given format.

@@ -10,18 +10,17 @@
 namespace Inachis\Service\Page\Export;
 
 use Inachis\Repository\PageRepository;
+use Inachis\Service\Export\AbstractExportService;
 use Inachis\Service\Page\Export\PageExportNormaliser;
+use Symfony\Component\TaggedIterator\TaggedIterator;
 
 /**
  * Service for exporting pages. The service uses the {@link PageRepository} to retrieve pages,
  * and the {@link PageExportNormaliser} to normalise them. The service uses the {@link PageExportWriter} 
  * interface to write the pages to a file of a given type (JSON/MD/XML).
  */
-final class PageExportService
+final class PageExportService extends AbstractExportService
 {
-    /** @var array<string, PageExportWriterInterface> */
-    private array $writers = [];
-
     /**
      * @param $pageRepository The repository to use for page operations.
      * @param $normaliser The normaliser to use.
@@ -30,19 +29,9 @@ final class PageExportService
     public function __construct(
         private PageRepository $pageRepository,
         private PageExportNormaliser $normaliser,
-        #[TaggedIterator('inachis.page_export_writer')]
-        iterable $writers,
+        #[TaggedIterator('inachis.export_writer')] iterable $writers,
     ) {
-        foreach ($writers as $writer) {
-            if (!$writer instanceof PageExportWriterInterface) {
-                continue;
-            }
-            foreach (['json', 'md', 'xml'] as $format) {
-                if ($writer->supports($format)) {
-                    $this->writers[$format] = $writer;
-                }
-            }
-        }
+        parent::__construct($writers);
     }
 
     /**
@@ -54,14 +43,19 @@ final class PageExportService
      */
     public function export(?iterable $pages = null, string $format = 'json'): string
     {
-        if (!isset($this->writers[$format])) {
-            throw new InvalidArgumentException(sprintf('Unsupported export format: %s', $format));
-        }
-
         $pages ??= $this->getAllPages();
-        $dtos = $this->normaliser->normaliseCollection($pages);
+        return $this->exportCollection($pages, $format);
+    }
 
-        return $this->writers[$format]->write($dtos);
+    /**
+     * Normalise a page.
+     * 
+     * @param object $page The page to normalise.
+     * @return object The normalised page.
+     */
+    protected function normalise(object $page): object
+    {
+        return $this->normaliser->normalise($page);
     }
 
     /**
@@ -91,9 +85,16 @@ final class PageExportService
      * @param PageExportFilterDto $filter The filter to use.
      * @return iterable<Page> The pages.
      */
-    public function getFilteredPages(PageExportFilterDto $filter): iterable
+    public function getFilteredPages(array $filter): iterable
     {
-        return $this->pageRepository->findFilteredForExport($filter);
+        $filter_type = $filter['type'] ?? '*';
+        unset($filter['type']);
+        return $this->pageRepository->getFilteredOfTypeByPostDate(
+            array_filter($filter),
+            $filter_type,
+            0,
+            10000,
+        );
     }
 
     /**

@@ -97,7 +97,7 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      * @param $limit
      * @return Paginator
      */
-    public function getFiltered(array $filters, int $offset, int $limit, string $sort): Paginator
+    public function getFiltered(array $filters, int $offset, int $limit, string $sort = ''): Paginator
     {
         $where = [
             '1=1',
