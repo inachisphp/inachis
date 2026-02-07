@@ -16,12 +16,10 @@ use Inachis\Repository\SeriesRepository;
 use Inachis\Service\Export\Category\CategoryExportService;
 use Inachis\Service\Page\Export\PageExportService;
 use Inachis\Service\Series\Export\SeriesExportService;
-use Inachis\Model\Page\PageExportFilterDto;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Controller for exporting pages and posts

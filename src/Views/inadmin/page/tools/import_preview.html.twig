@@ -9,44 +9,62 @@
 {% block content %}
 <div class="col-12 widget-posts">
 <section class="paginated-list">
-    <p>{{ pages|length }} pages detected in file. Imported content will be created with status 'draft'.</p>
+    <p>{{ items|length }} items detected in file. {% if import_type in ['page','series'] %}Imported content will be created with status 'draft'.{% endif %}</p>
 
     <form class="form nested-grid" method="post" action="{{ path('incc_tools_import_process') }}">
-        <table class="table table--responsive table--striped table--compact col-8">
+        <table class="table table--responsive table--striped table--compact col-{% if import_type == 'page' %}8{% else %}12{% endif %}">
             <thead>
                 <tr>
+                {% if import_type == 'page' %}
                     <th>Title</th>
                     <th>Type</th>
                     <th>Categories</th>
                     <th>Tags</th>
                     <th>Post Date</th>
+                {% elseif import_type == 'series' %}
+                    <th>Title</th>
+                    <th>Subtitle</th>
+                    <th>Items</th>
+                {% elseif import_type == 'category' %}
+                    <th>Description</th>
+                    <th>Full Path</th>
+                {% endif %}
                 </tr>
             </thead>
             <tbody>
-            {% for page in pages %}
+            {% for item in items %}
                 <tr>
-                    <td>{{ page.title }}</td>
-                    <td>{{ page.type }}</td>
-                    <td>{{ page.categories|map(c => c.path)|join(', ')|replace({'/': ' > '}) }}</td>
-                    <td>{{ page.tags|map(t => t.title)|join(', ') }}</td>
-                    <td>{{ page.postDate ? page.postDate|date('Y-m-d H:i') : '' }}</td>
+                    {% if import_type == 'page' %}
+                        <td>{{ item.title }}</td>
+                        <td>{{ item.type }}</td>
+                        <td>{{ item.categories|map(c => c.path)|join(', ')|replace({'/': ' > '}) }}</td>
+                        <td>{{ item.tags|map(t => t.title)|join(', ') }}</td>
+                        <td>{{ item.postDate ? item.postDate|date('Y-m-d H:i') : '' }}</td>
+                    {% elseif import_type == 'series' %}
+                        <td>{{ item.title }}</td>
+                        <td>{{ item.subTitle }}</td>
+                        <td>{{ item.items|length }}</td>
+                    {% elseif import_type == 'category' %}
+                        <td>{{ item.description }}</td>
+                        <td>{{ item.fullPath|replace({'/': ' > '}) }}</td>
+                    {% endif %}
                 </tr>
 
                 {% if warnings[loop.index0] is defined %}
-                <tr class="import-warning-row">
-                    <td colspan="6">
-                        <ul class="import-warnings">
-                            {% for warning in warnings[loop.index0] %}
-                                <li>{{ warning }}</li>
-                            {% endfor %}
-                        </ul>
-                    </td>
-                </tr>
+                    <tr class="import-warning-row">
+                        <td colspan="{{ import_type == 'page' ? 5 : import_type == 'series' ? 6 : 5 }}">
+                            <ul class="import-warnings">
+                                {% for warning in warnings[loop.index0] %}
+                                    <li>{{ warning }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
                 {% endif %}
             {% endfor %}
             </tbody>
         </table>
-
+{% if import_type == 'page' %}
         <fieldset class="col-4">
             <legend>Options</legend>
             <p>Select options for importing the content:</p>
@@ -62,14 +80,8 @@
                     Create missing tags
                 </label>
             </p>
-            <p>
-                <label>
-                    <input type="checkbox" class="checkbox" name="overridePostDates" value="1" checked>
-                    Override post dates
-                </label>
-            </p>
         </fieldset>
-
+{% endif %}
         <div class="fixed-bottom-bar">
             <p>
                 <button class="button button--positive" type="submit">
