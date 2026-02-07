@@ -30,17 +30,20 @@ final class SeriesMdWriter implements ExportWriterInterface
      */
     public function write(iterable $items): string
     {
-        $content = "---\n";
-        $content .= "title: " . $dto->title . "\n";
-        $content .= "subtitle: " . $dto->subTitle . "\n";
-        $content .= "url: " . $dto->url . "\n";
-        $content .= "description: " . $dto->description . "\n";
-        $content .= "firstDate: " . $dto->firstDate . "\n";
-        $content .= "lastDate: " . $dto->lastDate . "\n";
-        $content .= "visibility: " . $dto->visibility . "\n";
-        $content .= "items: " . implode(", ", $dto->items) . "\n";
-        $content .= "---\n";
+        $output = '';
 
-        return $content;
+        foreach ($items as $item) {
+            $output .= "---\n";
+            $output .= "title: " . $item->title . "\n";
+            $output .= "subtitle: " . $item->subTitle . "\n";
+            $output .= "url: " . $item->url . "\n";
+            $output .= "description: " . $item->description . "\n";
+            $output .= "firstDate: " . $item->firstDate . "\n";
+            $output .= "lastDate: " . $item->lastDate . "\n";
+            $output .= "visibility: " . $item->visibility . "\n";
+            $output .= "items: " . implode(", ", $item->items) . "\n";
+            $output .= "---\n";
+        }
+        return $output;
     }
 }

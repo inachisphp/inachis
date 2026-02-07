@@ -40,6 +40,24 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
     }
 
     /**
+     * @param $ids
+     * @return Paginator
+     */
+    public function getFilteredIds($ids): Paginator
+    {
+        return $this->getAll(
+            0,
+            0,
+            [
+                'q.id IN (:ids)',
+                [
+                    'ids' => $ids,
+                ]
+            ]
+        );
+    }
+
+    /**
      * @throws NonUniqueResultException
      */
     public function getSeriesByPost(Page $page): mixed

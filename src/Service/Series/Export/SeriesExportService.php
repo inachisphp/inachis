@@ -59,14 +59,23 @@ final class SeriesExportService extends AbstractExportService
     }
 
     /**
+     * Get series by IDs via the repository.
+     * 
+     * @param array $ids The IDs of the series to retrieve.
+     * @return iterable<Series> The series.
+     */
+    public function getSeriesByIds(array $ids): iterable
+    {
+        return $this->repository->getFilteredIds($ids);
+    }
+
+    /**
      * Get all series via the repository.
      * 
      * @return iterable<Series> The series.
      */
     public function getAllSeries(): iterable
     {
-        foreach ($this->repository->findAll() as $series) {
-            yield $this->normaliser->normalise($series);
-        }
+        return $this->repository->findAll();
     }
 }

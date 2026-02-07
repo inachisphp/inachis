@@ -97,7 +97,7 @@ class ExportController extends AbstractInachisController
             }
 
             try {
-                $exportedData = $exportService->export($items, $format);
+                $exportedContent = $exportService->export($items, $format);
             } catch (\InvalidArgumentException $e) {
                 $this->addFlash('error', $e->getMessage());
                 return $this->redirectToRoute('incc_tools_export');
