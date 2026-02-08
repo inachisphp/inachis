@@ -31,6 +31,7 @@ window.Inachis.Export = {
         this.keyword = document.getElementById('filter__keyword');
         this.manualOptions = document.getElementById('manual__options');
         this.manualTableContainer = document.getElementById('manual__table-container');
+        const selectedIds = document.getElementById('selectedIds').value.split(',').filter(id => id !== '');
 
         this.initTypeRadios();
         this.initScopeRadios();
@@ -47,6 +48,16 @@ window.Inachis.Export = {
                 e.preventDefault();
             }
         });
+
+        // Ensure correct intial state on POST
+        if (selectedIds.length > 0) {
+            const selectedContentType = document.querySelector('input[name="content_type"]:checked').value;
+            this.showFormatOptions(selectedContentType);
+            this.showScopeOptions(selectedContentType);
+            this.showFilterOptions('manual');
+            this.selectedIds = selectedIds;
+            this.syncIds();
+        }
     },
 
     initTypeRadios() {
@@ -127,7 +138,6 @@ window.Inachis.Export = {
 
     showScopeOptions(type) {
         this.scopeOptions.forEach(option => {
-            option.checked = false;
             if (option.dataset.contentType === type) {
                 option.removeAttribute('hidden');
                 option.removeAttribute('aria-hidden');
@@ -147,7 +157,6 @@ window.Inachis.Export = {
         this.syncIds();
         this.manualTableContainer.innerHTML = '';
         this.keyword.value = '';
-        this.keyword.focus();
         if (type === 'filtered') {
             this.filterOptions.removeAttribute('hidden');
             this.filterOptions.removeAttribute('aria-hidden');
@@ -158,7 +167,9 @@ window.Inachis.Export = {
         if (type === 'manual') {
             this.manualOptions.removeAttribute('hidden');
             this.manualOptions.removeAttribute('aria-hidden');
+            this.keyword.focus();
         } else {
+            this.keyword.blur();
             this.manualOptions.setAttribute('hidden', 'true');
             this.manualOptions.setAttribute('aria-hidden', 'true');
         }
