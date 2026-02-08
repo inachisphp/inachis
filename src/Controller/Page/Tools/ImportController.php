@@ -72,7 +72,7 @@ class ImportController extends AbstractInachisController
                         break;
                     case 'xml':
                         $xml = simplexml_load_string($content, "SimpleXMLElement", LIBXML_NOCDATA);
-                        $data = json_decode(json_encode($xml), true);
+                        $data = json_decode(json_encode($xml), true)['category'];
                         break;
                     case 'md':
                         throw new \InvalidArgumentException('Markdown import not implemented yet.');
