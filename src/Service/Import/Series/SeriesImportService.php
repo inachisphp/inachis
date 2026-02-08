@@ -22,6 +22,10 @@ use InvalidArgumentException;
  */
 final class SeriesImportService
 {
+    /**
+     * @param EntityManagerInterface $entityManager
+     * @param PageRepository $pageRepository
+     */
     public function __construct(
         private EntityManagerInterface $entityManager,
         private PageRepository $pageRepository,

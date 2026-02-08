@@ -28,7 +28,7 @@ final class CategoryImportService
      * @param CategoryExportDto[] $categoryDtos
      * @return CategoryImportResult
      */
-    public function importTree(iterable $categoryDtos): CategoryImportResult
+    public function import(iterable $categoryDtos): CategoryImportResult
     {
         $result = new CategoryImportResult();
         $existingCategories = [];
@@ -66,13 +66,17 @@ final class CategoryImportService
                     $parent = $cat;
                 }
 
-                // Optionally update description, visibility, image, icon
                 $cat->setDescription($dto->description ?? $cat->getDescription());
                 $cat->setVisible($dto->visible ?? $cat->isVisible());
                 $cat->setImage($dto->image ?? $cat->getImage());
                 $cat->setIcon($dto->icon ?? $cat->getIcon());
             }
-
+            $uow = $this->entityManager->getUnitOfWork();
+            foreach ($existingCategories as $category) {
+                if (!empty($uow->getEntityChangeSet($category))) {
+                    $result->categoriesUpdated++;
+                }
+            }
             $this->entityManager->flush();
             $this->entityManager->commit();
         } catch (\Throwable $e) {
@@ -95,7 +99,8 @@ final class CategoryImportService
 
         foreach ($data as $category) {
             $dto = new CategoryExportDto();
-            $dto->id = $category['id'] ?? null; // optional for internal linking
+            $dto->id = $category['id'] ?? null;
+            $dto->title = $category['title'] ?? null;
             $dto->fullPath = $category['fullPath'] ?? ($category['title'] ?? '');
             $dto->description = $category['description'] ?? null;
             $dto->visible = $category['visible'] ?? true;

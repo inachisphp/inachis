@@ -15,5 +15,6 @@ namespace Inachis\Service\Import\Category;
 final class CategoryImportResult
 {
     public int $categoriesCreated = 0;
+    public int $categoriesUpdated = 0;
     public array $warnings = [];
 }

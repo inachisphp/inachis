@@ -192,8 +192,9 @@ class ImportController extends AbstractInachisController
                 $resultSummary = [
                     'items' => $result->categoriesCreated ?? 0,
                     'message' => sprintf(
-                        'Imported %d categories.',
-                        $result->categoriesCreated
+                        'Imported %d categories and updated %d categories.',
+                        $result->categoriesCreated,
+                        $result->categoriesUpdated
                     ),
                 ];
                 break;

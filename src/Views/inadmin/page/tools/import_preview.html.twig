@@ -26,7 +26,7 @@
                     <th>Subtitle</th>
                     <th>Items</th>
                 {% elseif import_type == 'category' %}
-                    <th>Description</th>
+                    <th>Title</th>
                     <th>Full Path</th>
                 {% endif %}
                 </tr>
@@ -45,7 +45,7 @@
                         <td>{{ item.subTitle }}</td>
                         <td>{{ item.items|length }}</td>
                     {% elseif import_type == 'category' %}
-                        <td>{{ item.description }}</td>
+                        <td>{{ item.title }}</td>
                         <td>{{ item.fullPath|replace({'/': ' > '}) }}</td>
                     {% endif %}
                 </tr>
