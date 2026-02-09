@@ -174,9 +174,11 @@ export default class DatePicker {
       this.renderYearPanel();
       this.yearPanel.classList.add('visible');
       this.yearPanel.style.display = 'grid';
+      this.calendarContainer.style.display = 'none';
     } else {
       this.yearPanel.classList.remove('visible');
       this.yearPanel.style.display = 'none';
+      this.calendarContainer.style.display = 'block';
     }
   }
 
@@ -206,6 +208,7 @@ export default class DatePicker {
         this.yearPanelVisible = false;
         this.yearPanel.classList.remove('visible');
         this.yearPanel.style.display = 'none';
+        this.calendarContainer.style.display = 'block';
         this.renderCalendar();
       });
       this.yearPanel.appendChild(btn);
