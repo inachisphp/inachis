@@ -16,7 +16,7 @@ use Symfony\Component\TaggedIterator\TaggedIterator;
 
 /**
  * Service for exporting pages. The service uses the {@link PageRepository} to retrieve pages,
- * and the {@link PageExportNormaliser} to normalise them. The service uses the {@link PageExportWriter} 
+ * and the {@link PageExportNormaliser} to normalise them. The service uses the {@link PageExportWriter}
  * interface to write the pages to a file of a given type (JSON/MD/XML).
  */
 final class PageExportService extends AbstractExportService
@@ -36,7 +36,7 @@ final class PageExportService extends AbstractExportService
 
     /**
      * Export pages to a file of a given type (JSON/MD/XML).
-     * 
+     *
      * @param iterable $pages The pages to export.
      * @param string $format The format to export to (json/md/xml).
      * @return string The exported pages.
@@ -49,7 +49,7 @@ final class PageExportService extends AbstractExportService
 
     /**
      * Normalise a page.
-     * 
+     *
      * @param object $page The page to normalise.
      * @return object The normalised page.
      */
@@ -60,7 +60,7 @@ final class PageExportService extends AbstractExportService
 
     /**
      * Get pages by IDs via the repository.
-     * 
+     *
      * @param array $ids The IDs of the pages to retrieve.
      * @return iterable<Page> The pages.
      */
@@ -71,7 +71,7 @@ final class PageExportService extends AbstractExportService
 
     /**
      * Get all pages via the repository.
-     * 
+     *
      * @return iterable<Page> The pages.
      */
     public function getAllPages(): iterable
@@ -81,8 +81,8 @@ final class PageExportService extends AbstractExportService
 
     /**
      * Get filtered pages via the repository.
-     * 
-     * @param PageExportFilterDto $filter The filter to use.
+     *
+     * @param array $filter The filter to use.
      * @return iterable<Page> The pages.
      */
     public function getFilteredPages(array $filter): iterable
@@ -99,11 +99,11 @@ final class PageExportService extends AbstractExportService
 
     /**
      * Get the count of all pages via the repository.
-     * 
+     *
      * @return int The count of pages.
      */
     public function getAllCount(): int
     {
         return $this->pageRepository->getAllCount();
-    }   
+    }
 }

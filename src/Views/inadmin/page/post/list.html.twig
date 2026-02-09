@@ -95,16 +95,15 @@
                         'title': 'Recreate Link'
                     },
                     'export': {
-                        'button_class': 'button--secondary button--export dialog__link',
+                        'button_class': 'button--secondary button--export',
                         'button_type': 'button',
                         'data': {
-                            'class-name': 'dialog__export',
-                            'form-action': '',
-                            'template-name': 'export',
-                            'title': 'Export content'
+                            'content-type': 'post',
+                            'form-action': path('incc_tools_export'),
+                            'scope': 'manual',
                         },
                         'icon': 'cloud_download',
-                        'title': 'Export'
+                        'title': 'Export',
                     },
                     'delete': {
                         'button_class': 'button--negative button--delete button--confirm',

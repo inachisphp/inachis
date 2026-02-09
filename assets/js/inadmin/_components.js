@@ -6,6 +6,7 @@ window.Inachis.Components = {
 		this.initClearSearch('');
 		this.initCopyPaste('');
 		this.initDatePicker();
+		this.initExportButton();
 		this.initFilterBar();
 		this.initOptionSelectors();
 		this.initPasswordToggle();
@@ -77,6 +78,31 @@ window.Inachis.Components = {
 					}
 				}
 			});
+		});
+	},
+	initExportButton() {
+		const exportButton = document.querySelector('.button--export');
+		if (!exportButton) return;
+
+		exportButton.addEventListener('click', () => {
+			const hiddenData = {
+				scope: exportButton.dataset.scope,
+				content_type: exportButton.dataset.contentType,
+				selectedIds: Array.from(form.querySelectorAll('input[name="items[]"]:checked')).map(cb => cb.value),
+			}
+			const formAction = exportButton.dataset.formAction;
+			const listForm = document.querySelector('form.form');
+			if (!listForm) return;
+
+			listForm.action = formAction;
+			Object.entries(hiddenData).forEach(([name, value]) => {
+				const input = document.createElement('input');
+				input.type = 'hidden';
+				input.name = name;
+				input.value = value;
+				listForm.appendChild(input);
+			});
+			listForm.requestSubmit();
 		});
 	},
 	initFilterBar() {

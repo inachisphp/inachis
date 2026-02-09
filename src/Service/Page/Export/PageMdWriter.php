@@ -9,7 +9,7 @@
 
 namespace Inachis\Service\Page\Export;
 
-use Inachis\Model\PageExportDto;
+use Inachis\Model\Page\PageExportDto;
 use Inachis\Service\Export\ExportWriterInterface;
 use SimpleXMLElement;
 
@@ -30,6 +30,17 @@ class PageMdWriter implements ExportWriterInterface
     }
 
     /**
+     * Checks if the writer supports the given content domain.
+     *
+     * @param string|null $domain The content domain to check.
+     * @return bool True if the writer supports the domain, false otherwise.
+     */
+    public function supportsDomain(?string $domain): bool
+    {
+        return true;
+    }
+
+    /**
      * Writes the given pages to MD format.
      *
      * @param iterable $pages The pages to write.
@@ -38,7 +49,6 @@ class PageMdWriter implements ExportWriterInterface
     public function write(iterable $pages, array $options = []): string
     {
         $output = '';
-
         foreach ($pages as $page) {
             if (!$page instanceof PageExportDto) {
                 throw new \InvalidArgumentException('All items must be PageExportDto');
