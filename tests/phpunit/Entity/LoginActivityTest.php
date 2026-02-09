@@ -10,7 +10,8 @@
 namespace Inachis\Tests\phpunit\Entity;
 
 use Inachis\Entity\LoginActivity;
-use DateTime;
+use Inachis\Entity\User;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -20,7 +21,8 @@ class LoginActivityTest extends TestCase
 
     public function setUp(): void
     {
-        $this->loginActivity = new LoginActivity();
+        $user = $this->createStub(User::class);
+        $this->loginActivity = new LoginActivity($user, 'success');
         parent::setUp();
     }
 
@@ -38,11 +40,11 @@ class LoginActivityTest extends TestCase
     }
 
 
-    public function testSetAndGetRemoteIp(): void
+    public function testSetAndGetIpAddress(): void
     {
-        $this->assertEmpty($this->loginActivity->getRemoteIp());
-        $this->loginActivity->setRemoteIp('ip');
-        $this->assertEquals('ip', $this->loginActivity->getRemoteIp());
+        $this->assertEmpty($this->loginActivity->getIpAddress());
+        $this->loginActivity->setIpAddress('ip');
+        $this->assertEquals('ip', $this->loginActivity->getIpAddress());
     }
 
 
@@ -53,16 +55,10 @@ class LoginActivityTest extends TestCase
         $this->assertEquals('user-agent', $this->loginActivity->getUserAgent());
     }
 
-    public function testSetAndGetTimestamp(): void
+    public function testSetAndGetLoggedAt(): void
     {
-        $date = new DateTime();
-        $this->loginActivity->setTimestamp($date);
-        $this->assertEquals($date, $this->loginActivity->getTimestamp());
-    }
-    public function testSetAndGetAttemptCount(): void
-    {
-        $this->assertEquals(1, $this->loginActivity->getAttemptCount());
-        $this->loginActivity->setAttemptCount(10);
-        $this->assertEquals(10, $this->loginActivity->getAttemptCount());
+        $date = new DateTimeImmutable();
+        $this->loginActivity->setLoggedAt($date);
+        $this->assertEquals($date, $this->loginActivity->getLoggedAt());
     }
 }

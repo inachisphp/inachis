@@ -36,11 +36,11 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class AccountController extends AbstractInachisController
 {
     /**
-     * @param Request             $request
+     * @param Request $request
      * @param AuthenticationUtils $authenticationUtils
      * @return Response The response the controller results in
      */
-    #[Route("/incc/login", name: "app_account_login", methods: [ "GET", "POST" ])]
+    #[Route("/incc/login", name: "incc_account_login")]
     public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
     {
         $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();
@@ -49,8 +49,6 @@ class AccountController extends AbstractInachisController
         }
         $form = $this->createForm(LoginType::class, [
             'loginUsername' => $authenticationUtils->getLastUsername(),
-        ], [
-            // 'action' => '/incc/login_check',
         ]);
         $form->handleRequest($request);
         $this->data['page']['title'] = 'Sign In';
@@ -61,18 +59,13 @@ class AccountController extends AbstractInachisController
         return $this->render('inadmin/page/admin/signin.html.twig', $this->data);
     }
 
-    #[Route('/incc/login_check', name: 'app_account_login_check')]
-    public function dummyCheck(): void
-    {
-        throw new \LogicException('This route is handled by Symfony firewall and should never be called.');
-    }
-
     /**
      * @throws \Exception
      */
-    #[Route("/incc/logout", name: "incc_logout", methods: [ "GET", "POST" ])]
+    #[Route("/incc/logout", name: "incc_logout")]
     public function logout(): void
     {
+        throw new \LogicException('This method is blank and will be intercepted by the logout key on your firewall.');
     }
 
     /**

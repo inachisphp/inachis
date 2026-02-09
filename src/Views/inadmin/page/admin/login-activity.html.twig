@@ -1,0 +1,80 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    {% if user|default(null) %}
+    <a href="{{ path('incc_admin_list') }}">Users</a>
+    <span>Edit User: {{ user.username }}</span>
+    {% else %}
+    <span>Login Activity</span>
+    {% endif %}
+{% endblock pagetitle %}
+
+{% block content %}
+
+<div class="col-12 widget-data-list ui-tabs-external">
+    {% if user|default(null) %}
+        {% include 'inadmin/partials/tab-sets/profile.html.twig' with { activeTab: 'login-activity' } %}
+    {% else %}
+        {% include 'inadmin/partials/tab-sets/users.html.twig' %}
+    {% endif %}
+
+{# {% include 'inadmin/partials/table.html.twig' with {
+    type: 'loginActivity',
+    dataset: activities,
+    columns: [
+        {
+            title: 'Time'
+        },
+        {
+            title: 'User'
+        },
+        {
+            title: 'Type'
+        },
+        {
+            title: 'IP'
+        },
+        {
+            title: 'User-agent'
+        },
+    ],
+} %} #}
+
+
+<form name="post" method="post" class="form form__post">
+<table class="table  table--striped">
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>User</th>
+            <th>Type</th>
+            <th>IP</th>
+            <th>User Agent</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for activity in activities %}
+        <tr class="{{ activity.type == 'failure' ? 'table-danger' : '' }}">
+            <td>{{ activity.loggedAt|date('Y-m-d H:i:s') }}</td>
+            <td>
+                {{ activity.user ? activity.user.userIdentifier : activity.username }}
+            </td>
+            <td>
+                {% if activity.type == 'success' %}
+                    <span class="badge badge__ok">Success</span>
+                {% else %}
+                    <span class="badge badge__issue">Failure</span>
+                {% endif %}
+            </td>
+            <td>{{ activity.ipAddress }}</td>
+            <td class="text-muted small">{{ activity.userAgent|slice(0, 80) }}</td>
+            <td><a href="{{ path('incc_admin_login_activity_view', { id: activity.id}) }}">view</a></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</form>
+
+</div>
+{% endblock content %}

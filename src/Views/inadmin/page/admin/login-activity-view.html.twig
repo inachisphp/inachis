@@ -1,0 +1,28 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <span>Login Activity</span>
+{% endblock pagetitle %}
+
+{% block content %}
+
+<div class="col-12 widget-data-list ui-tabs-external">
+    {% include 'inadmin/partials/tab-sets/users.html.twig' %}
+    <section class="paginated-list">
+        <p><strong>Time:</strong> {{ activity.loggedAt|date('Y-m-d H:i:s') }}</p>
+        <p><strong>User:</strong> {{ (activity.user ? activity.user.userIdentifier : activity.username)|default('Unknown') }}</p>
+        <p><strong>Type:</strong> {{ activity.type }}</p>
+        <p><strong>IP Address:</strong> {{ activity.ipAddress }}</p>
+        <p><strong>User Agent:</strong> {{ activity.userAgent }}</p>
+        <p><strong>Extra Data:</strong></p>
+        <ul>
+            {% for key, value in activity.extraData %}
+                {% set value = value|join(', ') %}
+                <li><strong>{{ key|replace({'_': ' '})|title }}:</strong> {{ value|slice(0, 80) }}{% if value|length > 80 %}…{% endif %}</li>
+            {% else %}
+                <li>No extra data</li>
+            {% endfor %}
+        </ul>
+    </section>
+</div>
+{% endblock content %}
