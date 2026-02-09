@@ -31,7 +31,7 @@ class UserAccountEmailServiceTest extends TestCase
 
         $this->settings = [
             'clientIP' => '127.0.0.1',
-            'siteTitle' => 'ExampleSite',
+            'settings' => ['siteTitle' => 'ExampleSite'],
         ];
     }
 
@@ -127,6 +127,6 @@ class UserAccountEmailServiceTest extends TestCase
 
         $urlGenerator = fn(string $token) => "/incc/new-password/$token";
 
-        $service->sendForgotPasswordEmail($user, $this->settings, $urlGenerator);
+        $service->sendForgotPasswordEmail($user, this->settings, $urlGenerator);
     }
 }
