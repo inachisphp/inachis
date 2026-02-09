@@ -141,7 +141,7 @@ export default class DatePicker {
       const rect = this.input.getBoundingClientRect();
       this.picker.style.top = rect.bottom + window.scrollY + 'px';
       this.picker.style.left = rect.left + window.scrollX + 'px';
-      this.picker.style.width = (rect.width + 60) + 'px';
+      this.picker.style.width = (rect.width + 90) + 'px';
     };
 
     this.input.addEventListener('focus', () => {
@@ -246,6 +246,7 @@ export default class DatePicker {
       newTable.style.transition = '';
       this.calendar = newTable;
       this.isAnimating = false;
+      this.updateMonthYearLabel();
     }, 250);
   }
 
@@ -309,12 +310,15 @@ export default class DatePicker {
     return table;
   }
 
-  renderCalendar() {
+  updateMonthYearLabel() {
     const monthNames = [];
     for (let m = 0; m < 12; m++)
       monthNames.push(new Intl.DateTimeFormat(this.options.locale, { month: 'long' }).format(new Date(this.currentYear, m)));
     this.monthLabelBtn.textContent = `${monthNames[this.currentMonth]} ${this.currentYear}`;
+  }
 
+  renderCalendar() {
+    this.updateMonthYearLabel();
     const newTable = this.createCalendarTable();
     this.calendarContainer.replaceChild(newTable, this.calendar);
     this.calendar = newTable;
@@ -329,25 +333,33 @@ export default class DatePicker {
     // Hour input
     const hourLabel = document.createElement('label');
     hourLabel.textContent = 'H:';
+    hourLabel.style.display = 'none';
+
     this.hourInput = document.createElement('input');
     this.hourInput.type = 'number';
     this.hourInput.min = 0;
     this.hourInput.max = 23;
     this.hourInput.value = this.selectedDate?.getHours() ?? 0;
-    hourLabel.appendChild(this.hourInput);
+
+    const timeDivider = document.createElement('span');
+    timeDivider.textContent = ':';
 
     // Minute input
     const minuteLabel = document.createElement('label');
     minuteLabel.textContent = 'M:';
+    minuteLabel.style.display = 'none';
+
     this.minuteInput = document.createElement('input');
     this.minuteInput.type = 'number';
     this.minuteInput.min = 0;
     this.minuteInput.max = 59;
     this.minuteInput.value = this.selectedDate?.getMinutes() ?? 0;
-    minuteLabel.appendChild(this.minuteInput);
 
     this.timeContainer.appendChild(hourLabel);
+    this.timeContainer.appendChild(this.hourInput);
+    this.timeContainer.appendChild(timeDivider);
     this.timeContainer.appendChild(minuteLabel);
+    this.timeContainer.appendChild(this.minuteInput);
     this.picker.appendChild(this.timeContainer);
 
     // Sync inputs
