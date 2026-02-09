@@ -9,8 +9,8 @@
     {% block series_list_pre %}{% endblock series_list_pre %}
 
     {% block series_list %}
-        <div class="col-12 widget-posts">
-        {% include 'inadmin/partials/list.html.twig' with {
+        <div class="col-12 widget-posts ui-tabs-external">
+            {% include 'inadmin/partials/list.html.twig' with {
                 'className': 'form__series',
                 'type': 'series',
 
@@ -28,7 +28,13 @@
                 },
                 'url_result': path('incc_series_list'),
 
-                'filters': [],
+                'filters': {
+                    'Visibility': {
+                        '': 'All',
+                        'private': 'Private',
+                        'public': 'Public',
+                    }
+                },
                 'filter_values': query.filters,
                 'show_select_deselect': true,
                 'show_search': true,
@@ -51,6 +57,17 @@
                         },
                         'icon': 'visibility',
                         'title': 'Make public',
+                    },
+                    'export': {
+                        'button_class': 'button--secondary button--export',
+                        'button_type': 'button',
+                        'data': {
+                            'content-type': 'series',
+                            'form-action': path('incc_tools_export'),
+                            'scope': 'manual',
+                        },
+                        'icon': 'cloud_download',
+                        'title': 'Export',
                     },
                     'delete': {
                         'button_class': 'button--negative button--delete button--confirm',

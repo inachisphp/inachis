@@ -10,7 +10,7 @@ import './inadmin/_confirmation.js';
 import './inadmin/_contentSelector.js';
 import './inadmin/_dashboard.js';
 import './inadmin/_dialog.js';
-import './inadmin/_exportDialog.js';
+import './inadmin/_export.js';
 import './inadmin/_imageManager.js';
 import './inadmin/_map.js';
 import './inadmin/_menu.js';

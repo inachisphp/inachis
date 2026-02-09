@@ -83,6 +83,7 @@ class AdminProfileController extends AbstractInachisController
         );
         $this->data['query'] = $contentQuery;
         $this->data['page']['title'] = 'Users';
+        $this->data['page']['tab'] = 'users';
         return $this->render('inadmin/page/admin/list.html.twig', $this->data);
     }
 
@@ -146,6 +147,7 @@ class AdminProfileController extends AbstractInachisController
         $this->data['user'] = $user;
         $this->data['form'] = $form->createView();
         $this->data['page']['title'] = 'Profile';
+        $this->data['page']['tab'] = 'users';
         $this->data['heicSupported'] = $imageTransformer->isHEICSupported();
 
         return $this->render('inadmin/page/admin/profile.html.twig', $this->data);

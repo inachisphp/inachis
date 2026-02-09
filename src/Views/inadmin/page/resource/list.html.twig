@@ -75,12 +75,12 @@
                 </a>
                 {% if item.filesize / 1024 > limitKByte %}
                     <span class="ui-help help--warning">
-                        <em class="material-icons">warning</em>
+                        <em class="material-icons" aria-hidden="true">warning</em>
                         This file is larger than {{ limitKByte/1024 }} kb
                     </span>
                 {% elseif item.dimensionX|default(0) > limitSize or item.dimensionY|default(0) > limitSize %}
                     <span href="#" class="ui-help help--warning">
-                        <em class="material-icons">warning</em>
+                        <em class="material-icons" aria-hidden="true">warning</em>
                         This image is larger than {{ limitSize }} on at least one side
                     </span>
                 {% endif %}
@@ -110,14 +110,14 @@
 
     <section class="paginated-list">
         <p class="content-warning">
-            <i class="material-icons">info_outline</i>
+            <i class="material-icons" aria-hidden="true">info_outline</i>
             <span>Oops! Your filter didn't find anything!</span>
         </p>
     </section>
     {% else %}
         <section class="paginated-list">
             <p class="content-warning">
-                <i class="material-icons">info_outline</i>
+                <i class="material-icons" aria-hidden="true">info_outline</i>
                 <span>You don't have any content yet!</span>
                 <a class="dialog__link" data-class-name="dialog__imageManager" data-target="featureImage" data-template-name="image-manager" data-title="{{ 'admin.dialog.upload.title'|trans }}" data-view="upload" href="">Add some now!</a>
             </p>

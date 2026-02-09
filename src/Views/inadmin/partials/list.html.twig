@@ -96,16 +96,16 @@
             <span class="date">
                 {% endif %}
                 {% if item.postDate|default(false) %}
-                <span class="material-icons">event</span>
+                <span class="material-icons" aria-hidden="true">event</span>
                 <em>{{ item.postDate|date('jS M Y \\a\\t H:i', timezone) }}</em>
                 {% endif %}
                 {% if item.items is defined %}
                     {% if item.firstDate is not empty %}
-                <span class="material-icons">date_range</span>{{ item.firstDate|date("M j, Y") }} to {{ item.lastDate|date("M j, Y") }}
+                <span class="material-icons" aria-hidden="true">date_range</span>{{ item.firstDate|date("M j, Y") }} to {{ item.lastDate|date("M j, Y") }}
                     {% endif %}
-                <span class="material-icons">library_books</span> <strong>{{ item.items|length }}</strong> posts
+                <span class="material-icons" aria-hidden="true">library_books</span> <strong>{{ item.items|length }}</strong> posts
                 {% endif %}
-                <span class="material-icons">history</span>
+                <span class="material-icons" aria-hidden="true">history</span>
                  Updated: <em>{{ item.modDate|date('jS M Y \\a\\t H:i', timezone) }}</em>
                 {% if inline|default(false) == false %}
             </p>
@@ -133,18 +133,19 @@
     {% include 'inadmin/partials/filters.html.twig' with {
         'filters': filters,
         'filter_values': filter_values,
-        'show_search': show_search
+        'show_search': show_search,
+        'add_button': add_button,
     } only %}
     <section class="paginated-list">
         <p class="content-warning">
-            <i class="material-icons">info_outline</i>
+            <i class="material-icons" aria-hidden="true">info_outline</i>
             <span>Oops! Your filter didn't find anything!</span>
         </p>
     </section>
 {% else %}
     <section class="paginated-list">
         <p class="content-warning">
-            <i class="material-icons">info_outline</i>
+            <i class="material-icons" aria-hidden="true">info_outline</i>
             <span>You don't have any content yet!</span>
         {% if add_button is defined and add_button.url is defined %}
             <a href="{{ add_button.url }}">Add some now!</a>

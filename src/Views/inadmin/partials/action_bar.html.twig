@@ -13,7 +13,7 @@
                 if action.id is defined %} id="{{ action.id }}"{% endif
             %} name="{{ key }}" type="{{ action.button_type|default('submit') }}">
                 {% if action.icon is defined and action.icon is not empty %}
-                    <span class="material-icons">{{ action.icon }}</span>
+                    <span class="material-icons" aria-hidden="true">{{ action.icon }}</span>
                 {% endif %}
                 {{ action.title|default(null) }}
             </button>

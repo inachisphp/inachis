@@ -1,0 +1,34 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    {% if username|default(null) %}
+    <a href="{{ path('incc_admin_list') }}">Users</a>
+    <a href="{{ path('incc_admin_edit', { id: username }) }}">User: {{ username }}</a>
+    <span>Audit Log Entry</span>
+    {% else %}
+    <a href="{{ path('incc_admin_login_activity_index') }}">Audit Logs</a>
+    <span>Audit Log Entry</span>
+    {% endif %}
+{% endblock pagetitle %}
+
+{% block content %}
+
+<div class="col-12 widget-data-list">
+    <section class="paginated-list">
+        <p><strong>Time:</strong> {{ activity.loggedAt|date('Y-m-d H:i:s') }}</p>
+        <p><strong>User:</strong> {{ (activity.user ? activity.user.userIdentifier : activity.username)|default('Unknown') }}</p>
+        <p><strong>Type:</strong> {{ activity.type }}</p>
+        <p><strong>IP Address:</strong> {{ activity.ipAddress }}</p>
+        <p><strong>User Agent:</strong> {{ activity.userAgent }}</p>
+        <p><strong>Extra Data:</strong></p>
+        <ul>
+            {% for key, value in activity.extraData %}
+                {% set value = value|join(', ') %}
+                <li><strong>{{ key|replace({'_': ' '})|title }}:</strong> {{ value|slice(0, 80) }}{% if value|length > 80 %}…{% endif %}</li>
+            {% else %}
+                <li>No extra data</li>
+            {% endfor %}
+        </ul>
+    </section>
+</div>
+{% endblock content %}

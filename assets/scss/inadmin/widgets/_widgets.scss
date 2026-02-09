@@ -1,31 +1,66 @@
+@use '../definitions' as *;
+
 div.widget-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  flex-wrap: $gutter;
+  gap: $gutter;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(240px, 1fr)
+  );
+  margin-bottom: 2rem;
 }
 
 section.widget {
   h2 {
-    color: #666;
+    color: $text-muted;
     font-size: 0.85em;
     text-transform: uppercase;
   }
 }
 
 section.widget-settings {
-    background: #fff;
-    border: 1px solid #ddd;
-    margin: 1em;
-    max-width: 225px;
-    padding: 1em;
-    text-align: center;
-    width: 25%;
+  background: $bg-surface;
+  border: 1px solid $border-color;
+  border-radius: $radius-standard;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
+  height: 100%;
+  margin: 1em;
+  max-width: 250px;
+  min-width: 225px;
+  padding: 1.25rem;
+  text-align: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  width: 25%;
 
-    .material-icons {
-      font-size: 5em;
-    }
+  & p:last-child {
+    margin-top: auto;
+  }
+  &:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
 
-    p span {
-      font-size: 0.85em;
+  &.widget-settings--danger {
+    border: 1px solid $diagnostic-error;
+    background: $diagnostic-error;
+    color: $text-inverse;
+
+    h2 {
+      color: $text-inverse;
     }
+    .button {
+      background: $bg-surface;
+      color: $diagnostic-error;
+    }
+  }
+
+  .material-icons {
+    font-size: 5em;
+  }
+
+  p span {
+    font-size: 0.85em;
+  }
 }

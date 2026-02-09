@@ -1,5 +1,4 @@
 @use '../definitions' as *;
-@use '../mixins/box-shadow' as *;
 
 .admin__user {
 	margin: 0.5em 1em 0.5em 0;
@@ -7,40 +6,42 @@
 
 	a[href="#admin__user__options"] {
 		&:after {
-		    content: "";
-		    border-style: solid;
-		    border-width: 5px 5px 0 5px;
-		    border-color: #aaa transparent transparent transparent;
-		    position: relative;
+			content: "";
+			border-style: solid;
+			border-width: 5px 5px 0 5px;
+			border-color: $border-color-input transparent transparent transparent;
+			position: relative;
 			top: 1em;
 			right: -0.5em;
 		}
 	}
 
-	a, a:visited, button {
+	a,
+	a:visited,
+	button {
 		background-color: transparent;
 		border: none;
-		color: #666;
+		color: $text-muted;
 		cursor: pointer;
 		text-decoration: none;
 	}
 
 	img {
-		background-color: #fff;
-		border: 1px solid #aaa;
-		border-radius: 50%;
+		background-color: $bg-surface;
+		border: 1px solid $border-color;
+		border-radius: $radius-round;
 		padding: 2px;
 		vertical-align: middle;
 	}
 
 	[data-initials]:before {
-		background-color: #099bdd;
+		background-color: $profile-blue;
 		color: white;
 		opacity: 1;
 		content: attr(data-initials);
 		display: inline-block;
 		font-weight: bold;
-		border-radius: 50%;
+		border-radius: $radius-round;
 		vertical-align: middle;
 		width: 45px;
 		height: 45px;
@@ -51,59 +52,76 @@
 	[data-color="#f90"]:before {
 		background-color: #f90;
 	}
+
 	[data-color="#090"]:before {
 		background-color: #090;
 	}
+
 	[data-color="#dd0909"]:before {
 		background-color: #dd0909;
 	}
+
 	[data-color="#8409dd"]:before {
 		background-color: #8409dd;
 	}
+
 	[data-color="#dd8709"]:before {
 		background-color: #dd8709;
 	}
 
 	ul {
-		@include box-shadow(10px, 10px, 39px, -12px, rgba(0,0,0,0.61));
+		box-shadow: 10px 10px 39px -12px rgba(0, 0, 0, 0.61);
 
-		background-color: #fff;
-		border: 1px solid #eee;
-		display: none;
+		background-color: $bg-surface;
+		border: 1px solid $border-color;
 		font-size: 0.85em;
+		height: 0;
 		list-style-type: none;
 		min-width: 17em;
+		opacity: 0;
 		padding: 0;
 		position: absolute;
 		right: 1em;
 		top: 45px;
+		transition: 200ms opacity ease, 200ms height ease;
 
 		&.open {
-			display: block;
+			height: auto;
+			opacity: 1;
+
+			li {
+				display: block;
+			}
 		}
-		
+
 		li {
+			display:none;
 			text-align: right;
 
 			&.divider {
-				border-top: 1px solid #eee;
+				border-top: 1px solid $border-color;
 			}
 
-			a, a:visited, button, p {
+			a,
+			a:visited,
+			button,
+			p {
 				padding: 5px;
 			}
 
-			a, a:visited{
+			a,
+			a:visited {
 				display: block;
 			}
 
-			a:hover, button:hover {
-				background-color: #eee;
+			a:hover,
+			button:hover {
+				background-color: $border-color;
 			}
 
 			button {
-				border: 1px solid #eee;
-				border-radius: .5em;
+				border: 1px solid $border-color;
+				border-radius: $radius-standard;
 				display: block;
 				margin: 0.5em auto;
 				text-align: center;
@@ -117,13 +135,14 @@
 	}
 
 	.admin__user__notifications {
-	    background-color: $admin__user__notification__colour;
-	    border-radius: 50%;
-	    color: #fff;
-	    font-size: 0.7em;
-	    right: 65px;
-	    padding: 2px 5px;
-	    position: absolute;
-	    top: 35px;
+		background-color: $color-notification;
+		border-radius: $radius-round;
+		color: transparent;
+		color: $text-inverse;
+		font-size: 0.7em;
+		right: 65px;
+		padding: 2px 5px;
+		position: absolute;
+		top: 35px;
 	}
 }

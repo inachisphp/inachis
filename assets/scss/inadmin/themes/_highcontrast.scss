@@ -2,222 +2,307 @@
 @use 'sass:color';
 
 @mixin high-contrast-theme {
-    // Global
-    background-color: #000;
-    color: #fff;
+/* Primitives - Neutrals (Extreme Contrast) */
+    --color-neutral-000: #000000; /* Pure Black Background */
+    --color-neutral-050: #000000;
+    --color-neutral-100: #000000;
+    --color-neutral-200: #1a1a1a; /* Very dark surface for distinction */
+    --color-neutral-250: #ffffff; /* Borders must be white/bright */
+    --color-neutral-300: #ffffff;
+    --color-neutral-400: #ffffff;
+    --color-neutral-500: #ffffff;
+    --color-neutral-600: #ffffff;
+    --color-neutral-700: #ffffff; /* All text becomes white */
+    --color-neutral-800: #ffffff;
+    --color-neutral-900: #ffffff;
 
-    // Links
-    a, a:visited {
-        color: #ff0; // Yellow
-        text-decoration: underline;
+    /* Primitives - Brand (High Luminance) */
+    --color-brand-400: #00ffff; /* Cyan (High contrast on black) */
+    --color-brand-500: #ffff00; /* Pure Yellow (Extreme visibility) */
+    --color-brand-600: #ffff00;
+
+    --color-accent-500: #ffffff;
+
+    /* Semantic - Neon Tones for AAA */
+    --color-success-500: #00ff00; /* Pure Green */
+    --color-danger-500: #ff5555;  /* Bright Red */
+    --color-warning-500: #ffff00; /* Pure Yellow */
+    --color-info-500: #00ffff;
+
+    /* Custom HC Variables */
+    --hc-focus-outline: 3px solid #ffff00;
+
+  .EasyMDEContainer {
+    /* AAA Requirement: Text must be high contrast */
+    .CodeMirror {
+      background: var(--color-neutral-000) !important;
+      color: #ffffff !important;
+      border: 2px solid #ffffff !important; /* Thicker borders */
     }
 
-    a:hover {
-        background-color: #ff0;
-        color: #000;
-        text-decoration: none;
+    /* AAA Requirement: Focus must be unmistakable */
+    .CodeMirror-focused {
+      outline: var(--hc-focus-outline) !important;
+      outline-offset: 2px;
     }
 
-    // Headers
-    h1, h2, h3, h4, h5, h6 {
-        color: #fff;
+    /* AAA Requirement: Selection needs strong contrast */
+    .CodeMirror-selected {
+      background: #ffffff !important;
+      color: #000000 !important; /* Invert text in selection */
     }
 
-    // Layout Areas
-    .content-header {
-        background: #000;
-        border-bottom: 2px solid #fff;
+    /* -----------------------------------------
+     Syntax - Using High Luminance Colors
+    --------------------------------------------- */
+    .cm-header { color: var(--color-brand-500) !important; font-weight: 900; }
+    .cm-strong { color: #ffffff !important; text-decoration: underline; }
+    .cm-em { color: #ffffff !important; font-style: italic; border-bottom: 1px dashed; }
+    .cm-link { color: var(--color-brand-400) !important; text-decoration: underline; }
 
-        h1 {
-            a, a:visited {
-                background-color: #000;
-                border: 2px solid #fff;
-                color: #fff;
-            }
-            a:hover {
-                background-color: #fff;
-                color: #000;
-            }
-        }
-    }
+    /* Fixed your syntax error from the original file */
+    .cm-variable-2 { color: var(--color-warning-500) !important; }
+    .cm-tag { color: var(--color-brand-400) !important; }
 
-    .sidebar {
-        background: #000;
-        border-right: 2px solid #fff;
+    /* -----------------------------------------
+     Toolbar - AAA (No subtle hovers)
+    --------------------------------------------- */
+    .editor-toolbar {
+      background: #000000 !important;
+      border: 2px solid #ffffff !important;
 
-        a, a:visited {
-            color: #fff;
-
-            &:hover {
-                background-color: #fff;
-                color: #000;
-            }
-        }
-    }
-
-    .fixed-bottom-bar {
-        background-color: #000;
-        border-top: 2px solid #fff;
-    }
-
-    .admin__user ul {
-        background-color: #000;
-        border: 2px solid #fff;
-        color: #fff;
-    }
-
-    // Forms
-    .form {
-        input, textarea, select, .ts-dropdown .ts-control {
-            background-color: #000;
-            border: 2px solid #fff;
-            color: #fff;
-
-            &:focus {
-                background-color: #000;
-                border: 4px solid #fff; // Thicker border for focus
-                outline: 2px solid #ff0;
-            }
-        }
-
-        input[disabled], select[disabled], textarea[disabled] {
-            border-style: dashed;
-            color: #aaa;
-        }
-
-        // Tom Select specific
-        .ts-dropdown {
-            background-color: #000;
-            border: 2px solid #fff;
-            color: #fff;
-
-            .active {
-                background-color: #ff0;
-                color: #000;
-                border: 2px solid #000; // Visible border inside highlight
-            }
-        }
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    input[type="search"],
-    textarea {
-        background-color: #000;
-        color: #fff;
-        border: 2px solid #fff;
-    }
-
-    // Buttons
-    .button, .button:visited {
-        background-color: #000;
-        border: 2px solid #fff;
-        color: #fff;
-        font-weight: bold;
+      button {
+        color: #ffffff !important;
+        opacity: 1 !important;
+        border: 1px solid transparent;
 
         &:hover {
-            background-color: #fff;
-            color: #000;
-            border-color: #fff;
+          background: #ffffff !important;
+          color: #000000 !important;
+          border-color: #ffffff !important;
         }
 
-        // unify all buttons to black/white for max contrast, relying on text/icon for meaning
-        &.button--positive,
-        &.button--negative,
-        &.button--info,
-        &.button--add {
-            background-color: #000;
-            border-color: #fff;
-            color: #fff;
-
-            &:hover {
-                background-color: #fff;
-                color: #000;
-            }
-        }
-    }
-
-    // Tables
-    table {
-        background-color: #000;
-        color: #fff;
-        border: 2px solid #fff;
-
-        thead {
-            th {
-                background-color: #000;
-                color: #fff;
-                border-bottom: 2px solid #fff;
-            }
-        }
-
-        td {
-            border: 1px solid #fff;
-        }
-
-        tr:hover td {
-            background-color: #fff;
-            color: #000;
-
-            a {
-                color: #000;
-            }
-        }
-    }
-
-    img {
-        opacity: 1;
-        filter: grayscale(100%) contrast(120%);
-    }
-
-    // Pagination
-    .pagination {
-        a {
-            background-color: #000;
-            border: 2px solid #fff;
-            color: #fff;
-
-            &:hover {
-                background-color: #fff;
-                color: #000;
-            }
-
-            &.current {
-                background-color: #fff;
-                color: #000;
-                border: 2px solid #fff;
-                font-weight: bold;
-            }
-        }
-    }
-
-    // Badges
-    .badge {
-        background-color: #000 !important;
-        border: 2px solid #fff;
-        color: #fff !important;
-        font-weight: bold;
-    }
-
-    .ui-tabs, .ui-tabs-external {
-      background-color: #000;
-      color: #fff;
-      border: 2px solid #fff;
-
-      .ui-tabs-nav {
-        a, a:visited {
-          color: #ff0;
-          text-decoration: underline;
-        }
-
-        li.ui-tabs-active a {
-            background-color: #fff;
-            color: #000;
-            text-decoration: none;
+        &.active {
+          background: var(--color-brand-500) !important;
+          color: #000000 !important;
+          outline: 2px solid #ffffff;
         }
       }
     }
+  }
+
+  .EasyMDEContainer {
+    background: var(--color-neutral-000) !important;
+    border: 3px solid var(--color-neutral-300) !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  /* Inactive must still be fully readable */
+  .EasyMDEContainer.is-inactive {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  /* ---------------- Editor ---------------- */
+
+  .CodeMirror {
+    background: var(--color-neutral-000) !important;
+    color: var(--color-neutral-900) !important;
+    border: 2px solid var(--color-neutral-300) !important;
+    box-shadow: none !important;
+  }
+
+  /* Kill all glow / blur / animation */
+  .CodeMirror-focused {
+    outline: var(--hc-focus-outline) !important;
+    outline-offset: 3px;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* ---------------- Cursor ---------------- */
+
+  .CodeMirror-cursor {
+    border-left: 3px solid var(--color-brand-500) !important;
+    animation: none !important;
+  }
+
+  /* ---------------- Active Line ---------------- */
+
+  .CodeMirror-activeline-background {
+    background: var(--color-neutral-200) !important;
+    box-shadow: none !important;
+  }
+
+  /* ---------------- Gutter ---------------- */
+
+  .CodeMirror-gutters {
+    background: var(--color-neutral-000) !important;
+    border-right: 3px solid var(--color-neutral-300) !important;
+  }
+
+  .CodeMirror-linenumber {
+    color: var(--color-neutral-900) !important;
+    opacity: 1 !important;
+  }
+
+  .CodeMirror-activeline-gutter .CodeMirror-linenumber {
+    background: var(--color-brand-500) !important;
+    color: #000000 !important;
+    font-weight: 900;
+    border-radius: 0;
+  }
+
+  /* ---------------- Selection ---------------- */
+
+  .CodeMirror-selected {
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+  }
+
+  /* Selection on active line */
+  .CodeMirror-activeline .CodeMirror-selected {
+    background: #ffff00 !important;
+    color: #000000 !important;
+  }
+
+  /* ---------------- Markdown Syntax ---------------- */
+
+  .cm-header {
+    color: var(--color-brand-500) !important;
+    font-weight: 900 !important;
+    text-decoration: underline;
+  }
+
+  .cm-strong {
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    text-decoration: underline;
+  }
+
+  .cm-em {
+    color: #ffffff !important;
+    font-style: italic;
+    border-bottom: 2px dashed #ffffff;
+  }
+
+  .cm-link,
+  .cm-url {
+    color: var(--color-brand-400) !important;
+    text-decoration: underline !important;
+    font-weight: 700;
+  }
+
+  .cm-code,
+  .cm-inline-code {
+    background: var(--color-neutral-200) !important;
+    color: #ffffff !important;
+    border: 1px solid #ffffff;
+  }
+
+  .cm-comment {
+    color: #ffffff !important;
+    opacity: 1 !important;
+  }
+
+  /* ---------------- Toolbar ---------------- */
+
+  .editor-toolbar {
+    background: var(--color-neutral-000) !important;
+    border-bottom: 3px solid var(--color-neutral-300) !important;
+    box-shadow: none !important;
+
+    a,
+    button {
+      color: #ffffff !important;
+      opacity: 1 !important;
+      border: 2px solid transparent;
+      transition: none !important;
+
+      &:hover,
+      &:focus-visible {
+        background: #ffffff !important;
+        color: #000000 !important;
+        border-color: #ffffff !important;
+      }
+
+      &.active {
+        background: var(--color-brand-500) !important;
+        color: #000000 !important;
+        border-color: #ffffff !important;
+      }
+    }
+  }
+
+  /* ---------------- Status Bar ---------------- */
+
+  .editor-statusbar {
+    color: #ffffff !important;
+    border-top: 3px solid var(--color-neutral-300) !important;
+  }
+
+  /* ---------------- Preview Pane ---------------- */
+
+  .editor-preview,
+  .editor-preview-side {
+    background: var(--color-neutral-000) !important;
+    color: #ffffff !important;
+    border-left: 3px solid var(--color-neutral-300) !important;
+
+    ::selection {
+      background: #ffffff !important;
+      color: #000000 !important;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--color-brand-500) !important;
+      text-decoration: underline;
+    }
+
+    a {
+      color: var(--color-brand-400) !important;
+      text-decoration: underline !important;
+      font-weight: 700;
+    }
+
+    code,
+    pre {
+      background: var(--color-neutral-200) !important;
+      color: #ffffff !important;
+      border: 2px solid #ffffff;
+    }
+  }
+
+  /* ---------------- Scrollbars ---------------- */
+
+  .CodeMirror-scroll {
+    scrollbar-width: auto;
+    scrollbar-color: #ffffff #000000;
+  }
+
+  .CodeMirror-scroll::-webkit-scrollbar {
+    width: 14px;
+  }
+
+  .CodeMirror-scroll::-webkit-scrollbar-thumb {
+    background: #ffffff !important;
+    border: 3px solid #000000;
+  }
+
+  .CodeMirror-scroll::-webkit-scrollbar-track {
+    background: #000000 !important;
+  }
+
+  /* ---------------- Font Rendering ---------------- */
+
+  .CodeMirror,
+  .editor-toolbar,
+  .editor-preview {
+    -webkit-font-smoothing: auto !important;
+    -moz-osx-font-smoothing: auto !important;
+  }
 }
 
 .theme-contrast {

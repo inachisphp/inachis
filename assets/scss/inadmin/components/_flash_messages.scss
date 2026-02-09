@@ -1,24 +1,73 @@
 @use '../definitions' as *;
 
-.flash-notice, .flash-success, .flash-warning {
-  background-color: $admin__flash-background;
-  border-radius: 0.5em;
-  color: $admin__flash-color;
+.flash-notice,
+.flash-success,
+.flash-warning,
+.flash-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+
   padding: 1em;
   margin: 0.5em 0;
+  border-radius: $radius-standard;
 
-  span {
-    vertical-align: middle;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 
-    &.material-icons {
-      margin-right: 0.5em;
-    }
+  span.material-icons {
+    font-size: 1.25em;
   }
 }
-.flash-success {
-  background-color: #d9e7cb;
+
+.flash-notice {
+  background-color: $flash-notice-bg;
+  color: $flash-notice-text;
 }
+
+.flash-notice.info {
+  background-color: $color-brand-050;
+  border-left-color: $action-primary;
+}
+
+.flash-notice.warning {
+  background-color: $alert-warning-bg;
+  border-left-color: $alert-warning-border;
+}
+
+.flash-success {
+  background-color: $flash-success-bg;
+  color: $flash-success-text;
+}
+
 .flash-warning {
-  background-color: #f00000;
-  color: #fff;
+  background-color: $flash-warning-bg;
+  color: $flash-warning-text;
+}
+
+.flash-error {
+  background-color: $flash-error-bg;
+  color: $flash-error-text;
+  border-left: 4px solid currentColor;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+
+  .flash-notice,
+  .flash-success,
+  .flash-warning,
+  .flash-error {
+    animation: flash-in 150ms ease-out;
+  }
+
+  @keyframes flash-in {
+    from {
+      opacity: 0;
+      transform: translateY(-2px);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }

@@ -10,17 +10,23 @@
         </a>
         <ul id="admin__user__options">
             <li><p><strong>Welcome,</strong> {{ session.displayName }}</p></li>
-            <li><a href="{{ path('incc_admin_edit', {'id': session.username }) }}" title="Edit profile for {{ session.displayName }}">Edit your profile <span class="material-icons">perm_identity</span></a></li>
-            <li><a href="{{ path('incc_admin_theme') }}" title="Change your appearance settings">Appearance <span class="material-icons">brush</span></a></li>
-            <!-- li><a href="/incc/settings/releases">Update available <span class="material-icons">new_releases</span></a></li -->
-            <li><form action="{{ path('app_logout') }}" method="post"><button>Log out <span class="material-icons">logout</span></button></form></li>
+            <li><a href="{{ path('incc_admin_edit', {'id': session.username }) }}" title="Edit profile for {{ session.displayName }}">Edit your profile <span class="material-icons" aria-hidden="true">perm_identity</span></a></li>
+            <li><a href="{{ path('incc_admin_theme') }}" title="Change your appearance settings">Appearance <span class="material-icons" aria-hidden="true">brush</span></a></li>
+            <!-- li><a href="/incc/settings/releases">Update available <span class="material-icons" aria-hidden="true">new_releases</span></a></li -->
+            <li><form action="{{ path('incc_logout') }}" method="post"><button>Log out <span class="material-icons" aria-hidden="true">logout</span></button></form></li>
         </ul>
     </section>
     <section class="admin__search">
         <form action="{{ path('incc_search_results', { 'keyword': ' '}) }}" aria-label="Search content" method="post" role="search">
-            <label for="q" class="material-icons">{% trans %}admin.search.label{% endtrans %}</label>
-            <input id="q" name="keyword" placeholder="{% trans %}admin.search.placeholder{% endtrans %}" type="search" value="{{ keyword|default('') }}" />
-            <button class="clear-search material-icons" data-target="#q" type="button">cancel</button>
+            {% include 'inadmin/partials/search.html.twig' with {
+                ariaLabel: 'Search all content',
+                clearBtn: true,
+                enterKeyHint: 'search',
+                id: 'q',
+                name: 'keyword',
+                placeholder: 'admin.search.placeholder'|trans,
+                value: keyword|default(''),
+            } %}
         </form>
     </section>
 </div>

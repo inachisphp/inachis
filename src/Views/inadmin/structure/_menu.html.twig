@@ -5,9 +5,9 @@
     <ul>
         <li class="menu-add has-submenu">
             <a href="#" class="submenu-toggle" role="button" aria-haspopup="true" aria-expanded="false" tabindex="0" data-tooltip="New">
-                <i class="material-icons">edit</i>
+                <i class="material-icons" aria-hidden="true">edit</i>
                 <span>New</span>
-                <span class="material-icons arrow">chevron_right</span>
+                <span class="material-icons arrow" aria-hidden="true">chevron_right</span>
             </a>
             <ul class="submenu">
                 <li>
@@ -15,7 +15,7 @@
                         data-action="new-post"
                         data-tooltip="{% trans %}admin.menu.add.post.help{% endtrans %}"
                         title="{% trans %}admin.menu.add.post.help{% endtrans %}">
-                        <i class="material-icons">short_text</i>
+                        <i class="material-icons" aria-hidden="true">short_text</i>
                         <span>{% trans %}admin.menu.add.post.title{% endtrans %}</span>
                     </a>
                 </li>
@@ -23,7 +23,7 @@
                     <a href="{{ settings.domain ~ path('incc_post_edit', { type: 'page'}) }}/new"
                         data-tooltip="{% trans %}admin.menu.add.page.help{% endtrans %}"
                         title="{% trans %}admin.menu.add.page.help{% endtrans %}">
-                        <i class="material-icons">content_copy</i> 
+                        <i class="material-icons" aria-hidden="true">content_copy</i> 
                         <span>{% trans %}admin.menu.add.page.title{% endtrans %}</span>
                     </a>
                 </li>
@@ -34,15 +34,15 @@
             <a href="{{ settings.domain ~ path('incc_dashboard') }}"
                 data-tooltip="{% trans %}admin.dashboard.help{% endtrans %}"
                 title="{% trans %}admin.dashboard.help{% endtrans %}">
-                <i class="material-icons">home</i> 
+                <i class="material-icons" aria-hidden="true">home</i> 
                 <span>{% trans %}admin.dashboard.title{% endtrans %}</span>
             </a>
         </li>
-        <li class="{{ page.tab|activeMenu('post') }}">
+        <li class="{{ page.tab|activeMenu('post') ~ page.tab|activeMenu('page') }}">
             <a href="{{ settings.domain ~ path('incc_post_list', {'type': 'post'}) }}" 
                 data-tooltip="{% trans %}admin.posts.help{% endtrans %}" 
                 title="{% trans %}admin.posts.help{% endtrans %}">
-                <i class="material-icons">library_books</i> 
+                <i class="material-icons" aria-hidden="true">library_books</i> 
                 <span>{% trans %}admin.posts.title{% endtrans %}</span></a>
                 {# <span class="badge">3</span> #}
         </li>
@@ -50,7 +50,7 @@
             <a href="{{ settings.domain ~ path('incc_series_list') }}" 
                 data-tooltip="{% trans %}admin.series.help{% endtrans %}"
                 title="{% trans %}admin.series.help{% endtrans %}">
-                <i class="material-icons">chrome_reader_mode</i>
+                <i class="material-icons" aria-hidden="true">chrome_reader_mode</i>
                 <span>{% trans %}admin.series.title{% endtrans %}</span>
                 {# <span class="badge badge-dot"></span> #}
             </a>
@@ -59,7 +59,7 @@
             <a href="{{ settings.domain ~ path('incc_resource_list', { type: 'images' }) }}"
                 data-tooltip="{% trans %}admin.resources.help{% endtrans %}"   
                 title="{% trans %}admin.resources.help{% endtrans %}">
-                <i class="material-icons">wallpaper</i>
+                <i class="material-icons" aria-hidden="true">wallpaper</i>
                 <span>{% trans %}admin.resources.title{% endtrans %}</span>
             </a>
         </li>
@@ -72,39 +72,48 @@
                 tabindex="0"
                 data-tooltip="{% trans %}admin.menu.more.help{% endtrans %}"
                 title="{% trans %}admin.menu.more.help{% endtrans %}">
-                <i class="material-icons">more_horiz</i> 
+                <i class="material-icons" aria-hidden="true">more_horiz</i> 
                 <span>{% trans %}admin.menu.more.title{% endtrans %}</span>
-                <span class="material-icons arrow">chevron_right</span>
+                <span class="material-icons arrow" aria-hidden="true">chevron_right</span>
             </a>
             <ul class="submenu">
                 <li class="{{ page.tab|activeMenu('url') }}">
                     <a href="{{ settings.domain ~ path('incc_url_list') }}"
                         data-tooltop="{% trans %}admin.urls.help{% endtrans %}" 
                         title="{% trans %}admin.urls.help{% endtrans %}">
-                        <i class="material-icons">insert_link</i> 
+                        <i class="material-icons" aria-hidden="true">insert_link</i> 
                         <span>{% trans %}admin.urls.title{% endtrans %}</span></a>
                 </li>
-                <li class="{{ page.tab|activeMenu('users') }}">
+                <li class="{{ page.tab|activeMenu('users') ~ page.tab|activeMenu('audit-logs') ~ page.tab|activeMenu('policies') }}">
                     <a href="{{ settings.domain ~ path('incc_admin_list') }}" 
                         data-tooltip="{% trans %}admin.user.help{% endtrans %}"
                         title="{% trans %}admin.user.help{% endtrans %}">
-                        <i class="material-icons">people</i> 
+                        <i class="material-icons" aria-hidden="true">people</i> 
                         <span>{% trans %}admin.user.title{% endtrans %}</span>
                     </a>
                 </li>
+                <li class="{{ page.tab|activeMenu('waste') }}">
+                    <a href="{{ settings.domain ~ path('incc_waste_list') }}"
+                        data-tooltip="Manage deleted content"
+                        title="Manage deleted content">
+                        <i class="material-icons" aria-hidden="true">delete</i> 
+                        <span>Bin</span>
+                    </a>
+                </li>
+                <li class="{{ page.tab|activeMenu('tools') ~ page.tab|activeMenu('import') ~ page.tab|activeMenu('export') }}">
+                    <a href="{{ settings.domain ~ path('incc_tools_index') }}"
+                        data-tooltip="System Tools"
+                        title="Use system tools">
+                        <i class="material-icons" aria-hidden="true">build</i>
+                        <span>Tools</span></a>
+                </li>
                 <li class="{{ page.tab|activeMenu('settings') }}">
-                    <a href="{{ settings.domain ~ path('inachis_settings_index') }}"
+                    <a href="{{ settings.domain ~ path('incc_settings_index') }}"
                         data-tooltip="Settings"
                         title="Change advanced settings">
-                        <i class="material-icons">settings</i>
+                        <i class="material-icons" aria-hidden="true">settings</i>
                         <span>Settings</span></a>
                 </li>
-                {# <li class="{{ page.tab|activeMenu('tools') }}"><a href="{{ settings.domain ~ path('inachis_tools_index') }}" title="Tools"> #}
-                    {# <i class="material-icons">build</i><span> Tools</span></a> #}
-                {# </li> #}
-                {# <li><a href="{{ settings.domain ~ path('inachis_waste_list') }}" title="Manage deleted content"> #}
-                {# <i class="material-icons">delete</i><span> Bin</span></a> #}
-                {# </li> #}
             </ul>
         </li>
     </ul>
@@ -112,13 +121,13 @@
     <ul class="menu-view-site">
         <li>
             <a href="/" data-tooltip="View site">
-                <i class="material-icons">exit_to_app</i>
+                <i class="material-icons" aria-hidden="true">exit_to_app</i>
                 <span>{% trans %}admin.menu.view_site{% endtrans %}</span>
             </a>
         </li>
     </ul>
     <button class="menu-toggle desktop-menu-toggle" aria-label="Toggle sidebar">
-      <i class="material-icons chevron">chevron_right</i>
+      <i class="material-icons chevron" aria-hidden="true">chevron_right</i>
     </button>
 </nav>
 <div class="sidebar-overlay"></div>

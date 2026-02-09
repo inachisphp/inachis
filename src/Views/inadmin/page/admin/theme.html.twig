@@ -23,7 +23,7 @@
     {% for choice in form.theme %}
         {{ form_widget(choice) }}
         <label for="{{ choice.vars.id }}" tabindex="0" class="theme-option" aria-checked="{{ choice.vars.checked ? 'true' : 'false' }}">
-            <span class="material-icons">{{ choice.vars.attr['data-icon'] }}</span>
+            <span class="material-icons" aria-hidden="true">{{ choice.vars.attr['data-icon'] }}</span>
             {{ choice.vars.label|default(choice.vars.value|capitalize) }}
         </label>
     {% endfor %}
@@ -43,7 +43,7 @@
     {% for choice in form.fontSize %}
         {{ form_widget(choice) }}
         <label for="{{ choice.vars.id }}" tabindex="0" aria-checked="{{ choice.vars.checked ? 'true' : 'false' }}">
-            <span class="material-icons">{{ choice.vars.attr['data-icon'] }}</span>
+            <span class="material-icons" aria-hidden="true">{{ choice.vars.attr['data-icon'] }}</span>
             {{ choice.vars.label|default(choice.vars.value|capitalize) }}
         </label>
     {% endfor %}
@@ -54,7 +54,7 @@
     {% for choice in form.fontFamily %}
         {{ form_widget(choice) }}
         <label for="{{ choice.vars.id }}" tabindex="0" aria-checked="{{ choice.vars.checked ? 'true' : 'false' }}">
-            <span class="material-icons">{{ choice.vars.attr['data-icon'] }}</span>
+            <span class="material-icons" aria-hidden="true">{{ choice.vars.attr['data-icon'] }}</span>
             {{ choice.vars.label|default(choice.vars.value|capitalize) }}
         </label>
     {% endfor %}
@@ -65,7 +65,7 @@
     {% for choice in form.lineHeight %}
         {{ form_widget(choice) }}
         <label for="{{ choice.vars.id }}" tabindex="0" aria-checked="{{ choice.vars.checked ? 'true' : 'false' }}">
-            <span class="material-icons">{{ choice.vars.attr['data-icon'] }}</span>
+            <span class="material-icons" aria-hidden="true">{{ choice.vars.attr['data-icon'] }}</span>
             {{ choice.vars.label|default(choice.vars.value|capitalize) }}
         </label>
     {% endfor %}

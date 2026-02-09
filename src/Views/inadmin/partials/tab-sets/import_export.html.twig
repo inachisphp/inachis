@@ -1,0 +1,14 @@
+{{ include('inadmin/partials/tabs.html.twig', {
+    tabs: [
+        {
+            id: 'import',
+            title: 'Import',
+            url: path('incc_tools_import'),
+        },
+        {
+            id: 'export',
+            title: 'Export',
+            url: path('incc_tools_export'),
+        }
+    ]
+}) }}

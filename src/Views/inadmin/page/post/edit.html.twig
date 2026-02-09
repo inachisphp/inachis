@@ -52,7 +52,7 @@
                         class="button button--info button--copy"
                         type="button"
                 >
-                    <span class="material-icons">content_paste</span>
+                    <span class="material-icons" aria-hidden="true">content_paste</span>
                     {{ 'admin.post.share.copyLink.label'|trans }}
                 </button>
                 {% endif %}
@@ -173,7 +173,7 @@
                         <td>{{ revision.user.displayName }}</td>
                         <td><span class="badge">{{ revision.action }}</span></td>
                         <td>
-                            <a href="{{ path('inachis_page_post_revision_diff', { 'id': revision.id}) }}" class="button button--info"><span class="material-icons">compare_arrows</span> {% trans %}admin.post.revision.view{% endtrans %}</a>
+                            <a href="{{ path('inachis_page_post_revision_diff', { 'id': revision.id}) }}" class="button button--info"><span class="material-icons" aria-hidden="true">compare_arrows</span> {% trans %}admin.post.revision.view{% endtrans %}</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -188,11 +188,11 @@
             {{ form_widget(form.submit) }}
         {% if post.id is not empty %}
             {%- if post.status != "published" %}
-                <button type="submit" class="button button--secondary button--info" name="publish">{% if post.postDate > date() %}<span class="material-icons">schedule</span> {% trans %}admin.button.schedule{% endtrans %}{% else %}<span class="material-icons">publish</span> {% trans %}admin.button.publish{% endtrans %}{% endif %}</button>
+                <button type="submit" class="button button--secondary button--info" name="publish">{% if post.postDate > date() %}<span class="material-icons" aria-hidden="true">schedule</span> {% trans %}admin.button.schedule{% endtrans %}{% else %}<span class="material-icons" aria-hidden="true">publish</span> {% trans %}admin.button.publish{% endtrans %}{% endif %}</button>
             {%- endif %}
             {{ form_widget(form.delete) }}
             {%  if not post.isDraft %}
-                <a class="button button--secondary" href="/{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons">exit_to_app</span>
+                <a class="button button--secondary" href="/{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons" aria-hidden="true">exit_to_app</span>
                     {% trans %}admin.button.viewLive{% endtrans %}</a>
             {%  endif %}
         {% endif %}

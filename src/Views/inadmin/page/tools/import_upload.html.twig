@@ -1,0 +1,54 @@
+{% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <span>Import</span>
+{% endblock pagetitle %}
+
+{% block content %}
+
+{% block import_main %}
+<div class="col-12 widget-posts ui-tabs-external">
+    {% include 'inadmin/partials/tab-sets/import_export.html.twig' %}
+    <section class="paginated-list">
+        <p>Transfer your content from other platforms. Supported formats:</p>
+        <ul class="format-tags">
+            <li class="badge">Markdown (.md)</li>
+            <li class="badge">XML (.xml)</li>
+            <li class="badge">JSON (.json)</li>
+        </ul>
+        <form action="{{ path('incc_tools_import') }}" class="filepond form" enctype="multipart/form-data" method="post">
+            <p>
+                <label for="import_file">Import File</label>
+
+                {% include 'inadmin/partials/components/file-upload.html.twig' with {
+                    paramName: 'import_file',
+                    maxFiles: 1,
+                    maxFileSize: '10MB',
+                    uploadMultiple: false,
+                    autoUpload: false,
+                    acceptedFiles: ['text/markdown','application/xml', 'text/xml', 'application/json'],
+                    acceptedFilesMap: {
+                        'text/markdown': ['.md'],
+                        'application/xml': ['.xml'],
+                        'text/xml': ['.xml'],
+                        'application/json': ['.json']
+                    },
+                } only %}
+            </p>
+            <div class="fixed-bottom-bar">
+                <p>
+                    <button type="submit" class="button button--positive">
+                        <span class="material-icons" aria-hidden="true">file_upload</span>
+                        <span>Preview Import</span>
+                    </button>
+                </p>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock import_main %}
+
+{% endblock content %}
+
+

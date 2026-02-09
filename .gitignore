@@ -28,6 +28,7 @@
 /bin/.phpunit
 /bin/phpunit
 /composer
+/config/version.php
 
 /docker
 /docker-compose.yml

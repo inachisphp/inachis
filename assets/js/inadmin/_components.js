@@ -6,9 +6,11 @@ window.Inachis.Components = {
 		this.initClearSearch('');
 		this.initCopyPaste('');
 		this.initDatePicker();
+		this.initExportButton();
 		this.initFilterBar();
 		this.initOptionSelectors();
 		this.initPasswordToggle();
+		this.initReadingProgress();
 		this.initTomSelect('');
 		this.initSelectAllNone('');
 		this.initSeriesControls();
@@ -78,6 +80,31 @@ window.Inachis.Components = {
 			});
 		});
 	},
+	initExportButton() {
+		const exportButton = document.querySelector('.button--export');
+		if (!exportButton) return;
+
+		exportButton.addEventListener('click', () => {
+			const hiddenData = {
+				scope: exportButton.dataset.scope,
+				content_type: exportButton.dataset.contentType,
+				selectedIds: Array.from(form.querySelectorAll('input[name="items[]"]:checked')).map(cb => cb.value),
+			}
+			const formAction = exportButton.dataset.formAction;
+			const listForm = document.querySelector('form.form');
+			if (!listForm) return;
+
+			listForm.action = formAction;
+			Object.entries(hiddenData).forEach(([name, value]) => {
+				const input = document.createElement('input');
+				input.type = 'hidden';
+				input.name = name;
+				input.value = value;
+				listForm.appendChild(input);
+			});
+			listForm.requestSubmit();
+		});
+	},
 	initFilterBar() {
 		const toggle = document.querySelector('.filter__toggle');
 		const panel  = document.getElementById('filter__options');
@@ -85,6 +112,13 @@ window.Inachis.Components = {
 		if (!toggle || !panel) {
 			return;
 		}
+		const filterSelects = panel.querySelectorAll('select');
+
+		filterSelects.forEach(select => {
+			select.addEventListener('change', () => {
+				select.closest('form').requestSubmit();
+			});
+		});
 
 		toggle.addEventListener('click', () => {
 			const isOpen = toggle.getAttribute('aria-expanded') === 'true';
@@ -121,6 +155,32 @@ window.Inachis.Components = {
 				$button.html('visibility_off');
 			}
 		});
+	},
+	initReadingProgress() {
+		const bar = document.querySelector('.reading-progress__bar');
+		if (!bar) return;
+
+		if (document.documentElement.scrollHeight <= window.innerHeight) {
+			bar.style.display = 'none';
+			return;
+		}
+
+		function updateProgress() {
+			const doc = document.documentElement;
+			const scrollTop = doc.scrollTop || document.body.scrollTop;
+			const scrollHeight = doc.scrollHeight - doc.clientHeight;
+
+			const progress = scrollHeight > 0
+			? (scrollTop / scrollHeight) * 100
+			: 0;
+
+			bar.style.width = `${progress}%`;
+		}
+
+		window.addEventListener('scroll', updateProgress, { passive: true });
+		window.addEventListener('resize', updateProgress);
+		window.addEventListener('load', updateProgress);
+		document.addEventListener('DOMContentLoaded', updateProgress);
 	},
 	initTomSelect(selector) {
 		document.querySelectorAll(selector + ' .js-select').forEach(el => {

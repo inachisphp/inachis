@@ -11,7 +11,7 @@
                 </label>
                 <input id="chosenImage_{{ image.id }}" name="chosenImage[]" type="radio" value="{{ image.id }}" />
                 {% if image.filename|slice(0,4) == 'http' %}
-                    <em class="material-icons">link</em>
+                    <em class="material-icons" aria-hidden="true">link</em>
                 {% endif %}
             </li>
         {% endfor %}

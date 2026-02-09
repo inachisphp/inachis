@@ -33,7 +33,7 @@
                     {{ post.content|markdown_to_html|striptags|length > 300 ? post.content|markdown_to_html|striptags|slice(0, 300) ~ '…' : post.content|markdown_to_html|striptags  }}
                 {%- endif -%}
                     </p></a>
-                    <p class="date"><span class="material-icons">schedule</span> Updated: <em>{{ post.modDate|date('jS F Y \\a\\t H:i', post.timezone) }} {{ post.timezone }}</em></p>
+                    <p class="date"><span class="material-icons" aria-hidden="true">schedule</span> Updated: <em>{{ post.modDate|date('jS F Y \\a\\t H:i', post.timezone) }} {{ post.timezone }}</em></p>
                 </li>
             {% endfor %}
         </ol>
@@ -49,7 +49,7 @@
                 <li>
                     <h2><a aria-label="Edit {{ post.title }}" href="/incc/{{ post.type }}/{{ post.urls[0].link }}">{{ post.title }}</a></h2>
                     <p>{{ post.content|length > 250 ? post.content|slice(0, 250) ~ '…' : post.content  }}</p>
-                    <p class="date"><span class="material-icons">schedule</span> Scheduled for <em>{{ post.modDate|date('jS F Y \\a\\t H:i', post.timezone) }} {{ post.timezone }}</em></p>
+                    <p class="date"><span class="material-icons" aria-hidden="true">schedule</span> Scheduled for <em>{{ post.modDate|date('jS F Y \\a\\t H:i', post.timezone) }} {{ post.timezone }}</em></p>
                 </li>
             {% endfor %}
         </ol>
@@ -73,7 +73,7 @@
                         }) }}
                     </h2>
                     <p>{{ post.content|length > 250 ? post.content|slice(0, 250) ~ '…' : post.content  }}</p>
-                    <p class="date"><span class="material-icons">schedule</span> {{ post.modDate|date('jS F Y \\a\\t H:i', post.timezone) }} {{ post.timezone }}</p>
+                    <p class="date"><span class="material-icons" aria-hidden="true">schedule</span> {{ post.modDate|date('jS F Y \\a\\t H:i', post.timezone) }} {{ post.timezone }}</p>
                 </li>
             {% endfor %}
         </ol>

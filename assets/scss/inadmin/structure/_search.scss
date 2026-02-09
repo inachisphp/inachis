@@ -9,71 +9,63 @@ input[type="search"]::-webkit-search-results-decoration {
 
 .admin__search {
 	margin-right: 1em;
-	padding: 15px 0 10px 0;
 
-	@media (min-width: $breakpoint-medium) {
-		padding: 15px 10px 10px 0;
-	}
+	.input-icon-wrapper {
+		background-color: $bg-surface;
+		border: 1px solid $border-color;
 
-	input {
-		border: 1px solid #eee;
-		border-radius: 0.5em;
-		color: $admin__search_color;
-		padding: 0.5em 0.5em 0.5em 2em;
-		vertical-align: middle;
-		width: 14em;
-
-		&:focus, &:active {
-			border-color: $admin__search_color;
-			color: $admin__search_color;
-			outline: none;
+		input {
+			background-color: $bg-surface;
+			font-size: 0.9rem;
 		}
-	}
-
-	label {
-		color: $admin__search_color;
-		display: inline;
-		position: relative;
-		right: -1.5em;
-		vertical-align: middle;
 	}
 }
 
-.input-icon-wrapper {
-	position: relative; flex: 1; display: flex; align-items: center;
-	background: #f3f4f6; padding: 0 0.75rem;
-	border-radius: 0.5rem;
-	border: 1px solid transparent; transition: all 0.2s;
+form .input-icon-wrapper {
+	position: relative;
+	flex: 1;
+	display: flex;
+	align-items: center;
+	background-color: $bg-panel;
+	padding: 0 0.75rem;
+	border-radius: $radius-standard;
+	border: 1px solid transparent;
+	transition: all 0.2s;
 
 	input {
 		border: none;
-		background: transparent;
+		background-color: $bg-panel;
 		padding: 0.75rem 2rem 0.75rem 0.5rem;
 		width: 100%;
 		font-size: 1rem;
 		outline: none;
 	}
+
 	&:focus-within {
-		background: #fff;
-		border-color: #069;
-		box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+		background-color: $bg-surface;
+		border-color: $input-focus-border;
+		box-shadow: 0 0 0 3px $input-focus-ring;
+
+		input {
+			background-color: $bg-surface;
+		}
 	}
 }
 
 .clear-search {
 	background: none;
 	border: none;
-	color: #6b7280;
+	color: $text-muted;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
 	position: absolute;
 	right: 0.5rem;
 	padding: 4px;
-	border-radius: 50%;
+	border-radius: $radius-round;
 
 	&::hover {
-		background: rgba(0,0,0,0.05);
-		color: #111827;
+		background-color: $bg-panel;
+		color: $color-neutral-900;
 	}
 }

@@ -1,6 +1,6 @@
 {{ include('inadmin/partials/tabs.html.twig', {
     displayTabsCondition: user.username is defined and user.username is not empty,
-    page: { tab: activeTab, },
+    page: { tab: activeTab|default('profile'), },
     tabs: [
         {
             id: 'profile',
@@ -12,6 +12,11 @@
             title: 'Change Password',
             url: path('incc_admin_change_password', { 'id': user.username }),
             displayCondition: app.user.username == user.username,
+        },
+        {
+            id: 'login-activity',
+            title: 'Audit Logs',
+            url: path('incc_admin_login_activity', { 'id': user.username }),
         }
     ]
 }) }}

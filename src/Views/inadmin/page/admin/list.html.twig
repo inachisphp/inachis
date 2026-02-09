@@ -9,14 +9,15 @@
     {% block user_list_pre %}{% endblock user_list_pre %}
 
     {% block user_list %}
-    <div class="col-12 widget-posts">
+    <div class="col-12 widget-posts ui-tabs-external">
+        {% include 'inadmin/partials/tab-sets/users.html.twig' %}
 
         {% include 'inadmin/partials/table.html.twig' with {
             className: 'form__users',
             type: 'users',
 
             table_name: 'Administrator list',
-            table_class: 'table--responsive table--row-borders table--darkhead table--selectable',
+            table_class: 'table-responsive table--row-borders table--darkhead',
             table_desc: 'This table lists administrators. The first column contains checkboxes allowing users to select one or more tasks.',
             columns: [
                 {
@@ -52,11 +53,13 @@
                 {
                     title: 'Last Login',
                     source: '',
+                    hideOnMobile: true,
                 },
                 {
                     title: 'Password Last Modified',
                     source: 'passwordModDate',
                     source_type: 'date',
+                    hideOnMobile: true,
                 },
             ],
 

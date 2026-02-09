@@ -1,0 +1,18 @@
+{% extends "inadmin/emails/email-layout.txt.twig" %}
+
+{% block preheader %}{% endblock preheader %}
+
+{% block content %}
+New device sign-in detected
+
+Your account was accessed from a new device:
+
+IP Address: {{ ip }}
+User Agent: {{ userAgent }}
+Time: {{ time|date('Y-m-d \a\t H:i') }}
+
+If you do not recognize this activity, please change your password immediately.
+
+Change my password: {{ settings.domain }}
+
+{% endblock content %}

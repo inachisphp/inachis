@@ -1,3 +1,5 @@
+@use '../definitions' as *;
+
 .option-selector {
     display: flex;
     flex-wrap: wrap;
@@ -9,27 +11,27 @@
         position: absolute;
         width: 0;
 
-        &:checked + label {
-            background: #2196f3;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            color: #fff;
+        &:checked+label {
+            background: $button-bright-focus;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            color: $bg-surface;
             transform: translateY(-3px);
 
             &:hover {
-                box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+                box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
                 transform: translateY(-4px);
             }
 
             .material-icons {
-                color: #fff;
+                color: $bg-surface;
             }
         }
     }
 
     label {
         align-items: center;
-        background: #f0f0f0;
-        border-radius: 0.5rem;
+        background: $bg-panel;
+        border-radius: $radius-standard;
         cursor: pointer;
         display: flex;
         flex-direction: column;
@@ -43,12 +45,14 @@
         transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
         width: 5rem;
 
-        &:hover, &:focus {
-            background: #e0e0e0;
+        &:hover,
+        &:focus {
+            background: $color-neutral-250;
             transform: translateY(-2px);
         }
+
         &:focus-visible {
-            outline: 3px solid #2196f3;
+            outline: 3px solid $button-bright-focus;
             outline-offset: 2px;
         }
 
@@ -61,7 +65,7 @@
 .ripple {
     animation: ripple-animation 0.6s linear;
     background: rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
+    border-radius: $radius-round;
     pointer-events: none;
     position: absolute;
     transform: scale(0);

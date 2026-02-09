@@ -21,21 +21,20 @@
     {% include "inadmin/structure/metadata.html.twig" %}
     {% include "inadmin/structure/stylesheets.html.twig" %}
     {% include "inadmin/structure/javascript__top.html.twig" %}
-    {% if userPreference.fontFamily == 'dyslexic' %}
+    {% if userPreference|default(null) and userPreference.fontFamily == 'dyslexic' %}
     <style>
     	@font-face {
-        font-family: 'OpenDyslexic';
-        src: url('/assets/fonts/incc/OpenDyslexic-Regular.woff') format('woff');
-        font-weight: normal;
-        font-style: normal;
-        font-display: swap;
+            font-family: 'OpenDyslexic';
+            src: url('/assets/fonts/incc/OpenDyslexic-Regular.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
         }
     </style>
     {% endif %}
 </head>
-<body class="{%if userPreference|default(null)
-    %}theme-{{ userPreference.theme }} font-{{ userPreference.fontSize }} font-{{ userPreference.fontFamily }} line-{{ userPreference.lineHeight }}{%
-    endif %}{%if userPreference.highContrast %} theme-contrast{% endif %}{%
+<body class="{%if userPreference|default(null) %}{%if userPreference.highContrast %}theme-contrast{% else %}theme-{{ userPreference.theme }}{% endif
+    %} font-{{ userPreference.fontSize }} font-{{ userPreference.fontFamily }} line-{{ userPreference.lineHeight }}{% endif %}{%
     if page_type|default('default') != 'default' %} type_{{ page_type }}"{% endif
 %}">
 
@@ -51,7 +50,9 @@
 
 {%- if is_granted('ROLE_USER') %}
     {% include "inadmin/structure/_menu.html.twig" %}
-
+    <div class="reading-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="reading-progress__bar"></div>
+    </div>
     <header class="content-header">
         <h1>{% block pagetitle %}{% endblock pagetitle %}</h1>
         {% include 'inadmin/structure/_header.html.twig' %}
@@ -73,7 +74,7 @@
 
 
     <button type="button" id="back-to-top" class="back-to-top" aria-label="Back to top" hidden>
-        <span class="material-icons">arrow_upward</span>
+        <span class="material-icons" aria-hidden="true">arrow_upward</span>
     </button>
 </div>
 

@@ -12,7 +12,9 @@ section.pagination--row {
   list-style-type: none;
   padding-left: 15px;
 
-  .material-icons { vertical-align: middle; }
+  .material-icons {
+    vertical-align: middle;
+  }
 
   .page-item {
     display: table-cell;
@@ -21,53 +23,55 @@ section.pagination--row {
 
     &:first-child {
       .page-link {
-        border-top-left-radius: $pagination-border-radius;
-        border-bottom-left-radius: $pagination-border-radius;
+        border-top-left-radius: $radius-standard;
+        border-bottom-left-radius: $radius-standard;
       }
     }
+
     &:last-child {
       .page-link {
-        border-top-right-radius: $pagination-border-radius;
-        border-bottom-right-radius: $pagination-border-radius;
+        border-top-right-radius: $radius-standard;
+        border-bottom-right-radius: $radius-standard;
       }
     }
 
     &.active .page-link {
-      background-color: $admin__tabs__highlighted-color;
-      color: $admin__tabs-background;
+      background-color: $action-primary;
+      color: $text-inverse;
     }
 
-    &.disabled .page-link {
-    }
 
-    &.current a, &.current a:visited {
-      background-color: $admin__tabs__highlighted-color;
-      color: $admin__tabs-background;
+    &.current a,
+    &.current a:visited {
+      background-color: $action-primary;
+      color: $text-inverse;
     }
   }
+
   .page-link {
-    border: 1px solid #999;
-    color: #333;
+    border: 1px solid $border-color-input;
+    color: $text-main;
     display: block;
     padding: .5em .75em;
     text-decoration: none;
 
     &:hover {
-      background-color: #333;
-      color: #fff;
+      background-color: $text-main;
+      color: $text-inverse;
     }
 
     &:focus {
-      background-color: $admin__tabs__highlighted-color;
-      color: $admin__tabs-background;
+      background-color: $action-primary;
+      color: $text-inverse;
     }
 
     &:not(:disabled):not(.disabled) {
       cursor: pointer;
     }
   }
+
   .pagination-spacer {
-    color: #999;
+    color: $border-color-input;
     display: block;
     padding: .5em .75em;
   }

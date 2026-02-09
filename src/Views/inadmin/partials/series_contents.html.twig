@@ -27,13 +27,13 @@
         </table>
     {% else %}
         <p class="content-warning">
-            <i class="material-icons">info_outline</i>
+            <i class="material-icons" aria-hidden="true">info_outline</i>
             <span>{% trans %}admin.series.contents.no_content{% endtrans %}</span>
         </p>
     {% endif %}
 {% else %}
     <p class="content-warning">
-        <i class="material-icons">info_outline</i>
+        <i class="material-icons" aria-hidden="true">info_outline</i>
         <span>{% trans %}admin.series.contents.not_saved{% endtrans %}</span>
     </p>
 {% endif %}

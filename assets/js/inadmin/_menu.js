@@ -52,6 +52,15 @@ window.Inachis.NavMenu = {
 			const open = userMenu.classList.toggle('open');
 			userMenu.setAttribute('aria-expanded', open);
 		});
+		// Close user menu when clicking outside
+		document.addEventListener('click', e => {
+			const userMenu = document.querySelector('#admin__user__options');
+			const userToggle = document.querySelector('.admin__user a');
+			if (!userMenu.contains(e.target) && !userToggle.contains(e.target)) {
+				userMenu.classList.remove('open');
+				userMenu.setAttribute('aria-expanded', 'false');
+			}
+		});
 
 		// Sub menu toggles
 		submenuToggles.forEach(toggle => {

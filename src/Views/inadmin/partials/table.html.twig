@@ -2,6 +2,10 @@
 
     {{ form_start(form, {'attr': { 'class': 'form form__' ~ type ~ ' content__list' }}) }}
 
+
+    {% set table_class = table_class ~ (zebra|default(false) ? ' table--striped' : '') %}
+    {% set table_class = table_class ~ (show_select_deselect|default(false) ? ' table--selectable' : '') %}
+
     {% if dataset|default(null) is not empty and form|default(null) is not empty %}
     {{- form_errors(form) -}}
 
@@ -14,20 +18,20 @@
         {{ table_desc }}
     </p>
     {% endif %}
-    <table {%- if table_desc|default('') is not empty %} aria-describedby="table-desc"{% endif %} class="table{%- if table_class|default(null) %} {{ table_class }}{% endif %}{%- if zebra|default(false) %}{% endif %}">
+    <table {%- if table_desc|default('') is not empty %} aria-describedby="table-desc"{% endif %} class="table {{ table_class|default('') }}">
         {%if table_name|default(null) %}<caption class="visually-hidden">{{ table_name }}</caption>{% endif %}
         <thead>
-        <tr>
-        {% if actions|default(null) is not empty %}
-            <th scope="col">
-                <label for="select-all" class="visually-hidden">Select all rows</label>
-                <input aria-label="Select all rows" class="selectAllNone" id="select-all" name="selectAllNone" type="checkbox"  />
-            </th>
-        {% endif %}
-        {% for column in columns %}
-            <th scope="col"{% if column.hideOnMobile|default(false) %} class="hide-on-mobile"{% endif %}>{{ column.title }}</th>
-        {% endfor %}
-        </tr>
+            <tr>
+            {% if actions|default(null) is not empty %}
+                <th scope="col">
+                    <label for="select-all" class="visually-hidden">Select all rows</label>
+                    <input aria-label="Select all rows" class="selectAllNone" id="select-all" name="selectAllNone" type="checkbox"  />
+                </th>
+            {% endif %}
+            {% for column in columns %}
+                <th scope="col"{% if column.hideOnMobile|default(false) %} class="hide-on-mobile"{% endif %}>{{ column.title }}</th>
+            {% endfor %}
+            </tr>
         </thead>
         <tbody>
         {% for item in dataset.iterator %}
@@ -109,14 +113,14 @@
         } only %}
         <section class="paginated-list">
             <p class="content-warning">
-                <i class="material-icons">info_outline</i>
+                <i class="material-icons" aria-hidden="true">info_outline</i>
                 <span>Oops! Your filter didn't find anything!</span>
             </p>
         </section>
     {% else %}
         <section class="paginated-list">
             <p class="content-warning">
-                <i class="material-icons">info_outline</i>
+                <i class="material-icons" aria-hidden="true">info_outline</i>
                 <span>You don't have any content yet!</span>
                 {% if add_button is defined and add_button.url is defined %}
                     <a href="{{ add_button.url }}">Add some now!</a>

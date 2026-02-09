@@ -1,0 +1,138 @@
+@use '../definitions' as *;
+@use 'sass:color';
+
+.button,
+.button:visited {
+    background-color: $bg-surface;
+    border: 1px solid $border-color-input;
+    border-radius: $radius-standard;
+    padding: 0.5em 0.75em;
+    text-decoration: none;
+    text-wrap-mode: nowrap;
+    transition: background-color 0.2s ease;
+
+    .btn-text {
+        display: none;
+    }
+
+    &:hover {
+        background-color: $color-neutral-250;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+    }
+
+    span:nth-of-type(2),
+    i:nth-last-of-type(1) {
+        margin-top: 0.2em;
+    }
+
+    span,
+    i {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    &.button--positive {
+        background-color: $success-color;
+        border-color: $color-brand-500;
+        color: $text-inverse;
+
+        &:hover {
+            background-color: $action-primary-hover;
+        }
+    }
+
+    &.button--secondary {
+        background-color: $color-button-default-bg;
+        border-color: $color-button-default-bg;
+
+        &:hover {
+            background-color: $color-button-default-hover;
+        }
+    }
+
+    &.button--negative {
+        background-color: $color-danger-500;
+        border-color: $color-danger-500;
+        color: $text-inverse;
+
+        &:hover {
+            background-color: var(--color-danger-300);
+        }
+    }
+
+    &.button--info {
+        background-color: $color-info-500;
+        border-color: $color-info-500;
+        color: $text-inverse;
+
+        &:hover {
+            background-color: $color-info-700;
+        }
+    }
+
+    &.button--menu {
+        float: left;
+        padding: 5px 10px;
+    }
+
+    &.button--add {
+        background-color: $action-primary;
+        border-color: $action-primary;
+        color: $text-inverse;
+
+        &:hover {
+            background-color: $action-primary-hover;
+        }
+    }
+
+    &.button--action {
+        input {
+            color: $text-inverse;
+            border: none;
+            margin-top: 5px;
+            padding: 5px 10px;
+            background-color: $color-info-700;
+        }
+    }
+
+    &.button--switch {
+        input:checked+label {
+            background-color: $action-primary;
+            border-color: $action-primary;
+            color: $text-inverse;
+        }
+
+        &:hover {
+            background-color: $action-primary-hover;
+        }
+    }
+
+    &.button--ai {
+        background: linear-gradient(90deg, #069, #0063a7, #005fb4, #0059c0, #1751c9, #3e46ce, #5d35cf, #7914cc); // Keeping as specific gradient unless requested otherwise
+        border-color: #470099;
+        color: $text-inverse;
+        transition: background 0.3s ease;
+
+        &:hover {
+            background: linear-gradient(90deg,
+                    $color-brand-400,
+                    color.adjust(#0063a7, $lightness: 10%),
+                    color.adjust(#005fb4, $lightness: 10%),
+                    color.adjust(#0059c0, $lightness: 10%),
+                    color.adjust(#1751c9, $lightness: 10%),
+                    color.adjust(#3e46ce, $lightness: 10%),
+                    color.adjust(#5d35cf, $lightness: 10%),
+                    color.adjust(#7914cc, $lightness: 10%));
+            border-color: $alert-warning-border;
+        }
+    }
+
+    @media (min-width: $breakpoint-medium) {
+        .btn-text {
+            display: inline;
+        }
+    }
+}

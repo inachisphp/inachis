@@ -1,8 +1,7 @@
 security:
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+
     providers:
         app_user_provider:
             entity:
@@ -13,14 +12,15 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+
         main:
             lazy: true
             provider: app_user_provider
             user_checker: Inachis\Security\UserChecker
 
             form_login:
-                login_path: app_account_login
-                check_path: app_account_login
+                login_path: incc_account_login
+                check_path: incc_account_login
 
                 username_parameter: login[loginUsername]
                 password_parameter: login[loginPassword]
@@ -30,27 +30,22 @@ security:
                 default_target_path: incc_dashboard
 
             logout:
-                path: app_logout
-                target: app_account_login
-#                clear_site_data: *
+                path: incc_logout
+                target: incc_account_login
+
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
 
         secured_area:
             form_login:
                 enable_csrf: true
 
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-
-    # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/incc/login$, roles: PUBLIC_ACCESS }
         - { path: ^/incc/forgot-password$, roles: PUBLIC_ACCESS }
         - { path: ^/incc/new-password, roles: PUBLIC_ACCESS }
         - { path: ^/incc/logout, roles: PUBLIC_ACCESS }
-        - { path: ^/incc/login-check$, roles: PUBLIC_ACCESS }
         - { path: ^/incc/ax/calculate-password-strength$, roles: PUBLIC_ACCESS }
 
         - { path: ^/incc, roles: [ ROLE_ADMIN ] }
@@ -60,10 +55,6 @@ security:
 when@test:
     security:
         password_hashers:
-            # By default, password hashers are resource intensive and take time. This is
-            # important to generate secure password hashes. In tests however, secure hashes
-            # are not important, waste resources and increase test times. The following
-            # reduces the work factor to the lowest possible values.
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
                 algorithm: auto
                 cost: 4 # Lowest possible value for bcrypt

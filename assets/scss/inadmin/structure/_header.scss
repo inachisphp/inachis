@@ -1,9 +1,9 @@
 @use '../definitions' as *;
 
 .content-header {
-    background: #f1f5f9;
+    background: $bg-panel;
     padding: 3px 0px;
-    border-bottom: 1px solid #cbd5e1;
+    border-bottom: 1px solid $border-color-dark;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -20,6 +20,7 @@
     }
 
     .admin__actions {
+        align-items: center;
         display: flex;
         flex-direction: row-reverse;
     }
@@ -34,29 +35,51 @@
         width: auto;
 
         h1 {
-            display: block;
+            display: flex;
             margin: 0;
             font-size: 1rem;
-
-            a, a:visited {
-                background-color: #333;
-                border: 1px solid transparent;
-                border-top-right-radius: 2em;
-                border-bottom-right-radius: 2em;
-                color: #fff;
-                padding: 1em 2em 1em 1em;
-                text-decoration: none;
-            }
-            a:hover {
-                background-color: #999;
-                color: #333;
-            }
-            span {
-                padding: 1em;
-            }
-            & > span:first-child {
-                margin-left: 0;
-            }
         }
+
+        h1 a,
+        h1 a:visited {
+            background-color: #333;
+            border: 1px solid transparent;
+            border-top-right-radius: 2em;
+            border-bottom-right-radius: 2em;
+            color: #fff;
+            padding: 1em 2em 1em 1em;
+            text-decoration: none;
+
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 a+a {
+            margin-left: -1.5em;
+            padding-left: 2.5em;
+            z-index: 0;
+        }
+
+        h1 a:nth-child(1) {
+            background-color: #333;
+        }
+
+        h1 a:nth-child(2) {
+            background-color: #555;
+        }
+
+        h1 a:nth-child(3) {
+            background-color: #777;
+        }
+
+        h1 a:hover {
+            background-color: #999;
+            color: #333;
+        }
+
+        h1 span {
+            padding: 1em;
+        }
+
     }
 }

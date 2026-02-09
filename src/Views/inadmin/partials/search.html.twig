@@ -1,11 +1,17 @@
 <div class="input-icon-wrapper">
 	<span class="material-icons" aria-hidden="true">search</span>
 	<input type="search"
-		id="{{ id }}"
-		placeholder="{{ placeholder }}"
 		aria-label="{{ ariaLabel }}"
-		inputmode="search"
 		enterkeyhint="{{ enterKeyHint }}"
+		id="{{ id }}"
+		inputmode="search"
+		{% if name|default(null) is not empty %}
+		name="{{ name }}"
+		{% endif %}
+		placeholder="{{ placeholder }}"
+		{% if value|default(null) %}
+		value="{{ value|default('') }}"
+		{% endif %}
 	>
 {% if clearBtn|default(false) %}
 	<button class="clear-search material-icons" data-target="#{{ id }}" type="button">close</button>

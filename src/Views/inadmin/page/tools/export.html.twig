@@ -1,0 +1,128 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <span>Export</span>
+{% endblock pagetitle %}
+
+{% block content %}
+<div class="col-12 widget-posts ui-tabs-external">
+    {% include 'inadmin/partials/tab-sets/import_export.html.twig' %}
+
+<section class="paginated-list">
+
+<form class="form nested-grid" method="post" action="{{ path('incc_tools_export') }}">
+    <fieldset class="col-4">
+        <legend>Content Type</legend>
+        <p>
+            <label><input type="radio" class="checkbox" name="content_type" value="post"
+            {% if contentType|default('post') == 'post' %}checked{% endif %}> Pages and Posts</label>
+        </p>
+        <p>
+            <label><input type="radio" class="checkbox" name="content_type" value="series"
+            {% if contentType|default('post') == 'series' %}checked{% endif %}> Series</label>
+        </p>
+        <p>
+            <label><input type="radio" class="checkbox" name="content_type" value="category"
+            {% if contentType|default('post') == 'category' %}checked{% endif %}> Categories</label>
+        </p>
+    </fieldset>
+
+    <fieldset id="scope__posts" class="col-4" data-content-type="post">
+        <legend>Scope</legend>
+        <p><label><input type="radio" class="checkbox" name="scope" value="all"
+        {% if contentType|default('post') == 'post' and scope|default('all') == 'all' %}checked{% endif %}>
+            All pages and posts</label></p>
+        <p><label><input type="radio" class="checkbox" name="scope" value="filtered"
+        {% if contentType|default('post') == 'post' and scope|default('all') == 'filtered' %}checked{% endif %}>
+            Filtered pages and posts</label></p>
+        <p><label><input type="radio" class="checkbox" name="scope" value="manual"
+        {% if contentType|default('post') == 'post' and scope|default('all') == 'manual' %}checked{% endif %}>
+            Select manually</label></p>
+    </fieldset>
+    <fieldset id="scope__series" class="col-4" data-content-type="series" aria-hidden="true" hidden>
+        <legend>Scope</legend>
+        <p><label><input type="radio" class="checkbox" name="scope" value="all"
+        {% if contentType|default('series') == 'series' and scope|default('all') == 'all' %}checked{% endif %}>
+            All series</label></p>
+        <p><label><input type="radio" class="checkbox" name="scope" value="manual"
+        {% if contentType|default('series') == 'series' and scope|default('all') == 'manual' %}checked{% endif %}>
+            Select series manually</label></p>
+    </fieldset>
+    <fieldset id="scope__categories" class="col-4" data-content-type="category" aria-hidden="true" hidden>
+        <legend>Scope</legend>
+        <p>Entire category tree will be exported</p>
+    </fieldset>
+
+    <fieldset id="format__options" class="col-4">
+        <legend>Format</legend>
+        <p><label><input type="radio" class="checkbox" name="format" value="json" checked> JSON</label></p>
+        <p><label><input type="radio" class="checkbox" name="format" value="md"> Markdown</label></p>
+        <p><label><input type="radio" class="checkbox" name="format" value="xml"> XML</label></p>
+    </fieldset>
+
+    <fieldset id="filter__options" class="col-12" aria-hidden="true" hidden>
+        <legend>Filters</legend>
+        <p>
+            <label>Type</label>
+            <select name="filter[type]">
+                <option value="*">Any</option>
+                <option value="post">Post</option>
+                <option value="page">Page</option>
+            </select>
+        </p>
+        <p>
+            <label>Status</label>
+            <select name="filter[status]">
+                <option value="">Any</option>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
+            </select>
+        </p>
+        <p>
+            <label>From</label>
+            <input type="date" name="filter[fromDate]">
+            <label>To</label>
+            <input type="date" name="filter[toDate]">
+        </p>
+    </fieldset>
+
+    <input type="hidden" id="selectedIds" name="selectedIds" value="{{ selectedIds|default([])|join(',') }}">
+
+    <fieldset id="manual__options" class="col-12" aria-hidden="true" hidden>
+        <legend>Select Items</legend>
+        <p class="admonition admonition__info start-hidden" aria-live="polite" aria-atomic="true">
+            <strong>{{ selectedIds|default([])|length }}</strong> items will be exported.
+        </p>
+        {% include 'inadmin/partials/search.html.twig' with {
+            placeholder: 'Search…',
+            ariaLabel: 'Search',
+            enterKeyHint: 'search',
+            id: 'filter__keyword',
+            name: 'filter[keyword]',
+            value: filterKeyword|default('')
+        } %}
+
+        <div id="manual__table-container">
+        </div>
+    </fieldset>
+
+    <div class="fixed-bottom-bar">
+        <p>
+            <button class="button button--positive" name="export" value="1">
+                <span class="material-icons">file_download</span> Export
+            </button>
+        </p>
+    </div>
+
+</form>
+</section>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        window.Inachis.Export.init('{{ path('incc_tools_export_ajax') }}');
+    });
+</script>
+
+{% endblock content %}

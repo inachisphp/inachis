@@ -1,5 +1,0 @@
-@mixin box-shadow($top, $right, $bottom, $left, $color) {
-	-webkit-box-shadow: $top $right $bottom $left $color;
-	-moz-box-shadow: $top $right $bottom $left $color;
-	box-shadow: $top $right $bottom $left $color;	
-}

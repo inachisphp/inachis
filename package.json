@@ -8,6 +8,10 @@
     "dependencies": {
         "dropzone": "^6.0.0-beta.2",
         "easymde": "^2.20",
+        "filepond": "^4.32.11",
+        "filepond-plugin-file-validate-size": "^2.2.8",
+        "filepond-plugin-file-validate-type": "^1.2.9",
+        "filepond-plugin-image-preview": "^4.6.12",
         "jquery": "^3.7.1",
         "jquery-datetimepicker": "^2.5.21",
         "jquery-ui-dist": "^1.13.3",

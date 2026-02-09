@@ -1,18 +1,20 @@
+@use '../definitions' as *;
+
 #progressbar {
-  background-color: #eee;
+  background-color: $border-color;
   border: 1px solid transparent;
   border-radius: 5px;
   position: relative;
 
   .progress-label {
-    color: #fff;
+    color: $text-inverse;
     left: 50%;
     position: absolute;
     top: 0.65em;
   }
 
   .ui-progressbar-value {
-    background-color: rgb(191, 210, 85);
+    background-color: $progress-good;
     display: block;
     height: 2.5em;
     border-right: 1px solid transparent;
@@ -20,10 +22,10 @@
   }
 
   &.ui-progressbar-warning .ui-progressbar-value {
-    background-color: rgb(240, 146, 70);
+    background-color: $progress-warn;
   }
 
   &.ui-progressbar-danger .ui-progressbar-value {
-    background-color: rgb(217, 35, 92);
+    background-color: $progress-bad;
   }
 }

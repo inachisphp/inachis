@@ -33,8 +33,8 @@
     <div class="fixed-bottom-bar">
         <form method="post">
             <p>
-                <button class="button button--negative" name="doRevert" type="submit"><span class="material-icons">undo</span> Revert</button>
-                <a href="{{ path('incc_post_download', { 'id': revision_id }) }}" class="button button--secondary"><span class="material-icons">save_alt</span> {% trans %}admin.post.revision.download{% endtrans %}</a>
+                <button class="button button--negative" name="doRevert" type="submit"><span class="material-icons" aria-hidden="true">undo</span> Revert</button>
+                <a href="{{ path('incc_post_download', { 'id': revision_id }) }}" class="button button--secondary"><span class="material-icons" aria-hidden="true">save_alt</span> {% trans %}admin.post.revision.download{% endtrans %}</a>
                 <a href="/incc/post/{{ link }}" class="button button--info">Cancel</a>
             </p>
         </form>

@@ -1,0 +1,52 @@
+{% extends "inadmin/emails/email-layout.html.twig" %}
+
+{% block title %}New device sign-in detected for {{ settings.siteTitle }}{% endblock title %}
+
+{% block preheader %}
+We have detected a new device sign-in for your account.
+{% endblock preheader %}
+
+{% block content %}
+    <table class="fixed-table">
+        <tbody>
+        <tr>
+            <td style="border-bottom:1px solid #e7e7e7;">
+                <center>
+                    <table cellpadding="0" cellspacing="0" width="600" class="w320">
+                        <tr>
+                            <td align="left" class="mobile-padding" style="padding:20px">
+                                <br class="mobile-hide" />
+
+                                <h2>New device sign-in detected</h2>
+                                <p>Your account was accessed from a new device:</p>
+                                <ul>
+                                    <li>IP Address: <strong>{{ ip }}</strong></li>
+                                    <li>User Agent: <strong>{{ userAgent }}</strong></li>
+                                    <li>Time: <strong>{{ time|date('Y-m-d \a\t H:i') }}</strong></li>
+                                </ul>
+
+                                <p>If you do not recognize this activity, please change your password immediately.</p>
+
+                                <div style="padding:20px 0;">
+                                    <!--[if mso]>
+                                    <v:rect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:33px;v-text-anchor:middle;width:100px;" stroke="f" fillcolor="#D84A38">
+                                        <w:anchorlock/>
+                                        <center>
+                                    <![endif]-->
+                                    <a href="{{ settings.domain }}" class="button--cta">Change my password</a>
+                                    <!--[if mso]>
+                                    </center>
+                                    </v:rect>
+                                    <![endif]-->
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </center>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+{% endblock content %}
+
+{% block settings_unsubscribe %}{% endblock settings_unsubscribe %}

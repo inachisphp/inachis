@@ -79,6 +79,7 @@ class SeriesController extends AbstractInachisController
             $contentQuery['sort'],
         );
         $this->data['query'] = $contentQuery;
+        $this->data['page']['title'] = 'Series';
         $this->data['page']['tab'] = 'series';
         return $this->render('inadmin/page/series/list.html.twig', $this->data);
     }

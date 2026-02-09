@@ -2,20 +2,28 @@
 @use 'sass:color';
 
 .form {
-	input, textarea, select {
-	    border: 1px solid #999;
+
+	input,
+	textarea,
+	select {
+		background-color: $color-neutral-000;
+		border: 1px solid $border-color-input;
+		color: $color-neutral-700;
 		font-size: 1em;
-	    line-height: 1.5em;
-	    padding: 5px 10px;
-	    width: 15em;
+		line-height: 1.5em;
+		padding: 5px 10px;
+		width: 15em;
 	}
+
 	input.checkbox {
 		margin-right: 0.5em;
 		width: auto;
 	}
+
 	fieldset {
 		border: none;
 	}
+
 	legend {
 		display: none;
 	}
@@ -36,123 +44,14 @@
 			width: 60%;
 		}
 	}
+
 	.ts-dropdown-content {
 		input {
 			width: auto;
 		}
+
 		small {
 			display: block;
 		}
 	}
-}
-
-.button, .button:visited {
-	background-color: #fff;
-	border: 3px solid #fff;
-	border-radius: 0.5em;
-	padding: 0.5em 0.75em;
-	text-decoration: none;
-	text-wrap-mode: nowrap;
-	transition: background-color 0.2s ease;
-
-	.btn-text {
-		display: none;
-	}
-
-	&:hover {
-		background-color: color.adjust(#fff, $lightness: -10%);
-	}
-
-	&:disabled {
-		opacity: 0.5;
-	}
-
-	span:nth-of-type(2), i:nth-last-of-type(1) {
-		margin-top: 0.2em;
-	}
-
-	span, i {
-		display: inline-block;
-		vertical-align: middle;
-	}
-
-	&.button--secondary {
-		background-color: $button--default-active-color;
-		border-color: $button--default-active-color;
-
-		&:hover {
-			background-color: $button--default-hover-color;
-		}
-	}
-
-	&.button--positive {
-		background-color: $button--positive--active-color;
-		border-color: $button--positive--active-color;
-		color: #fff;
-
-		&:hover {
-			background-color: $button--positive--hover-color;
-		}
-	}
-
-	&.button--negative {
-		background-color: $button--negative--active-color;
-		border-color: $button--negative--active-color;
-		color: #fff;
-
-		&:hover {
-			background-color: $button--negative--hover-color;
-		}
-	}
-
-	&.button--info {
-		background-color: $button--info--active-color;
-		border-color: $button--info--active-color;
-		color: #fff;
-
-		&:hover {
-			background-color: $button--info--hover-color;
-		}
-	}
-
-	&.button--menu {
-		float: left;
-		padding: 5px 10px;
-	}
-
-	&.button--add {
-		background-color: $button--add--active-color;
-		border-color: $button--add--active-color;
-		color: #fff;
-
-		&:hover {
-			background-color: $button--add--hover-color;
-		}
-	}
-
-	&.button--ai {
-		background: linear-gradient(90deg, #069, #0063a7, #005fb4, #0059c0, #1751c9, #3e46ce, #5d35cf, #7914cc);
-		border-color: #470099;
-		color: #fff;
-		transition: background 0.3s ease;
-
-		&:hover {
-			background: linear-gradient(90deg,
-							color.adjust(#069, $lightness: 10%),
-							color.adjust(#0063a7, $lightness:10%),
-							color.adjust(#005fb4, $lightness:10%),
-							color.adjust(#0059c0, $lightness:10%),
-							color.adjust(#1751c9, $lightness:10%),
-							color.adjust(#3e46ce, $lightness:10%),
-							color.adjust(#5d35cf, $lightness:10%),
-							color.adjust(#7914cc, $lightness:10%));
-			border-color: #f60;
-		}
-	}
-
-	@media (min-width: $breakpoint-medium) {
-        .btn-text {
-            display: inline;
-        }
-    }
 }

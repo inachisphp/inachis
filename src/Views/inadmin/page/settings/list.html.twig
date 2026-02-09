@@ -1,0 +1,43 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+{% block pagetitle %}
+    <span>Settings</span>
+{% endblock pagetitle %}
+
+{% block content %}
+{% block settings_pre %}{% endblock settings_pre %}
+{% block settings %}
+<div class="col-12 widget-container">
+
+<!-- section class="widget widget-settings">
+    <p><span class="material-icons" aria-hidden="true">extension</span></p>
+    <h2>Plug-ins</h2>
+    <p><span>Manage your plugins</span></p>
+    <p><a href="{{ settings.domain }}" class="button button--secondary">Manage Plugins</a></p>
+</section>
+
+<section class="widget widget-settings">
+    <p><span class="material-icons" aria-hidden="true">extension</span></p>
+    <h2>Integrations</h2>
+    <p><span>Manage your integrations</span></p>
+    <p><a href="{{ settings.domain }}" class="button button--secondary">Manage Integrations</a></p>
+</section>
+
+<section class="widget widget-settings">
+    <p><span class="material-icons" aria-hidden="true">security</span></p>
+    <h2>Security</h2>
+    <p><span>Manage your security settings</span></p>
+    <p><a href="{{ settings.domain }}" class="button button--secondary">Manage Security</a></p>
+</section -->
+
+<section class="widget widget-settings">
+    <p><span class="material-icons" aria-hidden="true">commit</span></p>
+    <h2>Version {{ version.version }}</h2>
+    <p><span>Commit: {{ version.commit }}</span></p>
+    <p><span>Build date: {{ version.build_date }}</span></p>
+</section>
+
+</div>
+{% endblock settings %}
+{% block settings_post %}{% endblock settings_post %}
+{% endblock content %}
+

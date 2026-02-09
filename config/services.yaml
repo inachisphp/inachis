@@ -34,23 +34,72 @@ services:
         arguments:
             $checks: !tagged_iterator app.diagnostic_check
 
+    Inachis\EventListener\AdminResponseEvent:
+        arguments:
+            $csp: '%csp%'
+
+    Inachis\EventListener\LoginSuccessListener:
+        tags:
+            - { name: 'kernel.event_listener', event: Symfony\Component\Security\Http\Event\LoginSuccessEvent }
+
+    Inachis\EventListener\LoginFailureListener:
+        tags:
+            - { name: 'kernel.event_listener', event: Symfony\Component\Security\Http\Event\LoginFailureEvent }
+
     Inachis\Service\Image\ImageLocaliser:
         arguments:
             $publicImgPath: '%app.public_img_path%'
+
+    Inachis\Service\Page\Export\PageExportService:
+        arguments:
+            $writers: !tagged_iterator inachis.export_writer
+
+    Inachis\Service\Page\Export\PageJsonWriter:
+        tags:
+            - { name: 'inachis.export_writer', priority: 0 }
+
+    Inachis\Service\Page\Export\PageMdWriter:
+        tags:
+            - { name: 'inachis.export_writer', priority: 0 }
+
+    Inachis\Service\Page\Export\PageXmlWriter:
+        tags:
+            - { name: 'inachis.export_writer', priority: 0 }
+
+    Inachis\Service\Series\Export\SeriesExportService:
+        arguments:
+            $writers: !tagged_iterator inachis.export_writer
+
+    Inachis\Service\Series\Export\SeriesMdWriter:
+        tags:
+            - { name: 'inachis.export_writer', priority: 10 }
+
+    Inachis\Service\Series\Export\SeriesXmlWriter:
+        tags:
+            - { name: 'inachis.export_writer', priority: 10 }
+
+    Inachis\Service\Export\Category\CategoryExportService:
+        arguments:
+            $writers: !tagged_iterator inachis.export_writer
+
+    Inachis\Service\Export\Category\CategoryXmlWriter:
+        tags:
+            - { name: 'inachis.export_writer', priority: 10 }
 
     Inachis\Service\User\PasswordResetTokenService:
         arguments:
             $appSecret: '%env(APP_SECRET)%'
             $ttlSeconds: '%password_reset.ttl%'
 
+    Inachis\Service\VersionService:
+        arguments:
+            $versionFile: '%kernel.project_dir%/config/version.php'
+
     Inachis\Twig\:
         resource: '../src/Twig'
         tags: [ 'twig.extension' ]
         autoconfigure: true
 
-    Inachis\EventListener\AdminResponseEvent:
-        arguments:
-            $csp: '%csp%'
 
 #    Inachis\Service\CryptoService:
 #        arguments:
@@ -62,6 +111,6 @@ services:
 
 #    Inachis\Service\ImageResizer\GdImageResizer: ~
 #    Inachis\Service\ImageResizer\ImagickResizer: ~
-    Inachis\Service\ImageResizer\ImageResizerInterface:
-        factory: ['Inachis\Service\ImageResizer\ImageResizerFactory', 'create']
-        public: true
+    # Inachis\Service\ImageResizer\ImageResizerInterface:
+    #     factory: ['Inachis\Service\ImageResizer\ImageResizerFactory', 'create']
+    #     public: true

@@ -1,0 +1,43 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+{% block content %}
+
+    {% block settings_pre %}{% endblock settings_pre %}
+
+    {% block settings %}
+
+    <div class="col span_4_of_8">
+        <section class="section--boxed">
+            <h2>Storage</h2>
+            <div id="progressbar" data-percentage="{{ storage.percent }}" class="
+            {%- if storage.percent >= 90 -%}
+                ui-progressbar-danger
+            {%- elseif storage.percent >= 75 -%}
+                ui-progressbar-warning
+            {%- endif -%}">
+                <div class="progress-label">{{ storage.percent|number_format(2)|trim(0)|trim('.') }}%</div>
+            </div>
+        </section>
+
+        {% include "/inadmin/partials/export.html.twig" %}
+
+        <section class="section--boxed action-warning">
+            <form method="post" action="{{ path('inachis_tools_wipe') }}">
+                <h2>Delete All Content</h2>
+                <p><strong>Caution!</strong> This will clear all pages, posts, etc. from the site. This should only be done if you're absolutely sure as this action is NOT recoverable.</p>
+                <ul>
+                    <li><strong>{{ counts.page }}</strong> post and pages</li>
+                    <li><strong>{{ counts.series }}</strong> series</li>
+                    <li><strong>{{ counts.tag }}</strong> tags</li>
+                    <li><strong>{{ counts.url }}</strong> URLs</li>
+                </ul>
+                <p><input type="checkbox" name="confirm" /><label>I confirm I want to delete all content form this site.</label></p>
+                <p><button class="button button--negative" type="submit"><span class="material-icons" aria-hidden="true">delete_forever</span> Delete all</button></p>
+            </form>
+        </section>
+    </div>
+
+    {% endblock settings %}
+
+
+    {% block settings_post %}{% endblock settings_post %}
+{% endblock content %}

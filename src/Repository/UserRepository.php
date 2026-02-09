@@ -22,6 +22,15 @@ class UserRepository extends AbstractRepository //ServiceEntityRepository
     }
 
     /**
+     * @param string $username
+     * @return User|null
+     */
+    public function findByUsername(string $username): ?User
+    {
+        return $this->findOneBy(['username' => $username]);
+    }
+
+    /**
      * @param $filters
      * @param $offset
      * @param $limit

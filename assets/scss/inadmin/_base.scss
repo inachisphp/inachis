@@ -1,7 +1,8 @@
 @use 'definitions' as *;
 
 body {
-  background-color: $admin__background-color;
+  background-color: $bg-body;
+  color: $color-neutral-900;
   font-family: Roboto, Helvetica Neue, Helvetica, Arial, sans-serif;
   font-display: swap;
   overflow-x: hidden;
@@ -27,11 +28,11 @@ body .visually-hidden {
 
 .back-to-top {
   align-items: center;
-  background-color: #069;
+  background-color: $color-brand-500;
   border: none;
-  border-radius: 50%;
+  border-radius: $radius-round;
   bottom: 2rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   color: #fff;
   cursor: pointer;
   display: flex;
@@ -44,7 +45,8 @@ body .visually-hidden {
   width: 3rem;
   z-index: 99;
 
-  &[hidden="false"],&:not([hidden]) {
+  &[hidden="false"],
+  &:not([hidden]) {
     opacity: 1;
   }
 }
@@ -53,19 +55,44 @@ body .visually-hidden {
   * {
     transition: none !important;
     animation: none !important;
-    scroll-behavior :auto !important;
+    scroll-behavior: auto !important;
   }
 }
+
 .reduce-motion * {
   transition: none !important;
   animation: none !important;
   scroll-behavior: auto !important;
 }
 
-@media (prefers-contrast: more) {
-  body { --bg:#000; --hover:#1f1f1f; --active:#ff0; --text:#fff; }
-}
-.high-contrast { --bg:#000; --hover:#1f1f1f; --active:#ff0; --text:#fff; }
-.high-contrast a:focus, .high-contrast button:focus { outline:3px solid #ff0; outline-offset:2px; }
-.high-contrast .badge { background:#ff0; color:#000; }
-.high-contrast .layout:not(.expanded) a[data-tooltip]::after { background:#fff; color:#000; }
+// @media (prefers-contrast: more) {
+//   body {
+//     --bg: #000;
+//     --hover: #1f1f1f;
+//     --active: #ff0;
+//     --text: #fff;
+//   }
+// }
+
+// .high-contrast {
+//   --bg: #000;
+//   --hover: #1f1f1f;
+//   --active: #ff0;
+//   --text: #fff;
+// }
+
+// .high-contrast a:focus,
+// .high-contrast button:focus {
+//   outline: 3px solid #ff0;
+//   outline-offset: 2px;
+// }
+
+// .high-contrast .badge {
+//   background: #ff0;
+//   color: #000;
+// }
+
+// .high-contrast .layout:not(.expanded) a[data-tooltip]::after {
+//   background: #fff;
+//   color: #000;
+// }

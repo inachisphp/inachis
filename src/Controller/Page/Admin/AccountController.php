@@ -19,17 +19,12 @@ use Inachis\Repository\PasswordResetRequestRepository;
 use Inachis\Repository\UserRepository;
 use Inachis\Service\User\PasswordResetTokenService;
 use Inachis\Service\User\UserAccountEmailService;
-use Inachis\Util\Base64EncodeFile;
 use DateTime;
-use Doctrine\ORM\NonUniqueResultException;
 use Exception;
 use Random\RandomException;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -41,11 +36,11 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class AccountController extends AbstractInachisController
 {
     /**
-     * @param Request             $request
+     * @param Request $request
      * @param AuthenticationUtils $authenticationUtils
      * @return Response The response the controller results in
      */
-    #[Route("/incc/login", name: "app_account_login", methods: [ "GET", "POST" ])]
+    #[Route("/incc/login", name: "incc_account_login")]
     public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
     {
         $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();
@@ -67,10 +62,10 @@ class AccountController extends AbstractInachisController
     /**
      * @throws \Exception
      */
-    #[Route("/incc/logout", name: "app_logout", methods: [ "GET", "POST" ])]
-    public function logout(): never
+    #[Route("/incc/logout", name: "incc_logout")]
+    public function logout(): void
     {
-        throw new Exception('Don\'t forget to activate logout in security.yaml');
+        throw new \LogicException('This method is blank and will be intercepted by the logout key on your firewall.');
     }
 
     /**
