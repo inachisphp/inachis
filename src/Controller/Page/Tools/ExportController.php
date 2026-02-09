@@ -13,14 +13,13 @@ use Inachis\Controller\AbstractInachisController;
 use Inachis\Repository\CategoryRepository;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\SeriesRepository;
+use Inachis\Service\Export\Category\CategoryExportService;
 use Inachis\Service\Page\Export\PageExportService;
 use Inachis\Service\Series\Export\SeriesExportService;
-use Inachis\Model\Page\PageExportFilterDto;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Controller for exporting pages and posts
@@ -36,6 +35,7 @@ class ExportController extends AbstractInachisController
     #[Route('incc/tools/export', name: 'incc_tools_export', methods: ['GET', 'POST'])]
     public function export(
         Request $request,
+        CategoryExportService $categoryExportService,
         PageExportService $pageExportService,
         SeriesExportService $seriesExportService,
     ): Response {
@@ -57,7 +57,8 @@ class ExportController extends AbstractInachisController
         if ($request->isMethod('POST') && $request->request->has('export')) {
             switch ($contentType) {
                 case 'category':
-                    $items = $categoryRepository->getAll();
+                    $items = $categoryExportService->getAllCategories();
+                    $exportService = $categoryExportService;
                     break;
 
                 case 'post':
@@ -74,7 +75,7 @@ class ExportController extends AbstractInachisController
                     }
                     $exportService = $pageExportService;
                     break;
-                    
+
                 case 'series':
                     if ($scope === 'all') {
                         $items = $seriesExportService->getAllSeries();
@@ -97,7 +98,7 @@ class ExportController extends AbstractInachisController
             }
 
             try {
-                $exportedContent = $exportService->export($items, $format);
+                $exportedData = $exportService->export($items, $format);
             } catch (\InvalidArgumentException $e) {
                 $this->addFlash('error', $e->getMessage());
                 return $this->redirectToRoute('incc_tools_export');
@@ -105,7 +106,7 @@ class ExportController extends AbstractInachisController
 
             $filename = $contentType . '-export-' . date('Y-m-d-His') . '.' . $format;
             if ($format === 'md') {
-                return new Response($exportedContent, 200, [
+                return new Response($exportedData, 200, [
                     'Content-Type' => 'text/markdown',
                     'Content-Disposition' => 'attachment; filename="' . $filename . '"',
                 ]);

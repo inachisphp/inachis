@@ -48,29 +48,41 @@ services:
 
     Inachis\Service\Page\Export\PageJsonWriter:
         tags:
-            - { name: 'inachis.export_writer', format: 'json' }
+            - { name: 'inachis.export_writer', priority: 0 }
 
     Inachis\Service\Page\Export\PageMdWriter:
         tags:
-            - { name: 'inachis.export_writer', format: 'md' }
+            - { name: 'inachis.export_writer', priority: 0 }
 
     Inachis\Service\Page\Export\PageXmlWriter:
         tags:
-            - { name: 'inachis.export_writer', format: 'xml' }
+            - { name: 'inachis.export_writer', priority: 0 }
 
     Inachis\Service\Series\Export\SeriesExportService:
         arguments:
-            $writers: !tagged_iterator inachis.series_export_writer
+            $writers: !tagged_iterator inachis.export_writer
 
     Inachis\Service\Series\Export\SeriesMdWriter:
         tags:
-            - { name: 'inachis.series_export_writer', format: 'md' }
+            - { name: 'inachis.export_writer', priority: 10 }
+
+    Inachis\Service\Series\Export\SeriesXmlWriter:
+        tags:
+            - { name: 'inachis.export_writer', priority: 10 }
+
+    Inachis\Service\Export\Category\CategoryExportService:
+        arguments:
+            $writers: !tagged_iterator inachis.export_writer
+
+    Inachis\Service\Export\Category\CategoryXmlWriter:
+        tags:
+            - { name: 'inachis.export_writer', priority: 10 }
 
     Inachis\Service\User\PasswordResetTokenService:
         arguments:
             $appSecret: '%env(APP_SECRET)%'
             $ttlSeconds: '%password_reset.ttl%'
-            
+
     Inachis\Service\VersionService:
         arguments:
             $versionFile: '%kernel.project_dir%/config/version.php'

@@ -16,21 +16,13 @@ use Symfony\Component\TaggedIterator\TaggedIterator;
  */
 abstract class AbstractExportService
 {
-    /** @var array<string, ExportWriterInterface> */
-    protected array $writers = [];
+    /** @var iterable<ExportWriterInterface> */
+    protected iterable $writers;
 
     public function __construct(
-        #[TaggedIterator('inachis.export_writer')]
-        iterable $writers
+        #[TaggedIterator('inachis.export_writer')] iterable $writers,
     ) {
-        foreach ($writers as $writer) {
-            if (!$writer instanceof ExportWriterInterface) continue;
-            foreach (['json','md','xml'] as $format) {
-                if ($writer->supports($format)) {
-                    $this->writers[$format] = $writer;
-                }
-            }
-        }
+        $this->writers = $writers;
     }
 
     /**
@@ -40,18 +32,25 @@ abstract class AbstractExportService
      * @param string $format
      * @return string
      */
-    protected function exportCollection(iterable $collection, string $format): string
-    {
-        if (!isset($this->writers[$format])) {
-            throw new \InvalidArgumentException(sprintf('Unsupported export format: %s', $format));
+    protected function exportCollection(
+        iterable $items,
+        string $format,
+        ?string $domain = null,
+    ): string {
+        foreach ($this->writers as $writer) {
+            if ($writer->supports($format) && $writer->supportsDomain($domain)) {
+                $dtos = [];
+                foreach ($items as $item) {
+                    $dtos[] = $this->normalise($item);
+                }
+                return $writer->write($dtos);
+            }
         }
-
-        $dtos = [];
-        foreach ($collection as $item) {
-            $dtos[] = $this->normalise($item);
-        }
-
-        return $this->writers[$format]->write($dtos);
+        throw new \RuntimeException(sprintf(
+            'No export writer for format "%s" and domain "%s"',
+            $format,
+            $domain ?? 'default'
+        ));
     }
 
     /**

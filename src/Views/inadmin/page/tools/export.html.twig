@@ -15,33 +15,46 @@
     <fieldset class="col-4">
         <legend>Content Type</legend>
         <p>
-            <label><input type="radio" class="checkbox" name="content_type" value="post" checked> Pages and Posts</label>
+            <label><input type="radio" class="checkbox" name="content_type" value="post"
+            {% if contentType|default('post') == 'post' %}checked{% endif %}> Pages and Posts</label>
         </p>
         <p>
-            <label><input type="radio" class="checkbox" name="content_type" value="series"> Series</label>
+            <label><input type="radio" class="checkbox" name="content_type" value="series"
+            {% if contentType|default('post') == 'series' %}checked{% endif %}> Series</label>
         </p>
         <p>
-            <label><input type="radio" class="checkbox" name="content_type" value="category"> Categories</label>
+            <label><input type="radio" class="checkbox" name="content_type" value="category"
+            {% if contentType|default('post') == 'category' %}checked{% endif %}> Categories</label>
         </p>
     </fieldset>
 
     <fieldset id="scope__posts" class="col-4" data-content-type="post">
         <legend>Scope</legend>
-        <p><label><input type="radio" class="checkbox" name="scope" value="all" checked> All pages and posts</label></p>
-        <p><label><input type="radio" class="checkbox" name="scope" value="filtered"> Filtered pages and posts</label></p>
-        <p><label><input type="radio" class="checkbox" name="scope" value="manual"> Select manually</label></p>
+        <p><label><input type="radio" class="checkbox" name="scope" value="all"
+        {% if contentType|default('post') == 'post' and scope|default('all') == 'all' %}checked{% endif %}>
+            All pages and posts</label></p>
+        <p><label><input type="radio" class="checkbox" name="scope" value="filtered"
+        {% if contentType|default('post') == 'post' and scope|default('all') == 'filtered' %}checked{% endif %}>
+            Filtered pages and posts</label></p>
+        <p><label><input type="radio" class="checkbox" name="scope" value="manual"
+        {% if contentType|default('post') == 'post' and scope|default('all') == 'manual' %}checked{% endif %}>
+            Select manually</label></p>
     </fieldset>
     <fieldset id="scope__series" class="col-4" data-content-type="series" aria-hidden="true" hidden>
         <legend>Scope</legend>
-        <p><label><input type="radio" class="checkbox" name="scope" value="all"> All series</label></p>
-        <p><label><input type="radio" class="checkbox" name="scope" value="manual"> Select series manually</label></p>
+        <p><label><input type="radio" class="checkbox" name="scope" value="all"
+        {% if contentType|default('series') == 'series' and scope|default('all') == 'all' %}checked{% endif %}>
+            All series</label></p>
+        <p><label><input type="radio" class="checkbox" name="scope" value="manual"
+        {% if contentType|default('series') == 'series' and scope|default('all') == 'manual' %}checked{% endif %}>
+            Select series manually</label></p>
     </fieldset>
     <fieldset id="scope__categories" class="col-4" data-content-type="category" aria-hidden="true" hidden>
         <legend>Scope</legend>
         <p>Entire category tree will be exported</p>
     </fieldset>
 
-    <fieldset class="col-4">
+    <fieldset id="format__options" class="col-4">
         <legend>Format</legend>
         <p><label><input type="radio" class="checkbox" name="format" value="json" checked> JSON</label></p>
         <p><label><input type="radio" class="checkbox" name="format" value="md"> Markdown</label></p>
@@ -74,12 +87,12 @@
         </p>
     </fieldset>
 
-    <input type="hidden" id="selectedIds" name="selectedIds" value="{{ items|default([])|join(',') }}">
+    <input type="hidden" id="selectedIds" name="selectedIds" value="{{ selectedIds|default([])|join(',') }}">
 
     <fieldset id="manual__options" class="col-12" aria-hidden="true" hidden>
         <legend>Select Items</legend>
         <p class="admonition admonition__info start-hidden" aria-live="polite" aria-atomic="true">
-            <strong>{{ previewCount|default(0) }}</strong> items will be exported.
+            <strong>{{ selectedIds|default([])|length }}</strong> items will be exported.
         </p>
         {% include 'inadmin/partials/search.html.twig' with {
             placeholder: 'Search…',
