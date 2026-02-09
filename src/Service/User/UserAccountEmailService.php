@@ -30,19 +30,20 @@ readonly class UserAccountEmailService
     public function sendForgotPasswordEmail(User $user, array $data, callable $urlGenerator): void
     {
         $tokenData = $this->tokenService->createResetRequestForEmail($user->getEmail());
+        // record mod timestamp
 //        $this->entityManager->persist($user);
 //        $this->entityManager->flush();
 
         $email = (new TemplatedEmail())
             ->to(new Address($user->getEmail()))
-            ->subject('Reset your password for ' . $data['settings']['siteTitle'])
+            ->subject('Reset your password for ' . ($data['settings']['siteTitle'] ?? 'Inachis Admin Panel'))
             ->htmlTemplate('inadmin/emails/forgot-password.html.twig')
             ->textTemplate('inadmin/emails/forgot-password.txt.twig')
             ->context([
                 'ipAddress' => $data['clientIP'],
                 'url' => $urlGenerator($tokenData['token']),
                 'expiresAt' => $tokenData['expiresAt']->format('l jS F Y \a\\t H:i'),
-                'settings' => $data['settings'],
+                'settings' => $data['settings'] ?? [],
                 'logo' => Base64EncodeFile::encode('public/assets/imgs/incc/inachis.png'),
             ]);
         $this->mailer->send($email);
