@@ -1,11 +1,11 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    {% if user|default(null) %}
+    {% if username|default(null) %}
     <a href="{{ path('incc_admin_list') }}">Users</a>
-    <span>Edit User: {{ user.username }}</span>
+    <span>Edit User: {{ username }}</span>
     {% else %}
-    <span>Login Activity</span>
+    <span>Audit Logs</span>
     {% endif %}
 {% endblock pagetitle %}
 
@@ -55,6 +55,11 @@
     </thead>
     <tbody>
     {% for activity in activities %}
+        {% if user|default(null) %}
+            {% set url = path('incc_admin_login_activity_view', { username: user.username, id: activity.id}) %}
+        {% else %}
+            {% set url = path('incc_admin_all_login_activity_view', { id: activity.id}) %}
+        {% endif %}
         <tr class="{{ activity.type == 'failure' ? 'table-danger' : '' }}">
             <td>{{ activity.loggedAt|date('Y-m-d H:i:s') }}</td>
             <td>
@@ -69,7 +74,7 @@
             </td>
             <td>{{ activity.ipAddress }}</td>
             <td class="text-muted small">{{ activity.userAgent|slice(0, 80) }}</td>
-            <td><a href="{{ path('incc_admin_login_activity_view', { id: activity.id}) }}">view</a></td>
+            <td><a href="{{ url }}">view</a></td>
         </tr>
     {% endfor %}
     </tbody>

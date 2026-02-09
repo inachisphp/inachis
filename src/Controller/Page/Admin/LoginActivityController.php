@@ -67,12 +67,14 @@ class LoginActivityController extends AbstractInachisController
      * @param LoginActivity $activity
      * @return Response
      */
-    #[Route('/incc/admin/login-activity/{id}', name: 'incc_admin_login_activity_view')]
+    #[Route('/incc/admin/login-activity/{id}', name: 'incc_admin_all_login_activity_view')]
+    #[Route('/incc/admin/{username}/login-activity/{id}', name: 'incc_admin_login_activity_view')]
     public function view(Request $request, LoginActivityRepository $repository): Response
     {
         $this->data['page']['title'] = 'Login Activity';
         $this->data['page']['tab'] = 'audit-logs';
-        $this->data['activity'] = $request->attributes->get('activity');
+        $this->data['username'] = $request->attributes->get('username') ?? null;
+        $this->data['activity'] = $repository->find($request->attributes->get('id'));
         return $this->render('inadmin/page/admin/login-activity-view.html.twig', $this->data);
     }
 }

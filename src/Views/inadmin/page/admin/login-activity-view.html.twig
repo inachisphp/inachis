@@ -1,13 +1,19 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <span>Login Activity</span>
+    {% if username|default(null) %}
+    <a href="{{ path('incc_admin_list') }}">Users</a>
+    <a href="{{ path('incc_admin_edit', { id: username }) }}">User: {{ username }}</a>
+    <span>Audit Log Entry</span>
+    {% else %}
+    <a href="{{ path('incc_admin_login_activity_index') }}">Audit Logs</a>
+    <span>Audit Log Entry</span>
+    {% endif %}
 {% endblock pagetitle %}
 
 {% block content %}
 
-<div class="col-12 widget-data-list ui-tabs-external">
-    {% include 'inadmin/partials/tab-sets/users.html.twig' %}
+<div class="col-12 widget-data-list">
     <section class="paginated-list">
         <p><strong>Time:</strong> {{ activity.loggedAt|date('Y-m-d H:i:s') }}</p>
         <p><strong>User:</strong> {{ (activity.user ? activity.user.userIdentifier : activity.username)|default('Unknown') }}</p>
