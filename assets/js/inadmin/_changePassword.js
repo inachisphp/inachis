@@ -1,45 +1,64 @@
 window.Inachis.PasswordManager = {
-    _init() {
-        let saveTimeout = false;
-        const $passwordStrength = $('.password-strength');
-        $($passwordStrength.data('source')).on('input', () => {
-            if (saveTimeout) clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(() => {
-                const currentPassword = $('#change_password_current_password').val();
-                const newPassword = $('#change_password_new_password').val();
-                if (currentPassword !== newPassword && window.Inachis.PasswordManager.basicValidatePassword(newPassword)) {
-                    $.ajax({
-                        url: `${window.Inachis.prefix}/ax/calculate-password-strength`,
-                        data: { password: $($passwordStrength.data('source')).val() },
-                        method: 'POST',
-                    }).done((data) => {
-                        const strengthValue = Number(data);
+  _init() {
+    let saveTimeout = null;
+    const passwordStrength = document.querySelector('.password-strength');
+    const sourceSelector = passwordStrength.dataset.source;
+    const sourceInput = document.querySelector(sourceSelector);
 
-                        if (!Number.isFinite(strengthValue)) {
-                            console.error('Invalid password strength value:', data);
-                            return;
-                        }
+    sourceInput.addEventListener('input', () => {
+      if (saveTimeout) clearTimeout(saveTimeout);
 
-                        $passwordStrength.val(strengthValue + 1);
-                        const strength = {
-                            0: 'Very weak',
-                            1: 'Weak',
-                            2: 'Medium',
-                            3: 'Strong',
-                            4: 'Very strong',
-                        }
+      saveTimeout = setTimeout(async () => {
+        const currentPassword = document.querySelector('#change_password_current_password').value;
+        const newPassword = document.querySelector('#change_password_new_password').value;
 
-                        const label = strength[strengthValue] ?? 'Unknown';
+        if (currentPassword !== newPassword && window.Inachis.PasswordManager.basicValidatePassword(newPassword)) {
+          try {
+            const response = await fetch(`${window.Inachis.prefix}/ax/calculate-password-strength`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+              },
+              body: new URLSearchParams({
+                password: sourceInput.value,
+              }),
+            });
 
-                        $passwordStrength.html(`Password strength: ${label}`);
-                        $('#password-strength-help').html(`Password strength: ${label}`);
-                    });
-                }
-            }, 500);
-        });
-    },
+            if (!response.ok) throw new Error(response.statusText);
 
-    basicValidatePassword(password) {
-        return password.trim() !== '' && password.length >= 8;
-    }
+            const data = await response.text();
+            const strengthValue = Number(data);
+
+            if (!Number.isFinite(strengthValue)) {
+              console.error('Invalid password strength value:', data);
+              return;
+            }
+
+            passwordStrength.value = strengthValue + 1;
+
+            const strength = {
+              0: 'Very weak',
+              1: 'Weak',
+              2: 'Medium',
+              3: 'Strong',
+              4: 'Very strong',
+            };
+
+            const label = strength[strengthValue] ?? 'Unknown';
+
+            passwordStrength.textContent = `Password strength: ${label}`;
+            const helpEl = document.getElementById('password-strength-help');
+            if (helpEl) helpEl.textContent = `Password strength: ${label}`;
+
+          } catch (error) {
+            console.error('Password strength request failed:', error);
+          }
+        }
+      }, 500);
+    });
+  },
+
+  basicValidatePassword(password) {
+    return password.trim() !== '' && password.length >= 8;
+  }
 };

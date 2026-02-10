@@ -4,53 +4,62 @@ window.Inachis.Map = {
 	retina: false,
 	targetMap: null,
 
-	_init() {
+	init() {
 		this.showGeoLocation = location.protocol === 'https:' && 'geolocation' in navigator;
-		$('.ui-map').each((i, el) => this._initMap(i, el));
-		$(document).on('click', '.ui-cross', (e) => this.clear(e));
-		$(document).on('click', '.ui-geo', (e) => this.getGeoLocation(e));
+		document.querySelectorAll('.ui-map').forEach((el) => this._initMap(el));
+		document.querySelectorAll('.ui-cross').forEach((el) => el.addEventListener('click', (e) => this.clear(e)));
+		document.querySelectorAll('.ui-geo').forEach((el) => el.addEventListener('click', (e) => this.getGeoLocation(e)));
 	},
 
-	_initMap(index, mapElement) {
+	_initMap(mapElement) {
 		if (this.key === null) {
-			this.key = $(mapElement).attr('data-google-key')
+			this.key = mapElement.dataset.googleKey;
 		}
 		mapElement.type = 'hidden';
 		const mapName = (mapElement.name || mapElement.id);
-		const mapBox = $(`<div class="mapbox" id="${mapName}__map"></div>`);
-		$(mapElement).after(mapBox);
+		const mapBox = document.createElement('div');
+		mapBox.className = 'mapbox';
+		mapBox.id = `${mapName}__map`;
+		mapElement.after(mapBox);
 
-		this.addMap($(mapElement), mapName, mapBox);
+		this.addMap(mapElement, mapName, mapBox);
 
-		const searchBox = $(`<label class="material-icons" for="${mapName}__search"><span>search<span></label><input class="search" id="${mapName}__search" placeholder="Search for location…" type="search" />`);
-		$(mapBox).after(searchBox);
-		$(document).on('keyup', `#${mapName}__search`, (e) => this.search(e));
+		const searchBox = document.createElement('label');
+		searchBox.className = 'material-icons';
+		searchBox.htmlFor = `${mapName}__search`;
+		searchBox.innerHTML = '<span>search<span>';
+		mapBox.after(searchBox);
+		document.getElementById(`#${mapName}__search`).addEventListener('keyup', this.search);
 
 		if (this.showGeoLocation) {
-			const getGeoButton = $(`<a href="#" class="material-icons ui-geo" data-map-element="${mapName}">my_location</a>`);
-			$(mapBox).after(getGeoButton);
+			const getGeoButton = document.createElement('a');
+			getGeoButton.className = 'material-icons ui-geo';
+			getGeoButton.dataset.mapElement = mapName;
+			getGeoButton.innerHTML = 'my_location';
+			mapBox.after(getGeoButton);
 		}
 	},
 
 	addMap(mapElement, mapName, mapBox) {
 		if (mapElement.val() !== '') {
-			const mapClear = $('<a class="material-icons ui-cross" href="#">clear</a>');
-			$(mapElement).after(mapClear);
-			$(mapBox).empty();
-			$(mapBox).append($(`<img src="${window.Inachis.Map._generateGoogleMapsImage(mapName, mapElement)}" />`));
+			const mapClear = document.createElement('a');
+			mapClear.className = 'material-icons ui-cross';
+			mapClear.href = '#';
+			mapClear.innerHTML = 'clear';
+			mapElement.after(mapClear);
+			mapBox.innerHTML = `<img src="${window.Inachis.Map._generateGoogleMapsImage(mapName, mapElement)}" />`;
 		} else {
 			this.addNoMapMessage(mapBox);
 		}
 	},
 
 	addNoMapMessage(mapBox) {
-		$(mapBox).empty();
-		$(mapBox).append($('<p>This content doesn\'t appear on the map! Search for a location to add it.</p>'));
+		mapBox.innerHTML = '<p>This content doesn\'t appear on the map! Search for a location to add it.</p>';
 	},
 
 	updateMap(mapElement, mapName, mapBox) {
 		if (mapElement.val() !== '') {
-			$(mapBox).find('img').attr('src', window.Inachis.Map._generateGoogleMapsImage(mapName, mapElement));
+			mapBox.querySelector('img').src = window.Inachis.Map._generateGoogleMapsImage(mapName, mapElement);
 		}
 	},
 
@@ -58,7 +67,7 @@ window.Inachis.Map = {
 		if (mapElement.val() === '') {
 			return;
 		}
-		if ($(mapBox).has('img').length === 0) {
+		if (mapBox.querySelector('img') === null) {
 			return this.addMap(mapElement, mapName, mapBox);
 		}
 		this.updateMap(mapElement, mapName, mapBox);
@@ -76,9 +85,10 @@ window.Inachis.Map = {
 
 	clear(event) {
 		event.preventDefault();
-		$(event.currentTarget).prev().val('');
-		this.addNoMapMessage($(`#${$(event.currentTarget).prev().attr('id')}__map`));
-		$(event.currentTarget).remove();
+		const mapElement = event.currentTarget.previousElementSibling;
+		mapElement.value = '';
+		this.addNoMapMessage(document.getElementById(`${mapElement.id}__map`));
+		event.currentTarget.remove();
 	},
 
 	_generateGoogleMapsImage(mapName, mapElement) {
@@ -92,19 +102,19 @@ window.Inachis.Map = {
 	},
 
 	_getMapDimensions(mapElement) {
-		return [$(mapElement).innerWidth(), $(mapElement).innerHeight()];
+		return [document.getElementById(mapElement).innerWidth(), document.getElementById(mapElement).innerHeight()];
 	},
 
 	_getMapDimensionsAsString(mapElement) {
-		return `${$(mapElement).innerWidth()}x${$(mapElement).innerHeight()}`;
+		return `${document.getElementById(mapElement).innerWidth()}x${document.getElementById(mapElement).innerHeight()}`;
 	},
 
 	getGoogleGeocode(location) {
 		const baseUri = 'https://maps.googleapis.com/maps/api/geocode/json?';
-		$.ajax({
-			url: `${baseUri}address=${location}&key=${this.key}`,
-
-		}).done((result) => this._processGeocodeResult(result));
+		const url = `${baseUri}address=${location}&key=${this.key}`;
+		fetch(url)
+			.then(response => response.json())
+			.then(result => this._processGeocodeResult(result));
 	},
 
 	_processGeocodeResult(result) {
@@ -112,23 +122,23 @@ window.Inachis.Map = {
 			window.Inachis._log(`${result.status}: ${result.error_message}`);
 			return;
 		}
-		const $targetMap = $(`#${this.targetMap}`);
-		$targetMap.attr('value', `${result.results[0].geometry.location.lat},${result.results[0].geometry.location.lng}`);
-		this.addUpdateMap($targetMap, this.targetMap, $(`#${this.targetMap}__map`));
+		const targetMap = document.getElementById(this.targetMap);
+		targetMap.value = `${result.results[0].geometry.location.lat},${result.results[0].geometry.location.lng}`;
+		this.addUpdateMap(targetMap, this.targetMap, document.getElementById(`${this.targetMap}__map`));
 	},
 
 	getGeoLocation(event) {
 		event.preventDefault();
 
 		navigator.geolocation.getCurrentPosition((position) => {
-			const mapName = $(event.currentTarget).attr('data-map-element');
-			const mapElement = $(`#${mapName}`);
-			mapName.val(`${position.coords.latitude},${position.coords.longitude}`);
-			this.addUpdateMap(mapElement, mapName, $(`${mapName}__map`));
+			const mapName = event.currentTarget.dataset.mapElement;
+			const mapElement = document.getElementById(mapName);
+			mapElement.value = `${position.coords.latitude},${position.coords.longitude}`;
+			this.addUpdateMap(mapElement, mapName, document.getElementById(`${mapName}__map`));
 		});
 	}
 };
 
-$(document).ready(() => {
-	window.Inachis.Map._init();
+document.addEventListener('DOMContentLoaded', () => {
+	window.Inachis.Map.init();
 });
