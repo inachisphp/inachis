@@ -27,7 +27,7 @@ class UserPreferencesExtension extends AbstractExtension implements GlobalsInter
     /**
      * Will return userPreferences if the user is signed in
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getGlobals(): array
     {

@@ -13,14 +13,24 @@ use Imagick;
 use ImagickException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * Transform images
+ */
 class ImageTransformer
 {
+    /**
+     * Check if HEIC is supported
+     *
+     * @return bool
+     */
     public function isHEICSupported(): bool
     {
         return extension_loaded('imagick') && !empty(\Imagick::queryformats('HEI*'));
     }
 
     /**
+     * Create Imagick instance
+     *
      * @return Imagick
      */
     protected function createImagick(): Imagick
@@ -28,16 +38,34 @@ class ImageTransformer
         return new Imagick();
     }
 
+    /**
+     * Check if Imagick supports a specific method
+     *
+     * @param Imagick $imagick
+     * @param string $method
+     * @return bool
+     */
+    protected function imagickSupportsMethod(Imagick $imagick, string $method): bool
+    {
+        return method_exists($imagick, $method);
+    }
+
+    /**
+     * Apply orientation
+     *
+     * @param Imagick $imagick
+     * @return void
+     */
     protected function applyOrientation(Imagick $imagick): void
     {
         if ($this->imagickSupportsMethod($imagick, 'autoOrient')) {
             $imagick->autoOrient();
-        } else {
-            $imagick->autoRotateImage();
         }
     }
 
     /**
+     * Convert HEIC to JPEG
+     *
      * @throws ImagickException
      */
     public function convertHeicToJpeg(

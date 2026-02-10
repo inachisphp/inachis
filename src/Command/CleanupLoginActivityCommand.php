@@ -63,7 +63,7 @@ class CleanupLoginActivityCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $dryRun = $input->getOption('dry-run');
+        $dryRun = (bool) $input->getOption('dry-run');
         $batchSize = 1000;
 
         $this->messenger->dispatch(new CleanupLoginActivityMessage($dryRun, $batchSize));

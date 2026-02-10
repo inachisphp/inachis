@@ -20,16 +20,28 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+/**
+ * Create an admin user
+ */
 #[AsCommand(
     name: 'app:create-admin',
     description: 'Create a new administrator account for your site',
 )]
 class CreateAdminCommand extends Command
 {
+    /**
+     * Entity manager
+     */
     protected EntityManagerInterface $entityManager;
+
+    /**
+     * Password hasher
+     */
     protected UserPasswordHasherInterface $passwordHasher;
 
     /**
+     * Constructor
+     *
      * @param EntityManagerInterface $entityManager
      * @param UserPasswordHasherInterface $passwordHasher
      */
@@ -41,13 +53,15 @@ class CreateAdminCommand extends Command
     }
 
     /**
-     * @return void
+     * Configure the command
      */
     protected function configure(): void
     {
     }
 
     /**
+     * Execute the command
+     *
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
@@ -56,25 +70,26 @@ class CreateAdminCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+
+        /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
         $helper = $this->getHelper('question');
 
+        $normalizeToString = function (mixed $value = null): string {
+            return $value ? trim((string) $value) : '';
+        };
+
         $question = new Question('Please enter a new username: ');
-        $question->setNormalizer(function (?string $value = ''): string {
-            return $value ? trim($value) : '';
-        });
+        $question->setNormalizer($normalizeToString);
         $username = $helper->ask($input, $output, $question);
 
         $question = new Question('Please enter an email address for the user: ');
-        $question->setNormalizer(function (?string $value = ''): string {
-            return $value ? trim($value) : '';
-        });
+        $question->setNormalizer($normalizeToString);
         $emailAddress = $helper->ask($input, $output, $question);
 
         $question = new Question('Please enter a password for the user: ');
-        $question->setNormalizer(function (?string $value = ''): string {
-            return $value ? trim($value) : '';
-        });
-        $question->setValidator(function (?string $value = ''): string {
+        $question->setNormalizer($normalizeToString);
+        $question->setValidator(function (mixed $value): string {
+            $value = (string) $value;
             if ('' === trim($value)) {
                 throw new Exception('The password cannot be empty');
             }
@@ -84,18 +99,22 @@ class CreateAdminCommand extends Command
         $question->setMaxAttempts(2);
         $plaintextPassword = $helper->ask($input, $output, $question);
 
-        $user = new User($username, $plaintextPassword, $emailAddress);
+        $user = new User(
+            (string) $username,
+            (string) $plaintextPassword,
+            (string) $emailAddress
+        );
         $hashedPassword = $this->passwordHasher->hashPassword(
             $user,
-            $plaintextPassword
+            (string) $plaintextPassword
         );
         $user->setPassword($hashedPassword);
-        $user->setDisplayName($username);
+        $user->setDisplayName((string) $username);
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        $io->success(sprintf('User %s created', $username));
+        $io->success(sprintf('User %s created', ($user->getUsername())));
 
         return Command::SUCCESS;
     }

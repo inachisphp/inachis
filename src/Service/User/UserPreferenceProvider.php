@@ -56,7 +56,7 @@ class UserPreferenceProvider
     /**
      * Save changes to the user's preferences and refresh session cache
      * 
-     * @var UserPreference $preferences
+     * @param UserPreference $preferences
      */
     public function save(UserPreference $preferences): void
     {
