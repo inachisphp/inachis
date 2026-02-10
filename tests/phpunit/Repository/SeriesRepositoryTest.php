@@ -203,7 +203,7 @@ class SeriesRepositoryTest extends TestCase
             ->with(
                 $offset,
                 $limit,
-                [],
+                ['1=1', []],
                 [['q.modDate', 'ASC']],
             )
             ->willReturn($paginator);

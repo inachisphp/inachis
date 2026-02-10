@@ -36,7 +36,7 @@ readonly class UserAccountEmailService
 
         $email = (new TemplatedEmail())
             ->to(new Address($user->getEmail()))
-            ->subject('Reset your password for ' . ($data['settings']['siteTitle'] ?? 'Inachis Admin Panel'))
+            ->subject('Reset your password for ' . ($data['siteTitle'] ?? 'Inachis Admin Panel'))
             ->htmlTemplate('inadmin/emails/forgot-password.html.twig')
             ->textTemplate('inadmin/emails/forgot-password.txt.twig')
             ->context([
@@ -57,13 +57,13 @@ readonly class UserAccountEmailService
     {
         $data = $this->tokenService->createResetRequestForEmail($user->getEmail());
 
-        $user->setColor(RandomColorPicker::generate());
+        $user->getPreferences()->setColor(RandomColorPicker::generate());
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
         $email = (new TemplatedEmail())
             ->to(new Address($user->getEmail()))
-            ->subject('Welcome to ' . $settings['settings']['siteTitle'])
+            ->subject('Welcome to ' . ($settings['siteTitle'] ?? 'Inachis Admin Panel'))
             ->htmlTemplate('inadmin/emails/registration.html.twig')
             ->textTemplate('inadmin/emails/registration.txt.twig')
             ->context([

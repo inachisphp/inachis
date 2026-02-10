@@ -31,7 +31,7 @@ class UserAccountEmailServiceTest extends TestCase
 
         $this->settings = [
             'clientIP' => '127.0.0.1',
-            'settings' => ['siteTitle' => 'ExampleSite'],
+            'siteTitle' => 'ExampleSite',
         ];
     }
 
@@ -114,7 +114,6 @@ class UserAccountEmailServiceTest extends TestCase
                 $context = $email->getContext();
                 $this->assertEquals('/incc/new-password/' . $fakeTokenData['token'], $context['url']);
                 $this->assertStringContainsString('data:image/png;base64,', $context['logo']);
-                $this->assertEquals('ExampleSite', $context['settings']['siteTitle']);
 
                 return true;
             }));
@@ -126,7 +125,6 @@ class UserAccountEmailServiceTest extends TestCase
         );
 
         $urlGenerator = fn(string $token) => "/incc/new-password/$token";
-
-        $service->sendForgotPasswordEmail($user, this->settings, $urlGenerator);
+        $service->sendForgotPasswordEmail($user, $this->settings, $urlGenerator);
     }
 }

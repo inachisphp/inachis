@@ -75,12 +75,6 @@ class UserTest extends TestCase
         $this->assertEquals('FMS', $this->user->getInitials());
     }
 
-    public function testSetAndGetColor(): void
-    {
-        $this->user->setColor('#069');
-        $this->assertEquals('#069', $this->user->getColor());
-    }
-
     public function testSetAndGetAvatar(): void
     {
         $this->user->setAvatar('test.jpg');
@@ -165,16 +159,5 @@ class UserTest extends TestCase
     public function testErase(): void
     {
         $this->assertNull($this->user->erase());
-    }
-
-    /**
-     * @throws InvalidTimezoneException
-     */
-    public function testSetAndGetTimezone(): void
-    {
-        $this->user->setTimezone('Europe/London');
-        $this->assertEquals('Europe/London', $this->user->getTimezone());
-        $this->expectException(InvalidTimezoneException::class);
-        $this->user->setTimezone('Alpha Centauri');
     }
 }
