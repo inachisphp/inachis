@@ -36,15 +36,40 @@
     align-items: center;
     margin-bottom: 12px;
 
-    button {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      border: none;
-      background: transparent;
-      color: $color-brand-500;
-      cursor: pointer;
-      &:hover, &:focus { background: $color-brand-100; outline: none; }
-    }
+	button {
+		background: transparent;
+		border: none;
+		border-radius: $radius-round;
+		width: 36px;
+		height: 36px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: $text-main;
+		cursor: pointer;
+
+		&:active {
+			transform: scale(0.9);
+		}
+		&:hover {
+			background: $color-brand-050;
+		}
+
+		&:disabled {
+			opacity: 0.3;
+			cursor: not-allowed;
+			pointer-events: none;
+		}
+
+		&:focus-visible {
+			outline: 2px solid $color-focus;
+			outline-offset: 2px;
+		}
+
+		.material-icons {
+			font-size: 24px;
+		}
+	}
 
     .datepicker-month-label {
       flex: 1;
@@ -56,13 +81,22 @@
       padding: 4px 0;
       margin: 0 8px;
       cursor: pointer;
+
+	    &:hover {
+			background: $color-brand-050;
+		}
     }
+  }
+
+  .datepicker-calendar td.today:not(.selected) {
+    border: 1px solid $color-brand-400;
+    font-weight: 500;
   }
 
   .datepicker-calendar-container {
     width: 100%;
     overflow-x: auto;
-    min-height: 240px;
+    min-height: 210px;
   }
 
   .datepicker-calendar {
@@ -70,7 +104,7 @@
     table-layout: fixed;
     border-collapse: collapse;
 
-    th, td { text-align: center; padding: 12px; }
+    th, td { text-align: center; padding: 10px; }
 
     td {
       cursor: pointer;
@@ -132,5 +166,13 @@
         }
       }
     }
+  }
+}
+
+// @todo correct breakpoint
+@media (max-width: 480px) {
+  .datepicker-header button {
+    width: 44px;
+    height: 44px;
   }
 }

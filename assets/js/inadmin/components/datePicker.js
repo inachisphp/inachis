@@ -11,6 +11,7 @@ export default class DatePicker {
       showTodayButton: options.showTodayButton ?? true,
       todayButtonIcon: options.todayButtonIcon || 'today',
       locale: options.locale || navigator.language || 'en-GB',
+      materialIcons: options.materialIcons || false,
     };
 
     this.isMobile = /Mobi|Android/i.test(navigator.userAgent);
@@ -61,6 +62,15 @@ export default class DatePicker {
     this.currentMonth = inputDate?.getMonth() ?? today.getMonth();
     this.currentYear = inputDate?.getFullYear() ?? today.getFullYear();
 
+    const atMinMonth =
+      this.options.minDate &&
+      this.currentYear === this.options.minDate.getFullYear() &&
+      this.currentMonth === this.options.minDate.getMonth();
+    const atMaxMonth =
+      this.options.maxDate &&
+      this.currentYear === this.options.maxDate.getFullYear() &&
+      this.currentMonth === this.options.maxDate.getMonth();
+
     this.picker = document.createElement('div');
     this.picker.className = 'datepicker-popup';
     this.picker.setAttribute('role', 'dialog');
@@ -71,7 +81,11 @@ export default class DatePicker {
     if (this.options.showTodayButton) {
       this.todayButton = document.createElement('button');
       this.todayButton.className = 'datepicker-today-btn';
-      this.todayButton.innerHTML = `<span class="material-icons">${this.options.todayButtonIcon}</span> Today`;
+      if (this.options.materialIcons) {
+        this.todayButton.innerHTML = `<span class="material-icons">${this.options.todayButtonIcon}</span> Today`;
+      } else {
+        this.todayButton.textContent = 'Today';
+      }
       this.todayButton.addEventListener('click', () => {
         const today = new Date();
         if ((this.options.minDate && today < this.options.minDate) ||
@@ -91,13 +105,21 @@ export default class DatePicker {
 
     this.prevBtn = document.createElement('button');
     this.prevBtn.type = 'button';
-    this.prevBtn.textContent = '<';
     this.prevBtn.setAttribute('aria-label', 'Previous month');
 
     this.nextBtn = document.createElement('button');
     this.nextBtn.type = 'button';
-    this.nextBtn.textContent = '>';
     this.nextBtn.setAttribute('aria-label', 'Next month');
+
+    if (this.options.materialIcons) {
+      this.prevBtn.innerHTML = '<span class="material-icons" aria-hidden="true">chevron_left</span>';
+      this.nextBtn.innerHTML = '<span class="material-icons" aria-hidden="true">chevron_right</span>';
+    } else {
+      this.prevBtn.textContent = '<';
+      this.nextBtn.textContent = '>';
+    }
+    this.prevBtn.disabled = !!atMinMonth;
+    this.nextBtn.disabled = !!atMaxMonth;
 
     this.monthLabelBtn = document.createElement('button');
     this.monthLabelBtn.type = 'button';
@@ -166,6 +188,7 @@ export default class DatePicker {
     this.picker.style.display = 'none';
     this.yearPanelVisible = false;
     this.yearPanel.style.display = 'none';
+    // this.input.focus();
   }
 
   toggleYearPanel() {
