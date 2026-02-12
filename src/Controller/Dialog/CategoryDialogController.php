@@ -152,8 +152,13 @@ class CategoryDialogController extends AbstractInachisController
         CategoryRepository $categoryRepository,
         PageRepository $pageRepository
     ): JsonResponse {
-        /** @var Category $category */
-        $category = $categoryRepository->findOneBy(['id' => $request->request->get('id')]);
+        $id = $request->request->getInt('id');
+        /** @var Category|null $category */
+        $category = $categoryRepository->find($id);
+        if (!$category) {
+            return new JsonResponse(['count' => 0]);
+        }
+
         $count = $pageRepository->getPagesWithCategoryCount($category);
         foreach ($category->getChildren() as $child) {
             $count += $pageRepository->getPagesWithCategoryCount($child);

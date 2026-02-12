@@ -9,9 +9,9 @@
 
 namespace Inachis\Tests\phpunit\Entity;
 
+use DateTimeImmutable;
 use Inachis\Entity\User;
 use Inachis\Entity\Waste;
-use DateTime;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -62,7 +62,7 @@ class WasteTest extends TestCase
 
     public function testSetAndGetModDate(): void
     {
-        $date =  new DateTime();
+        $date =  new DateTimeImmutable();
         $this->waste->setModDate($date);
         $this->assertEquals($date, $this->waste->getModDate());
     }

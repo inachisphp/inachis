@@ -10,12 +10,12 @@
 namespace Inachis\Service\User;
 
 use DateTimeImmutable;
+use Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\{PasswordResetRequest,User};
 use Inachis\Repository\UserRepository;
 use Inachis\Repository\PasswordResetRequestRepository;
 use Doctrine\ORM\NonUniqueResultException;
-use Exception;
 use Random\RandomException;
 
 /**

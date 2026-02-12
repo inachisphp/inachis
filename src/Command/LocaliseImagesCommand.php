@@ -32,10 +32,10 @@ class LocaliseImagesCommand extends Command
     /**
      * Constructor
      * 
-     * @param EntityManagerInterface $em
-     * @param ImageExtractor $extractor
-     * @param ImageLocaliser $localiser
-     * @param ContentImageUpdater $updater
+     * @param EntityManagerInterface $entityManager
+     * @param ImageExtractor $imageExtractor
+     * @param ImageLocaliser $imageLocaliser
+     * @param ContentImageUpdater $contentImageUpdater
      */
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -79,7 +79,7 @@ class LocaliseImagesCommand extends Command
     /**
      * Process images for a content type
      * 
-     * @param array<string, mixed> $content_type
+     * @param array{class_name: class-string, field: string, single: bool, table_name: string, revisions?: bool} $content_type
      * @param OutputInterface $output
      * @param bool $dryRun
      * @return void
@@ -87,13 +87,18 @@ class LocaliseImagesCommand extends Command
      */
     private function processImagesForContentType(array $content_type, OutputInterface $output, bool $dryRun = true): void
     {
+        /** @var \Doctrine\ORM\EntityRepository<Image|Page|Series> $repository */
         $repository = $this->entityManager->getRepository($content_type['class_name']);
+        /** @var (Image|Page|Series)[] $results */
         $results = $repository->getAll(0, 0, ['q.' . $content_type['field'] . ' LIKE :content', ['content' => '%https%']]);
 
         foreach ($results as $entity) {
             $getter = 'get' . ucfirst($content_type['field']);
+            /** @var string $content */
             $content = $entity->$getter();
+            /** @var string[] $images */
             $images = $content_type['single'] ? [$content] : $this->imageExtractor->extractFromContent($content);
+            /** @var array{source: string[], destination: string[]} $changes */
             $changes = ['source' => [], 'destination' => []];
 
             foreach ($images as $imageUrl) {

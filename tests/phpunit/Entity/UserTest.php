@@ -9,10 +9,10 @@
 
 namespace Inachis\Tests\phpunit\Entity;
 
+use DateTimeImmutable;
 use Inachis\Entity\Image;
 use Inachis\Entity\User;
 use Inachis\Exception\InvalidTimezoneException;
-use DateTime;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -97,21 +97,21 @@ class UserTest extends TestCase
 
     public function testSetAndGetCreateDate(): void
     {
-        $currentDateTime = new DateTime('now');
+        $currentDateTime = new DateTimeImmutable('now');
         $this->user->setCreateDate($currentDateTime);
         $this->assertEquals($currentDateTime, $this->user->getCreateDate());
     }
 
     public function testSetAndGetModDate(): void
     {
-        $currentDateTime = new DateTime('now');
+        $currentDateTime = new DateTimeImmutable('now');
         $this->user->setModDate($currentDateTime);
         $this->assertEquals($currentDateTime, $this->user->getModDate());
     }
 
     public function testSetAndGetPasswordModDate(): void
     {
-        $currentDateTime = new DateTime('now');
+        $currentDateTime = new DateTimeImmutable('now');
         $this->user->setPasswordModDate($currentDateTime);
         $this->assertEquals($currentDateTime, $this->user->getPasswordModDate());
     }
@@ -119,7 +119,7 @@ class UserTest extends TestCase
     public function testHasCredentialsExpired(): void
     {
         $this->assertFalse($this->user->hasCredentialsExpired());
-        $this->user->setPasswordModDate(new DateTime('-20 days'));
+        $this->user->setPasswordModDate(new DateTimeImmutable('-20 days'));
         $this->assertTrue($this->user->hasCredentialsExpired(10));
     }
 

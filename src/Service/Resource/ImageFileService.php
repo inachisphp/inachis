@@ -9,10 +9,19 @@
 
 namespace Inachis\Service\Resource;
 
+use Inachis\Entity\Image;
+use Inachis\Transformer\ImageTransformer;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class ImageFileService
+/**
+ *
+ */
+readonly class ImageFileService
 {
+    public function __construct(
+        private ImageTransformer $transformer
+    ) {}
+
     /**
      * Create a hash of the uploaded image
      * @param UploadedFile $file
@@ -20,41 +29,117 @@ class ImageFileService
      */
     public function createChecksum(UploadedFile $file): string
     {
-        $context = hash_init('sha256');
-        $fp = fopen($file->getRealPath(), 'rb');
-        while (!feof($fp)) {
-            hash_update($context, fread($fp, 8192));
+        $path = $file->getRealPath();
+        if ($path === false) {
+            throw new \RuntimeException('Unable to determine file path.');
         }
-        fclose($fp);
-
-        return hash_final($context);
+        $hash = hash_file('sha256', $path);
+        if ($hash === false) {
+            throw new \RuntimeException('Unable to generate checksum.');
+        }
+        return $hash;
     }
 
     /**
      * Uses PHP function getimagesize to get the dimensions of the uploaded image
      * @param UploadedFile $file
-     * @return array
+     * @return array<int|string, int|string>|false
      */
-    public function getImageDimensions(UploadedFile $file): array
+    public function getImageDimensions(UploadedFile $file): array|false
     {
         return getimagesize($file->getRealPath());
     }
 
     /**
-     * @todo handle optimise image which reduces to Image::WARNING_SIZE max and 85% compression if JPEG
+     * Optimise image: resize, compress, convert to WebP/AVIF
+     *
      */
     public function optimise(UploadedFile $file): UploadedFile
     {
-        return $file;
+        if (!extension_loaded('imagick')) {
+            return $file;
+        }
+
+        $file = $this->convertHEICToJPEG($file);
+
+        $sourcePath = $file->getRealPath();
+        if ($sourcePath === false) {
+            throw new \RuntimeException('Unable to determine file path.');
+        }
+
+        $destinationPath = tempnam(sys_get_temp_dir(), 'opt_');
+        if ($destinationPath === false) {
+            throw new \RuntimeException('Unable to create temp file.');
+        }
+
+        $maxWidth = $maxHeight = Image::WARNING_DIMENSIONS;
+        $this->transformer->optimiseImage(
+            $sourcePath,
+            $destinationPath,
+            $maxWidth,
+            $maxHeight
+        );
+
+        $extension = strtolower(pathinfo($destinationPath, PATHINFO_EXTENSION));
+        if (!in_array($extension, ['webp', 'avif'], true)) {
+            $extension = '.webp';
+            rename($destinationPath, $destinationPath . $extension);
+            $destinationPath .= $extension;
+        }
+
+        return new UploadedFile(
+            $destinationPath,
+            pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . $extension,
+            mime_content_type($destinationPath) ?: null,
+            null,
+            true
+        );
     }
 
     /**
-     * @todo if HEIC, and HEIC supported, convert to JPEG
+     * Convert HEIC to JPEG if needed
+     *
      * @param UploadedFile $file
      * @return UploadedFile
      */
     public function convertHEICToJPEG(UploadedFile $file): UploadedFile
     {
-        return $file;
+        if (!$this->transformer->isHEICSupported()) {
+            return $file;
+        }
+        $extension = strtolower($file->getClientOriginalExtension());
+        if (!in_array($extension, ['heic', 'heif'], true)) {
+            return $file;
+        }
+        $mime = $file->getMimeType();
+        if (!in_array($mime, ['image/heic', 'image/heif'], true)) {
+            return $file;
+        }
+
+        $sourcePath = $file->getRealPath();
+        if ($sourcePath === false) {
+            throw new \RuntimeException('Unable to determine file path.');
+        }
+
+        $destinationPath = tempnam(sys_get_temp_dir(), 'heic_') . '.jpg';
+
+        try {
+            $this->transformer->convertHeicToJpeg(
+                $sourcePath,
+                $destinationPath,
+                85
+            );
+        } catch (\ImagickException $e) {
+            unlink($destinationPath);
+            throw new \RuntimeException('HEIC conversion failed.', 0, $e);
+        }
+
+        return new UploadedFile(
+            $destinationPath,
+            pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '.jpg',
+            'image/jpeg',
+            null,
+            true,
+        );
     }
 }

@@ -13,14 +13,14 @@ use Inachis\Entity\Page;
 use Inachis\Entity\Revision;
 use Inachis\Repository\RevisionRepository;
 use Inachis\Service\Image\ContentImageUpdater;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 
 class DummyEntity
 {
     private string $content = 'Original content with https://example.com/image.jpg';
-    private DateTime $modDate;
+    private DateTimeImmutable $modDate;
 
     public function getContent(): string
     {
@@ -30,7 +30,7 @@ class DummyEntity
     {
         $this->content = $value;
     }
-    public function setModDate(DateTime $date): void
+    public function setModDate(DateTimeImmutable $date): void
     {
         $this->modDate = $date;
     }

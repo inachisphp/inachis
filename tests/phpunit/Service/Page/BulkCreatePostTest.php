@@ -17,7 +17,7 @@ use Inachis\Repository\CategoryRepository;
 use Inachis\Repository\SeriesRepository;
 use Inachis\Repository\TagRepository;
 use Inachis\Service\Page\PageBulkCreateService;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use PHPUnit\Framework\TestCase;
@@ -42,8 +42,8 @@ class BulkCreatePostTest extends TestCase
         $this->categoryRepository = $this->createStub(CategoryRepository::class);
         $this->bulkCreateData = new BulkCreateData(
             'some title',
-            DateTime::createFromFormat('d/m/Y', '01/11/2025'),
-            DateTime::createFromFormat('d/m/Y', '07/11/2025'),
+            DateTimeImmutable::createFromFormat('d/m/Y', '01/11/2025'),
+            DateTimeImmutable::createFromFormat('d/m/Y', '07/11/2025'),
             false,
             Uuid::uuid1()->toString(),
             [ Uuid::uuid1() ],

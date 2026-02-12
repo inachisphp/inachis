@@ -9,15 +9,12 @@
 
 namespace Inachis\Controller\Page\Resource;
 
+use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Download;
-use Inachis\Entity\Image;
+use Inachis\Entity\{Download, Image};
 use Inachis\Form\ResourceType;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\DownloadRepository;
-use Inachis\Repository\ImageRepository;
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\{DownloadRepository, ImageRepository, PageRepository, SeriesRepository};
 use Inachis\Service\Resource\ImageFileService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
@@ -30,8 +27,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
-
-//use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 #[IsGranted('ROLE_ADMIN')]
 class ResourceController extends AbstractInachisController
@@ -179,7 +174,7 @@ class ResourceController extends AbstractInachisController
                 }
             }
             $resource->setAuthor($this->getUser());
-            $resource->setModDate(new \DateTime('now'));
+            $resource->setModDate(new DateTimeImmutable());
             $this->entityManager->persist($resource);
             $this->entityManager->flush();
 
@@ -224,42 +219,72 @@ class ResourceController extends AbstractInachisController
         SluggerInterface $slugger,
         #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory): JsonResponse
     {
-        if (empty($request->files->get("image"))) {
+        $imageData = $request->request->all('image');
+        /** @var UploadedFile $uploadedFileInput */
+        $uploadedFileInput = $request->files->get('image')['imageFile'] ?? null;
+
+        if (!$uploadedFileInput) {
             return new JsonResponse(['error' => 'No file provided'], 400);
-        } elseif (empty($request->request->all('image')['title'])) {
+        } elseif (empty($imageData['title'])) {
             return new JsonResponse(['error' => 'No title provided'], 400);
         }
-        $uploadedFile = $imageFileService->convertHEICToJPEG($request->files->get("image")['imageFile']);
-        if (!empty($request->request->all('image')['optimise'])) {
-            $uploadedFile = $imageFileService->optimise($uploadedFile);
-        }
-        $dimensions = $imageFileService->getImageDimensions($uploadedFile);
-
-        // @todo change filename to use the title for better SEO
-        $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-        $safeFilename = $slugger->slug($originalFilename);
-        $newFilename = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
-
-        $image = new Image();
-        $image
-            ->setTitle($request->request->all('image')['title'])
-            ->setDescription($request->request->all('image')['description'])
-            ->setAltText($request->request->all('image')['altText'])
-            ->setFilesize($uploadedFile->getSize())
-            ->setFiletype($uploadedFile->getMimeType())
-            ->setFilename($newFilename)
-            ->setChecksum($imageFileService->createChecksum($uploadedFile))
-            ->setDimensionX($dimensions[0])
-            ->setDimensionY($dimensions[1])
-        ;
 
         try {
+            // Step 1: Convert HEIC to JPEG if required
+            $uploadedFile = $imageFileService->convertHEICToJPEG($uploadedFileInput);
+
+            // Step 2: Optimise if required (to WebP or AVIF if available)
+            if (!empty($imageData['optimise'])) {
+                $uploadedFile = $imageFileService->optimise($uploadedFile);
+            }
+
+            // Step 3: Extract dimensions
+            $dimensions = $imageFileService->getImageDimensions($uploadedFile);
+            if ($dimensions === false) {
+                throw new \RuntimeException('Unable to read image dimensions.');
+            }
+
+            // Step 4: Generate checksum
+            $checksum = $imageFileService->createChecksum($uploadedFile);
+
+            // Step 5: Create safe filename
+            // @todo change filename to use the title for better SEO?
+            $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeFilename = $slugger->slug($originalFilename);
+            $newFilename = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
+
+            // Step 6: Move file to storage directory
             $uploadedFile->move($imageDirectory, $newFilename);
+
+            // Step 7: Create db record
+            $image = new Image();
+            $image
+                ->setTitle($imageData['title'])
+                ->setDescription($imageData['description'] ?? null)
+                ->setAltText($imageData['altText'] ?? null)
+                ->setFilesize($uploadedFile->getSize())
+                ->setFiletype($uploadedFile->getMimeType())
+                ->setFilename($newFilename)
+                ->setChecksum($checksum)
+                ->setDimensionX($dimensions[0])
+                ->setDimensionY($dimensions[1]);
+
+            $this->entityManager->persist($image);
+            $this->entityManager->flush(); 
+
+            return new JsonResponse([
+                'success' => true,
+                'filename' => $newFilename,
+                'checksum' => $checksum,
+                'dimensions' => [
+                    'width' => $dimensions[0],
+                    'height' => $dimensions[1],
+                ],
+            ]);
         } catch (FileException $e) {
+            return new JsonResponse(['error' => 'File upload failed: ' . $e->getMessage()], 400);
+        } catch (\RuntimeException $e) {
             return new JsonResponse(['error' => $e->getMessage()], 400);
         }
-        $this->entityManager->persist($image);
-        $this->entityManager->flush();
-        return new JsonResponse(['OK' => $image->getId()], 200);
     }
 }

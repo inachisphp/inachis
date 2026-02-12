@@ -9,7 +9,7 @@
 
 namespace Inachis\Service\Url;
 
-use DateTime;
+use DateTimeImmutable;
 use Inachis\Entity\Url;
 use Inachis\Repository\UrlRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -52,7 +52,7 @@ readonly class UrlBulkActionService
             match ($action) {
                 'delete'  => $this->urlRepository->remove($url),
                 'make_default'  => $this->makeDefault($url),
-                default   => null,
+                default => null,
             };
             $count++;
         }
@@ -76,10 +76,10 @@ readonly class UrlBulkActionService
             ]
         );
         if ($previous_default !== null) {
-            $previous_default->setDefault(false)->setModDate(new DateTime('now'));
+            $previous_default->setDefault(false)->setModDate(new DateTimeImmutable());
             $this->entityManager->persist($previous_default);
         }
-        $url->setDefault(true)->setModDate(new DateTime('now'));
+        $url->setDefault(true)->setModDate(new DateTimeImmutable());
         $this->entityManager->persist($url);
         $this->entityManager->flush();
     }
