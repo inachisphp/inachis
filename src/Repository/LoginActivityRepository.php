@@ -9,6 +9,7 @@
 
 namespace Inachis\Repository;
 
+use DateTimeImmutable;
 use Inachis\Entity\{LoginActivity, User};
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -94,7 +95,7 @@ class LoginActivityRepository extends ServiceEntityRepository
             ->where('l.type = :failure')
             ->andWhere('l.loggedAt > :since')
             ->setParameter('failure', 'failure')
-            ->setParameter('since', new \DateTimeImmutable("-{$minutes} minutes"))
+            ->setParameter('since', new DateTimeImmutable("-{$minutes} minutes"))
             ->groupBy('l.ipAddress')
             ->having('COUNT(l.id) >= :threshold')
             ->setParameter('threshold', $threshold)
@@ -118,10 +119,10 @@ class LoginActivityRepository extends ServiceEntityRepository
 
     /**
      * @param string $type
-     * @param \DateTimeImmutable $cutoff
+     * @param DateTimeImmutable $cutoff
      * @return int
      */
-    public function countOlderThan(string $type, \DateTimeImmutable $cutoff): int
+    public function countOlderThan(string $type, DateTimeImmutable $cutoff): int
     {
         return (int) $this->getEntityManager()->createQueryBuilder()
             ->select('COUNT(l.id)')
@@ -136,14 +137,14 @@ class LoginActivityRepository extends ServiceEntityRepository
 
     /**
      * @param string $type
-     * @param \DateTimeImmutable $cutoff
+     * @param DateTimeImmutable $cutoff
      * @param int $batchSize
      * @param callable|null $progressCallback
      * @return int
      */
     public function deleteOlderThan(
         string $type,
-        \DateTimeImmutable $cutoff,
+        DateTimeImmutable $cutoff,
         int $batchSize = 1000,
         ?callable $progressCallback = null
     ): int {

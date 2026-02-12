@@ -9,7 +9,6 @@
 
 namespace Inachis\Controller\Dialog;
 
-use DateTime;
 use DateInterval;
 use DateMalformedPeriodStringException;
 use DateMalformedStringException;

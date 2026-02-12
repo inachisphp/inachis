@@ -9,6 +9,7 @@
 
 namespace Inachis\Controller\Page\Admin;
 
+use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\User;
 use Inachis\Form\UserType;
@@ -17,7 +18,6 @@ use Inachis\Repository\UserRepository;
 use Inachis\Service\User\UserBulkActionService;
 use Inachis\Service\User\UserAccountEmailService;
 use Inachis\Transformer\ImageTransformer;
-use DateTime;
 use Random\RandomException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -123,7 +123,7 @@ class AdminProfileController extends AbstractInachisController
             if ($form->getClickedButton()->getName() === 'delete') {
                 $user->setRemoved(true);
             }
-            $user->setModDate(new DateTime('now'));
+            $user->setModDate(new DateTimeImmutable());
 
             if ($isNew) {
                 $userAccountEmailService->registerNewUser(

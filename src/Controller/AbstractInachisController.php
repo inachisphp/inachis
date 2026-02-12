@@ -9,6 +9,8 @@
 
 namespace Inachis\Controller;
 
+use DateTimeImmutable;
+use DateInterval;
 use Inachis\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -48,8 +50,8 @@ abstract class AbstractInachisController extends AbstractController
      */
     public function setDefaults(): void
     {
-        $sessionTimeout = new \DateTimeImmutable();
-        $sessionTimeout = $sessionTimeout->add(new \DateInterval('PT' . ini_get('session.gc_maxlifetime') . 'S'));
+        $sessionTimeout = new DateTimeImmutable();
+        $sessionTimeout = $sessionTimeout->add(new DateInterval('PT' . ini_get('session.gc_maxlifetime') . 'S'));
 
         $this->data = [
             'settings' => [
@@ -93,8 +95,11 @@ abstract class AbstractInachisController extends AbstractController
     private function getProtocolAndHostname(): string
     {
         $protocol = $this->isSecure() ? 'https://' : 'http://';
-
-        return $protocol . (!empty($_ENV['APP_DOMAIN']) ? $_ENV['APP_DOMAIN'] : '');
+        $domain = $_ENV['APP_DOMAIN'] ?? '';
+        if (!is_string($domain)) {
+            $domain = '';
+        }
+        return $protocol . $domain;
     }
 
     /**
@@ -124,9 +129,7 @@ abstract class AbstractInachisController extends AbstractController
      */
     private function isAuthenticated(): bool
     {
-        return $this->security instanceof Security &&
-            $this->security->getUser() instanceof User &&
-            !empty($this->security->getUser()->getUsername());
+        return $this->security->getUser() instanceof User;
     }
 
     /**

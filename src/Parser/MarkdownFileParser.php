@@ -9,11 +9,11 @@
 
 namespace Inachis\Parser;
 
+use DateTimeImmutable;
+use Exception;
 use Inachis\Entity\Category;
 use Inachis\Entity\Page;
-use DateTime;
 use Doctrine\Persistence\ObjectManager;
-use Exception;
 
 class MarkdownFileParser
 {
@@ -79,7 +79,7 @@ class MarkdownFileParser
             ++$offset;
         }
         if (preg_match(self::PARSE_DATE, $markdown[$offset], $match)) {
-            $page->setPostDate(new DateTime($match[0]));
+            $page->setPostDate(new DateTimeImmutable($match[0]));
             ++$offset;
         }
         if (preg_match(self::PARSE_CATEGORY_PATH, $markdown[$offset], $match)) {

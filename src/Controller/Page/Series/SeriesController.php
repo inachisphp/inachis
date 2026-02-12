@@ -9,6 +9,7 @@
 
 namespace Inachis\Controller\Page\Series;
 
+use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Image;
 use Inachis\Entity\Page;
@@ -20,7 +21,6 @@ use Inachis\Repository\PageRepository;
 use Inachis\Repository\SeriesRepository;
 use Inachis\Service\Series\SeriesBulkActionService;
 use Inachis\Util\UrlNormaliser;
-use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -135,7 +135,7 @@ class SeriesController extends AbstractInachisController
             }
 
             $series->setAuthor($this->getUser());
-            $series->setModDate(new DateTime('now'));
+            $series->setModDate(new DateTimeImmutable());
             $this->entityManager->persist($series);
             $this->entityManager->flush();
 

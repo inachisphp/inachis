@@ -9,7 +9,7 @@
 
 namespace Inachis\Controller\Page\Post;
 
-use DateTime;
+use DateTimeImmutable;
 use Exception;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Category;
@@ -243,7 +243,7 @@ class PageController extends AbstractInachisController
                 }
             }
 
-            $post->setModDate(new DateTime('now'));
+            $post->setModDate(new DateTimeImmutable());
             if (!empty($post->getId())) {
                 $this->entityManager->persist($revision);
             }
