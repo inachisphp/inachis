@@ -108,12 +108,16 @@
                     'delete': {
                         'button_class': 'button--negative button--delete button--confirm',
                         'data': {
+                            'confirm': 'delete',
+                            'confirm-text': 'Yes, delete',
                             'entity': 'posts',
                             'form-action': '',
-                            'title': 'all selected items',
+                            'title': 'Delete selected  ' ~ page.tab ~ 's',
                             'warning': 'All currently selected content will be deleted permanently. This action cannot be undone.',
                         },
                         'icon': 'delete_forever',
+                        'name': 'delete',
+                        'value': '1',
                         'title': 'Delete',
                     }
                 },
