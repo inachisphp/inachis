@@ -42,7 +42,7 @@ class LoginActivity
     private string $type;
 
     /**
-     * @var DateTime|null The date and time of the attempt
+     * @var DateTimeImmutable|null The date and time of the attempt
      */
     #[ORM\Column]
     private ?DateTimeImmutable $loggedAt;

@@ -9,17 +9,34 @@
 
 namespace Inachis\Controller;
 
+use DateTimeImmutable;
+use DateInterval;
 use Inachis\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Abstract controller for Inachis.
+ */
 abstract class AbstractInachisController extends AbstractController
 {
+    /**
+     * @var array<string>
+     */
     protected array $errors = [];
+
+    /**
+     * @var array<string, mixed>
+     */
     protected array $data = [];
 
+    /**
+     * @param EntityManagerInterface $entityManager
+     * @param Security $security
+     * @param TranslatorInterface $translator
+     */
     public function __construct(
         protected EntityManagerInterface $entityManager,
         protected Security $security,
@@ -27,13 +44,18 @@ abstract class AbstractInachisController extends AbstractController
     ) {}
 
     /**
+     * Sets the default data for the controller.
+     * 
      * @return void
      */
     public function setDefaults(): void
     {
+        $sessionTimeout = new DateTimeImmutable();
+        $sessionTimeout = $sessionTimeout->add(new DateInterval('PT' . ini_get('session.gc_maxlifetime') . 'S'));
+
         $this->data = [
             'settings' => [
-                'siteTitle' => $_ENV['APP_TITLE'],//$this->getParameter('app.config.title') ?: 'Untitled Site',
+                'siteTitle' => $_ENV['APP_TITLE'] ?: 'Untitled Site',//$this->getParameter('app.config.title') ?: 'Untitled Site',
                 'domain' => $this->getProtocolAndHostname(),
                 'google' => [],
                 'language' => //$this->getParameter('app.config.locale') ?
@@ -60,25 +82,29 @@ abstract class AbstractInachisController extends AbstractController
             ],
             'session' => $this->security->getUser(),
             'session_timeout' => ini_get('session.gc_maxlifetime'),
-            'session_timeout_time' => date(
-                'Y-m-d\TH:i:s',
-                strtotime('+' . ini_get('session.gc_maxlifetime') . ' seconds')
-            ),
+            'session_timeout_time' => $sessionTimeout->format('Y-m-d\TH:i:s'),
         ];
         $this->data['timeout_template'] = base64_encode($this->renderView('inadmin/dialog/session_timeout.html.twig'));
     }
 
     /**
+     * Gets the protocol and hostname.
+     * 
      * @return string
      */
     private function getProtocolAndHostname(): string
     {
         $protocol = $this->isSecure() ? 'https://' : 'http://';
-
-        return $protocol . (!empty($_ENV['APP_DOMAIN']) ? $_ENV['APP_DOMAIN'] : '');
+        $domain = $_ENV['APP_DOMAIN'] ?? '';
+        if (!is_string($domain)) {
+            $domain = '';
+        }
+        return $protocol . $domain;
     }
 
     /**
+     * Checks if the request is secure.
+     * 
      * @return bool
      */
     private function isSecure(): bool
@@ -97,14 +123,13 @@ abstract class AbstractInachisController extends AbstractController
     }
 
     /**
-     * Returns the result of testing if a user is currently signed in
-     * @return bool Status of user authentication
+     * Checks if the user is authenticated.
+     * 
+     * @return bool
      */
     private function isAuthenticated(): bool
     {
-        return $this->security instanceof Security &&
-            $this->security->getUser() instanceof User &&
-            !empty($this->security->getUser()->getUsername());
+        return $this->security->getUser() instanceof User;
     }
 
     /**
@@ -121,7 +146,6 @@ abstract class AbstractInachisController extends AbstractController
      * Returns a specific error message given by it's unique name.
      *
      * @param string $error The name of the error message to retrieve
-     *
      * @return string|null The requested error message if set
      */
     public function getError(string $error): ?string
@@ -142,6 +166,8 @@ abstract class AbstractInachisController extends AbstractController
     }
 
     /**
+     * Redirects to the setup page if there are no admins.
+     * 
      * @return string
      */
     public function redirectIfNoAdmins(): string
@@ -167,6 +193,8 @@ abstract class AbstractInachisController extends AbstractController
     }
 
     /**
+     * Redirects to the dashboard if the user is authenticated or to the setup page if there are no admins.
+     * 
      * @return string|null
      */
     public function redirectIfAuthenticatedOrNoAdmins(): ?string

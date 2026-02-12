@@ -7,10 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Service\Series\Export;
+namespace Inachis\Service\Export\Series;
 
 use Inachis\Repository\SeriesRepository;
-use Inachis\Service\Series\Export\SeriesExportNormaliser;
+use Inachis\Service\Export\Series\SeriesExportNormaliser;
 use Symfony\Component\TaggedIterator\TaggedIterator;
 use Inachis\Service\Export\AbstractExportService;
 
@@ -22,9 +22,9 @@ use Inachis\Service\Export\AbstractExportService;
 final class SeriesExportService extends AbstractExportService
 {
     /**
-     * @param $repository The repository to use for series operations.
-     * @param $normaliser The normaliser to use.
-     * @param $writers The writers to use.
+     * @param SeriesRepository $repository The repository to use for series operations.
+     * @param SeriesExportNormaliser $normaliser The normaliser to use.
+     * @param iterable<SeriesExportWriter> $writers The writers to use.
      */
     public function __construct(
         private SeriesRepository $repository,
@@ -37,7 +37,7 @@ final class SeriesExportService extends AbstractExportService
     /**
      * Export series to a file of a given type (JSON/MD/XML).
      *
-     * @param iterable $series The series to export.
+     * @param iterable<Series> $series The series to export.
      * @param string $format The format to export to (json/md/xml).
      * @return string The exported series.
      */

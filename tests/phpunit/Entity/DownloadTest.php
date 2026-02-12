@@ -9,8 +9,8 @@
 
 namespace Inachis\Tests\phpunit\Entity;
 
+use DateTimeImmutable;
 use Inachis\Entity\Download;
-use DateTime;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -79,13 +79,13 @@ class DownloadTest extends TestCase
 
     public function testSetAndGetCreateDate(): void
     {
-        $this->download->setCreateDate(new DateTime('1970-01-02 01:34:56'));
+        $this->download->setCreateDate(new DateTimeImmutable('1970-01-02 01:34:56'));
         $this->assertEquals('1970-01-02 01:34:56', $this->download->getCreateDate()->format('Y-m-d H:i:s'));
     }
 
     public function testSetAndGetModDate(): void
     {
-        $this->download->setModDate(new DateTime('1970-01-02 01:34:56'));
+        $this->download->setModDate(new DateTimeImmutable('1970-01-02 01:34:56'));
         $this->assertEquals('1970-01-02 01:34:56', $this->download->getModDate()->format('Y-m-d H:i:s'));
     }
 }

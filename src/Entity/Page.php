@@ -9,7 +9,7 @@
 
 namespace Inachis\Entity;
 
-use DateTime;
+use DateTimeImmutable;
 use DateTimeZone;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -118,23 +118,23 @@ class Page
     protected bool $visibility = self::PUBLIC;
 
     /**
-     * @var DateTime|null The date the {@link Page} was created
+     * @var DateTimeImmutable|null The date the {@link Page} was created
      */
-    #[ORM\Column(type: 'datetime')]
-    protected ?DateTime $createDate;
+    #[ORM\Column(type: 'datetime_immutable')]
+    protected ?DateTimeImmutable $createDate;
 
     /**
-     * @var DateTime|null The date the {@link Page} was published; a future date
+     * @var DateTimeImmutable|null The date the {@link Page} was published; a future date
      *             indicates the content is scheduled
      */
-    #[ORM\Column(type: 'datetime')]
-    protected ?DateTime $postDate;
+    #[ORM\Column(type: 'datetime_immutable')]
+    protected ?DateTimeImmutable $postDate;
 
     /**
-     * @var DateTime|null The date the {@link Page} was last modified
+     * @var DateTimeImmutable|null The date the {@link Page} was last modified
      */
-    #[ORM\Column(type: 'datetime')]
-    protected ?DateTime $modDate;
+    #[ORM\Column(type: 'datetime_immutable')]
+    protected ?DateTimeImmutable $modDate;
 
     /**
      * @var string|null The timezone for the publication date; defaults to UTC
@@ -235,7 +235,7 @@ class Page
         $this->setTitle($title);
         $this->setContent($content);
         $this->setAuthor($author);
-        $currentTime = new DateTime('now');
+        $currentTime = new DateTimeImmutable();
         $this->setCreateDate($currentTime);
         $this->setPostDate($currentTime);
         $this->setModDate($currentTime);
@@ -339,9 +339,9 @@ class Page
     /**
      * Returns the value of {@link createDate}.
      *
-     * @return DateTime The creation date of the {@link Page}
+     * @return DateTimeImmutable The creation date of the {@link Page}
      */
-    public function getCreateDate(): DateTime
+    public function getCreateDate(): DateTimeImmutable
     {
         return $this->createDate;
     }
@@ -349,9 +349,9 @@ class Page
     /**
      * Returns the value of {@link postDate}.
      *
-     * @return DateTime|null The publication date of the {@link Page}
+     * @return DateTimeImmutable|null The publication date of the {@link Page}
      */
-    public function getPostDate(): ?DateTime
+    public function getPostDate(): ?DateTimeImmutable
     {
         return $this->postDate;
     }
@@ -359,9 +359,9 @@ class Page
     /**
      * Returns the value of {@link modDate}.
      *
-     * @return DateTime The date the {@link Page} was last modified
+     * @return DateTimeImmutable The date the {@link Page} was last modified
      */
-    public function getModDate(): DateTime
+    public function getModDate(): DateTimeImmutable
     {
         return $this->modDate;
     }
@@ -614,10 +614,10 @@ class Page
     /**
      * Sets the value of {@link createDate}.
      *
-     * @param DateTime|null $value The date to be set
+     * @param DateTimeImmutable|null $value The date to be set
      * @return Page
      */
-    public function setCreateDate(?DateTime $value = null): self
+    public function setCreateDate(?DateTimeImmutable $value = null): self
     {
         $this->createDate = $value;
         return $this;
@@ -626,10 +626,10 @@ class Page
     /**
      * Sets the value of {@link postDate}.
      *
-     * @param DateTime|null $value The date to be set
+     * @param DateTimeImmutable|null $value The date to be set
      * @return Page
      */
-    public function setPostDate(?DateTime $value = null): self
+    public function setPostDate(?DateTimeImmutable $value = null): self
     {
         $this->postDate = $value;
         return $this;
@@ -638,10 +638,10 @@ class Page
     /**
      * Sets the value of {@link modDate}.
      *
-     * @param DateTime|null $value The date to set
+     * @param DateTimeImmutable|null $value The date to set
      * @return Page
      */
-    public function setModDate(?DateTime $value = null): self
+    public function setModDate(?DateTimeImmutable $value = null): self
     {
         $this->modDate = $value;
         return $this;
@@ -859,8 +859,8 @@ class Page
      */
     public function isScheduledPage(): bool
     {
-        $today = new DateTime('now', new DateTimeZone($this->getTimezone()));
-        $postDate = new DateTime(
+        $today = new DateTimeImmutable('now', new DateTimeZone($this->getTimezone()));
+        $postDate = new DateTimeImmutable(
             $this->getPostDate()->format('Y-m-d H:i:s'),
             new DateTimeZone($this->getTimezone())
         );

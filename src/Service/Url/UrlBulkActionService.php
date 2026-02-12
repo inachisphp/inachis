@@ -9,12 +9,15 @@
 
 namespace Inachis\Service\Url;
 
-
+use DateTimeImmutable;
+use Inachis\Entity\Url;
 use Inachis\Repository\UrlRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 
+/**
+ * Service for applying bulk actions to URLs
+ */
 readonly class UrlBulkActionService
 {
     /**
@@ -27,8 +30,10 @@ readonly class UrlBulkActionService
     ) {}
 
     /**
+     * Apply a bulk action to a list of URLs
+     * 
      * @param string $action
-     * @param array $ids
+     * @param array<string> $ids
      * @return int
      * @throws OptimisticLockException
      */
@@ -36,6 +41,7 @@ readonly class UrlBulkActionService
     {
         $count = 0;
         foreach ($ids as $id) {
+            /** @var Url|null $url */
             $url = $this->urlRepository->findOneBy([
                 'id' => $id,
                 'default' => false,
@@ -46,7 +52,7 @@ readonly class UrlBulkActionService
             match ($action) {
                 'delete'  => $this->urlRepository->remove($url),
                 'make_default'  => $this->makeDefault($url),
-                default   => null,
+                default => null,
             };
             $count++;
         }
@@ -54,8 +60,15 @@ readonly class UrlBulkActionService
         return $count;
     }
 
-    protected function makeDefault($url): void
+    /**
+     * Make a URL the default URL for its content
+     * 
+     * @param Url $url
+     * @return void
+     */
+    protected function makeDefault(Url $url): void
     {
+        /** @var Url|null $previous_default */
         $previous_default = $this->urlRepository->findOneBy(
             [
                 'content' => $url->getContent(),
@@ -63,10 +76,10 @@ readonly class UrlBulkActionService
             ]
         );
         if ($previous_default !== null) {
-            $previous_default->setDefault(false)->setModDate(new DateTime('now'));
+            $previous_default->setDefault(false)->setModDate(new DateTimeImmutable());
             $this->entityManager->persist($previous_default);
         }
-        $url->setDefault(true)->setModDate(new DateTime('now'));
+        $url->setDefault(true)->setModDate(new DateTimeImmutable());
         $this->entityManager->persist($url);
         $this->entityManager->flush();
     }

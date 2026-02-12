@@ -9,22 +9,24 @@
 
 namespace Inachis\Controller\Dialog;
 
+use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\SeriesRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use DateTime;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Controller for content selector dialog
+ */
 #[IsGranted('ROLE_ADMIN')]
 class ContentSelectorController extends AbstractInachisController
 {
-    protected array $errors = [];
-    protected array $data = [];
-
     /**
+     * Get content list
+     * 
      * @param Request $request
      * @param SeriesRepository $seriesRepository
      * @param PageRepository $pageRepository
@@ -36,13 +38,20 @@ class ContentSelectorController extends AbstractInachisController
         SeriesRepository $seriesRepository,
         PageRepository $pageRepository,
     ): Response {
-        $filters = array_filter($request->request->all('filters', []));
-        if ($request->request->get('seriesId', '') !== '') {
-            $series = $seriesRepository->find($request->request->get('seriesId'));
-            if ($series !== null && !$series->getItems()->isEmpty()) {
-                $filters['excludeIds'] = [];
-                foreach ($series->getItems() as $item) {
-                    $filters['excludeIds'][] = $item->getId();
+        $filters = array_filter($request->request->all('filters'));
+
+        /** @var string $seriesId */
+        $seriesId = $request->request->get('seriesId', '');
+        if ($seriesId !== '') {
+            $series = $seriesRepository->find($seriesId);
+            if ($series !== null) {
+            $items = $series->getItems();
+                if ($items instanceof \Doctrine\Common\Collections\Collection && !$items->isEmpty()) {
+                    $filters['excludeIds'] = [];
+                    /** @var \Inachis\Entity\Page $item */
+                    foreach ($items as $item) {
+                        $filters['excludeIds'][] = $item->getId();
+                    }
                 }
             }
         }
@@ -55,9 +64,11 @@ class ContentSelectorController extends AbstractInachisController
             $limit,
             'title asc'
         );
-        $this->data['query']['filters'] = $filters;
-        $this->data['query']['offset'] = $offset;
-        $this->data['query']['limit'] = $limit;
+        $this->data['query'] = [
+            'filters' => $filters,
+            'offset' => $offset,
+            'limit' => $limit,
+        ];
         return $this->render('inadmin/dialog/content-selector.html.twig', $this->data);
     }
 
@@ -73,30 +84,39 @@ class ContentSelectorController extends AbstractInachisController
         SeriesRepository $seriesRepository,
         PageRepository $pageRepository,
     ): Response {
-        if (!empty($request->request->all('ids'))) {
-            $series = $seriesRepository->findOneBy(['id' => $request->request->get('seriesId')]);
-            if ($series !== null) {
-                foreach ($request->request->all('ids') as $pageId) {
-                    $page = $pageRepository->findOneBy(['id' => $pageId]);
-                    if (empty($page) || empty($page->getId())) {
-                        continue;
-                    }
-                    $series->addItem($page);
-                    $firstDate = $series->getFirstDate();
-                    $lastDate = $series->getLastDate();
-                    if ($firstDate === null || $page->getPostDate()->format('Y-m-d H:i:s') < $firstDate->format('Y-m-d H:i:s')) {
-                        $series->setFirstDate($page->getPostDate());
-                    }
-                    if ($lastDate === null || $page->getPostDate()->format('Y-m-d H:i:s') > $lastDate->format('Y-m-d H:i:s')) {
-                        $series->setLastDate($page->getPostDate());
-                    }
+        $ids = $request->request->all('ids');
+        $seriesId = (string) $request->request->get('seriesId', '');
+        $series = $seriesRepository->find($seriesId);
+        if (empty($ids) || $series === null) {
+            return new Response('No change', Response::HTTP_NO_CONTENT);
+        }
+
+        foreach ($ids as $pageId) {
+            $page = $pageRepository->find($pageId);
+            if (!$page instanceof \Inachis\Entity\Page) {
+                continue;
+            }
+
+            $series->addItem($page);
+
+            $pageDate = $page->getPostDate();
+            if ($pageDate instanceof DateTimeInterface) {
+                $firstDate = $series->getFirstDate();
+                $lastDate = $series->getLastDate();
+
+                if ($firstDate === null || $pageDate < $firstDate) {
+                    $series->setFirstDate($pageDate);
                 }
-                $series->setModDate(new DateTime('now'));
-                $this->entityManager->persist($series);
-                $this->entityManager->flush();
-                return new Response('Saved', Response::HTTP_CREATED);
+                if ($lastDate === null || $pageDate > $lastDate) {
+                    $series->setLastDate($pageDate);
+                }
             }
         }
-        return new Response('No change', Response::HTTP_NO_CONTENT);
+        $series->setModDate(new DateTimeImmutable());
+
+        $this->entityManager->persist($series);
+        $this->entityManager->flush();
+
+        return new Response('Saved', Response::HTTP_CREATED);
     }
 }

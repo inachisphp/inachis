@@ -12,7 +12,7 @@ namespace Inachis\Tests\phpunit\Repository;
 use Inachis\Entity\Page;
 use Inachis\Entity\Revision;
 use Inachis\Repository\RevisionRepository;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
@@ -48,7 +48,7 @@ class RevisionRepositoryTest extends TestCase
             ->method('getEntityManager')->willReturn($this->entityManager);
 
         $uuid = Uuid::uuid1();
-        $date = new DateTime('now');
+        $date = new DateTimeImmutable('now');
         $page = new Page('test page', 'some content');
         $page->setId($uuid)->setSubTitle('sub-title')->setModDate($date);
         $revision = new Revision();
@@ -102,7 +102,7 @@ class RevisionRepositoryTest extends TestCase
     public function testDeleteAndRecordByPage(): void
     {
         $uuid = Uuid::uuid1();
-        $date = new DateTime('now');
+        $date = new DateTimeImmutable('now');
         $page = new Page('test page', 'some content');
         $page->setId($uuid)->setSubTitle('sub-title')->setModDate($date);
 

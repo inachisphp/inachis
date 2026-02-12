@@ -9,11 +9,13 @@
 
 namespace Inachis\Service\User;
 
-
+use DateTimeImmutable;
 use Inachis\Repository\UserRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * Service for applying bulk actions to users
+ */
 readonly class UserBulkActionService
 {
     /**
@@ -21,21 +23,24 @@ readonly class UserBulkActionService
      * @param EntityManagerInterface $entityManager
      */
     public function __construct(
-        private UserRepository         $userRepository,
+        private UserRepository $userRepository,
         private EntityManagerInterface $entityManager,
     ) {}
 
     /**
+     * Apply a bulk action to users
+     * 
      * @param string $action
-     * @param array $ids
+     * @param array<int> $ids
      * @return int
      */
     public function apply(string $action, array $ids): int
     {
         $count = 0;
         foreach ($ids as $id) {
+            /** @var \Inachis\Entity\User|null $user */
             $user = $this->userRepository->find($id);
-            if (empty($user->getUsername())) {
+            if (null === $user || empty($user->getUsername())) {
                 continue;
             }
             match ($action) {
@@ -44,7 +49,7 @@ readonly class UserBulkActionService
                 'disable' => $user->setActive(false),
                 default   => null,
             };
-            $user->setModDate(new DateTime());
+            $user->setModDate(new DateTimeImmutable());
             $this->entityManager->persist($user);
             $count++;
         }

@@ -9,9 +9,10 @@
 
 namespace Inachis\Form;
 
+use DateTimeImmutable;
+use IntlException;
 use Inachis\Entity\{Category,Page,Tag};
 use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
-use IntlException;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\Form\AbstractType;
@@ -25,7 +26,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use DateTime;
 
 class PostType extends AbstractType
 {
@@ -129,7 +129,8 @@ class PostType extends AbstractType
                 ],
                 'format' => 'dd/MM/yyyy HH:mm',
                 'html5'  => false,
-                'label'  => isset($options['data']) && $options['data']->getPostDate() < new DateTime() ?
+                'input'  => 'datetime_immutable',
+                'label'  => isset($options['data']) && $options['data']->getPostDate() < new DateTimeImmutable() ?
                     'admin.post.properties.postDate-past.label' :
                     'admin.post.properties.postDate-future.label',
                 'label_attr' => [
@@ -267,6 +268,7 @@ class PostType extends AbstractType
                     ],
                     'format' => 'dd/MM/yyyy HH:mm',
                     'html5'  => false,
+                    'input'  => 'datetime_immutable',
                     'label'  => 'admin.post.properties.modDate.label',
                     'label_attr' => [
                         'id' => 'modDate_label',

@@ -9,14 +9,13 @@
 
 namespace Inachis\Controller\Page\Search;
 
+use Exception;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Url;
 use Inachis\Entity\User;
 use Inachis\Repository\SearchRepository;
 use Inachis\Repository\UrlRepository;
 use Inachis\Repository\UserRepository;
-use DateTime;
-use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

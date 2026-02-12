@@ -11,6 +11,9 @@ namespace Inachis\Util;
 
 use Inachis\Entity\Url;
 
+/**
+ * UrlNormaliser class
+ */
 class UrlNormaliser
 {
     /**
@@ -21,24 +24,25 @@ class UrlNormaliser
      *                   is defined by URL::DEFAULT_URL_SIZE_LIMIT
      * @return string The generated SEO-friendly URL
      */
-    public static function toUri(string $title, int $limit = Url::DEFAULT_URL_SIZE_LIMIT): string
+    public static function toUri(string $title = '', int $limit = Url::DEFAULT_URL_SIZE_LIMIT): string
     {
-        $title = trim(
-            preg_replace(
-                [
-                    '/&/',
-                    '/[_\s\x{00a0}]+/',
-                    '/[^a-z0-9\-]+/i'
-                ],
-                [
-                    'and',
-                    '-',
-                    ''
-                ],
-                mb_strtolower($title)
-            ),
-            '-'
-        );
+        if ('' === $title) {
+            return '';
+        }
+        $title = preg_replace(
+            [
+                '/&/',
+                '/[_\s\x{00a0}]+/',
+                '/[^a-z0-9\-]+/i'
+            ],
+            [
+                'and',
+                '-',
+                ''
+            ],
+            mb_strtolower($title)
+        ) ?? '';
+        $title = trim($title, '-');
         if (mb_strlen($title) > $limit) {
             $title = mb_substr($title, 0, $limit);
         }
@@ -50,13 +54,19 @@ class UrlNormaliser
      * @param string $uri The URL to parse and obtain the short URL for
      * @return string
      */
-    public static function fromUri(string $uri): string
+    public static function fromUri(string $uri = ''): string
     {
+        if ('' === $uri) {
+            return '';
+        }
         $uri = parse_url($uri, PHP_URL_PATH);
+        if (!is_string($uri) || $uri === '') {
+            return '';
+        }
         if (str_ends_with($uri, '/')) {
             $uri = substr($uri, 0, -1);
         }
         $uri = explode('/', $uri);
-        return end($uri);
+        return (string) end($uri);
     }
 }

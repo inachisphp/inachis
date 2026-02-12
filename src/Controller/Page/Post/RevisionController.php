@@ -9,12 +9,12 @@
 
 namespace Inachis\Controller\Page\Post;
 
+use DateTimeImmutable;
+use Exception;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Parser\ArrayToMarkdown;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\RevisionRepository;
-use DateTime;
-use Exception;
 use Jfcherng\Diff\DiffHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -104,7 +104,7 @@ class RevisionController extends AbstractInachisController
         $page->setTitle($revision->getTitle())
             ->setSubTitle($revision->getSubTitle())
             ->setContent($revision->getContent())
-            ->setModDate(new DateTime('now'))
+            ->setModDate(new DateTimeImmutable())
             ->setAuthor($this->getUser());
 
         $newRevision = $revisionRepository->hydrateNewRevisionFromPage($page);

@@ -9,8 +9,7 @@
 
 namespace Inachis\Entity;
 
-use DateTime;
-use DateTimeInterface;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
@@ -57,10 +56,10 @@ class Waste
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
     private ?User $user;
     /**
-     * @var DateTime The date the item was added to the bin
+     * @var DateTimeImmutable The date the item was added to the bin
      */
-    #[ORM\Column(type: 'datetime')]
-    protected DateTime $modDate;
+    #[ORM\Column(type: 'datetime_immutable')]
+    protected DateTimeImmutable $modDate;
 
     /**
      * @return string|null
@@ -159,18 +158,18 @@ class Waste
     }
 
     /**
-     * @return DateTimeInterface|null The date the content was deleted
+     * @return DateTimeImmutable|null The date the content was deleted
      */
-    public function getModDate(): ?DateTimeInterface
+    public function getModDate(): ?DateTimeImmutable
     {
         return $this->modDate;
     }
 
     /**
-     * @param DateTime|null $value
+     * @param DateTimeImmutable|null $value
      * @return $this
      */
-    public function setModDate(?DateTime $value): self
+    public function setModDate(?DateTimeImmutable $value): self
     {
         $this->modDate = $value;
 

@@ -9,6 +9,7 @@
 
 namespace Inachis\Controller\Page\Tools;
 
+use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Diagnostics\DiagnosticsCollector;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -85,7 +86,7 @@ class DiagnosticsController extends AbstractInachisController
     #[Route('/incc/tools/server.json', name: 'incc_tools_diagnostics_json')]
     public function serverJson(DiagnosticsCollector $collector): JsonResponse {
         return $this->json([
-            'generated_at' => (new \DateTimeImmutable())->format(DATE_ATOM),
+            'generated_at' => (new DateTimeImmutable())->format(DATE_ATOM),
             'results' => $collector->collect(),
         ]);
 	}

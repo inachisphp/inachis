@@ -12,9 +12,15 @@ namespace Inachis\Util;
 use DateInvalidTimeZoneException;
 use DateTimeZone;
 
+/**
+ * TimezoneChoices class
+ */
 class TimezoneChoices
 {
     /**
+     * Get timezone choices
+     *
+     * @return array<string, string>
      * @throws DateInvalidTimeZoneException
      */
     public function getTimezones(): array

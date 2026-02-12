@@ -9,7 +9,7 @@
 
 namespace Inachis\Entity;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -67,16 +67,16 @@ class Series
     protected ?string $description = '';
 
     /**
-     * @var DateTime|null
+     * @var DateTimeImmutable|null
      */
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    protected ?DateTime $firstDate = null;
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    protected ?DateTimeImmutable $firstDate = null;
 
     /**
-     * @var DateTime|null
+     * @var DateTimeImmutable|null
      */
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    protected ?DateTime $lastDate = null;
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    protected ?DateTimeImmutable $lastDate = null;
 
     /**
      * @var Collection|null The array of pages in the series
@@ -103,17 +103,17 @@ class Series
     protected ?User $author = null;
 
     /**
-     * @var DateTime
+     * @var DateTimeImmutable
      */
-    #[ORM\Column(type: 'datetime')]
-    protected DateTime $createDate;
+    #[ORM\Column(type: 'datetime_immutable')]
+    protected DateTimeImmutable $createDate;
 
 
     /**
-     * @var DateTime
+     * @var DateTimeImmutable
      */
-    #[ORM\Column(type: 'datetime')]
-    protected DateTime $modDate;
+    #[ORM\Column(type: 'datetime_immutable')]
+    protected DateTimeImmutable $modDate;
 
     /**
      * @var bool Determining if a {@link Series} is visible to the public
@@ -128,7 +128,7 @@ class Series
     {
         $this->image = null;
         $this->items = new ArrayCollection();
-        $currentTime = new DateTime('now');
+        $currentTime = new DateTimeImmutable();
         $this->setCreateDate($currentTime);
         $this->setModDate($currentTime);
     }
@@ -225,37 +225,37 @@ class Series
     }
 
     /**
-     * @return DateTime|null
+     * @return DateTimeImmutable|null
      */
-    public function getFirstDate(): ?DateTime
+    public function getFirstDate(): ?DateTimeImmutable
     {
         return $this->firstDate;
     }
 
     /**
-     * @param DateTime|null $firstDate
+     * @param DateTimeImmutable|null $firstDate
      * @return $this
      */
-    public function setFirstDate(?DateTime $firstDate): self
+    public function setFirstDate(?DateTimeImmutable $firstDate): self
     {
         $this->firstDate = $firstDate;
         return $this;
     }
 
     /**
-     * @return DateTime|null
+     * @return DateTimeImmutable|null
      */
-    public function getLastDate(): ?DateTime
+    public function getLastDate(): ?DateTimeImmutable
     {
         return $this->lastDate;
     }
 
     /**
-     * @param DateTime|null $lastDate
+     * @param DateTimeImmutable|null $lastDate
      *
      * @return Series
      */
-    public function setLastDate(?DateTime $lastDate): self
+    public function setLastDate(?DateTimeImmutable $lastDate): self
     {
         $this->lastDate = $lastDate;
         return $this;
@@ -331,18 +331,18 @@ class Series
     }
 
     /**
-     * @return DateTime|null
+     * @return DateTimeImmutable|null
      */
-    public function getCreateDate(): ?DateTime
+    public function getCreateDate(): ?DateTimeImmutable
     {
         return $this->createDate;
     }
 
     /**
-     * @param DateTime $createDate
+     * @param DateTimeImmutable $createDate
      * @return $this
      */
-    public function setCreateDate(DateTime $createDate): self
+    public function setCreateDate(DateTimeImmutable $createDate): self
     {
         $this->createDate = $createDate;
 
@@ -350,18 +350,18 @@ class Series
     }
 
     /**
-     * @return DateTime|null
+     * @return DateTimeImmutable|null
      */
-    public function getModDate(): ?DateTime
+    public function getModDate(): ?DateTimeImmutable
     {
         return $this->modDate;
     }
 
     /**
-     * @param mixed $modDate
+     * @param DateTimeImmutable $modDate
      * @return Series
      */
-    public function setModDate(DateTime $modDate): self
+    public function setModDate(DateTimeImmutable $modDate): self
     {
         $this->modDate = $modDate;
         return $this;

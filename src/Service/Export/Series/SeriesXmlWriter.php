@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Service\Series\Export;
+namespace Inachis\Service\Export\Series;
 
 use Inachis\Model\Series\SeriesExportDto;
 use Inachis\Service\Export\AbstractXmlExportWriter;
-use SimpleXMLElement;
+use \SimpleXMLElement;
 
 /**
  * XML writer for series.
