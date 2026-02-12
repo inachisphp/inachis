@@ -191,6 +191,8 @@ class SeriesType extends AbstractType
             $builder
                 ->add('delete', SubmitType::class, [
                     'attr' => [
+                        'data-confirm' => 'delete',
+                        'data-confirm-text' => 'Yes, delete',
                         'class' => 'button button--negative button--confirm',
                         'data-entity' => 'series',
                         'data-title' => $options['data']->getTitle(),

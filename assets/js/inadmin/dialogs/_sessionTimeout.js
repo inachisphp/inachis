@@ -1,8 +1,11 @@
+import { Dialog } from '../components/dialog.js';
+
 window.Inachis.SessionTimeout = {
     countdown: null,
     countdownDate: null,
     timeoutHandle: null,
     countdownEl: null,
+    dialogInstance: null,
 
     options: {
         sessionTimeout: 1440, // seconds
@@ -27,43 +30,53 @@ window.Inachis.SessionTimeout = {
     },
 
     showAlert() {
-        window.Inachis.Dialog.buttons = [
-            {
-                text: 'Keep me signed-in',
-                class: 'button button--positive',
-                click: () => {
-                    this.continue();
-                    window.Inachis.Dialog.close?.();
+        const content = atob(this.options.templateEncoded);
+
+        this.dialogInstance = new Dialog({
+            id: 'dialog__sessionTimeout',
+            title: 'Session time-out',
+            className: 'dialog__sessionTimeout',
+            content,
+            buttons: [
+                {
+                    text: 'Keep me signed-in',
+                    class: 'button button--positive',
+                    click: async () => {
+                        await this.continue();
+                        this.dialogInstance.close();
+                    },
                 },
-            },
-            {
-                text: 'Log off now',
-                class: 'button button--negative',
-                click: () => {
-                    this.logOff();
+                {
+                    text: 'Log off now',
+                    class: 'button button--negative',
+                    click: () => {
+                        this.logOff();
+                    },
                 },
+            ],
+            onOpen: (dialog) => {
+                this.handleOpen(dialog);
             },
-        ];
+            onClose: () => {
+                this.cleanup();
+            },
+        });
 
-        window.Inachis.Dialog.className = 'dialog__sessionTimeout';
-        window.Inachis.Dialog.preloadContent = atob(
-            this.options.templateEncoded
-        );
-        window.Inachis.Dialog.title = 'Session time-out';
-        window.Inachis.Dialog.createDialog(null);
+        this.dialogInstance.open();
+    },
 
-        const placeholderText = document.querySelector(
-            '#dialog__sessionTimeout form > p'
-        );
-
+    handleOpen(dialog) {
+        // Replace placeholder
+        const placeholderText = dialog.dialog.querySelector('.dialog-body > p:first-child');
         if (placeholderText) {
-            placeholderText.innerHTML = placeholderText.innerHTML.replace(
-                '%TIMEOUT%',
-                this.options.sessionTimeout / 60
-            );
+            placeholderText.innerHTML =
+                placeholderText.innerHTML.replace(
+                    '%TIMEOUT%',
+                    this.options.sessionTimeout / 60
+                );
         }
 
-        this.countdownEl = document.querySelector('p.countdown');
+        this.countdownEl = dialog.dialog.querySelector('p.countdown');
         this.startCountdown();
     },
 
@@ -73,9 +86,7 @@ window.Inachis.SessionTimeout = {
                 `${Inachis.prefix}/keep-alive`,
                 {
                     method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                    },
+                    headers: { Accept: 'application/json' },
                 }
             );
 
@@ -85,7 +96,7 @@ window.Inachis.SessionTimeout = {
 
             const data = await response.json();
 
-            clearInterval(this.countdown);
+            this.cleanup();
 
             this.init({
                 sessionEndTime: data.time,
@@ -119,7 +130,7 @@ window.Inachis.SessionTimeout = {
             const distance = this.countdownDate - now;
 
             if (distance <= 0) {
-                clearInterval(this.countdown);
+                this.cleanup();
 
                 if (this.countdownEl) {
                     this.countdownEl.textContent =
@@ -143,9 +154,7 @@ window.Inachis.SessionTimeout = {
     },
 
     formatCountdown(hours, minutes, seconds) {
-        if (!this.countdownEl) {
-            return;
-        }
+        if (!this.countdownEl) return;
 
         const pad = n => String(n).padStart(2, '0');
 
@@ -155,5 +164,19 @@ window.Inachis.SessionTimeout = {
         }
 
         this.countdownEl.textContent = output;
+    },
+
+    cleanup() {
+        if (this.countdown) {
+            clearInterval(this.countdown);
+            this.countdown = null;
+        }
+
+        if (this.timeoutHandle) {
+            clearTimeout(this.timeoutHandle);
+            this.timeoutHandle = null;
+        }
+
+        this.countdownEl = null;
     },
 };

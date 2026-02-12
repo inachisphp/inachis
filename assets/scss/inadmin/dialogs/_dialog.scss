@@ -1,28 +1,61 @@
 @use '../definitions' as *;
 
-.ui-dialog {
-  background: var(--bg-surface);
-  position: absolute;
-  z-index: 110 !important;
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
 
-  .ui-dialog-titlebar {
-    button {
-      background-color: var(--bg-surface);
-      border: none;
-      float: right;
-      margin: 5px;
-      padding: 0;
-    }
+.dialog {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
 
-    span {
-      display: inline-block;
-      font-size: 1.3em;
-      font-weight: bold;
-      padding: 10px;
-    }
-  }
+.dialog-content {
+  background: #fff;
+  color: #000;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  width: clamp(320px, 75vw, 800px);
+  max-height: 90vh;
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
+}
 
-  .ui-dialog-secondary-bar {
+.dialog-header {
+  background: #fff;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dialog-title {
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+.dialog-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.dialog-body {
+  padding: 1rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.ui-dialog-secondary-bar {
     align-items: center;
     background-color: var(--color-neutral-300);
     border: 1px solid var(--color-neutral-400);
@@ -54,91 +87,21 @@
     }
   }
 
-  .ui-dialog-content {
-    max-height: 400px !important;
-    padding: 10px;
-    overflow-y: auto;
-
-    fieldset {
-      padding: 0;
-    }
-
-    .dz-default {
-      font-size: 1em;
-      margin: 1.5em 1.5em 0 1.5em;
-    }
-  }
-
-  .ui-dialog-buttonpane {
-    background-color: var(--color-neutral-300);
-    padding: 5px;
-    text-align: right;
-
-    button {
-      margin: 3px;
-    }
-  }
-
-  .gallery {
-    height: 330px;
-    overflow-y: scroll;
-
-    img {
-      height: 150px;
-      object-fit: cover;
-      width: 150px;
-    }
-
-    input {
-      position: absolute;
-      right: 0.5em;
-      top: 0.5em;
-    }
-
-    label span {
-      display: none;
-    }
-
-    li {
-      float: left;
-      position: relative;
-    }
-
-    ol,
-    li {
-      list-style-type: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .material-icons {
-      color: var(--color-neutral-000);
-      bottom: 0.1em;
-      position: absolute;
-      right: 0.1em;
-      text-shadow: 1px 1px 3px var(--color-neutral-800);
-    }
-  }
+.dialog-footer {
+  background: #eee;
+  border-top: 1px solid #ddd;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }
 
-.ui-widget-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  height: 100%;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 100 !important;
-}
-
-.ui-cross {
-  background-color: var(--bg-surface);
-  border: 1px solid #ccc;
-  border-radius: 50%;
-  margin: 20px 10px;
-  padding: 5px;
-  position: absolute;
-  right: 0;
+@media (max-width: 480px) {
+  .dialog-content {
+    width: 95vw;
+    height: 95vh;
+    border-radius: 0;
+  }
 }
 
 #dialog__contentSelector {
@@ -185,5 +148,46 @@
 
   100% {
     background-position: 100% 0, 100% 100%, 0 100%, 0 0
+  }
+}
+
+.gallery {
+  height: 330px;
+  overflow-y: scroll;
+
+  img {
+    height: 150px;
+    object-fit: cover;
+    width: 150px;
+  }
+
+  input {
+    position: absolute;
+    right: 0.5em;
+    top: 0.5em;
+  }
+
+  label span {
+    display: none;
+  }
+
+  li {
+    float: left;
+    position: relative;
+  }
+
+  ol,
+  li {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .material-icons {
+    color: var(--color-neutral-000);
+    bottom: 0.1em;
+    position: absolute;
+    right: 0.1em;
+    text-shadow: 1px 1px 3px var(--color-neutral-800);
   }
 }

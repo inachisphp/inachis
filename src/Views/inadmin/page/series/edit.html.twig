@@ -2,7 +2,7 @@
 
 {% block pagetitle %}
     <a href="{{ path('incc_series_list') }}">Series</a>
-    {% if series.id is empty %}New{% else %}Edit{% endif %} Series
+    <span>{% if series.id is empty %}New{% else %}Edit{% endif %} Series</span>
 {% endblock pagetitle %}
 
 {% block content %}
@@ -18,7 +18,7 @@
         {% if series.id is not empty %}
         <li>
             <a href="#series__contents">
-                {% trans %}admin.series.contents.title{% endtrans %} 
+                {% trans %}admin.series.contents.title{% endtrans %}
                 <span class="badge">{{ series.items|length }}</span></a>
         </li>
         {% endif %}

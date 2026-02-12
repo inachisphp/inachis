@@ -124,6 +124,7 @@ class ExportController extends AbstractInachisController
         $this->data['pages'] = $pageExportService->getAllPages();
         $this->data['scope'] = $scope;
         $this->data['format'] = $format;
+        $this->data['contentType'] = $contentType;
         $this->data['manualPages'] = $pagesPreview ;
         $this->data['selectedIds'] = $selectedIds;
         $this->data['previewCount'] = $previewCount;

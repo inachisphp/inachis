@@ -10,30 +10,13 @@
 namespace Inachis\Controller\Dialog;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Category;
-use Inachis\Entity\Page;
-use Inachis\Entity\Series;
-use Inachis\Entity\Tag;
-use Inachis\Entity\Url;
 use Inachis\Model\BulkCreateData;
-use Inachis\Repository\CategoryRepository;
-use Inachis\Repository\SeriesRepository;
-use Inachis\Repository\TagRepository;
 use Inachis\Service\Page\PageBulkCreateService;
-use Inachis\Util\UrlNormaliser;
-use DateInterval;
-use DateMalformedPeriodStringException;
-use DateMalformedStringException;
-use DatePeriod;
-use DateTimeImmutable;
 use Exception;
 use InvalidArgumentException;
-use Ramsey\Uuid\Uuid;
-use ReCaptcha\RequestMethod\Post;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use DateTime;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_ADMIN')]

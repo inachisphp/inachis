@@ -102,12 +102,16 @@
                 delete: {
                     button_class: 'button--negative button--delete button--confirm',
                     'data': {
+                        'confirm': 'delete',
+                        'confirm-text': 'Yes, delete',
                         'entity': 'users',
                         'form-action': '',
-                        'title': 'all selected users',
+                        'title': 'Delete selected users',
                         'warning': 'All currently selected users will be deleted permanently, and they will lose access to this system. This action cannot be undone.',
                     },
                     icon: 'delete',
+                    name: 'delete',
+                    value: '1',
                     title: 'Delete',
                 }
             }

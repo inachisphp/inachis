@@ -4,37 +4,23 @@
         <fieldset class="col-6">
             <p>
                 <button class="button button--add" id="dialog__imageManager__addnew" type="button">
-                    <span class="material-icons" aria-hidden="true">add</span> 
+                    <span class="material-icons" aria-hidden="true">add</span>
                     <span class="btn-text">Add new category</span>
                 </button>
             </p>
-            <p class="visually-hidden" id="dialog__categoryManager__top-level-category">
+            <p id="dialog__categoryManager__top-level-category" hidden>
                 <label for="dialog__categoryManager__existing_-1">
                     <input checked class="checkbox" id="dialog__categoryManager__existing_-1" name="catParent[]" type="radio" value="-1" />
                     As top-level category</label>
             </p>
 {% if categories is not empty  %}
-            <p class="visually-hidden" id="dialog__categoryManager__as-subcat">As a sub-category of:</p>
+            <p id="dialog__categoryManager__as-subcat" hidden>As a sub-category of:</p>
             <ol data-name="catParent[]">
                 {{ include("inadmin/dialog/category-manager-list.html.twig", { 'categories': categories }) }}
             </ol>
 {% endif %}
         </fieldset>
-        <fieldset class="col-6" id="dialog__categoryManager__exportimport">
-            <p>
-                <button class="button button--secondary" data-action="export_categories" type="button">
-                    <span class="material-icons" aria-hidden="true">download</span>
-                    <span class="btn-text">Export categories</span>
-                </button>
-            </p>
-            <p>
-                <button class="button button--secondary" data-action="import_categories" type="button">
-                    <span class="material-icons" aria-hidden="true">upload_file</span>
-                    <span class="btn-text">Import categories</span>
-                </button>
-            </p>
-        </fieldset>
-        <fieldset class="col-6 visually-hidden" id="dialog__categoryManager__add-edit-category">
+        <fieldset class="col-6" id="dialog__categoryManager__add-edit-category" hidden>
             <input id="dialog__categoryManager__id" type="hidden" />
             <p>
                 <label for="dialog__categoryManager__new">Category name</label>
@@ -55,7 +41,7 @@
                 <button aria-disabled="true" class="button button--negative" disabled="disabled" id="dialog__categoryManager__delete" type="button">Delete</button>
                 <a class="button button--info" id="dialog__categoryManager__cancel" title="Cancel">Cancel</a>
             </p>
-            <p class="info">Note: This category cannot be removed as content is assigned</p>
+            <p hidden class="info">Note: This category cannot be removed as content is assigned</p>
         </fieldset>
     </form>
 </section>

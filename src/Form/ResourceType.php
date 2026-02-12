@@ -101,6 +101,8 @@ class ResourceType extends AbstractType
             ])
             ->add('delete', SubmitType::class, [
                 'attr' => [
+                    'data-confirm' => 'delete',
+                    'data-confirm-text' => 'Yes, delete',
                     'class' => 'button button--negative button--confirm',
                     'data-entity' => 'image',
                     'data-title' => $options['data']->getTitle(),
