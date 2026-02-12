@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Service\Page\Export;
+namespace Inachis\Service\Export\Page;
 
 use Inachis\Service\Export\ExportWriterInterface;
 

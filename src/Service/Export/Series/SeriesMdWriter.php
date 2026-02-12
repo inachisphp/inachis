@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Service\Series\Export;
+namespace Inachis\Service\Export\Series;
 
 use Inachis\Model\Series\SeriesExportDto;
 use Inachis\Service\Export\ExportWriterInterface;
@@ -19,6 +19,9 @@ final class SeriesMdWriter implements ExportWriterInterface
 {
     /**
      * Checks if the writer supports the given format.
+     *
+     * @param string $format The format to check.
+     * @return bool True if the writer supports the format, false otherwise.
      */
     public function supports(string $format): bool
     {
@@ -38,6 +41,9 @@ final class SeriesMdWriter implements ExportWriterInterface
 
     /**
      * Writes the given series to the specified format.
+     *
+     * @param iterable<SeriesExportDto> $items The series to write.
+     * @return string The written series.
      */
     public function write(iterable $items): string
     {

@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Service\Series\Export;
+namespace Inachis\Service\Export\Series;
 
 use Inachis\Entity\Series;
 use Inachis\Model\Series\SeriesExportDto;

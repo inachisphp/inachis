@@ -11,7 +11,7 @@ namespace Inachis\Command;
 
 use Inachis\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
+use InvalidArgumentException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -65,7 +65,7 @@ class CreateAdminCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
-     * @throws Exception
+     * @throws \InvalidArgumentException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -75,41 +75,48 @@ class CreateAdminCommand extends Command
         $helper = $this->getHelper('question');
 
         $normalizeToString = function (mixed $value = null): string {
-            return $value ? trim((string) $value) : '';
+            if ($value === null) {
+                throw new InvalidArgumentException('This value cannot be empty');
+            }
+            if (!is_string($value)) {
+                throw new InvalidArgumentException('Value must be a string.');
+            }
+            $trimmed = trim($value);
+            if ($trimmed === '') {
+                throw new InvalidArgumentException('This value cannot be empty');
+            }
+
+            return $trimmed;
         };
 
         $question = new Question('Please enter a new username: ');
-        $question->setNormalizer($normalizeToString);
+        $question->setValidator($normalizeToString);
+        /** @var string $username */
         $username = $helper->ask($input, $output, $question);
 
         $question = new Question('Please enter an email address for the user: ');
-        $question->setNormalizer($normalizeToString);
+        $question->setValidator($normalizeToString);
+        /** @var string $emailAddress */
         $emailAddress = $helper->ask($input, $output, $question);
 
         $question = new Question('Please enter a password for the user: ');
-        $question->setNormalizer($normalizeToString);
-        $question->setValidator(function (mixed $value): string {
-            $value = (string) $value;
-            if ('' === trim($value)) {
-                throw new Exception('The password cannot be empty');
-            }
-            return $value;
-        });
+        $question->setValidator($normalizeToString);
         $question->setHidden(true);
         $question->setMaxAttempts(2);
+        /** @var string $plaintextPassword */
         $plaintextPassword = $helper->ask($input, $output, $question);
 
         $user = new User(
-            (string) $username,
-            (string) $plaintextPassword,
-            (string) $emailAddress
+            $username,
+            $plaintextPassword,
+            $emailAddress
         );
         $hashedPassword = $this->passwordHasher->hashPassword(
             $user,
-            (string) $plaintextPassword
+            $plaintextPassword
         );
         $user->setPassword($hashedPassword);
-        $user->setDisplayName((string) $username);
+        $user->setDisplayName($username);
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();

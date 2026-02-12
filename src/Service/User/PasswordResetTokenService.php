@@ -11,7 +11,7 @@ namespace Inachis\Service\User;
 
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\PasswordResetRequest;
+use Inachis\Entity\{PasswordResetRequest,User};
 use Inachis\Repository\UserRepository;
 use Inachis\Repository\PasswordResetRequestRepository;
 use Doctrine\ORM\NonUniqueResultException;
@@ -19,7 +19,7 @@ use Exception;
 use Random\RandomException;
 
 /**
- *
+ * Service for managing password reset tokens
  */
 class PasswordResetTokenService
 {
@@ -30,55 +30,63 @@ class PasswordResetTokenService
     /**
      * @var EntityManagerInterface
      */
-    private EntityManagerInterface $em;
+    private EntityManagerInterface $entityManager;
     /**
      * @var PasswordResetRequestRepository
      */
-    private PasswordResetRequestRepository $requestRepo;
+    private PasswordResetRequestRepository $passwordResetRequestRepository;
     /**
      * @var UserRepository
      */
-    private UserRepository $userRepo;
+    private UserRepository $userRepository;
     /**
      * @var int The lifetime for the password reset token. Default is 1800 seconds (30 minutes)
      */
     private int $ttlSeconds;
 
     /**
+     * Construct the password reset token service
+     * 
      * @param string $appSecret
-     * @param EntityManagerInterface $em
-     * @param PasswordResetRequestRepository $requestRepo
-     * @param UserRepository $userRepo
+     * @param EntityManagerInterface $entityManager
+     * @param PasswordResetRequestRepository $passwordResetRequestRepository
+     * @param UserRepository $userRepository
      * @param int $ttlSeconds
      */
     public function __construct(
         string $appSecret,
-        EntityManagerInterface $em,
-        PasswordResetRequestRepository $requestRepo,
-        UserRepository $userRepo,
+        EntityManagerInterface $entityManager,
+        PasswordResetRequestRepository $passwordResetRequestRepository,
+        UserRepository $userRepository,
         int $ttlSeconds = 1800
     ) {
         $this->appSecret = $appSecret;
-        $this->em = $em;
-        $this->requestRepo = $requestRepo;
-        $this->userRepo = $userRepo;
+        $this->entityManager = $entityManager;
+        $this->passwordResetRequestRepository = $passwordResetRequestRepository;
+        $this->userRepository = $userRepository;
         $this->ttlSeconds = $ttlSeconds;
     }
 
     /**
+     * Create a password reset request for an email address
+     * 
+     * @param string $email
+     * @return array<string,mixed>|null
      * @throws RandomException
      * @throws Exception
      */
     public function createResetRequestForEmail(string $email): ?array
     {
-        $user = $this->userRepo->findOneBy(['email' => $email]);
+        /** @var \Inachis\Entity\User|null $user */
+        $user = $this->userRepository->findOneBy(['email' => $email]);
         if (!$user) {
             return null;
         }
-        $existingRequests = $this->requestRepo->findActiveByUser($user);
+        /** @var \Inachis\Entity\PasswordResetRequest[] $existingRequests */
+        $existingRequests = $this->passwordResetRequestRepository->findActiveByUser($user);
         foreach ($existingRequests as $request) {
             $request->markUsed();
-            $this->em->persist($request);
+            $this->entityManager->persist($request);
         }
 
         $raw = bin2hex(random_bytes(32));
@@ -86,8 +94,8 @@ class PasswordResetTokenService
         $expires = new DateTimeImmutable(sprintf('+%d seconds', $this->ttlSeconds));
 
         $passwordResetRequest = new PasswordResetRequest($user, $hash, $expires);
-        $this->em->persist($passwordResetRequest);
-        $this->em->flush();
+        $this->entityManager->persist($passwordResetRequest);
+        $this->entityManager->flush();
 
         return [
             'token' => $raw,
@@ -97,16 +105,21 @@ class PasswordResetTokenService
     }
 
     /**
+     * Validate a password reset token for a user
+     * 
+     * @param string $rawToken
+     * @param User|null $user
+     * @return PasswordResetRequest|null
      * @throws NonUniqueResultException
      */
-    public function validateTokenForUser(string $rawToken, $user = null): ?PasswordResetRequest
+    public function validateTokenForUser(string $rawToken, ?User $user = null): ?PasswordResetRequest
     {
         $hash = hash_hmac('sha256', $rawToken, $this->appSecret);
 
         if ($user !== null) {
-            $candidate = $this->requestRepo->findLatestActiveForUser($user);
+            $candidate = $this->passwordResetRequestRepository->findLatestActiveForUser($user);
         } else {
-            $candidate = $this->requestRepo->findLatestActiveByHash($hash);
+            $candidate = $this->passwordResetRequestRepository->findLatestActiveByHash($hash);
         }
         if (!$candidate) {
             return null;
@@ -123,13 +136,15 @@ class PasswordResetTokenService
     }
 
     /**
+     * Mark a password reset request as used
+     * 
      * @param PasswordResetRequest $request
      * @return void
      */
     public function markAsUsed(PasswordResetRequest $request): void
     {
         $request->markUsed();
-        $this->em->persist($request);
-        $this->em->flush();
+        $this->entityManager->persist($request);
+        $this->entityManager->flush();
     }
 }

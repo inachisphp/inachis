@@ -19,13 +19,25 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 use DateTimeImmutable;
 use DateInterval;
 
+/**
+ * Repository for password reset requests.
+ */
 class PasswordResetRequestRepository extends ServiceEntityRepository
 {
+    /**
+     * @param ManagerRegistry $registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, PasswordResetRequest::class);
     }
 
+    /**
+     * Finds all active password reset requests for a given user.
+     * 
+     * @param User $user
+     * @return list<PasswordResetRequest>
+     */
     public function findActiveByUser(User $user): array
     {
         return $this->createQueryBuilder('r')
@@ -39,6 +51,10 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
     }
 
     /**
+     * Finds the latest active password reset request for a given user.
+     * 
+     * @param User $user
+     * @return PasswordResetRequest|null
      * @throws NonUniqueResultException
      */
     public function findLatestActiveForUser(User $user): ?PasswordResetRequest
@@ -55,6 +71,13 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * Finds the latest active password reset request for a given hash.
+     * 
+     * @param string $hash
+     * @return PasswordResetRequest|null
+     * @throws NonUniqueResultException
+     */
     public function findLatestActiveByHash(string $hash): ?PasswordResetRequest
     {
         return $this->createQueryBuilder('r')
@@ -69,6 +92,11 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * Purges expired password reset requests.
+     * 
+     * @return int
+     */
     public function purgeExpiredHashes(): int
     {
         return $this->createQueryBuilder('r')

@@ -9,16 +9,19 @@
 
 namespace Inachis\Command;
 
+use Exception;
 use Inachis\Entity\{Image, Page, Series};
 use Inachis\Service\Image\{ImageExtractor, ImageLocaliser, ContentImageUpdater};
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Command to localise images
+ */
 #[AsCommand(
     name: 'app:localise-images',
     description: 'Find references to remote images, copy them to [public]/imgs/, and update links',
@@ -27,20 +30,25 @@ use Symfony\Component\Console\Output\OutputInterface;
 class LocaliseImagesCommand extends Command
 {
     /**
+     * Constructor
+     * 
      * @param EntityManagerInterface $em
      * @param ImageExtractor $extractor
      * @param ImageLocaliser $localiser
      * @param ContentImageUpdater $updater
      */
     public function __construct(
-        private EntityManagerInterface $em,
-        private ImageExtractor $extractor,
-        private ImageLocaliser $localiser,
-        private ContentImageUpdater $updater,
+        private EntityManagerInterface $entityManager,
+        private ImageExtractor $imageExtractor,
+        private ImageLocaliser $imageLocaliser,
+        private ContentImageUpdater $contentImageUpdater,
     ) {
         parent::__construct();
     }
 
+    /**
+     * Configure the command
+     */
     protected function configure(): void
     {
         $this->addOption(
@@ -52,7 +60,9 @@ class LocaliseImagesCommand extends Command
     }
 
     /**
-     * @param InputInterface  $input
+     * Execute the command
+     * 
+     * @param InputInterface $input
      * @param OutputInterface $output
      * @return integer
      * @throws Exception
@@ -61,32 +71,34 @@ class LocaliseImagesCommand extends Command
     {
         foreach ($this->getTables() as $config) {
             $output->writeln("<info>Processing {$config['table_name']}…</info>");
-            $this->processImagesForContentType($config, $output, $input->getOption('dry-run'));
+            $this->processImagesForContentType($config, $output, (bool) $input->getOption('dry-run'));
         }
         return Command::SUCCESS;
     }
 
     /**
-     * @param array           $content_type
+     * Process images for a content type
+     * 
+     * @param array<string, mixed> $content_type
      * @param OutputInterface $output
-     * @param boolean|null    $dryRun
+     * @param bool $dryRun
      * @return void
      * @throws Exception
      */
-    private function processImagesForContentType(array $content_type, OutputInterface $output, ?bool $dryRun = true): void
+    private function processImagesForContentType(array $content_type, OutputInterface $output, bool $dryRun = true): void
     {
-        $repo = $this->em->getRepository($content_type['class_name']);
-        $results = $repo->getAll(0, 0, ['q.' . $content_type['field'] . ' LIKE :content', ['content' => '%https%']]);
+        $repository = $this->entityManager->getRepository($content_type['class_name']);
+        $results = $repository->getAll(0, 0, ['q.' . $content_type['field'] . ' LIKE :content', ['content' => '%https%']]);
 
         foreach ($results as $entity) {
             $getter = 'get' . ucfirst($content_type['field']);
             $content = $entity->$getter();
-            $images = $content_type['single'] ? [$content] : $this->extractor->extractFromContent($content);
+            $images = $content_type['single'] ? [$content] : $this->imageExtractor->extractFromContent($content);
             $changes = ['source' => [], 'destination' => []];
 
             foreach ($images as $imageUrl) {
                 $output->write("Copying $imageUrl... ");
-                $localPath = $dryRun ? null : $this->localiser->downloadToLocal($imageUrl);
+                $localPath = $dryRun ? null : $this->imageLocaliser->downloadToLocal($imageUrl);
                 if ($localPath) {
                     $changes['source'][] = $imageUrl;
                     $changes['destination'][] = $content_type['single'] ? basename($localPath) : $localPath;
@@ -97,13 +109,21 @@ class LocaliseImagesCommand extends Command
             }
 
             if (!empty($changes['source'])) {
-                $this->updater->updateEntity($entity, $content_type['field'], $changes, $content_type['revisions'] ?? false);
+                $this->contentImageUpdater->updateEntity($entity, $content_type['field'], $changes, $content_type['revisions'] ?? false);
             }
         }
     }
 
     /**
-     * @return array[]
+     * Get the tables to process
+     * 
+     * @return array<array{
+     *     class_name: class-string,
+     *     field: string,
+     *     single: bool,
+     *     table_name: string,
+     *     revisions?: bool
+     * }>
      */
     protected function getTables(): array
     {

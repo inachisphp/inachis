@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Service\Page\Export;
+namespace Inachis\Service\Export\Page;
 
 use Inachis\Repository\PageRepository;
 use Inachis\Service\Export\AbstractExportService;
-use Inachis\Service\Page\Export\PageExportNormaliser;
+use Inachis\Service\Export\Page\PageExportNormaliser;
 use Symfony\Component\TaggedIterator\TaggedIterator;
 
 /**
@@ -22,9 +22,9 @@ use Symfony\Component\TaggedIterator\TaggedIterator;
 final class PageExportService extends AbstractExportService
 {
     /**
-     * @param $pageRepository The repository to use for page operations.
-     * @param $normaliser The normaliser to use.
-     * @param $writers The writers to use.
+     * @param PageRepository $pageRepository The repository to use for page operations.
+     * @param PageExportNormaliser $normaliser The normaliser to use.
+     * @param iterable $writers The writers to use.
      */
     public function __construct(
         private PageRepository $pageRepository,
@@ -37,7 +37,7 @@ final class PageExportService extends AbstractExportService
     /**
      * Export pages to a file of a given type (JSON/MD/XML).
      *
-     * @param iterable $pages The pages to export.
+     * @param iterable|null $pages The pages to export.
      * @param string $format The format to export to (json/md/xml).
      * @return string The exported pages.
      */

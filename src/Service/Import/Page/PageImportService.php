@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Service\Page\Import;
+namespace Inachis\Service\Import\Page;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Category;
@@ -16,7 +16,7 @@ use Inachis\Entity\Tag;
 use Inachis\Entity\User;
 use Inachis\Model\Import\ImportOptionsDto;
 use Inachis\Model\Page\PageExportDto;
-use Inachis\Service\Page\Import\PageImportResult;
+use Inachis\Service\Import\Page\PageImportResult;
 use InvalidArgumentException;
 
 /**
