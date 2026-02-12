@@ -77,7 +77,7 @@ class LoginSuccessListener
                     ->context([
                         'ip' => $ip,
                         'userAgent' => $userAgent,
-                        'time' => new \DateTimeImmutable(),
+                        'time' => new DateTimeImmutable(),
                     ])
             );
         }

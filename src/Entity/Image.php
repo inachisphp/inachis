@@ -9,7 +9,7 @@
 
 namespace Inachis\Entity;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
@@ -53,7 +53,7 @@ class Image extends AbstractFile
      */
     public function __construct()
     {
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
         $this->setCreateDate($now);
         $this->setModDate($now);
         unset($now);

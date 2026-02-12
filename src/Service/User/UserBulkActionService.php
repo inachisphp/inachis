@@ -9,9 +9,8 @@
 
 namespace Inachis\Service\User;
 
-
+use DateTimeImmutable;
 use Inachis\Repository\UserRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -50,7 +49,7 @@ readonly class UserBulkActionService
                 'disable' => $user->setActive(false),
                 default   => null,
             };
-            $user->setModDate(new DateTime());
+            $user->setModDate(new DateTimeImmutable());
             $this->entityManager->persist($user);
             $count++;
         }
