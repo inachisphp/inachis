@@ -9,14 +9,22 @@
 
 namespace Inachis\Util;
 
+use Inachis\Entity\Page;
+use Inachis\Entity\Revision;
+
+/**
+ * Compare page content to revision
+ */
 class ContentRevisionCompare
 {
     /**
-     * @param $page
-     * @param $revision
+     * Check if page matches revision
+     *
+     * @param Page $page
+     * @param Revision $revision
      * @return bool
      */
-    public static function doesPageMatchRevision($page, $revision): bool
+    public static function doesPageMatchRevision(Page $page, Revision $revision): bool
     {
         return
             $revision->getContent() === $page->getContent() &&

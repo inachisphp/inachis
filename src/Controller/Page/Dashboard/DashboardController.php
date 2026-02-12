@@ -9,10 +9,10 @@
 
 namespace Inachis\Controller\Page\Dashboard;
 
+use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Page;
 use Inachis\Repository\PageRepository;
-use DateTime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -56,7 +56,7 @@ class DashboardController extends AbstractInachisController
                     'q.status = :status AND q.postDate > :postDate',
                     [
                         'status' => Page::PUBLISHED,
-                        'postDate' => new DateTime(),
+                        'postDate' => new DateTimeImmutable(),
                     ],
                 ],
                 'q.postDate ASC, q.modDate'
@@ -68,7 +68,7 @@ class DashboardController extends AbstractInachisController
                     'q.status = :status AND q.postDate <= :postDate',
                     [
                         'status' => Page::PUBLISHED,
-                        'postDate' => new DateTime(),
+                        'postDate' => new DateTimeImmutable(),
                     ],
                 ],
                 'q.postDate DESC, q.modDate'

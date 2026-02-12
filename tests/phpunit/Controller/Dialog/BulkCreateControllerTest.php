@@ -67,7 +67,7 @@ class BulkCreateControllerTest extends WebTestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['getUser', 'render'])
             ->getMock();
-        $this->controller->expects($this->never())
+        $this->controller->expects($this->once())
             ->method('getUser')->willReturn(new User());
         $this->controller->expects($this->never())
             ->method('render')

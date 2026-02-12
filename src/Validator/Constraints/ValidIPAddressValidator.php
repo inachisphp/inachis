@@ -13,9 +13,19 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
+/**
+ * ValidIPAddressValidator class
+ */
 class ValidIPAddressValidator extends ConstraintValidator
 {
-    public function validate($value, Constraint $constraint): void
+    /**
+     * Validate the IP address
+     *
+     * @param mixed $value
+     * @param Constraint $constraint
+     * @return void
+     */
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof ValidIPAddress) {
             throw new UnexpectedValueException($constraint, ValidIPAddress::class);
@@ -34,6 +44,8 @@ class ValidIPAddressValidator extends ConstraintValidator
     }
 
     /**
+     * Validate IPv4 address
+     *
      * @param string $ipAddress
      * @return bool
      */
@@ -49,6 +61,8 @@ class ValidIPAddressValidator extends ConstraintValidator
     }
 
     /**
+     * Validate IPv6 address
+     *
      * @param string $ipAddress
      * @return bool
      */

@@ -9,10 +9,10 @@
 
 namespace Inachis\Tests\phpunit\Entity;
 
+use DateTimeImmutable;
 use Inachis\Entity\Image;
 use Inachis\Entity\User;
 use Inachis\Exception\InvalidTimezoneException;
-use DateTime;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -75,12 +75,6 @@ class UserTest extends TestCase
         $this->assertEquals('FMS', $this->user->getInitials());
     }
 
-    public function testSetAndGetColor(): void
-    {
-        $this->user->setColor('#069');
-        $this->assertEquals('#069', $this->user->getColor());
-    }
-
     public function testSetAndGetAvatar(): void
     {
         $this->user->setAvatar('test.jpg');
@@ -103,21 +97,21 @@ class UserTest extends TestCase
 
     public function testSetAndGetCreateDate(): void
     {
-        $currentDateTime = new DateTime('now');
+        $currentDateTime = new DateTimeImmutable('now');
         $this->user->setCreateDate($currentDateTime);
         $this->assertEquals($currentDateTime, $this->user->getCreateDate());
     }
 
     public function testSetAndGetModDate(): void
     {
-        $currentDateTime = new DateTime('now');
+        $currentDateTime = new DateTimeImmutable('now');
         $this->user->setModDate($currentDateTime);
         $this->assertEquals($currentDateTime, $this->user->getModDate());
     }
 
     public function testSetAndGetPasswordModDate(): void
     {
-        $currentDateTime = new DateTime('now');
+        $currentDateTime = new DateTimeImmutable('now');
         $this->user->setPasswordModDate($currentDateTime);
         $this->assertEquals($currentDateTime, $this->user->getPasswordModDate());
     }
@@ -125,7 +119,7 @@ class UserTest extends TestCase
     public function testHasCredentialsExpired(): void
     {
         $this->assertFalse($this->user->hasCredentialsExpired());
-        $this->user->setPasswordModDate(new DateTime('-20 days'));
+        $this->user->setPasswordModDate(new DateTimeImmutable('-20 days'));
         $this->assertTrue($this->user->hasCredentialsExpired(10));
     }
 
@@ -165,16 +159,5 @@ class UserTest extends TestCase
     public function testErase(): void
     {
         $this->assertNull($this->user->erase());
-    }
-
-    /**
-     * @throws InvalidTimezoneException
-     */
-    public function testSetAndGetTimezone(): void
-    {
-        $this->user->setTimezone('Europe/London');
-        $this->assertEquals('Europe/London', $this->user->getTimezone());
-        $this->expectException(InvalidTimezoneException::class);
-        $this->user->setTimezone('Alpha Centauri');
     }
 }

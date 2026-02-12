@@ -9,8 +9,19 @@
 
 namespace Inachis\Util;
 
+/**
+ * Language codes
+ */
 class LanguageCodes
 {
+    /**
+     * @var array<string, array{
+     *     codes: array<string, string>,
+     *     default_code: string,
+     *     emoji: string,
+     *     friendly_name: string
+     * }>
+     */
     protected array $languages = [
         'Chinese' => [
             'codes' => [

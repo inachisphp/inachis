@@ -9,6 +9,8 @@
 
 namespace Inachis\Controller\Page\Admin;
 
+use DateTimeImmutable;
+use Exception;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\PasswordResetRequest;
 use Inachis\Entity\User;
@@ -19,8 +21,6 @@ use Inachis\Repository\PasswordResetRequestRepository;
 use Inachis\Repository\UserRepository;
 use Inachis\Service\User\PasswordResetTokenService;
 use Inachis\Service\User\UserAccountEmailService;
-use DateTime;
-use Exception;
 use Random\RandomException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -214,7 +214,7 @@ class AccountController extends AbstractInachisController
             $plainPassword = $form->getData()['change_password']['new_password'];
             $hashed = $passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashed);
-            $user->setPasswordModDate(new DateTime('now'));
+            $user->setPasswordModDate(new DateTimeImmutable());
             $tokenService->markAsUsed($resetRequest);
             $this->entityManager->persist($user);
             $this->entityManager->flush();

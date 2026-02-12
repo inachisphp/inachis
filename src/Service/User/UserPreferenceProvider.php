@@ -34,13 +34,13 @@ class UserPreferenceProvider
      */
     public function get(): ?UserPreference
     {
-        /** @var User $user */
+        /** @var User|null $user */
         $user = $this->security->getUser();
-        $session = $this->requestStack->getSession();
         if (!$user) {
             return null;
         }
 
+        /** @var UserPreference|null $preferences */
         $preferences = $user->getPreferences();
         if ($preferences === null) {
             $preferences = new UserPreference($user);
@@ -48,6 +48,7 @@ class UserPreferenceProvider
             $this->entityManager->persist($preferences);
         }
 
+        $session = $this->requestStack->getSession();
         $session->set('user_preferences', $preferences);
 
         return $preferences;
@@ -56,7 +57,7 @@ class UserPreferenceProvider
     /**
      * Save changes to the user's preferences and refresh session cache
      * 
-     * @var UserPreference $preferences
+     * @param UserPreference $preferences
      */
     public function save(UserPreference $preferences): void
     {

@@ -9,6 +9,9 @@
 
 namespace Inachis\Tests\phpunit\Entity;
 
+use DateTimeImmutable;
+use Exception;
+use InvalidArgumentException;
 use Inachis\Entity\Category;
 use Inachis\Entity\Image;
 use Inachis\Entity\Page;
@@ -17,10 +20,7 @@ use Inachis\Entity\Tag;
 use Inachis\Entity\Url;
 use Inachis\Entity\User;
 use Inachis\Exception\InvalidTimezoneException;
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
-use Exception;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -89,7 +89,7 @@ class PageTest extends TestCase
 
     public function testSetAndGetCreateDate(): void
     {
-        $currentTime = new DateTime('now');
+        $currentTime = new DateTimeImmutable('now');
         $this->page->setCreateDate($currentTime);
         $this->assertEquals($currentTime, $this->page->getCreateDate());
     }
@@ -99,11 +99,11 @@ class PageTest extends TestCase
      */
     public function testIsScheduledPage(): void
     {
-        $currentTime = new DateTime('yesterday');
+        $currentTime = new DateTimeImmutable('yesterday');
         $this->page->setPostDate($currentTime);
         $this->page->setStatus(Page::PUBLISHED);
         $this->assertFalse($this->page->isScheduledPage());
-        $currentTime = new DateTime('tomorrow');
+        $currentTime = new DateTimeImmutable('tomorrow');
         $this->page->setPostDate($currentTime);
         $this->assertTrue($this->page->isScheduledPage());
     }
@@ -118,7 +118,7 @@ class PageTest extends TestCase
 
     public function testSetAndGetModDate(): void
     {
-        $currentTime = new DateTime('now');
+        $currentTime = new DateTimeImmutable('now');
         $this->page->setModDate($currentTime);
         $this->assertEquals($currentTime, $this->page->getModDate());
     }
@@ -184,7 +184,7 @@ class PageTest extends TestCase
 
     public function testSetAndGetPostDate(): void
     {
-        $currentTime = new DateTime('now');
+        $currentTime = new DateTimeImmutable('now');
         $this->page->setPostDate($currentTime);
         $this->assertEquals($currentTime, $this->page->getPostDate());
     }
@@ -227,7 +227,7 @@ class PageTest extends TestCase
 
     public function testGetPostDateAsLink(): void
     {
-        $this->page->setPostDate(new DateTime('1970-01-01'));
+        $this->page->setPostDate(new DateTimeImmutable('1970-01-01'));
         $this->assertEquals('1970/01/01', $this->page->getPostDateAsLink());
         $this->page->setPostDate();
         $this->assertEquals('', $this->page->getPostDateAsLink());

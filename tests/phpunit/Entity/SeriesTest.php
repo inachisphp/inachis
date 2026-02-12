@@ -9,12 +9,9 @@
 
 namespace Inachis\Tests\phpunit\Entity;
 
-use Inachis\Entity\Image;
-use Inachis\Entity\Page;
-use Inachis\Entity\Series;
-use Inachis\Entity\User;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
+use Inachis\Entity\{Image, Page, Series, User};
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -62,14 +59,14 @@ class SeriesTest extends TestCase
 
     public function testGetAndSetFirstDate(): void
     {
-        $testDate = new DateTime();
+        $testDate = new DateTimeImmutable();
         $this->series->setFirstDate($testDate);
         $this->assertEquals($testDate, $this->series->getFirstDate());
     }
 
     public function testGetAndSetLastDate(): void
     {
-        $testDate = new DateTime();
+        $testDate = new DateTimeImmutable();
         $this->series->setLastDate($testDate);
         $this->assertEquals($testDate, $this->series->getLastDate());
     }
@@ -94,14 +91,14 @@ class SeriesTest extends TestCase
 
     public function testSetAndGetCreateDate(): void
     {
-        $date = new DateTime('now');
+        $date = new DateTimeImmutable('now');
         $this->series->setCreateDate($date);
         $this->assertEquals($date, $this->series->getCreateDate());
     }
 
     public function testSetAndGetModDate(): void
     {
-        $date = new DateTime('now');
+        $date = new DateTimeImmutable('now');
         $this->series->setModDate($date);
         $this->assertEquals($date, $this->series->getModDate());
     }

@@ -9,10 +9,10 @@
 
 namespace Inachis\Controller\Page\Admin;
 
+use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Form\ChangePasswordType;
 use Inachis\Repository\UserRepository;
-use DateTime;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,7 +51,7 @@ class ChangePasswordController extends AbstractInachisController
             $plaintextPassword = $request->request->all('change_password')['new_password'];
             $hashedPassword = $passwordHasher->hashPassword($user, $plaintextPassword);
             $user->setPassword($hashedPassword);
-            $user->setPasswordModDate(new DateTime('now'));
+            $user->setPasswordModDate(new DateTimeImmutable());
             if (!$passwordHasher->isPasswordValid($user, $plaintextPassword)) {
                 throw new AccessDeniedHttpException();
             }

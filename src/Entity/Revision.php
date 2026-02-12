@@ -9,9 +9,9 @@
 
 namespace Inachis\Entity;
 
-use DateTime;
-use Doctrine\ORM\Mapping as ORM;
+use DateTimeImmutable;
 use Exception;
+use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 
@@ -75,14 +75,14 @@ class Revision
     protected ?User $user;
 
     /**
-     * @var DateTime|null The date the {@link Page} was last modified
+     * @var DateTimeImmutable|null The date the {@link Page} was last modified
      */
-    #[ORM\Column(type: 'datetime')]
-    protected ?DateTime $modDate;
+    #[ORM\Column(type: 'datetime_immutable')]
+    protected ?DateTimeImmutable $modDate;
 
     public function __construct()
     {
-        $this->modDate = new DateTime();
+        $this->modDate = new DateTimeImmutable();
     }
 
     /**
@@ -151,19 +151,19 @@ class Revision
 
     /**
      * Returns the value of {@link modDate}.
-     * @return DateTime The date the {@link Page} was last modified
+     * @return DateTimeImmutable The date the {@link Page} was last modified
      */
-    public function getModDate(): DateTime
+    public function getModDate(): DateTimeImmutable
     {
         return $this->modDate;
     }
 
     /**
      * Sets the value of {@link modDate}.
-     * @param DateTime|null $value The date to set
+     * @param DateTimeImmutable|null $value The date to set
      * @return Revision
      */
-    public function setModDate(?DateTime $value): self
+    public function setModDate(?DateTimeImmutable $value): self
     {
         $this->modDate = $value;
 

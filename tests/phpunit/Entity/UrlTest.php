@@ -9,10 +9,9 @@
 
 namespace Inachis\Tests\phpunit\Entity;
 
-use Inachis\Entity\Page;
-use Inachis\Entity\Url;
-use DateTime;
+use DateTimeImmutable;
 use Exception;
+use Inachis\Entity\{Page, Url};
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -62,11 +61,11 @@ class UrlTest extends TestCase
      */
     public function testSetModDateToNow(): void
     {
-        $yesterdayDateTime = new DateTime('yesterday');
+        $yesterdayDateTime = new DateTimeImmutable('yesterday');
         $this->url->setModDate($yesterdayDateTime);
         $this->url->setModDateToNow();
         $this->assertEquals(
-            (new DateTime('now'))->format('Ymd'),
+            (new DateTimeImmutable('now'))->format('Ymd'),
             $this->url->getModDate()->format('Ymd')
         );
     }

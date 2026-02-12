@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Service\Page\Import;
+namespace Inachis\Service\Import\Page;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Category;

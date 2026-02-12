@@ -14,6 +14,9 @@ use Inachis\Repository\SeriesRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * Service for applying bulk actions to series
+ */
 readonly class SeriesBulkActionService
 {
     /**
@@ -26,16 +29,19 @@ readonly class SeriesBulkActionService
     ) {}
 
     /**
+     * Applies a bulk action to series.
+     *
      * @param string $action
-     * @param array $ids
+     * @param array<string> $ids
      * @return int
      */
     public function apply(string $action, array $ids): int
     {
         $count = 0;
         foreach ($ids as $id) {
+            /** @var Series|null $series */
             $series = $this->seriesRepository->findOneBy(['id' => $id]);
-            if (empty($series->getId())) {
+            if (empty($series) || empty($series->getId())) {
                 continue;
             }
             match ($action) {

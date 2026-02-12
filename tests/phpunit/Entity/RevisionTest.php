@@ -9,10 +9,10 @@
 
 namespace Inachis\Tests\phpunit\Entity;
 
+use DateTimeImmutable;
+use Exception;
 use Inachis\Entity\Revision;
 use Inachis\Entity\User;
-use DateTime;
-use Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -52,7 +52,7 @@ class RevisionTest extends TestCase
 
     public function testGetAndSetModDate(): void
     {
-        $testDate = new DateTime();
+        $testDate = new DateTimeImmutable();
         $this->revision->setModDate($testDate);
         $this->assertEquals($testDate, $this->revision->getModDate());
     }
