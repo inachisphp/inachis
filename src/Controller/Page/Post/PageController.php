@@ -265,7 +265,6 @@ class PageController extends AbstractInachisController
             'New ' . $post->getType();
         $this->data['includeEditor'] = true;
         $this->data['includeEditorId'] = $post->getId();
-        $this->data['includeDatePicker'] = true;
         $this->data['post'] = $post;
         $this->data['revisions'] = $revisionRepository->getAll(
             0,

@@ -1,6 +1,9 @@
 export default class DatePicker {
   constructor(selector, options = {}) {
-    this.input = document.querySelector(selector);
+    this.input =
+      typeof selector === 'string'
+        ? document.querySelector(selector)
+        : selector;
     if (!this.input) throw new Error(`DatePicker: No element found for selector "${selector}"`);
 
     this.options = {

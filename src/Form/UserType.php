@@ -124,6 +124,8 @@ class UserType extends AbstractType
                 $builder
                     ->add('delete', SubmitType::class, [
                         'attr' => [
+                            'data-confirm' => 'delete',
+                            'data-confirm-text' => 'Yes, delete',
                             'class' => 'button button--negative button--confirm',
                             'data-entity' => 'user',
                             'data-title' => sprintf(
