@@ -9,9 +9,9 @@
 
 namespace Inachis\Service\Series;
 
+use DateTimeImmutable;
 use Inachis\Entity\Series;
 use Inachis\Repository\SeriesRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -51,7 +51,7 @@ readonly class SeriesBulkActionService
                 default   => null,
             };
             if ($action !== 'delete') {
-                $series->setModDate(new DateTime());
+                $series->setModDate(new DateTimeImmutable());
                 $this->entityManager->persist($series);
             }
             $count++;

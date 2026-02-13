@@ -9,20 +9,21 @@
 
 namespace Inachis\Entity;
 
-use DateTime;
-use Doctrine\ORM\Mapping as ORM;
+use DateTimeImmutable;
 use Exception;
+use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Object for handling User entity.
  */
-#[ORM\Entity(repositoryClass: 'Inachis\Repository\UserRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\UserRepository')]
 #[ORM\Index(columns: [ 'usernameCanonical', 'emailCanonical' ], name: 'search_idx')]
 #[UniqueEntity(fields: ['email'], message: 'This email address is already used.')]
 #[UniqueEntity(fields: ['username'], message: 'This username is already taken.')]
@@ -45,7 +46,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string|null Username of the user
      */
-    #[ORM\Column(type: "string", length: 255, unique: true, nullable: false)]
+    #[ORM\Column(type: "string", length: 255, nullable: false)]
     #[Assert\NotBlank]
     #[Assert\Regex(
         pattern: '/^[A-Za-z0-9]{3,}$/',
@@ -79,7 +80,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string|null Email address of the user
      */
-    #[ORM\Column(type: "string", length: 512, unique: true, nullable: false)]
+    #[ORM\Column(type: "string", length: 512, nullable: false)]
     #[Assert\Email]
     #[Assert\NotBlank]
     protected ?string $email;
@@ -100,7 +101,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var array The roles assigned to this user. Currently, not in use.
      */
-    protected array $roles;
+    protected array $roles = [];
 
     /**
      * @var string|null string An image to use for the {@link User}
@@ -121,22 +122,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected bool $isRemoved = false;
 
     /**
-     * @var DateTime The date the {@link User} was added
+     * @var DateTimeImmutable The date the {@link User} was added
      */
-    #[ORM\Column(type: "datetime")]
-    protected DateTime $createDate;
+    #[ORM\Column(type: "datetime_immutable")]
+    protected DateTimeImmutable $createDate;
 
     /**
-     * @var DateTime The date the {@link User} was last modified
+     * @var DateTimeImmutable The date the {@link User} was last modified
      */
-    #[ORM\Column(type: "datetime")]
-    protected DateTime $modDate;
+    #[ORM\Column(type: "datetime_immutable")]
+    protected DateTimeImmutable $modDate;
 
     /**
-     * @var DateTime|null The date the password was last modified
+     * @var DateTimeImmutable|null The date the password was last modified
      */
-    #[ORM\Column(type: "datetime")]
-    protected ?DateTime $passwordModDate = null;
+    #[ORM\Column(type: "datetime_immutable")]
+    protected ?DateTimeImmutable $passwordModDate = null;
 
     /**
      * @var UserPreference|null Preferences for the current {@link User}
@@ -161,7 +162,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->setPassword($password);
         $this->setEmail($email);
         $this->setAvatar(null);
-        $currentTime = new DateTime('now');
+        $currentTime = new DateTimeImmutable();
         $this->setCreateDate($currentTime);
         $this->setModDate($currentTime);
     }
@@ -271,9 +272,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link createDate} for the {@link User}.
      *
-     * @return DateTime The creation date for the user
+     * @return DateTimeImmutable The creation date for the user
      */
-    public function getCreateDate(): DateTime
+    public function getCreateDate(): DateTimeImmutable
     {
         return $this->createDate;
     }
@@ -281,9 +282,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link modDate} for the {@link User}.
      *
-     * @return DateTime The modification for the user
+     * @return DateTimeImmutable The modification for the user
      */
-    public function getModDate(): DateTime
+    public function getModDate(): DateTimeImmutable
     {
         return $this->modDate;
     }
@@ -291,9 +292,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link passwordModDate} for the {@link User}.
      *
-     * @return DateTime The password last modification date for the user
+     * @return DateTimeImmutable The password last modification date for the user
      */
-    public function getPasswordModDate(): DateTime
+    public function getPasswordModDate(): DateTimeImmutable
     {
         return $this->passwordModDate;
     }
@@ -301,15 +302,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Gets the preferences for the current {@link User}
      *
-     * @return UserPreference
+     * @return UserPreference|null
      */
-    public function getPreferences(): UserPreference
+    public function getPreferences(): ?UserPreference
     {
-        if ($this->preferences === null) {
-            $this->preferences = new UserPreference($this);
-        }
-
-        return $this->preferences;
+        return $this->preferences ?? new UserPreference($this);
     }
 
     /**
@@ -370,11 +367,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @param string|null $value The value to set
      * @return $this
      */
-    public function setPassword(?string $value): self
+    public function setPassword(?string $value, ?DateTimeImmutable $now = null): self
     {
         $this->password = $value;
-        $this->setPasswordModDate(new DateTime('now'));
-
+        if ($value !== null) {
+            $this->passwordModDate = $now ?? new DateTimeImmutable();
+        }
         return $this;
     }
 
@@ -412,7 +410,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function setDisplayName(?string $value): self
     {
-        $this->displayName = $value;
+        $this->displayName = $value ?? '';
 
         return $this;
     }
@@ -472,10 +470,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the {@link createDate} from a DateTime object.
      *
-     * @param DateTime $value The date to be set
+     * @param DateTimeImmutable $value The date to be set
      * @return $this
      */
-    public function setCreateDate(DateTime $value): self
+    public function setCreateDate(DateTimeImmutable $value): self
     {
         $this->createDate = $value;
 
@@ -485,10 +483,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the {@link modDate} from a DateTime object.
      *
-     * @param DateTime $value The date to set
+     * @param DateTimeImmutable $value The date to set
      * @return $this
      */
-    public function setModDate(DateTime $value): self
+    public function setModDate(DateTimeImmutable $value): self
     {
         $this->modDate = $value;
 
@@ -498,10 +496,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the {@link passwordModDate} from a DateTime object.
      *
-     * @param DateTime $value The date to set
+     * @param DateTimeImmutable $value The date to set
      * @return $this
      */
-    public function setPasswordModDate(DateTime $value): self
+    public function setPasswordModDate(DateTimeImmutable $value): self
     {
         $this->passwordModDate = $value;
 
@@ -549,11 +547,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function hasCredentialsExpired(int $expiryDays = self::NO_PASSWORD_EXPIRY): bool
     {
-        return $expiryDays !== self::NO_PASSWORD_EXPIRY &&
-            time() >= strtotime(
-                '+' . $expiryDays . ' days',
-                $this->getPasswordModDate()->getTimestamp()
-            );
+        if ($expiryDays === self::NO_PASSWORD_EXPIRY || $this->passwordModDate === null) {
+            return false;
+        }
+        return $this->passwordModDate->modify("+{$expiryDays} days") <= new DateTimeImmutable();
     }
 
     /**
