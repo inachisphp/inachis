@@ -1,9 +1,9 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    {% if username|default(null) %}
+    {% if user|default(null) %}
     <a href="{{ path('incc_admin_list') }}">Users</a>
-    <span>Edit User: {{ username }}</span>
+    <span>Edit User</span>
     {% else %}
     <span>Audit Logs</span>
     {% endif %}
