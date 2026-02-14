@@ -280,6 +280,7 @@ class PageController extends AbstractInachisController
         if ($post->getId() !== null) {
             $this->data['textStats'] = ReadingTime::getWordCountAndReadingTime($this->data['post']->getContent());
         }
+        $this->data['allowedTypes'] = Image::ALLOWED_MIME_TYPES;
         return $this->render('inadmin/page/post/edit.html.twig', $this->data);
     }
 }

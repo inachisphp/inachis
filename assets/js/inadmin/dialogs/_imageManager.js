@@ -3,7 +3,7 @@ import { Dialog } from '../components/dialog.js';
 window.Inachis.ImageManager = {
 
     dialog: null,
-
+    allowedTypes: [],
     buttons: [
         {
             class: 'button button--positive',
@@ -49,6 +49,7 @@ window.Inachis.ImageManager = {
             `,
             buttons: this.buttons.concat(window.Inachis.Dialog?.buttons ?? []),
             view: triggerEl?.dataset.view ?? '',
+            allowedTypes: triggerEl?.dataset.allowedTypes.split(',') ?? [],
             onOpen: dialog => {
                 this.loadContent(dialog);
             }
@@ -91,6 +92,7 @@ window.Inachis.ImageManager = {
             allowMultiple: false,
             instantUpload: false,
             required: true,
+            acceptedFileTypes: this.dialog.options.allowedTypes,
         });
         this.updateDialogButtons();
 
@@ -247,10 +249,6 @@ window.Inachis.ImageManager = {
 
         document.querySelector('.gallery')
             ?.classList.toggle('visually-hidden');
-
-        // requestAnimationFrame(() => {
-        //     pond.layout();
-        // });
     },
 
     updateDialogButtons() {

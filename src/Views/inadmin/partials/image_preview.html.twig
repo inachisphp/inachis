@@ -17,6 +17,7 @@
             ><span class="material-icons" aria-hidden="true">hide_image</span> Remove Image</button>
         {% endif %}
     <button class="button button--info dialog__link"
+            data-allowed-types="{{ allowedTypes|default([])|join(',') }}"
             data-dialog="imageManager"
             data-target="{{ id }}"
             data-title="{% trans %}admin.dialog.image_manager.title{% endtrans %}"

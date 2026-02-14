@@ -152,6 +152,7 @@ class SeriesController extends AbstractInachisController
         $this->data['series'] = $series;
         $this->data['includeEditor'] = true;
         $this->data['includeEditorId'] = $series->getId();
+        $this->data['allowedTypes'] = Image::ALLOWED_MIME_TYPES;
         return $this->render('inadmin/page/series/edit.html.twig', $this->data);
     }
 
