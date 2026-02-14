@@ -1,4 +1,11 @@
 {% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_post_list', { type: page.tab }) }}">{{ page.tab|title }}s</a>
+    <a href="/incc/{{ page.tab }}/{{ url }}">Edit {{ page.tab }}</a>
+    <span>Track Changes</span>
+{% endblock pagetitle %}
+
 {% block content %}
 {% block track_changes_pre %}{% endblock track_changes_pre %}
 

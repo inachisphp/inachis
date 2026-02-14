@@ -56,6 +56,8 @@ class RevisionController extends AbstractInachisController
 
         $this->data['page']['title'] = 'Compare Revisions';
         $this->data['page']['tab'] = 'post';
+        $this->data['page_id'] = $page->getId();
+        $this->data['url'] = $page->getUrls()[0]->getLink();
         $this->data['title'] = json_decode(
             DiffHelper::calculate(
                 $revision->getTitle() ?? '',
