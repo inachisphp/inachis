@@ -126,6 +126,10 @@ class AdminProfileController extends AbstractInachisController
             $user->setModDate(new DateTimeImmutable());
 
             if ($isNew) {
+                if (!$user->getPreferences()) {
+                    $user->setPreferences(new UserPreference($user));
+                }
+                $user->getPreferences()->setColor(RandomColorPicker::generate());
                 $userAccountEmailService->registerNewUser(
                     $user,
                     $this->data,

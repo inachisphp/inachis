@@ -1,0 +1,49 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <span>Log viewer</span>
+{% endblock pagetitle %}
+{% block content %}
+<div class="col-12">
+    {% include 'inadmin/partials/table.html.twig' with {
+        dataset: entries ?? [],
+        type: 'log',
+        table_name: 'Application log',
+        table_class: 'table--responsive table--borderless table--darkhead',
+        table_desc: 'This table shows the most recent log entries from the application.',
+        columns: [
+            { title: 'Time', source: 'timestamp', className: 'timestamp' },
+            { title: 'Channel', source: 'channel', className: 'channel' },
+            {
+                title: 'Level',
+                badges: {
+                    'error': {
+                        field: 'level',
+                        condition: 'ERROR',
+                        className: 'badge__error',
+                    },
+                    'warning': {
+                        field: 'level',
+                        condition: 'WARNING',
+                        className: 'badge__warning',
+                    },
+                    'critical': {
+                        field: 'level',
+                        condition: 'CRITICAL',
+                        className: 'badge__critical',
+                    },
+                }
+            },
+            { title: 'Message', source: 'message', className: 'column--monospaced' },
+        ],
+        zebra: true,
+        filters: [],
+        filter_values: {
+            keyword: filter.keyword ?? '',
+        },
+        show_pagination: false,
+        show_search: true,
+    } %}
+</div>
+{% endblock content %}

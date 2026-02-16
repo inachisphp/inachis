@@ -1,9 +1,9 @@
 {% block table %}
+    {% if form|default(null) %}
+        {{ form_start(form, {'attr': { 'class': 'form form__' ~ type ~ ' content__list' }}) }}
+    {% endif %}
 
-    {{ form_start(form, {'attr': { 'class': 'form form__' ~ type ~ ' content__list' }}) }}
-
-
-    {% set table_class = table_class ~ (zebra|default(false) ? ' table--striped' : '') %}
+    {% set table_class = table_class|default('') ~ (zebra|default(false) ? ' table--striped' : '') %}
     {% set table_class = table_class ~ (show_select_deselect|default(false) ? ' table--selectable' : '') %}
 
     {% if dataset|default(null) is not empty and form|default(null) is not empty %}
@@ -34,7 +34,8 @@
             </tr>
         </thead>
         <tbody>
-        {% for item in dataset.iterator %}
+        {% if dataset.iterator|default(null) %}{% set dataset = dataset.iterator %}{% endif %}
+        {% for item in dataset %}
             <tr>
             {% if actions|default(null) is not empty %}
                 <td>
@@ -58,7 +59,7 @@
                         {% set slug_object = attribute(item, column.slug) %}
                     {% endif %}
                 {% endif %}
-                <{% if column.header is defined and column.header %}th scope="row"{% else %}td{% if column.flex|default(false) %} class="table--flex"{% endif %}{% if column.hideOnMobile|default(false) %} class="hide-on-mobile"{% endif %}{% endif %}>
+                <{% if column.header is defined and column.header %}th scope="row"{% else %}td{% if column.flex|default(false) %} class="table--flex"{% endif %}{% if column.hideOnMobile|default(false) %} class="hide-on-mobile"{% endif %}{% if column.className is defined %} class="{{ column.className == 'use_self' ? attribute(item, column.source) : column.className }}"{% endif %}{% endif %}>
                     {% if column.slug is defined %}
                         <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incc/{{ slug_prefix }}/{{ slug_object }}">
                     {% endif %}
@@ -92,7 +93,7 @@
         {% endfor %}
         </tbody>
     </table>
-
+    {% if show_pagination is not defined or show_pagination %}
         {{ include('inadmin/partials/pagination.html.twig', {
             offset: offset,
             limit: limit,
@@ -101,6 +102,7 @@
             result_url: url_result,
             total: total,
         }) }}
+    {% endif %}
     </section>
         {% if actions|default(null) is not empty %}
             {% include 'inadmin/partials/action_bar.html.twig' %}
@@ -129,5 +131,7 @@
         </section>
     {% endif %}
 
-    {{ form_end(form, render_rest: false) }}
+    {% if form|default(null) %}
+        {{ form_end(form, render_rest: false) }}
+    {% endif %}
 {% endblock table %}

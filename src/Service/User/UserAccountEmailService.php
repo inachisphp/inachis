@@ -17,7 +17,6 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
-use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Service for sending user account emails
@@ -27,12 +26,10 @@ readonly class UserAccountEmailService
     /**
      * @param MailerInterface $mailer
      * @param PasswordResetTokenService $tokenService
-     * @param EntityManagerInterface $entityManager
      */
     public function __construct(
         private MailerInterface $mailer,
         private PasswordResetTokenService $tokenService,
-        private EntityManagerInterface $entityManager,
     ) {}
 
     /**
@@ -54,10 +51,6 @@ readonly class UserAccountEmailService
             || empty($tokenData['expiresAt']) || !($tokenData['expiresAt'] instanceof \DateTimeImmutable)) {
             return;
         }
-
-        // @todo record mod timestamp
-//        $this->entityManager->persist($user);
-//        $this->entityManager->flush();
 
         /** @var string $siteTitle */
         $siteTitle = $data['siteTitle'] ?? 'Inachis Admin Panel';
@@ -97,11 +90,6 @@ readonly class UserAccountEmailService
             || empty($tokenData['expiresAt']) || !($tokenData['expiresAt'] instanceof \DateTimeImmutable)) {
             return;
         }
-
-        // @todo move this block to the controller
-        $user->getPreferences()->setColor(RandomColorPicker::generate());
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
 
         /** @var string $siteTitle */
         $siteTitle = $settings['siteTitle'] ?? 'Inachis Admin Panel';

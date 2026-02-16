@@ -1,0 +1,73 @@
+{% form_theme form with _self %}
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block form_row %}
+<p>
+    {{ form_label(form) }}
+    {{ form_widget(form) }}
+    {{ form_errors(form) }}
+</p>
+{% endblock %}
+
+{% block pagetitle %}
+    <span>Policies</span>
+{% endblock pagetitle %}
+
+{% block content %}
+<div class="content__edit col-12 ui-tabs-external">
+    {% include 'inadmin/partials/tab-sets/users.html.twig' %}
+    <section class="paginated-list nested-grid">
+    
+    {{ form_start(form, { 'attr' : { 'class': 'col-6 form form__post' } }) }}
+    <fieldset class="ui-tabs-panel">
+        <h2>Edit Custom Security Policy</h2>
+        {{ form_widget(form) }} 
+    </fieldset>
+    <div class="fixed-bottom-bar">
+    <p>
+        <button class="button button--positive">
+            <span class="material-icons" aria-hidden="true">save</span>
+            <span>Save</span>
+        </button>
+    </p>
+    </div>
+    {{ form_end(form) }}
+
+    <form class="col-6">
+    <table class="table">
+        <caption>Active Security Policy</caption>
+        <thead>
+            <tr>
+                <th>Active</th>
+                <th>Name</th>
+                <th>Requires 2FA</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for policy in policies %}
+                <tr>
+                    <td>
+                        <input type="radio" name="active_policy" value="{{ policy.id }}"
+                            {% if policy.isActive %}checked{% endif %}>
+                    </td>
+                    <td>{{ policy.name }}</td>
+                    <td>{{ policy.adminRequire2FA ? 'Yes' : 'No' }}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td>
+                    <input type="radio" name="active_policy" value="" {% if policies|filter(p => p.isActive)|length == 0 %}checked{% endif %}>
+                </td>
+                <td colspan="2"><em>None</em></td>
+            </tr>
+        </tbody>
+    </table>
+    <p>
+        <button class="button button--secondary">
+            <span>Set Active Policy</span>
+        </button>
+    </p>
+    </form>
+</section>
+</div>
+{% endblock content %}
