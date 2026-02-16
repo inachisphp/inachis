@@ -34,6 +34,7 @@
                         'template-name': 'image-manager',
                         title: 'admin.dialog.upload.title'|trans,
                         view: 'upload',
+                        'allowed-types': allowedTypes|default([])|join(','),
                     },
                     text: 'Upload a new image',
                     image: 'cloud_upload',

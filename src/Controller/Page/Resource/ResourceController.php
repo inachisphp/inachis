@@ -86,6 +86,7 @@ class ResourceController extends AbstractInachisController
         $this->data['page']['title'] = $type . 's';
         $this->data['limitKByte'] = Image::WARNING_FILESIZE;
         $this->data['limitSize'] = Image::WARNING_DIMENSIONS;
+        $this->data['allowedTypes'] = Image::ALLOWED_MIME_TYPES;
 
         return $this->render('inadmin/page/resource/list.html.twig', $this->data);
     }
