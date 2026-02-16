@@ -11,33 +11,57 @@
 
 {% block settings %}
 <div class="col-12">
-{% if spf_errors or dmarc_errors %}
-<section class="admonition admonition__warning">
-	<ul class="error-list">
-		{% for error in dmarc_errors|merge(spf_errors) %}
-			<li>{{ error }}</li>
-		{% endfor %}
-	</ul>
-</section>
+
+{% if report.issues %}
+		{% for error in report.issues %}
+	<p aria-live="polite" class="flash-{{ error.severity.value }}">
+			{% if error.severity.value == 'success' %}
+				<span class="material-icons" aria-hidden="true">check_circle</span>
+			{% elseif error.severity.value == 'warning' or error.severity.value == 'error' %}
+				<span class="material-icons" aria-hidden="true">warning</span>
+			{% elseif error.severity.value == 'notice' %}
+				<span class="material-icons" aria-hidden="true">info</span>
+			{% endif %}
+		{{ error.message }}
+	</p>
+{% endfor %}
 {% endif %}
 
 <section class="admonition admonition__info">
 	<h3 class="admonition__title">Mail Authentication</h3>
-	<p><strong>Domain:</strong> {{ domain }}</p>
+	<p><strong>Domain:</strong> {{ report.domain }}</p>
 	<p><strong>MX:</strong>
-	{% if mx_records %}
-		{% for record in mx_records %}
-			{{ record['target'] }}(Priority: {{ record['pri']}}, TTL: {{ record['ttl'] }} seconds)
+	{% if report.mxRecords %}
+		{% for record in report.mxRecords %}
+			{{ record['target'] }} (Priority: {{ record['pri']}}, TTL: {{ record['ttl'] }} seconds)
 		{% endfor %}
 	{% else %}
 	Not configured
 	{% endif %}
 	</p>
 	<p><strong>DMARC:</strong>
-		{{ dmarc|default(['Not configured'])|join(' | ') }}
+		{{ report.dmarcRecords|default(['Not configured'])|join(' | ') }}
 	</p>
 	<p><strong>SPF:</strong>
-		{{ spf|default(['Not configured'])|join(' | ') }}
+		{{ report.spfRecords|default(['Not configured'])|join(' | ') }}
+	</p>
+	<p><strong>DKIM:</strong>
+		{{ report.dkimRecords|default(['Not configured'])|join(' | ') }}
+	</p>
+	<p><strong>BIMI:</strong>
+		{{ report.bimiRecord|default(['Not configured'])|join(' | ') }}
+	</p>
+	<p><strong>TLS-RPT:</strong>
+	{% if report.tlsRptRecords %}
+		{% for record in report.tlsRptRecords %}
+			{{ record['txt'] }} (TTL: {{ record['ttl'] }} seconds)
+		{% endfor %}
+	{% else %}
+	Not configured
+	{% endif %}
+	</p>
+	<p><strong>CAA:</strong>
+		{{ report.caaRecords|default(['Not configured'])|join(' | ') }}
 	</p>
 </section>
 
@@ -56,8 +80,8 @@
 	<p>Example SPF for multiple providers (Outlook + Google): <code>v=spf1 include:_spf.google.com include:spf.protection.outlook.com ~all</code></p>
 
 	<h4>DMARC</h4>
-	<p>DMARC should be configured as a TXT record for <code>_dmarc.{{ domain }}</code> with a value such as:</p>
-	<p><code>v=DMARC1; p=none; rua=mailto:dmarc@{{ domain }};</code></p>
+	<p>DMARC should be configured as a TXT record for <code>_dmarc.{{ report.domain }}</code> with a value such as:</p>
+	<p><code>v=DMARC1; p=none; rua=mailto:dmarc@{{ report.domain }};</code></p>
 	<p><code>none</code> tells mailservers to do nothing, so is useful when making sure there are no issues. After a period of time, you can then change this to <code>quarantine</code>, or <code>reject</code>.</p>
 	<p><code>rua</code> is an email address to receive reports to</p>
 </section>

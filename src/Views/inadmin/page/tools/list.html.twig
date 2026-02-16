@@ -22,6 +22,15 @@
     <p><a href="{{ settings.domain ~ path('incc_tools_email') }}" class="button button--secondary">Review Email DNS</a></p>
 </section>
 
+{% if environment !== 'prod' %}
+<section class="widget widget-settings">
+    <p><span class="material-icons" aria-hidden="true">receipt_long</span></p>
+    <h2>Logs</h2>
+    <p><span>Review application logs.</span></p>
+    <p><a href="{{ settings.domain ~ path('incc_tools_logs') }}" class="button button--secondary">Review Logs</a></p>
+</section>
+{% endif %}
+
 <section class="widget widget-settings">
     <p><span class="material-icons" aria-hidden="true">import_export</span></p>
     <h2>Import / Export</h2>
