@@ -21,6 +21,7 @@ class ToolsIndexController extends AbstractInachisController
     #[Route("/incc/tools", name: 'incc_tools_index')]
     public function index(): Response
     {
+        $this->data['environment'] = $this->getParameter('kernel.environment');
         $this->data['page']['title'] = 'Tools';
         $this->data['page']['tab'] = 'tools';
         return $this->render('inadmin/page/tools/list.html.twig', $this->data);
