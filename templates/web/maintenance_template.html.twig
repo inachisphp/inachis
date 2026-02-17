@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maintenance Mode</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      text-align: center;
+      background-color: #333;
+      color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .status {
+      font-weight: bold;
+      font-size: 1rem;
+      color: #fcfcfc;
+    }
+
+    .logo {
+      max-width: 150px;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 2rem;
+      }
+      p {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="/assets/imgs/logo.svg" alt="Logo" class="logo">
+
+    <h1>We'll be back soon!</h1>
+    <p>{{ message }}</p>
+    
+    <p class="status">Estimated downtime: {{ estimated_downtime }}</p>
+  </div>
+</body>
+</html>

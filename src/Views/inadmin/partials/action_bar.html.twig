@@ -11,7 +11,7 @@
                 {% for datakey, datavalue in action.data %} data-{{ datakey }}="{{ datavalue }}"{% endfor %}
                     {%- endif %}{%-
                 if action.id is defined %} id="{{ action.id }}"{% endif
-            %} name="{{ key }}" type="{{ action.button_type|default('submit') }}">
+            %} name="{{ key }}" type="{{ action.button_type|default('submit') }}"{%if action.value is defined and action.value is not empty %} value="{{ action.value }}"{% endif %}>
                 {% if action.icon is defined and action.icon is not empty %}
                     <span class="material-icons" aria-hidden="true">{{ action.icon }}</span>
                 {% endif %}
