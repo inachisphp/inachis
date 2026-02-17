@@ -1,0 +1,54 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <span>Maintenance Mode</span>
+{% endblock pagetitle %}
+{% block content %}
+<div class="col-12 content__edit">
+    <section class="admonition admonition__info">
+        <p>Current IP: <strong>{{ current_ip }}</strong></p>
+        <p>Status: <strong>{{ enabled ? 'Enabled' : 'Disabled' }}</strong></p>
+    </section>
+
+    <form class="form form__post" method="post">
+    <fieldset class="ui-tabs-panel ui-widget-content">
+        <p>
+            <label>Maintenance Message:</label>
+            <textarea class="text full-width" name="message" rows="3">{{ config.message }}</textarea>
+        </p>
+        <p>
+            <label>Estimated Downtime:</label>
+            <input class="text" type="text" name="estimated_downtime" value="{{ config.estimated_downtime }}">
+        </p>
+        <p>
+            <label>Allowed IPs (comma separated):</label>
+            <input class="text" type="text" name="allowed_ips" value="{{ config.allowed_ips|join(', ') }}">
+        </p>
+        <p>
+            <label>Retry After (seconds):</label>
+            <input class="text" type="number" name="retry_after" value="{{ config.retry_after }}">
+        </p>
+
+        {% include 'inadmin/partials/action_bar.html.twig' with {
+            actions: {
+                toggle: {
+                    button_class: enabled ? 'button--positive' : 'button--negative',
+                    button_type: 'submit',
+                    name: 'toggle',
+                    value: enabled ? 'off' : 'on',
+                    title: enabled ? 'Disable Maintenance' : 'Enable Maintenance'
+                },
+                save: {
+                    button_class: 'button--secondary',
+                    button_type: 'submit',
+                    name: 'save',
+                    value: 'save',
+                    title: 'Save Config & Generate Page'
+                }
+            }
+        } %}
+    </fieldset>
+    </form>
+</div>
+{% endblock content %}
