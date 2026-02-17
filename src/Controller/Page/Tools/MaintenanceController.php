@@ -28,7 +28,7 @@ class MaintenanceController extends AbstractInachisController
      * @param Request $request The request
      * @return Response
      */
-    #[Route('/tools/maintenance', name: 'incc_tools_maintenance')]
+    #[Route('/incc/tools/maintenance', name: 'incc_tools_maintenance')]
     public function index(Request $request, MaintenanceManager $manager): Response
     {
         $config = $manager->getConfig();
