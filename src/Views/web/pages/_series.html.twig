@@ -5,9 +5,7 @@
 
 {% block content %}
 
-    <div class="section group">
-        <div class="col span_1_of_8"></div>
-        <div class="col span_6_of_8">
+    <div class="content-column">
 
             {% if series is defined %}
                 <article class="post format-standard hentry" id="series-{{ series.id }}">
@@ -19,7 +17,7 @@
                     </header>
 
                     <div class="entry-content">
-                        {{ series.description|default('')|markdown_to_html }}
+                        {{ series.description|default('')|markdown }}
 
                         {% if series.image.filename|default('') is not empty %}
                         <p><img alt="{{ series.image.altText }}" class="align_centre" src="{% if not (series.image.filename starts with 'http') %}/imgs/{% endif %}{{ series.image.filename }}" /></p>
@@ -30,8 +28,11 @@
                         <ul>
                             {% for item in series.items %}
                                 {% set title = (item.title|replace({ (series.title): '' })) ?: item.title %}
-                                {% if item.status == 'published' %}
-                            <li>{% if title is not empty %}{{ title }} - {% endif %}<a href="{{ item.urls|first.link }}">{{ item.subTitle }}</a></li>
+                                {% if item.status == 'published' and item.postDate|date('U') < 'now'|date('U') %}
+                            <li>
+                                {% if item.subTitle is not empty %}{{ title }} - {% endif %}
+                                <a href="{{ item.urls|first.link }}">{% if item.subTitle is empty %}{{ title }}{% else %}{{ item.subTitle }}{% endif %}</a>
+                            </li>
                                 {% endif %}
                             {% endfor %}
                         </ul>
@@ -40,8 +41,6 @@
                 </article>
             {% endif %}
 
-        </div>
-        <div class="col span_1_of_8"></div>
     </div>
 
 {% endblock content %}

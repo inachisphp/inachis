@@ -1,3 +1,8 @@
+{% if maintenance_enabled is defined and maintenance_enabled %}
+    <div class="maintenance-banner">
+        Maintenance Mode Enabled - <a href="/maintenance.html">View Maintenance Page</a>
+    </div>
+{% endif %}
 <div class="headercontainer">
     <header>
         <h1>{{ settings.siteTitle }}</h1>

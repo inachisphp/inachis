@@ -70,11 +70,11 @@ const builds = {
         //     entryPoints: ["assets/js/web.js"],
         //     outfile: "public/assets/js/scripts.min.js"
         // },
-        // scss: {
-        //     ...scssBaseConfig,
-        //     entryPoints: ["assets/scss/web/styles.scss"],
-        //     outfile: "public/assets/css/styles.min.css"
-        // }
+        scss: {
+            ...scssBaseConfig,
+            entryPoints: ["assets/scss/web/styles.scss"],
+            outfile: "public/assets/css/styles.min.css"
+        }
     }
 };
 
@@ -227,13 +227,23 @@ async function runWatchMode() {
         ]
     });
 
+    const webScssCtx = await esbuild.context({
+        ...builds.web.scss,
+        plugins: [
+            ...(builds.web.scss.plugins || []),
+            watchLogger("Web SCSS", color.css)
+        ]
+    });
+
     await Promise.all([
         inadminJsCtx.watch(),
-        inadminScssCtx.watch()
+        inadminScssCtx.watch(),
+        webScssCtx.watch()
     ]);
 
     console.log(color.js("📂 assets/js/inadmin/** → JS rebuild"));
     console.log(color.css("🎨 assets/scss/inadmin/** → CSS rebuild"));
+    console.log(color.css("🎨 assets/scss/web/** → CSS rebuild"));
     console.log("\n⏳ Waiting for changes...\n");
 }
 
@@ -247,8 +257,7 @@ async function runProdBuild() {
     await Promise.all([
         esbuild.build(builds.inadmin.js),
         esbuild.build(builds.inadmin.scss),
-        // esbuild.build(builds.web.js),
-        // esbuild.build(builds.web.scss),
+        esbuild.build(builds.web.scss),
     ]);
 
     await copyExtraLibraries();
