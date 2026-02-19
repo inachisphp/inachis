@@ -61,4 +61,18 @@ class MaintenanceController extends AbstractInachisController
         $this->data['current_ip'] = $currentIp;
         return $this->render('inadmin/page/tools/maintenance.html.twig', $this->data);
     }
+
+    /**
+     * Displays a preview of the maintenance page
+     *
+     * @param MaintenanceManager $manager
+     * @return Response
+     */
+    #[Route('/tools/maintenance/preview', name: 'incc_tools_maintenance_preview')]
+    public function preview(MaintenanceManager $manager): Response
+    {
+        $config = $manager->getConfig();
+        $this->data = [...($this->data ?? []), ...($config ?? [])];
+        return $this->render('web/maintenance_template.html.twig', $this->data);
+    }
 }
