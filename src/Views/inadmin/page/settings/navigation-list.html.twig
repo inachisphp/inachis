@@ -1,0 +1,98 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+{% block pagetitle %}
+    <a href="{{ path('incc_settings_index') }}">Settings</a>
+    <span>Navigation Tabs</span>
+{% endblock pagetitle %}
+{% block content %}
+<div class="col-12 widget-posts ui-tabs-external">
+    {% include 'inadmin/partials/table.html.twig' with {
+        type: 'tabs',
+
+        table_name: 'Navigation Tabs list',
+        table_class: 'table-responsive table--row-borders table--darkhead',
+        table_desc: 'This table lists navigation tabs. The first column contains checkboxes allowing users to select one or more tasks.',
+        columns: [
+            {
+                title: 'Title',
+                slug: 'id',
+                source: 'title',
+                header: true,
+            },
+            {
+                title: 'URL',
+                source: 'url',
+            },
+            {
+                title: 'Status',
+                flex: true,
+                badges: {
+                    'disabled': {
+                        field: 'isActive',
+                        condition: false,
+                        className: 'badge__disabled',
+                    },
+                    'active': {
+                        field: 'isActive',
+                        condition: true,
+                        className: 'badge__active',
+                    }
+                },
+            },
+        ],
+
+        offset: query.offset,
+        limit: query.limit,
+        total: dataset.count,
+
+        slug_prefix: 'settings/navigation/edit',
+
+        filters: [],
+        filter_values: query.filters,
+        show_search: false,
+        show_select_deselect: true,
+        sortable: true,
+
+        add_button: {
+            text: 'Create Tab',
+            url: path('incc_settings_navigation_edit', { id: 'new' }),
+        },
+
+        url_result: path('incc_settings_navigation_list'),
+        zebra: true,
+
+        actions: {
+            enable: {
+                button_class: 'button--secondary',
+                'data': {
+                    'form-action': '',
+                },
+                icon: 'visibility',
+                title: 'admin.button.enable'|trans,
+            },
+            disable: {
+                button_class: 'button--secondary',
+                'data': {
+                    'form-action': '',
+                },
+                icon: 'visibility_off',
+                title: 'admin.button.disable'|trans,
+            },
+            delete: {
+                button_class: 'button--negative button--delete button--confirm',
+                'data': {
+                    'confirm': 'delete',
+                    'confirm-text': 'Yes, delete',
+                    'entity': 'navigationtab',
+                    'form-action': '',
+                    'title': 'Delete selected tabs',
+                    'warning': 'All currently selected tabs will be deleted permanently. This action cannot be undone.',
+                },
+                icon: 'delete',
+                name: 'delete',
+                value: '1',
+                title: 'Delete',
+            }
+        }
+    } %}
+</div>
+{% endblock content %}

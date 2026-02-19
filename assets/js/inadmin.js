@@ -15,6 +15,7 @@ import './inadmin/dialogs/_sessionTimeout.js';
 import './inadmin/_changePassword.js';
 import './inadmin/_components.js';
 import './inadmin/_dashboard.js';
+import './inadmin/_dragdropTable.js';
 import './inadmin/_export.js';
 import './inadmin/_fileUpload.js';
 import './inadmin/_map.js';
