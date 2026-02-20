@@ -47,6 +47,7 @@ class MaintenanceManager
     public function enable(): void
     {
         touch($this->projectDir.'/var/maintenance.lock');
+        $this->generateStaticPage($this->getConfig());
     }
 
     /**
@@ -57,6 +58,7 @@ class MaintenanceManager
     public function disable(): void
     {
         @unlink($this->projectDir.'/var/maintenance.lock');
+        @unlink($this->projectDir.'/public/maintenance.html');
     }
 
     /**
@@ -79,19 +81,26 @@ class MaintenanceManager
     }
 
     /**
-     * Save the maintenance configuration
+     * Save the maintenance configuration using an atomic write.
      *
      * @param array $config The maintenance configuration
      * @return void
      */
     public function saveConfig(array $config): void
     {
-        $file = $this->projectDir.'/var/maintenance.json';
-        file_put_contents($file, json_encode($config, JSON_PRETTY_PRINT));
+        $this->atomicWrite(
+            'maintenance.json',
+            $this->projectDir . '/var',
+            json_encode($config, JSON_PRETTY_PRINT),
+            0600,
+            LOCK_EX,
+        );
     }
 
     /**
-     * Generate the static maintenance page
+     * Generates the static maintenance page. For security it will use an atomic write
+     * and set permissions correctly before writing content to the file and then moving it
+     * to the correct location.
      *
      * @param array $config The maintenance configuration
      * @return void
@@ -99,6 +108,25 @@ class MaintenanceManager
     public function generateStaticPage(array $config): void
     {
         $html = $this->twig->render('web/maintenance_template.html.twig', $config);
-        file_put_contents($this->projectDir.'/public/maintenance.html', $html);
+        $this->atomicWrite('maintenance.html', $this->projectDir.'/public', $html, 0644);
+    }
+
+    /**
+     * Write a file using an atomic write operation to avoid concurrency and security
+     * issues.
+     *
+     * @param string $filename The name of the file to write
+     * @param string $location The location to write the file to
+     * @param string $content The content to write to the file
+     * @param int $permissions The permissions to set on the file
+     * @param int $flags The flags to use with file_put_contents
+     */
+    private function atomicWrite($filename, $location, $content, $permissions = 0600, $flags = 0)
+    {
+        $tmpFile = $this->projectDir . '/var/' . $filename . '.tmp';
+        touch($tmpFile);
+        chmod($tmpFile, $permissions);
+        file_put_contents($tmpFile, $content, $flags);
+        rename($tmpFile, $location . '/' . $filename);
     }
 }

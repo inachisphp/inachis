@@ -145,7 +145,11 @@ admin.dialog.confirm.default.title: 'untitled'
 admin.dialog.confirm.default.warning: 'This action cannot be undone.'
 
 
-
+admin.navigation.title.label: 'Title'
+admin.navigation.title.placeholder: 'e.g. Home'
+admin.navigation.url.label: 'URL'
+admin.navigation.url.placeholder: 'e.g. /'
+admin.navigation.isActive.label: 'Active'
 
 
 

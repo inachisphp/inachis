@@ -13,6 +13,7 @@ window.Inachis = {
 		window.Inachis.CategoryManager.init();
 		window.Inachis.Components.init();
 		window.Inachis.ConfirmationPrompt.init();
+		window.Inachis.DragDropTable.init();
 		window.Inachis.ImageManager.init();
 		window.Inachis.PostEdit.init();
 	},

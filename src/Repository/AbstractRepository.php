@@ -86,9 +86,9 @@ abstract class AbstractRepository extends ServiceEntityRepository
     /**
      * Returns all entries for the current repository.
      *
-     * @param int          $offset The offset from which to return results from
-     * @param int          $limit  The maximum number of results to return
-     * @param array        $where
+     * @param int $offset The offset from which to return results from
+     * @param int $limit  The maximum number of results to return
+     * @param array $where
      * @param array|string $order
      * @param array|string $groupBy
      * @param array $join  $join
@@ -145,6 +145,8 @@ abstract class AbstractRepository extends ServiceEntityRepository
     }
 
     /**
+     * Returns the maximum number of items to show
+     * 
      * @return int
      */
     public function getMaxItemsToShow(): int

@@ -1,7 +1,7 @@
 {% block filter %}
     {% set isEmptyFilterValues = (filter_values|default(null)) is empty %}
 
-{% if filters is defined and filters is not empty or show_search|default(false) or (sort_options is defined and sort_options is not empty) %}
+{% if filters is defined and filters is not empty or show_search|default(false) or (sort_options is defined and sort_options is not empty) or add_button|default(null) is not empty %}
 
 <section class="filter-bar sticky-nav" aria-label="Filter and sort content list">
 <div id="toolbar-form" class="toolbar-container">

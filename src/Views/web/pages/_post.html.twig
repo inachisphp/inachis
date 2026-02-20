@@ -5,9 +5,7 @@
 
 {% block content %}
 
-<div class="section group">
-<div class="col span_1_of_8"></div>
-<div class="col span_6_of_8">
+<div class="content-column">
 
     {% if post is defined %}
     <article class="post type-{{ post.type }} status-{{ post.status }} format-standard hentry {% if post.categories is not empty %}category-{{ post.categories|first.title|lower }}{% endif %}" id="{{ post.type }}-{{ post.id }}">
@@ -42,7 +40,7 @@
 
         {% if series is defined and series is not empty %}
             <ul class="page-navigation">
-                <li><span>More posts on &ldquo;</span><a href="{{ path('app_series_view', { 'year': post.postDate|date('Y'), 'title': series.title|lower }) }}">{{ series.title }}{% if series.subTitle is not empty %} {% if series.subTitle|slice(0,3) != 'And' %}- {% endif %}{{ series.subTitle }}{% endif %}</a><span>&rdquo;</span></li>
+                <li><span>More posts on &ldquo;</span><a href="{{ path('web_series_view', { 'year': post.postDate|date('Y'), 'title': series.title|lower }) }}">{{ series.title }}{% if series.subTitle is not empty %} {% if series.subTitle|slice(0,3) != 'And' %}- {% endif %}{{ series.subTitle }}{% endif %}</a><span>&rdquo;</span></li>
             {% if series.previous|default('') is not empty and series.previous.status == 'published' %}
                 <li><span>Previous:</span> <a href="{{ settings.domain }}/{{ series.previous.urls|first.link }}">{{ series.previous.title }}{% if series.previous.subTitle is not empty %} - {{ series.previous.subTitle }}{% endif %}</a></li>
             {% endif %}
@@ -62,8 +60,6 @@
     </article>
     {% endif %}
 
-</div>
-<div class="col span_1_of_8"></div>
 </div>
 
 {% endblock content %}

@@ -5,6 +5,7 @@
 
     {% set table_class = table_class|default('') ~ (zebra|default(false) ? ' table--striped' : '') %}
     {% set table_class = table_class ~ (show_select_deselect|default(false) ? ' table--selectable' : '') %}
+    {% set table_class = table_class ~ (sortable|default(false) ? ' table--dragdrop' : '') %}
 
     {% if dataset|default(null) is not empty and form|default(null) is not empty %}
     {{- form_errors(form) -}}
@@ -22,6 +23,9 @@
         {%if table_name|default(null) %}<caption class="visually-hidden">{{ table_name }}</caption>{% endif %}
         <thead>
             <tr>
+            {% if sortable is defined and sortable %}
+                <th scope="col"></th>
+            {% endif %}
             {% if actions|default(null) is not empty %}
                 <th scope="col">
                     <label for="select-all" class="visually-hidden">Select all rows</label>
@@ -31,12 +35,18 @@
             {% for column in columns %}
                 <th scope="col"{% if column.hideOnMobile|default(false) %} class="hide-on-mobile"{% endif %}>{{ column.title }}</th>
             {% endfor %}
+            {% if sortable is defined and sortable %}
+                <th scope="col">Actions</th>
+            {% endif %}
             </tr>
         </thead>
         <tbody>
         {% if dataset.iterator|default(null) %}{% set dataset = dataset.iterator %}{% endif %}
         {% for item in dataset %}
             <tr>
+            {% if sortable is defined and sortable %}
+                <td class="handle">☰</td>
+            {% endif %}
             {% if actions|default(null) is not empty %}
                 <td>
                     <input class="checkbox" id="{{ type }}-{{ item.id }}__input" type="checkbox" name="items[]" value="{{ item.id }}" />
@@ -89,6 +99,12 @@
                     {% endif %}
                 </{% if column.header is defined and column.header %}th{% else %}td{% endif %}>
             {% endfor %}
+            {% if sortable is defined and sortable %}
+                <td>
+                    {% if not loop.first %}<button class="move-up">↑</button>{% endif %}
+                    {% if not loop.last %}<button class="move-down">↓</button>{% endif %}
+                </td>
+            {% endif %}
             </tr>
         {% endfor %}
         </tbody>
