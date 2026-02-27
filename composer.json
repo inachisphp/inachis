@@ -23,7 +23,6 @@
         "google/apiclient": "^2.18",
         "jaybizzle/crawler-detect": "^1.2",
         "jfcherng/php-diff": "^6.4",
-        "michelf/php-markdown": "^2.0",
         "phpdocumentor/reflection-docblock": "^6.0",
         "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.0",
