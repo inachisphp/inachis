@@ -10,15 +10,16 @@ namespace Inachis\Service\Plugin;
 
 use Psr\Container\ContainerInterface;
 use Doctrine\DBAL\Connection;
+use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
 final class PluginManager
 {
     private array $pluginData = [];
 
     public function __construct(
-        #[TaggedIterator('cms.plugin_installer')]
+        #[TaggedIterator('cms.plugin_installer', default: [])]
         /** @var iterable<PluginInstallerInterface> $installers */
-        private iterable $installers
+        private iterable $installers = []
     ) {
         foreach ($installers as $installer) {
             $name = $installer::class;
