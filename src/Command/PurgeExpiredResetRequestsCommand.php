@@ -21,7 +21,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * Command to purge expired password reset requests.
  */
 #[AsCommand(
-    name: 'app:purge-expired-reset-requests',
+    name: 'inachis:purge-expired-reset-requests',
     description: 'Purges all expired password reset requests.',
 )]
 class PurgeExpiredResetRequestsCommand extends Command

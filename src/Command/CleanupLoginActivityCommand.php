@@ -22,10 +22,10 @@ use Symfony\Component\Messenger\MessageBusInterface;
 /**
  * Advisable to add this to Windows Scheduler or Linux Cron
  * e.g.
- * 0 2 * * * /usr/bin/php /path/to/your/project/bin/console app:cleanup-login-activity
+ * 0 2 * * * /usr/bin/php /path/to/your/project/bin/console inachis:cleanup-login-activity
  */
 #[AsCommand(
-    name: 'app:cleanup-login-activity',
+    name: 'inachis:cleanup-login-activity',
     description: 'Deletes old login activity, successful older than 12 months, failed older than 90 days.'
 )]
 class CleanupLoginActivityCommand extends Command

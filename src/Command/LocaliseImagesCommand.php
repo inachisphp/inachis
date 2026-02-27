@@ -23,9 +23,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Command to localise images
  */
 #[AsCommand(
-    name: 'app:localise-images',
+    name: 'inachis:localise-images',
     description: 'Find references to remote images, copy them to [public]/imgs/, and update links',
-    aliases: ['app:localize-images'],
+    aliases: ['inachis:localize-images'],
 )]
 class LocaliseImagesCommand extends Command
 {
