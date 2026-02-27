@@ -205,7 +205,6 @@ class PageRepositoryTest extends TestCase
         ];
         $reflection = new ReflectionClass($this->repository);
         $method = $reflection->getMethod('determineOrderBy');
-        $method->setAccessible(true);
         foreach($orders as $key => $order) {
             $this->assertEquals($order, $method->invokeArgs($this->repository, [$key]));
         }
