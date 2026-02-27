@@ -34,7 +34,6 @@ class ImageTransformerTest extends TestCase
     {
         $reflection = new ReflectionClass($this->imageTransformer);
         $method = $reflection->getMethod('createImagick');
-        $method->setAccessible(true);
         $this->assertEquals(new Imagick(), $method->invoke($this->imageTransformer));
     }
 

@@ -21,11 +21,8 @@
         "esbuild": "^0.27.2",
         "esbuild-sass-plugin": "^3.6.0",
         "glob": "^13.0.0",
-        "imagemin": "^9.0.1",
-        "imagemin-gifsicle": "^7.0.0",
-        "imagemin-mozjpeg": "^10.0.0",
-        "imagemin-pngquant": "^10.0.0",
-        "imagemin-svgo": "^11.0.0",
-        "sass": "^1.97.2"
+        "sass": "^1.97.2",
+        "sharp": "^0.34.5",
+        "svgo": "^4.0.0"
     }
 }

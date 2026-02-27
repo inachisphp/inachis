@@ -38,7 +38,6 @@ class SearchRepositoryTest extends TestCase
         ];
         $reflection = new \ReflectionClass($this->repository);
         $method = $reflection->getMethod('getWhereConditions');
-        $method->setAccessible(true);
 
         $this->assertEquals($types['page'], $method->invoke($this->repository, 'page'));
         $this->assertEquals($types['series'], $method->invoke($this->repository, 'series'));
@@ -90,7 +89,6 @@ class SearchRepositoryTest extends TestCase
 
         $reflection = new \ReflectionClass($this->repository);
         $method = $reflection->getMethod('getSQLUnion');
-        $method->setAccessible(true);
 
         $sql = $method->invoke($this->repository, $fields);
 
@@ -114,7 +112,6 @@ class SearchRepositoryTest extends TestCase
         ];
         $reflection = new ReflectionClass($this->repository);
         $method = $reflection->getMethod('determineOrderBy');
-        $method->setAccessible(true);
         foreach($orders as $key => $order) {
             $this->assertEquals($order, $method->invokeArgs($this->repository, [$key]));
         }

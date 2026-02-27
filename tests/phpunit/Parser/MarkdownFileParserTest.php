@@ -208,8 +208,6 @@ MD;
     {
         $reflection = new ReflectionClass($this->parser);
         $method = $reflection->getMethod('resolveCategoryPath');
-        $method->setAccessible(true);
-
         $result = $method->invoke($this->parser, []);
 
         $this->assertNull($result);

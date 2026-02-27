@@ -10,6 +10,7 @@
 namespace Inachis\Form;
 
 use Inachis\Entity\Series;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -29,9 +30,11 @@ class SeriesType extends AbstractType
     /**
      * Constructor
      
+     * @param Security $security
      * @param TranslatorInterface $translator
      */
     public function __construct(
+        private Security $security,
         private TranslatorInterface $translator
     ) {}
 
@@ -44,6 +47,10 @@ class SeriesType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $newItem = empty($options['data']->getId());
+        $user = $this->security->getUser();
+        $userTimezone = $user && method_exists($user, 'getPreferences') 
+            ? $user->getPreferences()->getTimezone() 
+            : 'UTC';
         $builder
             ->add('title', TextType::class, [
                 'attr' => [
@@ -112,12 +119,15 @@ class SeriesType extends AbstractType
                     ],
                     'format' => 'dd/MM/yyyy', // HH:mm,
                     'html5' => false,
+                    'input' => 'datetime_immutable',
                     'label' => $this->translator->trans('admin.series.firstDate.label', [], 'messages'),
                     'label_attr' => [
                         'class' => 'inline_label',
                         'id' => 'firstDate_label',
                     ],
+                    'model_timezone' => 'UTC',
                     'required' => false,
+                    'view_timezone' => $userTimezone,
                     'widget' => 'single_text',
 
                 ])
@@ -130,12 +140,15 @@ class SeriesType extends AbstractType
                     ],
                     'format' => 'dd/MM/yyyy', // HH:mm,
                     'html5' => false,
+                    'input' => 'datetime_immutable',
                     'label'  => $this->translator->trans('admin.series.lastDate.label', [], 'messages'),
                     'label_attr' => [
                         'class' => 'inline_label',
                         'id' => 'lastDate_label',
                     ],
+                    'model_timezone' => 'UTC',
                     'required' => false,
+                    'view_timezone' => $userTimezone,
                     'widget' => 'single_text',
 
                 ])

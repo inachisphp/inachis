@@ -18,6 +18,7 @@ use Inachis\Repository\UserRepository;
 use Inachis\Service\User\UserBulkActionService;
 use Inachis\Service\User\UserAccountEmailService;
 use Inachis\Transformer\ImageTransformer;
+use Inachis\Util\RandomColorPicker;
 use Random\RandomException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;

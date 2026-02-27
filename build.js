@@ -2,11 +2,8 @@ import esbuild from "esbuild";
 import { sassPlugin } from "esbuild-sass-plugin";
 import fs from "fs";
 import path from "path";
-import imagemin from "imagemin";
-import imageminMozjpeg from "imagemin-mozjpeg";
-import imageminPngquant from "imagemin-pngquant";
-import imageminGifsicle from "imagemin-gifsicle";
-import imageminSvgo from "imagemin-svgo";
+import sharp from "sharp";
+import { optimize as optimizeSvg } from "svgo";
 
 const isWatch = process.argv.includes("--watch");
 const isProd = !isWatch;
@@ -99,15 +96,36 @@ async function optimizeImages() {
 
     await Promise.all(
         files.map(async file => {
-            await imagemin([path.join(inputDir, file)], {
-                destination: outputDir,
-                plugins: [
-                    imageminMozjpeg({ quality: 75 }),
-                    imageminPngquant({ quality: [0.7, 0.85] }),
-                    imageminGifsicle({ optimizationLevel: 2 }),
-                    imageminSvgo()
-                ]
-            });
+            const inputPath = path.join(inputDir, file);
+            const outputPath = path.join(outputDir, file);
+            const ext = path.extname(file).toLowerCase();
+
+            if (ext === ".jpg" || ext === ".jpeg") {
+                await sharp(inputPath)
+                    .jpeg({ quality: 75 })
+                    .toFile(outputPath);
+            }
+
+            else if (ext === ".png") {
+                await sharp(inputPath)
+                    .png({ quality: 80, compressionLevel: 9 })
+                    .toFile(outputPath);
+            }
+
+            else if (ext === ".gif") {
+                await sharp(inputPath)
+                    .gif()
+                    .toFile(outputPath);
+            }
+
+            else if (ext === ".svg") {
+                const svgContent = fs.readFileSync(inputPath, "utf8");
+                const result = optimizeSvg(svgContent, {
+                    multipass: true
+                });
+                fs.writeFileSync(outputPath, result.data);
+            }
+
             console.log(` - Optimized: ${file}`);
         })
     );
