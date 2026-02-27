@@ -1,0 +1,178 @@
+@use '../definitions' as *;
+
+.datepicker-popup {
+  position: absolute;
+  background: $bg-surface;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+  padding: 16px;
+  width: 100%;
+  max-width: 360px;
+  font-family: Roboto, sans-serif;
+  user-select: none;
+  z-index: 1000;
+
+  .datepicker-today-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px;
+    border: none;
+    border-radius: $radius-standard;
+    background: $color-brand-050;
+    color: $color-brand-500;
+    cursor: pointer;
+    font-weight: 500;
+    margin-bottom: 8px;
+    &:hover, &:focus { background: $color-brand-100; outline: none; }
+    span.material-icons { font-size: 1.2rem; }
+  }
+
+  .datepicker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+	button {
+		background: transparent;
+		border: none;
+		border-radius: $radius-round;
+		width: 36px;
+		height: 36px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: $text-main;
+		cursor: pointer;
+
+		&:active {
+			transform: scale(0.9);
+		}
+		&:hover {
+			background: $color-brand-050;
+		}
+
+		&:disabled {
+			opacity: 0.3;
+			cursor: not-allowed;
+			pointer-events: none;
+		}
+
+		&:focus-visible {
+			outline: 2px solid $color-focus;
+			outline-offset: 2px;
+		}
+
+		.material-icons {
+			font-size: 24px;
+		}
+	}
+
+    .datepicker-month-label {
+      flex: 1;
+      font-weight: 600;
+      font-size: 1rem;
+      text-align: center;
+      background: $color-brand-050;
+      border-radius: $radius-standard;
+      padding: 4px 0;
+      margin: 0 8px;
+      cursor: pointer;
+
+	    &:hover {
+			background: $color-brand-050;
+		}
+    }
+  }
+
+  .datepicker-calendar td.today:not(.selected) {
+    border: 1px solid $color-brand-400;
+    font-weight: 500;
+  }
+
+  .datepicker-calendar-container {
+    width: 100%;
+    overflow-x: auto;
+    min-height: 210px;
+  }
+
+  .datepicker-calendar {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+
+    th, td { text-align: center; padding: 10px; }
+
+    td {
+      cursor: pointer;
+      border-radius: $radius-standard;
+      transition: background 0.2s, color 0.2s;
+      &:hover, &:focus { background: $color-brand-050; outline: none; }
+      &.selected { background: $color-brand-500; color: $color-neutral-000; font-weight: 600; }
+      &.today { border: 1px solid $color-brand-500; }
+      &[disabled] { opacity: 0.3; cursor: default; pointer-events: none; }
+    }
+  }
+
+  .datepicker-year-panel {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin: 12px 0;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    &.visible { opacity: 1; transform: scale(1); }
+
+    button.year-btn {
+      padding: 8px 0;
+      border: none;
+      border-radius: $radius-standard;
+      background: $color-brand-050;
+      cursor: pointer;
+      font-weight: 500;
+      &:hover, &:focus { background: $color-brand-100; outline: none; }
+      &.selected { background: $color-brand-500; color: $color-neutral-000; font-weight: 600; }
+    }
+  }
+
+  .datepicker-time-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+
+    label {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.85rem;
+      color: $text-main;
+
+      input {
+        width: 60px;
+        padding: 6px 8px;
+        border-radius: $radius-standard;
+        border: 1px solid $border-color-input;
+        text-align: center;
+        font-size: 1rem;
+        &:focus {
+          border-color: $color-brand-500;
+          outline: none;
+          box-shadow: 0 0 0 2px $input-focus-ring;
+        }
+      }
+    }
+  }
+}
+
+// @todo correct breakpoint
+@media (max-width: 480px) {
+  .datepicker-header button {
+    width: 44px;
+    height: 44px;
+  }
+}

@@ -2,7 +2,7 @@
 
 {% block pagetitle %}
     <a href="{{ path('incc_series_list') }}">Series</a>
-    {% if series.id is empty %}New{% else %}Edit{% endif %} Series
+    <span>{% if series.id is empty %}New{% else %}Edit{% endif %} Series</span>
 {% endblock pagetitle %}
 
 {% block content %}
@@ -18,7 +18,7 @@
         {% if series.id is not empty %}
         <li>
             <a href="#series__contents">
-                {% trans %}admin.series.contents.title{% endtrans %} 
+                {% trans %}admin.series.contents.title{% endtrans %}
                 <span class="badge">{{ series.items|length }}</span></a>
         </li>
         {% endif %}
@@ -31,7 +31,7 @@
                 'id': 'series_image',
                 'name': 'series[image]',
                 'value': series.image,
-                'additionalClass': 'preview__small'
+                'additionalClass': 'preview__small',
             })
         }}
         <p>
@@ -87,7 +87,7 @@
         {{ form_widget(form.delete) }}
         {% endif %}
         {%  if series.id is not empty and series.items|length > 0 %}
-            <a class="button button--secondary" href="{{ path('app_series_view', { 'year': series.lastDate|date('Y'), 'title': series.url}) }}" target="_blank" title="View Live"><span class="material-icons" aria-hidden="true">exit_to_app</span> View Live</a>
+            <a class="button button--secondary" href="{{ path('web_series_view', { 'year': series.lastDate|date('Y'), 'title': series.url}) }}" target="_blank" title="View Live"><span class="material-icons" aria-hidden="true">exit_to_app</span> View Live</a>
             <span class="series__controls visually-hidden">
             with selected:
             {{ form_widget(form.remove) }}

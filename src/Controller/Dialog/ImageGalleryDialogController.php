@@ -28,7 +28,7 @@ class ImageGalleryDialogController extends AbstractInachisController
     public function getImageManagerList(): Response
     {
         $this->data['form'] = $this->createForm(ImageType::class)->createView();
-        $this->data['allowedTypes'] = Image::ALLOWED_TYPES;
+        $this->data['allowedTypes'] = Image::ALLOWED_MIME_TYPES;
         $this->data['dataset'] = [];
         return $this->render('inadmin/dialog/image-manager.html.twig', $this->data);
     }

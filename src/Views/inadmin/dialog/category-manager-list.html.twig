@@ -3,7 +3,7 @@
         <li data-value="{{ category.id }}">
             <span>
                 <label for="dialog__categoryManager__existing-{{ category.id }}">
-                <input class="checkbox visually-hidden" id="dialog__categoryManager__existing-{{ category.id }}" name="catParent[]" type="radio" value="{{ category.id }}" />
+                <input class="checkbox" id="dialog__categoryManager__existing-{{ category.id }}" name="catParent[]" type="radio" value="{{ category.id }}" hidden />
                  {{ category.title }}</label>
                 <a data-id="{{ category.id }}"
                    data-title="{{ category.title }}"

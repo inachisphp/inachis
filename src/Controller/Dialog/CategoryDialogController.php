@@ -22,11 +22,20 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-
+/**
+ * Category Dialog Controller
+ */
 #[IsGranted('ROLE_ADMIN')]
 class CategoryDialogController extends AbstractInachisController
 {
     /**
+     * @var array<string, mixed>
+     */
+    protected array $data = [];
+
+    /**
+     * Get the category manager content
+     *
      * @param CategoryRepository $categoryRepository
      * @return Response
      */
@@ -39,6 +48,8 @@ class CategoryDialogController extends AbstractInachisController
     }
 
     /**
+     * Get the category manager list
+     *
      * @param CategoryRepository $categoryRepository
      * @return Response
      */
@@ -51,6 +62,8 @@ class CategoryDialogController extends AbstractInachisController
     }
 
     /**
+     * Get the category manager list content
+     *
      * @param Request $request
      * @param CategoryRepository $categoryRepository
      * @return Response
@@ -58,11 +71,13 @@ class CategoryDialogController extends AbstractInachisController
     #[Route("incc/ax/categoryList/get", methods: [ "POST" ])]
     public function getCategoryManagerListContent(Request $request, CategoryRepository $categoryRepository): Response
     {
+        /** @var array<int, Category> $categories */
         $categories = empty($request->request->get('q')) ?
             $categoryRepository->findBy(['parent' => null]) :
             $categoryRepository->findByTitleLike($request->request->get('q'));
+        /** @var array<int, Category> $result */
         $result = [];
-        // Below code is used to handle where categories exist with the same name under multiple locations
+        // Below code is used to handle where categories exist with the same name under multiple locations but are distinct
         if (!empty($categories)) {
             $result['items'] = [];
             foreach ($categories as $category) {
@@ -92,6 +107,8 @@ class CategoryDialogController extends AbstractInachisController
     }
 
     /**
+     * Save the category manager content
+     *
      * @param Request $request
      * @param CategoryRepository $categoryRepository
      * @return Response
@@ -101,15 +118,16 @@ class CategoryDialogController extends AbstractInachisController
         Request $request,
         CategoryRepository $categoryRepository
     ): Response {
+        /** @var Category $category */
         $category = $request->request->get('id') !== '-1' ?
             $categoryRepository->findOneBy(['id' => $request->request->get('id')]) :
             new Category();
+        /** @var Category|null $parentCategory */
+        $parentCategory = $request->request->get('parentID') !== '-1' ?
+            $categoryRepository->findOneBy(['id' => $request->request->get('parentID')]) :
+            null;
         $categoryRepository->hydrate($category, $request->request->all());
-        $category->setParent(
-            $request->request->get('parentID') !== '-1' ?
-                $categoryRepository->findOneBy(['id' => $request->request->get('parentID')]) :
-                null
-        );
+        $category->setParent($parentCategory);
         $this->entityManager->persist($category);
         $this->entityManager->flush();
         return new JsonResponse(
@@ -121,6 +139,8 @@ class CategoryDialogController extends AbstractInachisController
     }
 
     /**
+     * Get the category usages
+     *
      * @param Request $request
      * @param CategoryRepository $categoryRepository
      * @param PageRepository $pageRepository
@@ -132,7 +152,13 @@ class CategoryDialogController extends AbstractInachisController
         CategoryRepository $categoryRepository,
         PageRepository $pageRepository
     ): JsonResponse {
-        $category = $categoryRepository->findOneBy(['id' => $request->request->get('id')]);
+        $id = $request->request->get('id');
+        /** @var Category|null $category */
+        $category = $categoryRepository->find($id);
+        if (!$category) {
+            return new JsonResponse(['count' => 0]);
+        }
+
         $count = $pageRepository->getPagesWithCategoryCount($category);
         foreach ($category->getChildren() as $child) {
             $count += $pageRepository->getPagesWithCategoryCount($child);
@@ -141,6 +167,8 @@ class CategoryDialogController extends AbstractInachisController
     }
 
     /**
+     * Delete the category
+     *
      * @param Request $request
      * @param CategoryRepository $categoryRepository
      * @param PageRepository $pageRepository
@@ -153,6 +181,7 @@ class CategoryDialogController extends AbstractInachisController
         PageRepository $pageRepository
     ): Response
     {
+        /** @var Category $category */
         $category = $categoryRepository->findOneBy(['id' => $request->request->get('id')]);
         $count = $pageRepository->getPagesWithCategoryCount($category);
 
@@ -167,7 +196,7 @@ class CategoryDialogController extends AbstractInachisController
                 Response::HTTP_BAD_REQUEST
             );
         }
-        $this->entityManager->getRepository(Category::class)->remove($category);
+        $categoryRepository->remove($category);
         return new JsonResponse();
     }
 }

@@ -9,9 +9,8 @@
 
 namespace Inachis\Tests\phpunit\Entity;
 
-use Inachis\Entity\Image;
-use Inachis\Entity\User;
-use DateTime;
+use DateTimeImmutable;
+use Inachis\Entity\{Image, User};
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -94,13 +93,13 @@ class ImageTest extends TestCase
 
         public function testSetAndGetCreateDate(): void
     {
-        $this->image->setCreateDate(new DateTime('1970-01-02 01:34:56'));
+        $this->image->setCreateDate(new DateTimeImmutable('1970-01-02 01:34:56'));
         $this->assertEquals('1970-01-02 01:34:56', $this->image->getCreateDate()->format('Y-m-d H:i:s'));
     }
 
     public function testSetAndGetModDate(): void
     {
-        $this->image->setModDate(new DateTime('1970-01-02 01:34:56'));
+        $this->image->setModDate(new DateTimeImmutable('1970-01-02 01:34:56'));
         $this->assertEquals('1970-01-02 01:34:56', $this->image->getModDate()->format('Y-m-d H:i:s'));
     }
 

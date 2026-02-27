@@ -10,6 +10,7 @@
 namespace Inachis\Form;
 
 use Inachis\Entity\Series;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -21,27 +22,43 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form for creating and editing a series
+ */
 class SeriesType extends AbstractType
 {
-    private TranslatorInterface $translator;
-
+    /**
+     * Constructor
+     
+     * @param Security $security
+     * @param TranslatorInterface $translator
+     */
     public function __construct(
-        TranslatorInterface $translator
-    ) {
-        $this->translator = $translator;
-    }
+        private Security $security,
+        private TranslatorInterface $translator
+    ) {}
 
+    /**
+     * Build the form
+     *
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $newItem = empty($options['data']->getId());
+        $user = $this->security->getUser();
+        $userTimezone = $user && method_exists($user, 'getPreferences') 
+            ? $user->getPreferences()->getTimezone() 
+            : 'UTC';
         $builder
             ->add('title', TextType::class, [
                 'attr' => [
-                    'aria-labelledby'  => 'title_label',
-                    'aria-required'    => 'true',
-                    'autofocus'        => 'true',
-                    'class'            => 'editor__title text',
-                    'placeholder'      => $this->translator->trans('admin.series.title.placeholder', [], 'messages'),
+                    'aria-labelledby' => 'title_label',
+                    'aria-required' => 'true',
+                    'autofocus' => 'true',
+                    'class' => 'editor__title text',
+                    'placeholder' => $this->translator->trans('admin.series.title.placeholder', [], 'messages'),
                 ],
                 'label'      => $this->translator->trans('admin.series.title.label', [], 'messages'),
                 'label_attr' => [
@@ -52,11 +69,11 @@ class SeriesType extends AbstractType
             ->add('subTitle', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'subTitle_label',
-                    'aria-required'   => 'false',
+                    'aria-required' => 'false',
                     'class' => 'editor__sub-title text',
-                    'placeholder'     => $this->translator->trans('admin.series.subTitle.placeholder', [], 'messages'),
+                    'placeholder' => $this->translator->trans('admin.series.subTitle.placeholder', [], 'messages'),
                 ],
-                'label'      => $this->translator->trans('admin.series.subTitle.label', [], 'messages'),
+                'label' => $this->translator->trans('admin.series.subTitle.label', [], 'messages'),
                 'label_attr' => [
                     'class' => 'inline_label',
                     'id' => 'subTitle_label',
@@ -80,13 +97,13 @@ class SeriesType extends AbstractType
             ->add('description', TextareaType::class, [
                 'attr' => [
                     'aria-labelledby' => 'description_label',
-                    'aria-required'   => 'false',
+                    'aria-required' => 'false',
                     'class' => 'mde_editor',
                 ],
-                'label'      => $this->translator->trans('admin.series.description.label', [], 'messages'),
+                'label' => $this->translator->trans('admin.series.description.label', [], 'messages'),
                 'label_attr' => [
                     'class' => 'hidden',
-                    'id'    => 'description_label',
+                    'id' => 'description_label',
                 ],
                 'required' => false,
             ])
@@ -95,38 +112,44 @@ class SeriesType extends AbstractType
             $builder
                 ->add('firstDate', DateTimeType::class, [
                     'attr' => [
-                        'aria-labelledby'  => 'firstDate_label',
-                        'aria-required'    => 'false',
+                        'aria-labelledby' => 'firstDate_label',
+                        'aria-required' => 'false',
                         'class' => 'date-width',
                         'readOnly' => true,
                     ],
                     'format' => 'dd/MM/yyyy', // HH:mm,
-                    'html5'  => false,
-                    'label'  => $this->translator->trans('admin.series.firstDate.label', [], 'messages'),
+                    'html5' => false,
+                    'input' => 'datetime_immutable',
+                    'label' => $this->translator->trans('admin.series.firstDate.label', [], 'messages'),
                     'label_attr' => [
                         'class' => 'inline_label',
                         'id' => 'firstDate_label',
                     ],
+                    'model_timezone' => 'UTC',
                     'required' => false,
-                    'widget'   => 'single_text',
+                    'view_timezone' => $userTimezone,
+                    'widget' => 'single_text',
 
                 ])
                 ->add('lastDate', DateTimeType::class, [
                     'attr' => [
-                        'aria-labelledby'  => 'lastDate_label',
-                        'aria-required'    => 'false',
+                        'aria-labelledby' => 'lastDate_label',
+                        'aria-required' => 'false',
                         'class' => 'date-width',
                         'readOnly' => true,
                     ],
                     'format' => 'dd/MM/yyyy', // HH:mm,
-                    'html5'  => false,
+                    'html5' => false,
+                    'input' => 'datetime_immutable',
                     'label'  => $this->translator->trans('admin.series.lastDate.label', [], 'messages'),
                     'label_attr' => [
                         'class' => 'inline_label',
                         'id' => 'lastDate_label',
                     ],
+                    'model_timezone' => 'UTC',
                     'required' => false,
-                    'widget'   => 'single_text',
+                    'view_timezone' => $userTimezone,
+                    'widget' => 'single_text',
 
                 ])
                 ->add('bulkCreate', ButtonType::class, [
@@ -154,12 +177,12 @@ class SeriesType extends AbstractType
                 ->add('visibility', CheckboxType::class, [
                     'attr' => [
                         'aria-labelledby' => 'visibility_label',
-                        'aria-required'   => 'false',
-                        'class'           => 'ui-switch',
-                        'data-label-off'  => 'private',
-                        'data-label-on'   => 'public',
+                        'aria-required' => 'false',
+                        'class' => 'ui-switch',
+                        'data-label-off' => 'private',
+                        'data-label-on' => 'public',
                     ],
-                    'label'      => $this->translator->trans('admin.series.visibility.label', [], 'messages'),
+                    'label' => $this->translator->trans('admin.series.visibility.label', [], 'messages'),
                     'label_attr' => [
                         'id' => 'visibility_label',
                         'class' => 'inline_label',
@@ -191,6 +214,8 @@ class SeriesType extends AbstractType
             $builder
                 ->add('delete', SubmitType::class, [
                     'attr' => [
+                        'data-confirm' => 'delete',
+                        'data-confirm-text' => 'Yes, delete',
                         'class' => 'button button--negative button--confirm',
                         'data-entity' => 'series',
                         'data-title' => $options['data']->getTitle(),
@@ -217,6 +242,11 @@ class SeriesType extends AbstractType
         }
     }
 
+    /**
+     * Configure the options for the form
+     * 
+     * @param OptionsResolver $resolver
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

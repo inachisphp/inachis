@@ -1,4 +1,11 @@
 {% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_post_list', { type: page.tab }) }}">{{ page.tab|title }}s</a>
+    <a href="/incc/{{ page.tab }}/{{ url }}">Edit {{ page.tab }}</a>
+    <span>Track Changes</span>
+{% endblock pagetitle %}
+
 {% block content %}
 {% block track_changes_pre %}{% endblock track_changes_pre %}
 
@@ -33,9 +40,22 @@
     <div class="fixed-bottom-bar">
         <form method="post">
             <p>
-                <button class="button button--negative" name="doRevert" type="submit"><span class="material-icons" aria-hidden="true">undo</span> Revert</button>
-                <a href="{{ path('incc_post_download', { 'id': revision_id }) }}" class="button button--secondary"><span class="material-icons" aria-hidden="true">save_alt</span> {% trans %}admin.post.revision.download{% endtrans %}</a>
-                <a href="/incc/post/{{ link }}" class="button button--info">Cancel</a>
+                <button class="button button--negative button--delete button--confirm"
+                    data-confirm="revert"
+                    data-confirm-text="Yes, revert"
+                    data-entity="post"
+                    data-form-action=""
+                    data-title="Revert selected  {{ page.tab }}"
+                    data-warning="Your current version will be replaced with the contents of this previous state."
+                    name="doRevert" type="submit">
+                    <span class="material-icons" aria-hidden="true">undo</span> <span>Revert</span>
+                </button>
+                <a href="{{ path('incc_post_download', { 'id': revision_id }) }}" class="button button--secondary">
+                    <span class="material-icons" aria-hidden="true">save_alt</span> {% trans %}admin.post.revision.download{% endtrans %}
+                </a>
+                <a href="/incc/post/{{ link }}" class="button button--info">
+                    <span>Cancel</span>
+                </a>
             </p>
         </form>
     </div>

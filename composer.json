@@ -16,15 +16,15 @@
         "ext-intl": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
-        "composer/package-versions-deprecated": "1.11.99.4",
+        "composer/package-versions-deprecated": "^1.11",
         "doctrine/doctrine-bundle": "^3.0",
-        "doctrine/doctrine-migrations-bundle": "^3.7",
+        "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.5",
         "google/apiclient": "^2.18",
         "jaybizzle/crawler-detect": "^1.2",
         "jfcherng/php-diff": "^6.4",
         "michelf/php-markdown": "^2.0",
-        "phpdocumentor/reflection-docblock": "^5.2",
+        "phpdocumentor/reflection-docblock": "^6.0",
         "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.0",
         "symfony/config": "^8.0",
@@ -63,7 +63,7 @@
         "php-parallel-lint/php-parallel-lint": "*",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-symfony": "^2.0",
-        "phpunit/phpunit": "^12.0",
+        "phpunit/phpunit": "^13.0",
         "psalm/phar": "^6.13",
         "slevomat/coding-standard": "^8.21",
         "symfony/browser-kit": "^8.0",
@@ -136,7 +136,7 @@
             "id": "01C425H726J8GJGXQBKPRWG2F5",
             "allow-contrib": true,
             "docker": true,
-            "require": "7.*"
+            "require": "8.*"
         },
         "google/apiclient-services": [
             "Analytics"

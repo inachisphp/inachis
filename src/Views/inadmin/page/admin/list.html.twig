@@ -5,10 +5,6 @@
 {% endblock pagetitle %}
 
 {% block content %}
-
-    {% block user_list_pre %}{% endblock user_list_pre %}
-
-    {% block user_list %}
     <div class="col-12 widget-posts ui-tabs-external">
         {% include 'inadmin/partials/tab-sets/users.html.twig' %}
 
@@ -102,18 +98,19 @@
                 delete: {
                     button_class: 'button--negative button--delete button--confirm',
                     'data': {
+                        'confirm': 'delete',
+                        'confirm-text': 'Yes, delete',
                         'entity': 'users',
                         'form-action': '',
-                        'title': 'all selected users',
+                        'title': 'Delete selected users',
                         'warning': 'All currently selected users will be deleted permanently, and they will lose access to this system. This action cannot be undone.',
                     },
                     icon: 'delete',
+                    name: 'delete',
+                    value: '1',
                     title: 'Delete',
                 }
             }
         } %}
     </div>
-    {% endblock user_list %}
-
-    {% block user_list_post %}{% endblock user_list_post %}
 {% endblock content %}

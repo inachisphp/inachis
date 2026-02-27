@@ -12,7 +12,7 @@ namespace Inachis\Tests\phpunit\Command;
 use Inachis\Command\CreateAdminCommand;
 use Inachis\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -75,8 +75,8 @@ class CreateAdminCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->setInputs(['test-user', 'test@example.com', '' ,'']);
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('The password cannot be empty');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('This value cannot be empty');
         $tester->execute([]);
     }
 

@@ -17,8 +17,20 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Image form type for uploads
+ * 
+ * @extends AbstractType<mixed>
+ */
 class ImageType extends AbstractType
 {
+    /**
+     * Build the form
+     *
+     * @param FormBuilderInterface<mixed> $builder
+     * @param array<string, mixed> $options
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -38,7 +50,7 @@ class ImageType extends AbstractType
                     'checked' => 'checked',
                     'class' => 'checkbox',
                 ],
-                'label' => 'Optimize image',
+                'label' => 'Optimize image (Convert to WebP/AVIF and limit dimensions to ' . Image::WARNING_DIMENSIONS . 'x' . Image::WARNING_DIMENSIONS . 'px)',
                 'label_attr' => [
                     'id' => 'image-uploader__optimiseImage__label'
                 ],
@@ -90,6 +102,12 @@ class ImageType extends AbstractType
         ;
     }
 
+    /**
+     * Configure options
+     *
+     * @param OptionsResolver $resolver
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

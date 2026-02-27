@@ -11,6 +11,7 @@ namespace Inachis\Twig;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
+use Symfony\Bundle\SecurityBundle\Security;
 
 /**
  * Class AppExtension
@@ -18,6 +19,16 @@ use Twig\TwigFilter;
  */
 class AppExtension extends AbstractExtension
 {
+    private Security $security;
+
+    /**
+     * @param Security $security
+     */
+    public function __construct(Security $security)
+    {
+        $this->security = $security;
+    }
+
     /**
      * @return TwigFilter[]
      */
@@ -25,7 +36,14 @@ class AppExtension extends AbstractExtension
     {
         return [
             new TwigFilter('activeMenu', [$this, 'activeMenuFilter']),
+            new TwigFilter('formatLocalTime', [$this, 'formatLocalTime']),
         ];
+    }
+
+    public function formatLocalTime(\DateTimeInterface $date, string $format = 'Y-m-d H:i'): string
+    {
+        $timezone = new \DateTimeZone($this->security->getUser()->getPreferences()->getTimezone());
+        return $date->setTimezone($timezone)->format($format);
     }
 
     /**
@@ -45,6 +63,9 @@ class AppExtension extends AbstractExtension
      */
     public function bytesToMinimumUnit(int $bytes, bool $trimTrailing = false): string
     {
+        if ($bytes < 0) {
+            return '0 B';
+        }
         $symbols = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
         $exp = (int) floor(log($bytes) / log(1024));
         $result = sprintf('%.2f', ($bytes / pow(1024, floor($exp))));

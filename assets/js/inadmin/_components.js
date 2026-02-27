@@ -1,7 +1,8 @@
 const { default: TomSelect } = require("tom-select");
+const { default: DatePicker } = require("./components/datePicker.js");
 
 window.Inachis.Components = {
-	initialize() {
+	init() {
 		this.initBackToTop();
 		this.initClearSearch('');
 		this.initCopyPaste('');
@@ -17,20 +18,29 @@ window.Inachis.Components = {
 		this.initSwitches('');
 		this.initUIToggle();
 
-		$('.image_preview .button--confirm').on('click', (event) => {
-			event.preventDefault();
-			const $imagePreview = $('.image_preview');
-			$imagePreview.find('input[type=hidden]').val('');
-			$imagePreview.find('img').remove();
-			$imagePreview.find('button.button--confirm').remove();
+		document.querySelectorAll('.image_preview .button--confirm').forEach(button => {
+			button.addEventListener('click', (event) => {
+				event.preventDefault();
+				const imagePreview = button.closest('.image_preview');
+				if (!imagePreview) return;
+				const hiddenInput = imagePreview.querySelector('input[type="hidden"]');
+				if (hiddenInput) hiddenInput.value = '';
+				imagePreview.querySelectorAll('img, button.button--confirm').forEach(el => {
+					el.remove();
+				});
+			});
 		});
 
-		$('.ui-sortby select#sort').on('change', function () {
-			$(this).closest('form').trigger('submit');
+		document.querySelectorAll('.ui-sortby select#sort').forEach(select => {
+			select.addEventListener('change', () => {
+				select.closest('form').requestSubmit();
+			});
 		});
 
 		tabs('.ui-tabbed');
-		$('.error-select').hide();
+		document.querySelectorAll('.error-select').forEach(el => {
+			el.style.display = 'none';
+		});
 	},
 
 	initBackToTop() {
@@ -45,39 +55,38 @@ window.Inachis.Components = {
 	},
 
 	initClearSearch(selector) {
-		$(`${selector}.clear-search`).on('click', function () {
-			const $searchBox = $($(this).attr('data-target'));
-			$searchBox.val('');
-			$searchBox.closest('form').trigger('submit');
+		document.querySelectorAll(`${selector}.clear-search`).forEach(button => {
+			button.addEventListener('click', () => {
+				const searchBox = document.querySelector(button.dataset.target);
+				searchBox.value = '';
+				searchBox.closest('form').requestSubmit();
+			});
 		});
 	},
 	initCopyPaste(selector) {
-		$(`${selector}.button--copy`).on('click', async function () {
-			const $textSource = $(`#${$(this).attr('data-target')}`);
-			const copyText = ($(this).attr('data-prefix') ?? '') + $textSource.val();
-			try {
-				await navigator.clipboard.writeText(copyText);
-			} catch (err) {
-				console.error('Failed to copy: ', err)
-			}
+		document.querySelectorAll(`${selector}.button--copy`).forEach(button => {
+			button.addEventListener('click', async () => {
+				const textSource = document.querySelector(`#${button.dataset.target}`);
+				const copyText = (button.dataset.prefix ?? '') + textSource.value;
+				try {
+					await navigator.clipboard.writeText(copyText);
+				} catch (err) {
+					console.error('Failed to copy: ', err)
+				}
+			});
 		});
 	},
 	initDatePicker() {
-		// http://xdsoft.net/jqplugins/datetimepicker/
-		// if ($('html').attr('lang')) {
-		// 	$.datetimepicker.setLocale($('html').attr('lang'));
-		// }
-		$('#post_postDate').each(function () {
-			$(this).datetimepicker({
-				format: 'd/m/Y H:i',
-				validateOnBlue: false,
-				onChangeDateTime: function (dp, $input) {
-					if (window.Inachis.PostEdit) {
-						// @todo Need to update JS so that it only updates URL if previously set URL matches the auto-generated pattern
-						$('input#post_url').val(window.Inachis.PostEdit.getUrlFromTitle());
-					}
+		const postDateSelector = document.querySelector('#post_postDate');
+		if (!postDateSelector) return;
+		const datePicker = new DatePicker('#post_postDate', {
+			onChange: (formattedDate) => {
+				if (window.Inachis?.PostEdit) {
+					document.querySelector('#post_url').value = window.Inachis.PostEdit.getUrlFromTitle();
 				}
-			});
+			},
+			format: 'dd/mm/yyyy HH:ii',
+			materialIcons: true,
 		});
 	},
 	initExportButton() {
@@ -144,16 +153,18 @@ window.Inachis.Components = {
 		});
 	},
 	initPasswordToggle() {
-		$('button.button--password-toggle').on('click', function () {
-			const $button = $(this);
-			const $input = $(`input[data-controller=${$button.data('action')}]`);
-			if ($input.attr('type') === "password") {
-				$input.attr('type', 'text');
-				$button.html('visibility');
-			} else {
-				$input.attr('type', 'password');
-				$button.html('visibility_off');
-			}
+		const passwordToggles = document.querySelectorAll('button.button--password-toggle');
+		passwordToggles.forEach(toggle => {
+			toggle.addEventListener('click', () => {
+				const input = document.querySelector(`input[data-controller=${toggle.dataset.action}]`);
+				if (input.type === "password") {
+					input.type = 'text';
+					toggle.innerHTML = 'visibility';
+				} else {
+					input.type = 'password';
+					toggle.innerHTML = 'visibility_off';
+				}
+			});
 		});
 	},
 	initReadingProgress() {
@@ -259,21 +270,41 @@ window.Inachis.Components = {
 		});
 	},
 	initSelectAllNone(selector) {
-		$(`${selector}.selectAllNone`).on('click', function () {
-			$(this).closest('form').first().find('input[type=checkbox]').prop('checked', $(this).prop('checked'));
-			window.Inachis.Components.toggleActionBar();
+		document.querySelectorAll(`${selector}.selectAllNone`).forEach(el => {
+			el.addEventListener('click', () => {
+				const form = el.closest('form');
+				const checkboxes = form.querySelectorAll('input[type=checkbox]');
+				checkboxes.forEach(cb => cb.checked = el.checked);
+				window.Inachis.Components.toggleActionBar();
+			});
 		});
-		$('input[name^="items"]').on('change', this.toggleActionBar);
+		document.querySelectorAll('input[name^="items"]').forEach(el => {
+			el.addEventListener('change', () => {
+				window.Inachis.Components.toggleActionBar();
+			});
+		});
 	},
 	initSeriesControls() {
-		$('input[name=series\\[itemList\\]\\[\\]]').on('change', function () {
-			const uncheckedItems = $('input[name=series\\[itemList\\]\\[\\]]:not(:checked)');
-			const checkedItems = $('input[name=series\\[itemList\\]\\[\\]]:checked');
-			const anyChecked = checkedItems.length > 0;
-			$('.series__controls').toggleClass('visually-hidden', !anyChecked);
+		document.querySelectorAll('input[name="series[itemList][]"]').forEach(input => {
+			input.addEventListener('change', () => {
+				const allItems = document.querySelectorAll('input[name="series[itemList][]"]');
+				const checkedItems = document.querySelectorAll('input[name="series[itemList][]"]:checked');
+				const anyChecked = checkedItems.length > 0;
 
-			checkedItems.closest('tr').addClass('selected');
-			uncheckedItems.closest('tr').removeClass('selected');
+				document.querySelectorAll('.series__controls').forEach(el => {
+					el.classList.toggle('visually-hidden', !anyChecked);
+				});
+				allItems.forEach(item => {
+					const row = item.closest('tr');
+					if (!row) return;
+
+					if (item.checked) {
+						row.classList.add('selected');
+					} else {
+						row.classList.remove('selected');
+					}
+				});
+			});
 		});
 	},
 	initSwitches(selector) {
@@ -287,33 +318,45 @@ window.Inachis.Components = {
 			});
 	},
 	initUIToggle() {
-		const $uiToggle = $('.ui-toggle');
-		$uiToggle.each(function () {
-			const targetElement = $(this).attr('data-target');
-			const targetDefaultState = $(this).attr('data-target-state');
+		const uiToggle = document.querySelectorAll('.ui-toggle');
+		uiToggle.forEach(el => {
+			const targetElement = el.getAttribute('data-target');
+			const targetDefaultState = el.getAttribute('data-target-state');
 			if (targetDefaultState === 'hidden') {
-				$(targetElement).hide();
+				document.querySelector(targetElement).classList.add('visually-hidden');
 			}
-		});
-		$uiToggle.on('click', function () {
-			$($(this).attr('data-target')).toggle();
+			el.addEventListener('click', () => {
+				const targetElement = document.querySelector(el.getAttribute('data-target'));
+				targetElement.classList.toggle('visually-hidden');
+				targetElement.setAttribute('aria-hidden', targetElement.classList.contains('visually-hidden'));
+			});
 		});
 	},
 
 	toggleActionBar() {
-		const uncheckedItems = $('input[name^="items"]:not(:checked)');
-		const checkedItems = $('input[name^="items"]:checked');
-		const anyUnchecked = uncheckedItems.length > 0;
-		const anyChecked = checkedItems.length > 0;
-		checkedItems.closest('tr').addClass('selected');
-		checkedItems.closest('article').addClass('selected');
-		uncheckedItems.closest('tr').removeClass('selected');
-		uncheckedItems.closest('article').removeClass('selected');
-		$('.fixed-bottom-bar').toggleClass('visually-hidden', !anyChecked);
-		$('.selectAllNone').prop('checked', !anyUnchecked);
+		const items = document.querySelectorAll('input[name^="items"]');
+
+		let anyChecked = false;
+		let anyUnchecked = false;
+
+		items.forEach(item => {
+			const isChecked = item.checked;
+			anyChecked ||= isChecked;
+			anyUnchecked ||= !isChecked;
+
+			const row = item.closest('tr');
+			const article = item.closest('article');
+
+			if (row) row.classList.toggle('selected', isChecked);
+			if (article) article.classList.toggle('selected', isChecked);
+		});
+		document.querySelectorAll('.fixed-bottom-bar').forEach(el => {
+			el.classList.toggle('visually-hidden', !anyChecked);
+			el.setAttribute('aria-hidden', !anyChecked);
+		});
+		document.querySelectorAll('.selectAllNone').forEach(el => {
+			el.checked = !anyUnchecked;
+			el.setAttribute('aria-checked', !anyUnchecked);
+		});
 	}
 };
-
-$(document).ready(() => {
-	window.Inachis.Components.initialize();
-});

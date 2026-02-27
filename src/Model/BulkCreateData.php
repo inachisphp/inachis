@@ -9,7 +9,7 @@
 
 namespace Inachis\Model;
 
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,8 +42,8 @@ class BulkCreateData
             throw new InvalidArgumentException('Start and end dates are required.');
         }
 
-        $start = DateTime::createFromFormat('d/m/Y', $form['startDate']);
-        $end   = DateTime::createFromFormat('d/m/Y', $form['endDate']);
+        $start = DateTimeImmutable::createFromFormat('d/m/Y', $form['startDate']);
+        $end   = DateTimeImmutable::createFromFormat('d/m/Y', $form['endDate']);
 
         if (!$start || !$end) {
             throw new InvalidArgumentException('Invalid date format, expected d/m/Y.');

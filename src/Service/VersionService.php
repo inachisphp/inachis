@@ -22,7 +22,9 @@ final class VersionService
      */
     public function __construct(string $versionFile)
     {
-        $this->version = require $versionFile;
+        /** @var array<string, string> $version */
+        $version = require $versionFile;
+        $this->version = $version;
     }
 
     /**

@@ -9,7 +9,7 @@
 
 namespace Inachis\Entity;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Uuid;
@@ -75,16 +75,16 @@ abstract class AbstractFile
     protected ?User $author = null;
 
     /**
-     * @var DateTime
+     * @var DateTimeImmutable
      */
-    #[ORM\Column(type: 'datetime')]
-    protected DateTime $createDate;
+    #[ORM\Column(type: 'datetime_immutable')]
+    protected DateTimeImmutable $createDate;
 
     /**
-     * @var DateTime
+     * @var DateTimeImmutable
      */
-    #[ORM\Column(type: 'datetime')]
-    protected DateTime $modDate;
+    #[ORM\Column(type: 'datetime_immutable')]
+    protected DateTimeImmutable $modDate;
 
     /**
      * Returns the value of {@link id}.
@@ -169,9 +169,9 @@ abstract class AbstractFile
     /**
      * Returns the value of {@link createDate}.
      *
-     * @return DateTime The creation date of the file
+     * @return DateTimeImmutable The creation date of the file
      */
-    public function getCreateDate(): DateTime
+    public function getCreateDate(): DateTimeImmutable
     {
         return $this->createDate;
     }
@@ -179,9 +179,9 @@ abstract class AbstractFile
     /**
      * Returns the value of {@link modDate}.
      *
-     * @return DateTime The date the file was last modified
+     * @return DateTimeImmutable The date the file was last modified
      */
-    public function getModDate(): DateTime
+    public function getModDate(): DateTimeImmutable
     {
         return $this->modDate;
     }
@@ -260,8 +260,8 @@ abstract class AbstractFile
      */
     public function isValidFiletype(string $value): bool
     {
-        if (defined('static::ALLOWED_MIME_TYPES')) {
-            return preg_match('/' . static::ALLOWED_MIME_TYPES . '/', $value) === 1;
+        if (defined('self::ALLOWED_MIME_TYPES')) {
+            return in_array($value, self::ALLOWED_MIME_TYPES, true);
         }
         return true;
     }
@@ -310,10 +310,10 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link createDate}.
      *
-     * @param DateTime|null $value The date to be set
+     * @param DateTimeImmutable|null $value The date to be set
      * @return $this
      */
-    public function setCreateDate(?DateTime $value): self
+    public function setCreateDate(?DateTimeImmutable $value): self
     {
         $this->createDate = $value;
 
@@ -323,10 +323,10 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link modDate}.
      *
-     * @param DateTime|null $value Specifies the mod date for the {@link Page}
+     * @param DateTimeImmutable|null $value Specifies the mod date for the {@link Page}
      * @return $this
      */
-    public function setModDate(?DateTime $value): self
+    public function setModDate(?DateTimeImmutable $value): self
     {
         $this->modDate = $value;
 

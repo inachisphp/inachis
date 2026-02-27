@@ -14,8 +14,8 @@ use Inachis\Repository\CategoryRepository;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\SeriesRepository;
 use Inachis\Service\Export\Category\CategoryExportService;
-use Inachis\Service\Page\Export\PageExportService;
-use Inachis\Service\Series\Export\SeriesExportService;
+use Inachis\Service\Export\Page\PageExportService;
+use Inachis\Service\Export\Series\SeriesExportService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -124,6 +124,7 @@ class ExportController extends AbstractInachisController
         $this->data['pages'] = $pageExportService->getAllPages();
         $this->data['scope'] = $scope;
         $this->data['format'] = $format;
+        $this->data['contentType'] = $contentType;
         $this->data['manualPages'] = $pagesPreview ;
         $this->data['selectedIds'] = $selectedIds;
         $this->data['previewCount'] = $previewCount;

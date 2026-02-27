@@ -9,7 +9,7 @@
 
 namespace Inachis\Controller\Page\Post;
 
-use DateTime;
+use DateTimeImmutable;
 use Exception;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Category;
@@ -243,7 +243,7 @@ class PageController extends AbstractInachisController
                 }
             }
 
-            $post->setModDate(new DateTime('now'));
+            $post->setModDate(new DateTimeImmutable());
             if (!empty($post->getId())) {
                 $this->entityManager->persist($revision);
             }
@@ -265,7 +265,6 @@ class PageController extends AbstractInachisController
             'New ' . $post->getType();
         $this->data['includeEditor'] = true;
         $this->data['includeEditorId'] = $post->getId();
-        $this->data['includeDatePicker'] = true;
         $this->data['post'] = $post;
         $this->data['revisions'] = $revisionRepository->getAll(
             0,
@@ -281,6 +280,7 @@ class PageController extends AbstractInachisController
         if ($post->getId() !== null) {
             $this->data['textStats'] = ReadingTime::getWordCountAndReadingTime($this->data['post']->getContent());
         }
+        $this->data['allowedTypes'] = Image::ALLOWED_MIME_TYPES;
         return $this->render('inadmin/page/post/edit.html.twig', $this->data);
     }
 }

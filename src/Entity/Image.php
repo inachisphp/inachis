@@ -9,7 +9,7 @@
 
 namespace Inachis\Entity;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
@@ -24,8 +24,8 @@ class Image extends AbstractFile
     /**
      * @const string RegExp for allowed mime-types
      */
-    public const ALLOWED_MIME_TYPES = 'image\/(png|p?jpeg|hei[cf]|webp|svg+xml)';
-    public const ALLOWED_TYPES = '.jpg,.jpeg,.png,.heic,.heif,.webp,.svg';
+    public const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg', 'image/heic', 'image/heif', 'image/webp', 'image/svg+xml'];
+    public const ALLOWED_TYPES = ['.jpg', '.jpeg', '.png', '.heic', '.heif', '.webp', '.svg'];
 
     public const WARNING_DIMENSIONS = 2048;
     public const WARNING_FILESIZE = 2048; //kb
@@ -53,7 +53,7 @@ class Image extends AbstractFile
      */
     public function __construct()
     {
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
         $this->setCreateDate($now);
         $this->setModDate($now);
         unset($now);

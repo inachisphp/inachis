@@ -17,27 +17,25 @@
     <div class="loader"></div>
 </section>
 <section class="ui-dialog-image-uploader visually-hidden">
-    {{ form_start(form, {'attr': { 'class': 'form' }}) }}
-        <fieldset class="col span_1_of_2 dropzone">
-            {{
-                include('inadmin/partials/dropzone.html.twig', {
-                    'dropzoneUrl': path('incc_resource_upload_image'),
-                    'helpText': 'Upload an image (JPEG or HEIC only)',
-                    'paramName': 'image[imageFile]',
-                    'uploadMultiple': false,
-                    'maxFilesize': 2097152,
-                    'acceptedFiles': allowedTypes,
-                    'autoUpload': false,
-                    'selector': '.ui-dialog-image-uploader form'
-                })
-            }}
+    {{ form_start(form, {'attr': { 'class': 'filepond form nested-grid' }}) }}
+        <fieldset class="col-6">
+            {% include 'inadmin/partials/components/file-upload.html.twig' with {
+                paramName: 'image[imageFile]',
+                maxFiles: 1,
+                maxFileSize: '10MB',
+                uploadMultiple: false,
+                autoUpload: false,
+                acceptedFiles: allowedTypes,
+            } only %}
+            {# 'helpText': 'Upload an image (JPEG or HEIC only)',
+                'selector': '.ui-dialog-image-uploader form' #}
             <p>
                 {{ form_widget(form.optimiseImage) }}
                 {{ form_label(form.optimiseImage) }}
             </p>
         </fieldset>
 
-        <fieldset class="col span_1_of_2">
+        <fieldset class="col-6">
             <p>
                 {{ form_label(form.title) }}
                 {{ form_widget(form.title) }}

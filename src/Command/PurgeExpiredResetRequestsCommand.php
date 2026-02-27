@@ -17,23 +17,35 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+/**
+ * Command to purge expired password reset requests.
+ */
 #[AsCommand(
-    name: 'app:purge-expired-reset-requests',
+    name: 'inachis:purge-expired-reset-requests',
     description: 'Purges all expired password reset requests.',
 )]
 class PurgeExpiredResetRequestsCommand extends Command
 {
-    protected EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
+    /**
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(protected EntityManagerInterface $entityManager)
     {
-        $this->entityManager = $entityManager;
         parent::__construct();
     }
 
+    /**
+     * Executes the command.
+     * 
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $count = $this->entityManager->getRepository(PasswordResetRequest::class)->purgeExpiredHashes();
+        /** @var \Inachis\Repository\PasswordResetRequestRepository $passwordResetRequestRepository */
+        $passwordResetRequestRepository = $this->entityManager->getRepository(PasswordResetRequest::class);
+        $count = $passwordResetRequestRepository->purgeExpiredHashes();
         $io = new SymfonyStyle($input, $output);
         $io->success(sprintf('Deleted %d expired password reset requests.', $count));
         return Command::SUCCESS;

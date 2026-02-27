@@ -9,16 +9,16 @@
 
 namespace Inachis\Tests\phpunit\Parser;
 
+use DateTimeImmutable;
+use Exception;
+use ReflectionClass;
+use ReflectionException;
 use Inachis\Entity\Category;
 use Inachis\Entity\Page;
 use Inachis\Parser\MarkdownFileParser;
-use DateTime;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
-use Exception;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use ReflectionException;
 
 class MarkdownFileParserTest extends TestCase
 {
@@ -71,7 +71,7 @@ MD;
         $this->assertInstanceOf(Page::class, $page);
         $this->assertSame('A title', $page->getTitle());
         $this->assertSame('Sub-title', $page->getSubTitle());
-        $this->assertInstanceOf(DateTime::class, $page->getPostDate());
+        $this->assertInstanceOf(DateTimeImmutable::class, $page->getPostDate());
         $this->assertEquals('2025-01-01', $page->getPostDate()->format('Y-m-d'));
         $this->assertSame('This is a test', $page->getContent());
         $this->assertTrue($page->getCategories()->contains($category3));
@@ -208,8 +208,6 @@ MD;
     {
         $reflection = new ReflectionClass($this->parser);
         $method = $reflection->getMethod('resolveCategoryPath');
-        $method->setAccessible(true);
-
         $result = $method->invoke($this->parser, []);
 
         $this->assertNull($result);

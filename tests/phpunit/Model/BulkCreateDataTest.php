@@ -9,8 +9,8 @@
 
 namespace Inachis\Tests\phpunit\Model;
 
+use DateTimeImmutable;
 use Inachis\Model\BulkCreateData;
-use DateTime;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,8 +23,8 @@ class BulkCreateDataTest extends TestCase
     {
         $this->bulkCreateData = new BulkCreateData(
             'some title',
-            DateTime::createFromFormat('d/m/Y', '01/11/2025'),
-            DateTime::createFromFormat('d/m/Y', '07/11/2025'),
+            DateTimeImmutable::createFromFormat('d/m/Y', '01/11/2025'),
+            DateTimeImmutable::createFromFormat('d/m/Y', '07/11/2025'),
             false,
             Uuid::uuid1()->toString(),
             [ 'test-tag' ],

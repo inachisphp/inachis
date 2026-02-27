@@ -18,6 +18,6 @@ window.Inachis.Notifications = {
 	}
 };
 
-$(document).ready(() => {
+document.addEventListener('DOMContentLoaded', () => {
 	window.Inachis.Notifications._init();
 });

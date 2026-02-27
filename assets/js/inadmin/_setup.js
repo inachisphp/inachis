@@ -1,16 +1,17 @@
 window.Setup = {
-	_init() {
-		$('.form__setup input').on('keyup blur change', (e) => {
-			const input = $(e.currentTarget);
-			if (input.val() != '' && input[0].checkValidity()) {
-				input.addClass('input__complete');
-			}
+	init() {
+		document.querySelectorAll('.form__setup input').forEach((input) => {
+			input.addEventListener('keyup', (e) => {
+				if (input.value != '' && input.checkValidity()) {
+					input.classList.add('input__complete');
+				}
+			});
 		});
 	}
 };
 
-$(document).ready(() => {
-	if ($('.form__setup')) {
-		window.Setup._init();
+document.addEventListener('DOMContentLoaded', () => {
+	if (document.querySelector('.form__setup')) {
+		window.Setup.init();
 	}
 });

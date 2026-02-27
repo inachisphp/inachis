@@ -1,0 +1,37 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_settings_navigation_list') }}">Navigation Tabs</a>
+    <span>Edit Tab</span>
+{% endblock pagetitle %}
+
+{% block content %}
+<div class="col-12 content__edit">
+{{ form_start(form, {'attr': { 'class': 'form form__post form__tabs' }}) }}
+    <section class="paginated-list">
+        <p>
+            {{ form_label(form.title) }}
+            {{ form_errors(form.title) }}
+            {{ form_widget(form.title) }}
+        </p>
+        <p>
+            {{ form_label(form.url) }}
+            {{ form_errors(form.url) }}
+            {{ form_widget(form.url) }}
+        </p>
+        <p>
+            {{ form_label(form.isActive) }}
+            {{ form_errors(form.isActive) }}
+            <span class="switch-wrapper">
+                {{ form_widget(form.isActive) }}
+            </span>
+        </p>
+    </section>
+    <div class="fixed-bottom-bar">
+        <p>
+            {{ form_widget(form.submit) }}
+        </p>
+    </div>
+{{ form_end(form) }}
+</div>
+{% endblock content %}

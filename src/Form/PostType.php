@@ -9,9 +9,11 @@
 
 namespace Inachis\Form;
 
+use DateTimeImmutable;
+use IntlException;
 use Inachis\Entity\{Category,Page,Tag};
 use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
-use IntlException;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\Form\AbstractType;
@@ -25,33 +27,53 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use DateTime;
 
+/**
+ * Form for creating and editing a post
+ */
 class PostType extends AbstractType
 {
-    private RouterInterface $router;
     private ArrayCollectionToArrayTransformer $transformer;
+    private EmojiTransliterator $emojisTransliterator;
+    private RouterInterface $router;
+    private Security $security;
     private TranslatorInterface $translator;
 
-    private EmojiTransliterator $emojisTransliterator;
-
     /**
+     * Constructor
+     *
+     * @param TranslatorInterface $translator
+     * @param RouterInterface $router
+     * @param Security $security
+     * @param ArrayCollectionToArrayTransformer $transformer
      * @throws IntlException
      */
     public function __construct(
         TranslatorInterface $translator,
         RouterInterface $router,
+        Security $security,
         ArrayCollectionToArrayTransformer $transformer
     ) {
+        $this->emojisTransliterator = EmojiTransliterator::create('github-emoji');
         $this->router = $router;
+        $this->security = $security;
         $this->translator = $translator;
         $this->transformer = $transformer;
-        $this->emojisTransliterator = EmojiTransliterator::create('github-emoji');
     }
 
+    /**
+     * Build the form
+     *
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $newItem = empty($options['data']->getId());
+        $user = $this->security->getUser();
+        $userTimezone = $user && method_exists($user, 'getPreferences') 
+            ? $user->getPreferences()->getTimezone() 
+            : 'UTC';
         $builder
             ->add('title', TextType::class, [
                 'attr' => [
@@ -129,13 +151,16 @@ class PostType extends AbstractType
                 ],
                 'format' => 'dd/MM/yyyy HH:mm',
                 'html5'  => false,
-                'label'  => isset($options['data']) && $options['data']->getPostDate() < new DateTime() ?
+                'input'  => 'datetime_immutable',
+                'label'  => isset($options['data']) && $options['data']->getPostDate() < new DateTimeImmutable() ?
                     'admin.post.properties.postDate-past.label' :
                     'admin.post.properties.postDate-future.label',
                 'label_attr' => [
                     'id' => 'postDate_label',
                     'class' => 'inline_label',
                 ],
+                'model_timezone' => 'UTC',
+                'view_timezone' => $userTimezone,
                 'required' => false,
                 'widget'   => 'single_text',
             ])
@@ -267,11 +292,14 @@ class PostType extends AbstractType
                     ],
                     'format' => 'dd/MM/yyyy HH:mm',
                     'html5'  => false,
+                    'input'  => 'datetime_immutable',
                     'label'  => 'admin.post.properties.modDate.label',
                     'label_attr' => [
                         'id' => 'modDate_label',
                         'class' => 'inline_label',
                     ],
+                    'model_timezone' => 'UTC',
+                    'view_timezone' => $userTimezone,
                     'widget'   => 'single_text',
                 ])
                 ->add('publish', SubmitType::class, [
@@ -287,6 +315,8 @@ class PostType extends AbstractType
                 ])
                 ->add('delete', SubmitType::class, [
                     'attr' => [
+                        'data-confirm' => 'delete',
+                        'data-confirm-text' => 'Yes, delete',
                         'class' => 'button button--negative button--confirm',
                         'data-entity' => $options['data']->getType(),
                         'data-title' => $options['data']->getTitle(),
@@ -302,6 +332,11 @@ class PostType extends AbstractType
         }
     }
 
+    /**
+     * Configure the options
+     *
+     * @param OptionsResolver $resolver
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

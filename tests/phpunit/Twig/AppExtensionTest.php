@@ -43,6 +43,6 @@ class AppExtensionTest extends TestCase
         $this->assertEquals('10 B', $this->appExtension->bytesToMinimumUnit(10, true));
         $this->assertEquals('1.00 KiB', $this->appExtension->bytesToMinimumUnit(1024));
         $this->assertEquals('3.81 MiB', $this->appExtension->bytesToMinimumUnit(4000000));
-        $this->assertEquals('-100.00 B', $this->appExtension->bytesToMinimumUnit(-100));
+        $this->assertEquals('0 B', $this->appExtension->bytesToMinimumUnit(-100));
     }
 }

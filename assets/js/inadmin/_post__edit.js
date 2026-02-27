@@ -151,7 +151,3 @@ window.Inachis.PostEdit = {
 		}
 	},
 };
-
-$(document).ready(function () {
-	window.Inachis.PostEdit.init();
-});

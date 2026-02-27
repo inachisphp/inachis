@@ -1,9 +1,13 @@
 window.Inachis.Style = {
-    _init() {
-        $('.material-icons').filter((i, el) => $(el).text() === 'check_box').addClass('checkbox__checked');
+    init() {
+        document.querySelectorAll('.material-icons').forEach(el => {
+            if (el.textContent === 'check_box') {
+                el.classList.add('checkbox__checked');
+            }
+        });
     }
 };
 
-$(document).ready(() => {
-    window.Inachis.Style._init();
+document.addEventListener('DOMContentLoaded', () => {
+    window.Inachis.Style.init();
 });

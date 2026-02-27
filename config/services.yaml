@@ -50,31 +50,31 @@ services:
         arguments:
             $publicImgPath: '%app.public_img_path%'
 
-    Inachis\Service\Page\Export\PageExportService:
+    Inachis\Service\Export\Page\PageExportService:
         arguments:
             $writers: !tagged_iterator inachis.export_writer
 
-    Inachis\Service\Page\Export\PageJsonWriter:
+    Inachis\Service\Export\Page\PageJsonWriter:
         tags:
             - { name: 'inachis.export_writer', priority: 0 }
 
-    Inachis\Service\Page\Export\PageMdWriter:
+    Inachis\Service\Export\Page\PageMdWriter:
         tags:
             - { name: 'inachis.export_writer', priority: 0 }
 
-    Inachis\Service\Page\Export\PageXmlWriter:
+    Inachis\Service\Export\Page\PageXmlWriter:
         tags:
             - { name: 'inachis.export_writer', priority: 0 }
 
-    Inachis\Service\Series\Export\SeriesExportService:
+    Inachis\Service\Export\Series\SeriesExportService:
         arguments:
             $writers: !tagged_iterator inachis.export_writer
 
-    Inachis\Service\Series\Export\SeriesMdWriter:
+    Inachis\Service\Export\Series\SeriesMdWriter:
         tags:
             - { name: 'inachis.export_writer', priority: 10 }
 
-    Inachis\Service\Series\Export\SeriesXmlWriter:
+    Inachis\Service\Export\Series\SeriesXmlWriter:
         tags:
             - { name: 'inachis.export_writer', priority: 10 }
 

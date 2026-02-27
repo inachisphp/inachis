@@ -6,17 +6,18 @@
         <span>with selected:</span>
         {% endif %}
         {% for key, action in actions %}
-            <button class="button {{ action.button_class|default(null) }}"{%-
+            {% set elementType = action.href ?? '' ? 'a' : 'button' %}
+            <{{ elementType }}{% if action.href ?? '' %} href="{{ action.href }}"{% endif %} class="button {{ action.button_class|default(null) }}"{%-
                 if action.data is defined and action.data is not empty %}
                 {% for datakey, datavalue in action.data %} data-{{ datakey }}="{{ datavalue }}"{% endfor %}
                     {%- endif %}{%-
                 if action.id is defined %} id="{{ action.id }}"{% endif
-            %} name="{{ key }}" type="{{ action.button_type|default('submit') }}">
+            %} name="{{ key }}" type="{{ action.button_type|default('submit') }}"{%if action.value is defined and action.value is not empty %} value="{{ action.value }}"{% endif %}>
                 {% if action.icon is defined and action.icon is not empty %}
                     <span class="material-icons" aria-hidden="true">{{ action.icon }}</span>
                 {% endif %}
                 {{ action.title|default(null) }}
-            </button>
+            </{{ elementType }}>
         {% endfor %}
     </p>
 </div>

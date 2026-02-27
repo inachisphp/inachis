@@ -2,11 +2,8 @@ import esbuild from "esbuild";
 import { sassPlugin } from "esbuild-sass-plugin";
 import fs from "fs";
 import path from "path";
-import imagemin from "imagemin";
-import imageminMozjpeg from "imagemin-mozjpeg";
-import imageminPngquant from "imagemin-pngquant";
-import imageminGifsicle from "imagemin-gifsicle";
-import imageminSvgo from "imagemin-svgo";
+import sharp from "sharp";
+import { optimize as optimizeSvg } from "svgo";
 
 const isWatch = process.argv.includes("--watch");
 const isProd = !isWatch;
@@ -70,11 +67,11 @@ const builds = {
         //     entryPoints: ["assets/js/web.js"],
         //     outfile: "public/assets/js/scripts.min.js"
         // },
-        // scss: {
-        //     ...scssBaseConfig,
-        //     entryPoints: ["assets/scss/web/styles.scss"],
-        //     outfile: "public/assets/css/styles.min.css"
-        // }
+        scss: {
+            ...scssBaseConfig,
+            entryPoints: ["assets/scss/web/styles.scss"],
+            outfile: "public/assets/css/styles.min.css"
+        }
     }
 };
 
@@ -99,15 +96,36 @@ async function optimizeImages() {
 
     await Promise.all(
         files.map(async file => {
-            await imagemin([path.join(inputDir, file)], {
-                destination: outputDir,
-                plugins: [
-                    imageminMozjpeg({ quality: 75 }),
-                    imageminPngquant({ quality: [0.7, 0.85] }),
-                    imageminGifsicle({ optimizationLevel: 2 }),
-                    imageminSvgo()
-                ]
-            });
+            const inputPath = path.join(inputDir, file);
+            const outputPath = path.join(outputDir, file);
+            const ext = path.extname(file).toLowerCase();
+
+            if (ext === ".jpg" || ext === ".jpeg") {
+                await sharp(inputPath)
+                    .jpeg({ quality: 75 })
+                    .toFile(outputPath);
+            }
+
+            else if (ext === ".png") {
+                await sharp(inputPath)
+                    .png({ quality: 80, compressionLevel: 9 })
+                    .toFile(outputPath);
+            }
+
+            else if (ext === ".gif") {
+                await sharp(inputPath)
+                    .gif()
+                    .toFile(outputPath);
+            }
+
+            else if (ext === ".svg") {
+                const svgContent = fs.readFileSync(inputPath, "utf8");
+                const result = optimizeSvg(svgContent, {
+                    multipass: true
+                });
+                fs.writeFileSync(outputPath, result.data);
+            }
+
             console.log(` - Optimized: ${file}`);
         })
     );
@@ -141,9 +159,6 @@ async function copyExtraLibraries() {
         "node_modules/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.min.js",
         "node_modules/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js",
         "node_modules/jquery/dist/jquery.min.js",
-        "node_modules//jquery-ui-dist/jquery-ui.min.js",
-        "node_modules/jquery-datetimepicker/build/jquery.datetimepicker.full.min.js",
-        "node_modules/jquery-datetimepicker/build/jquery.datetimepicker.min.css",
         "node_modules/easymde/dist/easymde.min.js",
         "node_modules/tom-select/dist/js/tom-select.complete.min.js"
     ];
@@ -230,13 +245,23 @@ async function runWatchMode() {
         ]
     });
 
+    const webScssCtx = await esbuild.context({
+        ...builds.web.scss,
+        plugins: [
+            ...(builds.web.scss.plugins || []),
+            watchLogger("Web SCSS", color.css)
+        ]
+    });
+
     await Promise.all([
         inadminJsCtx.watch(),
-        inadminScssCtx.watch()
+        inadminScssCtx.watch(),
+        webScssCtx.watch()
     ]);
 
     console.log(color.js("📂 assets/js/inadmin/** → JS rebuild"));
     console.log(color.css("🎨 assets/scss/inadmin/** → CSS rebuild"));
+    console.log(color.css("🎨 assets/scss/web/** → CSS rebuild"));
     console.log("\n⏳ Waiting for changes...\n");
 }
 
@@ -250,8 +275,7 @@ async function runProdBuild() {
     await Promise.all([
         esbuild.build(builds.inadmin.js),
         esbuild.build(builds.inadmin.scss),
-        // esbuild.build(builds.web.js),
-        // esbuild.build(builds.web.scss),
+        esbuild.build(builds.web.scss),
     ]);
 
     await copyExtraLibraries();

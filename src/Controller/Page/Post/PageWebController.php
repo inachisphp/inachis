@@ -9,6 +9,7 @@
 
 namespace Inachis\Controller\Page\Post;
 
+use Exception;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Category;
 use Inachis\Entity\Image;
@@ -21,8 +22,6 @@ use Inachis\Form\PostType;
 use Inachis\Repository\RevisionRepository;
 use Inachis\Util\ContentRevisionCompare;
 use Inachis\Util\ReadingTime;
-use DateTime;
-use Exception;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\RedirectResponse;

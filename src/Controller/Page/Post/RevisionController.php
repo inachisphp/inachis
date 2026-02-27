@@ -9,12 +9,12 @@
 
 namespace Inachis\Controller\Page\Post;
 
+use DateTimeImmutable;
+use Exception;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Parser\ArrayToMarkdown;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\RevisionRepository;
-use DateTime;
-use Exception;
 use Jfcherng\Diff\DiffHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,6 +56,8 @@ class RevisionController extends AbstractInachisController
 
         $this->data['page']['title'] = 'Compare Revisions';
         $this->data['page']['tab'] = 'post';
+        $this->data['page_id'] = $page->getId();
+        $this->data['url'] = $page->getUrls()[0]->getLink();
         $this->data['title'] = json_decode(
             DiffHelper::calculate(
                 $revision->getTitle() ?? '',
@@ -104,7 +106,7 @@ class RevisionController extends AbstractInachisController
         $page->setTitle($revision->getTitle())
             ->setSubTitle($revision->getSubTitle())
             ->setContent($revision->getContent())
-            ->setModDate(new DateTime('now'))
+            ->setModDate(new DateTimeImmutable())
             ->setAuthor($this->getUser());
 
         $newRevision = $revisionRepository->hydrateNewRevisionFromPage($page);

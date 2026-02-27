@@ -9,9 +9,9 @@
 
 namespace Inachis\Entity;
 
-use DateTime;
-use Doctrine\ORM\Mapping as ORM;
+use DateTimeImmutable;
 use Exception;
+use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 
@@ -62,16 +62,16 @@ class Url
     protected bool $default;
 
     /**
-     * @var DateTime The date the Url was added
+     * @var DateTimeImmutable The date the Url was added
      */
-    #[ORM\Column(type: 'datetime', nullable: false)]
-    protected DateTime $createDate;
+    #[ORM\Column(type: 'datetime_immutable', nullable: false)]
+    protected DateTimeImmutable $createDate;
 
     /**
-     * @var DateTime The date the Url was last modified
+     * @var DateTimeImmutable The date the Url was last modified
      */
-    #[ORM\Column(type: 'datetime', nullable: false)]
-    protected DateTime $modDate;
+    #[ORM\Column(type: 'datetime_immutable', nullable: false)]
+    protected DateTimeImmutable $modDate;
 
     /**
      * Default constructor for entity - by default the
@@ -88,8 +88,8 @@ class Url
         $this->setContent($content);
         $this->setLink($link);
         $this->setDefault((bool) $default);
-        $this->setCreateDate(new DateTime('now'));
-        $this->setModDate(new DateTime('now'));
+        $this->setCreateDate(new DateTimeImmutable());
+        $this->setModDate(new DateTimeImmutable());
         $this->associateContent();
     }
 
@@ -136,17 +136,17 @@ class Url
     }
 
     /**
-     * @return DateTime
+     * @return DateTimeImmutable
      */
-    public function getCreateDate(): DateTime
+    public function getCreateDate(): DateTimeImmutable
     {
         return $this->createDate;
     }
 
     /**
-     * @return DateTime
+     * @return DateTimeImmutable
      */
-    public function getModDate(): DateTime
+    public function getModDate(): DateTimeImmutable
     {
         return $this->modDate;
     }
@@ -193,20 +193,20 @@ class Url
     }
 
     /**
-     * @param DateTime $value
+     * @param DateTimeImmutable $value
      * @return $this
      */
-    public function setCreateDate(DateTime $value): self
+    public function setCreateDate(DateTimeImmutable $value): self
     {
         $this->createDate = $value;
         return $this;
     }
 
     /**
-     * @param DateTime $value
+     * @param DateTimeImmutable $value
      * @return $this
      */
-    public function setModDate(DateTime $value): self
+    public function setModDate(DateTimeImmutable $value): self
     {
         $this->modDate = $value;
         return $this;
@@ -214,10 +214,12 @@ class Url
 
     /**
      * Sets the mod date for the {@link Url} to the current date.
+     *
+     * @return $this
      */
     public function setModDateToNow(): self
     {
-        $this->setModDate(new DateTime('now'));
+        $this->setModDate(new DateTimeImmutable());
         return $this;
     }
 

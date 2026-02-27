@@ -9,21 +9,32 @@
 
 namespace Inachis\Util;
 
+/**
+ * ReadingTime class
+ */
 class ReadingTime
 {
-    private const WORDS_PER_MINUTE = 238;
     /**
+     * Words per minute
+     */
+    private const WORDS_PER_MINUTE = 238;
+
+    /**
+     * Get reading time
+     *
      * @param string|null  $text
      * @param int|null $wordCount
      * @param int|null $wpm
-     * @return int
+     * @return float
      */
-    public static function getReadingTime(?string $text, ?int $wordCount = 0, ?int $wpm = self::WORDS_PER_MINUTE): int
+    public static function getReadingTime(?string $text, ?int $wordCount = 0, ?int $wpm = self::WORDS_PER_MINUTE): float
     {
         return ceil(($wordCount > 0 ? $wordCount : self::getWordCount($text)) / $wpm);
     }
 
     /**
+     * Get word count
+     *
      * @param string|null $text
      * @return int
      */
@@ -34,9 +45,11 @@ class ReadingTime
     }
 
     /**
+     * Get word count and reading time
+     *
      * @param string|null  $text
      * @param int|null $wpm
-     * @return array
+     * @return array<string, int|float>
      */
     public static function getWordCountAndReadingTime(?string $text, ?int $wpm = self::WORDS_PER_MINUTE): array
     {

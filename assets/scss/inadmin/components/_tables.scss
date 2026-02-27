@@ -17,7 +17,7 @@
 
   &::-webkit-scrollbar-thumb {
     border-radius: 4px;
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
   }
 
   &::before,
@@ -106,6 +106,11 @@ table {
   }
 }
 
+.table--monospaced tr td,
+td.column--monospaced {
+  font-family: monospace;
+}
+
 // Zebra striping
 .table--striped {
   tbody tr:nth-child(even) {
@@ -154,8 +159,12 @@ table {
 
 // Automatically switch to dense mode on small screens
 @media (max-width: $breakpoint-small) {
-  .table--compact, .table--dense {
-    thead th, tbody td {
+
+  .table--compact,
+  .table--dense {
+
+    thead th,
+    tbody td {
       padding: 0.3rem 0.5rem;
     }
   }
@@ -214,11 +223,86 @@ table {
     right: 0.75rem;
     font-size: 0.7rem;
     opacity: 0.5;
-    color: rgba(255,255,255,0.8);
+    color: rgba(255, 255, 255, 0.8);
   }
 
-  &.sorted-asc::after { content: "↑"; opacity: 1; }
-  &.sorted-desc::after { content: "↓"; opacity: 1; }
+  &.sorted-asc::after {
+    content: "↑";
+    opacity: 1;
+  }
+
+  &.sorted-desc::after {
+    content: "↓";
+    opacity: 1;
+  }
+}
+
+.table--dragdrop {
+  tbody tr {
+    position: relative;
+    cursor: grab;
+    touch-action: none;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    will-change: transform;
+  }
+
+  tr.dragging {
+    background-color: #e0f7ff;
+    opacity: 0.8;
+    cursor: grabbing;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  tr.drop {
+    animation: drop-bounce 0.25s ease-out;
+  }
+
+  .placeholder {
+    background: #d0ebff;
+    border: 2px dashed #007bff;
+  }
+}
+
+.dragged-clone {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.95;
+  background: #f0f8ff;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+
+  input {
+    display: none;
+  }
+
+  &.lifted {
+    transform: scale(1.03);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  &.fade-out {
+    opacity: 0;
+    transform: scale(0.97);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@keyframes drop-bounce {
+  0% {
+    transform: scaleY(0.95);
+  }
+
+  50% {
+    transform: scaleY(1.05);
+  }
+
+  100% {
+    transform: scaleY(1);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -232,7 +316,7 @@ table {
 }
 
 .table--sticky-header thead {
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .table--sticky-col tbody td:first-child,
@@ -255,6 +339,7 @@ table {
 
 // Convert table to flex/grid for mobile
 @media (max-width: $breakpoint-medium) {
+
   .table-responsive table,
   .table-responsive tbody,
   .table-responsive tr,
@@ -373,7 +458,7 @@ table {
   }
 }
 
-.table--expandable tr.expanded + .row-details {
+.table--expandable tr.expanded+.row-details {
   display: table-row;
   max-height: 500px; // smooth transition
 }

@@ -1,0 +1,6 @@
+InachisFileUploader = {
+    _init: function ()
+    {
+
+    }
+};

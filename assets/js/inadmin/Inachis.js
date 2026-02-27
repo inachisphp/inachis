@@ -8,6 +8,26 @@ window.Inachis = {
 		}
 	},
 
+	bootstrap() {
+		window.Inachis.BulkCreateDialog.init();
+		window.Inachis.CategoryManager.init();
+		window.Inachis.Components.init();
+		window.Inachis.ConfirmationPrompt.init();
+		window.Inachis.DragDropTable.init();
+		window.Inachis.ImageManager.init();
+		window.Inachis.PostEdit.init();
+	},
+
+	initOnClick(selector, handler) {
+		const el = document.querySelector(selector);
+		if (!el) return;
+
+		el.addEventListener('click', e => {
+			e.preventDefault();
+			handler();
+		});
+	},
+
 	debounce(fn, delay = 300) {
 		let timer;
 
@@ -19,3 +39,7 @@ window.Inachis = {
 		};
 	}
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+	window.Inachis.bootstrap();
+});

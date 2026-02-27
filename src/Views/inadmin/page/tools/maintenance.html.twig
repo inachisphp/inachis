@@ -1,0 +1,62 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <span>Maintenance Mode</span>
+{% endblock pagetitle %}
+{% block content %}
+<div class="col-12 content__edit">
+    <section class="admonition admonition__info">
+        <p>Current IP: <strong>{{ current_ip }}</strong></p>
+        <p>Status: <strong>{{ enabled ? 'Enabled' : 'Disabled' }}</strong></p>
+    </section>
+
+    <form class="form form__post" method="post">
+    <fieldset class="ui-tabs-panel ui-widget-content">
+        <p>
+            <label for="message">Maintenance Message:</label>
+            <textarea class="text full-width" id="message" name="message" rows="3">{{ config.message }}</textarea>
+        </p>
+        <p>
+            <label for="estimated_downtime">Estimated Downtime:</label>
+            <input class="text" type="text" id="estimated_downtime" name="estimated_downtime" value="{{ config.estimated_downtime }}">
+        </p>
+        <p>
+            <label for="allowed_ips">Allowed IPs (comma separated):</label>
+            <input class="text" type="text" id="allowed_ips" name="allowed_ips" value="{{ config.allowed_ips|join(', ') }}">
+        </p>
+        <p>
+            <label for="retry_after">Retry After (seconds):</label>
+            <input class="text" type="number" id="retry_after" name="retry_after" value="{{ config.retry_after }}">
+        </p>
+
+        {% include 'inadmin/partials/action_bar.html.twig' with {
+            actions: {
+                toggle: {
+                    button_class: enabled ? 'button--positive' : 'button--negative',
+                    button_type: 'submit',
+                    name: 'toggle',
+                    value: enabled ? 'off' : 'on',
+                    title: enabled ? 'Disable Maintenance' : 'Enable Maintenance'
+                },
+                save: {
+                    button_class: 'button--secondary',
+                    button_type: 'submit',
+                    name: 'save',
+                    value: 'save',
+                    title: 'Save Config & Generate Page'
+                },
+                preview: {
+                    button_class: 'button--info',
+                    button_type: 'button',
+                    name: 'preview',
+                    value: 'preview',
+                    title: 'Preview',
+                    href: path('incc_tools_maintenance_preview')
+                }
+            }
+        } %}
+    </fieldset>
+    </form>
+</div>
+{% endblock content %}

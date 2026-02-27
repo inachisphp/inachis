@@ -20,12 +20,13 @@ use Inachis\Service\Import\Series\SeriesImportService;
 use Inachis\Service\Import\Series\SeriesImportValidator;
 use Inachis\Service\Import\Category\CategoryImportService;
 use Inachis\Service\Import\Category\CategoryImportValidator;
-use Inachis\Service\Page\Import\PageImportService;
-use Inachis\Service\Page\Import\PageImportValidator;
+use Inachis\Service\Import\Page\PageImportService;
+use Inachis\Service\Import\Page\PageImportValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Inachis\Parser\MarkdownFileParser;
 
 /**
  * Controller for importing pages and posts
@@ -75,7 +76,10 @@ class ImportController extends AbstractInachisController
                         $data = json_decode(json_encode($xml), true)['category'];
                         break;
                     case 'md':
-                        throw new \InvalidArgumentException('Markdown import not implemented yet.');
+                        $parser = new MarkdownFileParser();
+                        $data = $parser->parse($content);
+dump($data);exit;
+                        break;
                     default:
                         throw new \InvalidArgumentException('Unsupported file format.');
                 }
@@ -150,7 +154,7 @@ class ImportController extends AbstractInachisController
         $options = new ImportOptionsDto();
         $options->createMissingCategories = $request->request->getBoolean('createMissingCategories', false);
         $options->createMissingTags = $request->request->getBoolean('createMissingTags', false);
-        $options->overridePostDates = $request->request->getBoolean('overridePostDates', false);
+        // $options->overridePostDates = $request->request->getBoolean('overridePostDates', false);
 
         $warnings = [];
         $resultSummary = [];
@@ -179,7 +183,7 @@ class ImportController extends AbstractInachisController
                     'items' => $result->seriesImported ?? 0,
                     'pagesLinked' => $result->pagesLinked ?? 0,
                     'message' => sprintf(
-                        'Imported %d series and linked %d pages.',
+                        'Imported %d series, and linked %d pages.',
                         $result->seriesImported,
                         $result->pagesLinked
                     ),
@@ -192,7 +196,7 @@ class ImportController extends AbstractInachisController
                 $resultSummary = [
                     'items' => $result->categoriesCreated ?? 0,
                     'message' => sprintf(
-                        'Imported %d categories and updated %d categories.',
+                        'Imported %d categories, and updated %d categories.',
                         $result->categoriesCreated,
                         $result->categoriesUpdated
                     ),
