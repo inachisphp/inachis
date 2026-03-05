@@ -14,7 +14,7 @@ use Inachis\Entity\SecurityPolicy;
 use Inachis\Form\SecurityPolicyType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Controller for security policy management

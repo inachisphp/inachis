@@ -12,7 +12,8 @@ namespace Inachis\Controller\Page\Tools;
 use Inachis\Controller\AbstractInachisController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Controller for displaying application logs
@@ -22,7 +23,7 @@ class LogController extends AbstractInachisController
 {
     /**
      * Show the logs page
-     * 
+     *
      * @param Request $request The request
      * @return Response The response
      */
@@ -66,7 +67,7 @@ class LogController extends AbstractInachisController
     /**
      * Get the last N lines from a file
      * @todo move this into a service
-     * 
+     *
      * @param string $file The file to read
      * @param int $maxLines The maximum number of lines to read
      * @return array The last N lines from the file
@@ -97,7 +98,7 @@ class LogController extends AbstractInachisController
     /**
      * Parse a monolog log line
      * @todo move this into a service
-     * 
+     *
      * @param string $line The log line to parse
      * @return array|null The parsed log line
      */
