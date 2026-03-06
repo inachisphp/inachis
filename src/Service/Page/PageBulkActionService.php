@@ -18,6 +18,7 @@ use Inachis\Util\UrlNormaliser;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Symfony\Bundle\SecurityBundle\Security;
 
 readonly class PageBulkActionService
 {
@@ -31,6 +32,7 @@ readonly class PageBulkActionService
         private RevisionRepository $revisionRepository,
         private UrlRepository $urlRepository,
         private EntityManagerInterface $entityManager,
+        private Security $security,
     ) {}
 
     /**
@@ -75,15 +77,18 @@ readonly class PageBulkActionService
     }
 
     /**
+     * @param Page $post
      * @throws Exception
      */
     public function delete(Page $post): void
     {
-        $this->revisionRepository->deleteAndRecordByPage($post);
+        $this->revisionRepository->deleteAndRecordByPage($post, $this->security->getUser());
         $this->pageRepository->remove($post);
     }
 
     /**
+     * @param Page $post
+     * @return Page
      * @throws Exception
      */
     public function rebuild(Page $post): Page

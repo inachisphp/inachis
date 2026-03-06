@@ -9,18 +9,16 @@
 
 namespace Inachis\Repository;
 
-use Inachis\Entity\Page;
-use Inachis\Entity\Revision;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Inachis\Entity\{Page,Revision,User};
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\NonUniqueResultException;
-use DateTime;
+use DateTimeImmutable;
 
 /**
  * @method Revision|null find($id, $lockMode = null, $lockVersion = null)
  * @method Revision|null findOneBy(array $criteria, array $orderBy = null)
- * @method Revision[]    findAll()
- * @method Revision[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Revision[] findAll()
+ * @method Revision[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class RevisionRepository extends AbstractRepository implements RevisionRepositoryInterface
 {
@@ -75,20 +73,26 @@ class RevisionRepository extends AbstractRepository implements RevisionRepositor
      * @return Revision
      * @throws \Exception
      */
-    public function deleteAndRecordByPage(Page $page): Revision
+    public function deleteAndRecordByPage(Page $page, User $user = null): Revision
     {
         $this->createQueryBuilder('r')
             ->delete()
             ->where('r.page_id = :pageId')
-            ->setParameter('pageId', $page->getId());
+            ->setParameter('pageId', $page->getId())
+            ->getQuery()
+            ->execute();
+
         $revision = new Revision();
         $revision
             ->setPageId($page->getId())
             ->setTitle($page->getTitle())
             ->setSubTitle($page->getSubTitle())
-            ->setUser()
-            ->setModDate(new DateTime())
+            ->setUser($user)
+            ->setModDate(new DateTimeImmutable())
             ->setAction(self::DELETED);
+        $this->getEntityManager()->persist($revision);
+        $this->getEntityManager()->flush();
+
         return $revision;
     }
 }

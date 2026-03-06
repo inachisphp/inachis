@@ -134,6 +134,7 @@ class PageController extends AbstractInachisController
     public function edit(
         Request $request,
         ContentRevisionCompare $contentRevisionCompare,
+        PageBulkActionService $pageBulkActionService,
         PageRepository $pageRepository,
         RevisionRepository $revisionRepository,
         string $type = 'post',
@@ -164,12 +165,10 @@ class PageController extends AbstractInachisController
 
         if ($form->isSubmitted()) {//} && $form->isValid()) {
             if ($form->has('delete') && $form->get('delete')->isClicked()) {
-                $revisionRepository->deleteAndRecordByPage($post);
-                $pageRepository->remove($post);
+                $pageBulkActionService->delete($post);
                 return $this->redirectToRoute(
-                    'incc_dashboard',
-                    [],
-                    Response::HTTP_PERMANENTLY_REDIRECT
+                    'incc_post_list',
+                    [ 'type' => $type ]
                 );
             }
             $post->setAuthor($this->getUser());

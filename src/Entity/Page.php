@@ -175,7 +175,12 @@ class Page
     /**
      * @var Collection|null The array of URLs for the content
      */
-    #[ORM\OneToMany(mappedBy: 'content', targetEntity: 'Inachis\Entity\Url', cascade: [ 'persist' ])]
+    #[ORM\OneToMany(
+        mappedBy: 'content',
+        targetEntity: 'Inachis\Entity\Url',
+        cascade: [ 'persist', 'remove' ],
+        orphanRemoval: true
+    )]
     #[ORM\OrderBy(['default' => 'DESC'])]
     protected ?Collection $urls;
 
@@ -781,7 +786,9 @@ class Page
      */
     public function addCategory(Category $category): self
     {
-        $this->categories[] = $category;
+        if (!$this->categories->contains($category)) {
+            $this->categories->add($category);
+        }
         return $this;
     }
 
@@ -801,7 +808,9 @@ class Page
      */
     public function addTag(Tag $tag): self
     {
-        $this->tags[] = $tag;
+        if (!$this->tags->contains($tag)) {
+            $this->tags->add($tag);
+        }
         return $this;
     }
 
