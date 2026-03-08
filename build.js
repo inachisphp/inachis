@@ -5,12 +5,13 @@ import path from "path";
 import sharp from "sharp";
 import { optimize as optimizeSvg } from "svgo";
 
+const ROOT = process.cwd();
 const isWatch = process.argv.includes("--watch");
 const isProd = !isWatch;
 
 (() => {
-    const composerJson = JSON.parse(fs.readFileSync(path.resolve('composer.json'), 'utf-8'));
-    const versionFilePath = path.resolve('config/version.php');
+    const composerJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'composer.json'), 'utf-8'));
+    const versionFilePath = path.join(ROOT, 'config/version.php');
 
     const version = composerJson.version || 'dev';
     const commit = process.env.GIT_COMMIT || 'dev';
@@ -44,6 +45,9 @@ const scssBaseConfig = {
     plugins: [
         sassPlugin({
             outputStyle: "compressed",
+            loadPaths: [
+                path.join(ROOT, "node_modules")
+            ]
         })
     ]
 };
@@ -52,25 +56,25 @@ const builds = {
     inadmin: {
         js: {
             ...jsBaseConfig,
-            entryPoints: ["assets/js/inadmin.js"],
-            outfile: "public/assets/js/incc/scripts.min.js"
+            entryPoints: [path.join(ROOT, "assets/js/inadmin.js")],
+            outfile: path.join(ROOT, "public/assets/js/incc/scripts.min.js")
         },
         scss: {
             ...scssBaseConfig,
-            entryPoints: ["assets/scss/inadmin/styles.scss"],
-            outfile: "public/assets/css/incc/styles.min.css"
+            entryPoints: [path.join(ROOT, "assets/scss/inadmin/styles.scss")],
+            outfile: path.join(ROOT, "public/assets/css/incc/styles.min.css")
         }
     },
     web: {
         // js: {
         //     ...jsBaseConfig,
-        //     entryPoints: ["assets/js/web.js"],
-        //     outfile: "public/assets/js/scripts.min.js"
+        //     entryPoints: [path.join(ROOT, "assets/js/web.js")],
+        //     outfile: path.join(ROOT, "public/assets/js/scripts.min.js")
         // },
         scss: {
             ...scssBaseConfig,
-            entryPoints: ["assets/scss/web/styles.scss"],
-            outfile: "public/assets/css/styles.min.css"
+            entryPoints: [path.join(ROOT, "assets/scss/web/styles.scss")],
+            outfile: path.join(ROOT, "public/assets/css/styles.min.css")
         }
     }
 };
@@ -83,8 +87,8 @@ const color = {
 };
 
 async function optimizeImages() {
-    const inputDir = "assets/imgs/incc";
-    const outputDir = "public/assets/imgs/incc";
+    const inputDir = path.join(ROOT, "assets/imgs/incc");
+    const outputDir = path.join(ROOT, "public/assets/imgs/incc");
 
     if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir, { recursive: true });
@@ -132,8 +136,8 @@ async function optimizeImages() {
 }
 
 async function copyIconsAndManifests() {
-    const srcDir = 'assets/imgs/incc';
-    const destDir = 'public/assets/imgs/incc';
+    const srcDir = path.join(ROOT, "assets/imgs/incc");
+    const destDir = path.join(ROOT, "public/assets/imgs/incc");
     const filesToCopy = ['.ico', 'browserconfig.xml', 'site.webmanifest'];
 
     fs.mkdirSync(destDir, { recursive: true });
@@ -163,8 +167,8 @@ async function copyExtraLibraries() {
         "node_modules/tom-select/dist/js/tom-select.complete.min.js"
     ];
 
-    const destDirJs = "public/assets/js/incc/";
-    const destDirCss = "public/assets/css/incc/";
+    const destDirJs = path.join(ROOT, "public/assets/js/incc/");
+    const destDirCss = path.join(ROOT, "public/assets/css/incc/");
     if (!fs.existsSync(destDirJs)) fs.mkdirSync(destDirJs, { recursive: true });
     if (!fs.existsSync(destDirCss)) fs.mkdirSync(destDirCss, { recursive: true });
 

@@ -11,6 +11,7 @@ namespace Inachis\Diagnostics\Check\Database;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Platforms\MariaDBPlatform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Inachis\Diagnostics\CheckInterface;
@@ -58,7 +59,7 @@ final class DatabasePerformanceCheck implements CheckInterface
         try {
             $platform = $this->connection->getDatabasePlatform();
 
-            if ($platform instanceof MySQLPlatform) {
+            if ($platform instanceof MySQLPlatform || $platform instanceof MariaDBPlatform) {
                 return $this->checkMySql();
             }
 
