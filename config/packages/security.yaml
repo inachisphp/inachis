@@ -13,44 +13,47 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        main:
+        health:
+            pattern: ^/health$
+            security: false
+
+        incc:
+            pattern: ^/incc(/|$)
             lazy: true
+            stateless: false
             provider: app_user_provider
             user_checker: Inachis\Security\UserChecker
 
             form_login:
                 login_path: incc_account_login
                 check_path: incc_account_login
-
                 username_parameter: login[loginUsername]
                 password_parameter: login[loginPassword]
                 csrf_parameter: login[_token]
-
-                use_referer: true
                 default_target_path: incc_dashboard
+                use_referer: true
+                enable_csrf: true
 
             logout:
                 path: incc_logout
                 target: incc_account_login
+                invalidate_session: true
+                delete_cookies:
+                    PHPSESSID: null
 
             login_throttling:
                 max_attempts: 5
                 interval: '15 minutes'
 
-        secured_area:
-            form_login:
-                enable_csrf: true
+        main:
+            pattern: ^/
+            stateless: true
 
     access_control:
-        - { path: ^/incc/login$, roles: PUBLIC_ACCESS }
-        - { path: ^/incc/forgot-password$, roles: PUBLIC_ACCESS }
-        - { path: ^/incc/new-password, roles: PUBLIC_ACCESS }
-        - { path: ^/incc/logout, roles: PUBLIC_ACCESS }
-        - { path: ^/incc/ax/calculate-password-strength$, roles: PUBLIC_ACCESS }
-
-        - { path: ^/incc, roles: [ ROLE_ADMIN ] }
-        #- { path: ^/.*, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/.*, roles: PUBLIC_ACCESS, requires_channel: https }
+        - { path: ^/health$, roles: PUBLIC_ACCESS, ips: [127.0.0.1, ::1, 10.0.0.0/8, 192.168.0.0/16] }
+        - { path: ^/incc/(login|forgot-password|new-password|logout|ax/calculate-password-strength)$, roles: PUBLIC_ACCESS }
+        - { path: ^/incc, roles: ROLE_ADMIN }
+        - { path: ^/.*, roles: PUBLIC_ACCESS }
 
 when@test:
     security:

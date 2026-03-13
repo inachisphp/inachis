@@ -19,8 +19,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Annotation\IsGranted;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Controller for navigation tabs
@@ -30,7 +30,7 @@ class NavigationTabController extends AbstractInachisController
 {
     /**
      * List all navigation tabs
-     * 
+     *
      * @param Request $request
      * @param NavigationTabRepository $navigationTabRepository
      * @param NavigationTabService $navigationTabService
@@ -81,7 +81,7 @@ class NavigationTabController extends AbstractInachisController
 
     /**
      * Saves changes to a given navigation tab
-     * 
+     *
      * @param Request $request
      * @param NavigationTab $tab
      * @param EntityManagerInterface $em
@@ -106,7 +106,7 @@ class NavigationTabController extends AbstractInachisController
 
     /**
      * Add/Edit a navigation tab
-     * 
+     *
      * @param Request $request
      * @param NavigationTabRepository $navigationTabRepository
      * @param NavigationTabService $navigationTabService
@@ -114,14 +114,14 @@ class NavigationTabController extends AbstractInachisController
      */
     #[Route('/incc/settings/navigation/edit/{id}', name: 'incc_settings_navigation_edit')]
     public function edit(
-        Request $request, 
+        Request $request,
         NavigationTabRepository $navigationTabRepository,
         NavigationTabService $navigationTabService,
     ): Response {
         $id = $request->attributes->get('id');
         $isNew = ($id === 'new');
 
-        $tab = $isNew ? new NavigationTab(): 
+        $tab = $isNew ? new NavigationTab():
             $navigationTabRepository->findOneBy(
                 [ 'id' => $request->attributes->get('id') ]
             );
