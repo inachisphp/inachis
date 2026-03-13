@@ -222,6 +222,9 @@ class Page
     #[ORM\Column(type: 'boolean')]
     protected ?bool $nofollow = false;
 
+    #[ORM\Column(type: 'boolean')]
+    protected ?bool $showTableOfContents = false;
+
     /**
      * Default constructor for {@link Page}.
      *
@@ -509,6 +512,14 @@ class Page
     }
 
     /**
+     * @return bool|null
+     */
+    public function getShowTableOfContents(): ?bool
+    {
+        return $this->showTableOfContents;
+    }
+
+    /**
      * Sets the value of {@link id}.
      *
      * @param UuidInterface $value The UUID of the {@link Page}
@@ -764,6 +775,12 @@ class Page
     public function setNofollow(bool $value = false): self
     {
         $this->nofollow = $value;
+        return $this;
+    }
+
+    public function setShowTableOfContents(bool $value = false): self
+    {
+        $this->showTableOfContents = $value;
         return $this;
     }
 

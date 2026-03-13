@@ -144,6 +144,21 @@ class PostType extends AbstractType
                 ],
                 'required' => false,
             ])
+            ->add('showTableOfContents', CheckboxType::class, [
+                'attr' => [
+                    'aria-labelledby' => 'showTableOfContents_label',
+                    'aria-required' => 'false',
+                    'class' => 'ui-switch',
+                    'data-label-off'  => $this->translator->trans('admin.post.properties.showTableOfContents.off'),
+                    'data-label-on'   => $this->translator->trans('admin.post.properties.showTableOfContents.on'),
+                ],
+                'label' => 'admin.post.properties.showTableOfContents.label',
+                'label_attr' => [
+                    'id' => 'showTableOfContents_label',
+                    'class' => 'inline_label',
+                ],
+                'required' => false,
+            ])
             ->add('postDate', DateTimeType::class, [
                 'attr' => [
                     'aria-labelledby'  => 'postDate_label',
