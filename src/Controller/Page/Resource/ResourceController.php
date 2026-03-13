@@ -254,6 +254,9 @@ class ResourceController extends AbstractInachisController
             $safeFilename = $slugger->slug($originalFilename);
             $newFilename = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
 
+            $imageSize = $uploadedFile->getSize();
+            $imageMimeType = $uploadedFile->getMimeType();
+
             // Step 6: Move file to storage directory
             $uploadedFile->move($imageDirectory, $newFilename);
 
@@ -263,8 +266,8 @@ class ResourceController extends AbstractInachisController
                 ->setTitle($imageData['title'])
                 ->setDescription($imageData['description'] ?? null)
                 ->setAltText($imageData['altText'] ?? null)
-                ->setFilesize($uploadedFile->getSize())
-                ->setFiletype($uploadedFile->getMimeType())
+                ->setFilesize($imageSize)
+                ->setFiletype($imageMimeType)
                 ->setFilename($newFilename)
                 ->setChecksum($checksum)
                 ->setDimensionX($dimensions[0])
