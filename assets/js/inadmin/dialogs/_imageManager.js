@@ -62,15 +62,15 @@ window.Inachis.ImageManager = {
         fetch(`${window.Inachis.prefix}/ax/imageManager/get`, {
             method: 'POST'
         })
-        .then(res => res.text())
-        .then(html => {
-            dialog.setContent(html);
-            this._init();
-        })
-        .catch((e) => {
-            console.log(e);
-            dialog.setContent('<p>Error loading images</p>');
-        });
+            .then(res => res.text())
+            .then(html => {
+                dialog.setContent(html);
+                this._init();
+            })
+            .catch((e) => {
+                console.log(e);
+                dialog.setContent('<p>Error loading images</p>');
+            });
     },
 
     _init() {
@@ -92,6 +92,7 @@ window.Inachis.ImageManager = {
             allowMultiple: false,
             instantUpload: false,
             required: true,
+            storeAsFile: true,
             acceptedFileTypes: this.dialog.options.allowedTypes,
         });
         this.updateDialogButtons();
@@ -103,12 +104,19 @@ window.Inachis.ImageManager = {
 
         const form = document.querySelector('.ui-dialog-image-uploader form');
 
-        form?.addEventListener('submit', event => {
+        form?.addEventListener('submit', async event => {
             event.preventDefault();
             event.stopPropagation();
 
-            pond.on('processfile', (error, file) => {
-            if (error) return;
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch(form.action, {
+                    method: form.method || 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('Upload failed');
 
                 const imageTitle = document.querySelector('#image_title')?.value;
 
@@ -121,13 +129,10 @@ window.Inachis.ImageManager = {
                     this.toggleUploadImage();
                     this.searchImages();
                 }
-            });
 
-            pond.on('processfileerror', (file, error) => {
-                console.log('@todo show error', error);
-            });
-
-            pond.processFiles();
+            } catch (error) {
+                console.error(error);
+            }
         });
     },
 
@@ -206,37 +211,37 @@ window.Inachis.ImageManager = {
                     body: formData
                 }
             )
-            .then(res => res.text())
-            .then(html => {
-                gallery.innerHTML = html;
+                .then(res => res.text())
+                .then(html => {
+                    gallery.innerHTML = html;
 
-                this.offset = 0;
-                gallery.scrollTop = 0;
+                    this.offset = 0;
+                    gallery.scrollTop = 0;
 
-                this.addPaginationLinks();
+                    this.addPaginationLinks();
 
-                gallery.querySelectorAll('input[type=radio]')
-                    .forEach(radio => {
-                        radio.addEventListener('change', () => {
-                            this.enableChooseButton();
+                    gallery.querySelectorAll('input[type=radio]')
+                        .forEach(radio => {
+                            radio.addEventListener('change', () => {
+                                this.enableChooseButton();
+                            });
                         });
-                    });
 
-                const ol = gallery.querySelector('ol');
+                    const ol = gallery.querySelector('ol');
 
-                if (ol) {
-                    const values = [
-                        ol.dataset.start,
-                        ol.dataset.end,
-                        ol.dataset.total
-                    ];
+                    if (ol) {
+                        const values = [
+                            ol.dataset.start,
+                            ol.dataset.end,
+                            ol.dataset.total
+                        ];
 
-                    document.querySelectorAll('#images_count strong')
-                        .forEach((el, i) => {
-                            el.textContent = values[i];
-                        });
-                }
-            });
+                        document.querySelectorAll('#images_count strong')
+                            .forEach((el, i) => {
+                                el.textContent = values[i];
+                            });
+                    }
+                });
 
         }, 500);
     },

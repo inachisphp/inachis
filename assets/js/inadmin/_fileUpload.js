@@ -9,6 +9,7 @@ window.Inachis.FileUpload = {
     },
     pond: null,
     selector: '',
+    submitButton: null,
 
     loadScript: function (src) {
         return new Promise((resolve, reject) => {
@@ -31,8 +32,8 @@ window.Inachis.FileUpload = {
         });
     },
 
-    init: async function(selector, options) {
-        this.options = {...options};
+    init: async function (selector, options) {
+        this.options = { ...options };
         await Promise.all([
             this.loadCSS('/assets/css/incc/filepond.min.css'),
             this.loadCSS('/assets/css/incc/filepond-plugin-image-preview.min.css')
@@ -54,9 +55,9 @@ window.Inachis.FileUpload = {
             const inputElement = form.querySelector('input[type="file"]');
             this.pond = FilePond.create(inputElement);
             if (this.options.required) {
-                const submitButton = form.querySelector('button[type=submit]');
-                submitButton.disabled = true;
-                submitButton.setAttribute('aria-disabled', true);
+                this.submitButton = form.querySelector('button[type=submit]');
+                this.submitButton.disabled = true;
+                this.submitButton.setAttribute('aria-disabled', true);
             }
             const label = inputElement.closest('label') || form.querySelector(`label[for="${inputElement.id}"]`);
             if (label) {
@@ -65,17 +66,17 @@ window.Inachis.FileUpload = {
 
             this.pond.setOptions(this.options);
 
-            if (this.options.instantUpload) {
-                pond.on('addfile', (error, file) => {
+            if (!this.options.instantUpload) {
+                this.pond.on('addfile', (error, file) => {
                     if (!error) {
-                        submitButton.disabled = false;
-                        submitButton.setAttribute('aria-disabled', false);
+                        this.submitButton.disabled = false;
+                        this.submitButton.setAttribute('aria-disabled', false);
                     }
                 });
-                pond.on('removefile', (file) => {
-                    if (pond.getFiles().length === 0) {
-                        submitButton.disabled = true;
-                        submitButton.setAttribute('aria-disabled', true);
+                this.pond.on('removefile', (file) => {
+                    if (this.pond.getFiles().length === 0) {
+                        this.submitButton.disabled = true;
+                        this.submitButton.setAttribute('aria-disabled', true);
                     }
                 });
             }
