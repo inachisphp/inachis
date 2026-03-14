@@ -10,6 +10,7 @@
 namespace Inachis\Repository;
 
 use Inachis\Entity\NavigationTab;
+use Inachis\Model\NavigationTabDto;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -28,7 +29,7 @@ class NavigationTabRepository extends AbstractRepository
 
     /**
      * Returns the maximum position
-     * 
+     *
      * @return int
      */
     public function getMaxPosition(): int
@@ -41,7 +42,7 @@ class NavigationTabRepository extends AbstractRepository
 
     /**
      * Returns paginated tabs ordered by position
-     * 
+     *
      * @param array $filters
      * @param int $offset
      * @param int $limit
@@ -61,7 +62,7 @@ class NavigationTabRepository extends AbstractRepository
 
     /**
      * Returns tabs ordered by position
-     * 
+     *
      * @return array<NavigationTab>
      */
     public function getAllOrdered(): array
@@ -74,7 +75,7 @@ class NavigationTabRepository extends AbstractRepository
 
     /**
      * Returns all tabs indexed by UUID string for easy lookup
-     * 
+     *
      * @return array<string, NavigationTab>
      */
     public function findAllIndexedById(): array
@@ -91,7 +92,7 @@ class NavigationTabRepository extends AbstractRepository
 
     /**
      * Returns active tabs ordered by position
-     * 
+     *
      * @return array<NavigationTab>
      */
     public function findActiveOrdered(): array
@@ -105,8 +106,29 @@ class NavigationTabRepository extends AbstractRepository
     }
 
     /**
+     * Returns active tabs models ordered by position
+     *
+     * @return array<NavigationTab>
+     */
+    public function findActiveOrderedModels(): array
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->select('t.id, t.title, t.url, t.position')
+            ->where('t.isActive = :active')
+            ->setParameter('active', true)
+            ->orderBy('t.position', 'ASC');
+
+        $rows = $qb->getQuery()->getArrayResult();
+
+        return array_map(
+            [NavigationTabDto::class, 'fromArray'],
+            $rows
+        );
+    }
+
+    /**
      * Returns active tabs ordered by position
-     * 
+     *
      * @return array<string, array{url: string}>
      */
     public function findActiveOrderedUrlsIndexedByLabel(): array
@@ -125,5 +147,5 @@ class NavigationTabRepository extends AbstractRepository
 
         return $result;
     }
-    
+
 }

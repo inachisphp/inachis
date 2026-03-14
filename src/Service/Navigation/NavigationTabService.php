@@ -44,8 +44,8 @@ class NavigationTabService
     public function getActiveTabs(): array
     {
         return $this->cache->get(self::CACHE_KEY, function (ItemInterface $item) {
-            $item->expiresAfter(3600);
-            return $this->repository->findActiveOrdered();
+            $item->expiresAfter(null);
+            return $this->repository->findActiveOrderedModels();
         });
     }
 
@@ -191,7 +191,7 @@ class NavigationTabService
             array_map(fn($t) => $t->getId(), $tabs),
             $tabs
         ));
-        
+
         $this->entityManager->flush();
         $this->clearCache();
     }
@@ -222,7 +222,7 @@ class NavigationTabService
 
     /**
      * Apply an action to navigation tabs
-     * 
+     *
      * @param string $action
      * @param array<string> $ids
      * @return int
@@ -247,7 +247,7 @@ class NavigationTabService
             $this->entityManager->flush();
             $this->clearCache();
         });
-            
+
         return $count;
     }
 }

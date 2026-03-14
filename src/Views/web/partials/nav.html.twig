@@ -1,5 +1,5 @@
 <nav aria-label="Main navigation" role="navigation">
-    {% for tabName, tab in tabs %}
-        <a href="{{ tab.url }}">{{ tabName }}</a>
+    {% for tab in navigation_tabs() %}
+        <a href="{{ tab.url }}">{{ tab.title }}</a>
     {% endfor %}
 </nav>
