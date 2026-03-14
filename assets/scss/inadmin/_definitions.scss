@@ -85,6 +85,9 @@ $radius-round: 50%;
     --color-flash-warning-text: #8A3B00;
     --color-flash-error-bg: #F9E2E0;
     --color-flash-error-text: #7A1414;
+    --color-flash-autosave-bg: #FFF1D6;
+    --color-flash-autosave-text: #8A3B00;
+    --color-flash-autosave-discard: #cc0000;
 
     // Dropzone
     --color-dropzone-bg: #f8fafc;
@@ -248,6 +251,9 @@ $flash-warning-bg: var(--color-flash-warning-bg);
 $flash-warning-text: var(--color-flash-warning-text);
 $flash-error-bg: var(--color-flash-error-bg);
 $flash-error-text: var(--color-flash-error-text);
+$flash-autosave-bg: var(--color-flash-autosave-bg);
+$flash-autosave-text: var(--color-flash-autosave-text);
+$flash-autosave-discard: var(--color-flash-autosave-discard);
 
 $input-focus-border: var(--color-brand-500);
 $input-focus-ring: var(--color-brand-050);

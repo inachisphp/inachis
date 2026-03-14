@@ -35,16 +35,40 @@ div.EasyMDEContainer {
 }
 
 .autosave-notification {
-	align-items: flex-end;
-	background: $flash-notice-bg;
-	color: $flash-notice-text;
+  align-items: center;
+  animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+	background: $flash-autosave-bg;
+	bottom: 3.7rem;
+	color: $flash-autosave-text;
 	display: flex;
-	padding: 1em;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: auto;
 
-	button {
-		float: right;
-		margin: -0.7em 0 0 0;
-	}
+  button.button {
+    background-color: transparent;
+    border: none;
+    color: $flash-autosave-discard;
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+
+    &:hover {
+      background-color: transparent;
+      text-decoration: underline;
+    }
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* ======================================================
