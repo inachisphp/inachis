@@ -107,7 +107,27 @@ abstract class AbstractRepository extends ServiceEntityRepository
             ->select('q')
             ->from($this->getClassName(), 'q');
         if (!empty($join)) {
-            $qb->join($join[0], $join[1]);
+            foreach ($join as $j) {
+                // Old style: ['joinPath', 'alias']
+                // New style: ['joinType', 'joinPath', 'alias', 'condition']
+                if (count($j) === 2) {
+                    [$path, $alias] = $j;
+                    $qb->join($path, $alias);
+                } elseif (count($j) >= 3) {
+                    $type = $j[0]; // 'join' or 'leftJoin'
+                    $path = $j[1]; // e.g., 'q.items'
+                    $alias = $j[2]; // e.g., 'i'
+                    $condition = $j[3] ?? null;
+
+                    if ($type === 'join') {
+                        $condition ? $qb->join($path, $alias, 'WITH', $condition)
+                                : $qb->join($path, $alias);
+                    } elseif ($type === 'leftJoin') {
+                        $condition ? $qb->leftJoin($path, $alias, 'WITH', $condition)
+                                : $qb->leftJoin($path, $alias);
+                    }
+                }
+            }
         }
         if (!empty($where)) {
             $qb = $qb->where($where[0]);
@@ -146,7 +166,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
 
     /**
      * Returns the maximum number of items to show
-     * 
+     *
      * @return int
      */
     public function getMaxItemsToShow(): int
