@@ -14,7 +14,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -29,7 +29,7 @@ class SeriesType extends AbstractType
 {
     /**
      * Constructor
-     
+
      * @param Security $security
      * @param TranslatorInterface $translator
      */
@@ -48,8 +48,8 @@ class SeriesType extends AbstractType
     {
         $newItem = empty($options['data']->getId());
         $user = $this->security->getUser();
-        $userTimezone = $user && method_exists($user, 'getPreferences') 
-            ? $user->getPreferences()->getTimezone() 
+        $userTimezone = $user && method_exists($user, 'getPreferences')
+            ? $user->getPreferences()->getTimezone()
             : 'UTC';
         $builder
             ->add('title', TextType::class, [
@@ -110,47 +110,23 @@ class SeriesType extends AbstractType
         ;
         if (!$newItem) {
             $builder
-                ->add('firstDate', DateTimeType::class, [
+                ->add('firstDate', DateType::class, [
                     'attr' => [
-                        'aria-labelledby' => 'firstDate_label',
-                        'aria-required' => 'false',
-                        'class' => 'date-width',
+                        'style' => 'display: none;',
                         'readOnly' => true,
                     ],
-                    'format' => 'dd/MM/yyyy', // HH:mm,
-                    'html5' => false,
                     'input' => 'datetime_immutable',
-                    'label' => $this->translator->trans('admin.series.firstDate.label', [], 'messages'),
-                    'label_attr' => [
-                        'class' => 'inline_label',
-                        'id' => 'firstDate_label',
-                    ],
-                    'model_timezone' => 'UTC',
                     'required' => false,
-                    'view_timezone' => $userTimezone,
                     'widget' => 'single_text',
-
                 ])
-                ->add('lastDate', DateTimeType::class, [
+                ->add('lastDate', DateType::class, [
                     'attr' => [
-                        'aria-labelledby' => 'lastDate_label',
-                        'aria-required' => 'false',
-                        'class' => 'date-width',
+                        'style' => 'display: none;',
                         'readOnly' => true,
                     ],
-                    'format' => 'dd/MM/yyyy', // HH:mm,
-                    'html5' => false,
                     'input' => 'datetime_immutable',
-                    'label'  => $this->translator->trans('admin.series.lastDate.label', [], 'messages'),
-                    'label_attr' => [
-                        'class' => 'inline_label',
-                        'id' => 'lastDate_label',
-                    ],
-                    'model_timezone' => 'UTC',
                     'required' => false,
-                    'view_timezone' => $userTimezone,
                     'widget' => 'single_text',
-
                 ])
                 ->add('bulkCreate', ButtonType::class, [
                     'attr' => [
@@ -244,7 +220,7 @@ class SeriesType extends AbstractType
 
     /**
      * Configure the options for the form
-     * 
+     *
      * @param OptionsResolver $resolver
      */
     public function configureOptions(OptionsResolver $resolver): void
