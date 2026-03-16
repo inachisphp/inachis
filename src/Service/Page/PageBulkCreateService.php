@@ -20,7 +20,7 @@ use Inachis\Repository\TagRepository;
 use Inachis\Util\UrlNormaliser;
 use DateInterval;
 use DatePeriod;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use InvalidArgumentException;
@@ -45,6 +45,13 @@ class PageBulkCreateService
             throw new InvalidArgumentException('Series not found');
         }
 
+        if ($series->getFirstDate() === null || $series->getFirstDate() > $data->startDate) {
+            $series->setFirstDate($data->startDate);
+        }
+        if ($series->getLastDate() === null || $series->getLastDate() < $data->endDate) {
+            $series->setLastDate($data->endDate);
+        }
+
         $period = new DatePeriod(
             $data->startDate,
             new DateInterval('P1D'),
@@ -58,7 +65,7 @@ class PageBulkCreateService
 
             $post = new Page($title);
             $post->setPostDate($date);
-            $post->setModDate(new DateTime());
+            $post->setModDate(new DateTimeImmutable());
             $post->setAuthor($author);
             $post->addUrl(new Url(
                 $post,

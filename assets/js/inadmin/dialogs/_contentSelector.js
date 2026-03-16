@@ -60,11 +60,11 @@ window.Inachis.ContentSelectorDialog = {
      ----------------------------- */
 
   loadContentList(dialog) {
-    const body = dialog.body;
-    body.innerHTML = '<p/><div class="loader"></div><p/>';
-
     const keyword =
       dialog.dialog.querySelector('#ui-dialog-search-input')?.value || '';
+
+    const body = dialog.body;
+    body.innerHTML = '<p/><div class="loader"></div><p/>';
 
     fetch(`${Inachis.prefix}/ax/contentSelector/get`, {
       method: 'POST',
@@ -142,13 +142,17 @@ window.Inachis.ContentSelectorDialog = {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Saving…';
 
+    const params = new URLSearchParams();
+    params.append('seriesId', easymde.options.autosave.uniqueId);
+
+    selectedIds.forEach(id => {
+      params.append('ids[]', id);
+    });
+
     fetch(`${Inachis.prefix}/ax/contentSelector/save`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        seriesId: easymde.options.autosave.uniqueId,
-        ids: selectedIds
-      })
+      body: params
     })
       .then(res => res.text())
       .then(data => {

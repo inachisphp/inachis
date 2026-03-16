@@ -35,17 +35,19 @@
                 condition: false,
                 className: 'badge__private',
             },
-
+            public: {
+                className: 'badge__active',
+                default: true,
+            }
         } %}
         <table class="table table--compact table--row-borders table--selectable table--striped">
             <thead>
                 <tr>
                     <th></th>
-                    <th class="shortcol">Day</th>
+                    <th class="shortcol">#</th>
                     <th>Title</th>
                     <th>Date</th>
                     <th class="badgecol"></th>
-                    <th class="shortcol"></th>
                 </tr>
             </thead>
             <tbody>
@@ -59,16 +61,13 @@
                     </td>
                     <td>
                         <label id="series_item_{{ loop.index }}_label" for="series_item_{{ loop.index }}">
-                            {{ item.title }}{% if item.subTitle is not empty %} - {{ item.subTitle }}{% endif %}</label>
+                            <a aria-label="Edit item" href="/incc/{{ item.type }}/{{ item.urls|first.link|default('') }}" title="Edit {{ item.title }}">{{ item.title }}{% if item.subTitle is not empty %} - {{ item.subTitle }}{% endif %}</a></label>
                     </td>
                     <td>
                         {{ item.postDate|formatLocalTime('jS F Y') }}
                     </td>
                     <td class="badgecol">
                         {{ include('inadmin/partials/badge.html.twig') }}
-                    </td>
-                    <td class="shortcol">
-                        <a aria-label="Edit item" href="/incc/{{ item.type }}/{{ item.urls|first.link|default('') }}" title="Edit {{ item.title }}"><span class="material-icons">edit_note</span></a>
                     </td>
                 </tr>
             {% endfor %}

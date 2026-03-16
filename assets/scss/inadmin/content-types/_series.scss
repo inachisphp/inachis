@@ -15,11 +15,4 @@
       display: block;
     }
   }
-
-  .table--selectable tr td:nth-last-child(-n+2),
-  .table--selectable tr th:nth-last-child(-n+2) {
-    color: $color-neutral-450;
-    text-align: center;
-    width: 5rem;
-  }
 }
