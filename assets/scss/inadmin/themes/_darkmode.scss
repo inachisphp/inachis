@@ -33,6 +33,11 @@
     --color-track-ins-bg: #1e3a3a; /* Deep Teal */
     --color-track-del-bg: #4a2b2b; /* Deep Rose */
 
+    /* Flash Messages */
+    --color-flash-autosave-bg: #2d2618;   // Deep Charcoal-Amber
+    --color-flash-autosave-text: #fcd34d; // Bright Amber Text
+    --color-flash-autosave-discard: #f87171;
+
   div.EasyMDEContainer {
     background: $bg-body;
     color: $text-main;

@@ -384,4 +384,32 @@ class Series
         $this->visibility = $visibility;
         return $this;
     }
+
+    /**
+     * Returns the number of public and private items in the series
+
+     * @return array<string, int>
+     */
+    public function getItemVisibilityCounts(): array
+    {
+        $public = 0;
+        $private = 0;
+
+        foreach ($this->items as $item) {
+            if (
+                $item->getStatus() === Page::PUBLISHED &&
+                !$item->isScheduledPage() &&
+                $item->getVisibility()
+            ) {
+                $public++;
+            } else {
+                $private++;
+            }
+        }
+
+        return [
+            'public' => $public,
+            'private' => $private,
+        ];
+    }
 }

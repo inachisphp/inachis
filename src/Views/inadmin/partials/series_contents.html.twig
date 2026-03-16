@@ -1,25 +1,73 @@
 {% if series.id is not empty %}
+    {% if series.firstDate is not empty and series.lastDate is not empty %}
+        {% set counts = series.itemVisibilityCounts %}
+        {{ include('inadmin/partials/admonition.html.twig', {
+            show_title: false,
+            'type': 'info',
+            'text': series.firstDate|formatLocalTime('jS F Y') ~
+                    ' → ' ~
+                    series.lastDate|formatLocalTime('jS F Y') ~
+                    ' • ' ~
+                    counts.public ~
+                    ' public • ' ~
+                    counts.private ~
+                    ' private'
+        }) }}
+    {% endif %}
     <p class="series__controls">
         {{ form_widget(form.bulkCreate) }}
         {{ form_widget(form.addItem) }}
     </p>
     {% if series.items is not empty %}
+        {% set badges = {
+            draft: {
+                field: 'status',
+                condition: 'draft',
+                className: 'badge__draft',
+            },
+            scheduled: {
+                field: 'isScheduledPage',
+                condition: true,
+                className: 'badge__scheduled',
+            },
+            private: {
+                field: 'visibility',
+                condition: false,
+                className: 'badge__private',
+            },
+            public: {
+                className: 'badge__active',
+                default: true,
+            }
+        } %}
         <table class="table table--compact table--row-borders table--selectable table--striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th class="shortcol">#</th>
+                    <th>Title</th>
+                    <th>Date</th>
+                    <th class="badgecol"></th>
+                </tr>
+            </thead>
             <tbody>
             {% for item in series.items %}
                 <tr>
                     <td>
                         <input type="checkbox" name="series[itemList][]" id="series_item_{{ loop.index }}" value="{{ item.id }}" />
                     </td>
+                    <td class="shortcol">
+                        {{ loop.index }}
+                    </td>
                     <td>
                         <label id="series_item_{{ loop.index }}_label" for="series_item_{{ loop.index }}">
-                            {{ item.title }}{% if item.subTitle is not empty %} - {{ item.subTitle }}{% endif %}</label>
+                            <a aria-label="Edit item" href="/incc/{{ item.type }}/{{ item.urls|first.link|default('') }}" title="Edit {{ item.title }}">{{ item.title }}{% if item.subTitle is not empty %} - {{ item.subTitle }}{% endif %}</a></label>
                     </td>
                     <td>
-                        <span class="material-icons">{% if item.status == 'published' %}visibility{% else %}visibility_off{% endif %}</span>
+                        {{ item.postDate|formatLocalTime('jS F Y') }}
                     </td>
-                    <td>
-                        <a aria-label="Edit item" href="/incc/{{ item.type }}/{{ item.urls|first.link|default('') }}" title="Edit {{ item.title }}"><span class="material-icons">edit_note</span></a>
+                    <td class="badgecol">
+                        {{ include('inadmin/partials/badge.html.twig') }}
                     </td>
                 </tr>
             {% endfor %}

@@ -13,7 +13,7 @@ use Inachis\Controller\AbstractInachisController;
 use Inachis\Service\System\Maintenance\MaintenanceManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
@@ -68,7 +68,7 @@ class MaintenanceController extends AbstractInachisController
      * @param MaintenanceManager $manager
      * @return Response
      */
-    #[Route('/tools/maintenance/preview', name: 'incc_tools_maintenance_preview')]
+    #[Route('/incc/tools/maintenance/preview', name: 'incc_tools_maintenance_preview')]
     public function preview(MaintenanceManager $manager): Response
     {
         $config = $manager->getConfig();

@@ -127,6 +127,7 @@ class MaintenanceManager
         touch($tmpFile);
         chmod($tmpFile, $permissions);
         file_put_contents($tmpFile, $content, $flags);
-        rename($tmpFile, $location . '/' . $filename);
+        copy($tmpFile, $location . '/' . $filename);
+        unlink($tmpFile);
     }
 }

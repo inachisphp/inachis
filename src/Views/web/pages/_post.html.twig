@@ -33,7 +33,9 @@
             </div>
             {% endif %}
         </header>
-
+        {% if post.showTableOfContents %}
+            {% include 'web/partials/toc.html.twig' %}
+        {% endif %}
         <div class="entry-content">
             {% if post.content is not empty %}{{ post.content|markdown_to_html }}{% endif %}
         </div>

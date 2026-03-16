@@ -100,23 +100,22 @@ window.Inachis.PostEdit = {
 	},
 
 	showAutosaveNotification() {
-		const editor = document.querySelector('.EasyMDEContainer');
-		if (!editor?.parentNode) return;
 
-		const container = editor.parentNode;
+		const container = document.querySelector('.fixed-bottom-bar');
+		if (!container) return;
 
 		const p = document.createElement('p');
-		p.className = 'autosave-notification';
+		p.className = 'fixed-bottom-bar autosave-notification';
 		p.ariaLive = 'polite';
 
 		const span = document.createElement('span');
-		span.textContent = 'The below content has been recovered from an auto-save and must be saved before publishing.';
+		span.textContent = "✨ We've restored your unsaved changes. Save now to keep them.";
 		p.appendChild(span);
 
 		const button = document.createElement('button');
 		button.type = 'button';
 		button.className = 'button button--negative';
-		button.textContent = 'Clear auto-save';
+		button.textContent = 'Discard';
 
 		button.addEventListener('click', event => {
 			event.preventDefault();

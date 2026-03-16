@@ -175,7 +175,12 @@ class Page
     /**
      * @var Collection|null The array of URLs for the content
      */
-    #[ORM\OneToMany(mappedBy: 'content', targetEntity: 'Inachis\Entity\Url', cascade: [ 'persist' ])]
+    #[ORM\OneToMany(
+        mappedBy: 'content',
+        targetEntity: 'Inachis\Entity\Url',
+        cascade: [ 'persist', 'remove' ],
+        orphanRemoval: true
+    )]
     #[ORM\OrderBy(['default' => 'DESC'])]
     protected ?Collection $urls;
 
@@ -216,6 +221,9 @@ class Page
 
     #[ORM\Column(type: 'boolean')]
     protected ?bool $nofollow = false;
+
+    #[ORM\Column(type: 'boolean')]
+    protected ?bool $showTableOfContents = false;
 
     /**
      * Default constructor for {@link Page}.
@@ -504,6 +512,14 @@ class Page
     }
 
     /**
+     * @return bool|null
+     */
+    public function getShowTableOfContents(): ?bool
+    {
+        return $this->showTableOfContents;
+    }
+
+    /**
      * Sets the value of {@link id}.
      *
      * @param UuidInterface $value The UUID of the {@link Page}
@@ -762,6 +778,12 @@ class Page
         return $this;
     }
 
+    public function setShowTableOfContents(bool $value = false): self
+    {
+        $this->showTableOfContents = $value;
+        return $this;
+    }
+
     /**
      * Adds a {@link Url} to the {@link Page}.
      *
@@ -781,7 +803,9 @@ class Page
      */
     public function addCategory(Category $category): self
     {
-        $this->categories[] = $category;
+        if (!$this->categories->contains($category)) {
+            $this->categories->add($category);
+        }
         return $this;
     }
 
@@ -801,7 +825,9 @@ class Page
      */
     public function addTag(Tag $tag): self
     {
-        $this->tags[] = $tag;
+        if (!$this->tags->contains($tag)) {
+            $this->tags->add($tag);
+        }
         return $this;
     }
 

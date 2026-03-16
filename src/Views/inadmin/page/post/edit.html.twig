@@ -74,6 +74,13 @@
 				</span>
             </p>
             <p>
+                {{ form_label(form.showTableOfContents) }}
+                {{ form_errors(form.showTableOfContents) }}
+                <span class="switch-wrapper">
+                    {{ form_widget(form.showTableOfContents) }}
+				</span>
+            </p>
+            <p>
                 {{ form_label(form.postDate) }}
                 {{ form_errors(form.postDate) }}
                 <span id="post__schedule__timed">

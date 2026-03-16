@@ -105,11 +105,12 @@ window.Inachis.BulkCreateDialog = {
 
     const form = document.querySelector('#dialog__bulkCreate form');
     const payload = new URLSearchParams(new FormData(form));
+    payload.append('seriesId', easymde.options.autosave.uniqueId);
 
     fetch(`${window.Inachis.prefix}/ax/bulkCreate/save`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: payload.toString()
+      body: payload
     })
       .then(res => res.text())
       .then(data => {

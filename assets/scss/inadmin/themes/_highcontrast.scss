@@ -32,6 +32,10 @@
     /* Custom HC Variables */
     --hc-focus-outline: 3px solid #ffff00;
 
+    --color-flash-autosave-bg: #000000;
+    --color-flash-autosave-text: #ffff00;
+    --color-flash-autosave-discard: #ffffff;
+
   .EasyMDEContainer {
     /* AAA Requirement: Text must be high contrast */
     .CodeMirror {

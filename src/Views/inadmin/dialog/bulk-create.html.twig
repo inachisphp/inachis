@@ -3,11 +3,11 @@
         <legend>Bulk Creation</legend>
         <p>
             <label id="bulk_startDate_label" for="bulk_startDate">Start Date</label>
-            <input aria-labelledby="bulk_startDate_label" aria-required="true" id="bulk_startDate" type="date" name="startDate" />
+            <input aria-labelledby="bulk_startDate_label" aria-required="true" autocomplete="off" id="bulk_startDate" type="date" name="startDate" />
         </p>
         <p>
             <label id="bulk_endDate_label" for="bulk_endDate">End Date</label>
-            <input aria-labelledby="bulk_endDate_label" aria-required="true" id="bulk_endDate" type="date" name="endDate" />
+            <input aria-labelledby="bulk_endDate_label" aria-required="true" autocomplete="off" id="bulk_endDate" type="date" name="endDate" />
         </p>
         <p>
             <label id="bulk_title_label" for="bulk_title">Title stub</label>
@@ -21,11 +21,11 @@
     <fieldset class="col-6">
         <p>
             <label id="bulk_categories_label" for="bulk_categories">Categories</label>
-            <select id="bulk_categories" name="categories" aria-labelledby="bulk_categories_label" aria-required="false" class="js-select" data-url="/incc/ax/categoryList/get" multiple="multiple"></select>
+            <select id="bulk_categories" name="categories[]" aria-labelledby="bulk_categories_label" aria-required="false" class="js-select" data-url="/incc/ax/categoryList/get" multiple="multiple"></select>
         </p>
         <p>
             <label id="bulk_tags_label" for="bulk_tags">Tags</label>
-            <select id="bulk_tags" name="tags" aria-labelledby="bulk_tags_label" aria-required="false" class="js-select" data-tags="true" data-url="/incc/ax/tagList/get" multiple="multiple"></select>
+            <select id="bulk_tags" name="tags[]" aria-labelledby="bulk_tags_label" aria-required="false" class="js-select" data-tags="true" data-url="/incc/ax/tagList/get" multiple="multiple"></select>
         </p>
     </fieldset>
 </form>

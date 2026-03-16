@@ -42,10 +42,6 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function remove(Page $page): void
     {
-        foreach ($page->getUrls() as $postUrl) {
-            $this->getEntityManager()->getRepository(Url::class)->remove($postUrl);
-        }
-        // @todo are series links automatically removed? assume not
         $this->getEntityManager()->remove($page);
         $this->getEntityManager()->flush();
     }
