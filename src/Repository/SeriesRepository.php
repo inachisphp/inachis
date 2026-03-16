@@ -78,15 +78,15 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
     {
         $qb = $this->createQueryBuilder('s');
         return $qb
-            ->select('s')
-            ->leftJoin('s.items', 'Series_pages')
-            ->where(
-//                $qb->expr()->andX(
-                    'Series_pages.id = :pageId' //,
-//                    's.items.status = \'published\''
-//                )
-            )
-            ->setParameter('pageId', $page->getId())
+            ->select('s', 'i')
+            ->join('s.items', 'i')
+            ->where(':page MEMBER OF s.items')
+            ->andWhere('i.status = :status')
+            ->andWhere('s.visibility = :visibility')
+            ->setParameter('page', $page)
+            ->setParameter('status', Page::PUBLISHED)
+            ->setParameter('visibility', Series::PUBLIC)
+            ->orderBy('i.postDate', 'ASC')
             ->getQuery()
             ->getOneOrNullResult();
     }

@@ -1,0 +1,32 @@
+{% extends "web/structure/main.html.twig" %}
+{% block content %}
+
+<div class="section row">
+    <div class="col span_1_of_8"></div>
+    <div class="col span_6_of_8">
+        <article class="post type-page status-published format-standard hentry category-blog">
+        {% set lazyload = false %}
+        {% for entry in series %}
+            <article class="series">
+                <a href="{{ path('app_series_view', { 'year': entry.firstDate|date('Y'), 'title': entry.title|lower }) }}">
+                    <span class="image_container">
+                    {% if (entry.image is not empty) %}
+                        <img alt="{{ entry.image.altText }}" src="{% if not (entry.image.filename starts with 'http') %}/imgs/{% endif %}{{ entry.image.filename }}" width="400" />
+                    {% else %}
+                        <img alt="No image" src="/assets/imgs/placeholder.png" width="400" />
+                    {% endif %}
+                    </span>
+                    <span class="series--year">{{  entry.firstDate|date('Y') }}</span>
+                    <span class="series--title">{{ entry.title|slice(0, 20) }}{% if entry.title|length > 20 %}…{% endif %}</span>
+                    {% if entry.subTitle is not empty %}<span class="series--subtitle">{{ entry.subTitle }}</span>{% endif %}</a>
+            </article>
+            {% if loop.index >= 4 %}
+                {% set lazyload = true %}
+            {% endif %}
+        {% endfor %}
+        </article>
+    </div>
+    <div class="col span_1_of_8"></div>
+</div>
+
+{% endblock content %}

@@ -46,7 +46,11 @@ class ContentAggregator
 
         foreach ($series as $group) {
             foreach ($group->getItems() as $page) {
-                $excludePages[] = $page->getId();
+                if ($page->getStatus() !== Page::PUBLISHED) {
+                    $group->getItems()->removeElement($page);
+                } else {
+                    $excludePages[] = $page->getId();
+                }
             }
 
             $group->setDescription(TextCleaner::strip(
