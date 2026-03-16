@@ -116,7 +116,7 @@ window.Inachis.Components = {
 	},
 	initFilterBar() {
 		const toggle = document.querySelector('.filter__toggle');
-		const panel  = document.getElementById('filter__options');
+		const panel = document.getElementById('filter__options');
 
 		if (!toggle || !panel) {
 			return;
@@ -182,8 +182,8 @@ window.Inachis.Components = {
 			const scrollHeight = doc.scrollHeight - doc.clientHeight;
 
 			const progress = scrollHeight > 0
-			? (scrollTop / scrollHeight) * 100
-			: 0;
+				? (scrollTop / scrollHeight) * 100
+				: 0;
 
 			bar.style.width = `${progress}%`;
 		}
@@ -208,6 +208,9 @@ window.Inachis.Components = {
 				create: isTags,
 				persist: isTags ? false : undefined,
 				loadThrottle: 300,
+				onItemAdd: function (value, $item) {
+					this.control_input.value = '';
+				},
 
 				plugins: {
 					clear_button: { title: 'Remove all selected options' },
@@ -224,27 +227,27 @@ window.Inachis.Components = {
 				},
 
 				load: el.dataset.url
-				? function(query, callback) {
-					query = query.trim();
-					if (query.length < minQueryLength) return callback([]);
-					fetch(el.dataset.url, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-						body: new URLSearchParams({ q: query })
-					})
-						.then(res => res.json())
-						.then(json => callback(json.items || []))
-						.catch(err => {
-							console.error('TomSelect load error:', err);
-							callback([]);
-						});
+					? function (query, callback) {
+						query = query.trim();
+						if (query.length < minQueryLength) return callback([]);
+						fetch(el.dataset.url, {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+							body: new URLSearchParams({ q: query })
+						})
+							.then(res => res.json())
+							.then(json => callback(json.items || []))
+							.catch(err => {
+								console.error('TomSelect load error:', err);
+								callback([]);
+							});
 					}
-				: undefined,
+					: undefined,
 
 				shouldLoad: query => query.trim().length >= minQueryLength,
 
 				render: {
-					option: function(item, escape) {
+					option: function (item, escape) {
 						let desc = descriptionField ? item[descriptionField] || '' : '';
 						if (desc.length > 50) desc = desc.slice(0, 47) + '…';
 						return `<div role="option" aria-label="${escape(item.text)}${desc ? ' ' + escape(desc) : ''}">
@@ -252,10 +255,10 @@ window.Inachis.Components = {
 								${desc ? `<small>${escape(desc)}</small>` : ''}
 								</div>`;
 					},
-					item: function(item, escape) {
+					item: function (item, escape) {
 						return `<div>${escape(item.text)}</div>`;
 					},
-					no_results: function() {
+					no_results: function () {
 						return '<div class="no-results" role="alert" aria-live="polite">No matching options</div>';
 					}
 				},

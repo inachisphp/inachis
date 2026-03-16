@@ -100,7 +100,7 @@ class ContentSelectorController extends AbstractInachisController
             $series->addItem($page);
 
             $pageDate = $page->getPostDate();
-            if ($pageDate instanceof DateTimeInterface) {
+            if ($pageDate instanceof DateTimeImmutable) {
                 $firstDate = $series->getFirstDate();
                 $lastDate = $series->getLastDate();
 

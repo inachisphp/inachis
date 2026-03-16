@@ -28,7 +28,7 @@ class BulkCreateData
 
     public static function fromRequest(Request $request): self
     {
-        $form = $request->request->all('form');
+        $form = $request->request->all();
 
         if (!$form) {
             throw new InvalidArgumentException('Form data is missing.');
@@ -54,7 +54,7 @@ class BulkCreateData
             startDate: $start,
             endDate: $end,
             addDayNumber: !empty($form['addDay']),
-            seriesId: $request->request->get('seriesId'),
+            seriesId: $form['seriesId'] ?? '',
             tags: $form['tags'] ?? [],
             categories: $form['categories'] ?? [],
         );
