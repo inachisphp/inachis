@@ -58,7 +58,9 @@
                         &mdash; {{ item.subTitle }}
                     {% endif %}
 
-                    {{ include('inadmin/partials/badge.html.twig') }}
+                    <span>
+                        {{ include('inadmin/partials/badge.html.twig') }}
+                    </span>
 
                 {% if inline|default(false) == false %}
                 </h2>
