@@ -39,7 +39,7 @@ class NavigationTabService
     /**
      * Get all active navigation tabs ordered by position
      *
-     * @return array
+     * @return list<NavigationTab>
      */
     public function getActiveTabs(): array
     {

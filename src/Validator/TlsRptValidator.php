@@ -19,7 +19,7 @@ final class TlsRptValidator
 {
     /**
      * Validate TLS-RPT records
-     * @param list<array{target: string, priority: int}> $records
+     * @param list<array{target: string, priority: int, txt?: string}> $records
      * @return list<ValidationIssue>
      */
     public function validate(array $records): array

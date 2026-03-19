@@ -19,7 +19,7 @@ final class CaaValidator
 {
     /**
      * Validate CAA records
-     * @param list<array{target: string, priority: int}> $records
+     * @param list<array{target: string, priority: int, value?: string}> $records
      * @return list<ValidationIssue>
      */
     public function validate(array $records): array

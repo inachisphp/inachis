@@ -19,7 +19,7 @@ final class BimiValidator
 {
     /**
      * Validate BIMI records
-     * @param list<array{target: string, priority: int}> $records
+     * @param list<array{target: string, priority: int, txt?: string}> $records
      * @return list<ValidationIssue>
      */
     public function validate(array $records, string $dmarc): array

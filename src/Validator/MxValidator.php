@@ -19,7 +19,7 @@ final class MxValidator
 {
     /**
      * Validate MX records
-     * @param list<array{target: string, priority: int}> $records
+     * @param list<array{target: string|null, priority: int}> $records
      * @return list<ValidationIssue>
      */
     public function validate(array $records): array
