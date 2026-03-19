@@ -170,12 +170,13 @@ window.Inachis.ImageManager = {
         document.getElementById(imageTargetId).value = selected.value;
 
         const selectedImage = selected.closest('li')?.querySelector('img');
-        const src = selectedImage?.src;
+        let src = selectedImage?.src;
         const alt = selectedImage?.alt;
         if (!src) return;
 
         if (this.dialog.options.view === 'editor') {
             const cm = easymde.codemirror;
+            src = window.Inachis.makeImageUrlRelative(src);
             const output = `![${alt}](${src})`;
             cm.replaceSelection(output);
         } else if (existingImg) {
