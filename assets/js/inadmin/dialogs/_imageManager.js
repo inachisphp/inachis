@@ -169,17 +169,22 @@ window.Inachis.ImageManager = {
 
         document.getElementById(imageTargetId).value = selected.value;
 
-        const src = selected.closest('li')?.querySelector('img')?.src;
+        const selectedImage = selected.closest('li')?.querySelector('img');
+        const src = selectedImage?.src;
+        const alt = selectedImage?.alt;
         if (!src) return;
 
-        if (existingImg) {
+        if (this.dialog.options.view === 'editor') {
+            const cm = easymde.codemirror;
+            const output = `![${alt}](${src})`;
+            cm.replaceSelection(output);
+        } else if (existingImg) {
             existingImg.src = src;
         } else {
             const img = document.createElement('img');
-            img.alt = 'Preview of chosen image';
+            img.alt = alt;
             img.src = src;
-            document.getElementById(imageTargetId)
-                .insertAdjacentElement('afterend', img);
+            document.getElementById(imageTargetId).insertAdjacentElement('afterend', img);
         }
 
         this.dialog.close();
