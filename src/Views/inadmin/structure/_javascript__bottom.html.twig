@@ -9,6 +9,25 @@
     <script>
         let easymde = new EasyMDE({
             element: document.querySelector('.mde_editor'),
+            toolbar: [
+                "bold","italic","heading","|",
+                "quote","code","unordered-list","ordered-list","|",
+                "link","image",{
+                    name: "imageManager",
+                    action: (editor) => {
+                        const imageManagerButton = document.querySelector('.imageManager.dialog__link');
+                        imageManagerButton.dataset.className = 'dialog__imageManager';
+                        imageManagerButton.dataset.dialog = 'imageManager';
+                        imageManagerButton.dataset.templateName = 'image-manager';
+                        imageManagerButton.dataset.allowedTypes = 'image/png,image/jpeg,image/heic,image/heif,image/webp,image/svg+xml';
+                        imageManagerButton.dataset.view = 'editor';
+                        window.Inachis.ImageManager.open(imageManagerButton);
+                    },
+                    className: "fa fa-th dialog__link",
+                    title: "Image Manager"
+                }, "|",
+                "preview","side-by-side","fullscreen","|","guide",
+            ],
             autosave: {
                 enabled: true,
                 uniqueId: '{% if includeEditorId|default(null) is not empty %}{{ includeEditorId }}{% else %}new-content-{{ session.id }}-{{ date()|date('Ymd') }}{% endif %}'

@@ -28,6 +28,18 @@ window.Inachis = {
 		});
 	},
 
+	makeImageUrlRelative(url) {
+		try {
+			const parsed = new URL(url, window.location.origin);
+			if (parsed.origin === window.location.origin) {
+				return parsed.pathname + parsed.search + parsed.hash;
+			}
+			return url;
+		} catch {
+			return url;
+		}
+	},
+
 	debounce(fn, delay = 300) {
 		let timer;
 
