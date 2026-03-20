@@ -65,11 +65,12 @@ body.type_login {
 			border-radius: $radius-standard;
 			color: $text-inverse;
 			margin-bottom: 1.3em;
-			width: 90%;
+			width: 100%;
 		}
 
 		input[data-controller=toggle-password] {
-			width: 80%;
+			box-sizing: border-box;
+			padding-right: 50px;
 		}
 
 		.input:active {
@@ -142,5 +143,14 @@ body.type_login {
 		background: transparent;
 		border: none;
 		color: $text-inverse;
+		cursor: pointer;
+		position: absolute;
+		right: 12px;
+		top: 50%;
+		transform: translateY(-50%);
 	}
+}
+
+.password-wrapper {
+	position: relative;
 }

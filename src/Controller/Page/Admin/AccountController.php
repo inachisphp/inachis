@@ -220,7 +220,7 @@ class AccountController extends AbstractInachisController
             $this->entityManager->flush();
 
             $this->addFlash('success', 'Your password has been reset. You can now log in.');
-            return $this->redirectToRoute('app_account_login');
+            return $this->redirectToRoute('incc_account_login');
         }
         $this->data['form'] = $form->createView();
         $this->data['token'] = $token;

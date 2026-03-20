@@ -1,3 +1,5 @@
+/// not currently used
+
 window.Inachis.PasswordToggle = {
     values: {
         visibleLabel: { type: String, default: 'Show password' },
