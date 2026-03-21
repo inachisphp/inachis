@@ -3,6 +3,9 @@
 body.type_login {
 	background-image: $signin_background-image__dark;
 	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	transition: background-image 0.5s ease-in-out;
 	overflow: hidden;
 
 	.content {
@@ -16,14 +19,15 @@ body.type_login {
 .container__login,
 .setup {
 	background-color: $signin-overlay;
-	border: 1px solid transparent;
-	border-top: 10px solid $action-primary;
+	backdrop-filter: blur(18px);
+	-webkit-backdrop-filter: blur(18px);
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	// border-top: 10px solid $action-primary;
 	border-radius: $radius-standard;
+	box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 	color: $text-inverse;
 	margin: auto;
 	width: 25em;
-
-	box-shadow: 5px 7px 14px 0 rgba(0, 0, 0, 0.26);
 
 	&>div {
 		margin: 3em 0;
@@ -43,7 +47,12 @@ body.type_login {
 		padding: 0;
 
 		button {
+			&#login_logIn {
+				width: 100%;
+			}
+
 			i {
+				display: none;
 				margin-left: 0.5em;
 			}
 		}
