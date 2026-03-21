@@ -58,7 +58,11 @@
                         &mdash; {{ item.subTitle }}
                     {% endif %}
 
-                    {{ include('inadmin/partials/badge.html.twig') }}
+                    {% if badges|default(null) is not empty %}
+                        <span>
+                            {{ include('inadmin/partials/badge.html.twig') }}
+                        </span>
+                    {% endif %}
 
                 {% if inline|default(false) == false %}
                 </h2>

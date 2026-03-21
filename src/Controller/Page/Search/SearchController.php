@@ -96,7 +96,7 @@ class SearchController extends AbstractInachisController
                         'url',
                         $this->generateUrl('incc_resource_edit', [
                             'type' => 'images',
-                            'filename' => $result['sub_title']]
+                            'filename' => $result['id']]
                         )
                     );
                     break;

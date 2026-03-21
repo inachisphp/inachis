@@ -586,7 +586,7 @@ class AccountControllerTest extends WebTestCase
 
         $this->controller->expects($this->once())
             ->method('redirectToRoute')
-            ->with('app_account_login')
+            ->with('incc_account_login')
             ->willReturn(new RedirectResponse('/incc/login'));
 
         $result = $this->controller->newPassword(

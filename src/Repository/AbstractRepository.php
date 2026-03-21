@@ -107,24 +107,23 @@ abstract class AbstractRepository extends ServiceEntityRepository
             ->select('q')
             ->from($this->getClassName(), 'q');
         if (!empty($join)) {
-            foreach ($join as $j) {
-                // Old style: ['joinPath', 'alias']
-                // New style: ['joinType', 'joinPath', 'alias', 'condition']
-                if (count($j) === 2) {
-                    [$path, $alias] = $j;
-                    $qb->join($path, $alias);
-                } elseif (count($j) >= 3) {
-                    $type = $j[0]; // 'join' or 'leftJoin'
-                    $path = $j[1]; // e.g., 'q.items'
-                    $alias = $j[2]; // e.g., 'i'
-                    $condition = $j[3] ?? null;
+            if (count($join) === 2) {
+                $qb->join($join[0], $join[1]);
+            } else {
+                foreach ($join as $j) {
+                    if (count($j) >= 3) {
+                        $type = $j[0]; // 'join' or 'leftJoin'
+                        $path = $j[1]; // e.g., 'q.items'
+                        $alias = $j[2]; // e.g., 'i'
+                        $condition = $j[3] ?? null;
 
-                    if ($type === 'join') {
-                        $condition ? $qb->join($path, $alias, 'WITH', $condition)
-                                : $qb->join($path, $alias);
-                    } elseif ($type === 'leftJoin') {
-                        $condition ? $qb->leftJoin($path, $alias, 'WITH', $condition)
-                                : $qb->leftJoin($path, $alias);
+                        if ($type === 'join') {
+                            $condition ? $qb->join($path, $alias, 'WITH', $condition)
+                                    : $qb->join($path, $alias);
+                        } elseif ($type === 'leftJoin') {
+                            $condition ? $qb->leftJoin($path, $alias, 'WITH', $condition)
+                                    : $qb->leftJoin($path, $alias);
+                        }
                     }
                 }
             }

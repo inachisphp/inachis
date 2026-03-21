@@ -18,19 +18,25 @@ window.Inachis.NavMenu = {
 		}
 
 		// Desktop toggle
-		desktopBtn.addEventListener('click', () => {
-			layout.classList.toggle('expanded');
-			const isExpanded = layout.classList.contains('expanded');
-			localStorage.setItem('sidebarExpanded', isExpanded ? 'true' : 'false');
-		});
+		if (desktopBtn) {
+			desktopBtn.addEventListener('click', () => {
+				layout.classList.toggle('expanded');
+				const isExpanded = layout.classList.contains('expanded');
+				localStorage.setItem('sidebarExpanded', isExpanded ? 'true' : 'false');
+			});
+		}
 
 		// Mobile toggle
-		mobileBtn.addEventListener('click', () => {
-			layout.classList.add('expanded');
-			overlay.classList.add('active');
-			body.style.overflow = 'hidden';
-		});
-		overlay.addEventListener('click', closeMenu);
+		if (mobileBtn) {
+			mobileBtn.addEventListener('click', () => {
+				layout.classList.add('expanded');
+				overlay.classList.add('active');
+				body.style.overflow = 'hidden';
+			});
+		}
+		if (overlay) {
+			overlay.addEventListener('click', closeMenu);
+		}
 		document.querySelectorAll('.sidebar a').forEach(link => {
 			link.addEventListener('click', () => {
 				if (link.classList.contains('submenu-toggle')) return;
@@ -46,34 +52,36 @@ window.Inachis.NavMenu = {
 		}
 
 		// User menu toggle
-		document.querySelector('.admin__user a').addEventListener('click', e => {
-			e.preventDefault();
-			const userMenu = document.querySelector('#admin__user__options');
-			const open = userMenu.classList.toggle('open');
-			userMenu.setAttribute('aria-expanded', open);
-		});
-		// Close user menu when clicking outside
-		document.addEventListener('click', e => {
-			const userMenu = document.querySelector('#admin__user__options');
-			const userToggle = document.querySelector('.admin__user a');
-			if (!userMenu.contains(e.target) && !userToggle.contains(e.target)) {
-				userMenu.classList.remove('open');
-				userMenu.setAttribute('aria-expanded', 'false');
-			}
-		});
-
-		// Sub menu toggles
-		submenuToggles.forEach(toggle => {
-			toggle.addEventListener('click', e => {
+		const usermenu = document.querySelector('.admin__user a');
+		if (usermenu) {
+			usermenu.addEventListener('click', e => {
 				e.preventDefault();
-				const current = toggle.closest('.has-submenu');
-				const open = current.classList.toggle('open');
-				toggle.setAttribute('aria-expanded', open);
+				const userMenu = document.querySelector('#admin__user__options');
+				const open = userMenu.classList.toggle('open');
+				userMenu.setAttribute('aria-expanded', open);
 			});
-		});
-		document.addEventListener('click', e => {
-			closeSubMenus(e.target);
-		});
+			// Close user menu when clicking outside
+			document.addEventListener('click', e => {
+				const userMenu = document.querySelector('#admin__user__options');
+				const userToggle = document.querySelector('.admin__user a');
+				if (!userMenu.contains(e.target) && !userToggle.contains(e.target)) {
+					userMenu.classList.remove('open');
+					userMenu.setAttribute('aria-expanded', 'false');
+				}
+			});
+			// Sub menu toggles
+			submenuToggles.forEach(toggle => {
+				toggle.addEventListener('click', e => {
+					e.preventDefault();
+					const current = toggle.closest('.has-submenu');
+					const open = current.classList.toggle('open');
+					toggle.setAttribute('aria-expanded', open);
+				});
+			});
+			document.addEventListener('click', e => {
+				closeSubMenus(e.target);
+			});
+		}
 		// @todo review the below - need to get it working with LIs instead
 		document.querySelectorAll('.submenu a[aria-current="page"]').forEach(link => {
 			const parent = link.closest('.has-submenu');

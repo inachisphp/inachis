@@ -39,7 +39,7 @@ const jsBaseConfig = {
 
 const scssBaseConfig = {
     bundle: true,
-    external: ['*.png'],
+    external: [ "/assets/*" ],
     minify: isProd,
     sourcemap: !isProd,
     plugins: [
@@ -87,52 +87,68 @@ const color = {
 };
 
 async function optimizeImages() {
-    const inputDir = path.join(ROOT, "assets/imgs/incc");
-    const outputDir = path.join(ROOT, "public/assets/imgs/incc");
+    const targets = [
+        {
+            label: 'incc',
+            input: path.join(ROOT, "assets/imgs/incc"),
+            output: path.join(ROOT, "public/assets/imgs/incc")
+        },
+        {
+            label: 'web',
+            input: path.join(ROOT, "assets/imgs/web"),
+            output: path.join(ROOT, "public/assets/imgs")
+        }
+    ];
 
-    if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir, { recursive: true });
+    for (const { label, input, output } of targets) {
+
+        if (!fs.existsSync(input)) {
+            console.log(`⚠️  ${label}: input folder not found, skipping`);
+            continue;
+        }
+
+        console.log(`🖼️  Optimizing ${label} images...`);
+
+        fs.mkdirSync(output, { recursive: true });
+
+        const files = fs.readdirSync(input).filter(f =>
+            /\.(png|jpe?g|gif|svg)$/i.test(f)
+        );
+
+        await Promise.all(
+            files.map(async file => {
+                const inputPath = path.join(input, file);
+                const outputPath = path.join(output, file);
+                const ext = path.extname(file).toLowerCase();
+
+                if (ext === ".jpg" || ext === ".jpeg") {
+                    await sharp(inputPath)
+                        .jpeg({ quality: 75 })
+                        .toFile(outputPath);
+                }
+
+                else if (ext === ".png") {
+                    await sharp(inputPath)
+                        .png({ quality: 80, compressionLevel: 9 })
+                        .toFile(outputPath);
+                }
+
+                else if (ext === ".gif") {
+                    await sharp(inputPath)
+                        .gif()
+                        .toFile(outputPath);
+                }
+
+                else if (ext === ".svg") {
+                    const svgContent = fs.readFileSync(inputPath, "utf8");
+                    const result = optimizeSvg(svgContent, { multipass: true });
+                    fs.writeFileSync(outputPath, result.data);
+                }
+
+                console.log(` - Optimized: ${file} → ${output}`);
+            })
+        );
     }
-
-    const files = fs.readdirSync(inputDir).filter(f =>
-        /\.(png|jpe?g|gif|svg)$/i.test(f)
-    );
-
-    await Promise.all(
-        files.map(async file => {
-            const inputPath = path.join(inputDir, file);
-            const outputPath = path.join(outputDir, file);
-            const ext = path.extname(file).toLowerCase();
-
-            if (ext === ".jpg" || ext === ".jpeg") {
-                await sharp(inputPath)
-                    .jpeg({ quality: 75 })
-                    .toFile(outputPath);
-            }
-
-            else if (ext === ".png") {
-                await sharp(inputPath)
-                    .png({ quality: 80, compressionLevel: 9 })
-                    .toFile(outputPath);
-            }
-
-            else if (ext === ".gif") {
-                await sharp(inputPath)
-                    .gif()
-                    .toFile(outputPath);
-            }
-
-            else if (ext === ".svg") {
-                const svgContent = fs.readFileSync(inputPath, "utf8");
-                const result = optimizeSvg(svgContent, {
-                    multipass: true
-                });
-                fs.writeFileSync(outputPath, result.data);
-            }
-
-            console.log(` - Optimized: ${file}`);
-        })
-    );
 }
 
 async function copyIconsAndManifests() {
@@ -162,7 +178,6 @@ async function copyExtraLibraries() {
         "node_modules/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css",
         "node_modules/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.min.js",
         "node_modules/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js",
-        "node_modules/jquery/dist/jquery.min.js",
         "node_modules/easymde/dist/easymde.min.js",
         "node_modules/tom-select/dist/js/tom-select.complete.min.js"
     ];
