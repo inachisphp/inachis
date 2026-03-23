@@ -185,24 +185,24 @@ class Page
     protected ?Collection $urls;
 
     /**
-     * @var Collection|null The array of categories assigned to the post/page
+     * @var Collection The array of categories assigned to the post/page
      */
     #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Category')]
     #[ORM\JoinTable(name: 'Page_categories')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'category_id', referencedColumnName: 'id')]
     #[ORM\OrderBy([ 'title' => 'ASC' ])]
-    protected ?Collection $categories;
+    protected Collection $categories;
 
     /**
-     * @var Collection|null The array of tags assigned to the post/page
+     * @var Collection The array of tags assigned to the post/page
      */
     #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Tag', cascade: [ 'persist' ])]
     #[ORM\JoinTable(name: 'Page_tags')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'tag_id', referencedColumnName: 'id')]
     #[ORM\OrderBy([ 'title' => 'ASC' ])]
-    protected ?Collection $tags;
+    protected Collection $tags;
 
     /**
      * @var Collection|null  The array of Series that contains this page
@@ -228,10 +228,10 @@ class Page
     /**
      * Default constructor for {@link Page}.
      *
-     * @param string    $title   The title for the {@link Page}
-     * @param string    $content The content for the {@link Page}
-     * @param User|null $author  The {@link User} that authored the {@link Page}
-     * @param string    $type    The type of {@link Page} - post or page
+     * @param string $title The title for the {@link Page}
+     * @param string $content The content for the {@link Page}
+     * @param User|null $author The {@link User} that authored the {@link Page}
+     * @param string $type The type of {@link Page} - post or page
      * @throws Exception
      */
     public function __construct(
@@ -448,7 +448,7 @@ class Page
     /**
      * Returns an array of {@link Category)s assigned to the page.
      *
-     * @return Collection|null The array of {$link Category} entities for the {@link Page}
+     * @return Collection The array of {$link Category} entities for the {@link Page}
      */
     public function getCategories()
     {
@@ -458,7 +458,7 @@ class Page
     /**
      * Returns an array of {@link Tag)s assigned to the page.
      *
-     * @return Collection|null The array of {$link Category} entities for the {@link Page}
+     * @return Collection The array of {$link Category} entities for the {@link Page}
      */
     public function getTags()
     {

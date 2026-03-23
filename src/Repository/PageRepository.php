@@ -50,7 +50,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      * @param Category $category
      * @param int $maxDisplayCount
      * @param int $offset
-     * @return mixed
+     * @return array<int, Page>
      */
     public function getPagesWithCategory(Category $category, int $limit = 0, int $offset = 0)
     {
