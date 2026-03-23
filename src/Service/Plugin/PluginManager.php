@@ -12,13 +12,23 @@ use Psr\Container\ContainerInterface;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
+/**
+ * Manages plugins
+ */
 final class PluginManager
 {
+    /**
+     * @var array<string, array{enabled: bool, version: string, installer: PluginInstallerInterface}> $pluginData
+     */
     private array $pluginData = [];
 
+    /**
+     * Creates a new instance of the PluginManager
+     * 
+     * @param iterable<PluginInstallerInterface> $installers
+     */
     public function __construct(
         #[TaggedIterator('cms.plugin_installer', default: [])]
-        /** @var iterable<PluginInstallerInterface> $installers */
         private iterable $installers = []
     ) {
         foreach ($installers as $installer) {
@@ -31,6 +41,12 @@ final class PluginManager
         }
     }
 
+    /**
+     * Installs a plugin
+     * 
+     * @param string $name
+     * @throws \RuntimeException
+     */
     public function installPlugin(string $name): void
     {
         if (!isset($this->pluginData[$name])) {
@@ -45,26 +61,55 @@ final class PluginManager
         $plugin['installer']->install();
     }
 
+    /**
+     * Checks if a plugin is enabled
+     * 
+     * @param string $name
+     * @return bool
+     */
     public function isEnabled(string $name): bool
     {
         return $this->pluginData[$name]['enabled'] ?? false;
     }
 
+    /**
+     * Gets all installed plugins
+     * 
+     * @return array<string>
+     */
     public function getInstalledPlugins(): array
     {
         return array_keys($this->pluginData);
     }
 
-    public function getInstaller(string $pluginClass)
+    /**
+     * Gets the installer for a plugin
+     * 
+     * @param string $pluginClass
+     * @return PluginInstallerInterface|null
+     */
+    public function getInstaller(string $pluginClass): ?PluginInstallerInterface
     {
         return $this->pluginData[$pluginClass]['installer'] ?? null;
     }
 
+    /**
+     * Gets the version of a plugin
+     * 
+     * @param string $pluginClass
+     * @return string|null
+     */
     public function getVersion(string $pluginClass): ?string
     {
         return $this->pluginData[$pluginClass]['version'] ?? null;
     }
 
+    /**
+     * Sets the version of a plugin
+     * 
+     * @param string $pluginClass
+     * @param string $version
+     */
     public function setVersion(string $pluginClass, string $version): void
     {
         if (isset($this->pluginData[$pluginClass])) {
@@ -72,9 +117,15 @@ final class PluginManager
         }
     }
 
-    // @todo return latest version (could read from composer or plugin metadata)
+    /**
+     * Gets the latest version of a plugin
+     * 
+     * @param string $pluginClass
+     * @return string
+     */
     public function getLatestVersion(string $pluginClass): string
     {
+        // @todo return latest version (could read from composer or plugin metadata)
         // For now, return '1.0.0' or read composer-installed version
         return '1.0.0';
     }

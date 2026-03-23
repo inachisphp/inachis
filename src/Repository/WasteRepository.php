@@ -16,20 +16,25 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Waste|null find($id, $lockMode = null, $lockVersion = null)
- * @method Waste|null findOneBy(array $criteria, array $orderBy = null)
- * @method Waste[]    findAll()
- * @method Waste[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Repository for {@link Waste} entities
  */
 class WasteRepository extends AbstractRepository implements WasteRepositoryInterface
 {
+    /**
+     * Creates a new instance of the WasteRepository
+     * 
+     * @param ManagerRegistry $registry The registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Waste::class);
     }
+
     /**
-     * @param User $user
-     * @return int
+     * Deletes all waste for a user
+     * 
+     * @param User $user The user
+     * @return int The number of waste items deleted
      */
     public function deleteWasteByUser(User $user): int
     {
@@ -42,11 +47,14 @@ class WasteRepository extends AbstractRepository implements WasteRepositoryInter
         ;
     }
 
-        /**
-     * @param $filters
-     * @param $offset
-     * @param $limit
-     * @return Paginator
+    /**
+     * Gets filtered waste
+     * 
+     * @param array $filters The filters
+     * @param int $offset The offset
+     * @param int $limit The limit
+     * @param string $sort The sort
+     * @return Paginator The paginator
      */
     public function getFiltered($filters, $offset, $limit, $sort): Paginator
     {

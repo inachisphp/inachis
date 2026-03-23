@@ -36,8 +36,10 @@ readonly class PageBulkActionService
     ) {}
 
     /**
+     * Applies a bulk action to pages
+     * 
      * @param string $action
-     * @param array $ids
+     * @param array<string> $ids
      * @return int
      * @throws Exception
      */
