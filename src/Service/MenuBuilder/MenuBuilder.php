@@ -7,16 +7,27 @@
  */
 namespace Inachis\Service\MenuBuilder;
 
-use Inachis\Plugin\PluginManager;
+use Inachis\Service\Plugin\PluginManager;
 
+/**
+ * Builds the navigation menu by combining menu items from all enabled menu providers
+ */
 final class MenuBuilder
 {
+    /**
+     * @param PluginManager $pluginManager
+     * @param iterable<MenuProviderInterface> $menuProviders
+     */
     public function __construct(
         private PluginManager $pluginManager,
-        /** @var iterable<MenuProviderInterface> $menuProviders */
         private iterable $menuProviders
     ) {}
 
+    /**
+     * Builds the navigation menu by combining menu items from all enabled menu providers
+     * 
+     * @return array<int, array{label: string, url: string, priority: int}> The navigation menu
+     */
     public function build(): array
     {
         $items = [];
@@ -28,7 +39,6 @@ final class MenuBuilder
                 $items = array_merge($items, $provider->getMenuItems());
             }
         }
-
         usort($items, fn($a, $b) => ($a['priority'] ?? 0) <=> ($b['priority'] ?? 0));
 
         return $items;

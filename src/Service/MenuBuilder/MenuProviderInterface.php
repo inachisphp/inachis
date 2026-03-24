@@ -7,6 +7,7 @@
  */
 namespace Inachis\Service\MenuBuilder;
 
+use Inachis\Entity\MenuItem;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
@@ -18,7 +19,7 @@ interface MenuProviderInterface
     /**
      * Get the menu items for the current user.
      *
-     * @return array The menu items
+     * @return array<MenuItem> The menu items
      */
     public function getMenuItems(): array;
 }

@@ -28,6 +28,8 @@ class NavigationTabService
      *
      * @param NavigationTabRepository $repository
      * @param CacheInterface $cache
+     * @param EntityManagerInterface $entityManager
+     * @param TransactionHelper $transactionHelper
      */
     public function __construct(
         private NavigationTabRepository $repository,
@@ -39,7 +41,7 @@ class NavigationTabService
     /**
      * Get all active navigation tabs ordered by position
      *
-     * @return list<NavigationTab>
+     * @return array<NavigationTab>
      */
     public function getActiveTabs(): array
     {
@@ -199,7 +201,7 @@ class NavigationTabService
     /**
      * Normalise positions of given tabs in memory to be 1..n
      *
-     * @param array<string, NavigationTab> $tabs
+     * @param array<NavigationTab> $tabs
      */
     private function normalisePositionsIndexed(array $tabs): void
     {
@@ -213,7 +215,7 @@ class NavigationTabService
     /**
      * Delete navigation tabs
      *
-     * @param array<string> $ids
+     * @param NavigationTab $tab
      */
     private function delete(NavigationTab $tab): void
     {
@@ -232,8 +234,9 @@ class NavigationTabService
         $count = 0;
         $this->transactionHelper->executeInTransaction(function () use ($ids, $action, &$count) {
             foreach ($ids as $id) {
+                /** @var NavigationTab|null $tab */
                 $tab = $this->repository->findOneBy(['id' => $id]);
-                if (empty($tab->getId())) {
+                if (!$tab || !$tab->getId()) {
                     continue;
                 }
                 match ($action) {

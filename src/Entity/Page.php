@@ -173,7 +173,7 @@ class Page
     protected ?string $sharingMessage = '';
 
     /**
-     * @var Collection|null The array of URLs for the content
+     * @var Collection The array of URLs for the content
      */
     #[ORM\OneToMany(
         mappedBy: 'content',
@@ -182,7 +182,7 @@ class Page
         orphanRemoval: true
     )]
     #[ORM\OrderBy(['default' => 'DESC'])]
-    protected ?Collection $urls;
+    protected Collection $urls;
 
     /**
      * @var Collection The array of categories assigned to the post/page
@@ -438,9 +438,9 @@ class Page
      * Returns an array of URLs assigned to the page. The default URL will
      * always be first.
      *
-     * @return Collection|null The array of {$link Url} entities for the {@link Page}
+     * @return Collection<Url> The array of {$link Url} entities for the {@link Page}
      */
-    public function getUrls(): ?Collection
+    public function getUrls(): Collection
     {
         return $this->urls;
     }
@@ -448,9 +448,9 @@ class Page
     /**
      * Returns an array of {@link Category)s assigned to the page.
      *
-     * @return Collection The array of {$link Category} entities for the {@link Page}
+     * @return Collection<Category> The array of {$link Category} entities for the {@link Page}
      */
-    public function getCategories()
+    public function getCategories(): Collection
     {
         return $this->categories;
     }
@@ -458,9 +458,9 @@ class Page
     /**
      * Returns an array of {@link Tag)s assigned to the page.
      *
-     * @return Collection The array of {$link Category} entities for the {@link Page}
+     * @return Collection<Tag> The array of {$link Category} entities for the {@link Page}
      */
-    public function getTags()
+    public function getTags(): Collection
     {
         return $this->tags;
     }
