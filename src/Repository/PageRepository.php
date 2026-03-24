@@ -171,6 +171,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         int $limit,
         string $sort = 'postDate desc'
     ): Paginator {
+        $join = [];
         $where = [
             '1=1',
             $filters,
@@ -185,6 +186,11 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
                     $filters
                 )
             ];
+        }
+        if (!empty($filters['categories'])) {
+            $where[0] .= ' AND c.id IN (:categories)';
+            $where[1]['categories'] = array_is_list($filters['categories']) ? $filters['categories'] : array_keys($filters['categories']);
+            $join[] = ['leftJoin', 'q.categories', 'c'];
         }
         if (!empty($filters['status'])) {
             $where[0] .= ' AND q.status = :status';
@@ -210,6 +216,8 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             $limit,
             $where,
             $this->determineOrderBy($sort),
+            [],
+            $join
         );
     }
 

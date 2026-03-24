@@ -49,95 +49,95 @@
         <div class="col-12 widget-posts ui-tabs-external">
             {% include 'inadmin/partials/tab-sets/posts.html.twig' %}
             {% include 'inadmin/partials/list.html.twig' with {
-                'className': 'form__posts',
-                'type': 'post',
-                'dataset': posts,
+                className: 'form__posts',
+                type: 'post',
+                dataset: posts,
 
-                'offset': query.offset,
-                'limit': query.limit,
-                'total': posts.count,
+                offset: query.offset,
+                limit: query.limit,
+                total: posts.count,
 
-                'snippet_description': 'content',
-                'slug_prefix': page.tab,
-                'slug': 'urls[0].link',
+                snippet_description: 'content',
+                slug_prefix: page.tab,
+                slug: 'urls[0].link',
 
-                'add_button': {
-                    'text': 'Create ' ~ page.tab|capitalize,
-                    'url': link_new,
+                add_button: {
+                    text: 'Create ' ~ page.tab|capitalize,
+                    url: link_new,
                 },
-                'url_result': path('incc_post_list'),
+                url_result: path('incc_post_list'),
 
-                'badges': badges,
+                badges: badges,
 
-                'actions': {
-                    'private': {
-                        'button_class': 'button--secondary button--privacy',
-                        'data': {
+                actions: {
+                    private: {
+                        button_class: 'button--secondary button--privacy',
+                        data: {
                             'form-action': ''
                         },
-                        'icon': 'visibility_off',
-                        'title': 'Make private',
+                        icon: 'visibility_off',
+                        title: 'Make private',
                     },
-                    'public': {
-                        'button_class': 'button--secondary button--privacy',
-                        'data': {
+                    public: {
+                        button_class: 'button--secondary button--privacy',
+                        data: {
                             'form-action': ''
                         },
-                        'icon': 'visibility',
-                        'title': 'Make public',
+                        icon: 'visibility',
+                        title: 'Make public',
                     },
-                    'rebuild': {
-                        'button_class': 'button--secondary',
-                        'data': {
+                    rebuild: {
+                        button_class: 'button--secondary',
+                        data: {
                             'form-action': ''
                         },
                         'icon': 'hub',
-                        'title': 'Recreate Link'
+                        title: 'Recreate Link'
                     },
-                    'export': {
-                        'button_class': 'button--secondary button--export',
-                        'button_type': 'button',
-                        'data': {
+                    export: {
+                        button_class: 'button--secondary button--export',
+                        button_type: 'button',
+                        data: {
                             'content-type': 'post',
                             'form-action': path('incc_tools_export'),
                             'scope': 'manual',
                         },
-                        'icon': 'cloud_download',
+                        icon: 'cloud_download',
                         'title': 'Export',
                     },
-                    'delete': {
-                        'button_class': 'button--negative button--delete button--confirm',
-                        'data': {
-                            'confirm': 'delete',
+                    delete: {
+                        button_class: 'button--negative button--delete button--confirm',
+                        data: {
+                            confirm: 'delete',
                             'confirm-text': 'Yes, delete',
-                            'entity': 'posts',
+                            entity: 'posts',
                             'form-action': '',
-                            'title': 'Delete selected  ' ~ page.tab ~ 's',
-                            'warning': 'All currently selected content will be deleted permanently. This action cannot be undone.',
+                            title: 'Delete selected  ' ~ page.tab ~ 's',
+                            warning: 'All currently selected content will be deleted permanently. This action cannot be undone.',
                         },
-                        'icon': 'delete_forever',
+                        icon: 'delete_forever',
                         'name': 'delete',
                         'value': '1',
                         'title': 'Delete',
                     }
                 },
 
-                'filters': {
-                    'Status': {
+                filters: {
+                    Status: {
                         '': 'All',
                         'draft': 'Draft',
                         'published': 'Published',
                     },
-                    'Visibility': {
+                    Visibility: {
                         '': 'All',
                         'private': 'Private',
                         'public': 'Public',
                     }
                 },
 
-                'filter_values': query.filters,
+                filter_values: query.filters,
 
-                'sort_options': {
+                sort_options: {
                     'postDate asc': 'Published: Oldest',
                     'postDate desc': 'Published: Newest',
                     'modDate asc': 'Modified: Oldest',
@@ -146,10 +146,11 @@
                     'title desc': 'Title: Z-A',
                 },
 
-                'show_select_deselect': true,
-                'show_search': true,
+                show_category_filter: true,
+                show_select_deselect: true,
+                show_search: true,
                 showSummary: true,
-                'zebra': true,
+                zebra: true,
             }
             %}
 

@@ -156,6 +156,17 @@ div#filter__options {
 			color: $color-neutral-900;
 		}
 	}
+
+	.form & .js-select {
+		width: auto;
+	}
+	.ts-dropdown, .ts-control, .ts-control input {
+		background: none;
+		border: none;
+		font-size: inherit;
+		line-height: inherit;
+		width: 15rem;
+	}
 }
 
 .collapsible {
@@ -164,7 +175,7 @@ div#filter__options {
 	grid-template-rows: 0fr;
 	height: 0;
 	opacity: 0;
-	overflow: hidden;
+	// overflow: hidden;
 	transition: grid-template-rows 250ms ease, height 250ms ease, opacity 200ms ease, padding 200ms ease;
 	padding: 0;
 
