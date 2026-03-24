@@ -15,10 +15,10 @@ use Inachis\Repository\PageRepository;
 use Inachis\Repository\RevisionRepository;
 use Inachis\Repository\UrlRepository;
 use Inachis\Util\UrlNormaliser;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
+use DateTimeImmutable;
+use Exception;
 
 readonly class PageBulkActionService
 {
@@ -36,8 +36,10 @@ readonly class PageBulkActionService
     ) {}
 
     /**
+     * Applies a bulk action to pages
+     * 
      * @param string $action
-     * @param array $ids
+     * @param array<string> $ids
      * @return int
      * @throws Exception
      */
@@ -45,8 +47,9 @@ readonly class PageBulkActionService
     {
         $count = 0;
         foreach ($ids as $id) {
+            /** @var Page|null $post */
             $post = $this->pageRepository->findOneBy(['id' => $id]);
-            if (empty($post->getId())) {
+            if (!$post || !$post->getId()) {
                 continue;
             }
             match ($action) {
@@ -57,7 +60,7 @@ readonly class PageBulkActionService
                 default   => null,
             };
             if ($action !== 'delete') {
-                $post->setModDate(new DateTime());
+                $post->setModDate(new DateTimeImmutable());
                 $this->entityManager->persist($post);
                 if ($action === 'private' || $action === 'public') {
                     $revision = $this->revisionRepository->hydrateNewRevisionFromPage($post);
@@ -93,18 +96,23 @@ readonly class PageBulkActionService
      */
     public function rebuild(Page $post): Page
     {
-        if (!empty($post->getUrls())) {
+        if (!$post->getUrls()->isEmpty()) {
             foreach ($post->getUrls() as $url) {
                 $this->urlRepository->remove($url);
             }
         }
-        $link = $post->getPostDateAsLink() . '/' . UrlNormaliser::toUri($post->getTitle());
-        if ($post->getSubTitle() !== null) {
-            $link .= '-' . UrlNormaliser::toUri($post->getSubTitle());
+        $title = $post->getTitle();
+        if ($title === null) {
+            throw new Exception('Page title cannot be null');
+        }
+        $link = $post->getPostDateAsLink() . '/' . UrlNormaliser::toUri($title);
+        $subTitle = $post->getSubTitle();
+        if ($subTitle !== null) {
+            $link .= '-' . UrlNormaliser::toUri($subTitle);
         }
         $url = new Url($post, $link);
         $this->entityManager->persist($url);
-        $post->setModDate(new DateTime('now'));
+        $post->setModDate(new DateTimeImmutable('now'));
 
         return $post;
     }

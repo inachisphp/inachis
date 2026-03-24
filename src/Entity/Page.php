@@ -173,7 +173,7 @@ class Page
     protected ?string $sharingMessage = '';
 
     /**
-     * @var Collection|null The array of URLs for the content
+     * @var Collection The array of URLs for the content
      */
     #[ORM\OneToMany(
         mappedBy: 'content',
@@ -182,27 +182,27 @@ class Page
         orphanRemoval: true
     )]
     #[ORM\OrderBy(['default' => 'DESC'])]
-    protected ?Collection $urls;
+    protected Collection $urls;
 
     /**
-     * @var Collection|null The array of categories assigned to the post/page
+     * @var Collection The array of categories assigned to the post/page
      */
     #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Category')]
     #[ORM\JoinTable(name: 'Page_categories')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'category_id', referencedColumnName: 'id')]
     #[ORM\OrderBy([ 'title' => 'ASC' ])]
-    protected ?Collection $categories;
+    protected Collection $categories;
 
     /**
-     * @var Collection|null The array of tags assigned to the post/page
+     * @var Collection The array of tags assigned to the post/page
      */
     #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Tag', cascade: [ 'persist' ])]
     #[ORM\JoinTable(name: 'Page_tags')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'tag_id', referencedColumnName: 'id')]
     #[ORM\OrderBy([ 'title' => 'ASC' ])]
-    protected ?Collection $tags;
+    protected Collection $tags;
 
     /**
      * @var Collection|null  The array of Series that contains this page
@@ -228,10 +228,10 @@ class Page
     /**
      * Default constructor for {@link Page}.
      *
-     * @param string    $title   The title for the {@link Page}
-     * @param string    $content The content for the {@link Page}
-     * @param User|null $author  The {@link User} that authored the {@link Page}
-     * @param string    $type    The type of {@link Page} - post or page
+     * @param string $title The title for the {@link Page}
+     * @param string $content The content for the {@link Page}
+     * @param User|null $author The {@link User} that authored the {@link Page}
+     * @param string $type The type of {@link Page} - post or page
      * @throws Exception
      */
     public function __construct(
@@ -438,9 +438,9 @@ class Page
      * Returns an array of URLs assigned to the page. The default URL will
      * always be first.
      *
-     * @return Collection|null The array of {$link Url} entities for the {@link Page}
+     * @return Collection<Url> The array of {$link Url} entities for the {@link Page}
      */
-    public function getUrls(): ?Collection
+    public function getUrls(): Collection
     {
         return $this->urls;
     }
@@ -448,9 +448,9 @@ class Page
     /**
      * Returns an array of {@link Category)s assigned to the page.
      *
-     * @return Collection|null The array of {$link Category} entities for the {@link Page}
+     * @return Collection<Category> The array of {$link Category} entities for the {@link Page}
      */
-    public function getCategories()
+    public function getCategories(): Collection
     {
         return $this->categories;
     }
@@ -458,9 +458,9 @@ class Page
     /**
      * Returns an array of {@link Tag)s assigned to the page.
      *
-     * @return Collection|null The array of {$link Category} entities for the {@link Page}
+     * @return Collection<Tag> The array of {$link Category} entities for the {@link Page}
      */
-    public function getTags()
+    public function getTags(): Collection
     {
         return $this->tags;
     }

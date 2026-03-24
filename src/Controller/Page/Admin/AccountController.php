@@ -31,11 +31,13 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 /**
- * Class AccountController.
+ * Account controller
  */
 class AccountController extends AbstractInachisController
 {
     /**
+     * Login
+     * 
      * @param Request $request
      * @param AuthenticationUtils $authenticationUtils
      * @return Response The response the controller results in
@@ -60,6 +62,8 @@ class AccountController extends AbstractInachisController
     }
 
     /**
+     * Logout
+     * 
      * @throws \Exception
      */
     #[Route("/incc/logout", name: "incc_logout")]
@@ -69,6 +73,8 @@ class AccountController extends AbstractInachisController
     }
 
     /**
+     * Forgot password
+     * 
      * @param Request $request
      * @param PasswordResetRequestRepository $passwordResetRequestRepository
      * @param RateLimiterFactoryInterface $forgotPasswordIpLimiter

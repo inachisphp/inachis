@@ -68,11 +68,11 @@ class Category
     protected ?Category $parent = null;
 
     /**
-     * @var Collection|null The array of child categories if applicable
+     * @var Collection The array of child categories if applicable
      */
     #[ORM\OneToMany(targetEntity: 'Inachis\Entity\Category', mappedBy: 'parent')]
     #[ORM\OrderBy(['title' => 'ASC'])]
-    protected ?Collection $children;
+    protected Collection $children;
 
     /**
      * Default constructor for {@link Category}.

@@ -81,7 +81,7 @@ class CategoryDialogController extends AbstractInachisController
         if (!empty($categories)) {
             $result['items'] = [];
             foreach ($categories as $category) {
-                $title = $category->getTitle();
+                $title = $category->getTitle() ?? '';
                 if (isset($result['items'][$title])) {
                     $result['items'][$result['items'][$title]->path] = $result['items'][$title];
                     $result['items'][$result['items'][$title]->path]->text = $result['items'][$title]->path;

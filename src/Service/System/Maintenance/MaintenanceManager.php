@@ -41,8 +41,6 @@ class MaintenanceManager
 
     /**
      * Enable maintenance mode
-     *
-     * @return void
      */
     public function enable(): void
     {
@@ -52,8 +50,6 @@ class MaintenanceManager
 
     /**
      * Disable maintenance mode
-     *
-     * @return void
      */
     public function disable(): void
     {
@@ -64,7 +60,7 @@ class MaintenanceManager
     /**
      * Get the maintenance configuration
      *
-     * @return array
+     * @return array<mixed>
      */
     public function getConfig(): array
     {
@@ -77,21 +73,29 @@ class MaintenanceManager
                 'retry_after' => 3600,
             ];
         }
-        return json_decode(file_get_contents($file), true) ?? [];
+        $json = file_get_contents($file);
+        if ($json === false) {
+            return [];
+        }
+        $data = json_decode($json, true);
+        return is_array($data) ? $data : [];
     }
 
     /**
      * Save the maintenance configuration using an atomic write.
      *
-     * @param array $config The maintenance configuration
-     * @return void
+     * @param array<string, mixed> $config The maintenance configuration
      */
     public function saveConfig(array $config): void
     {
+        $content = json_encode($config, JSON_PRETTY_PRINT);
+        if ($content === false) {
+            throw new \RuntimeException('Failed to encode maintenance config to JSON.');
+        }
         $this->atomicWrite(
             'maintenance.json',
             $this->projectDir . '/var',
-            json_encode($config, JSON_PRETTY_PRINT),
+            $content,
             0600,
             LOCK_EX,
         );
@@ -102,8 +106,7 @@ class MaintenanceManager
      * and set permissions correctly before writing content to the file and then moving it
      * to the correct location.
      *
-     * @param array $config The maintenance configuration
-     * @return void
+     * @param array<mixed, mixed> $config The maintenance configuration
      */
     public function generateStaticPage(array $config): void
     {
@@ -121,8 +124,13 @@ class MaintenanceManager
      * @param int $permissions The permissions to set on the file
      * @param int $flags The flags to use with file_put_contents
      */
-    private function atomicWrite($filename, $location, $content, $permissions = 0600, $flags = 0)
-    {
+    private function atomicWrite(
+        string $filename,
+        string $location,
+        string $content,
+        int $permissions = 0600,
+        int $flags = 0
+    ): void {
         $tmpFile = $this->projectDir . '/var/' . $filename . '.tmp';
         touch($tmpFile);
         chmod($tmpFile, $permissions);

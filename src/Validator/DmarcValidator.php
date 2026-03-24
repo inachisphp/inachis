@@ -23,6 +23,7 @@ final class DmarcValidator
      */
     public function validate(array $records): array
     {
+        /** @var list<ValidationIssue> $issues */
         $issues = [];
 
         if ($records === []) {
@@ -79,7 +80,7 @@ final class DmarcValidator
     /**
      * Parse DMARC record
      * @param string $record
-     * @return array
+     * @return array<string, string>
      */
     private function parse(string $record): array
     {
@@ -98,7 +99,7 @@ final class DmarcValidator
      * Validate RUA/RUF records
      * @param string $rua
      * @param string $type
-     * @param array $issues
+     * @param list<ValidationIssue> $issues
      * @return void
      */
     private function validateRuaRuf(string $rua, string $type, array &$issues): void

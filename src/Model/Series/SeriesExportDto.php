@@ -44,7 +44,7 @@ final class SeriesExportDto
     public bool $visibility;
 
     /**
-     * @var string[] The titles of the posts for series contents
+     * @var array<int, string> The titles of the posts for series contents
      */
     public array $items = [];
 }

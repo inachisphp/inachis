@@ -17,12 +17,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Appearance controller
+ */
 #[IsGranted('ROLE_ADMIN')]
 class AppearanceController extends AbstractInachisController
 {
     /**
      * Allow a {@link User} to change their preferences (theme, accessibility settings, etc.)
      * 
+     * @param Request $request
+     * @param UserPreferenceProvider $userPreferenceProvider
      * @return Response
      */
     #[Route("/incc/admin/theme", name: "incc_admin_theme", methods: [ "GET", "POST" ])]

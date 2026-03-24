@@ -19,7 +19,7 @@ interface DnsResolverInterface
      *
      * @param string $host
      * @param int $type
-     * @return array
+     * @return array<int, array<string, mixed>>
      */
     public function getRecords(string $host, int $type): array;
 }

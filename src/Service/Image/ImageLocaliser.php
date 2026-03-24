@@ -12,11 +12,27 @@ namespace Inachis\Service\Image;
 use Symfony\Component\Filesystem\Filesystem;
 use Exception;
 
+/**
+ * Service for localising images
+ */
 class ImageLocaliser
 {
+    /**
+     * @var string The path to the public images directory
+     */
     protected string $publicImgPath = '';
+
+    /**
+     * @var Filesystem The filesystem
+     */
     protected Filesystem $filesystem;
 
+    /**
+     * Creates a new instance of the ImageLocaliser
+     * 
+     * @param Filesystem $filesystem The filesystem
+     * @param string $publicImgPath The path to the public images directory
+     */
     public function __construct(Filesystem $filesystem, string $publicImgPath)
     {
         $this->filesystem = $filesystem;

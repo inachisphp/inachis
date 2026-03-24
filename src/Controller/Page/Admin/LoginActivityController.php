@@ -18,13 +18,16 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Controller for login activity
+ * Login activity controller
  */
 #[IsGranted('ROLE_ADMIN')]
 class LoginActivityController extends AbstractInachisController
 {
     /**
+     * Login activity index
+     * 
      * @param LoginActivityRepository $repository
+     * @param Request $request
      * @return Response
      */
     #[Route('/incc/admin/login-activity', name: 'incc_admin_login_activity_index')]
@@ -45,7 +48,10 @@ class LoginActivityController extends AbstractInachisController
     }
 
     /**
+     * Login activity by user
+     * 
      * @param Request $request
+     * @param UserRepository $userRepository
      * @param LoginActivityRepository $repository
      * @return Response
      */
@@ -64,7 +70,10 @@ class LoginActivityController extends AbstractInachisController
     }
 
     /**
-     * @param LoginActivity $activity
+     * Login activity view
+     * 
+     * @param Request $request
+     * @param LoginActivityRepository $repository
      * @return Response
      */
     #[Route('/incc/admin/login-activity/{id}', name: 'incc_admin_all_login_activity_view')]
