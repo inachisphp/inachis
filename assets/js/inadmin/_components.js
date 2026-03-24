@@ -155,6 +155,7 @@ window.Inachis.Components = {
 	initPasswordToggle() {
 		const passwordToggles = document.querySelectorAll('button.button--password-toggle');
 		passwordToggles.forEach(toggle => {
+			toggle.closest('div,p').classList.add('password-wrapper');
 			toggle.addEventListener('click', () => {
 				const input = document.querySelector(`input[data-controller=${toggle.dataset.action}]`);
 				if (input.type === "password") {

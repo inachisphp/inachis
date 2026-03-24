@@ -178,7 +178,6 @@ async function copyExtraLibraries() {
         "node_modules/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css",
         "node_modules/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.min.js",
         "node_modules/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js",
-        "node_modules/jquery/dist/jquery.min.js",
         "node_modules/easymde/dist/easymde.min.js",
         "node_modules/tom-select/dist/js/tom-select.complete.min.js"
     ];

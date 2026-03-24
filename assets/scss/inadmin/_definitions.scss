@@ -18,6 +18,8 @@ $radius-round: 50%;
  Colours
 --------------------------------------------- **/
 :root {
+    --bg-image: url(/assets/imgs/incc/bg-signin.png);
+
     // Primitives - Neutrals
     --color-neutral-000: #ffffff;
     --color-neutral-050: #fafafa;
@@ -104,8 +106,8 @@ $radius-round: 50%;
     --color-profile-amber: #dd8709;
 
     // Signin
-    --color-signin-overlay: rgba(48, 48, 48, 0.75);
-    --color-signin-input-bg: #252525;
+    --color-signin-overlay: rgba(255, 255, 255, 0.08);
+    --color-signin-input-bg: rgba(37, 37, 37, 0.75);
     --color-signin-input-border: #353535;
 
     // Diagnostics
@@ -263,7 +265,7 @@ $table-mobile-break: 600px !default;
 $success-color: var(--color-success-500);
 $table-expandable--expanded: var(--color-brand-200);
 
-$signin_background-image__dark: url(/assets/imgs/incc/bg-signin.png);
+$signin_background-image__dark: var(--bg-image);
 
 $badge-colors: (
     default: (bg: #E0E0E0, text: #000),

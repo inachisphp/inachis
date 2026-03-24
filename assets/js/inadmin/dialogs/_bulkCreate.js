@@ -4,6 +4,7 @@ import DatePicker from '../components/datePicker.js';
 window.Inachis.BulkCreateDialog = {
   dialog: null,
   submitButton: null,
+  datePickers: [],
 
   init() {
     document.addEventListener('click', e => {
@@ -81,20 +82,53 @@ window.Inachis.BulkCreateDialog = {
     });
     const datepickers = document.querySelectorAll('#dialog__bulkCreate input[type=date]');
     datepickers.forEach(el => {
-      new DatePicker(el, {
+      const picker = new DatePicker(el, {
         format: 'dd/mm/yyyy',
         materialIcons: true,
-        onChange: (formattedDate) => this.validate(container),
+        onChange: (formattedDate) => this.handleDateChange(container),
       });
+
+      this.datePickers[el.id] = picker;
     });
+  },
+
+  handleDateChange(container) {
+    const startPicker = this.datePickers['bulk_startDate'];
+    const endPicker = this.datePickers['bulk_endDate'];
+
+    const startDate = startPicker?.parseInputDate();
+    const endDate = endPicker?.parseInputDate();
+
+    if (startDate && endPicker) {
+      endPicker.currentMonth = startDate.getMonth();
+      endPicker.currentYear = startDate.getFullYear();
+    }
+
+    // 1. Set endDate minDate = startDate
+    if (startDate && endPicker) {
+      endPicker.options.minDate = startDate;
+
+      // If picker is open, re-render to apply disabled dates
+      endPicker.renderCalendar();
+    }
+
+    // 2. If startDate > endDate → fix endDate
+    if (startDate && endDate && startDate > endDate) {
+      endPicker.selectedDate = new Date(startDate);
+      endPicker.updateValue();
+    }
+
+    this.validate(container);
   },
 
   validate(container) {
     const title = container.querySelector('#bulk_title')?.value.trim();
-    const start = container.querySelector('#bulk_startDate')?.value.trim();
-    const end = container.querySelector('#bulk_endDate')?.value.trim();
+    const start = this.datePickers['bulk_startDate']?.parseInputDate();
+    const end = this.datePickers['bulk_endDate']?.parseInputDate();
 
-    this.submitButton.disabled = !(title && start && end);
+    const valid = title && start && end && start <= end;
+
+    this.submitButton.disabled = !valid;
   },
 
   createPosts() {
