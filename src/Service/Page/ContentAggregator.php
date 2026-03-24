@@ -14,30 +14,49 @@ use Inachis\Entity\Series;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\SeriesRepository;
 use Inachis\Util\TextCleaner;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use DateTimeImmutable;
 
+/**
+ * Content aggregator service
+ */
 class ContentAggregator
 {
+    /**
+     * Items to show
+     */
     public const ITEMS_TO_SHOW = 10;
 
+    /**
+     * Constructor
+     * 
+     * @param PageRepository $pageRepository
+     * @param SeriesRepository $seriesRepository
+     */
     public function __construct(
         private readonly PageRepository $pageRepository,
         private readonly SeriesRepository $seriesRepository,
     ) {}
 
+    /**
+     * Get homepage content
+     * 
+     * @return array<string, Page|Series>
+     */
     public function getHomepageContent(): array
     {
         $data = [];
         $excludePages = [];
 
+        /** @var Paginator<Series> $series */
         $series = $this->seriesRepository->getAll(
             0,
             self::ITEMS_TO_SHOW,
             [
                 'q.lastDate < :postDate AND q.visibility = :visibility',
                 [
-                    'postDate' => new DateTime(),
+                    'postDate' => new DateTimeImmutable(),
                     'visibility' => Series::PUBLIC,
                 ],
             ],
@@ -57,15 +76,18 @@ class ContentAggregator
                 $group->getDescription(),
                 TextCleaner::REMOVE_BLOCKQUOTE_CONTENT | TextCleaner::REMOVE_IMAGE_ALT
             ));
-
-            $data[$group->getLastDate()->format('Ymd')] = $group;
+            
+            $lastDate = $group->getLastDate();
+            if ($lastDate instanceof DateTimeImmutable) {
+                $data['p' . $lastDate->format('Ymd')] = $group;
+            }
         }
 
         $pageQuery = 'q.status = :status AND q.visibility = :visibility AND q.postDate <= :postDate AND q.type = :type';
         $pageParameters = [
             'status'     => Page::PUBLISHED,
             'visibility' => Page::PUBLIC,
-            'postDate'   => new DateTime(),
+            'postDate'   => new DateTimeImmutable(),
             'type'       => Page::TYPE_POST,
         ];
 
@@ -74,6 +96,7 @@ class ContentAggregator
             $pageParameters['excludedPages'] = $excludePages;
         }
 
+        /** @var Paginator<Page> $pages */
         $pages = $this->pageRepository->getAll(
             0,
             self::ITEMS_TO_SHOW,
@@ -82,7 +105,10 @@ class ContentAggregator
         );
 
         foreach ($pages as $page) {
-            $data[$page->getPostDate()->format('Ymd')] = $page;
+            $postDate = $page->getPostDate();
+            if ($postDate instanceof DateTimeImmutable) {
+                $data['p' . $postDate->format('Ymd')] = $page;
+            }
         }
 
         krsort($data);

@@ -79,14 +79,14 @@ class Series
     protected ?DateTimeImmutable $lastDate = null;
 
     /**
-     * @var Collection|null The array of pages in the series
+     * @var Collection The array of pages in the series
      */
     #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Page', fetch: 'EAGER')]
     #[ORM\JoinTable(name: 'Series_pages')]
     #[ORM\JoinColumn(name: 'series_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\OrderBy(['postDate' => 'ASC'])]
-    protected ?Collection $items;
+    protected Collection $items;
 
     /**
      * @var Image|null
@@ -262,9 +262,9 @@ class Series
     }
 
     /**
-     * @return Collection|null
+     * @return Collection<int,Page>
      */
-    public function getItems(): ?Collection
+    public function getItems(): Collection
     {
         return $this->items;
     }
