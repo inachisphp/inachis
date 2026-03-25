@@ -41,6 +41,9 @@
         easymde.clearAutosavedValue();
             {{ app.session.set('clearAutosave', false) }}
         {% endif %}
+        new window.Inachis.EasyMDELinkValidator(easymde, {
+            endpoint: "/incc/api/validate-links",
+        });
     </script>
     {% endif %}
     <script>
