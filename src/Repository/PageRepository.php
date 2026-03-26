@@ -9,11 +9,7 @@
 
 namespace Inachis\Repository;
 
-use Inachis\Entity\Category;
-use Inachis\Entity\Image;
-use Inachis\Entity\Page;
-use Inachis\Entity\Tag;
-use Inachis\Entity\Url;
+use Inachis\Entity\{Category, Image, Page, Tag, Url};
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -28,7 +24,8 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
     public const MAX_ITEMS_TO_SHOW_ADMIN = 10;
 
     /**
-     * PageRepository constructor.
+     * PageRepository constructor
+     * 
      * @param ManagerRegistry $registry
      */
     public function __construct(ManagerRegistry $registry)
@@ -37,6 +34,8 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
     }
 
     /**
+     * Remove the given page from the database
+     * 
      * @param Page $page The {@link Page} entity to be removed.
      * @return void
      */
@@ -47,10 +46,12 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
     }
 
     /**
+     * Get all pages with the given category
+     * 
      * @param Category $category
-     * @param int $maxDisplayCount
+     * @param int $limit
      * @param int $offset
-     * @return array<int, Page>
+     * @return array<Page>
      */
     public function getPagesWithCategory(Category $category, int $limit = 0, int $offset = 0)
     {
@@ -60,10 +61,10 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             ->leftJoin('p.categories', 'Page_categories')
             ->where(
                 $qb->expr()->andX(
-                    'Page_categories.id = :categoryId',
-                    'p.status = \'published\'',
-                    'p.visibility = \'1\'',
-                    'p.type = \'post\''
+                    $qb->expr()->eq('Page_categories.id', ':categoryId'),
+                    $qb->expr()->eq('p.status', 'published'),
+                    $qb->expr()->eq('p.visibility', '1'),
+                    $qb->expr()->eq('p.type', 'post')
                 )
             )
             ->orderBy('p.postDate', 'DESC')
@@ -71,13 +72,16 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         if ($offset > 0) {
             $qb = $qb->setFirstResult($offset);
         }
-        return $qb
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->execute();
+        if ($limit > 0) {
+            $qb = $qb->setMaxResults($limit);
+        }
+        /** @var array<Page> */
+        return $qb->getQuery()->getResult();
     }
 
     /**
+     * Get the number of pages with the given category
+     * 
      * @param Category $category
      * @return int
      */
@@ -89,16 +93,19 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             ->leftJoin('p.categories', 'Page_categories')
             ->where('Page_categories.id = :categoryId')
             ->setParameter('categoryId', $category);
+        /** @var int */
         return $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
+     * Get all pages with the given tag
+     * 
      * @param Tag $tag
      * @param int $maxDisplayCount
      * @param int $offset
-     * @return mixed
+     * @return array<Page>
      */
-    public function getPagesWithTag(Tag $tag, int $maxDisplayCount = 0, int $offset = 0)
+    public function getPagesWithTag(Tag $tag, int $maxDisplayCount = 0, int $offset = 0): array
     {
         $qb = $this->createQueryBuilder('p');
         $qb = $qb
@@ -106,10 +113,10 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             ->leftJoin('p.tags', 'Page_tags')
             ->where(
                 $qb->expr()->andX(
-                    'Page_tags.id = :tagId',
-                    'p.status = \'published\'',
-                    'p.visibility = \'1\'',
-                    'p.type = \'post\''
+                    $qb->expr()->eq('Page_tags.id', ':tagId'),
+                    $qb->expr()->eq('p.status', 'published'),
+                    $qb->expr()->eq('p.visibility', '1'),
+                    $qb->expr()->eq('p.type', 'post')
                 )
             )
             ->orderBy('p.postDate', 'DESC')
@@ -117,26 +124,31 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         if ($offset > 0) {
             $qb = $qb->setFirstResult($offset);
         }
-        return $qb
-            ->setMaxResults($maxDisplayCount)
-            ->getQuery()
-            ->execute();
+        if ($maxDisplayCount > 0) {
+            $qb = $qb->setMaxResults($maxDisplayCount);
+        }
+        /** @var array<Page> */
+        return $qb->getQuery()->getResult();
     }
 
     /**
-     * @param $type
-     * @param $offset
-     * @param $limit
-     * @return Paginator
+     * Get all content of a certain type, ordered by post date
+     * 
+     * @param string $type
+     * @param int $offset
+     * @param int $limit
+     * @return Paginator<Page>
      */
-    public function getAllOfTypeByPostDate($type, $offset, $limit): Paginator
+    public function getAllOfTypeByPostDate(string $type, int $offset, int $limit): Paginator
     {
         return $this->getFilteredOfTypeByPostDate([], $type, $offset, $limit);
     }
 
     /**
+     * Determine the order by clause for the query builder
+     * 
      * @param string $orderBy
-     * @return array[]
+     * @return array<array<string>>
      */
     protected function determineOrderBy(string $orderBy): array
     {
@@ -157,15 +169,17 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
     }
 
     /**
-     * @param $filters
+     * Get all content of a certain type, ordered by post date
+     * 
+     * @param array<string, mixed> $filters
      * @param string $type
      * @param int $offset
      * @param int $limit
      * @param string $sort
-     * @return Paginator
+     * @return Paginator<Page>
      */
     public function getFilteredOfTypeByPostDate(
-        $filters,
+        array $filters,
         string $type,
         int $offset,
         int $limit,
@@ -193,6 +207,12 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
                     $filters
                 )
             ];
+        }
+        /** @var array<string, string> $filters['categories'] */
+        if (!empty($filters['categories'])) {
+            $where[0] .= ' AND c.id IN (:categories)';
+            $where[1]['categories'] = array_is_list($filters['categories']) ? $filters['categories'] : array_keys($filters['categories']);
+            $join[] = ['leftJoin', 'q.categories', 'c'];
         }
         if (!empty($filters['status'])) {
             $where[0] .= ' AND q.status = :status';
@@ -224,10 +244,12 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
     }
 
     /**
-     * @param $ids
-     * @return Paginator
+     * Get all pages with the given ids
+     * 
+     * @param array<string> $ids
+     * @return Paginator<Page>
      */
-    public function getFilteredIds($ids): Paginator
+    public function getFilteredIds(array $ids): Paginator
     {
         return $this->getAll(
             0,
@@ -242,8 +264,10 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
     }
 
     /**
+     * Get all pages that use the given image
+     * 
      * @param Image $image
-     * @return Paginator
+     * @return Paginator<Page>
      */
     public function getPostsUsingImage(Image $image): Paginator
     {

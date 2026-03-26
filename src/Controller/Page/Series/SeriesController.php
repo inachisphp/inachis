@@ -20,6 +20,7 @@ use Inachis\Repository\ImageRepository;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\SeriesRepository;
 use Inachis\Service\Series\SeriesBulkActionService;
+use Inachis\Service\Waste\WasteManagerService;
 use Inachis\Util\UrlNormaliser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -96,6 +97,7 @@ class SeriesController extends AbstractInachisController
         SeriesRepository $seriesRepository,
         ImageRepository $imageRepository,
         PageRepository $pageRepository,
+        WasteManagerService $wasteManagerService,
     ): Response {
         $series = $request->attributes->get('id') !== null ?
             $seriesRepository->findOneBy([
@@ -107,6 +109,7 @@ class SeriesController extends AbstractInachisController
 
         if ($form->isSubmitted()) {//} && $form->isValid()) {
             if ($form->getClickedButton()->getName() === 'delete') {
+                $wasteManagerService->sendToWaste($series);
                 $seriesRepository->remove($series);
                 return $this->redirect($this->generateUrl('incc_series_list'));
             }

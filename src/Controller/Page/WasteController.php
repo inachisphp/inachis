@@ -12,6 +12,7 @@ namespace Inachis\Controller\Page;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\WasteRepository;
+use Inachis\Service\Waste\WasteManagerService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -43,6 +44,7 @@ class WasteController extends AbstractInachisController
         Request $request,
         ContentQueryParameters $contentQueryParameters,
         WasteRepository $wasteRepository,
+        WasteManagerService $wasteManagerService,
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $form = $this->createFormBuilder()->getForm();
@@ -50,10 +52,12 @@ class WasteController extends AbstractInachisController
 
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
             foreach ($request->request->all('items') as $item) {
-                if ($request->request->get('delete') !== null) {
-                    $deleteItem = $wasteRepository->findOneBy(['id' => $item]);
-                    if ($deleteItem !== null) {
-                        $wasteRepository->remove($deleteItem);
+                $processItem = $wasteRepository->findOneBy(['id' => $item]);
+                if ($processItem !== null) {
+                    if ($request->request->get('delete') !== null) {
+                        $wasteManagerService->deleteWaste($processItem);
+                    } elseif ($request->request->get('recover') !== null) {
+                        $wasteManagerService->restore($processItem);
                     }
                 }
             }

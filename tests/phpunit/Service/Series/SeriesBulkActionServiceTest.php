@@ -12,6 +12,7 @@ namespace Inachis\Tests\phpunit\Service\Series;
 use Inachis\Entity\Series;
 use Inachis\Repository\SeriesRepository;
 use Inachis\Service\Series\SeriesBulkActionService;
+use Inachis\Service\Waste\WasteManagerService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
@@ -41,7 +42,8 @@ class SeriesBulkActionServiceTest extends TestCase
 
         $this->seriesBulkActionService = new SeriesBulkActionService(
             $this->seriesRepository,
-            $this->entityManager
+            $this->entityManager,
+            $this->createStub(WasteManagerService::class)
         );
     }
 
@@ -55,7 +57,8 @@ class SeriesBulkActionServiceTest extends TestCase
         $this->seriesRepository->method('findOneBy')->willReturn($this->series);
         $this->seriesBulkActionService = new SeriesBulkActionService(
             $this->seriesRepository,
-            $this->entityManager
+            $this->entityManager,
+            $this->createStub(WasteManagerService::class)
         );
         $result = $this->seriesBulkActionService->apply('', [Uuid::uuid1()->toString()]);
         $this->assertEquals(0, $result);

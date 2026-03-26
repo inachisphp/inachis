@@ -9,16 +9,16 @@
 
 namespace Inachis\Entity;
 
-use DateTimeImmutable;
-use DateTimeZone;
+use Inachis\Exception\InvalidTimezoneException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\Doctrine\UuidGenerator;
+use Ramsey\Uuid\UuidInterface;
+use DateTimeImmutable;
+use DateTimeZone;
 use Exception;
 use InvalidArgumentException;
-use Ramsey\Uuid\Doctrine\UuidGenerator;
-use Inachis\Exception\InvalidTimezoneException;
-use Ramsey\Uuid\UuidInterface;
 
 /**
  * Object for handling pages of a site.
@@ -118,23 +118,23 @@ class Page
     protected bool $visibility = self::PUBLIC;
 
     /**
-     * @var DateTimeImmutable|null The date the {@link Page} was created
+     * @var DateTimeImmutable The date the {@link Page} was created
      */
     #[ORM\Column(type: 'datetime_immutable')]
-    protected ?DateTimeImmutable $createDate;
+    protected DateTimeImmutable $createDate;
 
     /**
-     * @var DateTimeImmutable|null The date the {@link Page} was published; a future date
+     * @var DateTimeImmutable The date the {@link Page} was published; a future date
      *             indicates the content is scheduled
      */
     #[ORM\Column(type: 'datetime_immutable')]
-    protected ?DateTimeImmutable $postDate;
+    protected DateTimeImmutable $postDate;
 
     /**
-     * @var DateTimeImmutable|null The date the {@link Page} was last modified
+     * @var DateTimeImmutable The date the {@link Page} was last modified
      */
     #[ORM\Column(type: 'datetime_immutable')]
-    protected ?DateTimeImmutable $modDate;
+    protected DateTimeImmutable $modDate;
 
     /**
      * @var string|null The timezone for the publication date; defaults to UTC
@@ -173,7 +173,7 @@ class Page
     protected ?string $sharingMessage = '';
 
     /**
-     * @var Collection The array of URLs for the content
+     * @var Collection<int, Url> The array of URLs for the content
      */
     #[ORM\OneToMany(
         mappedBy: 'content',
@@ -185,7 +185,7 @@ class Page
     protected Collection $urls;
 
     /**
-     * @var Collection The array of categories assigned to the post/page
+     * @var Collection<int, Category> The array of categories assigned to the post/page
      */
     #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Category')]
     #[ORM\JoinTable(name: 'Page_categories')]
@@ -195,7 +195,7 @@ class Page
     protected Collection $categories;
 
     /**
-     * @var Collection The array of tags assigned to the post/page
+     * @var Collection<int, Tag> The array of tags assigned to the post/page
      */
     #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Tag', cascade: [ 'persist' ])]
     #[ORM\JoinTable(name: 'Page_tags')]
@@ -205,7 +205,7 @@ class Page
     protected Collection $tags;
 
     /**
-     * @var Collection|null  The array of Series that contains this page
+     * @var Collection<int, Series>|null  The array of Series that contains this page
      */
     #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Series', inversedBy: 'items')]
     protected ?Collection $series;
@@ -357,9 +357,9 @@ class Page
     /**
      * Returns the value of {@link postDate}.
      *
-     * @return DateTimeImmutable|null The publication date of the {@link Page}
+     * @return DateTimeImmutable The publication date of the {@link Page}
      */
-    public function getPostDate(): ?DateTimeImmutable
+    public function getPostDate(): DateTimeImmutable
     {
         return $this->postDate;
     }
@@ -438,7 +438,7 @@ class Page
      * Returns an array of URLs assigned to the page. The default URL will
      * always be first.
      *
-     * @return Collection<Url> The array of {$link Url} entities for the {@link Page}
+     * @return Collection<int,Url> The array of {$link Url} entities for the {@link Page}
      */
     public function getUrls(): Collection
     {
@@ -448,7 +448,7 @@ class Page
     /**
      * Returns an array of {@link Category)s assigned to the page.
      *
-     * @return Collection<Category> The array of {$link Category} entities for the {@link Page}
+     * @return Collection<int,Category> The array of {$link Category} entities for the {@link Page}
      */
     public function getCategories(): Collection
     {
@@ -458,7 +458,7 @@ class Page
     /**
      * Returns an array of {@link Tag)s assigned to the page.
      *
-     * @return Collection<Tag> The array of {$link Category} entities for the {@link Page}
+     * @return Collection<int,Tag> The array of {$link Category} entities for the {@link Page}
      */
     public function getTags(): Collection
     {
@@ -480,7 +480,9 @@ class Page
     }
 
     /**
-     * @return Collection|null
+     * Returns an array of {@link Series)s assigned to the page.
+     *
+     * @return Collection<int,Series>|null The array of {$link Series} entities for the {@link Page}
      */
     public function getSeries(): ?Collection
     {
@@ -488,6 +490,8 @@ class Page
     }
 
     /**
+     * Returns the language used by this content
+     *
      * @return string|null The language used by this content
      */
     public function getLanguage(): ?string
@@ -496,7 +500,9 @@ class Page
     }
 
     /**
-     * @return bool|null
+     * Returns the noindex status for the page
+     *
+     * @return bool|null The noindex status for the page
      */
     public function getNoindex(): ?bool
     {
@@ -504,7 +510,9 @@ class Page
     }
 
     /**
-     * @return bool|null
+     * Returns the nofollow status for the page
+     *
+     * @return bool|null The nofollow status for the page
      */
     public function getNofollow(): ?bool
     {
@@ -512,7 +520,9 @@ class Page
     }
 
     /**
-     * @return bool|null
+     * Returns the showTableOfContents status for the page
+     *
+     * @return bool|null The showTableOfContents status for the page
      */
     public function getShowTableOfContents(): ?bool
     {
@@ -630,10 +640,10 @@ class Page
     /**
      * Sets the value of {@link createDate}.
      *
-     * @param DateTimeImmutable|null $value The date to be set
+     * @param DateTimeImmutable $value The date to be set
      * @return Page
      */
-    public function setCreateDate(?DateTimeImmutable $value = null): self
+    public function setCreateDate(DateTimeImmutable $value): self
     {
         $this->createDate = $value;
         return $this;
@@ -642,10 +652,10 @@ class Page
     /**
      * Sets the value of {@link postDate}.
      *
-     * @param DateTimeImmutable|null $value The date to be set
+     * @param DateTimeImmutable $value The date to be set
      * @return Page
      */
-    public function setPostDate(?DateTimeImmutable $value = null): self
+    public function setPostDate(DateTimeImmutable $value): self
     {
         $this->postDate = $value;
         return $this;
@@ -654,10 +664,10 @@ class Page
     /**
      * Sets the value of {@link modDate}.
      *
-     * @param DateTimeImmutable|null $value The date to set
+     * @param DateTimeImmutable $value The date to set
      * @return Page
      */
-    public function setModDate(?DateTimeImmutable $value = null): self
+    public function setModDate(DateTimeImmutable $value): self
     {
         $this->modDate = $value;
         return $this;
@@ -666,11 +676,11 @@ class Page
     /**
      * Sets the value of {@link timezone}.
      *
-     * @param string|null $value The timezone for the post_date
+     * @param string $value The timezone for the post_date
      * @return Page
      * @throws InvalidTimezoneException
      */
-    public function setTimezone(?string $value): self
+    public function setTimezone(string $value = ''): self
     {
         if (!$this->isValidTimezone($value)) {
             throw new InvalidTimezoneException(
@@ -747,10 +757,12 @@ class Page
     }
 
     /**
-     * @param Collection|null $series
+     * Sets the value of {@link series}.
+     *
+     * @param Collection<int, Series> $series The series to assign to the page.
      * @return Page
      */
-    public function setSeries(?Collection $series): self
+    public function setSeries(Collection $series): self
     {
         $this->series = $series;
         return $this;
@@ -847,9 +859,6 @@ class Page
      */
     public function getPostDateAsLink(): string
     {
-        if (empty($this->postDate)) {
-            return '';
-        }
         return $this->postDate->format('Y') .
             '/' . $this->postDate->format('m') .
             '/' . $this->postDate->format('d');
@@ -885,10 +894,10 @@ class Page
      */
     public function isScheduledPage(): bool
     {
-        $today = new DateTimeImmutable('now', new DateTimeZone($this->getTimezone()));
+        $today = new DateTimeImmutable('now', new DateTimeZone($this->getTimezone() ?? 'UTC'));
         $postDate = new DateTimeImmutable(
             $this->getPostDate()->format('Y-m-d H:i:s'),
-            new DateTimeZone($this->getTimezone())
+            new DateTimeZone($this->getTimezone() ?? 'UTC')
         );
 
         return $this->getStatus() == Page::PUBLISHED && $postDate->format('YmdHis') > $today->format('YmdHis');
@@ -905,16 +914,20 @@ class Page
     }
 
     /**
-     * @return bool Check if {@link Page::$content} contains external images
+     * Check if {@link Page::$content} contains external images
+     *
+     * @return bool
      */
     public function hasHotlinkedImages(): bool
     {
-        preg_match('/!\[[^]]*]\(https?:/', $this->getContent(), $matches);
+        preg_match('/!\[[^]]*]\(https?:/', $this->getContent() ?? '', $matches);
         return !empty($matches);
     }
 
     /**
-     * @return bool Flag indicating if this content type can be exported
+     * Confirms if this content type can be exported.
+     *
+     * @return bool
      */
     public static function isExportable(): bool
     {
@@ -922,7 +935,9 @@ class Page
     }
 
     /**
-     * @return string The name to use for this content type when referred to by export, etc.
+     * The name to use for this content type when referred to by export, etc.
+     *
+     * @return string
      */
     public static function getName(): string
     {

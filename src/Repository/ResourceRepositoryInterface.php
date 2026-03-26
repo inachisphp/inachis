@@ -12,8 +12,22 @@ namespace Inachis\Repository;
 use Inachis\Entity\AbstractFile;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
+/**
+ * Interface for resource repositories
+ */
 interface ResourceRepositoryInterface
 {
+    /**
+     * Get all resources
+     * 
+     * @param int $offset
+     * @param int $limit
+     * @param array<array<string>> $where
+     * @param array<array<string>>|string $order
+     * @param array<array<string>>|string $groupBy
+     * @param array<array<string>> $join
+     * @return Paginator<AbstractFile>
+     */
     public function getAll(
         int $offset = 0,
         int $limit = 25,
@@ -24,17 +38,21 @@ interface ResourceRepositoryInterface
     ): Paginator;
 
     /**
-     * @param AbstractFile $download
+     * Remove the given resource from the database
+     * 
+     * @param AbstractFile $download The resource to be removed.
      * @return void
      */
     public function remove(AbstractFile $download): void;
 
     /**
-     * @param $filters
-     * @param $offset
-     * @param $limit
+     * Get all resources with the given filters
+     * 
+     * @param array<array<string>> $filters
+     * @param int $offset
+     * @param int $limit
      * @param string|null $sortBy
-     * @return Paginator
+     * @return Paginator<AbstractFile>
      */
     public function getFiltered($filters, $offset, $limit, ?string $sortBy = 'title asc'): Paginator;
 }

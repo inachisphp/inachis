@@ -79,7 +79,7 @@ class Series
     protected ?DateTimeImmutable $lastDate = null;
 
     /**
-     * @var Collection The array of pages in the series
+     * @var Collection<int, Page> The array of pages in the series
      */
     #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Page', fetch: 'EAGER')]
     #[ORM\JoinTable(name: 'Series_pages')]
@@ -134,6 +134,8 @@ class Series
     }
 
     /**
+     * Gets the value of {@link id}.
+     * 
      * @return UuidInterface|null
      */
     public function getId(): ?UuidInterface
@@ -142,7 +144,9 @@ class Series
     }
 
     /**
-     * @param UuidInterface|null $id
+     * Sets the value of {@link id}.
+     * 
+     * @param UuidInterface|null $id The UUID to set
      * @return Series
      */
     public function setId(?UuidInterface $id): self
@@ -152,6 +156,8 @@ class Series
     }
 
     /**
+     * Gets the value of {@link title}.
+     * 
      * @return string|null
      */
     public function getTitle(): ?string
@@ -160,7 +166,9 @@ class Series
     }
 
     /**
-     * @param string|null $title
+     * Sets the value of {@link title}.
+     * 
+     * @param string|null $title The title to set
      * @return Series
      */
     public function setTitle(?string $title): self
@@ -170,6 +178,8 @@ class Series
     }
 
     /**
+     * Gets the value of {@link subTitle}.
+     * 
      * @return string|null
      */
     public function getSubTitle(): ?string
@@ -178,7 +188,9 @@ class Series
     }
 
     /**
-     * @param string|null $subTitle
+     * Sets the value of {@link subTitle}.
+     * 
+     * @param string|null $subTitle The subtitle to set
      * @return Series
      */
     public function setSubTitle(?string $subTitle = ''): self
@@ -188,6 +200,8 @@ class Series
     }
 
     /**
+     * Gets the value of {@link url}.
+     * 
      * @return string|null
      */
     public function getUrl(): ?string
@@ -196,7 +210,9 @@ class Series
     }
 
     /**
-     * @param string|null $url
+     * Sets the value of {@link url}.
+     * 
+     * @param string|null $url The URL to set
      * @return Series
      */
     public function setUrl(?string $url): self
@@ -206,6 +222,8 @@ class Series
     }
 
     /**
+     * Gets the value of {@link description}.
+     * 
      * @return string|null
      */
     public function getDescription(): ?string
@@ -214,7 +232,9 @@ class Series
     }
 
     /**
-     * @param string|null $description
+     * Sets the value of {@link description}.
+     * 
+     * @param string|null $description The description to set
      * @return Series
      */
     public function setDescription(?string $description): self
@@ -225,6 +245,8 @@ class Series
     }
 
     /**
+     * Gets the value of {@link firstDate}.
+     * 
      * @return DateTimeImmutable|null
      */
     public function getFirstDate(): ?DateTimeImmutable
@@ -233,8 +255,10 @@ class Series
     }
 
     /**
-     * @param DateTimeImmutable|null $firstDate
-     * @return $this
+     * Sets the value of {@link firstDate}.
+     * 
+     * @param DateTimeImmutable|null $firstDate The first date to set
+     * @return Series
      */
     public function setFirstDate(?DateTimeImmutable $firstDate): self
     {
@@ -243,6 +267,8 @@ class Series
     }
 
     /**
+     * Gets the value of {@link lastDate}.
+     * 
      * @return DateTimeImmutable|null
      */
     public function getLastDate(): ?DateTimeImmutable
@@ -251,8 +277,9 @@ class Series
     }
 
     /**
-     * @param DateTimeImmutable|null $lastDate
-     *
+     * Sets the value of {@link lastDate}.
+     * 
+     * @param DateTimeImmutable|null $lastDate The last date to set
      * @return Series
      */
     public function setLastDate(?DateTimeImmutable $lastDate): self
@@ -262,7 +289,9 @@ class Series
     }
 
     /**
-     * @return Collection<int,Page>
+     * Gets the value of {@link items}.
+     * 
+     * @return Collection<int, Page>
      */
     public function getItems(): Collection
     {
@@ -270,18 +299,22 @@ class Series
     }
 
     /**
-     * @param Collection|null $items
+     * Sets the value of {@link items}.
+     * 
+     * @param Collection<int, Page> $items The array of pages in the series
      *
      * @return Series
      */
-    public function setItems(?Collection $items): self
+    public function setItems(Collection $items): self
     {
         $this->items = $items;
         return $this;
     }
 
     /**
-     * @param Page $item
+     * Adds an item to the {@link items}.
+     * 
+     * @param Page $item The item to add
      * @return Series
      */
     public function addItem(Page $item): self
@@ -291,6 +324,8 @@ class Series
     }
 
     /**
+     * Gets the value of {@link image}.
+     * 
      * @return Image|null
      */
     public function getImage(): ?Image
@@ -299,7 +334,9 @@ class Series
     }
 
     /**
-     * @param Image|null $image
+     * Sets the value of {@link image}.
+     * 
+     * @param Image|null $image The image to set
      * @return Series
      */
     public function setImage(?Image $image = null): self
@@ -309,8 +346,8 @@ class Series
     }
 
     /**
-     * Returns the value of {@link author}.
-     *
+     * Gets the value of {@link author}.
+     * 
      * @return User|null The UUID of the {@link Series} author
      */
     public function getAuthor(): ?User
@@ -331,6 +368,8 @@ class Series
     }
 
     /**
+     * Gets the value of {@link createDate}.
+     * 
      * @return DateTimeImmutable|null
      */
     public function getCreateDate(): ?DateTimeImmutable
@@ -339,8 +378,10 @@ class Series
     }
 
     /**
-     * @param DateTimeImmutable $createDate
-     * @return $this
+     * Sets the value of {@link createDate}.
+     * 
+     * @param DateTimeImmutable $createDate The create date to set
+     * @return Series
      */
     public function setCreateDate(DateTimeImmutable $createDate): self
     {
@@ -350,6 +391,8 @@ class Series
     }
 
     /**
+     * Gets the value of {@link modDate}.
+     * 
      * @return DateTimeImmutable|null
      */
     public function getModDate(): ?DateTimeImmutable
@@ -358,7 +401,9 @@ class Series
     }
 
     /**
-     * @param DateTimeImmutable $modDate
+     * Sets the value of {@link modDate}.
+     * 
+     * @param DateTimeImmutable $modDate The modification date to set
      * @return Series
      */
     public function setModDate(DateTimeImmutable $modDate): self
@@ -368,6 +413,8 @@ class Series
     }
 
     /**
+     * Gets the value of {@link visibility}.
+     * 
      * @return bool|null
      */
     public function getVisibility(): ?bool
@@ -376,7 +423,9 @@ class Series
     }
 
     /**
-     * @param bool $visibility
+     * Sets the value of {@link visibility}.
+     * 
+     * @param bool $visibility The visibility to set
      * @return Series
      */
     public function setVisibility(bool $visibility = self::PRIVATE): self

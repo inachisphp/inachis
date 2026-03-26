@@ -38,25 +38,29 @@ class WasteRepository extends AbstractRepository implements WasteRepositoryInter
      */
     public function deleteWasteByUser(User $user): int
     {
-        return $this->createQueryBuilder('w')
+        $result = $this->createQueryBuilder('w')
             ->delete(Waste::class, 'w')
             ->where('w.user = :user')
             ->setParameter('user', $user)
             ->getQuery()
             ->execute()
         ;
+        if (!is_int($result)) {
+            throw new \RuntimeException('Failed to delete waste');
+        }
+        return $result;
     }
 
     /**
      * Gets filtered waste
      * 
-     * @param array $filters The filters
+     * @param array<string, mixed> $filters The filters
      * @param int $offset The offset
      * @param int $limit The limit
      * @param string $sort The sort
-     * @return Paginator The paginator
+     * @return Paginator<Waste> The paginator
      */
-    public function getFiltered($filters, $offset, $limit, $sort): Paginator
+    public function getFiltered(array $filters, int $offset, int $limit, string $sort): Paginator
     {
         $where = [];
         if (!empty($filters['keyword'])) {

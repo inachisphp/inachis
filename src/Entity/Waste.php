@@ -22,13 +22,13 @@ use Ramsey\Uuid\UuidInterface;
 class Waste
 {
     /**
-     * @var UuidInterface|null The unique id of the waste item
+     * @var UuidInterface The unique id of the waste item
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    private ?UuidInterface $id;
+    private UuidInterface $id;
     /**
      * @var string|null The entity type
      */
@@ -50,11 +50,11 @@ class Waste
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $content = '';
     /**
-     * @var User|null The author for the {@link Page}
+     * @var User The author for the {@link Page}
      */
     #[ORM\ManyToOne(targetEntity: 'User', cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
-    private ?User $user;
+    private User $user;
     /**
      * @var DateTimeImmutable The date the item was added to the bin
      */
@@ -62,6 +62,8 @@ class Waste
     protected DateTimeImmutable $modDate;
 
     /**
+     * Gets the value of {@link id}.
+     * 
      * @return string|null
      */
     public function getId(): ?string
@@ -70,8 +72,10 @@ class Waste
     }
 
     /**
-     * @param UuidInterface $id
-     * @return $this
+     * Sets the value of {@link id}.
+     * 
+     * @param UuidInterface $id The id to set
+     * @return Waste
      */
     public function setId(UuidInterface $id): self
     {
@@ -81,6 +85,8 @@ class Waste
     }
 
     /**
+     * Gets the value of {@link sourceType}.
+     * 
      * @return string|null
      */
     public function getSourceType(): ?string
@@ -89,8 +95,10 @@ class Waste
     }
 
     /**
-     * @param string|null $sourceType
-     * @return $this
+     * Sets the value of {@link sourceType}.
+     * 
+     * @param string|null $sourceType The source type to set
+     * @return Waste
      */
     public function setSourceType(?string $sourceType): self
     {
@@ -101,6 +109,8 @@ class Waste
 
 
     /**
+     * Gets the value of {@link sourceName}.
+     * 
      * @return string|null
      */
     public function getSourceName(): ?string
@@ -109,8 +119,10 @@ class Waste
     }
 
     /**
-     * @param string|null $sourceName
-     * @return $this
+     * Sets the value of {@link sourceName}.
+     * 
+     * @param string|null $sourceName The source name to set
+     * @return Waste
      */
     public function setSourceName(?string $sourceName): self
     {
@@ -120,6 +132,8 @@ class Waste
     }
 
     /**
+     * Gets the value of {@link title}.
+     * 
      * @return string|null
      */
     public function getTitle(): ?string
@@ -128,8 +142,10 @@ class Waste
     }
 
     /**
-     * @param string|null $title
-     * @return $this
+     * Sets the value of {@link title}.
+     * 
+     * @param string|null $title The title to set
+     * @return Waste
      */
     public function setTitle(?string $title): self
     {
@@ -139,6 +155,8 @@ class Waste
     }
 
     /**
+     * Gets the value of {@link content}.
+     * 
      * @return string|null
      */
     public function getContent(): ?string
@@ -147,8 +165,10 @@ class Waste
     }
 
     /**
-     * @param string|null $content
-     * @return $this
+     * Sets the value of {@link content}.
+     * 
+     * @param string|null $content The content to set
+     * @return Waste
      */
     public function setContent(?string $content): self
     {
@@ -158,6 +178,8 @@ class Waste
     }
 
     /**
+     * Gets the value of {@link modDate}.
+     * 
      * @return DateTimeImmutable|null The date the content was deleted
      */
     public function getModDate(): ?DateTimeImmutable
@@ -166,10 +188,12 @@ class Waste
     }
 
     /**
-     * @param DateTimeImmutable|null $value
-     * @return $this
+     * Sets the value of {@link modDate}.
+     * 
+     * @param DateTimeImmutable $value The modification date to set
+     * @return Waste
      */
-    public function setModDate(?DateTimeImmutable $value): self
+    public function setModDate(DateTimeImmutable $value): self
     {
         $this->modDate = $value;
 
@@ -177,7 +201,9 @@ class Waste
     }
 
     /**
-     * @return User|null
+     * Gets the value of {@link user}.
+     * 
+     * @return User
      */
     public function getUser(): ?User
     {
@@ -185,12 +211,12 @@ class Waste
     }
 
     /**
-     * Sets the value of {@link author}.
+     * Sets the value of {@link user}.
      *
-     * @param User|null $value The UUID of user adding the {@link Waste}
-     * @return $this
+     * @param User $value The UUID of user adding the {@link Waste}
+     * @return Waste
      */
-    public function setUser(?User $value): self
+    public function setUser(User $value): self
     {
         $this->user = $value;
 

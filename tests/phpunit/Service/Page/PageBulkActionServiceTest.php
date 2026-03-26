@@ -15,11 +15,13 @@ use Inachis\Repository\PageRepository;
 use Inachis\Repository\RevisionRepository;
 use Inachis\Repository\UrlRepository;
 use Inachis\Service\Page\PageBulkActionService;
+use Inachis\Service\Waste\WasteManagerService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class PageBulkActionServiceTest extends TestCase
 {
@@ -47,7 +49,9 @@ class PageBulkActionServiceTest extends TestCase
             $this->pageRepository,
             $this->createStub(RevisionRepository::class),
             $this->createStub(UrlRepository::class),
-            $this->entityManager
+            $this->entityManager,
+            $this->createStub(Security::class),
+            $this->createStub(WasteManagerService::class)
         );
     }
 
@@ -63,7 +67,9 @@ class PageBulkActionServiceTest extends TestCase
             $this->pageRepository,
             $this->createStub(RevisionRepository::class),
             $this->createStub(UrlRepository::class),
-            $this->entityManager
+            $this->entityManager,
+            $this->createStub(Security::class),
+            $this->createStub(WasteManagerService::class)
         );
         $result = $this->pageBulkActionService->apply('', [Uuid::uuid1()->toString()]);
         $this->assertEquals(0, $result);
