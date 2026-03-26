@@ -190,6 +190,13 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             '1=1',
             $filters,
         ];
+        if (!empty($filters['categories'])) {
+            $where[0] .= ' AND c.id IN (:categories)';
+            $where[1]['categories'] = array_is_list($filters['categories']) ? $filters['categories'] : array_keys($filters['categories']);
+            $join[] = ['leftJoin', 'q.categories', 'c'];
+        } else if (isset($filters['categories'])) {
+            unset($filters['categories']);
+        }
         if ($type != '*') {
             $where = [
                 'q.type = :type',
