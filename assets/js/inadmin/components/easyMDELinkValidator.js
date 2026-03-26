@@ -31,10 +31,14 @@ window.Inachis.EasyMDELinkValidator = class {
       return;
     }
 
-    this.markChecking(links);
+    const uncached = links.filter(l => !this.cache.has(l));
+
+    if (uncached.length) {
+      this.markChecking(uncached);
+    }
 
     links.forEach(link => {
-      if (!this.cache.has(link)) {
+      if (!this.cache.has(link) && !this.queue.has(link)) {
         this.queue.add(link);
       }
     });
@@ -53,6 +57,11 @@ window.Inachis.EasyMDELinkValidator = class {
     const batch = Array.from(this.queue);
     this.queue.clear();
 
+    if (batch.length === 0) {
+      this.processing = false;
+      return;
+    }
+
     try {
       const results = await this.validate(batch);
 
@@ -60,7 +69,7 @@ window.Inachis.EasyMDELinkValidator = class {
         this.cache.set(r.url, r);
       });
 
-      this.handleChange();
+      this.renderFromCache();
     } catch (e) {
       console.error("Validation error", e);
     }
@@ -151,6 +160,14 @@ window.Inachis.EasyMDELinkValidator = class {
     }, 0);
   }
 
+  renderFromCache() {
+    const content = this.mde.value();
+    const links = this.extractLinks(content);
+
+    const results = links.map(l => this.cache.get(l)).filter(Boolean);
+    this.markLinks(results);
+  }
+
   showTooltip(e, data) {
     const t = this.tooltip;
 
@@ -204,7 +221,7 @@ window.Inachis.EasyMDELinkValidator = class {
     }
 
     // 2. ALL image links
-    const imageRegex = /!\[[^\]]*\]\((https?:\/\/[^\s)]+)\)/g;
+    const imageRegex = /!\[[^\]]*\]\(([^)]+)\)/g;
 
     while ((match = imageRegex.exec(text)) !== null) {
       links.add(match[1]);
