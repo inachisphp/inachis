@@ -32,12 +32,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Page controller
+ */
 #[IsGranted('ROLE_ADMIN')]
 class PageController extends AbstractInachisController
 {
     public const ITEMS_TO_SHOW = 20;
 
     /**
+     * List posts
+
      * @param Request $request
      * @param ContentQueryParameters $contentQueryParameters
      * @param PageBulkActionService $pageBulkActionService
@@ -105,6 +110,8 @@ class PageController extends AbstractInachisController
     }
 
     /**
+     * Edit post
+     *
      * @param Request $request
      * @param ContentRevisionCompare $contentRevisionCompare
      * @param string $type

@@ -22,6 +22,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 final class LinkValidationController
 {
 	private string $baseUrl;
+
 	/**
 	 * Constructor
 	 *
@@ -90,6 +91,7 @@ final class LinkValidationController
     }
 
     /**
+	 * Validate a single link
 	 *
      * @return array{
      *     url: string,

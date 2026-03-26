@@ -69,7 +69,7 @@
     <span class="filter__section-categories">
         <label id="filter__categories_label" for="filter__categories">Categories</label>
         <select id="filter__categories" name="filter[categories][]" aria-labelledby="filter__categories_label" aria-required="false" class="js-select" data-url="/incc/ax/categoryList/get" multiple="multiple">
-        {% for uuid, categoryName in filter_values['categories'] %}
+        {% for uuid, categoryName in filter_values['categories']|default([]) %}
             <option value="{{ uuid }}" selected>{{ categoryName }}</option>
         {% endfor %}
         </select>
