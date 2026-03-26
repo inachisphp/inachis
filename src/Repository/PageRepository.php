@@ -25,7 +25,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
 
     /**
      * PageRepository constructor
-     * 
+     *
      * @param ManagerRegistry $registry
      */
     public function __construct(ManagerRegistry $registry)
@@ -35,7 +35,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
 
     /**
      * Remove the given page from the database
-     * 
+     *
      * @param Page $page The {@link Page} entity to be removed.
      * @return void
      */
@@ -47,7 +47,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
 
     /**
      * Get all pages with the given category
-     * 
+     *
      * @param Category $category
      * @param int $limit
      * @param int $offset
@@ -81,7 +81,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
 
     /**
      * Get the number of pages with the given category
-     * 
+     *
      * @param Category $category
      * @return int
      */
@@ -99,7 +99,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
 
     /**
      * Get all pages with the given tag
-     * 
+     *
      * @param Tag $tag
      * @param int $maxDisplayCount
      * @param int $offset
@@ -133,7 +133,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
 
     /**
      * Get all content of a certain type, ordered by post date
-     * 
+     *
      * @param string $type
      * @param int $offset
      * @param int $limit
@@ -146,7 +146,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
 
     /**
      * Determine the order by clause for the query builder
-     * 
+     *
      * @param string $orderBy
      * @return array<array<string>>
      */
@@ -170,7 +170,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
 
     /**
      * Get all content of a certain type, ordered by post date
-     * 
+     *
      * @param array<string, mixed> $filters
      * @param string $type
      * @param int $offset
@@ -186,17 +186,13 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         string $sort = 'postDate desc'
     ): Paginator {
         $join = [];
+        if (isset($filters['categories']) && empty($filters['categories'])) {
+            unset($filters['categories']);
+        }
         $where = [
             '1=1',
             $filters,
         ];
-        if (!empty($filters['categories'])) {
-            $where[0] .= ' AND c.id IN (:categories)';
-            $where[1]['categories'] = array_is_list($filters['categories']) ? $filters['categories'] : array_keys($filters['categories']);
-            $join[] = ['leftJoin', 'q.categories', 'c'];
-        } else if (isset($filters['categories'])) {
-            unset($filters['categories']);
-        }
         if ($type != '*') {
             $where = [
                 'q.type = :type',
@@ -245,7 +241,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
 
     /**
      * Get all pages with the given ids
-     * 
+     *
      * @param array<string> $ids
      * @return Paginator<Page>
      */
@@ -265,7 +261,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
 
     /**
      * Get all pages that use the given image
-     * 
+     *
      * @param Image $image
      * @return Paginator<Page>
      */
