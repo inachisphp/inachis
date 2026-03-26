@@ -9,22 +9,23 @@
 
 namespace Inachis\Repository;
 
+use Inachis\Entity\{PasswordResetRequest, User};
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Inachis\Entity\PasswordResetRequest;
-use Inachis\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
-use DateTimeImmutable;
 use DateInterval;
+use DateTimeImmutable;
 
 /**
- * Repository for password reset requests.
+ * Repository for password reset requests
  */
 class PasswordResetRequestRepository extends ServiceEntityRepository
 {
     /**
+     * PasswordResetRequestRepository constructor
+     * 
      * @param ManagerRegistry $registry
      */
     public function __construct(ManagerRegistry $registry)
@@ -40,6 +41,7 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
      */
     public function findActiveByUser(User $user): array
     {
+        /** @var list<PasswordResetRequest> */
         return $this->createQueryBuilder('r')
             ->andWhere('r.user = :user')
             ->andWhere('r.used = false')
@@ -59,6 +61,7 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
      */
     public function findLatestActiveForUser(User $user): ?PasswordResetRequest
     {
+        /** @var PasswordResetRequest|null */
         return $this->createQueryBuilder('r')
             ->andWhere('r.user = :user')
             ->andWhere('r.used = false')
@@ -80,6 +83,7 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
      */
     public function findLatestActiveByHash(string $hash): ?PasswordResetRequest
     {
+        /** @var PasswordResetRequest|null */
         return $this->createQueryBuilder('r')
             ->andWhere('r.hash = :hash')
             ->andWhere('r.used = false')
@@ -99,11 +103,12 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
      */
     public function purgeExpiredHashes(): int
     {
+        /** @var int */
         return $this->createQueryBuilder('r')
             ->delete()
             ->andWhere('r.expiresAt < :now')
             ->setParameter('now', (new DateTimeImmutable())->sub(new DateInterval('PT1H')))
             ->getQuery()
-            ->execute();
+            ->getResult();
     }
 }

@@ -37,7 +37,7 @@ class NavigationTabsExtension extends AbstractExtension
 
     /**
      * Returns the list of active navigation tabs
-     * @return list<NavigationTab>
+     * @return array<NavigationTab>
      */
     public function getTabs(): array
     {
