@@ -89,6 +89,7 @@ class SearchControllerTest extends WebTestCase
         $results = $this->createMock(SearchResult::class);
         $results->method('getResults')->willReturn([
             0 => [
+                'id' => Uuid::uuid1(),
                 'type' => 'Image',
                 'title' => 'Test image',
                 'sub_title' => 'image.jpeg',
@@ -172,6 +173,7 @@ class SearchControllerTest extends WebTestCase
         $results = $this->createMock(SearchResult::class);
         $results->expects($this->once())->method('getResults')->willReturn([
             0 => [
+                'id' => Uuid::uuid1(),
                 'type' => 'Image',
                 'title' => 'Test image',
                 'sub_title' => 'image.jpeg',
