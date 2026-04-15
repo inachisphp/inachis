@@ -9,28 +9,59 @@
 {% block waste %}
 
 <div class="col-12 widget-posts">
-{% include 'inadmin/partials/list.html.twig' with {
+{% include 'inadmin/partials/table.html.twig' with {
     'className': 'form__waste',
     'type': 'waste',
+
+    'table_name': 'Waste list',
+    'table_class': 'table-responsive table--row-borders table--darkhead',
+    'table_desc': 'This table lists deleted items. The first column contains checkboxes allowing users to select one or more items.',
+    'columns': [
+        {
+            'title': 'Title',
+            'source': 'title',
+            'header': true,
+        },
+        {
+            'title': 'Original Type',
+            'source': 'sourceType',
+        },
+        {
+            'title': 'Date Deleted',
+            'source': 'modDate',
+            'source_type': 'date',
+            'hideOnMobile': true,
+        },
+    ],
 
     'offset': query.offset,
     'limit': query.limit,
     'total': dataset.count,
 
-    'snippet_description': 'title',
+    'slug_prefix': 'waste',
+    
+    'filters': [],
+    'filter_values': query.filters|default([]),
+    'show_search': false,
+    'show_select_deselect': true,
 
     'url_result': path('incc_waste_list'),
+    'zebra': true,
 
     'actions': {
         'recover': {
             'button_class': 'button--positive button-recover',
             'icon': 'restore_from_trash',
             'title': 'Restore',
+            'value': '1',
+            'name': 'recover',
         },
         'delete': {
             'button_class': 'button--negative button--delete',
             'icon': 'delete_forever',
             'title': 'Delete',
+            'value': '1',
+            'name': 'delete',
             },
         }
     }

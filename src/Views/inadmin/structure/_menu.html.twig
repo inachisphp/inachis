@@ -44,7 +44,6 @@
                 title="{% trans %}admin.posts.help{% endtrans %}">
                 <i class="material-icons" aria-hidden="true">library_books</i> 
                 <span>{% trans %}admin.posts.title{% endtrans %}</span></a>
-                {# <span class="badge">3</span> #}
         </li>
         <li class="{{ page.tab|activeMenu('series') }}">
             <a href="{{ settings.domain ~ path('incc_series_list') }}" 
@@ -52,7 +51,6 @@
                 title="{% trans %}admin.series.help{% endtrans %}">
                 <i class="material-icons" aria-hidden="true">chrome_reader_mode</i>
                 <span>{% trans %}admin.series.title{% endtrans %}</span>
-                {# <span class="badge badge-dot"></span> #}
             </a>
         </li>
         <li class="{{ page.tab|activeMenu('Image') }}">
@@ -96,7 +94,11 @@
                     <a href="{{ settings.domain ~ path('incc_waste_list') }}"
                         data-tooltip="Manage deleted content"
                         title="Manage deleted content">
-                        <i class="material-icons" aria-hidden="true">delete</i> 
+                        <i class="material-icons" aria-hidden="true">delete</i>
+                    {% if deleted_items > 0 %}
+                            {% if deleted_items > 99 %}{% set deleted_items = '99+' %}{% endif %}
+                            <span class="badge">{{ deleted_items }}</span>
+                    {% endif %}
                         <span>Bin</span>
                     </a>
                 </li>

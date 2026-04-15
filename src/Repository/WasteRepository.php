@@ -52,6 +52,16 @@ class WasteRepository extends AbstractRepository implements WasteRepositoryInter
     }
 
     /**
+     * Returns a count of the number of deleted items
+     * 
+     * @return int The number of waste items
+     */
+    public function getWasteCount(): int
+    {
+        return $this->count([]);
+    }
+
+    /**
      * Gets filtered waste
      * 
      * @param array<string, mixed> $filters The filters

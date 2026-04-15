@@ -13,6 +13,7 @@ use DateTimeImmutable;
 use Inachis\Entity\Series;
 use Inachis\Repository\SeriesRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Service\Waste\WasteManagerService;
 
 /**
  * Service for applying bulk actions to series
@@ -26,6 +27,7 @@ readonly class SeriesBulkActionService
     public function __construct(
         private SeriesRepository $seriesRepository,
         private EntityManagerInterface $entityManager,
+        private WasteManagerService $wasteManagerService,
     ) {}
 
     /**
@@ -45,12 +47,17 @@ readonly class SeriesBulkActionService
                 continue;
             }
             match ($action) {
-                'delete'  => $this->seriesRepository->remove($series),
+                'delete'  => function() use ($series) {
+                    $this->wasteManagerService->sendToWaste($series);
+                    $this->seriesRepository->remove($series);
+                },
                 'private'  => $series->setVisibility(Series::PRIVATE),
                 'public' => $series->setVisibility(Series::PUBLIC),
                 default   => null,
             };
-            if ($action !== 'delete') {
+            if ($action === 'delete') {
+                $action();
+            } else {
                 $series->setModDate(new DateTimeImmutable());
                 $this->entityManager->persist($series);
             }
