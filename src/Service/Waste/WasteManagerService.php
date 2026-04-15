@@ -10,15 +10,8 @@
 namespace Inachis\Service\Waste;
 
 use DateTimeImmutable;
+use Inachis\Entity\{Category, Image, Page, Series, Tag, Url, User, Waste};
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Category;
-use Inachis\Entity\Image;
-use Inachis\Entity\Page;
-use Inachis\Entity\Series;
-use Inachis\Entity\Tag;
-use Inachis\Entity\Url;
-use Inachis\Entity\User;
-use Inachis\Entity\Waste;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Filesystem;

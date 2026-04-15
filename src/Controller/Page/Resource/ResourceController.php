@@ -16,6 +16,7 @@ use Inachis\Form\ResourceType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\{DownloadRepository, ImageRepository, PageRepository, SeriesRepository};
 use Inachis\Service\Resource\ImageFileService;
+use Inachis\Service\Waste\WasteManagerService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -111,6 +112,7 @@ class ResourceController extends AbstractInachisController
         ImageRepository $imageRepository,
         PageRepository $pageRepository,
         SeriesRepository $seriesRepository,
+        WasteManagerService $wasteManagerService,
         #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory
     ): Response {
 //            "filename" => "[a-zA-Z0-9\-\_]\.(jpe?g|heic|png)",
@@ -152,7 +154,7 @@ class ResourceController extends AbstractInachisController
                     sizeof($this->data['usages']['series']) === 0 &&
                     $filesystem->exists($filename)) {
                     try {
-                        $filesystem->remove($filename);
+                        $wasteManagerService->sendToWaste($resource);
                         $repository->remove($resource);
                         $this->addFlash('success', 'Resource deleted.');
                         return $this->redirectToRoute(
@@ -163,7 +165,7 @@ class ResourceController extends AbstractInachisController
                             ],
                             Response::HTTP_PERMANENTLY_REDIRECT
                         );
-                    } catch (IOException $e) {
+                    } catch (\Exception $e) {
                         $this->addFlash('error', 'Failed to remove file.');
                         return $this->redirectToRoute(
                             'incc_resource_edit', [

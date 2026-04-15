@@ -17,6 +17,7 @@ use Inachis\Repository\UrlRepository;
 use Inachis\Util\UrlNormaliser;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Inachis\Service\Waste\WasteManagerService;
 use DateTimeImmutable;
 use Exception;
 
@@ -33,6 +34,7 @@ readonly class PageBulkActionService
         private UrlRepository $urlRepository,
         private EntityManagerInterface $entityManager,
         private Security $security,
+        private WasteManagerService $wasteManagerService,
     ) {}
 
     /**
@@ -85,6 +87,7 @@ readonly class PageBulkActionService
      */
     public function delete(Page $post): void
     {
+        $this->wasteManagerService->sendToWaste($post);
         $this->revisionRepository->deleteAndRecordByPage($post, $this->security->getUser());
         $this->pageRepository->remove($post);
     }
