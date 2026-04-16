@@ -12,6 +12,9 @@ namespace Inachis\Repository;
 use Inachis\Entity\Page;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
+/**
+ * Interface for page repositories
+ */
 interface PageRepositoryInterface
 {
     /**
@@ -19,10 +22,10 @@ interface PageRepositoryInterface
      * 
      * @param int $offset
      * @param int $limit
-     * @param array<string, mixed> $where
-     * @param array<string, mixed>|string $order
-     * @param array<string, mixed>|string $groupBy
-     * @param array<string, mixed> $join
+     * @param array<int, array<int, string>> $where
+     * @param array<int, array<int, string>>|string $order
+     * @param array<int, array<int, string>>|string $groupBy
+     * @param array<int, array<int, string>> $join
      * @return Paginator<Page>
      */
     public function getAll(
@@ -44,7 +47,7 @@ interface PageRepositoryInterface
     /**
      * Get all pages of a certain type, ordered by post date
      * 
-     * @param array<string, mixed> $filters
+     * @param array<int, array<int, string>> $filters
      * @param string $type
      * @param int $offset
      * @param int $limit

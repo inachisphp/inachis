@@ -13,6 +13,25 @@
 <section class="admonition admonition__info">
 	<h3 class="admonition__title">Images</h3>
     <p>Size: {{ storage.images }} bytes ({{ (storage.images / 1024 / 1024)|round(2) }} Mb)</p>
+    {% if storage.topPagesBySize is defined and storage.topPagesBySize|length > 0 %}
+	<h3 class="admonition__title">Top {{ storage.topPagesBySize|length }} Pages by Image Size</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Image Size</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for page in storage.topPagesBySize %}
+            <tr>
+                <td><a href="">{{ page.title }}</a></td>
+                <td>{{ page.imageSize }} bytes ({{ (page.imageSize / 1024 / 1024)|round(2) }} Mb)</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
 </section>
 {% endif %}
 

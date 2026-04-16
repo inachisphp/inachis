@@ -116,6 +116,9 @@
             {% if textStats is defined %}
                 <p>{% trans with {'%readingTime%': '<strong>' ~ textStats.readingTime ~ '</strong>'} from 'messages' %}admin.post.properties.readingTime{% endtrans %}</p>
             {% endif %}
+            {% if post.imageSize is defined and post.imageSize > 0 %}
+                <p><strong>Image Size:</strong> {{ post.imageSize }} bytes ({{ (post.imageSize / 1024 / 1024)|round(2) }} Mb)</p>
+            {% endif %}
             {% if settings.geotagContent is defined and settings.geotagContent and settings.google.key is defined and settings.google.key is not empty %}
             <p>
                 {{ form_label(form.latlong) }}
