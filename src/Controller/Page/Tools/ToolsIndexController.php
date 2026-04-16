@@ -11,6 +11,7 @@ namespace Inachis\Controller\Page\Tools;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\{Image,Page,Series,Tag,Url};
+use Inachis\Repository\ImageRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -25,6 +26,18 @@ class ToolsIndexController extends AbstractInachisController
         $this->data['page']['title'] = 'Tools';
         $this->data['page']['tab'] = 'tools';
         return $this->render('inadmin/page/tools/list.html.twig', $this->data);
+    }
+
+    #[Route("/incc/tools/storage", name: 'incc_tools_storage')]
+    public function storage(ImageRepository $imageRepository): Response
+    {
+        $this->data['environment'] = $this->getParameter('kernel.environment');
+        $this->data['page']['title'] = 'Storage';
+        $this->data['page']['tab'] = 'tools';
+        $this->data['storage'] = [
+            'images' => $imageRepository->getDiskUsage(),
+        ];
+        return $this->render('inadmin/page/tools/storage.html.twig', $this->data);
     }
 
     // /**

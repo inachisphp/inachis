@@ -1,0 +1,27 @@
+{% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <span>Storage</span>
+{% endblock pagetitle %}
+
+
+{% block content %}
+<div class="col-12">
+
+{% if storage.images is defined and storage.images > 0 %}
+<section class="admonition admonition__info">
+	<h3 class="admonition__title">Images</h3>
+    <p>Size: {{ storage.images }} bytes ({{ (storage.images / 1024 / 1024)|round(2) }} Mb)</p>
+</section>
+{% endif %}
+
+{% if storage.downloads is defined and storage.downloads > 0 %}
+<section class="admonition admonition__info">
+	<h3 class="admonition__title">Downloads</h3>
+    <p>Size: {{ storage.downloads }} bytes ({{ (storage.downloads / 1024 / 1024)|round(2) }} Mb)</p>
+</section>
+{% endif %}
+
+</div>
+{% endblock content %}

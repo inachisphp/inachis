@@ -18,14 +18,21 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 interface ResourceRepositoryInterface
 {
     /**
+     * Get the disk usage of resources
+     * 
+     * @return int The disk usage in bytes
+     */
+    public function getDiskUsage(): int;
+
+    /**
      * Get all resources
      * 
      * @param int $offset
      * @param int $limit
-     * @param array<array<string>> $where
-     * @param array<array<string>>|string $order
-     * @param array<array<string>>|string $groupBy
-     * @param array<array<string>> $join
+     * @param array<int, array<int, string>> $where
+     * @param array<int, array<int, string>>|string $order
+     * @param array<int, array<int, string>>|string $groupBy
+     * @param array<int, array<int, string>> $join
      * @return Paginator<AbstractFile>
      */
     public function getAll(

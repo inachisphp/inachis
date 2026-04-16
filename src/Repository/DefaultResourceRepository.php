@@ -17,6 +17,18 @@ trait DefaultResourceRepository
     public const MAX_ITEMS_TO_SHOW_ADMIN = 25;
 
     /**
+     * Get the disk usage of all images
+     * 
+     * @return int The disk usage in bytes
+     */
+    public function getDiskUsage(): int
+    {
+        $qb = $this->createQueryBuilder('r');
+        $qb->select('SUM(r.filesize)');
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
      * @param AbstractFile $file
      */
     public function remove(AbstractFile $file): void
