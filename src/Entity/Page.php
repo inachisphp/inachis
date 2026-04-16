@@ -225,6 +225,9 @@ class Page
     #[ORM\Column(type: 'boolean')]
     protected ?bool $showTableOfContents = false;
 
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+    protected int $imageSize = 0;
+
     /**
      * Default constructor for {@link Page}.
      *
@@ -793,6 +796,28 @@ class Page
     public function setShowTableOfContents(bool $value = false): self
     {
         $this->showTableOfContents = $value;
+        return $this;
+    }
+
+    /**
+     * Returns the value of {@link imageSize}.
+     *
+     * @return int The total size of the images referenced in the page content
+     */
+    public function getImageSize(): int
+    {
+        return $this->imageSize;
+    }
+
+    /**
+     * Sets the value of {@link imageSize}.
+     *
+     * @param int $value The calculated total file size
+     * @return Page
+     */
+    public function setImageSize(int $value): self
+    {
+        $this->imageSize = $value;
         return $this;
     }
 

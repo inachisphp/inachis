@@ -114,9 +114,9 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('Page_tags.id', ':tagId'),
-                    $qb->expr()->eq('p.status', 'published'),
-                    $qb->expr()->eq('p.visibility', '1'),
-                    $qb->expr()->eq('p.type', 'post')
+                    'p.status=\'published\'',
+                    'p.visibility=\'1\'',
+                    'p.type=\'post\''
                 )
             )
             ->orderBy('p.postDate', 'DESC')
@@ -278,5 +278,22 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
                 ]
             ]
         );
+    }
+
+    /**
+     * Get the top N pages with the largest image size calculated
+     * 
+     * @param int $limit
+     * @return array<Page>
+     */
+    public function getTopPagesByImageSize(int $limit = 10): array
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb = $qb
+            ->select('p')
+            ->orderBy('p.imageSize', 'DESC')
+            ->setMaxResults($limit);
+            
+        return $qb->getQuery()->getResult();
     }
 }

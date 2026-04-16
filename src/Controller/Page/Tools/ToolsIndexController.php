@@ -11,6 +11,7 @@ namespace Inachis\Controller\Page\Tools;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\{Image,Page,Series,Tag,Url};
+use Inachis\Repository\{ImageRepository,PageRepository};
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -18,6 +19,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class ToolsIndexController extends AbstractInachisController
 {
+    /**
+     * Index page for tools
+     *
+     * @return Response
+     */
     #[Route("/incc/tools", name: 'incc_tools_index')]
     public function index(): Response
     {
@@ -25,6 +31,26 @@ class ToolsIndexController extends AbstractInachisController
         $this->data['page']['title'] = 'Tools';
         $this->data['page']['tab'] = 'tools';
         return $this->render('inadmin/page/tools/list.html.twig', $this->data);
+    }
+
+    /**
+     * Storage usage page
+     *
+     * @param ImageRepository $imageRepository
+     * @param PageRepository $pageRepository
+     * @return Response
+     */
+    #[Route("/incc/tools/storage", name: 'incc_tools_storage')]
+    public function storage(ImageRepository $imageRepository, PageRepository $pageRepository): Response
+    {
+        $this->data['environment'] = $this->getParameter('kernel.environment');
+        $this->data['page']['title'] = 'Storage';
+        $this->data['page']['tab'] = 'tools';
+        $this->data['storage'] = [
+            'images' => $imageRepository->getDiskUsage(),
+            'topPagesBySize' => $pageRepository->getTopPagesByImageSize(10),
+        ];
+        return $this->render('inadmin/page/tools/storage.html.twig', $this->data);
     }
 
     // /**
