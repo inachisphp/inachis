@@ -160,12 +160,28 @@ div#filter__options {
 	.form & .js-select {
 		width: auto;
 	}
+	.ts-dropdown-content span {
+		background-color: rgba(125, 168, 208, 0.2);
+		border: none;
+		border-radius: 1px;
+		color: #495C9A;
+		font-size: inherit;
+		margin-right: 0;
+		padding: 0;
+	}
 	.ts-dropdown, .ts-control, .ts-control input {
 		background: none;
 		border: none;
 		font-size: inherit;
 		line-height: inherit;
 		width: 15rem;
+	}
+	.ts-control input {
+		width: auto;
+	}
+	.ts-control .item {
+		background: #ddd;
+		border-radius: 0.5rem;
 	}
 }
 
