@@ -1,0 +1,10 @@
+{% if dashboard.comments|default([]) is not empty %}
+<section class="widget widget-comments ui-tabbed">
+    <h2>Comments</h2>
+        <ol>
+            {% for comment in data.comments.results %}
+                <li>{{ comment.message }}</li>
+            {% endfor %}
+        </ol>
+</section>
+{% endif %}

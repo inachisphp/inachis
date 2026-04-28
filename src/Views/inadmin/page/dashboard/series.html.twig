@@ -1,0 +1,17 @@
+{% if dashboard.series|default([]) is not empty %}
+<section class="widget widget-series ui-section paginated-list rounded-top">
+    <h2>Latest Series</h2>
+    <dl>
+        {% for series in dashboard.series %}
+            <dt><a aria-label="Edit {{ series.title }}" href="{{ path('incc_series_edit', {'id': series.id}) }}">{{ series.title }}{{ series.subtitle ? ' - ' ~ series.subtitle }}</a></dt>
+			<dd>
+				<span>{{ series.items|length }}</span> posts &middot;
+				<span>Updated {{ series.lastDate|date('d M Y') }}</span>
+			</dd>
+        {% endfor %}
+    </dl>
+	<p class="view-all">
+		<a aria-label="View all series" href="{{ path('incc_series_list') }}">View all series &rarr;</a>
+	</p>
+</section>
+{% endif %}

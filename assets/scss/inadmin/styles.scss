@@ -1,4 +1,4 @@
-@use '../../../node_modules/normalize.css/normalize.css';
+@use 'normalize.css/normalize.css';
 
 @use 'base';
 @use 'structure/layout';
@@ -40,6 +40,7 @@
 @use 'content-types/gallery';
 @use 'content-types/series';
 @use 'content-types/warnings';
+@use 'widgets/dashboard';
 @use 'widgets/widgets';
 @use 'widgets/alerts';
 @use 'widgets/stats';
