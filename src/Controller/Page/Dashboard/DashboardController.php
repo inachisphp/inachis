@@ -11,8 +11,8 @@ namespace Inachis\Controller\Page\Dashboard;
 
 use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Page;
-use Inachis\Repository\PageRepository;
+use Inachis\Entity\{Page, Series};
+use Inachis\Repository\{PageRepository, SeriesRepository};
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -29,6 +29,7 @@ class DashboardController extends AbstractInachisController
     public function default(
         Request $request,
         PageRepository $pageRepository,
+        SeriesRepository $seriesRepository
     ): Response {
         $this->data['page'] = [
             'tab'   => 'dashboard',
@@ -72,6 +73,17 @@ class DashboardController extends AbstractInachisController
                     ],
                 ],
                 'q.postDate DESC, q.modDate'
+            ),
+            'series' => $seriesRepository->getAll(
+                0,
+                5,
+                [
+                    'q.visibility != :visibility',
+                    [
+                        'visibility' => Series::PRIVATE,
+                    ],
+                ],
+                'q.firstDate DESC, q.lastDate'
             )
         ];
         $this->data['dashboard']['stats']['recent'] = 0;

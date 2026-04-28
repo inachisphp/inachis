@@ -8,7 +8,7 @@
 {% block waste_pre %}{% endblock waste_pre %}
 {% block waste %}
 
-<div class="col-12 widget-posts">
+<div class="col-12 ui-section">
 {% include 'inadmin/partials/table.html.twig' with {
     'className': 'form__waste',
     'type': 'waste',
@@ -40,7 +40,7 @@
     'total': dataset.count,
 
     'slug_prefix': 'waste',
-    
+
     'filters': [],
     'filter_values': query.filters|default([]),
     'show_search': false,
