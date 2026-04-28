@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Command;
+namespace Inachis\Command\User;
 
 use Inachis\Entity\PasswordResetRequest;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,7 +21,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * Command to purge expired password reset requests.
  */
 #[AsCommand(
-    name: 'inachis:purge-expired-reset-requests',
+    name: 'inachis:user:purge-expired-reset-requests',
     description: 'Purges all expired password reset requests.',
 )]
 class PurgeExpiredResetRequestsCommand extends Command

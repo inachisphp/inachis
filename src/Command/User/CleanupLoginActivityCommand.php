@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Command;
+namespace Inachis\Command\User;
 
 use Inachis\Repository\LoginActivityRepository;
 use Inachis\Message\CleanupLoginActivityMessage;
@@ -25,7 +25,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
  * 0 2 * * * /usr/bin/php /path/to/your/project/bin/console inachis:cleanup-login-activity
  */
 #[AsCommand(
-    name: 'inachis:cleanup-login-activity',
+    name: 'inachis:user:cleanup-login-activity',
     description: 'Deletes old login activity, successful older than 12 months, failed older than 90 days.'
 )]
 class CleanupLoginActivityCommand extends Command
