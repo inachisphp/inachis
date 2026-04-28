@@ -7,9 +7,14 @@ section.paginated-list {
   clear: left;
   margin-bottom: 4em;
   padding: 1em;
+
+  &.rounded-top {
+    border-top-left-radius: $radius-standard;
+    border-top-right-radius: $radius-standard;
+  }
 }
 
-.widget-posts {
+.ui-section {
   clear: left;
 
   div.ui-tabs-panel {

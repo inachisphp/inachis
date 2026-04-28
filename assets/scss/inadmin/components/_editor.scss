@@ -49,6 +49,17 @@ div.EasyMDEContainer {
   border-bottom: 2px dashed orange;
 }
 
+.editor-statusbar .link-health-badge-inline {
+  margin-left: 12px;
+  font-weight: normal;
+  color: inherit;
+  font-size: 12px;
+
+  span {
+    margin-left: 0;
+    min-width: auto;
+  }
+}
 .autosave-notification {
   align-items: center;
   animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;

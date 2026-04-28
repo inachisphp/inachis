@@ -1,0 +1,24 @@
+{% macro render_list(items, id, empty_message = null, view_all_label = null, view_all_url = null) %}
+    {% if items|default([]) is not empty %}
+        <ol id="{{ id }}">
+            {% for post in items %}
+                <li>
+                    {{ include('inadmin/partials/details.html.twig', {
+                        item: post,
+                        link: '/incc/' ~ post.type ~ '/' ~ post.urls[0].link
+                    }) }}
+                </li>
+            {% endfor %}
+
+            {% if view_all_label is not empty and view_all_url is not empty %}
+                <li class="view-all">
+                    <a aria-label="View all {{ view_all_label }}" href="{{ view_all_url }}">View all {{ view_all_label }} &rarr;</a>
+                </li>
+            {% endif %}
+        </ol>
+    {% elseif empty_message %}
+        <div id="{{ id }}">
+            <p>{{ empty_message }}</p>
+        </div>
+    {% endif %}
+{% endmacro %}
