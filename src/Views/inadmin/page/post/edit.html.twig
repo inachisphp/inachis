@@ -191,16 +191,23 @@
         {% endif %}
     </div>
 
+    {% if post.postDate > date() %}{% set previewMode = true %}{% endif %}
     <div class="fixed-bottom-bar">
         <p>
             {{ form_widget(form.submit) }}
         {% if post.id is not empty %}
             {%- if post.status != "published" %}
-                <button type="submit" class="button button--secondary button--info" name="publish">{% if post.postDate > date() %}<span class="material-icons" aria-hidden="true">schedule</span> {% trans %}admin.button.schedule{% endtrans %}{% else %}<span class="material-icons" aria-hidden="true">publish</span> {% trans %}admin.button.publish{% endtrans %}{% endif %}</button>
+                <button type="submit" class="button button--secondary button--info" name="publish">
+                {% if previewMode %}
+                    <span class="material-icons" aria-hidden="true">schedule</span> {% trans %}admin.button.schedule{% endtrans %}
+                {% else %}
+                    <span class="material-icons" aria-hidden="true">publish</span> {% trans %}admin.button.publish{% endtrans %}
+                {% endif %}
+                </button>
             {%- endif %}
             {{ form_widget(form.delete) }}
             {%  if not post.isDraft %}
-                <a class="button button--secondary" href="/{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons" aria-hidden="true">exit_to_app</span>
+                <a class="button button--secondary" href="{% if previewMode %}/incc/preview/{% endif %}{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons" aria-hidden="true">exit_to_app</span>
                     {% trans %}admin.button.viewLive{% endtrans %}</a>
             {%  endif %}
         {% endif %}
