@@ -191,7 +191,7 @@
         {% endif %}
     </div>
 
-    {% if post.postDate > date() %}{% set previewMode = true %}{% endif %}
+    {% set previewMode = post.postDate > date() %}
     <div class="fixed-bottom-bar">
         <p>
             {{ form_widget(form.submit) }}
