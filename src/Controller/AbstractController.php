@@ -9,6 +9,7 @@
 
 namespace Inachis\Controller;
 
+use Inachis\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as SymfonyController;
 
 /**
