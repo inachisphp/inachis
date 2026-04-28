@@ -25,7 +25,7 @@
         <tbody>
             {% for page in storage.topPagesBySize %}
             <tr>
-                <td><a href="">{{ page.title }}</a></td>
+                <td><a href="/incc/{{ page.type }}/{{ page.urls|first.link }}">{{ page.title }}</a></td>
                 <td>{{ page.imageSize }} bytes ({{ (page.imageSize / 1024 / 1024)|round(2) }} Mb)</td>
             </tr>
             {% endfor %}

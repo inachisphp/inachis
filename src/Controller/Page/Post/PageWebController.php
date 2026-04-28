@@ -11,17 +11,10 @@ namespace Inachis\Controller\Page\Post;
 
 use Exception;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Category;
-use Inachis\Entity\Image;
-use Inachis\Entity\Page;
-use Inachis\Entity\Revision;
-use Inachis\Entity\Series;
-use Inachis\Entity\Tag;
-use Inachis\Entity\Url;
+use Inachis\Entity\{Category,Image,Page,Revision,Series,Tag,Url};
 use Inachis\Form\PostType;
 use Inachis\Repository\RevisionRepository;
-use Inachis\Util\ContentRevisionCompare;
-use Inachis\Util\ReadingTime;
+use Inachis\Util\{ContentRevisionCompare,ReadingTime};
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -50,22 +43,32 @@ class PageWebController extends AbstractInachisController
         ],
         methods: ["GET" ]
     )]
+    #[Route(
+        "/incc/preview/{year}/{month}/{day}/{title}",
+        requirements: [
+            "year" => "\d+",
+            "month" => "\d+",
+            "day" => "\d+"
+        ],
+        methods: ["GET" ]
+    )]
     public function getPost(Request $request, int $year, int $month, int $day, string $title): Response
     {
+        $link = sprintf('%d/%02d/%02d/%s', $year, $month, $day, $title);
         $url = $this->entityManager->getRepository(Url::class)->findOneBy([
-            'link' => ltrim(strtok($request->getRequestUri(), '?'), '/')
+            'link' => $link
         ]);
         if (empty($url)) {
             throw new NotFoundHttpException(
                 sprintf(
                     '%s does not exist',
-                    ltrim($request->getRequestUri(), '/')
+                    $link
                 )
             );
         }
         if (
             ($url->getContent()->isScheduledPage() || $url->getContent()->isDraft())
-            && !$this->security->isGranted('IS_AUTHENTICATED_FULLY')
+            && !$this->security->isGranted('IS_AUTHENTICATED_REMEMBERED')
         ) {
             return $this->redirectToRoute(
                 'inachis_default_homepage',

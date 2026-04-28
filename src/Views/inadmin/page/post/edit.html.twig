@@ -117,7 +117,7 @@
                 <p>{% trans with {'%readingTime%': '<strong>' ~ textStats.readingTime ~ '</strong>'} from 'messages' %}admin.post.properties.readingTime{% endtrans %}</p>
             {% endif %}
             {% if post.imageSize is defined and post.imageSize > 0 %}
-                <p><strong>Image Size:</strong> {{ post.imageSize }} bytes ({{ (post.imageSize / 1024 / 1024)|round(2) }} Mb)</p>
+                <p><strong>Total size of images used:</strong> {{ post.imageSize }} bytes ({{ (post.imageSize / 1024 / 1024)|round(2) }} Mb)</p>
             {% endif %}
             {% if settings.geotagContent is defined and settings.geotagContent and settings.google.key is defined and settings.google.key is not empty %}
             <p>
@@ -191,16 +191,23 @@
         {% endif %}
     </div>
 
+    {% set previewMode = post.postDate > date() %}
     <div class="fixed-bottom-bar">
         <p>
             {{ form_widget(form.submit) }}
         {% if post.id is not empty %}
             {%- if post.status != "published" %}
-                <button type="submit" class="button button--secondary button--info" name="publish">{% if post.postDate > date() %}<span class="material-icons" aria-hidden="true">schedule</span> {% trans %}admin.button.schedule{% endtrans %}{% else %}<span class="material-icons" aria-hidden="true">publish</span> {% trans %}admin.button.publish{% endtrans %}{% endif %}</button>
+                <button type="submit" class="button button--secondary button--info" name="publish">
+                {% if previewMode %}
+                    <span class="material-icons" aria-hidden="true">schedule</span> {% trans %}admin.button.schedule{% endtrans %}
+                {% else %}
+                    <span class="material-icons" aria-hidden="true">publish</span> {% trans %}admin.button.publish{% endtrans %}
+                {% endif %}
+                </button>
             {%- endif %}
             {{ form_widget(form.delete) }}
             {%  if not post.isDraft %}
-                <a class="button button--secondary" href="/{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons" aria-hidden="true">exit_to_app</span>
+                <a class="button button--secondary" href="{% if previewMode %}/incc/preview/{% endif %}{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons" aria-hidden="true">exit_to_app</span>
                     {% trans %}admin.button.viewLive{% endtrans %}</a>
             {%  endif %}
         {% endif %}

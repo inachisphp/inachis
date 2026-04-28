@@ -85,4 +85,38 @@ class WasteController extends AbstractInachisController
         $this->data['page']['tab'] = 'waste';
         return $this->render('inadmin/page/waste/list.html.twig', $this->data);
     }
+
+    /**
+     * @param string $id
+     * @param WasteRepository $wasteRepository
+     * @return Response
+     */
+    #[Route(
+        "/incc/waste/{id}",
+        requirements: [
+            "id" => "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+        ],
+        methods: [ 'GET' ],
+        name: "incc_waste_view"
+    )]
+    public function view(
+        string $id,
+        WasteRepository $wasteRepository,
+    ): Response {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        $processItem = $wasteRepository->findOneBy(['id' => $id]);
+        if ($processItem === null) {
+            throw $this->createNotFoundException('The item does not exist or has been permanently deleted');
+        }
+
+        $this->data['waste'] = $processItem;
+        $this->data['wasteContent'] = json_decode($processItem->getContent(), true);
+        $this->data['page']['tab'] = 'waste';
+
+        $form = $this->createFormBuilder()->getForm();
+        $this->data['form'] = $form->createView();
+
+        return $this->render('inadmin/page/waste/view.html.twig', $this->data);
+    }
 }

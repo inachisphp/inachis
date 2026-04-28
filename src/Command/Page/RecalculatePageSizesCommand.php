@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Command;
+namespace Inachis\Command\Page;
 
 use Inachis\Entity\Page;
 use Inachis\Repository\ImageRepository;

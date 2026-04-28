@@ -48,7 +48,7 @@ class ToolsIndexController extends AbstractInachisController
         $this->data['page']['tab'] = 'tools';
         $this->data['storage'] = [
             'images' => $imageRepository->getDiskUsage(),
-            'topPagesBySize' => $pageRepository->getTopPagesByImageSize(10),
+            'topPagesBySize' => $pageRepository->getTopPagesByImageSize(25),
         ];
         return $this->render('inadmin/page/tools/storage.html.twig', $this->data);
     }
