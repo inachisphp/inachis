@@ -8,13 +8,12 @@
 {% block dashboard_pre %}{% endblock dashboard_pre %}
 {% block dashboard %}
     {% include "inadmin/page/dashboard/alerts.html.twig" %}
-
     <div class="col-6">
-        {% include "inadmin/page/dashboard/activity.html.twig" %}
+        {% include "inadmin/page/dashboard/_posts.html.twig" %}
     </div>
 
     <div class="col-6">
-        {% include "inadmin/page/dashboard/series.html.twig" %}
+        {% include "inadmin/page/dashboard/_series.html.twig" %}
         <!-- {% include "inadmin/page/dashboard/stats.html.twig" %}
         {% include "inadmin/page/dashboard/_comments.html.twig" %} -->
     </div>

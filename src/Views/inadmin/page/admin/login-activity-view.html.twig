@@ -14,7 +14,7 @@
 {% block content %}
 
 <div class="col-12 widget-data-list">
-    <section class="paginated-list">
+    <section class="ui-section">
         <p><strong>Time:</strong> {{ activity.loggedAt|date('Y-m-d H:i:s') }}</p>
         <p><strong>User:</strong> {{ (activity.user ? activity.user.userIdentifier : activity.username)|default('Unknown') }}</p>
         <p><strong>Type:</strong> {{ activity.type }}</p>

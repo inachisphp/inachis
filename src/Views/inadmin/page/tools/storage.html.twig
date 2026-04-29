@@ -12,27 +12,49 @@
 {% if storage.images is defined and storage.images > 0 %}
 <section class="admonition admonition__info">
 	<h3 class="admonition__title">Images</h3>
-    <p>Size: {{ storage.images }} bytes ({{ (storage.images / 1024 / 1024)|round(2) }} Mb)</p>
-    {% if storage.topPagesBySize is defined and storage.topPagesBySize|length > 0 %}
-	<h3 class="admonition__title">Top {{ storage.topPagesBySize|length }} Pages by Image Size</h3>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Image Size</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for page in storage.topPagesBySize %}
-            <tr>
-                <td><a href="/incc/{{ page.type }}/{{ page.urls|first.link }}">{{ page.title }}</a></td>
-                <td>{{ page.imageSize }} bytes ({{ (page.imageSize / 1024 / 1024)|round(2) }} Mb)</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
+    <p>Total size: {{ storage.images }} bytes ({{ (storage.images / 1024 / 1024)|round(2) }} Mb)</p>
 </section>
+
+<h3 class="admonition__title">Largest 10 Images</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Filename</th>
+            <th>Size</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for image in storage.biggestImages %}
+        <tr>
+            <td>{{ image.title }}</td>
+            <td>{{ image.filename }}</td>
+            <td>{{ image.filesize }} bytes ({{ (image.filesize / 1024 / 1024)|round(2) }} Mb)</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+    {% if storage.topPagesBySize is defined and storage.topPagesBySize|length > 0 %}
+<h3 class="admonition__title">Top {{ storage.topPagesBySize|length }} Pages by Image Size</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Image Size</th>
+        </tr>
+    </thead>
+    <tbody>
+            {% for page in storage.topPagesBySize %}
+        <tr>
+            <td><a href="/incc/{{ page.type }}/{{ page.urls|first.link }}">{{ page.title }}</a></td>
+            <td>{{ page.imageSize }} bytes ({{ (page.imageSize / 1024 / 1024)|round(2) }} Mb)</td>
+        </tr>
+            {% endfor %}
+    </tbody>
+</table>
+    {% endif %}
 {% endif %}
 
 {% if storage.downloads is defined and storage.downloads > 0 %}

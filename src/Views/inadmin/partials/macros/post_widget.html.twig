@@ -1,24 +1,44 @@
 {% macro render_list(items, id, empty_message = null, view_all_label = null, view_all_url = null) %}
-    {% if items|default([]) is not empty %}
-        <ol id="{{ id }}">
-            {% for post in items %}
-                <li>
-                    {{ include('inadmin/partials/details.html.twig', {
-                        item: post,
-                        link: '/incc/' ~ post.type ~ '/' ~ post.urls[0].link
-                    }) }}
-                </li>
-            {% endfor %}
 
-            {% if view_all_label is not empty and view_all_url is not empty %}
-                <li class="view-all">
-                    <a aria-label="View all {{ view_all_label }}" href="{{ view_all_url }}">View all {{ view_all_label }} &rarr;</a>
-                </li>
+{% if items|default([]) is not empty %}
+<div id="{{ id }}">
+    <dl>
+    {% for item in items %}
+        <dt>
+            <a aria-label="Edit {{ item.title }}" href="{{ '/incc/' ~ item.type ~ '/' ~ item.urls[0].link }}">
+                {{ item.title }}{{ item.subtitle ? ' - ' ~ item.subtitle }}
+                {{ include('inadmin/partials/badge.html.twig', {
+                    'item': item,
+                    'badges': {
+                        'private': {
+                        'field': 'visibility',
+                        'condition': false,
+                        'className': 'badge__private'
+                    }
+                } }) }}
+            </a>
+        </dt>
+        <dd class="date">
+            {% if item.status === 'draft' %}
+            Updated: <em>{{ item.modDate|date('jS F Y', item.timezone) }}</em>
+            {% elseif item.postDate|date('U') > "now"|date('U') %}
+            Scheduled for <em>{{ item.postDate|date('jS F Y \\a\\t H:i', item.timezone) }} {{ item.timezone }}</em>
+            {% else %}
+            Published on {{ item.postDate|date('jS F Y \\a\\t H:i', item.timezone) }} {{ item.timezone }}
             {% endif %}
-        </ol>
-    {% elseif empty_message %}
-        <div id="{{ id }}">
-            <p>{{ empty_message }}</p>
-        </div>
+        </dd>
+    {% endfor %}
+    </dl>
+
+    {% if view_all_label is not empty and view_all_url is not empty %}
+    <p class="view-all">
+        <a aria-label="View all {{ view_all_label }}" href="{{ view_all_url }}">View all {{ view_all_label }} &rarr;</a>
+    </p>
     {% endif %}
+
+{% elseif empty_message %}
+        <p>{{ empty_message }}</p>
+{% endif %}
+</div>
+
 {% endmacro %}

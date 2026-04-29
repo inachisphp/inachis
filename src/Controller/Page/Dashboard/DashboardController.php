@@ -35,10 +35,27 @@ class DashboardController extends AbstractInachisController
             'tab'   => 'dashboard',
             'title' => 'Dashboard',
         ];
+        $recentDraft = $pageRepository->getAll(
+            0,
+            1,
+            [
+                'q.status = :status',
+                [
+                    'status' => Page::DRAFT,
+                ],
+            ],
+            [ ['q.modDate' , 'DESC'] ]
+        );
+        if ($recentDraft->count() > 0) {
+            $now = new DateTimeImmutable();
+            $recentDraftTimeAgo = $now->diff($recentDraft->getIterator()->current()->getModDate());
+        }
         $this->data['dashboard'] = [
             'draftCount' => 0,
             'publishCount' => 0,
             'upcomingCount' => 0,
+            'recentDraft' => $recentDraft,
+            'draftTimeAgo' => $recentDraftTimeAgo ?? 0,
             'drafts' => $pageRepository->getAll(
                 0,
                 5,
@@ -73,6 +90,17 @@ class DashboardController extends AbstractInachisController
                     ],
                 ],
                 'q.postDate DESC, q.modDate'
+            ),
+            'draftSeries' => $seriesRepository->getAll(
+                0,
+                5,
+                [
+                    'q.visibility = :visibility',
+                    [
+                        'visibility' => Series::PRIVATE,
+                    ],
+                ],
+                'q.firstDate DESC, q.lastDate'
             ),
             'series' => $seriesRepository->getAll(
                 0,

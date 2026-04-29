@@ -1,11 +1,13 @@
 {% import 'inadmin/partials/macros/post_widget.html.twig' as posts %}
 
-<section class="widget-posts ui-section ui-tabbed">
-    <ul class="widget-posts__tabs">
-        <li>
-            <a href="#widget-posts__drafts">Drafts</a>
-            <em class="badge{% if dashboard.draftCount == 0 %} badge__empty{% endif %}">{{ dashboard.draftCount }}</em>
-        </li>
+<section class="widget widget-posts ui-section rounded">
+    <header class="widget__header">
+        <h3>Posts</h3>
+        <ul class="ui-tabs">
+            <li>
+                <a href="#widget-posts__drafts">Drafts</a>
+                <em class="badge{% if dashboard.draftCount == 0 %} badge__empty{% endif %}">{{ dashboard.draftCount }}</em>
+            </li>
         {% if dashboard.upcoming|default([]) is not empty  %}
             <li>
                 <a href="#widget-posts__upcoming">Scheduled</a>
@@ -13,12 +15,13 @@
             </li>
         {% endif %}
         {% if dashboard.publishCount > 0 %}
-        <li>
-            <a href="#widget-posts__published">Latest</a>
-            <em class="badge{% if dashboard.publishCount == 0 %} badge__empty{% endif %}">{{ dashboard.publishCount }}</em>
-        </li>
+            <li>
+                <a href="#widget-posts__published">Latest</a>
+                <em class="badge{% if dashboard.publishCount == 0 %} badge__empty{% endif %}">{{ dashboard.publishCount }}</em>
+            </li>
         {% endif %}
     </ul>
+    </header>
 
    {{ posts.render_list(dashboard.drafts, 'widget-posts__drafts', 'There are currently no draft posts available', 'drafts') }}
 

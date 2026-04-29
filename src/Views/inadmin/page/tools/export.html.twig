@@ -6,10 +6,10 @@
 {% endblock pagetitle %}
 
 {% block content %}
-<div class="col-12 widget-posts ui-tabs-external">
+<div class="col-12">
     {% include 'inadmin/partials/tab-sets/import_export.html.twig' %}
 
-<section class="paginated-list">
+<section class="ui-section">
 
 <form class="form nested-grid" method="post" action="{{ path('incc_tools_export') }}">
     <fieldset class="col-4">
@@ -105,6 +105,7 @@
 
         <div id="manual__table-container">
         </div>
+        <p>&nbsp;</p>
     </fieldset>
 
     <div class="fixed-bottom-bar">

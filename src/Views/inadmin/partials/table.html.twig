@@ -13,7 +13,7 @@
     {{ include('inadmin/partials/filters.html.twig', {
         'show_select_deselect': false,
     }) }}
-    <section class="paginated-list">
+    <section class="ui-section">
     {% if table_desc|default('') is not empty %}
     <p id="table-desc" class="visually-hidden">
         {{ table_desc }}

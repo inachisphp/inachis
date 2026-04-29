@@ -1,0 +1,53 @@
+{% if dashboard.recentDraft|default([]) is not empty  %}
+    {% set showResume = true %}
+    {% set item = dashboard.recentDraft|first %}
+{% else %}
+    {% set showResume = false %}
+{% endif %}
+
+<section class="widget widget-actions ui-section rounded">
+    <header class="widget__header">
+        <h3>Activity Hub</h3>
+    </header>
+    <div class="nested-grid">
+        {% if showResume %}
+        <div class="col-6 ui-section rounded">
+            <a href="/incc/{{ item.type }}/{{ (item.urls|first).link }}" class="button button--positive button--large">Resume writing</a>
+            <h4>{{ item.title }}{{ item.subtitle ? ' - ' ~ item.subtitle }}</h4>
+            <p class="date">
+                Last edited:
+                {% if dashboard.draftTimeAgo.days > 0 %}
+                    {{ dashboard.draftTimeAgo.days }} days ago
+                {% elseif dashboard.draftTimeAgo.h > 0 %}
+                    {{ dashboard.draftTimeAgo.h }} hours ago
+                {% else %}
+                    just now
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+        <div class="{% if showResume %}col-6{% else %}col-12{% endif %} ui-section rounded">
+            <h4>Quick Create</h4>
+            <div class="icon-grid">
+            <a href="/incc/page/new" class="icon-item">
+                <div class="icon-box green">
+                    <span class="material-icons">add_circle</span>
+                </div>
+                <span>New Post</span>
+            </a>
+            <a href="/incc/media/upload" class="icon-item">
+                <div class="icon-box blue">
+                    <span class="material-icons">cloud_upload</span>
+                </div>
+                <span>Upload Image</span>
+            </a>
+            <a href="/incc/series/new" class="icon-item">
+                <div class="icon-box purple">
+                    <span class="material-icons">chrome_reader_mode</span>
+                </div>
+                <span>New Series</span>
+            </a>
+        </div>
+        </div>
+    </div>
+</section>

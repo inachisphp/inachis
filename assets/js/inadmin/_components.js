@@ -37,7 +37,7 @@ window.Inachis.Components = {
 			});
 		});
 
-		tabs('.ui-tabbed');
+		tabs('.ui-tabs');
 		document.querySelectorAll('.error-select').forEach(el => {
 			el.style.display = 'none';
 		});

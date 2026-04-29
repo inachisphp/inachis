@@ -47,6 +47,7 @@ class ToolsIndexController extends AbstractInachisController
         $this->data['page']['title'] = 'Storage';
         $this->data['page']['tab'] = 'tools';
         $this->data['storage'] = [
+            'biggestImages' => $imageRepository->getAll(0, 10, [], [['q.filesize', 'DESC']]),
             'images' => $imageRepository->getDiskUsage(),
             'topPagesBySize' => $pageRepository->getTopPagesByImageSize(25),
         ];

@@ -11,7 +11,7 @@
 
 {% block content %}
 
-<div class="col-12 widget-data-list ui-tabs-external">
+<div class="col-12 widget-data-list">
     {% if user|default(null) %}
         {% include 'inadmin/partials/tab-sets/profile.html.twig' with { activeTab: 'login-activity' } %}
     {% else %}
@@ -42,7 +42,7 @@
 
 
 <form name="post" method="post" class="form form__post">
-<table class="table  table--striped">
+<table class="table table--striped">
     <thead>
         <tr>
             <th>Time</th>

@@ -26,6 +26,7 @@
 @use 'components/penzai';
 @use 'components/progressbar';
 @use 'components/readingProgress';
+@use 'components/section';
 @use 'components/switch';
 @use 'components/switchButton';
 @use 'components/tables';
@@ -40,10 +41,12 @@
 @use 'content-types/gallery';
 @use 'content-types/series';
 @use 'content-types/warnings';
+
 @use 'widgets/dashboard';
 @use 'widgets/widgets';
 @use 'widgets/alerts';
 @use 'widgets/stats';
+@use 'widgets/actions';
 
 @use 'forms';
 

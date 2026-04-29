@@ -2,46 +2,55 @@
 @use 'sass:color';
 
 section.widget {
-	h2 {
-		color: $text-muted;
-		font-size: 0.85em;
-		text-transform: uppercase;
-	}
-}
+	padding: 0;
 
-.widget-series {
-	h2 {
+	header.widget__header {
+		border-bottom: 1px solid $border-color;
+		overflow: hidden;
+	}
+
+	h2,
+	h3 {
 		color: $text-muted;
 		font-size: 0.85em;
+		margin: 0;
+		padding: 1rem 1rem 0 1rem;
 		text-transform: uppercase;
 	}
+
 	dl {
 		color: var(--color-diagnostic-muted);
 		list-style-type: none;
-		margin: 2rem 0 0 0;
+		margin: 1rem;
 		padding: 0;
 
 		dt {
-			font-size: 1em;
 			font-weight: bold;
-			margin: 0;
-			padding: 0;
 		}
 
 		dd {
 			margin: 0.5rem 0 1.5rem 0;
 		}
 
-		a, a:visited {
-      		color: $action-primary;
+		a,
+		a:visited {
+			color: $action-primary;
 			display: block;
 			text-decoration: none;
 		}
 	}
+
 	p.view-all {
-		a, a:visited {
+		padding: 1rem;
+
+		a,
+		a:visited {
 			color: $action-primary;
 			text-decoration: none;
 		}
+	}
+
+	.ui-tabs {
+		border: none;
 	}
 }

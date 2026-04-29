@@ -2,142 +2,91 @@
 @use 'sass:color';
 
 section.paginated-list {
-  background-color: $bg-surface;
-  border: 1px solid $border-color;
-  clear: left;
-  margin-bottom: 4em;
-  padding: 1em;
+	clear: left;
+	margin-bottom: 4em;
+	padding: 30px 20px 60px 20px;
 
-  &.rounded-top {
-    border-top-left-radius: $radius-standard;
-    border-top-right-radius: $radius-standard;
-  }
-}
+	article {
+		clear: left;
+		list-style-type: none;
+		padding: 15px 5px;
+		transition: background 0.15s ease;
 
-.ui-section {
-  clear: left;
+		@media (min-width: $breakpoint-medium) {
+			margin: 0.5em 0;
+			padding: 15px 5px;
+		}
 
-  div.ui-tabs-panel {
-    background-color: $bg-surface;
-    border: 1px solid $border-color;
-    padding: 30px 20px 60px 20px;
-  }
+		&:hover {
+			background-color: $color-neutral-100;
+		}
 
-  .post,
-  .page,
-  .series {
+		a,
+		a:visited {
+			color: $action-primary;
+			display: block;
+			padding: 0 0 0 25px;
+			text-decoration: none;
+		}
 
-    a,
-    a:visited {
-      padding: 0 0 0 25px;
-    }
-  }
+		h2 {
+			display: flex;
+			font-size: 1.2em;
+			font-weight: 600;
+			justify-content: space-between;
+			margin: 0;
+			padding: 0;
 
-  article {
-    transition: background 0.15s ease;
+			.badge {
+				margin: 0 0.25em 0 0;
+			}
+		}
 
-    &:hover {
-      background-color: $color-neutral-100;
-    }
-  }
+		input.checkbox {
+			float: left;
+			margin: 5px 0 0 0;
+		}
 
-  .zebra article:nth-of-type(2n) {
-    background-color: $bg-panel;
-  }
+		p {
+			color: $text-muted;
+			font-size: 0.85em;
+			line-height: 1.7em;
+			margin-left: 2em;
 
-  .zebra article:nth-of-type(odd).selected {
-    background-color: $table-selected !important;
-    outline: 2px solid $table-selected;
-  }
+			// form & {
+			// 	margin: 0 0 0 1.5em;
+			// }
 
-  .zebra article:nth-child(even).selected {
-    background-color: $table-selected-zebra !important;
-    outline: 2px solid $table-selected-zebra;
-  }
+			&.date {
+				font-size: 0.8em;
+			}
 
-  ol.ui-widget-content {
-    background-color: $bg-surface;
-    border: 1px solid $border-color;
-    margin: 0;
-  }
+			&.date span.material-icons:not(:first-of-type) {
+				margin-left: 0.75em;
+			}
+		}
 
-  ol.ui-widget-content,
-  .post,
-  .page,
-  .series {
-    clear: left;
-    list-style-type: none;
-    padding: 15px 5px;
+		span {
+			vertical-align: middle;
+		}
 
-    @media (min-width: $breakpoint-medium) {
-      padding: 15px 5px;
-    }
+		.badge {
+			font-size: 0.5em;
+			margin-left: 20px;
+		}
+	}
 
-    a,
-    a:visited {
-      color: $action-primary;
-      display: block;
-      text-decoration: none;
-    }
+	&.zebra article:nth-of-type(2n) {
+		background-color: $bg-panel;
+	}
 
-    li {
-      margin: 25px 10px 40px 0;
-    }
+	&.zebra article:nth-of-type(odd).selected {
+		background-color: $table-selected !important;
+		outline: 2px solid $table-selected;
+	}
 
-    h2 {
-      display: flex;
-      font-size: 1.2em;
-      font-weight: 600;
-      justify-content: space-between;
-      margin: 0;
-      padding: 0;
-
-      .badge {
-        margin: 0 0.25em 0 0;
-      }
-    }
-
-    input {
-      float: left;
-      margin: 5px 0 0 0;
-    }
-
-    p {
-      color: $text-muted;
-      font-size: 0.85em;
-      line-height: 1.7em;
-      margin-left: 2em;
-
-      form & {
-        margin: 0 0 0 1.5em;
-      }
-
-      &.date {
-        font-size: 0.8em;
-      }
-
-      &.date span.material-icons:not(:first-of-type) {
-        margin-left: 0.75em;
-      }
-    }
-
-    span {
-      vertical-align: middle;
-    }
-
-    .badge {
-      font-size: 0.5em;
-      margin-left: 20px;
-    }
-  }
-}
-
-@media (min-width: $breakpoint-medium) {
-
-  .content__list ol.ui-widget-content,
-  .content__list .post,
-  .content__list .page,
-  .content__list .series {
-    margin: 0.5em 0;
-  }
+	&.zebra article:nth-child(even).selected {
+		background-color: $table-selected-zebra !important;
+		outline: 2px solid $table-selected-zebra;
+	}
 }
