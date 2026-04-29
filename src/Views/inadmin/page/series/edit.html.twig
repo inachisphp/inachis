@@ -10,8 +10,8 @@
 {% block series_edit %}
 
 {{ form_start(form, {'attr': { 'class': 'col-12 form form__post form__series' }}) }}
-<div class="ui-tabbed content__edit">
-    <ul>
+<div class="content__edit">
+    <ul class="ui-tabs">
         <li>
             <a href="#series__overview">Overview</a>
         </li>
@@ -24,7 +24,7 @@
         {% endif %}
     </ul>
 
-    <fieldset id="series__overview">
+    <fieldset class="ui-section" id="series__overview">
         <legend>Overview</legend>
         {{
             include('inadmin/partials/image_preview.html.twig', {
@@ -68,7 +68,7 @@
         </p>
     </fieldset>
 
-    <fieldset id="series__contents" class="content__edit edit__list">
+    <fieldset id="series__contents" class="ui-section content__edit edit__list">
         {{  include('inadmin/partials/series_contents.html.twig') }}
     </fieldset>
 </div>

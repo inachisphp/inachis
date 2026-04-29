@@ -6,107 +6,101 @@
 
 {% block content %}
 
-    {% block series_list_pre %}{% endblock series_list_pre %}
+<div class="col-12">
+    {% include 'inadmin/partials/list.html.twig' with {
+        'className': 'form__series',
+        'type': 'series',
 
-    {% block series_list %}
-        <div class="col-12 ui-section ui-tabs-external">
-            {% include 'inadmin/partials/list.html.twig' with {
-                'className': 'form__series',
-                'type': 'series',
+        'offset': query.offset,
+        'limit': query.limit,
+        'total': dataset.count,
 
-                'offset': query.offset,
-                'limit': query.limit,
-                'total': dataset.count,
+        'snippet_description': 'description',
+        'slug_prefix': 'series/edit',
+        'slug': 'id',
 
-                'snippet_description': 'description',
-                'slug_prefix': 'series/edit',
-                'slug': 'id',
+        'add_button': {
+            'text': 'Create Series',
+            'url': path('incc_series_new'),
+        },
+        'url_result': path('incc_series_list'),
 
-                'add_button': {
-                    'text': 'Create Series',
-                    'url': path('incc_series_new'),
-                },
-                'url_result': path('incc_series_list'),
-
-                'filters': {
-                    'Visibility': {
-                        '': 'All',
-                        'private': 'Private',
-                        'public': 'Public',
-                    }
-                },
-                'filter_values': query.filters,
-                'show_select_deselect': true,
-                'show_search': true,
-                showSummary: true,
-                'zebra': true,
-
-                'actions': {
-                    'private': {
-                        'button_class': 'button--secondary button--privacy',
-                        'data': {
-                            'form-action': ''
-                        },
-                        'icon': 'visibility_off',
-                        'title': 'Make private',
-                    },
-                    'public': {
-                        'button_class': 'button--secondary button--privacy',
-                        'data': {
-                            'form-action': ''
-                        },
-                        'icon': 'visibility',
-                        'title': 'Make public',
-                    },
-                    'export': {
-                        'button_class': 'button--secondary button--export',
-                        'button_type': 'button',
-                        'data': {
-                            'content-type': 'series',
-                            'form-action': path('incc_tools_export'),
-                            'scope': 'manual',
-                        },
-                        'icon': 'cloud_download',
-                        'title': 'Export',
-                    },
-                    'delete': {
-                        'button_class': 'button--negative button--delete button--confirm',
-                        'data': {
-                            'confirm': 'delete',
-                            'confirm-text': 'Yes, delete',
-                            'entity': 'series',
-                            'form-action': '',
-                            'title': 'Delete selected series',
-                            'warning': 'All currently selected content will be deleted permanently. This action cannot be undone.',
-                        },
-                        'icon': 'delete_forever',
-                        'name': 'delete',
-                        'value': '1',
-                        'title': 'Delete',
-                    },
-                },
-
-                'sort_options': {
-                    'lastDate asc': 'Newest',
-                    'lastDate desc': 'Oldest',
-                    'modDate asc': 'Modfied: Newest',
-                    'modDate desc': 'Modfiied: Oldest',
-                    'title asc': 'Title: A-Z',
-                    'title desc': 'Title: Z-A',
-                },
-
-                'badges': {
-                    'private': {
-                        'field': 'visibility',
-                        'condition': false,
-                        'className': 'badge__private'
-                    },
-                }
+        'filters': {
+            'Visibility': {
+                '': 'All',
+                'private': 'Private',
+                'public': 'Public',
             }
-        %}
-        </div>
-    {% endblock series_list %}
+        },
+        'filter_values': query.filters,
+        'show_select_deselect': true,
+        'show_search': true,
+        showSummary: true,
+        'zebra': true,
 
+        'actions': {
+            'private': {
+                'button_class': 'button--secondary button--privacy',
+                'data': {
+                    'form-action': ''
+                },
+                'icon': 'visibility_off',
+                'title': 'Make private',
+            },
+            'public': {
+                'button_class': 'button--secondary button--privacy',
+                'data': {
+                    'form-action': ''
+                },
+                'icon': 'visibility',
+                'title': 'Make public',
+            },
+            'export': {
+                'button_class': 'button--secondary button--export',
+                'button_type': 'button',
+                'data': {
+                    'content-type': 'series',
+                    'form-action': path('incc_tools_export'),
+                    'scope': 'manual',
+                },
+                'icon': 'cloud_download',
+                'title': 'Export',
+            },
+            'delete': {
+                'button_class': 'button--negative button--delete button--confirm',
+                'data': {
+                    'confirm': 'delete',
+                    'confirm-text': 'Yes, delete',
+                    'entity': 'series',
+                    'form-action': '',
+                    'title': 'Delete selected series',
+                    'warning': 'All currently selected content will be deleted permanently. This action cannot be undone.',
+                },
+                'icon': 'delete_forever',
+                'name': 'delete',
+                'value': '1',
+                'title': 'Delete',
+            },
+        },
 
-    {% block series_list_post %}{% endblock series_list_post %}
+        'sort_options': {
+            'lastDate asc': 'Newest',
+            'lastDate desc': 'Oldest',
+            'modDate asc': 'Modfied: Newest',
+            'modDate desc': 'Modfiied: Oldest',
+            'title asc': 'Title: A-Z',
+            'title desc': 'Title: Z-A',
+        },
+
+        'badges': {
+            'private': {
+                'field': 'visibility',
+                'condition': false,
+                'className': 'badge__private'
+            },
+        }
+    }
+%}
+</div>
+
 {% endblock content %}

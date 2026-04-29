@@ -74,6 +74,17 @@ class DashboardController extends AbstractInachisController
                 ],
                 'q.postDate DESC, q.modDate'
             ),
+            'draftSeries' => $seriesRepository->getAll(
+                0,
+                5,
+                [
+                    'q.visibility = :visibility',
+                    [
+                        'visibility' => Series::PRIVATE,
+                    ],
+                ],
+                'q.firstDate DESC, q.lastDate'
+            ),
             'series' => $seriesRepository->getAll(
                 0,
                 5,

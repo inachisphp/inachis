@@ -8,8 +8,8 @@
 {% block content %}
 
     {{ form_start(form, {'attr': { 'class': 'col-12 form form__post' }}) }}
-    <div class="ui-tabbed content__edit">
-        <ul>
+    <div class="content__edit">
+        <ul class="ui-tabs">
             <li>
                 <a href="#post__edit">{% trans %}admin.posts.tabs.content{% endtrans %}</a>
             </li>
@@ -28,7 +28,7 @@
 
         {{- form_errors(form) -}}
 
-        <fieldset id="post__edit">
+        <fieldset class="ui-section" id="post__edit">
             <legend>{% trans %}admin.post.edit.fieldset{% endtrans %}</legend>
             <p>
                 <a class="material-icons ui-toggle" href="#" data-target=".post__link__edit" data-target-state="hidden">link</a>
@@ -64,7 +64,7 @@
             </p>
         </fieldset>
 
-        <fieldset id="post__properties">
+        <fieldset class="ui-section" i id="post__properties">
             <legend>{% trans %}admin.post.properties.fieldset{% endtrans %}</legend>
             <p>
                 {{ form_label(form.visibility) }}
@@ -128,7 +128,7 @@
             {% endif %}
         </fieldset>
 
-        <fieldset id="post__sharing">
+        <fieldset class="ui-section" i id="post__sharing">
             <div class="nested-grid">
                 <section class="col-6">
                     <p>
@@ -161,7 +161,7 @@
         </fieldset>
 
         {%  if revisions is defined and revisions is not empty %}
-        <fieldset id="post__history">
+        <fieldset class="ui-section" i id="post__history">
             <table class="table table-responsive table-striped table-borderless">
                 <caption>{% trans %}admin.post.revision.caption{% endtrans %}</caption>
                 <thead>

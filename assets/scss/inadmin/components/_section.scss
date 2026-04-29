@@ -1,0 +1,26 @@
+@use '../definitions' as *;
+
+.ui-section,
+form fieldset.ui-section {
+    background-color: $bg-surface;
+    border: 1px solid $border-color;
+    overflow: hidden;
+    margin-inline: 0;
+    padding: 1rem;
+
+    &.no-padding {
+        padding: 0;
+    }
+
+    &.rounded-top,
+    &.rounded {
+        border-top-left-radius: $radius-standard;
+        border-top-right-radius: $radius-standard;
+    }
+
+    &.rounded-bottom,
+    &.rounded {
+        border-bottom-left-radius: $radius-standard;
+        border-bottom-right-radius: $radius-standard;
+    }
+}
