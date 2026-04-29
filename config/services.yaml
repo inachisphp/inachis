@@ -26,6 +26,12 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    Inachis\Analytics\Provider\InternalAnalyticsProvider: ~
+
+    Inachis\Analytics\AnalyticsProviderInterface:
+        # @todo Google Analytics / Umami / Plausible providers can be swapped in here if desired
+        alias: Inachis\Analytics\Provider\InternalAnalyticsProvider
+
     Inachis\Diagnostics\Check\:
         resource: '../src/Diagnostics/Check/*/*'
         tags: ['app.diagnostic_check']
@@ -45,6 +51,9 @@ services:
     Inachis\EventListener\LoginFailureListener:
         tags:
             - { name: 'kernel.event_listener', event: Symfony\Component\Security\Http\Event\LoginFailureEvent }
+
+    Inachis\EventSubscriber\AnalyticsSubscriber:
+        tags: ['kernel.event_subscriber']
 
     Inachis\Service\Image\ImageLocaliser:
         arguments:

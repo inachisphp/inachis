@@ -10,6 +10,7 @@
 namespace Inachis\Controller\Page\Dashboard;
 
 use DateTimeImmutable;
+use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\{Page, Series};
 use Inachis\Repository\{PageRepository, SeriesRepository};
@@ -28,6 +29,7 @@ class DashboardController extends AbstractInachisController
     #[Route('/incc', name: "incc_dashboard", methods: [ 'GET' ])]
     public function default(
         Request $request,
+        AnalyticsProviderInterface $analytics,
         PageRepository $pageRepository,
         SeriesRepository $seriesRepository
     ): Response {
@@ -113,6 +115,37 @@ class DashboardController extends AbstractInachisController
                 ],
                 'q.firstDate DESC, q.lastDate'
             )
+        ];
+        $this->data['dashboard']['analytics'] = [
+            'topPages' => $analytics->getTopPages(5),
+            'viewsToday' => $analytics->getTotalViews(
+                new DateTimeImmutable(),
+                new DateTimeImmutable()
+            ),
+            'viewsYesterday' => $analytics->getTotalViews(
+                new DateTimeImmutable('-1 day'),
+                new DateTimeImmutable('-1 day')
+            ),
+            'viewsThisMonth' => $analytics->getTotalViews(
+                new DateTimeImmutable('first day of this month'),
+                new DateTimeImmutable()
+            ),
+            'viewsLastMonth' => $analytics->getTotalViews(
+                new DateTimeImmutable('first day of last month'),
+                new DateTimeImmutable('last day of last month')
+            ),
+            'uniqueVisitorsThisMonth' => $analytics->getMonthlyUniqueVisitors(
+                new DateTimeImmutable('first day of this month'),
+                new DateTimeImmutable()
+            ),
+            'uniqueVisitorsLastMonth' => $analytics->getMonthlyUniqueVisitors(
+                new DateTimeImmutable('first day of last month'),
+                new DateTimeImmutable('last day of last month')
+            ),
+            // 'pageViewsPerDay' => $analytics->getPageViewsPerDay(
+            //     new DateTimeImmutable('-7 days'),
+            //     new DateTimeImmutable()
+            // ),
         ];
         $this->data['dashboard']['stats']['recent'] = 0;
         $this->data['dashboard']['draftCount'] = $this->data['dashboard']['drafts']->count();

@@ -1,17 +1,177 @@
 @use 'sass:color';
 @use '../definitions' as *;
 
-section.widget-stats article {
-  background-color: $bg-surface;
-  border: 1px solid $border-color;
-  padding: 0.6em;
-  margin-bottom: 2em;
 
-  &.widget-stats__focus {
-    border-bottom: 3px solid orange;
+ul.widget-stats__list {
+    padding: 1rem;
+}
 
-    h2 {
-      margin: 0;
+.widget-stats {
+    padding: 1.5rem;
+    background-color: $bg-surface;
+    border: 1px solid $border-color;
+    border-radius: $radius-standard;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+    &__grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+
+        @media (min-width: $breakpoint-medium) {
+            grid-template-columns: repeat(3, 1fr);
+        }
     }
-  }
+
+    &__card {
+        display: flex;
+        align-items: center;
+        padding: 1.25rem;
+        background-color: $bg-panel;
+        border: 1px solid $border-color;
+        border-left: 4px solid transparent;
+        border-radius: $radius-standard;
+        flex-wrap: wrap;
+        transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            border-color: $border-color-dark;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        &--total {
+            border-left-color: $color-brand-500;
+
+            .widget-stats__icon {
+                background-color: $color-brand-050;
+                color: $color-brand-500;
+            }
+        }
+
+        &--today {
+            border-left-color: $success-color;
+
+            .widget-stats__icon {
+                background-color: var(--color-flash-success-bg);
+                color: $success-color;
+            }
+        }
+
+        &--unique {
+            border-left-color: $profile-purple;
+
+            .widget-stats__icon {
+                background-color: rgba(132, 9, 221, 0.1); // Profile purple with low opacity
+                color: $profile-purple;
+            }
+        }
+    }
+
+    &__icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        margin-right: 1rem;
+        background-color: $color-brand-050;
+        color: $color-brand-500;
+        border-radius: $radius-round;
+        font-size: 1.25rem;
+    }
+
+    &__content {
+        h2 {
+            margin: 0;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: $text-muted;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+    }
+
+    &__value {
+        margin: 0.25rem 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: $text-main;
+    }
+
+    &__trend {
+        margin: 0;
+        font-size: 0.75rem;
+        font-weight: 500;
+
+        &--up {
+            color: $success-color;
+        }
+
+        &--down {
+            color: $color-danger-500;
+        }
+
+        i {
+            margin-right: 0.25rem;
+        }
+    }
+
+    &__popular {
+        h2 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: $text-main;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid $border-color;
+        }
+    }
+
+    &__list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    &__item {
+        position: relative;
+        padding: 0.75rem 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid $border-color;
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    &__item-title {
+        font-weight: 500;
+        color: $text-main;
+        flex: 1;
+        margin-right: 1rem;
+        z-index: 1;
+    }
+
+    &__item-count {
+        font-size: 0.875rem;
+        color: $text-muted;
+        white-space: nowrap;
+        z-index: 1;
+    }
+
+    &__item-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 4px;
+        background-color: $color-brand-100;
+        opacity: 0.3;
+        border-radius: 2px;
+        transition: width 0.6s ease-out;
+    }
 }

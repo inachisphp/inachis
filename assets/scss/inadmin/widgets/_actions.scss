@@ -76,16 +76,22 @@ section.widget.widget-actions {
 
     .icon-box.green {
         background-color: #dcfce7;
-        color: #166534;
+        span {
+            color: #166534;
+        }
     }
 
     .icon-box.blue {
         background-color: #dbeafe;
-        color: #1e40af;
+        span {
+            color: #1e40af;
+        }
     }
 
     .icon-box.purple {
         background-color: #f3e8ff;
-        color: #6b21a8;
+        span {
+            color: #6b21a8;
+        }
     }
 }
