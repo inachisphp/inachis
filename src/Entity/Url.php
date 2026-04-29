@@ -19,7 +19,7 @@ use Ramsey\Uuid\UuidInterface;
  * Object for handling custom URLs that are mapped to content.
  */
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\UrlRepository', readOnly: false)]
-#[ORM\Index(columns: [ 'linkCanonical' ], name: 'search_idx')]
+#[ORM\Index(columns: ['linkCanonical'], name: 'search_idx')]
 class Url
 {
     /**
@@ -28,13 +28,13 @@ class Url
     public const DEFAULT_URL_SIZE_LIMIT = 255;
 
     /**
-     * @var UuidInterface|null The unique identifier for the Url
+     * @var UuidInterface The unique identifier for the Url
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected ?UuidInterface $id = null;
+    protected UuidInterface $id;
 
     /**
      * @var Page The UUID of the content of the type specified by @see
@@ -78,16 +78,16 @@ class Url
      * URL will be specified as canonical. This can be overridden using
      * {@link Url::setDefault}.
      *
-     * @param Page   $content The {@link Page} object the link is for
-     * @param string|null $link The short link for the content
+     * @param Page $content The {@link Page} object the link is for
+     * @param string $link The short link for the content
      * @param bool $default
      * @throws Exception
      */
-    public function __construct(Page $content, ?string $link = '', ?bool $default = true)
+    public function __construct(Page $content, string $link = '', bool $default = true)
     {
         $this->setContent($content);
         $this->setLink($link);
-        $this->setDefault((bool) $default);
+        $this->setDefault($default);
         $this->setCreateDate(new DateTimeImmutable());
         $this->setModDate(new DateTimeImmutable());
         $this->associateContent();
@@ -96,15 +96,17 @@ class Url
     /**
      * Returns the UUID of the Url.
      *
-     * @return string The UUID of the URL
+     * @return UuidInterface The UUID of the URL
      */
-    public function getId(): string
+    public function getId(): UuidInterface
     {
         return $this->id;
     }
 
     /**
-     * @return string
+     * Returns the value of {@link link}.
+     *
+     * @return string The value of {@link link}
      */
     public function getLink(): string
     {
@@ -112,7 +114,9 @@ class Url
     }
 
     /**
-     * @return string
+     * Returns the value of {@link linkCanonical}.
+     *
+     * @return string The value of {@link linkCanonical}
      */
     public function getLinkCanonical(): string
     {
@@ -120,7 +124,9 @@ class Url
     }
 
     /**
-     * @return Page
+     * Returns the value of {@link content}.
+     *
+     * @return Page The value of {@link content}
      */
     public function getContent(): Page
     {
@@ -128,7 +134,9 @@ class Url
     }
 
     /**
-     * @return bool
+     * Returns the value of {@link default}.
+     *
+     * @return bool The value of {@link default}
      */
     public function isDefault(): bool
     {
@@ -136,7 +144,9 @@ class Url
     }
 
     /**
-     * @return DateTimeImmutable
+     * Returns the value of {@link createDate}.
+     *
+     * @return DateTimeImmutable The value of {@link createDate}
      */
     public function getCreateDate(): DateTimeImmutable
     {
@@ -144,7 +154,9 @@ class Url
     }
 
     /**
-     * @return DateTimeImmutable
+     * Returns the value of {@link modDate}.
+     *
+     * @return DateTimeImmutable The value of {@link modDate}
      */
     public function getModDate(): DateTimeImmutable
     {
@@ -152,7 +164,9 @@ class Url
     }
 
     /**
-     * @param UuidInterface $value
+     * Sets the value of {@link id}.
+     *
+     * @param UuidInterface $value The value to set
      * @return $this
      */
     public function setId(UuidInterface $value): self
@@ -162,7 +176,9 @@ class Url
     }
 
     /**
-     * @param string $value
+     * Sets the value of {@link link}.
+     *
+     * @param string $value The value to set
      * @return $this
      */
     public function setLink(string $value): self
@@ -173,7 +189,9 @@ class Url
     }
 
     /**
-     * @param Page $value
+     * Sets the value of {@link content}.
+     *
+     * @param Page $value The value to set
      * @return $this
      */
     public function setContent(Page $value): self
@@ -183,17 +201,21 @@ class Url
     }
 
     /**
-     * @param $value
+     * Sets the value of {@link default}.
+     *
+     * @param bool $value The value to set
      * @return $this
      */
-    public function setDefault($value): self
+    public function setDefault(bool $value): self
     {
-        $this->default = (bool) $value;
+        $this->default = $value;
         return $this;
     }
 
     /**
-     * @param DateTimeImmutable $value
+     * Sets the value of {@link createDate}.
+     *
+     * @param DateTimeImmutable $value The value to set
      * @return $this
      */
     public function setCreateDate(DateTimeImmutable $value): self
@@ -203,7 +225,9 @@ class Url
     }
 
     /**
-     * @param DateTimeImmutable $value
+     * Sets the value of {@link modDate}.
+     *
+     * @param DateTimeImmutable $value The value to set
      * @return $this
      */
     public function setModDate(DateTimeImmutable $value): self
@@ -235,6 +259,8 @@ class Url
     }
 
     /**
+     * Associates the {@link Url} with the {@link Page}.
+     *
      * @return void
      */
     public function associateContent(): void

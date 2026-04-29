@@ -10,20 +10,29 @@
 namespace Inachis\Repository;
 
 use Inachis\Entity\User;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
-class UserRepository extends AbstractRepository //ServiceEntityRepository
+/**
+ * Repository for {@link User} entities
+ */
+class UserRepository extends AbstractRepository
 {
+    /**
+     * Creates a new instance of the UserRepository
+     * 
+     * @param ManagerRegistry $registry The registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
     }
 
     /**
-     * @param string $username
-     * @return User|null
+     * Finds a user by username
+     * 
+     * @param string $username The username to search for
+     * @return User|null The user if found
      */
     public function findByUsername(string $username): ?User
     {
@@ -31,12 +40,14 @@ class UserRepository extends AbstractRepository //ServiceEntityRepository
     }
 
     /**
-     * @param $filters
-     * @param $offset
-     * @param $limit
-     * @return Paginator
+     * Gets filtered users
+     * 
+     * @param array $filters The filters
+     * @param int $offset The offset
+     * @param int $limit The limit
+     * @return Paginator<User> The paginator
      */
-    public function getFiltered($filters, $offset, $limit): Paginator
+    public function getFiltered(array $filters, int $offset, int $limit): Paginator
     {
         $where = [
             'q.isRemoved = \'0\'',
