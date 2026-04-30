@@ -1,89 +1,107 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 
+{% block pagetitle %}
+    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <span>Analytics</span>
+{% endblock pagetitle %}
+
+
 {% block content %}
-<h1>Analytics</h1>
+<section class="col-12 admonition admonition__info">
+	<p><strong>Data range:</strong> {{ analytics.from|date('jS F Y') }} &mdash; {{ analytics.to|date('jS F Y') }}</p>
+</section>
 
-<p>
-    {{ from|date('Y-m-d') }} → {{ to|date('Y-m-d') }}
-</p>
+<div class="col-6">
+    <section class="widget ui-section rounded">
+        <header class="widget__header">
+            <h2>Overview</h2>
+        </header>
+        <ul>
+            <li><strong>Total Views (30 days):</strong> {{ analytics.totalViews|number_format }}</li>
+            <li><strong>Unique Visitors:</strong> {{ analytics.uniqueVisitors|number_format }}</li>
+            {% if analytics.change is not null %}
+                <li>
+                    <strong>Change:</strong>
+                    {{ analytics.change > 0 ? '+' : '' }}{{ analytics.change|number_format }}%
+                </li>
+            {% endif %}
+        </ul>
+    </section>
 
-<hr>
+    <!-- section class="widget ui-section">
+        <header class="widget__header">
+            <h2>Top Referrers</h2>
+        </header>
+        <p>Not implemented yet.</p>
+    </section -->
+</div>
 
-<h2>Overview</h2>
-<ul>
-    <li><strong>Total Views (30d):</strong> {{ totalViews|number_format(1) }}</li>
-	<li><strong>Unique Visitors:</strong> {{ uniqueVisitors|number_format(1) }}</li>
-	{% if change is not null %}
-		<li>
-			<strong>Change:</strong>
-			{{ change > 0 ? '+' : '' }}{{ change|number_format(1) }}%
-		</li>
-	{% endif %}
-</ul>
+<section class="col-6 widget">
+    <header class="widget__header">
+	    <h2>Traffic (last 30 days)</h2>
+	</header>
+    <canvas id="trafficChart"></canvas>
+</section>
 
-<hr>
-
-<h2>Traffic (last 30 days)</h2>
-
-<canvas id="trafficChart" height="100"></canvas>
-
-<hr>
-
-<h2>Top Pages</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Page</th>
-            <th>Views</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for page in topPages %}
+<section class="col-6 widget">
+    <header class="widget__header">
+        <h2>Top Pages</h2>
+    </header>
+    <table>
+        <thead>
             <tr>
-                <td>{{ page.title ?? page.path }}</td>
-                <td>{{ page.total }}</td>
+                <th>Page</th>
+                <th>Views</th>
             </tr>
-        {% else %}
-            <tr><td colspan="2">No data</td></tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            {% for page in analytics.topPages %}
+                <tr>
+                    <td>{{ page.title }}</td>
+                    <td>{{ page.total }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="2">No data</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
 
-<hr>
-
-<h2>Top 404s</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Path</th>
-            <th>Hits</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for page in top404s %}
+<section class="col-6 widget">
+    <header class="widget__header">
+        <h2>Top 404s</h2>
+    </header>
+    <table>
+        <thead>
             <tr>
-                <td>{{ page.path }}</td>
-                <td>{{ page.total }}</td>
+                <th>Path</th>
+                <th>Hits</th>
             </tr>
-        {% else %}
-            <tr><td colspan="2">No data</td></tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            {% for page in analytics.top404s %}
+                <tr>
+                    <td>{{ page.path }}</td>
+                    <td>{{ page.total }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="2">No data</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
 
-<!-- script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const data = {
-        labels: {{ viewsPerDay|map(v => v.date)|json_encode|raw }},
+        labels: {{ analytics.viewsPerDay|map(v => v.date)|json_encode|raw }},
         datasets: [{
             label: 'Views',
-            data: {{ viewsPerDay|map(v => v.total)|json_encode|raw }},
+            data: {{ analytics.viewsPerDay|map(v => v.total)|json_encode|raw }},
             fill: false,
             tension: 0.2
         }]
     };
-
     new Chart(
         document.getElementById('trafficChart'),
         {
@@ -91,6 +109,6 @@
             data: data,
         }
     );
-</script -->
+</script>
 
 {% endblock content %}

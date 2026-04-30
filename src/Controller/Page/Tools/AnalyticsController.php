@@ -18,6 +18,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class AnalyticsController extends AbstractInachisController
 {
+    /**
+     * Analytics dashboard for showing general site traffic, popular pages, and 404 errors
+     *
+     * @param AnalyticsProviderInterface $analytics
+     * @return Response
+     */
     #[Route('/incc/tools/analytics', name: 'incc_tools_analytics')]
     public function index(AnalyticsProviderInterface $analytics): Response
     {
@@ -42,7 +48,7 @@ class AnalyticsController extends AbstractInachisController
 
 		$this->data['page']['title'] = 'Analytics';
         $this->data['page']['tab'] = 'tools';
-		$this->data = array_merge($this->data, [
+		$this->data['analytics'] = [
             'viewsPerDay' => $viewsPerDay,
             'topPages' => $topPages,
             'top404s' => $top404s,
@@ -51,7 +57,7 @@ class AnalyticsController extends AbstractInachisController
             'from' => $from,
             'to' => $to,
 			'change' => $change,
-		]);
+		];
         return $this->render('inadmin/page/tools/analytics.html.twig', $this->data);
     }
 }
