@@ -7,6 +7,15 @@ section.widget {
 	header.widget__header {
 		border-bottom: 1px solid $border-color;
 		overflow: hidden;
+		
+		h2 {
+			display: flex;
+			justify-content: space-between;
+		}
+	}
+
+	.widget__content {
+		padding: 1rem;
 	}
 
 	h2,
