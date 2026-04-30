@@ -1,0 +1,96 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block content %}
+<h1>Analytics</h1>
+
+<p>
+    {{ from|date('Y-m-d') }} → {{ to|date('Y-m-d') }}
+</p>
+
+<hr>
+
+<h2>Overview</h2>
+<ul>
+    <li><strong>Total Views (30d):</strong> {{ totalViews|number_format(1) }}</li>
+	<li><strong>Unique Visitors:</strong> {{ uniqueVisitors|number_format(1) }}</li>
+	{% if change is not null %}
+		<li>
+			<strong>Change:</strong>
+			{{ change > 0 ? '+' : '' }}{{ change|number_format(1) }}%
+		</li>
+	{% endif %}
+</ul>
+
+<hr>
+
+<h2>Traffic (last 30 days)</h2>
+
+<canvas id="trafficChart" height="100"></canvas>
+
+<hr>
+
+<h2>Top Pages</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Page</th>
+            <th>Views</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for page in topPages %}
+            <tr>
+                <td>{{ page.title ?? page.path }}</td>
+                <td>{{ page.total }}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="2">No data</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<hr>
+
+<h2>Top 404s</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Path</th>
+            <th>Hits</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for page in top404s %}
+            <tr>
+                <td>{{ page.path }}</td>
+                <td>{{ page.total }}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="2">No data</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const data = {
+        labels: {{ viewsPerDay|map(v => v.date)|json_encode|raw }},
+        datasets: [{
+            label: 'Views',
+            data: {{ viewsPerDay|map(v => v.total)|json_encode|raw }},
+            fill: false,
+            tension: 0.2
+        }]
+    };
+
+    new Chart(
+        document.getElementById('trafficChart'),
+        {
+            type: 'line',
+            data: data,
+        }
+    );
+</script -->
+
+{% endblock content %}
