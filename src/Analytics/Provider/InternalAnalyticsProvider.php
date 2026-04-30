@@ -135,6 +135,21 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
                 : $path;
         }
 
+        if (preg_match('#^/tag/(.+)$#', $path, $matches)) {
+            $tag = $matches[1];
+            return 'Tag: ' . $tag;
+        }
+
+        if (preg_match('#^/category/(.+)$#', $path, $matches)) {
+            $category = $matches[1];
+            return 'Category: ' . $category;
+        }
+
+        if (preg_match('#^/author/(.+)$#', $path, $matches)) {
+            $author = $matches[1];
+            return 'Author: ' . $author;
+        }
+
         return $path;
     }
 }
