@@ -45,6 +45,11 @@ class AnalyticsSubscriber implements EventSubscriberInterface
 		}
 
         $request = $event->getRequest();
+		$response = $event->getResponse();
+
+		if ($response->getStatusCode() !== 200) {
+			return;
+		}
 
         if ($request->getMethod() !== 'GET') return;
 
@@ -60,10 +65,9 @@ class AnalyticsSubscriber implements EventSubscriberInterface
 		$ip = $request->getClientIp();
 		$visitorId = hash('sha256', $ip . '|' . $userAgent);
 
-		// @todo decide if bots should be tracked or blocked
-		// if (preg_match('/bot|crawl|spider/i', $userAgent)) {
-		// 	return;
-		// }
+		if (preg_match('/bot|crawl|spider|slurp|wget|curl/i', $userAgent)) {
+			return;
+		}
 
         $date = date('Y-m-d');
 

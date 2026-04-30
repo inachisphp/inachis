@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Add this to cron such as * * * * * php /path/to/bin/console app:analytics:aggregate
+ * Add this to cron such as *\/5 * * * * php /path/to/bin/console inachis:analytics:aggregate
  */
 #[AsCommand(
     name: 'inachis:analytics:aggregate',
@@ -51,11 +51,7 @@ class AggregateAnalyticsCommand extends Command
             $this->processFile($file);
             $output->writeln(sprintf('Processed %s', basename($file)));
 
-            // delete after processing
-            // unlink($file);
 			rename($file, $file . '.processed');
-
-			// find var/analytics -name "*.processed" -mtime +7 -delete
         }
 
         return Command::SUCCESS;

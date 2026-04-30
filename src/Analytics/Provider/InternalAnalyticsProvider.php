@@ -12,6 +12,8 @@ namespace Inachis\Analytics\Provider;
 use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Repository\AnalyticsRepository;
 use Inachis\Repository\PageRepository;
+use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\UrlRepository;
 
 /**
  * Internal analytics provider
@@ -23,6 +25,8 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
     public function __construct(
         private AnalyticsRepository $analyticsRepository,
         private PageRepository $pageRepository,
+        private SeriesRepository $seriesRepository,
+        private UrlRepository $urlRepository,
     ) {}
 
     /**
@@ -84,10 +88,26 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      */
     private function resolveTitle(string $path): string
     {
-        if (preg_match('#^/post/(.+)$#', $path, $matches)) {
-            $slug = $matches[1];
-            $page = $this->pageRepository->findOneByLink($slug);
-            return $page?->getTitle() ?? $path;
+        if (preg_match('#^/[\d]{4}/[/\d]{2}/[/\d]{2}/(.+)$#', $path, $matches)) {
+            $slug = ltrim($matches[0], '/');
+            $url = $this->urlRepository->findOneBy([
+                'link' => $slug
+            ]);
+            $content = $url?->getContent();
+            return $content
+                ? $content->getTitle() . ($content->getSubTitle() ? ' - ' . $content->getSubTitle() : '')
+                : $path;
+        }
+        if (preg_match('#/([\d]{4})\-(.+)$#', $path, $matches)) {
+            $year = $matches[1];
+            $title = $matches[2];
+            $series = $this->seriesRepository->getPublicSeriesByYearAndUrl(
+                $year,
+                $title
+            );
+            return $series
+                ? $series->getTitle() . ($series->getSubTitle() ? ' - ' . $series->getSubTitle() : '')
+                : $path;
         }
 
         return $path;

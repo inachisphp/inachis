@@ -1,4 +1,4 @@
-{% if dashboard.publishCount > 0 %}
+{% if dashboard.analytics.viewsThisMonth > 0 or dashboard.analytics.viewsLastMonth > 0 %}
     <div class="widget-stats__grid">
         <article class="widget-stats__card widget-stats__card--total" aria-labelledby="stats-total-visits">
             <div class="widget-stats__icon" aria-hidden="true">
@@ -59,7 +59,7 @@
         <ul class="widget-stats__list" aria-labelledby="stats-popular-posts">
         {% for post in dashboard.analytics.topPages %}
             <li class="widget-stats__item">
-                <span class="widget-stats__item-title">{{ post.path }}</span>
+                <span class="widget-stats__item-title">{{ post.title }}</span>
                 <span class="widget-stats__item-count">{{ post.total }} views</span>
                 <div class="widget-stats__item-progress" style="width: {{ post.total }}%" aria-hidden="true"></div>
             </li>
@@ -67,7 +67,7 @@
         </ul>
     </section>
 {% else %}
-<section class="widget disabled">
-    <p>Statistics will appear here when you have published posts.</p>
+<section class="admonition admonition__info" role="note" aria-labelledby="stats-no-data">
+    <p id="stats-no-data">Statistics will appear here when you have published posts that have had visitors.</p>
 </section>
 {% endif %}
