@@ -5,7 +5,7 @@
                 <span class="material-icons">visibility</span>
             </div>
             <div class="widget-stats__content">
-                <h2 id="stats-total-visits">Total Visits</h2>
+                <h2 id="stats-total-visits">Total Views</h2>
                 <p class="widget-stats__value">{{ dashboard.analytics.viewsThisMonth }}</p>
                 {% if dashboard.analytics.viewsLastMonth > 0 %}
                     {% set trend = dashboard.analytics.viewsThisMonth / dashboard.analytics.viewsLastMonth * 100|round(2) > 1 ? 'up' : 'down' %}
@@ -22,7 +22,7 @@
                 <span class="material-icons">event_available</span>
             </div>
             <div class="widget-stats__content">
-                <h2 id="stats-visits-today">Visits Today</h2>
+                <h2 id="stats-visits-today">Views Today</h2>
                 <p class="widget-stats__value">{{ dashboard.analytics.viewsToday }}</p>
                 {% if dashboard.analytics.viewsYesterday > 0 %}
                     {% set trend = dashboard.analytics.viewsToday / dashboard.analytics.viewsYesterday * 100|round(2) > 1 ? 'up' : 'down' %}
@@ -39,7 +39,7 @@
                 <span class="material-icons">group</span>
             </div>
             <div class="widget-stats__content">
-                <h2 id="stats-unique-visitors">Unique Visitors</h2>
+                <h2 id="stats-unique-visitors">Visitors</h2>
                 <p class="widget-stats__value">{{ dashboard.analytics.uniqueVisitorsThisMonth }}</p>
                 {% if dashboard.analytics.uniqueVisitorsLastMonth > 0 %}
                     {% set trend = dashboard.analytics.uniqueVisitorsThisMonth / dashboard.analytics.uniqueVisitorsLastMonth * 100|round(2) > 1 ? 'up' : 'down' %}
@@ -56,7 +56,10 @@
         <header class="widget__header">
             <h2>
                 <span>Popular Posts</span>
-                <a href="{{ path('incc_tools_analytics') }}" class="widget__header__link">View All</a>
+                <a href="{{ path('incc_tools_analytics') }}"
+                   class="widget__header__link"
+                   title="View analytics for all posts"
+                >View All</a>
             </h2>
         </header>
         <ul class="widget-stats__list" aria-labelledby="stats-popular-posts">

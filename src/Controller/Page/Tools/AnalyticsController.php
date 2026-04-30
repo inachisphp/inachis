@@ -44,7 +44,7 @@ class AnalyticsController extends AbstractInachisController
 			? (($totalViews - $prevViews) / $prevViews) * 100
 			: null;
 		$trending = $analytics->getTrendingPages(10);
-
+        $topReferrers = $analytics->getTopReferrers(10);
 
 		$this->data['page']['title'] = 'Analytics';
         $this->data['page']['tab'] = 'tools';
@@ -57,6 +57,7 @@ class AnalyticsController extends AbstractInachisController
             'to' => $to,
 			'change' => $change,
 			'trending' => $trending,
+            'topReferrers' => $topReferrers,
 		];
         return $this->render('inadmin/page/tools/analytics.html.twig', $this->data);
     }

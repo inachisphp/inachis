@@ -68,4 +68,26 @@ interface AnalyticsProviderInterface
      * @return array
      */
     public function getTrendingPages(int $limit = 10): array;
+
+    /**
+     * Get the most common referring domains.
+     *
+     * Expected format:
+     * [
+     *   ['domain' => 'example.com', 'hits' => 42],
+     *   ...
+     * ]
+     */
+    public function getTopReferrers(int $limit = 10): array;
+
+    /**
+     * Get the most common referring domains for a specific page.
+     *
+     * Expected format:
+     * [
+     *   ['domain' => 'example.com', 'hits' => 42],
+     *   ...
+     * ]
+     */
+    public function getTopReferrersForPage(string $path, int $limit = 10): array;
 }

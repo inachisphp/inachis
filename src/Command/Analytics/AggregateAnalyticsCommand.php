@@ -71,6 +71,7 @@ class AggregateAnalyticsCommand extends Command
 
         $pageViews = [];
         $uniqueVisitors = [];
+		$referrers = [];
 
         while (($line = fgets($handle)) !== false) {
             $data = json_decode($line, true);
@@ -85,10 +86,15 @@ class AggregateAnalyticsCommand extends Command
 
             $key = $path . '|' . $date;
             $pageViews[$key] = ($pageViews[$key] ?? 0) + 1;
-
 			if ($visitor) {
                 $uniqueVisitors[$date][$visitor] = true;
             }
+
+			$ref = $data['ref'] ?? null;
+			if ($ref) {
+				$key = $ref . '|' . $path . '|' . $date;
+				$referrers[$key] = ($referrers[$key] ?? 0) + 1;
+			}
         }
 
         fclose($handle);
@@ -124,6 +130,24 @@ class AggregateAnalyticsCommand extends Command
                 );
             }
         }
+
+		foreach ($referrers as $key => $hits) {
+			[$domain, $path, $date] = explode('|', $key);
+
+			$this->db->executeStatement(
+				'
+				INSERT INTO analytics_referrer (domain, path, date, hits)
+				VALUES (:domain, :path, :date, :hits)
+				ON DUPLICATE KEY UPDATE hits = hits + :hits
+				',
+				[
+					'domain' => $domain,
+					'path' => $path,
+					'date' => $date,
+					'hits' => $hits,
+				]
+			);
+		}
     }
 
 	/**
