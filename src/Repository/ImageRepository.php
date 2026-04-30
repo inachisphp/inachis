@@ -28,4 +28,44 @@ class ImageRepository extends AbstractRepository implements ResourceRepositoryIn
     {
         parent::__construct($registry, Image::class);
     }
+
+    /**
+     * Get all images that do not have alt text
+     *
+     * @param int $limit
+     * @param int $offset
+     * @return array<Image>
+     */
+    public function getImagesWithoutAltText(int $limit = 0, int $offset = 0): array
+    {
+        $qb = $this->createQueryBuilder('i');
+        $qb = $qb
+            ->select('i')
+            ->where('i.alt IS NULL OR i.alt = :emptyString')
+            ->setParameter('emptyString', '');
+        if ($limit > 0) {
+            $qb->setMaxResults($limit);
+        }
+        if ($offset > 0) {
+            $qb->setFirstResult($offset);
+        }
+        /** @var array<Image> */
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Get the number of images that do not have alt text
+     *
+     * @return int
+     */
+    public function getImagesWithoutAltTextCount(): int
+    {
+        $qb = $this->createQueryBuilder('i');
+        $qb = $qb
+            ->select('COUNT(i)')
+            ->where('i.altText IS NULL OR i.altText = :emptyString')
+            ->setParameter('emptyString', '');
+        /** @var int */
+        return $qb->getQuery()->getSingleScalarResult();
+    }
 }

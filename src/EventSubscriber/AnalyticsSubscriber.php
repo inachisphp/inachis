@@ -61,7 +61,6 @@ class AnalyticsSubscriber implements EventSubscriberInterface
                 'path' => $path,
                 'date' => $date,
                 'code' => $status,
-                // 'ref' => $request->headers->get('referer') ?? '',
                 'ts'   => time(),
             ], JSON_UNESCAPED_SLASHES);
 
@@ -100,7 +99,8 @@ class AnalyticsSubscriber implements EventSubscriberInterface
         if ($refDomain && str_contains($refDomain, $request->getHost())) {
             $refDomain = null;
         }
-        
+        $refDomain = $refDomain ?? 'Direct';
+
         $file = sprintf('%s/analytics-%s.log', $dir, $date);
         $line = json_encode([
             'path' => $path,
