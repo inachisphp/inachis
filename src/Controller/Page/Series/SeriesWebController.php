@@ -22,7 +22,7 @@ class SeriesWebController extends AbstractInachisController
      * @param string $title
      * @return Response
      */
-    #[Route("/{year}-{title}", name: "web_series_view", methods: [ "GET" ])]
+    #[Route("/{year}-{title}", name: "web_series_view", methods: [ "GET" ], requirements: ["year" => "\d{4}"])]
     public function view(
         SeriesRepository $seriesRepository,
         int $year,
