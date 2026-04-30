@@ -146,4 +146,75 @@ class AnalyticsRepository
             LIMIT ' . (int) $limit
         );
     }
+
+    /**
+     * Get trending pages
+     *
+     * @param int $limit
+     * @return array
+     */
+    public function getTrendingPages(int $limit = 10): array
+    {
+        $now = new \DateTimeImmutable();
+
+        $thisWeekStart = $now->modify('monday this week')->format('Y-m-d');
+        $lastWeekStart = $now->modify('monday last week')->format('Y-m-d');
+        $lastWeekEnd   = $now->modify('sunday last week')->format('Y-m-d');
+
+        // Fetch this week
+        $current = $this->db->fetchAllAssociative(
+            '
+            SELECT path, SUM(views) AS total
+            FROM analytics_page_view
+            WHERE date >= :start
+            GROUP BY path
+            ',
+            ['start' => $thisWeekStart]
+        );
+
+        // Fetch last week
+        $previous = $this->db->fetchAllAssociative(
+            '
+            SELECT path, SUM(views) AS total
+            FROM analytics_page_view
+            WHERE date BETWEEN :start AND :end
+            GROUP BY path
+            ',
+            [
+                'start' => $lastWeekStart,
+                'end'   => $lastWeekEnd,
+            ]
+        );
+
+        // Index previous
+        $prevMap = [];
+        foreach ($previous as $row) {
+            $prevMap[$row['path']] = (int) $row['total'];
+        }
+
+        // Build result
+        $results = [];
+
+        foreach ($current as $row) {
+            $path = $row['path'];
+            $currentViews = (int) $row['total'];
+            $prevViews = $prevMap[$path] ?? 0;
+
+            $change = $prevViews > 0
+                ? (($currentViews - $prevViews) / $prevViews) * 100
+                : null;
+
+            $results[] = [
+                'path' => $path,
+                'current' => $currentViews,
+                'previous' => $prevViews,
+                'change' => $change,
+            ];
+        }
+
+        // Sort by current views
+        usort($results, fn ($a, $b) => $b['current'] <=> $a['current']);
+
+        return array_slice($results, 0, $limit);
+    }
 }
