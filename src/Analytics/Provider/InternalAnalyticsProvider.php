@@ -113,6 +113,9 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      */
     private function resolveTitle(string $path): string
     {
+        if ($path === '/' || empty($path)) {
+            return 'Home';
+        }
         if (preg_match('#^/[\d]{4}/[/\d]{2}/[/\d]{2}/(.+)$#', $path, $matches)) {
             $slug = ltrim($matches[0], '/');
             $url = $this->urlRepository->findOneBy([
