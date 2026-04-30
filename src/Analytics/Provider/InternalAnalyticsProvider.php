@@ -92,6 +92,20 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
     }
 
     /**
+     * Get trending pages
+     *
+     * @param int $limit
+     * @return array
+     */
+    public function getTrendingPages(int $limit = 10): array
+    {
+        return array_map(function ($row) {
+            $row['title'] = $this->resolveTitle($row['path']);
+            return $row;
+        }, $this->analyticsRepository->getTrendingPages($limit));
+    }
+
+    /**
      * Resolve title
      *
      * @param string $path

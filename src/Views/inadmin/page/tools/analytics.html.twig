@@ -45,6 +45,42 @@
 
 <section class="col-6 widget">
     <header class="widget__header">
+        <h2>Trending (This Week)</h2>
+    </header>
+    <table>
+        <thead>
+            <tr>
+                <th>Page</th>
+                <th>Views</th>
+                <th>Change</th>
+            </tr>
+        </thead>
+        <tbody>
+			{% for page in analytics.trending %}
+				<tr>
+					<td>{{ page.title ?? page.path }}</td>
+					<td>{{ page.current }}</td>
+					<td>
+						{% if page.change is null %}
+							NEW
+						{% elseif page.change > 0 %}
+							▲ +{{ page.change|number_format(1) }}%
+						{% elseif page.change < 0 %}
+							▼ {{ page.change|number_format(1) }}%
+						{% else %}
+							—
+						{% endif %}
+					</td>
+				</tr>
+			{% else %}
+				<tr><td colspan="3">No data</td></tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</section>
+
+<section class="col-6 widget">
+    <header class="widget__header">
         <h2>Top Pages</h2>
     </header>
     <table>

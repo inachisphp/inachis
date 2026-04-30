@@ -44,6 +44,7 @@ class AnalyticsController extends AbstractInachisController
 		$change = $prevViews > 0
 			? (($totalViews - $prevViews) / $prevViews) * 100
 			: null;
+		$trending = $analytics->getTrendingPages(10);
 
 
 		$this->data['page']['title'] = 'Analytics';
@@ -57,6 +58,7 @@ class AnalyticsController extends AbstractInachisController
             'from' => $from,
             'to' => $to,
 			'change' => $change,
+			'trending' => $trending,
 		];
         return $this->render('inadmin/page/tools/analytics.html.twig', $this->data);
     }

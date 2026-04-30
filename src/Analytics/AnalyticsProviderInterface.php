@@ -60,4 +60,12 @@ interface AnalyticsProviderInterface
      * ]
      */
     public function getTopErrors(int $limit = 10): array;
+
+    /**
+     * Get trending pages
+     *
+     * @param int $limit
+     * @return array
+     */
+    public function getTrendingPages(int $limit = 10): array;
 }
