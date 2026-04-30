@@ -7,25 +7,45 @@
 
 
 {% block content %}
-<section class="col-12 admonition admonition__info">
-    <p><strong>Data range:</strong> {{ analytics.from|date('jS F Y') }} &mdash; {{ analytics.to|date('jS F Y') }}</p>
-</section>
-
 <div class="col-6">
     <section class="widget ui-section rounded">
         <header class="widget__header">
-            <h2>Overview</h2>
+            <h2>Overview
+                <span class="badge badge--primary">{{ analytics.from|date('jS F Y') }} &mdash; {{ analytics.to|date('jS F Y') }}</span>
+            </h2>
         </header>
-        <ul>
-            <li><strong>Total Views (30 days):</strong> {{ analytics.totalViews|number_format }}</li>
-            <li><strong>Unique Visitors:</strong> {{ analytics.uniqueVisitors|number_format }}</li>
-            {% if analytics.change is not null %}
-                <li>
-                    <strong>Change:</strong>
-                    {{ analytics.change > 0 ? '+' : '' }}{{ analytics.change|number_format }}%
-                </li>
-            {% endif %}
-        </ul>
+        <div class="widget__content nested-grid">
+            <article class="col-4 widget-stats__card widget-stats__card--total" aria-labelledby="stats-total-visits">
+                <div class="widget-stats__icon" aria-hidden="true">
+                    <span class="material-icons">visibility</span>
+                </div>
+                <div class="widget-stats__content">
+                    <h2 id="stats-total-visits">Total Views</h2>
+                    <p class="widget-stats__value">{{ analytics.totalViews|number_format }}</p>
+                </div>
+            </article>
+
+            <article class="col-4 widget-stats__card widget-stats__card--unique" aria-labelledby="stats-unique-visitors">
+                <div class="widget-stats__icon" aria-hidden="true">
+                    <span class="material-icons">group</span>
+                </div>
+                <div class="widget-stats__content">
+                    <h2 id="stats-unique-visitors">Unique Visitors</h2>
+                    <p class="widget-stats__value">{{ analytics.uniqueVisitors|number_format }}</p>
+                </div>
+            </article>
+        {% if analytics.change is not null or true %}
+            <article class="col-4 widget-stats__card widget-stats__card--today" aria-labelledby="stats-change">
+                <div class="widget-stats__icon" aria-hidden="true">
+                    <span class="material-icons"> trending_{{ analytics.change > 0 ? 'up' : 'down' }}</span>
+                </div>
+                <div class="widget-stats__content">
+                    <h2 id="stats-change">Change</h2>
+                    <p class="widget-stats__value">{{ analytics.change|number_format }}%</p>
+                </div>
+            </article>
+        {% endif %}
+        </div>
     </section>
 
     <!-- section class="widget ui-section">
@@ -53,6 +73,7 @@
                 <th>Page</th>
                 <th>Views</th>
                 <th>Change</th>
+                <th>%</th>
             </tr>
         </thead>
         <tbody>
@@ -71,38 +92,13 @@
 							—
 						{% endif %}
 					</td>
+                    <td>{{ (page.current / analytics.totalViews * 100)|number_format(1) }}</td>
 				</tr>
 			{% else %}
-				<tr><td colspan="3">No data</td></tr>
+				<tr><td colspan="4">No data</td></tr>
 			{% endfor %}
 		</tbody>
 	</table>
-</section>
-
-<section class="col-6 widget">
-    <header class="widget__header">
-        <h2>Top Pages</h2>
-    </header>
-    <table>
-        <thead>
-            <tr>
-                <th>Page</th>
-                <th>Views</th>
-                <th>%</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for page in analytics.topPages %}
-                <tr>
-                    <td>{{ page.title }}</td>
-                    <td>{{ page.total }}</td>
-                    <td>{{ (page.total / analytics.totalViews * 100)|number_format(1) }}</td>
-                </tr>
-            {% else %}
-                <tr><td colspan="3">No data</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
 </section>
 
 <section class="col-6 widget">

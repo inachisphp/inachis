@@ -31,7 +31,6 @@ class AnalyticsController extends AbstractInachisController
         $from = $to->modify('-30 days');
 
         $viewsPerDay = $analytics->getPageViewsPerDay($from, $to);
-        $topPages = $analytics->getTopPages(10);
         $top404s = $analytics->getTopErrors(10);
         $totalViews = $analytics->getTotalViews($from, $to);
 		$uniqueVisitors = $analytics->getMonthlyUniqueVisitors($from, $to);
@@ -51,7 +50,6 @@ class AnalyticsController extends AbstractInachisController
         $this->data['page']['tab'] = 'tools';
 		$this->data['analytics'] = [
             'viewsPerDay' => $viewsPerDay,
-            'topPages' => $topPages,
             'top404s' => $top404s,
             'totalViews' => $totalViews,
 			'uniqueVisitors' => $uniqueVisitors,

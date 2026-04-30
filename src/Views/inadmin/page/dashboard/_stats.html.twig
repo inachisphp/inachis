@@ -54,7 +54,10 @@
 
     <section class="widget ui-section rounded">
         <header class="widget__header">
-            <h3>Popular Posts</h3>
+            <h2>
+                <span>Popular Posts</span>
+                <a href="{{ path('incc_tools_analytics') }}" class="widget__header__link">View All</a>
+            </h2>
         </header>
         <ul class="widget-stats__list" aria-labelledby="stats-popular-posts">
         {% for post in dashboard.analytics.topPages %}
