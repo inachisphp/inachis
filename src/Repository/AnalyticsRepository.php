@@ -217,4 +217,43 @@ class AnalyticsRepository
 
         return array_slice($results, 0, $limit);
     }
+
+    /**
+     * Get the most common referring domains.
+     *
+     * @param int $limit
+     * @return array
+     */
+    public function getTopReferrers(int $limit = 10): array
+    {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT domain, SUM(hits) AS total
+            FROM analytics_referrer
+            GROUP BY domain
+            ORDER BY total DESC
+            LIMIT ' . (int) $limit
+        );
+    }
+
+    /**
+     * Get the most common referring domains for a specific page.
+     *
+     * @param string $path
+     * @param int $limit
+     * @return array
+     */
+    public function getTopReferrersForPage(string $path, int $limit = 10): array
+    {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT domain, SUM(hits) AS total
+            FROM analytics_referrer
+            WHERE path = :path
+            GROUP BY domain
+            ORDER BY total DESC
+            LIMIT ' . (int) $limit,
+            ['path' => $path]
+        );
+    }
 }

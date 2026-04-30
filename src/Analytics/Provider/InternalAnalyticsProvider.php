@@ -106,6 +106,29 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
     }
 
     /**
+     * Get the most common referring domains.
+     *
+     * @param int $limit
+     * @return array
+     */
+    public function getTopReferrers(int $limit = 10): array
+    {
+        return $this->analyticsRepository->getTopReferrers($limit);
+    }
+
+    /**
+     * Get the most common referring domains for a specific page.
+     *
+     * @param string $path
+     * @param int $limit
+     * @return array
+     */
+    public function getTopReferrersForPage(string $path, int $limit = 10): array
+    {
+        return $this->analyticsRepository->getTopReferrersForPage($path, $limit);
+    }
+
+    /**
      * Resolve title
      *
      * @param string $path
