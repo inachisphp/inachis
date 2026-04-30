@@ -3,21 +3,70 @@ window.Inachis.EasyMDELinkValidator = class {
     this.mde = easymde;
     this.cm = easymde.codemirror;
 
-    this.endpoint = options.endpoint || "/incc/api/validate-links";
+    this.endpoint = options.endpoint || null;
     this.delay = options.delay || 800;
 
+    this.useBackend = !!this.endpoint;
+
+    this.maxConcurrent = options.maxConcurrent || 5;
+    this.minConcurrent = 2;
+    this.currentConcurrent = this.maxConcurrent;
+
+    this.retryLimit = 1;
+
     this.cache = new Map();
+    this.cacheTime = new Map();
+    this.cacheTTL = 60000;
+
     this.queue = new Set();
-    this.activeMarkers = [];
     this.processing = false;
+
+    this.activeMarkers = [];
+    this.currentFilter = "all";
+
+    this.coloriseBadge = options.coloriseBadge ?? true;
 
     this.init();
   }
 
   init() {
     this.injectStyles();
-    this.cm.on("change", this.debounce(() => this.handleChange(), this.delay));
     this.createTooltip();
+    this.createHealthBadge();
+    this.createModal();
+
+    this.cm.on("change", () => this.scheduleValidation());
+    this.cm.on("paste", (cm, e) => this.handlePaste(e));
+  }
+
+  /* --------------------------
+   * Scheduling
+   * -------------------------- */
+
+  scheduleValidation() {
+    if (this.idleHandle) {
+      cancelIdleCallback?.(this.idleHandle);
+      clearTimeout(this.idleHandle);
+    }
+
+    const run = () => this.handleChange();
+
+    if ("requestIdleCallback" in window) {
+      this.idleHandle = requestIdleCallback(run, { timeout: 1000 });
+    } else {
+      this.idleHandle = setTimeout(run, this.delay);
+    }
+  }
+
+  handlePaste(event) {
+    const pasted = event.clipboardData?.getData("text") || "";
+    const links = this.extractLinks(pasted);
+
+    links.forEach(link => {
+      if (!this.cache.has(link)) this.queue.add(link);
+    });
+
+    this.processQueue();
   }
 
   handleChange() {
@@ -33,7 +82,7 @@ window.Inachis.EasyMDELinkValidator = class {
 
     const uncached = links.filter(l => !this.cache.has(l));
 
-    if (uncached.length) {
+    if (uncached.length && uncached.length < 5) {
       this.markChecking(uncached);
     }
 
@@ -44,9 +93,7 @@ window.Inachis.EasyMDELinkValidator = class {
     });
 
     this.processQueue();
-
-    const results = links.map(l => this.cache.get(l)).filter(Boolean);
-    this.markLinks(results);
+    this.renderFromCache();
   }
 
   async processQueue() {
@@ -57,28 +104,29 @@ window.Inachis.EasyMDELinkValidator = class {
     const batch = Array.from(this.queue);
     this.queue.clear();
 
-    if (batch.length === 0) {
-      this.processing = false;
-      return;
-    }
-
     try {
-      const results = await this.validate(batch);
+      let results;
+
+      if (this.useBackend) {
+        results = await this.validate(batch);
+      } else {
+        results = await this.validateInParallel(batch);
+      }
 
       results.forEach(r => {
         this.cache.set(r.url, r);
+        this.cacheTime.set(r.url, Date.now());
       });
 
       this.renderFromCache();
+
     } catch (e) {
-      console.error("Validation error", e);
+      console.error(e);
     }
 
     this.processing = false;
 
-    if (this.queue.size) {
-      this.processQueue();
-    }
+    if (this.queue.size) this.processQueue();
   }
 
   async validate(links) {
@@ -91,9 +139,108 @@ window.Inachis.EasyMDELinkValidator = class {
     return res.json();
   }
 
-  markChecking(links) {
+  async validateInParallel(links) {
+    const results = [];
+
+    for (let i = 0; i < links.length; i += this.currentConcurrent) {
+      const chunk = links.slice(i, i + this.currentConcurrent);
+
+      const start = performance.now();
+
+      const res = await Promise.all(
+        chunk.map(url => this.testLinkWithRetry(url))
+      );
+
+      const duration = performance.now() - start;
+
+      if (duration > 1500 && this.currentConcurrent > this.minConcurrent) {
+        this.currentConcurrent--;
+      } else if (duration < 500 && this.currentConcurrent < this.maxConcurrent) {
+        this.currentConcurrent++;
+      }
+
+      results.push(...res);
+    }
+
+    return results;
+  }
+
+  async testLinkWithRetry(url, attempt = 0) {
+    const result = await this.testLink(url);
+
+    if (!result.ok && attempt < this.retryLimit) {
+      return this.testLinkWithRetry(url, attempt + 1);
+    }
+
+    return result;
+  }
+
+  async testLink(url) {
+    const start = performance.now();
+
+    try {
+      let res;
+
+      try {
+        res = await fetch(url, { method: "HEAD", mode: "cors" });
+      } catch {
+        res = await fetch(url, { method: "GET", mode: "cors" });
+      }
+
+      return {
+        url,
+        ok: res.ok,
+        status: res.status,
+        time_ms: Math.round(performance.now() - start),
+        redirects: res.redirected ? 1 : 0,
+        headers: {
+          "content-type": res.headers.get("content-type") || "",
+        }
+      };
+
+    } catch {
+      return {
+        url,
+        ok: false,
+        status: null,
+        error: "Network/CORS error",
+      };
+    }
+  }
+
+  /* --------------------------
+   * Rendering
+   * -------------------------- */
+
+  renderFromCache() {
+    const links = this.extractLinks(this.mde.value());
+    const results = links.map(l => this.cache.get(l)).filter(Boolean);
+
+    this.markLinks(results);
+    this.updateHealthBadge(results);
+  }
+
+  markLinks(results) {
     this.clearMarkers();
 
+    const doc = this.cm.getDoc();
+
+    results.forEach(r => {
+      const cursor = doc.getSearchCursor(r.url);
+
+      while (cursor.findNext()) {
+        const marker = this.cm.markText(cursor.from(), cursor.to(), {
+          className: this.getClass(r),
+          attributes: { "data-url": r.url }
+        });
+
+        this.attachEvents(marker, r);
+        this.activeMarkers.push(marker);
+      }
+    });
+  }
+
+  markChecking(links) {
     const doc = this.cm.getDoc();
 
     links.forEach(url => {
@@ -102,39 +249,18 @@ window.Inachis.EasyMDELinkValidator = class {
       while (cursor.findNext()) {
         const marker = this.cm.markText(cursor.from(), cursor.to(), {
           className: "cm-link-checking",
-          attributes: { "data-url": url },
         });
 
-        this.attachEvents(marker, { url, checking: true });
         this.activeMarkers.push(marker);
       }
     });
   }
 
-  markLinks(results) {
-    this.clearMarkers();
-
-    const doc = this.cm.getDoc();
-
-    results.forEach(result => {
-      const cursor = doc.getSearchCursor(result.url);
-
-      while (cursor.findNext()) {
-        const className = result.ok
-          ? "cm-link-valid"
-          : "cm-link-broken";
-
-        const marker = this.cm.markText(cursor.from(), cursor.to(), {
-          className,
-          attributes: {
-            "data-url": result.url,
-          },
-        });
-
-        this.attachEvents(marker, result);
-        this.activeMarkers.push(marker);
-      }
-    });
+  getClass(r) {
+    if (!r.ok) return "cm-link-broken";
+    if (r.redirects > 0) return "cm-link-redirect";
+    if (r.time_ms > 800) return "cm-link-slow";
+    return "cm-link-valid";
   }
 
   clearMarkers() {
@@ -142,142 +268,227 @@ window.Inachis.EasyMDELinkValidator = class {
     this.activeMarkers.length = 0;
   }
 
-  attachEvents(marker, data) {
-    const el = marker.replacedWith || null;
+  /* --------------------------
+   * UI
+   * -------------------------- */
 
-    setTimeout(() => {
-      const spans = document.querySelectorAll(`[data-url="${data.url}"]`);
-
-      spans.forEach(span => {
-        span.onmouseenter = (e) => this.showTooltip(e, data);
-        span.onmouseleave = () => this.hideTooltip();
-
-        if (!data.ok && !data.checking) {
-          span.style.cursor = "pointer";
-          span.onclick = () => this.retryLink(data.url);
-        }
-      });
-    }, 0);
+  createTooltip() {
+    this.tooltip = document.createElement("div");
+    this.tooltip.className = "link-tooltip";
+    document.body.appendChild(this.tooltip);
   }
 
-  renderFromCache() {
-    const content = this.mde.value();
-    const links = this.extractLinks(content);
+  showTooltip(e, d) {
+    this.tooltip.innerHTML = d.ok
+      ? `✔ ${d.status} (${d.time_ms}ms)`
+      : `❌ ${d.error || d.status}`;
 
-    const results = links.map(l => this.cache.get(l)).filter(Boolean);
-    this.markLinks(results);
-  }
-
-  showTooltip(e, data) {
-    const t = this.tooltip;
-
-    if (data.checking) {
-      t.innerHTML = "Checking...";
-    } else if (data.ok) {
-      t.innerHTML = `
-        <strong>OK</strong><br>
-        Status: ${data.status}<br>
-      `;
-    } else {
-      t.innerHTML = `
-        <strong>Broken</strong><br>
-        Status: ${data.status || ""}<br>
-        Error: ${data.error || "Unknown"}<br>
-        <em>Click to retry</em>
-      `;
-    }
-
-    t.style.display = "block";
-    t.style.left = e.pageX + 10 + "px";
-    t.style.top = e.pageY + 10 + "px";
+    this.tooltip.style.display = "block";
+    this.tooltip.style.left = e.pageX + 10 + "px";
+    this.tooltip.style.top = e.pageY + 10 + "px";
   }
 
   hideTooltip() {
     this.tooltip.style.display = "none";
   }
 
-  createTooltip() {
-    const t = document.createElement("div");
-    t.className = "link-tooltip";
-    document.body.appendChild(t);
-    this.tooltip = t;
+  attachEvents(marker, data) {
+    setTimeout(() => {
+      document.querySelectorAll(`[data-url="${data.url}"]`).forEach(el => {
+        el.onmouseenter = e => this.showTooltip(e, data);
+        el.onmouseleave = () => this.hideTooltip();
+      });
+    });
   }
 
-  retryLink(url) {
-    this.cache.delete(url);
-    this.queue.add(url);
+  createHealthBadge() {
+    const bottomBar = this.mde.element.parentElement.querySelector(".editor-statusbar");
+    if (!bottomBar) return;
+
+    const badge = document.createElement("span");
+    badge.className = "link-health-badge-inline";
+    badge.style.cursor = "pointer";
+    badge.onclick = () => this.openLinkModal();
+
+    // Initial text
+    badge.innerHTML = `✔ 0 ⚠ 0 ✖ 0`;
+
+    bottomBar.appendChild(badge);
+    this.healthBadge = badge;
+  }
+
+  updateHealthBadge(results) {
+    let ok = 0, slow = 0, broken = 0;
+
+    results.forEach(r => {
+      if (!r.ok) broken++;
+      else if (r.time_ms > 800) slow++;
+      else ok++;
+    });
+
+    if (!this.healthBadge) return;
+
+    if (this.coloriseBadge) {
+      this.healthBadge.innerHTML = `
+        <span style="color:#0f0">✔ ${ok}</span>
+        <span style="color:#ffa500">⚠ ${slow}</span>
+        <span style="color:#f00">✖ ${broken}</span>
+      `;
+    } else {
+      this.healthBadge.textContent = `✔ ${ok} ⚠ ${slow} ✖ ${broken}`;
+    }
+  }
+
+  createModal() {
+    const modal = document.createElement("div");
+    modal.className = "link-modal";
+
+    modal.innerHTML = `
+      <div class="link-modal-content">
+        <div class="link-modal-header">
+          <strong>Link Health</strong>
+          <div>
+            <button class="revalidate-btn">Revalidate</button>
+            <button class="export-btn">Export</button>
+            <button class="close-btn">×</button>
+          </div>
+        </div>
+        <div class="link-modal-list"></div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    modal.querySelector(".close-btn").onclick = () => modal.style.display = "none";
+    modal.querySelector(".revalidate-btn").onclick = () => this.revalidateAll();
+    modal.querySelector(".export-btn").onclick = () => this.exportReport();
+
+    this.modal = modal;
+  }
+
+  openLinkModal() {
+    this.modal.style.display = "flex";
+    this.renderModal();
+  }
+
+  renderModal() {
+    const container = this.modal.querySelector(".link-modal-list");
+    const links = this.extractLinks(this.mde.value());
+    const results = links.map(l => this.cache.get(l)).filter(Boolean);
+
+    container.innerHTML = "";
+
+    results.forEach(r => {
+      const row = document.createElement("div");
+      row.className = "link-row";
+      row.textContent = `${this.getStatusIcon(r)} ${r.url}`;
+      row.onclick = () => this.jumpToLink(r.url);
+
+      container.appendChild(row);
+    });
+  }
+
+  getStatusIcon(r) {
+    if (!r.ok) return "❌";
+    if (r.time_ms > 800) return "⏱";
+    if (r.redirects > 0) return "🔁";
+    return "✔";
+  }
+
+  jumpToLink(url) {
+    const cursor = this.cm.getDoc().getSearchCursor(url);
+    if (cursor.findNext()) {
+      this.cm.scrollIntoView(cursor.from());
+      this.cm.setCursor(cursor.from());
+    }
+  }
+
+  revalidateAll() {
+    const links = this.extractLinks(this.mde.value());
+
+    links.forEach(l => {
+      this.cache.delete(l);
+      this.queue.add(l);
+    });
+
     this.processQueue();
   }
 
-   extractLinks(text) {
+  exportReport() {
+    const links = this.extractLinks(this.mde.value());
+    const broken = links
+      .map(l => this.cache.get(l))
+      .filter(r => r && !r.ok);
+
+    const blob = new Blob([JSON.stringify(broken, null, 2)]);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "broken-links.json";
+    a.click();
+  }
+
+  /* --------------------------
+   * Utils
+   * -------------------------- */
+
+  extractLinks(text) {
     const links = new Set();
     let match;
 
-    // 1. ALL standard markdown links (this will also catch outer links)
     const linkRegex = /\[(?:!\[[^\]]*\]\([^)]+\)|[^\]])*\]\(([^)]+)\)/g;
+    while ((match = linkRegex.exec(text))) links.add(match[1]);
 
-    while ((match = linkRegex.exec(text)) !== null) {
-      links.add(match[1]);
-    }
-
-    // 2. ALL image links
     const imageRegex = /!\[[^\]]*\]\(([^)]+)\)/g;
-
-    while ((match = imageRegex.exec(text)) !== null) {
-      links.add(match[1]);
-    }
+    while ((match = imageRegex.exec(text))) links.add(match[1]);
 
     return [...links];
   }
 
   cleanupCache(currentLinks) {
+    const now = Date.now();
+
     this.cache.forEach((_, key) => {
-      if (!currentLinks.includes(key)) {
+      if (!currentLinks.includes(key) ||
+          now - (this.cacheTime.get(key) || 0) > this.cacheTTL) {
         this.cache.delete(key);
+        this.cacheTime.delete(key);
       }
     });
   }
 
-  debounce(fn, delay) {
-    let t;
-    return (...args) => {
-      clearTimeout(t);
-      t = setTimeout(() => fn(...args), delay);
-    };
-  }
-
   injectStyles() {
     const css = `
-      .cm-link-valid {
-        background: rgba(0,180,0,0.12);
-        border-bottom: 2px solid rgba(0,180,0,0.6);
+      .cm-link-valid { border-bottom:2px solid green; }
+      .cm-link-broken { border-bottom:2px solid red; }
+      .cm-link-checking { border-bottom:2px dashed orange; }
+      .cm-link-slow { border-bottom:2px dotted orange; }
+      .cm-link-redirect { border-bottom:2px dashed blue; }
+
+      .link-health-badge {
+        margin-left:10px;
+        background:#222;
+        color:#fff;
+        padding:4px 8px;
+        cursor:pointer;
       }
 
-      .cm-link-broken {
-        background: rgba(255,0,0,0.12);
-        border-bottom: 2px solid rgba(255,0,0,0.8);
+      .link-modal {
+        position:fixed; inset:0;
+        background:rgba(0,0,0,.6);
+        display:none; align-items:center; justify-content:center;
       }
 
-      .cm-link-checking {
-        background: rgba(255,165,0,0.15);
-        border-bottom: 2px dashed orange;
+      .link-modal-content {
+        background:#fff; width:500px;
+        max-height:80vh; overflow:auto;
       }
 
-      .link-tooltip {
-        position: absolute;
-        background: #222;
-        color: #fff;
-        padding: 8px 10px;
-        font-size: 12px;
-        border-radius: 4px;
-        display: none;
-        z-index: 9999;
-        max-width: 300px;
-      }
+      .link-row { padding:6px; cursor:pointer; }
+      .link-row:hover { background:#eee; }
     `;
 
     const style = document.createElement("style");
     style.innerHTML = css;
     document.head.appendChild(style);
   }
-}
+};

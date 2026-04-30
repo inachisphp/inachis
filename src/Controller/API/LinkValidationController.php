@@ -148,7 +148,7 @@ final class LinkValidationController
                     continue;
                 }
 
-                if (!filter_var(
+                if (($_ENV['APP_ENV'] ?? 'dev') === 'prod' && !filter_var(
                     $ip,
                     FILTER_VALIDATE_IP,
                     FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
