@@ -74,12 +74,19 @@ class ResourceController extends AbstractInachisController
             strtolower($type),
             'title asc',
         );
-        $this->data['dataset'] = $repository->getFiltered(
-            $contentQuery['filters'],
-            $contentQuery['offset'],
-            $contentQuery['limit'],
-            $contentQuery['sort'],
-        );
+        if ($request->query->has('altText') && $request->query->get('altText') === 'null') {
+            $this->data['dataset'] = $repository->getImagesWithoutAltText(
+                $contentQuery['offset'],
+                $contentQuery['limit']
+            );
+        } else {
+            $this->data['dataset'] = $repository->getFiltered(
+                $contentQuery['filters'],
+                $contentQuery['offset'],
+                $contentQuery['limit'],
+                $contentQuery['sort'],
+            );
+        }
         $this->data['form'] = $form->createView();
         $this->data['query'] = $contentQuery;
         $this->data['page']['type'] = strtolower($type) . 's';
@@ -276,7 +283,7 @@ class ResourceController extends AbstractInachisController
                 ->setDimensionY($dimensions[1]);
 
             $this->entityManager->persist($image);
-            $this->entityManager->flush(); 
+            $this->entityManager->flush();
 
             return new JsonResponse([
                 'success' => true,

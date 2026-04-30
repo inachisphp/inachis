@@ -32,25 +32,25 @@ class ImageRepository extends AbstractRepository implements ResourceRepositoryIn
     /**
      * Get all images that do not have alt text
      *
-     * @param int $limit
      * @param int $offset
-     * @return array<Image>
+     * @param int $limit
+     * @return Paginator<Image>
      */
-    public function getImagesWithoutAltText(int $limit = 0, int $offset = 0): array
+    public function getImagesWithoutAltText(int $offset = 0, int $limit = 0): Paginator
     {
-        $qb = $this->createQueryBuilder('i');
-        $qb = $qb
-            ->select('i')
-            ->where('i.alt IS NULL OR i.alt = :emptyString')
-            ->setParameter('emptyString', '');
-        if ($limit > 0) {
-            $qb->setMaxResults($limit);
-        }
-        if ($offset > 0) {
-            $qb->setFirstResult($offset);
-        }
-        /** @var array<Image> */
-        return $qb->getQuery()->getResult();
+        return $this->getAll(
+            offset: $offset,
+            limit: $limit,
+            where: [
+                'q.altText IS NULL OR q.altText = :emptyString',
+                [
+                    'emptyString' => ''
+                ]
+            ],
+            order: [
+                ['q.id', 'ASC']
+            ]
+        );
     }
 
     /**

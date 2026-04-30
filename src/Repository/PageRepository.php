@@ -62,9 +62,9 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('Page_categories.id', ':categoryId'),
-                    $qb->expr()->eq('p.status', 'published'),
+                    $qb->expr()->eq('p.status', '\'published\''),
                     $qb->expr()->eq('p.visibility', '1'),
-                    $qb->expr()->eq('p.type', 'post')
+                    $qb->expr()->eq('p.type', '\'post\'')
                 )
             )
             ->orderBy('p.postDate', 'DESC')
