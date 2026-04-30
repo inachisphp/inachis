@@ -46,15 +46,31 @@ class AnalyticsSubscriber implements EventSubscriberInterface
 
         $request = $event->getRequest();
 		$response = $event->getResponse();
+		$status = $response->getStatusCode();
 
-		if ($response->getStatusCode() !== 200) {
+		$path = strtok($request->getRequestUri(), '?');
+		$dir = __DIR__ . '/../../var/analytics';
+		$date = date('Y-m-d');
+
+		if ($status >= 400) {
+			$this->createAnalyticsDir($dir);
+
+			$file = sprintf('%s/error-%s.log', $dir, $date);
+
+			$line = json_encode([
+				'path' => $path,
+				'date' => $date,
+				'code' => $status,
+				// 'ref' => $request->headers->get('referer') ?? '',
+				'ts'   => time(),
+			], JSON_UNESCAPED_SLASHES);
+
+			file_put_contents($file, $line . PHP_EOL, FILE_APPEND | LOCK_EX);
+
 			return;
 		}
 
         if ($request->getMethod() !== 'GET') return;
-
-        $path = strtok($request->getRequestUri(), '?');
-
         if (str_starts_with($path, '/incc')) return;
         if (str_starts_with($path, '/_profiler')) return;
 		if (str_starts_with($path, '/_wdt')) return;
@@ -69,14 +85,8 @@ class AnalyticsSubscriber implements EventSubscriberInterface
 			return;
 		}
 
-        $date = date('Y-m-d');
-
-        $dir = __DIR__ . '/../../var/analytics';
-        if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
-        }
-
-        $file = sprintf('%s/analytics-%s.log', $dir, $date);
+		$this->createAnalyticsDir($dir);
+		$file = sprintf('%s/analytics-%s.log', $dir, $date);
 
 		$line = json_encode([
 			'path' => $path,
@@ -87,4 +97,16 @@ class AnalyticsSubscriber implements EventSubscriberInterface
 
         file_put_contents($file, $line . PHP_EOL, FILE_APPEND | LOCK_EX);
     }
+
+	/**
+	 * Creates the analytics directory
+	 *
+	 * @param string $dir The directory to create
+	 */
+	protected function createAnalyticsDir(string $dir): void
+	{
+		if (!is_dir($dir)) {
+			mkdir($dir, 0777, true);
+		}
+	}
 }

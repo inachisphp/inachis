@@ -81,6 +81,17 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
     }
 
     /**
+     * Get the most common paths that result in a 4xx or 5xx error.
+     *
+     * @param int $limit
+     * @return array
+     */
+    public function getTopErrors(int $limit = 10): array
+    {
+        return $this->analyticsRepository->getTopErrors($limit);
+    }
+
+    /**
      * Resolve title
      *
      * @param string $path

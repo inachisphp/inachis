@@ -129,4 +129,21 @@ class AnalyticsRepository
             ]
         );
     }
+
+	/**
+     * Get the most common paths that result in a 4xx or 5xx error.
+     *
+     * @param int $limit
+     * @return array
+     */
+    public function getTopErrors(int $limit = 10): array
+    {
+        return $this->db->fetchAllAssociative('
+            SELECT path, code, SUM(hits) AS hits
+            FROM analytics_errors
+            GROUP BY path
+            ORDER BY hits DESC
+            LIMIT ' . (int) $limit
+        );
+    }
 }

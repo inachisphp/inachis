@@ -49,4 +49,15 @@ interface AnalyticsProviderInterface
         \DateTimeInterface $from,
         \DateTimeInterface $to
     ): int;
+
+    /**
+     * Get the most common paths that result in a 4xx or 5xx error.
+     *
+     * Expected format:
+     * [
+     *   ['path' => '/post/hello-world', 'code' => 404, 'hits' => 42],
+     *   ...
+     * ]
+     */
+    public function getTopErrors(int $limit = 10): array;
 }

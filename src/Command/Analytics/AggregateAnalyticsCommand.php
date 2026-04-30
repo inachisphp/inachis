@@ -48,12 +48,16 @@ class AggregateAnalyticsCommand extends Command
 
         foreach ($files as $file) {
 			$output->writeln(sprintf('Processing <info>%s</info> ...', basename($file)));
-            $this->processFile($file);
-            $output->writeln(sprintf('Processed %s', basename($file)));
+			if (str_contains($file, '/analytics-')) {
+				$this->processFile($file);
+			} elseif (str_contains($file, '/error-')) {
+				$this->processErrorFile($file);
+			}
+
+			$output->writeln(sprintf('Processed %s', basename($file)));
 
 			rename($file, $file . '.processed');
         }
-
         return Command::SUCCESS;
     }
 
@@ -122,4 +126,51 @@ class AggregateAnalyticsCommand extends Command
             }
         }
     }
+
+	/**
+	 * Processes 404 files and aggregates 404 data
+	 *
+	 * @param string $file
+	 */
+	private function processErrorFile(string $file): void
+	{
+		$handle = fopen($file, 'r');
+
+		if (!$handle) {
+			return;
+		}
+
+		$counts = [];
+
+		while (($line = fgets($handle)) !== false) {
+			$data = json_decode($line, true);
+
+			if (!$data || !isset($data['path'], $data['date'], $data['code'])) {
+				continue;
+			}
+
+			$key = $data['path'] . '|' . $data['date'] . '|' . $data['code'];
+			$counts[$key] = ($counts[$key] ?? 0) + 1;
+		}
+
+		fclose($handle);
+
+		foreach ($counts as $key => $hits) {
+			[$path, $date, $code] = explode('|', $key);
+
+			$this->db->executeStatement(
+				'
+				INSERT INTO analytics_errors (path, date, code, hits)
+				VALUES (:path, :date, :code, :hits)
+				ON DUPLICATE KEY UPDATE hits = hits + :hits
+				',
+				[
+					'path' => $path,
+					'date' => $date,
+					'code' => $code,
+					'hits' => $hits,
+				]
+			);
+		}
+	}
 }
