@@ -37,18 +37,18 @@ class PageWebController extends AbstractInachisController
     #[Route(
         "/{year}/{month}/{day}/{title}",
         requirements: [
-            "year" => "\d+",
-            "month" => "\d+",
-            "day" => "\d+"
+            "year" => "\d{4}",
+            "month" => "\d{2}",
+            "day" => "\d{2}"
         ],
         methods: ["GET" ]
     )]
     #[Route(
         "/incc/preview/{year}/{month}/{day}/{title}",
         requirements: [
-            "year" => "\d+",
-            "month" => "\d+",
-            "day" => "\d+"
+            "year" => "\d{4}",
+            "month" => "\d{2}",
+            "day" => "\d{2}"
         ],
         methods: ["GET" ]
     )]

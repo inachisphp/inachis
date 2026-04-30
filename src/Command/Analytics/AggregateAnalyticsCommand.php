@@ -44,8 +44,7 @@ class AggregateAnalyticsCommand extends Command
             return Command::SUCCESS;
         }
 
-        $files = glob($dir . '/analytics-*.log');
-
+        $files = glob($dir . '/*-*.log');
         foreach ($files as $file) {
 			$output->writeln(sprintf('Processing <info>%s</info> ...', basename($file)));
 			if (str_contains($file, '/analytics-')) {

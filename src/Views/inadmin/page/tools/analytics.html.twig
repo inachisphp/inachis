@@ -8,7 +8,7 @@
 
 {% block content %}
 <section class="col-12 admonition admonition__info">
-	<p><strong>Data range:</strong> {{ analytics.from|date('jS F Y') }} &mdash; {{ analytics.to|date('jS F Y') }}</p>
+    <p><strong>Data range:</strong> {{ analytics.from|date('jS F Y') }} &mdash; {{ analytics.to|date('jS F Y') }}</p>
 </section>
 
 <div class="col-6">
@@ -38,8 +38,8 @@
 
 <section class="col-6 widget">
     <header class="widget__header">
-	    <h2>Traffic (last 30 days)</h2>
-	</header>
+        <h2>Traffic (last 30 days)</h2>
+    </header>
     <canvas id="trafficChart"></canvas>
 </section>
 
@@ -52,6 +52,7 @@
             <tr>
                 <th>Page</th>
                 <th>Views</th>
+                <th>%</th>
             </tr>
         </thead>
         <tbody>
@@ -59,9 +60,10 @@
                 <tr>
                     <td>{{ page.title }}</td>
                     <td>{{ page.total }}</td>
+                    <td>{{ (page.total / analytics.totalViews * 100)|number_format(1) }}</td>
                 </tr>
             {% else %}
-                <tr><td colspan="2">No data</td></tr>
+                <tr><td colspan="3">No data</td></tr>
             {% endfor %}
         </tbody>
     </table>
@@ -82,7 +84,7 @@
             {% for page in analytics.top404s %}
                 <tr>
                     <td>{{ page.path }}</td>
-                    <td>{{ page.total }}</td>
+                    <td>{{ page.hits }}</td>
                 </tr>
             {% else %}
                 <tr><td colspan="2">No data</td></tr>
@@ -93,14 +95,26 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+	const views = {{ analytics.viewsPerDay|map(v => v.total)|json_encode|raw }};
+	const avg = views.reduce((a, b) => a + b, 0) / views.length;
+    const avgLine = views.map(() => avg);
     const data = {
         labels: {{ analytics.viewsPerDay|map(v => v.date)|json_encode|raw }},
-        datasets: [{
-            label: 'Views',
-            data: {{ analytics.viewsPerDay|map(v => v.total)|json_encode|raw }},
-            fill: false,
-            tension: 0.2
-        }]
+        datasets: [
+            {
+                label: 'Views',
+                data: {{ analytics.viewsPerDay|map(v => v.total)|json_encode|raw }},
+                fill: false,
+                tension: 0.2
+            },
+            {
+                label: 'Average Views',
+                data: avgLine,
+                borderDash: [5, 5],
+                fill: false,
+                tension: 0
+            }
+        ]
     };
     new Chart(
         document.getElementById('trafficChart'),
