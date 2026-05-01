@@ -15,6 +15,21 @@
     <div class="col-6">
         <h2>Welcome back {{ app.user.displayName }},</h2>
         {% include "inadmin/page/dashboard/actions.html.twig" %}
+        {% if dashboard.alerts.tags.count > 0 or dashboard.alerts.categories.count > 0 or dashboard.alerts.featureImage.count > 0 or dashboard.alerts.sharingMessage.count > 0 %}
+        <div class="widget widget-alerts">
+            <article class="alert_priority__medium">
+                {% if dashboard.alerts.tags.count > 0 %}
+                    <p><span>Med</span> {{ dashboard.alerts.tags.count }} pages without tags <a href="/incc/post/list/?tag=null">Fix &rarr;</a></p>
+                {% endif %}
+                {% if dashboard.alerts.featureImage.count > 0 %}
+                    <p><span>Med</span> {{ dashboard.alerts.featureImage.count }} pages without feature images <a href="/incc/post/list/?featureImage=null">Fix &rarr;</a></p>
+                {% endif %}
+                {% if dashboard.alerts.sharingMessage.count > 0 %}
+                    <p><span>Med</span> {{ dashboard.alerts.sharingMessage.count }} pages without sharing messages <a href="/incc/post/list/?sharingMessage=null">Fix &rarr;</a></p>
+                {% endif %}
+            </article>
+        </div>
+        {% endif %}
     </div>
 
     <div class="col-6">
