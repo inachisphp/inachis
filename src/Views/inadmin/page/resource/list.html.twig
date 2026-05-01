@@ -120,5 +120,12 @@
         </p>
     </section>
 {% endif %}
+{% if showUploadDialog|default(false) %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            window.document.querySelector('[data-view="upload"]').click();
+        });
+    </script>
+{% endif %}
 </div>
 {% endblock content %}

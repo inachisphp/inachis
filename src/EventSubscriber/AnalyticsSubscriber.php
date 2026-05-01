@@ -50,24 +50,6 @@ class AnalyticsSubscriber implements EventSubscriberInterface
 
         $path = strtok($request->getRequestUri(), '?');
         $path = rtrim($path, '/');
-        $dir = __DIR__ . '/../../var/analytics';
-        $this->createAnalyticsDir($dir);
-        $date = date('Y-m-d');
-
-        if ($status >= 400) {
-            $file = sprintf('%s/error-%s.log', $dir, $date);
-
-            $line = json_encode([
-                'path' => $path,
-                'date' => $date,
-                'code' => $status,
-                'ts'   => time(),
-            ], JSON_UNESCAPED_SLASHES);
-
-            file_put_contents($file, $line . PHP_EOL, FILE_APPEND | LOCK_EX);
-
-            return;
-        }
 
         if ($request->getMethod() !== 'GET') return;
         if (str_starts_with($path, '/incc')) return;
@@ -85,6 +67,26 @@ class AnalyticsSubscriber implements EventSubscriberInterface
         $ip = $request->getClientIp();
         $visitorId = hash('sha256', $ip . '|' . $userAgent);
         if (preg_match('/bot|crawl|spider|slurp|wget|curl/i', $userAgent)) {
+            return;
+        }
+        
+        $dir = __DIR__ . '/../../var/analytics';
+        $this->createAnalyticsDir($dir);
+        $date = date('Y-m-d');
+
+        if ($status >= 400) {
+            $file = sprintf('%s/error-%s.log', $dir, $date);
+
+            $line = json_encode([
+                'path' => $path,
+                'date' => $date,
+                'code' => $status,
+                // 'ref' => $request->headers->get('referer') ?? '',
+                'ts'   => time(),
+            ], JSON_UNESCAPED_SLASHES);
+
+            file_put_contents($file, $line . PHP_EOL, FILE_APPEND | LOCK_EX);
+
             return;
         }
 

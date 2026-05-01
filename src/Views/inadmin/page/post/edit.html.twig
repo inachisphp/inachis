@@ -207,7 +207,7 @@
             {%- endif %}
             {{ form_widget(form.delete) }}
             {%  if not post.isDraft %}
-                <a class="button button--secondary" href="{% if previewMode %}/incc/preview/{% endif %}{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons" aria-hidden="true">exit_to_app</span>
+                <a class="button button--secondary" href="{% if previewMode %}/incc/preview{% endif %}/{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons" aria-hidden="true">exit_to_app</span>
                     {% trans %}admin.button.viewLive{% endtrans %}</a>
             {%  endif %}
         {% endif %}
