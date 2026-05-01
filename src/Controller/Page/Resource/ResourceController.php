@@ -268,8 +268,8 @@ class ResourceController extends AbstractInachisController
 
             // Step 5: Create safe filename
             $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-            $safe = strtolower($this->slugger->slug($image->getTitle() ?: $originalFilename));
-            $newFilename = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
+            $safeFilename = strtolower($slugger->slug($imageData['title'] . '-' . uniqid() ?: $originalFilename));
+            $newFilename = $safeFilename . '.' . $uploadedFile->guessExtension();
 
             $imageSize = $uploadedFile->getSize();
             $imageMimeType = $uploadedFile->getMimeType();
