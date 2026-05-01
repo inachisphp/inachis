@@ -22,6 +22,7 @@ use Inachis\Form\PostType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\RevisionRepository;
+use Inachis\Repository\TagRepository;
 use Inachis\Service\Page\PageBulkActionService;
 use Inachis\Util\ContentRevisionCompare;
 use Inachis\Util\ReadingTime;
@@ -158,6 +159,7 @@ class PageController extends AbstractInachisController
         PageBulkActionService $pageBulkActionService,
         PageRepository $pageRepository,
         RevisionRepository $revisionRepository,
+        TagRepository $tagRepository,
         string $type = 'post',
         ?string $title = null
     ): Response {
@@ -235,16 +237,15 @@ class PageController extends AbstractInachisController
             }
             if (!empty($request->request->all('post')['tags'])) {
                 $newTags = $request->request->all('post')['tags'];
-                if (!empty($newTags)) {
-                    foreach ($newTags as $newTag) {
-                        $tag = null;
-                        if (Uuid::isValid($newTag)) {
-                            $tag = $this->entityManager->getRepository(Tag::class)->findOneBy(['id' => $newTag]);
-                        }
-                        if (empty($tag)) {
-                            $tag = new Tag($newTag);
-                        }
-                        $post->getTags()->add($tag);
+                foreach ($newTags as $newTag) {
+                    if (Uuid::isValid($newTag)) {
+                        $tag = $tagRepository->find($newTag);
+                    } else {
+                        $tag = $tagRepository->getOrCreate($newTag);
+                    }
+
+                    if ($tag !== null) {
+                        $post->addTag($tag);
                     }
                 }
             }
