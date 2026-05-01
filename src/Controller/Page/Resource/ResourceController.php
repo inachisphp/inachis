@@ -92,6 +92,9 @@ class ResourceController extends AbstractInachisController
         $this->data['page']['type'] = strtolower($type) . 's';
         $this->data['page']['tab'] = strtolower($type);
         $this->data['page']['title'] = $type . 's';
+        if ($request->query->has('upload') && $request->query->get('upload') === 'true') {
+            $this->data['showUploadDialog'] = true;
+        }
         $this->data['limitKByte'] = Image::WARNING_FILESIZE;
         $this->data['limitSize'] = Image::WARNING_DIMENSIONS;
         $this->data['allowedTypes'] = Image::ALLOWED_MIME_TYPES;
@@ -257,10 +260,15 @@ class ResourceController extends AbstractInachisController
             // Step 4: Generate checksum
             $checksum = $imageFileService->createChecksum($uploadedFile);
 
+            // Step 4a: Check for duplicate checksum
+            $existingImage = $this->entityManager->getRepository(Image::class)->findOneBy(['checksum' => $checksum]);
+            if ($existingImage) {
+                return new JsonResponse(['error' => 'Duplicate image found'], 400);
+            }
+
             // Step 5: Create safe filename
-            // @todo change filename to use the title for better SEO?
             $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-            $safeFilename = $slugger->slug($originalFilename);
+            $safe = strtolower($this->slugger->slug($image->getTitle() ?: $originalFilename));
             $newFilename = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
 
             $imageSize = $uploadedFile->getSize();
