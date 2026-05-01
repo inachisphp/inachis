@@ -102,17 +102,28 @@ class TagRepository extends AbstractRepository
 
     /**
      * Gets all tags with usage count.
-
+     *
+     * @param int $offset
+     * @param int $limit
      * @return array<array{tag: Tag, usageCount: int}>
      */
-    public function findAllWithUsageCount(): array
+    public function findAllWithUsageCount(int $offset = 0, int $limit = 0): array
     {
-        return $this->getEntityManager()->createQuery(
+        $qb = $this->getEntityManager()->createQuery(
             'SELECT t, COUNT(p.id) AS usageCount
              FROM Inachis\Entity\Tag t
              LEFT JOIN Inachis\Entity\Page p WITH t MEMBER OF p.tags
              GROUP BY t.id
              ORDER BY t.title ASC'
-        )->getResult();
+        );
+
+        if ($offset > 0) {
+            $qb = $qb->setFirstResult($offset);
+        }
+        if ($limit > 0) {
+            $qb = $qb->setMaxResults($limit);
+        }
+
+        return $qb->getResult();
     }
 }

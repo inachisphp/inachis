@@ -15,6 +15,7 @@ window.Inachis = {
 		window.Inachis.ConfirmationPrompt.init();
 		window.Inachis.DragDropTable.init();
 		window.Inachis.ImageManager.init();
+		window.Inachis.MergeTags.init();
 		window.Inachis.PostEdit.init();
 	},
 
