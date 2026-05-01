@@ -36,7 +36,7 @@
 
 {% if startPageIndex > 0 %}
             <li class="page-item">
-                <a href="{{ result_url ~ '/0/' ~ limit }}"
+                <a href="{{ result_url ~ '/0/' ~ limit ~ (querystring is defined and querystring ? '?' ~ querystring : '') }}"
                    aria-label="Go to first page" class="page-link">1</a>
             </li>
 
@@ -47,7 +47,7 @@
 
 {% if showFirstNext|default(false) %}
             <li class="page-item{% if currentPageIndex <= 0 %} disabled{% endif %}">
-                <a href="{{ result_url ~ '/' ~ max(0, (currentPageIndex - 1) * limit) ~ '/' ~ limit }}"
+                <a href="{{ result_url ~ '/' ~ max(0, (currentPageIndex - 1) * limit) ~ '/' ~ limit ~ (querystring is defined and querystring ? '?' ~ querystring : '') }}"
                    rel="prev"
                    aria-label="Go to previous page"
                    class="page-link"
@@ -60,7 +60,7 @@
 {% for pageIndex in range(startPageIndex, endPageIndex) %}
     {% set pageNum = pageIndex + 1 %}
             <li class="page-item{% if pageIndex == currentPageIndex %} current{% endif %}">
-                <a href="{{ result_url ~ '/' ~ (pageIndex * limit) ~ '/' ~ limit }}"
+                <a href="{{ result_url ~ '/' ~ (pageIndex * limit) ~ '/' ~ limit ~ (querystring is defined and querystring ? '?' ~ querystring : '') }}"
                    class="page-link"
                    aria-label="Go to page {{ pageNum }}"
                    {% if pageIndex == currentPageIndex %}aria-current="page"{% endif %}>
@@ -71,7 +71,7 @@
 
 {% if showFirstNext|default(false) %}
             <li class="page-item{% if currentPageIndex >= totalPages - 1 %} disabled{% endif %}">
-                <a href="{{ result_url ~ '/' ~ min(lastPageOffset, (currentPageIndex + 1) * limit) ~ '/' ~ limit }}"
+                <a href="{{ result_url ~ '/' ~ min(lastPageOffset, (currentPageIndex + 1) * limit) ~ '/' ~ limit ~ (querystring is defined and querystring ? '?' ~ querystring : '') }}"
                    rel="next"
                    aria-label="Go to next page"
                    class="page-link"
@@ -86,7 +86,7 @@
             <li class="pagination-spacer" aria-hidden="true"><span aria-hidden="true">…</span></li>
     {% endif %}
             <li class="page-item">
-                <a href="{{ result_url ~ '/' ~ lastPageOffset ~ '/' ~ limit }}"
+                <a href="{{ result_url ~ '/' ~ lastPageOffset ~ '/' ~ limit ~ (querystring is defined and querystring ? '?' ~ querystring : '') }}"
                    aria-label="Go to last page"
                    class="page-link">
                     {{ totalPages }}

@@ -42,7 +42,7 @@
                 </div>
             </article>
 
-        {% if analytics.change is not null or true %}
+        {% if analytics.change is not null %}
             <article class="col-4 widget-stats__card widget-stats__card--today" aria-labelledby="stats-change">
                 <div class="widget-stats__icon" aria-hidden="true">
                     <span class="material-icons"> trending_{{ analytics.change > 0 ? 'up' : 'down' }}</span>
