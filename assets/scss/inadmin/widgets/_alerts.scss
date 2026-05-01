@@ -21,5 +21,18 @@
       background-color: $alert-warning-bg;
       border-bottom: 3px solid $alert-warning-border;
     }
+
+    a,
+    a:visited {
+      color: #333;
+      float: right;
+      text-decoration: none;
+    }
+
+    a:hover,
+    a:active {
+      color: #009;
+      text-decoration: underline;
+    }
   }
 }

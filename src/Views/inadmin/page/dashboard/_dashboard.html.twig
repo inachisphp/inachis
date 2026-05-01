@@ -7,15 +7,16 @@
 {% block content %}
 {% block dashboard_pre %}{% endblock dashboard_pre %}
 {% block dashboard %}
+    {% if dashboard.alerts|default([]) is not empty %}
+        <div class="col-12">
+            {% include "inadmin/page/dashboard/alerts.html.twig" %}
+        </div>
+    {% endif %}
     <div class="col-6">
         <h2>Welcome back {{ app.user.displayName }},</h2>
-        {% if dashboard.alerts|default([]) is not empty %}
-            <!-- add widget here for site warnings such as large images -->
-            {% include "inadmin/page/dashboard/alerts.html.twig" %}
-        {% else %}
-            {% include "inadmin/page/dashboard/actions.html.twig" %}
-        {% endif %}
+        {% include "inadmin/page/dashboard/actions.html.twig" %}
     </div>
+
     <div class="col-6">
         {% include "inadmin/page/dashboard/stats.html.twig" %}
     </div>

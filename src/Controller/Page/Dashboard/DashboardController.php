@@ -12,8 +12,8 @@ namespace Inachis\Controller\Page\Dashboard;
 use DateTimeImmutable;
 use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\{Page, Series};
-use Inachis\Repository\{PageRepository, SeriesRepository};
+use Inachis\Entity\{Image, Page, Series};
+use Inachis\Repository\{ImageRepository, PageRepository, SeriesRepository};
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -30,6 +30,7 @@ class DashboardController extends AbstractInachisController
     public function default(
         Request $request,
         AnalyticsProviderInterface $analytics,
+        ImageRepository $imageRepository,
         PageRepository $pageRepository,
         SeriesRepository $seriesRepository
     ): Response {
@@ -147,7 +148,28 @@ class DashboardController extends AbstractInachisController
             //     new DateTimeImmutable()
             // ),
         ];
-        $this->data['dashboard']['stats']['recent'] = 0;
+        $this->data['dashboard']['alerts'] = [
+            'altText' => [
+                'count' => $imageRepository->getImagesWithoutAltTextCount(),
+                // 'pages' => $imageRepository->getImagesWithoutAltText(5),
+            ],
+            'tags' => [
+                'count' => $pageRepository->getPagesWithoutTagsCount(),
+                // 'pages' => $pageRepository->getPagesWithoutTags(5),
+            ],
+            'categories' => [
+                'count' => $pageRepository->getPagesWithoutCategoriesCount(),
+                // 'pages' => $pageRepository->getPagesWithoutCategories(5),
+            ],
+            'featureImage' => [
+                'count' => $pageRepository->getPagesWithoutFeatureImageCount(),
+                // 'pages' => $pageRepository->getPagesWithoutFeatureImage(5),
+            ],
+            'sharingMessage' => [
+                'count' => $pageRepository->getPagesWithoutSharingMessageCount(),
+                // 'pages' => $pageRepository->getPagesWithoutSharingMessage(5),
+            ],
+        ];
         $this->data['dashboard']['draftCount'] = $this->data['dashboard']['drafts']->count();
         $this->data['dashboard']['upcomingCount'] = $this->data['dashboard']['upcoming']->count();
         $this->data['dashboard']['publishCount'] = $this->data['dashboard']['posts']->count();

@@ -32,6 +32,10 @@ services:
         # @todo Google Analytics / Umami / Plausible providers can be swapped in here if desired
         alias: Inachis\Analytics\Provider\InternalAnalyticsProvider
 
+    Inachis\Command\Image\SyncImagesFromContentCommand:
+        arguments:
+            $imageDirectory: '%kernel.project_dir%/public/imgs'
+
     Inachis\Diagnostics\Check\:
         resource: '../src/Diagnostics/Check/*/*'
         tags: ['app.diagnostic_check']

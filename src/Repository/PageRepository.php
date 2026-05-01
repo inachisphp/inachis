@@ -62,9 +62,9 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             ->where(
                 $qb->expr()->andX(
                     $qb->expr()->eq('Page_categories.id', ':categoryId'),
-                    $qb->expr()->eq('p.status', 'published'),
+                    $qb->expr()->eq('p.status', '\'published\''),
                     $qb->expr()->eq('p.visibility', '1'),
-                    $qb->expr()->eq('p.type', 'post')
+                    $qb->expr()->eq('p.type', '\'post\'')
                 )
             )
             ->orderBy('p.postDate', 'DESC')
@@ -282,7 +282,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
 
     /**
      * Get the top N pages with the largest image size calculated
-     * 
+     *
      * @param int $limit
      * @return array<Page>
      */
@@ -293,7 +293,153 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             ->select('p')
             ->orderBy('p.imageSize', 'DESC')
             ->setMaxResults($limit);
-            
+
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Get all pages that do not have tags
+     *
+     * @param int $offset
+     * @param int $limit
+     * @return Paginator<Page>
+     */
+    public function getPagesWithoutTags(int $offset = 0, int $limit = 0): Paginator
+    {
+        return $this->getAll(
+            offset: $offset,
+            limit: $limit,
+            where: [
+                'q.tags IS EMPTY'
+            ],
+            order: [
+                ['q.postDate', 'DESC']
+            ]
+        );
+    }
+
+    /**
+     * Get all pages that do not have tags
+     *
+     * @return int
+     */
+    public function getPagesWithoutTagsCount(): int
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb = $qb
+            ->select('COUNT(p)')
+            ->leftJoin('p.tags', 'Page_tags')
+            ->where('Page_tags.id IS NULL');
+        /** @var int */
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Get all pages that do not have categories
+     *
+     * @param int $offset
+     * @param int $limit
+     * @return Paginator<Page>
+     */
+    public function getPagesWithoutCategories(int $offset = 0, int $limit = 0): Paginator
+    {
+        return $this->getAll(
+            offset: $offset,
+            limit: $limit,
+            where: [
+                'q.categories IS EMPTY'
+            ],
+            order: [
+                ['q.postDate', 'DESC']
+            ]
+        );
+    }
+
+    /**
+     * Get all pages that do not have categories
+     *
+     * @return int
+     */
+    public function getPagesWithoutCategoriesCount(): int
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb = $qb
+            ->select('COUNT(p)')
+            ->leftJoin('p.categories', 'Page_categories')
+            ->where('Page_categories.id IS NULL');
+        /** @var int */
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Get all pages that do not have a feature image
+     *
+     * @param int $offset
+     * @param int $limit
+     * @return Paginator<Page>
+     */
+    public function getPagesWithoutFeatureImage(int $offset = 0, int $limit = 0): Paginator
+    {
+        return $this->getAll(
+            offset: $offset,
+            limit: $limit,
+            where: [
+                'q.featureImage IS NULL'
+            ],
+            order: [
+                ['q.postDate', 'DESC']
+            ]
+        );
+    }
+
+    /**
+     * Get all pages that do not have a feature image
+     *
+     * @return int
+     */
+    public function getPagesWithoutFeatureImageCount(): int
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb = $qb
+            ->select('COUNT(p)')
+            ->where('p.featureImage IS NULL');
+        /** @var int */
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Get all pages that do not have a sharing message
+     *
+     * @param int $offset
+     * @param int $limit
+     * @return Paginator<Page>
+     */
+    public function getPagesWithoutSharingMessage(int $offset = 0, int $limit = 0): Paginator
+    {
+        return $this->getAll(
+            offset: $offset,
+            limit: $limit,
+            where: [
+                'q.sharingMessage IS NULL'
+            ],
+            order: [
+                ['q.postDate', 'DESC']
+            ]
+        );
+    }
+
+    /**
+     * Get all pages that do not have a sharing message
+     *
+     * @return int
+     */
+    public function getPagesWithoutSharingMessageCount(): int
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb = $qb
+            ->select('COUNT(p)')
+            ->where('p.sharingMessage IS NULL');
+        /** @var int */
+        return $qb->getQuery()->getSingleScalarResult();
     }
 }

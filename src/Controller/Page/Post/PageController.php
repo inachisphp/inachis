@@ -96,13 +96,27 @@ class PageController extends AbstractInachisController
             'postDate desc',
         );
         $this->data['form'] = $form->createView();
-        $this->data['posts'] = $pageRepository->getFilteredOfTypeByPostDate(
-            $contentQuery['filters'],
-            $type,
-            $contentQuery['offset'],
-            $contentQuery['limit'],
-            $contentQuery['sort'],
-        );
+        if ($request->query->has('category') && $request->query->get('category') === 'null') {
+            $this->data['posts'] = $pageRepository->getPagesWithoutCategories($contentQuery['offset'], $contentQuery['limit']);
+            $this->data['querystring'] = 'category=null';
+        } elseif ($request->query->has('tag') && $request->query->get('tag') === 'null') {
+            $this->data['posts'] = $pageRepository->getPagesWithoutTags($contentQuery['offset'], $contentQuery['limit']);
+            $this->data['querystring'] = 'tag=null';
+        } elseif ($request->query->has('featureImage') && $request->query->get('featureImage') === 'null') {
+            $this->data['posts'] = $pageRepository->getPagesWithoutFeatureImage($contentQuery['offset'], $contentQuery['limit']);
+            $this->data['querystring'] = 'featureImage=null';
+        } elseif ($request->query->has('sharingMessage') && $request->query->get('sharingMessage') === 'null') {
+            $this->data['posts'] = $pageRepository->getPagesWithoutSharingMessage($contentQuery['offset'], $contentQuery['limit']);
+            $this->data['querystring'] = 'sharingMessage=null';
+        } else {
+            $this->data['posts'] = $pageRepository->getFilteredOfTypeByPostDate(
+                $contentQuery['filters'],
+                $type,
+                $contentQuery['offset'],
+                $contentQuery['limit'],
+                $contentQuery['sort'],
+            );
+        }
         $this->data['query'] = $contentQuery;
         $this->data['page']['tab'] = $type;
         $this->data['page']['title'] = ucfirst($type) . 's';
