@@ -154,8 +154,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-	const views = {{ analytics.viewsPerDay|map(v => v.total)|json_encode|raw }};
-	const avg = views.reduce((a, b) => a + b, 0) / views.length;
+    const views = {{ analytics.viewsPerDay|map(v => v.total)|json_encode|raw }}
+        .map(v => Number(v) || 0);
+    const avg = views.reduce((a, b) => a + b, 0) / views.length;
     const avgLine = views.map(() => avg);
     const data = {
         labels: {{ analytics.viewsPerDay|map(v => v.date)|json_encode|raw }},
