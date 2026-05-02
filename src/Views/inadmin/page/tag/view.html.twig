@@ -1,0 +1,61 @@
+{% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_tags_list') }}">{{ 'Tags'|trans }}</a>
+	<span>{{ tag.title }}</span>
+{% endblock pagetitle %}
+
+{% block content %}
+<div class="col-12">
+	{% include 'inadmin/partials/table.html.twig' with {
+		className: 'form__tag col-6',
+		type: 'post',
+		additional_classes: 'default',
+
+		table_name: 'Tag usage',
+		table_class: 'table--responsive table--row-borders table--focusable table--darkhead',
+		table_desc: 'This table lists tags used by pages and posts.',
+
+		columns: [
+			{
+				title: 'Title',
+				source: 'title',
+				header: true,
+				slug_prefix: 'type',
+				slug: 'urls[0].link',
+			},
+			{
+				title: 'Sub Title',
+				source: 'subTitle',
+			},
+			{
+				title: 'Published',
+				source: 'postDate',
+				source_type: 'date',
+			},
+		],
+
+		limit: query.limit,
+		offset: query.offset,
+		total: total,
+		url_result: path('incc_tag_show', {
+			id: tag.id,
+			offset: query.offset,
+			limit: query.limit,
+		}),
+
+		show_select_deselect: true,
+		zebra: true,
+
+		actions: {
+
+			delete: {
+				button_class: 'button--negative button--delete',
+				icon: 'delete_forever',
+				title: 'Remove',
+			},
+		}
+	} %}
+</div>
+<p>&nbsp;</p>
+{% endblock content %}

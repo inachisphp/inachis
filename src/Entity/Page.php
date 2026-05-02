@@ -869,6 +869,18 @@ class Page
     }
 
     /**
+     * Removes a {@link Tag} from the {@link Page}.
+     *
+     * @param Tag $tag The {@link Tag} to remove from the {@link Page}
+     * @return $this
+     */
+    public function removeTag(Tag $tag): self
+    {
+        $this->tags->removeElement($tag);
+        return $this;
+    }
+
+    /**
      * @return $this
      */
     public function removeTags(): self

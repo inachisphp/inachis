@@ -13,6 +13,7 @@ use Inachis\Model\ContentQueryParameters;
 use Inachis\Entity\Tag;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\TagRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -95,7 +96,8 @@ class TagsController extends AbstractInachisController
                 if ($tag === null) {
                     continue;
                 }
-                if (count($pageRepository->getPagesWithTag($tag)) > 0) {
+                $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$tag->getId()]], '*', 0, 0);
+                if ($pages->getIterator()->count() > 0) {
                     $this->addFlash('error', 'Tag still in use - please remove tag from pages before deleting');
                     return $this->redirectToRoute('incc_tags_list');
                 }
@@ -126,7 +128,7 @@ class TagsController extends AbstractInachisController
         $this->data['query'] = $contentQuery;
         $this->data['total'] = $tagRepository->getAllCount();
         $this->data['page']['title'] = 'Tags';
-        $this->data['page']['tab'] = 'settings';
+        $this->data['page']['tab'] = 'tag';
         return $this->render('inadmin/page/tag/list.html.twig', $this->data);
     }
 
@@ -141,8 +143,9 @@ class TagsController extends AbstractInachisController
     #[Route('/incc/tags/merge', name: 'incc_tags_merge', methods: ['POST'])]
     public function mergeTags(
         Request $request,
+        PageRepository $pageRepository,
         TagRepository $tagRepository,
-        EntityManagerInterface $em
+        EntityManagerInterface $entityManager
     ): Response {
         $targetId = $request->request->get('target');
         $sourceIds = $request->request->all('sources');
@@ -164,42 +167,18 @@ class TagsController extends AbstractInachisController
             }
 
             // Move pages across
-            foreach ($source->getPages() as $page) {
+            $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$source->getId()]], '*', 0, 0);
+            foreach ($pages as $page) {
                 $page->removeTag($source);
                 $page->addTag($target);
             }
 
-            $em->remove($source);
+            $entityManager->remove($source);
         }
-
-        $em->flush();
+        $entityManager->flush();
 
         return new Response('OK');
     }
-    // public function merge(Request $request, PageRepository $pageRepository, TagRepository $tagRepository): Response
-    // {
-    //     $sources = $tagRepository->find($request->request->all('sources'));
-    //     $target = $tagRepository->find($request->request->get('target'));
-
-    //     if (!$source || !$target || $source === $target) {
-    //         throw new \InvalidArgumentException('Invalid merge');
-    //     }
-
-    //     $pages = $pageRepository->getPagesWithTag($source);
-
-    //     foreach ($pages as $page) {
-    //         $page->removeTag($source);
-
-    //         if (!$page->getTags()->contains($target)) {
-    //             $page->addTag($target);
-    //         }
-    //     }
-
-    //     $this->entityManager->remove($source);
-    //     $this->entityManager->flush();
-
-    //     return $this->redirectToRoute('incc_tags_list');
-    // }
 
     /**
      * Show tag and its pages
@@ -208,14 +187,50 @@ class TagsController extends AbstractInachisController
      * @param PageRepository $pageRepository
      * @return Response
      */
-    #[Route('/incc/tags/{id}', name: 'incc_tag_show')]
-    public function show(Tag $tag, PageRepository $pageRepository): Response
-    {
-        $pages = $pageRepository->findByTag($tag);
+    #[Route('/incc/tags/{id}/{offset}/{limit}', name: 'incc_tag_show', requirements: [ "offset" => "\d+", "limit" => "\d+" ], defaults: [ "offset" => 0, "limit" => 25 ])]
+    public function show(
+        Tag $tag,
+        PageRepository $pageRepository,
+        ContentQueryParameters $contentQueryParameters,
+        Request $request,
+        int $offset = 0,
+        int $limit = 25
+    ): Response {
+        $form = $this->createFormBuilder()->getForm();
+        $form->handleRequest($request);
 
-        return $this->render('inadmin/page/tag/view.html.twig', [
-            'tag' => $tag,
-            'pages' => $pages,
-        ]);
+        if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
+            $items = $request->request->all('items') ?? [];
+            $action = $request->request->has('delete')  ? 'delete' : null;
+
+            // @todo move the following foreach loop into a TagsBulkActionService and pass it $request
+            foreach($items as $item) {
+                $page = $pageRepository->findOneBy(['id' => $item]);
+                if ($page === null) {
+                    continue;
+                }
+                $page->removeTag($tag);
+            }
+            $this->entityManager->flush();
+
+            return $this->redirectToRoute('incc_tag_show', ['id' => $tag->getId()]);
+        }
+
+        $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$tag->getId()]], '*', $offset, $limit);
+
+        $this->data['dataset'] = $pages;
+        $this->data['form'] = $form->createView();
+        $this->data['query'] = $contentQueryParameters->process(
+            $request,
+            $pageRepository,
+            'page',
+            'title'
+        );
+        $this->data['total'] = $pages->getIterator()->count();
+        $this->data['page']['title'] = 'Tags';
+        $this->data['page']['tab'] = 'settings';
+        $this->data['tag'] = $tag;
+
+        return $this->render('inadmin/page/tag/view.html.twig', $this->data);
     }
 }
