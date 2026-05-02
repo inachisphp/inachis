@@ -1,0 +1,133 @@
+{% if stats is not defined or stats.totalViews == 0 %}
+    <p>No analytics data yet. Once you start getting traffic to this post we will be able to show you the analytics here.</p>
+{% else %}
+    <section class="admonition admonition__info">
+        <header class="admonition__header">
+            <h2>Data range</h2>
+        </header>
+        <p class="admonition__content">
+            {{ stats.from|date('jS F Y') }} &mdash; {{ stats.to|date('jS F Y') }}
+        </p>
+		{% set best = stats.viewsPerDay
+			|sort((a, b) => b.views <=> a.views)
+			|first
+		%}
+		<p>Best day: {{ best.date|date('jS F Y') }} ({{ best.views }} views)</p>
+    </section>
+
+    <section class="widget ui-section rounded">
+        <header class="widget__header">
+            <h2>Overview</h2>
+        </header>
+        <div class="widget__content nested-grid">
+
+            <article class="col-6 widget-stats__card widget-stats__card--total">
+                <div class="widget-stats__icon">
+                    <span class="material-icons">visibility</span>
+                </div>
+                <div class="widget-stats__content">
+                    <h2>Total Views</h2>
+                    <p class="widget-stats__value">
+                        {{ stats.totalViews|number_format }}
+                    </p>
+                </div>
+            </article>
+
+            <article class="col-6 widget-stats__card">
+                <div class="widget-stats__icon">
+                    <span class="material-icons">insights</span>
+                </div>
+                <div class="widget-stats__content">
+                    <h2>Daily Average</h2>
+                    <p class="widget-stats__value">
+                        {{ (stats.totalViews / stats.viewsPerDay|length)|number_format(0) }}
+                    </p>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+	<section class="col-6 widget">
+    <header class="widget__header">
+        <h2>Traffic (last 90 days)</h2>
+    </header>
+    <canvas id="pageTrafficChart"></canvas>
+</section>
+
+<section class="col-6 widget">
+    <header class="widget__header">
+        <h2>Top Referrers</h2>
+    </header>
+    <table>
+        <thead>
+            <tr>
+                <th>Source</th>
+                <th>Visits</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ref in stats.topReferrers %}
+                <tr>
+                    <td>{{ ref.domain }}</td>
+                    <td>{{ ref.total }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="2">No data</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const labels = {{ stats.viewsPerDay|map(v => v.date)|json_encode|raw }};
+    const views = {{ stats.viewsPerDay|map(v => v.views)|json_encode|raw }};
+
+    const avg = views.reduce((a, b) => a + b, 0) / views.length;
+    const avgLine = views.map(() => avg);
+
+    new Chart(
+        document.getElementById('pageTrafficChart'),
+        {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Views',
+                        data: views,
+                        fill: false,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Average',
+                        data: avgLine,
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            maxTicksLimit: 10
+                        }
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        }
+    );
+</script>
+{% endif %}

@@ -6,8 +6,7 @@
 {% endblock pagetitle %}
 
 {% block content %}
-{% block series_edit_pre %}{% endblock series_edit_pre %}
-{% block series_edit %}
+{% set showStats = series.id is not empty and series.visibility == '1' %}
 
 {{ form_start(form, {'attr': { 'class': 'col-12 form form__post form__series' }}) }}
 <div class="content__edit">
@@ -20,6 +19,11 @@
             <a href="#series__contents">
                 {% trans %}admin.series.contents.title{% endtrans %}
                 <span class="badge">{{ series.items|length }}</span></a>
+        </li>
+        {% endif %}
+        {% if showStats %}
+        <li data-source="{{ path('incc_api_series_stats', { 'id': series.id }) }}" class="tab--lazyload">
+            <a href="#series__stats">{% trans %}admin.posts.tabs.stats{% endtrans %}</a>
         </li>
         {% endif %}
     </ul>
@@ -71,6 +75,11 @@
     <fieldset id="series__contents" class="ui-section content__edit edit__list">
         {{  include('inadmin/partials/series_contents.html.twig') }}
     </fieldset>
+
+    {% if showStats %}
+    <fieldset id="series__stats" class="ui-section content__edit">
+    </fieldset>
+    {% endif %}
 </div>
 
 <div class="fixed-bottom-bar">
@@ -91,6 +100,4 @@
 
 {{ form_row(form._token) }}
 {{ form_end(form, {render_rest: false}) }}
-{% endblock series_edit %}
-{% block series_edit_post %}{% endblock series_edit_post %}
 {% endblock content %}

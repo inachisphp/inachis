@@ -6,6 +6,7 @@
 {% endblock pagetitle %}
 
 {% block content %}
+    {% set showStats = post.id is not empty and post.status|default('') == 'published' %}
 
     {{ form_start(form, {'attr': { 'class': 'col-12 form form__post' }}) }}
     <div class="content__edit">
@@ -22,6 +23,11 @@
             {%  if revisions is defined and revisions is not empty %}
             <li>
                 <a href="#post__history">{% trans %}admin.posts.tabs.revisions{% endtrans %}</a>
+            </li>
+            {% endif %}
+            {% if showStats %}
+            <li data-source="{{ path('incc_api_post_stats', { 'id': post.id }) }}" class="tab--lazyload">
+                <a href="#post__stats">{% trans %}admin.posts.tabs.stats{% endtrans %}</a>
             </li>
             {% endif %}
         </ul>
@@ -187,6 +193,11 @@
                 {% endfor %}
                 </tbody>
             </table>
+        </fieldset>
+        {% endif %}
+
+        {% if showStats %}
+        <fieldset class="ui-section" i id="post__stats">
         </fieldset>
         {% endif %}
     </div>

@@ -9,8 +9,11 @@
 
 namespace Inachis\Repository;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use Inachis\Entity\{Page, Series};
 
 /**
  * Analytics repository
@@ -255,5 +258,107 @@ class AnalyticsRepository
             LIMIT ' . (int) $limit,
             ['path' => $path]
         );
+    }
+
+    /**
+     * Get page views per day for paths
+     *
+     * @param string[] $paths
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return array
+     */
+    public function getPageViewsPerDayForPaths(
+        array $paths,
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
+        if (empty($paths)) {
+            return [];
+        }
+
+        $data = $this->db->executeQuery(
+            '
+            SELECT date, SUM(views) as total
+            FROM analytics_page_view
+            WHERE path IN (:paths)
+            AND date BETWEEN :from AND :to
+            GROUP BY date
+            ORDER BY date ASC
+            ',
+            [
+                'paths' => $paths,
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ],
+            [
+                'paths' => ArrayParameterType::STRING,
+            ]
+        )->fetchAllAssociative();
+
+        return $this->fillMissingDates($data, $from, $to);
+    }
+
+    /**
+     * Get page views per day for a page
+     *
+     * @param Page $page
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return array
+     */
+	public function getPageStatsOverTime(Page $page, \DateTimeInterface $from, \DateTimeInterface $to): array
+	{
+		$paths = $page->getUrls()->map(fn($url) => '/' . $url->getLink());
+
+		return $this->getPageViewsPerDayForPaths($paths->toArray(), $from, $to);
+	}
+
+    /**
+     * Get page views per day for a series
+     *
+     * @param Series $series
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return array
+     */
+    public function getSeriesStatsOverTime(Series $series, \DateTimeInterface $from, \DateTimeInterface $to): array
+    {
+        $paths = ['/' . $series->getLastDate()->format('Y') . '-' . $series->getUrl()];
+
+        return $this->getPageViewsPerDayForPaths($paths, $from, $to);
+    }
+
+    /**
+     * Fill in missing dates
+     *
+     * @param array $data
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return array
+     */
+    public function fillMissingDates(array $data, \DateTimeInterface $from, \DateTimeInterface $to): array
+    {
+        $indexed = [];
+        foreach ($data as $row) {
+            $indexed[$row['date']] = (int) $row['total'];
+        }
+
+        $result = [];
+        $current = new \DateTimeImmutable($from->format('Y-m-d'));
+        $end = new \DateTimeImmutable($to->format('Y-m-d'));
+
+        while ($current <= $end) {
+            $key = $current->format('Y-m-d');
+
+            $result[] = [
+                'date' => $key,
+                'views' => $indexed[$key] ?? 0,
+            ];
+
+            $current = $current->modify('+1 day');
+        }
+
+        return $result;
     }
 }

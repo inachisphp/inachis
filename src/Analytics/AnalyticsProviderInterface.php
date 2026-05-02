@@ -9,6 +9,8 @@
 
 namespace Inachis\Analytics;
 
+use Inachis\Entity\{Page, Series};
+
 /**
  * Interface for analytics providers
  *
@@ -90,4 +92,56 @@ interface AnalyticsProviderInterface
      * ]
      */
     public function getTopReferrersForPage(string $path, int $limit = 10): array;
+
+    /**
+     * Get page views per day for paths
+     *
+     * Expected format:
+     * [
+     *   ['date' => '2026-04-29', 'total' => 123],
+     *   ...
+     * ]
+     *
+     * @param string[] $paths
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return array
+     */
+    public function getPageViewsPerDayForPaths(
+        array $paths,
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array;
+
+    /**
+     * Get page stats over time
+     *
+     * Expected format:
+     * [
+     *   ['date' => '2026-04-29', 'views' => 123],
+     *   ...
+     * ]
+     *
+     * @param Page $page
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return array
+     */
+    public function getPageStatsOverTime(Page $page, \DateTimeInterface $from, \DateTimeInterface $to): array;
+
+    /**
+     * Get series stats over time
+     *
+     * Expected format:
+     * [
+     *   ['date' => '2026-04-29', 'views' => 123],
+     *   ...
+     * ]
+     *
+     * @param Series $series
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return array
+     */
+    public function getSeriesStatsOverTime(Series $series, \DateTimeInterface $from, \DateTimeInterface $to): array;
 }
