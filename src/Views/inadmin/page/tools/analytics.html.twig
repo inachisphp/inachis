@@ -82,7 +82,10 @@
 				<tr>
 					<td>{{ page.title ?? page.path }}</td>
 					<td>{{ page.current }}</td>
-					<td>
+					<td {% 
+                        if page.change < 0 %}class="widget-stats__trend--down"{% 
+                        elseif page.change > 0 %}class="widget-stats__trend--up"{% 
+                    endif %}>
 						{% if page.change is null %}
 							NEW
 						{% elseif page.change > 0 %}
