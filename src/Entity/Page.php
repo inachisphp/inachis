@@ -326,11 +326,11 @@ class Page
     /**
      * Returns the value of {@link status}.
      *
-     * @return EditorialStatus The current publishing status of the {@link Page}
+     * @return string The current publishing status of the {@link Page}
      */
-    public function getStatus(): EditorialStatus
+    public function getStatus(): string
     {
-        return $this->status;
+        return $this->status->value;
     }
 
     /**
@@ -954,7 +954,7 @@ class Page
      */
     public function isDraft(): bool
     {
-        return $this->status === EditorialStatus::DRAFT;
+        return $this->status->value === EditorialStatus::DRAFT;
     }
 
     /**

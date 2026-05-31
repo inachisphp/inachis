@@ -16,7 +16,7 @@
     'url': source.url.link is defined ?
     '/' ~ source.url.link :
     source.url is defined ?
-    path('app_series_view', { 'year': source.firstDate|date('Y'), 'title': source.title|lower }) :
+    path('web_series_view', { 'year': source.firstDate|date('Y'), 'title': source.title|lower }) :
     app.request.uri,
 } %}
 
