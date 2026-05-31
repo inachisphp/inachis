@@ -212,10 +212,11 @@ class AggregateAnalyticsCommand extends Command
 			if (!$data || !isset($data['path'], $data['date'], $data['code'])) {
 				continue;
 			}
+            if ($this-shouldIgnoreError($path)) {
+                continue;
+            }
 
-            $data['path'] = $this->normalisePath($data['path']);
-
-			$key = $data['path'] . '|' . $data['date'] . '|' . $data['code'];
+            $key = $this->normalisePath($data['path']) . '|' . $data['date'] . '|' . $data['code'];
 			$counts[$key] = ($counts[$key] ?? 0) + 1;
 		}
 
@@ -403,5 +404,32 @@ class AggregateAnalyticsCommand extends Command
     private function normalisePath(string $path): string
     {
         return mb_substr(trim($path), 0, 255);
+    }
+
+    /**
+     * Exclude obvious vulnerability scans from statistics - they should
+     * be dealt with through other means
+     * 
+     * @param string $path The path to check for ignoring
+     * @return bool Should the current path be ignored
+     */
+    private function shouldIgnoreError(string $path): bool
+    {
+        $patterns = [
+            '.env',
+            'phpinfo',
+            'wp-admin',
+            'wp-login',
+            'vendor/phpunit',
+            'server-status',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (stripos($path, $pattern) !== false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
