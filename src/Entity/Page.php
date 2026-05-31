@@ -920,17 +920,6 @@ class Page
     }
 
     /**
-     * Confirms the status being set to the {@link Page} is valid.
-     *
-     * @param string|null $value The string to test as being a valid status
-     * @return bool Result of testing if string is draft or published
-     */
-    public function isValidStatus(?string $value): bool
-    {
-        return EditorialStatus::tryFrom($value) !== null;
-    }
-
-    /**
      * Determines of a provided string is a valid Timezone defined in PHP (>5.2).
      *
      * @param string $timezone The string to test
