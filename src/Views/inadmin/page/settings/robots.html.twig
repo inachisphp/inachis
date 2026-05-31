@@ -4,35 +4,22 @@
     <span>robots.txt Configuration</span>
 {% endblock pagetitle %}
 {% block content %}
-
-<form method="post">
-    <div class="card">
-        <div class="card-header">
-            robots.txt
-        </div>
-
-        <div class="card-body">
-            <p>
-                Enter the contents of your robots.txt file below.
-                The sitemap URL will be appended automatically.
-            </p>
-
-            <textarea
-                name="robots_txt"
-                rows="20"
-                class="form-control font-monospace"
-            >{{ robotsTxt }}</textarea>
-        </div>
-
-        <div class="card-footer">
-            <button
-                type="submit"
-                class="btn btn-primary"
-            >
-                Save
-            </button>
-        </div>
+<div class="col-12 content__edit">
+{{ form_start(form, {'attr': { 'class': 'form form__post form__tabs' }}) }}
+    <section class="ui-section">
+		<p>
+            {{ form_label(form.robots_txt) }}
+            {{ form_errors(form.robots_txt) }}
+            {{ form_widget(form.robots_txt) }}
+        </p>
+    </section>
+    <div class="fixed-bottom-bar">
+        <p>
+            {{ form_widget(form.submit) }}
+			<a class="button button--secondary" href="{{ path('web_robots_txt') }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons" aria-hidden="true">exit_to_app</span>
+                    {% trans %}admin.button.viewLive{% endtrans %}</a>
+        </p>
     </div>
-</form>
-
+{{ form_end(form) }}
+</div>
 {% endblock content %}

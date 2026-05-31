@@ -9,6 +9,7 @@
 
 namespace Inachis\Controller\Page\Setting;
 
+use Inachis\Form\RobotsTxtType;
 use Inachis\Repository\SettingRepository;
 use Inachis\Controller\AbstractInachisController;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,18 +29,27 @@ class RobotsTxtController extends AbstractInachisController
 	 * @return Response
 	 */
 	#[Route('/incc/settings/robots', name: 'incc_settings_robots')]
-	public function edit(Request $request, SettingRepository $settingRepository): Response {
-        if ($request->isMethod('POST')) {
-            $robotsTxt = trim(
-                $request->request->get('robots_txt', '')
-            );
+	public function edit(Request $request, SettingRepository $settingRepository): Response
+    {
+        $form = $this->createForm(
+            RobotsTxtType::class,
+            [
+                'robots_txt' => $settingRepository->getValue('robots_txt') ?? '',
+            ]
+        );
+        $form->handleRequest($request);
 
-			if (preg_match('/^Disallow:\s*\/\s*$/mi', $robotsTxt)) {
-				$this->addFlash(
-					'warning',
-					'Your robots.txt blocks the entire site from indexing.'
-				);
-			}
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            $robotsTxt = trim($data['robots_txt']);
+
+            if (preg_match('/^Disallow:\s*\/\s*$/mi', $robotsTxt)) {
+                $this->addFlash(
+                    'warning',
+                    'Your robots.txt blocks the entire site from indexing.'
+                );
+            }
 
             $settingRepository->setValue(
                 'robots_txt',
@@ -51,13 +61,12 @@ class RobotsTxtController extends AbstractInachisController
                 'robots.txt configuration updated.'
             );
 
-            return $this->redirectToRoute(
-                'incc_settings_robots'
-            );
+            return $this->redirectToRoute('incc_settings_robots');
         }
 
         $this->data['page']['title'] = 'robots.txt Configuration';
         $this->data['page']['tab'] = 'settings';
+        $this->data['form'] = $form->createView();
 		$this->data['robotsTxt'] = $settingRepository->getValue('robots_txt') ?? '';
 
         return $this->render('/inadmin/page/settings/robots.html.twig', $this->data);

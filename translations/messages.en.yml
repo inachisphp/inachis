@@ -156,7 +156,7 @@ admin.navigation.url.label: 'URL'
 admin.navigation.url.placeholder: 'e.g. /'
 admin.navigation.isActive.label: 'Active'
 
-
+admin.setting.robots_txt.label: 'Enter the contents of your robots.txt file below. The sitemap URL will be appended automatically.'
 
 
 admin.label.username: Username
