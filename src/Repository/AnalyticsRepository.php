@@ -361,4 +361,97 @@ class AnalyticsRepository
 
         return $result;
     }
+
+    /**
+     * Get top visitor countries/regions.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     * @return array
+     */
+    public function getTopRegions(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array
+    {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT country_code, country_name, SUM(hits) AS total
+            FROM analytics_regions
+            WHERE date BETWEEN :from AND :to
+            GROUP BY country_code, country_name
+            ORDER BY total DESC
+            LIMIT ' . (int) $limit,
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
+        );
+    }
+
+    /**
+     * Get RSS subscriber stats over time.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return array
+     */
+    public function getSubscriberStatsOverTime(\DateTimeInterface $from, \DateTimeInterface $to): array
+    {
+        $data = $this->db->fetchAllAssociative(
+            '
+            SELECT date, SUM(subscribers) AS total
+            FROM analytics_subscribers
+            WHERE date BETWEEN :from AND :to
+            GROUP BY date
+            ORDER BY date ASC
+            ',
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
+        );
+
+        // Fill missing dates
+        $indexed = [];
+        foreach ($data as $row) {
+            $indexed[$row['date']] = (int) $row['total'];
+        }
+
+        $result = [];
+        $current = new \DateTimeImmutable($from->format('Y-m-d'));
+        $end = new \DateTimeImmutable($to->format('Y-m-d'));
+
+        while ($current <= $end) {
+            $key = $current->format('Y-m-d');
+
+            $result[] = [
+                'date' => $key,
+                'subscribers' => $indexed[$key] ?? 0,
+            ];
+
+            $current = $current->modify('+1 day');
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get current subscribers per feed path.
+     *
+     * @return array
+     */
+    public function getCurrentSubscribersPerFeed(): array
+    {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT s.path, s.subscribers
+            FROM analytics_subscribers s
+            INNER JOIN (
+                SELECT path, MAX(date) AS max_date
+                FROM analytics_subscribers
+                GROUP BY path
+            ) latest ON s.path = latest.path AND s.date = latest.max_date
+            ORDER BY s.subscribers DESC
+            '
+        );
+    }
 }

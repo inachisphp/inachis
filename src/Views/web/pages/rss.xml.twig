@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>{{ feed_title }}</title>
+    <link>{{ settings.domain }}</link>
+    <description>{{ feed_description }}</description>
+    <language>{{ settings.language|default('en') }}</language>
+    <pubDate>{{ posts|length > 0 ? posts|first.postDate|date('r') : 'now'|date('r') }}</pubDate>
+    <lastBuildDate>{{ 'now'|date('r') }}</lastBuildDate>
+    <atom:link href="{{ feed_url }}" rel="self" type="application/rss+xml" />
+    {% for post in posts %}
+      <item>
+        <title>{{ post.title }}{% if post.subTitle is not empty %} — {{ post.subTitle }}{% endif %}</title>
+        <link>{{ settings.domain }}/{{ post.urls.first.link }}</link>
+        <description><![CDATA[{{ post.featureSnippet is not empty ? post.featureSnippet : (post.content|striptags|slice(0, 250) ~ '...') }}]]></description>
+        <pubDate>{{ post.postDate|date('r') }}</pubDate>
+        <guid isPermaLink="true">{{ settings.domain }}/{{ post.urls.first.link }}</guid>
+        {% if post.author is not empty %}
+          <author>{{ post.author.email|default('no-reply@davidgpaul.co.uk') }} ({{ post.author.displayName|default(post.author.username) }})</author>
+        {% endif %}
+      </item>
+    {% endfor %}
+  </channel>
+</rss>

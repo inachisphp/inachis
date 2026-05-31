@@ -93,6 +93,13 @@
                     {{ form_widget(form.postDate) }}
 				</span>
             </p>
+            <p>
+                {{ form_label(form.expireDate) }}
+                {{ form_errors(form.expireDate) }}
+                <span id="post__schedule__timed">
+                    {{ form_widget(form.expireDate) }}
+				</span>
+            </p>
             {% if post.id is not empty %}
             <p>
                 {{ form_label(form.modDate) }}

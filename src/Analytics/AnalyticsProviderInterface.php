@@ -144,4 +144,19 @@ interface AnalyticsProviderInterface
      * @return array
      */
     public function getSeriesStatsOverTime(Series $series, \DateTimeInterface $from, \DateTimeInterface $to): array;
+
+    /**
+     * Get top visitor countries/regions.
+     */
+    public function getTopRegions(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array;
+
+    /**
+     * Get RSS subscriber stats over time.
+     */
+    public function getSubscriberStatsOverTime(\DateTimeInterface $from, \DateTimeInterface $to): array;
+
+    /**
+     * Get current subscribers per feed path.
+     */
+    public function getCurrentSubscribersPerFeed(): array;
 }

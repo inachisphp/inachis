@@ -12,6 +12,7 @@ namespace Inachis\Repository;
 use Inachis\Entity\Image;
 use Inachis\Entity\Page;
 use Inachis\Entity\Series;
+use Inachis\Enum\EditorialStatus;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -84,7 +85,7 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             ->andWhere('i.status = :status')
             ->andWhere('s.visibility = :visibility')
             ->setParameter('page', $page)
-            ->setParameter('status', Page::PUBLISHED)
+            ->setParameter('status', EditorialStatus::PUBLISHED)
             ->setParameter('visibility', Series::PUBLIC)
             ->orderBy('i.postDate', 'ASC')
             ->getQuery()

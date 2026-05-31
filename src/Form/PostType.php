@@ -71,8 +71,8 @@ class PostType extends AbstractType
     {
         $newItem = empty($options['data']->getId());
         $user = $this->security->getUser();
-        $userTimezone = $user && method_exists($user, 'getPreferences') 
-            ? $user->getPreferences()->getTimezone() 
+        $userTimezone = $user && method_exists($user, 'getPreferences')
+            ? $user->getPreferences()->getTimezone()
             : 'UTC';
         $builder
             ->add('title', TextType::class, [
@@ -172,6 +172,26 @@ class PostType extends AbstractType
                     'admin.post.properties.postDate-future.label',
                 'label_attr' => [
                     'id' => 'postDate_label',
+                    'class' => 'inline_label',
+                ],
+                'model_timezone' => 'UTC',
+                'view_timezone' => $userTimezone,
+                'required' => false,
+                'widget'   => 'single_text',
+            ])
+            ->add('expireDate', DateTimeType::class, [
+                'attr' => [
+                    'aria-labelledby'  => 'expireDate_label',
+                    'aria-required'    => 'false',
+                ],
+                'format' => 'dd/MM/yyyy HH:mm',
+                'html5'  => false,
+                'input'  => 'datetime_immutable',
+                'label'  => isset($options['data']) && $options['data']->getExpireDate() < new DateTimeImmutable() ?
+                    'admin.post.properties.expireDate-past.label' :
+                    'admin.post.properties.expireDate-future.label',
+                'label_attr' => [
+                    'id' => 'expireDate_label',
                     'class' => 'inline_label',
                 ],
                 'model_timezone' => 'UTC',

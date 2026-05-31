@@ -1,0 +1,93 @@
+{% extends "web/structure/main.html.twig" %}
+
+{% set pageClass = 'feeds-list-page' %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<div class="content-column">
+    <div style="margin-bottom: var(--spacing-xl);">
+        <h1 style="font-size: clamp(2rem, 5vw, 2.75rem); margin-bottom: var(--spacing-sm); text-align: center; font-weight: 800;">
+            Stay Updated
+        </h1>
+        <p style="text-align: center; color: var(--color-muted); max-width: 60ch; margin: 0 auto var(--spacing-lg) auto;">
+            Subscribe to our RSS feeds using your favorite news aggregator (Feedly, NetNewsWire, Feedbin, etc.) to get automated updates whenever new articles are published.
+        </p>
+
+        <!-- Main Feed Card -->
+        <article class="feed-card main-feed" style="margin-bottom: var(--spacing-lg); padding: var(--spacing-lg); border: 2px solid var(--color-link); background-color: var(--color-accent); position: relative;">
+            <div style="display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-xs);">
+                <span class="material-icons" style="font-size: 2rem; color: #f26522;">rss_feed</span>
+                <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--color-text);">All Articles Feed</h2>
+            </div>
+            <p style="color: var(--color-muted); margin-bottom: var(--spacing-md);">
+                Get every new blog post as soon as it goes live. Highly recommended for general updates.
+            </p>
+            <div class="feed-url-container" style="display: flex; gap: var(--spacing-xs); flex-wrap: wrap; align-items: center;">
+                <input type="text" readonly value="{{ settings.domain }}/feed" class="feed-url-input" 
+                       style="flex: 1; min-width: 250px; padding: 0.5rem; border: var(--border-width) solid var(--color-border); border-radius: var(--border-radius); background: var(--color-bg); color: var(--color-text); font-family: var(--font-mono); font-size: 0.9rem;" />
+                <button onclick="copyFeedUrl('{{ settings.domain }}/feed', this)" class="feed-btn"
+                        style="padding: 0.5rem 1rem; border: none; background: var(--color-link); color: white; border-radius: var(--border-radius); font-weight: 600; cursor: pointer; transition: background 0.2s;">
+                    Copy Link
+                </button>
+                <a href="/feed" target="_blank" class="feed-btn"
+                   style="padding: 0.5rem 1rem; border: var(--border-width) solid var(--color-link); color: var(--color-link); border-radius: var(--border-radius); font-weight: 600; text-align: center; text-decoration: none; transition: background 0.2s;">
+                    Open Feed
+                </a>
+            </div>
+        </article>
+
+        <!-- Category Feeds -->
+        <h2 style="font-size: 1.5rem; margin-top: var(--spacing-xl); margin-bottom: var(--spacing-md); border-bottom: var(--border-width) solid var(--color-border); padding-bottom: var(--spacing-xs);">
+            Filter by Category
+        </h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-md);">
+            {% for category in categories %}
+                <article class="feed-card category-feed" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: var(--spacing-xs); margin-bottom: var(--spacing-xs);">
+                            <span class="material-icons" style="font-size: 1.5rem; color: var(--color-muted);">folder</span>
+                            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 600;">{{ category.title }} Feed</h3>
+                        </div>
+                        <p style="color: var(--color-muted); font-size: 0.95rem; margin-bottom: var(--spacing-md); flex: 1;">
+                            {{ category.description|default('Only articles published in the ' ~ category.title ~ ' category.') }}
+                        </p>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: var(--spacing-xs); margin-top: auto;">
+                        <input type="text" readonly value="{{ settings.domain }}/feed/{{ category.title }}" 
+                               style="padding: 0.4rem; border: var(--border-width) solid var(--color-border); border-radius: var(--border-radius); background: var(--color-bg); color: var(--color-text); font-family: var(--font-mono); font-size: 0.85rem;" />
+                        <div style="display: flex; gap: var(--spacing-xs);">
+                            <button onclick="copyFeedUrl('{{ settings.domain }}/feed/{{ category.title }}', this)" 
+                                    style="flex: 1; padding: 0.4rem; border: none; background: var(--color-link); color: white; border-radius: var(--border-radius); font-weight: 600; font-size: 0.85rem; cursor: pointer;">
+                                Copy
+                            </button>
+                            <a href="/feed/{{ category.title }}" target="_blank" 
+                               style="flex: 1; padding: 0.4rem; border: var(--border-width) solid var(--color-link); color: var(--color-link); border-radius: var(--border-radius); font-weight: 600; font-size: 0.85rem; text-align: center;">
+                                Open
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            {% else %}
+                <p style="color: var(--color-muted); font-style: italic;">No categories found.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+function copyFeedUrl(url, button) {
+    navigator.clipboard.writeText(url).then(function() {
+        const originalText = button.textContent || button.value;
+        if (button.tagName === 'INPUT' || button.tagName === 'BUTTON') {
+            button.textContent = 'Copied!';
+            button.style.background = '#28a745';
+            setTimeout(function() {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+    });
+}
+</script>
+{% endblock content %}

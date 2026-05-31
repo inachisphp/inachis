@@ -13,6 +13,7 @@ use DateTimeImmutable;
 use Exception;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\{Category, Image, Page, Revision, Tag, Url};
+use Inachis\Enum\EditorialStatus;
 use Inachis\Form\PostType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\{PageRepository, RevisionRepository, TagRepository};
@@ -187,7 +188,7 @@ class PageController extends AbstractInachisController
             }
             $post->setAuthor($this->getUser());
             if (null !== $request->request->get('publish')) {
-                $post->setStatus(Page::PUBLISHED);
+                $post->setStatus(EditorialStatus::PUBLISHED);
                 if (isset($revision)) {
                     if ($contentRevisionCompare->doesPageMatchRevision($post, $revision)) {
                         $revision->setContent('');
@@ -249,7 +250,7 @@ class PageController extends AbstractInachisController
             }
 
             if ($form->has('publish') && $form->get('publish')->isClicked()) {
-                $post->setStatus(Page::PUBLISHED);
+                $post->setStatus(EditorialStatus::PUBLISHED);
                 if (isset($revision)) {
                     $revision->setAction(RevisionRepository::PUBLISHED);
                 }

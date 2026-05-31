@@ -218,4 +218,39 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
 	{
 		return $this->analyticsRepository->getSeriesStatsOverTime($series, $from, $to);
 	}
+
+    /**
+     * Get top visitor countries/regions.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     * @return array
+     */
+    public function getTopRegions(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array
+    {
+        return $this->analyticsRepository->getTopRegions($from, $to, $limit);
+    }
+
+    /**
+     * Get RSS subscriber stats over time.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return array
+     */
+    public function getSubscriberStatsOverTime(\DateTimeInterface $from, \DateTimeInterface $to): array
+    {
+        return $this->analyticsRepository->getSubscriberStatsOverTime($from, $to);
+    }
+
+    /**
+     * Get current subscribers per feed path.
+     *
+     * @return array
+     */
+    public function getCurrentSubscribersPerFeed(): array
+    {
+        return $this->analyticsRepository->getCurrentSubscribersPerFeed();
+    }
 }
