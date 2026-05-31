@@ -45,6 +45,11 @@ class AnalyticsController extends AbstractInachisController
 			: null;
 		$trending = $analytics->getTrendingPages(10);
         $topReferrers = $analytics->getTopReferrers(10);
+        
+        $topRegions = $analytics->getTopRegions($from, $to, 10);
+        $subscriberStats = $analytics->getSubscriberStatsOverTime($from, $to);
+        $subscribersPerFeed = $analytics->getCurrentSubscribersPerFeed();
+        $totalSubscribers = array_sum(array_column($subscribersPerFeed, 'subscribers'));
 
 		$this->data['page']['title'] = 'Analytics';
         $this->data['page']['tab'] = 'tools';
@@ -58,6 +63,10 @@ class AnalyticsController extends AbstractInachisController
 			'change' => $change,
 			'trending' => $trending,
             'topReferrers' => $topReferrers,
+            'topRegions' => $topRegions,
+            'subscriberStats' => $subscriberStats,
+            'subscribersPerFeed' => $subscribersPerFeed,
+            'totalSubscribers' => $totalSubscribers,
 		];
         return $this->render('inadmin/page/tools/analytics.html.twig', $this->data);
     }

@@ -13,6 +13,7 @@ use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Inachis\Enum\EditorialStatus;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 
@@ -135,7 +136,7 @@ class Series
 
     /**
      * Gets the value of {@link id}.
-     * 
+     *
      * @return UuidInterface|null
      */
     public function getId(): ?UuidInterface
@@ -145,7 +146,7 @@ class Series
 
     /**
      * Sets the value of {@link id}.
-     * 
+     *
      * @param UuidInterface|null $id The UUID to set
      * @return Series
      */
@@ -157,7 +158,7 @@ class Series
 
     /**
      * Gets the value of {@link title}.
-     * 
+     *
      * @return string|null
      */
     public function getTitle(): ?string
@@ -167,7 +168,7 @@ class Series
 
     /**
      * Sets the value of {@link title}.
-     * 
+     *
      * @param string|null $title The title to set
      * @return Series
      */
@@ -179,7 +180,7 @@ class Series
 
     /**
      * Gets the value of {@link subTitle}.
-     * 
+     *
      * @return string|null
      */
     public function getSubTitle(): ?string
@@ -189,7 +190,7 @@ class Series
 
     /**
      * Sets the value of {@link subTitle}.
-     * 
+     *
      * @param string|null $subTitle The subtitle to set
      * @return Series
      */
@@ -201,7 +202,7 @@ class Series
 
     /**
      * Gets the value of {@link url}.
-     * 
+     *
      * @return string|null
      */
     public function getUrl(): ?string
@@ -211,7 +212,7 @@ class Series
 
     /**
      * Sets the value of {@link url}.
-     * 
+     *
      * @param string|null $url The URL to set
      * @return Series
      */
@@ -223,7 +224,7 @@ class Series
 
     /**
      * Gets the value of {@link description}.
-     * 
+     *
      * @return string|null
      */
     public function getDescription(): ?string
@@ -233,7 +234,7 @@ class Series
 
     /**
      * Sets the value of {@link description}.
-     * 
+     *
      * @param string|null $description The description to set
      * @return Series
      */
@@ -246,7 +247,7 @@ class Series
 
     /**
      * Gets the value of {@link firstDate}.
-     * 
+     *
      * @return DateTimeImmutable|null
      */
     public function getFirstDate(): ?DateTimeImmutable
@@ -256,7 +257,7 @@ class Series
 
     /**
      * Sets the value of {@link firstDate}.
-     * 
+     *
      * @param DateTimeImmutable|null $firstDate The first date to set
      * @return Series
      */
@@ -268,7 +269,7 @@ class Series
 
     /**
      * Gets the value of {@link lastDate}.
-     * 
+     *
      * @return DateTimeImmutable|null
      */
     public function getLastDate(): ?DateTimeImmutable
@@ -278,7 +279,7 @@ class Series
 
     /**
      * Sets the value of {@link lastDate}.
-     * 
+     *
      * @param DateTimeImmutable|null $lastDate The last date to set
      * @return Series
      */
@@ -290,7 +291,7 @@ class Series
 
     /**
      * Gets the value of {@link items}.
-     * 
+     *
      * @return Collection<int, Page>
      */
     public function getItems(): Collection
@@ -300,7 +301,7 @@ class Series
 
     /**
      * Sets the value of {@link items}.
-     * 
+     *
      * @param Collection<int, Page> $items The array of pages in the series
      *
      * @return Series
@@ -313,7 +314,7 @@ class Series
 
     /**
      * Adds an item to the {@link items}.
-     * 
+     *
      * @param Page $item The item to add
      * @return Series
      */
@@ -325,7 +326,7 @@ class Series
 
     /**
      * Gets the value of {@link image}.
-     * 
+     *
      * @return Image|null
      */
     public function getImage(): ?Image
@@ -335,7 +336,7 @@ class Series
 
     /**
      * Sets the value of {@link image}.
-     * 
+     *
      * @param Image|null $image The image to set
      * @return Series
      */
@@ -347,7 +348,7 @@ class Series
 
     /**
      * Gets the value of {@link author}.
-     * 
+     *
      * @return User|null The UUID of the {@link Series} author
      */
     public function getAuthor(): ?User
@@ -369,7 +370,7 @@ class Series
 
     /**
      * Gets the value of {@link createDate}.
-     * 
+     *
      * @return DateTimeImmutable|null
      */
     public function getCreateDate(): ?DateTimeImmutable
@@ -379,7 +380,7 @@ class Series
 
     /**
      * Sets the value of {@link createDate}.
-     * 
+     *
      * @param DateTimeImmutable $createDate The create date to set
      * @return Series
      */
@@ -392,7 +393,7 @@ class Series
 
     /**
      * Gets the value of {@link modDate}.
-     * 
+     *
      * @return DateTimeImmutable|null
      */
     public function getModDate(): ?DateTimeImmutable
@@ -402,7 +403,7 @@ class Series
 
     /**
      * Sets the value of {@link modDate}.
-     * 
+     *
      * @param DateTimeImmutable $modDate The modification date to set
      * @return Series
      */
@@ -414,7 +415,7 @@ class Series
 
     /**
      * Gets the value of {@link visibility}.
-     * 
+     *
      * @return bool|null
      */
     public function getVisibility(): ?bool
@@ -424,7 +425,7 @@ class Series
 
     /**
      * Sets the value of {@link visibility}.
-     * 
+     *
      * @param bool $visibility The visibility to set
      * @return Series
      */
@@ -446,7 +447,7 @@ class Series
 
         foreach ($this->items as $item) {
             if (
-                $item->getStatus() === Page::PUBLISHED &&
+                $item->getStatus() === EditorialStatus::PUBLISHED &&
                 !$item->isScheduledPage() &&
                 $item->getVisibility()
             ) {

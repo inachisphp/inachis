@@ -33,7 +33,7 @@ class PageBulkCreateService
 {
     /**
      * Creates a new instance of the PageBulkCreateService
-     * 
+     *
      * @param EntityManagerInterface $entityManager
      * @param SeriesRepository $seriesRepository
      * @param TagRepository $tagRepository
@@ -48,7 +48,7 @@ class PageBulkCreateService
 
     /**
      * Creates pages in bulk
-     * 
+     *
      * @param BulkCreateData $data
      * @param User $author
      * @return int
@@ -87,16 +87,16 @@ class PageBulkCreateService
                 $post,
                 $post->getPostDateAsLink() . '/' . UrlNormaliser::toUri($title)
             ));
-
-            foreach($data->tags as $newTag) {
-                $tag = null;
+            foreach ($data->tags as $newTag) {
                 if (Uuid::isValid($newTag)) {
-                    $tag = $this->tagRepository->findOneBy(['id' => $newTag]);
+                    $tag = $this->tagRepository->find($newTag);
+                } else {
+                    $tag = $this->tagRepository->getOrCreate($newTag);
                 }
-                if (empty($tag)) {
-                    $tag = new Tag($newTag);
+
+                if ($tag !== null) {
+                    $post->addTag($tag);
                 }
-                $post->getTags()->add($tag);
             }
             foreach($data->categories as $newCategory) {
                 $category = null;

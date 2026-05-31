@@ -32,18 +32,30 @@ class Tag
     /**
      * @var string The text for the tag
      */
-    #[ORM\Column(type: "string", length: 50)]
+    #[ORM\Column(type: "string", length: 50, unique: true)]
     protected string $title;
 
     /**
+     * @var string The slug for the tag
+     */
+    #[ORM\Column(type: "string", length: 60, unique: true)]
+    protected string $slug;
+
+    /**
+     * Initialises a new {@link Tag}.
+     *
      * @param string $title The value of the tag
      */
     public function __construct(string $title = '')
     {
-        $this->setTitle($title);
+        if ($title !== '') {
+            $this->setTitle($title);
+        }
     }
 
     /**
+     * Gets the unique identifier of the tag.
+     *
      * @return UuidInterface|null
      */
     public function getId(): ?UuidInterface
@@ -52,6 +64,8 @@ class Tag
     }
 
     /**
+     * Gets the title of the tag.
+     *
      * @return string
      */
     public function getTitle(): string
@@ -60,6 +74,18 @@ class Tag
     }
 
     /**
+     * Gets the slug for the tag.
+     *
+     * @return string
+     */
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    /**
+     * Sets the unique identifier of the tag.
+     *
      * @param UuidInterface $value The unique identifier of the tag
      * @return $this
      */
@@ -70,12 +96,28 @@ class Tag
     }
 
     /**
+     * Sets the title of the tag and generates a slug.
+     *
      * @param string $value The value of the tag
      * @return $this
      */
     public function setTitle(string $value): self
     {
-        $this->title = $value;
+        $this->title = mb_strtolower(trim($value));
+        $this->slug = $this->slugify($value);
         return $this;
+    }
+
+    /**
+     * Generates a slug for a string.
+     *
+     * @param string $value The value to slugify
+     * @return string The slug
+     */
+    private function slugify(string $value): string
+    {
+        $value = mb_strtolower($value);
+        $value = preg_replace('/[^a-z0-9]+/i', '-', $value);
+        return trim($value, '-');
     }
 }

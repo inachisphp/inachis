@@ -51,7 +51,9 @@ class AggregateAnalyticsCommand extends Command
 				$this->processFile($file);
 			} elseif (str_contains($file, '/error-')) {
 				$this->processErrorFile($file);
-			}
+			} elseif (str_contains($file, '/subscriber-')) {
+                $this->processSubscriberFile($file);
+            }
 
 			$output->writeln(sprintf('Processed %s', basename($file)));
 
@@ -68,10 +70,14 @@ class AggregateAnalyticsCommand extends Command
     private function processFile(string $file): void
     {
         $handle = fopen($file, 'r');
+        if (!$handle) {
+            return;
+        }
 
         $pageViews = [];
         $uniqueVisitors = [];
 		$referrers = [];
+        $regionHits = []; // Array of [date => [countryCode => [name => string, hits => int]]]
 
         while (($line = fgets($handle)) !== false) {
             $data = json_decode($line, true);
@@ -83,6 +89,7 @@ class AggregateAnalyticsCommand extends Command
 			$path = $data['path'];
             $date = $data['date'];
             $visitor = $data['visitor'] ?? null;
+            $ip = $data['ip'] ?? null;
 
             $key = $path . '|' . $date;
             $pageViews[$key] = ($pageViews[$key] ?? 0) + 1;
@@ -95,6 +102,21 @@ class AggregateAnalyticsCommand extends Command
 				$key = $ref . '|' . $path . '|' . $date;
 				$referrers[$key] = ($referrers[$key] ?? 0) + 1;
 			}
+
+            // Resolve country/region for this IP
+            if ($ip) {
+                $country = $this->resolveIpToCountry($ip);
+                $code = $country['code'];
+                $name = $country['name'];
+
+                if (!isset($regionHits[$date][$code])) {
+                    $regionHits[$date][$code] = [
+                        'name' => $name,
+                        'hits' => 0,
+                    ];
+                }
+                $regionHits[$date][$code]['hits']++;
+            }
         }
 
         fclose($handle);
@@ -148,6 +170,25 @@ class AggregateAnalyticsCommand extends Command
 				]
 			);
 		}
+
+        // Save region/country stats
+        foreach ($regionHits as $date => $countries) {
+            foreach ($countries as $code => $countryData) {
+                $this->db->executeStatement(
+                    '
+                    INSERT INTO analytics_regions (country_code, country_name, date, hits)
+                    VALUES (:code, :name, :date, :hits)
+                    ON DUPLICATE KEY UPDATE hits = hits + :hits
+                    ',
+                    [
+                        'code' => $code,
+                        'name' => $countryData['name'],
+                        'date' => $date,
+                        'hits' => $countryData['hits'],
+                    ]
+                );
+            }
+        }
     }
 
 	/**
@@ -196,4 +237,158 @@ class AggregateAnalyticsCommand extends Command
 			);
 		}
 	}
+
+    /**
+     * Processes RSS subscriber log files
+     *
+     * @param string $file
+     */
+    private function processSubscriberFile(string $file): void
+    {
+        $handle = fopen($file, 'r');
+        if (!$handle) {
+            return;
+        }
+
+        $aggregators = []; // [path => [aggregatorName => max_subscriber_count]]
+        $individuals = []; // [path => [visitorId => true]]
+        $date = null;
+
+        while (($line = fgets($handle)) !== false) {
+            $data = json_decode($line, true);
+            if (!$data || !isset($data['path'], $data['date'])) {
+                continue;
+            }
+
+            $path = $data['path'];
+            $date = $data['date'];
+            $visitor = $data['visitor'] ?? '';
+            $ua = $data['ua'] ?? '';
+
+            // Detect feed aggregators
+            $aggName = null;
+            if (stripos($ua, 'Feedly') !== false) { $aggName = 'Feedly'; }
+            elseif (stripos($ua, 'Feedbin') !== false) { $aggName = 'Feedbin'; }
+            elseif (stripos($ua, 'NewsBlur') !== false) { $aggName = 'NewsBlur'; }
+            elseif (stripos($ua, 'Bloglovin') !== false) { $aggName = 'Bloglovin'; }
+            elseif (stripos($ua, 'Blogtrottr') !== false) { $aggName = 'Blogtrottr'; }
+            elseif (stripos($ua, 'Superfeedr') !== false) { $aggName = 'Superfeedr'; }
+            elseif (stripos($ua, 'WordPress') !== false) { $aggName = 'WordPress'; }
+            elseif (stripos($ua, 'FeedFetcher') !== false) { $aggName = 'FeedFetcher'; }
+
+            if ($aggName) {
+                $count = 1;
+                if (preg_match('/(\d+)\s+subscriber/i', $ua, $matches)) {
+                    $count = (int) $matches[1];
+                }
+                $aggregators[$path][$aggName] = max($aggregators[$path][$aggName] ?? 0, $count);
+            } elseif ($visitor) {
+                $individuals[$path][$visitor] = true;
+            }
+        }
+
+        fclose($handle);
+
+        if (!$date) {
+            return;
+        }
+
+        // Combine standard aggregators + unique individual reader visitor hashes
+        $allPaths = array_unique(array_merge(array_keys($aggregators), array_keys($individuals)));
+        foreach ($allPaths as $path) {
+            $totalSubscribers = array_sum($aggregators[$path] ?? []) + count($individuals[$path] ?? []);
+
+            $this->db->executeStatement(
+                '
+                INSERT INTO analytics_subscribers (path, date, subscribers)
+                VALUES (:path, :date, :subscribers)
+                ON DUPLICATE KEY UPDATE subscribers = :subscribers
+                ',
+                [
+                    'path' => $path,
+                    'date' => $date,
+                    'subscribers' => $totalSubscribers,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Resolves an IP to its Country Code and Country Name using a cache-backed GeoIP lookup
+     *
+     * @param string $ip
+     * @return array{code: string, name: string}
+     */
+    private function resolveIpToCountry(string $ip): array
+    {
+        // 1. Identify local/private/empty IPs
+        if (
+            $ip === '127.0.0.1' ||
+            $ip === '::1' ||
+            str_starts_with($ip, '192.168.') ||
+            str_starts_with($ip, '10.') ||
+            filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false
+        ) {
+            return ['code' => 'Local', 'name' => 'Local Network'];
+        }
+
+        // 2. Query cache database
+        try {
+            $cached = $this->db->fetchAssociative(
+                'SELECT country_code, country_name FROM analytics_ip_cache WHERE ip = :ip LIMIT 1',
+                ['ip' => $ip]
+            );
+
+            if ($cached) {
+                return [
+                    'code' => $cached['country_code'],
+                    'name' => $cached['country_name']
+                ];
+            }
+        } catch (\Exception $e) {
+            // Ignore DB errors
+        }
+
+        // 3. Resolve using ip-api.com (timeout: 2 seconds)
+        $code = 'Unknown';
+        $name = 'Unknown';
+
+        try {
+            $ctx = stream_context_create([
+                'http' => [
+                    'timeout' => 2.0,
+                    'user_agent' => 'InachisAnalytics/1.0'
+                ]
+            ]);
+            $response = @file_get_contents('http://ip-api.com/json/' . urlencode($ip) . '?fields=status,country,countryCode', false, $ctx);
+            if ($response) {
+                $res = json_decode($response, true);
+                if ($res && isset($res['status']) && $res['status'] === 'success') {
+                    $code = $res['countryCode'] ?? 'Unknown';
+                    $name = $res['country'] ?? 'Unknown';
+                }
+            }
+        } catch (\Exception $e) {
+            // Fallback to unknown if API fails
+        }
+
+        // 4. Save to cache
+        try {
+            $this->db->executeStatement(
+                '
+                INSERT IGNORE INTO analytics_ip_cache (ip, country_code, country_name, created_at)
+                VALUES (:ip, :code, :name, NOW())
+                ',
+                [
+                    'ip' => $ip,
+                    'code' => $code,
+                    'name' => $name
+                ]
+            );
+        } catch (\Exception $e) {
+            // Ignore DB errors
+        }
+
+        return ['code' => $code, 'name' => $name];
+    }
 }

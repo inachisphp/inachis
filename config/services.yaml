@@ -44,6 +44,13 @@ services:
         arguments:
             $checks: !tagged_iterator app.diagnostic_check
 
+    Inachis\EntityListener\SettingListener:
+        tags:
+            - {
+              name: doctrine.orm.entity_listener,
+              entity: Inachis\Entity\Setting,
+            }
+
     Inachis\EventListener\AdminResponseEvent:
         arguments:
             $csp: '%csp%'
@@ -103,6 +110,10 @@ services:
         arguments:
             $appSecret: '%env(APP_SECRET)%'
             $ttlSeconds: '%password_reset.ttl%'
+
+    Inachis\Service\EncryptionService:
+        arguments:
+            $masterKey: '%env(INACHIS_MASTER_KEY)%'
 
     Inachis\Service\VersionService:
         arguments:

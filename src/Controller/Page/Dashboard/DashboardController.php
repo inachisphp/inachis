@@ -13,6 +13,7 @@ use DateTimeImmutable;
 use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\{Image, Page, Series};
+use Inachis\Enum\EditorialStatus;
 use Inachis\Repository\{ImageRepository, PageRepository, SeriesRepository};
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,7 +45,7 @@ class DashboardController extends AbstractInachisController
             [
                 'q.status = :status',
                 [
-                    'status' => Page::DRAFT,
+                    'status' => EditorialStatus::DRAFT,
                 ],
             ],
             [ ['q.modDate' , 'DESC'] ]
@@ -65,7 +66,7 @@ class DashboardController extends AbstractInachisController
                 [
                     'q.status = :status',
                     [
-                        'status' => Page::DRAFT,
+                        'status' => EditorialStatus::DRAFT,
                     ],
                 ],
                 'q.postDate ASC, q.modDate'
@@ -76,7 +77,7 @@ class DashboardController extends AbstractInachisController
                 [
                     'q.status = :status AND q.postDate > :postDate',
                     [
-                        'status' => Page::PUBLISHED,
+                        'status' => EditorialStatus::PUBLISHED,
                         'postDate' => new DateTimeImmutable(),
                     ],
                 ],
@@ -88,7 +89,7 @@ class DashboardController extends AbstractInachisController
                 [
                     'q.status = :status AND q.postDate <= :postDate',
                     [
-                        'status' => Page::PUBLISHED,
+                        'status' => EditorialStatus::PUBLISHED,
                         'postDate' => new DateTimeImmutable(),
                     ],
                 ],

@@ -24,7 +24,7 @@ class WasteManagerService
 {
     /**
      * Inject the dependencies
-     
+
      * @param EntityManagerInterface $entityManager
      * @param Security $security
      * @param Filesystem $filesystem
@@ -40,7 +40,7 @@ class WasteManagerService
 
     /**
      * Send an entity to the waste bin
-     * 
+     *
      * @param object $entity
      */
     public function sendToWaste(object $entity): void
@@ -48,7 +48,7 @@ class WasteManagerService
         $waste = new Waste();
         $waste->setUser($this->security->getUser());
         $waste->setModDate(new DateTimeImmutable());
-        
+
         $data = [
             'id' => $entity->getId(),
         ];
@@ -84,7 +84,7 @@ class WasteManagerService
             foreach ($entity->getUrls() as $url) {
                 $data['urls'][] = ['link' => $url->getLink(), 'default' => $url->isDefault()];
             }
-            
+
         } elseif ($entity instanceof Series) {
             $waste->setSourceType('Series');
             $waste->setSourceName($entity->getTitle());
@@ -102,7 +102,7 @@ class WasteManagerService
             foreach ($entity->getItems() as $item) {
                 $data['items'][] = $item->getId();
             }
-            
+
         } elseif ($entity instanceof Image) {
             $waste->setSourceType('Image');
             $waste->setSourceName($entity->getFilename());
@@ -131,14 +131,14 @@ class WasteManagerService
         }
 
         $waste->setContent(json_encode($data));
-        
+
         $this->entityManager->persist($waste);
         $this->entityManager->flush();
     }
 
     /**
      * Restore an entity from the waste bin
-     * 
+     *
      * @param Waste $waste
      */
     public function restore(Waste $waste): void
@@ -158,7 +158,7 @@ class WasteManagerService
                 $page->setTitle($data['title']);
                 $page->setSubTitle($data['subTitle'] ?? null);
                 $page->setContent($data['content'] ?? null);
-                $page->setStatus($data['status'] ?? Page::DRAFT);
+                $page->setStatus($data['status'] ?? EditorialStatus::DRAFT);
                 $page->setVisibility($data['visibility'] ?? Page::PRIVATE);
                 if (!empty($data['postDate'])) {
                     $page->setPostDate(new DateTimeImmutable($data['postDate']));
@@ -170,7 +170,7 @@ class WasteManagerService
                 }
                 $page->setType($data['type'] ?? 'post');
                 $page->setFeatureSnippet($data['featureSnippet'] ?? null);
-                
+
                 if (!empty($data['author'])) {
                     $author = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $data['author']]);
                     if ($author) {
@@ -219,7 +219,7 @@ class WasteManagerService
                 $series->setDescription($data['description'] ?? null);
                 $series->setVisibility($data['visibility'] ?? Series::PRIVATE);
                 $series->setUrl($data['url'] ?? null);
-                
+
                 if (!empty($data['author'])) {
                     $author = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $data['author']]);
                     if ($author) {
@@ -256,34 +256,34 @@ class WasteManagerService
                 $image->setChecksum($data['checksum'] ?? '');
                 $image->setDimensionX($data['dimensionX'] ?? 0);
                 $image->setDimensionY($data['dimensionY'] ?? 0);
-                
+
                 if (!empty($data['author'])) {
                     $author = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $data['author']]);
                     if ($author) {
                         $image->setAuthor($author);
                     }
                 }
-                
+
                 $wastePath = $this->imageDirectory . '.waste/' . $image->getFilename();
                 $targetPath = $this->imageDirectory . $image->getFilename();
                 if ($this->filesystem->exists($wastePath)) {
                     $this->filesystem->rename($wastePath, $targetPath);
                 }
-                
+
                 $this->entityManager->persist($image);
                 break;
 
             default:
                 throw new \InvalidArgumentException('Unknown source type in waste for restore');
         }
-        
+
         $this->entityManager->remove($waste);
         $this->entityManager->flush();
     }
 
     /**
      * Delete an entity from the waste bin
-     * 
+     *
      * @param Waste $waste
      */
     public function deleteWaste(Waste $waste): void

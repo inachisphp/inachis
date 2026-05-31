@@ -7,9 +7,6 @@
 {% endblock pagetitle %}
 
 {% block content %}
-{% block track_changes_pre %}{% endblock track_changes_pre %}
-
-{% block track_changes %}
     <section class="col-12" id="track_changes">
         <h2>{% if title[0][0].tag is defined %}{{ title[0][0].new.lines[0]|raw }}{% else %}{{ title }}{% endif %}</h2>
     {% if subTitle is not empty %}
@@ -61,7 +58,4 @@
             </p>
         </form>
     </div>
-
-{% endblock track_changes %}
-{% block track_changes_post %}{% endblock track_changes_post %}
 {% endblock content %}

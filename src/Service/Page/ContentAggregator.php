@@ -11,6 +11,7 @@ namespace Inachis\Service\Page;
 
 use Inachis\Entity\Page;
 use Inachis\Entity\Series;
+use Inachis\Enum\EditorialStatus;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\SeriesRepository;
 use Inachis\Util\TextCleaner;
@@ -30,7 +31,7 @@ class ContentAggregator
 
     /**
      * Constructor
-     * 
+     *
      * @param PageRepository $pageRepository
      * @param SeriesRepository $seriesRepository
      */
@@ -41,7 +42,7 @@ class ContentAggregator
 
     /**
      * Get homepage content
-     * 
+     *
      * @return array<string, Page|Series>
      */
     public function getHomepageContent(): array
@@ -65,7 +66,7 @@ class ContentAggregator
 
         foreach ($series as $group) {
             foreach ($group->getItems() as $page) {
-                if ($page->getStatus() !== Page::PUBLISHED) {
+                if ($page->getStatus() !== EditorialStatus::PUBLISHED) {
                     $group->getItems()->removeElement($page);
                 } else {
                     $excludePages[] = $page->getId();
@@ -76,7 +77,7 @@ class ContentAggregator
                 $group->getDescription(),
                 TextCleaner::REMOVE_BLOCKQUOTE_CONTENT | TextCleaner::REMOVE_IMAGE_ALT
             ));
-            
+
             $lastDate = $group->getLastDate();
             if ($lastDate instanceof DateTimeImmutable) {
                 $data['p' . $lastDate->format('Ymd')] = $group;
@@ -85,7 +86,7 @@ class ContentAggregator
 
         $pageQuery = 'q.status = :status AND q.visibility = :visibility AND q.postDate <= :postDate AND q.type = :type';
         $pageParameters = [
-            'status'     => Page::PUBLISHED,
+            'status'     => EditorialStatus::PUBLISHED,
             'visibility' => Page::PUBLIC,
             'postDate'   => new DateTimeImmutable(),
             'type'       => Page::TYPE_POST,

@@ -132,6 +132,24 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
     }
 
     /**
+     * Get the number of pages with the given tag
+     *
+     * @param Tag $tag
+     * @return int
+     */
+    public function getPagesWithTagCount(Tag $tag): int
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb = $qb
+            ->select('COUNT(p) AS numPages')
+            ->leftJoin('p.tags', 'Page_tags')
+            ->where('Page_tags.id = :tagId AND p.status = \'published\' AND p.visibility = \'1\' AND p.type = \'post\'')
+            ->setParameter('tagId', $tag);
+        /** @var int */
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
      * Get all content of a certain type, ordered by post date
      *
      * @param string $type
@@ -189,6 +207,9 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         if (isset($filters['categories']) && empty($filters['categories'])) {
             unset($filters['categories']);
         }
+        if (isset($filters['tags']) && empty($filters['tags'])) {
+            unset($filters['tags']);
+        }
         $where = [
             '1=1',
             $filters,
@@ -209,6 +230,12 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             $where[0] .= ' AND c.id IN (:categories)';
             $where[1]['categories'] = array_is_list($filters['categories']) ? $filters['categories'] : array_keys($filters['categories']);
             $join[] = ['leftJoin', 'q.categories', 'c'];
+        }
+        /** @var array<string, string> $filters['tags'] */
+        if (!empty($filters['tags'])) {
+            $where[0] .= ' AND t.id IN (:tags)';
+            $where[1]['tags'] = array_is_list($filters['tags']) ? $filters['tags'] : array_keys($filters['tags']);
+            $join[] = ['leftJoin', 'q.tags', 't'];
         }
         if (!empty($filters['status'])) {
             $where[0] .= ' AND q.status = :status';
