@@ -18,10 +18,19 @@ use DateTime;
 
 class SitemapGenerator
 {
+    /** @var RouterInterface  */
     private RouterInterface $router;
+
+    /** @var ParameterBagInterface*/
     private ParameterBagInterface $params;
+
+    /** @var EntityManagerInterface */
     private EntityManagerInterface $entityManager;
+
+    /** @var SeriesRepository */
     private SeriesRepository $seriesRepository;
+
+    /** @var UrlRepository */
     private UrlRepository $urlRepository;
 
     public function __construct(
@@ -73,24 +82,24 @@ class SitemapGenerator
         // }
 
         // dynamic URLs from Url entity where default = true
-        $defaults = $this->urlRepository->findBy(['default' => true]);
+        $defaults = $this->urlRepository->findSitemapUrls();
         foreach ($defaults as $urlEntity) {
-            if (!method_exists($urlEntity, 'getPath')) {
-                continue; // guard
-            }
             $path = $urlEntity->getPath();
-            // ensure leading slash
-            if ($path[0] !== '/') {
-                $path = '/' . $path;
-            }
-            // apply same exclusion rule
+
             if (preg_match('#^/incc#', $path)) {
                 continue;
             }
+
             $url = $baseUrl . $path;
+
+            $page = $urlEntity->getContent();
+
             $urlElement = $xml->addChild('url');
             $urlElement->addChild('loc', htmlspecialchars($url, ENT_QUOTES, 'UTF-8'));
-            $urlElement->addChild('lastmod', (new DateTime())->format('Y-m-d'));
+            $urlElement->addChild(
+                'lastmod',
+                $page->getModDate()->format('Y-m-d')
+            );
             $urlElement->addChild('changefreq', 'weekly');
             $urlElement->addChild('priority', '0.6');
         }
