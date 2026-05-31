@@ -114,6 +114,14 @@ class Url
     }
 
     /**
+     * Returns the URL path used for sitemap generation.
+     */
+    public function getPath(): string
+    {
+        return '/' . ltrim($this->link, '/');
+    }
+
+    /**
      * Returns the value of {@link linkCanonical}.
      *
      * @return string The value of {@link linkCanonical}

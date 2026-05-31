@@ -3,6 +3,7 @@ parameters:
 
     app.config.title: 'Wandering the World'
     app.config.locale: 'en'
+    app.domain: '%env(APP_DOMAIN)%'
 
     password_reset.ttl: '%env(PASSWORD_RESET_TTL)%'
     app.public_img_path: '%env(APP_PUBLIC_IMG_PATH)%'

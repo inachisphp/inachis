@@ -11,6 +11,10 @@ ianchis is a framework for creating simple websites in PHP using symfony such as
 1. Download a [release package](https://github.com/inachisphp/inachis/releases), and extract on your intended server
 2. Import dev/install/inachis.sql into your DBMS
 3. Add database connection settings to `.env.local`
-3. [Create your first administrator](https://github.com/inachisphp/inachis/wiki/Configuration#create-you-first-administrator) and sign-in
-
-
+4. Run ```bash
+APP_ENV=prod APP_DEBUG=0 composer install --no-dev --optimize-autoloader --no-interaction
+npm install
+npm run build
+rm -rf {node_modules,dev}
+```
+5. [Create your first administrator](https://github.com/inachisphp/inachis/wiki/Configuration#create-you-first-administrator) and sign-in
