@@ -86,7 +86,7 @@ class AggregateAnalyticsCommand extends Command
                 continue;
             }
 
-			$path = $data['path'];
+			$path = $this->normalisePath($data['path']);
             $date = $data['date'];
             $visitor = $data['visitor'] ?? null;
             $ip = $data['ip'] ?? null;
@@ -213,6 +213,8 @@ class AggregateAnalyticsCommand extends Command
 				continue;
 			}
 
+            $data['path'] = $this->normalisePath($data['path']);
+
 			$key = $data['path'] . '|' . $data['date'] . '|' . $data['code'];
 			$counts[$key] = ($counts[$key] ?? 0) + 1;
 		}
@@ -260,7 +262,7 @@ class AggregateAnalyticsCommand extends Command
                 continue;
             }
 
-            $path = $data['path'];
+            $path = $this->normalisePath($data['path']);
             $date = $data['date'];
             $visitor = $data['visitor'] ?? '';
             $ua = $data['ua'] ?? '';
@@ -390,5 +392,16 @@ class AggregateAnalyticsCommand extends Command
         }
 
         return ['code' => $code, 'name' => $name];
+    }
+
+    /**
+     * Ensures no path is stored with more than 255 characters
+     * 
+     * @param string $path The path to normalise
+     * @return string The normalised path
+     */
+    private function normalisePath(string $path): string
+    {
+        return mb_substr(trim($path), 0, 255);
     }
 }
