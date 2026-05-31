@@ -12,20 +12,13 @@ namespace Inachis\Controller\Page\Post;
 use DateTimeImmutable;
 use Exception;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Category;
-use Inachis\Entity\Image;
-use Inachis\Entity\Page;
-use Inachis\Entity\Revision;
-use Inachis\Entity\Tag;
-use Inachis\Entity\Url;
+use Inachis\Entity\{Category, Image, Page, Revision, Tag, Url};
+use Inachis\Enum\EditorialStatus;
 use Inachis\Form\PostType;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\RevisionRepository;
+use Inachis\Repository\{PageRepository, RevisionRepository, TagRepository};
 use Inachis\Service\Page\PageBulkActionService;
-use Inachis\Util\ContentRevisionCompare;
-use Inachis\Util\ReadingTime;
-use Inachis\Util\UrlNormaliser;
+use Inachis\Util\{ContentRevisionCompare, ReadingTime, UrlNormaliser};
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -158,6 +151,7 @@ class PageController extends AbstractInachisController
         PageBulkActionService $pageBulkActionService,
         PageRepository $pageRepository,
         RevisionRepository $revisionRepository,
+        TagRepository $tagRepository,
         string $type = 'post',
         ?string $title = null
     ): Response {
@@ -194,7 +188,7 @@ class PageController extends AbstractInachisController
             }
             $post->setAuthor($this->getUser());
             if (null !== $request->request->get('publish')) {
-                $post->setStatus(Page::PUBLISHED);
+                $post->setStatus(EditorialStatus::PUBLISHED);
                 if (isset($revision)) {
                     if ($contentRevisionCompare->doesPageMatchRevision($post, $revision)) {
                         $revision->setContent('');
@@ -235,16 +229,15 @@ class PageController extends AbstractInachisController
             }
             if (!empty($request->request->all('post')['tags'])) {
                 $newTags = $request->request->all('post')['tags'];
-                if (!empty($newTags)) {
-                    foreach ($newTags as $newTag) {
-                        $tag = null;
-                        if (Uuid::isValid($newTag)) {
-                            $tag = $this->entityManager->getRepository(Tag::class)->findOneBy(['id' => $newTag]);
-                        }
-                        if (empty($tag)) {
-                            $tag = new Tag($newTag);
-                        }
-                        $post->getTags()->add($tag);
+                foreach ($newTags as $newTag) {
+                    if (Uuid::isValid($newTag)) {
+                        $tag = $tagRepository->find($newTag);
+                    } else {
+                        $tag = $tagRepository->getOrCreate($newTag);
+                    }
+
+                    if ($tag !== null) {
+                        $post->addTag($tag);
                     }
                 }
             }
@@ -257,7 +250,7 @@ class PageController extends AbstractInachisController
             }
 
             if ($form->has('publish') && $form->get('publish')->isClicked()) {
-                $post->setStatus(Page::PUBLISHED);
+                $post->setStatus(EditorialStatus::PUBLISHED);
                 if (isset($revision)) {
                     $revision->setAction(RevisionRepository::PUBLISHED);
                 }

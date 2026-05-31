@@ -11,6 +11,7 @@ import './inadmin/dialogs/_categoryManager.js';
 import './inadmin/dialogs/_confirmation.js';
 import './inadmin/dialogs/_contentSelector.js';
 import './inadmin/dialogs/_imageManager.js';
+import './inadmin/dialogs/_mergeTags.js';
 import './inadmin/dialogs/_sessionTimeout.js';
 
 import './inadmin/_changePassword.js';

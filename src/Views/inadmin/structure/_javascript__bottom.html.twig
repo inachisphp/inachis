@@ -1,7 +1,7 @@
 {% block javascript_bottom %}
 {%- if is_granted('ROLE_USER') %}
     {% if includeEditor|default(false) %}
-    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/easymde@2.21.0/dist/easymde.min.js" integrity="sha512-UmZY9uYOaO4z0/s0QZlR5E0hdmbaiFKFbt4sjA5mV+LOHbjCqPatgNmccUDl33tIvh72fQqGnDtt1YNisDRQ7Q==" crossorigin="anonymous"></script>
         {% if editorHighlighting|default(false) %}
     <script src="https://cdn.jsdelivr.net/highlight.js/latest/highlight.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/highlight.js/latest/styles/github.min.css">

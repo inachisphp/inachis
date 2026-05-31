@@ -109,6 +109,7 @@ class AnalyticsSubscriber implements EventSubscriberInterface
             'date' => $date,
             'visitor' => $visitorId,
             'ref' => $refDomain,
+            'ip' => $ip,
             'ts' => time(),
         ], JSON_UNESCAPED_SLASHES);
 

@@ -75,6 +75,8 @@ admin.post.properties.showTableOfContents.on: 'on'
 admin.post.properties.showTableOfContents.off: 'off'
 admin.post.properties.postDate-future.label: 'Publish on'
 admin.post.properties.postDate-past.label: 'Published on'
+admin.post.properties.expireDate-future.label: 'Expires on'
+admin.post.properties.expireDate-past.label: 'Expired on'
 admin.post.properties.modDate.label: 'Last modified'
 admin.post.properties.categories.label: 'Categories'
 admin.post.properties.categories.placeholder: 'Select a category'
@@ -154,7 +156,7 @@ admin.navigation.url.label: 'URL'
 admin.navigation.url.placeholder: 'e.g. /'
 admin.navigation.isActive.label: 'Active'
 
-
+admin.setting.robots_txt.label: 'Enter the contents of your robots.txt file below. The sitemap URL will be appended automatically.'
 
 
 admin.label.username: Username
@@ -185,3 +187,4 @@ admin:
       properties: Properties
       sharing: Sharing
       revisions: History
+      stats: Statistics

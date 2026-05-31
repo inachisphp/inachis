@@ -1,0 +1,55 @@
+{% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <span>Tags</span>
+{% endblock pagetitle %}
+
+{% block content %}
+<div class="col-12">
+    {% include 'inadmin/partials/tab-sets/posts.html.twig' %}
+	{% include 'inadmin/partials/table.html.twig' with {
+		className: 'form__tag col-6',
+		type: 'tag',
+		additional_classes: 'default',
+
+		table_name: 'Tag list',
+		table_class: 'table--responsive table--row-borders table--focusable table--darkhead',
+		table_desc: 'This table lists tags used by pages and posts. The first column contains checkboxes allowing users to select one or more tasks.',
+
+		columns: [
+			{
+				title: 'Tag',
+				source: 'title',
+				header: true,
+				url: 'url'
+			},
+			{
+				title: 'Usage',
+				source: 'usageCount',
+			}
+		],
+
+		limit: query.limit,
+		offset: query.offset,
+		total: total,
+		url_result: path('incc_tags_list'),
+
+		show_select_deselect: true,
+		zebra: true,
+
+		actions: {
+			merge: {
+				button_class: 'button--neutral button--merge',
+				href: '#',
+				icon: 'merge',
+				title: 'Merge',
+			},
+			delete: {
+				button_class: 'button--negative button--delete',
+				icon: 'delete_forever',
+				title: 'Delete',
+			},
+		}
+	} %}
+</div>
+{% endblock content %}

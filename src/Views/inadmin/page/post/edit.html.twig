@@ -6,6 +6,7 @@
 {% endblock pagetitle %}
 
 {% block content %}
+    {% set showStats = post.id is not empty and post.status|default('') == 'published' %}
 
     {{ form_start(form, {'attr': { 'class': 'col-12 form form__post' }}) }}
     <div class="content__edit">
@@ -22,6 +23,11 @@
             {%  if revisions is defined and revisions is not empty %}
             <li>
                 <a href="#post__history">{% trans %}admin.posts.tabs.revisions{% endtrans %}</a>
+            </li>
+            {% endif %}
+            {% if showStats %}
+            <li data-source="{{ path('incc_api_post_stats', { 'id': post.id }) }}" class="tab--lazyload">
+                <a href="#post__stats">{% trans %}admin.posts.tabs.stats{% endtrans %}</a>
             </li>
             {% endif %}
         </ul>
@@ -87,13 +93,13 @@
                     {{ form_widget(form.postDate) }}
 				</span>
             </p>
-            {% if post.id is not empty %}
             <p>
-                {{ form_label(form.modDate) }}
-                {{ form_errors(form.modDate) }}
-                {{ form_widget(form.modDate) }}
+                {{ form_label(form.expireDate) }}
+                {{ form_errors(form.expireDate) }}
+                <span id="post__schedule__timed">
+                    {{ form_widget(form.expireDate) }}
+				</span>
             </p>
-            {% endif %}
             <p>
                 {{ form_label(form.categories) }}
                 {{ form_errors(form.categories) }}
@@ -162,6 +168,13 @@
 
         {%  if revisions is defined and revisions is not empty %}
         <fieldset class="ui-section" i id="post__history">
+            {% if post.id is not empty %}
+            <p>
+                {{ form_label(form.modDate) }}
+                {{ form_errors(form.modDate) }}
+                {{ form_widget(form.modDate) }}
+            </p>
+            {% endif %}
             <table class="table table-responsive table-striped table-borderless">
                 <caption>{% trans %}admin.post.revision.caption{% endtrans %}</caption>
                 <thead>
@@ -187,6 +200,11 @@
                 {% endfor %}
                 </tbody>
             </table>
+        </fieldset>
+        {% endif %}
+
+        {% if showStats %}
+        <fieldset class="ui-section" id="post__stats">
         </fieldset>
         {% endif %}
     </div>

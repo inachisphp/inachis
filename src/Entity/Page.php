@@ -9,6 +9,7 @@
 
 namespace Inachis\Entity;
 
+use Inachis\Enum\EditorialStatus;
 use Inachis\Exception\InvalidTimezoneException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -28,16 +29,6 @@ use InvalidArgumentException;
 #[ORM\Index(columns: ['title', 'sub_title', 'content'], name: "fulltext_title_content", flags: ["fulltext"])]
 class Page
 {
-    /**
-     * @const string Indicates a Page is currently in draft
-     */
-    public const DRAFT = 'draft';
-
-    /**
-     * @const string Indicates a Page has been published
-     */
-    public const PUBLISHED = 'published';
-
     /**
      * @const string Indicates a Page is public
      */
@@ -106,10 +97,10 @@ class Page
     protected ?string $featureSnippet = '';
 
     /**
-     * @var string|null Current status of the {@link Page}, defaults to {@link DRAFT}
+     * @var EditorialStatus Current status of the {@link Page}, defaults to {@link DRAFT}
      */
-    #[ORM\Column(type: 'string', length:20)]
-    protected ?string $status = self::DRAFT;
+    #[ORM\Column(type: 'text', enumType: EditorialStatus::class, length: 20)]
+    protected EditorialStatus $status = EditorialStatus::DRAFT;
 
     /**
      * @var bool Determining if a {@link Page} is visible to the public
@@ -124,11 +115,16 @@ class Page
     protected DateTimeImmutable $createDate;
 
     /**
-     * @var DateTimeImmutable The date the {@link Page} was published; a future date
-     *             indicates the content is scheduled
+     * @var DateTimeImmutable The date the {@link Page} was published; a future date indicates the content is scheduled
      */
     #[ORM\Column(type: 'datetime_immutable')]
     protected DateTimeImmutable $postDate;
+
+    /**
+     * @var DateTimeImmutable The expiration date for the {@link Page} - when it should go offline
+     */
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    protected ?DateTimeImmutable $expireDate = null;
 
     /**
      * @var DateTimeImmutable The date the {@link Page} was last modified
@@ -330,9 +326,9 @@ class Page
     /**
      * Returns the value of {@link status}.
      *
-     * @return string|null The current publishing status of the {@link Page}
+     * @return EditorialStatus The current publishing status of the {@link Page}
      */
-    public function getStatus(): ?string
+    public function getStatus(): EditorialStatus
     {
         return $this->status;
     }
@@ -365,6 +361,16 @@ class Page
     public function getPostDate(): DateTimeImmutable
     {
         return $this->postDate;
+    }
+
+    /**
+     * Returns the value of {@link expireDate}.
+     *
+     * @return DateTimeImmutable|null The expiration date for the {@link Page}
+     */
+    public function getExpireDate(): ?DateTimeImmutable
+    {
+        return $this->expireDate;
     }
 
     /**
@@ -619,12 +625,12 @@ class Page
     /**
      * Sets the value of {@link status}.
      *
-     * @param string|null $value The new publishing status of the {@link Page}
+     * @param string $value The new publishing status of the {@link Page}
      * @return Page
      */
-    public function setStatus(?string $value = self::DRAFT): self
+    public function setStatus(string $value): self
     {
-        $this->status = $this->isValidStatus($value) ? $value : self::DRAFT;
+        $this->status = EditorialStatus::tryFrom($value) ?? EditorialStatus::DRAFT;
         return $this;
     }
 
@@ -661,6 +667,18 @@ class Page
     public function setPostDate(DateTimeImmutable $value): self
     {
         $this->postDate = $value;
+        return $this;
+    }
+
+    /**
+     * Sets the value of {@link expireDate}.
+     *
+     * @param DateTimeImmutable|null $value The expiration date for the {@link Page}
+     * @return Page
+     */
+    public function setExpireDate(?DateTimeImmutable $value): self
+    {
+        $this->expireDate = $value;
         return $this;
     }
 
@@ -869,6 +887,18 @@ class Page
     }
 
     /**
+     * Removes a {@link Tag} from the {@link Page}.
+     *
+     * @param Tag $tag The {@link Tag} to remove from the {@link Page}
+     * @return $this
+     */
+    public function removeTag(Tag $tag): self
+    {
+        $this->tags->removeElement($tag);
+        return $this;
+    }
+
+    /**
      * @return $this
      */
     public function removeTags(): self
@@ -897,7 +927,7 @@ class Page
      */
     public function isValidStatus(?string $value): bool
     {
-        return $value === self::DRAFT || $value === self::PUBLISHED;
+        return EditorialStatus::tryFrom($value) !== null;
     }
 
     /**
@@ -925,7 +955,7 @@ class Page
             new DateTimeZone($this->getTimezone() ?? 'UTC')
         );
 
-        return $this->getStatus() == Page::PUBLISHED && $postDate->format('YmdHis') > $today->format('YmdHis');
+        return $this->getStatus() == EditorialStatus::PUBLISHED && $postDate->format('YmdHis') > $today->format('YmdHis');
     }
 
     /**
@@ -935,7 +965,7 @@ class Page
      */
     public function isDraft(): bool
     {
-        return $this->status === self::DRAFT;
+        return $this->status === EditorialStatus::DRAFT;
     }
 
     /**

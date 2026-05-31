@@ -49,6 +49,46 @@
 
       link.addEventListener("click", e => {
         e.preventDefault();
+
+        const liEl = this.items[i];
+        const panel = this.panels[i];
+
+        if (liEl.classList.contains("tab--lazyload") && panel) {
+          const source = liEl.getAttribute("data-source");
+
+          if (!liEl.dataset.loaded) {
+            panel.innerHTML = "<p>&nbsp;</p><div class=\"loader\"></div><p>&nbsp;</p>";
+
+            fetch(source, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                tabIndex: i
+              })
+            })
+              .then(res => {
+                if (!res.ok) throw new Error("Network response was not ok");
+                return res.text();
+              })
+              .then(html => {
+                panel.innerHTML = html;
+                this.runScriptsSequentially(panel)
+                  .then(() => {
+                    liEl.dataset.loaded = "true";
+                  })
+                  .catch(err => {
+                    console.error("Script execution failed:", err);
+                  });
+              })
+              .catch(err => {
+                panel.innerHTML = "<p>Error loading content.</p>";
+                console.error(err);
+              });
+          }
+        }
+
         this.activate(i, true);
       });
 
@@ -61,6 +101,43 @@
     });
     this.activate(this.activeIndex, false);
   };
+
+  Tabs.prototype.runScriptsSequentially = function (container) {
+    const scripts = Array.from(container.querySelectorAll("script"));
+
+    const loadScript = (script) => {
+      return new Promise((resolve, reject) => {
+        const newScript = document.createElement("script");
+        // Copy attributes
+        Array.from(script.attributes).forEach(attr => {
+          newScript.setAttribute(attr.name, attr.value);
+        });
+
+        if (script.src) {
+          // Avoid loading Chart.js multiple times
+          if (script.src.includes("chart.js") && window.Chart) {
+            resolve();
+            return;
+          }
+
+          newScript.src = script.src;
+          newScript.onload = resolve;
+          newScript.onerror = reject;
+          document.head.appendChild(newScript);
+        } else {
+          newScript.textContent = script.textContent;
+          document.body.appendChild(newScript);
+          resolve();
+        }
+      });
+    };
+
+    // Chain execution in order
+    return scripts.reduce(
+      (p, script) => p.then(() => loadScript(script)),
+      Promise.resolve()
+    );
+  }
 
   Tabs.prototype.activate = function (index, userInitiated) {
     this.items.forEach((li, i) => {

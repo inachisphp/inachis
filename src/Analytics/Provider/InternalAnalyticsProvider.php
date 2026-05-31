@@ -10,10 +10,8 @@
 namespace Inachis\Analytics\Provider;
 
 use Inachis\Analytics\AnalyticsProviderInterface;
-use Inachis\Repository\AnalyticsRepository;
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\SeriesRepository;
-use Inachis\Repository\UrlRepository;
+use Inachis\Entity\{Page, Series};
+use Inachis\Repository\{AnalyticsRepository, PageRepository, SeriesRepository, UrlRepository};
 
 /**
  * Internal analytics provider
@@ -177,5 +175,82 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
         }
 
         return $path;
+    }
+
+    /**
+     * Get page views per day for paths
+     *
+     * @param string[] $paths
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return array
+     */
+    public function getPageViewsPerDayForPaths(
+        array $paths,
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
+        return $this->analyticsRepository->getPageViewsPerDayForPaths($paths, $from, $to);
+    }
+
+    /**
+     * Get page stats over time
+     *
+     * @param Page $page
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return array
+     */
+    public function getPageStatsOverTime(Page $page, \DateTimeInterface $from, \DateTimeInterface $to): array
+	{
+		return $this->analyticsRepository->getPageStatsOverTime($page, $from, $to);
+	}
+
+    /**
+     * Get series stats over time
+     *
+     * @param Series $series
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return array
+     */
+    public function getSeriesStatsOverTime(Series $series, \DateTimeInterface $from, \DateTimeInterface $to): array
+	{
+		return $this->analyticsRepository->getSeriesStatsOverTime($series, $from, $to);
+	}
+
+    /**
+     * Get top visitor countries/regions.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     * @return array
+     */
+    public function getTopRegions(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array
+    {
+        return $this->analyticsRepository->getTopRegions($from, $to, $limit);
+    }
+
+    /**
+     * Get RSS subscriber stats over time.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return array
+     */
+    public function getSubscriberStatsOverTime(\DateTimeInterface $from, \DateTimeInterface $to): array
+    {
+        return $this->analyticsRepository->getSubscriberStatsOverTime($from, $to);
+    }
+
+    /**
+     * Get current subscribers per feed path.
+     *
+     * @return array
+     */
+    public function getCurrentSubscribersPerFeed(): array
+    {
+        return $this->analyticsRepository->getCurrentSubscribersPerFeed();
     }
 }

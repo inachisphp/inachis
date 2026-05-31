@@ -60,7 +60,7 @@ final class PageImportService
                     type: $dto->type ?? Page::TYPE_POST
                 );
 
-                $page->setStatus($dto->status ?? Page::DRAFT);
+                $page->setStatus($dto->status ?? EditorialStatus::DRAFT);
                 $page->setVisibility($dto->visibility ?? Page::PUBLIC);
                 $page->setAllowComments($dto->allowComments ?? false);
                 $page->setLanguage($dto->language ?? '');
