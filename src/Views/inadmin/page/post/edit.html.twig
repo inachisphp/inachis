@@ -100,13 +100,6 @@
                     {{ form_widget(form.expireDate) }}
 				</span>
             </p>
-            {% if post.id is not empty %}
-            <p>
-                {{ form_label(form.modDate) }}
-                {{ form_errors(form.modDate) }}
-                {{ form_widget(form.modDate) }}
-            </p>
-            {% endif %}
             <p>
                 {{ form_label(form.categories) }}
                 {{ form_errors(form.categories) }}
@@ -175,6 +168,13 @@
 
         {%  if revisions is defined and revisions is not empty %}
         <fieldset class="ui-section" i id="post__history">
+            {% if post.id is not empty %}
+            <p>
+                {{ form_label(form.modDate) }}
+                {{ form_errors(form.modDate) }}
+                {{ form_widget(form.modDate) }}
+            </p>
+            {% endif %}
             <table class="table table-responsive table-striped table-borderless">
                 <caption>{% trans %}admin.post.revision.caption{% endtrans %}</caption>
                 <thead>
@@ -204,7 +204,7 @@
         {% endif %}
 
         {% if showStats %}
-        <fieldset class="ui-section" i id="post__stats">
+        <fieldset class="ui-section" id="post__stats">
         </fieldset>
         {% endif %}
     </div>

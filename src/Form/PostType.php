@@ -187,7 +187,7 @@ class PostType extends AbstractType
                 'format' => 'dd/MM/yyyy HH:mm',
                 'html5'  => false,
                 'input'  => 'datetime_immutable',
-                'label'  => isset($options['data']) && $options['data']->getExpireDate() < new DateTimeImmutable() ?
+                'label'  => isset($options['data']) && $options['data']->getExpireDate() != '' && $options['data']->getExpireDate() < new DateTimeImmutable() ?
                     'admin.post.properties.expireDate-past.label' :
                     'admin.post.properties.expireDate-future.label',
                 'label_attr' => [
