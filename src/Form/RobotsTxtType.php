@@ -33,7 +33,6 @@ class RobotsTxtType extends AbstractType
             ->add('robots_txt', TextareaType::class, [
                 'attr' => [
                     'aria-labelledby' => 'title_label',
-                    'aria-required' => 'true',
                     'autofocus' => 'true',
                     'class' => 'text halfwidth',
                     'rows' => 15,
@@ -42,6 +41,7 @@ class RobotsTxtType extends AbstractType
                 'label_attr' => [
                     'id' => 'title_label',
                 ],
+                'required' => false,
             ])
             ->add('submit', SubmitType::class, [
                 'attr' => [

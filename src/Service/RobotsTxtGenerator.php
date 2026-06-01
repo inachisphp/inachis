@@ -10,7 +10,7 @@
 namespace Inachis\Service;
 
 use Inachis\Repository\SettingRepository;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Service for generating the content of the robots.txt file based on stored settings
@@ -21,13 +21,12 @@ class RobotsTxtGenerator
 	 * Construct the generator with the required dependencies
 	 *
 	 * @param SettingRepository $settingRepository
-	 * @param UrlGeneratorInterface $urlGenerator
+	 * @param RequestStack $requestStack
 	 */
 	public function __construct(
 		private readonly SettingRepository $settingRepository,
-		private readonly UrlGeneratorInterface $urlGenerator
-	) {
-	}
+    	private readonly RequestStack $requestStack,
+	){}
 
 	/**
 	 * Generate the content of the robots.txt file based on the stored configuration
@@ -42,17 +41,16 @@ class RobotsTxtGenerator
             ?? 'User-agent: *'
         );
 
-        // $sitemapUrl = $this->urlGenerator->generate(
-        //     'inachis_sitemap',
-        //     [],
-        //     UrlGeneratorInterface::ABSOLUTE_URL
-        // );
-
+		$request = $this->requestStack->getCurrentRequest();
+		$sitemapUrl = '/sitemap.xml';
+        if ($request) {
+    		$sitemapUrl = $request->getSchemeAndHttpHost() . '/sitemap.xml';
+		}
         $content = $robotsTxt;
 
-        // if (!str_contains($robotsTxt, 'Sitemap:')) {
-        //     $content .= "\n\nSitemap: " . $sitemapUrl;
-        // }
+        if (!str_contains($robotsTxt, 'Sitemap:')) {
+            $content .= "\n\nSitemap: " . $sitemapUrl;
+        }
 
         return $content;
     }

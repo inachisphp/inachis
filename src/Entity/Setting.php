@@ -47,6 +47,10 @@ class Setting
     /** @var string|null The decrypted value of the setting */
     private ?string $value = null;
 
+    /** @var \DateTimeImmutable The timestamp when the setting was last updated */
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $updatedAt;
+
     /**
      * @return UuidInterface|null
      */
@@ -107,6 +111,7 @@ class Setting
     public function setValue(?string $value): self
     {
         $this->value = $value;
+        $this->updatedAt = new \DateTimeImmutable();
 
         return $this;
     }

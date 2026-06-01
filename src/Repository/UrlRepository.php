@@ -11,6 +11,7 @@ namespace Inachis\Repository;
 
 use Inachis\Entity\Page;
 use Inachis\Entity\Url;
+use Inachis\Enum\EditorialStatus;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -138,5 +139,30 @@ class UrlRepository extends AbstractRepository
             [],
             ['q.content', 'p']
         );
+    }
+
+    /**
+     * Finds all URLs that should be included in the sitemap.
+     *
+     * @return array
+     */
+    public function findSitemapUrls(): array
+    {
+        $now = new \DateTimeImmutable();
+
+        return $this->createQueryBuilder('u')
+            ->innerJoin('u.content', 'p')
+            ->andWhere('u.default = :default')
+            ->andWhere('p.visibility = :visible')
+            ->andWhere('p.status = :status')
+            ->andWhere('p.postDate <= :now')
+            ->andWhere('(p.expireDate IS NULL OR p.expireDate > :now)')
+            ->andWhere('p.noindex = false')
+            ->setParameter('default', true)
+            ->setParameter('visible', true)
+            ->setParameter('status', EditorialStatus::PUBLISHED)
+            ->setParameter('now', $now)
+            ->getQuery()
+            ->getResult();
     }
 }
