@@ -447,7 +447,7 @@ class Series
 
         foreach ($this->items as $item) {
             if (
-                $item->getStatus()->value === EditorialStatus::PUBLISHED &&
+                $item->getStatus() === EditorialStatus::PUBLISHED &&
                 !$item->isScheduledPage() &&
                 $item->getVisibility()
             ) {

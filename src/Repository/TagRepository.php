@@ -21,7 +21,7 @@ class TagRepository extends AbstractRepository
 {
     /**
      * Creates a new instance of the TagRepository
-     * 
+     *
      * @param ManagerRegistry $registry The registry
      */
     public function __construct(ManagerRegistry $registry)
@@ -31,7 +31,7 @@ class TagRepository extends AbstractRepository
 
     /**
      * Finds tags by title
-     * 
+     *
      * @param string $title The title to search for
      * @return Paginator<Tag> The paginator
      */
@@ -55,8 +55,9 @@ class TagRepository extends AbstractRepository
      *
      * @param string $value
      * @return string
+     * @throws \InvalidArgumentException if the normalised value is empty
      */
-    private function normalize(string $value): string
+    private function normalise(string $value): string
     {
         $value = trim($value);
         $value = mb_strtolower($value);
@@ -78,16 +79,16 @@ class TagRepository extends AbstractRepository
     public function getOrCreate(string $title): Tag
     {
         $em = $this->getEntityManager();
-        $normalized = $this->normalize($title);
+        $normalised = $this->normalise($title);
 
         // Fast path
-        $existing = $this->findOneBy(['title' => $normalized]);
+        $existing = $this->findOneBy(['title' => $normalised]);
         if ($existing !== null) {
             return $existing;
         }
 
         // Create
-        $tag = new Tag($normalized);
+        $tag = new Tag($normalised);
         $em->persist($tag);
 
         try {
@@ -97,14 +98,14 @@ class TagRepository extends AbstractRepository
             // Another request created it
             $em->detach($tag);
 
-            $existing = $this->findOneBy(['title' => $normalized]);
+            $existing = $this->findOneBy(['title' => $normalised]);
             if ($existing !== null) {
                 return $existing;
             }
 
             throw new \RuntimeException(sprintf(
                 'Failed to create or retrieve tag "%s"',
-                $normalized
+                $normalised
             ));
         }
     }
@@ -134,5 +135,37 @@ class TagRepository extends AbstractRepository
         }
 
         return $qb->getResult();
+    }
+
+    /**
+     * retund a count of tags
+     *
+     * @return int
+     */
+    public function countTags(): int
+    {
+        return (int) $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Return a batch of tags, ordered by title, with pagination.
+     *
+     * @param int $offset
+     * @param int $limit
+     * @return array<Tag>
+     */
+    public function findBatch(
+        int $offset,
+        int $limit
+    ): array {
+        return $this->createQueryBuilder('t')
+            ->orderBy('t.title', 'ASC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 }
