@@ -21,13 +21,29 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type for creating and editing user preferences
+ */
 class UserPreferenceType extends AbstractType
 {
+    /**
+     * Creates a new instance of {@link UserPreferenceType}
+     * 
+     * @param TranslatorInterface $translator The translator service
+     * @param Security $security The security service
+     */
     public function __construct(
         protected TranslatorInterface $translator,
         protected Security $security
     ) {}
 
+    /**
+     * Builds the form
+     * 
+     * @param FormBuilderInterface $builder The form builder
+     * @param array<string, mixed> $options The form options
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -180,6 +196,12 @@ class UserPreferenceType extends AbstractType
             ]);
     }
 
+    /**
+     * Configures the options for the form
+     * 
+     * @param OptionsResolver $resolver The options resolver
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

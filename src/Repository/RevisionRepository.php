@@ -12,30 +12,50 @@ namespace Inachis\Repository;
 use Inachis\Entity\{Page,Revision,User};
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\NonUniqueResultException;
+use Ramsey\Uuid\UuidInterface;
 use DateTimeImmutable;
 
 /**
- * @method Revision|null find($id, $lockMode = null, $lockVersion = null)
- * @method Revision|null findOneBy(array $criteria, array $orderBy = null)
- * @method Revision[] findAll()
- * @method Revision[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Repository for revision entities
  */
 class RevisionRepository extends AbstractRepository implements RevisionRepositoryInterface
 {
+    /**
+     * The action type for a deleted revision
+     */
     public const DELETED = 'Deleted';
+    /**
+     * The action type for a published revision
+     */
     public const PUBLISHED = 'Published';
+    /**
+     * The action type for an updated revision
+     */
     public const UPDATED = 'Updated';
+    /**
+     * The action type for a visibility change revision
+     */
     public const VISIBILITY_CHANGE = 'Visibility changed to %s';
+    /**
+     * The action type for a reverted revision
+     */
     public const REVERTED = 'Reverted to version %s';
 
+    /**
+     * RevisionRepository constructor
+     * 
+     * @param ManagerRegistry $registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Revision::class);
     }
 
     /**
-     * @param Page $page
-     * @return Revision
+     * Hydrate a new revision from a page
+     * 
+     * @param Page $page The page to hydrate the revision from.
+     * @return Revision The hydrated revision.
      * @throws NonUniqueResultException
      * @throws \Exception
      */
@@ -53,12 +73,14 @@ class RevisionRepository extends AbstractRepository implements RevisionRepositor
     }
 
     /**
-     * @param string $pageId
-     * @return int
+     * Get the next version number for a page
+     * 
+     * @param UuidInterface $pageId The ID of the page.
+     * @return int The next version number.
      * @throws NonUniqueResultException
      * @throws \Doctrine\ORM\NoResultException
      */
-    public function getNextVersionNumberForPageId(string $pageId): int
+    public function getNextVersionNumberForPageId(UuidInterface $pageId): int
     {
         return ((int) $this->createQueryBuilder('r')
             ->select('MAX(r.versionNumber) as max_version')
@@ -69,11 +91,14 @@ class RevisionRepository extends AbstractRepository implements RevisionRepositor
     }
 
     /**
-     * @param Page $page
-     * @return Revision
+     * Delete a page and record the deletion as a revision
+     * 
+     * @param Page $page The page to delete.
+     * @param User|null $user The user performing the deletion.
+     * @return Revision The recorded revision.
      * @throws \Exception
      */
-    public function deleteAndRecordByPage(Page $page, User $user = null): Revision
+    public function deleteAndRecordByPage(Page $page, ?User $user): Revision
     {
         $this->createQueryBuilder('r')
             ->delete()
