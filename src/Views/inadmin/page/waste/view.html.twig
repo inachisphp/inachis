@@ -1,0 +1,125 @@
+{% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_waste_list') }}">Deleted Content</a>
+    <span>Deleted {{ waste.sourceType|default('Content') }}: {{ waste.title }}</span>
+{% endblock pagetitle %}
+
+{% block content %}
+<div class="col-12">
+    <div class="content__panel">
+        <h2 class="h3">Waste Item Details</h2>
+        
+        <table class="table-responsive table--row-borders">
+            <tbody>
+                <tr>
+                    <th scope="row" style="width: 200px;">Original Type</th>
+                    <td>{{ waste.sourceType }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Deleted At</th>
+                    <td>{{ waste.modDate|date('Y-m-d H:i:s') }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Title</th>
+                    <td>{{ waste.title }}</td>
+                </tr>
+                
+                {% if waste.sourceType == 'Page' or waste.sourceType == 'Series' %}
+                    {% if wasteContent.subTitle is defined and wasteContent.subTitle %}
+                    <tr>
+                        <th scope="row">Subtitle</th>
+                        <td>{{ wasteContent.subTitle }}</td>
+                    </tr>
+                    {% endif %}
+                {% endif %}
+                
+                {% if waste.sourceType == 'Page' %}
+                    {% if wasteContent.type is defined %}
+                    <tr>
+                        <th scope="row">Page Type</th>
+                        <td>{{ wasteContent.type }}</td>
+                    </tr>
+                    {% endif %}
+                    
+                    {% if wasteContent.urls is defined and wasteContent.urls|length > 0 %}
+                    <tr>
+                        <th scope="row">URLs</th>
+                        <td>
+                            <ul class="list-unstyled">
+                                {% for url in wasteContent.urls %}
+                                    <li>{{ url.link }}{% if url.default %} <strong>(Default)</strong>{% endif %}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    
+                    {% if wasteContent.tags is defined and wasteContent.tags|length > 0 %}
+                    <tr>
+                        <th scope="row">Tags (IDs)</th>
+                        <td>{{ wasteContent.tags|join(', ') }}</td>
+                    </tr>
+                    {% endif %}
+                    
+                    {% if wasteContent.categories is defined and wasteContent.categories|length > 0 %}
+                    <tr>
+                        <th scope="row">Categories (IDs)</th>
+                        <td>{{ wasteContent.categories|join(', ') }}</td>
+                    </tr>
+                    {% endif %}
+                {% endif %}
+
+                {% if waste.sourceType == 'Series' %}
+                    {% if wasteContent.description is defined and wasteContent.description %}
+                    <tr>
+                        <th scope="row">Description</th>
+                        <td>{{ wasteContent.description }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if wasteContent.url is defined and wasteContent.url %}
+                    <tr>
+                        <th scope="row">URL</th>
+                        <td>{{ wasteContent.url }}</td>
+                    </tr>
+                    {% endif %}
+                {% endif %}
+
+                {% if waste.sourceType == 'Image' %}
+                    {% if wasteContent.filename is defined %}
+                    <tr>
+                        <th scope="row">Filename</th>
+                        <td>{{ wasteContent.filename }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if wasteContent.filetype is defined %}
+                    <tr>
+                        <th scope="row">File Type</th>
+                        <td>{{ wasteContent.filetype }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if wasteContent.description is defined and wasteContent.description %}
+                    <tr>
+                        <th scope="row">Description</th>
+                        <td>{{ wasteContent.description }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if wasteContent.altText is defined and wasteContent.altText %}
+                    <tr>
+                        <th scope="row">Alt Text</th>
+                        <td>{{ wasteContent.altText }}</td>
+                    </tr>
+                    {% endif %}
+                {% endif %}
+            </tbody>
+        </table>
+        
+        {% if waste.sourceType == 'Page' and wasteContent.content is defined and wasteContent.content %}
+        <h3 class="h4 mt-4">Content</h3>
+        <div class="content-preview" style="background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 4px; color: #333">
+            {{ wasteContent.content }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}

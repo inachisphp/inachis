@@ -26,8 +26,19 @@ use Exception;
 use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 
+/**
+ * Service for bulk creating pages
+ */
 class PageBulkCreateService
 {
+    /**
+     * Creates a new instance of the PageBulkCreateService
+     *
+     * @param EntityManagerInterface $entityManager
+     * @param SeriesRepository $seriesRepository
+     * @param TagRepository $tagRepository
+     * @param CategoryRepository $categoryRepository
+     */
     public function __construct(
         private EntityManagerInterface $entityManager,
         private SeriesRepository $seriesRepository,
@@ -36,6 +47,11 @@ class PageBulkCreateService
     ) {}
 
     /**
+     * Creates pages in bulk
+     *
+     * @param BulkCreateData $data
+     * @param User $author
+     * @return int
      * @throws Exception
      */
     public function create(BulkCreateData $data, User $author): int
@@ -71,16 +87,16 @@ class PageBulkCreateService
                 $post,
                 $post->getPostDateAsLink() . '/' . UrlNormaliser::toUri($title)
             ));
-
-            foreach($data->tags as $newTag) {
-                $tag = null;
+            foreach ($data->tags as $newTag) {
                 if (Uuid::isValid($newTag)) {
-                    $tag = $this->tagRepository->findOneBy(['id' => $newTag]);
+                    $tag = $this->tagRepository->find($newTag);
+                } else {
+                    $tag = $this->tagRepository->getOrCreate($newTag);
                 }
-                if (empty($tag)) {
-                    $tag = new Tag($newTag);
+
+                if ($tag !== null) {
+                    $post->addTag($tag);
                 }
-                $post->getTags()->add($tag);
             }
             foreach($data->categories as $newCategory) {
                 $category = null;

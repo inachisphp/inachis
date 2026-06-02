@@ -13,7 +13,7 @@
     {{ include('inadmin/partials/filters.html.twig', {
         'show_select_deselect': false,
     }) }}
-    <section class="paginated-list">
+    <section class="ui-section">
     {% if table_desc|default('') is not empty %}
     <p id="table-desc" class="visually-hidden">
         {{ table_desc }}
@@ -71,7 +71,11 @@
                 {% endif %}
                 <{% if column.header is defined and column.header %}th scope="row"{% else %}td{% if column.flex|default(false) %} class="table--flex"{% endif %}{% if column.hideOnMobile|default(false) %} class="hide-on-mobile"{% endif %}{% if column.className is defined %} class="{{ column.className == 'use_self' ? attribute(item, column.source) : column.className }}"{% endif %}{% endif %}>
                     {% if column.slug is defined %}
-                        <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incc/{{ slug_prefix }}/{{ slug_object }}">
+                        {% if column.slug_prefix is defined %}
+                            <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incc/{{ attribute(item, column.slug_prefix) }}/{{ slug_object }}">
+                        {% elseif slug_prefix is defined %}
+                            <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incc/{{ slug_prefix }}/{{ slug_object }}">
+                        {% endif %}
                     {% endif %}
                     {% if column.url is defined and column.url is not empty %}
                             <a aria-label="Edit {{ attribute(item, 'title') }}" href="{{ attribute(item, column.url) }}">

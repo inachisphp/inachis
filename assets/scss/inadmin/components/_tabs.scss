@@ -3,69 +3,58 @@
 
 .ui-tabs,
 .ui-tabs-external {
+	background: $bg-surface;
+	border: 1px solid $border-color;
+	border-top-left-radius: 1em;
+	border-top-right-radius: 1em;
+	border-bottom: none;
+
 	clear: both;
+	display: block;
+	font-size: 0.9em;
+	list-style-type: none;
+	margin: 1em 0 0 0;
+	padding: 0.5em 0 0 0.5rem;
 
-	fieldset {
-		clear: both;
-	}
-
-	ol,
-	div:not(.switch-wrapper div) {
-		clear: left;
-	}
-
-	.ui-tabs-nav {
-		background: $bg-surface;
-		border: 1px solid $border-color;
-		border-top-left-radius: 1em;
-		border-top-right-radius: 1em;
-		border-bottom: none;
+	&::after {
+		content: ' ';
 		clear: both;
 		display: block;
-		font-size: 0.9em;
-		list-style-type: none;
-		margin: 1em 0 0 0;
-		padding: 0.5em 0 0 0;
+	}
 
-		&::after {
-			content: ' ';
-			clear: both;
-			display: block;
+	a,
+	a:visited {
+		color: $text-muted;
+		display: inline-block;
+		text-decoration: none;
+		padding: 0.6rem;
+	}
+
+	li {
+		border-bottom: 3px solid transparent;
+		float: left;
+		margin: 0 5px 0;
+
+		&:hover {
+			background-color: $border-color;
+			border-bottom-color: $action-primary-hover;
 		}
+	}
+
+	.ui-state-active {
+		border-bottom: 3px solid $action-primary;
 
 		a,
 		a:visited {
-			color: $text-muted;
-			display: inline-block;
-			text-decoration: none;
-			padding: 0.6rem;
-		}
-
-		li {
-			border-bottom: 3px solid transparent;
-			float: left;
-			margin: 0 5px 0;
-
-			&:hover {
-				background-color: $border-color;
-				border-bottom-color: $action-primary-hover;
-			}
-		}
-
-		.ui-state-active {
-			border-bottom: 3px solid $action-primary;
-
-			a,
-			a:visited {
-				color: $action-primary;
-				font-weight: bold;
-			}
+			color: $action-primary;
+			font-weight: bold;
 		}
 	}
 }
 
-.form__post fieldset.ui-tabs-panel {
-	background: $bg-surface;
-	border: 1px solid $border-color;
-	margin: 0;
-}
+
+// .form__post fieldset.ui-tabs-panel {
+// 	background: $bg-surface;
+// 	border: 1px solid $border-color;
+// 	margin: 0;
+// }

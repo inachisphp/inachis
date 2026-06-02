@@ -3,6 +3,7 @@ parameters:
 
     app.config.title: 'Wandering the World'
     app.config.locale: 'en'
+    app.domain: '%env(APP_DOMAIN)%'
 
     password_reset.ttl: '%env(PASSWORD_RESET_TTL)%'
     app.public_img_path: '%env(APP_PUBLIC_IMG_PATH)%'
@@ -26,6 +27,16 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    Inachis\Analytics\Provider\InternalAnalyticsProvider: ~
+
+    Inachis\Analytics\AnalyticsProviderInterface:
+        # @todo Google Analytics / Umami / Plausible providers can be swapped in here if desired
+        alias: Inachis\Analytics\Provider\InternalAnalyticsProvider
+
+    Inachis\Command\Image\SyncImagesFromContentCommand:
+        arguments:
+            $imageDirectory: '%kernel.project_dir%/public/imgs'
+
     Inachis\Diagnostics\Check\:
         resource: '../src/Diagnostics/Check/*/*'
         tags: ['app.diagnostic_check']
@@ -33,6 +44,13 @@ services:
     Inachis\Diagnostics\DiagnosticsCollector:
         arguments:
             $checks: !tagged_iterator app.diagnostic_check
+
+    Inachis\EntityListener\SettingListener:
+        tags:
+            - {
+              name: doctrine.orm.entity_listener,
+              entity: Inachis\Entity\Setting,
+            }
 
     Inachis\EventListener\AdminResponseEvent:
         arguments:
@@ -45,6 +63,9 @@ services:
     Inachis\EventListener\LoginFailureListener:
         tags:
             - { name: 'kernel.event_listener', event: Symfony\Component\Security\Http\Event\LoginFailureEvent }
+
+    Inachis\EventSubscriber\AnalyticsSubscriber:
+        tags: ['kernel.event_subscriber']
 
     Inachis\Service\Image\ImageLocaliser:
         arguments:
@@ -90,6 +111,10 @@ services:
         arguments:
             $appSecret: '%env(APP_SECRET)%'
             $ttlSeconds: '%password_reset.ttl%'
+
+    Inachis\Service\EncryptionService:
+        arguments:
+            $masterKey: '%env(INACHIS_MASTER_KEY)%'
 
     Inachis\Service\VersionService:
         arguments:

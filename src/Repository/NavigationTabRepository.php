@@ -21,6 +21,8 @@ class NavigationTabRepository extends AbstractRepository
 {
     /**
      * Constructor
+     *
+     * @param ManagerRegistry $registry
      */
     public function __construct(ManagerRegistry $registry)
     {

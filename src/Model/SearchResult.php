@@ -18,6 +18,14 @@ use Traversable;
  */
 class SearchResult implements IteratorAggregate
 {
+    /**
+     * Creates a new instance of {@link SearchResult}
+     * 
+     * @param array<int, array<string, mixed>> $results The search results
+     * @param int $total The total number of search results
+     * @param int $offset The offset of the search results
+     * @param int $limit The limit of the search results
+     */
     public function __construct(
         private array $results,
         private readonly int $total,
@@ -26,7 +34,9 @@ class SearchResult implements IteratorAggregate
     ) {}
 
     /**
-     * @return Traversable
+     * Returns an iterator for the search results
+     * 
+     * @return Traversable The iterator for the search results
      */
     public function getIterator(): Traversable
     {
@@ -34,7 +44,9 @@ class SearchResult implements IteratorAggregate
     }
 
     /**
-     * @return int
+     * Returns the total number of search results
+     * 
+     * @return int The total number of search results
      */
     public function getTotal(): int
     {
@@ -42,7 +54,9 @@ class SearchResult implements IteratorAggregate
     }
 
     /**
-     * @return int
+     * Returns the offset of the search results
+     * 
+     * @return int The offset of the search results
      */
     public function getOffset(): int
     {
@@ -50,7 +64,9 @@ class SearchResult implements IteratorAggregate
     }
 
     /**
-     * @return int
+     * Returns the limit of the search results
+     * 
+     * @return int The limit of the search results
      */
     public function getLimit(): int
     {
@@ -58,7 +74,9 @@ class SearchResult implements IteratorAggregate
     }
 
     /**
-     * @return array
+     * Returns the search results
+     * 
+     * @return array<int, array<string, mixed>> The search results
      */
     public function getResults(): array
     {
@@ -66,12 +84,14 @@ class SearchResult implements IteratorAggregate
     }
 
     /**
-     * @param $key
-     * @param $property
-     * @param mixed $value
+     * Updates a property of a specific search result
+     * 
+     * @param string|int $key The key of the search result
+     * @param string $property The property to update
+     * @param mixed $value The value to set
      * @return void
      */
-    public function updateResultPropertyByKey($key, $property, mixed $value): void
+    public function updateResultPropertyByKey(string|int $key, string $property, mixed $value): void
     {
         $this->results[$key][$property] = $value;
     }

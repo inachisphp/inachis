@@ -1,11 +1,14 @@
-{% if alerts is defined %}
-<section class="widget widget-alerts">
-    <h2>Notifications</h2>
-    <article class="alert_priority__high">
-        <p><span>High</span> HDD space is running low</p>
-    </article>
-    <article class="alert_priority__medium">
-        <p><span>Med</span> A new version is available</p>
-    </article>
-</section>
-{% endif %}
+<div class="widget widget-alerts">
+    {% if dashboard.alerts.altText.count > 0 or dashboard.alerts.categories.count > 0 %}
+        <article class="alert_priority__high">
+            {% if dashboard.alerts.altText.count > 0 %}
+                <p><span>High</span> {{ dashboard.alerts.altText.count }} images without alt text <a href="{{ path('incc_resource_list', { 'type': 'images' }) }}?altText=null">Fix &rarr;</a></p>
+            {% endif %}
+            {% if dashboard.alerts.categories.count > 0 %}
+                <p><span>High</span> {{ dashboard.alerts.categories.count }} pages without categories <a href="/incc/post/list?category=null">Fix &rarr;</a></p>
+            {% endif %}
+        </article>
+    {% endif %}
+
+
+</div>

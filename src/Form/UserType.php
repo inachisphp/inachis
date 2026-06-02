@@ -23,17 +23,29 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type for creating and editing users
+ */
 class UserType extends AbstractType
 {
-    private TranslatorInterface $translator;
-    private Security $security;
+    /**
+     * Creates a new instance of {@link UserType}
+     * 
+     * @param TranslatorInterface $translator The translator service
+     * @param Security $security The security service
+     */
+    public function __construct(
+        private TranslatorInterface $translator,
+        private Security $security
+    ) {}
 
-    public function __construct(TranslatorInterface $translator, Security $security)
-    {
-        $this->translator = $translator;
-        $this->security = $security;
-    }
-
+    /**
+     * Builds the form
+     * 
+     * @param FormBuilderInterface $builder The form builder
+     * @param array<string, mixed> $options The form options
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $newUser = !isset($options['data']) || !($options['data'] instanceof User) || $options['data']->getId() === null;
@@ -157,6 +169,12 @@ class UserType extends AbstractType
         }
     }
 
+    /**
+     * Configures the options for the form
+     * 
+     * @param OptionsResolver $resolver The options resolver
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

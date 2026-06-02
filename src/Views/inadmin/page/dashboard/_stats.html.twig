@@ -1,33 +1,82 @@
-{% if dashboard.publishCount > 0 %}
-<section class="widget widget-stats">
-    <article class="widget-stats__focus">
-        <p>
-            <span class="material-icons" aria-hidden="true">trending_up</span>
-            Your most recent post has had <strong>{{ dashboard.stats.recent }}</strong> visitors
-        </p>
-    </article>
+{% if dashboard.analytics.viewsThisMonth > 0 or dashboard.analytics.viewsLastMonth > 0 %}
+    <div class="widget-stats__grid">
+        <article class="widget-stats__card widget-stats__card--total" aria-labelledby="stats-total-visits">
+            <div class="widget-stats__icon" aria-hidden="true">
+                <span class="material-icons">visibility</span>
+            </div>
+            <div class="widget-stats__content">
+                <h2 id="stats-total-visits">This Month</h2>
+                <p class="widget-stats__value">{{ dashboard.analytics.viewsThisMonth }}</p>
+                {% if dashboard.analytics.viewsLastMonth > 0 %}
+                    {% set monthTrend = ((dashboard.analytics.viewsThisMonth - dashboard.analytics.viewsLastMonth) / dashboard.analytics.viewsLastMonth * 100)|round(2) %}
+                    {% set trend = monthTrend > 1 ? 'up' : 'down' %}
+                    <p class="widget-stats__trend widget-stats__trend--{{ trend }}">
+                        <span class="material-icons">trending_{{ trend }}</span>
+                        {{ monthTrend }}% from last month
+                    </p>
+                {% endif %}
+            </div>
+        </article>
 
-    <article>
-        <h2>Popular content</h2>
-        <p>Last 30 days - {{ 'now'|date('j F') }} &ndash; {{ '-30 days'|date('j F') }}</p>
-        <ol>
-            <li>
-                <span>post 1</span>
-                <em>10,022</em>
+        <article class="widget-stats__card widget-stats__card--today" aria-labelledby="stats-visits-today">
+            <div class="widget-stats__icon" aria-hidden="true">
+                <span class="material-icons">event_available</span>
+            </div>
+            <div class="widget-stats__content">
+                <h2 id="stats-visits-today">Views Today</h2>
+                <p class="widget-stats__value">{{ dashboard.analytics.viewsToday }}</p>
+                {% if dashboard.analytics.viewsYesterday > 0 %}
+                    {% set dayTrend = ((dashboard.analytics.viewsToday - dashboard.analytics.viewsYesterday) / dashboard.analytics.viewsYesterday * 100)|round(2) %}
+                    {% set trend = dayTrend > 1 ? 'up' : 'down' %}
+                    <p class="widget-stats__trend widget-stats__trend--{{ trend }}">
+                        <span class="material-icons">trending_{{ trend }}</span>
+                        {{ dayTrend }}% from yesterday
+                    </p>
+                {% endif %}
+            </div>
+        </article>
+
+        <article class="widget-stats__card widget-stats__card--unique" aria-labelledby="stats-unique-visitors">
+            <div class="widget-stats__icon" aria-hidden="true">
+                <span class="material-icons">group</span>
+            </div>
+            <div class="widget-stats__content">
+                <h2 id="stats-unique-visitors">Visitors</h2>
+                <p class="widget-stats__value">{{ dashboard.analytics.uniqueVisitorsThisMonth }}</p>
+                {% if dashboard.analytics.uniqueVisitorsLastMonth > 0 %}
+                    {% set uniqueVisitorTrend = ((dashboard.analytics.uniqueVisitorsThisMonth - dashboard.analytics.uniqueVisitorsLastMonth) / dashboard.analytics.uniqueVisitorsLastMonth * 100)|round(2) %}
+                    {% set trend = uniqueVisitorTrend > 1 ? 'up' : 'down' %}
+                    <p class="widget-stats__trend widget-stats__trend--{{ trend }}">
+                        <span class="material-icons">trending_{{ trend }}</span>
+                        {{ uniqueVisitorTrend }}% from last month
+                    </p>
+                {% endif %}
+            </div>
+        </article>
+    </div>
+
+    <section class="widget ui-section rounded">
+        <header class="widget__header">
+            <h2>
+                <span>Popular Posts</span>
+                <a href="{{ path('incc_tools_analytics') }}"
+                   class="widget__header__link"
+                   title="View analytics for all posts"
+                >View All</a>
+            </h2>
+        </header>
+        <ul class="widget-stats__list" aria-labelledby="stats-popular-posts">
+        {% for post in dashboard.analytics.topPages %}
+            <li class="widget-stats__item">
+                <span class="widget-stats__item-title">{{ post.title }}</span>
+                <span class="widget-stats__item-count">{{ post.total }} views</span>
+                <div class="widget-stats__item-progress" style="width: {{ post.total }}%" aria-hidden="true"></div>
             </li>
-            <li>
-                <span>post 2</span>
-                <em>70</em>
-            </li>
-            <li>
-                <span>post 3</span>
-                <em>2</em>
-            </li>
-        </ol>
-    </article>
-</section>
+        {% endfor %}
+        </ul>
+    </section>
 {% else %}
-<section class="widget disabled">
-    <p>Statistics will appear here when you have published posts.</p>
+<section class="admonition admonition__info" role="note" aria-labelledby="stats-no-data">
+    <p id="stats-no-data">Statistics will appear here when you have published posts that have had visitors.</p>
 </section>
 {% endif %}

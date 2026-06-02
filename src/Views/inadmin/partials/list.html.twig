@@ -7,7 +7,7 @@
 
     {{ include('inadmin/partials/filters.html.twig') }}
 
-    <section class="paginated-list{%- if zebra|default(false) %} zebra{% endif %}">
+    <section class="ui-section paginated-list{%- if zebra|default(false) %} zebra{% endif %}">
         {% for item in dataset.iterator %}
             {% if slug is defined %}
                 {% if '.' in slug %}

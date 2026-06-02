@@ -11,12 +11,23 @@ namespace Inachis\Twig;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use Inachis\Entity\NavigationTab;
 use Inachis\Service\Navigation\NavigationTabService;
 
+/**
+ * Twig extension for navigation tabs
+ */
 class NavigationTabsExtension extends AbstractExtension
 {
+    /**
+     * @param NavigationTabService $navigation
+     */
     public function __construct(private NavigationTabService $navigation) {}
 
+    /**
+     * Returns the list of functions provided by this extension
+     * @return list<TwigFunction>
+     */
     public function getFunctions(): array
     {
         return [
@@ -24,7 +35,11 @@ class NavigationTabsExtension extends AbstractExtension
         ];
     }
 
-    public function getTabs()
+    /**
+     * Returns the list of active navigation tabs
+     * @return array<NavigationTab>
+     */
+    public function getTabs(): array
     {
         return $this->navigation->getActiveTabs();
     }

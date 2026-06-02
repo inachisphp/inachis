@@ -11,13 +11,13 @@
     {% block profile %}
 
         {{ form_start(form, {'attr': { 'class': 'col-12 form form__post form__user' }}) }}
-        <div class="ui-tabs-external">
+        <div>
     {% if user.username is defined and user.username is not empty %}
             {{ include('inadmin/partials/tab-sets/profile.html.twig', {
                 'activeTab': 'profile'
             }) }}
     {% endif %}
-            <section class="paginated-list">
+            <section class="ui-section">
     {% if user.username is defined and user.username is not empty %}
 {# @todo add avatar selector #}
         {% if false and app.user.username == user.username %}

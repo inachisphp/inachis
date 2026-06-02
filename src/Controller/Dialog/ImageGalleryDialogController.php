@@ -49,19 +49,20 @@ class ImageGalleryDialogController extends AbstractInachisController
         Request $request,
         ImageRepository $imageRepository,
     ): Response {
-        $filters = array_filter($request->request->all('filter', []));
-        $offset = (int) $request->attributes->get('offset', 0);
-        $limit = (int) $request->attributes->get(
-            'limit',
-            $imageRepository::MAX_ITEMS_TO_SHOW_ADMIN
-        );
+        $filters = array_filter($request->request->all('filter'));
+        $offsetRaw = $request->attributes->get('offset');
+        $offset = is_numeric($offsetRaw) ? $offsetRaw : 0;
+        $limitRaw = $request->attributes->get('limit');
+        $limit = is_numeric($limitRaw) ? $limitRaw : $imageRepository::MAX_ITEMS_TO_SHOW_ADMIN;
         $this->data['images'] = $imageRepository->getFiltered(
             $filters,
             $offset,
             $limit
         );
-        $this->data['query']['offset'] = $offset;
-        $this->data['query']['limit'] = $limit;
+        $this->data['query'] = [
+            'offset' => $offset,
+            'limit' => $limit
+        ];
         return $this->render('inadmin/partials/gallery.html.twig', $this->data);
     }
 }

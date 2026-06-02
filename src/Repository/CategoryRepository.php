@@ -15,12 +15,19 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class CategoryRepository extends AbstractRepository implements CategoryRepositoryInterface
 {
+    /**
+     * Constructor for CategoryRepository
+     *
+     * @param ManagerRegistry $registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Category::class);
     }
 
     /**
+     * Removes a Category entity from the database.
+     *
      * @param Category $category
      */
     public function remove(Category $category): void
@@ -31,6 +38,7 @@ class CategoryRepository extends AbstractRepository implements CategoryRepositor
 
     /**
      * Returns an array of the root level categories.
+     *
      * @return Category[] The array of {@link Category} objects
      */
     public function getRootCategories(): array
@@ -42,10 +50,12 @@ class CategoryRepository extends AbstractRepository implements CategoryRepositor
     }
 
     /**
-     * @param $title
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * Find categories by title
+     *
+     * @param string $title
+     * @return Paginator<Category>
      */
-    public function findByTitleLike($title): Paginator
+    public function findByTitleLike(string$title): Paginator
     {
         return $this->getAll(
             0,
@@ -58,5 +68,37 @@ class CategoryRepository extends AbstractRepository implements CategoryRepositor
             ],
             'q.title'
         );
+    }
+
+    /**
+     * Return a count of visible categories
+     *
+     * @return integer
+     */
+    public function countVisibleCategories(): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Return a batch of categories, ordered by title, with pagination.
+     *
+     * @param integer $offset
+     * @param integer $limit
+     * @return array<Category>
+     */
+    public function findBatch(
+        int $offset,
+        int $limit
+    ): array {
+        return $this->createQueryBuilder('c')
+            ->orderBy('c.title', 'ASC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 }

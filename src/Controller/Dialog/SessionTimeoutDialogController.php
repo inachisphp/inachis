@@ -25,19 +25,31 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
+/**
+ * Session timeout dialog controller
+ */
 #[IsGranted('ROLE_ADMIN')]
 class SessionTimeoutDialogController extends AbstractInachisController
 {
+    /**
+     * Keep alive
+     * 
+     * @return JsonResponse
+     */
     #[Route('/incc/keep-alive', methods: [ 'POST' ])]
     public function keepAlive(): JsonResponse
     {
-        return new JsonResponse(['time' => date(
-            'Y-m-d\TH:i:s\Z',
-            strtotime('+' . ini_get('session.gc_maxlifetime') . ' seconds')
-        )]);
+        return new JsonResponse([
+            'time' => date(
+                'Y-m-d\TH:i:s\Z',
+                time() + (int) ini_get('session.gc_maxlifetime')
+            )
+        ]);
     }
 
     /**
+     * Show dialog
+     * 
      * @param Request $request
      * @return Response
      */

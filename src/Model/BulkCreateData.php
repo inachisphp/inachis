@@ -10,22 +10,42 @@
 namespace Inachis\Model;
 
 use DateTimeImmutable;
-use DateTimeInterface;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Data for bulk creating pages
+ */
 class BulkCreateData
 {
+    /**
+     * Creates a new instance of the BulkCreateData
+     * 
+     * @param string $title
+     * @param DateTimeImmutable $startDate
+     * @param DateTimeImmutable $endDate
+     * @param bool $addDayNumber
+     * @param string $seriesId
+     * @param array<string> $tags
+     * @param array<string> $categories
+     */
     public function __construct(
         public string $title,
-        public DateTimeInterface $startDate,
-        public DateTimeInterface $endDate,
+        public DateTimeImmutable $startDate,
+        public DateTimeImmutable $endDate,
         public bool $addDayNumber,
         public string $seriesId,
         public array $tags = [],
         public array $categories = [],
     ) {}
 
+    /**
+     * Creates a new instance of the BulkCreateData from a request
+     * 
+     * @param Request $request
+     * @return self
+     * @throws InvalidArgumentException
+     */
     public static function fromRequest(Request $request): self
     {
         $form = $request->request->all();

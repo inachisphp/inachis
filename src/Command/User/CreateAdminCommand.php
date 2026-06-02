@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Command;
+namespace Inachis\Command\User;
 
 use Inachis\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,7 +24,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  * Create an admin user
  */
 #[AsCommand(
-    name: 'inachis:create-admin',
+    name: 'inachis:user:create',
     description: 'Create a new administrator account for your site',
 )]
 class CreateAdminCommand extends Command

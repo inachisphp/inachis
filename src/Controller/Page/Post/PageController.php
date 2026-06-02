@@ -12,32 +12,30 @@ namespace Inachis\Controller\Page\Post;
 use DateTimeImmutable;
 use Exception;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Category;
-use Inachis\Entity\Image;
-use Inachis\Entity\Page;
-use Inachis\Entity\Revision;
-use Inachis\Entity\Tag;
-use Inachis\Entity\Url;
+use Inachis\Entity\{Category, Image, Page, Revision, Tag, Url};
+use Inachis\Enum\EditorialStatus;
 use Inachis\Form\PostType;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\RevisionRepository;
+use Inachis\Repository\{PageRepository, RevisionRepository, TagRepository};
 use Inachis\Service\Page\PageBulkActionService;
-use Inachis\Util\ContentRevisionCompare;
-use Inachis\Util\ReadingTime;
-use Inachis\Util\UrlNormaliser;
+use Inachis\Util\{ContentRevisionCompare, ReadingTime, UrlNormaliser};
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Page controller
+ */
 #[IsGranted('ROLE_ADMIN')]
 class PageController extends AbstractInachisController
 {
     public const ITEMS_TO_SHOW = 20;
 
     /**
+     * List posts
+
      * @param Request $request
      * @param ContentQueryParameters $contentQueryParameters
      * @param PageBulkActionService $pageBulkActionService
@@ -91,13 +89,27 @@ class PageController extends AbstractInachisController
             'postDate desc',
         );
         $this->data['form'] = $form->createView();
-        $this->data['posts'] = $pageRepository->getFilteredOfTypeByPostDate(
-            $contentQuery['filters'],
-            $type,
-            $contentQuery['offset'],
-            $contentQuery['limit'],
-            $contentQuery['sort'],
-        );
+        if ($request->query->has('category') && $request->query->get('category') === 'null') {
+            $this->data['posts'] = $pageRepository->getPagesWithoutCategories($contentQuery['offset'], $contentQuery['limit']);
+            $this->data['querystring'] = 'category=null';
+        } elseif ($request->query->has('tag') && $request->query->get('tag') === 'null') {
+            $this->data['posts'] = $pageRepository->getPagesWithoutTags($contentQuery['offset'], $contentQuery['limit']);
+            $this->data['querystring'] = 'tag=null';
+        } elseif ($request->query->has('featureImage') && $request->query->get('featureImage') === 'null') {
+            $this->data['posts'] = $pageRepository->getPagesWithoutFeatureImage($contentQuery['offset'], $contentQuery['limit']);
+            $this->data['querystring'] = 'featureImage=null';
+        } elseif ($request->query->has('sharingMessage') && $request->query->get('sharingMessage') === 'null') {
+            $this->data['posts'] = $pageRepository->getPagesWithoutSharingMessage($contentQuery['offset'], $contentQuery['limit']);
+            $this->data['querystring'] = 'sharingMessage=null';
+        } else {
+            $this->data['posts'] = $pageRepository->getFilteredOfTypeByPostDate(
+                $contentQuery['filters'],
+                $type,
+                $contentQuery['offset'],
+                $contentQuery['limit'],
+                $contentQuery['sort'],
+            );
+        }
         $this->data['query'] = $contentQuery;
         $this->data['page']['tab'] = $type;
         $this->data['page']['title'] = ucfirst($type) . 's';
@@ -105,6 +117,8 @@ class PageController extends AbstractInachisController
     }
 
     /**
+     * Edit post
+     *
      * @param Request $request
      * @param ContentRevisionCompare $contentRevisionCompare
      * @param string $type
@@ -137,6 +151,7 @@ class PageController extends AbstractInachisController
         PageBulkActionService $pageBulkActionService,
         PageRepository $pageRepository,
         RevisionRepository $revisionRepository,
+        TagRepository $tagRepository,
         string $type = 'post',
         ?string $title = null
     ): Response {
@@ -173,7 +188,7 @@ class PageController extends AbstractInachisController
             }
             $post->setAuthor($this->getUser());
             if (null !== $request->request->get('publish')) {
-                $post->setStatus(Page::PUBLISHED);
+                $post->setStatus(EditorialStatus::PUBLISHED);
                 if (isset($revision)) {
                     if ($contentRevisionCompare->doesPageMatchRevision($post, $revision)) {
                         $revision->setContent('');
@@ -214,16 +229,15 @@ class PageController extends AbstractInachisController
             }
             if (!empty($request->request->all('post')['tags'])) {
                 $newTags = $request->request->all('post')['tags'];
-                if (!empty($newTags)) {
-                    foreach ($newTags as $newTag) {
-                        $tag = null;
-                        if (Uuid::isValid($newTag)) {
-                            $tag = $this->entityManager->getRepository(Tag::class)->findOneBy(['id' => $newTag]);
-                        }
-                        if (empty($tag)) {
-                            $tag = new Tag($newTag);
-                        }
-                        $post->getTags()->add($tag);
+                foreach ($newTags as $newTag) {
+                    if (Uuid::isValid($newTag)) {
+                        $tag = $tagRepository->find($newTag);
+                    } else {
+                        $tag = $tagRepository->getOrCreate($newTag);
+                    }
+
+                    if ($tag !== null) {
+                        $post->addTag($tag);
                     }
                 }
             }
@@ -236,7 +250,7 @@ class PageController extends AbstractInachisController
             }
 
             if ($form->has('publish') && $form->get('publish')->isClicked()) {
-                $post->setStatus(Page::PUBLISHED);
+                $post->setStatus(EditorialStatus::PUBLISHED);
                 if (isset($revision)) {
                     $revision->setAction(RevisionRepository::PUBLISHED);
                 }

@@ -16,39 +16,61 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Waste|null find($id, $lockMode = null, $lockVersion = null)
- * @method Waste|null findOneBy(array $criteria, array $orderBy = null)
- * @method Waste[]    findAll()
- * @method Waste[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Repository for {@link Waste} entities
  */
 class WasteRepository extends AbstractRepository implements WasteRepositoryInterface
 {
+    /**
+     * Creates a new instance of the WasteRepository
+     * 
+     * @param ManagerRegistry $registry The registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Waste::class);
     }
+
     /**
-     * @param User $user
-     * @return int
+     * Deletes all waste for a user
+     * 
+     * @param User $user The user
+     * @return int The number of waste items deleted
      */
     public function deleteWasteByUser(User $user): int
     {
-        return $this->createQueryBuilder('w')
+        $result = $this->createQueryBuilder('w')
             ->delete(Waste::class, 'w')
             ->where('w.user = :user')
             ->setParameter('user', $user)
             ->getQuery()
             ->execute()
         ;
+        if (!is_int($result)) {
+            throw new \RuntimeException('Failed to delete waste');
+        }
+        return $result;
     }
 
-        /**
-     * @param $filters
-     * @param $offset
-     * @param $limit
-     * @return Paginator
+    /**
+     * Returns a count of the number of deleted items
+     * 
+     * @return int The number of waste items
      */
-    public function getFiltered($filters, $offset, $limit, $sort): Paginator
+    public function getWasteCount(): int
+    {
+        return $this->count([]);
+    }
+
+    /**
+     * Gets filtered waste
+     * 
+     * @param array<string, mixed> $filters The filters
+     * @param int $offset The offset
+     * @param int $limit The limit
+     * @param string $sort The sort
+     * @return Paginator<Waste> The paginator
+     */
+    public function getFiltered(array $filters, int $offset, int $limit, string $sort): Paginator
     {
         $where = [];
         if (!empty($filters['keyword'])) {

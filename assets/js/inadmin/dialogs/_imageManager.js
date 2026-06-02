@@ -115,8 +115,11 @@ window.Inachis.ImageManager = {
                     method: form.method || 'POST',
                     body: formData
                 });
+                const data = await response.json();
 
-                if (!response.ok) throw new Error('Upload failed');
+                if (!response.ok) {
+                    throw new Error(data.error);
+                }
 
                 const imageTitle = document.querySelector('#image_title')?.value;
 
@@ -131,7 +134,19 @@ window.Inachis.ImageManager = {
                 }
 
             } catch (error) {
-                console.error(error);
+                const container = document.querySelector('.filepond');
+                let existing = document.getElementById('upload_error_details');
+
+                if (!existing) {
+                    const div = document.createElement('div');
+                    div.id = 'upload_error_details';
+                    div.className = 'col-12 admonition admonition__warning';
+                    div.textContent = error.message;
+
+                    container.insertBefore(div, container.firstChild);
+                } else {
+                    existing.textContent = error.message;
+                }
             }
         });
     },

@@ -56,11 +56,7 @@ final class SeriesImportValidator
             $seriesWarnings[] = 'URL is missing';
         }
 
-        if (!is_bool($dto->visibility)) {
-            $seriesWarnings[] = 'Visibility must be boolean';
-        }
-
-        if (!empty($dto->items) && !is_array($dto->items)) {
+        if (empty($dto->items)) {
             $seriesWarnings[] = 'Items must be an array of page titles';
         }
 

@@ -9,6 +9,7 @@
 
 namespace Inachis\Twig;
 
+use Inachis\Entity\User;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -40,13 +41,27 @@ class AppExtension extends AbstractExtension
         ];
     }
 
-    public function formatLocalTime(\DateTimeInterface $date, string $format = 'Y-m-d H:i'): string
+    /**
+     * Format a date to the local timezone
+     *
+     * @param \DateTimeImmutable $date
+     * @param string $format
+     * @return string
+     */
+    public function formatLocalTime(\DateTimeImmutable $date, string $format = 'Y-m-d H:i'): string
     {
-        $timezone = new \DateTimeZone($this->security->getUser()->getPreferences()->getTimezone());
-        return $date->setTimezone($timezone)->format($format);
+        $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            return $date->format($format);
+        }
+        $timezone = new \DateTimeZone($user->getPreferences()?->getTimezone() ?? 'UTC');
+        $localisedDate = (clone $date)->setTimezone($timezone);
+        return $localisedDate->format($format);
     }
 
     /**
+     * Returns the active menu option
+     *
      * @param string $menuOption
      * @param string|null $selectedOption
      * @return string
@@ -57,6 +72,8 @@ class AppExtension extends AbstractExtension
     }
 
     /**
+     * Convert bytes to the smallest unit
+     *
      * @param int $bytes
      * @param bool $trimTrailing
      * @return string

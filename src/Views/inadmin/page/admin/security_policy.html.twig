@@ -14,9 +14,9 @@
 {% endblock pagetitle %}
 
 {% block content %}
-<div class="content__edit col-12 ui-tabs-external">
+<div class="content__edit col-12">
     {% include 'inadmin/partials/tab-sets/users.html.twig' %}
-    <section class="paginated-list nested-grid">
+    <section class="ui-section nested-grid">
     
     {{ form_start(form, { 'attr' : { 'class': 'col-6 form form__post' } }) }}
     <fieldset class="ui-tabs-panel">

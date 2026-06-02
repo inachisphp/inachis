@@ -9,10 +9,25 @@
 
 namespace Inachis\Repository;
 
+use Inachis\Entity\Page;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
+/**
+ * Interface for page repositories
+ */
 interface PageRepositoryInterface
 {
+    /**
+     * Get all pages
+     * 
+     * @param int $offset
+     * @param int $limit
+     * @param array<int, array<int, string>> $where
+     * @param array<int, array<int, string>>|string $order
+     * @param array<int, array<int, string>>|string $groupBy
+     * @param array<int, array<int, string>> $join
+     * @return Paginator<Page>
+     */
     public function getAll(
         int $offset = 0,
         int $limit = 25,
@@ -21,21 +36,26 @@ interface PageRepositoryInterface
         array|string $groupBy = [],
         array $join = []
     ): Paginator;
+
     /**
+     * Get the maximum number of items to show in the admin interface
+     
      * @return int
      */
     public function getMaxItemsToShow(): int;
 
     /**
-     * @param $filters
+     * Get all pages of a certain type, ordered by post date
+     * 
+     * @param array<int, array<int, string>> $filters
      * @param string $type
      * @param int $offset
      * @param int $limit
      * @param string $sort
-     * @return Paginator
+     * @return Paginator<Page>
      */
     public function getFilteredOfTypeByPostDate(
-        $filters,
+        array $filters,
         string $type,
         int $offset,
         int $limit,

@@ -16,7 +16,7 @@
     'url': source.url.link is defined ?
     '/' ~ source.url.link :
     source.url is defined ?
-    path('app_series_view', { 'year': source.firstDate|date('Y'), 'title': source.title|lower }) :
+    path('web_series_view', { 'year': source.firstDate|date('Y'), 'title': source.title|lower }) :
     app.request.uri,
 } %}
 
@@ -86,6 +86,10 @@
     <link rel="search" type="application/opensearchdescription+xml" title="{{ settings.siteTitle }}" href="{{ settings.domain }}/search.xml" />
     <link rel="Shortcut Icon" type="image/x-icon" href="{{ settings.domain }}/favicon.ico" />
     <link rel="icon" type="image/x-icon" href="{{ settings.domain }}/favicon.ico" />
+    <link rel="alternate" type="application/rss+xml" title="All Posts RSS Feed" href="{{ settings.domain }}/feed" />
+    {% if filterName is defined and filterName == 'category' and filterValue is defined %}
+        <link rel="alternate" type="application/rss+xml" title="Category: {{ filterValue }} RSS Feed" href="{{ settings.domain }}/feed/{{ filterValue }}" />
+    {% endif %}
 {% endblock metadata %}
 
 {% block sm_twitter %}

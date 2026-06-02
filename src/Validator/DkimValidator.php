@@ -20,7 +20,7 @@ final class DkimValidator
     /**
      * Validates DKIM records
      * 
-     * @param list<string> $records
+     * @param list<array{target: string, priority: int, txt?: string}> $records
      * @param string $selector
      * @return list<ValidationIssue>
      */
@@ -125,6 +125,7 @@ final class DkimValidator
         $key = "-----BEGIN PUBLIC KEY-----\n" . chunk_split($pubKey, 64, "\n") . "-----END PUBLIC KEY-----";
         $res = openssl_pkey_get_public($key);
         if ($res === false) return 0;
+        /** @var array{bits?: int} $details */
         $details = openssl_pkey_get_details($res);
         return $details['bits'] ?? 0;
     }

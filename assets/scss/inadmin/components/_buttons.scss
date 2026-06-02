@@ -11,6 +11,15 @@
     text-wrap-mode: nowrap;
     transition: background-color 0.2s ease;
 
+    &.button--large {
+        display: block;
+        padding: 1rem;
+        text-align: center;
+        text-transform: uppercase;
+        text-wrap: auto;
+        width: 100%;
+    }
+
     .btn-text {
         display: none;
     }
@@ -36,7 +45,6 @@
 
     &.button--positive {
         background-color: $success-color;
-        border-color: $color-brand-500;
         color: $text-inverse;
 
         &:hover {

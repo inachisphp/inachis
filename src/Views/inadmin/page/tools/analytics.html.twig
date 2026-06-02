@@ -1,0 +1,191 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <span>Analytics</span>
+{% endblock pagetitle %}
+
+
+{% block content %}
+<div class="col-6">
+    <section class="admonition admonition__info">
+        <header class="admonition__header">
+            <h2>Data range</h2>
+        </header>
+        <p class="admonition__content">
+            {{ analytics.from|date('jS F Y') }} &mdash; {{ analytics.to|date('jS F Y') }}
+        </p>
+    </section>
+
+    <section class="widget ui-section rounded">
+        <header class="widget__header">
+            <h2>Overview</h2>
+        </header>
+        <div class="widget__content nested-grid">
+            <article class="col-4 widget-stats__card widget-stats__card--total" aria-labelledby="stats-total-visits">
+                <div class="widget-stats__icon" aria-hidden="true">
+                    <span class="material-icons">visibility</span>
+                </div>
+                <div class="widget-stats__content">
+                    <h2 id="stats-total-visits">Total Views</h2>
+                    <p class="widget-stats__value">{{ analytics.totalViews|number_format }}</p>
+                </div>
+            </article>
+
+            <article class="col-4 widget-stats__card widget-stats__card--unique" aria-labelledby="stats-unique-visitors">
+                <div class="widget-stats__icon" aria-hidden="true">
+                    <span class="material-icons">group</span>
+                </div>
+                <div class="widget-stats__content">
+                    <h2 id="stats-unique-visitors">Visitors</h2>
+                    <p class="widget-stats__value">{{ analytics.uniqueVisitors|number_format }}</p>
+                </div>
+            </article>
+
+        {% if analytics.change is not null %}
+            <article class="col-4 widget-stats__card widget-stats__card--today" aria-labelledby="stats-change">
+                <div class="widget-stats__icon" aria-hidden="true">
+                    <span class="material-icons"> trending_{{ analytics.change > 0 ? 'up' : 'down' }}</span>
+                </div>
+                <div class="widget-stats__content">
+                    <h2 id="stats-change">Change</h2>
+                    <p class="widget-stats__value">{{ analytics.change|number_format }}%</p>
+                </div>
+            </article>
+        {% endif %}
+        </div>
+    </section>
+</div>
+
+<section class="col-6 widget">
+    <header class="widget__header">
+        <h2>Traffic (last 30 days)</h2>
+    </header>
+    <canvas id="trafficChart"></canvas>
+</section>
+
+<section class="col-6 widget">
+    <header class="widget__header">
+        <h2>Trending (This Week)</h2>
+    </header>
+    <table>
+        <thead>
+            <tr>
+                <th>Page</th>
+                <th>Views</th>
+                <th>Change</th>
+                <th>%</th>
+            </tr>
+        </thead>
+        <tbody>
+			{% for page in analytics.trending %}
+				<tr>
+					<td>{{ page.title ?? page.path }}</td>
+					<td>{{ page.current }}</td>
+					<td {% 
+                        if page.change < 0 %}class="widget-stats__trend--down"{% 
+                        elseif page.change > 0 %}class="widget-stats__trend--up"{% 
+                    endif %}>
+						{% if page.change is null %}
+							NEW
+						{% elseif page.change > 0 %}
+							▲ +{{ page.change|number_format(1) }}%
+						{% elseif page.change < 0 %}
+							▼ {{ page.change|number_format(1) }}%
+						{% else %}
+							—
+						{% endif %}
+					</td>
+                    <td>{{ (page.current / analytics.totalViews * 100)|number_format(1) }}</td>
+				</tr>
+			{% else %}
+				<tr><td colspan="4">No data</td></tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</section>
+
+<section class="col-6 widget">
+    <header class="widget__header">
+        <h2>Top 404s</h2>
+    </header>
+    <table>
+        <thead>
+            <tr>
+                <th>Path</th>
+                <th>Hits</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for page in analytics.top404s %}
+                <tr>
+                    <td>{{ page.path }}</td>
+                    <td>{{ page.hits }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="2">No data</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<section class="col-6 widget">
+    <header class="widget__header">
+        <h2>Top Referrers</h2>
+    </header>
+    <table>
+        <thead>
+            <tr>
+                <th>Source</th>
+                <th>Visits</th>
+                <th>%</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ref in analytics.topReferrers %}
+                <tr>
+                    <td>{{ ref.domain }}</td>
+                    <td>{{ ref.total }}</td>
+                    <td>{{ (ref.total / analytics.totalViews * 100)|number_format(1) }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="3">No data</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const views = {{ analytics.viewsPerDay|map(v => v.total)|json_encode|raw }}
+        .map(v => Number(v) || 0);
+    const avg = views.reduce((a, b) => a + b, 0) / views.length;
+    const avgLine = views.map(() => avg);
+    const data = {
+        labels: {{ analytics.viewsPerDay|map(v => v.date)|json_encode|raw }},
+        datasets: [
+            {
+                label: 'Views',
+                data: {{ analytics.viewsPerDay|map(v => v.total)|json_encode|raw }},
+                fill: false,
+                tension: 0.2
+            },
+            {
+                label: 'Average Views',
+                data: avgLine,
+                borderDash: [5, 5],
+                fill: false,
+                tension: 0
+            }
+        ]
+    };
+    new Chart(
+        document.getElementById('trafficChart'),
+        {
+            type: 'line',
+            data: data,
+        }
+    );
+</script>
+
+{% endblock content %}

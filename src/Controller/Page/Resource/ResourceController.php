@@ -16,6 +16,7 @@ use Inachis\Form\ResourceType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\{DownloadRepository, ImageRepository, PageRepository, SeriesRepository};
 use Inachis\Service\Resource\ImageFileService;
+use Inachis\Service\Waste\WasteManagerService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -73,17 +74,27 @@ class ResourceController extends AbstractInachisController
             strtolower($type),
             'title asc',
         );
-        $this->data['dataset'] = $repository->getFiltered(
-            $contentQuery['filters'],
-            $contentQuery['offset'],
-            $contentQuery['limit'],
-            $contentQuery['sort'],
-        );
+        if ($request->query->has('altText') && $request->query->get('altText') === 'null') {
+            $this->data['dataset'] = $repository->getImagesWithoutAltText(
+                $contentQuery['offset'],
+                $contentQuery['limit']
+            );
+        } else {
+            $this->data['dataset'] = $repository->getFiltered(
+                $contentQuery['filters'],
+                $contentQuery['offset'],
+                $contentQuery['limit'],
+                $contentQuery['sort'],
+            );
+        }
         $this->data['form'] = $form->createView();
         $this->data['query'] = $contentQuery;
         $this->data['page']['type'] = strtolower($type) . 's';
         $this->data['page']['tab'] = strtolower($type);
         $this->data['page']['title'] = $type . 's';
+        if ($request->query->has('upload') && $request->query->get('upload') === 'true') {
+            $this->data['showUploadDialog'] = true;
+        }
         $this->data['limitKByte'] = Image::WARNING_FILESIZE;
         $this->data['limitSize'] = Image::WARNING_DIMENSIONS;
         $this->data['allowedTypes'] = Image::ALLOWED_MIME_TYPES;
@@ -111,6 +122,7 @@ class ResourceController extends AbstractInachisController
         ImageRepository $imageRepository,
         PageRepository $pageRepository,
         SeriesRepository $seriesRepository,
+        WasteManagerService $wasteManagerService,
         #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory
     ): Response {
 //            "filename" => "[a-zA-Z0-9\-\_]\.(jpe?g|heic|png)",
@@ -152,7 +164,7 @@ class ResourceController extends AbstractInachisController
                     sizeof($this->data['usages']['series']) === 0 &&
                     $filesystem->exists($filename)) {
                     try {
-                        $filesystem->remove($filename);
+                        $wasteManagerService->sendToWaste($resource);
                         $repository->remove($resource);
                         $this->addFlash('success', 'Resource deleted.');
                         return $this->redirectToRoute(
@@ -163,7 +175,7 @@ class ResourceController extends AbstractInachisController
                             ],
                             Response::HTTP_PERMANENTLY_REDIRECT
                         );
-                    } catch (IOException $e) {
+                    } catch (\Exception $e) {
                         $this->addFlash('error', 'Failed to remove file.');
                         return $this->redirectToRoute(
                             'incc_resource_edit', [
@@ -248,11 +260,16 @@ class ResourceController extends AbstractInachisController
             // Step 4: Generate checksum
             $checksum = $imageFileService->createChecksum($uploadedFile);
 
+            // Step 4a: Check for duplicate checksum
+            $existingImage = $this->entityManager->getRepository(Image::class)->findOneBy(['checksum' => $checksum]);
+            if ($existingImage) {
+                return new JsonResponse(['error' => 'Duplicate image found'], 400);
+            }
+
             // Step 5: Create safe filename
-            // @todo change filename to use the title for better SEO?
             $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-            $safeFilename = $slugger->slug($originalFilename);
-            $newFilename = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
+            $safeFilename = strtolower($slugger->slug($imageData['title'] . '-' . uniqid() ?: $originalFilename));
+            $newFilename = $safeFilename . '.' . $uploadedFile->guessExtension();
 
             $imageSize = $uploadedFile->getSize();
             $imageMimeType = $uploadedFile->getMimeType();
@@ -274,7 +291,7 @@ class ResourceController extends AbstractInachisController
                 ->setDimensionY($dimensions[1]);
 
             $this->entityManager->persist($image);
-            $this->entityManager->flush(); 
+            $this->entityManager->flush();
 
             return new JsonResponse([
                 'success' => true,

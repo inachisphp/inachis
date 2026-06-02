@@ -9,7 +9,6 @@
 
 namespace Inachis\Service\System\Domain;
 
-use InvalidArgumentException;
 use Inachis\Model\Domain\DomainDnsReport;
 use Inachis\Validator\BimiValidator;
 use Inachis\Validator\DkimValidator;
@@ -20,6 +19,8 @@ use Inachis\Validator\TlsRptValidator;
 use Inachis\Validator\CaaValidator;
 use Inachis\Model\Domain\ValidationIssue;
 use Inachis\Model\Domain\Severity;
+use InvalidArgumentException;
+use OpenSSLCertificate;
 
 /**
  * Analyses the email settings of a domain
@@ -176,7 +177,8 @@ final class DomainEmailAnalyser
                             $includedTxt = $this->dns->getRecords($value, DNS_TXT);
                             $foundSpf = false;
                             foreach ($includedTxt as $rec) {
-                                if (str_starts_with(strtolower($rec['txt'] ?? ''), 'v=spf1')) {
+                                $record = $rec['txt'] ?? null;
+                                if (is_string($record) && str_starts_with(strtolower($record), 'v=spf1')) {
                                     $foundSpf = true;
                                     break;
                                 }
@@ -198,42 +200,54 @@ final class DomainEmailAnalyser
     /**
      * Extracts the SPF records from the DNS records
      *
-     * @param array $txtRecords
-     * @return array
+     * @param array<int, array{txt: string}> $txtRecords
+     * @return list<string>
      */
     private function extractSpf(array $txtRecords): array
     {
+        /** @var array<int, string> $txts */
+        $txts = array_column($txtRecords, 'txt');
+
         return array_values(array_filter(
-            array_column($txtRecords, 'txt'),
-            fn(string $txt) => str_starts_with(strtolower($txt), 'v=spf1')
+            $txts,
+            /** @param mixed $txt */
+            fn($txt) => str_starts_with(strtolower($txt), 'v=spf1')
         ));
     }
 
     /**
      * Extracts the DMARC records from the DNS records
      *
-     * @param array $txtRecords
-     * @return array
+     * @param array<int, array{txt: string}> $txtRecords
+     * @return list<string>
      */
     private function extractDmarc(array $txtRecords): array
     {
+        /** @var array<int, string> $txts */
+        $txts = array_column($txtRecords, 'txt');
+
         return array_values(array_filter(
-            array_column($txtRecords, 'txt'),
-            fn(string $txt) => str_starts_with(strtolower($txt), 'v=dmarc1')
+            $txts,
+            /** @param mixed $txt */
+            fn($txt) => str_starts_with(strtolower($txt), 'v=dmarc1')
         ));
     }
 
     /**
      * Extracts the DKIM records from the DNS records
      *
-     * @param array $txtRecords
-     * @return array
+     * @param array<int, array{txt: string}> $txtRecords
+     * @return array<int, string>
      */
     private function extractDkim(array $txtRecords): array
     {
+        /** @var array<int, string> $txts */
+        $txts = array_column($txtRecords, 'txt');
+
         return array_values(array_filter(
-            array_column($txtRecords, 'txt'),
-            fn(string $txt) => str_starts_with(strtolower($txt), 'v=dkim1')
+            $txts,
+            /** @param mixed $txt */
+            fn($txt) => str_starts_with(strtolower($txt), 'v=dkim1')
         ));
     }
 
@@ -250,6 +264,9 @@ final class DomainEmailAnalyser
         if (str_starts_with($domain, 'www.')) {
             $domain = substr($domain, 4);
         }
+        if ($domain === '') {
+            throw new InvalidArgumentException('Domain cannot be empty');
+        }
         return $domain;
     }
 
@@ -258,8 +275,8 @@ final class DomainEmailAnalyser
      *
      * @param string $ip
      * @param string $spf
-     * @param array $visitedIncludes
-     * @param array $issues
+     * @param list<string> $visitedIncludes
+     * @param list<ValidationIssue> $issues
      * @return bool
      */
     private function isIpAuthorized(string $ip, string $spf, array $visitedIncludes = [], array &$issues = []): bool
@@ -300,7 +317,7 @@ final class DomainEmailAnalyser
                 $records = $this->dns->getRecords($includeDomain, DNS_TXT);
                 foreach ($records as $rec) {
                     $txt = $rec['txt'] ?? '';
-                    if (str_starts_with(strtolower($txt), 'v=spf1')) {
+                    if (is_string($txt) && str_starts_with(strtolower($txt), 'v=spf1')) {
                         if ($this->isIpAuthorized($ip, $txt, array_merge($visitedIncludes, [$includeDomain]), $issues)) {
                             return true;
                         }
@@ -353,13 +370,17 @@ final class DomainEmailAnalyser
 
             $ipBin = inet_pton($ip);
             $subnetBin = inet_pton($subnet);
+            if ($ipBin === false || $subnetBin === false) {
+                throw new InvalidArgumentException("Invalid IPv6 address or subnet");
+            }
+
             $maskLeft = $mask;
 
             for ($i = 0; $i < 16; $i++) {
                 $bits = min($maskLeft, 8);
                 $maskLeft -= $bits;
                 $maskByte = (0xFF << (8 - $bits)) & 0xFF;
-                if (($ipBin[$i] & $maskByte) !== ($subnetBin[$i] & $maskByte)) {
+                if ((ord($ipBin[$i]) & $maskByte) !== (ord($subnetBin[$i]) & $maskByte)) {
                     return false;
                 }
             }
@@ -373,9 +394,9 @@ final class DomainEmailAnalyser
      * Validate TLS certificate of an MX host
      *
      * @param string $host
-     * @return bool
+     * @return bool|int
      */
-    private function validateMxTls(string $host): bool
+    private function validateMxTls(string $host): bool|int
     {
         $port = 25;
         $timeout = 5;
@@ -394,8 +415,13 @@ final class DomainEmailAnalyser
         }
 
         $params = stream_context_get_params($client);
-        $cert = $params['options']['ssl']['peer_certificate'] ?? null;
-        if (!$cert) return false;
+        $cert = null;
+        if (isset($params['options']['ssl']) && is_array($params['options']['ssl'])) {
+            $cert = $params['options']['ssl']['peer_certificate'] ?? null;
+        }
+        if (!($cert instanceof OpenSSLCertificate || is_string($cert))) {
+            return false;
+        }
 
         $valid = openssl_x509_checkpurpose($cert, X509_PURPOSE_SSL_CLIENT, [$host]);
         fclose($client);

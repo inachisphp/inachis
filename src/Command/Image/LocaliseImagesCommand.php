@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Command;
+namespace Inachis\Command\Image;
 
 use Exception;
 use Inachis\Entity\{Image, Page, Series};
@@ -23,9 +23,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Command to localise images
  */
 #[AsCommand(
-    name: 'inachis:localise-images',
+    name: 'inachis:images:localise',
     description: 'Find references to remote images, copy them to [public]/imgs/, and update links',
-    aliases: ['inachis:localize-images'],
+    aliases: ['inachis:images:localize'],
 )]
 class LocaliseImagesCommand extends Command
 {
