@@ -35,8 +35,7 @@ class CategoryRepositoryTest extends TestCase
             ->onlyMethods(['getEntityManager', 'createQueryBuilder', 'getAll'])
             ->getMock();
 
-        $this->repository->expects($this->atLeast(0))
-            ->method('getEntityManager')->willReturn($this->entityManager);
+        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
         parent::setUp();
     }
 

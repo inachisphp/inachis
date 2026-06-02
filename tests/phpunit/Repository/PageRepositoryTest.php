@@ -51,8 +51,7 @@ class PageRepositoryTest extends TestCase
             ->onlyMethods(['getEntityManager', 'createQueryBuilder', 'getAll'])
             ->getMock();
 
-        $this->repository->expects($this->atLeast(0))
-            ->method('getEntityManager')->willReturn($this->entityManager);
+        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
         parent::setUp();
     }
 
@@ -69,16 +68,7 @@ class PageRepositoryTest extends TestCase
     public function testRemove(): void
     {
         $page = new Page();
-        $url = new Url($page, 'test-link');
 
-        $urlRepository = $this->createMock(UrlRepository::class);
-        $urlRepository->expects($this->once())
-            ->method('remove')
-            ->with($url);
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(Url::class)
-            ->willReturn($urlRepository);
         $this->entityManager->expects($this->once())
             ->method('remove')
             ->with($page);
@@ -95,7 +85,7 @@ class PageRepositoryTest extends TestCase
         $page->addCategory($category);
         $expr = $this->createStub(Expr::class);
         $query = $this->createMock(Query::class);
-        $query->expects($this->once())->method('execute')->willReturn($page);
+        $query->expects($this->once())->method('getResult')->willReturn([$page]);
         $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->once())->method('select')->willReturnSelf();
         $qb->expects($this->once())->method('leftJoin')->willReturnSelf();
@@ -105,12 +95,12 @@ class PageRepositoryTest extends TestCase
         $qb->expects($this->once())->method('setFirstResult')->willReturnSelf();
         $qb->expects($this->once())->method('setMaxResults')->willReturnSelf();
         $qb->expects($this->once())->method('getQuery')->willReturn($query);
-        $qb->expects($this->once())->method('expr')->willReturn($expr);
+        $qb->expects($this->exactly(5))->method('expr')->willReturn($expr);
 
         $this->repository->expects($this->once())
             ->method('createQueryBuilder')->willReturn($qb);
         $this->assertEquals(
-            $page,
+            [$page],
             $this->repository->getPagesWithCategory($category, 10, 20)
         );
     }
@@ -143,7 +133,7 @@ class PageRepositoryTest extends TestCase
         $page->addTag($tag);
         $expr = $this->createStub(Expr::class);
         $query = $this->createMock(Query::class);
-        $query->expects($this->once())->method('execute')->willReturn([$page]);
+        $query->expects($this->once())->method('getResult')->willReturn([$page]);
         $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->once())->method('select')->willReturnSelf();
         $qb->expects($this->once())->method('leftJoin')->willReturnSelf();
@@ -253,17 +243,16 @@ class PageRepositoryTest extends TestCase
             ->with(
                 0,
                 0,
+            [
+                'q.id IN (:ids)',
                 [
-                    'q.id IN (:ids)',
-                    [
-                        'ids' => '1,2,3',
-                    ],
+                    'ids' => ['1','2','3'],
                 ]
-            )
+            ])
             ->willReturn($paginator);
         $this->assertEquals(
             $paginator,
-            $this->repository->getFilteredIds('1,2,3')
+            $this->repository->getFilteredIds(['1','2','3'])
         );
     }
 

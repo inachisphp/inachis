@@ -36,23 +36,19 @@ class UrlRepositoryTest extends TestCase
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $registry
             ->method('getManagerForClass')
-            ->with(Url::class)
             ->willReturn($this->entityManager);
         $metadata = new ClassMetadata(Url::class);
 
         $this->entityManager
             ->method('getClassMetadata')
-            ->with(Url::class)
             ->willReturn($metadata);
         $this->repository = $this->getMockBuilder(UrlRepository::class)
             ->setConstructorArgs([$registry])
             ->onlyMethods([ 'getClassName', 'getEntityManager', 'getAll', 'findOneBy' ])
             ->getMock();
-        $this->repository->expects($this->atLeast(0))
-            ->method('getClassName')
+        $this->repository->method('getClassName')
             ->willReturn(Url::class);
-        $this->repository->expects($this->atLeast(0))
-            ->method('getEntityManager')
+        $this->repository->method('getEntityManager')
             ->willReturn($this->entityManager);
         parent::setUp();
     }

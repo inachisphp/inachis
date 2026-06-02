@@ -104,7 +104,7 @@ class PasswordResetRequestRepositoryTest extends TestCase
         $qb->expects($this->once())->method('andWhere')->willReturnSelf();
         $qb->expects($this->once())->method('setParameter')->willReturnSelf();
         $query = $this->createMock(Query::class);
-        $query->expects($this->once())->method('execute')->willReturn(5);
+        $query->expects($this->once())->method('getResult')->willReturn(5);
         $qb->expects($this->once())->method('getQuery')->willReturn($query);
 
         $this->repository->expects($this->once())
