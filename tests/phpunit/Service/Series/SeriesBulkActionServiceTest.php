@@ -9,12 +9,12 @@
 
 namespace Inachis\Tests\phpunit\Service\Series;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Series;
 use Inachis\Repository\SeriesRepository;
 use Inachis\Service\Series\SeriesBulkActionService;
 use Inachis\Service\Waste\WasteManagerService;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;

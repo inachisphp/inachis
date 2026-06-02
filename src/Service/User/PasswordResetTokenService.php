@@ -23,25 +23,19 @@ use Random\RandomException;
  */
 class PasswordResetTokenService
 {
-    /**
-     * @var string
-     */
+    /** @var string The application secret used for hashing the tokens */
     private string $appSecret;
-    /**
-     * @var EntityManagerInterface
-     */
+
+    /** @var EntityManagerInterface */
     private EntityManagerInterface $entityManager;
-    /**
-     * @var PasswordResetRequestRepository
-     */
+
+    /** @var PasswordResetRequestRepository */
     private PasswordResetRequestRepository $passwordResetRequestRepository;
-    /**
-     * @var UserRepository
-     */
+
+    /** @var UserRepository */
     private UserRepository $userRepository;
-    /**
-     * @var int The lifetime for the password reset token. Default is 1800 seconds (30 minutes)
-     */
+
+    /** @var int The lifetime for the password reset token. Default is 1800 seconds (30 minutes) */
     private int $ttlSeconds;
 
     /**

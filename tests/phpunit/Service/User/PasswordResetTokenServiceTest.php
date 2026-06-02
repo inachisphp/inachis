@@ -30,9 +30,9 @@ class PasswordResetTokenServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->createStub(EntityManagerInterface::class);
-        $this->requestRepository = $this->createStub(PasswordResetRequestRepository::class);
-        $this->userRepository = $this->createStub(UserRepository::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->requestRepository = $this->createMock(PasswordResetRequestRepository::class);
+        $this->userRepository = $this->createMock(UserRepository::class);
     }
 
     /**

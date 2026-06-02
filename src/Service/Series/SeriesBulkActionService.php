@@ -47,17 +47,12 @@ readonly class SeriesBulkActionService
                 continue;
             }
             match ($action) {
-                'delete'  => function() use ($series) {
-                    $this->wasteManagerService->sendToWaste($series);
-                    $this->seriesRepository->remove($series);
-                },
+                'delete'  => $this->sendToWaste($series),
                 'private'  => $series->setVisibility(Series::PRIVATE),
                 'public' => $series->setVisibility(Series::PUBLIC),
-                default   => null,
+                default => null,
             };
-            if ($action === 'delete') {
-                $action();
-            } else {
+            if ($action !== 'delete') {
                 $series->setModDate(new DateTimeImmutable());
                 $this->entityManager->persist($series);
             }
@@ -65,5 +60,16 @@ readonly class SeriesBulkActionService
         }
         $this->entityManager->flush();
         return $count;
+    }
+
+    /**
+     * Sends a series to waste.
+     *
+     * @param Series $series
+     */
+    public function sendToWaste(Series $series)
+    {
+        $this->wasteManagerService->sendToWaste($series);
+        $this->seriesRepository->remove($series);
     }
 }

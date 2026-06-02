@@ -64,8 +64,8 @@ class ContentAggregatorTest extends TestCase
 
         $this->assertIsArray($result);
         $this->assertCount(2, $result);
-        $this->assertArrayHasKey('20240102', $result);
-        $this->assertArrayHasKey('20240101', $result);
+        $this->assertArrayHasKey('p20240102', $result);
+        $this->assertArrayHasKey('p20240101', $result);
     }
 
     private function createMockPaginator(array $items): Paginator
