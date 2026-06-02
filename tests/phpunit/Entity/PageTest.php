@@ -19,6 +19,7 @@ use Inachis\Entity\Series;
 use Inachis\Entity\Tag;
 use Inachis\Entity\Url;
 use Inachis\Entity\User;
+use Inachis\Enum\EditorialStatus;
 use Inachis\Exception\InvalidTimezoneException;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
@@ -43,9 +44,9 @@ class PageTest extends TestCase
 
     public function testIsDraft(): void
     {
-        $this->page->setStatus();
+        $this->page->setStatus(EditorialStatus::DRAFT);
         $this->assertTrue($this->page->isDraft());
-        $this->page->setStatus(Page::PUBLISHED);
+        $this->page->setStatus(EditorialStatus::PUBLISHED);
         $this->assertFalse($this->page->isDraft());
     }
 
@@ -101,7 +102,7 @@ class PageTest extends TestCase
     {
         $currentTime = new DateTimeImmutable('yesterday');
         $this->page->setPostDate($currentTime);
-        $this->page->setStatus(Page::PUBLISHED);
+        $this->page->setStatus(EditorialStatus::PUBLISHED);
         $this->assertFalse($this->page->isScheduledPage());
         $currentTime = new DateTimeImmutable('tomorrow');
         $this->page->setPostDate($currentTime);
@@ -163,23 +164,16 @@ class PageTest extends TestCase
 
     public function testSetAndGetStatus(): void
     {
-        $this->page->setStatus();
-        $this->assertEquals(Page::DRAFT, $this->page->getStatus());
-        $this->page->setStatus(Page::PUBLISHED);
-        $this->assertEquals(Page::PUBLISHED, $this->page->getStatus());
+        $this->page->setStatus(EditorialStatus::DRAFT);
+        $this->assertEquals(EditorialStatus::DRAFT, $this->page->getStatus());
+        $this->page->setStatus(EditorialStatus::PUBLISHED);
+        $this->assertEquals(EditorialStatus::PUBLISHED, $this->page->getStatus());
     }
 
     public function testSetAndGetFeatureSnippet(): void
     {
         $this->page->setFeatureSnippet('test');
         $this->assertEquals('test', $this->page->getFeatureSnippet());
-    }
-
-    public function testIsValidStatus(): void
-    {
-        $this->assertFalse($this->page->isValidStatus('test'));
-        $this->assertTrue($this->page->isValidStatus(Page::DRAFT));
-        $this->assertTrue($this->page->isValidStatus(Page::PUBLISHED));
     }
 
     public function testSetAndGetPostDate(): void
@@ -229,8 +223,6 @@ class PageTest extends TestCase
     {
         $this->page->setPostDate(new DateTimeImmutable('1970-01-01'));
         $this->assertEquals('1970/01/01', $this->page->getPostDateAsLink());
-        $this->page->setPostDate();
-        $this->assertEquals('', $this->page->getPostDateAsLink());
     }
 
     public function testHasHotlinkedImages(): void

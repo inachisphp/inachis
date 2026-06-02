@@ -260,8 +260,8 @@ abstract class AbstractFile
      */
     public function isValidFiletype(string $value): bool
     {
-        if (defined('self::ALLOWED_MIME_TYPES')) {
-            return in_array($value, self::ALLOWED_MIME_TYPES, true);
+        if (defined(static::class . '::ALLOWED_MIME_TYPES')) {
+            return in_array($value, static::ALLOWED_MIME_TYPES, true);
         }
         return true;
     }

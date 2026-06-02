@@ -35,8 +35,9 @@ class RevisionTest extends TestCase
 
     public function testGetAndSetPageId(): void
     {
-        $this->revision->setPageId('test');
-        $this->assertEquals('test', $this->revision->getPageId());
+        $uuid = Uuid::uuid1();
+        $this->revision->setPageId($uuid);
+        $this->assertEquals($uuid, $this->revision->getPageId());
     }
 
     /**

@@ -326,11 +326,11 @@ class Page
     /**
      * Returns the value of {@link status}.
      *
-     * @return string The current publishing status of the {@link Page}
+     * @return EditorialStatus The current publishing status of the {@link Page}
      */
-    public function getStatus(): string
+    public function getStatus(): EditorialStatus
     {
-        return $this->status->value;
+        return $this->status;
     }
 
     /**
@@ -625,12 +625,12 @@ class Page
     /**
      * Sets the value of {@link status}.
      *
-     * @param string $value The new publishing status of the {@link Page}
+     * @param EditorialStatus $value The new publishing status of the {@link Page}
      * @return Page
      */
-    public function setStatus(string $value): self
+    public function setStatus(EditorialStatus $value): self
     {
-        $this->status = EditorialStatus::tryFrom($value) ?? EditorialStatus::DRAFT;
+        $this->status = $value;
         return $this;
     }
 
@@ -954,7 +954,7 @@ class Page
      */
     public function isDraft(): bool
     {
-        return $this->status->value === EditorialStatus::DRAFT;
+        return $this->status === EditorialStatus::DRAFT;
     }
 
     /**
