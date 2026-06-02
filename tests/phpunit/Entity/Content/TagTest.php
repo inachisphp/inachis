@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Tests\phpunit\Entity;
+namespace Inachis\Tests\phpunit\Entity\Content;
 
 use Inachis\Entity\Tag;
 use PHPUnit\Framework\TestCase;

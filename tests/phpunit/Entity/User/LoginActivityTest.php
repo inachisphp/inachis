@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Tests\phpunit\Entity;
+namespace Inachis\Tests\phpunit\Entity\User;
 
 use Inachis\Entity\LoginActivity;
 use Inachis\Entity\User;
