@@ -59,7 +59,7 @@ class ContentImageUpdaterTest extends TestCase
             ->method('hydrateNewRevisionFromPage')
             ->with($page)
             ->willReturn($revision);
-        $this->em->method('getRepository')
+        $this->em->expects($this->once())->method('getRepository')
             ->with(Revision::class)
             ->willReturn($revisionRepository);
 

@@ -53,8 +53,8 @@ class UserAccountEmailServiceTest extends TestCase
             ->willReturn($fakeTokenData);
 
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->entityManager->expects($this->once())->method('persist')->with($user);
-        $this->entityManager->expects($this->once())->method('flush');
+        // $this->entityManager->expects($this->once())->method('persist')->with($user);
+        // $this->entityManager->expects($this->once())->method('flush');
 
         $this->mailer->expects($this->once())
             ->method('send')

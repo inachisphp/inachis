@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Tests\phpunit\Command;
+namespace Inachis\Tests\phpunit\Command\User;
 
-use Inachis\Command\CreateAdminCommand;
+use Inachis\Command\User\CreateAdminCommand;
 use Inachis\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;

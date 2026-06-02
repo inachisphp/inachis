@@ -11,6 +11,7 @@ namespace Inachis\Tests\phpunit\Util;
 
 use Inachis\Twig\AppExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class AppExtensionTest extends TestCase
 {
@@ -18,7 +19,8 @@ class AppExtensionTest extends TestCase
 
     public function setUp(): void
     {
-        $this->appExtension = new AppExtension();
+        $security = $this->createStub(Security::class);
+        $this->appExtension = new AppExtension($security);
 
         parent::setUp();
     }
@@ -26,9 +28,11 @@ class AppExtensionTest extends TestCase
     public function testGetFilters(): void
     {
         $filters = $this->appExtension->getFilters();
-        $this->assertCount(1, $filters);
+        $this->assertCount(2, $filters);
         $this->assertInstanceOf('Twig\TwigFilter', $filters[0]);
+        $this->assertInstanceOf('Twig\TwigFilter', $filters[1]);
         $this->assertEquals('activeMenu', $filters[0]->getName());
+        $this->assertEquals('formatLocalTime', $filters[1]->getName());
     }
 
     public function testActiveMenuFilter(): void

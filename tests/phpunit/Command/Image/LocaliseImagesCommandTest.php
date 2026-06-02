@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Tests\phpunit\Command;
+namespace Inachis\Tests\phpunit\Command\Image;
 
-use Inachis\Command\LocaliseImagesCommand;
+use Inachis\Command\Image\LocaliseImagesCommand;
 use Inachis\Entity\Image;
 use Inachis\Entity\Page;
 use Inachis\Entity\Series;
