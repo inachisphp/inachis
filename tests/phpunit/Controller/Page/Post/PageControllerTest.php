@@ -10,52 +10,27 @@
 namespace Inachis\Tests\phpunit\Controller\Page\Post;
 
 use Inachis\Controller\Page\Post\PageController;
-use Inachis\Entity\Page;
 use Inachis\Entity\Revision;
 use Inachis\Entity\Url;
 use Inachis\Repository\PageRepository;
-use Inachis\Repository\PageRepositoryInterface;
 use Inachis\Repository\RevisionRepository;
+use Inachis\Repository\TagRepository;
 use Inachis\Repository\UrlRepository;
+use Inachis\Service\Page\PageBulkActionService;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use Inachis\Util\ContentRevisionCompare;
-use ArrayIterator;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Exception;
-use PHPUnit\Framework\MockObject\MockObject;
-use ReflectionClass;
-use ReflectionException;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PageControllerTest extends WebTestCase
+class PageControllerTest extends InachisControllerTestCase
 {
-    private EntityManagerInterface|MockObject $entityManager;
-    private Security|MockObject $security;
-
-    private TranslatorInterface $translator;
-
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
-    protected function setUp(): void
-    {
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->security = $this->createStub(Security::class);
-        $this->translator = $this->createStub(TranslatorInterface::class);
-    }
-
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
@@ -79,7 +54,13 @@ class PageControllerTest extends WebTestCase
             ->willReturn($urlRepository);
 
         $controller = $this->getMockBuilder(PageController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository,
+            ])
             ->onlyMethods(['denyAccessUnlessGranted', 'redirectToRoute'])
             ->getMock();
         $controller->expects($this->once())
@@ -91,8 +72,10 @@ class PageControllerTest extends WebTestCase
         $response = $controller->edit(
             $request,
             $this->createStub(ContentRevisionCompare::class),
+            $this->createStub(PageBulkActionService::class),
             $pageRepository,
             $revisionRepository,
+            $this->createStub(TagRepository::class),
             'post',
             'ome-post'
         );
@@ -122,14 +105,14 @@ class PageControllerTest extends WebTestCase
         $revisionRepository = $this->getMockBuilder(RevisionRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $revisionRepository->expects($this->atLeast(0))
-            ->method('getAll')
+        $revisionRepository->method('getAll')
             ->willReturn($paginator);
         $this->entityManager->expects($this->atLeastOnce())
             ->method('getRepository')
             ->willReturnMap([
                 [Url::class, $urlRepository],
                 [Revision::class, $revisionRepository],
+                [Tag::class, $this->createStub(TagRepository::class)],
             ]);
 
         $form = $this->createMock(Form::class);
@@ -137,7 +120,13 @@ class PageControllerTest extends WebTestCase
         $form->expects($this->once())->method('isSubmitted')->willReturn(false);
 
         $controller = $this->getMockBuilder(PageController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository,
+            ])
             ->onlyMethods(['denyAccessUnlessGranted', 'createForm', 'render'])
             ->getMock();
         $controller->expects($this->once())
@@ -151,8 +140,10 @@ class PageControllerTest extends WebTestCase
         $response = $controller->edit(
             $request,
             $this->createStub(ContentRevisionCompare::class),
+            $this->createStub(PageBulkActionService::class),
             $pageRepository,
             $revisionRepository,
+            $this->createStub(TagRepository::class),
             'post',
             'new'
         );

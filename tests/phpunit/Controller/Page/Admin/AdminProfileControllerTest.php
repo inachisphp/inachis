@@ -58,8 +58,7 @@ class AdminProfileControllerTest extends WebTestCase
                 'render',
             ])
             ->getMock();
-        $this->controller->expects($this->atLeast(0))
-            ->method('render')
+        $this->controller->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
@@ -195,7 +194,7 @@ class AdminProfileControllerTest extends WebTestCase
         $userRegistrationService = $this->createStub(UserAccountEmailService::class);
         $user = (new User())->setEmail('test-user@example.com');
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->expects($this->atLeast(0))->method('findOneBy')->willReturn($user);
+        $userRepository->method('findOneBy')->willReturn($user);
 
         $button = $this->createMock(Button::class);
         $button->expects($this->atLeastOnce())->method('getName')->willReturn('enableDisable');

@@ -17,13 +17,13 @@ use Inachis\Repository\ImageRepository;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\SeriesRepository;
 use Inachis\Service\Resource\ImageFileService;
+use Inachis\Service\Waste\WasteManagerService;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Uuid;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -36,7 +36,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\String\UnicodeString;
 use Symfony\Component\Translation\Translator;
 
-class ResourceControllerTest extends WebTestCase
+class ResourceControllerTest extends InachisControllerTestCase
 {
     protected ResourceController $controller;
 
@@ -54,11 +54,14 @@ class ResourceControllerTest extends WebTestCase
         $paginator = $this->createStub(Paginator::class);
         $imageRepository = $this->createMock(ImageRepository::class);
         $imageRepository->expects($this->once())->method('getFiltered')->willReturn($paginator);
-        $entityManager = $this->createStub(EntityManager::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(Translator::class);
         $this->controller = $this->getMockBuilder(ResourceController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository,
+            ])
             ->onlyMethods(['createFormBuilder', 'generateUrl', 'render'])
             ->getMock();
         $this->controller->expects($this->once())
@@ -91,11 +94,14 @@ class ResourceControllerTest extends WebTestCase
         ], [], [], [
             'REQUEST_URI' => '/incc/resources/{type}/{filename}'
         ]);
-        $entityManager = $this->createStub(EntityManager::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(Translator::class);
         $this->controller = $this->getMockBuilder(ResourceController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository
+            ])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'render'])
             ->getMock();
         $this->controller->expects($this->once())
@@ -114,8 +120,9 @@ class ResourceControllerTest extends WebTestCase
         $seriesRepository = $this->createMock(SeriesRepository::class);
         $seriesRepository->expects($this->once())->method('getSeriesUsingImage')->willReturn($paginator);
         $imageDirectory = '/tmp/';
+        $wasteManagerService = $this->createStub(WasteManagerService::class);
         $result = $this->controller->edit($request, $filesystem, $downloadRepository, $imageRepository,
-            $pageRepository, $seriesRepository, $imageDirectory);
+            $pageRepository, $seriesRepository, $wasteManagerService, $imageDirectory);
         $this->assertEquals('rendered:inadmin/page/resource/edit.html.twig', $result->getContent());
     }
 
@@ -130,11 +137,14 @@ class ResourceControllerTest extends WebTestCase
         ], [], [], [
             'REQUEST_URI' => '/incc/resources/{type}/{filename}'
         ]);
-        $entityManager = $this->createStub(EntityManager::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(Translator::class);
         $this->controller = $this->getMockBuilder(ResourceController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository
+            ])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'redirectToRoute'])
             ->getMock();
         $this->controller->expects($this->once())
@@ -151,8 +161,9 @@ class ResourceControllerTest extends WebTestCase
         $seriesRepository = $this->createMock(SeriesRepository::class);
         $seriesRepository->expects($this->never())->method('getSeriesUsingImage');
         $imageDirectory = '/tmp/';
+        $wasteManagerService = $this->createStub(WasteManagerService::class);
         $result = $this->controller->edit($request, $filesystem, $downloadRepository, $imageRepository,
-            $pageRepository, $seriesRepository, $imageDirectory);
+            $pageRepository, $seriesRepository, $wasteManagerService, $imageDirectory);
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/resources/images', $result->getTargetUrl());
     }
@@ -173,11 +184,14 @@ class ResourceControllerTest extends WebTestCase
             'REQUEST_URI' => '/incc/resources/{type}/{filename}'
         ]);
         $image = (new Image())->setId(Uuid::uuid1());
-        $entityManager = $this->createStub(EntityManager::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(Translator::class);
         $this->controller = $this->getMockBuilder(ResourceController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository
+            ])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirectToRoute'])
             ->getMock();
         $this->controller->expects($this->once())
@@ -202,8 +216,9 @@ class ResourceControllerTest extends WebTestCase
         $seriesRepository = $this->createMock(SeriesRepository::class);
         $seriesRepository->expects($this->once())->method('getSeriesUsingImage')->willReturn($paginator);
         $imageDirectory = '/tmp/';
+        $wasteManagerService = $this->createStub(WasteManagerService::class);
         $result = $this->controller->edit($request, $filesystem, $downloadRepository, $imageRepository,
-            $pageRepository, $seriesRepository, $imageDirectory);
+            $pageRepository, $seriesRepository, $wasteManagerService, $imageDirectory);
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/resources/images', $result->getTargetUrl());
     }
@@ -224,11 +239,14 @@ class ResourceControllerTest extends WebTestCase
             'REQUEST_URI' => '/incc/resources/{type}/{filename}'
         ]);
         $image = (new Image())->setId(Uuid::uuid1());
-        $entityManager = $this->createStub(EntityManager::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(Translator::class);
         $this->controller = $this->getMockBuilder(ResourceController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository
+            ])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirectToRoute'])
             ->getMock();
         $this->controller->expects($this->once())
@@ -244,9 +262,10 @@ class ResourceControllerTest extends WebTestCase
             ->willReturn($form);
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->once())->method('exists')->willReturn(true);
-        $filesystem->expects($this->once())
-            ->method('remove')
-            ->willThrowException(new IOException('Failed to remove file.'));
+        $wasteManagerService = $this->createMock(WasteManagerService::class);
+        $wasteManagerService->expects($this->once())
+            ->method('sendToWaste')
+            ->willThrowException(new \Exception('Failed to remove file.'));
         $downloadRepository = $this->createStub(DownloadRepository::class);
         $imageRepository = $this->createMock(ImageRepository::class);
         $imageRepository->expects($this->once())->method('findOneBy')->willReturn($image);
@@ -258,7 +277,7 @@ class ResourceControllerTest extends WebTestCase
         $imageDirectory = '/tmp/';
 
         $result = $this->controller->edit($request, $filesystem, $downloadRepository, $imageRepository,
-            $pageRepository, $seriesRepository, $imageDirectory);
+            $pageRepository, $seriesRepository, $wasteManagerService, $imageDirectory);
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/resources/images', $result->getTargetUrl());
     }
@@ -275,11 +294,14 @@ class ResourceControllerTest extends WebTestCase
             'REQUEST_URI' => '/incc/resources/{type}/{filename}'
         ]);
         $image = (new Image())->setId(Uuid::uuid1());
-        $entityManager = $this->createStub(EntityManager::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(Translator::class);
         $this->controller = $this->getMockBuilder(ResourceController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository
+            ])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirectToRoute'])
             ->getMock();
         $this->controller->expects($this->once())
@@ -303,8 +325,9 @@ class ResourceControllerTest extends WebTestCase
         $seriesRepository = $this->createMock(SeriesRepository::class);
         $seriesRepository->expects($this->once())->method('getSeriesUsingImage')->willReturn($paginator);
         $imageDirectory = '/tmp/';
+        $wasteManagerService = $this->createStub(WasteManagerService::class);
         $result = $this->controller->edit($request, $filesystem, $downloadRepository, $imageRepository,
-            $pageRepository, $seriesRepository, $imageDirectory);
+            $pageRepository, $seriesRepository, $wasteManagerService, $imageDirectory);
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/resources/images', $result->getTargetUrl());
     }
@@ -317,11 +340,14 @@ class ResourceControllerTest extends WebTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incc/resource/image/upload'
         ]);
-        $entityManager = $this->createStub(EntityManager::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(Translator::class);
         $this->controller = $this->getMockBuilder(ResourceController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository
+            ])
             ->onlyMethods(['redirectToRoute'])
             ->getMock();
         $this->controller->expects($this->never())->method('redirectToRoute');
@@ -339,15 +365,20 @@ class ResourceControllerTest extends WebTestCase
     public function testUploadImageNoTitle(): void
     {
         $request = new Request([], [], [], [], [
-            'image' => $this->createStub(UploadedFile::class),
+            'image' => [
+                'imageFile' => $this->createStub(UploadedFile::class),
+            ],
         ], [
             'REQUEST_URI' => '/incc/resource/image/upload'
         ]);
-        $entityManager = $this->createStub(EntityManager::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(Translator::class);
         $this->controller = $this->getMockBuilder(ResourceController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository
+            ])
             ->onlyMethods(['redirectToRoute'])
             ->getMock();
         $this->controller->expects($this->never())->method('redirectToRoute');
@@ -383,11 +414,14 @@ class ResourceControllerTest extends WebTestCase
         ], [
             'REQUEST_URI' => '/incc/resource/image/upload'
         ]);
-        $entityManager = $this->createStub(EntityManager::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(Translator::class);
         $this->controller = $this->getMockBuilder(ResourceController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository
+            ])
             ->onlyMethods(['redirectToRoute'])
             ->getMock();
         $this->controller->expects($this->never())->method('redirectToRoute');
@@ -432,11 +466,14 @@ class ResourceControllerTest extends WebTestCase
         ], [
             'REQUEST_URI' => '/incc/resource/image/upload'
         ]);
-        $entityManager = $this->createStub(EntityManager::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(Translator::class);
         $this->controller = $this->getMockBuilder(ResourceController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository
+            ])
             ->onlyMethods(['redirectToRoute'])
             ->getMock();
         $this->controller->expects($this->never())->method('redirectToRoute');

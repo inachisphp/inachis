@@ -10,22 +10,18 @@
 namespace Inachis\Tests\phpunit\Controller\Dialog;
 
 use Inachis\Controller\Dialog\CategoryDialogController;
-use Inachis\Controller\Dialog\ImageGalleryDialogController;
 use Inachis\Entity\Category;
 use Inachis\Repository\CategoryRepository;
 use Inachis\Repository\PageRepository;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use ArrayIterator;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CategoryDialogControllerTest extends WebTestCase
+class CategoryDialogControllerTest extends InachisControllerTestCase
 {
     protected CategoryRepository $categoryRepository;
     protected CategoryDialogController $controller;
@@ -35,26 +31,33 @@ class CategoryDialogControllerTest extends WebTestCase
      */
     public function setUp(): void
     {
-        $entityManager = $this->createStub(EntityManagerInterface::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(TranslatorInterface::class);
+        parent::setUp();
+        
         $this->controller = $this->getMockBuilder(CategoryDialogController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository,
+            ])
             ->onlyMethods(['render'])
             ->getMock();
-        $this->controller->expects($this->atLeast(0))->method('render')
+        $this->controller->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
         $this->categoryRepository = $this->createMock(CategoryRepository::class);
         parent::setUp();
     }
+
     public function testGetCategoryManagerContent(): void
     {
         $this->categoryRepository->expects($this->never())->method('findAll');
         $result = $this->controller->getCategoryManagerContent($this->categoryRepository);
         $this->assertEquals('rendered:inadmin/dialog/category-manager.html.twig', $result->getContent());
     }
+
     public function testGetCategoryManagerList(): void
     {
         $this->categoryRepository->expects($this->never())->method('findAll');
