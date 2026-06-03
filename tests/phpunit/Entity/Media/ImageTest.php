@@ -10,7 +10,8 @@
 namespace Inachis\Tests\phpunit\Entity\Media;
 
 use DateTimeImmutable;
-use Inachis\Entity\{Image, User};
+use Inachis\Entity\Media\Image;
+use Inachis\Entity\User\User;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;

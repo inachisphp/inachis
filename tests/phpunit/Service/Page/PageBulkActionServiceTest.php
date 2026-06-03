@@ -9,8 +9,8 @@
 
 namespace Inachis\Tests\phpunit\Service\Page;
 
-use Inachis\Entity\Page;
-use Inachis\Entity\Url;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Url;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\RevisionRepository;
 use Inachis\Repository\UrlRepository;

@@ -7,11 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Entity;
+namespace Inachis\Entity\User;
 
-use Doctrine\ORM\Mapping as ORM;
 use Inachis\Exception\InvalidTimezoneException;
 use Inachis\Validator\DateValidator;
+use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\UuidInterface;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -21,13 +21,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 class UserPreference
 {
     /**
-     * @var UuidInterface|null The unique identifier for the {@link UserPreference}
+     * @var UuidInterface The unique identifier for the {@link UserPreference}
      */
     #[ORM\Id]
     #[ORM\Column(type: "uuid", unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: "CUSTOM")]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected ?UuidInterface $id = null;
+    protected UuidInterface $id;
 
     /**
      * @var User The {@link User} the preferences are for
@@ -136,7 +136,7 @@ class UserPreference
     /**
      * Sets the highContrast flag for the {@link UserPreference}
      *
-     * @return string
+     * @return self
      */
     public function setHighContrast(bool $highContrast): self
     {
@@ -159,7 +159,7 @@ class UserPreference
     /**
      * Sets the fontFamily descriptor for the {@link UserPreference}
      *
-     * @param string $fontSize
+     * @param string $fontFamily
      * @return self
      */
     public function setFontFamily(string $fontFamily): self

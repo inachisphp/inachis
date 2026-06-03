@@ -10,9 +10,7 @@
 namespace Inachis\Tests\phpunit\Controller\Page\Post;
 
 use Inachis\Controller\Page\Post\RevisionController;
-use Inachis\Entity\Page;
-use Inachis\Entity\Revision;
-use Inachis\Entity\Url;
+use Inachis\Entity\Content\{Page, Revision, Url};
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\RevisionRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;

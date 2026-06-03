@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Repository;
 
-use Inachis\Entity\Download;
+use Inachis\Entity\Media\Download;
 use Inachis\Repository\DownloadRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;

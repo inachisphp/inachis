@@ -9,9 +9,10 @@
 
 namespace Inachis\Tests\phpunit\Controller\Page\Series;
 
-use Doctrine\ORM\EntityManager;
 use Inachis\Controller\Page\Series\SeriesController;
-use Inachis\Entity\{Image, Page, Series, User};
+use Inachis\Entity\Content\{Page, Series};
+use Inachis\Entity\Media\Image;
+use Inachis\Entity\User\User;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\ImageRepository;
 use Inachis\Repository\PageRepository;
@@ -21,14 +22,12 @@ use Inachis\Service\Waste\WasteManagerService;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Uuid;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Button;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SeriesControllerTest extends InachisControllerTestCase
 {

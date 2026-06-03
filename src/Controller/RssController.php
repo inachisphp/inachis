@@ -9,7 +9,7 @@
 
 namespace Inachis\Controller;
 
-use Inachis\Entity\{Category, Page, Url};
+use Inachis\Entity\Content\{Category, Page};
 use Inachis\Enum\EditorialStatus;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

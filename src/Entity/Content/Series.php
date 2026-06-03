@@ -7,17 +7,20 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Entity;
+namespace Inachis\Entity\Content;
 
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Inachis\Entity\Media\Image;
+use Inachis\Entity\User\User;
 use Inachis\Enum\EditorialStatus;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 
 /**
+ * Object for handling {@link Series} entities
  */
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\SeriesRepository', readOnly: false)]
 #[ORM\Index(name: 'search_idx', columns: ['title'])]
@@ -82,7 +85,7 @@ class Series
     /**
      * @var Collection<int, Page> The array of pages in the series
      */
-    #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Page', fetch: 'EAGER')]
+    #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Content\Page', fetch: 'EAGER')]
     #[ORM\JoinTable(name: 'Series_pages')]
     #[ORM\JoinColumn(name: 'series_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'page_id', referencedColumnName: 'id')]
@@ -92,14 +95,14 @@ class Series
     /**
      * @var Image|null
      */
-    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\Image', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\Media\Image', cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'image_id', referencedColumnName: 'id')]
     protected ?Image $image = null;
 
     /**
      * @var User|null The UUID of the {@link User} that created the {@link Series}
      */
-    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User', cascade: [ 'detach' ])]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User\User', cascade: [ 'detach' ])]
     #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id')]
     protected ?User $author = null;
 

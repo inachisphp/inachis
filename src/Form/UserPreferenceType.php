@@ -9,9 +9,7 @@
 
 namespace Inachis\Form;
 
-use Inachis\Entity\UserPreference;
-use Inachis\Util\RandomColorPicker;
-use Inachis\Util\TimezoneChoices;
+use Inachis\Entity\User\UserPreference;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;

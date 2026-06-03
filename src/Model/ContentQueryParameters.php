@@ -9,7 +9,7 @@
 
 namespace Inachis\Model;
 
-use Inachis\Entity\Category;
+use Inachis\Entity\Content\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 

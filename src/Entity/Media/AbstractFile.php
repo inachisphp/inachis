@@ -7,12 +7,12 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Entity;
+namespace Inachis\Entity\Media;
 
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Inachis\Entity\User\User;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
-use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
@@ -70,7 +70,7 @@ abstract class AbstractFile
     /**
      * @var User|null The UUID of the {@link User} that uploaded the file
      */
-    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User', cascade: [ 'detach' ])]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User\User', cascade: [ 'detach' ])]
     #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id')]
     protected ?User $author = null;
 

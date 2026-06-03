@@ -11,7 +11,7 @@ namespace Inachis\Tests\phpunit\Entity\Content;
 
 use DateTimeImmutable;
 use Exception;
-use Inachis\Entity\{Page, Url};
+use Inachis\Entity\Content\{Page, Url};
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 

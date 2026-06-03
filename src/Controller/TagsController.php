@@ -9,12 +9,11 @@
 
 namespace Inachis\Controller;
 
+use Inachis\Entity\Content\Tag;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Entity\Tag;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\TagRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

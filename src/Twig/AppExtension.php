@@ -9,7 +9,7 @@
 
 namespace Inachis\Twig;
 
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Symfony\Bundle\SecurityBundle\Security;

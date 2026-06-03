@@ -9,25 +9,25 @@
 
 namespace Inachis\EventListener;
 
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 
 /**
- * Class HashPasswordListener
- * @package Inachis\EventListener
+ * Event listener for hashing passwords
  */
 class HashPasswordListener implements EventSubscriber
 {
     /**
      * @var UserPasswordEncoder
      */
-    private $passwordEncoder;
+    private UserPasswordEncoder $passwordEncoder;
 
     /**
      * HashPasswordListener constructor.
-     * @param UserPasswordEncoder $passwordEncoder
+     * 
+     * @param UserPasswordEncoder $passwordEncoder The password encoder
      */
     public function __construct(UserPasswordEncoder $passwordEncoder)
     {
@@ -35,7 +35,9 @@ class HashPasswordListener implements EventSubscriber
     }
 
     /**
-     * @param LifecycleEventArgs $args
+     * Handles pre-persist events
+     * 
+     * @param LifecycleEventArgs $args The lifecycle event arguments
      */
     public function prePersist(LifecycleEventArgs $args): void
     {
@@ -46,7 +48,9 @@ class HashPasswordListener implements EventSubscriber
     }
 
     /**
-     * @param LifecycleEventArgs $args
+     * Handles pre-update events
+     * 
+     * @param LifecycleEventArgs $args The lifecycle event arguments
      */
     public function preUpdate(LifecycleEventArgs $args): void
     {
@@ -62,7 +66,9 @@ class HashPasswordListener implements EventSubscriber
     }
 
     /**
-     * @return string[]
+     * Returns the events this listener is subscribed to
+     * 
+     * @return array<int, string> The events this listener is subscribed to
      */
     public function getSubscribedEvents(): array
     {
@@ -70,7 +76,9 @@ class HashPasswordListener implements EventSubscriber
     }
 
     /**
-     * @param User $entity
+     * Encodes the password for the given user
+     * 
+     * @param User $entity The user
      */
     private function encodePassword(User $entity): void
     {

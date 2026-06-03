@@ -9,12 +9,9 @@
 
 namespace Inachis\Tests\phpunit\Form;
 
-use Inachis\Entity\Image;
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Form\UserType;
-use Inachis\Util\RandomColorPicker;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\Attributes\Test;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Bundle\SecurityBundle\Security;

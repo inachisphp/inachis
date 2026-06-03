@@ -10,9 +10,7 @@
 namespace Inachis\Tests\phpunit\Entity\User;
 
 use DateTimeImmutable;
-use Inachis\Entity\Image;
-use Inachis\Entity\User;
-use Inachis\Exception\InvalidTimezoneException;
+use Inachis\Entity\User\User;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 

@@ -9,8 +9,8 @@
 
 namespace Inachis\Tests\phpunit\Entity\Content;
 
-use Inachis\Entity\Category;
-use Inachis\Entity\Image;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Media\Image;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 

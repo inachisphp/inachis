@@ -7,10 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Entity;
+namespace Inachis\Entity\Waste;
 
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Inachis\Entity\User\User;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 
@@ -52,7 +53,7 @@ class Waste
     /**
      * @var User The author for the {@link Page}
      */
-    #[ORM\ManyToOne(targetEntity: 'User', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: '\Inachis\Entity\User\User', cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
     private User $user;
     /**

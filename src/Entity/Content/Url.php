@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Entity;
+namespace Inachis\Entity\Content;
 
 use DateTimeImmutable;
 use Exception;
@@ -39,7 +39,7 @@ class Url
     /**
      * @var Page The UUID of the content of the type specified by @see
      */
-    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\Page', fetch: 'EAGER', inversedBy: 'urls')]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\Content\Page', fetch: 'EAGER', inversedBy: 'urls')]
     #[ORM\JoinColumn(name: 'content_id', referencedColumnName: 'id')]
     protected Page $content;
 

@@ -12,7 +12,7 @@ namespace Inachis\Controller\Page\Dashboard;
 use DateTimeImmutable;
 use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\{Image, Page, Series};
+use Inachis\Entity\Content\Series;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Repository\{ImageRepository, PageRepository, SeriesRepository};
 use Symfony\Component\HttpFoundation\Request;

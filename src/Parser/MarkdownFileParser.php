@@ -11,8 +11,8 @@ namespace Inachis\Parser;
 
 use DateTimeImmutable;
 use Exception;
-use Inachis\Entity\Category;
-use Inachis\Entity\Page;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Page;
 use Doctrine\Persistence\ObjectManager;
 
 class MarkdownFileParser

@@ -7,10 +7,11 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Entity;
+namespace Inachis\Entity\Media;
 
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Inachis\Entity\Media\AbstractFile;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
@@ -85,7 +86,7 @@ class Image extends AbstractFile
 
     /**
      * @param int $value
-     * @return $this
+     * @return self
      */
     public function setDimensionX(int $value): self
     {
@@ -96,7 +97,7 @@ class Image extends AbstractFile
 
     /**
      * @param int $value
-     * @return $this
+     * @return self
      */
     public function setDimensionY(int $value): self
     {
@@ -107,7 +108,7 @@ class Image extends AbstractFile
 
     /**
      * @param string|null $value
-     * @return $this
+     * @return self
      */
     public function setAltText(?string $value): self
     {
@@ -120,7 +121,7 @@ class Image extends AbstractFile
      * @param $imageDirectory
      * @return array
      */
-    public function getImageProperties($imageDirectory): array
+    public function getImageProperties(string $imageDirectory): array
     {
         $fullImagePath = self::getFilename();
         if (!empty($imageDirectory) && !str_starts_with($fullImagePath, 'http')) {

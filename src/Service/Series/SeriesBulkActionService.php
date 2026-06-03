@@ -10,7 +10,7 @@
 namespace Inachis\Service\Series;
 
 use DateTimeImmutable;
-use Inachis\Entity\Series;
+use Inachis\Entity\Content\Series;
 use Inachis\Repository\SeriesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Service\Waste\WasteManagerService;

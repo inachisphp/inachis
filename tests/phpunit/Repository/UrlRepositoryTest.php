@@ -9,8 +9,8 @@
 
 namespace Inachis\Tests\phpunit\Repository;
 
-use Inachis\Entity\Page;
-use Inachis\Entity\Url;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Url;
 use Inachis\Repository\UrlRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;

@@ -10,8 +10,8 @@
 namespace Inachis\Tests\phpunit\Entity\Waste;
 
 use DateTimeImmutable;
-use Inachis\Entity\User;
-use Inachis\Entity\Waste;
+use Inachis\Entity\User\User;
+use Inachis\Entity\Waste\Waste;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 

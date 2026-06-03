@@ -9,8 +9,8 @@
 
 namespace Inachis\Tests\phpunit\Entity\User;
 
-use Inachis\Entity\LoginActivity;
-use Inachis\Entity\User;
+use Inachis\Entity\User\LoginActivity;
+use Inachis\Entity\User\User;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -60,5 +60,32 @@ class LoginActivityTest extends TestCase
         $date = new DateTimeImmutable();
         $this->loginActivity->setLoggedAt($date);
         $this->assertEquals($date, $this->loginActivity->getLoggedAt());
+    }
+
+    public function testSetAndGetType(): void
+    {
+        $this->loginActivity->setType('type');
+        $this->assertEquals('type', $this->loginActivity->getType());
+    }
+
+    public function testSetAndGetUser(): void
+    {
+        $user = $this->createStub(User::class);
+        $this->loginActivity->setUser($user);
+        $this->assertEquals($user, $this->loginActivity->getUser());
+    }
+
+    public function testGetSessionHash(): void
+    {
+        $this->assertEmpty($this->loginActivity->getSessionHash());
+        $this->loginActivity->setSessionHash('hash');
+        $this->assertEquals('hash', $this->loginActivity->getSessionHash());
+    }
+
+    public function testGetExtraData(): void
+    {
+        $this->assertEmpty($this->loginActivity->getExtraData());
+        $this->loginActivity->setExtraData(['key' => 'value']);
+        $this->assertEquals(['key' => 'value'], $this->loginActivity->getExtraData());
     }
 }

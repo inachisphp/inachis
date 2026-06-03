@@ -7,8 +7,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Entity;
+namespace Inachis\Entity\Content;
 
+use Inachis\Entity\User\User;
+use Inachis\Entity\Media\Image;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Exception\InvalidTimezoneException;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -79,14 +81,14 @@ class Page
     /**
      * @var User|null The UUID of the author for the {@link Page}
      */
-    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User', cascade: [ 'detach' ])]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User\User', cascade: [ 'detach' ])]
     #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id')]
     protected ?User $author = null;
 
     /**
      * @var Image|null The featured {@link Image} for the {@link Page}
      */
-    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\Image', cascade: [ 'detach' ])]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\Media\Image', cascade: [ 'detach' ])]
     #[ORM\JoinColumn(name: 'image_id', referencedColumnName: 'id')]
     protected ?Image $featureImage = null;
 
@@ -173,7 +175,7 @@ class Page
      */
     #[ORM\OneToMany(
         mappedBy: 'content',
-        targetEntity: 'Inachis\Entity\Url',
+        targetEntity: 'Inachis\Entity\Content\Url',
         cascade: [ 'persist', 'remove' ],
         orphanRemoval: true
     )]
@@ -183,7 +185,7 @@ class Page
     /**
      * @var Collection<int, Category> The array of categories assigned to the post/page
      */
-    #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Category')]
+    #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Content\Category')]
     #[ORM\JoinTable(name: 'Page_categories')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'category_id', referencedColumnName: 'id')]
@@ -193,7 +195,7 @@ class Page
     /**
      * @var Collection<int, Tag> The array of tags assigned to the post/page
      */
-    #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Tag', cascade: [ 'persist' ])]
+    #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Content\Tag', cascade: [ 'persist' ])]
     #[ORM\JoinTable(name: 'Page_tags')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'tag_id', referencedColumnName: 'id')]
@@ -203,7 +205,7 @@ class Page
     /**
      * @var Collection<int, Series>|null  The array of Series that contains this page
      */
-    #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Series', inversedBy: 'items')]
+    #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Content\Series', inversedBy: 'items')]
     protected ?Collection $series;
 
     /**

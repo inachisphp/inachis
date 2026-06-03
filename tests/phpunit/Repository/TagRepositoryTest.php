@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Repository;
 
-use Inachis\Entity\Tag;
+use Inachis\Entity\Content\Tag;
 use Inachis\Repository\TagRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;

@@ -9,9 +9,9 @@
 
 namespace Inachis\Tests\phpunit\Service\Page;
 
-use Inachis\Entity\Category;
-use Inachis\Entity\Series;
-use Inachis\Entity\User;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Series;
+use Inachis\Entity\User\User;
 use Inachis\Model\BulkCreateData;
 use Inachis\Repository\CategoryRepository;
 use Inachis\Repository\SeriesRepository;

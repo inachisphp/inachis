@@ -10,7 +10,7 @@
 namespace Inachis\Tests\phpunit\Controller\Page\Resource;
 
 use Inachis\Controller\Page\Resource\ResourceController;
-use Inachis\Entity\Image;
+use Inachis\Entity\Media\Image;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\DownloadRepository;
 use Inachis\Repository\ImageRepository;
@@ -19,11 +19,9 @@ use Inachis\Repository\SeriesRepository;
 use Inachis\Service\Resource\ImageFileService;
 use Inachis\Service\Waste\WasteManagerService;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Uuid;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -34,7 +32,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\String\UnicodeString;
-use Symfony\Component\Translation\Translator;
 
 class ResourceControllerTest extends InachisControllerTestCase
 {

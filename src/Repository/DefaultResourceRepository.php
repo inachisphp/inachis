@@ -9,7 +9,7 @@
 
 namespace Inachis\Repository;
 
-use Inachis\Entity\AbstractFile;
+use Inachis\Entity\Media\AbstractFile;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 trait DefaultResourceRepository

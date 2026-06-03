@@ -11,7 +11,7 @@ namespace Inachis\Form;
 
 use DateTimeImmutable;
 use IntlException;
-use Inachis\Entity\{Category,Page,Tag};
+use Inachis\Entity\Content\{Category,Page,Tag};
 use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -325,6 +325,7 @@ class PostType extends AbstractType
                         'aria-readonly'    => 'true',
                         'readOnly' => true,
                     ],
+                    'disabled' => true,
                     'format' => 'dd/MM/yyyy HH:mm',
                     'html5'  => false,
                     'input'  => 'datetime_immutable',

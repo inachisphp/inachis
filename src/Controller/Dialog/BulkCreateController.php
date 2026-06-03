@@ -9,19 +9,12 @@
 
 namespace Inachis\Controller\Dialog;
 
-use DateInterval;
-use DateMalformedPeriodStringException;
-use DateMalformedStringException;
-use DatePeriod;
-use DateTimeImmutable;
 use Exception;
 use InvalidArgumentException;
 use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\User\User;
 use Inachis\Model\BulkCreateData;
 use Inachis\Service\Page\PageBulkCreateService;
-use Inachis\Util\UrlNormaliser;
-use Ramsey\Uuid\Uuid;
-use ReCaptcha\RequestMethod\Post;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -46,11 +39,10 @@ class BulkCreateController extends AbstractInachisController
     /**
      * Get the bulk create dialog
      *
-     * @param Request $request
      * @return Response
      */
     #[Route("/incc/ax/bulkCreate/get", methods: [ "POST" ])]
-    public function contentList(Request $request): Response
+    public function contentList(): Response
     {
         return $this->render('inadmin/dialog/bulk-create.html.twig', $this->data);
     }
@@ -65,7 +57,7 @@ class BulkCreateController extends AbstractInachisController
      */
     #[Route("/incc/ax/bulkCreate/save", methods: [ "POST" ])]
     public function saveContent(Request $request, PageBulkCreateService $bulkCreatePost): Response {
-        /** @var \Inachis\Entity\User|null $user */
+        /** @var User|null $user */
         $user = $this->getUser();
         if ($user === null) {
             return new Response('Unauthorized', Response::HTTP_UNAUTHORIZED);

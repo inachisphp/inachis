@@ -7,18 +7,19 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Entity;
+namespace Inachis\Entity\User;
 
 use DateTimeImmutable;
 use Exception;
 use Doctrine\ORM\Mapping as ORM;
+use Inachis\Entity\Security\Role;
+use Inachis\Entity\User\UserPreference;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Object for handling User entity.
@@ -78,7 +79,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected ?string $plainPassword;
 
     /**
-     * @var string|null Email address of the user
+     * @var string|null The email address of the user
      */
     #[ORM\Column(type: "string", length: 512, nullable: false)]
     #[Assert\Email]
@@ -86,7 +87,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected ?string $email;
 
     /**
-     * @var string|null Email address of the user
+     * @var string|null The canonical email address of the user
      */
     #[ORM\Column(name: 'emailCanonical', type: "string", length: 255, unique: true, nullable: false)]
     protected ?string $emailCanonical;
@@ -99,12 +100,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected string $displayName = '';
 
     /**
-     * @var array The roles assigned to this user. Currently, not in use.
+     * @var array<string> The roles assigned to this user. Currently, not in use.
      */
     protected array $roles = [];
 
     /**
-     * @var string|null string An image to use for the {@link User}
+     * @var string|null An image to use for the {@link User}
      */
     #[ORM\Column(name: 'avatar', type: "string", length: 255, nullable: true)]
     protected ?string $avatar = '';
@@ -138,6 +139,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column(type: "datetime_immutable")]
     protected ?DateTimeImmutable $passwordModDate = null;
+
+    #[ORM\ManyToOne(targetEntity: Role::class)]
+    #[ORM\JoinColumn(name: "role_id", referencedColumnName: "id", nullable: true, onDelete: "SET NULL")]
+    private ?Role $role = null;
 
     /**
      * @var UserPreference|null Preferences for the current {@link User}
@@ -225,9 +230,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->displayName;
     }
 
+    public function getRole(): ?Role
+    {
+        return $this->role;
+    }
+
+    public function setRole(?Role $role): self
+    {
+        $this->role = $role;
+        return $this;
+    }
+
     /**
      * Returns the role(s) for the current {@link User}
-     * @return array
+     * @return array<string>
      */
     public function getRoles(): array
     {
@@ -292,9 +308,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link passwordModDate} for the {@link User}.
      *
-     * @return DateTimeImmutable The password last modification date for the user
+     * @return DateTimeImmutable|null The password last modification date for the user
      */
-    public function getPasswordModDate(): DateTimeImmutable
+    public function getPasswordModDate(): ?DateTimeImmutable
     {
         return $this->passwordModDate;
     }
@@ -322,9 +338,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the initials for the {@link User} based on their {@link User.displayName}
      *
-     * @return string
+     * @return string|null
      */
-    public function getInitials(): string
+    public function getInitials(): ?string
     {
         $initials = '';
         $nameWords = explode(' ', $this->getDisplayName());
@@ -335,7 +351,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Sets the value of {@link Id}.
+     * Sets the unique id for the {@link User}.
      *
      * @param UuidInterface|null $value The value to set
      * @return $this
@@ -408,7 +424,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @param string|null $value The value to set
      * @return $this
      */
-    public function setDisplayName(?string $value): self
+    public function setDisplayName(string $value): self
     {
         $this->displayName = $value ?? '';
 
@@ -418,7 +434,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the role(s) for the current {@link User}
      *
-     * @param array $roles
+     * @param array<string> $roles
      * @return self
      */
     public function setRoles(array $roles): self
@@ -566,7 +582,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             '(?:\.[a-z0-9!#\$%&\'*+\/=?^_`{|}~-]+)' .
             '*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+' .
             '[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/',
-            $this->email
+            $this->email ?? ''
         );
     }
 

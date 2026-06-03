@@ -7,14 +7,18 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Entity;
+namespace Inachis\Entity\User;
 
-use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Inachis\Entity\User\User;
 use Inachis\Repository\PasswordResetRequestRepository;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
+use DateTimeImmutable;
 
+/**
+ * Entity for storing password reset requests
+ */
 #[ORM\Entity(repositoryClass: PasswordResetRequestRepository::class)]
 #[ORM\Table(name: "password_reset_requests")]
 #[ORM\Index(columns: [ "user_id", "token_hash" ], name: "search_idx")]
@@ -61,11 +65,13 @@ class PasswordResetRequest
     private bool $used = false;
 
     /**
-     * @param $user
-     * @param string            $tokenHash
-     * @param DateTimeImmutable $expiresAt
+     * Creates a new instance of {@link PasswordResetRequest}
+     * 
+     * @param User $user The user this token relates to
+     * @param string $tokenHash The HMAC hash of the token
+     * @param DateTimeImmutable $expiresAt The expiry date and time for the token
      */
-    public function __construct($user, string $tokenHash, DateTimeImmutable $expiresAt)
+    public function __construct(User $user, string $tokenHash, DateTimeImmutable $expiresAt)
     {
         $this->user = $user;
         $this->tokenHash = $tokenHash;
@@ -74,6 +80,8 @@ class PasswordResetRequest
     }
 
     /**
+     * Get the value of id
+     * 
      * @return UuidInterface|null
      */
     public function getId(): ?UuidInterface
@@ -82,6 +90,8 @@ class PasswordResetRequest
     }
 
     /**
+     * Get the value of user
+     * 
      * @return User
      */
     public function getUser(): User
@@ -90,6 +100,8 @@ class PasswordResetRequest
     }
 
     /**
+     * Get the value of tokenHash
+     * 
      * @return string
      */
     public function getTokenHash(): string
@@ -98,6 +110,8 @@ class PasswordResetRequest
     }
 
     /**
+     * Get the value of createdAt
+     * 
      * @return DateTimeImmutable
      */
     public function getCreatedAt(): DateTimeImmutable
@@ -106,6 +120,8 @@ class PasswordResetRequest
     }
 
     /**
+     * Get the value of expiresAt
+     * 
      * @return DateTimeImmutable
      */
     public function getExpiresAt(): DateTimeImmutable
@@ -114,7 +130,9 @@ class PasswordResetRequest
     }
 
     /**
-     * @return boolean
+     * Get the value of used
+     * 
+     * @return bool
      */
     public function isUsed(): bool
     {
@@ -122,6 +140,8 @@ class PasswordResetRequest
     }
 
     /**
+     * Mark the token as used
+     * 
      * @return void
      */
     public function markUsed(): void

@@ -9,11 +9,9 @@
 
 namespace Inachis\Repository;
 
-use Inachis\Entity\Image;
-use Inachis\Entity\Page;
-use Inachis\Entity\Series;
+use Inachis\Entity\Content\{Page,Series};
+use Inachis\Entity\Media\Image;
 use Inachis\Enum\EditorialStatus;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;

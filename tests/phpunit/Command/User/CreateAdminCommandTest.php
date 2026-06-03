@@ -10,7 +10,7 @@
 namespace Inachis\Tests\phpunit\Command\User;
 
 use Inachis\Command\User\CreateAdminCommand;
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;

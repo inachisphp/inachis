@@ -10,18 +10,14 @@
 namespace Inachis\Tests\phpunit\Controller\Dialog;
 
 use Inachis\Controller\Dialog\ContentSelectorController;
-use Inachis\Entity\Page;
-use Inachis\Entity\Series;
+use Inachis\Entity\Content\{Page, Series};
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\SeriesRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContentSelectorControllerTest extends InachisControllerTestCase
 {

@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Entity;
+namespace Inachis\Entity\System;
 
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
@@ -53,6 +53,17 @@ class NavigationTab
      */
     #[ORM\Column]
     private bool $isActive = true;
+
+    /**
+     * Set the value of id
+     *
+     * @param UuidInterface|null $id
+     * @return self
+     */
+    public function setId(?UuidInterface $id): self {
+        $this->id = $id;
+        return $this;
+    }
 
     /**
      * Get the value of id

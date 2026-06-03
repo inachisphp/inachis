@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Form;
 
-use Inachis\Entity\Page;
+use Inachis\Entity\Content\Page;
 use Inachis\Form\PostType;
 use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;

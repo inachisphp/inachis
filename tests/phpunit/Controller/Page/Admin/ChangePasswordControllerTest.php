@@ -10,10 +10,9 @@
 namespace Inachis\Tests\phpunit\Controller\Page\Admin;
 
 use Inachis\Controller\Page\Admin\ChangePasswordController;
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Repository\UserRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
-use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Ramsey\Uuid\Uuid;
@@ -24,7 +23,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChangePasswordControllerTest extends InachisControllerTestCase
 {

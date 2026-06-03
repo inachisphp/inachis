@@ -11,7 +11,9 @@ namespace Inachis\Tests\phpunit\Entity\Content;
 
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
-use Inachis\Entity\{Image, Page, Series, User};
+use Inachis\Entity\Content\{Page, Series};
+use Inachis\Entity\Media\Image;
+use Inachis\Entity\User\User;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 

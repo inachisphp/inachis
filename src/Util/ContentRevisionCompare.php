@@ -9,8 +9,7 @@
 
 namespace Inachis\Util;
 
-use Inachis\Entity\Page;
-use Inachis\Entity\Revision;
+use Inachis\Entity\Content\{Page, Revision};
 
 /**
  * Compare page content to revision

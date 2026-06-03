@@ -10,7 +10,7 @@
 namespace Inachis\Tests\phpunit\Controller\Page\Search;
 
 use Inachis\Controller\Page\Search\SearchController;
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Model\SearchResult;
 use Inachis\Repository\SearchRepository;
 use Inachis\Repository\UrlRepository;

@@ -9,7 +9,8 @@
 
 namespace Inachis\Repository;
 
-use Inachis\Entity\{Page,Revision,User};
+use Inachis\Entity\Content\{Page,Revision};
+use Inachis\Entity\User\User;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\NonUniqueResultException;
 use Ramsey\Uuid\UuidInterface;

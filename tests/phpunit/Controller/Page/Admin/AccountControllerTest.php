@@ -11,8 +11,7 @@ namespace Inachis\Tests\phpunit\Controller\Page\Admin;
 
 
 use Inachis\Controller\Page\Admin\AccountController;
-use Inachis\Entity\PasswordResetRequest;
-use Inachis\Entity\User;
+use Inachis\Entity\User\{PasswordResetRequest, User};
 use Inachis\Repository\PasswordResetRequestRepository;
 use Inachis\Repository\UserRepository;
 use Inachis\Service\User\PasswordResetTokenService;

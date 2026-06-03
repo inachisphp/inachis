@@ -9,7 +9,7 @@
 
 namespace Inachis\Form;
 
-use Inachis\Entity\Series;
+use Inachis\Entity\Content\Series;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;

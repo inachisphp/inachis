@@ -12,13 +12,9 @@ namespace Inachis\Tests\phpunit\Entity\Content;
 use DateTimeImmutable;
 use Exception;
 use InvalidArgumentException;
-use Inachis\Entity\Category;
-use Inachis\Entity\Image;
-use Inachis\Entity\Page;
-use Inachis\Entity\Series;
-use Inachis\Entity\Tag;
-use Inachis\Entity\Url;
-use Inachis\Entity\User;
+use Inachis\Entity\Media\Image;
+use Inachis\Entity\Content\{Category, Page, Series, Tag, Url};
+use Inachis\Entity\User\User;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Exception\InvalidTimezoneException;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -198,7 +194,7 @@ class PageTest extends TestCase
         $this->assertNull($this->page->getUrl());
         $this->page->addUrl(new Url($this->page, 'test', true));
         $this->assertNotEmpty($this->page->getUrls());
-        $this->assertInstanceOf('\Inachis\Entity\Url', $this->page->getUrl());
+        $this->assertInstanceOf('\Inachis\Entity\Content\Url', $this->page->getUrl());
         $this->expectException(InvalidArgumentException::class);
         $this->page->getUrl(100);
     }

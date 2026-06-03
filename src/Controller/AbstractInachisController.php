@@ -9,7 +9,6 @@
 
 namespace Inachis\Controller;
 
-use Inachis\Entity\User;
 use Inachis\Controller\AbstractController;
 use Inachis\Repository\WasteRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,11 +27,6 @@ abstract class AbstractInachisController extends AbstractController
      * @var array<string>
      */
     protected array $errors = [];
-
-    /**
-     * @var array<string, mixed>
-     */
-    protected array $data = [];
 
     /**
      * @param EntityManagerInterface $entityManager

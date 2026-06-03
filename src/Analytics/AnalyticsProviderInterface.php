@@ -9,7 +9,7 @@
 
 namespace Inachis\Analytics;
 
-use Inachis\Entity\{Page, Series};
+use Inachis\Entity\Content\{Page, Series};
 
 /**
  * Interface for analytics providers

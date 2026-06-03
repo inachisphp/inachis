@@ -10,11 +10,8 @@
 namespace Inachis\Controller\Page\Tools;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Model\Import\ImportOptionsDto;
-use Inachis\Model\Page\{CategoryPathDto,PageExportDto,TagDto};
-use Inachis\Model\Series\SeriesExportDto;
-use Inachis\Model\CategoryExportDto;
 use Inachis\Service\Import\ImportDetector;
 use Inachis\Service\Import\Series\SeriesImportService;
 use Inachis\Service\Import\Series\SeriesImportValidator;

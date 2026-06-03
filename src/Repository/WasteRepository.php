@@ -9,8 +9,8 @@
 
 namespace Inachis\Repository;
 
-use Inachis\Entity\User;
-use Inachis\Entity\Waste;
+use Inachis\Entity\User\User;
+use Inachis\Entity\Waste\Waste;
 use Inachis\Repository\WasteRepositoryInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;

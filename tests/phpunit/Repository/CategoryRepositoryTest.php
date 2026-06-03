@@ -9,13 +9,12 @@
 
 namespace Inachis\Tests\phpunit\Repository;
 
-use Inachis\Entity\Category;
+use Inachis\Entity\Content\Category;
 use Inachis\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;

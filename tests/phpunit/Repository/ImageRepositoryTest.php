@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Repository;
 
-use Inachis\Entity\Image;
+use Inachis\Entity\Media\Image;
 use Inachis\Repository\ImageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;

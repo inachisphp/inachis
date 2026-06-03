@@ -9,7 +9,7 @@
 
 namespace Inachis\Repository;
 
-use Inachis\Entity\NavigationTab;
+use Inachis\Entity\System\NavigationTab;
 use Inachis\Model\NavigationTabDto;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -45,7 +45,7 @@ class NavigationTabRepository extends AbstractRepository
     /**
      * Returns paginated tabs ordered by position
      *
-     * @param array $filters
+     * @param array<int, array<int, string>> $filters
      * @param int $offset
      * @param int $limit
      * @return Paginator<NavigationTab>

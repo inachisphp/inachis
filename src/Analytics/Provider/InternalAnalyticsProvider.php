@@ -10,7 +10,7 @@
 namespace Inachis\Analytics\Provider;
 
 use Inachis\Analytics\AnalyticsProviderInterface;
-use Inachis\Entity\{Page, Series};
+use Inachis\Entity\Content\{Page, Series};
 use Inachis\Repository\{AnalyticsRepository, PageRepository, SeriesRepository, UrlRepository};
 
 /**

@@ -7,7 +7,7 @@
  */
 namespace Inachis\Service\MenuBuilder;
 
-use Inachis\Entity\MenuItem;
+use Inachis\Entity\System\MenuItem;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**

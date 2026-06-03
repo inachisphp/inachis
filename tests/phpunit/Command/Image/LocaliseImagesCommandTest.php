@@ -10,9 +10,8 @@
 namespace Inachis\Tests\phpunit\Command\Image;
 
 use Inachis\Command\Image\LocaliseImagesCommand;
-use Inachis\Entity\Image;
-use Inachis\Entity\Page;
-use Inachis\Entity\Series;
+use Inachis\Entity\Content\{Page, Series};
+use Inachis\Entity\Media\Image;
 use Inachis\Repository\ImageRepository;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\SeriesRepository;

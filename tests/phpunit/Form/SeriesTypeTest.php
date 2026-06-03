@@ -9,16 +9,13 @@
 
 namespace Inachis\Tests\phpunit\Form;
 
-use Inachis\Entity\Series;
-use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use Inachis\Entity\Content\Series;
 use Inachis\Form\SeriesType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\Attributes\Test;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]

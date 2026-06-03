@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Service\User;
 
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Service\User\PasswordResetTokenService;
 use Inachis\Service\User\UserAccountEmailService;
 use Doctrine\ORM\EntityManagerInterface;

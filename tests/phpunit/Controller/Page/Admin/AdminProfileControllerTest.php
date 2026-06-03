@@ -10,18 +10,18 @@
 namespace Inachis\Tests\phpunit\Controller\Page\Admin;
 
 use Inachis\Controller\Page\Admin\AdminProfileController;
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\UserRepository;
 use Inachis\Service\User\UserBulkActionService;
 use Inachis\Service\User\UserAccountEmailService;
 use Inachis\Transformer\ImageTransformer;
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Ramsey\Uuid\Uuid;
 use Random\RandomException;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Button;
 use Symfony\Component\Form\Form;
@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AdminProfileControllerTest extends WebTestCase
+class AdminProfileControllerTest extends InachisControllerTestCase
 {
     /**
      * @var AdminProfileController&MockObject $controller
@@ -43,11 +43,16 @@ class AdminProfileControllerTest extends WebTestCase
      */
     public function setUp(): void
     {
-        $entityManager = $this->createStub(EntityManagerInterface::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(TranslatorInterface::class);
+        parent::setUp();
+        
         $this->controller = $this->getMockBuilder(AdminProfileController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository,
+            ])
             ->onlyMethods([
                 'addFlash',
                 'createForm',
@@ -115,7 +120,13 @@ class AdminProfileControllerTest extends WebTestCase
         $userRepository = $this->createStub(UserRepository::class);
         $contentQueryParameters = $this->createStub(ContentQueryParameters::class);
         $this->controller = $this->getMockBuilder(AdminProfileController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository,
+            ])
             ->onlyMethods([
                 'addFlash',
                 'createForm',

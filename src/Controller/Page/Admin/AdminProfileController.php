@@ -11,7 +11,7 @@ namespace Inachis\Controller\Page\Admin;
 
 use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Form\UserType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\UserRepository;

@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Entity\Content;
 
-use Inachis\Entity\Tag;
+use Inachis\Entity\Content\Tag;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 

@@ -10,7 +10,7 @@
 namespace Inachis\Tests\phpunit\Entity\Media;
 
 use DateTimeImmutable;
-use Inachis\Entity\Download;
+use Inachis\Media\Entity\Download;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;

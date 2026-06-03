@@ -9,9 +9,8 @@
 
 namespace Inachis\Tests\phpunit\Service\Page;
 
-use DateTime;
-use Inachis\Entity\Page;
-use Inachis\Entity\Series;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\SeriesRepository;

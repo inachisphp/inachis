@@ -11,7 +11,7 @@ namespace Inachis\Service\Image;
 
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Revision;
+use Inachis\Entity\Content\Revision;
 use Inachis\Repository\RevisionRepository;
 
 /**

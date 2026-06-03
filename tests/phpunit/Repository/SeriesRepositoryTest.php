@@ -9,9 +9,9 @@
 
 namespace Inachis\Tests\phpunit\Repository;
 
-use Inachis\Entity\Image;
-use Inachis\Entity\Page;
-use Inachis\Entity\Series;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
+use Inachis\Entity\Media\Image;
 use Inachis\Repository\SeriesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\AbstractQuery;

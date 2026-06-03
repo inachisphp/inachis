@@ -10,7 +10,7 @@
 namespace Inachis\Tests\phpunit\Controller\Dialog;
 
 use Inachis\Controller\Dialog\CategoryDialogController;
-use Inachis\Entity\Category;
+use Inachis\Entity\Content\Category;
 use Inachis\Repository\CategoryRepository;
 use Inachis\Repository\PageRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;

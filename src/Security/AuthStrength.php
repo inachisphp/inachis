@@ -7,7 +7,7 @@
  */
 namespace Inachis\Security;
 
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 
 /**
  * AuthStrength class

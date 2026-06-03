@@ -12,7 +12,7 @@ namespace Inachis\Service\User;
 use DateTimeImmutable;
 use Exception;
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\{PasswordResetRequest,User};
+use Inachis\Entity\User\{PasswordResetRequest,User};
 use Inachis\Repository\UserRepository;
 use Inachis\Repository\PasswordResetRequestRepository;
 use Doctrine\ORM\NonUniqueResultException;
@@ -71,12 +71,12 @@ class PasswordResetTokenService
      */
     public function createResetRequestForEmail(string $email): ?array
     {
-        /** @var \Inachis\Entity\User|null $user */
+        /** @var \Inachis\Entity\User\User|null $user */
         $user = $this->userRepository->findOneBy(['email' => $email]);
         if (!$user) {
             return null;
         }
-        /** @var \Inachis\Entity\PasswordResetRequest[] $existingRequests */
+        /** @var \Inachis\Entity\User\PasswordResetRequest[] $existingRequests */
         $existingRequests = $this->passwordResetRequestRepository->findActiveByUser($user);
         foreach ($existingRequests as $request) {
             $request->markUsed();

@@ -11,9 +11,8 @@ namespace Inachis\Controller\Page\Series;
 
 use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Image;
-use Inachis\Entity\Page;
-use Inachis\Entity\Series;
+use Inachis\Entity\Content\Series;
+use Inachis\Entity\Media\Image;
 use Inachis\Form\SeriesType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\ImageRepository;

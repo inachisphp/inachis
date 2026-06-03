@@ -10,7 +10,7 @@
 namespace Inachis\Tests\phpunit\Controller\Dialog;
 
 use Inachis\Controller\Dialog\BulkCreateController;
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Service\Page\PageBulkCreateService;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

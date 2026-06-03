@@ -9,8 +9,8 @@
 
 namespace Inachis\Tests\phpunit\Repository;
 
-use Inachis\Entity\PasswordResetRequest;
-use Inachis\Entity\User;
+use Inachis\Entity\User\PasswordResetRequest;
+use Inachis\Entity\User\User;
 use Inachis\Repository\PasswordResetRequestRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

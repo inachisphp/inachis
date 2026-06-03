@@ -7,11 +7,12 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Entity;
+namespace Inachis\Entity\Content;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Inachis\Entity\Media\Image;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 
@@ -64,13 +65,13 @@ class Category
     /**
      * @var Category|null The parent category, if self is not a top-level category
      */
-    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\Category', inversedBy: 'children')]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\Content\Category', inversedBy: 'children')]
     protected ?Category $parent = null;
 
     /**
      * @var Collection The array of child categories if applicable
      */
-    #[ORM\OneToMany(targetEntity: 'Inachis\Entity\Category', mappedBy: 'parent')]
+    #[ORM\OneToMany(targetEntity: 'Inachis\Entity\Content\Category', mappedBy: 'parent')]
     #[ORM\OrderBy(['title' => 'ASC'])]
     protected Collection $children;
 

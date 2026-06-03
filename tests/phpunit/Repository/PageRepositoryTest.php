@@ -9,13 +9,11 @@
 
 namespace Inachis\Tests\phpunit\Repository;
 
-use Inachis\Entity\Category;
-use Inachis\Entity\Image;
-use Inachis\Entity\Page;
-use Inachis\Entity\Tag;
-use Inachis\Entity\Url;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Tag;
+use Inachis\Entity\Media\Image;
 use Inachis\Repository\PageRepository;
-use Inachis\Repository\UrlRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
@@ -27,14 +25,6 @@ use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use ReflectionClass;
 
-/**
- * @covers \Inachis\Repository\PageRepository
- * @uses \Inachis\Entity\Page
- * @uses \Inachis\Entity\Category
- * @uses \Inachis\Entity\Tag
- * @uses \Inachis\Entity\Url
- * @uses \Inachis\Entity\Image
- */
 class PageRepositoryTest extends TestCase
 {
     private EntityManagerInterface $entityManager;

@@ -9,8 +9,8 @@
 
 namespace Inachis\Tests\phpunit\Entity\User;
 
-use Inachis\Entity\PasswordResetRequest;
-use Inachis\Entity\User;
+use Inachis\Entity\User\PasswordResetRequest;
+use Inachis\Entity\User\User;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 

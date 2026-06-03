@@ -5,7 +5,7 @@
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
-namespace Inachis\Entity;
+namespace Inachis\Entity\Security;
 
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
@@ -20,13 +20,13 @@ use Ramsey\Uuid\UuidInterface;
 class SecurityPolicy
 {
     /**
-     * @var UuidInterface|null
+     * @var UuidInterface The unique identifier for the {@link SecurityPolicy}
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    private ?UuidInterface $id;
+    private UuidInterface $id;
 
     /**
      * @var string The name of the security policy
@@ -166,8 +166,21 @@ class SecurityPolicy
     }
 
     /**
+     * Set the unique identifier for the {@link SecurityPolicy}
+     * 
+     * @param UuidInterface $value The unique identifier for the {@link SecurityPolicy}
+     * @return self
+     */
+    public function setId(UuidInterface $value): self
+    {
+        $this->id = $value;
+        return $this;
+    }
+
+    /**
      * Get the unique identifier for the {@link SecurityPolicy}
-     * @return UuidInterface|null
+     * 
+     * @return UuidInterface|null The unique identifier for the {@link SecurityPolicy}
      */
     public function getId(): ?UuidInterface
     {
@@ -222,7 +235,7 @@ class SecurityPolicy
     public function setMinLength(int $minLength): self
     {
         if ($minLength < 1) {
-            throw new InvalidArgumentException('Password minimum length must be at least 1.');
+            throw new \InvalidArgumentException('Password minimum length must be at least 1.');
         }
         $this->minLength = $minLength;
         return $this;
@@ -326,7 +339,7 @@ class SecurityPolicy
     {
         if ($passwordRegex !== null) {
             if (@preg_match($passwordRegex, '') === false) {
-                throw new InvalidArgumentException('Invalid regex pattern provided.');
+                throw new \InvalidArgumentException('Invalid regex pattern provided.');
             }
         }
         $this->passwordRegex = $passwordRegex;
@@ -350,7 +363,7 @@ class SecurityPolicy
     public function setPasswordExpiryDays(?int $passwordExpiryDays): self
     {
         if ($passwordExpiryDays !== null && $passwordExpiryDays < 1) {
-            throw new InvalidArgumentException('Password expiry must be positive or null.');
+            throw new \InvalidArgumentException('Password expiry must be positive or null.');
         }
         $this->passwordExpiryDays = $passwordExpiryDays;
         return $this;
@@ -373,7 +386,7 @@ class SecurityPolicy
     public function setPasswordHistory(int $passwordHistory): self
     {
         if ($passwordHistory < 0) {
-            throw new InvalidArgumentException('Password history must be zero or positive.');
+            throw new \InvalidArgumentException('Password history must be zero or positive.');
         }
         $this->passwordHistory = $passwordHistory;
         return $this;
@@ -396,7 +409,7 @@ class SecurityPolicy
     public function setMaxFailedLoginAttempts(int $maxFailedLoginAttempts): self
     {
         if ($maxFailedLoginAttempts < 1) {
-            throw new InvalidArgumentException('Max failed login attempts must be at least 1.');
+            throw new \InvalidArgumentException('Max failed login attempts must be at least 1.');
         }
         $this->maxFailedLoginAttempts = $maxFailedLoginAttempts;
         return $this;
@@ -419,7 +432,7 @@ class SecurityPolicy
     public function setLockoutDurationMinutes(int $lockoutDurationMinutes): self
     {
         if ($lockoutDurationMinutes < 1) {
-            throw new InvalidArgumentException('Lockout duration must be at least 1 minute.');
+            throw new \InvalidArgumentException('Lockout duration must be at least 1 minute.');
         }
         $this->lockoutDurationMinutes = $lockoutDurationMinutes;
         return $this;

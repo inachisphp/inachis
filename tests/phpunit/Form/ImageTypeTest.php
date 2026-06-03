@@ -9,10 +9,9 @@
 
 namespace Inachis\Tests\phpunit\Form;
 
-use Inachis\Entity\Image;
+use Inachis\Entity\Media\Image;
 use Inachis\Form\ImageType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Contracts\Translation\TranslatorInterface;
