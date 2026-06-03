@@ -13,8 +13,8 @@ use DateTimeImmutable;
 use Exception;
 use ReflectionClass;
 use ReflectionException;
-use Inachis\Entity\Category;
-use Inachis\Entity\Page;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Page;
 use Inachis\Parser\MarkdownFileParser;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
@@ -31,7 +31,7 @@ class MarkdownFileParserTest extends TestCase
         $this->entityManager = $this->createStub(ObjectManager::class);
         $this->repository = $this->createStub(ObjectRepository::class);
         $this->entityManager->method('getRepository')
-            ->with(Category::class)->willReturn($this->repository);
+            ->willReturn($this->repository);
         $this->parser  = new MarkdownFileParser($this->entityManager);
 
         parent::setUp();

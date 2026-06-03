@@ -10,7 +10,6 @@
 namespace Inachis\Controller\Setup;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\User;
 use Inachis\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

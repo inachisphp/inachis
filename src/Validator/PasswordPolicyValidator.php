@@ -8,7 +8,7 @@
 
 namespace Inachis\Validator;
 
-use Inachis\Entity\SecurityPolicy;
+use Inachis\Entity\Security\SecurityPolicy;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;

@@ -13,10 +13,10 @@ use Inachis\Controller\Page\Url\UrlController;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\UrlRepository;
 use Inachis\Service\Url\UrlBulkActionService;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Uuid;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UrlControllerTest extends WebTestCase
+class UrlControllerTest extends InachisControllerTestCase
 {
     /**
      * @throws Exception
@@ -38,11 +38,14 @@ class UrlControllerTest extends WebTestCase
         ], [], [], [
             'REQUEST_URI' => '/incc/url/list/50/25'
         ]);
-        $entityManager = $this->createStub(EntityManager::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(TranslatorInterface::class);
-        $controller = $this->getMockBuilder(UrlController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            $controller = $this->getMockBuilder(UrlController::class)
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository,
+            ])
             ->onlyMethods(['createFormBuilder', 'render'])
             ->getMock();
         $controller->expects($this->once())
@@ -83,11 +86,14 @@ class UrlControllerTest extends WebTestCase
         ], [], [], [
             'REQUEST_URI' => '/incc/url/list/50/25'
         ]);
-        $entityManager = $this->createStub(EntityManager::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(TranslatorInterface::class);
         $controller = $this->getMockBuilder(UrlController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository
+            ])
             ->onlyMethods(['addFlash', 'createFormBuilder', 'redirectToRoute'])
             ->getMock();
         $form = $this->createMock(Form::class);
@@ -130,10 +136,7 @@ class UrlControllerTest extends WebTestCase
             ->method('findSimilarUrlsExcludingId')->willReturn([
             [ 'link' => 'test-url' ],
         ]);
-        $entityManager = $this->createStub(EntityManager::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(TranslatorInterface::class);
-        $controller = new UrlController($entityManager, $security, $translator);
+        $controller = new UrlController($this->entityManager, $this->params, $this->security, $this->translator, $this->wasteRepository);
         $result = $controller->checkUrlUsage($request, $urlRepository);
         $this->assertEquals('test-url-1', $result->getContent());
 

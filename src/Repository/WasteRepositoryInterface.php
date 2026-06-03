@@ -9,7 +9,7 @@
 
 namespace Inachis\Repository;
 
-use Inachis\Entity\Waste;
+use Inachis\Entity\Waste\Waste;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**

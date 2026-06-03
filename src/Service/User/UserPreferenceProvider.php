@@ -10,7 +10,7 @@
 namespace Inachis\Service\User;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\{User,UserPreference};
+use Inachis\Entity\User\{User,UserPreference};
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 

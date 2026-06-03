@@ -11,7 +11,7 @@ namespace Inachis\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Inachis\Entity\Setting;
+use Inachis\Entity\System\Setting;
 
 class SettingRepository extends ServiceEntityRepository
 {

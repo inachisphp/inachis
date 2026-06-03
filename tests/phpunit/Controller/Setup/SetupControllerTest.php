@@ -12,15 +12,15 @@ namespace Inachis\Tests\phpunit\Controller\Setup;
 use Inachis\Controller\Setup\SetupController;
 use Inachis\Repository\UserRepository;
 use Inachis\Service\Page\ContentAggregator;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\Exception;
-use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\Translator;
 
-class SetupControllerTest extends TestCase
+class SetupControllerTest extends InachisControllerTestCase
 {
     /**
      * @throws Exception
@@ -34,9 +34,11 @@ class SetupControllerTest extends TestCase
         $userRepository->expects($this->once())->method('getAllCount')->willReturn(5);
         $controller = $this->getMockBuilder(SetupController::class)
             ->setConstructorArgs([
-                $this->createStub(EntityManager::class),
-                $this->createStub(Security::class),
-                $this->createStub(Translator::class),
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository
             ])
             ->onlyMethods(['redirectToRoute'])
             ->getMock();
@@ -61,9 +63,11 @@ class SetupControllerTest extends TestCase
         $userRepository->expects($this->once())->method('getAllCount')->willReturn(0);
         $controller = $this->getMockBuilder(SetupController::class)
             ->setConstructorArgs([
-                $this->createStub(EntityManager::class),
-                $this->createStub(Security::class),
-                $this->createStub(Translator::class),
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository
             ])
             ->onlyMethods(['createFormBuilder', 'render'])
             ->getMock();
@@ -79,9 +83,11 @@ class SetupControllerTest extends TestCase
     public function testGetErrors(): void
     {
         $controller = new SetupController(
-            $this->createStub(EntityManager::class),
-            $this->createStub(Security::class),
-            $this->createStub(Translator::class),
+            $this->entityManager,
+            $this->params,
+            $this->security,
+            $this->translator,
+            $this->wasteRepository
         );
         $this->assertEmpty($controller->getErrors());
     }
@@ -89,9 +95,11 @@ class SetupControllerTest extends TestCase
     public function testAddAndGetError(): void
     {
         $controller = new SetupController(
-            $this->createStub(EntityManager::class),
-            $this->createStub(Security::class),
-            $this->createStub(Translator::class),
+            $this->entityManager,
+            $this->params,
+            $this->security,
+            $this->translator,
+            $this->wasteRepository
         );
         $controller->addError('test', 'Something went wrong');
         $this->assertEquals('Something went wrong', $controller->getError('test'));

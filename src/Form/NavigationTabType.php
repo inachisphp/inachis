@@ -9,10 +9,9 @@
 
 namespace Inachis\Form;
 
-use Inachis\Entity\NavigationTab;
+use Inachis\Entity\System\NavigationTab;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;

@@ -9,9 +9,7 @@
 
 namespace Inachis\Controller;
 
-use Inachis\Entity\Category;
-use Inachis\Entity\Page;
-use Inachis\Entity\Series;
+use Inachis\Entity\Content\{Category, Page, Series};
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

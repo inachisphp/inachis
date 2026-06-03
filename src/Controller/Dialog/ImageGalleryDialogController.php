@@ -10,7 +10,7 @@
 namespace Inachis\Controller\Dialog;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Image;
+use Inachis\Entity\Media\Image;
 use Inachis\Form\ImageType;
 use Inachis\Repository\ImageRepository;
 use Symfony\Component\HttpFoundation\Request;

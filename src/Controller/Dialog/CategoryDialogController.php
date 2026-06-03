@@ -10,12 +10,9 @@
 namespace Inachis\Controller\Dialog;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Controller\ZipStream;
-use Inachis\Entity\Category;
-use Inachis\Entity\Page;
+use Inachis\Entity\Content\Category;
 use Inachis\Repository\CategoryRepository;
 use Inachis\Repository\PageRepository;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

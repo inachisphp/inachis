@@ -7,7 +7,7 @@
  */
 namespace Inachis\Security;
 
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 
 /**
  * AuthStrength class
@@ -28,7 +28,7 @@ class AuthStrength
      */
     public function isStrongEnough(User $user, string $level): bool
     {
-        return match ($level) {
+        return (bool) match ($level) {
             'ADMIN' => $user->hasAnySecondFactor(),
             'SUPER_ADMIN' => $user->hasStrongSecondFactor(),
             'STEP_UP' => $this->hasRecentStepUp($user),

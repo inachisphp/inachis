@@ -9,7 +9,7 @@
 
 namespace Inachis\Command\Page;
 
-use Inachis\Entity\Page;
+use Inachis\Entity\Content\Page;
 use Inachis\Repository\ImageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;

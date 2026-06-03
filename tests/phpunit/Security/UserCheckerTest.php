@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Security;
 
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Security\UserChecker;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;

@@ -9,10 +9,12 @@
 
 namespace Inachis\Service\Export\Category;
 
+use Inachis\Entity\Content\Category;
 use Inachis\Repository\CategoryRepository;
-use Inachis\Service\Export\Category\CategoryExportNormaliser;
-use Symfony\Component\TaggedIterator\TaggedIterator;
 use Inachis\Service\Export\AbstractExportService;
+use Inachis\Service\Export\Category\CategoryExportNormaliser;
+use Inachis\Service\Export\ExportWriterInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
  * Service for exporting categories. The service uses the {@link CategoryRepository} to retrieve categories,
@@ -22,14 +24,14 @@ use Inachis\Service\Export\AbstractExportService;
 final class CategoryExportService extends AbstractExportService
 {
     /**
-     * @param $repository The repository to use for categories operations.
-     * @param $normaliser The normaliser to use.
-     * @param $writers The writers to use.
+     * @param CategoryRepository $repository The repository to use for categories operations.
+     * @param CategoryExportNormaliser $normaliser The normaliser to use.
+     * @param iterable<ExportWriterInterface> $writers The writers to use.
      */
     public function __construct(
         private CategoryRepository $repository,
         private CategoryExportNormaliser $normaliser,
-        #[TaggedIterator('inachis.export_writer')] iterable $writers,
+        #[AutowireIterator('inachis.export_writer')] iterable $writers,
     ) {
         parent::__construct($writers);
     }
@@ -37,7 +39,7 @@ final class CategoryExportService extends AbstractExportService
     /**
      * Export categories to a file of a given type (JSON/XML).
      *
-     * @param iterable $categories The categories to export.
+     * @param iterable<Category> $categories The categories to export.
      * @param string $format The format to export to (json/xml).
      * @return string The exported categories.
      */

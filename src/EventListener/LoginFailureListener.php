@@ -9,11 +9,10 @@
 
 namespace Inachis\EventListener;
 
-use Inachis\Entity\LoginActivity;
+use Inachis\Entity\User\LoginActivity;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
-use Symfony\Component\Security\Core\Exception\TooManyLoginAttemptsAuthenticationException;
 
 /**
  * LoginFailureListener for logging failed login attempts.

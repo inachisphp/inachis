@@ -9,18 +9,17 @@
 
 namespace Inachis\Tests\phpunit\Controller\Page\Dashboard;
 
+use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Controller\Page\Dashboard\DashboardController;
-use Inachis\Repository\PageRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Repository\{PageRepository, SeriesRepository};
+use Inachis\Repository\ImageRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DashboardControllerTest extends WebTestCase
+class DashboardControllerTest extends InachisControllerTestCase
 {
     /**
      * @throws Exception
@@ -30,11 +29,14 @@ class DashboardControllerTest extends WebTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incc/'
         ]);
-        $entityManager = $this->createStub(EntityManagerInterface::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(TranslatorInterface::class);
         $controller = $this->getMockBuilder(DashboardController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository,
+            ])
             ->onlyMethods(['render'])
             ->getMock();
         $controller->expects($this->once())->method('render')
@@ -45,7 +47,13 @@ class DashboardControllerTest extends WebTestCase
         $pageRepository = $this->createMock(PageRepository::class);
         $pageRepository->expects($this->atLeastOnce())->method('getAll')->willReturn($paginator);
         
-        $result = $controller->default($request, $pageRepository);
+        $result = $controller->default(
+            $request,
+            $this->createStub(AnalyticsProviderInterface::class),
+            $this->createStub(ImageRepository::class),
+            $pageRepository,
+            $this->createStub(SeriesRepository::class),
+        );
         $this->assertEquals(
             'rendered:inadmin/page/dashboard/dashboard.html.twig',
             $result->getContent()

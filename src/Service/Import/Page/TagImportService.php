@@ -10,7 +10,7 @@
 namespace Inachis\Service\Import\Page;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Tag;
+use Inachis\Entity\Content\Tag;
 
 final class TagImportService
 {

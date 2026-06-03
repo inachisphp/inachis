@@ -11,7 +11,7 @@ namespace Inachis\Twig;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
-use Inachis\Entity\NavigationTab;
+use Inachis\Entity\System\NavigationTab;
 use Inachis\Service\Navigation\NavigationTabService;
 
 /**

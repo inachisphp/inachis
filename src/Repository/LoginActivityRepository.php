@@ -10,7 +10,7 @@
 namespace Inachis\Repository;
 
 use DateTimeImmutable;
-use Inachis\Entity\{LoginActivity, User};
+use Inachis\Entity\User\{LoginActivity, User};
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

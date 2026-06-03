@@ -10,10 +10,7 @@
 namespace Inachis\Controller\Page\Admin;
 
 use DateTimeImmutable;
-use Exception;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\PasswordResetRequest;
-use Inachis\Entity\User;
 use Inachis\Form\ChangePasswordType;
 use Inachis\Form\ForgotPasswordType;
 use Inachis\Form\LoginType;

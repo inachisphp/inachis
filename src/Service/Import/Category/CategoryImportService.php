@@ -10,7 +10,7 @@
 namespace Inachis\Service\Import\Category;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Category;
+use Inachis\Entity\Content\Category;
 use Inachis\Model\CategoryExportDto;
 
 /**

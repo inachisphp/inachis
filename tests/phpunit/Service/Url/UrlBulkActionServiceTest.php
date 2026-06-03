@@ -9,8 +9,8 @@
 
 namespace Inachis\Tests\phpunit\Service\Url;
 
-use Inachis\Entity\Page;
-use Inachis\Entity\Url;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Url;
 use Inachis\Repository\UrlRepository;
 use Inachis\Service\Url\UrlBulkActionService;
 use Doctrine\ORM\EntityManager;

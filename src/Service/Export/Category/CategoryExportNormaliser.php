@@ -9,7 +9,7 @@
 
 namespace Inachis\Service\Export\Category;
 
-use Inachis\Entity\Category;
+use Inachis\Entity\Content\Category;
 use Inachis\Model\CategoryExportDto;
 
 /**

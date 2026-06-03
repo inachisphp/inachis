@@ -13,7 +13,7 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
-use Inachis\Entity\Page;
+use Inachis\Entity\Content\Page;
 use Inachis\Repository\ImageRepository;
 
 /**

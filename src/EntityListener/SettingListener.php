@@ -9,7 +9,7 @@
 
 namespace Inachis\EntityListener;
 
-use Inachis\Entity\Setting;
+use Inachis\Entity\System\Setting;
 use Inachis\Service\EncryptionService;
 use Doctrine\ORM\Event\PostLoadEventArgs;
 use Doctrine\ORM\Event\PrePersistEventArgs;

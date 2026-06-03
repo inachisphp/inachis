@@ -9,12 +9,12 @@
 
 namespace Inachis\Controller\Page\Series;
 
-use Inachis\Controller\AbstractInachisController;
+use Inachis\Controller\AbstractWebController;
 use Inachis\Repository\SeriesRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class SeriesWebController extends AbstractInachisController
+class SeriesWebController extends AbstractWebController
 {
     /**
      * @param SeriesRepository $seriesRepository

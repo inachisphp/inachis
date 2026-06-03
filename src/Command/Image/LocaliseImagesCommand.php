@@ -10,7 +10,8 @@
 namespace Inachis\Command\Image;
 
 use Exception;
-use Inachis\Entity\{Image, Page, Series};
+use Inachis\Entity\Content\{Page, Series};
+use Inachis\Entity\Media\Image;
 use Inachis\Service\Image\{ImageExtractor, ImageLocaliser, ContentImageUpdater};
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;

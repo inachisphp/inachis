@@ -9,7 +9,7 @@
 
 namespace Inachis\Util;
 
-use Inachis\Entity\Url;
+use Inachis\Entity\Content\Url;
 
 /**
  * UrlNormaliser class

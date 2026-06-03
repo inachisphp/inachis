@@ -10,7 +10,7 @@
 namespace Inachis\Controller\Page\Setting;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\NavigationTab;
+use Inachis\Entity\System\NavigationTab;
 use Inachis\Form\NavigationTabType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\NavigationTabRepository;

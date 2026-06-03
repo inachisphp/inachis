@@ -7,8 +7,8 @@
 {% block content %}
     {% set badges = {
         draft: {
-            field: 'status',
-            condition: 'draft',
+            field: 'isdraft',
+            condition: 'true',
             className: 'badge__draft',
         },
         scheduled: {

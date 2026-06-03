@@ -9,7 +9,7 @@
 
 namespace Inachis\Repository;
 
-use Inachis\Entity\Category;
+use Inachis\Entity\Content\Category;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 

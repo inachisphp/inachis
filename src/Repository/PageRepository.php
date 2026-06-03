@@ -9,7 +9,8 @@
 
 namespace Inachis\Repository;
 
-use Inachis\Entity\{Category, Image, Page, Tag, Url};
+use Inachis\Entity\Content\{Category, Page, Tag};
+use Inachis\Entity\Media\Image;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 

@@ -9,12 +9,10 @@
 
 namespace Inachis\Repository;
 
-use Inachis\Entity\{PasswordResetRequest, User};
+use Inachis\Entity\User\{PasswordResetRequest, User};
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\RateLimiter\RateLimiterFactory;
 use DateInterval;
 use DateTimeImmutable;
 

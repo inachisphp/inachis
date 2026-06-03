@@ -9,7 +9,7 @@
 
 namespace Inachis\Repository;
 
-use Inachis\Entity\Download;
+use Inachis\Entity\Media\Download;
 use Doctrine\Persistence\ManagerRegistry;
 
 class DownloadRepository extends AbstractRepository implements ResourceRepositoryInterface

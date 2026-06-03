@@ -11,24 +11,20 @@ namespace Inachis\Tests\phpunit\Controller\Page\Admin;
 
 
 use Inachis\Controller\Page\Admin\AccountController;
-use Inachis\Entity\PasswordResetRequest;
-use Inachis\Entity\User;
+use Inachis\Entity\User\{PasswordResetRequest, User};
 use Inachis\Repository\PasswordResetRequestRepository;
 use Inachis\Repository\UserRepository;
 use Inachis\Service\User\PasswordResetTokenService;
 use Inachis\Service\User\UserAccountEmailService;
-use Doctrine\ORM\EntityManager;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Random\RandomException;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -37,26 +33,29 @@ use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Component\Translation\Translator;
 
-class AccountControllerTest extends WebTestCase
+class AccountControllerTest extends InachisControllerTestCase
 {
     /** @var AccountController&MockObject */
     protected AccountController $controller;
 
     public function setUp(): void
     {
-        $entityManager = $this->createStub(EntityManager::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(Translator::class);
+        parent::setUp();
         $this->controller = $this->getMockBuilder(AccountController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository,
+            ])
             ->onlyMethods([
                 'addFlash', 'createForm', 'createFormBuilder', 'redirectIfAuthenticatedOrNoAdmins',
                 'redirectToRoute', 'render'
             ])
             ->getMock();
-        $this->controller->expects($this->atLeast(0))->method('render')
+        $this->controller->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
@@ -446,7 +445,7 @@ class AccountControllerTest extends WebTestCase
         $tokenService = $this->createStub(PasswordResetTokenService::class);
         $passwordHasher = $this->createStub(UserPasswordHasherInterface::class);
         $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->expects($this->atLeast(0))->method('findOneBy')->willReturn(new User());
+        $userRepository->method('findOneBy')->willReturn(new User());
 
         $form = $this->createMock(Form::class);
         $form->expects($this->once())->method('isSubmitted')->willReturn(true);

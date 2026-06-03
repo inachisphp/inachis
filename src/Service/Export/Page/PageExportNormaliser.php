@@ -9,7 +9,7 @@
 
 namespace Inachis\Service\Export\Page;
 
-use Inachis\Entity\Page;
+use Inachis\Entity\Content\Page;
 use Inachis\Model\Page\PageExportDto;
 use Inachis\Model\Page\CategoryPathDto;
 use Inachis\Model\Page\TagDto;
