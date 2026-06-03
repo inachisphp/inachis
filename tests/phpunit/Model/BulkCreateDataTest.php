@@ -44,9 +44,7 @@ class BulkCreateDataTest extends TestCase
     public function testFromRequestNoTitle(): void
     {
         $request = new Request([], [
-            'form' => [
-                'test' => 'some title',
-            ],
+            'test' => 'some title',
         ], [], [], [], []);
         $this->expectExceptionMessage('Title is required.');
         BulkCreateData::fromRequest($request);
@@ -55,9 +53,7 @@ class BulkCreateDataTest extends TestCase
     public function testFromRequestNoDates(): void
     {
         $request = new Request([], [
-            'form' => [
-                'title' => 'some title',
-            ],
+            'title' => 'some title',
         ], [], [], [], []);
         $this->expectExceptionMessage('Start and end dates are required.');
         BulkCreateData::fromRequest($request);
@@ -66,11 +62,9 @@ class BulkCreateDataTest extends TestCase
     public function testFromRequestInvalidDateFormat(): void
     {
         $request = new Request([], [
-            'form' => [
-                'title' => 'some title',
-                'startDate' => '2025-11-01',
-                'endDate' => '2025-11-07',
-            ],
+            'title' => 'some title',
+            'startDate' => '2025-11-01',
+            'endDate' => '2025-11-07',
         ], [], [], [], []);
         $this->expectExceptionMessage('Invalid date format, expected d/m/Y.');
         BulkCreateData::fromRequest($request);
@@ -79,13 +73,11 @@ class BulkCreateDataTest extends TestCase
     public function testFromRequest(): void
     {
         $request = new Request([], [
-            'form' => [
-                'title' => 'some title',
-                'startDate' => '01/11/2025',
-                'endDate' => '07/11/2025',
-                'tags' => ['test-tag'],
-                'categories' => ['test-category'],
-            ],
+            'title' => 'some title',
+            'startDate' => '01/11/2025',
+            'endDate' => '07/11/2025',
+            'tags' => ['test-tag'],
+            'categories' => ['test-category'],
             'seriesId' => $this->bulkCreateData->seriesId,
         ], [], [], [], []);
         $result = BulkCreateData::fromRequest($request);

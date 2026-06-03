@@ -31,7 +31,7 @@ class MarkdownFileParserTest extends TestCase
         $this->entityManager = $this->createStub(ObjectManager::class);
         $this->repository = $this->createStub(ObjectRepository::class);
         $this->entityManager->method('getRepository')
-            ->with(Category::class)->willReturn($this->repository);
+            ->willReturn($this->repository);
         $this->parser  = new MarkdownFileParser($this->entityManager);
 
         parent::setUp();

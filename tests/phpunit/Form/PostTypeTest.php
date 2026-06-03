@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -59,6 +60,7 @@ final class PostTypeTest extends TestCase
         $postType = new PostType(
             $this->translator(),
             $this->router(),
+            $this->createStub(Security::class),
             $this->transformer()
         );
 
@@ -71,7 +73,9 @@ final class PostTypeTest extends TestCase
             ['url', TextType::class, $this->anything()],
             ['content', TextareaType::class, $this->anything()],
             ['visibility', CheckboxType::class, $this->anything()],
+            ['showTableOfContents', CheckboxType::class, $this->anything()],
             ['postDate', DateTimeType::class, $this->anything()],
+            ['expireDate', DateTimeType::class, $this->anything()],
             ['categories', EntityType::class, $this->anything()],
             ['tags', EntityType::class, $this->anything()],
             ['language', ChoiceType::class, $this->anything()],
@@ -97,6 +101,7 @@ final class PostTypeTest extends TestCase
         $postType = new PostType(
             $this->translator(),
             $this->router(),
+            $this->createStub(Security::class),
             $this->transformer()
         );
 
@@ -108,7 +113,9 @@ final class PostTypeTest extends TestCase
             ['url', TextType::class, $this->anything()],
             ['content', TextareaType::class, $this->anything()],
             ['visibility', CheckboxType::class, $this->anything()],
+            ['showTableOfContents', CheckboxType::class, $this->anything()],
             ['postDate', DateTimeType::class, $this->anything()],
+            ['expireDate', DateTimeType::class, $this->anything()],
             ['categories', EntityType::class, $this->anything()],
             ['tags', EntityType::class, $this->anything()],
             ['language', ChoiceType::class, $this->anything()],
@@ -132,6 +139,7 @@ final class PostTypeTest extends TestCase
         $postType = new PostType(
             $this->translator(),
             $this->router(),
+            $this->createStub(Security::class),
             $this->transformer()
         );
 
