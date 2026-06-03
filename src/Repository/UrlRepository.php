@@ -17,9 +17,7 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class UrlRepository extends AbstractRepository
 {
-    /**
-     * The maximum number of items to show in the admin interface
-     */
+    /** @var int The maximum number of items to show in the admin interface */
     public const MAX_ITEMS_TO_SHOW_ADMIN = 20;
 
     /**
@@ -33,10 +31,9 @@ class UrlRepository extends AbstractRepository
     }
 
     /**
-     * @param Url $url
+     * Remove a Url entity from the database.
      *
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @param Url $url
      */
     public function remove(Url $url): void
     {
@@ -45,8 +42,9 @@ class UrlRepository extends AbstractRepository
     }
 
     /**
-     * @param Page $page
+     * This method retrieves the default URL associated with the specified Page.
      *
+     * @param Page $page
      * @return mixed
      */
     public function getDefaultUrl(Page $page): mixed
@@ -60,6 +58,9 @@ class UrlRepository extends AbstractRepository
     }
 
     /**
+     * Find URLs that are similar to the given URL, excluding a specific ID.
+     * This is useful for ensuring URL uniqueness when updating or creating new URLs.
+     *
      * @param string $url
      * @param string $id
      * @return float|int|mixed|string
@@ -85,8 +86,11 @@ class UrlRepository extends AbstractRepository
     }
 
     /**
+     * Determine the order by clause based on the input parameter.
+     * This method maps specific sort options to corresponding database fields and sort directions.
+     *
      * @param string $orderBy
-     * @return array[]
+     * @return array<array{0: string, 1: string}>
      */
     protected function determineOrderBy(string $orderBy): array
     {
@@ -109,14 +113,16 @@ class UrlRepository extends AbstractRepository
     }
 
     /**
-     * @param $filters
+     * Find a URL by its link, with an optional parameter to exclude a specific ID.
+     *
+     * @param array $filters
      * @param int $offset
      * @param int $limit
      * @param string $sort
      * @return Paginator
      */
     public function getFiltered(
-        $filters,
+        array $filters,
         int $offset,
         int $limit,
         string $sort = 'postDate desc'
@@ -141,15 +147,17 @@ class UrlRepository extends AbstractRepository
     }
 
     /**
-     * Finds all URLs that should be included in the sitemap.
+     * Count the number of URLs that will be used in the sitemap,
+     * based on specific criteria such as visibility, status, and indexing rules.
      *
-     * @return array
+     * @return integer
      */
-    public function findSitemapUrls(): array
+    public function countSitemapUrls(): int
     {
         $now = new \DateTimeImmutable();
 
-        return $this->createQueryBuilder('u')
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
             ->innerJoin('u.content', 'p')
             ->andWhere('u.default = :default')
             ->andWhere('p.visibility = :visible')
@@ -161,6 +169,42 @@ class UrlRepository extends AbstractRepository
             ->setParameter('visible', true)
             ->setParameter('status', EditorialStatus::PUBLISHED)
             ->setParameter('now', $now)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Find a batch of URLs for the sitemap, based on specific criteria.
+     * This method retrieves a subset of URLs that meet the conditions for inclusion in the sitemap,
+     * such as being the default URL for a page, having the page be visible and published, and not
+     * being marked as noindex.
+     *
+     * @param integer $offset
+     * @param integer $limit
+     * @return array<Url>
+     */
+    public function findSitemapUrlsBatch(
+        int $offset,
+        int $limit
+    ): array {
+        $now = new \DateTimeImmutable();
+
+        return $this->createQueryBuilder('u')
+            ->innerJoin('u.content', 'p')
+            ->addSelect('p')
+            ->andWhere('u.default = :default')
+            ->andWhere('p.visibility = :visible')
+            ->andWhere('p.status = :status')
+            ->andWhere('p.postDate <= :now')
+            ->andWhere('(p.expireDate IS NULL OR p.expireDate > :now)')
+            ->andWhere('p.noindex = false')
+            ->setParameter('default', true)
+            ->setParameter('visible', true)
+            ->setParameter('status', EditorialStatus::PUBLISHED)
+            ->setParameter('now', $now)
+            ->orderBy('p.postDate', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }

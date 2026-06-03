@@ -9,101 +9,383 @@
 
 namespace Inachis\Service;
 
-use Inachis\Repository\{SeriesRepository,UrlRepository};
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Routing\RouterInterface;
+use Inachis\Entity\Series;
+use Inachis\Repository\CategoryRepository;
+use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\TagRepository;
+use Inachis\Repository\UrlRepository;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use SimpleXMLElement;
-use DateTime;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * Generates an XML sitemap for the site, including posts, categories, tags, and series.
+ * The sitemap is split into multiple files if there are more than 50,000 URLs, and an index
+ * file is created to reference them.
+ */
 class SitemapGenerator
 {
-    /** @var RouterInterface  */
-    private RouterInterface $router;
+    /** @var int Maximum number of URLs per sitemap file, as per sitemap protocol limits */
+    private const MAX_URLS_PER_FILE = 50000;
 
-    /** @var ParameterBagInterface*/
-    private ParameterBagInterface $params;
-
-    /** @var EntityManagerInterface */
-    private EntityManagerInterface $entityManager;
-
-    /** @var SeriesRepository */
-    private SeriesRepository $seriesRepository;
-
-    /** @var UrlRepository */
-    private UrlRepository $urlRepository;
-
+    /**
+     * SitemapGenerator constructor.
+     *
+     * @param UrlRepository $urlRepository
+     * @param CategoryRepository $categoryRepository
+     * @param TagRepository $tagRepository
+     * @param SeriesRepository $seriesRepository
+     * @param UrlGeneratorInterface $router
+     * @param ParameterBagInterface $params
+     */
     public function __construct(
-        RouterInterface $router,
-        ParameterBagInterface $params,
-        EntityManagerInterface $entityManager,
-        SeriesRepository $seriesRepository,
-        UrlRepository $urlRepository
+        private readonly UrlRepository $urlRepository,
+        private readonly CategoryRepository $categoryRepository,
+        private readonly TagRepository $tagRepository,
+        private readonly SeriesRepository $seriesRepository,
+        private readonly UrlGeneratorInterface $router,
+        private readonly ParameterBagInterface $params
     ) {
-        $this->router = $router;
-        $this->params = $params;
-        $this->entityManager = $entityManager;
-        $this->seriesRepository = $seriesRepository;
-        $this->urlRepository = $urlRepository;
     }
 
     /**
-     * Generates the XML sitemap content.
+     * Generates the sitemap files and saves them to the public directory.
      */
-    public function generate(): string
+    public function generate(): void
     {
-        $baseUrl = $this->params->has('app.domain') ? $this->params->get('app.domain') : getenv('APP_DOMAIN');
-        if (!$baseUrl) {
-            throw new \RuntimeException('Base URL not configured. Set app.domain or APP_DOMAIN env var.');
+        $publicDir = rtrim(
+            $this->params->get('kernel.project_dir'),
+            '/'
+        ) . '/public';
+
+        $sitemapDir = $publicDir . '/sitemaps';
+
+        if (!is_dir($sitemapDir)) {
+            mkdir($sitemapDir, 0755, true);
         }
-        $baseUrl = rtrim($baseUrl, '/');
 
-        $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><urlset></urlset>');
-        $xml->addAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
+        $files = [];
 
-        // static routes
-        // foreach ($this->router->getRouteCollection() as $name => $route) {
-        //     $methods = $route->getMethods();
-        //     if (!empty($methods) && !in_array('GET', $methods, true)) {
-        //         continue;
-        //     }
-        //     $path = $route->getPath();
-        //     // exclude /incc* paths as per user request
-        //     if (preg_match('#^/(incc|feed[s/]|health|setup|robots.txt|{page}|_error|_profiler|_wdt)#', $path)) {
-        //         continue;
-        //     }
-        //     // generate URL
-        //     $url = $baseUrl . $path;
-        //     $urlElement = $xml->addChild('url');
-        //     $urlElement->addChild('loc', htmlspecialchars($url, ENT_QUOTES, 'UTF-8'));
-        //     $urlElement->addChild('lastmod', (new DateTime())->format('Y-m-d'));
-        //     $urlElement->addChild('changefreq', 'weekly');
-        //     $urlElement->addChild('priority', '0.5');
-        // }
+        $files = array_merge(
+            $files,
+            $this->generatePosts($sitemapDir)
+        );
 
-        // dynamic URLs from Url entity where default = true
-        $defaults = $this->urlRepository->findSitemapUrls();
-        foreach ($defaults as $urlEntity) {
-            $path = $urlEntity->getPath();
+        $files = array_merge(
+            $files,
+            $this->generateSeries($sitemapDir)
+        );
 
-            if (preg_match('#^/incc#', $path)) {
-                continue;
+        $files = array_merge(
+            $files,
+            $this->generateCategories($sitemapDir)
+        );
+
+        $files = array_merge(
+            $files,
+            $this->generateTags($sitemapDir)
+        );
+
+        $this->generateIndex(
+            $publicDir . '/sitemap.xml',
+            $files
+        );
+    }
+
+    /**
+     * Generates sitemap files for posts, splitting into multiple files if necessary.
+     *
+     * @param string $dir
+     * @return array<string>
+     */
+    private function generatePosts(string $dir): array
+    {
+        $files = [];
+        $total = $this->urlRepository->countSitemapUrls();
+        $fileNumber = 1;
+
+        for (
+            $offset = 0;
+            $offset < $total;
+            $offset += self::MAX_URLS_PER_FILE
+        ) {
+            $filename = "sitemap-posts-{$fileNumber}.xml";
+
+            $writer = $this->createWriter(
+                "{$dir}/{$filename}"
+            );
+
+            $urlBatch = $this->urlRepository->findSitemapUrlsBatch(
+                $offset,
+                self::MAX_URLS_PER_FILE
+            );
+            foreach ($urlBatch as $url) {
+                /** @var \Inachis\Entity\Url $url */
+                $content = $url->getContent();
+
+                $writer->startElement('url');
+                $writer->writeElement(
+                    'loc',
+                    $this->absoluteUrl('/' . ltrim($url->getLink(), '/'))
+                );
+                $writer->writeElement(
+                    'lastmod',
+                    $content->getModDate()->format('Y-m-d')
+                );
+                $writer->endElement();
             }
 
-            $url = $baseUrl . $path;
+            $this->closeWriter($writer);
 
-            $page = $urlEntity->getContent();
+            $files[] = $filename;
 
-            $urlElement = $xml->addChild('url');
-            $urlElement->addChild('loc', htmlspecialchars($url, ENT_QUOTES, 'UTF-8'));
-            $urlElement->addChild(
-                'lastmod',
-                $page->getModDate()->format('Y-m-d')
-            );
-            $urlElement->addChild('changefreq', 'weekly');
-            $urlElement->addChild('priority', '0.6');
+            $fileNumber++;
         }
 
-        return $xml->asXML();
+        return $files;
+    }
+
+    /**
+     * Generate series sitemap files, splitting into multiple files if necessary.
+     *
+     * @param string $dir
+     * @return array<string>
+     */
+    private function generateSeries(string $dir): array
+    {
+        return $this->generateEntitySitemapFiles(
+            $dir,
+            'series',
+            $this->seriesRepository->countPublicSeries(),
+            fn(int $offset, int $limit)
+                => $this->seriesRepository->findPublicSeriesBatch(
+                    $offset,
+                    $limit
+                ),
+            function (Series $series): string {
+                return sprintf(
+                    '/%s-%s',
+                    $series->getLastDate()?->format('Y'),
+                    $series->getUrl()
+                );
+            },
+            fn(Series $series)
+                => $series->getModDate()
+        );
+    }
+
+    /**
+     * Generate category sitemap files, splitting into multiple files if necessary.
+     *
+     * @param string $dir
+     * @return array<string>
+     */
+    private function generateCategories(string $dir): array
+    {
+        return $this->generateEntitySitemapFiles(
+            $dir,
+            'categories',
+            $this->categoryRepository->countVisibleCategories(),
+            fn($o, $l)
+                => $this->categoryRepository->findBatch($o, $l),
+            fn($c)
+                => '/category/' . rawurlencode($c->getTitle()),
+            fn() => null
+        );
+    }
+
+    /**
+     * Generate tag sitemap files, splitting into multiple files if necessary.
+     *
+     * @param string $dir
+     * @return array<string>
+     */
+    private function generateTags(string $dir): array
+    {
+        return $this->generateEntitySitemapFiles(
+            $dir,
+            'tags',
+            $this->tagRepository->countTags(),
+            fn($o, $l)
+                => $this->tagRepository->findBatch($o, $l),
+            fn($t)
+                => '/tag/' . rawurlencode($t->getTitle()),
+            fn() => null
+        );
+    }
+
+    /**
+     * Helper method to generate sitemap files for a given entity type, handling pagination and file splitting.
+     *
+     * @param string $dir
+     * @param string $prefix
+     * @param integer $total
+     * @param callable $loader
+     * @param callable $urlBuilder
+     * @param callable $lastMod
+     * @return array<string>
+     */
+    private function generateEntitySitemapFiles(
+        string $dir,
+        string $prefix,
+        int $total,
+        callable $loader,
+        callable $urlBuilder,
+        callable $lastMod
+    ): array {
+        $files = [];
+        $fileNumber = 1;
+
+        for (
+            $offset = 0;
+            $offset < $total;
+            $offset += self::MAX_URLS_PER_FILE
+        ) {
+            $filename = "sitemap-{$prefix}-{$fileNumber}.xml";
+
+            $writer = $this->createWriter(
+                "{$dir}/{$filename}"
+            );
+
+            foreach (
+                $loader(
+                    $offset,
+                    self::MAX_URLS_PER_FILE
+                ) as $item
+            ) {
+                $writer->startElement('url');
+
+                $writer->writeElement(
+                    'loc',
+                    $this->absoluteUrl(
+                        $urlBuilder($item)
+                    )
+                );
+
+                $date = $lastMod($item);
+
+                if ($date instanceof \DateTimeInterface) {
+                    $writer->writeElement(
+                        'lastmod',
+                        $date->format('Y-m-d')
+                    );
+                }
+
+                $writer->endElement();
+            }
+
+            $this->closeWriter($writer);
+
+            $files[] = $filename;
+
+            $fileNumber++;
+        }
+
+        return $files;
+    }
+
+    /**
+     * Generate the sitemap index file that references all the individual sitemap files.
+     *
+     * @param string $filename
+     * @param array<string> $files
+     */
+    private function generateIndex(
+        string $filename,
+        array $files
+    ): void {
+        $writer = new \XMLWriter();
+
+        $writer->openURI($filename);
+        $writer->startDocument(
+            '1.0',
+            'UTF-8'
+        );
+
+        $writer->startElement('sitemapindex');
+
+        $writer->writeAttribute(
+            'xmlns',
+            'http://www.sitemaps.org/schemas/sitemap/0.9'
+        );
+
+        foreach ($files as $file) {
+            $writer->startElement('sitemap');
+
+            $writer->writeElement(
+                'loc',
+                $this->absoluteUrl('/sitemaps/' . $file)
+            );
+            $writer->writeElement(
+                'lastmod',
+                date('Y-m-d')
+            );
+
+            $writer->endElement();
+        }
+
+        $writer->endElement();
+        $writer->endDocument();
+        $writer->flush();
+    }
+
+    /**
+     * Create an XML writer for generating sitemap files.
+     *
+     * @param string $filename
+     * @return \XMLWriter
+     */
+    private function createWriter(
+        string $filename
+    ): \XMLWriter {
+        $writer = new \XMLWriter();
+
+        $writer->openURI($filename);
+
+        $writer->startDocument(
+            '1.0',
+            'UTF-8'
+        );
+
+        $writer->startElement('urlset');
+
+        $writer->writeAttribute(
+            'xmlns',
+            'http://www.sitemaps.org/schemas/sitemap/0.9'
+        );
+
+        return $writer;
+    }
+
+    /**
+     * Close the XML writer and flush the output.
+     *
+     * @param \XMLWriter $writer
+     */
+    private function closeWriter(
+        \XMLWriter $writer
+    ): void {
+        $writer->endElement();
+        $writer->endDocument();
+        $writer->flush();
+    }
+
+    /**
+     * Convert a relative URL path to an absolute URL using the router's base URL.
+     *
+     * @param string $path
+     * @return string
+     */
+    private function absoluteUrl(
+        string $path
+    ): string {
+        $base = $this->router->generate(
+            'inachis_default_homepage',
+            [],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        return rtrim($base, '/')
+            . '/'
+            . ltrim($path, '/');
     }
 }
