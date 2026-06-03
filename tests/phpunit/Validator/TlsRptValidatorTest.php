@@ -38,12 +38,12 @@ final class TlsRptValidatorTest extends TestCase
 
         $this->assertCount(1, $issues);
         $this->assertInstanceOf(ValidationIssue::class, $issues[0]);
-        $this->assertSame('tls-rpt', $issues[0]->getType());
+        $this->assertSame('tls-rpt', $issues[0]->type);
         $this->assertStringContainsString(
             'Invalid TLS-RPT record format:',
-            $issues[0]->getMessage()
+            $issues[0]->message
         );
-        $this->assertSame(Severity::Error, $issues[0]->getSeverity());
+        $this->assertSame(Severity::Error, $issues[0]->severity);
     }
 
     public function testValidateWithValidRecords(): void
