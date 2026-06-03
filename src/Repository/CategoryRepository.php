@@ -55,7 +55,7 @@ class CategoryRepository extends AbstractRepository implements CategoryRepositor
      * @param string $title
      * @return Paginator<Category>
      */
-    public function findByTitleLike(string$title): Paginator
+    public function findByTitleLike(string $title): Paginator
     {
         return $this->getAll(
             0,
