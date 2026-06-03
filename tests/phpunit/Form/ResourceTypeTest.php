@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Form;
 
-use Inachis\Entity\Content\Image;
+use Inachis\Entity\Media\Image;
 use Inachis\Form\ResourceType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\Form\Test\TypeTestCase;

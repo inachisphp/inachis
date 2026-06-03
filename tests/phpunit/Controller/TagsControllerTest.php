@@ -45,8 +45,6 @@ class TagsControllerTest extends InachisControllerTestCase
         $tagRepository = $this->createMock(TagRepository::class);
         $tagRepository->expects($this->once())
             ->method('findByTitleLike')->willReturn($this->createMockPaginator([]));
-        $this->entityManager->expects($this->atLeast(0))
-            ->method('getRepository')->willReturn($tagRepository);
 
         $response = $controller->getTagManagerListContent($request, $tagRepository);
         $data = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
@@ -78,8 +76,6 @@ class TagsControllerTest extends InachisControllerTestCase
         $tagRepository->expects($this->once())
             ->method('findByTitleLike')
             ->willReturn($this->createMockPaginator([$tag1, $tag2, $tag3]));
-        $this->entityManager->expects($this->atLeast(0))
-            ->method('getRepository')->willReturn($tagRepository);
 
         $response = $controller->getTagManagerListContent($request, $tagRepository);
         $data = json_decode($response->getContent(), true, JSON_THROW_ON_ERROR);
@@ -100,8 +96,6 @@ class TagsControllerTest extends InachisControllerTestCase
             ->getMock();
         $paginator->expects($this->once())->method('getIterator')
             ->willReturn(new ArrayIterator($items));
-        $paginator->expects($this->atLeast(0))->method('count')
-            ->willReturn(count($items));
 
         return $paginator;
     }
