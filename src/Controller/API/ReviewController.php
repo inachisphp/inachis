@@ -9,8 +9,7 @@
 
 namespace Inachis\Controller\API;
 
-use Inachis\Entity\Page;
-use Inachis\Entity\ReviewThread;
+use Inachis\Entity\Content\{Page, ReviewThread};
 use Inachis\Service\Page\ReviewNormaliser;
 use Inachis\Service\Page\ReviewPageService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

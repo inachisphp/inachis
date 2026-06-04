@@ -31,7 +31,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * Get top pages
      *
      * @param int $limit
-     * @return array
+     * @return array<array<string>>
      */
     public function getTopPages(int $limit = 10): array
     {
@@ -47,7 +47,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      *
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array
+     * @return array<array<string>>
      */
     public function getPageViewsPerDay(\DateTimeInterface $from, \DateTimeInterface $to): array
     {

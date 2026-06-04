@@ -9,7 +9,7 @@
 
 namespace Inachis\Service;
 
-use Inachis\Entity\Series;
+use Inachis\Entity\Content\Series;
 use Inachis\Repository\CategoryRepository;
 use Inachis\Repository\SeriesRepository;
 use Inachis\Repository\TagRepository;
@@ -119,7 +119,7 @@ class SitemapGenerator
                 self::MAX_URLS_PER_FILE
             );
             foreach ($urlBatch as $url) {
-                /** @var \Inachis\Entity\Url $url */
+                /** @var \Inachis\Entity\Content\Url $url */
                 $content = $url->getContent();
 
                 $writer->startElement('url');

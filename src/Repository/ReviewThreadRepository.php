@@ -11,8 +11,7 @@ namespace Inachis\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Inachis\Entity\Page;
-use Inachis\Entity\ReviewThread;
+use Inachis\Entity\Content\{Page, ReviewThread};
 
 class ReviewThreadRepository extends ServiceEntityRepository
 {

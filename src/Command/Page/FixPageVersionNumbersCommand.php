@@ -3,8 +3,7 @@
 namespace Inachis\Command\Page;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Page;
-use Inachis\Entity\Revision;
+use Inachis\Entity\Content\{Page, Revision};
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
