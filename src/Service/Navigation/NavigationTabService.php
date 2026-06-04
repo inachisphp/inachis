@@ -115,7 +115,7 @@ class NavigationTabService
         $tabs = $this->repository->getAllOrdered();
 
         foreach ($tabs as $index => $item) {
-            if ($item->getId()->equals($tab->getId())) {
+            if ($item->getId()?->equals($tab->getId())) {
                 $swapIndex = $index + $direction;
 
                 if ($swapIndex >= 0 && $swapIndex < count($tabs)) {
@@ -223,6 +223,9 @@ class NavigationTabService
      */
     private function delete(NavigationTab $tab): void
     {
+        if ($tab->isSystem()) {
+            return;
+        }
         $this->entityManager->remove($tab);
     }
 
