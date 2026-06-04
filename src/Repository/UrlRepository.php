@@ -11,7 +11,6 @@ namespace Inachis\Repository;
 
 use Inachis\Entity\Content\{Page, Url};
 use Inachis\Enum\EditorialStatus;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 

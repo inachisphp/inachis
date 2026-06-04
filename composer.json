@@ -16,7 +16,6 @@
         "ext-intl": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
-        "composer/package-versions-deprecated": "^1.11",
         "doctrine/doctrine-bundle": "^3.0",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.5",
@@ -38,6 +37,7 @@
         "symfony/framework-bundle": "^8.0",
         "symfony/http-client": "8.*",
         "symfony/http-kernel": "^8.0",
+        "symfony/intl": "8.*",
         "symfony/mailer": "8.*",
         "symfony/messenger": "8.*",
         "symfony/monolog-bundle": "^4.0",
@@ -54,6 +54,7 @@
         "symfony/validator": "^8.0",
         "symfony/yaml": "^8.0",
         "twig/extra-bundle": "^3.21",
+        "twig/intl-extra": "^3.26",
         "twig/markdown-extra": "^3.22",
         "twig/string-extra": "^3.21"
     },

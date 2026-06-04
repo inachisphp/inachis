@@ -45,12 +45,10 @@ class BulkCreateControllerTest extends WebTestCase
     public function testSaveContentBadRequest(): void
     {
         $request = new Request([], [
-            'form' => [
-                'startDate' => '01/11/2025',
-                'endDate' => '07/11/2025',
-                'tags' => ['test-tag'],
-                'categories' => ['test-category'],
-            ],
+            'startDate' => '01/11/2025',
+            'endDate' => '07/11/2025',
+            'tags' => ['test-tag'],
+            'categories' => ['test-category'],
             'seriesId' => Uuid::uuid1()->toString(),
         ], [], [], [], [
             'REQUEST_URI' => '/incc/ax/bulkCreate/get'
@@ -75,18 +73,20 @@ class BulkCreateControllerTest extends WebTestCase
     public function testSaveContentNoChange(): void
     {
         $request = new Request([], [
-            'form' => [
-                'title' => 'some title',
-                'startDate' => '01/11/2025',
-                'endDate' => '07/11/2025',
-                'tags' => ['test-tag'],
-                'categories' => ['test-category'],
-            ],
+            'title' => 'some title',
+            'startDate' => '01/11/2025',
+            'endDate' => '07/11/2025',
+            'tags' => ['test-tag'],
+            'categories' => ['test-category'],
             'seriesId' => Uuid::uuid1()->toString(),
         ], [], [], [], [
             'REQUEST_URI' => '/incc/ax/bulkCreate/get'
         ]);
-        $bulkCreatePost = $this->createStub(PageBulkCreateService::class);
+        $this->assertArrayHasKey('title', $request->request->all());
+        $bulkCreatePost = $this->createMock(PageBulkCreateService::class);
+        $bulkCreatePost->expects($this->once())
+            ->method('create')
+            ->willReturn(0);
         $this->controller = $this->getMockBuilder(BulkCreateController::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getUser', 'render'])
@@ -106,13 +106,11 @@ class BulkCreateControllerTest extends WebTestCase
     public function testSaveContent(): void
     {
         $request = new Request([], [
-            'form' => [
-                'title' => 'some title',
-                'startDate' => '01/11/2025',
-                'endDate' => '07/11/2025',
-                'tags' => ['test-tag'],
-                'categories' => ['test-category'],
-            ],
+            'title' => 'some title',
+            'startDate' => '01/11/2025',
+            'endDate' => '07/11/2025',
+            'tags' => ['test-tag'],
+            'categories' => ['test-category'],
             'seriesId' => Uuid::uuid1()->toString(),
         ], [], [], [], [
             'REQUEST_URI' => '/incc/ax/bulkCreate/get'

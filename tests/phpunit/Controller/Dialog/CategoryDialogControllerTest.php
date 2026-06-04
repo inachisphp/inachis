@@ -153,7 +153,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
         $category = (new Category('test-category'))->setId($uuid);
         $category->addChild(new Category('test-sub-category'));
         $this->categoryRepository->expects($this->once())
-            ->method('findOneBy')
+            ->method('find')
             ->willReturn($category);
         $pageRepository = $this->createMock(PageRepository::class);
         $pageRepository->expects($this->atLeastOnce())

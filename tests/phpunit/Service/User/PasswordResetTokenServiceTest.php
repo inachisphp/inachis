@@ -28,18 +28,16 @@ class PasswordResetTokenServiceTest extends TestCase
     private UserRepository $userRepository;
     private PasswordResetTokenService $tokenService;
 
-    protected function setUp(): void
-    {
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->requestRepository = $this->createMock(PasswordResetRequestRepository::class);
-        $this->userRepository = $this->createMock(UserRepository::class);
-    }
-
     /**
      * @throws RandomException
      */
     public function testCreateResetRequestForEmailWhenUserNotFound(): void
     {
+
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->requestRepository = $this->createStub(PasswordResetRequestRepository::class);
+        $this->userRepository = $this->createStub(UserRepository::class);
+
         $this->tokenService = new PasswordResetTokenService(
             'secret',
             $this->entityManager,
@@ -56,6 +54,10 @@ class PasswordResetTokenServiceTest extends TestCase
     {
         $user = new User('user', 'password', 'test@example.com');
         $request = new PasswordResetRequest($user, 'tokenHash', new DateTimeImmutable('now'));
+
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->requestRepository = $this->createMock(PasswordResetRequestRepository::class);
+        $this->userRepository = $this->createMock(UserRepository::class);
         $this->userRepository
             ->expects($this->once())->method('findOneBy')
             ->with(['email' => 'test@example.com'])
@@ -84,6 +86,10 @@ class PasswordResetTokenServiceTest extends TestCase
     {
         $user = new User('user', 'password', 'test@example.com');
         $candidate = new PasswordResetRequest($user, hash_hmac('sha256', 'raw-token', 'secret'), new DateTimeImmutable('tomorrow'));
+
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->requestRepository = $this->createMock(PasswordResetRequestRepository::class);
+        $this->userRepository = $this->createStub(UserRepository::class);
         $this->requestRepository
             ->expects($this->once())->method('findLatestActiveForUser')
             ->with($user)
@@ -105,6 +111,10 @@ class PasswordResetTokenServiceTest extends TestCase
         $user = new User('user', 'password', 'test@example.com');
         $hash = hash_hmac('sha256', 'raw-token', 'secret');
         $candidate = new PasswordResetRequest($user, $hash, new DateTimeImmutable('tomorrow'));
+
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->requestRepository = $this->createMock(PasswordResetRequestRepository::class);
+        $this->userRepository = $this->createStub(UserRepository::class);
         $this->requestRepository
             ->expects($this->once())->method('findLatestActiveByHash')
             ->with($hash)
@@ -125,6 +135,10 @@ class PasswordResetTokenServiceTest extends TestCase
     {
         $user = new User('user', 'password', 'test@example.com');
         $candidate = null;
+
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->requestRepository = $this->createMock(PasswordResetRequestRepository::class);
+        $this->userRepository = $this->createStub(UserRepository::class);
         $this->requestRepository
             ->expects($this->once())->method('findLatestActiveForUser')
             ->with($user)
@@ -145,6 +159,10 @@ class PasswordResetTokenServiceTest extends TestCase
     {
         $user = new User('user', 'password', 'test@example.com');
         $candidate = new PasswordResetRequest($user, 'tokenHash', new DateTimeImmutable('yesterday'));
+
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->requestRepository = $this->createMock(PasswordResetRequestRepository::class);
+        $this->userRepository = $this->createStub(UserRepository::class);
         $this->requestRepository
             ->expects($this->once())->method('findLatestActiveForUser')
             ->with($user)
@@ -165,6 +183,10 @@ class PasswordResetTokenServiceTest extends TestCase
     {
         $user = new User('user', 'password', 'test@example.com');
         $candidate = new PasswordResetRequest($user, 'tokenHash', new DateTimeImmutable('tomorrow'));
+
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->requestRepository = $this->createMock(PasswordResetRequestRepository::class);
+        $this->userRepository = $this->createStub(UserRepository::class);
         $this->requestRepository
             ->expects($this->once())->method('findLatestActiveForUser')
             ->with($user)
@@ -182,9 +204,11 @@ class PasswordResetTokenServiceTest extends TestCase
     {
         $user = new User('user', 'password', 'test@example.com');
         $request = new PasswordResetRequest($user, 'tokenHash', new DateTimeImmutable('now'));
-        $this->entityManager
-            ->expects($this->once())->method('persist')
-            ->with($request);
+
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->requestRepository = $this->createStub(PasswordResetRequestRepository::class);
+        $this->userRepository = $this->createStub(UserRepository::class);
+        $this->entityManager->expects($this->once())->method('persist')->with($request);
         $this->tokenService = new PasswordResetTokenService(
             'secret',
             $this->entityManager,

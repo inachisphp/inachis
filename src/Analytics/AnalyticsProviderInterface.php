@@ -53,6 +53,15 @@ interface AnalyticsProviderInterface
     ): int;
 
     /**
+     * Get monthly unique visitor count
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return integer
+     */
+    public function getMonthlyUniqueVisitors(\DateTimeInterface $from, \DateTimeInterface $to): int;
+
+    /**
      * Get the most common paths that result in a 4xx or 5xx error.
      *
      * Expected format:

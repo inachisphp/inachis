@@ -11,11 +11,8 @@ namespace Inachis\Service\Page;
 
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Page;
-use Inachis\Entity\ReviewComment;
-use Inachis\Entity\ReviewThread;
-use Inachis\Entity\Revision;
-use Inachis\Entity\User;
+use Inachis\Entity\Content\{Page, ReviewComment, ReviewThread, Revision};
+use Inachis\Entity\User\User;
 use Inachis\Repository\ReviewThreadRepository;
 
 class ReviewPageService

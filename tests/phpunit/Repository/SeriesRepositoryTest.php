@@ -278,6 +278,7 @@ class SeriesRepositoryTest extends TestCase
     {
         $qb = $this->createMock(QueryBuilder::class);
         $qb->method('select')->willReturnSelf();
+        $qb->method('join')->willReturnSelf();
         $qb->method('leftJoin')->willReturnSelf();
         $qb->method('where')->willReturnSelf();
         $qb->method('andWhere')->willReturnSelf();

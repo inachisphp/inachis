@@ -9,18 +9,20 @@
 
 namespace Inachis\Tests\phpunit\Controller\Page\Post;
 
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Exception;
 use Inachis\Controller\Page\Post\PageController;
 use Inachis\Entity\Content\{Revision, Url};
 use Inachis\Repository\PageRepository;
+use Inachis\Repository\ReviewThreadRepository;
 use Inachis\Repository\RevisionRepository;
 use Inachis\Repository\TagRepository;
 use Inachis\Repository\UrlRepository;
 use Inachis\Service\Page\PageBulkActionService;
+use Inachis\Service\Page\ReviewRebaseService;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use Inachis\Util\ContentRevisionCompare;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use Exception;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -74,6 +76,8 @@ class PageControllerTest extends InachisControllerTestCase
             $this->createStub(PageBulkActionService::class),
             $pageRepository,
             $revisionRepository,
+            $this->createStub(ReviewThreadRepository::class),
+            $this->createStub(ReviewRebaseService::class),
             $this->createStub(TagRepository::class),
             'post',
             'ome-post'
@@ -142,6 +146,8 @@ class PageControllerTest extends InachisControllerTestCase
             $this->createStub(PageBulkActionService::class),
             $pageRepository,
             $revisionRepository,
+            $this->createStub(ReviewThreadRepository::class),
+            $this->createStub(ReviewRebaseService::class),
             $this->createStub(TagRepository::class),
             'post',
             'new'

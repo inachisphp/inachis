@@ -2,7 +2,7 @@
 
 namespace Inachis\Service\Page;
 
-use Inachis\Entity\ReviewThread;
+use Inachis\Entity\Content\ReviewThread;
 
 class ReviewRebaseService
 {

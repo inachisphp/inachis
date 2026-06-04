@@ -435,7 +435,7 @@ class ResourceControllerTest extends InachisControllerTestCase
         $result = $this->controller->uploadImage($request, $imageFileService, $slugger, '/tmp');
         $this->assertInstanceOf(JsonResponse::class, $result);
         $this->assertEquals(200, $result->getStatusCode());
-        $this->assertStringContainsString('OK', $result->getContent());
+        $this->assertStringContainsString('success', $result->getContent());
     }
 
     /**
