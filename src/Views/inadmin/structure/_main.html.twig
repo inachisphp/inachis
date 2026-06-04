@@ -60,18 +60,19 @@
 {% endif %}
 
     <main class="content">
-    {% block form_login_pre %}
-        {% if 'Content saved.' in app.session.flashbag.peek('success') %}
-            {{ app.session.set('clearAutosave', true) }}
-        {% endif %}
-        {% if page_type|default(null) is null or page_type != 'login' %}
-            {% include "inadmin/partials/flashes.html.twig" %}
-        {% endif %}
-    {% endblock form_login_pre %}
+        {% block form_login_pre %}
+            {% if 'Content saved.' in app.session.flashbag.peek('success') %}
+                {{ app.session.set('clearAutosave', true) }}
+            {% endif %}
+            {% if page_type|default(null) is null or page_type != 'login' %}
+                {% include "inadmin/partials/flashes.html.twig" %}
+            {% endif %}
+        {% endblock form_login_pre %}
 
-    {% block content %}{% endblock content %}
-  </main>
+        {% block content %}{% endblock content %}
+    </main>
 
+    {% block reviewbar %}{% endblock reviewbar %}
 
     <button type="button" id="back-to-top" class="back-to-top" aria-label="Back to top" hidden>
         <span class="material-icons" aria-hidden="true">arrow_upward</span>

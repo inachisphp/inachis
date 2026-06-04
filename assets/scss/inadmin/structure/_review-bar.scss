@@ -1,0 +1,34 @@
+@use '../definitions' as *;
+@use 'sass:color';
+
+#review-sidebar-container {
+  grid-column: 3;
+  grid-row: 2;
+  width: 15rem;
+  background: $reviewbar-bg;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.06),
+              -1px 0 4px rgba(0, 0, 0, 0.03);
+}
+
+.review-sidebar {
+  overflow-y: auto;
+  position: fixed;
+  width: 15rem;
+
+  .review-sidebar-header {
+    background-color: $bg-panel;
+    border-bottom: 1px solid $border-color;
+    font-size: 1.25rem;
+    font-weight: bold;
+    padding: 1rem;
+  }
+
+  .review-sidebar-body {
+    padding: 1rem;
+
+    blockquote {
+      background-color: $bg-surface;
+      padding: 0.25rem;
+    }
+  }
+}

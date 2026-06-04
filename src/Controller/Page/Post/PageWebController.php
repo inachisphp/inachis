@@ -51,7 +51,15 @@ class PageWebController extends AbstractWebController
     )]
     public function getPost(Request $request, int $year, int $month, int $day, string $title): Response
     {
-        $link = sprintf('%d/%02d/%02d/%s', $year, $month, $day, $title);
+        if ( $year === 0
+            && $month === 0
+            && $day === 0
+            && $request->attributes->has('page')
+        ) {
+                $link = $request->attributes->get('page');
+        } else {
+                $link = sprintf('%d/%02d/%02d/%s', $year, $month, $day, $title);
+        }
         $url = $this->entityManager->getRepository(Url::class)->findOneBy([
             'link' => $link
         ]);

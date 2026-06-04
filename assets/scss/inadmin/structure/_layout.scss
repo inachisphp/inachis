@@ -20,7 +20,7 @@
   }
 
   @media (min-width: $breakpoint-medium) {
-    grid-template-columns: $sidebar-collapsed 1fr;
+    grid-template-columns: $sidebar-collapsed 1fr auto;
   }
 }
 
