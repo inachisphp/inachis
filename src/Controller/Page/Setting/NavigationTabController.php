@@ -122,10 +122,9 @@ class NavigationTabController extends AbstractInachisController
         $isNew = ($id === 'new');
 
         $tab = $isNew ? new NavigationTab():
-            $navigationTabRepository->findOneBy(
-                [ 'id' => $request->attributes->get('id') ]
-            );
-        /** @var Form $form */
+        $navigationTabRepository->findOneBy(
+            [ 'id' => $request->attributes->get('id') ]
+        );
         $form = $this->createForm(NavigationTabType::class, $tab);
         $form->handleRequest($request);
 

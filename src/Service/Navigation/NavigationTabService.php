@@ -68,21 +68,40 @@ class NavigationTabService
     public function add(NavigationTab $tab): void
     {
         $this->transactionHelper->executeInTransaction(function () use ($tab) {
-            $maxPosition = $this->repository->getMaxPosition();
-            $tab->setPosition($maxPosition + 1);
 
             if ($tab->getId() === null) {
+                $tab->setPosition(
+                    $this->repository->getMaxPosition() + 1
+                );
+
                 $this->entityManager->persist($tab);
             }
-
-            // Normalise positions in case there are gaps
-            $tabs = $this->repository->getAllOrdered();
-            $tabs[] = $tab;
-            $this->normalisePositionsIndexed($tabs);
 
             $this->entityManager->flush();
             $this->clearCache();
         });
+    }
+
+    /**
+     * Reassign positions safely while preserving the unique constraint.
+     *
+     * @param NavigationTab[] $orderedTabs
+     */
+    private function applyOrderedPositions(array $orderedTabs): void
+    {
+        // Phase 1: move everything out of the way
+        foreach ($orderedTabs as $index => $tab) {
+            $tab->setPosition(1000 + $index);
+        }
+
+        $this->entityManager->flush();
+
+        // Phase 2: assign final positions
+        foreach ($orderedTabs as $index => $tab) {
+            $tab->setPosition($index + 1);
+        }
+
+        $this->entityManager->flush();
     }
 
     /**
@@ -98,16 +117,18 @@ class NavigationTabService
         foreach ($tabs as $index => $item) {
             if ($item->getId()->equals($tab->getId())) {
                 $swapIndex = $index + $direction;
+
                 if ($swapIndex >= 0 && $swapIndex < count($tabs)) {
-                    $this->swapPositions($item, $tabs[$swapIndex]);
-                    break;
+                    [$tabs[$index], $tabs[$swapIndex]] =
+                        [$tabs[$swapIndex], $tabs[$index]];
                 }
+
+                break;
             }
         }
 
         $this->transactionHelper->executeInTransaction(function () use ($tabs) {
-            $this->normalisePositionsIndexed($tabs);
-            $this->entityManager->flush();
+            $this->applyOrderedPositions($tabs);
             $this->clearCache();
         });
     }
@@ -135,20 +156,6 @@ class NavigationTabService
     }
 
     /**
-     * Swap the positions of two navigation tabs
-     *
-     * @param NavigationTab $a
-     * @param NavigationTab $b
-     * @return void
-     */
-    private function swapPositions(NavigationTab $a, NavigationTab $b): void
-    {
-        $posA = $a->getPosition();
-        $a->setPosition($b->getPosition());
-        $b->setPosition($posA);
-    }
-
-    /**
      * Reorder navigation tabs based on input data
      *
      * @param array<int, array{id?: string, position?: int}> $data
@@ -156,30 +163,43 @@ class NavigationTabService
      */
     public function reorderTabs(array $data): bool
     {
-        $tabs = $this->repository->findAllIndexedById();
-        $updated = false;
+        if (!isset($data['order']) || !is_array($data['order'])) {
+            return false;
+        }
 
-        $this->transactionHelper->executeInTransaction(function () use ($data, $tabs, &$updated) {
-            foreach ($data as $item) {
-                $id = (string) ($item['id'] ?? '');
-                $position = isset($item['position']) ? (int) $item['position'] : null;
+        $tabsById = $this->repository->findAllIndexedById();
 
-                if ($id && isset($tabs[$id]) && $position !== null) {
-                    if ($tabs[$id]->getPosition() !== $position) {
-                        $tabs[$id]->setPosition($position);
-                        $updated = true;
-                    }
-                }
+        $orderedTabs = [];
+
+        foreach ($data['order'] as $id) {
+            if (isset($tabsById[$id])) {
+                $orderedTabs[] = $tabsById[$id];
             }
+        }
 
-            if ($updated) {
-                $this->normalisePositionsIndexed($tabs);
-                $this->entityManager->flush();
-                $this->clearCache();
+        if (count($orderedTabs) !== count($tabsById)) {
+            return false;
+        }
+
+        $changed = false;
+
+        foreach ($orderedTabs as $index => $tab) {
+            if ($tab->getPosition() !== ($index + 1)) {
+                $changed = true;
+                break;
             }
+        }
+
+        if (!$changed) {
+            return false;
+        }
+
+        $this->transactionHelper->executeInTransaction(function () use ($orderedTabs) {
+            $this->applyOrderedPositions($orderedTabs);
+            $this->clearCache();
         });
 
-        return $updated;
+        return true;
     }
 
 
@@ -189,27 +209,11 @@ class NavigationTabService
     public function normalisePositions(): void
     {
         $tabs = $this->repository->getAllOrdered();
-        $this->normalisePositionsIndexed(array_combine(
-            array_map(fn($t) => $t->getId(), $tabs),
-            $tabs
-        ));
 
-        $this->entityManager->flush();
-        $this->clearCache();
-    }
-
-    /**
-     * Normalise positions of given tabs in memory to be 1..n
-     *
-     * @param array<NavigationTab> $tabs
-     */
-    private function normalisePositionsIndexed(array $tabs): void
-    {
-        usort($tabs, fn(NavigationTab $a, NavigationTab $b) => $a->getPosition() <=> $b->getPosition());
-
-        foreach ($tabs as $index => $tab) {
-            $tab->setPosition($index + 1);
-        }
+        $this->transactionHelper->executeInTransaction(function () use ($tabs) {
+            $this->applyOrderedPositions($tabs);
+            $this->clearCache();
+        });
     }
 
     /**
