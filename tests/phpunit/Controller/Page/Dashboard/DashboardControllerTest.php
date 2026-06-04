@@ -46,10 +46,15 @@ class DashboardControllerTest extends InachisControllerTestCase
         $paginator = $this->createStub(Paginator::class);
         $pageRepository = $this->createMock(PageRepository::class);
         $pageRepository->expects($this->atLeastOnce())->method('getAll')->willReturn($paginator);
+
+        $analytics = $this->createMock(AnalyticsProviderInterface::class);
+        $analytics->expects($this->once())->method('getTopPages')->willReturn([]);
+        $analytics->expects($this->atLeastOnce())->method('getTotalViews')->willReturn(2);
+        $analytics->expects($this->atLeastOnce())->method('getMonthlyUniqueVisitors')->willReturn(3);
         
         $result = $controller->default(
             $request,
-            $this->createStub(AnalyticsProviderInterface::class),
+            $analytics,
             $this->createStub(ImageRepository::class),
             $pageRepository,
             $this->createStub(SeriesRepository::class),
