@@ -168,6 +168,10 @@ class Page
     #[ORM\Column(type: 'string', length: 140, nullable: true)]
     protected ?string $sharingMessage = '';
 
+    /** @var int The current version number for this content */
+    #[ORM\Column(type: 'integer')]
+    protected int $versionNumber = 1;
+
     /**
      * @var Collection<int, Url> The array of URLs for the content
      */
@@ -904,6 +908,23 @@ class Page
     public function removeTags(): self
     {
         $this->tags->clear();
+        return $this;
+    }
+
+    public function getVersionNumber(): int
+    {
+        return $this->versionNumber;
+    }
+
+    public function setVersionNumber(int $version): self
+    {
+        $this->versionNumber = $version;
+        return $this;
+    }
+
+    public function incrementVersionNumber(): self
+    {
+        $this->versionNumber += 1;
         return $this;
     }
 

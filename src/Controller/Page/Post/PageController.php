@@ -16,8 +16,8 @@ use Inachis\Entity\{Category, Image, Page, Revision, Tag, Url};
 use Inachis\Enum\EditorialStatus;
 use Inachis\Form\PostType;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\{PageRepository, RevisionRepository, TagRepository};
-use Inachis\Service\Page\PageBulkActionService;
+use Inachis\Repository\{PageRepository, ReviewThreadRepository, RevisionRepository, TagRepository};
+use Inachis\Service\Page\{PageBulkActionService, ReviewRebaseService};
 use Inachis\Util\{ContentRevisionCompare, ReadingTime, UrlNormaliser};
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
@@ -151,6 +151,8 @@ class PageController extends AbstractInachisController
         PageBulkActionService $pageBulkActionService,
         PageRepository $pageRepository,
         RevisionRepository $revisionRepository,
+        ReviewThreadRepository $reviewThreadRepository,
+        ReviewRebaseService $reviewRebaseService,
         TagRepository $tagRepository,
         string $type = 'post',
         ?string $title = null
@@ -261,6 +263,11 @@ class PageController extends AbstractInachisController
                 $this->entityManager->persist($revision);
             }
             $this->entityManager->persist($post);
+
+            $threads = $reviewThreadRepository->findOpenForPage($post);
+            foreach ($threads as $thread) {
+                $reviewRebaseService->rebase($thread, $post->getContent());
+            }
             $this->entityManager->flush();
 
             $this->addFlash('success', 'Content saved.');

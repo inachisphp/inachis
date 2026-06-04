@@ -3,6 +3,7 @@ import './inadmin/Inachis.js';
 import './inadmin/components/datePicker.js';
 import './inadmin/components/dialog.js';
 import './inadmin/components/easyMDELinkValidator.js';
+import './inadmin/components/easyMDEReviewPlugin.js';
 import './inadmin/components/optionSelector.js';
 import './inadmin/components/tabs.js';
 
