@@ -9,10 +9,8 @@
 
 namespace Inachis\Service\Page;
 
-use Inachis\Entity\Page;
-use Inachis\Entity\Tag;
-use Inachis\Entity\Url;
-use Inachis\Entity\User;
+use Inachis\Entity\Content\{Page, Url};
+use Inachis\Entity\User\User;
 use Inachis\Model\BulkCreateData;
 use Inachis\Repository\CategoryRepository;
 use Inachis\Repository\SeriesRepository;

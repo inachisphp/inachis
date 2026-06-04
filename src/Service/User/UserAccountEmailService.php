@@ -9,9 +9,8 @@
 
 namespace Inachis\Service\User;
 
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Util\Base64EncodeFile;
-use Inachis\Util\RandomColorPicker;
 use Random\RandomException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;

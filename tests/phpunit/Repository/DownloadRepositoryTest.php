@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Repository;
 
-use Inachis\Entity\Download;
+use Inachis\Entity\Media\Download;
 use Inachis\Repository\DownloadRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -32,8 +32,7 @@ class DownloadRepositoryTest extends TestCase
             ->onlyMethods([ 'getEntityManager', 'getAll' ])
             ->getMock();
 
-        $this->repository->expects($this->atLeast(0))
-            ->method('getEntityManager')->willReturn($this->entityManager);
+        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
         parent::setUp();
     }
 

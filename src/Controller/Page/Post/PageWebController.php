@@ -10,20 +10,17 @@
 namespace Inachis\Controller\Page\Post;
 
 use Exception;
-use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\{Category,Image,Page,Revision,Series,Tag,Url};
-use Inachis\Form\PostType;
-use Inachis\Repository\RevisionRepository;
-use Inachis\Util\{ContentRevisionCompare,ReadingTime};
+use Inachis\Controller\AbstractWebController;
+use Inachis\Entity\Content\{Category,Page,Series,Tag,Url};
+use Inachis\Util\ReadingTime;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
-use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-class PageWebController extends AbstractInachisController
+class PageWebController extends AbstractWebController
 {
     /**
      * @param Request $request
@@ -54,7 +51,15 @@ class PageWebController extends AbstractInachisController
     )]
     public function getPost(Request $request, int $year, int $month, int $day, string $title): Response
     {
-        $link = sprintf('%d/%02d/%02d/%s', $year, $month, $day, $title);
+        if ( $year === 0
+            && $month === 0
+            && $day === 0
+            && $request->attributes->has('page')
+        ) {
+                $link = $request->attributes->get('page');
+        } else {
+                $link = sprintf('%d/%02d/%02d/%s', $year, $month, $day, $title);
+        }
         $url = $this->entityManager->getRepository(Url::class)->findOneBy([
             'link' => $link
         ]);

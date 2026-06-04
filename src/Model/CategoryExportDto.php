@@ -9,7 +9,7 @@
 
 namespace Inachis\Model;
 
-use Inachis\Entity\Category;
+use Inachis\Entity\Content\Category;
 
 /**
  * Data Transfer Object for exporting categories.

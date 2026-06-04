@@ -22,14 +22,29 @@ final class CaaValidatorTest extends TestCase
 
         $issues = $validator->validate([]);
 
+        $this->assertCount(0, $issues);
+    }
+
+    public function testValidateWithInvalidRecords(): void
+    {
+        $validator = new CaaValidator();
+
+        $issues = $validator->validate([
+            [
+                'target' => 'example.com',
+                'priority' => 10,
+                // 'value' is missing
+            ]
+        ]);
+
         $this->assertCount(1, $issues);
         $this->assertInstanceOf(ValidationIssue::class, $issues[0]);
-        $this->assertSame('caa', $issues[0]->getType());
+        $this->assertSame('caa', $issues[0]->type);
         $this->assertSame(
             'Malformed CAA record',
-            $issues[0]->getMessage()
+            $issues[0]->message
         );
-        $this->assertSame(Severity::Error, $issues[0]->getSeverity());
+        $this->assertSame(Severity::Error, $issues[0]->severity);
     }
 
     public function testValidateWithValidRecords(): void
@@ -40,7 +55,7 @@ final class CaaValidatorTest extends TestCase
             [
                 'target' => 'example.com',
                 'priority' => 10,
-                'txt' => 'v=BIMI1; l=https://example.com/logo.svg;'
+                'value' => 'caa record 1'
             ]
         ];
 

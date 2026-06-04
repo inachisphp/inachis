@@ -8,7 +8,7 @@
 
 namespace Inachis\Form;
 
-use Inachis\Entity\SecurityPolicy;
+use Inachis\Entity\Security\SecurityPolicy;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;

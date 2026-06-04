@@ -9,7 +9,7 @@
 
 namespace Inachis\Service\Resource;
 
-use Inachis\Entity\Image;
+use Inachis\Entity\Media\Image;
 use Inachis\Transformer\ImageTransformer;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 

@@ -35,10 +35,9 @@
         <a aria-label="View all {{ view_all_label }}" href="{{ view_all_url }}">View all {{ view_all_label }} &rarr;</a>
     </p>
     {% endif %}
-
+</div>
 {% elseif empty_message %}
         <p>{{ empty_message }}</p>
 {% endif %}
-</div>
 
 {% endmacro %}

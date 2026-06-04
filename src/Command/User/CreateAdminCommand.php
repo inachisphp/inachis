@@ -9,7 +9,7 @@
 
 namespace Inachis\Command\User;
 
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Symfony\Component\Console\Attribute\AsCommand;

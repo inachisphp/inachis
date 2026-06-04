@@ -8,7 +8,7 @@
 <div class="content-column">
 
     {% if post is defined %}
-    <article class="post type-{{ post.type }} status-{{ post.status }} format-standard hentry {% if post.categories is not empty %}category-{{ post.categories|first.title|lower }}{% endif %}" id="{{ post.type }}-{{ post.id }}">
+    <article class="post type-{{ post.type }} status-{{ post.status.value }} format-standard hentry {% if post.categories is not empty %}category-{{ post.categories|first.title|lower }}{% endif %}" id="{{ post.type }}-{{ post.id }}">
         <header class="entry-header">
             <h1 class="entry-title">{{ post.title }}</h1>
             {%- if post.subTitle is not empty %}

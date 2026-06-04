@@ -10,7 +10,7 @@
 namespace Inachis\Service\Import\Series;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\{Page,Series};
+use Inachis\Entity\Content\{Page,Series};
 use Inachis\Model\Series\SeriesExportDto;
 use Inachis\Repository\PageRepository;
 use Inachis\Service\Import\Series\SeriesImportResult;

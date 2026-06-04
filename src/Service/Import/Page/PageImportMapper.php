@@ -9,7 +9,7 @@
 
 namespace Inachis\Service\Import\Page;
 
-use Inachis\Entity\Category;
+use Inachis\Entity\Content\Category;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**

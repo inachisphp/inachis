@@ -10,25 +10,21 @@
 namespace Inachis\Tests\phpunit\Controller\Page\Admin;
 
 use Inachis\Controller\Page\Admin\ChangePasswordController;
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Repository\UserRepository;
-use Doctrine\ORM\EntityManager;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Ramsey\Uuid\Uuid;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ChangePasswordControllerTest extends WebTestCase
+class ChangePasswordControllerTest extends InachisControllerTestCase
 {
     /**
      * @throws Exception
@@ -45,14 +41,18 @@ class ChangePasswordControllerTest extends WebTestCase
             'REQUEST_URI' => '/incc/admin/{id}/change-password'
         ]);
         $user = (new User('test-user'))->setId(Uuid::uuid1());
-        $entityManager = $this->createStub(EntityManager::class);
         $security = $this->createMock(Security::class);
         $security->expects($this->atLeastOnce())->method('getUser')->willReturn($user);
-        $translator = $this->createStub(TranslatorInterface::class);
 
         /** @var ChangePasswordController&MockObject $controller */
         $controller = $this->getMockBuilder(ChangePasswordController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $security,
+                $this->translator,
+                $this->wasteRepository,
+            ])
             ->onlyMethods(['addFlash', 'createForm', 'render'])
             ->getMock();
         $controller->expects($this->once())
@@ -86,14 +86,18 @@ class ChangePasswordControllerTest extends WebTestCase
             'REQUEST_URI' => '/incc/admin/{id}/change-password'
         ]);
         $user = (new User('test-user'))->setId(Uuid::uuid1());
-        $entityManager = $this->createStub(EntityManager::class);
         $security = $this->createMock(Security::class);
         $security->expects($this->atLeastOnce())->method('getUser')->willReturn($user);
-        $translator = $this->createStub(TranslatorInterface::class);
 
         /** @var ChangePasswordController&MockObject $controller */
         $controller = $this->getMockBuilder(ChangePasswordController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $security,
+                $this->translator,
+                $this->wasteRepository,
+            ])
             ->onlyMethods(['addFlash', 'createForm', 'render'])
             ->getMock();
         $controller->method('render')
@@ -121,10 +125,13 @@ class ChangePasswordControllerTest extends WebTestCase
         ], [], [], [], [
             'REQUEST_URI' => '/incc/ax/calculate-password-strength'
         ]);
-        $entityManager = $this->createStub(EntityManager::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(TranslatorInterface::class);
-        $controller = new ChangePasswordController($entityManager, $security, $translator);
+        $controller = new ChangePasswordController(
+            $this->entityManager,
+            $this->params,
+            $this->security,
+            $this->translator,
+            $this->wasteRepository
+        );
 
         $result = $controller->calculatePasswordStrength($request);
 

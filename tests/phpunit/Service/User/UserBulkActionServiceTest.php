@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Service\User;
 
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Repository\UserRepository;
 use Inachis\Service\User\UserBulkActionService;
 use Doctrine\ORM\EntityManager;

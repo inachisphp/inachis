@@ -9,7 +9,7 @@
 
 namespace Inachis\Service\Navigation;
 
-use Inachis\Entity\NavigationTab;
+use Inachis\Entity\System\NavigationTab;
 use Inachis\Repository\NavigationTabRepository;
 use Inachis\Service\Doctrine\TransactionHelper;
 use Doctrine\ORM\EntityManagerInterface;

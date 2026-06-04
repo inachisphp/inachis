@@ -11,7 +11,6 @@ namespace Inachis\Controller\Page\Url;
 
 use Doctrine\ORM\OptimisticLockException;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Url;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\UrlRepository;
 use Inachis\Service\Url\UrlBulkActionService;

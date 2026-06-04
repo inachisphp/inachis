@@ -9,8 +9,8 @@
 
 namespace Inachis\Tests\phpunit\Service\Image;
 
-use Inachis\Entity\Page;
-use Inachis\Entity\Revision;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Revision;
 use Inachis\Repository\RevisionRepository;
 use Inachis\Service\Image\ContentImageUpdater;
 use DateTimeImmutable;
@@ -59,7 +59,7 @@ class ContentImageUpdaterTest extends TestCase
             ->method('hydrateNewRevisionFromPage')
             ->with($page)
             ->willReturn($revision);
-        $this->em->method('getRepository')
+        $this->em->expects($this->once())->method('getRepository')
             ->with(Revision::class)
             ->willReturn($revisionRepository);
 

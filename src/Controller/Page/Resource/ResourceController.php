@@ -11,7 +11,7 @@ namespace Inachis\Controller\Page\Resource;
 
 use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\{Download, Image};
+use Inachis\Entity\Media\{Download, Image};
 use Inachis\Form\ResourceType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\{DownloadRepository, ImageRepository, PageRepository, SeriesRepository};
@@ -19,7 +19,6 @@ use Inachis\Service\Resource\ImageFileService;
 use Inachis\Service\Waste\WasteManagerService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
-use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;

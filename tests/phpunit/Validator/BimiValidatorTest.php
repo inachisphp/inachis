@@ -24,12 +24,12 @@ final class BimiValidatorTest extends TestCase
 
         $this->assertCount(1, $issues);
         $this->assertInstanceOf(ValidationIssue::class, $issues[0]);
-        $this->assertSame('bimi', $issues[0]->getType());
+        $this->assertSame('bimi', $issues[0]->type);
         $this->assertSame(
             'No BIMI record found (required when DMARC is reject)',
-            $issues[0]->getMessage()
+            $issues[0]->message
         );
-        $this->assertSame(Severity::Warning, $issues[0]->getSeverity());
+        $this->assertSame(Severity::Warning, $issues[0]->severity);
     }
 
     public function testValidBimiRecordPasses(): void
@@ -64,9 +64,9 @@ final class BimiValidatorTest extends TestCase
         $issues = $validator->validate($records, 'v=DMARC1; p=reject;');
 
         $this->assertCount(1, $issues);
-        $this->assertSame('bimi', $issues[0]->getType());
-        $this->assertStringContainsString('Invalid BIMI record format', $issues[0]->getMessage());
-        $this->assertSame(Severity::Error, $issues[0]->getSeverity());
+        $this->assertSame('bimi', $issues[0]->type);
+        $this->assertStringContainsString('Invalid BIMI record format', $issues[0]->message);
+        $this->assertSame(Severity::Error, $issues[0]->severity);
     }
 
     public function testNoValidationWhenPolicyIsNotReject(): void
@@ -101,6 +101,6 @@ final class BimiValidatorTest extends TestCase
         $issues = $validator->validate($records, 'v=DMARC1; p=reject;');
 
         $this->assertCount(1, $issues);
-        $this->assertSame(Severity::Error, $issues[0]->getSeverity());
+        $this->assertSame(Severity::Error, $issues[0]->severity);
     }
 }

@@ -9,8 +9,7 @@
 
 namespace Inachis\Repository;
 
-use Inachis\Entity\Image;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Inachis\Entity\Media\Image;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 

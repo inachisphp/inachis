@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Repository;
 
-use Inachis\Entity\Tag;
+use Inachis\Entity\Content\Tag;
 use Inachis\Repository\TagRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -41,11 +41,9 @@ class TagRepositoryTest extends TestCase
             ->setConstructorArgs([$registry])
             ->onlyMethods([ 'getEntityManager', 'getAll', 'getClassName', 'createQueryBuilder', ])
             ->getMock();
-        $this->repository->expects($this->atLeast(0))
-            ->method('getEntityManager')
+        $this->repository->method('getEntityManager')
             ->willReturn($this->entityManager);
-        $this->repository->expects($this->atLeast(0))
-            ->method('getClassName')
+        $this->repository->method('getClassName')
             ->willReturn(Tag::class);
         parent::setUp();
     }
@@ -109,8 +107,7 @@ class TagRepositoryTest extends TestCase
         $qb->expects($this->once())->method('getQuery')->willReturn($query);
 
         $registry = $this->createMock(ManagerRegistry::class);
-        $registry->expects($this->atLeast(0))
-            ->method('getManagerForClass')
+        $registry->method('getManagerForClass')
             ->willReturn($this->entityManager);
         $this->repository = $this->getMockBuilder(TagRepository::class)
             ->setConstructorArgs([$registry])
@@ -150,8 +147,8 @@ class TagRepositoryTest extends TestCase
         $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->atLeast(1))->method('select')->willReturnSelf();
         $qb->expects($this->atLeast(1))->method('from')->willReturnSelf();
-        $qb->expects($this->atLeast(0))->method('addOrderBy')->willReturnSelf();
-        $qb->expects($this->atLeast(0))->method('getQuery')->willReturn($query);
+        $qb->method('addOrderBy')->willReturnSelf();
+        $qb->method('getQuery')->willReturn($query);
 
         $registry = $this->createStub(ManagerRegistry::class);
         $registry->method('getManagerForClass')

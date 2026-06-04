@@ -22,14 +22,28 @@ final class TlsRptValidatorTest extends TestCase
 
         $issues = $validator->validate([]);
 
+        $this->assertCount(0, $issues);
+    }
+
+    public function testValidateWithInvalidateRecord(): void
+    {
+        $validator = new TlsRptValidator();
+        $issues = $validator->validate([
+            [
+                'target' => 'example.com',
+                'priority' => 10,
+                'txt' => 'invalid record'
+            ]
+        ]);
+
         $this->assertCount(1, $issues);
         $this->assertInstanceOf(ValidationIssue::class, $issues[0]);
-        $this->assertSame('tls-rpt', $issues[0]->getType());
+        $this->assertSame('tls-rpt', $issues[0]->type);
         $this->assertStringContainsString(
             'Invalid TLS-RPT record format:',
-            $issues[0]->getMessage()
+            $issues[0]->message
         );
-        $this->assertSame(Severity::Error, $issues[0]->getSeverity());
+        $this->assertSame(Severity::Error, $issues[0]->severity);
     }
 
     public function testValidateWithValidRecords(): void
@@ -40,7 +54,7 @@ final class TlsRptValidatorTest extends TestCase
             [
                 'target' => 'example.com',
                 'priority' => 10,
-                'txt' => 'v=TLSRPT1; rua=mailto:[EMAIL_ADDRESS]'
+                'txt' => 'v=TLSRPTv1; rua=mailto:[EMAIL_ADDRESS]'
             ]
         ];
 

@@ -10,17 +10,14 @@
 namespace Inachis\Tests\phpunit\Controller\Page\Search;
 
 use Inachis\Controller\Page\Search\SearchController;
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Model\SearchResult;
 use Inachis\Repository\SearchRepository;
 use Inachis\Repository\UrlRepository;
 use Inachis\Repository\UserRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
-use PHPUnit\Framework\MockObject\MockObject;
 use Ramsey\Uuid\Uuid;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -28,45 +25,41 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SearchControllerTest extends WebTestCase
+class SearchControllerTest extends InachisControllerTestCase
 {
     private SearchController $controller;
-    private EntityManagerInterface|MockObject $entityManager;
-    private Security|MockObject $security;
-
-    private TranslatorInterface $translator;
 
     /**
      * @throws \ReflectionException
      */
     protected function setUp(): void
     {
-        $this->entityManager = $this->createStub(EntityManagerInterface::class);
-        $this->security = $this->createStub(Security::class);
-        $this->translator = $this->createStub(TranslatorInterface::class);
+        parent::setUp();
+
         $form = $this->createStub(Form::class);
         $formBuilder = $this->createMock(FormBuilder::class);
-        $formBuilder->expects($this->atLeast(0))
-            ->method('getForm')->willReturn($form);
+        $formBuilder->method('getForm')->willReturn($form);
 
         $this->controller = $this->getMockBuilder(SearchController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository
+            ])
             ->onlyMethods(['createFormBuilder', 'generateUrl', 'render'])
             ->getMock();
-        $this->controller->expects($this->atLeast(0))
-            ->method('render')
+        $this->controller->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:' . $template);
             });
-        $this->controller->expects($this->atLeast(0))
-            ->method('generateUrl')
+        $this->controller->method('generateUrl')
             ->willReturnCallback(function (string $route, array $parameters) {
                 return 'redirected:' . $route;
             });
-        $this->controller->expects($this->atLeast(0))
-            ->method('createFormBuilder')->willReturn($formBuilder);
+        $this->controller->method('createFormBuilder')->willReturn($formBuilder);
     }
 
     /**

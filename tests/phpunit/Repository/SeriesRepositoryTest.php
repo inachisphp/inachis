@@ -9,9 +9,9 @@
 
 namespace Inachis\Tests\phpunit\Repository;
 
-use Inachis\Entity\Image;
-use Inachis\Entity\Page;
-use Inachis\Entity\Series;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
+use Inachis\Entity\Media\Image;
 use Inachis\Repository\SeriesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\AbstractQuery;
@@ -277,16 +277,13 @@ class SeriesRepositoryTest extends TestCase
     private function mockQueryBuilder(AbstractQuery $query): QueryBuilder
     {
         $qb = $this->createMock(QueryBuilder::class);
-        $qb->expects($this->atLeast(0))
-            ->method('select')->willReturnSelf();
-        $qb->expects($this->atLeast(0))
-            ->method('leftJoin')->willReturnSelf();
-        $qb->expects($this->atLeast(0))
-            ->method('where')->willReturnSelf();
-        $qb->expects($this->atLeast(0))
-            ->method('setParameter')->willReturnSelf();
-        $qb->expects($this->atLeast(0))
-            ->method('getQuery')->willReturn($query);
+        $qb->method('select')->willReturnSelf();
+        $qb->method('leftJoin')->willReturnSelf();
+        $qb->method('where')->willReturnSelf();
+        $qb->method('andWhere')->willReturnSelf();
+        $qb->method('orderBy')->willReturnSelf();
+        $qb->method('setParameter')->willReturnSelf();
+        $qb->method('getQuery')->willReturn($query);
 
         return $qb;
     }

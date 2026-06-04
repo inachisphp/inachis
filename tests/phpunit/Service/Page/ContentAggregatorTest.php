@@ -9,12 +9,12 @@
 
 namespace Inachis\Tests\phpunit\Service\Page;
 
-use Inachis\Entity\Page;
-use Inachis\Entity\Series;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
+use Inachis\Enum\EditorialStatus;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\SeriesRepository;
 use Inachis\Service\Page\ContentAggregator;
-use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -41,17 +41,19 @@ class ContentAggregatorTest extends TestCase
         $seriesItemPage = $this->createConfiguredStub(Page::class, [
             'getId' => Uuid::uuid1(),
         ]);
+        $seriesItemPage->method('getStatus')->willReturn(EditorialStatus::PUBLISHED);
         $seriesGroup = $this->createStub(Series::class);
         $seriesGroup->method('getItems')
             ->willReturn(new ArrayCollection([$seriesItemPage]));
-        $seriesGroup->method('getLastDate')->willReturn(new DateTime('2024-01-02'));
+        $seriesGroup->method('getLastDate')->willReturn(new \DateTimeImmutable('2024-01-02'));
         $seriesGroup->method('getDescription')->willReturn('Some <blockquote>test</blockquote>');
         $seriesGroup->method('setDescription');
         $seriesRepository->method('getAll')
             ->willReturn($this->createMockPaginator([$seriesGroup]));
 
         $pageResult = $this->createStub(Page::class);
-        $pageResult->method('getPostDate')->willReturn(new DateTime('2024-01-01'));
+        $pageResult->method('getStatus')->willReturn(EditorialStatus::PUBLISHED);
+        $pageResult->method('getPostDate')->willReturn(new \DateTimeImmutable('2024-01-01'));
         $pageRepository->method('getAll')
             ->willReturn($this->createMockPaginator([$pageResult]));
 
@@ -61,8 +63,8 @@ class ContentAggregatorTest extends TestCase
 
         $this->assertIsArray($result);
         $this->assertCount(2, $result);
-        $this->assertArrayHasKey('20240102', $result);
-        $this->assertArrayHasKey('20240101', $result);
+        $this->assertArrayHasKey('p20240102', $result);
+        $this->assertArrayHasKey('p20240101', $result);
     }
 
     private function createMockPaginator(array $items): Paginator

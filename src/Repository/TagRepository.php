@@ -9,8 +9,7 @@
 
 namespace Inachis\Repository;
 
-use Inachis\Entity\Page;
-use Inachis\Entity\Tag;
+use Inachis\Entity\Content\Tag;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
@@ -121,8 +120,8 @@ class TagRepository extends AbstractRepository
     {
         $qb = $this->getEntityManager()->createQuery(
             'SELECT t, COUNT(p.id) AS usageCount
-             FROM Inachis\Entity\Tag t
-             LEFT JOIN Inachis\Entity\Page p WITH t MEMBER OF p.tags
+             FROM Inachis\Entity\Content\Tag t
+             LEFT JOIN Inachis\Entity\Content\Page p WITH t MEMBER OF p.tags
              GROUP BY t.id
              ORDER BY t.title ASC'
         );

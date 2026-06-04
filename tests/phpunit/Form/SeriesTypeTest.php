@@ -9,15 +9,13 @@
 
 namespace Inachis\Tests\phpunit\Form;
 
-use Inachis\Entity\Series;
-use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use Inachis\Entity\Content\Series;
 use Inachis\Form\SeriesType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\Attributes\Test;
 use Ramsey\Uuid\Uuid;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -27,10 +25,9 @@ class SeriesTypeTest extends TypeTestCase
     protected function getExtensions(): array
     {
         $translator = $this->createStub(TranslatorInterface::class);
-        $router = $this->createStub(RouterInterface::class);
-        $transformer = $this->createStub(ArrayCollectionToArrayTransformer::class);
+        $security = $this->createStub(Security::class);
         return [
-            new PreloadedExtension([new SeriesType($translator, $router, $transformer)], [])
+            new PreloadedExtension([new SeriesType($security, $translator)], [])
         ];
     }
 

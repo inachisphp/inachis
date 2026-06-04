@@ -9,8 +9,8 @@
 
 namespace Inachis\Tests\phpunit\Util;
 
-use Inachis\Entity\Page;
-use Inachis\Entity\Revision;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Revision;
 use Inachis\Util\ContentRevisionCompare;
 use PHPUnit\Framework\TestCase;
 

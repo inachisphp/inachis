@@ -9,7 +9,7 @@
 
 namespace Inachis\Service\Export\Series;
 
-use Inachis\Entity\Series;
+use Inachis\Entity\Content\Series;
 use Inachis\Model\Series\SeriesExportDto;
 
 /**

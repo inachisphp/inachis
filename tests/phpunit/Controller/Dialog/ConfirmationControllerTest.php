@@ -10,15 +10,15 @@
 namespace Inachis\Tests\phpunit\Controller\Dialog;
 
 use Inachis\Controller\Dialog\ConfirmationController;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ConfirmationControllerTest extends WebTestCase
+class ConfirmationControllerTest extends InachisControllerTestCase
 {
     /**
      * @throws Exception
@@ -28,11 +28,14 @@ class ConfirmationControllerTest extends WebTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incc/ax/confirmation/get'
         ]);
-        $entityManager = $this->createStub(EntityManagerInterface::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(TranslatorInterface::class);
         $controller = $this->getMockBuilder(ConfirmationController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository,
+            ])
             ->onlyMethods(['render'])
             ->getMock();
         $controller->expects($this->once())->method('render')

@@ -9,12 +9,11 @@
 
 namespace Inachis\Form;
 
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Util\RandomColorPicker;
 use Inachis\Util\TimezoneChoices;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;

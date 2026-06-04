@@ -9,8 +9,8 @@
 
 namespace Inachis\Tests\phpunit\Repository;
 
-use Inachis\Entity\Page;
-use Inachis\Entity\Revision;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Revision;
 use Inachis\Repository\RevisionRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -110,7 +110,7 @@ class RevisionRepositoryTest extends TestCase
             ->setConstructorArgs([$this->registry])
             ->onlyMethods([ 'getEntityManager', 'createQueryBuilder' ])
             ->getMock();
-        $this->repository->expects($this->atMost(1))
+        $this->repository->expects($this->exactly(2))
             ->method('getEntityManager')->willReturn($this->entityManager);
 
         $qb = $this->createMock(QueryBuilder::class);
@@ -120,7 +120,7 @@ class RevisionRepositoryTest extends TestCase
 
         $this->repository->expects($this->once())->method('createQueryBuilder')->willReturn($qb);
 
-        $result = $this->repository->deleteAndRecordByPage($page);
+        $result = $this->repository->deleteAndRecordByPage($page, null);
         $this->assertEquals(RevisionRepository::DELETED, $result->getAction());
         $this->assertEquals('test page', $result->getTitle());
         $this->assertEquals('sub-title', $result->getSubTitle());

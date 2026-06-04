@@ -38,7 +38,7 @@ readonly class UserBulkActionService
     {
         $count = 0;
         foreach ($ids as $id) {
-            /** @var \Inachis\Entity\User|null $user */
+            /** @var \Inachis\Entity\User\User|null $user */
             $user = $this->userRepository->find($id);
             if (null === $user || empty($user->getUsername())) {
                 continue;

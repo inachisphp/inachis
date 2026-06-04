@@ -11,8 +11,8 @@ namespace Inachis\Parser;
 
 use DateTimeImmutable;
 use Exception;
-use Inachis\Entity\Category;
-use Inachis\Entity\Page;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Page;
 use Doctrine\Persistence\ObjectManager;
 
 class MarkdownFileParser
@@ -97,8 +97,10 @@ class MarkdownFileParser
     }
 
     /**
-     * @param array $path
-     * @return Category|null
+     * Resolves a category path to a {@link Category}
+     * 
+     * @param array<string> $path The category path
+     * @return Category|null The resolved {@link Category}
      */
     private function resolveCategoryPath(array $path): ?Category
     {

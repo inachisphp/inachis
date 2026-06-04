@@ -17,6 +17,9 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
+/**
+ * Event listener for admin responses
+ */
 final class AdminResponseEvent implements EventSubscriberInterface
 {
     /**
@@ -24,21 +27,27 @@ final class AdminResponseEvent implements EventSubscriberInterface
      */
     private $logger;
 
+    /**
+     * @var ContentSecurityPolicy
+     */
     private $csp;
 
     /**
      * AdminResponseEvent constructor.
      *
      * @param LoggerInterface    $logger
+     * @param ContentSecurityPolicy $csp
      */
-    public function __construct(LoggerInterface $logger, $csp)
+    public function __construct(LoggerInterface $logger, ContentSecurityPolicy $csp)
     {
         $this->logger = $logger;
         $this->csp = $csp;
     }
 
     /**
-     * @param ResponseEvent $event
+     * Handles kernel requests
+     * 
+     * @param RequestEvent $event The request event
      */
     public function onKernelRequest(RequestEvent $event): void
     {
@@ -49,13 +58,20 @@ final class AdminResponseEvent implements EventSubscriberInterface
     }
 
     /**
-     * @param ResponseEvent $event
+     * Handles kernel responses
+     * 
+     * @param ResponseEvent $event The response event
      */
     public function onKernelResponse(ResponseEvent $event): void
     {
         $this->sendSecurityHeaders($event);
     }
 
+    /**
+     * Handles kernel controllers
+     * 
+     * @param ControllerEvent $event The controller event
+     */
     public function onKernelController(ControllerEvent $event): void
     {
         $controller = $event->getController();
@@ -65,19 +81,23 @@ final class AdminResponseEvent implements EventSubscriberInterface
     }
 
     /**
-     * @return string[]
+     * Returns the events this listener is subscribed to
+     * 
+     * @return array<int, array<int, string>> The events this listener is subscribed to
      */
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::REQUEST    => 'onKernelRequest',
+            KernelEvents::REQUEST => 'onKernelRequest',
             KernelEvents::CONTROLLER => 'onKernelController',
-            KernelEvents::RESPONSE   => 'onKernelResponse',
+            KernelEvents::RESPONSE => 'onKernelResponse',
         ];
     }
 
     /**
-     * @param ResponseEvent $event
+     * Sends security headers to the response
+     * 
+     * @param ResponseEvent $event The response event
      */
     public function sendSecurityHeaders(ResponseEvent $event): void
     {

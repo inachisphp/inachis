@@ -9,43 +9,31 @@
 
 namespace Inachis\Tests\phpunit\Controller;
 
-use Inachis\Controller\TagsController;
-use Inachis\Entity\Tag;
-use Inachis\Repository\TagRepository;
 use ArrayIterator;
-use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Controller\TagsController;
+use Inachis\Entity\Content\Tag;
+use Inachis\Repository\TagRepository;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Twig\Environment;
 
-class TagsControllerTest extends TestCase
+class TagsControllerTest extends InachisControllerTestCase
 {
-    private EntityManagerInterface $entityManager;
-    private Security $security;
-
-    protected TranslatorInterface $translator;
-
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->security = $this->createStub(Security::class);
-        $this->translator = $this->createStub(TranslatorInterface::class);
+        parent::setUp();
     }
 
     private function makeController(): TagsController
     {
         return new TagsController(
             $this->entityManager,
+            $this->params,
             $this->security,
             $this->translator,
+            $this->wasteRepository,
         );
     }
 
@@ -57,8 +45,6 @@ class TagsControllerTest extends TestCase
         $tagRepository = $this->createMock(TagRepository::class);
         $tagRepository->expects($this->once())
             ->method('findByTitleLike')->willReturn($this->createMockPaginator([]));
-        $this->entityManager->expects($this->atLeast(0))
-            ->method('getRepository')->willReturn($tagRepository);
 
         $response = $controller->getTagManagerListContent($request, $tagRepository);
         $data = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
@@ -90,8 +76,6 @@ class TagsControllerTest extends TestCase
         $tagRepository->expects($this->once())
             ->method('findByTitleLike')
             ->willReturn($this->createMockPaginator([$tag1, $tag2, $tag3]));
-        $this->entityManager->expects($this->atLeast(0))
-            ->method('getRepository')->willReturn($tagRepository);
 
         $response = $controller->getTagManagerListContent($request, $tagRepository);
         $data = json_decode($response->getContent(), true, JSON_THROW_ON_ERROR);
@@ -112,8 +96,6 @@ class TagsControllerTest extends TestCase
             ->getMock();
         $paginator->expects($this->once())->method('getIterator')
             ->willReturn(new ArrayIterator($items));
-        $paginator->expects($this->atLeast(0))->method('count')
-            ->willReturn(count($items));
 
         return $paginator;
     }

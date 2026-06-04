@@ -214,7 +214,7 @@
         <p>
             {{ form_widget(form.submit) }}
         {% if post.id is not empty %}
-            {%- if post.status != "published" %}
+            {%- if post.status.value != "published" %}
                 <button type="submit" class="button button--secondary button--info" name="publish">
                 {% if previewMode %}
                     <span class="material-icons" aria-hidden="true">schedule</span> {% trans %}admin.button.schedule{% endtrans %}

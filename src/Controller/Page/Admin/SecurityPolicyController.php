@@ -10,7 +10,7 @@ namespace Inachis\Controller\Page\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\SecurityPolicy;
+use Inachis\Entity\Security\SecurityPolicy;
 use Inachis\Form\SecurityPolicyType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

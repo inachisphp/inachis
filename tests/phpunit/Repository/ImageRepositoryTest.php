@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Repository;
 
-use Inachis\Entity\Image;
+use Inachis\Entity\Media\Image;
 use Inachis\Repository\ImageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -33,8 +33,7 @@ class ImageRepositoryTest extends TestCase
             ->onlyMethods([ 'getEntityManager', 'getAll' ])
             ->getMock();
 
-        $this->repository->expects($this->atLeast(0))
-            ->method('getEntityManager')->willReturn($this->entityManager);
+        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
         parent::setUp();
     }
 

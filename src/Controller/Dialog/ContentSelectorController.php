@@ -48,7 +48,7 @@ class ContentSelectorController extends AbstractInachisController
             $items = $series->getItems();
                 if ($items instanceof \Doctrine\Common\Collections\Collection && !$items->isEmpty()) {
                     $filters['excludeIds'] = [];
-                    /** @var \Inachis\Entity\Page $item */
+                    /** @var \Inachis\Entity\Content\Page $item */
                     foreach ($items as $item) {
                         $filters['excludeIds'][] = $item->getId();
                     }
@@ -93,7 +93,7 @@ class ContentSelectorController extends AbstractInachisController
 
         foreach ($ids as $pageId) {
             $page = $pageRepository->find($pageId);
-            if (!$page instanceof \Inachis\Entity\Page) {
+            if (!$page instanceof \Inachis\Entity\Content\Page) {
                 continue;
             }
 

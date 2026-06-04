@@ -9,7 +9,7 @@
 
 namespace Inachis\EventListener;
 
-use Inachis\Entity\{LoginActivity, User};
+use Inachis\Entity\User\{LoginActivity, User};
 use Inachis\Repository\LoginActivityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;

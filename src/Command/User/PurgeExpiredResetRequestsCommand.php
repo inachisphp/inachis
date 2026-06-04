@@ -9,7 +9,7 @@
 
 namespace Inachis\Command\User;
 
-use Inachis\Entity\PasswordResetRequest;
+use Inachis\Entity\User\PasswordResetRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;

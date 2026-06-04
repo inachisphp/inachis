@@ -9,8 +9,7 @@
 
 namespace Inachis\Service\Page;
 
-use Inachis\Entity\Page;
-use Inachis\Entity\Url;
+use Inachis\Entity\Content\{Page, Url};
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\RevisionRepository;
 use Inachis\Repository\UrlRepository;

@@ -9,20 +9,22 @@
 
 namespace Inachis\Parser;
 
-use Inachis\Entity\Category;
-use Inachis\Entity\Page;
-use Doctrine\Common\Persistence\ObjectManager;
-
+/**
+ * Converts an array representation of a {@link Page} to markdown
+ */
 final class ArrayToMarkdown
 {
     /**
+     * Converts an array representation of a {@link Page} to markdown
+     * 
      * Row 0 - title
      * Row 1 - subtitle / post date
      * Row 2 - postdate / category
      * Row 3 - Category / null
      * Row 4+ - Post content
-     * @param string[] $post
-     * @return string
+     * 
+     * @param array<string> $post The array representation of a {@link Page}
+     * @return string The markdown representation of a {@link Page}
      */
     public static function parse(array $post): string
     {

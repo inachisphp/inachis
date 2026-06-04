@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Repository;
 
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Repository\WasteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;

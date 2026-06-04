@@ -9,11 +9,9 @@
 
 namespace Inachis\Repository;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ParameterType;
-use Inachis\Entity\{Page, Series};
+use Inachis\Entity\Content\{Page, Series};
 
 /**
  * Analytics repository

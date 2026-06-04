@@ -10,10 +10,8 @@
 namespace Inachis\Service\Import\Page;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Category;
-use Inachis\Entity\Page;
-use Inachis\Entity\Tag;
-use Inachis\Entity\User;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\User\User;
 use Inachis\Model\Import\ImportOptionsDto;
 use Inachis\Model\Page\PageExportDto;
 use Inachis\Service\Import\Page\PageImportResult;

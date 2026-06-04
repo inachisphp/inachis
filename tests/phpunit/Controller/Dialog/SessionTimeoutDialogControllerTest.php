@@ -10,24 +10,27 @@
 namespace Inachis\Tests\phpunit\Controller\Dialog;
 
 use Inachis\Controller\Dialog\SessionTimeoutDialogController;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SessionTimeoutDialogControllerTest extends WebTestCase
+class SessionTimeoutDialogControllerTest extends InachisControllerTestCase
 {
     protected SessionTimeoutDialogController $controller;
 
     public function setUp(): void
     {
-        $entityManager = $this->createStub(EntityManagerInterface::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(TranslatorInterface::class);
-        $this->controller = new SessionTimeoutDialogController($entityManager, $security, $translator);
         parent::setUp();
+        $this->controller = new SessionTimeoutDialogController(
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository,
+        );
     }
     public function testKeepAlive(): void
     {

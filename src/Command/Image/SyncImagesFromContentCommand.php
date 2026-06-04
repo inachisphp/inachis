@@ -9,7 +9,7 @@
 
 namespace Inachis\Command\Image;
 
-use Inachis\Entity\Image;
+use Inachis\Entity\Media\Image;
 use Inachis\Repository\PageRepository;
 use Inachis\Repository\ImageRepository;
 use Inachis\Service\Resource\ImageFileService;

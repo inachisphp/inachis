@@ -10,7 +10,7 @@
 namespace Inachis\Command\Image;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Image;
+use Inachis\Entity\Media\Image;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

@@ -9,7 +9,7 @@
 
 namespace Inachis\Controller;
 
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as SymfonyController;
 
 /**
@@ -17,6 +17,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as SymfonyContr
  */
 abstract class AbstractController extends SymfonyController
 {
+
+    /**
+     * @var array<string, mixed>
+     */
+    protected array $data = [];
+
     /**
      * Gets the protocol and hostname.
      * 
