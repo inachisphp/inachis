@@ -119,7 +119,7 @@ class ContentSelectorControllerTest extends InachisControllerTestCase
         $series = (new Series())->setId(Uuid::uuid1());
         $series->addItem(new Page());
         $seriesRepository = $this->createMock(SeriesRepository::class);
-        $seriesRepository->expects($this->once())->method('findOneBy')->willReturn($series);
+        $seriesRepository->expects($this->once())->method('find')->willReturn($series);
         $pageRepository = $this->createStub(PageRepository::class);
 
         $result = $controller->saveContent($request, $seriesRepository, $pageRepository);
@@ -160,9 +160,9 @@ class ContentSelectorControllerTest extends InachisControllerTestCase
         $series = (new Series())->setId(Uuid::uuid1());
         $series->addItem($page);
         $seriesRepository = $this->createMock(SeriesRepository::class);
-        $seriesRepository->expects($this->once())->method('findOneBy')->willReturn($series);
+        $seriesRepository->expects($this->once())->method('find')->willReturn($series);
         $pageRepository = $this->createMock(PageRepository::class);
-        $pageRepository->expects($this->once())->method('findOneBy')->willReturn($page);
+        $pageRepository->expects($this->once())->method('find')->willReturn($page);
 
         $result = $controller->saveContent($request, $seriesRepository, $pageRepository);
         $this->assertEquals('Saved', $result->getContent());

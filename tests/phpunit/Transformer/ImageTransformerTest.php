@@ -22,6 +22,9 @@ class ImageTransformerTest extends TestCase
 
     protected function setUp(): void
     {
+        if (!class_exists(\Imagick::class)) {
+            $this->markTestSkipped('Imagick extension is not installed.');
+        }
         $this->imageTransformer = new ImageTransformer();
     }
 
