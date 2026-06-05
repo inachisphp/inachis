@@ -196,7 +196,7 @@ class UserPreference
      * Sets the timezone for the {@link UserPreference}
      * 
      * @param string|null $value
-     * @return $this
+     * @return self
      * @throws InvalidTimezoneException
      */
     public function setTimezone(?string $value): self
@@ -208,7 +208,7 @@ class UserPreference
     /**
      * Sets the background colour for the {@link User}'s lettered avatar
      * @param string $color
-     * @return $this
+     * @return self
      */
     public function setColor(string $color): self
     {

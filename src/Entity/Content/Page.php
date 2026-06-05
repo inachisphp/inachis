@@ -548,7 +548,7 @@ class Page
      * Sets the value of {@link id}.
      *
      * @param UuidInterface $value The UUID of the {@link Page}
-     * @return $this
+     * @return self
      */
     public function setId(UuidInterface $value): self
     {
@@ -746,7 +746,7 @@ class Page
      * Sets the current type of {@link Page} entity.
      *
      * @param string $type The type of page
-     * @return $this
+     * @return self
      * @throws Exception
      */
     public function setType(string $type): self
@@ -871,7 +871,7 @@ class Page
     }
 
     /**
-     * @return $this
+     * @return self
      */
     public function removeCategories(): self
     {
@@ -896,7 +896,7 @@ class Page
      * Removes a {@link Tag} from the {@link Page}.
      *
      * @param Tag $tag The {@link Tag} to remove from the {@link Page}
-     * @return $this
+     * @return self
      */
     public function removeTag(Tag $tag): self
     {
@@ -905,7 +905,7 @@ class Page
     }
 
     /**
-     * @return $this
+     * @return self
      */
     public function removeTags(): self
     {

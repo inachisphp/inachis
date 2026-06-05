@@ -45,7 +45,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected ?UuidInterface $id = null;
 
     /**
-     * @var string|null Username of the user
+     * @var string Username of the user
      */
     #[ORM\Column(type: "string", length: 255, nullable: false)]
     #[Assert\NotBlank]
@@ -53,7 +53,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         pattern: '/^[A-Za-z0-9]{3,}$/',
         message: 'Username may only contain letters and digits, and must be 3 characters or more.'
     )]
-    protected ?string $username;
+    protected string $username;
 
     /**
      * @var string|null Username of the user
@@ -97,7 +97,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column(type: "string", length: 512)]
     #[Assert\NotBlank]
-    protected string $displayName = '';
+    protected string $displayName;
 
     /**
      * @var array<string> The roles assigned to this user. Currently, not in use.
@@ -156,12 +156,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * version of the password instead. This entity should never hold
      * the password in plain-text.
      *
-     * @param string|null $username The username for the {@link User}
+     * @param string $username The username for the {@link User}
      * @param string|null $password The password for the {@link User}
      * @param string|null $email The email for the {@link User}
      * @throws Exception
      */
-    public function __construct(?string $username = '', ?string $password = '', ?string $email = '')
+    public function __construct(string $username = '', ?string $password = '', ?string $email = '')
     {
         $this->setUsername($username);
         $this->setPassword($password);
@@ -342,10 +342,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getInitials(): ?string
     {
+        $name = $this->getDisplayName();
         $initials = '';
-        $nameWords = explode(' ', $this->getDisplayName());
-        foreach ($nameWords as $nameWord) {
-            $initials .= ucfirst($nameWord[0]);
+        if (!empty($name)) {
+            $nameWords = explode(' ', $name);
+            foreach ($nameWords as $nameWord) {
+                $initials .= ucfirst($nameWord[0]);
+            }
         }
         return $initials;
     }
@@ -354,7 +357,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the unique id for the {@link User}.
      *
      * @param UuidInterface|null $value The value to set
-     * @return $this
+     * @return self
      */
     public function setId(?UuidInterface $value): self
     {
@@ -366,10 +369,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the value of {@link username}.
      *
-     * @param string|null $value The value to set
-     * @return $this
+     * @param string $value The value to set
+     * @return self
      */
-    public function setUsername(?string $value): self
+    public function setUsername(string $value): self
     {
         $this->username = $value;
         $this->usernameCanonical = $value;
@@ -381,7 +384,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the value of {@link password}.
      *
      * @param string|null $value The value to set
-     * @return $this
+     * @return self
      */
     public function setPassword(?string $value, ?DateTimeImmutable $now = null): self
     {
@@ -394,7 +397,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @param string|null $value New password to use
-     * @return $this
+     * @return self
      */
     public function setPlainPassword(?string $value): self
     {
@@ -408,7 +411,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the value of {@link email}.
      *
      * @param string|null $value The value to set
-     * @return $this
+     * @return self
      */
     public function setEmail(?string $value): self
     {
@@ -421,12 +424,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the value of {@link displayName}.
      *
-     * @param string|null $value The value to set
-     * @return $this
+     * @param string $value The value to set
+     * @return self
      */
     public function setDisplayName(string $value): self
     {
-        $this->displayName = $value ?? '';
+        $this->displayName = $value;
 
         return $this;
     }
@@ -448,7 +451,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the value of {@link avatar}.
      *
      * @param string|null $value The value to set
-     * @return $this
+     * @return self
      */
     public function setAvatar(?string $value): self
     {
@@ -461,7 +464,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the value of {@link isActive}.
      *
      * @param bool $value The value to set
-     * @return $this
+     * @return self
      */
     public function setActive(bool $value): self
     {
@@ -474,7 +477,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the value of {@link isRemoved}.
      *
      * @param bool $value The value to set
-     * @return $this
+     * @return self
      */
     public function setRemoved(bool $value): self
     {
@@ -487,7 +490,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the {@link createDate} from a DateTime object.
      *
      * @param DateTimeImmutable $value The date to be set
-     * @return $this
+     * @return self
      */
     public function setCreateDate(DateTimeImmutable $value): self
     {
@@ -500,7 +503,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the {@link modDate} from a DateTime object.
      *
      * @param DateTimeImmutable $value The date to set
-     * @return $this
+     * @return self
      */
     public function setModDate(DateTimeImmutable $value): self
     {
@@ -513,7 +516,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the {@link passwordModDate} from a DateTime object.
      *
      * @param DateTimeImmutable $value The date to set
-     * @return $this
+     * @return self
      */
     public function setPasswordModDate(DateTimeImmutable $value): self
     {
@@ -544,7 +547,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function erase(): void
     {
-        $this->setUsername(null);
         $this->setPassword(null);
         $this->setEmail(null);
         $this->setAvatar(null);

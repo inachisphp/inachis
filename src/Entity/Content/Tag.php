@@ -87,7 +87,7 @@ class Tag
      * Sets the unique identifier of the tag.
      *
      * @param UuidInterface $value The unique identifier of the tag
-     * @return $this
+     * @return self
      */
     public function setId(UuidInterface $value): self
     {
@@ -99,7 +99,7 @@ class Tag
      * Sets the title of the tag and generates a slug.
      *
      * @param string $value The value of the tag
-     * @return $this
+     * @return self
      */
     public function setTitle(string $value): self
     {
@@ -118,6 +118,9 @@ class Tag
     {
         $value = mb_strtolower($value);
         $value = preg_replace('/[^a-z0-9]+/i', '-', $value);
+        if ($value === null) {
+            return '';
+        }
         return trim($value, '-');
     }
 }

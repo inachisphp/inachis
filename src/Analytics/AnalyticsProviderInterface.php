@@ -27,6 +27,10 @@ interface AnalyticsProviderInterface
      *   ['date' => '2026-04-29', 'total' => 123],
      *   ...
      * ]
+     * 
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return array<array{date: string, total: int}>
      */
     public function getPageViewsPerDay(
         \DateTimeInterface $from,
@@ -41,11 +45,18 @@ interface AnalyticsProviderInterface
      *   ['path' => '/post/hello-world', 'total' => 42],
      *   ...
      * ]
+     * 
+     * @param int $limit
+     * @return array<array{path: string, total: int}>
      */
     public function getTopPages(int $limit = 10): array;
 
     /**
      * Get total views in a date range.
+     * 
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return int
      */
     public function getTotalViews(
         \DateTimeInterface $from,
@@ -57,7 +68,7 @@ interface AnalyticsProviderInterface
      *
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return integer
+     * @return int
      */
     public function getMonthlyUniqueVisitors(\DateTimeInterface $from, \DateTimeInterface $to): int;
 
@@ -69,6 +80,9 @@ interface AnalyticsProviderInterface
      *   ['path' => '/post/hello-world', 'code' => 404, 'hits' => 42],
      *   ...
      * ]
+     * 
+     * @param int $limit
+     * @return array<array{path: string, code: int, hits: int}>
      */
     public function getTopErrors(int $limit = 10): array;
 
@@ -88,6 +102,9 @@ interface AnalyticsProviderInterface
      *   ['domain' => 'example.com', 'hits' => 42],
      *   ...
      * ]
+     * 
+     * @param int $limit
+     * @return array<array{domain: string, hits: int}>
      */
     public function getTopReferrers(int $limit = 10): array;
 
@@ -99,6 +116,10 @@ interface AnalyticsProviderInterface
      *   ['domain' => 'example.com', 'hits' => 42],
      *   ...
      * ]
+     * 
+     * @param string $path
+     * @param int $limit
+     * @return array<array{domain: string, hits: int}>
      */
     public function getTopReferrersForPage(string $path, int $limit = 10): array;
 
@@ -114,7 +135,7 @@ interface AnalyticsProviderInterface
      * @param string[] $paths
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array
+     * @return array<array{date: string, total: int}>
      */
     public function getPageViewsPerDayForPaths(
         array $paths,
@@ -134,7 +155,7 @@ interface AnalyticsProviderInterface
      * @param Page $page
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array
+     * @return array<array{date: string, views: int}>
      */
     public function getPageStatsOverTime(Page $page, \DateTimeInterface $from, \DateTimeInterface $to): array;
 
@@ -150,22 +171,33 @@ interface AnalyticsProviderInterface
      * @param Series $series
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array
+     * @return array<array{date: string, views: int}>
      */
     public function getSeriesStatsOverTime(Series $series, \DateTimeInterface $from, \DateTimeInterface $to): array;
 
     /**
      * Get top visitor countries/regions.
+     * 
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     * @return array
      */
     public function getTopRegions(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array;
 
     /**
      * Get RSS subscriber stats over time.
+     * 
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return array
      */
     public function getSubscriberStatsOverTime(\DateTimeInterface $from, \DateTimeInterface $to): array;
 
     /**
      * Get current subscribers per feed path.
+     * 
+     * @return array
      */
     public function getCurrentSubscribersPerFeed(): array;
 }

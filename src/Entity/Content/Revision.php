@@ -37,7 +37,7 @@ class Revision
     /**
      * The ID of the {@link Page}
      * 
-     * @var UuidInterface The ID of the {@link Page}
+     * @var string|null The ID of the {@link Page}
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
     protected ?string $page_id;
@@ -118,7 +118,7 @@ class Revision
      * Sets the value of {@link id}.
      *
      * @param UuidInterface $value The UUID of the {@link Revision}
-     * @return $this
+     * @return self
      */
     public function setId(UuidInterface $value): self
     {
@@ -129,7 +129,7 @@ class Revision
     /**
      * Returns the value of {@link page_id}.
      * 
-     * @return UuidInterface The ID of the {@link Page}
+     * @return string|null The ID of the {@link Page}
      */
     public function getPageId(): ?string
     {
@@ -139,8 +139,8 @@ class Revision
     /**
      * Sets the value of {@link page_id}.
      * 
-     * @param UuidInterface $value The ID of the {@link Page}
-     * @return $this
+     * @param string $page_id The ID of the {@link Page}
+     * @return self
      */
     public function setPageId(string $page_id): self
     {
@@ -163,7 +163,7 @@ class Revision
      * Sets the value of {@link versionNumber}.
      * 
      * @param int $value The version number of the {@link Revision}
-     * @return $this
+     * @return self
      * @throws Exception
      */
     public function setVersionNumber(int $value): self
@@ -213,7 +213,7 @@ class Revision
      * Sets the value of {@link user}.
      * 
      * @param User|null $value The user who created the {@link Revision}
-     * @return $this
+     * @return self
      */
     public function setUser(?User $value = null): self
     {
@@ -236,7 +236,7 @@ class Revision
      * Sets the value of {@link action}.
      * 
      * @param string $value The action type for the {@link Revision}
-     * @return $this
+     * @return self
      */
     public function setAction(string $value): self
     {
@@ -259,7 +259,7 @@ class Revision
      * Sets the value of {@link title}.
      * 
      * @param string $value The title of the {@link Revision}
-     * @return $this
+     * @return self
      */
     public function setTitle(string $value): self
     {
@@ -282,7 +282,7 @@ class Revision
      * Sets the value of {@link subTitle}.
      * 
      * @param string|null $value The sub-title of the {@link Revision}
-     * @return $this
+     * @return self
      */
     public function setSubTitle(?string $value = null): self
     {
@@ -305,7 +305,7 @@ class Revision
      * Sets the value of {@link content}.
      * 
      * @param string|null $value The content of the {@link Revision}
-     * @return $this
+     * @return self
      */
     public function setContent(?string $value): self
     {

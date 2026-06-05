@@ -52,7 +52,7 @@ class Setting
     private \DateTimeImmutable $updatedAt;
 
     /**
-     * @return UuidInterface|null
+     * @return UuidInterface
      */
     public function getId(): ?UuidInterface
     {
@@ -60,10 +60,10 @@ class Setting
     }
 
     /**
-     * @param UuidInterface|null $id
+     * @param UuidInterface $id
      * @return Setting
      */
-    public function setId(?UuidInterface $id): self
+    public function setId(UuidInterface $id): self
     {
         $this->id = $id;
         return $this;
@@ -181,6 +181,28 @@ class Setting
     public function setEncryptedKey(?string $encryptedKey): self
     {
         $this->encryptedKey = $encryptedKey;
+
+        return $this;
+    }
+
+    /**
+     * Get the last updated date for the setting
+     *
+     * @return \DateTimeImmutable
+     */
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * Set the last updated date
+     * 
+     * @param \DateTimeImmutable $updatedAt
+     */
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

@@ -11,7 +11,7 @@ namespace Inachis\Analytics\Provider;
 
 use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Entity\Content\{Page, Series};
-use Inachis\Repository\{AnalyticsRepository, PageRepository, SeriesRepository, UrlRepository};
+use Inachis\Repository\{AnalyticsRepository, SeriesRepository, UrlRepository};
 
 /**
  * Internal analytics provider
@@ -22,16 +22,15 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
 {
     public function __construct(
         private AnalyticsRepository $analyticsRepository,
-        private PageRepository $pageRepository,
         private SeriesRepository $seriesRepository,
         private UrlRepository $urlRepository,
     ) {}
 
     /**
      * Get top pages
-     *
+     * 
      * @param int $limit
-     * @return array<array<string>>
+     * @return array<array{path: string, total: int}>
      */
     public function getTopPages(int $limit = 10): array
     {
@@ -47,7 +46,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      *
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array<array<string>>
+     * @return array<array{date: string, total: int}>
      */
     public function getPageViewsPerDay(\DateTimeInterface $from, \DateTimeInterface $to): array
     {
@@ -82,7 +81,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * Get the most common paths that result in a 4xx or 5xx error.
      *
      * @param int $limit
-     * @return array
+     * @return array<array{path: string, code: int, hits: int}>
      */
     public function getTopErrors(int $limit = 10): array
     {
@@ -107,7 +106,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * Get the most common referring domains.
      *
      * @param int $limit
-     * @return array
+     * @return array<array{domain: string, hits: int}>
      */
     public function getTopReferrers(int $limit = 10): array
     {
@@ -119,7 +118,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      *
      * @param string $path
      * @param int $limit
-     * @return array
+     * @return array<array{domain: string, hits: int}>
      */
     public function getTopReferrersForPage(string $path, int $limit = 10): array
     {
@@ -183,7 +182,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * @param string[] $paths
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array
+     * @return array<array{date: string, total: int}>
      */
     public function getPageViewsPerDayForPaths(
         array $paths,
@@ -199,7 +198,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * @param Page $page
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array
+     * @return array<array{date: string, views: int}>
      */
     public function getPageStatsOverTime(Page $page, \DateTimeInterface $from, \DateTimeInterface $to): array
 	{
@@ -212,7 +211,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * @param Series $series
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array
+     * @return array<array{date: string, views: int}>
      */
     public function getSeriesStatsOverTime(Series $series, \DateTimeInterface $from, \DateTimeInterface $to): array
 	{

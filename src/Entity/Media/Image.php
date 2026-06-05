@@ -22,30 +22,24 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 #[ORM\Index(columns: ['title', 'alt_text', 'description'], name: "fulltext_title_content", flags: ["fulltext"])]
 class Image extends AbstractFile
 {
-    /**
-     * @const string RegExp for allowed mime-types
-     */
+    /** @var list<string> */
     public const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg', 'image/heic', 'image/heif', 'image/webp', 'image/svg+xml'];
+
+    /** @var list<string> */
     public const ALLOWED_TYPES = ['.jpg', '.jpeg', '.png', '.heic', '.heif', '.webp', '.svg'];
 
     public const WARNING_DIMENSIONS = 2048;
     public const WARNING_FILESIZE = 2048; //kb
 
-    /**
-     * @var int
-     */
+    /** @var int The width of the image */
     #[ORM\Column(type: 'integer')]
     protected int $dimensionX = 0;
 
-    /**
-     * @var int
-     */
+    /** @var int The height of the image */
     #[ORM\Column(type: 'integer')]
     protected int $dimensionY = 0;
 
-    /**
-     * @var string|null
-     */
+    /** @var string|null The alt text for the image */
     #[ORM\Column(type: 'string', nullable: true)]
     protected ?string $altText = '';
 
@@ -61,6 +55,8 @@ class Image extends AbstractFile
     }
 
     /**
+     * Returns the width of the image
+     * 
      * @return int
      */
     public function getDimensionX(): int
@@ -69,6 +65,8 @@ class Image extends AbstractFile
     }
 
     /**
+     * Returns the height of the image
+     * 
      * @return int
      */
     public function getDimensionY(): int
@@ -77,6 +75,8 @@ class Image extends AbstractFile
     }
 
     /**
+     * Returns alt text for the image
+     * 
      * @return string|null
      */
     public function getAltText(): ?string
@@ -85,6 +85,8 @@ class Image extends AbstractFile
     }
 
     /**
+     * Sets the width of the image
+     * 
      * @param int $value
      * @return self
      */
@@ -96,6 +98,8 @@ class Image extends AbstractFile
     }
 
     /**
+     * Sets the height of the image
+     * 
      * @param int $value
      * @return self
      */
@@ -107,6 +111,8 @@ class Image extends AbstractFile
     }
 
     /**
+     * Sets the alt text for the image
+     * 
      * @param string|null $value
      * @return self
      */
@@ -118,10 +124,12 @@ class Image extends AbstractFile
     }
 
     /**
-     * @param $imageDirectory
-     * @return array
+     * Gets the properties of the image file using PHP's getimagesize function
+     * 
+     * @param string $imageDirectory
+     * @return array<int|string, int|string>|false
      */
-    public function getImageProperties(string $imageDirectory): array
+    public function getImageProperties(string $imageDirectory): array|false
     {
         $fullImagePath = self::getFilename();
         if (!empty($imageDirectory) && !str_starts_with($fullImagePath, 'http')) {

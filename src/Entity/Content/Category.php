@@ -33,10 +33,10 @@ class Category
     protected ?UuidInterface $id = null;
 
     /**
-     * @var string|null The name of the category
+     * @var string The name of the category
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    protected ?string $title = '';
+    protected string $title = '';
 
     /**
      * @var string|null Description of the category
@@ -69,7 +69,7 @@ class Category
     protected ?Category $parent = null;
 
     /**
-     * @var Collection The array of child categories if applicable
+     * @var Collection<int, Category> The array of child categories if applicable
      */
     #[ORM\OneToMany(targetEntity: 'Inachis\Entity\Content\Category', mappedBy: 'parent')]
     #[ORM\OrderBy(['title' => 'ASC'])]
@@ -101,9 +101,9 @@ class Category
     /**
      * Returns the value of {@link title}.
      *
-     * @return string|null The title of the {@link Category} - cannot be empty
+     * @return string The title of the {@link Category} - cannot be empty
      */
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -159,7 +159,7 @@ class Category
     /**
      * Returns all child categories for the current {@link Category}.
      *
-     * @return Collection
+     * @return Collection<int, Category>
      */
     public function getChildren(): Collection
     {
@@ -170,7 +170,7 @@ class Category
      * Sets the value of {@link id}.
      *
      * @param UuidInterface|null $value The UUID of the {@link Category}
-     * @return $this
+     * @return self
      */
     public function setId(?UuidInterface $value): self
     {
@@ -182,10 +182,10 @@ class Category
     /**
      * Sets the value of {@link title}.
      *
-     * @param string|null $value The title of the {@link Category}
-     * @return $this
+     * @param string $value The title of the {@link Category}
+     * @return self
      */
-    public function setTitle(?string $value): self
+    public function setTitle(string $value): self
     {
         $this->title = $value;
 
@@ -196,7 +196,7 @@ class Category
      * Sets the value of {@link description}.
      *
      * @param string|null $value The description of the {@link Category}
-     * @return $this
+     * @return self
      */
     public function setDescription(?string $value): self
     {
@@ -209,7 +209,7 @@ class Category
      * Sets the value of {@link image}.
      *
      * @param Image|null $value The UUID or URL of the image for {@link Category}
-     * @return $this
+     * @return self
      */
     public function setImage(?Image $value): self
     {
@@ -222,7 +222,7 @@ class Category
      * Sets the value of {@link icon}.
      *
      * @param Image|null $value The UUID or URL of the image for {@link Category}
-     * @return $this
+     * @return self
      */
     public function setIcon(?Image $value): self
     {
@@ -246,7 +246,7 @@ class Category
      * Sets the value of {@link parent}.
      *
      * @param Category|null $parent The parent of the current category
-     * @return $this
+     * @return self
      */
     public function setParent(?Category $parent = null): self
     {
@@ -312,10 +312,11 @@ class Category
      */
     public function getFullPath(): string
     {
-        if (!$this->isChildCategory()) {
-            return $this->getTitle();
+        $parent = $this->getParent();
+        if (!empty($parent)) {
+            return $parent->getFullPath() . '/' . $this->getTitle();
         }
 
-        return $this->getParent()->getFullPath() . '/' . $this->getTitle();
+        return $this->getTitle();
     }
 }

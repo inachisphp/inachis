@@ -36,7 +36,7 @@ class PasswordResetRequest
     /**
      * @var User The User this token relates to
      */
-    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User')]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User\User')]
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
 
