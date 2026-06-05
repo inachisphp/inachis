@@ -10,7 +10,7 @@
 namespace Inachis\Service\Export\Category;
 
 use Inachis\Entity\Content\Category;
-use Inachis\Repository\CategoryRepository;
+use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Service\Export\AbstractExportService;
 use Inachis\Service\Export\Category\CategoryExportNormaliser;
 use Inachis\Service\Export\ExportWriterInterface;

@@ -16,7 +16,7 @@ use Ramsey\Uuid\UuidInterface;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: 'Inachis\Repository\UserPreferenceRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\User\UserPreferenceRepository', readOnly: false)]
 #[ORM\Index(columns: [ 'user_id' ], name: 'search_idx')]
 class UserPreference
 {

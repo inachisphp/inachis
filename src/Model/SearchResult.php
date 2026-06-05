@@ -15,13 +15,15 @@ use Traversable;
 
 /**
  * Model for containing search result items
+ * @template TValue of array<string, mixed>
+ * @implements IteratorAggregate<int, TValue>
  */
 class SearchResult implements IteratorAggregate
 {
     /**
      * Creates a new instance of {@link SearchResult}
      * 
-     * @param array<int, array<string, mixed>> $results The search results
+     * @param list<array<string, mixed>> $results The search results
      * @param int $total The total number of search results
      * @param int $offset The offset of the search results
      * @param int $limit The limit of the search results
@@ -36,7 +38,7 @@ class SearchResult implements IteratorAggregate
     /**
      * Returns an iterator for the search results
      * 
-     * @return Traversable The iterator for the search results
+     * @return Traversable<int, TValue> The iterator for the search results
      */
     public function getIterator(): Traversable
     {
@@ -76,7 +78,7 @@ class SearchResult implements IteratorAggregate
     /**
      * Returns the search results
      * 
-     * @return array<int, array<string, mixed>> The search results
+     * @return array<int, array<string, TValue>> The search results
      */
     public function getResults(): array
     {

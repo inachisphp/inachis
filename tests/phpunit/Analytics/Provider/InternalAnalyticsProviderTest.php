@@ -14,10 +14,8 @@ use Inachis\Analytics\Provider\InternalAnalyticsProvider;
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Series;
 use Inachis\Entity\Content\Url;
-use Inachis\Repository\AnalyticsRepository;
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\SeriesRepository;
-use Inachis\Repository\UrlRepository;
+use Inachis\Repository\Analytics\AnalyticsRepository;
+use Inachis\Repository\Content\{PageRepository, SeriesRepository, UrlRepository};
 use PHPUnit\Framework\TestCase;
 
 class InternalAnalyticsProviderTest extends TestCase
@@ -32,7 +30,6 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
-            $this->createStub(PageRepository::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -56,7 +53,6 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
-            $this->createStub(PageRepository::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -73,7 +69,6 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
-            $this->createStub(PageRepository::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -90,7 +85,6 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
-            $this->createStub(PageRepository::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -110,7 +104,6 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
-            $this->createStub(PageRepository::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -143,7 +136,6 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
-            $this->createStub(PageRepository::class),
             $seriesRepository,
             $urlRepository,
         );
@@ -170,7 +162,6 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
-            $this->createStub(PageRepository::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -192,7 +183,6 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
-            $this->createStub(PageRepository::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -211,7 +201,6 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
-            $this->createStub(PageRepository::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -229,7 +218,6 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
-            $this->createStub(PageRepository::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -247,7 +235,6 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
-            $this->createStub(PageRepository::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -265,7 +252,6 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
-            $this->createStub(PageRepository::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -283,7 +269,6 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
-            $this->createStub(PageRepository::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -301,7 +286,6 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
-            $this->createStub(PageRepository::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );

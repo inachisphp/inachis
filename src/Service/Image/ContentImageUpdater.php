@@ -12,7 +12,7 @@ namespace Inachis\Service\Image;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Content\Revision;
-use Inachis\Repository\RevisionRepository;
+use Inachis\Repository\Content\RevisionRepository;
 
 /**
  * Handles updating of content fields containing image URLs, and optionally creates a new revision for the change.

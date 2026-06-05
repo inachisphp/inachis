@@ -12,7 +12,7 @@ namespace Inachis\Controller\Page\Url;
 use Doctrine\ORM\OptimisticLockException;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\UrlRepository;
+use Inachis\Repository\Content\UrlRepository;
 use Inachis\Service\Url\UrlBulkActionService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

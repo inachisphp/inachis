@@ -12,7 +12,7 @@ namespace Inachis\Tests\phpunit\Controller\Page\Admin;
 use Inachis\Controller\Page\Admin\AdminProfileController;
 use Inachis\Entity\User\User;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\UserRepository;
+use Inachis\Repository\User\UserRepository;
 use Inachis\Service\User\UserBulkActionService;
 use Inachis\Service\User\UserAccountEmailService;
 use Inachis\Transformer\ImageTransformer;

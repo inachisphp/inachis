@@ -10,7 +10,6 @@
 namespace Inachis\Command\Analytics;
 
 use Doctrine\DBAL\Connection;
-use Inachis\Repository\AnalyticsRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

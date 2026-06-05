@@ -11,9 +11,9 @@ namespace Inachis\Tests\phpunit\Service\Page;
 
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Url;
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\RevisionRepository;
-use Inachis\Repository\UrlRepository;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\RevisionRepository;
+use Inachis\Repository\Content\UrlRepository;
 use Inachis\Service\Page\PageBulkActionService;
 use Inachis\Service\Waste\WasteManagerService;
 use Doctrine\ORM\EntityManager;

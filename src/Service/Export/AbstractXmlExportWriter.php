@@ -11,6 +11,9 @@ namespace Inachis\Service\Export;
 
 use SimpleXMLElement;
 
+/**
+ * Abstract base class for XML export writers.
+ */
 abstract class AbstractXmlExportWriter implements ExportWriterInterface
 {
     /**
@@ -25,11 +28,17 @@ abstract class AbstractXmlExportWriter implements ExportWriterInterface
 
     /**
      * Write one DTO into XML
+     *
+     * @param SimpleXMLElement $xml The XML element to write to.
+     * @param object $item The item to write.
      */
     abstract protected function writeItem(SimpleXMLElement $xml, object $item): void;
 
     /**
      * XML write entry point
+     *
+     * @param iterable<object> $items The items to write.
+     * @return string The XML.
      */
     final public function write(iterable $items): string
     {
@@ -45,11 +54,20 @@ abstract class AbstractXmlExportWriter implements ExportWriterInterface
             $this->writeItem($itemXml, $item);
         }
 
-        return $xml->asXML();
+        $xml = $xml->asXML();
+        if ($xml === false) {
+            throw new \RuntimeException('Failed to write XML');
+        }
+
+        return $xml;
     }
 
     /**
      * Helper for optional text nodes
+     *
+     * @param SimpleXMLElement $xml The XML element to write to.
+     * @param string $name The name of the node.
+     * @param string|null $value The value of the node.
      */
     protected function optional(
         SimpleXMLElement $xml,
@@ -63,6 +81,12 @@ abstract class AbstractXmlExportWriter implements ExportWriterInterface
 
     /**
      * Helper for boolean nodes
+     *
+     * @param SimpleXMLElement $xml The XML element to write to.
+     * @param string $name The name of the node.
+     * @param bool $value The value of the node.
+     * @param string $true The value to use for true.
+     * @param string $false The value to use for false.
      */
     protected function boolean(
         SimpleXMLElement $xml,

@@ -11,8 +11,7 @@ namespace Inachis\Controller;
 
 use Inachis\Entity\Content\Tag;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\TagRepository;
+use Inachis\Repository\Content\{PageRepository,TagRepository};
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

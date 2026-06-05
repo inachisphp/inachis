@@ -13,8 +13,8 @@ use DateTimeImmutable;
 use Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\User\{PasswordResetRequest,User};
-use Inachis\Repository\UserRepository;
-use Inachis\Repository\PasswordResetRequestRepository;
+use Inachis\Repository\User\UserRepository;
+use Inachis\Repository\User\PasswordResetRequestRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Random\RandomException;
 

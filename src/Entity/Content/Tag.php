@@ -16,7 +16,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * Object for handling tags that are mapped to content.
  */
-#[ORM\Entity(repositoryClass: 'Inachis\Repository\TagRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\TagRepository', readOnly: false)]
 #[ORM\Index(name: "search_idx", columns: [ "title" ])]
 class Tag
 {

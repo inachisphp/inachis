@@ -16,7 +16,7 @@ use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: 'Inachis\Repository\LoginActivityRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\User\LoginActivityRepository', readOnly: false)]
 class LoginActivity
 {
     /**

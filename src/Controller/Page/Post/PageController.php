@@ -17,7 +17,7 @@ use Inachis\Entity\Media\Image;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Form\PostType;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\{PageRepository, ReviewThreadRepository, RevisionRepository, TagRepository};
+use Inachis\Repository\Content\{PageRepository, ReviewThreadRepository, RevisionRepository, TagRepository};
 use Inachis\Service\Page\{PageBulkActionService, ReviewRebaseService};
 use Inachis\Util\{ContentRevisionCompare, ReadingTime, UrlNormaliser};
 use Ramsey\Uuid\Uuid;

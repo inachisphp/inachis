@@ -22,7 +22,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * Object for handling {@link Series} entities
  */
-#[ORM\Entity(repositoryClass: 'Inachis\Repository\SeriesRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\SeriesRepository', readOnly: false)]
 #[ORM\Index(name: 'search_idx', columns: ['title'])]
 #[ORM\Index(name: "fulltext_title_content", columns: ['title', 'sub_title', 'description'], flags: ["fulltext"])]
 class Series

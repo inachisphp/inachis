@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 
-#[ORM\Entity(repositoryClass: 'Inachis\Repository\SettingRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\System\SettingRepository', readOnly: false)]
 #[ORM\Index(columns: ['name'], name: 'search_idx')]
 class Setting
 {

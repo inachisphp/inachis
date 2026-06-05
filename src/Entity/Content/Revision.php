@@ -19,7 +19,7 @@ use Exception;
 /**
  * Object for handling {@link Page} revisions
  */
-#[ORM\Entity(repositoryClass: 'Inachis\Repository\RevisionRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\RevisionRepository', readOnly: false)]
 #[ORM\Index(columns: [ 'page_id', 'user_id' ], name: 'search_idx')]
 class Revision
 {

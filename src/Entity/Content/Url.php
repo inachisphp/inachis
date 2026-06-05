@@ -18,7 +18,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * Object for handling custom URLs that are mapped to content.
  */
-#[ORM\Entity(repositoryClass: 'Inachis\Repository\UrlRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\UrlRepository', readOnly: false)]
 #[ORM\Index(columns: ['linkCanonical'], name: 'search_idx')]
 class Url
 {

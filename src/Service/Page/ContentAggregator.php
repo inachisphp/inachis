@@ -11,8 +11,7 @@ namespace Inachis\Service\Page;
 
 use Inachis\Entity\Content\{Page, Series};
 use Inachis\Enum\EditorialStatus;
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\Content\{PageRepository, SeriesRepository};
 use Inachis\Util\TextCleaner;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use DateTimeImmutable;

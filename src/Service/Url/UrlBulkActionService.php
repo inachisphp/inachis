@@ -11,7 +11,7 @@ namespace Inachis\Service\Url;
 
 use DateTimeImmutable;
 use Inachis\Entity\Content\Url;
-use Inachis\Repository\UrlRepository;
+use Inachis\Repository\Content\UrlRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 

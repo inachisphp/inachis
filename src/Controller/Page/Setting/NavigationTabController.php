@@ -13,7 +13,7 @@ use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\System\NavigationTab;
 use Inachis\Form\NavigationTabType;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\NavigationTabRepository;
+use Inachis\Repository\System\NavigationTabRepository;
 use Inachis\Service\Navigation\NavigationTabService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;

@@ -26,7 +26,7 @@ use InvalidArgumentException;
 /**
  * Object for handling pages of a site.
  */
-#[ORM\Entity(repositoryClass: 'Inachis\Repository\PageRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\PageRepository', readOnly: false)]
 #[ORM\Index(columns: ['title', 'author_id', 'image_id'], name: 'search_idx')]
 #[ORM\Index(columns: ['title', 'sub_title', 'content'], name: "fulltext_title_content", flags: ["fulltext"])]
 class Page

@@ -11,8 +11,8 @@ namespace Inachis\Tests\phpunit\Controller\Dialog;
 
 use Inachis\Controller\Dialog\ContentSelectorController;
 use Inachis\Entity\Content\{Page, Series};
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;

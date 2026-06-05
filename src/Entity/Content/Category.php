@@ -19,7 +19,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * Object for handling categories on a site.
  */
-#[ORM\Entity(repositoryClass: 'Inachis\Repository\CategoryRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\CategoryRepository', readOnly: false)]
 #[ORM\Index(columns: ['title'], name: 'search_idx')]
 class Category
 {

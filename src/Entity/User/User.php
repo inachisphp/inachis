@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Object for handling User entity.
  */
-#[ORM\Entity(repositoryClass: 'Inachis\Repository\UserRepository')]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\User\UserRepository')]
 #[ORM\Index(columns: [ 'usernameCanonical', 'emailCanonical' ], name: 'search_idx')]
 #[UniqueEntity(fields: ['email'], message: 'This email address is already used.')]
 #[UniqueEntity(fields: ['username'], message: 'This username is already taken.')]
@@ -97,7 +97,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column(type: "string", length: 512)]
     #[Assert\NotBlank]
-    protected string $displayName;
+    protected string $displayName = '';
 
     /**
      * @var array<string> The roles assigned to this user. Currently, not in use.

@@ -11,7 +11,8 @@ namespace Inachis\Analytics\Provider;
 
 use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Entity\Content\{Page, Series};
-use Inachis\Repository\{AnalyticsRepository, SeriesRepository, UrlRepository};
+use Inachis\Repository\Analytics\AnalyticsRepository;
+use Inachis\Repository\Content\{SeriesRepository, UrlRepository};
 
 /**
  * Internal analytics provider
