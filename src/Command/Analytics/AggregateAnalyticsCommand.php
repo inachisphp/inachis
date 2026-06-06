@@ -53,6 +53,8 @@ class AggregateAnalyticsCommand extends Command
 				$this->processErrorFile($file);
 			} elseif (str_contains($file, '/subscriber-')) {
                 $this->processSubscriberFile($file);
+            } elseif (str_contains($file, '/bot-')) {
+                $this->processBotFile($file);
             }
 
 			$output->writeln(sprintf('Processed %s', basename($file)));
@@ -212,7 +214,7 @@ class AggregateAnalyticsCommand extends Command
 			if (!$data || !isset($data['path'], $data['date'], $data['code'])) {
 				continue;
 			}
-            if ($this-shouldIgnoreError($path)) {
+            if ($this->shouldIgnoreError($data['path'])) {
                 continue;
             }
 
@@ -311,6 +313,53 @@ class AggregateAnalyticsCommand extends Command
                     'path' => $path,
                     'date' => $date,
                     'subscribers' => $totalSubscribers,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Processes bot log files and aggregates bot traffic by user-agent per day
+     *
+     * @param string $file
+     */
+    private function processBotFile(string $file): void
+    {
+        $handle = fopen($file, 'r');
+        if (!$handle) {
+            return;
+        }
+
+        $counts = []; // [ua|date => hits]
+
+        while (($line = fgets($handle)) !== false) {
+            $data = json_decode($line, true);
+
+            if (!$data || !isset($data['ua'], $data['date'])) {
+                continue;
+            }
+
+            $ua = mb_substr(trim($data['ua']), 0, 255);
+            $date = $data['date'];
+            $key = $ua . '|' . $date;
+            $counts[$key] = ($counts[$key] ?? 0) + 1;
+        }
+
+        fclose($handle);
+
+        foreach ($counts as $key => $hits) {
+            [$ua, $date] = explode('|', $key, 2);
+
+            $this->db->executeStatement(
+                '
+                INSERT INTO analytics_bots (user_agent, date, hits)
+                VALUES (:ua, :date, :hits)
+                ON DUPLICATE KEY UPDATE hits = hits + :hits
+                ',
+                [
+                    'ua'   => $ua,
+                    'date' => $date,
+                    'hits' => $hits,
                 ]
             );
         }

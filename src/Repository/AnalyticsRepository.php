@@ -452,4 +452,29 @@ class AnalyticsRepository
             '
         );
     }
+
+    /**
+     * Get top bot user-agents ordered by total hits in the given date range.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     * @return array
+     */
+    public function getTopBots(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 15): array
+    {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT user_agent, SUM(hits) AS total
+            FROM analytics_bots
+            WHERE date BETWEEN :from AND :to
+            GROUP BY user_agent
+            ORDER BY total DESC
+            LIMIT ' . (int) $limit,
+            [
+                'from' => $from->format('Y-m-d'),
+                'to'   => $to->format('Y-m-d'),
+            ]
+        );
+    }
 }

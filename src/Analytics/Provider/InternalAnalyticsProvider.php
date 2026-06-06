@@ -253,4 +253,17 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
     {
         return $this->analyticsRepository->getCurrentSubscribersPerFeed();
     }
+
+    /**
+     * Get top bot user-agents in the given date range.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     * @return array
+     */
+    public function getTopBots(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 15): array
+    {
+        return $this->analyticsRepository->getTopBots($from, $to, $limit);
+    }
 }

@@ -67,6 +67,14 @@ class AnalyticsSubscriber implements EventSubscriberInterface
         $ip = $request->getClientIp();
         $visitorId = hash('sha256', $ip . '|' . $userAgent);
         if (preg_match('/bot|crawl|spider|slurp|wget|curl/i', $userAgent)) {
+            $botFile = sprintf('%s/bot-%s.log', $dir, $date);
+            $botLine = json_encode([
+                'path' => $path,
+                'ua'   => mb_substr($userAgent, 0, 255),
+                'date' => $date,
+                'ts'   => time(),
+            ], JSON_UNESCAPED_SLASHES);
+            file_put_contents($botFile, $botLine . PHP_EOL, FILE_APPEND | LOCK_EX);
             return;
         }
         

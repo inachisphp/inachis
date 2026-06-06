@@ -168,4 +168,15 @@ interface AnalyticsProviderInterface
      * Get current subscribers per feed path.
      */
     public function getCurrentSubscribersPerFeed(): array;
+
+    /**
+     * Get top bot user-agents in the given date range.
+     *
+     * Expected format:
+     * [
+     *   ['user_agent' => 'Googlebot/2.1', 'total' => 1234],
+     *   ...
+     * ]
+     */
+    public function getTopBots(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 15): array;
 }
