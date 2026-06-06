@@ -7,5 +7,10 @@
     <header>
         <h1>{{ settings.siteTitle }}</h1>
         {% include "web/partials/nav.html.twig" %}
+        <form action="{{ path('web_search') }}" method="get" role="search" class="site-search" aria-label="Search the site">
+            <label for="site-search-input" class="visually-hidden">Search</label>
+            <input id="site-search-input" name="q" type="search" value="{{ app.request.query.get('q', '') }}" placeholder="Search pages and series" />
+            <button type="submit">Go</button>
+        </form>
     </header>
 </div>

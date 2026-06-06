@@ -26,7 +26,7 @@ class SearchRepositoryTest extends TestCase
     public function setUp(): void
     {
         $registry = $this->createStub(ManagerRegistry::class);
-        $this->connection = $this->createStub(Connection::class);
+        $this->connection = $this->createMock(Connection::class);
         $this->repository = new SearchRepository($registry, $this->connection);
     }
 
@@ -63,7 +63,10 @@ class SearchRepositoryTest extends TestCase
             ->method('fetchOne')
             ->willReturn($totalResults);
 
-        $this->connection
+        $connection = $this->createMock(Connection::class);
+        $this->connection = $connection;
+
+        $connection
             ->method('prepare')
             ->willReturnOnConsecutiveCalls(
                 $this->createConfiguredStub(Statement::class, [
@@ -83,6 +86,47 @@ class SearchRepositoryTest extends TestCase
     }
 
 
+    public function testSearchPublicReturnsSearchResultWithoutImages(): void
+    {
+        $keyword = 'example';
+        $offset = 0;
+        $limit = 10;
+        $totalResults = 3;
+        $fetchedRows = [
+            ['id' => 1, 'title' => 'Page result', 'type' => 'Page'],
+            ['id' => 2, 'title' => 'Series result', 'type' => 'Series'],
+        ];
+
+        $mainStmt = $this->createMock(Result::class);
+        $mainStmt->expects($this->once())
+            ->method('fetchAllAssociative')
+            ->willReturn($fetchedRows);
+        $countStmt = $this->createMock(Result::class);
+        $countStmt->expects($this->once())
+            ->method('fetchOne')
+            ->willReturn($totalResults);
+
+        $connection = $this->createMock(Connection::class);
+        $this->connection = $connection;
+
+        $connection
+            ->method('prepare')
+            ->willReturnOnConsecutiveCalls(
+                $this->createConfiguredStub(Statement::class, [
+                    'executeQuery' => $mainStmt,
+                ]),
+                $this->createConfiguredStub(Statement::class, [
+                    'executeQuery' => $countStmt,
+                ])
+            );
+
+        $result = $this->repository->searchPublic($keyword, $offset, $limit);
+
+        $this->assertInstanceOf(SearchResult::class, $result);
+        $this->assertSame($fetchedRows, $result->getResults());
+        $this->assertSame($totalResults, $result->getTotal());
+    }
+
     public function testGetSQLUnionGeneratesCorrectSQL(): void
     {
         $fields = ['p.id, p.title', 's.id, s.title', 'i.id, i.title'];
@@ -96,6 +140,20 @@ class SearchRepositoryTest extends TestCase
         $this->assertStringContainsString('SELECT s.id, s.title FROM series s WHERE', $sql);
         $this->assertStringContainsString('SELECT i.id, i.title FROM image i WHERE', $sql);
         $this->assertStringContainsString('UNION ALL', $sql);
+    }
+
+    public function testGetSQLUnionWithoutImagesOmitsImageBranch(): void
+    {
+        $fields = ['p.id, p.title', 's.id, s.title'];
+
+        $reflection = new \ReflectionClass($this->repository);
+        $method = $reflection->getMethod('getSQLUnion');
+
+        $sql = $method->invoke($this->repository, $fields, false);
+
+        $this->assertStringContainsString('SELECT p.id, p.title FROM page p WHERE', $sql);
+        $this->assertStringContainsString('SELECT s.id, s.title FROM series s WHERE', $sql);
+        $this->assertStringNotContainsString('FROM image i WHERE', $sql);
     }
 
     public function testDetermineOrderBy(): void
