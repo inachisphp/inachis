@@ -10,7 +10,7 @@
 namespace Inachis\Service\User;
 
 use DateTimeImmutable;
-use Inachis\Repository\UserRepository;
+use Inachis\Repository\User\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**

@@ -18,7 +18,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * Object for handling {@link Waste} contents
  */
-#[ORM\Entity(repositoryClass: 'Inachis\Repository\WasteRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\Waste\WasteRepository', readOnly: false)]
 #[ORM\Index(name: 'search_idx', columns: ['source_type', 'user_id'])]
 class Waste
 {

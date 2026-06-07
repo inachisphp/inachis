@@ -11,8 +11,7 @@ namespace Inachis\Controller\Dialog;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Content\Category;
-use Inachis\Repository\CategoryRepository;
-use Inachis\Repository\PageRepository;
+use Inachis\Repository\Content\{CategoryRepository, PageRepository};
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

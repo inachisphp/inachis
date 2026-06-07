@@ -12,7 +12,7 @@ namespace Inachis\Service\Import\Series;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Content\{Page,Series};
 use Inachis\Model\Series\SeriesExportDto;
-use Inachis\Repository\PageRepository;
+use Inachis\Repository\Content\PageRepository;
 use Inachis\Service\Import\Series\SeriesImportResult;
 use DateTime;
 use InvalidArgumentException;

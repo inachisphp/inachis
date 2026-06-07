@@ -18,7 +18,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * Object for handling custom URLs that are mapped to content.
  */
-#[ORM\Entity(repositoryClass: 'Inachis\Repository\UrlRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\UrlRepository', readOnly: false)]
 #[ORM\Index(columns: ['linkCanonical'], name: 'search_idx')]
 class Url
 {
@@ -175,7 +175,7 @@ class Url
      * Sets the value of {@link id}.
      *
      * @param UuidInterface $value The value to set
-     * @return $this
+     * @return self
      */
     public function setId(UuidInterface $value): self
     {
@@ -187,7 +187,7 @@ class Url
      * Sets the value of {@link link}.
      *
      * @param string $value The value to set
-     * @return $this
+     * @return self
      */
     public function setLink(string $value): self
     {
@@ -200,7 +200,7 @@ class Url
      * Sets the value of {@link content}.
      *
      * @param Page $value The value to set
-     * @return $this
+     * @return self
      */
     public function setContent(Page $value): self
     {
@@ -212,7 +212,7 @@ class Url
      * Sets the value of {@link default}.
      *
      * @param bool $value The value to set
-     * @return $this
+     * @return self
      */
     public function setDefault(bool $value): self
     {
@@ -224,7 +224,7 @@ class Url
      * Sets the value of {@link createDate}.
      *
      * @param DateTimeImmutable $value The value to set
-     * @return $this
+     * @return self
      */
     public function setCreateDate(DateTimeImmutable $value): self
     {
@@ -236,7 +236,7 @@ class Url
      * Sets the value of {@link modDate}.
      *
      * @param DateTimeImmutable $value The value to set
-     * @return $this
+     * @return self
      */
     public function setModDate(DateTimeImmutable $value): self
     {
@@ -247,7 +247,7 @@ class Url
     /**
      * Sets the mod date for the {@link Url} to the current date.
      *
-     * @return $this
+     * @return self
      */
     public function setModDateToNow(): self
     {

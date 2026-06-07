@@ -11,8 +11,7 @@ namespace Inachis\Controller\Dialog;
 
 use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\Content\{PageRepository, SeriesRepository};
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

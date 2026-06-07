@@ -16,7 +16,7 @@ use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: 'Inachis\Repository\LoginActivityRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\User\LoginActivityRepository', readOnly: false)]
 class LoginActivity
 {
     /**
@@ -73,7 +73,7 @@ class LoginActivity
     private ?string $username = '';
 
     /**
-     * @var array|null Anything else worth noting about the login attempt
+     * @var array<string>|null Anything else worth noting about the login attempt
      */
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $extraData = null;
@@ -88,7 +88,7 @@ class LoginActivity
      * @param string|null $userAgent
      * @param string|null $sessionId
      * @param string|null $username
-     * @param array|null $extraData
+     * @param array<string>|null $extraData
      */
     public function __construct(
         ?User $user,
@@ -174,7 +174,7 @@ class LoginActivity
     }
 
     /**
-     * @return array|null
+     * @return array<string>|null
      */
     public function getExtraData(): ?array
     {
@@ -262,7 +262,7 @@ class LoginActivity
     }
 
     /**
-     * @param array|null $extraData
+     * @param array<string>|null $extraData
      * @return self
      */
     public function setExtraData(?array $extraData): self

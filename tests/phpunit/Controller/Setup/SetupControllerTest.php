@@ -10,15 +10,11 @@
 namespace Inachis\Tests\phpunit\Controller\Setup;
 
 use Inachis\Controller\Setup\SetupController;
-use Inachis\Repository\UserRepository;
-use Inachis\Service\Page\ContentAggregator;
+use Inachis\Repository\User\UserRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
-use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\Exception;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\Translator;
 
 class SetupControllerTest extends InachisControllerTestCase
 {

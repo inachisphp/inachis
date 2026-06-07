@@ -10,7 +10,7 @@
 namespace Inachis\Tests\phpunit\Model;
 
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\PageRepository;
+use Inachis\Repository\Content\PageRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;

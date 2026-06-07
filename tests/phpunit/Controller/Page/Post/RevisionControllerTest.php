@@ -11,8 +11,8 @@ namespace Inachis\Tests\phpunit\Controller\Page\Post;
 
 use Inachis\Controller\Page\Post\RevisionController;
 use Inachis\Entity\Content\{Page, Revision, Url};
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\RevisionRepository;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\RevisionRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Uuid;

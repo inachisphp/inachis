@@ -10,10 +10,7 @@
 namespace Inachis\Service;
 
 use Inachis\Entity\Content\Series;
-use Inachis\Repository\CategoryRepository;
-use Inachis\Repository\SeriesRepository;
-use Inachis\Repository\TagRepository;
-use Inachis\Repository\UrlRepository;
+use Inachis\Repository\Content\{CategoryRepository, SeriesRepository, TagRepository, UrlRepository};
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 

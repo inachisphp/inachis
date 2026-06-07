@@ -11,8 +11,8 @@ namespace Inachis\Tests\phpunit\Controller\Dialog;
 
 use Inachis\Controller\Dialog\CategoryDialogController;
 use Inachis\Entity\Content\Category;
-use Inachis\Repository\CategoryRepository;
-use Inachis\Repository\PageRepository;
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Content\PageRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use ArrayIterator;
 use Doctrine\ORM\Tools\Pagination\Paginator;

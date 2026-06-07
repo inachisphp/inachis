@@ -14,7 +14,7 @@ use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\User\User;
 use Inachis\Form\UserType;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\UserRepository;
+use Inachis\Repository\User\UserRepository;
 use Inachis\Service\User\UserBulkActionService;
 use Inachis\Service\User\UserAccountEmailService;
 use Inachis\Transformer\ImageTransformer;

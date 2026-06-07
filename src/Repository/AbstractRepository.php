@@ -10,18 +10,16 @@
 namespace Inachis\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\ConnectionException;
-use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Psr\Log\LoggerInterface;
-use Exception;
 
+/**
+ * @template T of object
+ * @extends ServiceEntityRepository<T>
+ */
 abstract class AbstractRepository extends ServiceEntityRepository
 {
     /**
      * @param array $values
-     *
      * @return mixed
      */
     public function create(array $values = []): mixed
@@ -37,7 +35,6 @@ abstract class AbstractRepository extends ServiceEntityRepository
      *
      * @param mixed $object The object to hydrate
      * @param array $values The values to apply to the object
-     *
      * @return mixed The hydrated object
      */
     public function hydrate(mixed $object, array $values): mixed
@@ -88,11 +85,10 @@ abstract class AbstractRepository extends ServiceEntityRepository
      *
      * @param int $offset The offset from which to return results from
      * @param int $limit  The maximum number of results to return
-     * @param array $where
-     * @param array|string $order
-     * @param array|string $groupBy
-     * @param array $join  $join
-     *
+     * @param list<int, array<int, string>> $where
+     * @param list<int, array<int, string>>|string $order
+     * @param list<int, array<int, string>>|string $groupBy
+     * @param list<int, array<int, string>> $join
      * @return Paginator The result of fetching the objects
      */
     public function getAll(

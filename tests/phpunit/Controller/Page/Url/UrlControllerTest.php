@@ -11,19 +11,16 @@ namespace Inachis\Tests\phpunit\Controller\Page\Url;
 
 use Inachis\Controller\Page\Url\UrlController;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\UrlRepository;
+use Inachis\Repository\Content\UrlRepository;
 use Inachis\Service\Url\UrlBulkActionService;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
-use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Uuid;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UrlControllerTest extends InachisControllerTestCase
 {

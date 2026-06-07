@@ -16,7 +16,7 @@ use Ramsey\Uuid\UuidInterface;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: 'Inachis\Repository\UserPreferenceRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\User\UserPreferenceRepository', readOnly: false)]
 #[ORM\Index(columns: [ 'user_id' ], name: 'search_idx')]
 class UserPreference
 {
@@ -196,7 +196,7 @@ class UserPreference
      * Sets the timezone for the {@link UserPreference}
      * 
      * @param string|null $value
-     * @return $this
+     * @return self
      * @throws InvalidTimezoneException
      */
     public function setTimezone(?string $value): self
@@ -208,7 +208,7 @@ class UserPreference
     /**
      * Sets the background colour for the {@link User}'s lettered avatar
      * @param string $color
-     * @return $this
+     * @return self
      */
     public function setColor(string $color): self
     {

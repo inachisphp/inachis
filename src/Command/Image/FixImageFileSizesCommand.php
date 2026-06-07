@@ -9,8 +9,7 @@
 
 namespace Inachis\Command\Image;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Media\Image;
+use Inachis\Repository\Media\ImageRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,20 +22,17 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class FixImageFileSizesCommand extends Command
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private ImageRepository $imageRepository,
+    ) {
         parent::__construct();
-        $this->entityManager = $entityManager;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
-        $imageRepository = $this->entityManager->getRepository(Image::class);
-        $images = $imageRepository->findAll();
+        $images = $this->imageRepository->findAll();
 
         $basePath = getcwd() . '/public/imgs/';
 

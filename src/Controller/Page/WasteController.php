@@ -11,7 +11,7 @@ namespace Inachis\Controller\Page;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\WasteRepository;
+use Inachis\Repository\Waste\WasteRepository;
 use Inachis\Service\Waste\WasteManagerService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

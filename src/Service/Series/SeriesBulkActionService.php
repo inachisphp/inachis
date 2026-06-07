@@ -11,7 +11,7 @@ namespace Inachis\Service\Series;
 
 use DateTimeImmutable;
 use Inachis\Entity\Content\Series;
-use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\Content\SeriesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Service\Waste\WasteManagerService;
 

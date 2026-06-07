@@ -9,10 +9,10 @@
 
 namespace Inachis\Command\Image;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Content\Page;
-use Inachis\Entity\Content\Series;
 use Inachis\Entity\Media\Image;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\SeriesRepository;
+use Inachis\Repository\Media\ImageRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -35,11 +35,12 @@ class ImageMigrationCommand extends Command
     private string $projectDir;
 
     /**
-     * @param EntityManagerInterface $em
      * @param SluggerInterface $slugger
      */
     public function __construct(
-        private EntityManagerInterface $em,
+        private ImageRepository $imageRepository,
+        private PageRepository $pageRepository,
+        private SeriesRepository $seriesRepository,
         private SluggerInterface $slugger
     ) {
         parent::__construct();
@@ -83,9 +84,9 @@ class ImageMigrationCommand extends Command
      */
     private function scan(OutputInterface $output): int
     {
-        $images = $this->em->getRepository(Image::class)->findAll();
-        $pages = $this->em->getRepository(Page::class)->findAll();
-        $seriesList = $this->em->getRepository(Series::class)->findAll();
+        $images = $this->imageRepository->findAll();
+        $pages = $this->pageRepository->findAll();
+        $seriesList = $this->seriesRepository->findAll();
 
         $plan = [
             'images' => [],
@@ -302,7 +303,7 @@ class ImageMigrationCommand extends Command
         // -----------------------------
         // Update content
         // -----------------------------
-        $pages = $this->em->getRepository(Page::class)->findAll();
+        $pages = $this->pageRepository->findAll();
         
         $output->writeln('<info>Updating pages...</info>');
 
@@ -333,7 +334,7 @@ class ImageMigrationCommand extends Command
 
         $output->writeln('<info>Updating series...</info>');
 
-        $seriesList = $this->em->getRepository(Series::class)->findAll();
+        $seriesList = $this->seriesRepository->findAll();
 
         $seriesProgress = new ProgressBar($output, count($seriesList));
         $seriesProgress->advance($checkpoint['seriesIndex']);
@@ -400,7 +401,7 @@ class ImageMigrationCommand extends Command
 
         $reverse = array_flip($plan['contentReplacements']);
 
-        $pages = $this->em->getRepository(Page::class)->findAll();
+        $pages = $this->pageRepository->findAll();
 
         foreach ($pages as $page) {
             $content = $page->getContent();

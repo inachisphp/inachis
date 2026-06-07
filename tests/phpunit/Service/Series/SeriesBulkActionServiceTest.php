@@ -12,7 +12,7 @@ namespace Inachis\Tests\phpunit\Service\Series;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Content\Series;
-use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Service\Series\SeriesBulkActionService;
 use Inachis\Service\Waste\WasteManagerService;
 use PHPUnit\Framework\MockObject\Exception;

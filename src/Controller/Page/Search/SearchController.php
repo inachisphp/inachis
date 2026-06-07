@@ -11,9 +11,9 @@ namespace Inachis\Controller\Page\Search;
 
 use Exception;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Repository\SearchRepository;
-use Inachis\Repository\UrlRepository;
-use Inachis\Repository\UserRepository;
+use Inachis\Repository\Content\SearchRepository;
+use Inachis\Repository\Content\UrlRepository;
+use Inachis\Repository\User\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

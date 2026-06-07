@@ -11,7 +11,7 @@ namespace Inachis\Tests\phpunit\Controller\Page\Admin;
 
 use Inachis\Controller\Page\Admin\ChangePasswordController;
 use Inachis\Entity\User\User;
-use Inachis\Repository\UserRepository;
+use Inachis\Repository\User\UserRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;

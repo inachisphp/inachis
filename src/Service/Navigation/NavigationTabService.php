@@ -10,7 +10,7 @@
 namespace Inachis\Service\Navigation;
 
 use Inachis\Entity\System\NavigationTab;
-use Inachis\Repository\NavigationTabRepository;
+use Inachis\Repository\System\NavigationTabRepository;
 use Inachis\Service\Doctrine\TransactionHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\Cache\CacheInterface;

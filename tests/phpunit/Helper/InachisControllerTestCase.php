@@ -10,7 +10,7 @@
 namespace Inachis\Tests\phpunit\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Repository\WasteRepository;
+use Inachis\Repository\Waste\WasteRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;

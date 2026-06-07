@@ -10,7 +10,7 @@
 namespace Inachis\Controller\Page\Series;
 
 use Inachis\Controller\AbstractWebController;
-use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\Content\SeriesRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
