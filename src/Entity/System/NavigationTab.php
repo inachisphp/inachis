@@ -48,11 +48,13 @@ class NavigationTab
     #[ORM\Column(unique: true)]
     private int $position = 0;
 
-    /**
-     * Whether the tab is active
-     */
+    /** @var bool Flag indicating if the tab is active */
     #[ORM\Column]
     private bool $isActive = true;
+
+    /** @var bool Flag indicating if this is a system-defined tab that cannot be removed */
+    #[ORM\Column]
+    private bool $isSystem = false;
 
     /**
      * Set the value of id
@@ -114,6 +116,10 @@ class NavigationTab
      */
     public function setUrl(string $url): self
     {
+        if ($this->isSystem()) {
+            return $this;
+        }
+
         $this->url = $url;
         return $this;
     }
@@ -159,6 +165,28 @@ class NavigationTab
     public function setIsActive(bool $isActive): self
     {
         $this->isActive = $isActive;
+        return $this;
+    }
+
+    /**
+     * Get the value of isSystem
+     *
+     * @return bool
+     */
+    public function isSystem(): bool
+    {
+        return $this->isSystem;
+    }
+
+    /**
+     * Set the value of isSystem
+     *
+     * @param bool $isSystem
+     * @return self
+     */
+    public function setIsSystem(bool $isSystem): self
+    {
+        $this->isSystem = $isSystem;
         return $this;
     }
 }
