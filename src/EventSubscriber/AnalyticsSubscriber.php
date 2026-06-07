@@ -63,6 +63,10 @@ class AnalyticsSubscriber implements EventSubscriberInterface
         if (str_starts_with($path, '/wp-admin/')) return;
         if (str_ends_with($path, '.xml')) return;
 
+        $dir = __DIR__ . '/../../var/analytics';
+        $this->createAnalyticsDir($dir);
+        $date = date('Y-m-d');
+
         $userAgent = $request->headers->get('User-Agent', '');
         $ip = $request->getClientIp();
         $visitorId = hash('sha256', $ip . '|' . $userAgent);
@@ -77,10 +81,6 @@ class AnalyticsSubscriber implements EventSubscriberInterface
             file_put_contents($botFile, $botLine . PHP_EOL, FILE_APPEND | LOCK_EX);
             return;
         }
-        
-        $dir = __DIR__ . '/../../var/analytics';
-        $this->createAnalyticsDir($dir);
-        $date = date('Y-m-d');
 
         if ($status >= 400) {
             $file = sprintf('%s/error-%s.log', $dir, $date);

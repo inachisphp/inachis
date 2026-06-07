@@ -449,6 +449,7 @@ class AnalyticsRepository
                 GROUP BY path
             ) latest ON s.path = latest.path AND s.date = latest.max_date
             ORDER BY s.subscribers DESC
+            LIMIT 10
             '
         );
     }
