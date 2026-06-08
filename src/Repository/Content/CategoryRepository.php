@@ -15,6 +15,11 @@ use Inachis\Entity\Content\Category;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
+/**
+ * Repository for handling {@link Category} entities
+ * 
+ * @extends AbstractRepository<Category>
+ */
 class CategoryRepository extends AbstractRepository implements CategoryRepositoryInterface
 {
     /**
@@ -41,10 +46,11 @@ class CategoryRepository extends AbstractRepository implements CategoryRepositor
     /**
      * Returns an array of the root level categories.
      *
-     * @return Category[] The array of {@link Category} objects
+     * @return array<int,Category> The array of {@link Category} objects
      */
     public function getRootCategories(): array
     {
+        /** @var array<int,Category> */
         return $this->createQueryBuilder('q')
             ->where('q.parent is null')
             ->getQuery()
@@ -90,12 +96,13 @@ class CategoryRepository extends AbstractRepository implements CategoryRepositor
      *
      * @param integer $offset
      * @param integer $limit
-     * @return array<Category>
+     * @return array<int,Category>
      */
     public function findBatch(
         int $offset,
         int $limit
     ): array {
+        /** @var array<int,Category> */
         return $this->createQueryBuilder('c')
             ->orderBy('c.title', 'ASC')
             ->setFirstResult($offset)

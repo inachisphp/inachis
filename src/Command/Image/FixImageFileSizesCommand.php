@@ -9,6 +9,7 @@
 
 namespace Inachis\Command\Image;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Repository\Media\ImageRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -23,6 +24,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class FixImageFileSizesCommand extends Command
 {
     public function __construct(
+        private EntityManagerInterface $entityManager,
         private ImageRepository $imageRepository,
     ) {
         parent::__construct();
@@ -44,11 +46,9 @@ class FixImageFileSizesCommand extends Command
 
         foreach ($images as $image) {
             $checked++;
-
-            // adjust method name if needed (e.g. getFilesize())
-            if (method_exists($image, 'getFilesize') && $image->getFilesize() > 0) {
-                continue;
-            }
+            // if ($image->getFilesize() > 0) {
+            //     continue;
+            // }
 
             $filename = $image->getFilename();
             $path = $basePath . $filename;

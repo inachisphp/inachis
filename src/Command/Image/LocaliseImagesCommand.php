@@ -12,8 +12,11 @@ namespace Inachis\Command\Image;
 use Exception;
 use Inachis\Entity\Content\{Page, Series};
 use Inachis\Entity\Media\Image;
+use Inachis\Repository\Content\{PageRepository,SeriesRepository};
+use Inachis\Repository\Media\ImageRepository;
 use Inachis\Service\Image\{ImageExtractor, ImageLocaliser, ContentImageUpdater};
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -65,7 +68,7 @@ class LocaliseImagesCommand extends Command
      * 
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return integer
+     * @return int
      * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -88,9 +91,9 @@ class LocaliseImagesCommand extends Command
      */
     private function processImagesForContentType(array $content_type, OutputInterface $output, bool $dryRun = true): void
     {
-        /** @var \Doctrine\ORM\EntityRepository<Image|Page|Series> $repository */
+        /** @var ImageRepository|PageRepository|SeriesRepository $repository */
         $repository = $this->entityManager->getRepository($content_type['class_name']);
-        /** @var (Image|Page|Series)[] $results */
+        /** @var Paginator<Image|Page|Series> $results */
         $results = $repository->getAll(0, 0, ['q.' . $content_type['field'] . ' LIKE :content', ['content' => '%https%']]);
 
         foreach ($results as $entity) {

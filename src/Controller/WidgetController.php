@@ -62,11 +62,11 @@ class WidgetController extends AbstractController
     }
 
     /**
-     * @param $categoryName
+     * @param string $categoryName
      * @param int $maxDisplayCount
      * @return Page[]
      */
-    private function getPagesWithCategoryName($categoryName, int $maxDisplayCount = 0): array
+    private function getPagesWithCategoryName(string $categoryName, int $maxDisplayCount = 0): array
     {
         $category = $this->entityManager->getRepository(Category::class)->findOneBy([
             'title' => $categoryName,

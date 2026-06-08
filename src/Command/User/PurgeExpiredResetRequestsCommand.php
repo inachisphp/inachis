@@ -9,8 +9,7 @@
 
 namespace Inachis\Command\User;
 
-use Inachis\Entity\User\PasswordResetRequest;
-use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Repository\User\PasswordResetRequestRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,9 +26,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class PurgeExpiredResetRequestsCommand extends Command
 {
     /**
-     * @param EntityManagerInterface $entityManager
+     * @param PasswordResetRequestRepository $passwordResetRequestRepository
      */
-    public function __construct(protected EntityManagerInterface $entityManager)
+    public function __construct(protected PasswordResetRequestRepository $passwordResetRequestRepository)
     {
         parent::__construct();
     }
@@ -43,9 +42,7 @@ class PurgeExpiredResetRequestsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var \Inachis\Repository\PasswordResetRequestRepository $passwordResetRequestRepository */
-        $passwordResetRequestRepository = $this->entityManager->getRepository(PasswordResetRequest::class);
-        $count = $passwordResetRequestRepository->purgeExpiredHashes();
+        $count = $this->passwordResetRequestRepository->purgeExpiredHashes();
         $io = new SymfonyStyle($input, $output);
         $io->success(sprintf('Deleted %d expired password reset requests.', $count));
         return Command::SUCCESS;

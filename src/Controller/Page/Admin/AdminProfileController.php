@@ -14,6 +14,7 @@ use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\User\User;
 use Inachis\Form\UserType;
 use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\User\UserRepository;
 use Inachis\Service\User\UserBulkActionService;
 use Inachis\Service\User\UserAccountEmailService;
@@ -49,6 +50,7 @@ class AdminProfileController extends AbstractInachisController
     )]
     public function list(
         Request $request,
+        CategoryRepository $categoryRepository,
         ContentQueryParameters $contentQueryParameters,
         UserBulkActionService $userBulkActionService,
         UserRepository $userRepository,
@@ -72,7 +74,7 @@ class AdminProfileController extends AbstractInachisController
 
         $contentQuery = $contentQueryParameters->process(
             $request,
-            $userRepository,
+            $categoryRepository,
             'admin',
             'displayName asc',
         );
