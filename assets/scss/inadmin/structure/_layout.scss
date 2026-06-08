@@ -29,6 +29,7 @@
   padding: 0;
   display: grid;
   grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
   gap: $gutter;
   grid-column: 1;
   grid-row: auto;
