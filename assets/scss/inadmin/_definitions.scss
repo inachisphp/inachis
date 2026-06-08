@@ -6,6 +6,7 @@ $gutter: 16px;
 $breakpoint-small: 480px;
 $breakpoint-medium: 768px;
 $breakpoint-large: 1024px;
+$breakpoint-xlarge: 1280px;
 
 $sidebar-collapsed: 60px;
 $sidebar-expanded: 220px;
@@ -269,6 +270,8 @@ $success-color: var(--color-success-500);
 $table-expandable--expanded: var(--color-brand-200);
 
 $signin_background-image__dark: var(--bg-image);
+
+$subscribers-color: orange;
 
 $badge-colors: (
     default: (bg: #E0E0E0, text: #000),

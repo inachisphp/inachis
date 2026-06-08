@@ -80,31 +80,6 @@ class NavigationTabController extends AbstractInachisController
     }
 
     /**
-     * Saves changes to a given navigation tab
-     *
-     * @param Request $request
-     * @param NavigationTab $tab
-     * @param EntityManagerInterface $em
-     * @return Response
-     */
-    // #[Route('/incc/settings/navigation/{id}/edit', name: 'incc_settings_navigation_edit', methods: ['POST'])]
-    // public function edit(
-    //     Request $request,
-    //     NavigationTab $tab,
-    //     EntityManagerInterface $em
-    // ): Response {
-    //     $form = $this->createForm(NavigationTabType::class, $tab);
-    //     $form->handleRequest($request);
-
-    //     if ($form->isSubmitted() && $form->isValid()) {
-    //         $em->flush();
-    //     }
-    //     // $navigationService->clearCache();
-
-    //     return $this->redirectToRoute('incc_settings_navigation_list');
-    // }
-
-    /**
      * Add/Edit a navigation tab
      *
      * @param Request $request
@@ -122,10 +97,9 @@ class NavigationTabController extends AbstractInachisController
         $isNew = ($id === 'new');
 
         $tab = $isNew ? new NavigationTab():
-            $navigationTabRepository->findOneBy(
-                [ 'id' => $request->attributes->get('id') ]
-            );
-        /** @var Form $form */
+        $navigationTabRepository->findOneBy(
+            [ 'id' => $request->attributes->get('id') ]
+        );
         $form = $this->createForm(NavigationTabType::class, $tab);
         $form->handleRequest($request);
 

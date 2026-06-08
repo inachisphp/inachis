@@ -7,8 +7,8 @@
 
 
 {% block content %}
-<div class="col-6">
-    <section class="admonition admonition__info">
+<!-- div class="col-6" -->
+    <section class="col-6 admonition admonition__info">
         <header class="admonition__header">
             <h2>Data range</h2>
         </header>
@@ -17,12 +17,13 @@
         </p>
     </section>
 
-    <section class="widget ui-section rounded">
+    <section class="col-6 widget ui-section rounded">
         <header class="widget__header">
             <h2>Overview</h2>
         </header>
+        {% set cardSize = analytics.change is not null ? 'col-3' : 'col-4' %}
         <div class="widget__content nested-grid">
-            <article class="col-4 widget-stats__card widget-stats__card--total" aria-labelledby="stats-total-visits">
+            <article class="{{ cardSize }} widget-stats__card widget-stats__card--total" aria-labelledby="stats-total-visits">
                 <div class="widget-stats__icon" aria-hidden="true">
                     <span class="material-icons">visibility</span>
                 </div>
@@ -32,7 +33,7 @@
                 </div>
             </article>
 
-            <article class="col-4 widget-stats__card widget-stats__card--unique" aria-labelledby="stats-unique-visitors">
+            <article class="{{ cardSize }} widget-stats__card widget-stats__card--unique" aria-labelledby="stats-unique-visitors">
                 <div class="widget-stats__icon" aria-hidden="true">
                     <span class="material-icons">group</span>
                 </div>
@@ -43,7 +44,7 @@
             </article>
 
         {% if analytics.change is not null %}
-            <article class="col-4 widget-stats__card widget-stats__card--today" aria-labelledby="stats-change">
+            <article class="{{ cardSize }} widget-stats__card widget-stats__card--today" aria-labelledby="stats-change">
                 <div class="widget-stats__icon" aria-hidden="true">
                     <span class="material-icons"> trending_{{ analytics.change > 0 ? 'up' : 'down' }}</span>
                 </div>
@@ -53,9 +54,19 @@
                 </div>
             </article>
         {% endif %}
+
+            <article class="{{ cardSize }} widget-stats__card widget-stats__card--subscribers" aria-labelledby="stats-subscribers">
+                <div class="widget-stats__icon" aria-hidden="true">
+                    <span class="material-icons" style="color: var(--color-warning-500);">rss_feed</span>
+                </div>
+                <div class="widget-stats__content">
+                    <h2 id="stats-subscribers">Subscribers</h2>
+                    <p class="widget-stats__value">{{ analytics.totalSubscribers|number_format }}</p>
+                </div>
+            </article>
         </div>
     </section>
-</div>
+<!-- /div -->
 
 <section class="col-6 widget">
     <header class="widget__header">
@@ -82,9 +93,9 @@
 				<tr>
 					<td>{{ page.title ?? page.path }}</td>
 					<td>{{ page.current }}</td>
-					<td {% 
-                        if page.change < 0 %}class="widget-stats__trend--down"{% 
-                        elseif page.change > 0 %}class="widget-stats__trend--up"{% 
+					<td {%
+                        if page.change < 0 %}class="widget-stats__trend--down"{%
+                        elseif page.change > 0 %}class="widget-stats__trend--up"{%
                     endif %}>
 						{% if page.change is null %}
 							NEW
@@ -103,6 +114,41 @@
 			{% endfor %}
 		</tbody>
 	</table>
+</section>
+
+<section class="col-6 widget">
+    <header class="widget__header">
+        <h2>Users by Region</h2>
+    </header>
+    <table>
+        <thead>
+            <tr>
+                <th>Country</th>
+                <th>Hits</th>
+                <th>%</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for region in analytics.topRegions %}
+                <tr>
+                    <td>
+                        <span style="font-weight: 600;">{{ region.country_name }}</span>
+                        <span style="color: var(--color-neutral-500); font-size: 0.85rem; margin-left: 0.5rem;">({{ region.country_code }})</span>
+                    </td>
+                    <td>{{ region.total|number_format }}</td>
+                    <td>
+                        {% if analytics.totalViews > 0 %}
+                            {{ (region.total / analytics.totalViews * 100)|number_format(1) }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="3">No data available for this range</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </section>
 
 <section class="col-6 widget">
@@ -155,6 +201,61 @@
     </table>
 </section>
 
+<section class="col-6 widget">
+    <header class="widget__header">
+        <h2>Bot Traffic (last 30 days)</h2>
+    </header>
+    <table>
+        <thead>
+            <tr>
+                <th>User Agent</th>
+                <th>Hits</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bot in analytics.topBots %}
+                <tr>
+                    <td style="font-family: monospace; font-size: 0.85rem; word-break: break-all;">{{ bot.user_agent }}</td>
+                    <td>{{ bot.total|number_format }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="2">No bot traffic recorded yet</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<section class="col-6 widget">
+    <header class="widget__header">
+        <h2>RSS Subscribers (last 30 days)</h2>
+    </header>
+    <canvas id="subscribersChart"></canvas>
+</section>
+
+<section class="col-6 widget">
+    <header class="widget__header">
+        <h2>RSS Feed Subscribers</h2>
+    </header>
+    <table>
+        <thead>
+            <tr>
+                <th>Feed Path</th>
+                <th>Subscribers</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for feed in analytics.subscribersPerFeed %}
+                <tr>
+                    <td><code class="inline">{{ feed.path }}</code></td>
+                    <td><strong>{{ feed.subscribers|number_format }}</strong></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="2">No subscriber log data aggregated yet</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const views = {{ analytics.viewsPerDay|map(v => v.total)|json_encode|raw }}
@@ -184,6 +285,27 @@
         {
             type: 'line',
             data: data,
+        }
+    );
+
+    const subsData = {
+        labels: {{ analytics.subscriberStats|map(s => s.date)|json_encode|raw }},
+        datasets: [
+            {
+                label: 'RSS Subscribers',
+                data: {{ analytics.subscriberStats|map(s => s.subscribers)|json_encode|raw }},
+                fill: false,
+                tension: 0.2,
+                borderColor: '#f26522',
+                backgroundColor: '#f26522',
+            }
+        ]
+    };
+    new Chart(
+        document.getElementById('subscribersChart'),
+        {
+            type: 'line',
+            data: subsData,
         }
     );
 </script>

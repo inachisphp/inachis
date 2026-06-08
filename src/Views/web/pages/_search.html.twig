@@ -1,0 +1,48 @@
+{% extends "web/structure/main.html.twig" %}
+
+{% set pageClass = 'search-results' %}
+
+{% block content %}
+<div class="content-column">
+    <h1 class="entry-title">{% if keyword is not empty %}Search results for “{{ keyword }}”{% else %}Search{% endif %}</h1>
+
+    {% if keyword is empty %}
+        <p>Enter a keyword to find pages, posts, and series.</p>
+    {% elseif results is empty %}
+        <p>No results found for “{{ keyword }}”.</p>
+    {% else %}
+        <p>{{ total }} result{% if total != 1 %}s{% endif %} found.</p>
+        <ul class="search-results-list">
+            {% for item in results %}
+                <li class="search-result">
+                    <h2><a href="{{ item.url|default('#') }}">{{ item.title }}</a></h2>
+                    <!-- p class="search-result__meta">{{ item.type|default('content')|capitalize }}</p -->
+                    {% if item.excerpt is defined and item.excerpt is not empty %}
+                        <p>{{ item.excerpt|striptags|slice(0, 180) }}</p>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+
+        {% if totalPages|default(1) > 1 %}
+            <nav class="pagination" aria-label="Search results pagination">
+                {% if pageNumber|default(1) > 1 %}
+                    <a href="{{ path('web_search', {'q': keyword, 'page': pageNumber - 1}) }}">Previous</a>
+                {% endif %}
+
+                {% for page in 1..totalPages %}
+                    {% if page == pageNumber %}
+                        <strong>{{ page }}</strong>
+                    {% else %}
+                        <a href="{{ path('web_search', {'q': keyword, 'page': page}) }}">{{ page }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if pageNumber|default(1) < totalPages %}
+                    <a href="{{ path('web_search', {'q': keyword, 'page': pageNumber + 1}) }}">Next</a>
+                {% endif %}
+            </nav>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock content %}

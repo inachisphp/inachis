@@ -63,16 +63,24 @@ class AnalyticsSubscriber implements EventSubscriberInterface
         if (str_starts_with($path, '/wp-admin/')) return;
         if (str_ends_with($path, '.xml')) return;
 
+        $dir = __DIR__ . '/../../var/analytics';
+        $this->createAnalyticsDir($dir);
+        $date = date('Y-m-d');
+
         $userAgent = $request->headers->get('User-Agent', '');
         $ip = $request->getClientIp();
         $visitorId = hash('sha256', $ip . '|' . $userAgent);
         if (preg_match('/bot|crawl|spider|slurp|wget|curl/i', $userAgent)) {
+            $botFile = sprintf('%s/bot-%s.log', $dir, $date);
+            $botLine = json_encode([
+                'path' => $path,
+                'ua'   => mb_substr($userAgent, 0, 255),
+                'date' => $date,
+                'ts'   => time(),
+            ], JSON_UNESCAPED_SLASHES);
+            file_put_contents($botFile, $botLine . PHP_EOL, FILE_APPEND | LOCK_EX);
             return;
         }
-        
-        $dir = __DIR__ . '/../../var/analytics';
-        $this->createAnalyticsDir($dir);
-        $date = date('Y-m-d');
 
         if ($status >= 400) {
             $file = sprintf('%s/error-%s.log', $dir, $date);

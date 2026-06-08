@@ -86,6 +86,6 @@ class WidgetController extends AbstractController
      */
     private function getRecentSeries(int $maxDisplayCount = 0): array
     {
-        return $this->entityManager->getRepository(Series::class)->findBy([], ['lastDate' => 'DESC'], $maxDisplayCount);
+        return $this->entityManager->getRepository(Series::class)->findBy(['visibility' => 1], ['lastDate' => 'DESC'], $maxDisplayCount);
     }
 }

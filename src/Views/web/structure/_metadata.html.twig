@@ -58,34 +58,17 @@
     <meta name="DC.identifier" scheme="DCTERMS.URI" content="{{ app.request.uri }}" />
     <meta name="generator" content="inachis" />
 
-    <link rel="apple-touch-icon" sizes="57x57" href="{{ settings.domain }}/assets/imgs/favicons/apple-touch-icon-57x57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="{{ settings.domain }}/assets/imgs/favicons/apple-touch-icon-60x60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="{{ settings.domain }}/assets/imgs/favicons/apple-touch-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="{{ settings.domain }}/assets/imgs/favicons/apple-touch-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="{{ settings.domain }}/assets/imgs/favicons/apple-touch-icon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="{{ settings.domain }}/assets/imgs/favicons/apple-touch-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="{{ settings.domain }}/assets/imgs/favicons/apple-touch-icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="{{ settings.domain }}/assets/imgs/favicons/apple-touch-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ settings.domain }}/assets/imgs/favicons/apple-touch-icon-180x180.png">
-    <meta name="apple-mobile-web-app-title" content="{{ 'siteTitle' }}">
-    <link rel="mask-icon" href="/inadmin/assets/images/favicons/safari-pinned-tab.svg" color="#5bbad5">
-
-    <link rel="icon" type="image/png" href="{{ settings.domain }}/assets/imgs/favicons/favicon-32x32.png" sizes="32x32">
-    <link rel="icon" type="image/png" href="{{ settings.domain }}/assets/imgs/favicons/favicon-16x16.png" sizes="16x16">
-    <link rel="icon" type="image/png" href="{{ settings.domain }}/assets/imgs/favicons/favicon-96x96.png" sizes="96x96">
-
-    <link rel="manifest" href="{{ settings.domain }}/assets/imgs/favicons/manifest.json">
-    <link rel="icon" type="image/png" href="{{ settings.domain }}/assets/imgs/favicons/android-chrome-192x192.png" sizes="192x192">
-    <meta name="theme-color" content="#069">
+    <link rel="icon" type="image/png" href="{{ settings.domain }}/assets/imgs/favicons/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="{{ settings.domain }}/assets/imgs/favicons/favicon.svg" />
+    <link rel="shortcut icon" href="{{ settings.domain }}/assets/imgs/favicons/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ settings.domain }}/assets/imgs/favicons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="{{ settings.siteTitle }}" />
+    <link rel="manifest" href="{{ settings.domain }}/assets/imgs/favicons/site.webmanifest" />
 
     <meta name="application-name" content="{{ settings.siteTitle }}">
-    <meta name="msapplication-TileColor" content="#2d89ef">
-    <meta name="msapplication-TileImage" content="{{ settings.domain }}/assets/imgs/windows10-144x144.png">
 
     <link rel="canonical" href="{{ settings.domain }}/" />
     <link rel="search" type="application/opensearchdescription+xml" title="{{ settings.siteTitle }}" href="{{ settings.domain }}/search.xml" />
-    <link rel="Shortcut Icon" type="image/x-icon" href="{{ settings.domain }}/favicon.ico" />
-    <link rel="icon" type="image/x-icon" href="{{ settings.domain }}/favicon.ico" />
     <link rel="alternate" type="application/rss+xml" title="All Posts RSS Feed" href="{{ settings.domain }}/feed" />
     {% if filterName is defined and filterName == 'category' and filterValue is defined %}
         <link rel="alternate" type="application/rss+xml" title="Category: {{ filterValue }} RSS Feed" href="{{ settings.domain }}/feed/{{ filterValue }}" />
