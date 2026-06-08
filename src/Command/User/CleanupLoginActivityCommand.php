@@ -9,9 +9,7 @@
 
 namespace Inachis\Command\User;
 
-use Inachis\Repository\LoginActivityRepository;
 use Inachis\Message\CleanupLoginActivityMessage;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -32,13 +30,8 @@ class CleanupLoginActivityCommand extends Command
 {
     /**
      * @param MessageBusInterface $messenger
-     * @param EntityManagerInterface $entityManager
-     * @param LoginActivityRepository $repository
      */
-    public function __construct(
-        protected MessageBusInterface $messenger,
-        protected EntityManagerInterface $entityManager,
-        protected LoginActivityRepository $repository)
+    public function __construct(protected MessageBusInterface $messenger)
     {
         parent::__construct();
     }

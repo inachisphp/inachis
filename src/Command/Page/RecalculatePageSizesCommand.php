@@ -10,8 +10,9 @@
 namespace Inachis\Command\Page;
 
 use Inachis\Entity\Content\Page;
-use Inachis\Repository\ImageRepository;
+use Inachis\Repository\Media\ImageRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Repository\Content\PageRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,10 +32,12 @@ class RecalculatePageSizesCommand extends Command
      * 
      * @param EntityManagerInterface $entityManager
      * @param ImageRepository $imageRepository
+     * @param PageRepository $pageRepository
      */
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ImageRepository $imageRepository,
+        private PageRepository $pageRepository,
     ) {
         parent::__construct();
     }
@@ -50,9 +53,8 @@ class RecalculatePageSizesCommand extends Command
     {
         $output->writeln('<info>Recalculating page image sizes…</info>');
 
-        $repository = $this->entityManager->getRepository(Page::class);
         /** @var Page[] $pages */
-        $pages = $repository->findAll();
+        $pages = $this->pageRepository->findAll();
         
         $count = 0;
 
