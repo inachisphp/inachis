@@ -36,7 +36,7 @@ class PasswordResetRequest
     /**
      * @var User The User this token relates to
      */
-    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User')]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User\User')]
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
 
@@ -66,7 +66,7 @@ class PasswordResetRequest
 
     /**
      * Creates a new instance of {@link PasswordResetRequest}
-     * 
+     *
      * @param User $user The user this token relates to
      * @param string $tokenHash The HMAC hash of the token
      * @param DateTimeImmutable $expiresAt The expiry date and time for the token
@@ -81,7 +81,7 @@ class PasswordResetRequest
 
     /**
      * Get the value of id
-     * 
+     *
      * @return UuidInterface|null
      */
     public function getId(): ?UuidInterface
@@ -91,7 +91,7 @@ class PasswordResetRequest
 
     /**
      * Get the value of user
-     * 
+     *
      * @return User
      */
     public function getUser(): User
@@ -101,7 +101,7 @@ class PasswordResetRequest
 
     /**
      * Get the value of tokenHash
-     * 
+     *
      * @return string
      */
     public function getTokenHash(): string
@@ -111,7 +111,7 @@ class PasswordResetRequest
 
     /**
      * Get the value of createdAt
-     * 
+     *
      * @return DateTimeImmutable
      */
     public function getCreatedAt(): DateTimeImmutable
@@ -121,7 +121,7 @@ class PasswordResetRequest
 
     /**
      * Get the value of expiresAt
-     * 
+     *
      * @return DateTimeImmutable
      */
     public function getExpiresAt(): DateTimeImmutable
@@ -131,7 +131,7 @@ class PasswordResetRequest
 
     /**
      * Get the value of used
-     * 
+     *
      * @return bool
      */
     public function isUsed(): bool
@@ -141,7 +141,7 @@ class PasswordResetRequest
 
     /**
      * Mark the token as used
-     * 
+     *
      * @return void
      */
     public function markUsed(): void
