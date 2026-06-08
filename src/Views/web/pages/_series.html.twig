@@ -28,7 +28,7 @@
                         <ul>
                             {% for item in series.items %}
                                 {% set title = (item.title|replace({ (series.title): '' })) ?: item.title %}
-                                {% if item.status == 'published' and item.postDate|date('U') < 'now'|date('U') %}
+                                {% if item.status.value == 'published' and item.postDate|date('U') < 'now'|date('U') %}
                             <li>
                                 {% if item.subTitle is not empty %}{{ title }} - {% endif %}
                                 <a href="{{ item.urls|first.link }}">{% if item.subTitle is empty %}{{ title }}{% else %}{{ item.subTitle }}{% endif %}</a>
