@@ -19,10 +19,10 @@ interface SeriesRepositoryInterface
      *
      * @param int $offset The offset from which to return results from
      * @param int $limit  The maximum number of results to return
-     * @param list<array<mixed>> $where
-     * @param list<array<mixed>>|string $order
-     * @param list<array<mixed>>|string $groupBy
-     * @param list<array<mixed>> $join
+     * @param list<int, array<int, string>> $where
+     * @param list<int, array<int, string>>|string $order
+     * @param array<string> $groupBy
+     * @param list<int, array<int, string>> $join
      * @return Paginator<Series>
      */
     public function getAll(
@@ -30,7 +30,7 @@ interface SeriesRepositoryInterface
         int $limit = 25,
         array $where = [],
         array|string $order = [],
-        array|string $groupBy = [],
+        array $groupBy = [],
         array $join = []
     ): Paginator;
 

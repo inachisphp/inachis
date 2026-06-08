@@ -18,6 +18,8 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Repository for retrieving {@link Page} entities
+ * 
+ * @extends AbstractRepository<Page>
  */
 class PageRepository extends AbstractRepository implements PageRepositoryInterface
 {
@@ -192,7 +194,16 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
     /**
      * Get all content of a certain type, ordered by post date
      *
-     * @param array<string, mixed> $filters
+     * @param array{
+     *   categories?:array<string>,
+     *   tags?:array<string>,
+     *   status?:string,
+     *   visibility?:string,
+     *   keyword?:string,
+     *   excludeIds?:string,
+     *   fromDate?:string,
+     *   toDate?:string
+     * } $filters
      * @param string $type
      * @param int $offset
      * @param int $limit
@@ -228,13 +239,11 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
                 )
             ];
         }
-        /** @var array<string, string> $filters['categories'] */
         if (!empty($filters['categories'])) {
             $where[0] .= ' AND c.id IN (:categories)';
             $where[1]['categories'] = array_is_list($filters['categories']) ? $filters['categories'] : array_keys($filters['categories']);
             $join[] = ['leftJoin', 'q.categories', 'c'];
         }
-        /** @var array<string, string> $filters['tags'] */
         if (!empty($filters['tags'])) {
             $where[0] .= ' AND t.id IN (:tags)';
             $where[1]['tags'] = array_is_list($filters['tags']) ? $filters['tags'] : array_keys($filters['tags']);
@@ -248,7 +257,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         }
         if (!empty($filters['keyword'])) {
             $where[0] .= ' AND (q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.content LIKE :keyword )';
-            $where[1]['keyword'] = '%' . $where[1]['keyword'] . '%';
+            $where[1]['keyword'] = '%' . $filters['keyword'] . '%';
         }
         if (!empty($filters['excludeIds'])) {
             $where[0] .= ' AND q.id NOT IN (:excludeIds)';
@@ -324,6 +333,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             ->orderBy('p.imageSize', 'DESC')
             ->setMaxResults($limit);
 
+        /** @var array<Page> */
         return $qb->getQuery()->getResult();
     }
 

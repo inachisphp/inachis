@@ -18,8 +18,11 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
  */
 abstract class AbstractRepository extends ServiceEntityRepository
 {
+    /** @var int */
+    public const MAX_ITEMS_TO_SHOW_ADMIN = 10;
+
     /**
-     * @param array $values
+     * @param array<string,mixed> $values
      * @return mixed
      */
     public function create(array $values = []): mixed
@@ -34,7 +37,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * based on the provided values.
      *
      * @param mixed $object The object to hydrate
-     * @param array $values The values to apply to the object
+     * @param array<string,mixed> $values The values to apply to the object
      * @return mixed The hydrated object
      */
     public function hydrate(mixed $object, array $values): mixed
@@ -56,7 +59,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * Returns the count for entries in the current repository match any
      * provided constraints.
      *
-     * @param string[] $where Array of elements and string replacements
+     * @param array{0:string,1:array<string,string>}|array{} $where Array of elements and string replacements
      * @return int The number of entities located
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
@@ -87,7 +90,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * @param int $limit  The maximum number of results to return
      * @param list<int, array<int, string>> $where
      * @param list<int, array<int, string>>|string $order
-     * @param list<int, array<int, string>>|string $groupBy
+     * @param array<string> $groupBy
      * @param list<int, array<int, string>> $join
      * @return Paginator The result of fetching the objects
      */
@@ -96,7 +99,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
         int $limit = 25,
         array $where = [],
         array|string $order = [],
-        array|string $groupBy = [],
+        array $groupBy = [],
         array $join = []
     ): Paginator {
         $qb = $this->getEntityManager()->createQueryBuilder()
@@ -167,6 +170,6 @@ abstract class AbstractRepository extends ServiceEntityRepository
     public function getMaxItemsToShow(): int
     {
         // @todo check if an alternative is set in yaml config
-        return defined('static::MAX_ITEMS_TO_SHOW_ADMIN') ? (int) static::MAX_ITEMS_TO_SHOW_ADMIN : 10;
+        return static::MAX_ITEMS_TO_SHOW_ADMIN;
     }
 }

@@ -270,7 +270,7 @@ class AnalyticsRepository
      * @param string[] $paths
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array<array<string,mixed>>
+     * @return array<array{date: string, total: int}>
      */
     public function getPageViewsPerDayForPaths(
         array $paths,
@@ -325,7 +325,7 @@ class AnalyticsRepository
      * @param Series $series
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array<array<string,mixed>>
+     * @return array<array{date: string, views: int}>
      */
     public function getSeriesStatsOverTime(Series $series, \DateTimeInterface $from, \DateTimeInterface $to): array
     {
@@ -472,7 +472,7 @@ class AnalyticsRepository
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
      * @param int $limit
-     * @return array
+     * @return array<int,mixed>
      */
     public function getTopBots(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 15): array
     {

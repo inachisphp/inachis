@@ -54,7 +54,7 @@ final class CategoryExportDto
     /**
      * List of child categories IDs
      *
-     * @var string[]
+     * @var array<int,string|null>
      */
     public array $childrenIds = [];
 
@@ -69,15 +69,15 @@ final class CategoryExportDto
     public static function fromEntity(Category $category): self
     {
         $dto = new self();
-        $dto->id = $category->getId()?->__toString();
-        $dto->title = $category->getTitle() ?? '';
+        $dto->id = $category->getId()?->toString();
+        $dto->title = $category->getTitle();
         $dto->description = $category->getDescription();
-        $dto->image = $category->getImage()?->__toString() ?? null;
-        $dto->icon = $category->getIcon()?->__toString() ?? null;
+        $dto->image = $category->getImage()?->getId()?->toString() ?? null;
+        $dto->icon = $category->getIcon()?->getId()?->toString() ?? null;
         $dto->visible = $category->isVisible();
-        $dto->parentId = $category->getParent()?->getId()?->__toString();
+        $dto->parentId = $category->getParent()?->getId()?->toString();
         $dto->childrenIds = array_map(
-            fn($child) => $child->getId()?->__toString(),
+            fn($child) => $child->getId()?->toString(),
             $category->getChildren()->toArray()
         );
         $dto->fullPath = $category->getFullPath();

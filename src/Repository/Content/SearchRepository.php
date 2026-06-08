@@ -47,7 +47,7 @@ class SearchRepository extends ServiceEntityRepository
      * @param int $offset
      * @param int $limit
      * @param string $orderBy
-     * @return SearchResult<int, array<string, mixed>>
+     * @return SearchResult<array<string, mixed>>
      */
     public function search(?string $keyword, int $offset = 0, int $limit = 25, string  $orderBy = 'relevance DESC, contentDate DESC'): SearchResult
     {
@@ -59,7 +59,7 @@ class SearchRepository extends ServiceEntityRepository
      * @param int $offset
      * @param int $limit
      * @param string $orderBy
-     * @return SearchResult<int, array<string, mixed>>
+     * @return SearchResult<array<string, mixed>>
      */
     public function searchPublic(?string $keyword, int $offset = 0, int $limit = 25, string $orderBy = 'relevance DESC, contentDate DESC'): SearchResult
     {
@@ -72,7 +72,7 @@ class SearchRepository extends ServiceEntityRepository
      * @param int $limit
      * @param string $orderBy
      * @param bool $includeImages
-     * @return SearchResult<int, array<string, mixed>>
+     * @return SearchResult<array<string, mixed>>
      */
     private function searchWithScope(?string $keyword, int $offset, int $limit, string $orderBy, bool $includeImages): SearchResult
     {

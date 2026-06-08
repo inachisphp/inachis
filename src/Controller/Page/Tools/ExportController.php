@@ -36,6 +36,7 @@ class ExportController extends AbstractInachisController
         Request $request,
         CategoryExportService $categoryExportService,
         PageExportService $pageExportService,
+        PageRepository $pageRepository,
         SeriesExportService $seriesExportService,
     ): Response {
         $contentType = $request->request->get('content_type') ?? 'post';

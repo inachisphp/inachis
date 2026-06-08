@@ -41,7 +41,7 @@ abstract class AbstractFile
      * @var string The title of the {@link Image}
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    protected string $title;
+    protected string $title = '';
 
     /**
      * @var ?string
@@ -53,7 +53,7 @@ abstract class AbstractFile
      * @var string
      */
     #[ORM\Column(type: 'string', nullable: false)]
-    protected string $filename;
+    protected string $filename = '';
 
     /**
      * @var string
@@ -266,7 +266,7 @@ abstract class AbstractFile
      */
     public function isValidFiletype(string $value): bool
     {
-        return in_array($value, static::ALLOWED_MIME_TYPES, true);
+        return empty(static::ALLOWED_MIME_TYPES) || in_array($value, static::ALLOWED_MIME_TYPES, true);
     }
 
     /**

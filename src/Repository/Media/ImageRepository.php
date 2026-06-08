@@ -21,6 +21,9 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 class ImageRepository extends AbstractRepository implements ResourceRepositoryInterface
 {
     use DefaultResourceRepository;
+    
+    /** @var int */
+    public const MAX_ITEMS_TO_SHOW_ADMIN = 25;
 
     /**
      * @param ManagerRegistry $registry

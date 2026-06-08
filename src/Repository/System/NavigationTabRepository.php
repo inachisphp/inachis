@@ -51,9 +51,10 @@ class NavigationTabRepository extends AbstractRepository
      * @param array{} $filters
      * @param int $offset
      * @param int $limit
+     * @param string $sort
      * @return Paginator<NavigationTab>
      */
-    public function getFiltered(array $filters, int $offset, int $limit): Paginator
+    public function getFiltered(array $filters, int $offset, int $limit, string $sort = ''): Paginator
     {
         return $this->getAll(
             $offset,

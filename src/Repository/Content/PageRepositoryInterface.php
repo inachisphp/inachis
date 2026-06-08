@@ -20,12 +20,12 @@ interface PageRepositoryInterface
     /**
      * Get all pages
      * 
-     * @param int $offset
-     * @param int $limit
-     * @param array<int, array<int, string>> $where
-     * @param array<int, array<int, string>>|string $order
-     * @param array<int, array<int, string>>|string $groupBy
-     * @param array<int, array<int, string>> $join
+     * @param int $offset The offset from which to return results from
+     * @param int $limit  The maximum number of results to return
+     * @param list<int, array<int, string>> $where
+     * @param list<int, array<int, string>>|string $order
+     * @param array<string> $groupBy
+     * @param list<int, array<int, string>> $join
      * @return Paginator<Page>
      */
     public function getAll(
@@ -33,13 +33,13 @@ interface PageRepositoryInterface
         int $limit = 25,
         array $where = [],
         array|string $order = [],
-        array|string $groupBy = [],
+        array $groupBy = [],
         array $join = []
     ): Paginator;
 
     /**
      * Get the maximum number of items to show in the admin interface
-     
+     *
      * @return int
      */
     public function getMaxItemsToShow(): int;
@@ -47,7 +47,16 @@ interface PageRepositoryInterface
     /**
      * Get all pages of a certain type, ordered by post date
      * 
-     * @param array<int, array<int, string>> $filters
+     * @param array{
+     *   categories?:array<string>,
+     *   tags?:array<string>,
+     *   status?:string,
+     *   visibility?:string,
+     *   keyword?:string,
+     *   excludeIds?:string,
+     *   fromDate?:string,
+     *   toDate?:string
+     * } $filters
      * @param string $type
      * @param int $offset
      * @param int $limit

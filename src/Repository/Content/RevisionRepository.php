@@ -68,7 +68,7 @@ class RevisionRepository extends AbstractRepository implements RevisionRepositor
     {
         $revision = new Revision();
         return $revision
-            ->setPageId($page->getId())
+            ->setPageId($page->getId()?->toString()?:'')
             ->setVersionNumber($this->getNextVersionNumberForPageId($page->getId()))
             ->setTitle($page->getTitle())
             ->setSubTitle($page->getSubTitle())
@@ -80,12 +80,12 @@ class RevisionRepository extends AbstractRepository implements RevisionRepositor
     /**
      * Get the next version number for a page
      * 
-     * @param UuidInterface $pageId The ID of the page.
+     * @param UuidInterface|null $pageId The ID of the page.
      * @return int The next version number.
      * @throws NonUniqueResultException
      * @throws \Doctrine\ORM\NoResultException
      */
-    public function getNextVersionNumberForPageId(UuidInterface $pageId): int
+    public function getNextVersionNumberForPageId(?UuidInterface $pageId): int
     {
         return ((int) $this->createQueryBuilder('r')
             ->select('MAX(r.versionNumber) as max_version')
@@ -114,7 +114,7 @@ class RevisionRepository extends AbstractRepository implements RevisionRepositor
 
         $revision = new Revision();
         $revision
-            ->setPageId($page->getId())
+            ->setPageId($page->getId()?->toString()?:'')
             ->setTitle($page->getTitle())
             ->setSubTitle($page->getSubTitle())
             ->setUser($user)

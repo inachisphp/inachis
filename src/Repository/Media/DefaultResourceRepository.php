@@ -14,8 +14,6 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 trait DefaultResourceRepository
 {
-    public const MAX_ITEMS_TO_SHOW_ADMIN = 25;
-
     /**
      * Get the disk usage of all images
      * 
