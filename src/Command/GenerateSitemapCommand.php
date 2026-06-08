@@ -15,6 +15,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[AsCommand(
     name: 'inachis:generate-sitemap',
@@ -27,11 +28,11 @@ class GenerateSitemapCommand extends Command
 
     public function __construct(
         private SitemapGenerator $generator,
-        private ParameterBagInterface $params,
+        #[Autowire('%kernel.project_dir%')]
+        private readonly string $projectDir,
     ) {
         parent::__construct();
-        // $this->publicDir = __DIR__ . '/../../public';
-        $this->publicDir = rtrim($params->get('kernel.project_dir'), '/') . '/public';
+        $this->publicDir = rtrim($projectDir, '/') . '/public';
     }
 
     /**

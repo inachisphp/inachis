@@ -26,7 +26,7 @@ use InvalidArgumentException;
 /**
  * Object for handling pages of a site.
  */
-#[ORM\Entity(repositoryClass: 'Inachis\Repository\PageRepository', readOnly: false)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\PageRepository', readOnly: false)]
 #[ORM\Index(columns: ['title', 'author_id', 'image_id'], name: 'search_idx')]
 #[ORM\Index(columns: ['title', 'sub_title', 'content'], name: "fulltext_title_content", flags: ["fulltext"])]
 class Page
@@ -548,7 +548,7 @@ class Page
      * Sets the value of {@link id}.
      *
      * @param UuidInterface $value The UUID of the {@link Page}
-     * @return $this
+     * @return self
      */
     public function setId(UuidInterface $value): self
     {
@@ -746,7 +746,7 @@ class Page
      * Sets the current type of {@link Page} entity.
      *
      * @param string $type The type of page
-     * @return $this
+     * @return self
      * @throws Exception
      */
     public function setType(string $type): self
@@ -871,7 +871,7 @@ class Page
     }
 
     /**
-     * @return $this
+     * @return self
      */
     public function removeCategories(): self
     {
@@ -896,7 +896,7 @@ class Page
      * Removes a {@link Tag} from the {@link Page}.
      *
      * @param Tag $tag The {@link Tag} to remove from the {@link Page}
-     * @return $this
+     * @return self
      */
     public function removeTag(Tag $tag): self
     {
@@ -905,7 +905,7 @@ class Page
     }
 
     /**
-     * @return $this
+     * @return self
      */
     public function removeTags(): self
     {

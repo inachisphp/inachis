@@ -15,9 +15,10 @@ use Inachis\Entity\Content\Series;
 use Inachis\Entity\Media\Image;
 use Inachis\Form\SeriesType;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\ImageRepository;
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Media\ImageRepository;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Service\Series\SeriesBulkActionService;
 use Inachis\Service\Waste\WasteManagerService;
 use Inachis\Util\UrlNormaliser;
@@ -47,6 +48,7 @@ class SeriesController extends AbstractInachisController
     )]
     public function list(
         Request $request,
+        CategoryRepository $categoryRepository,
         ContentQueryParameters $contentQueryParameters,
         SeriesBulkActionService $seriesBulkActionService,
         SeriesRepository $seriesRepository
@@ -67,7 +69,7 @@ class SeriesController extends AbstractInachisController
 
         $contentQuery = $contentQueryParameters->process(
             $request,
-            $seriesRepository,
+            $categoryRepository,
             'series',
             'lastDate desc',
         );

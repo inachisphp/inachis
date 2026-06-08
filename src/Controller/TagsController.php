@@ -11,8 +11,7 @@ namespace Inachis\Controller;
 
 use Inachis\Entity\Content\Tag;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\TagRepository;
+use Inachis\Repository\Content\{CategoryRepository, PageRepository,TagRepository};
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -76,6 +75,7 @@ class TagsController extends AbstractInachisController
     )]
     public function index(
         Request $request,
+        CategoryRepository $categoryRepository,
         ContentQueryParameters $contentQueryParameters,
         PageRepository $pageRepository,
         TagRepository $tagRepository,
@@ -110,7 +110,7 @@ class TagsController extends AbstractInachisController
 
         $contentQuery = $contentQueryParameters->process(
             $request,
-            $tagRepository,
+            $categoryRepository,
             'tag',
             'title',
         );
@@ -189,6 +189,7 @@ class TagsController extends AbstractInachisController
     #[Route('/incc/tags/{id}/{offset}/{limit}', name: 'incc_tag_show', requirements: [ "offset" => "\d+", "limit" => "\d+" ], defaults: [ "offset" => 0, "limit" => 25 ])]
     public function show(
         Tag $tag,
+        CategoryRepository $categoryRepository,
         PageRepository $pageRepository,
         ContentQueryParameters $contentQueryParameters,
         Request $request,
@@ -221,7 +222,7 @@ class TagsController extends AbstractInachisController
         $this->data['form'] = $form->createView();
         $this->data['query'] = $contentQueryParameters->process(
             $request,
-            $pageRepository,
+            $categoryRepository,
             'page',
             'title'
         );

@@ -9,7 +9,7 @@
 
 namespace Inachis\Service\Export\Series;
 
-use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Service\Export\Series\SeriesExportNormaliser;
 use Symfony\Component\TaggedIterator\TaggedIterator;
 use Inachis\Service\Export\AbstractExportService;

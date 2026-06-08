@@ -11,7 +11,8 @@ namespace Inachis\Controller\Page;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\WasteRepository;
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Waste\WasteRepository;
 use Inachis\Service\Waste\WasteManagerService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,6 +43,7 @@ class WasteController extends AbstractInachisController
     )]
     public function list(
         Request $request,
+        CategoryRepository $categoryRepository,
         ContentQueryParameters $contentQueryParameters,
         WasteRepository $wasteRepository,
         WasteManagerService $wasteManagerService,
@@ -70,7 +72,7 @@ class WasteController extends AbstractInachisController
 
         $contentQuery = $contentQueryParameters->process(
             $request,
-            $wasteRepository,
+            $categoryRepository,
             'waste',
             'modDate desc',
         );

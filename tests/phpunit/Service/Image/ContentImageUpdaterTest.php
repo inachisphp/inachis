@@ -11,7 +11,7 @@ namespace Inachis\Tests\phpunit\Service\Image;
 
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Revision;
-use Inachis\Repository\RevisionRepository;
+use Inachis\Repository\Content\RevisionRepository;
 use Inachis\Service\Image\ContentImageUpdater;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;

@@ -9,7 +9,7 @@
 
 namespace Inachis\Service\Export\Page;
 
-use Inachis\Repository\PageRepository;
+use Inachis\Repository\Content\PageRepository;
 use Inachis\Service\Export\AbstractExportService;
 use Inachis\Service\Export\Page\PageExportNormaliser;
 use Symfony\Component\TaggedIterator\TaggedIterator;

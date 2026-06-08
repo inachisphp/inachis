@@ -10,7 +10,7 @@
 namespace Inachis\Tests\phpunit\Controller\Dialog;
 
 use Inachis\Controller\Dialog\ImageGalleryDialogController;
-use Inachis\Repository\ImageRepository;
+use Inachis\Repository\Media\ImageRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;

@@ -11,25 +11,21 @@ namespace Inachis\Tests\phpunit\Controller\Page\Post;
 
 use Inachis\Controller\Page\Post\PageWebController;
 use Inachis\Entity\Content\{Category, Page, Series, Tag, Url};
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\SeriesRepository;
-use Inachis\Repository\TagRepository;
-use Inachis\Repository\UrlRepository;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\SeriesRepository;
+use Inachis\Repository\Content\TagRepository;
+use Inachis\Repository\Content\UrlRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use PHPUnit\Framework\MockObject\Exception;
-use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionClass;
 use ReflectionException;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PageWebControllerTest extends InachisControllerTestCase
 {

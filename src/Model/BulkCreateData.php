@@ -48,6 +48,15 @@ class BulkCreateData
      */
     public static function fromRequest(Request $request): self
     {
+        /** @var array{
+         *   title?: string,
+         *   seriesId?:string,
+         *   startDate?: string,
+         *   endDate?: string,
+         *   tags?:array<string>,
+         *   categories?:array<string>,
+         *   addDay?:int
+         * } $form */
         $form = $request->request->all();
 
         if (!$form) {

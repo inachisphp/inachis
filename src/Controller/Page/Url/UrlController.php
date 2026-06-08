@@ -12,7 +12,8 @@ namespace Inachis\Controller\Page\Url;
 use Doctrine\ORM\OptimisticLockException;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\UrlRepository;
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Content\UrlRepository;
 use Inachis\Service\Url\UrlBulkActionService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,6 +40,7 @@ class UrlController extends AbstractInachisController
     )]
     public function list(
         Request $request,
+        CategoryRepository $categoryRepository,
         ContentQueryParameters $contentQueryParameters,
         UrlBulkActionService $urlBulkActionService,
         UrlRepository $urlRepository,
@@ -59,7 +61,7 @@ class UrlController extends AbstractInachisController
         }
         $contentQuery = $contentQueryParameters->process(
             $request,
-            $urlRepository,
+            $categoryRepository,
             'url',
             'contentDate asc',
         );

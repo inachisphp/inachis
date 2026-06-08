@@ -10,7 +10,7 @@
 namespace Inachis\MessageHandler;
 
 use Inachis\Message\CleanupLoginActivityMessage;
-use Inachis\Repository\LoginActivityRepository;
+use Inachis\Repository\User\LoginActivityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 

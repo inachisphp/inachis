@@ -10,7 +10,7 @@
 namespace Inachis\Controller;
 
 use Inachis\Controller\AbstractController;
-use Inachis\Repository\WasteRepository;
+use Inachis\Repository\Waste\WasteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;

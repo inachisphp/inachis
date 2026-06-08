@@ -17,7 +17,7 @@ use Inachis\Entity\Media\Image;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Form\PostType;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\{PageRepository, ReviewThreadRepository, RevisionRepository, TagRepository};
+use Inachis\Repository\Content\{CategoryRepository, PageRepository, ReviewThreadRepository, RevisionRepository, TagRepository};
 use Inachis\Service\Page\{PageBulkActionService, ReviewRebaseService};
 use Inachis\Util\{ContentRevisionCompare, ReadingTime, UrlNormaliser};
 use Ramsey\Uuid\Uuid;
@@ -58,6 +58,7 @@ class PageController extends AbstractInachisController
     )]
     public function list(
         Request $request,
+        CategoryRepository $categoryRepository,
         ContentQueryParameters $contentQueryParameters,
         PageBulkActionService $pageBulkActionService,
         PageRepository $pageRepository,
@@ -85,7 +86,7 @@ class PageController extends AbstractInachisController
 
         $contentQuery = $contentQueryParameters->process(
             $request,
-            $pageRepository,
+            $categoryRepository,
             'post',
             'postDate desc',
         );
@@ -260,7 +261,7 @@ class PageController extends AbstractInachisController
             }
 
             $post->setModDate(new DateTimeImmutable());
-            if (!empty($post->getId())) {
+            if (!empty($post->getId()) && isset($revision)) {
                 $this->entityManager->persist($revision);
             }
             $this->entityManager->persist($post);

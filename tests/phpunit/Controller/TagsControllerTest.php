@@ -12,7 +12,7 @@ namespace Inachis\Tests\phpunit\Controller;
 use ArrayIterator;
 use Inachis\Controller\TagsController;
 use Inachis\Entity\Content\Tag;
-use Inachis\Repository\TagRepository;
+use Inachis\Repository\Content\TagRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Ramsey\Uuid\Uuid;

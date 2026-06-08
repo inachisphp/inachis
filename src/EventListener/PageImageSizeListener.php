@@ -14,7 +14,7 @@ use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
 use Inachis\Entity\Content\Page;
-use Inachis\Repository\ImageRepository;
+use Inachis\Repository\Media\ImageRepository;
 
 /**
  * Event subscriber to calculate and set the total size of images

@@ -22,6 +22,12 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
  */
 abstract class AbstractFile
 {
+    /** @var list<string> */
+    public const ALLOWED_MIME_TYPES = [];
+
+    /** @var list<string> */
+    public const ALLOWED_TYPES = [];
+
     /**
      * @var UuidInterface|null The unique id of the category
      */
@@ -119,9 +125,9 @@ abstract class AbstractFile
     /**
      * Returns the value of {@link filename}.
      *
-     * @return string|null The filename of the record
+     * @return string The filename of the record
      */
-    public function getFilename(): ?string
+    public function getFilename(): string
     {
         return $this->filename;
     }
@@ -190,7 +196,7 @@ abstract class AbstractFile
      * Sets the value of {@link id}.
      *
      * @param ?UuidInterface $value The id to set
-     * @return $this
+     * @return self
      */
     public function setId(?UuidInterface $value): self
     {
@@ -202,10 +208,10 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link title}.
      *
-     * @param string|null $value The title to set
-     * @return $this
+     * @param string $value The title to set
+     * @return self
      */
-    public function setTitle(?string $value): self
+    public function setTitle(string $value): self
     {
         $this->title = $value;
 
@@ -216,7 +222,7 @@ abstract class AbstractFile
      * Sets the value of {@link description}.
      *
      * @param string|null $value The description to set
-     * @return $this
+     * @return self
      */
     public function setDescription(?string $value): self
     {
@@ -228,10 +234,10 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link filename}.
      *
-     * @param string|null $value The filename to set
-     * @return $this
+     * @param string $value The filename to set
+     * @return self
      */
-    public function setFilename(?string $value): self
+    public function setFilename(string $value): self
     {
         $this->filename = $value;
 
@@ -242,7 +248,7 @@ abstract class AbstractFile
      * Sets the value of {@link filetype}.
      *
      * @param string $value The filetype to set
-     * @return $this
+     * @return self
      */
     public function setFiletype(string $value): self
     {
@@ -260,17 +266,14 @@ abstract class AbstractFile
      */
     public function isValidFiletype(string $value): bool
     {
-        if (defined(static::class . '::ALLOWED_MIME_TYPES')) {
-            return in_array($value, static::ALLOWED_MIME_TYPES, true);
-        }
-        return true;
+        return empty(static::ALLOWED_MIME_TYPES) || in_array($value, static::ALLOWED_MIME_TYPES, true);
     }
 
     /**
      * Sets the value of {@link filesize}.
      *
      * @param int $value The filesize to set
-     * @return $this
+     * @return self
      */
     public function setFilesize(int $value): self
     {
@@ -286,7 +289,7 @@ abstract class AbstractFile
      * Sets the value of {@link checksum}.
      *
      * @param string $value The checksum to set
-     * @return $this
+     * @return self
      */
     public function setChecksum(string $value): self
     {
@@ -310,10 +313,10 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link createDate}.
      *
-     * @param DateTimeImmutable|null $value The date to be set
-     * @return $this
+     * @param DateTimeImmutable $value The date to be set
+     * @return self
      */
-    public function setCreateDate(?DateTimeImmutable $value): self
+    public function setCreateDate(DateTimeImmutable $value): self
     {
         $this->createDate = $value;
 
@@ -323,10 +326,10 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link modDate}.
      *
-     * @param DateTimeImmutable|null $value Specifies the mod date for the {@link Page}
-     * @return $this
+     * @param DateTimeImmutable $value Specifies the mod date for the {@link Page}
+     * @return self
      */
-    public function setModDate(?DateTimeImmutable $value): self
+    public function setModDate(DateTimeImmutable $value): self
     {
         $this->modDate = $value;
 

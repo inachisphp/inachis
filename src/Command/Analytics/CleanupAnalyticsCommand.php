@@ -10,13 +10,12 @@
 namespace Inachis\Command\Analytics;
 
 use Doctrine\DBAL\Connection;
-use Inachis\Repository\AnalyticsRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * Command to remove old analytics data and delete processed files
@@ -31,17 +30,16 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 )]
 class CleanupAnalyticsCommand extends Command
 {
-    private string $projectDir;
-
     /**
+     * @param string $projectDir
      * @param Connection $db
      */
     public function __construct(
+        #[Autowire('%kernel.project_dir%')]
+        private readonly string $projectDir,
         private Connection $db,
-        ParameterBagInterface $params
     ) {
         parent::__construct();
-        $this->projectDir = $params->get('kernel.project_dir');
     }
 
     /**

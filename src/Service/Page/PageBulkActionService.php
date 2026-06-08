@@ -10,9 +10,7 @@
 namespace Inachis\Service\Page;
 
 use Inachis\Entity\Content\{Page, Url};
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\RevisionRepository;
-use Inachis\Repository\UrlRepository;
+use Inachis\Repository\Content\{PageRepository, RevisionRepository, UrlRepository};
 use Inachis\Util\UrlNormaliser;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;

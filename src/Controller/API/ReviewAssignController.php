@@ -11,8 +11,8 @@ namespace Inachis\Controller\API;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\User\User;
-use Inachis\Repository\ReviewThreadRepository;
-use Inachis\Repository\UserRepository;
+use Inachis\Repository\Content\ReviewThreadRepository;
+use Inachis\Repository\User\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

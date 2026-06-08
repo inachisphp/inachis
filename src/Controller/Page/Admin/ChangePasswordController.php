@@ -12,7 +12,7 @@ namespace Inachis\Controller\Page\Admin;
 use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Form\ChangePasswordType;
-use Inachis\Repository\UserRepository;
+use Inachis\Repository\User\UserRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

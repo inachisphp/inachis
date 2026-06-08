@@ -13,9 +13,10 @@ use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\System\NavigationTab;
 use Inachis\Form\NavigationTabType;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\NavigationTabRepository;
+use Inachis\Repository\System\NavigationTabRepository;
 use Inachis\Service\Navigation\NavigationTabService;
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Repository\Content\CategoryRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -32,14 +33,16 @@ class NavigationTabController extends AbstractInachisController
      * List all navigation tabs
      *
      * @param Request $request
+     * @param CategoryRepository $categoryRepository
+     * @param ContentQueryParameters $contentQueryParameters
      * @param NavigationTabRepository $navigationTabRepository
      * @param NavigationTabService $navigationTabService
-     * @param EntityManagerInterface $entityManager
      * @return Response
      */
     #[Route('/incc/settings/navigation', name: 'incc_settings_navigation_list')]
     public function index(
         Request $request,
+        CategoryRepository $categoryRepository,
         ContentQueryParameters $contentQueryParameters,
         NavigationTabRepository $navigationTabRepository,
         NavigationTabService $navigationTabService,
@@ -62,7 +65,7 @@ class NavigationTabController extends AbstractInachisController
 
         $contentQuery = $contentQueryParameters->process(
             $request,
-            $navigationTabRepository,
+            $categoryRepository,
             'navigationTab',
             'position asc',
         );

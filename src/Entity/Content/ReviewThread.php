@@ -20,15 +20,18 @@ use Ramsey\Uuid\UuidInterface;
 #[ORM\Entity]
 class ReviewThread
 {
+    /** @var UuidInterface The unqiue identifier for the review thread */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid')]
 	#[ORM\GeneratedValue(strategy: 'CUSTOM')]
 	#[ORM\CustomIdGenerator(class: UuidGenerator::class)]
 	private ?UuidInterface $id = null;
 
+    /** @var Page The page the review thread is for */
     #[ORM\ManyToOne(targetEntity: Page::class)]
     private Page $page;
 
+    /** @var Collection<int, ReviewComment> Comments associated with this review thread */
     #[ORM\OneToMany(
         mappedBy: 'thread',
         targetEntity: ReviewComment::class,
@@ -38,54 +41,67 @@ class ReviewThread
     #[ORM\OrderBy(['created' => 'ASC'])]
     protected Collection $comments;
 
+    /** @var string The current status of this thread */
     #[ORM\Column(type: 'string', length: 20)]
     protected string $status = 'open';
 
+    /** @var bool Flag indicating if the offsets need rebasing after content change */
     #[ORM\Column(type: 'boolean')]
     protected bool $needsRebase = false;
 
-    #[ORM\ManyToOne(targetEntity: Revision::class)]
-    protected ?Revision $createdRevision = null;
-
+    /** @var User The user who started this review thread */
     #[ORM\ManyToOne(targetEntity: User::class)]
     protected User $createdBy;
 
+    /** @var int The starting offset in the content for the review thread */
     #[ORM\Column(type: 'integer')]
     protected int $startOffset;
 
+    /** @var int The ending offset in the content for the review thread */
     #[ORM\Column(type: 'integer')]
     protected int $endOffset;
 
+    /** @var int The current starting offset in the content for the review thread */
     #[ORM\Column(type: 'integer', nullable: true)]
     protected ?int $currentStartOffset = null;
 
+    /** @var int The current ending offset in the content for the review thread */
     #[ORM\Column(type: 'integer', nullable: true)]
     protected ?int $currentEndOffset = null;
 
+    /** @var string The text content of the selection */
     #[ORM\Column(type: 'text')]
     protected string $selectedText;
 
+    /** @var string The content before the selected text */
     #[ORM\Column(type: 'text')]
     protected string $contextBefore;
 
+    /** @var string The content after he selected text */
     #[ORM\Column(type: 'text')]
     protected string $contextAfter;
 
+    /** @var User The user this review has been assigned to */
     #[ORM\ManyToOne(targetEntity: User::class)]
     protected ?User $assignedTo = null;
 
+    /** @var bool Flag indicating if this review is resolved */
     #[ORM\Column(type: 'boolean')]
     protected bool $resolved = false;
 
+    /** @var DateTimeImmutable The datetime this review was started  */
     #[ORM\Column(type: 'datetime_immutable')]
     protected DateTimeImmutable $created;
 
+    /** @var DateTimeImmutable The datetime this review was last updated  */
     #[ORM\Column(type: 'datetime_immutable')]
     protected DateTimeImmutable $updated;
 
+    /** @var User The user who resolved this review thread  */
     #[ORM\ManyToOne(targetEntity: User::class)]
     protected ?User $resolvedBy = null;
 
+    /** @var DateTimeImmutable The datetime this review thread was resolved  */
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     protected ?DateTimeImmutable $resolvedAt = null;
 
@@ -120,11 +136,22 @@ class ReviewThread
         return $this;
     }
 
+    /**
+     * Returns the collection of comments for this review
+     *
+     * @return Collection<int, ReviewComment>
+     */
     public function getComments(): Collection
     {
         return $this->comments;
     }
 
+    /**
+     * Sets the collection of comments for this review
+     *
+     * @param Collection<int, ReviewComment> $comments
+     * @return self
+     */
     public function setComments(Collection $comments): self
     {
         $this->comments = $comments;
@@ -152,18 +179,6 @@ class ReviewThread
     public function setNeedsRebase(bool $needsRebase): self
     {
         $this->needsRebase = $needsRebase;
-
-        return $this;
-    }
-
-    public function getCreatedRevision(): ?Revision
-    {
-        return $this->createdRevision;
-    }
-
-    public function setCreatedRevision(?Revision $createdRevision): self
-    {
-        $this->createdRevision = $createdRevision;
 
         return $this;
     }

@@ -9,7 +9,7 @@
 
 namespace Inachis\Service;
 
-use Inachis\Repository\SettingRepository;
+use Inachis\Repository\System\SettingRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**

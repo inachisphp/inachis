@@ -20,6 +20,12 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 #[AsCommand(name: 'inachis:plugin:sync')]
 final class PluginSyncCommand extends Command
 {
+    /**
+     * Constructor for PluginSync command
+     *
+     * @param PluginManager $pluginManager
+     * @param DependencyFactory $migrationFactory
+     */
     public function __construct(
         private PluginManager $pluginManager,
         #[Autowire(service: 'doctrine.migrations.dependency_factory')]
@@ -28,11 +34,21 @@ final class PluginSyncCommand extends Command
         parent::__construct();
     }
 
+    /**
+     * Configure the command
+     */
     protected function configure(): void
     {
         $this->setDescription('Sync all installed plugins: run install/update hooks and migrations.');
     }
 
+    /**
+     * Execute the command
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<info>Starting plugin sync...</info>');

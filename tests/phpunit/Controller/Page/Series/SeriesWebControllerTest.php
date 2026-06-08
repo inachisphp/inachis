@@ -11,7 +11,7 @@ namespace Inachis\Tests\phpunit\Controller\Page\Series;
 
 use Inachis\Controller\Page\Series\SeriesWebController;
 use Inachis\Entity\Content\Series;
-use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use ReflectionClass;
 use Symfony\Component\DependencyInjection\ContainerInterface;

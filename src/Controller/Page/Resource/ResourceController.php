@@ -14,7 +14,8 @@ use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Media\{Download, Image};
 use Inachis\Form\ResourceType;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\{DownloadRepository, ImageRepository, PageRepository, SeriesRepository};
+use Inachis\Repository\Content\{CategoryRepository, PageRepository, SeriesRepository};
+use Inachis\Repository\Media\{DownloadRepository, ImageRepository};
 use Inachis\Service\Resource\ImageFileService;
 use Inachis\Service\Waste\WasteManagerService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -48,6 +49,7 @@ class ResourceController extends AbstractInachisController
     )]
     public function list(
         Request $request,
+        CategoryRepository $categoryRepository,
         ContentQueryParameters $contentQueryParameters,
         DownloadRepository $downloadRepository,
         ImageRepository $imageRepository,
@@ -69,17 +71,17 @@ class ResourceController extends AbstractInachisController
         $form->handleRequest($request);
         $contentQuery = $contentQueryParameters->process(
             $request,
-            $repository,
+            $categoryRepository,
             strtolower($type),
             'title asc',
         );
         if ($request->query->has('altText') && $request->query->get('altText') === 'null') {
-            $this->data['dataset'] = $repository->getImagesWithoutAltText(
+            $this->data['dataset'] = $imageRepository->getImagesWithoutAltText(
                 $contentQuery['offset'],
                 $contentQuery['limit']
             );
         } else {
-            $this->data['dataset'] = $repository->getFiltered(
+            $this->data['dataset'] = $imageRepository->getFiltered(
                 $contentQuery['filters'],
                 $contentQuery['offset'],
                 $contentQuery['limit'],

@@ -10,9 +10,8 @@
 namespace Inachis\Controller\Page\Tools;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Repository\CategoryRepository;
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Service\Export\Category\CategoryExportService;
 use Inachis\Service\Export\Page\PageExportService;
 use Inachis\Service\Export\Series\SeriesExportService;
@@ -37,6 +36,7 @@ class ExportController extends AbstractInachisController
         Request $request,
         CategoryExportService $categoryExportService,
         PageExportService $pageExportService,
+        PageRepository $pageRepository,
         SeriesExportService $seriesExportService,
     ): Response {
         $contentType = $request->request->get('content_type') ?? 'post';

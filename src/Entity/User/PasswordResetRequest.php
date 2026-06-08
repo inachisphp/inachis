@@ -11,7 +11,6 @@ namespace Inachis\Entity\User;
 
 use Doctrine\ORM\Mapping as ORM;
 use Inachis\Entity\User\User;
-use Inachis\Repository\PasswordResetRequestRepository;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use DateTimeImmutable;
@@ -19,7 +18,7 @@ use DateTimeImmutable;
 /**
  * Entity for storing password reset requests
  */
-#[ORM\Entity(repositoryClass: PasswordResetRequestRepository::class)]
+#[ORM\Entity(repositoryClass: 'Inachis\Repository\User\PasswordResetRequestRepository')]
 #[ORM\Table(name: "password_reset_requests")]
 #[ORM\Index(columns: [ "user_id", "token_hash" ], name: "search_idx")]
 class PasswordResetRequest

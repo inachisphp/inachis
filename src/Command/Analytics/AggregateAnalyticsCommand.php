@@ -10,7 +10,6 @@
 namespace Inachis\Command\Analytics;
 
 use Doctrine\DBAL\Connection;
-use Inachis\Repository\AnalyticsRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,7 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 class AggregateAnalyticsCommand extends Command
 {
-    public function __construct(private Connection $db, private AnalyticsRepository $analyticsRepository) {
+    public function __construct(private Connection $db) {
 		parent::__construct();
 	}
 
@@ -45,21 +44,23 @@ class AggregateAnalyticsCommand extends Command
         }
 
         $files = glob($dir . '/*-*.log');
-        foreach ($files as $file) {
-			$output->writeln(sprintf('Processing <info>%s</info> ...', basename($file)));
-			if (str_contains($file, '/analytics-')) {
-				$this->processFile($file);
-			} elseif (str_contains($file, '/error-')) {
-				$this->processErrorFile($file);
-			} elseif (str_contains($file, '/subscriber-')) {
-                $this->processSubscriberFile($file);
-            } elseif (str_contains($file, '/bot-')) {
-                $this->processBotFile($file);
+        if (!empty($files)){
+            foreach ($files as $file) {
+                $output->writeln(sprintf('Processing <info>%s</info> ...', basename($file)));
+                if (str_contains($file, '/analytics-')) {
+                    $this->processFile($file);
+                } elseif (str_contains($file, '/error-')) {
+                    $this->processErrorFile($file);
+                } elseif (str_contains($file, '/subscriber-')) {
+                    $this->processSubscriberFile($file);
+                } elseif (str_contains($file, '/bot-')) {
+                    $this->processBotFile($file);
+                }
+
+                $output->writeln(sprintf('Processed %s', basename($file)));
+
+                rename($file, $file . '.processed');
             }
-
-			$output->writeln(sprintf('Processed %s', basename($file)));
-
-			rename($file, $file . '.processed');
         }
         return Command::SUCCESS;
     }
@@ -82,6 +83,7 @@ class AggregateAnalyticsCommand extends Command
         $regionHits = []; // Array of [date => [countryCode => [name => string, hits => int]]]
 
         while (($line = fgets($handle)) !== false) {
+            /** @var array{path?: string, date?: string, visitor?: string, ref?: string, ip?:string, ts?:int}|array{} $data */
             $data = json_decode($line, true);
 
             if (!$data || !isset($data['path'], $data['date'])) {
@@ -209,6 +211,7 @@ class AggregateAnalyticsCommand extends Command
 		$counts = [];
 
 		while (($line = fgets($handle)) !== false) {
+            /** @var array{path?: string, date?: string, code?: string, ts?:int} $data */
 			$data = json_decode($line, true);
 
 			if (!$data || !isset($data['path'], $data['date'], $data['code'])) {
@@ -260,6 +263,7 @@ class AggregateAnalyticsCommand extends Command
         $date = null;
 
         while (($line = fgets($handle)) !== false) {
+            /** @var array{path?: string, date?: string, visitor?: string, ua?: string, ts?:int} $data */
             $data = json_decode($line, true);
             if (!$data || !isset($data['path'], $data['date'])) {
                 continue;
@@ -333,6 +337,7 @@ class AggregateAnalyticsCommand extends Command
         $counts = []; // [ua|date => hits]
 
         while (($line = fgets($handle)) !== false) {
+            /** @var array{path?: string, ua?: string, date?: string, ts?:int} $data */
             $data = json_decode($line, true);
 
             if (!$data || !isset($data['ua'], $data['date'])) {
@@ -386,6 +391,7 @@ class AggregateAnalyticsCommand extends Command
 
         // 2. Query cache database
         try {
+            /** @var array{country_code: string, country_name: string}|array{} $cached */
             $cached = $this->db->fetchAssociative(
                 'SELECT country_code, country_name FROM analytics_ip_cache WHERE ip = :ip LIMIT 1',
                 ['ip' => $ip]
@@ -414,6 +420,7 @@ class AggregateAnalyticsCommand extends Command
             ]);
             $response = @file_get_contents('http://ip-api.com/json/' . urlencode($ip) . '?fields=status,country,countryCode', false, $ctx);
             if ($response) {
+                /** @var array{status?:string, countryCode?:string, country?:string}|array{} */
                 $res = json_decode($response, true);
                 if ($res && isset($res['status']) && $res['status'] === 'success') {
                     $code = $res['countryCode'] ?? 'Unknown';

@@ -11,8 +11,8 @@ namespace Inachis\Tests\phpunit\Controller\Page\Dashboard;
 
 use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Controller\Page\Dashboard\DashboardController;
-use Inachis\Repository\{PageRepository, SeriesRepository};
-use Inachis\Repository\ImageRepository;
+use Inachis\Repository\Content\{PageRepository, SeriesRepository};
+use Inachis\Repository\Media\ImageRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;

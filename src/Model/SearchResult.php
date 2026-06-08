@@ -15,13 +15,14 @@ use Traversable;
 
 /**
  * Model for containing search result items
+ * @implements IteratorAggregate<int, array<string|int, mixed>>
  */
 class SearchResult implements IteratorAggregate
 {
     /**
      * Creates a new instance of {@link SearchResult}
      * 
-     * @param array<int, array<string, mixed>> $results The search results
+     * @param list<array<string|int, mixed>> $results The search results
      * @param int $total The total number of search results
      * @param int $offset The offset of the search results
      * @param int $limit The limit of the search results
@@ -36,7 +37,7 @@ class SearchResult implements IteratorAggregate
     /**
      * Returns an iterator for the search results
      * 
-     * @return Traversable The iterator for the search results
+     * @return Traversable<int, array<string|int, mixed>> The iterator for the search results
      */
     public function getIterator(): Traversable
     {
@@ -76,7 +77,7 @@ class SearchResult implements IteratorAggregate
     /**
      * Returns the search results
      * 
-     * @return array<int, array<string, mixed>> The search results
+     * @return array<int, array<string|int, mixed>> The search results
      */
     public function getResults(): array
     {
@@ -88,11 +89,12 @@ class SearchResult implements IteratorAggregate
      * 
      * @param string|int $key The key of the search result
      * @param string $property The property to update
-     * @param mixed $value The value to set
-     * @return void
+     * @param mixed $value
      */
     public function updateResultPropertyByKey(string|int $key, string $property, mixed $value): void
     {
-        $this->results[$key][$property] = $value;
+        if (isset($this->results[$key])) {
+            $this->results[$key][$property] = $value;
+        }
     }
 }

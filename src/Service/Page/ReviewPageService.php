@@ -13,7 +13,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Content\{Page, ReviewComment, ReviewThread, Revision};
 use Inachis\Entity\User\User;
-use Inachis\Repository\ReviewThreadRepository;
+use Inachis\Repository\Content\ReviewThreadRepository;
 
 class ReviewPageService
 {

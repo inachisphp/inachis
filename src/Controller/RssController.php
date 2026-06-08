@@ -11,6 +11,8 @@ namespace Inachis\Controller;
 
 use Inachis\Entity\Content\{Category, Page};
 use Inachis\Enum\EditorialStatus;
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Content\PageRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -49,11 +51,10 @@ class RssController extends AbstractInachisController
      * Default main RSS Feed
      */
     #[Route('/feed', name: 'rss_feed', methods: ['GET'])]
-    public function feed(Request $request): Response
+    public function feed(Request $request, PageRepository $pageRepository): Response
     {
         $this->logSubscriberHit($request, '/feed');
 
-        $pageRepository = $this->entityManager->getRepository(Page::class);
         $paginator = $pageRepository->getFilteredOfTypeByPostDate(
             [
                 'status' => EditorialStatus::PUBLISHED,
@@ -80,11 +81,15 @@ class RssController extends AbstractInachisController
      * RSS Feed filtered by category
      */
     #[Route('/feed/{categoryName}', name: 'rss_feed_category', methods: ['GET'])]
-    public function categoryFeed(Request $request, string $categoryName): Response
-    {
+    public function categoryFeed(
+        Request $request,
+        CategoryRepository $categoryRepository,
+        PageRepository $pageRepository,
+        string $categoryName
+    ): Response {
         $this->logSubscriberHit($request, '/feed/' . $categoryName);
 
-        $category = $this->entityManager->getRepository(Category::class)->findOneBy([
+        $category = $categoryRepository->findOneBy([
             'title' => $categoryName
         ]);
 
@@ -92,7 +97,6 @@ class RssController extends AbstractInachisController
             throw new NotFoundHttpException(sprintf('Category %s not found', $categoryName));
         }
 
-        $pageRepository = $this->entityManager->getRepository(Page::class);
         $paginator = $pageRepository->getFilteredOfTypeByPostDate(
             [
                 'status' => EditorialStatus::PUBLISHED,
@@ -118,11 +122,14 @@ class RssController extends AbstractInachisController
 
     /**
      * Visual list of available RSS Feeds to subscribe to
+     * 
+     * @param CategoryRepository $categoryRepository
+     * @return Response
      */
     #[Route('/feeds', name: 'rss_feeds_list', methods: ['GET'])]
-    public function feedsList(): Response
+    public function feedsList(CategoryRepository $categoryRepository): Response
     {
-        $categories = $this->entityManager->getRepository(Category::class)->findBy([
+        $categories = $categoryRepository->findBy([
             'visible' => true
         ], ['title' => 'ASC']);
 

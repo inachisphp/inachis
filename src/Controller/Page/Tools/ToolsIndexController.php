@@ -10,7 +10,8 @@
 namespace Inachis\Controller\Page\Tools;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Repository\{ImageRepository,PageRepository};
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Media\ImageRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
