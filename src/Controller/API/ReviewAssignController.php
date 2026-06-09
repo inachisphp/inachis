@@ -10,7 +10,7 @@
 namespace Inachis\Controller\API;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Repository\Content\ReviewThreadRepository;
 use Inachis\Repository\User\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
