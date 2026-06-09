@@ -235,6 +235,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->role;
     }
 
+    /**
+     * Sets the Role for the current {@link User}
+     *
+     * @param Role|null $role
+     * @return self
+     */
     public function setRole(?Role $role): self
     {
         $this->role = $role;
@@ -243,6 +249,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Returns the role(s) for the current {@link User}
+     * 
      * @return array<string>
      */
     public function getRoles(): array

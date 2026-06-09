@@ -11,11 +11,17 @@ namespace Inachis\Diagnostics;
 
 final class DiagnosticsCollector
 {
-    public function __construct(
-        private iterable $checks
-    ) {}
+    /**
+     * Constructor for DiagnosticsCollector
+     *
+     * @param iterable<CheckInterface> $checks
+     */
+    public function __construct(private iterable $checks) {}
 
-    /** @return CheckResult[] */
+    /**
+     * Returns the result of checks
+     * @return list<CheckResult>
+     */
     public function collect(): array
     {
         $results = [];
@@ -27,6 +33,11 @@ final class DiagnosticsCollector
         return $results;
     }
 
+    /**
+     * Groups checks by category
+     *
+     * @return array<string,array<string,string|array<CheckResult>>>
+     */
     public function grouped(): array
     {
         $groups = [];

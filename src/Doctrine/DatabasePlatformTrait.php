@@ -18,7 +18,7 @@ use Doctrine\DBAL\Platforms\MySQL84Platform;
 use Doctrine\DBAL\Platforms\MariaDBPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLServerPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 
 /**
  * Trait for obtaining the database platform name. This used to be obtainable prior to DBAL 4.x using
@@ -37,8 +37,6 @@ trait DatabasePlatformTrait
         return match (true) {
             // MySQL variants
             $platform instanceof MySQLPlatform,
-            $platform instanceof MySQL57Platform,
-            $platform instanceof MySQL80Platform,
             $platform instanceof MySQL81Platform,
             $platform instanceof MySQL82Platform,
             $platform instanceof MySQL83Platform,
@@ -54,7 +52,7 @@ trait DatabasePlatformTrait
             $platform instanceof SQLServerPlatform => 'sqlserver',
 
             // SQLite
-            $platform instanceof SqlitePlatform => 'sqlite',
+            $platform instanceof SQLitePlatform => 'sqlite',
 
             // Unknown
             default => 'unknown',

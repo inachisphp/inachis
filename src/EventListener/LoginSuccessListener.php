@@ -43,11 +43,12 @@ class LoginSuccessListener
     public function __invoke(LoginSuccessEvent $event): void
     {
         $request = $event->getRequest();
+        /** @var User $user */
         $user = $event->getUser();
         $firewallName = $event->getFirewallName();
-        $ip = $request?->getClientIp();
-        $userAgent = $request?->headers->get('User-Agent');
-        $sessionId = $request?->getSession()?->getId();
+        $ip = $request->getClientIp();
+        $userAgent = $request->headers->get('User-Agent');
+        $sessionId = $request->getSession()->getId();
         $fingerprint = hash('sha512', $ip . '|' . $userAgent);
         $activity = new LoginActivity(
             $user,
@@ -67,7 +68,7 @@ class LoginSuccessListener
             $fingerprint
         );
 
-        if (!$isKnownDevice) {
+        if (!$isKnownDevice && !empty($user->getEmail())) {
             $this->mailer->send(
                 (new TemplatedEmail())
                     ->to($user->getEmail())
@@ -77,7 +78,7 @@ class LoginSuccessListener
                     ->context([
                         'ip' => $ip,
                         'userAgent' => $userAgent,
-                        'time' => new DateTimeImmutable(),
+                        'time' => new \DateTimeImmutable(),
                     ])
             );
         }

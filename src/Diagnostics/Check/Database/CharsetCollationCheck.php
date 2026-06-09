@@ -18,12 +18,39 @@ final class CharsetCollationCheck implements CheckInterface
 {
     use DatabasePlatformTrait;
 
+    /**
+     * Constructor for the check
+     *
+     * @param Connection $connection
+     */
     public function __construct(private readonly Connection $connection) {}
 
+    /**
+     * Gets the id of the check
+     *
+     * @return string
+     */
     public function getId(): string { return 'db_charset_collation'; }
+
+    /**
+     * Gets the friendly name for the check
+     *
+     * @return string
+     */
     public function getLabel(): string { return 'Character set / Collation'; }
+
+    /**
+     * Gets the name of the section this check appear sunder
+     *
+     * @return string
+     */
     public function getSection(): string { return 'Database'; }
 
+    /**
+     * Runs the check
+     *
+     * @return CheckResult
+     */
     public function run(): CheckResult
     {
         $platform = $this->connection->getDatabasePlatform();
@@ -43,6 +70,7 @@ final class CharsetCollationCheck implements CheckInterface
         }
 
         try {
+            /** @var array<string, string> */
             $row = $this->connection->fetchAssociative(
                 "SELECT @@character_set_database AS charset, @@collation_database AS collation"
             );

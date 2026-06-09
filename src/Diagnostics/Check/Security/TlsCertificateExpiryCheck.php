@@ -15,25 +15,39 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final class TlsCertificateExpiryCheck implements CheckInterface
 {
-    public function __construct(
-        private readonly RequestStack $requestStack
-    ) {}
+    /**
+     * Constructor the check
+     *
+     * @param RequestStack $requestStack
+     */
+    public function __construct(private readonly RequestStack $requestStack) {}
 
-    public function getId(): string
-    {
-        return 'tls_certificate_expiry';
-    }
+    /**
+     * Returns the id of the check
+     *
+     * @return string
+     */
+    public function getId(): string { return 'tls_certificate_expiry'; }
 
-    public function getLabel(): string
-    {
-        return 'TLS Certificate Expiry';
-    }
+    /**
+     * Returns a friendly name for the check
+     *
+     * @return string
+     */
+    public function getLabel(): string { return 'TLS Certificate Expiry'; }
 
-    public function getSection(): string
-    {
-        return 'Security';
-    }
+    /**
+     * Returns the section name this check appears under
+     *
+     * @return string
+     */
+    public function getSection(): string { return 'Security'; }
 
+    /**
+     * Runs the check
+     *
+     * @return CheckResult
+     */
     public function run(): CheckResult
     {
         $request = $this->requestStack->getMainRequest();
