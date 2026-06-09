@@ -18,12 +18,42 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Form template for specifying security policy
+ * 
+ * @extends AbstractType<array{
+ *     name?: string,
+ *     requireLowercase?: bool,
+ *     requireNumber?: bool,
+ *     requireSpecial?: bool,
+ *     passwordRegex?: string,
+ *     passwordExpiryDays:? int,
+ *     passwordHistory?: int,
+ *     maxFailedLoginAttempts?: int,
+ *     lockoutDurationMinutes?: int,
+ *     adminRequire2FA?: bool,
+ *     superAdminRequire2FA?: bool,
+ *     superAdminRequiresWebAuthn?: bool,
+ *     stepUpForSensitiveActions?: bool,
+ * }>
  */
 class SecurityPolicyType extends AbstractType
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
+     * @param FormBuilderInterface<array{
+     *     name?: string,
+     *     requireLowercase?: bool,
+     *     requireNumber?: bool,
+     *     requireSpecial?: bool,
+     *     passwordRegex?: string,
+     *     passwordExpiryDays:? int,
+     *     passwordHistory?: int,
+     *     maxFailedLoginAttempts?: int,
+     *     lockoutDurationMinutes?: int,
+     *     adminRequire2FA?: bool,
+     *     superAdminRequire2FA?: bool,
+     *     superAdminRequiresWebAuthn?: bool,
+     *     stepUpForSensitiveActions?: bool,
+     * }|null> $builder
+     * @param array<string, mixed> $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

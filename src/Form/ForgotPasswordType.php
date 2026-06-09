@@ -9,25 +9,36 @@
 
 namespace Inachis\Form;
 
-use Karser\Recaptcha3Bundle\Form\Recaptcha3Type;
-use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Undocumented class
+ * 
+ * @extends AbstractType<array{
+ *     forgot_email?: string,
+ * }>
+ */
 class ForgotPasswordType extends AbstractType
 {
-    private ?TranslatorInterface $translator;
-    public function __construct(?TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
-    }
+    /**
+     * Constructor for the ForgotPasswordType
+     *
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(private readonly TranslatorInterface $translator) {}
 
+    /**
+     * Builds the form
+     *
+     * @param FormBuilderInterface<array{
+     *     forgot_email?: string,
+     * }|null> $builder
+     * @param array<string, mixed> $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder

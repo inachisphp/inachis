@@ -18,13 +18,29 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Form for editing a navigation tab
+ * 
+ * @extends AbstractType<array{
+ *     robots_txt?: string,
+ *     submit?: string,
+ * }>
  */
 class RobotsTxtType extends AbstractType
 {
-
+    /**
+     * Constructor for RobotsTxtType
+     *
+     * @param TranslatorInterface $translator
+     */
     public function __construct(private TranslatorInterface $translator) {}
+
     /**
      * Build the form
+     *
+     * @param FormBuilderInterface<array{
+     *     robots_txt?: string,
+     *     submit?: string,
+     * }|null> $builder
+     * @param array<string, mixed> $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -58,6 +74,8 @@ class RobotsTxtType extends AbstractType
 
     /**
      * Configure the options for the form
+     * 
+     * @param OptionsResolver $resolver
      */
     public function configureOptions(OptionsResolver $resolver): void
     {

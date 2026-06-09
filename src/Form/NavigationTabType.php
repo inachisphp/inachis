@@ -20,13 +20,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Form for editing a navigation tab
+ * 
+ * @extends AbstractType<NavigationTab>
  */
 class NavigationTabType extends AbstractType
 {
-
+    /**
+     * Constructor for the NavigationTabType form
+     *
+     * @param TranslatorInterface $translator
+     */
     public function __construct(private TranslatorInterface $translator) {}
+
     /**
      * Build the form
+     * @param FormBuilderInterface<NavigationTab|null> $builder
+     * @param array<string, mixed> $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

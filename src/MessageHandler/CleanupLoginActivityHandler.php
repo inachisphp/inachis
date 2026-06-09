@@ -22,11 +22,9 @@ class CleanupLoginActivityHandler
 {
     /**
      * @param LoginActivityRepository $repo
-     * @param EntityManagerInterface $em
      */
     public function __construct(
         private readonly LoginActivityRepository $repo,
-        private readonly EntityManagerInterface $em
     ) {}
 
     /**

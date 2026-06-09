@@ -17,15 +17,34 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Builds an amdin login form
+ * 
+ * @extends AbstractType<array{
+ *     loginUsername?: string,
+ *     loginPassword?: string,
+ *     logIn?: string,
+ * }>
+ */
 class LoginType extends AbstractType
 {
-    private ?TranslatorInterface $translator;
+    /**
+     * Constructor for the LoginType
+     *
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(private readonly TranslatorInterface $translator) {}
 
-    public function __construct(?TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
-    }
-
+    /**
+     * Builds the login form
+     *
+     * @param FormBuilderInterface<array{
+     *     loginUsername?: string,
+     *     loginPassword?: string,
+     *     logIn?: string,
+     * }|null> $builder
+     * @param array<string, mixed> $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder

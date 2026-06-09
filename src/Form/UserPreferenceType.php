@@ -21,6 +21,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Form type for creating and editing user preferences
+ * 
+ * @extends AbstractType<UserPreference>
  */
 class UserPreferenceType extends AbstractType
 {
@@ -38,9 +40,8 @@ class UserPreferenceType extends AbstractType
     /**
      * Builds the form
      * 
-     * @param FormBuilderInterface $builder The form builder
+     * @param FormBuilderInterface<UserPreference|null> $builder The form builder
      * @param array<string, mixed> $options The form options
-     * @return void
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -57,6 +58,7 @@ class UserPreferenceType extends AbstractType
                         'dark' => 'dark_mode',
                         'auto' => 'brightness_auto',
                     ];
+                    /** @var string $value */
                     return [
                         'class' => 'theme-option',
                         // 'id' => 'theme-' . $value,
@@ -94,6 +96,7 @@ class UserPreferenceType extends AbstractType
                     'Largest' => 'largest',
                 ],
                 'choice_attr' => function($choice, $key, $value) {
+                    /** @var string $value */
                     return [
                         'class' => 'fontSizePreview-' . $value,
                         'data-icon' => 'format_size',
@@ -115,6 +118,7 @@ class UserPreferenceType extends AbstractType
                     'Dyslexic' => 'dyslexic'
                 ],
                 'choice_attr' => function($choice, $key, $value) {
+                    /** @var string $value */
                     $icons = [
                         'sans' => 'font_download',
                         'serif' => 'font_download',
@@ -141,6 +145,7 @@ class UserPreferenceType extends AbstractType
                     'Spacious' => 'spacious',
                 ],
                 'choice_attr' => function($choice, $key, $value) {
+                    /** @var string $value */
                     return [
                         'class' => 'lineHeightPreview-' . $value,
                         'data-icon' => 'line_weight',
@@ -198,7 +203,6 @@ class UserPreferenceType extends AbstractType
      * Configures the options for the form
      * 
      * @param OptionsResolver $resolver The options resolver
-     * @return void
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
