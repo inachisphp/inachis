@@ -9,8 +9,6 @@
 
 namespace Inachis\EventListener;
 
-use Inachis\Security\ContentSecurityPolicy;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -24,11 +22,8 @@ final class AdminResponseEvent implements EventSubscriberInterface
 {
     /**
      * AdminResponseEvent constructor.
-     *
-     * @param LoggerInterface $logger
-     * @param ContentSecurityPolicy $csp
      */
-    public function __construct(private LoggerInterface $logger, private ContentSecurityPolicy $csp) {}
+    public function __construct() {}
 
     /**
      * Handles kernel requests

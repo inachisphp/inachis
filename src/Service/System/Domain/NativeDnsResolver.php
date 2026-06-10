@@ -12,10 +12,8 @@ namespace Inachis\Service\System\Domain;
 /**
  * Native DNS resolver
  * 
- * @phpstan-type DnsRecord array{
- *     type: string,
- *     target?: string
- * }
+ * @phpstan-import-type DnsRecord from \Inachis\Service\System\Domain\DnsResolverInterface
+ * @phpstan-import-type DnsEntries from \Inachis\Service\System\Domain\DnsResolverInterface
  */
 final class NativeDnsResolver implements DnsResolverInterface
 {
@@ -31,10 +29,9 @@ final class NativeDnsResolver implements DnsResolverInterface
 
     /**
      * Get DNS records for a host
-     
      * @param string $host
      * @param int $type
-     * @return list<DnsRecord>
+     * @return DnsEntries
      */
     public function getRecords(string $host, int $type): array
     {
@@ -42,7 +39,7 @@ final class NativeDnsResolver implements DnsResolverInterface
         $attempts = 0;
 
         while ($attempts <= $this->retryCount) {
-            /** @var list<DnsRecord> $records */
+            /** @var DnsEntries */
             $records = @dns_get_record($host, $type) ?: [];
             if (!empty($records)) {
                 break;
@@ -67,8 +64,8 @@ final class NativeDnsResolver implements DnsResolverInterface
      * Flattens CNAME records for TXT lookups
      *
      * @param string $host
-     * @param list<DnsRecord> $records
-     * @return list<DnsRecord>
+     * @param DnsEntries $records
+     * @return DnsEntries
      */
     private function flattenCnameTxt(string $host, array $records): array
     {

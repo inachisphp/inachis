@@ -24,6 +24,12 @@ use OpenSSLCertificate;
 
 /**
  * Analyses the email settings of a domain
+ * 
+ * @phpstan-import-type DnsRecord from \Inachis\Service\System\Domain\DnsResolverInterface
+ * @phpstan-import-type DnsEntries from \Inachis\Service\System\Domain\DnsResolverInterface
+ * @phpstan-import-type DnsMxRecord from \Inachis\Service\System\Domain\DnsResolverInterface
+ * @phpstan-import-type DnsTxtRecord from \Inachis\Service\System\Domain\DnsResolverInterface
+ * @phpstan-import-type DnsCaaRecord from \Inachis\Service\System\Domain\DnsResolverInterface
  */
 final class DomainEmailAnalyser
 {
@@ -69,6 +75,14 @@ final class DomainEmailAnalyser
         $bimiRecord = $this->dns->getRecords("_bimi.$domain", DNS_TXT);
         $tlsRptRecords = $this->dns->getRecords("_smtp._tls.$domain", DNS_TXT);
         $caaRecords = $this->dns->getRecords($domain, DNS_CAA);
+ 
+        /** @var list<DnsTxtRecord> $txtRecords */
+        /** @var list<DnsMxRecord> $mxRecords */
+        /** @var list<DnsTxtRecord> $dmarcTxt */
+        /** @var list<DnsTxtRecord> $dkimTxt */
+        /** @var list<DnsTxtRecord> $bimiRecord */
+        /** @var list<DnsTxtRecord> $tlsRptRecords */
+        /** @var list<DnsCaaRecord> $caaRecords */
 
         $spfRecords = $this->extractSpf($txtRecords);
         $dmarcRecords = $this->extractDmarc($dmarcTxt);
@@ -86,7 +100,8 @@ final class DomainEmailAnalyser
         ];
 
         if (!empty($serverIp) && !empty($spfRecords)) {
-            $authorized = $this->isIpAuthorized($serverIp, $spfRecords[0] ?? '', $issues);
+            /** @var array<int, string> $spfRecords */
+            $authorized = $this->isIpAuthorized($serverIp, $spfRecords[0] ?? '', [], $issues);
             if (!$authorized) {
                 $issues[] = new ValidationIssue(
                     'spf',
@@ -110,6 +125,7 @@ final class DomainEmailAnalyser
             }
         }
 
+        /** @var list<string> $spfRecords */
         return new DomainDnsReport(
             $domain,
             $dkimRecords,
@@ -200,7 +216,7 @@ final class DomainEmailAnalyser
     /**
      * Extracts the SPF records from the DNS records
      *
-     * @param array<int, array{txt: string}> $txtRecords
+     * @param DnsEntries $txtRecords
      * @return list<string>
      */
     private function extractSpf(array $txtRecords): array
@@ -218,7 +234,7 @@ final class DomainEmailAnalyser
     /**
      * Extracts the DMARC records from the DNS records
      *
-     * @param array<int, array{txt: string}> $txtRecords
+     * @param DnsEntries $txtRecords
      * @return list<string>
      */
     private function extractDmarc(array $txtRecords): array
@@ -236,8 +252,8 @@ final class DomainEmailAnalyser
     /**
      * Extracts the DKIM records from the DNS records
      *
-     * @param array<int, array{txt: string}> $txtRecords
-     * @return array<int, string>
+     * @param DnsEntries $txtRecords
+     * @return list<string>
      */
     private function extractDkim(array $txtRecords): array
     {
@@ -261,6 +277,7 @@ final class DomainEmailAnalyser
     {
         $domain = strtolower(trim($domain));
         $domain = preg_replace('#^https?://#', '', $domain);
+        /** @var string $domain */
         if (str_starts_with($domain, 'www.')) {
             $domain = substr($domain, 4);
         }
@@ -316,6 +333,7 @@ final class DomainEmailAnalyser
                 }
                 $records = $this->dns->getRecords($includeDomain, DNS_TXT);
                 foreach ($records as $rec) {
+                    /** @var mixed $txt */
                     $txt = $rec['txt'] ?? '';
                     if (is_string($txt) && str_starts_with(strtolower($txt), 'v=spf1')) {
                         if ($this->isIpAuthorized($ip, $txt, array_merge($visitedIncludes, [$includeDomain]), $issues)) {

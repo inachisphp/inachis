@@ -51,11 +51,7 @@ services:
               name: doctrine.orm.entity_listener,
               entity: Inachis\Entity\System\Setting,
             }
-
-    Inachis\EventListener\AdminResponseEvent:
-        arguments:
-            $csp: '%csp%'
-
+            
     Inachis\EventListener\LoginSuccessListener:
         tags:
             - { name: 'kernel.event_listener', event: Symfony\Component\Security\Http\Event\LoginSuccessEvent }
