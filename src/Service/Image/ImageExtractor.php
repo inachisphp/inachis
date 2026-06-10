@@ -28,6 +28,6 @@ class ImageExtractor
     public function extractFromContent(string $content): array
     {
         preg_match_all(self::MARKDOWN_IMAGE, $content, $matches);
-        return $matches[1] ?? [];
+        return $matches[1] ?: [];
     }
 }

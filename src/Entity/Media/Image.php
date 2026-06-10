@@ -16,6 +16,22 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
  * Object for handling images on a site.
+ * 
+ * @phpstan-type ImageShape array{
+ *    id: string,
+ *    title?: string,
+ *    description?: string,
+ *    filename: string,
+ *    filetype: string,
+ *    filesize: int,
+ *    checksum: string,
+ *    author?: string,
+ *    createDate: string,
+ *    modDate: string,
+ *    dimensionX: int,
+ *    dimensionY: int,
+ *    altText?: string
+ * }
  */
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\Media\ImageRepository', readOnly: false)]
 #[ORM\Index(columns: ['title', 'filename', 'filetype'], name: 'search_idx')]

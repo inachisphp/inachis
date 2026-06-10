@@ -21,6 +21,22 @@ use Ramsey\Uuid\UuidInterface;
 
 /**
  * Object for handling {@link Series} entities
+ * 
+ * @phpstan-type SeriesShape array{
+ *     id: string,
+ *     title?: string,
+ *     subTitle?: string,
+ *     url: string,
+ *     description?: string,
+ *     firstDate?: string,
+ *     lastDate?: string,
+ *     items: array<array{id: string}>|array{},
+ *     image?: string,
+ *     author?: string,
+ *     createDate: string,
+ *     modDate: string,
+ *     visibility: bool
+ * }
  */
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\SeriesRepository', readOnly: false)]
 #[ORM\Index(name: 'search_idx', columns: ['title'])]

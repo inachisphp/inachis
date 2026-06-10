@@ -67,7 +67,7 @@ readonly class SeriesBulkActionService
      *
      * @param Series $series
      */
-    public function sendToWaste(Series $series)
+    public function sendToWaste(Series $series): void
     {
         $this->wasteManagerService->sendToWaste($series);
         $this->seriesRepository->remove($series);

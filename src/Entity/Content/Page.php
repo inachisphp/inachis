@@ -25,6 +25,38 @@ use InvalidArgumentException;
 
 /**
  * Object for handling pages of a site.
+ * 
+ * @phpstan-type PageShape array{
+ *    id: string,
+ *    title: string,
+ *    subTitle?: string,
+ *    content?: string,
+ *    author?: string,
+ *    featureImage?: string,
+ *    featureSnippet?: string,
+ *    status: EditorialStatus,
+ *    visibility: bool,
+ *    createDate: string,
+ *    postDate: string,
+ *    expireDate?: string,
+ *    modDate: string,
+ *    timezone: string,
+ *    password: string,
+ *    allowComments: bool,
+ *    type: string,
+ *    latlong?: string,
+ *    sharingMessage?: string,
+ *    versionNumber: int,
+ *    urls: array<array{link: string, default: bool}>,
+ *    categories: array<array{id: string}>|array{},
+ *    tags: array<array{id: string}>|array{},
+ *    series: array<array{id: string}>|array{},
+ *    language?: string,
+ *    noindex: bool,
+ *    nofollow: bool,
+ *    showTableOfContents: bool,
+ *    imageSize: int
+ * }
  */
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\PageRepository', readOnly: false)]
 #[ORM\Index(columns: ['title', 'author_id', 'image_id'], name: 'search_idx')]
@@ -61,10 +93,10 @@ class Page
     protected ?UuidInterface $id = null;
 
     /**
-     * @var string|null The title of the {@link Page}
+     * @var string The title of the {@link Page}
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    protected ?string $title = null;
+    protected string $title = '';
 
     /**
      * @var string|null An optional subtitle for the {@link Page}
@@ -272,9 +304,9 @@ class Page
     /**
      * Returns the value of {@link title}.
      *
-     * @return string|null The title of the {@link Page} - cannot be empty
+     * @return string The title of the {@link Page} - cannot be empty
      */
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -559,10 +591,10 @@ class Page
     /**
      * Sets the value of {@link title}.
      *
-     * @param string|null $value The title of the {@link Page}
+     * @param string $value The title of the {@link Page}
      * @return Page
      */
-    public function setTitle(?string $value): self
+    public function setTitle(string $value): self
     {
         $this->title = $value;
         return $this;
