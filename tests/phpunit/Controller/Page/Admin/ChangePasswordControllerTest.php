@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Controller\Page\Admin;
 
-use Inachis\Controller\Page\Admin\ChangePasswordController;
+use Inachis\Controller\API\User\ChangePasswordController;
 use Inachis\Entity\User\User;
 use Inachis\Repository\User\UserRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
@@ -123,7 +123,7 @@ class ChangePasswordControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'password' => 'Testpa$$word123',
         ], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/calculate-password-strength'
+            'REQUEST_URI' => '/incc/api/calculate-password-strength'
         ]);
         $controller = new ChangePasswordController(
             $this->entityManager,
