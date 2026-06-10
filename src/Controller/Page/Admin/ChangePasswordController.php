@@ -10,18 +10,20 @@
 namespace Inachis\Controller\Page\Admin;
 
 use DateTimeImmutable;
+use Exception;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Form\ChangePasswordType;
 use Inachis\Repository\User\UserRepository;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Validator\Constraints\PasswordStrengthValidator;
 
+/**
+ * Controller used for changing password for an administrator {@link User}
+ */
 class ChangePasswordController extends AbstractInachisController
 {
     /**
@@ -38,17 +40,28 @@ class ChangePasswordController extends AbstractInachisController
         UserPasswordHasherInterface $passwordHasher,
         UserRepository $userRepository,
     ): Response {
+        /** @var \Inachis\Entity\User\User */
+        $currentUser = $this->security->getUser();
+        /** @var \Inachis\Entity\User\User|null */
         $user = $userRepository->findOneBy(['username' => $request->attributes->get('id')]);
+        if (!$user) {
+            throw new AccessDeniedHttpException();
+        }
+
         $form = $this->createForm(
             ChangePasswordType::class,
             null,
             [
-                'last_modified' => $this->security->getUser()->getPasswordModDate()->format('d F Y'),
+                'last_modified' => $currentUser->getPasswordModDate()?->format('d F Y'),
             ]
         );
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid() && $user->getId() === $this->security->getUser()->getId()) {
+        if ($form->isSubmitted() && $form->isValid() && $user->getId() === $currentUser->getId()) {
+            /** @var string */
             $plaintextPassword = $request->request->all('change_password')['new_password'];
+            if (strtolower($user->getUsername() ?: '') === strtolower($plaintextPassword)) {
+                throw new Exception('Your password cannot be the same as your username.');
+            }
             $hashedPassword = $passwordHasher->hashPassword($user, $plaintextPassword);
             $user->setPassword($hashedPassword);
             $user->setPasswordModDate(new DateTimeImmutable());
@@ -63,16 +76,5 @@ class ChangePasswordController extends AbstractInachisController
         $this->data['page']['title'] = 'Change Password';
         $this->data['page']['tab'] = 'users';
         return $this->render('inadmin/page/admin/change-password.html.twig', $this->data);
-    }
-
-    /**
-     * Returns a JSON object containing the result of calculating the password strength entropy
-     * @param Request $request
-     * @return JsonResponse
-     */
-    #[Route("/incc/ax/calculate-password-strength", name:"incc_admin_calculate-password-strength", methods: [ "POST" ])]
-    public function calculatePasswordStrength(Request $request): JsonResponse
-    {
-        return new JsonResponse(PasswordStrengthValidator::estimateStrength($request->request->get('password')));
     }
 }
