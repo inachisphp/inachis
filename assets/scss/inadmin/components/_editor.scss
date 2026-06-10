@@ -282,13 +282,10 @@ div.EasyMDEContainer {
 
 .review-comment-button {
     z-index:99999;
-
-    border:none;
-
-    border-radius:4px;
-
+    background-color: #222;
+    border: #333;
+    border-radius: 0.5rem;
     padding:6px 10px;
-
     cursor:pointer;
 }
 
@@ -368,10 +365,17 @@ div.EasyMDEContainer {
         rgba(255,140,0,.45);
     cursor:pointer;
 }
+
 .review-assignment {
     margin: 10px 0;
 }
 
 .review-assignment select {
     width: 100%;
+}
+.review-warning {
+    padding:10px;
+    margin-bottom:10px;
+    background:#fff3cd;
+    border:1px solid #ffe69c;
 }

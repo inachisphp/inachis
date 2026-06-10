@@ -1,5 +1,4 @@
 window.Inachis.EasyMDEReviewPlugin = class {
-
     constructor(mde, options = {}) {
         this.mde = mde;
         this.cm = mde.codemirror;
@@ -14,6 +13,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
 		this.markers = [];
 		this.threads = [];
 		this.reviewers = [];
+		this.showResolved = false;
 
         this.init();
     }
@@ -42,20 +42,15 @@ window.Inachis.EasyMDEReviewPlugin = class {
     }
 
 	async loadReviewers() {
-		const response =
-			await fetch(
-				`${this.endpoint}/reviewers`
-			);
-
-		this.reviewers =
-			await response.json();
+		const response =await fetch(
+			`${this.endpoint}/reviewers`
+		);
+		this.reviewers =await response.json();
 	}
 
     renderThreads() {
         this.clearMarkers();
-
         this.threads.forEach(thread => {
-
             if (thread.resolved) {
                 return;
             }
@@ -97,8 +92,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
     }
 
     attachHighlightEvents() {
-        document
-            .querySelectorAll('[data-thread-id]')
+        document.querySelectorAll('[data-thread-id]')
             .forEach(el => {
 
                 if (el.dataset.reviewBound) {
@@ -122,12 +116,8 @@ window.Inachis.EasyMDEReviewPlugin = class {
     }
 
 	createSidebar() {
-		const sidebar =
-			document.createElement('div');
-
-		sidebar.className =
-			'review-sidebar';
-
+		const sidebar = document.createElement('div');
+		sidebar.className = 'review-sidebar';
 		sidebar.innerHTML = `
 			<div class="review-sidebar-header">
 				Reviews
@@ -138,10 +128,9 @@ window.Inachis.EasyMDEReviewPlugin = class {
 			</div>
 		`;
 
-		const container =
-			document.querySelector(
-				this.sidebarContainer
-			);
+		const container = document.querySelector(
+			this.sidebarContainer
+		);
 
 		if (container) {
 			container.appendChild(sidebar);
@@ -153,40 +142,28 @@ window.Inachis.EasyMDEReviewPlugin = class {
 	}
 
     createStatusBarButton() {
-		const bar = this.mde.element
-			.parentElement
-			.querySelector('.editor-statusbar');
-
+		const bar = this.mde.element.parentElement.querySelector('.editor-statusbar');
 		if (!bar) {
 			return;
 		}
 
-		const button =
-			document.createElement('span');
-
-		button.className =
-			'review-status-button';
-
+		const button = document.createElement('span');
+		button.className = 'review-status-button';
 		button.onclick = () => {
 			this.showThreadList();
 		};
 
 		bar.appendChild(button);
-
 		this.statusButton = button;
 
 		this.updateStatusButton();
 	}
 
     createCommentButton() {
-
         const button = document.createElement('button');
-
         button.className = 'review-comment-button';
-        button.textContent = '💬 Comment';
-
+        button.textContent = '💬';
         button.style.display = 'none';
-
         document.body.appendChild(button);
 
         button.onclick = () => {
@@ -196,12 +173,31 @@ window.Inachis.EasyMDEReviewPlugin = class {
         this.commentButton = button;
     }
 
+	createReopenButton(thread) {
+		const button = document.createElement('button');
+
+		button.type = 'button';
+
+		button.className =
+			'button review-reopen-button';
+
+		button.textContent =
+			'Reopen Review';
+
+		button.onclick = async () => {
+
+			await this.reopenThread(
+				thread.id
+			);
+		};
+
+		return button;
+	}
+
     attachSelectionListener() {
 
         this.cm.on('cursorActivity', () => {
-
-            const selection =
-                this.cm.getSelection();
+            const selection = this.cm.getSelection();
 
             if (!selection.trim()) {
                 this.hideCommentButton();
@@ -213,28 +209,39 @@ window.Inachis.EasyMDEReviewPlugin = class {
     }
 
 	showThreadList() {
-		const body =
-			this.sidebar.querySelector(
-				'.review-sidebar-body'
-			);
+		const body = this.sidebar.querySelector(
+			'.review-sidebar-body'
+		);
 
 		body.innerHTML = '';
+		const toggle = document.createElement('a');
+		toggle.href = '#';
+		toggle.className = 'review-toggle-resolved';
+		toggle.textContent = this.showResolved
+				? 'Hide resolved reviews'
+				: 'Show resolved reviews';
+		toggle.onclick = event => {
+			event.preventDefault();
+			this.showResolved = !this.showResolved;
+			this.showThreadList();
+		};
+		console.log(toggle);
+		body.appendChild(toggle);
 
-		const openThreads =
-			this.threads.filter(
-				t => !t.resolved
-			);
+		const visibleThreads = this.threads.filter(thread => {
+			if (!this.showResolved) {
+				return !thread.resolved;
+			}
 
-		if (!openThreads.length) {
+			return true;
+		});
 
-			body.innerHTML =
-				'<p>No open reviews</p>';
-
+		if (!visibleThreads.length) {
+			body.innerHTML = '<p>No open reviews</p>';
 			return;
 		}
 
-		openThreads.forEach(thread => {
-
+		visibleThreads.forEach(thread => {
 			const item =
 				document.createElement('div');
 
@@ -247,7 +254,14 @@ window.Inachis.EasyMDEReviewPlugin = class {
 						thread.selectedText
 					).substring(0, 60)}
 				</strong>
+
+				${thread.resolved
+					? '<span class="review-status-resolved">Resolved</span>'
+					: ''
+				}
+
 				<br>
+
 				${thread.comments?.length || 0}
 				comment(s)
 			`;
@@ -263,29 +277,23 @@ window.Inachis.EasyMDEReviewPlugin = class {
 		});
 	}
 
-    showCommentButton() {
-
-        const selection =
-            window.getSelection();
-
+    showCommentButton(coords) {
+        const selection = window.getSelection();
         if (!selection.rangeCount) {
             return;
         }
 
-        const rect =
-            selection
-                .getRangeAt(0)
-                .getBoundingClientRect();
+		const from = this.cm.getCursor('from');
+		const to = this.cm.getCursor('to');
+		const start = this.cm.cursorCoords(from, 'page');
+		const end = this.cm.cursorCoords(to, 'page');
+		const left = (start.left + end.left) / 2;
+		const top = Math.min(start.top, end.top);
 
         this.commentButton.style.display = 'block';
-
-        this.commentButton.style.position = 'fixed';
-
-        this.commentButton.style.left =
-            `${rect.right + 10}px`;
-
-        this.commentButton.style.top =
-            `${rect.top}px`;
+		this.commentButton.style.position = 'absolute';
+		this.commentButton.style.left = `${left}px`;
+		this.commentButton.style.top = `${top - 40}px`;
     }
 
     hideCommentButton() {
@@ -293,17 +301,57 @@ window.Inachis.EasyMDEReviewPlugin = class {
     }
 
     openCommentDialog() {
+		const body =
+			this.sidebar.querySelector(
+				'.review-sidebar-body'
+			);
 
-        const message = prompt(
-            'Enter review comment'
-        );
+		body.innerHTML = '';
 
-        if (!message) {
-            return;
-        }
+		const wrapper = document.createElement('div');
+		wrapper.className = 'review-new-thread';
+		wrapper.innerHTML = `
+			<h3>Create Review</h3>
 
-        this.createThread(message);
-    }
+			<div class="review-selection-preview">
+				${this.escapeHtml(
+					this.cm.getSelection()
+				)}
+			</div>
+
+			<textarea
+				class="review-new-thread-message"
+				rows="5"
+				placeholder="Enter review comment..."
+			></textarea>
+
+			<button
+				type="button"
+				class="button button--add">
+				Create Review
+			</button>
+		`;
+
+		wrapper.querySelector('button')
+			.onclick = async () => {
+				const message = wrapper
+					.querySelector(
+						'.review-new-thread-message'
+					)
+					.value
+					.trim();
+
+				if (!message) {
+					return;
+				}
+
+				await this.createThread(
+					message
+				);
+			};
+
+		body.appendChild(wrapper);
+	}
 
     async createThread(message) {
 
@@ -367,12 +415,25 @@ window.Inachis.EasyMDEReviewPlugin = class {
 
         const thread = await response.json();
         this.threads.push(thread);
-        this.renderThreads();
+		this.renderThreads();
 		this.updateStatusButton();
 		this.hideCommentButton();
+		this.openThread(thread);
     }
 
     openThread(thread) {
+		if (thread.needsRebase) {
+			const warning = document.createElement('div');
+
+			warning.className = 'review-warning';
+			warning.innerHTML = `
+				⚠ This review could not be
+				automatically relocated after
+				content changes.
+			`;
+
+			body.appendChild(warning);
+		}
 		this.activeThreadId = thread.id;
 
 		const body = this.sidebar.querySelector(
@@ -425,14 +486,12 @@ window.Inachis.EasyMDEReviewPlugin = class {
 			});
 		}
 
-		body.appendChild(
-			this.createReplyForm(thread)
-		);
-
-		body.appendChild(
-			this.createResolveButton(thread)
-		);
-
+		if (!thread.resolved) {
+			body.appendChild(this.createReplyForm(thread));
+			body.appendChild(this.createResolveButton(thread));
+		} else {
+			body.appendChild(this.createReopenButton(thread));
+		}
 		this.renderThreads();
 	}
 
@@ -535,6 +594,33 @@ window.Inachis.EasyMDEReviewPlugin = class {
 		);
 	}
 
+	async reopenThread(threadId) {
+		const response = await fetch(
+			`${this.endpoint}/thread/${threadId}/reopen`,
+			{
+				method: 'POST'
+			}
+		);
+
+		if (!response.ok) {
+			alert(
+				'Failed to reopen review'
+			);
+			return;
+		}
+
+		await this.loadThreads();
+
+		const thread =
+			this.findThreadById(
+				threadId
+			);
+
+		if (thread) {
+			this.openThread(thread);
+		}
+	}
+
     injectStyles() {
 
         const style =
@@ -563,6 +649,46 @@ window.Inachis.EasyMDEReviewPlugin = class {
                 padding: 6px 10px;
                 cursor: pointer;
             }
+			.review-selection-preview {
+				padding: 10px;
+				margin-bottom: 10px;
+				border: 1px solid #ddd;
+				background: #fafafa;
+				font-size: 0.9em;
+			}
+
+			.review-new-thread-message {
+				width: 100%;
+				margin-bottom: 10px;
+			}
+
+			.review-resolve-confirmation {
+				margin-top: 12px;
+				padding: 12px;
+				border: 1px solid #ddd;
+				border-radius: 4px;
+			}
+
+			.review-confirm-actions {
+				display: flex;
+				gap: 8px;
+			}
+
+			.review-confirm-message {
+				margin-bottom: 8px;
+			}
+
+			.review-toggle-resolved {
+				display:block;
+				margin-bottom:10px;
+			}
+
+			.review-status-resolved {
+				display:inline-block;
+				margin-left:8px;
+				font-size:.85em;
+				opacity:.7;
+			}
         `;
 
         document.head.appendChild(style);
@@ -713,32 +839,75 @@ window.Inachis.EasyMDEReviewPlugin = class {
 	}
 
 	createResolveButton(thread) {
-		const button =
-			document.createElement('button');
-
+		const button = document.createElement('button');
 		button.type = 'button';
-
-		button.className =
-			'button button--positive review-resolve-button';
-
-		button.textContent =
-			'Resolve';
-
-		button.onclick = async () => {
-
-			if (
-				!confirm(
-					'Resolve this review?'
-				)
-			) {
-				return;
-			}
-
-			await this.resolveThread(
-				thread.id
+		button.className = 'button button--positive review-resolve-button';
+		button.textContent = 'Resolve';
+		button.onclick = () => {
+			this.showResolveConfirmation(
+				thread
 			);
 		};
 
 		return button;
+	}
+
+	showResolveConfirmation(thread) {
+		const body =
+			this.sidebar.querySelector(
+				'.review-sidebar-body'
+			);
+
+		const existing =
+			body.querySelector(
+				'.review-resolve-confirmation'
+			);
+
+		if (existing) {
+			existing.remove();
+			return;
+		}
+
+		const container =
+			document.createElement('div');
+
+		container.className =
+			'review-resolve-confirmation';
+
+		container.innerHTML = `
+			<p>
+				Resolve this review?
+			</p>
+
+			<button
+				type="button"
+				class="button button--positive">
+				Resolve
+			</button>
+
+			<button
+				type="button"
+				class="button">
+				Cancel
+			</button>
+		`;
+
+		const buttons =
+			container.querySelectorAll(
+				'button'
+			);
+
+		buttons[0].onclick =
+			async () => {
+
+				await this.resolveThread(
+					thread.id
+				);
+			};
+
+		buttons[1].onclick =
+			() => container.remove();
+
+		body.appendChild(container);
 	}
 };
