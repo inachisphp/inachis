@@ -11,8 +11,8 @@ namespace Inachis\Service\Export\Series;
 
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Service\Export\Series\SeriesExportNormaliser;
-use Symfony\Component\TaggedIterator\TaggedIterator;
 use Inachis\Service\Export\AbstractExportService;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
  * Service for exporting series. The service uses the {@link SeriesRepository} to retrieve series,
@@ -29,7 +29,7 @@ final class SeriesExportService extends AbstractExportService
     public function __construct(
         private SeriesRepository $repository,
         private SeriesExportNormaliser $normaliser,
-        #[TaggedIterator('inachis.export_writer')] iterable $writers,
+        #[AutowireIterator('inachis.export_writer')] iterable $writers,
     ) {
         parent::__construct($writers);
     }

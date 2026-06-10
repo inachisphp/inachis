@@ -8,9 +8,8 @@
 
 namespace Inachis\Service\Plugin;
 
-use Psr\Container\ContainerInterface;
-use Doctrine\DBAL\Connection;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+
 
 /**
  * Manages plugins
@@ -28,7 +27,7 @@ final class PluginManager
      * @param iterable<PluginInstallerInterface> $installers
      */
     public function __construct(
-        #[TaggedIterator('cms.plugin_installer', default: [])]
+        #[AutowireIterator('cms.plugin_installer')]
         private iterable $installers = []
     ) {
         foreach ($installers as $installer) {
