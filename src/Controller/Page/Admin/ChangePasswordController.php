@@ -59,8 +59,8 @@ class ChangePasswordController extends AbstractInachisController
         if ($form->isSubmitted() && $form->isValid() && $user->getId() === $currentUser->getId()) {
             /** @var string */
             $plaintextPassword = $request->request->all('change_password')['new_password'];
-            if (strtolower($user->getUsername() ?: '') === strtolower($plaintextPassword)) {
-                throw new Exception('Your password cannot be the same as your username.');
+            if (str_contains(strtolower($plaintextPassword), strtolower($user->getUsername() ?: ''))) {
+                throw new Exception('Your password cannot contain username.');
             }
             $hashedPassword = $passwordHasher->hashPassword($user, $plaintextPassword);
             $user->setPassword($hashedPassword);
