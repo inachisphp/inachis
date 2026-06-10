@@ -14,12 +14,14 @@ use Inachis\Model\Domain\Severity;
 
 /**
  * Validates TLS-RPT records
+ * 
+ * @phpstan-import-type DnsTxtRecord from \Inachis\Service\System\Domain\DnsResolverInterface
  */
 final class TlsRptValidator
 {
     /**
      * Validate TLS-RPT records
-     * @param list<array{target: string, priority: int, txt?: string}> $records
+     * @param list<DnsTxtRecord> $records
      * @return list<ValidationIssue>
      */
     public function validate(array $records): array

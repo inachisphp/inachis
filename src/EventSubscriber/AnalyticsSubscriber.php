@@ -9,7 +9,6 @@
 
 namespace Inachis\EventSubscriber;
 
-use Doctrine\DBAL\Connection;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
@@ -18,11 +17,6 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  */
 class AnalyticsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @param Connection $db
-     */
-    public function __construct(private Connection $db) {}
-
     /**
      * @return array<string, string>
      */
@@ -49,7 +43,7 @@ class AnalyticsSubscriber implements EventSubscriberInterface
         $status = $response->getStatusCode();
 
         $path = strtok($request->getRequestUri(), '?');
-        $path = rtrim($path, '/');
+        $path = $path ? rtrim($path, '/') : '';
 
         if ($request->getMethod() !== 'GET') return;
         if (str_starts_with($path, '/incc')) return;

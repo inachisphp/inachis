@@ -16,7 +16,7 @@ final class DomainDnsReport
 {
     /**
      * @param string $domain
-     * @param list<array<string, mixed>> $dkimRecords
+     * @param list<string> $dkimRecords
      * @param list<array<string, mixed>> $mxRecords
      * @param list<string> $spfRecords
      * @param list<string> $dmarcRecords

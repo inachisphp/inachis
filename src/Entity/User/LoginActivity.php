@@ -73,7 +73,7 @@ class LoginActivity
     private ?string $username = '';
 
     /**
-     * @var array<string>|null Anything else worth noting about the login attempt
+     * @var array<string,array<string>|string>|null Anything else worth noting about the login attempt
      */
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $extraData = null;
@@ -88,7 +88,7 @@ class LoginActivity
      * @param string|null $userAgent
      * @param string|null $sessionId
      * @param string|null $username
-     * @param array<string>|null $extraData
+     * @param array<string,array<string>|string>|null $extraData
      */
     public function __construct(
         ?User $user,
@@ -174,7 +174,7 @@ class LoginActivity
     }
 
     /**
-     * @return array<string>|null
+     * @return array<string,array<string>|string>|null 
      */
     public function getExtraData(): ?array
     {
@@ -262,7 +262,10 @@ class LoginActivity
     }
 
     /**
-     * @param array<string>|null $extraData
+     * @param array<
+     *     string,
+     *     array<string>|string
+     * >|null $extraData
      * @return self
      */
     public function setExtraData(?array $extraData): self

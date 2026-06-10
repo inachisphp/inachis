@@ -14,9 +14,13 @@ use Inachis\Entity\User\User;
  */
 class AuthStrength
 {
+    /** @var int */
     public const NONE = 0;
+    /** @var int */
     public const PASSWORD = 1;
+    /** @var int */
     public const TOTP = 2;
+    /** @var int */
     public const WEBAUTHN = 3;
 
     /**
@@ -28,9 +32,10 @@ class AuthStrength
      */
     public function isStrongEnough(User $user, string $level): bool
     {
+        // @todo finish implementing this
         return (bool) match ($level) {
-            'ADMIN' => $user->hasAnySecondFactor(),
-            'SUPER_ADMIN' => $user->hasStrongSecondFactor(),
+            // 'ADMIN' => $user->hasAnySecondFactor(),
+            // 'SUPER_ADMIN' => $user->hasStrongSecondFactor(),
             'STEP_UP' => $this->hasRecentStepUp($user),
             default => true,
         };

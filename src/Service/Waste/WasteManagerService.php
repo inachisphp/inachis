@@ -14,7 +14,9 @@ use Inachis\Entity\Content\{Category, Page, Series, Tag, Url};
 use Inachis\Entity\Media\Image;
 use Inachis\Entity\User\User;
 use Inachis\Entity\Waste\Waste;
+use Inachis\Repository\Content\PageRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Enum\EditorialStatus;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Filesystem;
@@ -22,6 +24,10 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Manages the waste bin for the application
+ * 
+ * @phpstan-import-type ImageShape from \Inachis\Entity\Media\Image
+ * @phpstan-import-type PageShape from \Inachis\Entity\Content\Page
+ * @phpstan-import-type SeriesShape from \Inachis\Entity\Content\Series
  */
 class WasteManagerService
 {
@@ -35,6 +41,7 @@ class WasteManagerService
      */
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private PageRepository $pageRepository,
         private Security $security,
         private Filesystem $filesystem,
         #[Autowire('%kernel.project_dir%/public/imgs/')]
@@ -44,12 +51,14 @@ class WasteManagerService
     /**
      * Send an entity to the waste bin
      *
-     * @param object $entity
+     * @param Image|Page|Series $entity
      */
     public function sendToWaste(object $entity): void
     {
         $waste = new Waste();
-        $waste->setUser($this->security->getUser());
+        /** @var User */
+        $deletedBy = $this->security->getUser();
+        $waste->setUser($deletedBy);
         $waste->setModDate(new DateTimeImmutable());
 
         $data = [
@@ -66,7 +75,7 @@ class WasteManagerService
             $data['author'] = $entity->getAuthor()?->getId();
             $data['status'] = $entity->getStatus();
             $data['visibility'] = $entity->getVisibility();
-            $data['postDate'] = $entity->getPostDate()?->format('Y-m-d H:i:s');
+            $data['postDate'] = $entity->getPostDate()->format('Y-m-d H:i:s');
             $data['timezone'] = $entity->getTimezone();
             $data['password'] = $entity->getPassword();
             $data['allowComments'] = $entity->isAllowComments();
@@ -133,7 +142,7 @@ class WasteManagerService
             throw new \InvalidArgumentException('Unsupported entity type for waste');
         }
 
-        $waste->setContent(json_encode($data));
+        $waste->setContent(json_encode($data) ?: '');
 
         $this->entityManager->persist($waste);
         $this->entityManager->flush();
@@ -146,60 +155,66 @@ class WasteManagerService
      */
     public function restore(Waste $waste): void
     {
-        $data = json_decode($waste->getContent(), true);
+        /** @var ImageShape|PageShape|SeriesShape|null */
+        $data = json_decode($waste->getContent() ?? '', true);
         if (!$data) {
             throw new \RuntimeException('Failed to decode waste content');
         }
 
         switch ($waste->getSourceType()) {
             case 'Page':
-                $page = $this->entityManager->getRepository(Page::class)->findOneBy(['id' => $data['id']]);
+                /** @var Page|null $page */
+                $page = $this->pageRepository->findOneBy(['id' => $data['id']]);
                 if (!$page) {
                     $page = new Page();
                     $page->setId(Uuid::fromString($data['id']));
                 }
+                /** @var PageShape $data */
                 $page->setTitle($data['title']);
                 $page->setSubTitle($data['subTitle'] ?? null);
                 $page->setContent($data['content'] ?? null);
-                $page->setStatus($data['status'] ?? EditorialStatus::DRAFT);
-                $page->setVisibility($data['visibility'] ?? Page::PRIVATE);
+                $page->setStatus($data['status']);
+                $page->setVisibility($data['visibility']);
                 if (!empty($data['postDate'])) {
                     $page->setPostDate(new DateTimeImmutable($data['postDate']));
                 }
-                $page->setTimezone($data['timezone'] ?? 'UTC');
-                $page->setPassword($data['password'] ?? null);
-                if (isset($data['allowComments'])) {
-                    $page->setAllowComments($data['allowComments']);
-                }
-                $page->setType($data['type'] ?? 'post');
-                $page->setFeatureSnippet($data['featureSnippet'] ?? null);
+                $page->setTimezone($data['timezone']);
+                $page->setPassword($data['password']);
+                $page->setAllowComments($data['allowComments']);
+                $page->setType($data['type']);
+                $page->setFeatureSnippet($data['featureSnippet'] ?? '');
 
-                if (!empty($data['author'])) {
+                if(isset($data['author'])) {
+                    /** @var User|null */
                     $author = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $data['author']]);
                     if ($author) {
                         $page->setAuthor($author);
                     }
                 }
-                if (!empty($data['featureImage'])) {
+                
+                if(isset($data['featureImage'])) {
+                    /** @var Image|null */
                     $image = $this->entityManager->getRepository(Image::class)->findOneBy(['id' => $data['featureImage']]);
                     if ($image) {
                         $page->setFeatureImage($image);
                     }
                 }
-                if (!empty($data['categories'])) {
-                    foreach ($data['categories'] as $catId) {
-                        $cat = $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $catId]);
-                        if ($cat) $page->getCategories()->add($cat);
-                    }
+                
+
+                foreach ($data['categories'] as $catId) {
+                    $cat = $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $catId]);
+                    if ($cat) $page->getCategories()->add($cat);
                 }
-                if (!empty($data['tags'])) {
-                    foreach ($data['tags'] as $tagId) {
-                        $tag = $this->entityManager->getRepository(Tag::class)->findOneBy(['id' => $tagId]);
-                        if ($tag) $page->getTags()->add($tag);
-                    }
+
+                foreach ($data['tags'] as $tagId) {
+                    /** @var Tag|null */
+                    $tag = $this->entityManager->getRepository(Tag::class)->findOneBy(['id' => $tagId]);
+                    if ($tag) $page->getTags()->add($tag);
                 }
+
                 if (!empty($data['urls'])) {
                     foreach ($data['urls'] as $urlData) {
+                        /** @var Url|null */
                         $urlExists = $this->entityManager->getRepository(Url::class)->findOneBy(['link' => $urlData['link']]);
                         if (!$urlExists) {
                             $url = new Url($page, $urlData['link']);
@@ -212,24 +227,28 @@ class WasteManagerService
                 break;
 
             case 'Series':
+                /** @var Series|null */
                 $series = $this->entityManager->getRepository(Series::class)->findOneBy(['id' => $data['id']]);
                 if (!$series) {
                     $series = new Series();
                     $series->setId(Uuid::fromString($data['id']));
                 }
-                $series->setTitle($data['title']);
-                $series->setSubTitle($data['subTitle'] ?? null);
-                $series->setDescription($data['description'] ?? null);
-                $series->setVisibility($data['visibility'] ?? Series::PRIVATE);
-                $series->setUrl($data['url'] ?? null);
+                /** @var SeriesShape $data */
+                $series->setTitle($data['title'] ?? '');
+                $series->setSubTitle($data['subTitle'] ?? '');
+                $series->setDescription($data['description'] ?? '');
+                $series->setVisibility($data['visibility']);
+                $series->setUrl($data['url']);
 
                 if (!empty($data['author'])) {
+                    /** @var User|null */
                     $author = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $data['author']]);
                     if ($author) {
                         $series->setAuthor($author);
                     }
                 }
                 if (!empty($data['image'])) {
+                    /** @var Image|null */
                     $image = $this->entityManager->getRepository(Image::class)->findOneBy(['id' => $data['image']]);
                     if ($image) {
                         $series->setImage($image);
@@ -237,6 +256,7 @@ class WasteManagerService
                 }
                 if (!empty($data['items'])) {
                     foreach ($data['items'] as $itemId) {
+                        /** @var Page|null */
                         $item = $this->entityManager->getRepository(Page::class)->findOneBy(['id' => $itemId]);
                         if ($item) $series->getItems()->add($item);
                     }
@@ -245,20 +265,22 @@ class WasteManagerService
                 break;
 
             case 'Image':
+                /** @var Image|null */
                 $image = $this->entityManager->getRepository(Image::class)->findOneBy(['id' => $data['id']]);
                 if (!$image) {
                     $image = new Image();
                     $image->setId(Uuid::fromString($data['id']));
                 }
-                $image->setTitle($data['title']);
-                $image->setDescription($data['description'] ?? null);
-                $image->setAltText($data['altText'] ?? null);
+                /** @var ImageShape $data */
+                $image->setTitle($data['title'] ?? '');
+                $image->setDescription($data['description'] ?? '');
+                $image->setAltText($data['altText'] ?? '');
                 $image->setFilename($data['filename']);
-                $image->setFiletype($data['filetype'] ?? 'image/jpeg');
-                $image->setFilesize($data['filesize'] ?? 0);
-                $image->setChecksum($data['checksum'] ?? '');
-                $image->setDimensionX($data['dimensionX'] ?? 0);
-                $image->setDimensionY($data['dimensionY'] ?? 0);
+                $image->setFiletype($data['filetype'] ?: 'image/jpeg');
+                $image->setFilesize($data['filesize'] ?: 0);
+                $image->setChecksum($data['checksum'] ?: '');
+                $image->setDimensionX($data['dimensionX'] ?: 0);
+                $image->setDimensionY($data['dimensionY'] ?: 0);
 
                 if (!empty($data['author'])) {
                     $author = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $data['author']]);
@@ -292,7 +314,8 @@ class WasteManagerService
     public function deleteWaste(Waste $waste): void
     {
         if ($waste->getSourceType() === 'Image') {
-            $data = json_decode($waste->getContent(), true);
+            /** @var ImageShape|null */
+            $data = json_decode($waste->getContent() ?: '', true);
             if ($data && !empty($data['filename'])) {
                 $wastePath = $this->imageDirectory . '.waste/' . $data['filename'];
                 if ($this->filesystem->exists($wastePath)) {

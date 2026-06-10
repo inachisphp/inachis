@@ -14,12 +14,14 @@ use Inachis\Model\Domain\Severity;
 
 /**
  * Validates MX records
+ * 
+ * @phpstan-import-type DnsMxRecord from \Inachis\Service\System\Domain\DnsResolverInterface
  */
 final class MxValidator
 {
     /**
      * Validate MX records
-     * @param list<array{target: string|null, priority: int}> $records
+     * @param list<DnsMxRecord> $records
      * @return list<ValidationIssue>
      */
     public function validate(array $records): array

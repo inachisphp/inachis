@@ -15,27 +15,56 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+
+/**
+ * Class for implementing a toggle password component
+ */
 class TogglePasswordTypeExtension extends AbstractTypeExtension
 {
+    /**
+     * Returns the form component type that this class extends
+     *
+     * @return iterable<class-string>
+     */
     public static function getExtendedTypes(): iterable
     {
         return [ PasswordType::class ];
     }
 
+    /**
+     * Sets the default options
+     *
+     * @param OptionsResolver $resolver
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('toggle_password', false);
     }
 
+    /**
+     * Configures the view for the component
+     *
+     * @param FormView $view
+     * @param FormInterface<mixed> $form
+     * @param array<string, mixed> $options
+     */
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['type'] = 'password';
-        if ($options['toggle_password']) {
-            $view->vars['attr']['data-controller'] =
-                trim(($view->vars['attr']['data-controller'] ?? '') . ' toggle-password');
-
-            $view->vars['attr']['data-action'] =
-                trim(($view->vars['attr']['data-action'] ?? '') . ' toggle-password#toggle');
+        if (!isset($options['toggle_password'])) {
+            return;
         }
+        /** @var array<string, mixed> $attr */
+        $attr = is_array($view->vars['attr'] ?? null) ? $view->vars['attr'] : [];
+        
+        /** @var string $controller */
+        $controller = $attr['data-controller'] ?? '';
+        $attr['data-controller'] = trim($controller . ' toggle-password');
+
+        /** @var string $action */
+        $action = $attr['data-action'] ?? '';
+        $attr['data-action'] = trim($action . ' toggle-password#toggle');
+
+        $view->vars['attr'] = $attr;
     }
 }

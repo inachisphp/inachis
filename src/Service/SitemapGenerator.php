@@ -9,10 +9,12 @@
 
 namespace Inachis\Service;
 
+use Inachis\Entity\Content\Category;
 use Inachis\Entity\Content\Series;
+use Inachis\Entity\Content\Tag;
 use Inachis\Repository\Content\{CategoryRepository, SeriesRepository, TagRepository, UrlRepository};
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Generates an XML sitemap for the site, including posts, categories, tags, and series.
@@ -32,7 +34,6 @@ class SitemapGenerator
      * @param TagRepository $tagRepository
      * @param SeriesRepository $seriesRepository
      * @param UrlGeneratorInterface $router
-     * @param ParameterBagInterface $params
      */
     public function __construct(
         private readonly UrlRepository $urlRepository,
@@ -40,7 +41,8 @@ class SitemapGenerator
         private readonly TagRepository $tagRepository,
         private readonly SeriesRepository $seriesRepository,
         private readonly UrlGeneratorInterface $router,
-        private readonly ParameterBagInterface $params
+        #[Autowire('%kernel.project_dir%')]
+        private readonly string $projectDir,
     ) {
     }
 
@@ -50,7 +52,7 @@ class SitemapGenerator
     public function generate(): void
     {
         $publicDir = rtrim(
-            $this->params->get('kernel.project_dir'),
+            $this->projectDir,
             '/'
         ) . '/public';
 
@@ -182,9 +184,9 @@ class SitemapGenerator
             $dir,
             'categories',
             $this->categoryRepository->countVisibleCategories(),
-            fn($o, $l)
+            fn(int $o, int $l)
                 => $this->categoryRepository->findBatch($o, $l),
-            fn($c)
+            fn(Category $c)
                 => '/category/' . rawurlencode($c->getTitle()),
             fn() => null
         );
@@ -202,9 +204,9 @@ class SitemapGenerator
             $dir,
             'tags',
             $this->tagRepository->countTags(),
-            fn($o, $l)
+            fn(int $o, int $l)
                 => $this->tagRepository->findBatch($o, $l),
-            fn($t)
+            fn(Tag $t)
                 => '/tag/' . rawurlencode($t->getTitle()),
             fn() => null
         );

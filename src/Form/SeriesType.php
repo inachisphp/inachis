@@ -10,6 +10,7 @@
 namespace Inachis\Form;
 
 use Inachis\Entity\Content\Series;
+use Inachis\Entity\User\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
@@ -24,6 +25,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Form for creating and editing a series
+ * 
+ * @extends AbstractType<Series>
  */
 class SeriesType extends AbstractType
 {
@@ -35,21 +38,21 @@ class SeriesType extends AbstractType
      */
     public function __construct(
         private Security $security,
-        private TranslatorInterface $translator
+        private readonly TranslatorInterface $translator
     ) {}
 
     /**
      * Build the form
      *
-     * @param FormBuilderInterface $builder
-     * @param array $options
+     * @param FormBuilderInterface<Series|null> $builder
+     * @param array<string, mixed> $options The form options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $newItem = empty($options['data']->getId());
+        $newItem = !$options['data'] instanceof Series || empty($options['data']->getId());
         $user = $this->security->getUser();
-        $userTimezone = $user && method_exists($user, 'getPreferences')
-            ? $user->getPreferences()->getTimezone()
+        $userTimezone = $user instanceof User
+            ? $user->getPreferences()?->getTimezone()
             : 'UTC';
         $builder
             ->add('title', TextType::class, [

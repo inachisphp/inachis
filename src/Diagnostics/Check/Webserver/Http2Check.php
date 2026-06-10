@@ -20,6 +20,7 @@ final class Http2Check implements CheckInterface
 
     public function run(): CheckResult
     {
+        /** @var string */
         $protocol = $_SERVER['SERVER_PROTOCOL'] ?? '';
         $status = str_contains($protocol, 'HTTP/2') ? 'ok' : 'warning';
 

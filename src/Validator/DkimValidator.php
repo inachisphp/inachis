@@ -20,7 +20,7 @@ final class DkimValidator
     /**
      * Validates DKIM records
      * 
-     * @param list<array{target: string, priority: int, txt?: string}> $records
+     * @param list<string> $records
      * @param string $selector
      * @return list<ValidationIssue>
      */
@@ -36,7 +36,7 @@ final class DkimValidator
         $seenSelectors = [];
 
         foreach ($records as $record) {
-            $txt = trim($record['txt'] ?? '');
+            $txt = trim($record);
             $lower = strtolower($txt);
 
             if (!str_starts_with($lower, 'v=dkim1')) {

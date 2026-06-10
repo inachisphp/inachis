@@ -14,12 +14,14 @@ use Inachis\Model\Domain\Severity;
 
 /**
  * Validates BIMI records
+ * 
+ * @phpstan-import-type DnsTxtRecord from \Inachis\Service\System\Domain\DnsResolverInterface
  */
 final class BimiValidator
 {
     /**
      * Validate BIMI records
-     * @param list<array{target: string, priority: int, txt?: string}> $records
+     * @param list<DnsTxtRecord> $records
      * @return list<ValidationIssue>
      */
     public function validate(array $records, string $dmarc): array

@@ -26,10 +26,7 @@ class LoginFailureListener
     public function __construct(
         protected EntityManagerInterface $entityManager,
         protected RequestStack $requestStack,
-    ) {
-        $this->entityManager = $entityManager;
-        $this->requestStack = $requestStack;
-    }
+    ) {}
 
     /**
      * Logs a failed login attempt.
@@ -39,9 +36,10 @@ class LoginFailureListener
     public function __invoke(LoginFailureEvent $event): void
     {
         $request = $event->getRequest();
-        $ip = $request?->getClientIp();
-        $userAgent = $request?->headers->get('User-Agent');
-        $submittedUsername = $request?->request->all('login')['loginUsername'] ?? null;
+        $ip = $request->getClientIp();
+        $userAgent = $request->headers->get('User-Agent');
+        /** @var string $submittedUsername */
+        $submittedUsername = $request->request->all('login')['loginUsername'] ?? '';
         $exception = $event->getException();
 
         // if ($exception instanceof TooManyLoginAttemptsAuthenticationException) {

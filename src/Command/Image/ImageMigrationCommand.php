@@ -45,7 +45,7 @@ class ImageMigrationCommand extends Command
     ) {
         parent::__construct();
 
-        $this->projectDir = getcwd();
+        $this->projectDir = getcwd() ?: '';
         $this->imageDir = $this->projectDir . '/public/imgs/';
         $this->planFile = $this->projectDir . '/var/image_migration_plan.json';
         $this->checkpointFile = $this->projectDir . '/var/image_migration_checkpoint.json';
@@ -107,7 +107,10 @@ class ImageMigrationCommand extends Command
         // -----------------------------
         foreach ($pages as $page) {
             if ($page->getFeatureImage()) {
-                $used[$page->getFeatureImage()->getId()->toString()] = true;
+                $id = $page->getFeatureImage()->getId()?->toString();
+                if (!empty($id)) {
+                    $used[$id] = true;
+                }
             }
 
             $this->extractRefs($page->getContent(), $used);
@@ -115,7 +118,10 @@ class ImageMigrationCommand extends Command
 
         foreach ($seriesList as $series) {
             if ($series->getImage()) {
-                $used[$series->getImage()->getId()->toString()] = true;
+                $id = $series->getImage()->getId()?->toString();
+                if (!empty($id)) {
+                    $used[$id] = true;
+                }
             }
 
             $this->extractRefs($series->getDescription(), $used);
@@ -154,7 +160,7 @@ class ImageMigrationCommand extends Command
             if (!$old) continue;
 
             $ext = strtolower(pathinfo($old, PATHINFO_EXTENSION));
-            $safe = strtolower($this->slugger->slug($image->getTitle() . '-' . uniqid() ?: 'image'));
+            $safe = strtolower($this->slugger->slug($image->getTitle() . '-' . uniqid()));
 
             $new = $safe . '.' . $ext;
 
@@ -162,7 +168,7 @@ class ImageMigrationCommand extends Command
             $checksum = (file_exists($path)) ? hash_file('sha256', $path) : null;
 
             $plan['images'][] = [
-                'id' => $image->getId()->toString(),
+                'id' => $image->getId()?->toString() ?: '',
                 'old' => $old,
                 'new' => $new,
                 'ext' => $ext,
@@ -173,7 +179,8 @@ class ImageMigrationCommand extends Command
 
             $plan['contentReplacements'][$old] = $new;
 
-            if (!isset($used[$image->getId()->toString()])) {
+            $imageId = $image->getId()?->toString() ?: '';
+            if (!empty($imageId) && !isset($used[$imageId])) {
                 $plan['unused'][] = $old;
             }
         }

@@ -66,7 +66,7 @@ class ImageLocaliser
             }
 
             if (pathinfo($tmpPath, PATHINFO_EXTENSION) === '') {
-                $extension = explode('/', mime_content_type($tmpPath))[1];
+                $extension = explode('/', mime_content_type($tmpPath) ?: '')[1];
                 $this->filesystem->rename($tmpPath, $tmpPath . '.' . $extension, true);
                 $filename .= '.' . $extension;
                 $tmpPath .= '.' . $extension;

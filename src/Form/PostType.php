@@ -12,7 +12,7 @@ namespace Inachis\Form;
 use DateTimeImmutable;
 use IntlException;
 use Inachis\Entity\Content\{Category,Page,Tag};
-use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use Inachis\Entity\User\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Emoji\EmojiTransliterator;
@@ -30,14 +30,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Form for creating and editing a post
+ * 
+ * @extends AbstractType<Page>
  */
 class PostType extends AbstractType
 {
-    private ArrayCollectionToArrayTransformer $transformer;
     private EmojiTransliterator $emojisTransliterator;
-    private RouterInterface $router;
-    private Security $security;
-    private TranslatorInterface $translator;
 
     /**
      * Constructor
@@ -45,45 +43,39 @@ class PostType extends AbstractType
      * @param TranslatorInterface $translator
      * @param RouterInterface $router
      * @param Security $security
-     * @param ArrayCollectionToArrayTransformer $transformer
      * @throws IntlException
      */
     public function __construct(
-        TranslatorInterface $translator,
-        RouterInterface $router,
-        Security $security,
-        ArrayCollectionToArrayTransformer $transformer
+        private readonly TranslatorInterface $translator,
+        private RouterInterface $router,
+        private Security $security,
     ) {
         $this->emojisTransliterator = EmojiTransliterator::create('github-emoji');
-        $this->router = $router;
-        $this->security = $security;
-        $this->translator = $translator;
-        $this->transformer = $transformer;
     }
 
     /**
      * Build the form
      *
-     * @param FormBuilderInterface $builder
-     * @param array $options
+     * @param FormBuilderInterface<Page|null> $builder
+     * @param array<string, mixed> $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $newItem = empty($options['data']->getId());
+        $newItem = !$options['data'] instanceof Page || empty($options['data']->getId());
         $user = $this->security->getUser();
-        $userTimezone = $user && method_exists($user, 'getPreferences')
-            ? $user->getPreferences()->getTimezone()
+        $userTimezone = $user instanceof User
+            ? $user->getPreferences()?->getTimezone()
             : 'UTC';
         $builder
             ->add('title', TextType::class, [
                 'attr' => [
-                    'aria-labelledby'  => 'title_label',
-                    'aria-required'    => 'true',
-                    'autofocus'        => 'true',
-                    'class'            => 'editor__title text',
-                    'placeholder'      => 'admin.post.title.placeholder',
+                    'aria-labelledby' => 'title_label',
+                    'aria-required' => 'true',
+                    'autofocus' => 'true',
+                    'class' => 'editor__title text',
+                    'placeholder' => 'admin.post.title.placeholder',
                 ],
-                'label'      => 'admin.post.title.label',
+                'label' => 'admin.post.title.label',
                 'label_attr' => [
                     'id' => 'title_label',
                     'class' => 'inline_label',
@@ -94,9 +86,9 @@ class PostType extends AbstractType
                     'aria-labelledby' => 'subTitle_label',
                     'aria-required'   => 'false',
                     'class' => 'editor__sub-title text inline_label',
-                    'placeholder'     => 'admin.post.subTitle.placeholder',
+                    'placeholder' => 'admin.post.subTitle.placeholder',
                 ],
-                'label'      => 'admin.post.subTitle.label',
+                'label' => 'admin.post.subTitle.label',
                 'label_attr' => [
                     'id' => 'subTitle_label',
                     'class' => 'inline_label',
@@ -106,10 +98,10 @@ class PostType extends AbstractType
             ->add('url', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'url_label',
-                    'aria-required'   => 'false',
+                    'aria-required' => 'false',
                     'class' => 'field__wide',
                 ],
-                'label'      => 'admin.post.url.label',
+                'label' => 'admin.post.url.label',
                 'label_attr' => [
                     'id' => 'url_label',
                 ],
@@ -122,22 +114,22 @@ class PostType extends AbstractType
                     'aria-required'   => 'false',
                     'class' => 'mde_editor',
                 ],
-                'label'      => 'admin.post.content.label',
+                'label' => 'admin.post.content.label',
                 'label_attr' => [
                     'class' => 'hidden',
-                    'id'    => 'content_label',
+                    'id' => 'content_label',
                 ],
                 'required' => false,
             ])
             ->add('visibility', CheckboxType::class, [
                 'attr' => [
                     'aria-labelledby' => 'visibility_label',
-                    'aria-required'   => 'false',
-                    'class'           => 'ui-switch',
-                    'data-label-off'  => $this->translator->trans('admin.post.properties.visibility.private'),
-                    'data-label-on'   => $this->translator->trans('admin.post.properties.visibility.public'),
+                    'aria-required' => 'false',
+                    'class' => 'ui-switch',
+                    'data-label-off' => $this->translator->trans('admin.post.properties.visibility.private'),
+                    'data-label-on' => $this->translator->trans('admin.post.properties.visibility.public'),
                 ],
-                'label'      => 'admin.post.properties.visibility.label',
+                'label' => 'admin.post.properties.visibility.label',
                 'label_attr' => [
                     'id' => 'visibility_label',
                     'class' => 'inline_label',
@@ -149,8 +141,8 @@ class PostType extends AbstractType
                     'aria-labelledby' => 'showTableOfContents_label',
                     'aria-required' => 'false',
                     'class' => 'ui-switch',
-                    'data-label-off'  => $this->translator->trans('admin.post.properties.showTableOfContents.off'),
-                    'data-label-on'   => $this->translator->trans('admin.post.properties.showTableOfContents.on'),
+                    'data-label-off' => $this->translator->trans('admin.post.properties.showTableOfContents.off'),
+                    'data-label-on' => $this->translator->trans('admin.post.properties.showTableOfContents.on'),
                 ],
                 'label' => 'admin.post.properties.showTableOfContents.label',
                 'label_attr' => [
@@ -161,15 +153,17 @@ class PostType extends AbstractType
             ])
             ->add('postDate', DateTimeType::class, [
                 'attr' => [
-                    'aria-labelledby'  => 'postDate_label',
-                    'aria-required'    => 'false',
+                    'aria-labelledby' => 'postDate_label',
+                    'aria-required' => 'false',
                 ],
-                'format' => 'dd/MM/yyyy HH:mm',
-                'html5'  => false,
-                'input'  => 'datetime_immutable',
-                'label'  => isset($options['data']) && $options['data']->getPostDate() < new DateTimeImmutable() ?
-                    'admin.post.properties.postDate-past.label' :
-                    'admin.post.properties.postDate-future.label',
+                'format'=> 'dd/MM/yyyy HH:mm',
+                'html5' => false,
+                'input' => 'datetime_immutable',
+                'label' => isset($options['data'])
+                    && $options['data'] instanceof Page
+                    && $options['data']->getPostDate() < new DateTimeImmutable() ?
+                        'admin.post.properties.postDate-past.label' :
+                        'admin.post.properties.postDate-future.label',
                 'label_attr' => [
                     'id' => 'postDate_label',
                     'class' => 'inline_label',
@@ -177,19 +171,22 @@ class PostType extends AbstractType
                 'model_timezone' => 'UTC',
                 'view_timezone' => $userTimezone,
                 'required' => false,
-                'widget'   => 'single_text',
+                'widget' => 'single_text',
             ])
             ->add('expireDate', DateTimeType::class, [
                 'attr' => [
-                    'aria-labelledby'  => 'expireDate_label',
-                    'aria-required'    => 'false',
+                    'aria-labelledby' => 'expireDate_label',
+                    'aria-required' => 'false',
                 ],
                 'format' => 'dd/MM/yyyy HH:mm',
-                'html5'  => false,
-                'input'  => 'datetime_immutable',
-                'label'  => isset($options['data']) && $options['data']->getExpireDate() != '' && $options['data']->getExpireDate() < new DateTimeImmutable() ?
-                    'admin.post.properties.expireDate-past.label' :
-                    'admin.post.properties.expireDate-future.label',
+                'html5' => false,
+                'input' => 'datetime_immutable',
+                'label' => isset($options['data'])
+                    && $options['data'] instanceof Page
+                    && $options['data']->getExpireDate() != ''
+                    && $options['data']->getExpireDate() < new DateTimeImmutable() ?
+                        'admin.post.properties.expireDate-past.label' :
+                        'admin.post.properties.expireDate-future.label',
                 'label_attr' => [
                     'id' => 'expireDate_label',
                     'class' => 'inline_label',
@@ -197,17 +194,17 @@ class PostType extends AbstractType
                 'model_timezone' => 'UTC',
                 'view_timezone' => $userTimezone,
                 'required' => false,
-                'widget'   => 'single_text',
+                'widget' => 'single_text',
             ])
             ->add('categories', EntityType::class, [
                 'choice_attr' => function ($choice, $key, $value) {
                     return ['selected' => 'selected'];
                 },
                 'choice_label' => 'title',
-                'choices'      => isset($options['data']) ?
+                'choices' => isset($options['data']) && $options['data'] instanceof Page ?
                     $options['data']->getCategories()->toArray() : [],
-                'class'        => Category::class,
-                'attr'         => [
+                'class' => Category::class,
+                'attr' => [
                     'aria-labelledby' => 'categories_label',
                     'aria-required' => 'false',
                     'class' => 'js-select halfwidth',
@@ -226,22 +223,22 @@ class PostType extends AbstractType
             ->add('tags', EntityType::class, [
                 'attr' => [
                     'aria-labelledby'  => 'tags_label',
-                    'aria-required'    => 'false',
-                    'class'            => 'js-select halfwidth',
-                    'data-tags'        => 'true',
-                    'data-url'         => $this->router->generate('inachis_tags_gettagmanagerlistcontent'),
+                    'aria-required' => 'false',
+                    'class' => 'js-select halfwidth',
+                    'data-tags' => 'true',
+                    'data-url' => $this->router->generate('inachis_tags_gettagmanagerlistcontent'),
                 ],
-                'choices'      => isset($options['data']) ? $options['data']->getTags()->toArray() : [],
+                'choices' => isset($options['data']) && $options['data'] instanceof Page ? $options['data']->getTags()->toArray() : [],
                 'choice_label' => 'title',
-                'choice_attr'  => function ($choice, $key, $value) {
+                'choice_attr' => function ($choice, $key, $value) {
                     return ['selected' => 'selected'];
                 },
-                'class'      => Tag::class,
-                'label'      => 'admin.post.properties.tags.label',
+                'class' => Tag::class,
+                'label' => 'admin.post.properties.tags.label',
                 'label_attr' => [
                     'id' => 'tags_label',
                 ],
-                'mapped'   => false,
+                'mapped' => false,
                 'multiple' => true,
                 'required' => false,
             ])
@@ -252,7 +249,7 @@ class PostType extends AbstractType
                     $this->emojisTransliterator->transliterate(':fr: Français') => 'fr_FR',
                 ],
                 'duplicate_preferred_choices' => false,
-                'empty_data'  => 'en_GB',
+                'empty_data' => 'en_GB',
                 'preferred_choices' => [ 'en_GB' ],
             ])
             ->add('latlong', TextType::class, [
@@ -271,13 +268,13 @@ class PostType extends AbstractType
             ->add('featureSnippet', TextareaType::class, [
                 'attr' => [
                     'aria-labelledby' => 'teaser_label',
-                    'aria-required'   => 'false',
+                    'aria-required' => 'false',
                     'class' => 'full-width',
                     'rows' => 3,
                 ],
-                'label'      => 'admin.post.sharing.featureSnippet.label',
+                'label' => 'admin.post.sharing.featureSnippet.label',
                 'label_attr' => [
-                    'id'    => 'teaser_label',
+                    'id' => 'teaser_label',
                 ],
                 'required' => false,
             ])
@@ -321,22 +318,22 @@ class PostType extends AbstractType
             $builder
                 ->add('modDate', DateTimeType::class, [
                     'attr' => [
-                        'aria-labelledby'  => 'modDate_label',
-                        'aria-readonly'    => 'true',
+                        'aria-labelledby' => 'modDate_label',
+                        'aria-readonly' => 'true',
                         'readOnly' => true,
                     ],
                     'disabled' => true,
                     'format' => 'dd/MM/yyyy HH:mm',
-                    'html5'  => false,
-                    'input'  => 'datetime_immutable',
-                    'label'  => 'admin.post.properties.modDate.label',
+                    'html5' => false,
+                    'input' => 'datetime_immutable',
+                    'label' => 'admin.post.properties.modDate.label',
                     'label_attr' => [
                         'id' => 'modDate_label',
                         'class' => 'inline_label',
                     ],
                     'model_timezone' => 'UTC',
                     'view_timezone' => $userTimezone,
-                    'widget'   => 'single_text',
+                    'widget' => 'single_text',
                 ])
                 ->add('publish', SubmitType::class, [
                     'attr' => [

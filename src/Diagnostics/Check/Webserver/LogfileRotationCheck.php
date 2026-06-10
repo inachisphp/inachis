@@ -24,17 +24,17 @@ final class LogfileRotationCheck implements CheckInterface
     private const STATE_FILE = 'log_health_state.json';
 
     /**
-     * The log directory
+     * @var string The log directory
      */
     private string $logDir;
 
     /**
-     * The cache directory
+     * @var string The cache directory
      */
     private string $cacheDir;
 
     /**
-     * The environment
+     * @var string The environment
      */
     private string $environment;
 
@@ -50,7 +50,7 @@ final class LogfileRotationCheck implements CheckInterface
         private readonly int $warningSizeMb = 200,
         private readonly int $errorSizeMb = 500,
     ) {
-        $this->logDir = $kernel->getLogDir();
+        $this->logDir = $kernel->getLogDir() ?? '';
         $this->cacheDir = $kernel->getCacheDir();
         $this->environment = $kernel->getEnvironment();
     }
@@ -92,7 +92,7 @@ final class LogfileRotationCheck implements CheckInterface
         $statePath = $this->cacheDir . '/' . self::STATE_FILE;
 
         $previous = file_exists($statePath)
-            ? json_decode(file_get_contents($statePath), true)
+            ? json_decode(file_get_contents($statePath) ?: '', true)
             : [];
 
         $current = [];

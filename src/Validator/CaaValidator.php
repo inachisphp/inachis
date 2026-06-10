@@ -14,12 +14,14 @@ use Inachis\Model\Domain\Severity;
 
 /**
  * Validates CAA records
+ * 
+ * @phpstan-import-type DnsCaaRecord from \Inachis\Service\System\Domain\DnsResolverInterface
  */
 final class CaaValidator
 {
     /**
      * Validate CAA records
-     * @param list<array{target: string, priority: int, value?: string}> $records
+     * @param list<DnsCaaRecord> $records
      * @return list<ValidationIssue>
      */
     public function validate(array $records): array

@@ -16,17 +16,18 @@ use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
+use Inachis\Doctrine\DatabasePlatformTrait;
 
 final class DatabasePerformanceCheck implements CheckInterface
 {
+    use DatabasePlatformTrait;
+
     /**
      * Constructor
      *
      * @param Connection $connection The connection to use for the check
      */
-    public function __construct(
-        private readonly Connection $connection,
-    ) {}
+    public function __construct(private readonly Connection $connection) {}
 
     /**
      * Returns the ID of the check
@@ -67,7 +68,7 @@ final class DatabasePerformanceCheck implements CheckInterface
                 return $this->checkPostgres();
             }
 
-            return $this->unsupported($platform);
+            return $this->unsupported($this->getDatabasePlatformName($platform));
 
         } catch (Exception $e) {
             return $this->error($e->getMessage());
@@ -84,9 +85,11 @@ final class DatabasePerformanceCheck implements CheckInterface
         $issues = [];
         $severity = 'ok';
 
+        /** @var int */
         $threads = (int) $this->connection
             ->fetchOne("SHOW STATUS LIKE 'Threads_running'", [], [], 1);
-
+            
+        /** @var int */
         $maxConnections = (int) $this->connection
             ->fetchOne("SHOW VARIABLES LIKE 'max_connections'", [], [], 1);
 

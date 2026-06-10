@@ -24,6 +24,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Form type for creating and editing users
+ * 
+ * @extends AbstractType<User>
  */
 class UserType extends AbstractType
 {
@@ -41,9 +43,8 @@ class UserType extends AbstractType
     /**
      * Builds the form
      * 
-     * @param FormBuilderInterface $builder The form builder
+     * @param FormBuilderInterface<User|null> $builder The form builder
      * @param array<string, mixed> $options The form options
-     * @return void
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -131,7 +132,11 @@ class UserType extends AbstractType
                 'multiple' => false,
                 'property_path' => 'preferences.color',
             ]);
-            if ($options['data']->getId() !== $this->security->getUser()->getId()) {
+            $currentUser = $this->security->getUser();
+            if (!$currentUser instanceof User) {
+                throw new \LogicException();
+            }
+            if ($options['data']->getId() !== $currentUser->getId()) {
                 $builder
                     ->add('delete', SubmitType::class, [
                         'attr' => [
@@ -172,7 +177,6 @@ class UserType extends AbstractType
      * Configures the options for the form
      * 
      * @param OptionsResolver $resolver The options resolver
-     * @return void
      */
     public function configureOptions(OptionsResolver $resolver): void
     {

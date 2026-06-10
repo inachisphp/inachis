@@ -21,26 +21,38 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Change password form used for changing the current password for the user
+ * 
+ * @extends AbstractType<array{
+ *     current_password?: string,
+ *     username?: string,
+ *     new_password?: string
+ * }>
  */
 class ChangePasswordType extends AbstractType
 {
     /**
-     * @var TranslatorInterface|null
+     * @var TranslatorInterface
      */
-    private ?TranslatorInterface $translator;
+    private TranslatorInterface $translator;
 
     /**
-     * @param TranslatorInterface|null $translator Translator for getting UI text from.
+     * @param TranslatorInterface $translator Translator for getting UI text from.
      */
-    public function __construct(?TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
     /**
-     * @param FormBuilderInterface $builder The form builder object to attach this form to.
-     * @param array                $options Options to use - password_reset toggle, and last_modified date.
-     * @return void
+     * @param FormBuilderInterface<array{
+     *     current_password?: string,
+     *     username?: string,
+     *     new_password?: string
+     * }|null> $builder The form builder object to attach this form to.
+     * @param array{
+     *     password_reset: bool,
+     *     last_modified: string|null
+     * } $options Options to use - password_reset toggle, and last_modified date.
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

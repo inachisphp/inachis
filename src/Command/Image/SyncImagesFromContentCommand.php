@@ -10,8 +10,8 @@
 namespace Inachis\Command\Image;
 
 use Inachis\Entity\Media\Image;
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\ImageRepository;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Media\ImageRepository;
 use Inachis\Service\Resource\ImageFileService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -27,6 +27,15 @@ use Symfony\Component\Console\Attribute\AsCommand;
 )]
 class SyncImagesFromContentCommand extends Command
 {
+    /**
+     * Constructor for SyncImagesFromContentCommand
+     *
+     * @param PageRepository $pageRepository
+     * @param ImageRepository $imageRepository
+     * @param EntityManagerInterface $em
+     * @param ImageFileService $imageFileService
+     * @param string $imageDirectory
+     */
     public function __construct(
         private readonly PageRepository $pageRepository,
         private readonly ImageRepository $imageRepository,
@@ -37,6 +46,9 @@ class SyncImagesFromContentCommand extends Command
         parent::__construct();
     }
 
+    /**
+     * Configure the command
+     */
     protected function configure(): void
     {
         $this
@@ -49,6 +61,13 @@ class SyncImagesFromContentCommand extends Command
             );
     }
 
+    /**
+     * Execute the command
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!is_dir($this->imageDirectory)) {
@@ -59,6 +78,7 @@ class SyncImagesFromContentCommand extends Command
         }
         $fix = $input->getOption('fix');
 
+        /** @var array{id: string, content: string, title: string}|array{} $pages */
         $pages = $this->pageRepository->createQueryBuilder('p')
             ->select('p.id, p.content, p.title')
             ->getQuery()

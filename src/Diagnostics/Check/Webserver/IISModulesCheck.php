@@ -24,6 +24,7 @@ final class IISModulesCheck implements CheckInterface
 
     public function run(): CheckResult
     {
+        /** @var string */
         $serverSoftware = $_SERVER['SERVER_SOFTWARE'] ?? '';
         $isIIS = str_contains(strtolower($serverSoftware), 'microsoft-iis');
 

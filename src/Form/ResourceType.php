@@ -9,7 +9,7 @@
 
 namespace Inachis\Form;
 
-use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use Inachis\Entity\Media\AbstractFile;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -17,26 +17,27 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * ResourceType
+ * 
+ * @extends AbstractType<AbstractFile>
+ */
 class ResourceType extends AbstractType
 {
-    private TranslatorInterface $translator;
-
     /**
+     * Constructor for ResourceType
+     * 
      * @param TranslatorInterface $translator
      */
-    public function __construct(TranslatorInterface $translator) {
-        $this->translator = $translator;
-    }
+    public function __construct(private readonly TranslatorInterface $translator) {}
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
-     * @return void
+     * Builds the form
+     * 
+     * @param FormBuilderInterface<AbstractFile|null> $builder
+     * @param array<string, mixed> $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -105,7 +106,7 @@ class ResourceType extends AbstractType
                     'data-confirm-text' => 'Yes, delete',
                     'class' => 'button button--negative button--confirm',
                     'data-entity' => 'image',
-                    'data-title' => $options['data']->getTitle(),
+                    'data-title' => $options['data'] instanceof AbstractFile ? $options['data']->getTitle() : 'Unknown',
                 ],
                 'label' => $this->translator->trans('admin.button.delete', [], 'messages'),
             ])
@@ -114,7 +115,6 @@ class ResourceType extends AbstractType
 
     /**
      * @param OptionsResolver $resolver
-     * @return void
      */
     public function configureOptions(OptionsResolver $resolver): void
     {

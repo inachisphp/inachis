@@ -26,7 +26,7 @@ class LocaleSubscriber implements EventSubscriberInterface
     /**
      * LocaleSubscriber constructor.
      * 
-     * @param string $defaultLocale The default locale
+     * @param string $defaultLocale The default locale, defaults to 'en'
      */
     public function __construct(string $defaultLocale = 'en')
     {
@@ -49,14 +49,18 @@ class LocaleSubscriber implements EventSubscriberInterface
             $request->getSession()->set('_locale', $locale);
         } else {
             // if no explicit locale has been set on this request, use one from the session
-            $request->setLocale($request->getSession()->get('_locale', $this->defaultLocale));
+            $locale = $request->getSession()->get('_locale', $this->defaultLocale);
+            if (!is_string($locale)) {
+                $locale = $this->defaultLocale;
+            }
+            $request->setLocale($locale);
         }
     }
 
     /**
      * Returns the events this listener is subscribed to
      * 
-     * @return array<int, array<int, string>> The events this listener is subscribed to
+     * @return array<array<string|int>> The events this listener is subscribed to
      */
     public static function getSubscribedEvents(): array
     {
