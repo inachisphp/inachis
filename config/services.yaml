@@ -100,11 +100,11 @@ services:
             $appSecret: '%env(APP_SECRET)%'
             $ttlSeconds: '%password_reset.ttl%'
 
-    Inachis\Service\EncryptionService:
+    Inachis\Service\Crypto\EncryptionService:
         arguments:
             $masterKey: '%env(INACHIS_MASTER_KEY)%'
 
-    Inachis\Service\VersionService:
+    Inachis\Service\System\VersionService:
         arguments:
             $versionFile: '%kernel.project_dir%/config/version.php'
 

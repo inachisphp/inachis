@@ -293,4 +293,21 @@ class InternalAnalyticsProviderTest extends TestCase
         $result = $analyticsProvider->getCurrentSubscribersPerFeed();
         $this->assertEquals([], $result);   
     }
+
+    public function testGetTopBots(): void
+    {
+        $analyticsRepository = $this->createMock(AnalyticsRepository::class);
+        $analyticsRepository->expects($this->once())->method('getTopBots')->willReturn([
+        ]);
+
+        $analyticsProvider = new InternalAnalyticsProvider(
+            $analyticsRepository,
+            $this->createStub(SeriesRepository::class),
+            $this->createStub(UrlRepository::class)
+        );
+        $testDate = new DateTimeImmutable('now');
+
+        $result = $analyticsProvider->getTopBots($testDate, $testDate);
+        $this->assertEquals([], $result);   
+    }
 }

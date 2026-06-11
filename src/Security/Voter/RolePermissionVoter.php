@@ -1,6 +1,6 @@
 <?php
 
-namespace Inachis\Security;
+namespace Inachis\Security\Voter;
 
 use Inachis\Entity\Security\RolePermission;
 use Inachis\Entity\User\User;

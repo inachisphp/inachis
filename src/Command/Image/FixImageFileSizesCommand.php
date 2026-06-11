@@ -23,6 +23,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class FixImageFileSizesCommand extends Command
 {
+    /**
+     * Constructor for FixImageFileSizesCommand
+     *
+     * @param EntityManagerInterface $entityManager
+     * @param ImageRepository $imageRepository
+     */
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ImageRepository $imageRepository,
@@ -30,6 +36,13 @@ class FixImageFileSizesCommand extends Command
         parent::__construct();
     }
 
+    /**
+     * Executes the command
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

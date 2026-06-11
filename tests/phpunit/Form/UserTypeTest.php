@@ -96,7 +96,7 @@ class UserTypeTest extends TypeTestCase
     //     $this->assertTrue($form->has('color'), 'Color field should exist for existing users.');
     //     $colorField = $form->get('color');
     //     $choices = $colorField->getConfig()->getOption('choices');
-    //     $expectedColors = RandomColorPicker::getAll();
+    //     $expectedColors = ProfileColorPalette::getAll();
     //     $this->assertSame(array_combine($expectedColors, $expectedColors), $choices);
     //     $choiceAttr = $colorField->getConfig()->getOption('choice_attr');
     //     $this->assertIsCallable($choiceAttr);

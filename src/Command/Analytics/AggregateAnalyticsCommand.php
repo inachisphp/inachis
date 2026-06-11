@@ -24,6 +24,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 class AggregateAnalyticsCommand extends Command
 {
+    /**
+     * Constructor for AggregateAnalyticsCommand
+     *
+     * @param Connection $db
+     */
     public function __construct(private Connection $db) {
 		parent::__construct();
 	}

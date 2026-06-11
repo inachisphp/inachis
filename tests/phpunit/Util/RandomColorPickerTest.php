@@ -9,16 +9,16 @@
 
 namespace Inachis\Tests\phpunit\Util;
 
-use Inachis\Util\RandomColorPicker;
+use Inachis\Service\User\ProfileColorPalette;
 use PHPUnit\Framework\TestCase;
 
-class RandomColorPickerTest extends TestCase
+class ProfileColorPaletteTest extends TestCase
 {
-    protected RandomColorPicker $colorPicker;
+    protected ProfileColorPalette $colorPicker;
 
     public function setUp(): void
     {
-        $this->colorPicker  = new RandomColorPicker();
+        $this->colorPicker  = new ProfileColorPalette();
         parent::setUp();
     }
 

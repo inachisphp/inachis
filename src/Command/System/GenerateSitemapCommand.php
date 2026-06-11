@@ -9,8 +9,7 @@
 
 namespace Inachis\Command\System;
 
-use Inachis\Service\SitemapGenerator;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Inachis\Service\Url\SitemapGenerator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

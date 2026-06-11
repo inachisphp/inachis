@@ -31,6 +31,8 @@ use Symfony\Component\Finder\Finder;
 class CleanupAnalyticsCommand extends Command
 {
     /**
+     * Constructor for CleanupAnalyticsCommand
+     * 
      * @param string $projectDir
      * @param Connection $db
      */

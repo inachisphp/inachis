@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Parser;
+namespace Inachis\Service\Parser;
 
 use DateTimeImmutable;
 use Exception;

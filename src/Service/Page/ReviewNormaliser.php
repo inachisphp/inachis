@@ -22,13 +22,16 @@ class ReviewNormaliser
      *     resolved: bool,
      *     startOffset: int,
      *     endOffset: int,
+     *     currentStartOffset: int|null,
+     *     currentEndOffset: int|null,
+     *     needsRebase: bool,
      *     selectedText: string,
-     *     assignedTo: array{id: string, name?: string}|null,
+     *     assignedTo: array{id: string, name: string|null}|null,
      *     comments: list<array{
      *         id: string,
      *         message: string,
      *         created: string|false,
-     *         author: array{id: string, name?: string}
+     *         author: array{id: string, name: string|null}|null
      *     }>|array{}
      * }
      */

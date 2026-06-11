@@ -11,7 +11,7 @@ namespace Inachis\Diagnostics\Check\Environment;
 
 use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
-use Inachis\Util\NumberFormatter;
+use Inachis\Service\Formatting\NumberFormatter;
 
 final class DiskSpaceCheck implements CheckInterface
 {

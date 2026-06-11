@@ -11,7 +11,7 @@ namespace Inachis\Service\Page;
 
 use Inachis\Entity\Content\{Page, Url};
 use Inachis\Repository\Content\{PageRepository, RevisionRepository, UrlRepository};
-use Inachis\Util\UrlNormaliser;
+use Inachis\Service\Formatting\UrlNormaliser;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Inachis\Service\Waste\WasteManagerService;

@@ -13,7 +13,7 @@ use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
 use Inachis\Doctrine\DatabasePlatformTrait;
 use Doctrine\DBAL\Connection;
-use Inachis\Util\NumberFormatter;
+use Inachis\Service\Formatting\NumberFormatter;
 
 final class InnoDBBufferPoolCheck implements CheckInterface
 {

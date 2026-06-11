@@ -10,7 +10,7 @@
 namespace Inachis\Controller\Page\Setting;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Service\VersionService;
+use Inachis\Service\System\VersionService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;

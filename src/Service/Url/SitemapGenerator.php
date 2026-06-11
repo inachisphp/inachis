@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Service;
+namespace Inachis\Service\Url;
 
 use Inachis\Entity\Content\Category;
 use Inachis\Entity\Content\Series;
@@ -215,12 +215,13 @@ class SitemapGenerator
     /**
      * Helper method to generate sitemap files for a given entity type, handling pagination and file splitting.
      *
+     * @template T
      * @param string $dir
      * @param string $prefix
      * @param integer $total
-     * @param callable $loader
-     * @param callable $urlBuilder
-     * @param callable $lastMod
+     * @param callable(int, int): iterable<T> $loader
+     * @param callable(T): string $urlBuilder
+     * @param callable(T): (\DateTimeInterface|null) $lastMod
      * @return array<string>
      */
     private function generateEntitySitemapFiles(
@@ -245,12 +246,9 @@ class SitemapGenerator
                 "{$dir}/{$filename}"
             );
 
-            foreach (
-                $loader(
-                    $offset,
-                    self::MAX_URLS_PER_FILE
-                ) as $item
-            ) {
+            /** @var iterable<T> $items */
+            $items = $loader($offset, self::MAX_URLS_PER_FILE);
+            foreach ($items as $item) {
                 $writer->startElement('url');
 
                 $writer->writeElement(

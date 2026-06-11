@@ -175,7 +175,7 @@ class UserPreferenceType extends AbstractType
             //     'attr' => [
             //         'aria-labelledby' => 'user__color__label',
             //     ],
-            //     'choices' => array_combine(RandomColorPicker::getAll(), RandomColorPicker::getAll()),
+            //     'choices' => array_combine(ProfileColorPalette::getAll(), ProfileColorPalette::getAll()),
             //     'choice_attr' => function ($choice, $key, $value) {
             //         return ['data-color' => $value];
             //     },

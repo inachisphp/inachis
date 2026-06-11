@@ -7,9 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Util;
+namespace Inachis\Service\User;
 
-class RandomColorPicker
+class ProfileColorPalette
 {
     /**
      * @var array|string[] The list of available colours to use for profile icon backgrounds

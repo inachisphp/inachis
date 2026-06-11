@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Parser;
+namespace Inachis\Service\Parser;
 
 /**
  * Converts an array representation of a {@link Page} to markdown
@@ -35,12 +35,6 @@ final class ArrayToMarkdown
         }
         if (!empty($post['subTitle'])) {
             $markdown .= '## ' . $post['subTitle'] . PHP_EOL;
-        }
-        if (!empty($post['postDate'])) {
-            $markdown .= $post['postDate'] . PHP_EOL;
-        }
-        if (!empty($post['categories']) && !empty($post['categories'][0]['fullPath'])) {
-            $markdown .= $post['categories'][0]['fullPath'] . PHP_EOL;
         }
         if (!empty($post['content'])) {
             $markdown .= PHP_EOL . PHP_EOL . $post['content'];

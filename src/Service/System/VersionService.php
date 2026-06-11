@@ -5,7 +5,7 @@
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
-namespace Inachis\Service;
+namespace Inachis\Service\System;
 
 /**
  * Returns version information about the framework

@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Parser;
 
-use Inachis\Parser\ArrayToMarkdown;
+use Inachis\Service\Parser\ArrayToMarkdown;
 use PHPUnit\Framework\TestCase;
 
 class ArrayToMarkdownTest extends TestCase

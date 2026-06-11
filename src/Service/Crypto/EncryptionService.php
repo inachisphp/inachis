@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Service;
+namespace Inachis\Service\Crypto;
 
 use RuntimeException;
 

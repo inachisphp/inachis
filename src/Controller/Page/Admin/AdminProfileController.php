@@ -11,7 +11,7 @@ namespace Inachis\Controller\Page\Admin;
 
 use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\User\User;
+use Inachis\Entity\User\{User,UserPreference};
 use Inachis\Form\UserType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\Content\CategoryRepository;
@@ -19,7 +19,7 @@ use Inachis\Repository\User\UserRepository;
 use Inachis\Service\User\UserBulkActionService;
 use Inachis\Service\User\UserAccountEmailService;
 use Inachis\Transformer\ImageTransformer;
-use Inachis\Util\RandomColorPicker;
+use Inachis\Service\User\ProfileColorPalette;
 use Random\RandomException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -132,7 +132,7 @@ class AdminProfileController extends AbstractInachisController
                 if (!$user->getPreferences()) {
                     $user->setPreferences(new UserPreference($user));
                 }
-                $user->getPreferences()->setColor(RandomColorPicker::generate());
+                $user->getPreferences()->setColor(ProfileColorPalette::generate());
                 $userAccountEmailService->registerNewUser(
                     $user,
                     $this->data,

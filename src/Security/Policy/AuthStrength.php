@@ -5,7 +5,7 @@
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
-namespace Inachis\Security;
+namespace Inachis\Security\Policy;
 
 use Inachis\Entity\User\User;
 

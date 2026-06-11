@@ -7,7 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Util;
+namespace Inachis\Service\Content;
+
+use Inachis\Service\Content\TextCleaner;
 
 /**
  * ReadingTime class

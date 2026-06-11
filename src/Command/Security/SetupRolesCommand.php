@@ -8,7 +8,7 @@
  */
 
 
-namespace Inachis\Command\User;
+namespace Inachis\Command\Security;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Security\Role;
@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 #[AsCommand(
-    name: 'inachis:user:setup-roles',
+    name: 'inachis:security:setup-roles',
     description: 'Create default roles and assign permissions.',
 )]
 class SetupRolesCommand extends Command

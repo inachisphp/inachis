@@ -11,7 +11,7 @@ namespace Inachis\Diagnostics\Check\Performance;
 
 use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
-use Inachis\Util\NumberFormatter;
+use Inachis\Service\Formatting\NumberFormatter;
 
 final class RealpathCacheTtlCheck implements CheckInterface
 {
