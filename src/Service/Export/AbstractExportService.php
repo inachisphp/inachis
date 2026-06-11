@@ -9,7 +9,7 @@
 
 namespace Inachis\Service\Export;
 
-use Symfony\Component\TaggedIterator\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
  * Abstract export service
@@ -19,8 +19,13 @@ abstract class AbstractExportService
     /** @var iterable<ExportWriterInterface> */
     protected iterable $writers;
 
+    /**
+     * Inject the export writers
+     *
+     * @param iterable<ExportWriterInterface> $writers
+     */
     public function __construct(
-        #[TaggedIterator('inachis.export_writer')] iterable $writers,
+        #[AutowireIterator('inachis.export_writer')] iterable $writers,
     ) {
         $this->writers = $writers;
     }
@@ -55,6 +60,9 @@ abstract class AbstractExportService
 
     /**
      * Each service must implement its own normalise logic
+     *
+     * @param object $entity
+     * @return object
      */
     abstract protected function normalise(object $entity): object;
 }

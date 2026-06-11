@@ -22,7 +22,7 @@ use Inachis\Repository\Content\UrlRepository;
 use Inachis\Service\Page\PageBulkActionService;
 use Inachis\Service\Page\ReviewRebaseService;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
-use Inachis\Util\ContentRevisionCompare;
+use Inachis\Service\Content\ContentRevisionCompare;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;

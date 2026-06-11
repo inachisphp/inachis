@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Util;
 
-use Inachis\Utils\UrlNormaliser;
+use Inachis\Service\Formatting\UrlNormaliser;
 use Inachis\Validator\DateValidator;
 use PHPUnit\Framework\TestCase;
 use Inachis\Exception\InvalidTimezoneException;

@@ -11,7 +11,6 @@ namespace Inachis\Diagnostics\Check\Performance;
 
 use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -19,27 +18,21 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class HttpLatencyCheck implements CheckInterface
 {
-	/**
-	 * The internal URL to measure
-	 */
+	/** @var string The internal URL to measure */
     private string $internalUrl;
 
-	/**
-	 * The public URL to measure
-	 */
+	/** @var string The public URL to measure */
     private string $publicUrl;
 
 	/**
 	 * Constructor
 	 *
 	 * @param HttpClientInterface $client The HTTP client
-	 * @param KernelInterface $kernel The kernel
 	 * @param int $samples The number of samples to take
 	 * @param float $timeout The timeout in seconds
 	 */
     public function __construct(
         private readonly HttpClientInterface $client,
-        KernelInterface $kernel,
         private readonly int $samples = 3,
         private readonly float $timeout = 5.0,
     ) {
@@ -47,8 +40,9 @@ final class HttpLatencyCheck implements CheckInterface
         $this->internalUrl = 'https://127.0.0.1/health';
 
         // public entry point (may go through proxy)
-        $this->publicUrl = $_SERVER['APP_URL']
-            ?? 'https://localhost/health';
+        $this->publicUrl = is_string($_SERVER['APP_URL'] ?? null)
+            ? $_SERVER['APP_URL']
+            : 'https://localhost/health';
     }
 
 	/**
@@ -105,7 +99,7 @@ final class HttpLatencyCheck implements CheckInterface
                 $severity = 'error';
                 $issues[] = 'High HTTP latency';
             } elseif ($public['average'] > 400) {
-                $severity = $severity === 'error' ? 'error' : 'warning';
+                $severity = 'warning';
             }
 
             // Docker / container detection
@@ -156,7 +150,14 @@ final class HttpLatencyCheck implements CheckInterface
 	 * Measure the HTTP latency
 	 *
 	 * @param string $url The URL to measure
-	 * @return array The measurement results
+	 * @return array{
+     *     samples: array<array{total: int|float}>,
+     *     average: int|float,
+     *     dns: int|float,
+     *     connect: int|float,
+     *     tls: int|float,
+     *     ttfb: int|float
+     * } The measurement results
 	 */
     private function measure(string $url): array
     {
@@ -174,6 +175,14 @@ final class HttpLatencyCheck implements CheckInterface
             $response->getStatusCode();
             $duration = (hrtime(true) - $start) / 1e6; // ms
 
+            /** @var array{
+             *     namelookup_time?: float,
+             *     connect_time?: float,
+             *     ssl_time?: float,
+             *     starttransfer_time?: float,
+             *     ...<string, mixed>
+             * } $info
+             */
             $info = $response->getInfo();
             $samples[] = ['total' => $duration];
             $dnsTimes[] = ($info['namelookup_time'] ?? 0) * 1000;
@@ -198,6 +207,6 @@ final class HttpLatencyCheck implements CheckInterface
     private function isContainer(): bool
     {
         return file_exists('/.dockerenv') ||
-            (file_exists('/proc/1/cgroup') && str_contains(file_get_contents('/proc/1/cgroup'), 'docker'));
+            (file_exists('/proc/1/cgroup') && str_contains(file_get_contents('/proc/1/cgroup') ?: '', 'docker'));
     }
 }

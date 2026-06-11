@@ -43,6 +43,7 @@ final class SSLCheck implements CheckInterface
         }
 
         try {
+            /** @var array{Variable_name: string, Value: string}|false */
             $row = $this->connection->fetchAssociative("SHOW VARIABLES LIKE 'have_ssl'");
             $value = strtoupper($row['Value'] ?? 'NO');
             $status = $value === 'YES' ? 'ok' : 'warning';

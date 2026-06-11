@@ -11,7 +11,7 @@ namespace Inachis\Tests\phpunit\Util;
 
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Revision;
-use Inachis\Util\ContentRevisionCompare;
+use Inachis\Service\Content\ContentRevisionCompare;
 use PHPUnit\Framework\TestCase;
 
 class ContentRevisionCompareTest extends TestCase

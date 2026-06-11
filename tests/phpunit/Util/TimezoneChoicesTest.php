@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Util;
 
-use Inachis\Util\TimezoneChoices;
+use Inachis\Form\Provider\TimezoneChoices;
 use DateInvalidTimeZoneException;
 use PHPUnit\Framework\TestCase;
 

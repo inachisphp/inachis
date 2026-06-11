@@ -33,10 +33,6 @@ services:
         # @todo Google Analytics / Umami / Plausible providers can be swapped in here if desired
         alias: Inachis\Analytics\Provider\InternalAnalyticsProvider
 
-    Inachis\Command\Image\SyncImagesFromContentCommand:
-        arguments:
-            $imageDirectory: '%kernel.project_dir%/public/imgs'
-
     Inachis\Diagnostics\Check\:
         resource: '../src/Diagnostics/Check/*/*'
         tags: ['app.diagnostic_check']
@@ -62,10 +58,6 @@ services:
 
     Inachis\EventSubscriber\AnalyticsSubscriber:
         tags: ['kernel.event_subscriber']
-
-    Inachis\Service\Image\ImageLocaliser:
-        arguments:
-            $publicImgPath: '%app.public_img_path%'
 
     Inachis\Service\Export\Page\PageExportService:
         arguments:
@@ -108,11 +100,11 @@ services:
             $appSecret: '%env(APP_SECRET)%'
             $ttlSeconds: '%password_reset.ttl%'
 
-    Inachis\Service\EncryptionService:
+    Inachis\Service\Crypto\EncryptionService:
         arguments:
             $masterKey: '%env(INACHIS_MASTER_KEY)%'
 
-    Inachis\Service\VersionService:
+    Inachis\Service\System\VersionService:
         arguments:
             $versionFile: '%kernel.project_dir%/config/version.php'
 

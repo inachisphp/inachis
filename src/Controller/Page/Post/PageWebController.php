@@ -12,7 +12,7 @@ namespace Inachis\Controller\Page\Post;
 use Exception;
 use Inachis\Controller\AbstractWebController;
 use Inachis\Entity\Content\{Category,Page,Series,Tag,Url};
-use Inachis\Util\ReadingTime;
+use Inachis\Service\Content\ReadingTime;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;

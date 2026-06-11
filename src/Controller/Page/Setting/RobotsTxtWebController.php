@@ -10,7 +10,7 @@
 namespace Inachis\Controller\Page\Setting;
 
 use Inachis\Controller\AbstractController;
-use Inachis\Service\RobotsTxtGenerator;
+use Inachis\Service\Url\RobotsTxtGenerator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 

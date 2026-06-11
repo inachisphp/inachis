@@ -11,7 +11,7 @@ namespace Inachis\Service\Page;
 
 use Inachis\Entity\Content\{Page, Url};
 use Inachis\Repository\Content\{PageRepository, RevisionRepository, UrlRepository};
-use Inachis\Util\UrlNormaliser;
+use Inachis\Service\Formatting\UrlNormaliser;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Inachis\Service\Waste\WasteManagerService;
@@ -85,7 +85,9 @@ readonly class PageBulkActionService
     public function delete(Page $post): void
     {
         $this->wasteManagerService->sendToWaste($post);
-        $this->revisionRepository->deleteAndRecordByPage($post, $this->security->getUser());
+        /** @var \Inachis\Entity\User\User */
+        $deletedBy = $this->security->getUser();
+        $this->revisionRepository->deleteAndRecordByPage($post, $deletedBy);
         $this->pageRepository->remove($post);
     }
 
@@ -102,9 +104,9 @@ readonly class PageBulkActionService
             }
         }
         $title = $post->getTitle();
-        if ($title === null) {
-            throw new Exception('Page title cannot be null');
-        }
+        // if ($title === null) {
+        //     throw new Exception('Page title cannot be null');
+        // }
         $link = $post->getPostDateAsLink() . '/' . UrlNormaliser::toUri($title);
         $subTitle = $post->getSubTitle();
         if ($subTitle !== null) {

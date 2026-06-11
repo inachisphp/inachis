@@ -22,7 +22,7 @@ security:
             lazy: true
             stateless: false
             provider: app_user_provider
-            user_checker: Inachis\Security\UserChecker
+            user_checker: Inachis\Security\Authentication\UserChecker
 
             form_login:
                 login_path: incc_account_login

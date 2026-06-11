@@ -12,7 +12,7 @@ namespace Inachis\Service\Page;
 use Inachis\Entity\Content\{Page, Series};
 use Inachis\Enum\EditorialStatus;
 use Inachis\Repository\Content\{PageRepository, SeriesRepository};
-use Inachis\Util\TextCleaner;
+use Inachis\Service\Content\TextCleaner;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use DateTimeImmutable;
 
@@ -104,9 +104,7 @@ class ContentAggregator
 
         foreach ($pages as $page) {
             $postDate = $page->getPostDate();
-            if ($postDate instanceof DateTimeImmutable) {
-                $data['p' . $postDate->format('Ymd')] = $page;
-            }
+            $data['p' . $postDate->format('Ymd')] = $page;
         }
 
         krsort($data);

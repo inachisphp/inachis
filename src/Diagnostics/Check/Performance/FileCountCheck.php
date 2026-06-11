@@ -14,6 +14,7 @@ use Inachis\Diagnostics\CheckResult;
 
 final class FileCountCheck implements CheckInterface
 {
+    /** @var list<string> */
     private array $paths = [
         'src',
         'templates',
@@ -39,7 +40,7 @@ final class FileCountCheck implements CheckInterface
             $this->getId(),
             $this->getLabel(),
             $status,
-            $totalFiles,
+            (string) $totalFiles,
             $status === 'ok' ? "Total files: $totalFiles" : "Total files: $totalFiles (may stress OpCache / realpath cache)",
             $status === 'ok' ? null : "Consider increasing opcache.max_accelerated_files or realpath_cache_size.",
             $this->getSection(),
@@ -47,6 +48,12 @@ final class FileCountCheck implements CheckInterface
         );
     }
 
+    /**
+     * Counts the number of fiels in the folder
+     *
+     * @param string $dir
+     * @return int
+     */
     private function countFiles(string $dir): int
     {
         $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));

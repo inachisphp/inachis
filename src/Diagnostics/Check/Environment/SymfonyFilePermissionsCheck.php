@@ -14,6 +14,7 @@ use Inachis\Diagnostics\CheckResult;
 
 final class SymfonyFilePermissionsCheck implements CheckInterface
 {
+    /** @var list<string> */
     private array $paths = [
         'public/imgs',
         'var/cache',

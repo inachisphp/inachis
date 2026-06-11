@@ -49,10 +49,11 @@ class AnalyticsRepository
 	 * Get top pages
 	 *
 	 * @param int $limit
-	 * @return list<array<string, mixed>>
+	 * @return list<array{path: string, total: numeric-string}>
 	 */
 	public function getTopPages(int $limit = 10): array
 	{
+        /** @var list<array{path: string, total: numeric-string}> */
 		return $this->db->executeQuery(
 			'
 			SELECT path, SUM(views) as total
@@ -68,10 +69,11 @@ class AnalyticsRepository
 	 *
 	 * @param \DateTimeInterface $from
 	 * @param \DateTimeInterface $to
-	 * @return array<array<string, mixed>>
+	 * @return list<array{date: string, total: numeric-string}>
 	 */
 	public function getPageViewsPerDay(\DateTimeInterface $from, \DateTimeInterface $to): array
     {
+        /** @var list<array{date: string, total: numeric-string}> */
         return $this->db->fetchAllAssociative(
             '
             SELECT date, SUM(views) as total
@@ -141,10 +143,11 @@ class AnalyticsRepository
      * Get the most common paths that result in a 4xx or 5xx error.
      *
      * @param int $limit
-     * @return array<array<string, mixed>>
+     * @return list<array{path: string, code: string, hits: numeric-string}>
      */
     public function getTopErrors(int $limit = 10): array
     {
+        /** @var list<array{path: string, code: string, hits: numeric-string}> */
         return $this->db->fetchAllAssociative('
             SELECT path, code, SUM(hits) AS hits
             FROM analytics_errors
@@ -158,7 +161,7 @@ class AnalyticsRepository
      * Get trending pages
      *
      * @param int $limit
-     * @return list<array{path: mixed, current: int, previous: int, change: float|int|null}>
+     * @return list<array{path: string, current: int, previous: int, change: float|int|null}>
      */
     public function getTrendingPages(int $limit = 10): array
     {
@@ -168,7 +171,7 @@ class AnalyticsRepository
         $lastWeekStart = $now->modify('monday last week')->format('Y-m-d');
         $lastWeekEnd   = $now->modify('sunday last week')->format('Y-m-d');
 
-        /** @var list<array{path:string,total:int|string|null}> $current This week */
+        /** @var list<array{path: string, total: numeric-string}> $current This week */
         $current = $this->db->fetchAllAssociative(
             '
             SELECT path, SUM(views) AS total
@@ -179,7 +182,7 @@ class AnalyticsRepository
             ['start' => $thisWeekStart]
         );
 
-        /** @var list<array{path:string,total:int|string|null}> $previous Last Week */
+        /** @var list<array{path: string, total: numeric-string}> $previous Last Week */
         $previous = $this->db->fetchAllAssociative(
             '
             SELECT path, SUM(views) AS total
@@ -229,10 +232,11 @@ class AnalyticsRepository
      * Get the most common referring domains.
      *
      * @param int $limit
-     * @return list<array<string,mixed>>
+     * @return list<array{domain: string, total: numeric-string}>
      */
     public function getTopReferrers(int $limit = 10): array
     {
+        /** @var list<array{domain: string, total: numeric-string}> */
         return $this->db->fetchAllAssociative(
             '
             SELECT domain, SUM(hits) AS total
@@ -248,10 +252,11 @@ class AnalyticsRepository
      *
      * @param string $path
      * @param int $limit
-     * @return list<array<string,mixed>>
+     * @return list<array{domain: string, total: numeric-string}>
      */
     public function getTopReferrersForPage(string $path, int $limit = 10): array
     {
+        /** @var list<array{domain: string, total: numeric-string}> */
         return $this->db->fetchAllAssociative(
             '
             SELECT domain, SUM(hits) AS total
@@ -270,18 +275,15 @@ class AnalyticsRepository
      * @param string[] $paths
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array<array{date: string, total: int}>
+     * @return list<array{date: string, views: int}>
      */
-    public function getPageViewsPerDayForPaths(
-        array $paths,
-        \DateTimeInterface $from,
-        \DateTimeInterface $to
-    ): array {
+    public function getPageViewsPerDayForPaths(array $paths, \DateTimeInterface $from, \DateTimeInterface $to): array
+    {
         if (empty($paths)) {
             return [];
         }
 
-        /** @var list<array{date:string,total:int|string|null}> $data */
+        /** @var list<array{date:string, total:numeric-string}> $data */
         $data = $this->db->executeQuery(
             '
             SELECT date, SUM(views) as total
@@ -310,7 +312,7 @@ class AnalyticsRepository
      * @param Page $page
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array<array<string,mixed>>
+     * @return list<array{date: string, views: int}>
      */
 	public function getPageStatsOverTime(Page $page, \DateTimeInterface $from, \DateTimeInterface $to): array
 	{
@@ -325,7 +327,7 @@ class AnalyticsRepository
      * @param Series $series
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array<array{date: string, views: int}>
+     * @return list<array{date: string, views: int}>
      */
     public function getSeriesStatsOverTime(Series $series, \DateTimeInterface $from, \DateTimeInterface $to): array
     {
@@ -341,10 +343,10 @@ class AnalyticsRepository
     /**
      * Fill in missing dates
      *
-     * @param list<array{date:string,total:int|string|null}> $data
+     * @param list<array{date:string, total:int|string|null}> $data
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array<array<string,mixed>>
+     * @return list<array{date: string, views: int}>
      */
     public function fillMissingDates(array $data, \DateTimeInterface $from, \DateTimeInterface $to): array
     {
@@ -377,10 +379,11 @@ class AnalyticsRepository
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
      * @param int $limit
-     * @return array<array<string,mixed>>
+     * @return list<array{country_code: string, country_name: string, total: numeric-string}>
      */
     public function getTopRegions(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array
     {
+        /** @var list<array{country_code: string, country_name: string, total: numeric-string}> */
         return $this->db->fetchAllAssociative(
             '
             SELECT country_code, country_name, SUM(hits) AS total
@@ -401,7 +404,7 @@ class AnalyticsRepository
      *
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array<array<string,mixed>>
+     * @return list<array{date: string, subscribers: int}>
      */
     public function getSubscriberStatsOverTime(\DateTimeInterface $from, \DateTimeInterface $to): array
     {
@@ -447,10 +450,11 @@ class AnalyticsRepository
     /**
      * Get current subscribers per feed path.
      *
-     * @return array<array<string,mixed>>
+     * @return list<array{path: string, subscribers: numeric-string}>
      */
     public function getCurrentSubscribersPerFeed(): array
     {
+        /** @var list<array{path: string, subscribers: numeric-string}> */
         return $this->db->fetchAllAssociative(
             '
             SELECT s.path, s.subscribers
@@ -472,10 +476,11 @@ class AnalyticsRepository
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
      * @param int $limit
-     * @return array<int,mixed>
+     * @return list<array{user_agent: string, total: numeric-string}>
      */
     public function getTopBots(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 15): array
     {
+        /** @var list<array{user_agent: string, total: numeric-string}> */
         return $this->db->fetchAllAssociative(
             '
             SELECT user_agent, SUM(hits) AS total

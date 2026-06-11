@@ -14,7 +14,12 @@ namespace Inachis\Service\Import\Series;
  */
 final class SeriesImportResult
 {
+    /** @var int */
     public int $seriesImported = 0;
+    
+    /** @var int */
     public int $pagesLinked = 0;
+
+    /** @var list<string> */
     public array $warnings = [];
 }

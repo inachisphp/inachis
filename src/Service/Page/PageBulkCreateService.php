@@ -13,7 +13,7 @@ use Inachis\Entity\Content\{Page, Url};
 use Inachis\Entity\User\User;
 use Inachis\Model\BulkCreateData;
 use Inachis\Repository\Content\{CategoryRepository, SeriesRepository, TagRepository};
-use Inachis\Util\UrlNormaliser;
+use Inachis\Service\Formatting\UrlNormaliser;
 use DateInterval;
 use DatePeriod;
 use DateTimeImmutable;

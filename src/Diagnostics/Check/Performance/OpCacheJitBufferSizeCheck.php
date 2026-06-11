@@ -20,7 +20,7 @@ final class OpCacheJitBufferSizeCheck implements CheckInterface
 
     public function run(): CheckResult
     {
-        $value = (int) ini_get('opcache.jit_buffer_size');
+        $value = (string) ini_get('opcache.jit_buffer_size');
         $recommended = 134217728; // 128M in bytes
         $status = $value >= $recommended ? 'ok' : 'warning';
         return new CheckResult(

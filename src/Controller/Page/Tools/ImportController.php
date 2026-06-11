@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Inachis\Parser\MarkdownFileParser;
+use Inachis\Service\Parser\MarkdownFileParser;
 
 /**
  * Controller for importing pages and posts

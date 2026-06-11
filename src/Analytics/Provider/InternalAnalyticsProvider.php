@@ -31,7 +31,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * Get top pages
      * 
      * @param int $limit
-     * @return array<array{path: string, total: int}>
+     * @return list<array{path: string, total: numeric-string, title: string}>
      */
     public function getTopPages(int $limit = 10): array
     {
@@ -47,7 +47,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      *
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array<array{date: string, total: int}>
+     * @return list<array{date: string, total: numeric-string}>
      */
     public function getPageViewsPerDay(\DateTimeInterface $from, \DateTimeInterface $to): array
     {
@@ -82,7 +82,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * Get the most common paths that result in a 4xx or 5xx error.
      *
      * @param int $limit
-     * @return array<array{path: string, code: int, hits: int}>
+     * @return list<array{path: string, code: string, hits: numeric-string}>
      */
     public function getTopErrors(int $limit = 10): array
     {
@@ -93,7 +93,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * Get trending pages
      *
      * @param int $limit
-     * @return array
+     * @return list<array{path: string, current: int, previous: int, change: float|int|null}>
      */
     public function getTrendingPages(int $limit = 10): array
     {
@@ -107,7 +107,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * Get the most common referring domains.
      *
      * @param int $limit
-     * @return array<array{domain: string, hits: int}>
+     * @return list<array{domain: string, total: numeric-string}>
      */
     public function getTopReferrers(int $limit = 10): array
     {
@@ -119,7 +119,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      *
      * @param string $path
      * @param int $limit
-     * @return array<array{domain: string, hits: int}>
+     * @return list<array{domain: string, total: numeric-string}>
      */
     public function getTopReferrersForPage(string $path, int $limit = 10): array
     {
@@ -183,7 +183,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * @param string[] $paths
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array<array{date: string, total: int}>
+     * @return list<array{date: string, views: int}>
      */
     public function getPageViewsPerDayForPaths(
         array $paths,
@@ -199,7 +199,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * @param Page $page
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array<array{date: string, views: int}>
+     * @return list<array{date: string, views: int}>
      */
     public function getPageStatsOverTime(Page $page, \DateTimeInterface $from, \DateTimeInterface $to): array
 	{
@@ -212,7 +212,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * @param Series $series
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array<array{date: string, views: int}>
+     * @return list<array{date: string, views: int}>
      */
     public function getSeriesStatsOverTime(Series $series, \DateTimeInterface $from, \DateTimeInterface $to): array
 	{
@@ -225,7 +225,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
      * @param int $limit
-     * @return array
+     * @return list<array{country_code: string, country_name: string, total: numeric-string}>
      */
     public function getTopRegions(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array
     {
@@ -237,7 +237,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      *
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array
+     * @return list<array{date: string, subscribers: int}>
      */
     public function getSubscriberStatsOverTime(\DateTimeInterface $from, \DateTimeInterface $to): array
     {
@@ -247,7 +247,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
     /**
      * Get current subscribers per feed path.
      *
-     * @return array
+     * @return list<array{path: string, subscribers: numeric-string}>
      */
     public function getCurrentSubscribersPerFeed(): array
     {
@@ -260,7 +260,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
      * @param int $limit
-     * @return array
+     * @return list<array{user_agent: string, total: numeric-string}>
      */
     public function getTopBots(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 15): array
     {

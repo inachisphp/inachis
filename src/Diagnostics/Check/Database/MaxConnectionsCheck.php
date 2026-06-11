@@ -30,10 +30,12 @@ final class MaxConnectionsCheck implements CheckInterface
             $platform = $this->connection->getDatabasePlatform();
             $platformName = $this->getDatabasePlatformName($platform);
             if (in_array($platformName, ['mysql', 'mariadb'])) {
+                /** @var array{Variable_name: string, Value: numeric-string}|false $row */
                 $row = $this->connection->fetchAssociative("SHOW VARIABLES LIKE 'max_connections'");
                 $value = (int) ($row['Value'] ?? 0);
                 $recommended = 100;
             } elseif ($platformName === 'sqlserver') {
+                /** @var array{value_in_use: int}|false */
                 $row = $this->connection->fetchAssociative(
                     "SELECT value_in_use FROM sys.configurations WHERE name = 'max worker threads'"
                 );
@@ -72,7 +74,7 @@ final class MaxConnectionsCheck implements CheckInterface
             $this->getId(),
             $this->getLabel(),
             $status,
-            $value,
+            (string) $value,
             $status === 'ok'
                 ? "Max connections/workers ($value) is sufficient."
                 : "Max connections/workers ($value) below recommended ($recommended).",

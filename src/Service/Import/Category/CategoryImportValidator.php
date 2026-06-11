@@ -52,10 +52,6 @@ final class CategoryImportValidator
             $categoryWarnings[] = 'Full path is missing';
         }
 
-        if (!is_bool($dto->visible)) {
-            $categoryWarnings[] = 'Visible must be boolean';
-        }
-
         if (!empty($dto->image) && !is_string($dto->image)) {
             $categoryWarnings[] = 'Image must be a string';
         }

@@ -14,6 +14,7 @@ use Inachis\Diagnostics\CheckResult;
 
 final class SensitiveFilesCheck implements CheckInterface
 {
+    /** @var list<string> */
     private array $publicPaths = [
         'public/.env',
         'public/.env.local',

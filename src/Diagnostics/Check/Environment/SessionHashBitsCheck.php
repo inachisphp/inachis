@@ -34,7 +34,7 @@ final class SessionHashBitsCheck implements CheckInterface
             $this->getId(),
             $this->getLabel(),
             $status,
-            $value,
+            (string) $value,
             $status === 'ok' ? 'Session hash strength is sufficient.' : 'Session hash entropy is low; consider increasing hash_bits_per_character.',
             $status !== 'ok' ? 'Set session.hash_bits_per_character >= 5 in php.ini for stronger session IDs.' : null,
             $this->getSection(),

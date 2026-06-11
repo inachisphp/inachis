@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Util;
 
-use Inachis\Util\UrlNormaliser;
+use Inachis\Service\Formatting\UrlNormaliser;
 use PHPUnit\Framework\TestCase;
 use TypeError;
 

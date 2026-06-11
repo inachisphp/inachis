@@ -13,7 +13,7 @@ use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
 use Inachis\Doctrine\DatabasePlatformTrait;
 use Doctrine\DBAL\Connection;
-use Inachis\Util\NumberFormatter;
+use Inachis\Service\Formatting\NumberFormatter;
 
 final class InnoDBBufferPoolCheck implements CheckInterface
 {
@@ -44,6 +44,7 @@ final class InnoDBBufferPoolCheck implements CheckInterface
                 );
             }
 
+            /** @var array{Variable_name: string, Value: numeric-string}|false */
             $row = $this->connection->fetchAssociative("SHOW VARIABLES LIKE 'innodb_buffer_pool_size'");
             $value = (int) ($row['Value'] ?? 0);
             $recommended = 536870912; // 512 MB

@@ -212,18 +212,12 @@
     {% set previewMode = post.postDate > date() %}
     <div class="fixed-bottom-bar">
         <p>
-            {{ form_widget(form.submit) }}
+            {% if form.submit is defined %}{{ form_widget(form.submit) }}{% endif %}
+            
         {% if post.id is not empty %}
-            {%- if post.status.value != "published" %}
-                <button type="submit" class="button button--secondary button--info" name="publish">
-                {% if previewMode %}
-                    <span class="material-icons" aria-hidden="true">schedule</span> {% trans %}admin.button.schedule{% endtrans %}
-                {% else %}
-                    <span class="material-icons" aria-hidden="true">publish</span> {% trans %}admin.button.publish{% endtrans %}
-                {% endif %}
-                </button>
-            {%- endif %}
-            {{ form_widget(form.delete) }}
+            {% if form.review is defined %}{{ form_widget(form.review) }}{% endif %}
+            {% if form.publish is defined %}{{ form_widget(form.publish) }}{% endif %}
+            {% if form.delete is defined %}{{ form_widget(form.delete) }}{% endif %}
             {%  if not post.isDraft %}
                 <a class="button button--secondary" href="{% if previewMode %}/incc/preview{% endif %}/{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons" aria-hidden="true">exit_to_app</span>
                     {% trans %}admin.button.viewLive{% endtrans %}</a>
@@ -236,6 +230,9 @@
 
 {% endblock content %}
 
+
 {% block reviewbar %}
+    {% if post.status.value == 'review' %}
     <div id="review-sidebar-container"></div>
+    {% endif %}
 {% endblock reviewbar %}

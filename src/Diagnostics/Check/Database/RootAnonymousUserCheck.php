@@ -43,6 +43,7 @@ final class RootAnonymousUserCheck implements CheckInterface
         }
 
         try {
+            /** @var list<array{User: string, Host: string}> */
             $users = $this->connection->fetchAllAssociative(
                 "SELECT User, Host FROM mysql.user WHERE User = '' OR User = 'root'"
             );

@@ -10,7 +10,7 @@
 namespace Inachis\Service\User;
 
 use Inachis\Entity\User\User;
-use Inachis\Util\Base64EncodeFile;
+use Inachis\Service\File\Base64EncodeFile;
 use Random\RandomException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;

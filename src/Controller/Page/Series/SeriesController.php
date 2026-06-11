@@ -21,7 +21,7 @@ use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Service\Series\SeriesBulkActionService;
 use Inachis\Service\Waste\WasteManagerService;
-use Inachis\Util\UrlNormaliser;
+use Inachis\Service\Formatting\UrlNormaliser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

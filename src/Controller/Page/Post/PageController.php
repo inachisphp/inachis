@@ -19,7 +19,7 @@ use Inachis\Form\PostType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\Content\{CategoryRepository, PageRepository, ReviewThreadRepository, RevisionRepository, TagRepository};
 use Inachis\Service\Page\{PageBulkActionService, ReviewRebaseService};
-use Inachis\Util\{ContentRevisionCompare, ReadingTime, UrlNormaliser};
+use Inachis\Service\Content\{ContentRevisionCompare, ReadingTime};
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

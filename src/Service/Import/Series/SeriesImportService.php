@@ -15,6 +15,7 @@ use Inachis\Model\Series\SeriesExportDto;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Service\Import\Series\SeriesImportResult;
 use DateTime;
+use DateTimeImmutable;
 use InvalidArgumentException;
 
 /**
@@ -34,7 +35,7 @@ final class SeriesImportService
     /**
      * Import series from DTOs.
      *
-     * @param SeriesExportDto[] $seriesDtos
+     * @param list<SeriesExportDto> $seriesDtos
      * @return SeriesImportResult
      */
     public function import(iterable $seriesDtos): SeriesImportResult
@@ -53,8 +54,8 @@ final class SeriesImportService
                 $series->setSubTitle($seriesDto->subTitle);
                 $series->setUrl($seriesDto->url); //@todo need to check if URL is already in use and generate a new one if so
                 $series->setDescription($seriesDto->description);
-                $series->setFirstDate(new DateTime($seriesDto->firstDate));
-                $series->setLastDate(new DateTime($seriesDto->lastDate));
+                $series->setFirstDate(new DateTimeImmutable($seriesDto->firstDate ?: ''));
+                $series->setLastDate(new DateTimeImmutable($seriesDto->lastDate ?: ''));
                 $series->setVisibility(Series::PRIVATE);
 
                 // Link pages by title
@@ -91,7 +92,16 @@ final class SeriesImportService
     /**
      * Maps the imported data to DTOs.
      *
-     * @param array $data
+     * @param array{
+     *     title?: string,
+     *     subTitle?: string,
+     *     url?: string,
+     *     description?: string,
+     *     firstDate?: string,
+     *     lastDate?: string,
+     *     visibility?: bool,
+     *     items:list<string>
+     * } $data
      * @return SeriesExportDto[]
      */
     public function mapToDto(array $data): array

@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Util;
 
-use Inachis\Util\TextCleaner;
+use Inachis\Service\Content\TextCleaner;
 use PHPUnit\Framework\TestCase;
 
 class TextCleanerTest extends TestCase

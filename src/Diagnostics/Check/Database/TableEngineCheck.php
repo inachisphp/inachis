@@ -43,6 +43,27 @@ final class TableEngineCheck implements CheckInterface
         }
 
         try {
+            /** @var list<array{
+             *    Name: string,
+             *    Engine: string|null,
+             *    Version: int|string,
+             *    Row_format: string,
+             *    Rows: int|string|null,
+             *    Avg_row_length: int|string|null,
+             *    Data_length: int|string|null,
+             *    Max_data_length: int|string|null,
+             *    Index_length: int|string|null,
+             *    Data_free: int|string|null,
+             *    Auto_increment: int|string|null,
+             *    Create_time: string|null,
+             *    Update_time: string|null,
+             *    Check_time: string|null,
+             *    Collation: string|null,
+             *    Checksum: int|string|null,
+             *    Create_options: string|null,
+             *    Comment: string
+             *}> $tables
+             */
             $tables = $this->connection->fetchAllAssociative("SHOW TABLE STATUS");
             $nonInnoDB = array_filter($tables, fn($t) => strtoupper($t['Engine'] ?? '') !== 'INNODB');
             $count = count($nonInnoDB);

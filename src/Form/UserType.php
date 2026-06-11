@@ -10,8 +10,8 @@
 namespace Inachis\Form;
 
 use Inachis\Entity\User\User;
-use Inachis\Util\RandomColorPicker;
-use Inachis\Util\TimezoneChoices;
+use Inachis\Service\User\ProfileColorPalette;
+use Inachis\Form\Provider\TimezoneChoices;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -120,7 +120,7 @@ class UserType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'user__color__label',
                 ],
-                'choices' => array_combine(RandomColorPicker::getAll(), RandomColorPicker::getAll()),
+                'choices' => array_combine(ProfileColorPalette::getAll(), ProfileColorPalette::getAll()),
                 'choice_attr' => function ($choice, $key, $value) {
                     return ['data-color' => $value];
                 },

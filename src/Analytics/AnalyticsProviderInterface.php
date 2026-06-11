@@ -21,33 +21,18 @@ interface AnalyticsProviderInterface
 {
     /**
      * Get total page views per day between two dates.
-     *
-     * Expected format:
-     * [
-     *   ['date' => '2026-04-29', 'total' => 123],
-     *   ...
-     * ]
      * 
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array<array{date: string, total: int}>
+     * @return list<array{date: string, total: numeric-string}>
      */
-    public function getPageViewsPerDay(
-        \DateTimeInterface $from,
-        \DateTimeInterface $to
-    ): array;
+    public function getPageViewsPerDay(\DateTimeInterface $from, \DateTimeInterface $to): array;
 
     /**
      * Get most visited pages.
-     *
-     * Expected format:
-     * [
-     *   ['path' => '/post/hello-world', 'total' => 42],
-     *   ...
-     * ]
      * 
      * @param int $limit
-     * @return array<array{path: string, total: int}>
+     * @return list<array{path: string, total: numeric-string, title: string}>
      */
     public function getTopPages(int $limit = 10): array;
 
@@ -58,10 +43,7 @@ interface AnalyticsProviderInterface
      * @param \DateTimeInterface $to
      * @return int
      */
-    public function getTotalViews(
-        \DateTimeInterface $from,
-        \DateTimeInterface $to
-    ): int;
+    public function getTotalViews(\DateTimeInterface $from, \DateTimeInterface $to): int;
 
     /**
      * Get monthly unique visitor count
@@ -74,15 +56,9 @@ interface AnalyticsProviderInterface
 
     /**
      * Get the most common paths that result in a 4xx or 5xx error.
-     *
-     * Expected format:
-     * [
-     *   ['path' => '/post/hello-world', 'code' => 404, 'hits' => 42],
-     *   ...
-     * ]
      * 
      * @param int $limit
-     * @return array<array{path: string, code: int, hits: int}>
+     * @return list<array{path: string, code: string, hits: numeric-string}>
      */
     public function getTopErrors(int $limit = 10): array;
 
@@ -90,88 +66,54 @@ interface AnalyticsProviderInterface
      * Get trending pages
      *
      * @param int $limit
-     * @return array
+     * @return list<array{path: string, current: int, previous: int, change: float|int|null}>
      */
     public function getTrendingPages(int $limit = 10): array;
 
     /**
      * Get the most common referring domains.
-     *
-     * Expected format:
-     * [
-     *   ['domain' => 'example.com', 'hits' => 42],
-     *   ...
-     * ]
      * 
      * @param int $limit
-     * @return array<array{domain: string, hits: int}>
+     * @return list<array{domain: string, total: numeric-string}>
      */
     public function getTopReferrers(int $limit = 10): array;
 
     /**
      * Get the most common referring domains for a specific page.
-     *
-     * Expected format:
-     * [
-     *   ['domain' => 'example.com', 'hits' => 42],
-     *   ...
-     * ]
      * 
      * @param string $path
      * @param int $limit
-     * @return array<array{domain: string, hits: int}>
+     * @return list<array{domain: string, total: numeric-string}>
      */
     public function getTopReferrersForPage(string $path, int $limit = 10): array;
 
     /**
      * Get page views per day for paths
      *
-     * Expected format:
-     * [
-     *   ['date' => '2026-04-29', 'total' => 123],
-     *   ...
-     * ]
-     *
      * @param string[] $paths
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array<array{date: string, total: int}>
+     * @return list<array{date: string, views: int}>
      */
-    public function getPageViewsPerDayForPaths(
-        array $paths,
-        \DateTimeInterface $from,
-        \DateTimeInterface $to
-    ): array;
+    public function getPageViewsPerDayForPaths(array $paths, \DateTimeInterface $from, \DateTimeInterface $to): array;
 
     /**
      * Get page stats over time
      *
-     * Expected format:
-     * [
-     *   ['date' => '2026-04-29', 'views' => 123],
-     *   ...
-     * ]
-     *
      * @param Page $page
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array<array{date: string, views: int}>
+     * @return list<array{date: string, views: int}>
      */
     public function getPageStatsOverTime(Page $page, \DateTimeInterface $from, \DateTimeInterface $to): array;
 
     /**
      * Get series stats over time
      *
-     * Expected format:
-     * [
-     *   ['date' => '2026-04-29', 'views' => 123],
-     *   ...
-     * ]
-     *
      * @param Series $series
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array<array{date: string, views: int}>
+     * @return list<array{date: string, views: int}>
      */
     public function getSeriesStatsOverTime(Series $series, \DateTimeInterface $from, \DateTimeInterface $to): array;
 
@@ -181,7 +123,7 @@ interface AnalyticsProviderInterface
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
      * @param int $limit
-     * @return array
+     * @return list<array{country_code: string, country_name: string, total: numeric-string}>
      */
     public function getTopRegions(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array;
 
@@ -190,25 +132,24 @@ interface AnalyticsProviderInterface
      * 
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @return array
+     * @return list<array{date: string, subscribers: int}>
      */
     public function getSubscriberStatsOverTime(\DateTimeInterface $from, \DateTimeInterface $to): array;
 
     /**
      * Get current subscribers per feed path.
      * 
-     * @return array
+     * @return list<array{path: string, subscribers: numeric-string}>
      */
     public function getCurrentSubscribersPerFeed(): array;
 
     /**
      * Get top bot user-agents in the given date range.
-     *
-     * Expected format:
-     * [
-     *   ['user_agent' => 'Googlebot/2.1', 'total' => 1234],
-     *   ...
-     * ]
+     * 
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     * @return list<array{user_agent: string, total: numeric-string}>
      */
     public function getTopBots(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 15): array;
 }

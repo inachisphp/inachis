@@ -21,6 +21,7 @@ admin.button.enable: 'Enable'
 admin.button.publish: 'Publish'
 admin.button.remove: 'Remove'
 admin.button.save: 'Save'
+admin.button.review: 'Send for review'
 admin.button.schedule: 'Schedule'
 admin.button.viewLive: 'View live'
 

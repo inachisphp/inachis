@@ -85,13 +85,13 @@ final class DatabasePerformanceCheck implements CheckInterface
         $issues = [];
         $severity = 'ok';
 
-        /** @var int */
-        $threads = (int) $this->connection
-            ->fetchOne("SHOW STATUS LIKE 'Threads_running'", [], [], 1);
+        /** @var array{Variable_name: string, Value: numeric-string} */
+        $row = $this->connection->fetchAssociative("SHOW STATUS LIKE 'Threads_running'");
+        $threads = (int) $row['Value'];
             
-        /** @var int */
-        $maxConnections = (int) $this->connection
-            ->fetchOne("SHOW VARIABLES LIKE 'max_connections'", [], [], 1);
+        /** @var array{Variable_name: string, Value: numeric-string} */
+        $row = $this->connection->fetchAssociative("SHOW VARIABLES LIKE 'max_connections'");
+        $maxConnections = (int) $row['Value'];
 
         $usage = $maxConnections > 0
             ? round(($threads / $maxConnections) * 100, 1)
@@ -105,9 +105,11 @@ final class DatabasePerformanceCheck implements CheckInterface
             $issues[] = "Elevated connection usage ({$usage}%)";
         }
 
-        $longQueries = (int) $this->connection->fetchOne(
-            "SELECT COUNT(*) FROM information_schema.processlist WHERE TIME > 10 AND COMMAND != 'Sleep'"
+        /** @var array{Variable_name: string, Value: numeric-string} */
+        $row = $this->connection->fetchAssociative(
+            "SELECT COUNT(*) AS Value FROM information_schema.processlist WHERE TIME > 10 AND COMMAND != 'Sleep'"
         );
+        $longQueries = (int) $row['Value'];
 
         if ($longQueries > 5) {
             $severity = 'error';
@@ -117,16 +119,18 @@ final class DatabasePerformanceCheck implements CheckInterface
             $issues[] = "{$longQueries} long-running queries";
         }
 
-        $deadlocks = (int) $this->connection
-            ->fetchOne("SHOW STATUS LIKE 'Innodb_deadlocks'", [], [], 1);
+        /** @var array{Variable_name: string, Value: numeric-string} */
+        $row = $this->connection->fetchAssociative("SHOW STATUS LIKE 'Innodb_deadlocks'");
+        $deadlocks = (int) $row['Value'];
 
         if ($deadlocks > 0) {
             $severity = 'warning';
             $issues[] = "{$deadlocks} InnoDB deadlocks detected";
         }
 
-        $lockWaits = (int) $this->connection
-            ->fetchOne("SHOW STATUS LIKE 'Innodb_row_lock_current_waits'", [], [], 1);
+        /** @var array{Variable_name: string, Value: numeric-string} */
+        $row = $this->connection->fetchAssociative("SHOW STATUS LIKE 'Innodb_row_lock_current_waits'");
+        $lockWaits = (int) $row['Value'];
 
         if ($lockWaits > 0) {
             $severity = 'warning';
@@ -134,8 +138,9 @@ final class DatabasePerformanceCheck implements CheckInterface
         }
 
         try {
-            $replica = $this->connection->fetchAssociative("SHOW SLAVE STATUS");
-            if ($replica && isset($replica['Seconds_Behind_Master'])) {
+            /** @var array{Seconds_Behind_Master?: numeric-string}|false */
+            $replica = $this->connection->fetchAssociative('SHOW SLAVE STATUS');
+            if ($replica !== false && isset($replica['Seconds_Behind_Master'])) {
                 $lag = (int) $replica['Seconds_Behind_Master'];
                 if ($lag > 30) {
                     $severity = 'error';
@@ -175,13 +180,17 @@ final class DatabasePerformanceCheck implements CheckInterface
         $issues = [];
         $severity = 'ok';
 
-        $active = (int) $this->connection->fetchOne(
+        /** @var numeric-string|int $value */
+        $value = $this->connection->fetchOne(
             "SELECT count(*) FROM pg_stat_activity WHERE state != 'idle'"
         );
+        $active = (int) $value;
 
-        $maxConnections = (int) $this->connection->fetchOne(
+        /** @var numeric-string|int $value */
+        $value = $this->connection->fetchOne(
             "SHOW max_connections"
         );
+        $maxConnections = (int) $value;
 
         $usage = $maxConnections > 0
             ? round(($active / $maxConnections) * 100, 1)
@@ -195,9 +204,11 @@ final class DatabasePerformanceCheck implements CheckInterface
             $issues[] = "Elevated connection usage ({$usage}%)";
         }
 
-        $longQueries = (int) $this->connection->fetchOne(
+        /** @var numeric-string|int $value */
+        $value = $this->connection->fetchOne(
             "SELECT COUNT(*) FROM pg_stat_activity WHERE state = 'active' AND now() - query_start > interval '10 seconds'"
         );
+        $longQueries = (int) $value;
 
         if ($longQueries > 5) {
             $severity = 'error';
@@ -207,9 +218,11 @@ final class DatabasePerformanceCheck implements CheckInterface
             $issues[] = "{$longQueries} long-running queries";
         }
 
-        $deadlocks = (int) $this->connection->fetchOne(
+        /** @var numeric-string|int $value */
+        $value = $this->connection->fetchOne(
             "SELECT deadlocks FROM pg_stat_database WHERE datname = current_database()"
         );
+        $deadlocks = (int) $value;
 
         if ($deadlocks > 0) {
             $severity = 'warning';
@@ -217,6 +230,7 @@ final class DatabasePerformanceCheck implements CheckInterface
         }
 
         try {
+            /** @var numeric-string|int|null */
             $lag = $this->connection->fetchOne(
                 "SELECT EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())"
             );

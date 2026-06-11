@@ -20,7 +20,7 @@ final class RealpathCacheSizeCheck implements CheckInterface
 
     public function run(): CheckResult
     {
-        $value = (int) ini_get('realpath_cache_size');
+        $value = (string) ini_get('realpath_cache_size');
         $recommended = 4194304; // 4M in bytes
         $status = $value >= $recommended ? 'ok' : 'warning';
         return new CheckResult(

@@ -12,7 +12,7 @@ namespace Inachis\Service\Export\Page;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Service\Export\AbstractExportService;
 use Inachis\Service\Export\Page\PageExportNormaliser;
-use Symfony\Component\TaggedIterator\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
  * Service for exporting pages. The service uses the {@link PageRepository} to retrieve pages,
@@ -29,7 +29,7 @@ final class PageExportService extends AbstractExportService
     public function __construct(
         private PageRepository $pageRepository,
         private PageExportNormaliser $normaliser,
-        #[TaggedIterator('inachis.export_writer')] iterable $writers,
+        #[AutowireIterator('inachis.export_writer')] iterable $writers,
     ) {
         parent::__construct($writers);
     }

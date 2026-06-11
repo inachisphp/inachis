@@ -15,7 +15,7 @@ use ReflectionClass;
 use ReflectionException;
 use Inachis\Entity\Content\Category;
 use Inachis\Entity\Content\Page;
-use Inachis\Parser\MarkdownFileParser;
+use Inachis\Service\Parser\MarkdownFileParser;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;

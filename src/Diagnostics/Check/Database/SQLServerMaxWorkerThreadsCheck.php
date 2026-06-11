@@ -43,6 +43,7 @@ final class SQLServerMaxWorkerThreadsCheck implements CheckInterface
                 );
             }
 
+            /** @var array{value_in_use: int}|false */
             $row = $this->connection->fetchAssociative(
                 "SELECT value_in_use FROM sys.configurations WHERE name = 'max worker threads'"
             );
@@ -68,7 +69,7 @@ final class SQLServerMaxWorkerThreadsCheck implements CheckInterface
             $this->getId(),
             $this->getLabel(),
             $status,
-            $value,
+            (string) $value,
             $status === 'ok'
                 ? 'Max worker threads is sufficient.'
                 : "Max worker threads ($value) below recommended ($recommended).",

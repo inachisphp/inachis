@@ -20,7 +20,7 @@ final class OpCacheMaxAcceleratedFilesCheck implements CheckInterface
 
     public function run(): CheckResult
     {
-        $value = (int) ini_get('opcache.max_accelerated_files');
+        $value = (string) ini_get('opcache.max_accelerated_files');
         $recommended = 20000;
         $status = $value >= $recommended ? 'ok' : 'warning';
         return new CheckResult(

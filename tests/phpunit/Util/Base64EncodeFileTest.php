@@ -9,7 +9,7 @@
 
 namespace Inachis\Tests\phpunit\Util;
 
-use Inachis\Util\Base64EncodeFile;
+use Inachis\Service\File\Base64EncodeFile;
 use PHPUnit\Framework\TestCase;
 
 class Base64EncodeFileTest extends TestCase

@@ -12,7 +12,7 @@ namespace Inachis\Controller\Page\Post;
 use DateTimeImmutable;
 use Exception;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Parser\ArrayToMarkdown;
+use Inachis\Service\Parser\ArrayToMarkdown;
 use Inachis\Repository\Content\{PageRepository, RevisionRepository};
 use Jfcherng\Diff\DiffHelper;
 use Symfony\Component\HttpFoundation\Request;
