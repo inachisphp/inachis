@@ -136,4 +136,14 @@ class ReviewController extends AbstractController
             'success' => true
         ]);
     }
+
+	#[Route('/incc/api/review/thread/{id}/reopen', methods: ['POST'])]
+	public function reopen(ReviewThread $thread): JsonResponse
+	{
+		$this->reviewService->reopenThread($thread);
+
+		return $this->json([
+			'success' => true
+		]);
+	}
 }

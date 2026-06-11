@@ -8,22 +8,91 @@ class ReviewRebaseService
 {
     public function rebase(ReviewThread $thread, string $newContent): bool
 	{
-		$position = strpos($newContent, $thread->getSelectedText());
 
-		if ($position === false) {
-			$thread->setNeedsRebase(true);
-			return false;
+		$selectedText =
+			$thread->getSelectedText();
+
+		$contextBefore =
+			$thread->getContextBefore();
+
+		$contextAfter =
+			$thread->getContextAfter();
+
+		$matches = [
+
+			// Best match
+			[
+				'needle' =>
+					$contextBefore .
+					$selectedText .
+					$contextAfter,
+
+				'offset' =>
+					strlen($contextBefore)
+			],
+
+			// Selected text + before
+			[
+				'needle' =>
+					$contextBefore .
+					$selectedText,
+
+				'offset' =>
+					strlen($contextBefore)
+			],
+
+			// Selected text + after
+			[
+				'needle' =>
+					$selectedText .
+					$contextAfter,
+
+				'offset' => 0
+			],
+
+			// Last resort
+			[
+				'needle' =>
+					$selectedText,
+
+				'offset' => 0
+			]
+		];
+
+		foreach ($matches as $match) {
+
+			$position = strpos(
+				$newContent,
+				$match['needle']
+			);
+
+			if ($position === false) {
+				continue;
+			}
+
+			$currentStart =
+				$position +
+				$match['offset'];
+
+			$currentEnd =
+				$currentStart +
+				strlen($selectedText);
+
+			$thread->setCurrentStartOffset(
+				$currentStart
+			);
+
+			$thread->setCurrentEndOffset(
+				$currentEnd
+			);
+
+			$thread->setNeedsRebase(false);
+
+			return true;
 		}
 
-		$thread->setCurrentStartOffset($position);
+		$thread->setNeedsRebase(true);
 
-		$thread->setCurrentEndOffset(
-			$position +
-			strlen($thread->getSelectedText())
-		);
-
-		$thread->setNeedsRebase(false);
-
-		return true;
+		return false;
 	}
 }
