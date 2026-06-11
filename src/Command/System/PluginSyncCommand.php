@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Command\Plugin;
+namespace Inachis\Command\System;
 
 use Inachis\Service\Plugin\PluginManager;
 use Doctrine\Migrations\DependencyFactory;

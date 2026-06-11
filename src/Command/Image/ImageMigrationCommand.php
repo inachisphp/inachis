@@ -27,14 +27,27 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 )]
 class ImageMigrationCommand extends Command
 {
+    /** @var int */
     private const MAX_DIMENSION = 1024;
     
+    /** @var string */
     private string $checkpointFile;
+
+    /** @var string */
     private string $imageDir;
+
+    /** @var string */
     private string $planFile;
+
+    /** @var string */
     private string $projectDir;
 
     /**
+     * Undocumented function
+     *
+     * @param ImageRepository $imageRepository
+     * @param PageRepository $pageRepository
+     * @param SeriesRepository $seriesRepository
      * @param SluggerInterface $slugger
      */
     public function __construct(

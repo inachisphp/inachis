@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Command;
+namespace Inachis\Command\System;
 
 use Inachis\Service\SitemapGenerator;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
