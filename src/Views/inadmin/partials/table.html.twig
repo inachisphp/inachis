@@ -85,6 +85,10 @@
                             {{ attribute(item, column.source)|date('d/m/Y') }}
                         {% elseif column.source_type is defined and column.source_type == 'title' %}
                             {{ attribute(attribute(item, column.source), 'title') }}
+                        {% elseif column.source_type is defined and column.source_type == 'count' %}
+                            {{ attribute(item, column.source)|length }}
+                        {% elseif column.source_type is defined and column.source_type == 'boolean' %}
+                            {{ attribute(item, column.source) ? 'Yes' : 'No' }}
                         {% else %}
                             {% if column.maxLength is defined %}
                                 {{ attribute(item, column.source)|slice(0, column.maxLength) }}

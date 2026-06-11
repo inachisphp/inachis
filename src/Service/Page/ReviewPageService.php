@@ -39,7 +39,6 @@ class ReviewPageService
      * @param string $selectedText
      * @param string $contextBefore
      * @param string $contextAfter
-     * @param Revision|null $revision
      * @return ReviewThread
      */
     public function createThread(

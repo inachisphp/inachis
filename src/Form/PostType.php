@@ -13,6 +13,7 @@ use DateTimeImmutable;
 use IntlException;
 use Inachis\Entity\Content\{Category,Page,Tag};
 use Inachis\Entity\User\User;
+use Inachis\Enum\EditorialStatus;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Emoji\EmojiTransliterator;
@@ -26,6 +27,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Validator\Constraints\IsTrueValidator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -62,6 +64,12 @@ class PostType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $newItem = !$options['data'] instanceof Page || empty($options['data']->getId());
+        $isScheduled = $options['data'] instanceof Page && $options['data']->getPostDate() > new \DateTimeImmutable('now');
+        // @todo update these based on role permissions
+        $showSave = true;
+        $showReview = $options['data'] instanceof Page && $options['data']->getStatus() == EditorialStatus::DRAFT;
+        $showPublish = $options['data'] instanceof Page && $options['data']->getStatus() == EditorialStatus::REVIEW;
+        $showDelete = true;
         $user = $this->security->getUser();
         $userTimezone = $user instanceof User
             ? $user->getPreferences()?->getTimezone()
@@ -301,8 +309,9 @@ class PostType extends AbstractType
                     'id' => 'nofollow_label',
                 ],
                 'required' => false,
-            ])
-            ->add('submit', SubmitType::class, [
+            ]);
+        if ($showSave) {
+            $builder->add('submit', SubmitType::class, [
                 'attr' => [
                     'class' => 'button button--positive',
                 ],
@@ -312,8 +321,8 @@ class PostType extends AbstractType
                     $this->translator->trans('admin.button.save'),
                 ),
                 'label_html' => true,
-            ])
-        ;
+            ]);
+        }
         if (!$newItem) {
             $builder
                 ->add('modDate', DateTimeType::class, [
@@ -334,19 +343,36 @@ class PostType extends AbstractType
                     'model_timezone' => 'UTC',
                     'view_timezone' => $userTimezone,
                     'widget' => 'single_text',
-                ])
-                ->add('publish', SubmitType::class, [
+                ]);
+            if ($showReview) {
+                $builder->add('review', SubmitType::class, [
                     'attr' => [
-                        'class' => 'button button--info',
+                        'class' => 'button button--secondary',
                     ],
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> <span>%s</span>',
-                        'publish',
-                        $this->translator->trans('admin.button.publish'),
+                        'rate_review',
+                        $this->translator->trans('admin.button.review'),
                     ),
                     'label_html' => true,
-                ])
-                ->add('delete', SubmitType::class, [
+                ]);
+            }
+            if ($showPublish) {
+                $builder->add('publish', SubmitType::class, [
+                    'attr' => [
+                        'class' => 'button button--secondary',
+                    ],
+                    'label' => sprintf(
+                        '<span class="material-icons">%s</span> <span>%s</span>',
+                        $isScheduled ? 'schedule' : 'publish',
+                        $isScheduled ? $this->translator->trans('admin.button.schedule')
+                         : $this->translator->trans('admin.button.publish'),
+                    ),
+                    'label_html' => true,
+                ]);
+            }
+            if ($showDelete) {
+                $builder->add('delete', SubmitType::class, [
                     'attr' => [
                         'data-confirm' => 'delete',
                         'data-confirm-text' => 'Yes, delete',
@@ -360,8 +386,8 @@ class PostType extends AbstractType
                         $this->translator->trans('admin.button.delete'),
                     ),
                     'label_html' => true,
-                ])
-            ;
+                ]);
+            }
         }
     }
 

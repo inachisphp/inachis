@@ -1,0 +1,79 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <span>Roles</span>
+{% endblock pagetitle %}
+
+{% block content %}
+    <div class="col-12">
+        {% include 'inadmin/partials/tab-sets/users.html.twig' %}
+
+        {% include 'inadmin/partials/table.html.twig' with {
+            className: 'form__roles',
+            type: 'roles',
+
+            table_name: 'Roles',
+            table_class: 'table-responsive table--row-borders table--darkhead',
+            table_desc: 'This table lists the roles available in the system. Each role controls what actions its members may perform on content resources.',
+            columns: [
+                {
+                    title: 'Name',
+                    slug: 'id',
+                    source: 'name',
+                    header: true,
+                },
+                {
+                    title: 'Description',
+                    source: 'description',
+                },
+                {
+                    title: 'Permissions',
+                    source: 'rolePermissions',
+                    source_type: 'count',
+                    hideOnMobile: true,
+                },
+                {
+                    title: 'Skip Review',
+                    source: 'disableReview',
+                    source_type: 'boolean',
+                    hideOnMobile: true,
+                },
+            ],
+
+            offset: query.offset,
+            limit: query.limit,
+            total: dataset.count,
+
+            slug_prefix: 'security/roles',
+
+            show_search: false,
+            show_select_deselect: true,
+
+            add_button: {
+                text: 'Create Role',
+                url: path('incc_admin_role_edit', { roleId: 'new' }),
+            },
+
+            url_result: path('incc_admin_role_index'),
+            zebra: true,
+
+            actions: {
+                delete: {
+                    button_class: 'button--negative button--delete button--confirm',
+                    'data': {
+                        'confirm': 'delete',
+                        'confirm-text': 'Yes, delete',
+                        'entity': 'roles',
+                        'form-action': '',
+                        'title': 'Delete selected roles',
+                        'warning': 'All currently selected roles will be permanently deleted. Users assigned to these roles will lose the associated permissions. This action cannot be undone.',
+                    },
+                    icon: 'delete',
+                    name: 'delete',
+                    value: '1',
+                    title: 'Delete',
+                }
+            }
+        } %}
+    </div>
+{% endblock content %}
