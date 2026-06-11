@@ -21,11 +21,11 @@ final class RealpathCacheTtlCheck implements CheckInterface
 
     public function run(): CheckResult
     {
-        $value = (int) ini_get('realpath_cache_ttl');
+        $value = (string) ini_get('realpath_cache_ttl');
         $recommended = 600;
         $status = $value >= $recommended ? 'ok' : 'warning';
 
-        $humanValue = NumberFormatter::formatSeconds($value);
+        $humanValue = NumberFormatter::formatSeconds((int) $value);
 
         return new CheckResult(
             $this->getId(),

@@ -13,8 +13,11 @@ final class NumberFormatter
 {
     /**
      * Convert bytes to human-readable format.
+     * 
+     * @param int|float $bytes
+     * @return string
      */
-    public static function formatBytes(int $bytes): string
+    public static function formatBytes(int|float $bytes): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
         $i = 0;
@@ -27,6 +30,9 @@ final class NumberFormatter
 
     /**
      * Convert seconds to human-readable format (seconds or minutes if >= 60s).
+     * 
+     * @param int $seconds
+     * @return string
      */
     public static function formatSeconds(int $seconds): string
     {

@@ -21,7 +21,7 @@ final class ExposePhpCheck implements CheckInterface
 
     public function run(): CheckResult
     {
-        $value = ini_get('expose_php');
+        $value = ini_get('expose_php') ?: '';
         $status = ($value === '0' || strtolower($value) === 'off') ? 'ok' : 'warning';
 
         return new CheckResult(

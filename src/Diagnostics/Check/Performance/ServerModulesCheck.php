@@ -20,10 +20,12 @@ final class ServerModulesCheck implements CheckInterface
 
     public function run(): CheckResult
     {
+        /** @var string */
         $serverSoftware = $_SERVER['SERVER_SOFTWARE'] ?? 'unknown';
         $serverSoftwareLower = strtolower($serverSoftware);
         $details = [];
         $status = 'ok';
+        $details[] = 'HTTP/2: ' . ($this->detectHttp2() ? 'enabled' : 'not detected');
 
         if (str_contains($serverSoftwareLower, 'apache')) {
             // Apache best-effort module detection
@@ -42,7 +44,7 @@ final class ServerModulesCheck implements CheckInterface
                 } else {
                     $enabled = in_array($mod, $loadedModules) ? 'enabled' : 'disabled';
                     $details[] = "$label: $enabled";
-                    if ($enabled === 'disabled' && $status !== 'error') {
+                    if ($enabled === 'disabled') {
                         $status = 'warning';
                     }
                 }
@@ -76,6 +78,11 @@ final class ServerModulesCheck implements CheckInterface
         );
     }
 
+    /**
+     * Detects if compression is in use
+     *
+     * @return string
+     */
     private function detectCompression(): string
     {
         foreach (headers_list() as $header) {
@@ -86,9 +93,16 @@ final class ServerModulesCheck implements CheckInterface
         return 'none';
     }
 
+    /**
+     * Detect if HTTP/2 is in use
+     *
+     * @return boolean
+     */
     private function detectHttp2(): bool
     {
-        return isset($_SERVER['SERVER_PROTOCOL']) && str_contains($_SERVER['SERVER_PROTOCOL'], 'HTTP/2');
+        $protocol = $_SERVER['SERVER_PROTOCOL'] ?? null;
+
+        return is_string($protocol) && str_contains($protocol, 'HTTP/2');
     }
 
     private function detectExpires(): bool

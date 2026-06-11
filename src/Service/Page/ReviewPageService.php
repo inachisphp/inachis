@@ -17,14 +17,30 @@ use Inachis\Repository\Content\ReviewThreadRepository;
 
 class ReviewPageService
 {
+    /**
+     * Constructor for the review page service
+     *
+     * @param EntityManagerInterface $entityManager
+     * @param ReviewThreadRepository $reviewThreadRepository
+     */
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ReviewThreadRepository $reviewThreadRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Creates a new review thread and initial comment.
+     *
+     * @param Page $page
+     * @param User $author
+     * @param string $message
+     * @param int $startOffset
+     * @param int $endOffset
+     * @param string $selectedText
+     * @param string $contextBefore
+     * @param string $contextAfter
+     * @param Revision|null $revision
+     * @return ReviewThread
      */
     public function createThread(
         Page $page,
@@ -42,7 +58,6 @@ class ReviewPageService
         $thread
             ->setPage($page)
             ->setCreatedBy($author)
-            ->setCreatedRevision($revision)
             ->setStartOffset($startOffset)
             ->setEndOffset($endOffset)
             ->setSelectedText($selectedText)

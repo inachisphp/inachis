@@ -85,7 +85,9 @@ readonly class PageBulkActionService
     public function delete(Page $post): void
     {
         $this->wasteManagerService->sendToWaste($post);
-        $this->revisionRepository->deleteAndRecordByPage($post, $this->security->getUser());
+        /** @var \Inachis\Entity\User\User */
+        $deletedBy = $this->security->getUser();
+        $this->revisionRepository->deleteAndRecordByPage($post, $deletedBy);
         $this->pageRepository->remove($post);
     }
 
@@ -102,9 +104,9 @@ readonly class PageBulkActionService
             }
         }
         $title = $post->getTitle();
-        if ($title === null) {
-            throw new Exception('Page title cannot be null');
-        }
+        // if ($title === null) {
+        //     throw new Exception('Page title cannot be null');
+        // }
         $link = $post->getPostDateAsLink() . '/' . UrlNormaliser::toUri($title);
         $subTitle = $post->getSubTitle();
         if ($subTitle !== null) {

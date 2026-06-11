@@ -43,6 +43,7 @@ final class WaitTimeoutCheck implements CheckInterface
                 );
             }
 
+            /** @var array{Variable_name: string, Value:numeric-string}|false */
             $row = $this->connection->fetchAssociative("SHOW VARIABLES LIKE 'wait_timeout'");
             $value = (int) ($row['Value'] ?? 0);
         } catch (\Throwable $e) {

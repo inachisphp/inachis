@@ -14,6 +14,7 @@ use Inachis\Diagnostics\CheckResult;
 
 final class TempUploadDirectoryCheck implements CheckInterface
 {
+    /** @var list<string> */
     private array $paths = [
         'public/uploads',
         'var/tmp',

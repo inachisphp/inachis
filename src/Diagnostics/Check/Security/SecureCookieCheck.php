@@ -26,7 +26,7 @@ final class SecureCookieCheck implements CheckInterface
 
         foreach ($_COOKIE as $name => $value) {
             $params = session_get_cookie_params();
-            if (!($params['secure'] ?? false) || !($params['httponly'] ?? false)) {
+            if (!$params['secure'] || !$params['httponly']) {
                 $details[] = "$name: missing secure or HttpOnly";
                 $status = 'warning';
             } else {

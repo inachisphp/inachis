@@ -20,7 +20,7 @@ final class MaxExecutionTimeCheck implements CheckInterface
 
     public function run(): CheckResult
     {
-        $max = (int)(ini_get('max_execution_time') ?: 0);
+        $max = (string)(ini_get('max_execution_time') ?: '0');
         $status = $max >= 30 ? 'ok' : 'warning';
         $details = "max_execution_time: $max seconds";
 

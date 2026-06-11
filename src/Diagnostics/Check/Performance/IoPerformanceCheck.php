@@ -78,12 +78,15 @@ final class IoPerformanceCheck implements CheckInterface
             $start = hrtime(true);
 
             $handle = fopen($file, 'wb');
+            if (!$handle) {
+                throw new \Exception('Could not write to ' . $file);
+            }
             for ($i = 0; $i < $this->testSizeMb; $i++) {
                 fwrite($handle, $data);
             }
             fflush($handle);
             fclose($handle);
-
+            
             $writeDuration = (hrtime(true) - $start) / 1e9;
             $writeSpeed = round(($bytes / 1024 / 1024) / $writeDuration, 1);
 
@@ -93,6 +96,9 @@ final class IoPerformanceCheck implements CheckInterface
             $start = hrtime(true);
 
             $handle = fopen($file, 'rb');
+            if (!$handle) {
+                throw new \Exception('Could not read from ' . $file);
+            }
             while (!feof($handle)) {
                 fread($handle, 8192);
             }

@@ -43,6 +43,7 @@ final class SQLServerMemoryCheck implements CheckInterface
                 );
             }
 
+            /** @var array{value_in_use: int}|false */
             $row = $this->connection->fetchAssociative(
                 "SELECT value_in_use FROM sys.configurations WHERE name = 'max server memory (MB)'"
             );

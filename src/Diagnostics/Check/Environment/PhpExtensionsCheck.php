@@ -14,6 +14,7 @@ use Inachis\Diagnostics\CheckResult;
 
 final class PhpExtensionsCheck implements CheckInterface
 {
+    /** @var list<string> */
     private array $required = ['pdo', 'mbstring', 'openssl'];
 
     public function getId(): string { return 'php_extensions'; }

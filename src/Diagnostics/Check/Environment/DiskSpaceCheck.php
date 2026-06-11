@@ -22,7 +22,7 @@ final class DiskSpaceCheck implements CheckInterface
     public function run(): CheckResult
     {
         $free = disk_free_space('/') ?: 0;
-        $freeMB = NumberFormatter::formatBytes($free);
+        $freeMB = NumberFormatter::formatBytes($free ?: 0);
         $status = $free < 1024 * 1024 * 2048 ? 'warning' : 'ok'; // less than 2Gb
         $details = "Free disk space: {$freeMB}";
 

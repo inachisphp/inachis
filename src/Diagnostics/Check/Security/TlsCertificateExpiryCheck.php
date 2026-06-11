@@ -11,6 +11,7 @@ namespace Inachis\Diagnostics\Check\Security;
 
 use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
+use OpenSSLCertificate;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final class TlsCertificateExpiryCheck implements CheckInterface
@@ -93,7 +94,7 @@ final class TlsCertificateExpiryCheck implements CheckInterface
 
             $certificate = $params['options']['ssl']['peer_certificate'] ?? null;
 
-            if (!$certificate) {
+            if (!$certificate || !($certificate instanceof OpenSSLCertificate || is_string($certificate))) {
                 throw new \RuntimeException('Certificate not available');
             }
 
