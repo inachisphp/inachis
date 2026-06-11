@@ -11,7 +11,7 @@ namespace Inachis\Service\Page;
 
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Content\{Page, ReviewComment, ReviewThread, Revision};
+use Inachis\Entity\Content\{Page, ReviewComment, ReviewThread};
 use Inachis\Entity\User\User;
 use Inachis\Repository\Content\ReviewThreadRepository;
 
@@ -51,7 +51,6 @@ class ReviewPageService
         string $selectedText,
         string $contextBefore = '',
         string $contextAfter = '',
-        ?Revision $revision = null
     ): ReviewThread {
         $thread = new ReviewThread();
 

@@ -39,6 +39,7 @@ class ReviewAssignController extends AbstractController
 			throw $this->createNotFoundException();
 		}
 
+		/** @var array{userId: string, ...} */
 		$payload = json_decode($request->getContent(), true);
 
 		$user = $users->find($payload['userId']);

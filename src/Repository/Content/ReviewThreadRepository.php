@@ -15,7 +15,7 @@ use Inachis\Entity\Content\{Page, ReviewThread};
 
 /**
  * Repository for handling {@link ReviewThread} entities
- * 
+ *
  * @extends ServiceEntityRepository<ReviewThread>
  */
 class ReviewThreadRepository extends ServiceEntityRepository
@@ -32,7 +32,7 @@ class ReviewThreadRepository extends ServiceEntityRepository
 
     /**
      * Returns an array of open {@link ReviewThread} objects for the give {@link Page}
-     * 
+     *
      * @return array<ReviewThread>
      */
     public function findOpenForPage(Page $page): array
@@ -50,7 +50,7 @@ class ReviewThreadRepository extends ServiceEntityRepository
     /**
      * Returns all {@link ReviewThread} for a given {@link Page} including both open and
      * closed.
-     * 
+     *
      * @return array<ReviewThread>
      */
     public function findAllForPage(Page $page): array
@@ -62,5 +62,25 @@ class ReviewThreadRepository extends ServiceEntityRepository
             ->orderBy('t.updated', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function countOpen(): int
+    {
+
+    }
+
+    public function countResolved(): int
+    {
+
+    }
+
+    public function countAssignedReviews(): int
+    {
+
+    }
+
+    public function countUnassignedReviews(): int
+    {
+        
     }
 }

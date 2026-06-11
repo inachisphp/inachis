@@ -48,12 +48,15 @@ class ReviewNormaliser
             ];
         }
 
-        return [
-            'id' => (string) $thread->getId(),
-            'resolved' => $thread->isResolved(),
-            'startOffset' => $thread->getStartOffset(),
-            'endOffset' => $thread->getEndOffset(),
-            'selectedText' => $thread->getSelectedText(),
+		return [
+			'id' => (string) $thread->getId(),
+			'resolved' => $thread->isResolved(),
+			'startOffset' => $thread->getStartOffset(),
+			'endOffset' => $thread->getEndOffset(),
+			'currentStartOffset' => $thread->getCurrentStartOffset(),
+			'currentEndOffset' => $thread->getCurrentEndOffset(),
+			'needsRebase' => $thread->isNeedsRebase(),
+			'selectedText' => $thread->getSelectedText(),
 			'assignedTo' => $thread->getAssignedTo()
 				? [
 					'id' =>
@@ -68,6 +71,6 @@ class ReviewNormaliser
 				]
 				: null,
             'comments' => $comments,
-        ];
+		];
     }
 }
