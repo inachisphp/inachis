@@ -13,6 +13,25 @@ use Inachis\Entity\Content\ReviewThread;
 
 class ReviewNormaliser
 {
+    /**
+     * Normalises the thread
+     *
+     * @param ReviewThread $thread
+     * @return array{
+     *     id: string,
+     *     resolved: bool,
+     *     startOffset: int,
+     *     endOffset: int,
+     *     selectedText: string,
+     *     assignedTo: array{id: string, name?: string}|null,
+     *     comments: list<array{
+     *         id: string,
+     *         message: string,
+     *         created: string|false,
+     *         author: array{id: string, name?: string}
+     *     }>|array{}
+     * }
+     */
     public function normaliseThread(ReviewThread $thread): array
     {
         $comments = [];
