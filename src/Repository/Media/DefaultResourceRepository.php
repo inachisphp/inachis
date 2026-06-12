@@ -12,6 +12,9 @@ namespace Inachis\Repository\Media;
 use Inachis\Entity\Media\AbstractFile;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
+/**
+ * @template T of AbstractFile
+ */
 trait DefaultResourceRepository
 {
     /**
@@ -39,13 +42,33 @@ trait DefaultResourceRepository
     }
 
     /**
+     * Get all resources
+     * 
+     * @param int $offset The offset from which to return results from
+     * @param int $limit  The maximum number of results to return
+     * @param list{0: string, 1?:array<string, string|list<string>>}|list{} $where
+     * @param list<list{0: string, 1: string}>|string|list{} $order
+     * @param list<string>|list{} $groupBy
+     * @param list<list{0: string, 1: string, 2: string, 3?: string}>|list{} $join
+     * @return Paginator<T>
+     */
+    abstract public function getAll(
+        int $offset = 0,
+        int $limit = 25,
+        array $where = [],
+        array|string $order = [],
+        array $groupBy = [],
+        array $join = []
+    ): Paginator;
+
+    /**
      * Returns a filtered list of resource files
      * 
      * @param array{keyword?: string} $filters
      * @param int $offset
      * @param int $limit
      * @param string|null $sortBy
-     * @return Paginator<AbstractFile>
+     * @return Paginator<T>
      */
     public function getFiltered(array $filters, int $offset, int $limit, ?string $sortBy = 'title asc'): Paginator
     {
@@ -72,7 +95,7 @@ trait DefaultResourceRepository
      * Returns an SQL orderBy for the given string
      * 
      * @param string|null $orderBy
-     * @return array<int,string>
+     * @return list{0: string, 1: string}
      */
     protected function determineOrderBy(?string $orderBy): array
     {

@@ -47,7 +47,7 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
     /**
      * Get a paginator of Series entities filtered by the given IDs.
      *
-     * @param array<string> $ids
+     * @param list<string> $ids
      * @return Paginator<Series>
      */
     public function getFilteredIds(array $ids): Paginator
@@ -200,8 +200,8 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             [
                 'q.description LIKE :filename OR q.image = :image',
                 [
-                    'filename' => '%' . $image->getFilename() . '%',
-                    'image' => $image,
+                    'filename' => '%' . $image->getFilename(). '%',
+                    'image' => $image->getId()?->toString() ?? '',
                 ]
             ]
         );

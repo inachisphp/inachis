@@ -94,7 +94,7 @@ class UrlRepository extends AbstractRepository
      * This method maps specific sort options to corresponding database fields and sort directions.
      *
      * @param string $orderBy
-     * @return array<array{0: string, 1: string}>
+     * @return list<array{0: string, 1: string}>
      */
     protected function determineOrderBy(string $orderBy): array
     {
@@ -146,7 +146,7 @@ class UrlRepository extends AbstractRepository
             $where,
             $this->determineOrderBy($sort),
             [],
-            ['q.content', 'p']
+            [['join', 'q.content', 'p']]
         );
     }
 

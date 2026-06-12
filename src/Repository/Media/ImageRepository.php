@@ -16,10 +16,13 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * Image repository
+ * 
  * @extends AbstractRepository<Image>
+ * @implements ResourceRepositoryInterface<Image>
  */
 class ImageRepository extends AbstractRepository implements ResourceRepositoryInterface
 {
+    /** @use DefaultResourceRepository<Image> */
     use DefaultResourceRepository;
     
     /** @var int */
