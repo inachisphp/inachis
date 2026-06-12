@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Service\Series;
+namespace Inachis\Service\Content\Series;
 
 use DateTimeImmutable;
 use Inachis\Entity\Content\Series;

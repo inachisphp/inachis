@@ -435,9 +435,9 @@ class Series
     /**
      * Gets the value of {@link visibility}.
      *
-     * @return bool|null
+     * @return bool
      */
-    public function getVisibility(): ?bool
+    public function getVisibility(): bool
     {
         return $this->visibility;
     }

@@ -7,14 +7,14 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Tests\phpunit\Service\Page;
+namespace Inachis\Tests\phpunit\Service\Content\Page;
 
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Url;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\RevisionRepository;
 use Inachis\Repository\Content\UrlRepository;
-use Inachis\Service\Page\PageBulkActionService;
+use Inachis\Service\Content\Page\PageBulkActionService;
 use Inachis\Service\Waste\WasteManagerService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;

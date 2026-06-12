@@ -120,7 +120,7 @@ class NavigationTabRepository extends AbstractRepository
     /**
      * Returns active tabs models ordered by position
      *
-     * @return array<int,NavigationTabDto>
+     * @return list<NavigationTabDto>
      */
     public function findActiveOrderedModels(): array
     {
@@ -130,7 +130,7 @@ class NavigationTabRepository extends AbstractRepository
             ->setParameter('active', true)
             ->orderBy('t.position', 'ASC');
 
-        /** @var array<int,array{
+        /** @var list<array{
          *     id:string,
          *     title:string,
          *     url:string,

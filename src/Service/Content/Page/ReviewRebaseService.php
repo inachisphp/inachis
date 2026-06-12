@@ -1,6 +1,6 @@
 <?php
 
-namespace Inachis\Service\Page;
+namespace Inachis\Service\Content\Page;
 
 use Inachis\Entity\Content\ReviewThread;
 

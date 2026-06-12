@@ -9,7 +9,7 @@
 
 namespace Inachis\Controller;
 
-use Inachis\Service\Page\ContentAggregator;
+use Inachis\Service\Content\Page\ContentAggregator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

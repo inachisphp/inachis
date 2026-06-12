@@ -59,7 +59,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * Returns the count for entries in the current repository match any
      * provided constraints.
      *
-     * @param array{0:string,1:array<string,string>}|array{} $where Array of elements and string replacements
+     * @param array{0:string, 1?:array<string,string|list<string>>}|array{} $where Array of elements and string replacements
      * @return int The number of entities located
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
@@ -88,11 +88,11 @@ abstract class AbstractRepository extends ServiceEntityRepository
      *
      * @param int $offset The offset from which to return results from
      * @param int $limit  The maximum number of results to return
-     * @param list<int, array<int, string>> $where
-     * @param list<int, array<int, string>>|string $order
-     * @param array<string> $groupBy
-     * @param list<int, array<int, string>> $join
-     * @return Paginator The result of fetching the objects
+     * @param list{0: string, 1?:array<string, string|list<string>>}|list{} $where
+     * @param list<list{0: string, 1: string}>|string|list{} $order
+     * @param list<string>|list{} $groupBy
+     * @param list<list{0: string, 1: string, 2: string, 3?: string}>|list{} $join
+     * @return Paginator<T> The result of fetching the objects
      */
     public function getAll(
         int $offset = 0,
@@ -106,24 +106,18 @@ abstract class AbstractRepository extends ServiceEntityRepository
             ->select('q')
             ->from($this->getClassName(), 'q');
         if (!empty($join)) {
-            if (count($join) === 2) {
-                $qb->join($join[0], $join[1]);
-            } else {
-                foreach ($join as $j) {
-                    if (count($j) >= 3) {
-                        $type = $j[0]; // 'join' or 'leftJoin'
-                        $path = $j[1]; // e.g., 'q.items'
-                        $alias = $j[2]; // e.g., 'i'
-                        $condition = $j[3] ?? null;
+            foreach ($join as $j) {
+                $type = $j[0]; // 'join' or 'leftJoin'
+                $path = $j[1]; // e.g., 'q.items'
+                $alias = $j[2]; // e.g., 'i'
+                $condition = $j[3] ?? null;
 
-                        if ($type === 'join') {
-                            $condition ? $qb->join($path, $alias, 'WITH', $condition)
-                                    : $qb->join($path, $alias);
-                        } elseif ($type === 'leftJoin') {
-                            $condition ? $qb->leftJoin($path, $alias, 'WITH', $condition)
-                                    : $qb->leftJoin($path, $alias);
-                        }
-                    }
+                if ($type === 'join') {
+                    $condition ? $qb->join($path, $alias, 'WITH', $condition)
+                            : $qb->join($path, $alias);
+                } elseif ($type === 'leftJoin') {
+                    $condition ? $qb->leftJoin($path, $alias, 'WITH', $condition)
+                            : $qb->leftJoin($path, $alias);
                 }
             }
         }
@@ -159,6 +153,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
             $query = $query->setMaxResults($limit);
         }
 
+        /** @var Paginator<T> */
         return new Paginator($query, false);
     }
 
