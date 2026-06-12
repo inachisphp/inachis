@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Service\Page;
+namespace Inachis\Service\Content\Page;
 
 use Inachis\Entity\Content\{Page, Url};
 use Inachis\Entity\User\User;

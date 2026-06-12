@@ -7,13 +7,13 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Tests\phpunit\Service\Series;
+namespace Inachis\Tests\phpunit\Service\Content\Series;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Content\Series;
 use Inachis\Repository\Content\SeriesRepository;
-use Inachis\Service\Series\SeriesBulkActionService;
+use Inachis\Service\Content\Series\SeriesBulkActionService;
 use Inachis\Service\Waste\WasteManagerService;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;

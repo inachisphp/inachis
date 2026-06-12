@@ -18,7 +18,7 @@ use Inachis\Enum\EditorialStatus;
 use Inachis\Form\PostType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\Content\{CategoryRepository, PageRepository, ReviewThreadRepository, RevisionRepository, TagRepository};
-use Inachis\Service\Page\{PageBulkActionService, ReviewRebaseService};
+use Inachis\Service\Content\Page\{PageBulkActionService, ReviewRebaseService};
 use Inachis\Service\Content\{ContentRevisionCompare, ReadingTime};
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
