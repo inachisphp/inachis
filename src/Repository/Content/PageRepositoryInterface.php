@@ -51,11 +51,11 @@ interface PageRepositoryInterface
      *   categories?:array<string>,
      *   tags?:array<string>,
      *   status?:string,
-     *   visibility?:string,
+     *   visibility?:bool,
      *   keyword?:string,
      *   excludeIds?:string,
-     *   fromDate?:string,
-     *   toDate?:string
+     *   fromDate?:\DateTimeImmutable,
+     *   toDate?:\DateTimeImmutable
      * } $filters
      * @param string $type
      * @param int $offset

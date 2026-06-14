@@ -68,11 +68,12 @@ class UrlRepository extends AbstractRepository
      *
      * @param string $url
      * @param string $id
-     * @return float|int|mixed|string
+     * @return list{0?: array{link: string}}
      */
     public function findSimilarUrlsExcludingId(string $url, string $id)
     {
         $qb = $this->createQueryBuilder('u');
+        /** @var list{0?: array{link: string}} */
         return $qb
             ->select('u.link')
             ->where(

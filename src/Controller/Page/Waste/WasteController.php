@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Controller\Page;
+namespace Inachis\Controller\Page\Waste;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Model\ContentQueryParameters;
@@ -70,6 +70,7 @@ class WasteController extends AbstractInachisController
             );
         }
 
+        /** @var array{filters: array{keyword?: string}|array{}, sort: string, offset: int, limit: int} */
         $contentQuery = $contentQueryParameters->process(
             $request,
             $categoryRepository,
@@ -84,7 +85,7 @@ class WasteController extends AbstractInachisController
             $contentQuery['sort'],
         );
         $this->data['query'] = $contentQuery;
-        $this->data['page']['tab'] = 'waste';
+        $this->setPageProperties(['tab' => 'waste']);
         return $this->render('inadmin/page/waste/list.html.twig', $this->data);
     }
 
@@ -113,8 +114,8 @@ class WasteController extends AbstractInachisController
         }
 
         $this->data['waste'] = $processItem;
-        $this->data['wasteContent'] = json_decode($processItem->getContent(), true);
-        $this->data['page']['tab'] = 'waste';
+        $this->data['wasteContent'] = json_decode($processItem->getContent() ?? '', true);
+        $this->setPageProperties(['tab' => 'waste']);
 
         $form = $this->createFormBuilder()->getForm();
         $this->data['form'] = $form->createView();

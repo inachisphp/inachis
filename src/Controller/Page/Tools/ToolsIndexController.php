@@ -28,8 +28,7 @@ class ToolsIndexController extends AbstractInachisController
     public function index(): Response
     {
         $this->data['environment'] = $this->getParameter('kernel.environment');
-        $this->data['page']['title'] = 'Tools';
-        $this->data['page']['tab'] = 'tools';
+        $this->setPageProperties(['title' => 'Tools', 'tab' => 'tools']);
         return $this->render('inadmin/page/tools/list.html.twig', $this->data);
     }
 
@@ -44,8 +43,7 @@ class ToolsIndexController extends AbstractInachisController
     public function storage(ImageRepository $imageRepository, PageRepository $pageRepository): Response
     {
         $this->data['environment'] = $this->getParameter('kernel.environment');
-        $this->data['page']['title'] = 'Storage';
-        $this->data['page']['tab'] = 'tools';
+        $this->setPageProperties(['title' => 'Storage', 'tab' => 'tools']);
         $this->data['storage'] = [
             'biggestImages' => $imageRepository->getAll(0, 10, [], [['q.filesize', 'DESC']]),
             'images' => $imageRepository->getDiskUsage(),
@@ -53,24 +51,4 @@ class ToolsIndexController extends AbstractInachisController
         ];
         return $this->render('inadmin/page/tools/storage.html.twig', $this->data);
     }
-
-    // /**
-    //  * @param LoggerInterface $logger
-    //  * @param Request $request
-    //  * @return RedirectResponse
-    //  * @throws \Doctrine\DBAL\ConnectionException
-    //  */
-    // #[Route("/incc/settings/wipe", methods: [ "POST" ])]
-    // public function wipe(LoggerInterface $logger, Request $request): RedirectResponse
-    // {
-    //     if ($request->request->get('confirm', false)) {
-    //         $logger->info('Wiping all content');
-    //         $this->entityManager->getRepository(Image::class)->wipe($logger);
-    //         $this->entityManager->getRepository(Page::class)->wipe($logger);
-    //         $this->entityManager->getRepository(Series::class)->wipe($logger);
-    //         $this->entityManager->getRepository(Tag::class)->wipe($logger);
-    //         $this->entityManager->getRepository(Url::class)->wipe($logger);
-    //     }
-    //     return $this->redirectToRoute('inachis_settings_index');
-    // }
 }

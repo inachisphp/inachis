@@ -56,11 +56,12 @@ class SeriesController extends AbstractInachisController
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
-            $items = $request->request->all('items') ?? [];
+            /** @var list<string> */
+            $items = $request->request->all('items');
             $action = $request->request->has('delete') ? 'delete' :
                 ($request->request->has('private') ? 'private' :
                     ($request->request->has('public') ? 'public' : null));
-            if ($action !== null && !empty($items)) {
+            if ($action !== null) {
                 $count = $seriesBulkActionService->apply($action, $items);
                 $this->addFlash('success', "Action '$action' applied to $count series.");
             }
@@ -81,8 +82,7 @@ class SeriesController extends AbstractInachisController
             $contentQuery['sort'],
         );
         $this->data['query'] = $contentQuery;
-        $this->data['page']['title'] = 'Series';
-        $this->data['page']['tab'] = 'series';
+        $this->setPageProperties(['title' => 'Series', 'tab' => 'series']);
         return $this->render('inadmin/page/series/list.html.twig', $this->data);
     }
 
@@ -150,9 +150,8 @@ class SeriesController extends AbstractInachisController
             );
         }
 
+        $this->setPageProperties(['title' => $series->getId() !== null ? 'Editing "' . $series->getTitle() . '"' : 'New Series', 'tab' => 'series']);
         $this->data['form'] = $form->createView();
-        $this->data['page']['title'] = $series->getId() !== null ? 'Editing "' . $series->getTitle() . '"' : 'New Series';
-        $this->data['page']['tab'] = 'series';
         $this->data['series'] = $series;
         $this->data['includeEditor'] = true;
         $this->data['includeEditorId'] = $series->getId();

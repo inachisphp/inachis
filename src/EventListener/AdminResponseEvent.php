@@ -9,6 +9,8 @@
 
 namespace Inachis\EventListener;
 
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Controller\AbstractWebController;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -56,8 +58,11 @@ final class AdminResponseEvent implements EventSubscriberInterface
     public function onKernelController(ControllerEvent $event): void
     {
         $controller = $event->getController();
-        if (is_array($controller) && method_exists($controller[0], 'setDefaults')) {
-            $controller[0]->setDefaults();
+        if (is_array($controller)) {
+            $controller = $controller[0];
+            if ($controller instanceof AbstractInachisController || $controller instanceof AbstractWebController) {
+                $controller->setDefaults();
+            }
         }
     }
 

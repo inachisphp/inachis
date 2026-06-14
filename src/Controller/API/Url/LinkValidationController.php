@@ -7,13 +7,14 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Controller\API;
+namespace Inachis\Controller\API\Url;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Link Validation Controller
@@ -128,7 +129,7 @@ final class LinkValidationController
 			];
 		}
 		$host = parse_url($url, PHP_URL_HOST);
-		if ($host !== $this->baseUrl) {
+		if (is_string($host) && $host !== $this->baseUrl) {
             // SSRF protection
             $records = dns_get_record($host, DNS_A + DNS_AAAA);
 
@@ -171,7 +172,7 @@ final class LinkValidationController
 
             $statusCode = $response->getStatusCode();
 
-            if ($statusCode >= 400 || $statusCode === 405) {
+            if ($statusCode >= 400) {
                 $response = $this->httpClient->request('GET', $url, [
                     'timeout' => 5,
                     'max_redirects' => 5,
@@ -181,6 +182,7 @@ final class LinkValidationController
             }
 
 			$timeMs = (int)((microtime(true) - $start) * 1000);
+            /** @var array{redirect_count?:int, ...} */
 			$info = $response->getInfo();
 			$redirectCount = $info['redirect_count'] ?? 0;
 

@@ -9,9 +9,9 @@
 
 namespace Inachis\Controller\API\Search;
 
-use Inachis\Repository\SearchRepository;
-use Inachis\Repository\SeriesRepository;
-use Inachis\Repository\UrlRepository;
+use Inachis\Repository\Content\SearchRepository;
+use Inachis\Repository\Content\SeriesRepository;
+use Inachis\Repository\Content\UrlRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +21,12 @@ class SearchAPIController extends AbstractController
 {
     /**
      * JSON search endpoint for front-end clients.
+     * 
+     * @param Request $request
+     * @param SearchRepository $searchRepository
+     * @param UrlRepository $urlRepository
+     * @param SeriesRepository $seriesRepository
+     * @return JsonResponse
      */
     #[Route('/api/search', name: 'api_search', methods: ['GET'])]
     public function search(

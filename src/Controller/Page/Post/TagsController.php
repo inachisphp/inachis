@@ -7,12 +7,14 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Controller;
+namespace Inachis\Controller\Page\Post;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Content\Tag;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\Content\{CategoryRepository, PageRepository,TagRepository};
-use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Service\Content\Page\TagBulkActionService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,20 +34,19 @@ class TagsController extends AbstractInachisController
     #[Route("incc/ax/tagList/get", methods: [ "POST" ])]
     public function getTagManagerListContent(Request $request, TagRepository $tagRepository): Response
     {
-        $tags = $tagRepository->findByTitleLike($request->request->get('q'));
-        $result = [];
-        // Below code is used to handle where tags exist with the same name under multiple locations
-        if (!empty($tags)) {
-            $result['items'] = [];
-            foreach ($tags as $tag) {
-                $title = $tag->getTitle();
-                $result['items'][$title] = (object) [
-                    'id'   => $tag->getId(),
-                    'text' => $title,
-                ];
-            }
-            $result = array_values($result['items']);
+        /** @var \Doctrine\ORM\Tools\Pagination\Paginator<Tag> */
+        $tags = $tagRepository->findByTitleLike($request->request->getString('q'));
+        $items = [];
+
+        foreach ($tags as $tag) {
+            $title = $tag->getTitle();
+            $items[$title] = (object) [
+                'id'   => $tag->getId(),
+                'text' => $title,
+            ];
         }
+
+        $result = array_values($items);
 
         return new JsonResponse(
             [
@@ -60,8 +61,9 @@ class TagsController extends AbstractInachisController
      * List all tags and provide ability to delete or merge
      *
      * @param Request $request
+     * @param CategoryRepository $categoryRepository
      * @param ContentQueryParameters $contentQueryParameters
-     * @param PageRepository $pageRepository
+     * @param TagBulkActionService $tagBulkActionService
      * @param TagRepository $tagRepository
      * @param int $offset
      * @param int $limit
@@ -77,7 +79,7 @@ class TagsController extends AbstractInachisController
         Request $request,
         CategoryRepository $categoryRepository,
         ContentQueryParameters $contentQueryParameters,
-        PageRepository $pageRepository,
+        TagBulkActionService $tagBulkActionService,
         TagRepository $tagRepository,
         int $offset = 0,
         int $limit = 25
@@ -86,22 +88,18 @@ class TagsController extends AbstractInachisController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
-            $items = $request->request->all('items') ?? [];
-            $action = $request->request->has('delete')  ? 'delete' : null;
+            /** @var list<string> */
+            $items = $request->request->all('items');
+            $action = $request->request->has('delete') ? 'delete' : null;
 
-            // @todo move the following foreach loop into a TagsBulkActionService and pass it $request
-            foreach($items as $item) {
-                $tag = $tagRepository->find($item);
-                if ($tag === null) {
-                    continue;
+            if ($action !== null) {
+                try {
+                    $count = $tagBulkActionService->apply($action, $items);
+                    $this->addFlash('success', "Action '$action' applied to $count tags.");
                 }
-                $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$tag->getId()]], '*', 0, 0);
-                if ($pages->getIterator()->count() > 0) {
-                    $this->addFlash('error', 'Tag still in use - please remove tag from pages before deleting');
-                    return $this->redirectToRoute('incc_tags_list');
+                catch(\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
                 }
-
-                $this->entityManager->remove($tag);
             }
             $this->entityManager->flush();
 
@@ -114,6 +112,7 @@ class TagsController extends AbstractInachisController
             'tag',
             'title',
         );
+
         $this->data['dataset'] = array_map(
             fn($row) => (object) [
                 'id' => $row[0]->getId(),
@@ -126,8 +125,7 @@ class TagsController extends AbstractInachisController
         $this->data['form'] = $form->createView();
         $this->data['query'] = $contentQuery;
         $this->data['total'] = $tagRepository->getAllCount();
-        $this->data['page']['title'] = 'Tags';
-        $this->data['page']['tab'] = 'tag';
+        $this->setPageProperties(['title' => 'Tags', 'tab' => 'tag']);
         return $this->render('inadmin/page/tag/list.html.twig', $this->data);
     }
 
@@ -137,6 +135,7 @@ class TagsController extends AbstractInachisController
      * @param Request $request
      * @param PageRepository $pageRepository
      * @param TagRepository $tagRepository
+     * @param EntityManagerInterface $entityManager
      * @return Response
      */
     #[Route('/incc/tags/merge', name: 'incc_tags_merge', methods: ['POST'])]
@@ -166,7 +165,7 @@ class TagsController extends AbstractInachisController
             }
 
             // Move pages across
-            $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$source->getId()]], '*', 0, 0);
+            $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$source->getId()?->toString() ?? '']], '*', 0, 0);
             foreach ($pages as $page) {
                 $page->removeTag($source);
                 $page->addTag($target);
@@ -192,6 +191,7 @@ class TagsController extends AbstractInachisController
         CategoryRepository $categoryRepository,
         PageRepository $pageRepository,
         ContentQueryParameters $contentQueryParameters,
+        TagBulkActionService $tagBulkActionService,
         Request $request,
         int $offset = 0,
         int $limit = 25
@@ -200,7 +200,7 @@ class TagsController extends AbstractInachisController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
-            $items = $request->request->all('items') ?? [];
+            $items = $request->request->all('items');
             $action = $request->request->has('delete')  ? 'delete' : null;
 
             // @todo move the following foreach loop into a TagsBulkActionService and pass it $request
@@ -216,7 +216,7 @@ class TagsController extends AbstractInachisController
             return $this->redirectToRoute('incc_tag_show', ['id' => $tag->getId()]);
         }
 
-        $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$tag->getId()]], '*', $offset, $limit);
+        $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$tag->getId()?->toString() ?? '']], '*', $offset, $limit);
 
         $this->data['dataset'] = $pages;
         $this->data['form'] = $form->createView();
@@ -227,9 +227,8 @@ class TagsController extends AbstractInachisController
             'title'
         );
         $this->data['total'] = $pages->getIterator()->count();
-        $this->data['page']['title'] = 'Tags';
-        $this->data['page']['tab'] = 'settings';
         $this->data['tag'] = $tag;
+        $this->setPageProperties(['title' => 'Tags', 'tab' => 'tag']);
 
         return $this->render('inadmin/page/tag/view.html.twig', $this->data);
     }

@@ -24,10 +24,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class CategoryDialogController extends AbstractInachisController
 {
-    /**
-     * @var array<string, mixed>
-     */
-    protected array $data = [];
 
     /**
      * Get the category manager content

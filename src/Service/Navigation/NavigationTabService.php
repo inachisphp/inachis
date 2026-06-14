@@ -10,6 +10,7 @@
 namespace Inachis\Service\Navigation;
 
 use Inachis\Entity\System\NavigationTab;
+use Inachis\Model\NavigationTabDto;
 use Inachis\Repository\System\NavigationTabRepository;
 use Inachis\Service\Doctrine\TransactionHelper;
 use Doctrine\ORM\EntityManagerInterface;
@@ -41,7 +42,7 @@ class NavigationTabService
     /**
      * Get all active navigation tabs ordered by position
      *
-     * @return array<NavigationTab>
+     * @return list<NavigationTabDto>
      */
     public function getActiveTabs(): array
     {
@@ -158,12 +159,12 @@ class NavigationTabService
     /**
      * Reorder navigation tabs based on input data
      *
-     * @param array<int, array{id?: string, position?: int}> $data
+     * @param array{id?: string, order?: list<string>} $data
      * @return bool True if any changes were made
      */
     public function reorderTabs(array $data): bool
     {
-        if (!isset($data['order']) || !is_array($data['order'])) {
+        if (!isset($data['order'])) {
             return false;
         }
 

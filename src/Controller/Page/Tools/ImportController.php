@@ -48,8 +48,7 @@ class ImportController extends AbstractInachisController
         PageImportService $pageImportService,
         PageImportValidator $pageImportValidator
     ): Response {
-        $this->data['page']['title'] = 'Import';
-        $this->data['page']['tab'] = 'import';
+        $this->setPageProperties(['title' => 'Import', 'tab' => 'import']);
 
         if ($request->isMethod('POST')) {
             $uploadedFile = $request->files->get('import_file');
@@ -189,9 +188,9 @@ dump($data);exit;
 
             case 'category':
                 $result = $categoryImportService->import($dtos, $currentUser, $options);
-                $warnings = $result->warnings ?? [];
+                $warnings = $result->warnings;
                 $resultSummary = [
-                    'items' => $result->categoriesCreated ?? 0,
+                    'items' => $result->categoriesCreated,
                     'message' => sprintf(
                         'Imported %d categories, and updated %d categories.',
                         $result->categoriesCreated,
