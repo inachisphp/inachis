@@ -19,6 +19,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ConfirmationController extends AbstractInachisController
 {
     /**
+     * Renders a confirmation dialog
+     * 
      * @param Request $request
      * @return Response
      */

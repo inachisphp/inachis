@@ -59,6 +59,9 @@ final class FileCountCheck implements CheckInterface
         $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
         $count = 0;
         foreach ($rii as $file) {
+            if (!$file instanceof \SplFileInfo) {
+                continue;
+            }
             if ($file->isFile()) {
                 $count++;
             }

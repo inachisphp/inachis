@@ -10,7 +10,9 @@
 namespace Inachis\Form;
 
 use Inachis\Entity\Content\Series;
+use Inachis\Entity\Media\Image;
 use Inachis\Entity\User\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
@@ -108,6 +110,11 @@ class SeriesType extends AbstractType
                     'class' => 'hidden',
                     'id' => 'description_label',
                 ],
+                'required' => false,
+            ])
+            ->add('image', EntityType::class, [
+                'class' => Image::class,
+                'choice_label' => fn (Image $image) => $image->getFilename(),
                 'required' => false,
             ])
         ;

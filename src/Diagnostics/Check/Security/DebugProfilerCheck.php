@@ -27,7 +27,9 @@ final class DebugProfilerCheck implements CheckInterface
         foreach ($endpoints as $endpoint) {
             /** @var string */
             $schema = $_SERVER['REQUEST_SCHEME'] ?? 'http';
-            $url = $schema . '://' . $_SERVER['HTTP_HOST'] . '/' . $endpoint;
+            /** @var string */
+            $host = $_SERVER['HTTP_HOST'];
+            $url = $schema . '://' . $host . '/' . $endpoint;
             $headers = @get_headers($url);
             if ($headers && strpos($headers[0], '200') !== false) {
                 $accessible[] = $endpoint;

@@ -91,10 +91,10 @@ final class LogfileRotationCheck implements CheckInterface
         $files = glob($this->logDir . '/*.log') ?: [];
         $statePath = $this->cacheDir . '/' . self::STATE_FILE;
 
+        /** @var array<string, array{size: int, time: int}|array{}|null> */
         $previous = file_exists($statePath)
             ? json_decode(file_get_contents($statePath) ?: '', true)
             : [];
-
         $current = [];
         $issues = [];
         $severity = 'ok';
@@ -119,8 +119,8 @@ final class LogfileRotationCheck implements CheckInterface
             }
 
             if (isset($previous[$file])) {
-                $deltaBytes = $size - $previous[$file]['size'];
-                $deltaTime = $now - $previous[$file]['time'];
+                $deltaBytes = $size - ($previous[$file]['size'] ?? 0);
+                $deltaTime = $now - ($previous[$file]['time'] ?? 0);
 
                 if ($deltaBytes > 0 && $deltaTime > 0) {
                     $bytesPerSecond = $deltaBytes / $deltaTime;

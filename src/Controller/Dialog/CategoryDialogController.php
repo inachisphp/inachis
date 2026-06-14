@@ -66,14 +66,14 @@ class CategoryDialogController extends AbstractInachisController
         /** @var array<int, Category> $categories */
         $categories = empty($request->request->get('q')) ?
             $categoryRepository->findBy(['parent' => null]) :
-            $categoryRepository->findByTitleLike($request->request->get('q'));
+            $categoryRepository->findByTitleLike($request->request->getString('q'));
         /** @var array<int, Category> $result */
         $result = [];
         // Below code is used to handle where categories exist with the same name under multiple locations but are distinct
         if (!empty($categories)) {
             $result['items'] = [];
             foreach ($categories as $category) {
-                $title = $category->getTitle() ?? '';
+                $title = $category->getTitle();
                 if (isset($result['items'][$title])) {
                     $result['items'][$result['items'][$title]->path] = $result['items'][$title];
                     $result['items'][$result['items'][$title]->path]->text = $result['items'][$title]->path;

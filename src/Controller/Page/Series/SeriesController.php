@@ -68,6 +68,13 @@ class SeriesController extends AbstractInachisController
             return $this->redirectToRoute('incc_series_list');
         }
 
+        /** @var array{
+         *     filters: array{keyword?:string, visibility?:string},
+         *     offset: int,
+         *     limit: int,
+         *     sort: string
+         * } 
+         */
         $contentQuery = $contentQueryParameters->process(
             $request,
             $categoryRepository,
@@ -87,6 +94,8 @@ class SeriesController extends AbstractInachisController
     }
 
     /**
+     * Create/Edit Series
+     * 
      * @param Request $request
      * @return Response
      * @throws \Exception
@@ -100,45 +109,41 @@ class SeriesController extends AbstractInachisController
         PageRepository $pageRepository,
         WasteManagerService $wasteManagerService,
     ): Response {
-        $series = $request->attributes->get('id') !== null ?
-            $seriesRepository->findOneBy([
-                'id' => $request->attributes->get('id')
-            ]) :
-            new Series();
+        $series = $request->attributes->get('id') !== null
+            ? $seriesRepository->findOneBy([
+                'id' => $request->attributes->get('id'),
+            ]) ?? new Series()
+            : new Series();
         $form = $this->createForm(SeriesType::class, $series);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {//} && $form->isValid()) {
-            if ($form->getClickedButton()->getName() === 'delete') {
+        if ($form->isSubmitted() && $form->isValid()) {
+            $delete = $form->has('delete') ? $form->get('delete') : null;
+            $remove = $form->has('remove') ? $form->get('remove') : null;
+
+            if ($delete instanceof \Symfony\Component\Form\ClickableInterface && $delete->isClicked()) {
                 $wasteManagerService->sendToWaste($series);
                 $seriesRepository->remove($series);
                 return $this->redirect($this->generateUrl('incc_series_list'));
             }
-            if (!empty($request->request->all('series')['image'])) {
-                $series->setImage(
-                    $imageRepository->findOneBy([
-                        'id' => $request->request->all('series')['image'],
-                    ])
-                );
-            }
             if (empty($request->request->all('series')['url'])) {
                 $series->setUrl(
-                    UrlNormaliser::toUri($series->getTitle())
+                    UrlNormaliser::toUri($series->getTitle() ?? '')
                 );
             }
-            if ($form->getClickedButton()->getName() === 'remove') {
+            if ($remove instanceof \Symfony\Component\Form\ClickableInterface && $remove->isClicked()) {
                 $deleteItems = $pageRepository->findBy([
                     'id' => $request->request->all('series')['itemList']
                 ]);
                 foreach ($deleteItems as $deleteItem) {
                     $series->getItems()->removeElement($deleteItem);
                 }
-                if (empty($series->getItems())) {
+                if ($series->getItems()->isEmpty()) {
                     $series->setFirstDate(null)->setLastDate(null);
                 }
             }
 
-            $series->setAuthor($this->getUser());
+            $series->setAuthor($this->getCurrentUser());
             $series->setModDate(new DateTimeImmutable());
             $this->entityManager->persist($series);
             $this->entityManager->flush();
