@@ -12,6 +12,7 @@ namespace Inachis\Service\Import\Page;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\User\User;
+use Inachis\Enum\EditorialStatus;
 use Inachis\Model\Import\ImportOptionsDto;
 use Inachis\Model\Page\PageExportDto;
 use Inachis\Service\Import\Page\PageImportResult;
@@ -22,6 +23,13 @@ use InvalidArgumentException;
  */
 final class PageImportService
 {
+    /**
+     * Constructor for PageImportService
+     *
+     * @param EntityManagerInterface $entityManager
+     * @param CategoryImportService $categoryService
+     * @param TagImportService $tagService
+     */
     public function __construct(
         private EntityManagerInterface $entityManager,
         private CategoryImportService $categoryService,
@@ -31,7 +39,7 @@ final class PageImportService
     /**
      * Imports the given pages.
      *
-     * @param iterable $pageDtos The pages to import.
+     * @param iterable<PageExportDto> $pageDtos The pages to import.
      * @param User $author The author of the pages.
      * @param ImportOptionsDto $options The import options.
      * @return PageImportResult The result of the import.
@@ -58,14 +66,14 @@ final class PageImportService
                     type: $dto->type ?? Page::TYPE_POST
                 );
 
-                $page->setStatus($dto->status ?? EditorialStatus::DRAFT);
+                $page->setStatus(EditorialStatus::from($dto->status));
                 $page->setVisibility($dto->visibility ?? Page::PUBLIC);
                 $page->setAllowComments($dto->allowComments ?? false);
                 $page->setLanguage($dto->language ?? '');
                 $page->setTimezone($dto->timezone ?? 'UTC');
 
                 if ($dto->postDate && $options->overridePostDates) {
-                    $page->setPostDate(new \DateTime($dto->postDate));
+                    $page->setPostDate(new \DateTimeImmutable($dto->postDate));
                 }
 
                 foreach ($dto->categories ?? [] as $categoryDto) {

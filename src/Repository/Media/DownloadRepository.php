@@ -18,9 +18,11 @@ use Doctrine\Persistence\ManagerRegistry;
  * Download repository for managing Download entities
  * 
  * @extends AbstractRepository<Download>
+  * @implements ResourceRepositoryInterface<Download>
  */
 class DownloadRepository extends AbstractRepository implements ResourceRepositoryInterface
 {
+    /** @use DefaultResourceRepository<Download> */
     use DefaultResourceRepository;
 
     public function __construct(ManagerRegistry $registry)

@@ -20,14 +20,27 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class SearchRepository extends ServiceEntityRepository
 {
+    /** @var Connection */
     private Connection $connection;
 
+    /**
+     * Constructor for Search Repository
+     *
+     * @param ManagerRegistry $registry
+     * @param Connection $connection
+     */
     public function __construct(ManagerRegistry $registry, Connection $connection)
     {
         $this->connection = $connection;
         parent::__construct($registry, SearchResult::class);
     }
 
+    /**
+     * Return an orderBy value based on a provided string
+     *
+     * @param string $orderBy
+     * @return string
+     */
     protected function determineOrderBy(string $orderBy): string
     {
         return match ($orderBy) {
@@ -43,11 +56,13 @@ class SearchRepository extends ServiceEntityRepository
     }
 
     /**
+     * Perform search across all available types
+     * 
      * @param string $keyword
      * @param int $offset
      * @param int $limit
      * @param string $orderBy
-     * @return SearchResult<array<string, mixed>>
+     * @return SearchResult
      */
     public function search(?string $keyword, int $offset = 0, int $limit = 25, string  $orderBy = 'relevance DESC, contentDate DESC'): SearchResult
     {
@@ -55,11 +70,14 @@ class SearchRepository extends ServiceEntityRepository
     }
 
     /**
+     * Perform a front-end search excluding results front-end users would not be interested in, such
+     * as {@link Image} resukts
+     * 
      * @param string $keyword
      * @param int $offset
      * @param int $limit
      * @param string $orderBy
-     * @return SearchResult<array<string, mixed>>
+     * @return SearchResult
      */
     public function searchPublic(?string $keyword, int $offset = 0, int $limit = 25, string $orderBy = 'relevance DESC, contentDate DESC'): SearchResult
     {
@@ -67,12 +85,14 @@ class SearchRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param string $keyword
+     * Performs the actual search
+     * 
+     * @param string|null $keyword
      * @param int $offset
      * @param int $limit
      * @param string $orderBy
      * @param bool $includeImages
-     * @return SearchResult<array<string, mixed>>
+     * @return SearchResult
      */
     private function searchWithScope(?string $keyword, int $offset, int $limit, string $orderBy, bool $includeImages): SearchResult
     {

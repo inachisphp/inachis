@@ -10,8 +10,8 @@
 namespace Inachis\Controller\API;
 
 use Inachis\Entity\Content\{Page, ReviewThread};
-use Inachis\Service\Page\ReviewNormaliser;
-use Inachis\Service\Page\ReviewPageService;
+use Inachis\Service\Content\Page\ReviewNormaliser;
+use Inachis\Service\Content\Page\ReviewPageService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

@@ -17,7 +17,7 @@ use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\Media\ImageRepository;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
-use Inachis\Service\Series\SeriesBulkActionService;
+use Inachis\Service\Content\Series\SeriesBulkActionService;
 use Inachis\Service\Waste\WasteManagerService;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;

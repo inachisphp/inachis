@@ -14,6 +14,8 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * Interface for resource repositories
+ * 
+ * @template T of AbstractFile
  */
 interface ResourceRepositoryInterface
 {
@@ -29,11 +31,11 @@ interface ResourceRepositoryInterface
      * 
      * @param int $offset The offset from which to return results from
      * @param int $limit  The maximum number of results to return
-     * @param list<int, array<int, string>> $where
-     * @param list<int, array<int, string>>|string $order
-     * @param array<string> $groupBy
-     * @param list<int, array<int, string>> $join
-     * @return Paginator<AbstractFile>
+     * @param list{0: string, 1?:array<string, string|list<string>>}|list{} $where
+     * @param list<list{0: string, 1: string}>|string|list{} $order
+     * @param list<string>|list{} $groupBy
+     * @param list<list{0: string, 1: string, 2: string, 3?: string}>|list{} $join
+     * @return Paginator<T>
      */
     public function getAll(
         int $offset = 0,
@@ -59,7 +61,7 @@ interface ResourceRepositoryInterface
      * @param int $offset
      * @param int $limit
      * @param string|null $sortBy
-     * @return Paginator<AbstractFile>
+     * @return Paginator<T>
      */
     public function getFiltered(array $filters, int $offset, int $limit, ?string $sortBy = 'title asc'): Paginator;
 }

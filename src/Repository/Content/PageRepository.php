@@ -171,7 +171,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      * Determine the order by clause for the query builder
      *
      * @param string $orderBy
-     * @return array<array<string>>
+     * @return list<list{0: string, 1: string}>
      */
     protected function determineOrderBy(string $orderBy): array
     {
@@ -226,7 +226,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         }
         $where = [
             '1=1',
-            $filters,
+            [],
         ];
         if ($type != '*') {
             $where = [
@@ -235,7 +235,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
                     [
                         'type' => $type,
                     ],
-                    $filters
+                    []
                 )
             ];
         }
@@ -281,7 +281,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
     /**
      * Get all pages with the given ids
      *
-     * @param array<string> $ids
+     * @param list<string> $ids
      * @return Paginator<Page>
      */
     public function getFilteredIds(array $ids): Paginator
@@ -312,8 +312,8 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             [
                 'q.content LIKE :filename OR q.featureImage = :image',
                 [
-                    'filename' => '%' . $image->getFilename() . '%',
-                    'image' => $image->getId(),
+                    'filename' => '%' . $image->getFilename(). '%',
+                    'image' => $image->getId()?->toString() ?? '',
                 ]
             ]
         );

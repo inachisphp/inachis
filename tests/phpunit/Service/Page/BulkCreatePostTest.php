@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Tests\phpunit\Service\Page;
+namespace Inachis\Tests\phpunit\Service\Content\Page;
 
 use Inachis\Entity\Content\Category;
 use Inachis\Entity\Content\Series;
@@ -16,7 +16,7 @@ use Inachis\Model\BulkCreateData;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Repository\Content\TagRepository;
-use Inachis\Service\Page\PageBulkCreateService;
+use Inachis\Service\Content\Page\PageBulkCreateService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;

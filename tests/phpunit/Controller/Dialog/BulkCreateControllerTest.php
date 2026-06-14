@@ -11,7 +11,7 @@ namespace Inachis\Tests\phpunit\Controller\Dialog;
 
 use Inachis\Controller\Dialog\BulkCreateController;
 use Inachis\Entity\User\User;
-use Inachis\Service\Page\PageBulkCreateService;
+use Inachis\Service\Content\Page\PageBulkCreateService;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;

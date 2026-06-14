@@ -10,16 +10,9 @@
 namespace Inachis\Tests\phpunit\Controller;
 
 use Inachis\Controller\DefaultController;
-use Inachis\Service\Page\ContentAggregator;
-use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\MockObject\MockObject;
+use Inachis\Service\Content\Page\ContentAggregator;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DefaultControllerTest extends TestCase
 {

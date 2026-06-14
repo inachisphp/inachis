@@ -22,10 +22,10 @@ interface RevisionRepositoryInterface
      *
      * @param int $offset The offset from which to return results from
      * @param int $limit  The maximum number of results to return
-     * @param list<int, array<int, string>> $where
-     * @param list<int, array<int, string>>|string $order
-     * @param array<string> $groupBy
-     * @param list<int, array<int, string>> $join
+     * @param list{0: string, 1?:array<string, string|list<string>>}|list{} $where
+     * @param list<list{0: string, 1: string}>|string|list{} $order
+     * @param list<string>|list{} $groupBy
+     * @param list<list{0: string, 1: string, 2: string, 3?: string}>|list{} $join
      * @return Paginator<Revision>
      */
     public function getAll(
