@@ -1,0 +1,110 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_settings_index') }}">Settings</a>
+    <span>Themes</span>
+{% endblock pagetitle %}
+
+{% block content %}
+    <div class="col-12 nested-grid">
+        <section class="col-12 ui-section rounded" style="display: flex; gap: 1rem; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <div>
+                <strong>Last scanned:</strong>
+                {% if scanStatus.lastScannedAt %}
+                    {{ scanStatus.lastScannedAt|date('Y-m-d H:i:s') }}
+                {% else %}
+                    Never
+                {% endif %}
+            </div>
+
+            <div>
+                <strong>Status:</strong>
+                {% if scanStatus.errorCount > 0 %}
+                    {{ scanStatus.errorCount }} error{{ scanStatus.errorCount == 1 ? '' : 's' }} found
+                {% else %}
+                    No errors found
+                {% endif %}
+            </div>
+
+            <div>
+                <a class="button button--secondary" href="{{ path('incc_settings_themes_rescan') }}">Rescan now</a>
+            </div>
+        </section>
+
+        {% for theme in themes %}
+            <section class="col-4 ui-section rounded">
+                <div>
+                    <div>
+                        {% if theme.screenshot %}
+                            <a href="{{ path('incc_settings_theme_screenshot', { slug: theme.slug }) }}" target="_blank" rel="noopener">
+                                <img src="{{ path('incc_settings_theme_screenshot', { slug: theme.slug }) }}" alt="{{ theme.name }} screenshot" style="width: 100%; height: auto; border-radius: .5rem; display: block; object-fit: cover;">
+                            </a>
+                        {% else %}
+                            <div>
+                                No screenshot
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <div style="display: flex; align-items: center; gap: .75rem; flex-wrap: wrap;">
+                            <h3 style="margin: 0;">{{ theme.name }}</h3>
+                            {% if activeTheme.slug == theme.slug %}
+                                <span class="badge badge__active">Active</span>
+                            {% endif %}
+                        </div>
+
+                        <p style="margin-top: .5rem;">{{ theme.description ?: 'No description provided.' }}</p>
+
+                        <p><strong>Version:</strong> {{ theme.version }}<br>
+                        <strong>Author:</strong> {{ theme.author ?: 'Unknown' }}</p>
+
+                        <div style="margin-top: 1rem; display: grid; gap: .5rem;">
+                            <div>
+                                <strong>Required features</strong>
+                                <ul>
+                                    {% for feature in theme.requiredFeatures %}
+                                        <li>
+                                            {% if feature in activeTheme.requiredFeatures or feature_enabled(feature) %}
+                                                ✓ {{ feature }}
+                                            {% else %}
+                                                ✗ {{ feature }}
+                                            {% endif %}
+                                        </li>
+                                    {% else %}
+                                        <li>None</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            <div>
+                                <strong>Suggested features</strong>
+                                <ul>
+                                    {% for feature in theme.suggestedFeatures %}
+                                        <li>{{ feature }}</li>
+                                    {% else %}
+                                        <li>None</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 1rem;">
+                            {% if activeTheme.slug == theme.slug %}
+                                <button type="button" class="button button--positive" disabled>Active</button>
+                            {% else %}
+                                <form method="post" action="{{ path('incc_settings_theme_activate', { slug: theme.slug }) }}" style="display: inline;">
+                                    <button type="submit" class="button button--positive">Activate</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        {% else %}
+            <section class="col-12 ui-section rounded">
+                <p>No themes were discovered. Create a theme under <code>themes/</code> or keep using the legacy <code>templates/themes/</code> fallback.</p>
+            </section>
+        {% endfor %}
+    </div>
+{% endblock content %}
