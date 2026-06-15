@@ -23,4 +23,19 @@ form fieldset.ui-section {
         border-bottom-left-radius: $radius-standard;
         border-bottom-right-radius: $radius-standard;
     }
+
+    .header__with-badge {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        flex-wrap: wrap;
+    }
+
+    .ui-image-header img {
+        width: 100%;
+        height: auto;
+        border-radius: .5rem;
+        display: block;
+        object-fit: cover;
+    }
 }

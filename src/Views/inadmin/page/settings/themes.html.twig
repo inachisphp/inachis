@@ -7,7 +7,7 @@
 
 {% block content %}
     <div class="col-12 nested-grid">
-        <section class="col-12 ui-section rounded" style="display: flex; gap: 1rem; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <section class="col-12 admonition admonition-with-action admonition__info">
             <div>
                 <strong>Last scanned:</strong>
                 {% if scanStatus.lastScannedAt %}
@@ -34,32 +34,30 @@
         {% for theme in themes %}
             <section class="col-4 ui-section rounded">
                 <div>
-                    <div>
+                    <div class="ui-image-header">
                         {% if theme.screenshot %}
                             <a href="{{ path('incc_settings_theme_screenshot', { slug: theme.slug }) }}" target="_blank" rel="noopener">
-                                <img src="{{ path('incc_settings_theme_screenshot', { slug: theme.slug }) }}" alt="{{ theme.name }} screenshot" style="width: 100%; height: auto; border-radius: .5rem; display: block; object-fit: cover;">
+                                <img src="{{ path('incc_settings_theme_screenshot', { slug: theme.slug }) }}" alt="{{ theme.name }} screenshot">
                             </a>
                         {% else %}
-                            <div>
-                                No screenshot
-                            </div>
+                            <img src="{{ path('incc_settings_theme_screenshot', { slug: 'default' }) }}" alt="Default screenshot">
                         {% endif %}
                     </div>
 
                     <div>
-                        <div style="display: flex; align-items: center; gap: .75rem; flex-wrap: wrap;">
-                            <h3 style="margin: 0;">{{ theme.name }}</h3>
+                        <div class="header__with-badge">
+                            <h3>{{ theme.name }}</h3>
                             {% if activeTheme.slug == theme.slug %}
                                 <span class="badge badge__active">Active</span>
                             {% endif %}
                         </div>
 
-                        <p style="margin-top: .5rem;">{{ theme.description ?: 'No description provided.' }}</p>
+                        <p>{{ theme.description ?: 'No description provided.' }}</p>
 
                         <p><strong>Version:</strong> {{ theme.version }}<br>
                         <strong>Author:</strong> {{ theme.author ?: 'Unknown' }}</p>
 
-                        <div style="margin-top: 1rem; display: grid; gap: .5rem;">
+                        <div>
                             <div>
                                 <strong>Required features</strong>
                                 <ul>
@@ -89,11 +87,11 @@
                             </div>
                         </div>
 
-                        <div style="margin-top: 1rem;">
+                        <div>
                             {% if activeTheme.slug == theme.slug %}
                                 <button type="button" class="button button--positive" disabled>Active</button>
                             {% else %}
-                                <form method="post" action="{{ path('incc_settings_theme_activate', { slug: theme.slug }) }}" style="display: inline;">
+                                <form method="post" action="{{ path('incc_settings_theme_activate', { slug: theme.slug }) }}">
                                     <button type="submit" class="button button--positive">Activate</button>
                                 </form>
                             {% endif %}
