@@ -9,9 +9,9 @@
 
 namespace Inachis\Controller\Page\Search;
 
-use Inachis\Repository\SearchRepository;
-use Inachis\Repository\SeriesRepository;
-use Inachis\Repository\UrlRepository;
+use Inachis\Repository\Content\SearchRepository;
+use Inachis\Repository\Content\SeriesRepository;
+use Inachis\Repository\Content\UrlRepository;
 use Inachis\Controller\AbstractWebController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -88,6 +88,6 @@ class SearchWebController extends AbstractWebController
         $this->data['perPage'] = $limit;
         $this->data['totalPages'] = $total > 0 ? (int) ceil($total / $limit) : 1;
 
-        return $this->render('web/pages/_search.html.twig', $this->data);
+        return $this->render('web/pages/search.html.twig', $this->data);
     }
 }

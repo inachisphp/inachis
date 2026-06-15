@@ -59,6 +59,12 @@ services:
     Inachis\EventSubscriber\AnalyticsSubscriber:
         tags: ['kernel.event_subscriber']
 
+    Inachis\EventSubscriber\ThemeTwigPathSubscriber:
+        arguments:
+            $twigLoader: '@twig.loader.native_filesystem'
+        tags:
+            - { name: kernel.event_subscriber }
+
     Inachis\Service\Export\Page\PageExportService:
         arguments:
             $writers: !tagged_iterator inachis.export_writer
