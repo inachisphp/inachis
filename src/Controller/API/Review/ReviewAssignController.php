@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Controller\API;
+namespace Inachis\Controller\API\Review;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\User\User;
@@ -25,13 +25,23 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class ReviewAssignController extends AbstractController
 {
+	/**
+	 *  Assigns the thread to a User
+	 * 
+	 * @param string $id
+	 * @param Request $request
+	 * @param ReviewThreadRepository $threads
+	 * @param UserRepository $users
+	 * @param EntityManagerInterface $entityManager
+	 * @return JsonResponse
+	 */
 	#[Route('/incc/api/review/thread/{id}/assign', methods: ['POST'])]
 	public function assign(
 		string $id,
 		Request $request,
 		ReviewThreadRepository $threads,
 		UserRepository $users,
-		EntityManagerInterface $entityManager
+		EntityManagerInterface $entityManager,
 	): JsonResponse {
 
 		$thread = $threads->find($id);
@@ -54,6 +64,12 @@ class ReviewAssignController extends AbstractController
 		return $this->json([ 'success' => true ]);
 	}
 
+	/**
+	 * Returns a list of available reviewers
+	 *
+	 * @param UserRepository $users
+	 * @return JsonResponse
+	 */
 	#[Route('/incc/api/review/reviewers', methods: ['GET'])]
 	public function reviewers(
 		UserRepository $users

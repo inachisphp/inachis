@@ -36,10 +36,10 @@ class MaintenanceController extends AbstractInachisController
         $currentIp = $request->getClientIp();
 
         if ($request->isMethod('POST')) {
-            $config['message'] = $request->request->get('message', $config['message']);
-            $config['estimated_downtime'] = $request->request->get('estimated_downtime', $config['estimated_downtime']);
-            $config['allowed_ips'] = array_filter(array_map('trim', explode(',', $request->request->get('allowed_ips', ''))));
-            $config['retry_after'] = (int)$request->request->get('retry_after', $config['retry_after'] ?? 3600);
+            $config['message'] = $request->request->getString('message', $config['message'] ?? '');
+            $config['estimated_downtime'] = $request->request->getString('estimated_downtime', $config['estimated_downtime'] ?? '');
+            $config['allowed_ips'] = array_filter(array_map('trim', explode(',', $request->request->getString('allowed_ips', ''))));
+            $config['retry_after'] = (int)$request->request->getInt('retry_after', $config['retry_after'] ?? 3600);
 
             $manager->saveConfig($config);
             $manager->generateStaticPage($config);
@@ -54,8 +54,7 @@ class MaintenanceController extends AbstractInachisController
             return $this->redirectToRoute('incc_tools_maintenance');
         }
 
-        $this->data['page']['title'] = 'Maintenance Mode';
-        $this->data['page']['tab'] = 'tools';
+        $this->setPageProperties(['title' => 'Maintenance Mode', 'tab' => 'tools']);
         $this->data['config'] = $config;
         $this->data['enabled'] = $enabled;
         $this->data['current_ip'] = $currentIp;
@@ -72,7 +71,7 @@ class MaintenanceController extends AbstractInachisController
     public function preview(MaintenanceManager $manager): Response
     {
         $config = $manager->getConfig();
-        $this->data = [...($this->data ?? []), ...($config ?? [])];
+        $this->data = [...$this->data, ...($config ?: [])];
         return $this->render('web/maintenance_template.html.twig', $this->data);
     }
 }

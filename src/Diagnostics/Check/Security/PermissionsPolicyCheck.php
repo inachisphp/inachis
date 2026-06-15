@@ -21,7 +21,12 @@ final class PermissionsPolicyCheck implements CheckInterface
 
     public function run(): CheckResult
     {
+        /** @var array<string, string>|false $headers */
         $headers = getallheaders();
+        if (!is_array($headers)) {
+            $headers = [];
+        }
+
         $value = $headers['Permissions-Policy'] ?? $headers['Feature-Policy'] ?? '(not set)';
         $status = ($value !== '(not set)') ? 'ok' : 'warning';
 

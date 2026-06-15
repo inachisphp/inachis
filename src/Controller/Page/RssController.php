@@ -7,8 +7,9 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Controller;
+namespace Inachis\Controller\Page;
 
+use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Content\{Category, Page};
 use Inachis\Enum\EditorialStatus;
 use Inachis\Repository\Content\CategoryRepository;
@@ -22,14 +23,19 @@ class RssController extends AbstractInachisController
 {
     /**
      * Helper to log feed subscription requests
+     * 
+     * @param Request $request
+     * @param string $feedPath
      */
     private function logSubscriberHit(Request $request, string $feedPath): void
     {
         $userAgent = $request->headers->get('User-Agent', '');
         $ip = $request->getClientIp() ?? '127.0.0.1';
         $visitorId = hash('sha256', $ip . '|' . $userAgent);
+        /** @var string */
+        $projectDir = $this->params->get('kernel.project_dir');
+        $dir = $projectDir . '/var/analytics';
 
-        $dir = $this->params->get('kernel.project_dir') . '/var/analytics';
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
@@ -49,15 +55,20 @@ class RssController extends AbstractInachisController
 
     /**
      * Default main RSS Feed
+     * 
+     * @param Request $request
+     * @param PageRepository $pageRepository
+     * @return Response
      */
     #[Route('/feed', name: 'rss_feed', methods: ['GET'])]
     public function feed(Request $request, PageRepository $pageRepository): Response
     {
         $this->logSubscriberHit($request, '/feed');
 
+        /** @var \Doctrine\ORM\Tools\Pagination\Paginator<Page> */
         $paginator = $pageRepository->getFilteredOfTypeByPostDate(
             [
-                'status' => EditorialStatus::PUBLISHED,
+                'status' => EditorialStatus::PUBLISHED->value,
                 'visibility' => Page::PUBLIC,
                 'toDate' => new \DateTimeImmutable(),
             ],
@@ -67,6 +78,7 @@ class RssController extends AbstractInachisController
         );
 
         $this->data['posts'] = iterator_to_array($paginator);
+        /** array<string,string> $this->data['settings'] */
         $this->data['feed_title'] = $this->data['settings']['siteTitle'];
         $this->data['feed_description'] = $this->data['settings']['abstract'] ?: 'Blog post updates';
         $this->data['feed_url'] = $this->data['settings']['domain'] . '/feed';
@@ -79,6 +91,12 @@ class RssController extends AbstractInachisController
 
     /**
      * RSS Feed filtered by category
+     * 
+     * @param Request $request
+     * @param CategoryRepository $categoryRepository
+     * @param PageRepository $pageRepository
+     * @param string $categoryName
+     * @return Response
      */
     #[Route('/feed/{categoryName}', name: 'rss_feed_category', methods: ['GET'])]
     public function categoryFeed(
@@ -99,10 +117,10 @@ class RssController extends AbstractInachisController
 
         $paginator = $pageRepository->getFilteredOfTypeByPostDate(
             [
-                'status' => EditorialStatus::PUBLISHED,
+                'status' => EditorialStatus::PUBLISHED->value,
                 'visibility' => Page::PUBLIC,
                 'toDate' => new \DateTimeImmutable(),
-                'categories' => [$category->getId()->toString()],
+                'categories' => [$category->getId()?->toString() ?? ''],
             ],
             Page::TYPE_POST,
             0,
@@ -133,8 +151,10 @@ class RssController extends AbstractInachisController
             'visible' => true
         ], ['title' => 'ASC']);
 
-        $this->data['page']['title'] = 'Subscribe to RSS Feeds';
-        $this->data['page']['description'] = 'Choose from our range of RSS feeds to stay updated with latest articles.';
+        $this->setPageProperties([
+            'title' => 'Subscribe to RSS Feeds',
+            'description' => 'Choose from our range of RSS feeds to stay updated with latest articles.',
+        ]);
         $this->data['categories'] = $categories;
 
         return $this->render('web/pages/feeds-list.html.twig', $this->data);

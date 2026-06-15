@@ -27,8 +27,7 @@ class SettingsIndexController extends AbstractInachisController
     #[Route("/incc/settings", name: 'incc_settings_index')]
     public function index(VersionService $versionService): Response
     {
-        $this->data['page']['title'] = 'Settings';
-        $this->data['page']['tab'] = 'settings';
+        $this->setPageProperties(['title' => 'Settings', 'tab' => 'settings']);
         $this->data['version'] = $versionService->getAll();
         return $this->render('inadmin/page/settings/list.html.twig', $this->data);
     }

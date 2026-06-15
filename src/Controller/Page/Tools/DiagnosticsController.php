@@ -30,8 +30,7 @@ class DiagnosticsController extends AbstractInachisController
     public function index(DiagnosticsCollector $collector): Response {
         $results = $collector->collect();
 
-        $this->data['page']['title'] = 'Server settings';
-        $this->data['page']['tab'] = 'tools';
+        $this->setPageProperties(['title' => 'Server settings', 'tab' => 'tools']);
         $this->data['sections'] = $collector->grouped();
         $this->data['environment'] = $this->getParameter('kernel.environment');
         $this->data['summary'] = $this->buildSummary($results);
@@ -42,17 +41,23 @@ class DiagnosticsController extends AbstractInachisController
     /**
      * Build a summary array for the summary cards in Twig
      *
-     * @param array $results Array of CheckResult objects
-     * @return array
+     * @param list<\Inachis\Diagnostics\CheckResult> $results Array of CheckResult objects
+     * @return array{
+     *     database: array{ok: int, warning: int, error: int, info: int},
+     *     environment: array{ok: int, warning: int, error: int, info: int},
+     *     performance: array{ok: int, warning: int, error: int, info: int},
+     *     security: array{ok: int, warning: int, error: int, info: int},
+     *     webserver: array{ok: int, warning: int, error: int, info: int},
+     * }
      */
     private function buildSummary(array $results): array
     {
         $summary = [
-            'database' => ['ok' => 0, 'warning' => 0, 'error' => 0],
-            'environment' => ['ok' => 0, 'warning' => 0, 'error' => 0],
-            'performance' => ['ok' => 0, 'warning' => 0, 'error' => 0],
-            'security' => ['ok' => 0, 'warning' => 0, 'error' => 0],
-            'webserver' => ['ok' => 0, 'warning' => 0, 'error' => 0],
+            'database' => ['ok' => 0, 'warning' => 0, 'error' => 0, 'info' => 0],
+            'environment' => ['ok' => 0, 'warning' => 0, 'error' => 0, 'info' => 0],
+            'performance' => ['ok' => 0, 'warning' => 0, 'error' => 0, 'info' => 0],
+            'security' => ['ok' => 0, 'warning' => 0, 'error' => 0, 'info' => 0],
+            'webserver' => ['ok' => 0, 'warning' => 0, 'error' => 0, 'info' => 0],
         ];
 
         foreach ($results as $result) {
@@ -66,14 +71,18 @@ class DiagnosticsController extends AbstractInachisController
             };
 
             if ($sectionKey) {
-                $status = $result->status;
-                if (!isset($summary[$sectionKey][$status])) {
-                    $summary[$sectionKey][$status] = 0;
+                $status = match ($result->status) {
+                    'ok' => 'ok',
+                    'warning' => 'warning',
+                    'error' => 'error',
+                    'info' => 'info',
+                    default => null,
+                };
+                if ($status !== null) {
+                    $summary[$sectionKey][$status]++;
                 }
-                $summary[$sectionKey][$status]++;
             }
         }
-
         return $summary;
     }
 

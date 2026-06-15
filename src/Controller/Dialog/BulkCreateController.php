@@ -27,16 +27,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class BulkCreateController extends AbstractInachisController
 {
     /**
-     * @var array<string, string>
-     */
-    protected array $errors = [];
-
-    /**
-     * @var array<string, mixed>
-     */
-    protected array $data = [];
-
-    /**
      * Get the bulk create dialog
      *
      * @return Response
@@ -44,7 +34,7 @@ class BulkCreateController extends AbstractInachisController
     #[Route("/incc/ax/bulkCreate/get", methods: [ "POST" ])]
     public function contentList(): Response
     {
-        return $this->render('inadmin/dialog/bulk-create.html.twig', $this->data);
+        return $this->render('inadmin/dialog/bulk-create.html.twig');
     }
 
     /**

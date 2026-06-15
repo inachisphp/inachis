@@ -7,12 +7,12 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Controller\API;
+namespace Inachis\Controller\API\Review;
 
+use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Content\{Page, ReviewThread};
 use Inachis\Service\Content\Page\ReviewNormaliser;
 use Inachis\Service\Content\Page\ReviewPageService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * Review controller
  */
 #[IsGranted('ROLE_ADMIN')]
-class ReviewController extends AbstractController
+class ReviewController extends AbstractInachisController
 {
     public function __construct(
         private readonly ReviewPageService $reviewService,
@@ -63,6 +63,15 @@ class ReviewController extends AbstractController
         Request $request,
         Page $page
     ): JsonResponse {
+        /** @var array{
+         *     message: string,
+         *     startOffset: int, 
+         *     endOffset: int, 
+         *     selectedText: string, 
+         *     contextBefore?: string, 
+         *     contextAfter?: string,...
+         * }
+         */
         $payload = json_decode(
             $request->getContent(),
             true,
@@ -72,7 +81,7 @@ class ReviewController extends AbstractController
 
         $thread = $this->reviewService->createThread(
             page: $page,
-            author: $this->getUser(),
+            author: $this->getCurrentUser(),
             message: $payload['message'],
             startOffset: $payload['startOffset'],
             endOffset: $payload['endOffset'],
@@ -108,7 +117,7 @@ class ReviewController extends AbstractController
 
         $comment = $this->reviewService->addReply(
             $thread,
-            $this->getUser(),
+            $this->getCurrentUser(),
             $payload['message']
         );
 
@@ -129,7 +138,7 @@ class ReviewController extends AbstractController
     ): JsonResponse {
         $this->reviewService->resolveThread(
             $thread,
-            $this->getUser()
+            $this->getCurrentUser()
         );
 
         return $this->json([
@@ -137,6 +146,12 @@ class ReviewController extends AbstractController
         ]);
     }
 
+    /**
+     * Reopens the specified thread
+     * 
+     * @param ReviewThread $thread
+     * @return JsonResponse
+     */
 	#[Route('/incc/api/review/thread/{id}/reopen', methods: ['POST'])]
 	public function reopen(ReviewThread $thread): JsonResponse
 	{

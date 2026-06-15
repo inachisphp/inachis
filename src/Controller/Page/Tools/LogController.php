@@ -30,13 +30,16 @@ class LogController extends AbstractInachisController
     #[Route('/incc/tools/logs', name: 'incc_tools_logs')]
     public function showLogs(Request $request): Response
     {
-        $logPath = $this->getParameter('kernel.project_dir') . '/var/log/dev.log';
+        /** @var string */
+        $projectDir = $this->getParameter('kernel.project_dir');
+        $logPath = $projectDir . '/var/log/dev.log';
         if (!file_exists($logPath) || !is_readable($logPath)) {
             throw $this->createNotFoundException('Log file not readable or does not exist');
         }
 
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
+        /** @var array{keyword?: string} */
         $filter = $request->request->all('filter');
 
         $allLines = $this->getLastLines($logPath, 1000);
@@ -59,8 +62,7 @@ class LogController extends AbstractInachisController
         $this->data['form'] = $form->createView();
         $this->data['entries'] = $parsedLines;
         $this->data['filter'] = $filter;
-        $this->data['page']['title'] = 'Logs';
-        $this->data['page']['tab'] = 'logs';
+        $this->setPageProperties(['title' => 'Logs', 'tab' => 'logs']);
         return $this->render('inadmin/page/tools/log.html.twig', $this->data);
     }
 
@@ -70,7 +72,7 @@ class LogController extends AbstractInachisController
      *
      * @param string $file The file to read
      * @param int $maxLines The maximum number of lines to read
-     * @return array The last N lines from the file
+     * @return array<string> The last N lines from the file
      */
     private function getLastLines(string $file, int $maxLines): array
     {
@@ -89,7 +91,6 @@ class LogController extends AbstractInachisController
             $buffer = $char . $buffer;
             $pos--;
         }
-
         fclose($handle);
 
         return array_filter(explode("\n", trim($buffer)));
@@ -100,14 +101,13 @@ class LogController extends AbstractInachisController
      * @todo move this into a service
      *
      * @param string $line The log line to parse
-     * @return array|null The parsed log line
+     * @return array{timestamp: string, channel: string, level: string, message: string, raw: string}|null The parsed log line
      */
     private function parseMonologLine(string $line): ?array
     {
         if (!preg_match('/^\[(.*?)\]\s+([^.]+)\.([A-Z]+):\s+(.*)$/', $line, $matches)) {
             return null;
         }
-
         return [
             'timestamp' => $matches[1],
             'channel' => $matches[2],

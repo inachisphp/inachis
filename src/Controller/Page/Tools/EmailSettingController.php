@@ -34,13 +34,12 @@ class EmailSettingController extends AbstractInachisController
 		Request $request,
 		DomainEmailAnalyser $domainEmailAnalyser,
 	): Response {
-        $domain = $_ENV['APP_DOMAIN'] ?? 'example.com';
-		$serverIp = !empty($_ENV['SERVER_IP']) ? $_ENV['SERVER_IP'] : $this->getExternalIp();
-		$selector = $_ENV['DKIM_SELECTOR'] ?? 'default';
+        $domain = isset($_ENV['APP_DOMAIN']) && is_string($_ENV['APP_DOMAIN']) ? $_ENV['APP_DOMAIN'] : 'example.com';
+		$serverIp = !empty($_ENV['SERVER_IP']) && is_string($_ENV['SERVER_IP']) ? $_ENV['SERVER_IP'] : $this->getExternalIp();
+		$selector = isset($_ENV['DKIM_SELECTOR']) && is_string($_ENV['DKIM_SELECTOR']) ? $_ENV['DKIM_SELECTOR'] : 'default';
 		$report = $domainEmailAnalyser->analyse($domain, $serverIp, $selector);
 
-		$this->data['page']['title'] = 'Email settings';
-		$this->data['page']['tab'] = 'tools';
+		$this->setPageProperties(['title' => 'Email settings', 'tab' => 'tools']);
 		$this->data['report'] = $report;
 
 		return $this->render('inadmin/page/tools/email.html.twig', $this->data);
@@ -69,7 +68,7 @@ class EmailSettingController extends AbstractInachisController
 				$error = curl_error($ch);
 				curl_close($ch);
 
-				if ($ip && filter_var(trim($ip), FILTER_VALIDATE_IP)) {
+				if (is_string($ip) && filter_var(trim($ip), FILTER_VALIDATE_IP)) {
 					return trim($ip);
 				}
 			}

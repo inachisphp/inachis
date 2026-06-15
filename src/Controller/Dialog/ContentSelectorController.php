@@ -37,6 +37,18 @@ class ContentSelectorController extends AbstractInachisController
         SeriesRepository $seriesRepository,
         PageRepository $pageRepository,
     ): Response {
+        /**
+         * @var array{
+         *   categories?:array<string>,
+         *   tags?:array<string>,
+         *   status?:string,
+         *   visibility?:bool,
+         *   keyword?:string,
+         *   excludeIds?:string,
+         *   fromDate?:\DateTimeImmutable,
+         *   toDate?:\DateTimeImmutable
+         * }
+         */
         $filters = array_filter($request->request->all('filters'));
 
         /** @var string $seriesId */
@@ -44,7 +56,7 @@ class ContentSelectorController extends AbstractInachisController
         if ($seriesId !== '') {
             $series = $seriesRepository->find($seriesId);
             if ($series !== null) {
-            $items = $series->getItems();
+                $items = $series->getItems();
                 if ($items instanceof \Doctrine\Common\Collections\Collection && !$items->isEmpty()) {
                     $filters['excludeIds'] = [];
                     /** @var \Inachis\Entity\Content\Page $item */
@@ -54,8 +66,8 @@ class ContentSelectorController extends AbstractInachisController
                 }
             }
         }
-        $offset = (int) $request->request->get('offset', 0);
-        $limit = (int) $request->request->get('limit', 25);
+        $offset = $request->request->getInt('offset', 0);
+        $limit = $request->request->getInt('limit', 25);
         $this->data['pages'] = $pageRepository->getFilteredOfTypeByPostDate(
             $filters,
             '*',
@@ -99,16 +111,14 @@ class ContentSelectorController extends AbstractInachisController
             $series->addItem($page);
 
             $pageDate = $page->getPostDate();
-            if ($pageDate instanceof DateTimeImmutable) {
-                $firstDate = $series->getFirstDate();
-                $lastDate = $series->getLastDate();
+            $firstDate = $series->getFirstDate();
+            $lastDate = $series->getLastDate();
 
-                if ($firstDate === null || $pageDate < $firstDate) {
-                    $series->setFirstDate($pageDate);
-                }
-                if ($lastDate === null || $pageDate > $lastDate) {
-                    $series->setLastDate($pageDate);
-                }
+            if ($firstDate === null || $pageDate < $firstDate) {
+                $series->setFirstDate($pageDate);
+            }
+            if ($lastDate === null || $pageDate > $lastDate) {
+                $series->setLastDate($pageDate);
             }
         }
         $series->setModDate(new DateTimeImmutable());

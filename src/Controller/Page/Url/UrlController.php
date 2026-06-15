@@ -11,6 +11,7 @@ namespace Inachis\Controller\Page\Url;
 
 use Doctrine\ORM\OptimisticLockException;
 use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Content\Url;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\UrlRepository;
@@ -49,16 +50,19 @@ class UrlController extends AbstractInachisController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
-            $items = $request->request->all('items') ?? [];
+            /** @var list<string> */
+            $items = $request->request->all('items');
             $action = $request->request->has('delete')  ? 'delete' :
                 ($request->request->has('make_default') ? 'make_default' : null);
 
-            if ($action !== null && !empty($items)) {
+            if ($action !== null) {
                 $count = $urlBulkActionService->apply($action, $items);
                 $this->addFlash('success', "Action '$action' applied to $count urls.");
             }
             return $this->redirectToRoute('incc_url_list');
         }
+
+        /** @var array{filters: array{keyword?: string}|array{}, sort: string, offset: int, limit: int} */
         $contentQuery = $contentQueryParameters->process(
             $request,
             $categoryRepository,
@@ -73,8 +77,7 @@ class UrlController extends AbstractInachisController
         );
         $this->data['form'] = $form->createView();
         $this->data['query'] = $contentQuery;
-        $this->data['page']['title'] = 'URLs';
-        $this->data['page']['tab'] = 'url';
+        $this->setPageProperties(['title' => 'URLs', 'tab' => 'url']);
 
         return $this->render('inadmin/page/url/list.html.twig', $this->data);
     }
@@ -92,12 +95,13 @@ class UrlController extends AbstractInachisController
         Request $request,
         UrlRepository $urlRepository,
     ): Response {
-        $url = $request->request->get('url');
+        $url = $request->request->getString('url');
         $urls = $urlRepository->findSimilarUrlsExcludingId(
             $url,
-            $request->request->get('id')
+            $request->request->getString('id')
         );
-        if (!empty($urls)) {
+
+        if (isset($urls[0])) {
             preg_match('/\-([0-9]+)$/', $urls[0]['link'], $matches);
             if (!isset($matches[1])) {
                 $matches = [

@@ -49,11 +49,10 @@ class ImageGalleryDialogController extends AbstractInachisController
         Request $request,
         ImageRepository $imageRepository,
     ): Response {
+        /** @var array{keyword?: string} */
         $filters = array_filter($request->request->all('filter'));
-        $offsetRaw = $request->attributes->get('offset');
-        $offset = is_numeric($offsetRaw) ? $offsetRaw : 0;
-        $limitRaw = $request->attributes->get('limit');
-        $limit = is_numeric($limitRaw) ? $limitRaw : $imageRepository::MAX_ITEMS_TO_SHOW_ADMIN;
+        $offset = $request->attributes->getInt('offset', 0);
+        $limit = $request->attributes->getInt('limit', $imageRepository::MAX_ITEMS_TO_SHOW_ADMIN);
         $this->data['images'] = $imageRepository->getFiltered(
             $filters,
             $offset,

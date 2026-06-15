@@ -42,7 +42,7 @@ class RobotsTxtController extends AbstractInachisController
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
 
-            $robotsTxt = trim($data['robots_txt']);
+            $robotsTxt = trim($data['robots_txt'] ?? '');
 
             if (preg_match('/^Disallow:\s*\/\s*$/mi', $robotsTxt)) {
                 $this->addFlash(
@@ -64,8 +64,7 @@ class RobotsTxtController extends AbstractInachisController
             return $this->redirectToRoute('incc_settings_robots');
         }
 
-        $this->data['page']['title'] = 'robots.txt Configuration';
-        $this->data['page']['tab'] = 'settings';
+        $this->setPageProperties(['title' => 'robots.txt Configuration', 'tab' => 'settings']);
         $this->data['form'] = $form->createView();
 		$this->data['robotsTxt'] = $settingRepository->getValue('robots_txt') ?? '';
 

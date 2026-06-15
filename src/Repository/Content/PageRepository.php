@@ -198,11 +198,11 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      *   categories?:array<string>,
      *   tags?:array<string>,
      *   status?:string,
-     *   visibility?:string,
+     *   visibility?:bool,
      *   keyword?:string,
      *   excludeIds?:string,
-     *   fromDate?:string,
-     *   toDate?:string
+     *   fromDate?:\DateTimeImmutable,
+     *   toDate?:\DateTimeImmutable
      * } $filters
      * @param string $type
      * @param int $offset
@@ -251,9 +251,11 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         }
         if (!empty($filters['status'])) {
             $where[0] .= ' AND q.status = :status';
+            $where[1]['status'] = $filters['status'];
         }
         if (!empty($filters['visibility'])) {
             $where[0] .= ' AND q.visibility = :visibility';
+            $where[1]['visibility'] = $filters['visibility'];
         }
         if (!empty($filters['keyword'])) {
             $where[0] .= ' AND (q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.content LIKE :keyword )';
@@ -261,13 +263,17 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         }
         if (!empty($filters['excludeIds'])) {
             $where[0] .= ' AND q.id NOT IN (:excludeIds)';
+            $where[1]['excludeIds'] = $filters['excludeIds'];
         }
         if (!empty($filters['fromDate'])) {
             $where[0] .= ' AND q.postDate >= :fromDate';
+            $where[1]['fromDate'] = $filters['fromDate'];
         }
         if (!empty($filters['toDate'])) {
             $where[0] .= ' AND q.postDate <= :toDate';
+            $where[1]['toDate'] = $filters['toDate'];
         }
+
         return $this->getAll(
             $offset,
             $limit,

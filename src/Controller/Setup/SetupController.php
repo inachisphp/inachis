@@ -11,14 +11,13 @@ namespace Inachis\Controller\Setup;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Repository\User\UserRepository;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class SetupController extends AbstractInachisController
 {
     /**
-     * @param Request $request
+     * @param UserRepository $userRepository
      * @return Response
      */
     #[Route("/setup", name: 'incc_setup_stage1', methods: [ "GET", "POST" ])]
@@ -33,7 +32,8 @@ class SetupController extends AbstractInachisController
         }
         $form = $this->createFormBuilder()->getForm();
         $this->data['form'] = $form->createView();
-        $this->data['page']['title'] = 'Inachis Install';
+        $this->setPageProperties(['title' => 'Inachis Install']);
+        
         return $this->render('setup/stage-1.html.twig', $this->data);
     }
 }

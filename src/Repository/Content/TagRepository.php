@@ -117,7 +117,7 @@ class TagRepository extends AbstractRepository
      *
      * @param int $offset
      * @param int $limit
-     * @return array<int,array{tag:Tag,usageCount:int}>
+     * @return list<array{0:Tag, usageCount:int}>
      */
     public function findAllWithUsageCount(int $offset = 0, int $limit = 0): array
     {
@@ -136,7 +136,7 @@ class TagRepository extends AbstractRepository
             $qb = $qb->setMaxResults($limit);
         }
 
-        /** @var array<int,array{tag:Tag,usageCount:int}> */
+        /** @var list<array{0:Tag, usageCount:int}> */
         return $qb->getResult();
     }
 

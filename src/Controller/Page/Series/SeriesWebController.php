@@ -29,7 +29,7 @@ class SeriesWebController extends AbstractWebController
         string $title
     ): Response {
         $this->data['series'] = $seriesRepository->getPublicSeriesByYearAndUrl(
-            $year,
+            (string) $year,
             $title
         );
         if (empty($this->data['series'])) {

@@ -12,20 +12,29 @@ namespace Inachis\Service\Import\Category;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Content\Category;
 use Inachis\Model\CategoryExportDto;
+use Inachis\Model\Import\CategoryImportResult;
+use Inachis\Repository\Content\CategoryRepository;
 
 /**
  * Service for importing categories from DTOs and building a tree.
  */
 final class CategoryImportService
 {
+    /**
+     * Constructor for CategoryImportService
+     *
+     * @param CategoryRepository $categoryRepository
+     * @param EntityManagerInterface $entityManager
+     */
     public function __construct(
+        private CategoryRepository $categoryRepository,
         private EntityManagerInterface $entityManager
     ) {}
 
     /**
      * Build or update category tree from DTOs.
      *
-     * @param CategoryExportDto[] $categoryDtos
+     * @param iterable<CategoryExportDto> $categoryDtos
      * @return CategoryImportResult
      */
     public function import(iterable $categoryDtos): CategoryImportResult
@@ -37,7 +46,7 @@ final class CategoryImportService
 
         try {
             // Map existing categories by full path
-            foreach ($this->entityManager->getRepository(Category::class)->findAll() as $cat) {
+            foreach ($this->categoryRepository->findAll() as $cat) {
                 $existingCategories[$cat->getFullPath()] = $cat;
             }
 
@@ -45,6 +54,10 @@ final class CategoryImportService
             foreach ($categoryDtos as $dto) {
                 /** @var CategoryExportDto $dto */
                 $parent = null;
+
+                if (!is_string($dto->fullPath) || empty($dto->fullPath)) {
+                    continue;
+                }
 
                 // Rebuild hierarchy from fullPath
                 $segments = explode('/', $dto->fullPath);

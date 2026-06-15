@@ -60,7 +60,7 @@ class MaintenanceManager
     /**
      * Get the maintenance configuration
      *
-     * @return array<mixed>
+     * @return array{message: string, estimated_downtime: string, allowed_ips:list<string>, retry_after: int}| array{}
      */
     public function getConfig(): array
     {

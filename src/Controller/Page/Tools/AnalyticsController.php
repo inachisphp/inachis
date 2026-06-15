@@ -52,8 +52,7 @@ class AnalyticsController extends AbstractInachisController
         $totalSubscribers = array_sum(array_column($subscribersPerFeed, 'subscribers'));
         $topBots = $analytics->getTopBots($from, $to, 15);
 
-		$this->data['page']['title'] = 'Analytics';
-        $this->data['page']['tab'] = 'tools';
+        $this->setPageProperties(['title' => 'Analytics', 'tab' => 'tools']);
 		$this->data['analytics'] = [
             'viewsPerDay' => $viewsPerDay,
             'top404s' => $top404s,

@@ -92,19 +92,23 @@ final class TlsCertificateExpiryCheck implements CheckInterface
 
             $params = stream_context_get_params($client);
 
-            $certificate = $params['options']['ssl']['peer_certificate'] ?? null;
+            /** @var array<string, mixed> $ssl */
+            $ssl = $params['options']['ssl'] ?? [];
+
+            $certificate = $ssl['peer_certificate'] ?? null;
 
             if (!$certificate || !($certificate instanceof OpenSSLCertificate || is_string($certificate))) {
                 throw new \RuntimeException('Certificate not available');
             }
 
+            /** @var array{validTo_time_t: int,...}|false */
             $parsed = openssl_x509_parse($certificate);
 
             if (!isset($parsed['validTo_time_t'])) {
                 throw new \RuntimeException('Unable to determine certificate expiry');
             }
 
-            $expiryTimestamp = (int) $parsed['validTo_time_t'];
+            $expiryTimestamp = (int) $parsed['validTo_time_t'] ?: 0;
 
             $daysRemaining = (int) floor(
                 ($expiryTimestamp - time()) / 86400
