@@ -9,6 +9,8 @@
 
 namespace Inachis\Service\Export;
 
+use Inachis\Entity\Content\{Page, Series};
+
 /**
  * Interface for export writers.
  */
@@ -33,7 +35,7 @@ interface ExportWriterInterface
     /**
      * Writes the given content to the specified format.
      *
-     * @param iterable $items The content to write.
+     * @param iterable<Page|Series> $items The content to write.
      * @return string The exported content.
      */
     public function write(iterable $items): string;

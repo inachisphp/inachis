@@ -27,12 +27,12 @@ class ConfirmationController extends AbstractInachisController
     #[Route("/incc/ax/confirmation/get", methods: [ "POST" ])]
     public function contentList(Request $request): Response
     {
-        $this->data['title'] = $request->request->get('title', '') ?: sprintf(
+        $this->data['title'] = $request->request->getString('title', '') ?: sprintf(
             '<%s>',
             $this->translator->trans('admin.dialog.confirm.default.title', [], 'messages'),
         );
-        $this->data['entity'] = $request->request->get('entity', '');
-        $this->data['warning'] = $request->request->get('warning', '') ?:
+        $this->data['entity'] = $request->request->getString('entity', '');
+        $this->data['warning'] = $request->request->getString('warning', '') ?:
             $this->translator->trans('admin.dialog.confirm.default.warning', [], 'messages');
         return $this->render('inadmin/dialog/confirmation.html.twig', $this->data);
     }

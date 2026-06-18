@@ -54,10 +54,6 @@ final readonly class ThemeTwigPathSubscriber implements EventSubscriberInterface
      */
     public function onKernelRequest(RequestEvent $event): void
     {
-        if (!$this->twigLoader instanceof FilesystemLoader) {
-            return;
-        }
-
         $defaultThemePath = $this->projectDir . '/templates/themes/default';
         if (is_dir($defaultThemePath) && !in_array($defaultThemePath, $this->twigLoader->getPaths(), true)) {
             $this->twigLoader->prependPath($defaultThemePath);

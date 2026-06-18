@@ -9,6 +9,7 @@
 
 namespace Inachis\Service\Export;
 
+use Inachis\Entity\Content\{Category, Page, Series};
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
@@ -33,7 +34,7 @@ abstract class AbstractExportService
     /**
      * Export the collection
      *
-     * @param iterable<object> $collection
+     * @param iterable<Category|Page|Series> $items
      * @param string $format
      * @return string
      */
@@ -64,5 +65,5 @@ abstract class AbstractExportService
      * @param object $entity
      * @return object
      */
-    abstract protected function normalise(object $entity): object;
+    abstract protected function normalise(Category|Page|Series $entity): object;
 }

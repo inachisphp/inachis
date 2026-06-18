@@ -53,8 +53,7 @@ class RevisionController extends AbstractInachisController
             )),
         ];
 
-        $this->data['page']['title'] = 'Compare Revisions';
-        $this->data['page']['tab'] = 'post';
+        $this->setPageProperties(['title' => 'Compare Revisions', 'tab' => 'post']);
         $this->data['page_id'] = $page->getId();
         $this->data['url'] = $page->getUrls()[0]->getLink();
         $this->data['title'] = json_decode(
@@ -136,11 +135,11 @@ class RevisionController extends AbstractInachisController
         SerializerInterface $serializer
     ): Response {
         $revision = $revisionRepository->findOneBy([
-            'id' => $request->attributes->get('id')
+            'id' => $request->attributes->getString('id')
         ]);
         if (empty($revision) || empty($revision->getPageId())) {
             throw new NotFoundHttpException(
-                sprintf('Version history could not be found for %s', $request->attributes->get('id'))
+                sprintf('Version history could not be found for %s', $request->attributes->getString('id'))
             );
         }
         $post = [
@@ -168,22 +167,22 @@ class RevisionController extends AbstractInachisController
      * @param Request $request
      * @param RevisionRepository $revisionRepository
      * @param PageRepository $pageRepository
-     * @return array
+     * @return list{0: \Inachis\Entity\Content\Revision, 1: \Inachis\Entity\Content\Page}
      */
     private function loadPageWithRevision(Request $request, RevisionRepository $revisionRepository, PageRepository $pageRepository): array
     {
         $revision = $revisionRepository->findOneBy([
-            'id' => $request->attributes->get('id')
+            'id' => $request->attributes->getString('id')
         ]);
         if (empty($revision) || empty($revision->getPageId())) {
             throw new NotFoundHttpException(
-                sprintf('Version history could not be found for %s', $request->attributes->get('id'))
+                sprintf('Version history could not be found for %s', $request->attributes->getString('id'))
             );
         }
         $page = $pageRepository->findOneBy(['id' => $revision->getPageId()]);
         if (empty($page) || empty($page->getId())) {
             throw new NotFoundHttpException(
-                sprintf('Page could not be found for revision %s', $request->attributes->get('id'))
+                sprintf('Page could not be found for revision %s', $request->attributes->getString('id'))
             );
         }
 

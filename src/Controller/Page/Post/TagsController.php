@@ -31,7 +31,7 @@ class TagsController extends AbstractInachisController
      * @param TagRepository $tagRepository
      * @return Response
      */
-    #[Route("incc/ax/tagList/get", methods: [ "POST" ])]
+    #[Route("incc/ax/tagList/get", methods: [ "POST" ], name: 'api_tags_list')]
     public function getTagManagerListContent(Request $request, TagRepository $tagRepository): Response
     {
         /** @var \Doctrine\ORM\Tools\Pagination\Paginator<Tag> */
@@ -145,7 +145,7 @@ class TagsController extends AbstractInachisController
         TagRepository $tagRepository,
         EntityManagerInterface $entityManager
     ): Response {
-        $targetId = $request->request->get('target');
+        $targetId = $request->request->getString('target');
         $sourceIds = $request->request->all('sources');
 
         if (!$targetId || empty($sourceIds)) {

@@ -200,7 +200,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      *   status?:string,
      *   visibility?:bool,
      *   keyword?:string,
-     *   excludeIds?:string,
+     *   excludeIds?:list<string>,
      *   fromDate?:\DateTimeImmutable,
      *   toDate?:\DateTimeImmutable
      * } $filters

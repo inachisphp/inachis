@@ -42,8 +42,8 @@ class SearchController extends AbstractInachisController
         UrlRepository $urlRepository,
         UserRepository $userRepository,
     ): Response {
-        if ($request->attributes->get('keyword') === ' ' && !empty($request->request->get('keyword', ''))) {
-            $keyword = str_replace('/', '', $request->request->get('keyword', ''));
+        if ($request->attributes->getString('keyword') === ' ' && !empty($request->request->getString('keyword', ''))) {
+            $keyword = str_replace('/', '', $request->request->getString('keyword', ''));
             $keyword = preg_replace('/(?:%25)*2[fF]/', '', $keyword);
             return $this->redirectToRoute('incc_search_results', ['keyword' => $keyword]);
         }
@@ -51,26 +51,30 @@ class SearchController extends AbstractInachisController
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
-        $sort = $request->request->get('sort', '');
+        $sort = $request->request->getString('sort', '');
         if ($request->isMethod('post')) {
             $request->getSession()->set('search_sort', $sort);
         } elseif ($request->getSession()->has('search_sort')) {
+            /** @var string */
             $sort = $request->getSession()->get('search_sort', '');
         }
 
         $results = $searchRepository->search(
-            $request->attributes->get('keyword'),
-            $request->attributes->get('offset'),
-            $request->attributes->get('limit'),
+            $request->attributes->getString('keyword'),
+            $request->attributes->getInt('offset'),
+            $request->attributes->getInt('limit'),
             $sort,
         );
 
+        $this->setPageProperties([
+            'title' => sprintf('\'%s\' results', $request->attributes->getString('keyword')),
+        ]);
         $this->data['form'] = $form->createView();
-        $this->data['query']['sort'] = $sort;
-        $this->data['query']['offset'] = $results->getOffset();
-        $this->data['query']['limit'] = $results->getLimit();
-        $this->data['page']['title'] =  sprintf('\'%s\' results', $request->attributes->get('keyword'));
-
+        $this->data['query'] = [
+            'sort' => $sort,
+            'offset' => $results->getOffset(),
+            'limit' => $results->getLimit(),
+        ];
         $this->data['results'] = $results;
 
         foreach ($this->data['results']->getResults() as $key => $result) {
@@ -125,7 +129,7 @@ class SearchController extends AbstractInachisController
             }
         }
         $this->data['total'] = $results->getTotal();
-        $this->data['keyword'] = $request->attributes->get('keyword');
+        $this->data['keyword'] = $request->attributes->getString('keyword');
 
         return $this->render('inadmin/page/search/results.html.twig', $this->data);
     }

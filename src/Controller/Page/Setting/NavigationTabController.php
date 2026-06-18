@@ -96,12 +96,12 @@ class NavigationTabController extends AbstractInachisController
         NavigationTabRepository $navigationTabRepository,
         NavigationTabService $navigationTabService,
     ): Response {
-        $id = $request->attributes->get('id');
+        $id = $request->attributes->getString('id');
         $isNew = ($id === 'new');
 
         $tab = $isNew ? new NavigationTab():
         $navigationTabRepository->findOneBy(
-            [ 'id' => $request->attributes->get('id') ]
+            [ 'id' => $request->attributes->getString('id') ]
         );
         $form = $this->createForm(NavigationTabType::class, $tab);
         $form->handleRequest($request);

@@ -9,13 +9,12 @@
 
 namespace Inachis\Service\Import\Series;
 
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Content\{Page,Series};
 use Inachis\Model\Series\SeriesExportDto;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Service\Import\Series\SeriesImportResult;
-use DateTime;
-use DateTimeImmutable;
 use InvalidArgumentException;
 
 /**
@@ -35,7 +34,7 @@ final class SeriesImportService
     /**
      * Import series from DTOs.
      *
-     * @param list<SeriesExportDto> $seriesDtos
+     * @param list<SeriesExportDto|null> $seriesDtos
      * @return SeriesImportResult
      */
     public function import(iterable $seriesDtos): SeriesImportResult
@@ -92,7 +91,7 @@ final class SeriesImportService
     /**
      * Maps the imported data to DTOs.
      *
-     * @param array{
+     * @param array<array{
      *     title?: string,
      *     subTitle?: string,
      *     url?: string,
@@ -100,8 +99,8 @@ final class SeriesImportService
      *     firstDate?: string,
      *     lastDate?: string,
      *     visibility?: bool,
-     *     items:list<string>
-     * } $data
+     *     items?: list<string>
+     * }> $data
      * @return SeriesExportDto[]
      */
     public function mapToDto(array $data): array

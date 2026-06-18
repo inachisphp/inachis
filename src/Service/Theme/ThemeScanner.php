@@ -48,6 +48,7 @@ final readonly class ThemeScanner
         $cacheItem = $this->cache->getItem(self::CACHE_KEY_THEMES);
 
         if ($cacheItem->isHit()) {
+            /** @var array<ThemeDto>|null */
             $themes = $cacheItem->get();
 
             if (is_array($themes)) {
@@ -68,6 +69,7 @@ final readonly class ThemeScanner
         $cacheItem = $this->cache->getItem(self::CACHE_KEY_SCAN_STATUS);
 
         if ($cacheItem->isHit()) {
+            /** @var array{lastScannedAt: int|null, errorCount: int, errors: string[]}|null */
             $status = $cacheItem->get();
 
             if (is_array($status)) {
@@ -115,6 +117,7 @@ final readonly class ThemeScanner
     /**
      * Scans the themes directory for a list of themes
      *
+     * @param list<string> &$errors
      * @return array<ThemeDto>
      */
     public function scanThemes(array &$errors = []): array
@@ -243,9 +246,9 @@ final readonly class ThemeScanner
         $theme = new ThemeDto();
         $theme->slug = (string) $manifest['slug'];
         $theme->name = (string) $manifest['name'];
-        $theme->version = (string) ($manifest['version'] ?? '1.0.0');
-        $theme->author = (string) ($manifest['author'] ?? '');
-        $theme->description = (string) ($manifest['description'] ?? '');
+        $theme->version = is_string($manifest['version']) ? $manifest['version'] : '1.0.0';
+        $theme->author = is_string($manifest['author']) ? $manifest['author'] : '';
+        $theme->description = is_string($manifest['description']) ? $manifest['description'] : '';
         $theme->path = $themePath;
         $theme->screenshot = $screenshot;
         $theme->requiredFeatures = $this->extractFeatures(
@@ -263,9 +266,9 @@ final readonly class ThemeScanner
     /**
      * Extracts a feature list for the given theme manifest
      *
-     * @param array<string> $manifest
+     * @param array<string, string> $manifest
      * @param string $section
-     * @return array<string>
+     * @return list<string>|array{}
      */
     private function extractFeatures(
         array $manifest,

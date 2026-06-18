@@ -27,9 +27,9 @@ final class SeriesExportNormaliser
     {
         $dto = new SeriesExportDto();
 
-        $dto->title = $series->getTitle();
+        $dto->title = $series->getTitle() ?? '';
         $dto->subTitle = $series->getSubTitle();
-        $dto->url = $series->getUrl();
+        $dto->url = $series->getUrl() ?? '';
         $dto->description = $series->getDescription();
 
         $dto->firstDate = $series->getFirstDate()?->format('Y-m-d');
@@ -37,7 +37,7 @@ final class SeriesExportNormaliser
 
         $dto->visibility = $series->getVisibility();
 
-        foreach ($series->getItems() ?? [] as $page) {
+        foreach ($series->getItems() as $page) {
             $dto->items[] = $page->getTitle();
         }
 

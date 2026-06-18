@@ -43,10 +43,10 @@ class SecurityPolicyController extends AbstractInachisController
 
         // Active policy selection
         if ($request->isMethod('POST') && $request->request->has('active_policy')) {
-            $activeId = $request->request->get('active_policy');
+            $activeId = $request->request->getString('active_policy');
 
             foreach ($policies as $policy) {
-                $policy->setIsActive($policy->getId()->toString() === $activeId);
+                $policy->setIsActive($policy->getId()?->toString() === $activeId);
             }
 
             $em->flush();
@@ -54,9 +54,7 @@ class SecurityPolicyController extends AbstractInachisController
             return $this->redirectToRoute('security_policy');
         }
 
-
-        $this->data['page']['title'] = 'Security Policy';
-        $this->data['page']['tab'] = 'policies';
+        $this->setPageProperties(['title' => 'Security Policy', 'tab' => 'policies']);
         $this->data['policies'] = $policies;
         $this->data['form'] = $form->createView();
         return $this->render('inadmin/page/admin/security_policy.html.twig', $this->data);

@@ -12,6 +12,7 @@ namespace Inachis\Form;
 use DateTimeImmutable;
 use IntlException;
 use Inachis\Entity\Content\{Category,Page,Tag};
+use Inachis\Entity\Media\Image;
 use Inachis\Entity\User\User;
 use Inachis\Enum\EditorialStatus;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -27,7 +28,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Validator\Constraints\IsTrueValidator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -204,14 +204,7 @@ class PostType extends AbstractType
                 'required' => false,
                 'widget' => 'single_text',
             ])
-            ->add('categories', EntityType::class, [
-                'choice_attr' => function ($choice, $key, $value) {
-                    return ['selected' => 'selected'];
-                },
-                'choice_label' => 'title',
-                'choices' => isset($options['data']) && $options['data'] instanceof Page ?
-                    $options['data']->getCategories()->toArray() : [],
-                'class' => Category::class,
+            ->add('categories', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'categories_label',
                     'aria-required' => 'false',
@@ -219,35 +212,51 @@ class PostType extends AbstractType
                     'placeholder' => $this->translator->trans('admin.post.properties.categories.placeholder'),
                     'data-url' => $this->router->generate('inachis_dialog_categorydialog_getcategorymanagerlistcontent'),
                     'data-render-description-field' => 'path',
+                    'data-selected-options' => json_encode(
+                        array_map(
+                            static fn (Category $category) => [
+                                'value' => (string) $category->getId(),
+                                'text'  => $category->getTitle(),
+                            ],
+                            $options['data'] instanceof Page
+                                ? $options['data']->getCategories()->toArray()
+                                : []
+                        ),
+                        JSON_THROW_ON_ERROR
+                    ),
                 ],
                 'label'      => 'admin.post.properties.categories.label',
                 'label_attr' => [
                     'id' => 'categories_label',
                 ],
                 'mapped'   => false,
-                'multiple' => true,
                 'required' => false,
             ])
-            ->add('tags', EntityType::class, [
+            ->add('tags', TextType::class, [
                 'attr' => [
                     'aria-labelledby'  => 'tags_label',
                     'aria-required' => 'false',
                     'class' => 'js-select halfwidth',
+                    'data-selected-options' => json_encode(
+                        array_map(
+                            static fn (Tag $tag) => [
+                                'value' => (string) $tag->getId(),
+                                'text'  => $tag->getTitle(),
+                            ],
+                            $options['data'] instanceof Page
+                                ? $options['data']->getTags()->toArray()
+                                : []
+                        ),
+                        JSON_THROW_ON_ERROR
+                    ),
                     'data-tags' => 'true',
-                    'data-url' => $this->router->generate('inachis_tags_gettagmanagerlistcontent'),
+                    'data-url' => $this->router->generate('api_tags_list'),
                 ],
-                'choices' => isset($options['data']) && $options['data'] instanceof Page ? $options['data']->getTags()->toArray() : [],
-                'choice_label' => 'title',
-                'choice_attr' => function ($choice, $key, $value) {
-                    return ['selected' => 'selected'];
-                },
-                'class' => Tag::class,
                 'label' => 'admin.post.properties.tags.label',
                 'label_attr' => [
                     'id' => 'tags_label',
                 ],
                 'mapped' => false,
-                'multiple' => true,
                 'required' => false,
             ])
             ->add('language', ChoiceType::class, [
@@ -271,6 +280,11 @@ class PostType extends AbstractType
                 'label_attr' => [
                     'id' => 'latlong_label'
                 ],
+                'required' => false,
+            ])
+            ->add('featureImage', EntityType::class, [
+                'class' => Image::class,
+                'choice_label' => fn (Image $image) => $image->getFilename(),
                 'required' => false,
             ])
             ->add('featureSnippet', TextareaType::class, [

@@ -28,6 +28,7 @@ class ChangePasswordController extends AbstractInachisController
 {
     /**
      * Controller for the change-password tab in the admin interface
+     * 
      * @param Request $request
      * @param UserPasswordHasherInterface $passwordHasher
      * @param UserRepository $userRepository
@@ -43,7 +44,7 @@ class ChangePasswordController extends AbstractInachisController
         /** @var \Inachis\Entity\User\User */
         $currentUser = $this->security->getUser();
         /** @var \Inachis\Entity\User\User|null */
-        $user = $userRepository->findOneBy(['username' => $request->attributes->get('id')]);
+        $user = $userRepository->findOneBy(['username' => $request->attributes->getString('id')]);
         if (!$user) {
             throw new AccessDeniedHttpException();
         }
@@ -71,10 +72,9 @@ class ChangePasswordController extends AbstractInachisController
             $this->addFlash('success', 'Password updated.');
             $this->entityManager->flush();
         }
+        $this->setPageProperties(['title' => 'Change Password', 'tab' => 'users']);
         $this->data['user'] = $user;
         $this->data['form'] = $form->createView();
-        $this->data['page']['title'] = 'Change Password';
-        $this->data['page']['tab'] = 'users';
         return $this->render('inadmin/page/admin/change-password.html.twig', $this->data);
     }
 }

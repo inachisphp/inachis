@@ -56,7 +56,7 @@ class PageWebController extends AbstractWebController
             && $day === 0
             && $request->attributes->has('page')
         ) {
-                $link = $request->attributes->get('page');
+                $link = $request->attributes->getString('page');
         } else {
                 $link = sprintf('%d/%02d/%02d/%s', $year, $month, $day, $title);
         }

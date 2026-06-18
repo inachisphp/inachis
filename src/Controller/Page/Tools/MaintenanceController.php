@@ -44,9 +44,9 @@ class MaintenanceController extends AbstractInachisController
             $manager->saveConfig($config);
             $manager->generateStaticPage($config);
 
-            if ($request->request->get('toggle') === 'on') {
+            if ($request->request->getString('toggle') === 'on') {
                 $manager->enable();
-            } elseif ($request->request->get('toggle') === 'off') {
+            } elseif ($request->request->getString('toggle') === 'off') {
                 $manager->disable();
             }
 

@@ -22,7 +22,10 @@ class SearchResult implements IteratorAggregate
     /**
      * Creates a new instance of {@link SearchResult}
      * 
-     * @param list<array<string|int, mixed>> $results The search results
+     * @param list<
+     *     array{id: string, title: string, sub_title: string, content: string, type: string, 
+     *         contentDate: string, mod_date: string, author: \Inachis\Entity\User\User|null, relevance: float}
+     * > $results The search results
      * @param int $total The total number of search results
      * @param int $offset The offset of the search results
      * @param int $limit The limit of the search results
@@ -77,7 +80,12 @@ class SearchResult implements IteratorAggregate
     /**
      * Returns the search results
      * 
-     * @return array<int, array<string|int, mixed>> The search results
+     * @return list<
+     *     array{
+     *         id: string, title: string, sub_title: string, content: string, type: string, 
+     *         contentDate: string, mod_date: string, author: \Inachis\Entity\User\User|null, relevance: float
+     *     }
+     * > The search results
      */
     public function getResults(): array
     {

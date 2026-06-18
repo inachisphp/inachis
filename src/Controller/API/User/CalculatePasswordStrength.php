@@ -28,10 +28,7 @@ class CalculatePasswordStrength extends AbstractInachisController
     #[Route("/incc/api/calculate-password-strength", name:"incc_api_calculate-password-strength", methods: [ "POST" ])]
     public function calculatePasswordStrength(Request $request): JsonResponse
     {
-        $password = $request->request->get('password') ?: '';
-        if (!is_string($password)) {
-            $password = '';
-        }
+        $password = $request->request->getString('password', '');
         return new JsonResponse(PasswordStrengthValidator::estimateStrength($password));
     }
 }

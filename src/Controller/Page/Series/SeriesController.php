@@ -109,9 +109,9 @@ class SeriesController extends AbstractInachisController
         PageRepository $pageRepository,
         WasteManagerService $wasteManagerService,
     ): Response {
-        $series = $request->attributes->get('id') !== null
+        $series = $request->attributes->getString('id', '') !== ''
             ? $seriesRepository->findOneBy([
-                'id' => $request->attributes->get('id'),
+                'id' => $request->attributes->getString('id'),
             ]) ?? new Series()
             : new Series();
         $form = $this->createForm(SeriesType::class, $series);
@@ -171,7 +171,7 @@ class SeriesController extends AbstractInachisController
     #[Route("/incc/series/contents/{id}", name: "incc_series_contents", methods: [ "POST" ])]
     public function contents(Request $request, SeriesRepository $seriesRepository): Response
     {
-        $series = $seriesRepository->findOneBy(['id' => $request->attributes->get('id')]);
+        $series = $seriesRepository->findOneBy(['id' => $request->attributes->getString('id')]);
         $form = $this->createForm(SeriesType::class, $series);
         $form->handleRequest($request);
 

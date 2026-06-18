@@ -64,7 +64,7 @@ class CategoryDialogController extends AbstractInachisController
     public function getCategoryManagerListContent(Request $request, CategoryRepository $categoryRepository): Response
     {
         /** @var array<int, Category> $categories */
-        $categories = empty($request->request->get('q')) ?
+        $categories = empty($request->request->getString('q')) ?
             $categoryRepository->findBy(['parent' => null]) :
             $categoryRepository->findByTitleLike($request->request->getString('q'));
         /** @var array<int, Category> $result */
@@ -111,12 +111,12 @@ class CategoryDialogController extends AbstractInachisController
         CategoryRepository $categoryRepository
     ): Response {
         /** @var Category $category */
-        $category = $request->request->get('id') !== '-1' ?
-            $categoryRepository->findOneBy(['id' => $request->request->get('id')]) :
+        $category = $request->request->getString('id') !== '-1' ?
+            $categoryRepository->findOneBy(['id' => $request->request->getString('id')]) :
             new Category();
         /** @var Category|null $parentCategory */
-        $parentCategory = $request->request->get('parentID') !== '-1' ?
-            $categoryRepository->findOneBy(['id' => $request->request->get('parentID')]) :
+        $parentCategory = $request->request->getString('parentID') !== '-1' ?
+            $categoryRepository->findOneBy(['id' => $request->request->getString('parentID')]) :
             null;
         $categoryRepository->hydrate($category, $request->request->all());
         $category->setParent($parentCategory);
@@ -144,7 +144,7 @@ class CategoryDialogController extends AbstractInachisController
         CategoryRepository $categoryRepository,
         PageRepository $pageRepository
     ): JsonResponse {
-        $id = $request->request->get('id');
+        $id = $request->request->getString('id');
         /** @var Category|null $category */
         $category = $categoryRepository->find($id);
         if (!$category) {
@@ -174,7 +174,7 @@ class CategoryDialogController extends AbstractInachisController
     ): Response
     {
         /** @var Category $category */
-        $category = $categoryRepository->findOneBy(['id' => $request->request->get('id')]);
+        $category = $categoryRepository->findOneBy(['id' => $request->request->getString('id')]);
         $count = $pageRepository->getPagesWithCategoryCount($category);
 
         if ($count > 0) {

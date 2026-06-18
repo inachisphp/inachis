@@ -14,6 +14,7 @@ use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Waste\WasteRepository;
 use Inachis\Service\Waste\WasteManagerService;
+use PhpParser\Node\NullableType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -56,9 +57,9 @@ class WasteController extends AbstractInachisController
             foreach ($request->request->all('items') as $item) {
                 $processItem = $wasteRepository->findOneBy(['id' => $item]);
                 if ($processItem !== null) {
-                    if ($request->request->get('delete') !== null) {
+                    if ($request->request->getString('delete', '') !== '') {
                         $wasteManagerService->deleteWaste($processItem);
-                    } elseif ($request->request->get('recover') !== null) {
+                    } elseif ($request->request->getString('recover', '') !== '') {
                         $wasteManagerService->restore($processItem);
                     }
                 }

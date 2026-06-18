@@ -50,7 +50,7 @@ class AccountController extends AbstractInachisController
             'loginUsername' => $authenticationUtils->getLastUsername(),
         ]);
         $form->handleRequest($request);
-        $this->data['page']['title'] = 'Sign In';
+        $this->setPageProperties(['title' => 'Sign In']);
         $this->data['form'] = $form->createView();
         $this->data['expired'] = $request->query->has('expired');
         $this->data['error'] = $authenticationUtils->getLastAuthenticationError();
@@ -106,13 +106,16 @@ class AccountController extends AbstractInachisController
         }
         $passwordResetRequestRepository->purgeExpiredHashes();
 
-        $this->data['page']['title'] = 'Request a password reset';
+        $this->setPageProperties(['title' => 'Request a password reset']);
         $form = $this->createForm(ForgotPasswordType::class, [
-            'forgot_email' => $request->request->get('forgot_email'),
+            'forgot_email' => $request->request->getString('forgot_email'),
         ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $emailAddress = (string) $request->request->all('forgot_password')['forgot_email'];
+            /** @var array{forgot_email:string} $forgotPassword */
+            $forgotPassword = $request->request->all('forgot_password');
+
+            $emailAddress = $forgotPassword['forgot_email'];
             if ($emailAddress) {
                 $accountLimiter = $forgotPasswordAccountLimiter->create(strtolower($emailAddress));
                 $limit = $accountLimiter->consume(1);
@@ -144,7 +147,7 @@ class AccountController extends AbstractInachisController
                     $this->addFlash('warning', 'Error while sending mail: ' . $e->getMessage());
                 }
             }
-            $this->data['page']['title'] = 'Password reset request sent';
+            $this->setPageProperties(['title' => 'Password reset request sent']);
             $this->data['form'] = $this->createFormBuilder()->getForm()->createView();
             return $this->render('inadmin/page/admin/forgot-password-sent.html.twig', $this->data);
         }
@@ -180,14 +183,22 @@ class AccountController extends AbstractInachisController
             $this->addFlash('warning', 'Invalid token.');
             return $this->redirectToRoute('incc_account_forgot-password');
         }
-
-        $form = $this->createForm(ChangePasswordType::class, [
-            'change_password' => $request->request->all('change_password', [
+        $changePassword = $request->request->all('change_password');
+        if ($changePassword === []) {
+            $changePassword = [
                 'username' => '',
-            ]),
-        ], [
-            'password_reset' => true,
-        ]);
+            ];
+        }
+
+        $form = $this->createForm(
+            ChangePasswordType::class,
+            [
+                'change_password' => $changePassword,
+            ],
+            [
+                'password_reset' => true,
+            ]
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -202,9 +213,17 @@ class AccountController extends AbstractInachisController
                 // @todo replace with something better - throw new TooManyRequestsHttpException();
                 return new Response('Too many password reset attempts from this IP. Try again later.', 429, $headers);
             };
-            $user = $userRepository->findOneBy(
-                [ 'username' => $form->getData()['change_password']['username'] ]
-            );
+            /** @var array{
+             *     change_password: array{
+             *         username: string,
+             *         new_password: string
+             *     }
+             * } $data
+             */
+            $data = $form->getData();
+            $user = $userRepository->findOneBy([
+                'username' => $data['change_password']['username'],
+            ]);
             if (!$user) {
                 $this->addFlash('error', 'Invalid token.');
                 return $this->redirectToRoute('incc_account_forgot-password');
@@ -214,7 +233,8 @@ class AccountController extends AbstractInachisController
                 $this->addFlash('error', 'Invalid or expired reset token.');
                 return $this->redirectToRoute('incc_account_forgot-password');
             }
-            $plainPassword = $form->getData()['change_password']['new_password'];
+            $plainPassword = $data['change_password']['new_password'];
+
             $hashed = $passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashed);
             $user->setPasswordModDate(new DateTimeImmutable());
