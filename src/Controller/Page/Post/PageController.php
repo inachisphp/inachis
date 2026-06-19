@@ -220,7 +220,7 @@ class PageController extends AbstractInachisController
             $data = $request->request->all('post');
             $urlManager->apply($post, is_string($data['url']) ? $data['url'] : '');
             $categoryManager->apply($post, is_string($data['categories']) ? $data['categories'] : '');
-            $tagManager->apply($post, $data['tags'] ?? '');
+            $tagManager->apply($post, is_string($data['tags']) ? $data['tags'] : '');
 
             // Publish the {@link Page}
             if ($publish instanceof ClickableInterface && $publish->isClicked()) {

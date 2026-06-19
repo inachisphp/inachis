@@ -927,7 +927,7 @@ class Page
     /**
      * Sets the tags for this Page
      *
-     * @param Collection $tags
+     * @param Collection<Tag> $tags
      * @return self
      */
     public function setTags(Collection $tags): self
@@ -1039,6 +1039,16 @@ class Page
     public function isDraft(): bool
     {
         return $this->status === EditorialStatus::DRAFT;
+    }
+
+    /**
+     * Determines if the current page/post is archived.
+     *
+     * @return bool The result of testing if the page is archived
+     */
+    public function isArchived(): bool
+    {
+        return $this->status === EditorialStatus::ARCHIVED;
     }
 
     /**

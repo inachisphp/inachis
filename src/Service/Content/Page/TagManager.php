@@ -31,15 +31,15 @@ class TagManager
      * Apply specified tags to the provided {@link Page}
      *
      * @param Page $page
-     * @param mixed $rawTags
+     * @param string $rawTags
      */
-    public function apply(Page $page, mixed $rawTags): void
+    public function apply(Page $page, string $rawTags): void
     {
         $page->removeTags();
 
         $tags = array_filter(array_map(
             'trim',
-            explode(',', (string) $rawTags)
+            explode(',', $rawTags)
         ));
 
         foreach ($tags as $tagValue) {
