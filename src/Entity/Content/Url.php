@@ -37,7 +37,7 @@ class Url
     protected UuidInterface $id;
 
     /**
-     * @var Page The UUID of the content of the type specified by @see
+     * @var Page The UUID of the content
      */
     #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\Content\Page', fetch: 'EAGER', inversedBy: 'urls')]
     #[ORM\JoinColumn(name: 'content_id', referencedColumnName: 'id')]
@@ -274,5 +274,13 @@ class Url
     public function associateContent(): void
     {
         $this->content->addUrl($this);
+    }
+
+    /**
+     * Checks if the linked content is live - i.e. not draft, archived, or scheduled
+     */
+    public function isContentLive(): bool
+    {
+        return !$this->content->isDraft() && !$this->content->isScheduledPage() && !$this->content->isArchived();
     }
 }

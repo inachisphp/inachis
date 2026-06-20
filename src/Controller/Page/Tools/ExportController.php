@@ -39,9 +39,9 @@ class ExportController extends AbstractInachisController
         PageRepository $pageRepository,
         SeriesExportService $seriesExportService,
     ): Response {
-        $contentType = $request->request->get('content_type') ?? 'post';
-        $scope = $request->request->get('scope') ?? 'all';
-        $format = $request->request->get('format') ?? 'json';
+        $contentType = $request->request->getString('content_type') ?? 'post';
+        $scope = $request->request->getString('scope') ?? 'all';
+        $format = $request->request->getString('format') ?? 'json';
         $selectedIds = array_filter(explode(',', $request->request->get('selectedIds') ?? ''));
         $filter = $request->request->all('filter');
         $filterType = $filter['type'] ?? null;
@@ -119,8 +119,7 @@ class ExportController extends AbstractInachisController
             ]);
         }
 
-        $this->data['page']['title'] = 'Export';
-        $this->data['page']['tab'] = 'export';
+        $this->setPageProperties(['title' => 'Export', 'tab' => 'export']);
         $this->data['pages'] = $pageExportService->getAllPages();
         $this->data['scope'] = $scope;
         $this->data['format'] = $format;

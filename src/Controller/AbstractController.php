@@ -62,8 +62,12 @@ abstract class AbstractController extends SymfonyController
      *
      * @param array<string, string> $properties
      */
-    protected function setPageProperties(array $properties)
+    protected function setPageProperties(array $properties): void
     {
-        $this->data['page'] = array_merge($this->data['page'], $properties);
+        $page = $this->data['page'] ?? [];
+        if (!is_array($page)) {
+            $page = [];
+        }
+        $this->data['page'] = array_merge($page, $properties);
     }
 }

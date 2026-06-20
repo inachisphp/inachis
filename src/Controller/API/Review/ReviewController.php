@@ -24,11 +24,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class ReviewController extends AbstractInachisController
 {
-    public function __construct(
-        private readonly ReviewPageService $reviewService,
-        private readonly ReviewNormaliser $normaliser
-    ) {}
-
 	/**
 	 * Returns a JSON list of review threads for a page, including all comments and author information.
 	 * The threads are ordered by last updated date, with the most recently updated threads first.
@@ -36,16 +31,21 @@ class ReviewController extends AbstractInachisController
 	 * The response format is as follows:
 	 *
 	 * @param Page $page The page for which to list review threads
+     * @param ReviewPageService $reviewService
+     * @param ReviewNormaliser $normaliser
 	 * @return JsonResponse A JSON response containing an array of review threads, each with its comments and author information
 	 */
     #[Route('/incc/api/review/page/{id}', methods: ['GET'])]
-    public function list(Page $page): JsonResponse
-    {
-        $threads = $this->reviewService->getThreadsForPage($page);
+    public function list(
+        Page $page,
+        ReviewPageService $reviewService,
+        ReviewNormaliser $normaliser,
+    ): JsonResponse {
+        $threads = $reviewService->getThreadsForPage($page);
 
         return $this->json(
             array_map(
-                fn ($thread) => $this->normaliser->normaliseThread($thread),
+                fn ($thread) => $normaliser->normaliseThread($thread),
                 $threads
             )
         );
@@ -56,12 +56,16 @@ class ReviewController extends AbstractInachisController
 	 *
 	 * @param Request $request
 	 * @param Page $page
+     * @param ReviewPageService $reviewService
+     * @param ReviewNormaliser $normaliser
 	 * @return JsonResponse
 	 */
     #[Route('/incc/api/review/page/{id}', methods: ['POST'])]
     public function create(
         Request $request,
-        Page $page
+        Page $page,
+        ReviewPageService $reviewService,
+        ReviewNormaliser $normaliser,
     ): JsonResponse {
         /** @var array{
          *     message: string,
@@ -79,7 +83,7 @@ class ReviewController extends AbstractInachisController
             JSON_THROW_ON_ERROR
         );
 
-        $thread = $this->reviewService->createThread(
+        $thread = $reviewService->createThread(
             page: $page,
             author: $this->getCurrentUser(),
             message: $payload['message'],
@@ -91,7 +95,7 @@ class ReviewController extends AbstractInachisController
         );
 
         return $this->json(
-            $this->normaliser->normaliseThread($thread)
+            $normaliser->normaliseThread($thread)
         );
     }
 
@@ -99,13 +103,15 @@ class ReviewController extends AbstractInachisController
 	 * Adds a reply to a thread, and returns the UUID of the added comment
 	 *
 	 * @param Request $request
+     * @param ReviewPageService $reviewService
 	 * @param ReviewThread $thread
 	 * @return JsonResponse
 	 */
     #[Route('/incc/api/review/thread/{id}/reply', methods: ['POST'])]
     public function reply(
         Request $request,
-        ReviewThread $thread
+        ReviewPageService $reviewService,
+        ReviewThread $thread,
     ): JsonResponse {
 		/** @var array{message: string} $payload */
         $payload = json_decode(
@@ -115,7 +121,7 @@ class ReviewController extends AbstractInachisController
             JSON_THROW_ON_ERROR
         );
 
-        $comment = $this->reviewService->addReply(
+        $comment = $reviewService->addReply(
             $thread,
             $this->getCurrentUser(),
             $payload['message']
@@ -129,14 +135,16 @@ class ReviewController extends AbstractInachisController
 	/**
 	 * Resolves the specified review thread and returns success
 	 *
+     * @param ReviewPageService $reviewService
 	 * @param ReviewThread $thread
 	 * @return JsonResponse
 	 */
     #[Route('/incc/api/review/thread/{id}/resolve', methods: ['POST'])]
     public function resolve(
-        ReviewThread $thread
+        ReviewPageService $reviewService,
+        ReviewThread $thread,
     ): JsonResponse {
-        $this->reviewService->resolveThread(
+        $reviewService->resolveThread(
             $thread,
             $this->getCurrentUser()
         );
@@ -149,13 +157,16 @@ class ReviewController extends AbstractInachisController
     /**
      * Reopens the specified thread
      * 
+     * @param ReviewPageService $reviewService
      * @param ReviewThread $thread
      * @return JsonResponse
      */
 	#[Route('/incc/api/review/thread/{id}/reopen', methods: ['POST'])]
-	public function reopen(ReviewThread $thread): JsonResponse
-	{
-		$this->reviewService->reopenThread($thread);
+	public function reopen(
+        ReviewPageService $reviewService,
+        ReviewThread $thread,
+    ): JsonResponse {
+		$reviewService->reopenThread($thread);
 
 		return $this->json([
 			'success' => true

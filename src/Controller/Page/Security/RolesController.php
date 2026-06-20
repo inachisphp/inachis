@@ -46,8 +46,8 @@ class RolesController extends AbstractInachisController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && !empty($request->request->all('items'))) {
-            $items = $request->request->all('items') ?? [];
-            if ($request->request->has('delete') && !empty($items)) {
+            $items = $request->request->all('items');
+            if ($request->request->has('delete')) {
                 $count = 0;
                 foreach ($items as $roleId) {
                     $role = $roleRepository->find($roleId);
@@ -63,12 +63,14 @@ class RolesController extends AbstractInachisController
             return $this->redirectToRoute('incc_admin_role_index');
         }
 
+        /** @var array{filters: array{keyword?: string}, offset: int, limit: int, sort?: string} */
         $contentQuery = $contentQueryParameters->process(
             $request,
             $categoryRepository,
             'admin',
             'displayName asc',
         );
+        $this->setPageProperties(['title' => 'Roles', 'tab' => 'roles']);
         $this->data['form'] = $form->createView();
         $this->data['dataset'] = $roleRepository->getFiltered(
             $contentQuery['filters'],
@@ -76,8 +78,6 @@ class RolesController extends AbstractInachisController
             $contentQuery['limit'],
         );
         $this->data['query'] = $contentQuery;
-        $this->data['page']['title']  = 'Roles';
-        $this->data['page']['tab']    = 'roles';
 
         return $this->render('inadmin/page/security/roles/list.html.twig', $this->data);
     }
@@ -88,9 +88,9 @@ class RolesController extends AbstractInachisController
      * The route parameter {role-id} is either the UUID of an existing role
      * or the literal string "new" for creating a fresh role.
      *
-     * @param Request        $request
+     * @param Request $request
      * @param RoleRepository $roleRepository
-     * @param string         $roleId
+     * @param string $roleId
      * @return Response The response the controller results in
      */
     #[Route(
@@ -120,9 +120,8 @@ class RolesController extends AbstractInachisController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $clickedButton = $form->getClickedButton()?->getName();
-
-            if ($clickedButton === 'delete' && !$isNew) {
+            $delete = $form->has('delete') ? $form->get('delete') : null;
+            if ($delete instanceof \Symfony\Component\Form\ClickableInterface && $delete->isClicked() && !$isNew) {
                 $roleName = $role->getName();
                 $this->entityManager->remove($role);
                 $this->entityManager->flush();
@@ -145,11 +144,10 @@ class RolesController extends AbstractInachisController
         // Build a structured permission matrix to pass to the template.
         $permissionMatrix = $this->buildPermissionMatrix($role);
 
-        $this->data['role']             = $role;
-        $this->data['form']             = $form->createView();
+        $this->setPageProperties(['title' => $isNew ? 'New Role' : 'Edit Role', 'tab' => 'roles']);
+        $this->data['role'] = $role;
+        $this->data['form'] = $form->createView();
         $this->data['permissionMatrix'] = $permissionMatrix;
-        $this->data['page']['title']    = $isNew ? 'New Role' : 'Edit Role';
-        $this->data['page']['tab']      = 'roles';
 
         return $this->render('inadmin/page/security/roles/edit.html.twig', $this->data);
     }
@@ -163,12 +161,12 @@ class RolesController extends AbstractInachisController
      * deletions automatically.
      *
      * @param Request $request
-     * @param Role    $role
-     * @return void
+     * @param Role $role
      */
     private function syncPermissions(Request $request, Role $role): void
     {
-        $posted = $request->request->all('permissions') ?? [];
+        /** @var array<string, array<string, mixed>> $posted */
+        $posted = $request->request->all('permissions');
 
         // Remove all existing permissions; orphanRemoval will delete them.
         foreach ($role->getRolePermissions() as $existing) {

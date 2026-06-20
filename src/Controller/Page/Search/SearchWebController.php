@@ -75,11 +75,9 @@ class SearchWebController extends AbstractWebController
             }
         }
 
-        $data = (array) ($this->data ?? []);
-        $pageMeta = (array) ($data['page'] ?? []);
-        $pageMeta['title'] = $keyword === '' ? 'Search' : sprintf('Search results for “%s”', $keyword);
-
-        $data['page'] = $pageMeta;
+        $this->setPageProperties([
+            'title' => $keyword === '' ? 'Search' : sprintf('Search results for “%s”', $keyword),
+        ]);
         $data['keyword'] = $keyword;
         $this->data = $data;
         $this->data['results'] = $results;

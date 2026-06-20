@@ -54,11 +54,11 @@ class ResourceController extends AbstractInachisController
         DownloadRepository $downloadRepository,
         ImageRepository $imageRepository,
     ): Response {
-        $typeClass = match($request->attributes->get('type')) {
+        $typeClass = match($request->attributes->getString('type')) {
             'downloads' => Download::class,
             default => Image::class,
         };
-        $type = substr(strrchr($typeClass, '\\'), 1);
+        $type = substr(strrchr($typeClass, '\\') ?: '', 1);
         $repository = match($type) {
             'Download' => $downloadRepository,
             default => $imageRepository,
@@ -69,31 +69,34 @@ class ResourceController extends AbstractInachisController
             ]))
             ->getForm();
         $form->handleRequest($request);
+        /** @var array{filters: array{keyword?: string}, offset: int, limit: int, sort: string} */
         $contentQuery = $contentQueryParameters->process(
             $request,
             $categoryRepository,
             strtolower($type),
             'title asc',
         );
-        if ($request->query->has('altText') && $request->query->get('altText') === 'null') {
-            $this->data['dataset'] = $imageRepository->getImagesWithoutAltText(
+        if ($repository instanceof ImageRepository && $request->query->getString('altText', '') === 'null') {
+            $this->data['dataset'] = $repository->getImagesWithoutAltText(
                 $contentQuery['offset'],
                 $contentQuery['limit']
             );
         } else {
-            $this->data['dataset'] = $imageRepository->getFiltered(
+            $this->data['dataset'] = $repository->getFiltered(
                 $contentQuery['filters'],
                 $contentQuery['offset'],
                 $contentQuery['limit'],
                 $contentQuery['sort'],
             );
         }
+        $this->setPageProperties([
+            'title' => $type . 's',
+            'type' => strtolower($type) . 's',
+            'tab' => strtolower($type),
+        ]);
         $this->data['form'] = $form->createView();
         $this->data['query'] = $contentQuery;
-        $this->data['page']['type'] = strtolower($type) . 's';
-        $this->data['page']['tab'] = strtolower($type);
-        $this->data['page']['title'] = $type . 's';
-        if ($request->query->has('upload') && $request->query->get('upload') === 'true') {
+        if ($request->query->has('upload') && $request->query->getString('upload') === 'true') {
             $this->data['showUploadDialog'] = true;
         }
         $this->data['limitKByte'] = Image::WARNING_FILESIZE;
@@ -127,23 +130,23 @@ class ResourceController extends AbstractInachisController
         #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory
     ): Response {
 //            "filename" => "[a-zA-Z0-9\-\_]\.(jpe?g|heic|png)",
-        $typeClass = match ($request->attributes->get('type')) {
+        $typeClass = match ($request->attributes->getString('type')) {
             'downloads' => Download::class,
             default => Image::class,
         };
-        $type = substr(strrchr($typeClass, '\\'), 1);
+        $type = substr(strrchr($typeClass, '\\') ?: '', 1);
         $repository = match($type) {
             'Download' => $downloadRepository,
             default => $imageRepository,
         };
         $resource = $repository->findOneBy([
-            'id' => $request->attributes->get('filename'),
+            'id' => $request->attributes->getString('filename'),
         ]);
         if (empty($resource)) {
             return $this->redirectToRoute(
                 'incc_resource_list',
                 [
-                    'type' => $request->attributes->get('type'),
+                    'type' => $request->attributes->getString('type'),
 
                 ],
                 Response::HTTP_PERMANENTLY_REDIRECT
@@ -151,18 +154,20 @@ class ResourceController extends AbstractInachisController
         }
         $form = $this->createForm(ResourceType::class, $resource);
         $form->handleRequest($request);
-        if ($type === 'Image') {
-            $this->data['usages']['posts'] = $pageRepository->getPostsUsingImage($resource);
-            $this->data['usages']['series'] = $seriesRepository->getSeriesUsingImage($resource);
+        if ($resource instanceof Image) {
+            $this->data['usages'] = [
+                'posts' => $pageRepository->getPostsUsingImage($resource),
+                'series' => $seriesRepository->getSeriesUsingImage($resource),
+            ];
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
             $resource = $form->getData();
             if (isset($request->request->all('resource')['delete'])) {
                 $filename = $imageDirectory . $resource->getFilename();
-                if ($type === 'Image' &&
-                    sizeof($this->data['usages']['posts']) === 0 &&
-                    sizeof($this->data['usages']['series']) === 0 &&
+                if ($resource instanceof Image &&
+                    $this->data['usages']['posts']->empty() &&
+                    $this->data['usages']['series']->empty() &&
                     $filesystem->exists($filename)) {
                     try {
                         $wasteManagerService->sendToWaste($resource);
@@ -171,7 +176,7 @@ class ResourceController extends AbstractInachisController
                         return $this->redirectToRoute(
                             'incc_resource_list',
                             [
-                                'type' => $request->attributes->get('type'),
+                                'type' => $request->attributes->getString('type'),
 
                             ],
                             Response::HTTP_PERMANENTLY_REDIRECT
@@ -180,14 +185,14 @@ class ResourceController extends AbstractInachisController
                         $this->addFlash('error', 'Failed to remove file.');
                         return $this->redirectToRoute(
                             'incc_resource_edit', [
-                                'type' => $request->attributes->get('type'),
+                                'type' => $request->attributes->getString('type'),
                                 'filename' => $resource->getId(),
                             ]
                         );
                     }
                 }
             }
-            $resource->setAuthor($this->getUser());
+            $resource->setAuthor($this->getCurrentUser());
             $resource->setModDate(new DateTimeImmutable());
             $this->entityManager->persist($resource);
             $this->entityManager->flush();
@@ -195,17 +200,19 @@ class ResourceController extends AbstractInachisController
             $this->addFlash('success', 'Content saved.');
             return $this->redirectToRoute(
                 'incc_resource_edit', [
-                    'type' => $request->attributes->get('type'),
+                    'type' => $request->attributes->getString('type'),
                     'filename' => $resource->getId(),
                 ]
             );
         }
+        $this->setPageProperties([
+            'type' => $request->attributes->getString('type'),
+            'title' => sprintf('%s: %s', $type, $resource->getTitle()),
+            'tab' => $type,
+        ]);
         $this->data['form'] = $form->createView();
-        $this->data['page']['type'] = $request->attributes->get('type');
-        $this->data['page']['tab'] = $type;
-        $this->data['page']['title'] = sprintf('%s: %s', $type, $resource->getTitle());
         $this->data['resource'] = $resource;
-        if ($type === 'Image') {
+        if ($resource instanceof Image) {
             try {
                 $sizes = $resource->getImageProperties($imageDirectory);
             } catch (FileNotFoundException $exception) {
@@ -234,7 +241,7 @@ class ResourceController extends AbstractInachisController
         #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory): JsonResponse
     {
         $imageData = $request->request->all('image');
-        /** @var UploadedFile $uploadedFileInput */
+        /** @var UploadedFile $uploadedFileInput|null */
         $uploadedFileInput = $request->files->get('image')['imageFile'] ?? null;
 
         if (!$uploadedFileInput) {

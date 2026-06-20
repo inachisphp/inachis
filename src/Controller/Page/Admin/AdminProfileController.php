@@ -32,6 +32,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class AdminProfileController extends AbstractInachisController
 {
     /**
+     * List administrators
+     * 
      * @param Request $request
      * @param ContentQueryParameters $contentQueryParameters
      * @param UserBulkActionService $userBulkActionService
@@ -59,12 +61,13 @@ class AdminProfileController extends AbstractInachisController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && !empty($request->request->all('items'))) {
-            $items = $request->request->all('items') ?? [];
+            /** @var list<string> */
+            $items = $request->request->all('items');
             $action = $request->request->has('delete')  ? 'delete' :
                 ($request->request->has('enable') ? 'enable' :
                 ($request->request->has('disable') ? 'disable' : null));
 
-            if ($action !== null && !empty($items)) {
+            if ($action !== null) {
                 $count = $userBulkActionService->apply($action, $items);
                 $this->addFlash('success', "Action '$action' applied to $count users.");
             }
@@ -72,12 +75,14 @@ class AdminProfileController extends AbstractInachisController
             return $this->redirectToRoute('incc_admin_list');
         }
 
+        /** @var array{filters: array{keyword?: string}, offset: int, limit: int, sort: string} */
         $contentQuery = $contentQueryParameters->process(
             $request,
             $categoryRepository,
             'admin',
             'displayName asc',
         );
+        $this->setPageProperties(['title' => 'Users', 'tab' => 'users']);
         $this->data['form'] = $form->createView();
         $this->data['dataset'] = $userRepository->getFiltered(
             $contentQuery['filters'],
@@ -85,8 +90,6 @@ class AdminProfileController extends AbstractInachisController
             $contentQuery['limit'],
         );
         $this->data['query'] = $contentQuery;
-        $this->data['page']['title'] = 'Users';
-        $this->data['page']['tab'] = 'users';
         return $this->render('inadmin/page/admin/list.html.twig', $this->data);
     }
 
@@ -106,13 +109,13 @@ class AdminProfileController extends AbstractInachisController
         UserAccountEmailService $userAccountEmailService,
         UserRepository $userRepository,
     ): Response {
-        $id = $request->attributes->get('id');
+        $id = $request->attributes->getString('id');
         $isNew = ($id === 'new');
 
         $user = $isNew ? new User(): 
             $userRepository->findOneBy(
-                [ 'username' => $request->attributes->get('id') ]
-            );
+                [ 'username' => $request->attributes->getString('id') ]
+            ) ?? new User();
         /** @var Form $form */
         $form = $this->createForm(UserType::class, $user, [
             'validation_groups' => [ '' ],
@@ -120,10 +123,13 @@ class AdminProfileController extends AbstractInachisController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($form->getClickedButton()->getName() === 'enableDisable') {
+            $enableDisable = $form->has('enableDisable') ? $form->get('enableDisable') : null;
+            $delete = $form->has('delete') ? $form->get('delete') : null;
+        
+            if ($enableDisable instanceof \Symfony\Component\Form\ClickableInterface && $enableDisable->isClicked()) {
                 $user->setActive(!$user->isEnabled());
             }
-            if ($form->getClickedButton()->getName() === 'delete') {
+            if ($delete instanceof \Symfony\Component\Form\ClickableInterface && $delete->isClicked()) {
                 $user->setRemoved(true);
             }
             $user->setModDate(new DateTimeImmutable());
@@ -132,7 +138,7 @@ class AdminProfileController extends AbstractInachisController
                 if (!$user->getPreferences()) {
                     $user->setPreferences(new UserPreference($user));
                 }
-                $user->getPreferences()->setColor(ProfileColorPalette::generate());
+                $user->getPreferences()?->setColor(ProfileColorPalette::generate());
                 $userAccountEmailService->registerNewUser(
                     $user,
                     $this->data,
@@ -151,10 +157,9 @@ class AdminProfileController extends AbstractInachisController
             ]));
         }
 
+        $this->setPageProperties(['title' => 'Profile', 'tab' => 'users']);
         $this->data['user'] = $user;
         $this->data['form'] = $form->createView();
-        $this->data['page']['title'] = 'Profile';
-        $this->data['page']['tab'] = 'users';
         $this->data['heicSupported'] = $imageTransformer->isHEICSupported();
 
         return $this->render('inadmin/page/admin/profile.html.twig', $this->data);

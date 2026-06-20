@@ -25,6 +25,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DashboardController extends AbstractInachisController
 {
     /**
+     * Provides the main dashboard
+     * 
      * @param Request $request The request made to the controller
      * @return Response
      */
@@ -46,7 +48,7 @@ class DashboardController extends AbstractInachisController
             [
                 'q.status = :status',
                 [
-                    'status' => EditorialStatus::DRAFT,
+                    'status' => EditorialStatus::DRAFT->value,
                 ],
             ],
             [ ['q.modDate' , 'DESC'] ]
@@ -67,7 +69,7 @@ class DashboardController extends AbstractInachisController
                 [
                     'q.status = :status',
                     [
-                        'status' => EditorialStatus::DRAFT,
+                        'status' => EditorialStatus::DRAFT->value,
                     ],
                 ],
                 'q.postDate ASC, q.modDate'
@@ -78,8 +80,8 @@ class DashboardController extends AbstractInachisController
                 [
                     'q.status = :status AND q.postDate > :postDate',
                     [
-                        'status' => EditorialStatus::PUBLISHED,
-                        'postDate' => new DateTimeImmutable(),
+                        'status' => EditorialStatus::PUBLISHED->value,
+                        'postDate' => new DateTimeImmutable('now')->format('Y-m-d H:i:s'),
                     ],
                 ],
                 'q.postDate ASC, q.modDate'
@@ -90,8 +92,8 @@ class DashboardController extends AbstractInachisController
                 [
                     'q.status = :status AND q.postDate <= :postDate',
                     [
-                        'status' => EditorialStatus::PUBLISHED,
-                        'postDate' => new DateTimeImmutable(),
+                        'status' => EditorialStatus::PUBLISHED->value,
+                        'postDate' => new DateTimeImmutable('now')->format('Y-m-d H:i:s'),
                     ],
                 ],
                 'q.postDate DESC, q.modDate'
@@ -102,7 +104,7 @@ class DashboardController extends AbstractInachisController
                 [
                     'q.visibility = :visibility',
                     [
-                        'visibility' => Series::PRIVATE,
+                        'visibility' => (string) Series::PRIVATE,
                     ],
                 ],
                 'q.firstDate DESC, q.lastDate'
@@ -113,7 +115,7 @@ class DashboardController extends AbstractInachisController
                 [
                     'q.visibility != :visibility',
                     [
-                        'visibility' => Series::PRIVATE,
+                        'visibility' => (string) Series::PRIVATE,
                     ],
                 ],
                 'q.firstDate DESC, q.lastDate'

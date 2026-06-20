@@ -35,10 +35,10 @@ final class ThemeController extends AbstractInachisController
     #[Route('/incc/settings/themes', name: 'incc_settings_themes', methods: ['GET'])]
     public function index(ThemeScanner $themeScanner, ThemeManager $themeManager): Response
     {
+        $this->setPageProperties(['title' => 'Themes']);
         $this->data['themes'] = $themeScanner->getThemes();
         $this->data['activeTheme'] = $themeManager->getActiveTheme();
         $this->data['scanStatus'] = $themeScanner->getScanStatus();
-        $this->data['page']['title'] = 'Themes';
 
         return $this->render('inadmin/page/settings/themes.html.twig', $this->data);
     }

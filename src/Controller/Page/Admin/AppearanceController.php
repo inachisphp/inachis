@@ -10,6 +10,7 @@
 namespace Inachis\Controller\Page\Admin;
 
 use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\User\UserPreference;
 use Inachis\Form\UserPreferenceType;
 use Inachis\Service\User\UserPreferenceProvider;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,25 +34,27 @@ class AppearanceController extends AbstractInachisController
     #[Route("/incc/admin/theme", name: "incc_admin_theme", methods: [ "GET", "POST" ])]
     public function edit(Request $request, UserPreferenceProvider $userPreferenceProvider): Response
     {
+        /** @var UserPreference */
         $preferences = $userPreferenceProvider->get();
         $form = $this->createForm(UserPreferenceType::class, $preferences);
         $form->handleRequest($request);
 
         if ($request->isMethod('POST')) {
-            $preferences->setTheme($request->request->get('theme', $preferences->getTheme()));
-            $preferences->setFontSize($request->request->get('font_size', $preferences->getFontSize()));
-            $preferences->setColor($request->request->get('color', $preferences->getColor()));
-            $preferences->setTimezone($request->request->get('timezone', $preferences->getTimezone()));
+            $preferences->setTheme($request->request->getString('theme', $preferences->getTheme()));
+            $preferences->setFontSize($request->request->getString('font_size', $preferences->getFontSize()));
+            $preferences->setColor($request->request->getString('color', $preferences->getColor()));
+            $preferences->setTimezone($request->request->getString('timezone', $preferences->getTimezone()));
 
             $userPreferenceProvider->save($preferences);
 
             return $this->redirectToRoute('incc_admin_theme'); 
         }
 
+        $this->setPageProperties(['title' => 'Appearance']);
         $this->data['form'] = $form->createView();
-        $this->data['user']['preferences'] = $preferences;
-        $this->data['page']['title'] = 'Appearance';
-        
+        $this->data['user'] = [
+            'preferences' => $preferences,
+        ];
         return $this->render('inadmin/page/admin/theme.html.twig', $this->data);
     }
 }

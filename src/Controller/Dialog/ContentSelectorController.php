@@ -44,7 +44,7 @@ class ContentSelectorController extends AbstractInachisController
          *   status?:string,
          *   visibility?:bool,
          *   keyword?:string,
-         *   excludeIds?:string,
+         *   excludeIds?:list<string>,
          *   fromDate?:\DateTimeImmutable,
          *   toDate?:\DateTimeImmutable
          * }
@@ -52,16 +52,16 @@ class ContentSelectorController extends AbstractInachisController
         $filters = array_filter($request->request->all('filters'));
 
         /** @var string $seriesId */
-        $seriesId = $request->request->get('seriesId', '');
+        $seriesId = $request->request->getString('seriesId', '');
         if ($seriesId !== '') {
             $series = $seriesRepository->find($seriesId);
             if ($series !== null) {
                 $items = $series->getItems();
-                if ($items instanceof \Doctrine\Common\Collections\Collection && !$items->isEmpty()) {
+                if (!$items->isEmpty()) {
                     $filters['excludeIds'] = [];
                     /** @var \Inachis\Entity\Content\Page $item */
                     foreach ($items as $item) {
-                        $filters['excludeIds'][] = $item->getId();
+                        $filters['excludeIds'][] = $item->getId()?->toString() ?: '';
                     }
                 }
             }
@@ -96,7 +96,7 @@ class ContentSelectorController extends AbstractInachisController
         PageRepository $pageRepository,
     ): Response {
         $ids = $request->request->all('ids');
-        $seriesId = (string) $request->request->get('seriesId', '');
+        $seriesId = $request->request->getString('seriesId', '');
         $series = $seriesRepository->find($seriesId);
         if (empty($ids) || $series === null) {
             return new Response('No change', Response::HTTP_NO_CONTENT);

@@ -41,21 +41,35 @@ class ContentAnalyticsController extends AbstractInachisController
         if ($post == null) {
             return new Response('');
         }
+
+        $fromDate = $request->query->has('from')
+            ? new \DateTimeImmutable($request->query->getString('from'))
+            : new \DateTimeImmutable('90 days ago');
+
+        $toDate = $request->query->has('to')
+            ? new \DateTimeImmutable($request->query->getString('to'))
+            : new \DateTimeImmutable();
+
         $data = $analyticsProvider->getPageStatsOverTime(
             $post,
-            $request->query->get('from') ?? (new \DateTimeImmutable('90 days ago')),
-            $request->query->get('to') ?? new \DateTimeImmutable()
+            $fromDate,
+            $toDate,
         );
+        $url = $post->getUrls()->first();
+        $topReferrers = [];
+        if ($url !== false) {
+            $topReferrers = $analyticsProvider->getTopReferrersForPage(
+                '/' . $url->getLink()
+            );
+        }
 
         $this->data['post'] = $post;
         $this->data['stats'] = [
-            'from' => $request->query->get('from') ?? (new \DateTimeImmutable('90 days ago')),
-            'to' => $request->query->get('to') ?? new \DateTimeImmutable(),
+            'from' => $fromDate,
+            'to' => $toDate,
             'viewsPerDay' => $data,
             'totalViews' => array_sum(array_column($data, 'views')),
-            'topReferrers' => $analyticsProvider->getTopReferrersForPage(
-				'/' . $post->getUrls()->first()->getLink(),
-			),
+            'topReferrers' => $topReferrers,
         ];
 
         return $this->render('inadmin/partials/analytics.html.twig', $this->data);
@@ -82,19 +96,26 @@ class ContentAnalyticsController extends AbstractInachisController
         if ($series == null) {
             return new Response('');
         }
+        $fromDate = $request->query->has('from')
+            ? new \DateTimeImmutable($request->query->getString('from'))
+            : new \DateTimeImmutable('90 days ago');
+
+        $toDate = $request->query->has('to')
+            ? new \DateTimeImmutable($request->query->getString('to'))
+            : new \DateTimeImmutable();
         $data = $analyticsProvider->getSeriesStatsOverTime(
             $series,
-            $request->query->get('from') ?? (new \DateTimeImmutable('90 days ago')),
-            $request->query->get('to') ?? new \DateTimeImmutable()
+            $fromDate,
+            $toDate,
         );
         $this->data['post'] = $series;
         $this->data['stats'] = [
-            'from' => $request->query->get('from') ?? (new \DateTimeImmutable('90 days ago')),
-            'to' => $request->query->get('to') ?? new \DateTimeImmutable(),
+            'from' => $fromDate,
+            'to' => $toDate,
             'viewsPerDay' => $data,
             'totalViews' => array_sum(array_column($data, 'views')),
             'topReferrers' => $analyticsProvider->getTopReferrersForPage(
-				'/' . $series->getLastDate()->format('Y') . '/' . $series->getUrl()
+				'/' . ($series->getLastDate()?->format('Y') ?? '') . '/' . $series->getUrl()
 			),
         ];
 

@@ -45,7 +45,7 @@ class LocaleSubscriber implements EventSubscriberInterface
             return;
         }
         // try to see if the locale has been set as a _locale routing parameter
-        if ($locale = $request->attributes->get('_locale')) {
+        if ($locale = $request->attributes->getString('_locale')) {
             $request->getSession()->set('_locale', $locale);
         } else {
             // if no explicit locale has been set on this request, use one from the session

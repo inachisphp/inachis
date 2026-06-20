@@ -12,15 +12,20 @@ namespace Inachis\Controller\Page\Post;
 use DateTimeImmutable;
 use Exception;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Content\{Category, Page, Url};
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Url;
 use Inachis\Entity\Media\Image;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Form\PostType;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\Content\{CategoryRepository, PageRepository, ReviewThreadRepository, RevisionRepository, TagRepository};
-use Inachis\Service\Content\Page\{PageBulkActionService, ReviewRebaseService};
+use Inachis\Repository\Content\{CategoryRepository, PageRepository, ReviewThreadRepository, RevisionRepository};
+use Inachis\Service\Content\Page\CategoryManager;
+use Inachis\Service\Content\Page\PageBulkActionService;
+use Inachis\Service\Content\Page\ReviewRebaseService;
+use Inachis\Service\Content\Page\TagManager;
+use Inachis\Service\Content\Page\UrlManager;
 use Inachis\Service\Content\{ContentRevisionCompare, ReadingTime};
-use Ramsey\Uuid\Uuid;
+use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -69,12 +74,13 @@ class PageController extends AbstractInachisController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
-            $items = $request->request->all('items') ?? [];
+            /** @var array<string,string>|array{} */
+            $items = $request->request->all('items');
             $action = $request->request->has('delete')  ? 'delete' :
                 ($request->request->has('private') ? 'private' :
                 ($request->request->has('public') ? 'public' : null));
 
-            if ($action !== null && !empty($items)) {
+            if ($action !== null) {
                 $count = $pageBulkActionService->apply($action, $items);
                 $this->addFlash('success', "Action '$action' applied to $count $type.");
             }
@@ -84,6 +90,16 @@ class PageController extends AbstractInachisController
             );
         }
 
+        /** @var array{
+         *     filters: array{
+         *         categories?: array<string>, tags?: array<string>, status?: string, visibility?: bool,
+         *         keyword?: string, excludeIds?: list<string>, fromDate?: \DateTimeImmutable, toDate?: \DateTimeImmutable
+         *     }|array{},
+         *     sort: string,
+         *     offset: int,
+         *     limit: int
+         * }
+         */
         $contentQuery = $contentQueryParameters->process(
             $request,
             $categoryRepository,
@@ -112,9 +128,8 @@ class PageController extends AbstractInachisController
                 $contentQuery['sort'],
             );
         }
+        $this->setPageProperties(['title' => ucfirst($type) . 's', 'tab' => $type,]);
         $this->data['query'] = $contentQuery;
-        $this->data['page']['tab'] = $type;
-        $this->data['page']['title'] = ucfirst($type) . 's';
         return $this->render('inadmin/page/post/list.html.twig', $this->data);
     }
 
@@ -149,13 +164,15 @@ class PageController extends AbstractInachisController
     )]
     public function edit(
         Request $request,
+        CategoryManager $categoryManager,
         ContentRevisionCompare $contentRevisionCompare,
         PageBulkActionService $pageBulkActionService,
         PageRepository $pageRepository,
         RevisionRepository $revisionRepository,
         ReviewThreadRepository $reviewThreadRepository,
         ReviewRebaseService $reviewRebaseService,
-        TagRepository $tagRepository,
+        TagManager $tagManager,
+        UrlManager $urlManager,
         string $type = 'post',
         ?string $title = null
     ): Response {
@@ -170,7 +187,7 @@ class PageController extends AbstractInachisController
             );
         }
         $post = null !== $title ?
-            $pageRepository->findOneBy(['id' => $url[0]->getContent()->getId()]) :
+            ($pageRepository->findOneBy(['id' => $url[0]->getContent()->getId()]) ?: new Page()) :
             $post = new Page();
         if ($post->getId() === null) {
             $post->setType($type);
@@ -181,86 +198,45 @@ class PageController extends AbstractInachisController
         }
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
+        if($form->isSubmitted() && !$form->isValid()) {
+            dump($form);
+        }
+        if ($form->isSubmitted() && $form->isValid()) {
+            $delete = $form->has('delete') ? $form->get('delete') : null;
+            $publish = $form->has('publish') ? $form->get('publish') : null;
 
-        if ($form->isSubmitted()) {//} && $form->isValid()) {
-            if ($form->has('delete') && $form->get('delete')->isClicked()) {
+            // Handle delete action
+            if ($delete instanceof ClickableInterface && $delete->isClicked()) {
                 $pageBulkActionService->delete($post);
                 return $this->redirectToRoute(
                     'incc_post_list',
                     [ 'type' => $type ]
                 );
             }
-            $post->setAuthor($this->getUser());
-            if (null !== $request->request->get('publish')) {
-                $post->setStatus(EditorialStatus::PUBLISHED);
-                if (isset($revision)) {
-                    if ($contentRevisionCompare->doesPageMatchRevision($post, $revision)) {
-                        $revision->setContent('');
-                    }
-                    $revision->setAction(RevisionRepository::PUBLISHED);
-                }
-            }
-            if (!empty($request->request->all('post')['url'])) {
-                $newUrl = $request->request->all('post')['url'];
-                $urlFound = false;
-                if (!empty($post->getUrls())) {
-                    foreach ($post->getUrls() as $url) {
-                        if ($url->getLink() !== $newUrl) {
-                            $url->setDefault(false);
-                        } else {
-                            $urlFound = true;
-                        }
-                    }
-                }
-                if (!$urlFound) {
-                    new Url($post, $newUrl);
-                }
-            }
-            $post = $post->removeCategories()->removeTags();
-            if (!empty($request->request->all('post')['categories'])) {
-                $newCategories = $request->request->all('post')['categories'];
-                if (!empty($newCategories)) {
-                    foreach ($newCategories as $newCategory) {
-                        $category = null;
-                        if (Uuid::isValid($newCategory)) {
-                            $category = $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $newCategory]);
-                        }
-                        if (!empty($category)) {
-                            $post->getCategories()->add($category);
-                        }
-                    }
-                }
-            }
-            if (!empty($request->request->all('post')['tags'])) {
-                $newTags = $request->request->all('post')['tags'];
-                foreach ($newTags as $newTag) {
-                    if (Uuid::isValid($newTag)) {
-                        $tag = $tagRepository->find($newTag);
-                    } else {
-                        $tag = $tagRepository->getOrCreate($newTag);
-                    }
 
-                    if ($tag !== null) {
-                        $post->addTag($tag);
-                    }
-                }
-            }
-            if (!empty($request->request->all('post')['featureImage'])) {
-                $post->setFeatureImage(
-                    $this->entityManager->getRepository(Image::class)->findOneBy([
-                        'id' => $request->request->all('post')['featureImage']
-                    ])
-                );
-            }
-
-            if ($form->has('publish') && $form->get('publish')->isClicked()) {
-                $post->setStatus(EditorialStatus::PUBLISHED);
-                if (isset($revision)) {
-                    $revision->setAction(RevisionRepository::PUBLISHED);
-                }
-            }
-
+            // Update post
+            $post->setAuthor($this->getCurrentUser());
             $post->setModDate(new DateTimeImmutable());
+            $data = $request->request->all('post');
+            $urlManager->apply($post, is_string($data['url']) ? $data['url'] : '');
+            $categoryManager->apply($post, is_string($data['categories']) ? $data['categories'] : '');
+            $tagManager->apply($post, is_string($data['tags']) ? $data['tags'] : '');
+
+            // Publish the {@link Page}
+            if ($publish instanceof ClickableInterface && $publish->isClicked()) {
+                $post->setStatus(EditorialStatus::PUBLISHED);
+            }
+
+            // Update revisions to show published
+            if (isset($revision)) {
+                if ($contentRevisionCompare->doesPageMatchRevision($post, $revision)) {
+                    $revision->setContent('');
+                }
+                if ($post->getStatus() === EditorialStatus::PUBLISHED) {
+                    $revision->setAction(RevisionRepository::PUBLISHED);
+                }
+            }
+
             if (!empty($post->getId()) && isset($revision)) {
                 $this->entityManager->persist($revision);
             }
@@ -268,23 +244,24 @@ class PageController extends AbstractInachisController
 
             $threads = $reviewThreadRepository->findOpenForPage($post);
             foreach ($threads as $thread) {
-                $reviewRebaseService->rebase($thread, $post->getContent());
+                $reviewRebaseService->rebase($thread, $post->getContent() ?: '');
             }
             $this->entityManager->flush();
 
             $this->addFlash('success', 'Content saved.');
+            $firstLink = $post->getUrls()[0];
             return $this->redirect(
                 '/incc/' .
                 $post->getType() . '/' .
-                $post->getUrls()[0]->getLink()
+                $firstLink?->getLink()
             );
         }
 
-        $this->data['form'] = $form->createView();
-        $this->data['page']['tab'] = $post->getType();
-        $this->data['page']['title'] = $post->getId() !== null ?
+        $this->setPageProperties(['title' =>  $post->getId() !== null ?
             'Editing "' . $post->getTitle() . '"' :
-            'New ' . $post->getType();
+            'New ' . $post->getType(),
+            'tab' => $post->getType()]);
+        $this->data['form'] = $form->createView();
         $this->data['includeEditor'] = true;
         $this->data['includeEditorId'] = $post->getId();
         $this->data['post'] = $post;
@@ -293,7 +270,7 @@ class PageController extends AbstractInachisController
             25,
             [
                 'q.page_id = :pageId', [
-                    'pageId' => $post->getId(),
+                    'pageId' => $post->getId()?->toString() ?: '',
                 ]
             ], [
                 [ 'q.versionNumber', 'DESC']

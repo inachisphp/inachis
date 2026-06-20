@@ -270,7 +270,20 @@ window.Inachis.Components = {
 			if (!el.placeholder) el.setAttribute('aria-label', 'Select an option');
 			el.classList.add('wcag-select');
 
-			new TomSelect(el, options);
+			let ts = new TomSelect(el, options);
+
+			const selected = el.dataset.selectedOptions
+				? JSON.parse(el.dataset.selectedOptions)
+				: [];
+
+			if (selected.length) {
+				ts.addOptions(selected.map(opt => ({
+					id: opt.value,
+					text: opt.text
+				})));
+
+				ts.setValue(selected.map(opt => opt.value));
+			}
 		});
 	},
 	initSelectAllNone(selector) {

@@ -36,8 +36,7 @@ class LoginActivityController extends AbstractInachisController
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
-        $this->data['page']['title'] = 'Login Activity';
-        $this->data['page']['tab'] = 'audit-logs';
+        $this->setPageProperties(['title' => 'Login Activity', 'tab' => 'audit-logs']);
         $this->data['form'] = $form->createView();
         $this->data['activities'] = $repository->findRecent(100);
         $this->data['errors'] = [
@@ -58,12 +57,11 @@ class LoginActivityController extends AbstractInachisController
     #[Route('/incc/admin/{id}/login-activity', name: 'incc_admin_login_activity')]
     public function loginActivity(Request $request, UserRepository $userRepository, LoginActivityRepository $repository): Response
     {
-        $user = $userRepository->findByUsername($request->attributes->get('id'));
+        $user = $userRepository->findByUsername($request->attributes->getString('id'));
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
-        $this->data['page']['title'] = 'Login Activity';
-        $this->data['page']['tab'] = 'audit-logs';
+        $this->setPageProperties(['title' => 'Login Activity', 'tab' => 'audit-logs']);
         $this->data['user'] = $user;
         $this->data['activities'] = $repository->findByUser($user, 100);
         return $this->render('inadmin/page/admin/login-activity.html.twig', $this->data);
@@ -80,10 +78,9 @@ class LoginActivityController extends AbstractInachisController
     #[Route('/incc/admin/{username}/login-activity/{id}', name: 'incc_admin_login_activity_view')]
     public function view(Request $request, LoginActivityRepository $repository): Response
     {
-        $this->data['page']['title'] = 'Login Activity';
-        $this->data['page']['tab'] = 'audit-logs';
-        $this->data['username'] = $request->attributes->get('username') ?? null;
-        $this->data['activity'] = $repository->find($request->attributes->get('id'));
+        $this->setPageProperties(['title' => 'Login Activity', 'tab' => 'audit-logs']);
+        $this->data['username'] = $request->attributes->getString('username', '');
+        $this->data['activity'] = $repository->find($request->attributes->getString('id'));
         return $this->render('inadmin/page/admin/login-activity-view.html.twig', $this->data);
     }
 }

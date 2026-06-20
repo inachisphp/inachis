@@ -454,9 +454,9 @@ class Page
     /**
      * Returns the type of the current {@link Page} entity.
      *
-     * @return string|null The current type
+     * @return string The current type
      */
-    public function getType(): ?string
+    public function getType(): string
     {
         return $this->type;
     }
@@ -903,6 +903,19 @@ class Page
     }
 
     /**
+     * Removes a specific category from the collection
+     * 
+     * @param Category $category
+     * @return self
+     */
+    public function removeCategory(Category $category): self
+    {
+        $this->categories->removeElement($category);
+        $this->categories->clear();
+        return $this;
+    }
+
+    /**
      * @return self
      */
     public function removeCategories(): self
@@ -912,9 +925,25 @@ class Page
     }
 
     /**
+     * Sets the tags for this Page
+     *
+     * @param Collection<Tag> $tags
+     * @return self
+     */
+    public function setTags(Collection $tags): self
+    {
+        $this->tags->clear();
+        foreach ($tags as $tag) {
+            $this->addTag($tag);
+        }
+        return $this;
+    }
+
+    /**
      * Adds a {@link Tag} to the {@link Page}.
      *
      * @param Tag $tag The new {@link Tag} to add to the {@link Page}
+     * @return self
      */
     public function addTag(Tag $tag): self
     {
@@ -1010,6 +1039,16 @@ class Page
     public function isDraft(): bool
     {
         return $this->status === EditorialStatus::DRAFT;
+    }
+
+    /**
+     * Determines if the current page/post is archived.
+     *
+     * @return bool The result of testing if the page is archived
+     */
+    public function isArchived(): bool
+    {
+        return $this->status === EditorialStatus::ARCHIVED;
     }
 
     /**

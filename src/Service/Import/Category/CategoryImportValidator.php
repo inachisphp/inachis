@@ -52,14 +52,6 @@ final class CategoryImportValidator
             $categoryWarnings[] = 'Full path is missing';
         }
 
-        if (!empty($dto->image) && !is_string($dto->image)) {
-            $categoryWarnings[] = 'Image must be a string';
-        }
-
-        if (!empty($dto->icon) && !is_string($dto->icon)) {
-            $categoryWarnings[] = 'Icon must be a string';
-        }
-
         if (!empty($categoryWarnings)) {
             $this->warnings[$index] = $categoryWarnings;
         }

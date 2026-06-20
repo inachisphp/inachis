@@ -9,6 +9,7 @@
 
 namespace Inachis\Controller\Page\Tools;
 
+use Doctrine\ORM\EntityManager;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\User\User;
 use Inachis\Model\Import\ImportOptionsDto;
@@ -24,6 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Inachis\Service\Parser\MarkdownFileParser;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Controller for importing pages and posts
@@ -40,6 +42,7 @@ class ImportController extends AbstractInachisController
     #[Route('/incc/tools/import', name: 'incc_tools_import', methods: ['GET', 'POST'])]
     public function import(
         Request $request,
+        EntityManager $entityManager,
         ImportDetector $importDetector,
         CategoryImportService $categoryImportService,
         CategoryImportValidator $categoryImportValidator,
@@ -51,6 +54,7 @@ class ImportController extends AbstractInachisController
         $this->setPageProperties(['title' => 'Import', 'tab' => 'import']);
 
         if ($request->isMethod('POST')) {
+            /** @var UploadedFile|null */
             $uploadedFile = $request->files->get('import_file');
 
             if (!$uploadedFile) {
@@ -58,7 +62,7 @@ class ImportController extends AbstractInachisController
                 return $this->redirectToRoute('incc_tools_import');
             }
 
-            $content = file_get_contents($uploadedFile->getPathname());
+            $content = file_get_contents($uploadedFile->getPathname()) ?: '';
             $ext = strtolower($uploadedFile->getClientOriginalExtension());
             $importType = 'page';
 
@@ -72,7 +76,7 @@ class ImportController extends AbstractInachisController
                         $data = json_decode(json_encode($xml), true)['category'];
                         break;
                     case 'md':
-                        $parser = new MarkdownFileParser();
+                        $parser = new MarkdownFileParser($entityManager);
                         $data = $parser->parse($content);
 dump($data);exit;
                         break;

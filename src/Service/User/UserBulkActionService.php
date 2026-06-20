@@ -31,7 +31,7 @@ readonly class UserBulkActionService
      * Apply a bulk action to users
      * 
      * @param string $action
-     * @param array<int> $ids
+     * @param list<string> $ids
      * @return int
      */
     public function apply(string $action, array $ids): int

@@ -30,7 +30,7 @@ final class ThemeDto
 	/** @var list<string> */
     public array $suggestedFeatures = [];
 
-	/** @var string|null */
+	/** @var string */
     public string $path;
 	/** @var string|null */
     public ?string $screenshot;

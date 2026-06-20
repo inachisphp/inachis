@@ -11,7 +11,7 @@ namespace Inachis\Service\Waste;
 
 use DateTimeImmutable;
 use Inachis\Entity\Content\{Category, Page, Series, Tag, Url};
-use Inachis\Entity\Media\Image;
+use Inachis\Entity\Media\{Download,Image};
 use Inachis\Entity\User\User;
 use Inachis\Entity\Waste\Waste;
 use Inachis\Repository\Content\PageRepository;
@@ -51,7 +51,7 @@ class WasteManagerService
     /**
      * Send an entity to the waste bin
      *
-     * @param Image|Page|Series $entity
+     * @param Download|Image|Page|Series $entity
      */
     public function sendToWaste(object $entity): void
     {

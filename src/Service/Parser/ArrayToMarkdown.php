@@ -23,7 +23,7 @@ final class ArrayToMarkdown
      * Row 3 - Category / null
      * Row 4+ - Post content
      * 
-     * @param array<string> $post The array representation of a {@link Page}
+     * @param array<string, string|null>|array{} $post The array representation of a {@link Page}
      * @return string The markdown representation of a {@link Page}
      */
     public static function parse(array $post): string
