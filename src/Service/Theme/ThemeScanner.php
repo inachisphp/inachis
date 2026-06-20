@@ -203,7 +203,7 @@ final readonly class ThemeScanner
         }
 
         try {
-            $manifest = Yaml::parseFile($manifestFile);
+            $manifest = Yaml::parseFile($manifestFile, Yaml::PARSE_EXCEPTION_ON_ALIAS);
         } catch (ParseException $exception) {
             $this->logger->warning(sprintf(
                 'Failed to parse theme manifest "%s": %s',
@@ -251,6 +251,7 @@ final readonly class ThemeScanner
         $theme->description = is_string($manifest['description']) ? $manifest['description'] : '';
         $theme->path = $themePath;
         $theme->screenshot = $screenshot;
+
         $theme->requiredFeatures = $this->extractFeatures(
             $manifest,
             'requires'
@@ -266,7 +267,7 @@ final readonly class ThemeScanner
     /**
      * Extracts a feature list for the given theme manifest
      *
-     * @param array<string, string> $manifest
+     * @param array<mixed> $manifest
      * @param string $section
      * @return list<string>|array{}
      */
@@ -274,8 +275,12 @@ final readonly class ThemeScanner
         array $manifest,
         string $section
     ): array {
-        $features = $manifest[$section]['features'] ?? [];
+        $sectionData = $manifest[$section] ?? null;
+        if (!is_array($sectionData)) {
+            return [];
+        }
 
+        $features = $sectionData['features'] ?? null;
         if (!is_array($features)) {
             return [];
         }

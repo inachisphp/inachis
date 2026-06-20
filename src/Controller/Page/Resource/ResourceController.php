@@ -154,6 +154,7 @@ class ResourceController extends AbstractInachisController
         }
         $form = $this->createForm(ResourceType::class, $resource);
         $form->handleRequest($request);
+        $this->data['usages'] = [];
         if ($resource instanceof Image) {
             $this->data['usages'] = [
                 'posts' => $pageRepository->getPostsUsingImage($resource),
@@ -166,8 +167,9 @@ class ResourceController extends AbstractInachisController
             if (isset($request->request->all('resource')['delete'])) {
                 $filename = $imageDirectory . $resource->getFilename();
                 if ($resource instanceof Image &&
-                    $this->data['usages']['posts']->empty() &&
-                    $this->data['usages']['series']->empty() &&
+                    isset($this->data['usages']['posts']) && 
+                    $this->data['usages']['posts']->count() === 0 &&
+                    $this->data['usages']['series']->count() === 0 &&
                     $filesystem->exists($filename)) {
                     try {
                         $wasteManagerService->sendToWaste($resource);
@@ -241,8 +243,15 @@ class ResourceController extends AbstractInachisController
         #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory): JsonResponse
     {
         $imageData = $request->request->all('image');
-        /** @var UploadedFile $uploadedFileInput|null */
-        $uploadedFileInput = $request->files->get('image')['imageFile'] ?? null;
+        $uploadedFileInput = null;
+        if ($request->files->has('image')) {
+            $imageBag = $request->files->get('image');
+
+            if (is_array($imageBag)) {
+                /** @var \Symfony\Component\HttpFoundation\File\UploadedFile */
+                $uploadedFileInput = $imageBag['imageFile'] ?? null;
+            }
+        }
 
         if (!$uploadedFileInput) {
             return new JsonResponse(['error' => 'No file provided'], 400);
@@ -269,14 +278,18 @@ class ResourceController extends AbstractInachisController
             $checksum = $imageFileService->createChecksum($uploadedFile);
 
             // Step 4a: Check for duplicate checksum
-            $existingImage = $this->entityManager->getRepository(Image::class)->findOneBy(['checksum' => $checksum]);
+            $existingImage = $this->entityManager->getRepository(Image::class)->findOneBy([
+                'checksum' => $checksum,
+            ]);
             if ($existingImage) {
                 return new JsonResponse(['error' => 'Duplicate image found'], 400);
             }
 
             // Step 5: Create safe filename
             $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-            $safeFilename = strtolower($slugger->slug($imageData['title'] . '-' . uniqid() ?: $originalFilename));
+            $safeFilename = strtolower(
+                $slugger->slug($imageData['title'] . '-' . uniqid() ?: $originalFilename)
+            );
             $newFilename = $safeFilename . '.' . $uploadedFile->guessExtension();
 
             $imageSize = $uploadedFile->getSize();
