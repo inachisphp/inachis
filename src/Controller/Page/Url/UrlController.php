@@ -69,17 +69,20 @@ class UrlController extends AbstractInachisController
             'url',
             'contentDate asc',
         );
-        $this->data['dataset'] = $urlRepository->getFiltered(
-            $contentQuery['filters'],
-            $contentQuery['offset'],
-            $contentQuery['limit'],
-            $contentQuery['sort'],
-        );
-        $this->data['form'] = $form->createView();
-        $this->data['query'] = $contentQuery;
-        $this->setPageProperties(['title' => 'URLs', 'tab' => 'url']);
 
-        return $this->render('inadmin/page/url/list.html.twig', $this->data);
+        $this->viewModel->page->title = 'URLs';
+        $this->viewModel->page->tab = 'url';
+        return $this->render('inadmin/page/url/list.html.twig', [
+            'viewModel' => $this->viewModel,
+            'dataset' => $urlRepository->getFiltered(
+                $contentQuery['filters'],
+                $contentQuery['offset'],
+                $contentQuery['limit'],
+                $contentQuery['sort'],
+            ),
+            'form' => $form->createView(),
+            'query' => $contentQuery,
+        ]);
     }
 
     /**

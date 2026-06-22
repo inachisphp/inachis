@@ -50,12 +50,14 @@ class AccountController extends AbstractInachisController
             'loginUsername' => $authenticationUtils->getLastUsername(),
         ]);
         $form->handleRequest($request);
-        $this->setPageProperties(['title' => 'Sign In']);
-        $this->data['form'] = $form->createView();
-        $this->data['expired'] = $request->query->has('expired');
-        $this->data['error'] = $authenticationUtils->getLastAuthenticationError();
+        $this->viewModel->page->title = 'Sign In';
 
-        return $this->render('inadmin/page/admin/signin.html.twig', $this->data);
+        return $this->render('inadmin/page/admin/signin.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'expired' => $request->query->has('expired'),
+            'error' => $authenticationUtils->getLastAuthenticationError(),
+        ]);
     }
 
     /**
@@ -106,7 +108,6 @@ class AccountController extends AbstractInachisController
         }
         $passwordResetRequestRepository->purgeExpiredHashes();
 
-        $this->setPageProperties(['title' => 'Request a password reset']);
         $form = $this->createForm(ForgotPasswordType::class, [
             'forgot_email' => $request->request->getString('forgot_email'),
         ]);
@@ -133,11 +134,13 @@ class AccountController extends AbstractInachisController
                 'email' => $emailAddress,
             ]);
             if (null !== $user) {
-                $this->data['clientIP'] = $request->getClientIp();
                 try {
                     $userRegistrationService->sendForgotPasswordEmail(
                         $user,
-                        $this->data,
+                        [
+                            'viewModel' => $this->viewModel,
+                            'clientIP' => $request->getClientIp(),
+                        ],
                         fn (string $token) => $this->generateUrl(
                             'incc_account_new-password',
                             [ 'token' => $token ]
@@ -147,13 +150,18 @@ class AccountController extends AbstractInachisController
                     $this->addFlash('warning', 'Error while sending mail: ' . $e->getMessage());
                 }
             }
-            $this->setPageProperties(['title' => 'Password reset request sent']);
-            $this->data['form'] = $this->createFormBuilder()->getForm()->createView();
-            return $this->render('inadmin/page/admin/forgot-password-sent.html.twig', $this->data);
+            $this->viewModel->page->title = 'Password reset request sent';
+            return $this->render('inadmin/page/admin/forgot-password-sent.html.twig', [
+                'viewModel' => $this->viewModel,
+                'form' => $this->createFormBuilder()->getForm()->createView(),
+            ]);
         }
-        $this->data['form'] = $form->createView();
 
-        return $this->render('inadmin/page/admin/forgot-password.html.twig', $this->data);
+        $this->viewModel->page->title = 'Request a password reset';
+        return $this->render('inadmin/page/admin/forgot-password.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+        ]);
     }
 
     /**
@@ -245,9 +253,11 @@ class AccountController extends AbstractInachisController
             $this->addFlash('success', 'Your password has been reset. You can now log in.');
             return $this->redirectToRoute('incc_account_login');
         }
-        $this->data['form'] = $form->createView();
-        $this->data['token'] = $token;
 
-        return $this->render('inadmin/page/admin/new-password.html.twig', $this->data);
+        return $this->render('inadmin/page/admin/new-password.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'token' => $token,
+        ]);
     }
 }

@@ -66,19 +66,11 @@ class SearchController extends AbstractInachisController
             $sort,
         );
 
-        $this->setPageProperties([
-            'title' => sprintf('\'%s\' results', $request->attributes->getString('keyword')),
-        ]);
-        $this->data['form'] = $form->createView();
-        $this->data['query'] = [
-            'sort' => $sort,
-            'offset' => $results->getOffset(),
-            'limit' => $results->getLimit(),
-        ];
-        $this->data['results'] = $results;
+        $this->viewModel->page->title = sprintf('\'%s\' results', $request->attributes->getString('keyword'));
 
-        foreach ($this->data['results']->getResults() as $key => $result) {
-            $this->data['results']->updateResultPropertyByKey(
+
+        foreach ($results->getResults() as $key => $result) {
+            $results->updateResultPropertyByKey(
                 $key,
                 'relevance',
                 number_format($result['relevance'], 2)
@@ -86,14 +78,14 @@ class SearchController extends AbstractInachisController
             $author = $userRepository->findOneBy([
                 'id' => $result['author'],
             ]);
-            $this->data['results']->updateResultPropertyByKey(
+            $results->updateResultPropertyByKey(
                 $key,
                 'author',
                 !empty($author) ? $author->getDisplayName() : 'Unknown',
             );
             switch ($result['type']) {
                 case 'Image':
-                    $this->data['results']->updateResultPropertyByKey(
+                    $results->updateResultPropertyByKey(
                         $key,
                         'url',
                         $this->generateUrl('incc_resource_edit', [
@@ -104,7 +96,7 @@ class SearchController extends AbstractInachisController
                     break;
 
                 case 'Series':
-                    $this->data['results']->updateResultPropertyByKey(
+                    $results->updateResultPropertyByKey(
                         $key,
                         'url',
                         $this->generateUrl('incc_series_edit', ['id' => $result['id']])
@@ -117,7 +109,7 @@ class SearchController extends AbstractInachisController
                         'content' => $result['id'],
                         'default' => true,
                     ]);
-                    $this->data['results']->updateResultPropertyByKey(
+                    $results->updateResultPropertyByKey(
                         $key,
                         'url',
                         sprintf(
@@ -128,9 +120,19 @@ class SearchController extends AbstractInachisController
                     );
             }
         }
-        $this->data['total'] = $results->getTotal();
-        $this->data['keyword'] = $request->attributes->getString('keyword');
+        
 
-        return $this->render('inadmin/page/search/results.html.twig', $this->data);
+        return $this->render('inadmin/page/search/results.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'keyword' => $request->attributes->getString('keyword'),
+            'query' => [
+                'sort' => $sort,
+                'offset' => $results->getOffset(),
+                'limit' => $results->getLimit(),
+            ],
+            'results' => $results,
+            'total' => $results->getTotal(),
+        ]);
     }
 }

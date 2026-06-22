@@ -11,7 +11,7 @@
             </a>
             <ul class="submenu">
                 <li>
-                    <a href="{{ settings.domain ~ path('incc_post_edit', { type: 'post'}) }}/post/new"
+                    <a href="{{ viewModel.settings.domain ~ path('incc_post_edit', { type: 'post'}) }}/post/new"
                         data-action="new-post"
                         data-tooltip="{% trans %}admin.menu.add.post.help{% endtrans %}"
                         title="{% trans %}admin.menu.add.post.help{% endtrans %}">
@@ -20,7 +20,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ settings.domain ~ path('incc_post_edit', { type: 'page'}) }}/new"
+                    <a href="{{ viewModel.settings.domain ~ path('incc_post_edit', { type: 'page'}) }}/new"
                         data-tooltip="{% trans %}admin.menu.add.page.help{% endtrans %}"
                         title="{% trans %}admin.menu.add.page.help{% endtrans %}">
                         <i class="material-icons" aria-hidden="true">content_copy</i> 
@@ -30,31 +30,31 @@
             </ul>
         </li>
 
-        <li class="{{ page.tab|activeMenu('dashboard') }}">
-            <a href="{{ settings.domain ~ path('incc_dashboard') }}"
+        <li class="{{ viewModel.page.tab|activeMenu('dashboard') }}">
+            <a href="{{ viewModel.settings.domain ~ path('incc_dashboard') }}"
                 data-tooltip="{% trans %}admin.dashboard.help{% endtrans %}"
                 title="{% trans %}admin.dashboard.help{% endtrans %}">
                 <i class="material-icons" aria-hidden="true">home</i> 
                 <span>{% trans %}admin.dashboard.title{% endtrans %}</span>
             </a>
         </li>
-        <li class="{{ page.tab|activeMenu('post') ~ page.tab|activeMenu('page') }}">
-            <a href="{{ settings.domain ~ path('incc_post_list', {'type': 'post'}) }}" 
+        <li class="{{ viewModel.page.tab|activeMenu('post') ~ viewModel.page.tab|activeMenu('page') }}">
+            <a href="{{ viewModel.settings.domain ~ path('incc_post_list', {'type': 'post'}) }}" 
                 data-tooltip="{% trans %}admin.posts.help{% endtrans %}" 
                 title="{% trans %}admin.posts.help{% endtrans %}">
                 <i class="material-icons" aria-hidden="true">library_books</i> 
                 <span>{% trans %}admin.posts.title{% endtrans %}</span></a>
         </li>
-        <li class="{{ page.tab|activeMenu('series') }}">
-            <a href="{{ settings.domain ~ path('incc_series_list') }}" 
+        <li class="{{ viewModel.page.tab|activeMenu('series') }}">
+            <a href="{{ viewModel.settings.domain ~ path('incc_series_list') }}" 
                 data-tooltip="{% trans %}admin.series.help{% endtrans %}"
                 title="{% trans %}admin.series.help{% endtrans %}">
                 <i class="material-icons" aria-hidden="true">chrome_reader_mode</i>
                 <span>{% trans %}admin.series.title{% endtrans %}</span>
             </a>
         </li>
-        <li class="{{ page.tab|activeMenu('Image') }}">
-            <a href="{{ settings.domain ~ path('incc_resource_list', { type: 'images' }) }}"
+        <li class="{{ viewModel.page.tab|activeMenu('Image') }}">
+            <a href="{{ viewModel.settings.domain ~ path('incc_resource_list', { type: 'images' }) }}"
                 data-tooltip="{% trans %}admin.resources.help{% endtrans %}"   
                 title="{% trans %}admin.resources.help{% endtrans %}">
                 <i class="material-icons" aria-hidden="true">wallpaper</i>
@@ -75,42 +75,42 @@
                 <span class="material-icons arrow" aria-hidden="true">chevron_right</span>
             </a>
             <ul class="submenu">
-                <li class="{{ page.tab|activeMenu('url') }}">
-                    <a href="{{ settings.domain ~ path('incc_url_list') }}"
+                <li class="{{ viewModel.page.tab|activeMenu('url') }}">
+                    <a href="{{ viewModel.settings.domain ~ path('incc_url_list') }}"
                         data-tooltop="{% trans %}admin.urls.help{% endtrans %}" 
                         title="{% trans %}admin.urls.help{% endtrans %}">
                         <i class="material-icons" aria-hidden="true">insert_link</i> 
                         <span>{% trans %}admin.urls.title{% endtrans %}</span></a>
                 </li>
-                <li class="{{ page.tab|activeMenu('users') ~ page.tab|activeMenu('audit-logs') ~ page.tab|activeMenu('policies') }}">
-                    <a href="{{ settings.domain ~ path('incc_admin_list') }}" 
+                <li class="{{ viewModel.page.tab|activeMenu('users') ~ viewModel.page.tab|activeMenu('audit-logs') ~ viewModel.page.tab|activeMenu('policies') }}">
+                    <a href="{{ viewModel.settings.domain ~ path('incc_admin_list') }}" 
                         data-tooltip="{% trans %}admin.user.help{% endtrans %}"
                         title="{% trans %}admin.user.help{% endtrans %}">
                         <i class="material-icons" aria-hidden="true">people</i> 
                         <span>{% trans %}admin.user.title{% endtrans %}</span>
                     </a>
                 </li>
-                <li class="{{ page.tab|activeMenu('waste') }}">
-                    <a href="{{ settings.domain ~ path('incc_waste_list') }}"
+                <li class="{{ viewModel.page.tab|activeMenu('waste') }}">
+                    <a href="{{ viewModel.settings.domain ~ path('incc_waste_list') }}"
                         data-tooltip="Manage deleted content"
                         title="Manage deleted content">
                         <i class="material-icons" aria-hidden="true">delete</i>
-                    {% if deleted_items > 0 %}
-                            {% if deleted_items > 99 %}{% set deleted_items = '99+' %}{% endif %}
-                            <span class="badge">{{ deleted_items }}</span>
+                    {% if viewModel.deletedItems > 0 %}
+                            {% if viewModel.deletedItems > 99 %}{% set deletedItems = '99+' %}{% endif %}
+                            <span class="badge">{{ deletedItems|default(viewModel.deletedItems) }}</span>
                     {% endif %}
                         <span>Bin</span>
                     </a>
                 </li>
-                <li class="{{ page.tab|activeMenu('tools') ~ page.tab|activeMenu('import') ~ page.tab|activeMenu('export') }}">
-                    <a href="{{ settings.domain ~ path('incc_tools_index') }}"
+                <li class="{{ viewModel.page.tab|activeMenu('tools') ~ viewModel.page.tab|activeMenu('import') ~ viewModel.page.tab|activeMenu('export') }}">
+                    <a href="{{ viewModel.settings.domain ~ path('incc_tools_index') }}"
                         data-tooltip="System Tools"
                         title="Use system tools">
                         <i class="material-icons" aria-hidden="true">build</i>
                         <span>Tools</span></a>
                 </li>
-                <li class="{{ page.tab|activeMenu('settings') }}">
-                    <a href="{{ settings.domain ~ path('incc_settings_index') }}"
+                <li class="{{ viewModel.page.tab|activeMenu('settings') }}">
+                    <a href="{{ viewModel.settings.domain ~ path('incc_settings_index') }}"
                         data-tooltip="Settings"
                         title="Change advanced settings">
                         <i class="material-icons" aria-hidden="true">settings</i>

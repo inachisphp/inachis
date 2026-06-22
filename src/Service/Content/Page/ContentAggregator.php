@@ -54,7 +54,7 @@ class ContentAggregator
             [
                 'q.lastDate < :postDate AND q.visibility = :visibility',
                 [
-                    'postDate' => new DateTimeImmutable(),
+                    'postDate' => new DateTimeImmutable('now'),
                     'visibility' => Series::PUBLIC,
                 ],
             ],
@@ -85,7 +85,7 @@ class ContentAggregator
         $pageParameters = [
             'status'     => EditorialStatus::PUBLISHED,
             'visibility' => Page::PUBLIC,
-            'postDate'   => new DateTimeImmutable(),
+            'postDate'   => new DateTimeImmutable('now'),
             'type'       => Page::TYPE_POST,
         ];
 

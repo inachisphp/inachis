@@ -54,11 +54,14 @@ class MaintenanceController extends AbstractInachisController
             return $this->redirectToRoute('incc_tools_maintenance');
         }
 
-        $this->setPageProperties(['title' => 'Maintenance Mode', 'tab' => 'tools']);
-        $this->data['config'] = $config;
-        $this->data['enabled'] = $enabled;
-        $this->data['current_ip'] = $currentIp;
-        return $this->render('inadmin/page/tools/maintenance.html.twig', $this->data);
+        $this->viewModel->page->title = 'Maintenance Mode';
+        $this->viewModel->page->tab = 'tools';
+        return $this->render('inadmin/page/tools/maintenance.html.twig', [
+            'viewModel' => $this->viewModel,
+            'enabled' => $enabled,
+            'config' => $config,
+            'current_ip' => $currentIp,
+        ]);
     }
 
     /**
@@ -71,7 +74,6 @@ class MaintenanceController extends AbstractInachisController
     public function preview(MaintenanceManager $manager): Response
     {
         $config = $manager->getConfig();
-        $this->data = [...$this->data, ...($config ?: [])];
-        return $this->render('web/maintenance_template.html.twig', $this->data);
+        return $this->render('web/maintenance_template.html.twig', $config);
     }
 }

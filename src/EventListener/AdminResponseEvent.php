@@ -51,22 +51,6 @@ final class AdminResponseEvent implements EventSubscriberInterface
     }
 
     /**
-     * Handles kernel controllers
-     * 
-     * @param ControllerEvent $event The controller event
-     */
-    public function onKernelController(ControllerEvent $event): void
-    {
-        $controller = $event->getController();
-        if (is_array($controller)) {
-            $controller = $controller[0];
-            if ($controller instanceof AbstractInachisController || $controller instanceof AbstractWebController) {
-                $controller->setDefaults();
-            }
-        }
-    }
-
-    /**
      * Returns the events this listener is subscribed to
      * 
      * @return array<string, string> The events this listener is subscribed to
@@ -75,7 +59,6 @@ final class AdminResponseEvent implements EventSubscriberInterface
     {
         return [
             KernelEvents::REQUEST => 'onKernelRequest',
-            KernelEvents::CONTROLLER => 'onKernelController',
             KernelEvents::RESPONSE => 'onKernelResponse',
         ];
     }

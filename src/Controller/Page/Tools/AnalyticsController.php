@@ -52,23 +52,26 @@ class AnalyticsController extends AbstractInachisController
         $totalSubscribers = array_sum(array_column($subscribersPerFeed, 'subscribers'));
         $topBots = $analytics->getTopBots($from, $to, 15);
 
-        $this->setPageProperties(['title' => 'Analytics', 'tab' => 'tools']);
-		$this->data['analytics'] = [
-            'viewsPerDay' => $viewsPerDay,
-            'top404s' => $top404s,
-            'totalViews' => $totalViews,
-			'uniqueVisitors' => $uniqueVisitors,
-            'from' => $from,
-            'to' => $to,
-			'change' => $change,
-			'trending' => $trending,
-            'topReferrers' => $topReferrers,
-            'topRegions' => $topRegions,
-            'subscriberStats' => $subscriberStats,
-            'subscribersPerFeed' => $subscribersPerFeed,
-            'totalSubscribers' => $totalSubscribers,
-            'topBots' => $topBots,
-		];
-        return $this->render('inadmin/page/tools/analytics.html.twig', $this->data);
+        $this->viewModel->page->title = 'Analytics';
+        $this->viewModel->page->tab = 'tools';
+        return $this->render('inadmin/page/tools/analytics.html.twig', [
+            'viewModel' => $this->viewModel,
+            'analytics' => [
+                'viewsPerDay' => $viewsPerDay,
+                'top404s' => $top404s,
+                'totalViews' => $totalViews,
+                'uniqueVisitors' => $uniqueVisitors,
+                'from' => $from,
+                'to' => $to,
+                'change' => $change,
+                'trending' => $trending,
+                'topReferrers' => $topReferrers,
+                'topRegions' => $topRegions,
+                'subscriberStats' => $subscriberStats,
+                'subscribersPerFeed' => $subscribersPerFeed,
+                'totalSubscribers' => $totalSubscribers,
+                'topBots' => $topBots,
+            ],
+        ]);
     }
 }

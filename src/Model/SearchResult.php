@@ -24,7 +24,7 @@ class SearchResult implements IteratorAggregate
      * 
      * @param list<
      *     array{id: string, title: string, sub_title: string, content: string, type: string, 
-     *         contentDate: string, mod_date: string, author: \Inachis\Entity\User\User|null, relevance: float}
+     *         contentDate: string, mod_date: string, author: string, relevance: float}
      * > $results The search results
      * @param int $total The total number of search results
      * @param int $offset The offset of the search results
@@ -83,7 +83,7 @@ class SearchResult implements IteratorAggregate
      * @return list<
      *     array{
      *         id: string, title: string, sub_title: string, content: string, type: string, 
-     *         contentDate: string, mod_date: string, author: \Inachis\Entity\User\User|null, relevance: float
+     *         contentDate: string, mod_date: string, author: string, relevance: float
      *     }
      * > The search results
      */
@@ -95,14 +95,103 @@ class SearchResult implements IteratorAggregate
     /**
      * Updates a property of a specific search result
      * 
-     * @param string|int $key The key of the search result
-     * @param string $property The property to update
+     * @param int $key The key of the search result
+     * @param string $property
      * @param mixed $value
      */
-    public function updateResultPropertyByKey(string|int $key, string $property, mixed $value): void
+    public function updateResultPropertyByKey(int $key, string $property, mixed $value): void
     {
-        if (isset($this->results[$key])) {
-            $this->results[$key][$property] = $value;
+       if (!isset($this->results[$key])) {
+            return;
         }
+
+        match ($property) {
+            'title',
+            'sub_title',
+            'content',
+            'type',
+            'author',
+            'contentDate',
+            'mod_date',
+            'url' => $this->updateStringProperty($key, $property, $value),
+
+            'relevance' => $this->updateRelevanceProperty($key, $value),
+
+            default => throw new \InvalidArgumentException(
+                sprintf('Unknown property "%s"', $property)
+            ),
+        };
+    }
+
+    /**
+     * Updates the properties of the result known to be a string
+     *
+     * @param int $key
+     * @param string $property
+     * @param mixed $value
+     */
+    private function updateStringProperty(int $key, string $property, mixed $value): void
+    {
+        if (!is_string($value)) {
+            throw new \InvalidArgumentException(
+                sprintf('%s must be a string', $property)
+            );
+        }
+        match ($property) {
+            'title' => $this->results[$key]['title'] = $value,
+            'sub_title' => $this->results[$key]['sub_title'] = $value,
+            'content' => $this->results[$key]['content'] = $value,
+            'type' => $this->results[$key]['type'] = $value,
+            'author' => $this->results[$key]['author'] = $value,
+            'contentDate' => $this->results[$key]['contentDate'] = $value,
+            'mod_date' => $this->results[$key]['mod_date'] = $value,
+            'url' => $this->results[$key]['url'] = $value,
+
+            default => throw new \InvalidArgumentException(
+                sprintf('Unknown property "%s"', $property)
+            ),
+        };
+    }
+
+    // private function updateAuthorProperty(
+    //     string|int $key,
+    //     mixed $value
+    // ): void {
+    //     if (
+    //         $value !== null
+    //         && !$value instanceof \Inachis\Entity\User\User
+    //     ) {
+    //         throw new \InvalidArgumentException(
+    //             'author must be a User or null'
+    //         );
+    //     }
+
+    //     $this->results[$key]['author'] = $value;
+    // }
+
+    /**
+     * Updates the relevance property of the {@link SearchResult}
+     *
+     * @param int $key
+     * @param mixed $value
+     */
+    private function updateRelevanceProperty(int $key, mixed $value): void {
+        if (is_string($value)) {
+            if (!is_numeric($value)) {
+                throw new \InvalidArgumentException(
+                    'relevance string must be numeric'
+                );
+            }
+
+            $value = (float) $value;
+        }
+
+        if (!is_float($value)) {
+            throw new \InvalidArgumentException(
+                'relevance must be a float or numeric string'
+            );
+        }
+
+        $this->results[$key]['relevance'] = $value;
     }
 }

@@ -31,9 +31,11 @@ class SetupController extends AbstractInachisController
             );
         }
         $form = $this->createFormBuilder()->getForm();
-        $this->data['form'] = $form->createView();
-        $this->setPageProperties(['title' => 'Inachis Install']);
         
-        return $this->render('setup/stage-1.html.twig', $this->data);
+        $this->viewModel->page->title = 'Inachis Install';
+        return $this->render('setup/stage-1.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+        ]);
     }
 }

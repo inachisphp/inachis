@@ -113,20 +113,23 @@ class TagsController extends AbstractInachisController
             'title',
         );
 
-        $this->data['dataset'] = array_map(
-            fn($row) => (object) [
-                'id' => $row[0]->getId(),
-                'title' => $row[0]->getTitle(),
-                'url' => '/incc/tags/' . $row[0]->getId(),
-                'usageCount' => $row['usageCount'],
-            ],
-            $tagRepository->findAllWithUsageCount($offset, $limit)
-        );
-        $this->data['form'] = $form->createView();
-        $this->data['query'] = $contentQuery;
-        $this->data['total'] = $tagRepository->getAllCount();
-        $this->setPageProperties(['title' => 'Tags', 'tab' => 'tag']);
-        return $this->render('inadmin/page/tag/list.html.twig', $this->data);
+        $this->viewModel->page->title = 'Tags';
+        $this->viewModel->page->tab = 'tag';
+        return $this->render('inadmin/page/tag/list.html.twig', [
+            'viewModel' => $this->viewModel,
+            'dataset' => array_map(
+                fn($row) => (object) [
+                    'id' => $row[0]->getId(),
+                    'title' => $row[0]->getTitle(),
+                    'url' => '/incc/tags/' . $row[0]->getId(),
+                    'usageCount' => $row['usageCount'],
+                ],
+                $tagRepository->findAllWithUsageCount($offset, $limit)
+            ),
+            'form' => $form->createView(),
+            'query' => $contentQuery,
+            'total' => $tagRepository->getAllCount(),
+        ]);
     }
 
     /**
@@ -218,18 +221,20 @@ class TagsController extends AbstractInachisController
 
         $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$tag->getId()?->toString() ?? '']], '*', $offset, $limit);
 
-        $this->data['dataset'] = $pages;
-        $this->data['form'] = $form->createView();
-        $this->data['query'] = $contentQueryParameters->process(
-            $request,
-            $categoryRepository,
-            'page',
-            'title'
-        );
-        $this->data['total'] = $pages->getIterator()->count();
-        $this->data['tag'] = $tag;
-        $this->setPageProperties(['title' => 'Tags', 'tab' => 'tag']);
-
-        return $this->render('inadmin/page/tag/view.html.twig', $this->data);
+        $this->viewModel->page->title = 'Tags';
+        $this->viewModel->page->tab = 'tag';
+        return $this->render('inadmin/page/tag/view.html.twig', [
+            'viewModel' => $this->viewModel,
+            'dataset' => $pages,
+            'form' => $form->createView(),
+            'query' => $contentQueryParameters->process(
+                $request,
+                $categoryRepository,
+                'page',
+                'title'
+            ),
+            'total' => $pages->count(),
+            'tag' => $tag,
+        ]);
     }
 }

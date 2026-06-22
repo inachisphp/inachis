@@ -53,7 +53,7 @@ interface PageRepositoryInterface
      *   status?:string,
      *   visibility?:bool,
      *   keyword?:string,
-     *   excludeIds?:string,
+     *   excludeIds?:list<string>,
      *   fromDate?:\DateTimeImmutable,
      *   toDate?:\DateTimeImmutable
      * } $filters

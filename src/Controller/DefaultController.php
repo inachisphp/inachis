@@ -28,8 +28,10 @@ class DefaultController extends AbstractInachisController
     #[Route("/", methods: [ "GET" ])]
     public function homepage(ContentAggregator $contentProvider): Response
     {
-        $this->data['content'] = $contentProvider->getHomepageContent();
-        return $this->render('web/pages/homepage.html.twig', $this->data);
+        return $this->render('web/pages/homepage.html.twig', [
+            'viewModel' => $this->viewModel,
+            'content' => $contentProvider->getHomepageContent(),
+        ]);
     }
 
     /**
@@ -43,6 +45,6 @@ class DefaultController extends AbstractInachisController
         return new JsonResponse([
             'status' => 'ok',
             'time' => time(),
-    ]);
-}
+        ]);
+    }
 }

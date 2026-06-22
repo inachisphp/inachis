@@ -34,9 +34,9 @@ class CategoryDialogController extends AbstractInachisController
     #[Route("/incc/ax/categoryManager/get", methods: [ "POST" ])]
     public function getCategoryManagerContent(CategoryRepository $categoryRepository): Response
     {
-        $this->data['categories'] = $categoryRepository->findBy(['parent' => null]);
-
-        return $this->render('inadmin/dialog/category-manager.html.twig', $this->data);
+        return $this->render('inadmin/dialog/category-manager.html.twig', [
+            'categories' => $categoryRepository->findBy(['parent' => null]),
+        ]);
     }
 
     /**
@@ -48,9 +48,9 @@ class CategoryDialogController extends AbstractInachisController
     #[Route("/incc/ax/categoryManager/list", methods: [ "POST" ])]
     public function getCategoryManagerList(CategoryRepository $categoryRepository): Response
     {
-        $this->data['categories'] = $categoryRepository->findBy(['parent' => null]);
-
-        return $this->render('inadmin/dialog/category-manager-list.html.twig', $this->data);
+        return $this->render('inadmin/dialog/category-manager-list.html.twig', [
+            'categories' => $categoryRepository->findBy(['parent' => null]),
+        ]);
     }
 
     /**

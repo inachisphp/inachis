@@ -72,9 +72,13 @@ class ChangePasswordController extends AbstractInachisController
             $this->addFlash('success', 'Password updated.');
             $this->entityManager->flush();
         }
-        $this->setPageProperties(['title' => 'Change Password', 'tab' => 'users']);
-        $this->data['user'] = $user;
-        $this->data['form'] = $form->createView();
-        return $this->render('inadmin/page/admin/change-password.html.twig', $this->data);
+
+        $this->viewModel->page->title = 'Change Password';
+        $this->viewModel->page->tab = 'users';
+        return $this->render('inadmin/page/admin/change-password.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'user' => $user,
+        ]);
     }
 }

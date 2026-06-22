@@ -70,16 +70,18 @@ class RolesController extends AbstractInachisController
             'admin',
             'displayName asc',
         );
-        $this->setPageProperties(['title' => 'Roles', 'tab' => 'roles']);
-        $this->data['form'] = $form->createView();
-        $this->data['dataset'] = $roleRepository->getFiltered(
-            $contentQuery['filters'],
-            $contentQuery['offset'],
-            $contentQuery['limit'],
-        );
-        $this->data['query'] = $contentQuery;
-
-        return $this->render('inadmin/page/security/roles/list.html.twig', $this->data);
+        $this->viewModel->page->title = 'Roles';
+        $this->viewModel->page->tab = 'roles';
+        return $this->render('inadmin/page/security/roles/list.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'dataset' => $roleRepository->getFiltered(
+                $contentQuery['filters'],
+                $contentQuery['offset'],
+                $contentQuery['limit'],
+            ),
+            'query' => $contentQuery,
+        ]);
     }
 
     /**
@@ -144,12 +146,14 @@ class RolesController extends AbstractInachisController
         // Build a structured permission matrix to pass to the template.
         $permissionMatrix = $this->buildPermissionMatrix($role);
 
-        $this->setPageProperties(['title' => $isNew ? 'New Role' : 'Edit Role', 'tab' => 'roles']);
-        $this->data['role'] = $role;
-        $this->data['form'] = $form->createView();
-        $this->data['permissionMatrix'] = $permissionMatrix;
-
-        return $this->render('inadmin/page/security/roles/edit.html.twig', $this->data);
+        $this->viewModel->page->title = $isNew ? 'New Role' : 'Edit Role';
+        $this->viewModel->page->tab = 'roles';
+        return $this->render('inadmin/page/security/roles/edit.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'permissionMatrix' => $permissionMatrix,
+            'role' => $role,
+        ]);
     }
 
     /**

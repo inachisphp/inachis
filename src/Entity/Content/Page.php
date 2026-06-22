@@ -927,7 +927,7 @@ class Page
     /**
      * Sets the tags for this Page
      *
-     * @param Collection<Tag> $tags
+     * @param Collection<int, Tag> $tags
      * @return self
      */
     public function setTags(Collection $tags): self

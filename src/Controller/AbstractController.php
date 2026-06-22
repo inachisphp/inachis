@@ -9,18 +9,23 @@
 
 namespace Inachis\Controller;
 
+use Inachis\Model\System\PageMetadata;
+use Inachis\Model\System\PageView;
+use Inachis\Model\System\SiteSettings;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as SymfonyController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * 
  */
 abstract class AbstractController extends SymfonyController
 {
+    protected PageView $viewModel;
 
-    /**
-     * @var array<string, mixed>
-     */
-    protected array $data = [];
+    public function __construct(protected ParameterBagInterface $params)
+    {
+        $this->viewModel = $this->createPageViewModel();
+    }
 
     /**
      * Gets the protocol and hostname.
@@ -58,16 +63,45 @@ abstract class AbstractController extends SymfonyController
     }
 
     /**
-     * Applies properties to the current page view
+     * Sets up the {@link PageView} model
      *
-     * @param array<string, string> $properties
+     * @return PageView
      */
-    protected function setPageProperties(array $properties): void
+    protected function createPageViewModel(): PageView
     {
-        $page = $this->data['page'] ?? [];
-        if (!is_array($page)) {
-            $page = [];
-        }
-        $this->data['page'] = array_merge($page, $properties);
+        $settings = new SiteSettings(
+            siteTitle: $this->params->has('app.config.title')
+                && is_string($this->params->get('app.config.title'))
+                ? $this->params->get('app.config.title')
+                : 'Untitled Site',
+
+            domain: $this->getProtocolAndHostname(),
+
+            google: [],
+
+            language: $this->params->has('app.config.locale')
+                && is_string($this->params->get('app.config.locale'))
+                ? $this->params->get('app.config.locale')
+                : 'en',
+
+            textDirection: $this->params->has('app.config.textDirection')
+                && is_string($this->params->get('app.config.textDirection'))
+                ? $this->params->get('app.config.textDirection')
+                : 'ltr',
+
+            abstract: $this->params->has('app.config.abstract')
+                && is_string($this->params->get('app.config.abstract'))
+                ? $this->params->get('app.config.abstract')
+                : '',
+
+            geotagContent: $this->params->has('app.config.geotagContent')
+                && is_bool($this->params->get('app.config.geotagContent'))
+                ? $this->params->get('app.config.geotagContent')
+                : false,
+        );
+
+        $page = new PageMetadata();
+
+        return new PageView($settings, $page);
     }
 }

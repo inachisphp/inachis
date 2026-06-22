@@ -28,14 +28,17 @@ class SeriesWebController extends AbstractWebController
         int $year,
         string $title
     ): Response {
-        $this->data['series'] = $seriesRepository->getPublicSeriesByYearAndUrl(
+        $series = $seriesRepository->getPublicSeriesByYearAndUrl(
             (string) $year,
             $title
         );
-        if (empty($this->data['series'])) {
+        if (empty($series)) {
             throw $this->createNotFoundException('This page does not exist');
         }
-        return $this->render('web/pages/series.html.twig', $this->data);
+        return $this->render('web/pages/series.html.twig', [
+            'viewModel' => $this->viewModel,
+            'series' => $series,
+        ]);
     }
 
 }

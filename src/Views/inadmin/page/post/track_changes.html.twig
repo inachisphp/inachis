@@ -1,8 +1,8 @@
 {% extends "inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_post_list', { type: page.tab }) }}">{{ page.tab|title }}s</a>
-    <a href="/incc/{{ page.tab }}/{{ url }}">Edit {{ page.tab }}</a>
+    <a href="{{ path('incc_post_list', { type: viewModel.page.tab }) }}">{{ viewModel.page.tab|title }}s</a>
+    <a href="/incc/{{ viewModel.page.tab }}/{{ url }}">Edit {{ viewModel.page.tab }}</a>
     <span>Track Changes</span>
 {% endblock pagetitle %}
 
@@ -40,7 +40,7 @@
                     data-confirm-text="Yes, revert"
                     data-entity="post"
                     data-form-action=""
-                    data-title="Revert selected  {{ page.tab }}"
+                    data-title="Revert selected  {{ viewModel.page.tab }}"
                     data-warning="Your current version will be replaced with the contents of this previous state."
                     name="doRevert" type="submit">
                     <span class="material-icons" aria-hidden="true">undo</span> <span>Revert</span>

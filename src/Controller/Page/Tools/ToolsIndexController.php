@@ -27,9 +27,13 @@ class ToolsIndexController extends AbstractInachisController
     #[Route("/incc/tools", name: 'incc_tools_index')]
     public function index(): Response
     {
-        $this->data['environment'] = $this->getParameter('kernel.environment');
-        $this->setPageProperties(['title' => 'Tools', 'tab' => 'tools']);
-        return $this->render('inadmin/page/tools/list.html.twig', $this->data);
+        
+        $this->viewModel->page->title = 'Tools';
+        $this->viewModel->page->tab = 'tools';
+        return $this->render('inadmin/page/tools/list.html.twig', [
+            'viewModel' => $this->viewModel,
+            'environment' => $this->getParameter('kernel.environment'),
+        ]);
     }
 
     /**
@@ -42,13 +46,16 @@ class ToolsIndexController extends AbstractInachisController
     #[Route("/incc/tools/storage", name: 'incc_tools_storage')]
     public function storage(ImageRepository $imageRepository, PageRepository $pageRepository): Response
     {
-        $this->data['environment'] = $this->getParameter('kernel.environment');
-        $this->setPageProperties(['title' => 'Storage', 'tab' => 'tools']);
-        $this->data['storage'] = [
-            'biggestImages' => $imageRepository->getAll(0, 10, [], [['q.filesize', 'DESC']]),
-            'images' => $imageRepository->getDiskUsage(),
-            'topPagesBySize' => $pageRepository->getTopPagesByImageSize(25),
-        ];
-        return $this->render('inadmin/page/tools/storage.html.twig', $this->data);
+        $this->viewModel->page->title = 'Storage';
+        $this->viewModel->page->tab = 'tools';
+        return $this->render('inadmin/page/tools/storage.html.twig', [
+            'viewModel' => $this->viewModel,
+            'environment' => $this->getParameter('kernel.environment'),
+            'storage' => [
+                'biggestImages' => $imageRepository->getAll(0, 10, [], [['q.filesize', 'DESC']]),
+                'images' => $imageRepository->getDiskUsage(),
+                'topPagesBySize' => $pageRepository->getTopPagesByImageSize(25),
+            ],
+        ]);
     }
 }

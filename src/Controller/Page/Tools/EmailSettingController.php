@@ -39,10 +39,12 @@ class EmailSettingController extends AbstractInachisController
 		$selector = isset($_ENV['DKIM_SELECTOR']) && is_string($_ENV['DKIM_SELECTOR']) ? $_ENV['DKIM_SELECTOR'] : 'default';
 		$report = $domainEmailAnalyser->analyse($domain, $serverIp, $selector);
 
-		$this->setPageProperties(['title' => 'Email settings', 'tab' => 'tools']);
-		$this->data['report'] = $report;
-
-		return $this->render('inadmin/page/tools/email.html.twig', $this->data);
+		$this->viewModel->page->title = 'Email settings';
+		$this->viewModel->page->tab = 'tools';
+		return $this->render('inadmin/page/tools/email.html.twig', [
+			'viewModel' => $this->viewModel,
+			'report' => $report,
+		]);
 	}
 
 	/**

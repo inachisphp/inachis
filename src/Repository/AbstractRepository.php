@@ -88,7 +88,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
      *
      * @param int $offset The offset from which to return results from
      * @param int $limit  The maximum number of results to return
-     * @param list{0: string, 1?:array<string, string|list<string>>}|list{} $where
+     * @param list{0: string, 1?:array<string, mixed>}|list{} $where
      * @param list<list{0: string, 1: string}>|string|list{} $order
      * @param list<string>|list{} $groupBy
      * @param list<list{0: string, 1: string, 2: string, 3?: string}>|list{} $join

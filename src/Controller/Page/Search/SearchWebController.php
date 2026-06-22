@@ -29,10 +29,8 @@ class SearchWebController extends AbstractWebController
         UrlRepository $urlRepository,
         SeriesRepository $seriesRepository,
     ): Response {
-        $this->setDefaults();
-
-        $keyword = trim((string) $request->query->get('q', ''));
-        $pageNumber = max(1, (int) $request->query->get('page', 1));
+        $keyword = trim($request->query->getString('q', ''));
+        $pageNumber = max(1, $request->query->getInt('page', 1));
         $limit = 25;
         $offset = ($pageNumber - 1) * $limit;
 
@@ -75,17 +73,15 @@ class SearchWebController extends AbstractWebController
             }
         }
 
-        $this->setPageProperties([
-            'title' => $keyword === '' ? 'Search' : sprintf('Search results for “%s”', $keyword),
+        $this->viewModel->page->title = $keyword === '' ? 'Search' : sprintf('Search results for “%s”', $keyword);
+        return $this->render('web/pages/search.html.twig', [
+            'viewModel' => $this->viewModel,
+            'keyword' => $keyword,
+            'pageNumber' => $pageNumber,
+            'perPage' => $limit,
+            'results' => $results,
+            'total' => $total,
+            'totalPages' => $total > 0 ? (int) ceil($total / $limit) : 1,
         ]);
-        $data['keyword'] = $keyword;
-        $this->data = $data;
-        $this->data['results'] = $results;
-        $this->data['total'] = $total;
-        $this->data['pageNumber'] = $pageNumber;
-        $this->data['perPage'] = $limit;
-        $this->data['totalPages'] = $total > 0 ? (int) ceil($total / $limit) : 1;
-
-        return $this->render('web/pages/search.html.twig', $this->data);
     }
 }

@@ -51,7 +51,7 @@
         <p>
             {{ form_label(form.url) }}
             {{ form_errors(form.url) }}
-            {{ settings.domain -}}/{{ series.firstDate|date('Y') }}-{{ form_widget(form.url) }}
+            {{ viewModel.settings.domain -}}/{{ series.firstDate|date('Y') }}-{{ form_widget(form.url) }}
             <span class="admonition admonition__info">The year is defined by the last date of the series</span>
         </p>
         {% if series.items is not empty %}

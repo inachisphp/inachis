@@ -35,12 +35,14 @@ final class ThemeController extends AbstractInachisController
     #[Route('/incc/settings/themes', name: 'incc_settings_themes', methods: ['GET'])]
     public function index(ThemeScanner $themeScanner, ThemeManager $themeManager): Response
     {
-        $this->setPageProperties(['title' => 'Themes']);
-        $this->data['themes'] = $themeScanner->getThemes();
-        $this->data['activeTheme'] = $themeManager->getActiveTheme();
-        $this->data['scanStatus'] = $themeScanner->getScanStatus();
-
-        return $this->render('inadmin/page/settings/themes.html.twig', $this->data);
+        $this->viewModel->page->title = 'Themes';
+        $this->viewModel->page->tab = 'settings';
+        return $this->render('inadmin/page/settings/themes.html.twig', [
+            'viewModel' => $this->viewModel,
+            'activeTheme' => $themeManager->getActiveTheme(),
+            'scanStatus' => $themeScanner->getScanStatus(),
+            'themes' => $themeScanner->getThemes(),
+        ]);
     }
 
     /**
@@ -55,7 +57,6 @@ final class ThemeController extends AbstractInachisController
     public function rescan(ThemeScanner $themeScanner): Response
     {
         $themeScanner->rescanThemes();
-
         $this->addFlash('success', 'Theme folders rescanned.');
 
         return $this->redirectToRoute('incc_settings_themes');
