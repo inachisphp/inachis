@@ -196,9 +196,9 @@ abstract class AbstractFile
      * Sets the value of {@link id}.
      *
      * @param ?UuidInterface $value The id to set
-     * @return self
+     * @return static
      */
-    public function setId(?UuidInterface $value): self
+    public function setId(?UuidInterface $value): static
     {
         $this->id = $value;
 
@@ -209,9 +209,9 @@ abstract class AbstractFile
      * Sets the value of {@link title}.
      *
      * @param string $value The title to set
-     * @return self
+     * @return static
      */
-    public function setTitle(string $value): self
+    public function setTitle(string $value): static
     {
         $this->title = $value;
 
@@ -222,9 +222,9 @@ abstract class AbstractFile
      * Sets the value of {@link description}.
      *
      * @param string|null $value The description to set
-     * @return self
+     * @return static
      */
-    public function setDescription(?string $value): self
+    public function setDescription(?string $value): static
     {
         $this->description = $value;
 
@@ -235,9 +235,9 @@ abstract class AbstractFile
      * Sets the value of {@link filename}.
      *
      * @param string $value The filename to set
-     * @return self
+     * @return static
      */
-    public function setFilename(string $value): self
+    public function setFilename(string $value): static
     {
         $this->filename = $value;
 
@@ -248,9 +248,9 @@ abstract class AbstractFile
      * Sets the value of {@link filetype}.
      *
      * @param string $value The filetype to set
-     * @return self
+     * @return static
      */
-    public function setFiletype(string $value): self
+    public function setFiletype(string $value): static
     {
         if (!$this->isValidFiletype($value)) {
             throw new FileException(sprintf('Invalid file type %s', $value));
@@ -273,9 +273,9 @@ abstract class AbstractFile
      * Sets the value of {@link filesize}.
      *
      * @param int $value The filesize to set
-     * @return self
+     * @return static
      */
-    public function setFilesize(int $value): self
+    public function setFilesize(int $value): static
     {
         if ($value < 0) {
             throw new FileException('File size must be a positive integer');
@@ -289,9 +289,9 @@ abstract class AbstractFile
      * Sets the value of {@link checksum}.
      *
      * @param string $value The checksum to set
-     * @return self
+     * @return static
      */
-    public function setChecksum(string $value): self
+    public function setChecksum(string $value): static
     {
         $this->checksum = $value;
 
@@ -302,9 +302,9 @@ abstract class AbstractFile
      * Sets the value of {@link author}.
      *
      * @param User|null $value The {@link User} to set as the author
-     * @return AbstractFile
+     * @return static
      */
-    public function setAuthor(?User $value = null): self
+    public function setAuthor(?User $value = null): static
     {
         $this->author = $value;
         return $this;
@@ -314,9 +314,9 @@ abstract class AbstractFile
      * Sets the value of {@link createDate}.
      *
      * @param DateTimeImmutable $value The date to be set
-     * @return self
+     * @return static
      */
-    public function setCreateDate(DateTimeImmutable $value): self
+    public function setCreateDate(DateTimeImmutable $value): static
     {
         $this->createDate = $value;
 
@@ -327,9 +327,9 @@ abstract class AbstractFile
      * Sets the value of {@link modDate}.
      *
      * @param DateTimeImmutable $value Specifies the mod date for the {@link Page}
-     * @return self
+     * @return static
      */
-    public function setModDate(DateTimeImmutable $value): self
+    public function setModDate(DateTimeImmutable $value): static
     {
         $this->modDate = $value;
 

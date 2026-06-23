@@ -106,21 +106,21 @@ class PageController extends AbstractInachisController
             'post',
             'postDate desc',
         );
-        $this->data['form'] = $form->createView();
+        
         if ($request->query->has('category') && $request->query->get('category') === 'null') {
-            $this->data['posts'] = $pageRepository->getPagesWithoutCategories($contentQuery['offset'], $contentQuery['limit']);
-            $this->data['querystring'] = 'category=null';
+            $posts = $pageRepository->getPagesWithoutCategories($contentQuery['offset'], $contentQuery['limit']);
+            $queryString = 'category=null';
         } elseif ($request->query->has('tag') && $request->query->get('tag') === 'null') {
-            $this->data['posts'] = $pageRepository->getPagesWithoutTags($contentQuery['offset'], $contentQuery['limit']);
-            $this->data['querystring'] = 'tag=null';
+            $posts = $pageRepository->getPagesWithoutTags($contentQuery['offset'], $contentQuery['limit']);
+            $queryString = 'tag=null';
         } elseif ($request->query->has('featureImage') && $request->query->get('featureImage') === 'null') {
-            $this->data['posts'] = $pageRepository->getPagesWithoutFeatureImage($contentQuery['offset'], $contentQuery['limit']);
-            $this->data['querystring'] = 'featureImage=null';
+            $posts = $pageRepository->getPagesWithoutFeatureImage($contentQuery['offset'], $contentQuery['limit']);
+            $queryString = 'featureImage=null';
         } elseif ($request->query->has('sharingMessage') && $request->query->get('sharingMessage') === 'null') {
-            $this->data['posts'] = $pageRepository->getPagesWithoutSharingMessage($contentQuery['offset'], $contentQuery['limit']);
-            $this->data['querystring'] = 'sharingMessage=null';
+            $posts = $pageRepository->getPagesWithoutSharingMessage($contentQuery['offset'], $contentQuery['limit']);
+            $queryString = 'sharingMessage=null';
         } else {
-            $this->data['posts'] = $pageRepository->getFilteredOfTypeByPostDate(
+            $posts = $pageRepository->getFilteredOfTypeByPostDate(
                 $contentQuery['filters'],
                 $type,
                 $contentQuery['offset'],
@@ -128,9 +128,15 @@ class PageController extends AbstractInachisController
                 $contentQuery['sort'],
             );
         }
-        $this->setPageProperties(['title' => ucfirst($type) . 's', 'tab' => $type,]);
-        $this->data['query'] = $contentQuery;
-        return $this->render('inadmin/page/post/list.html.twig', $this->data);
+        $this->viewModel->page->title = ucfirst($type) . 's';
+        $this->viewModel->page->tab = $type;
+        return $this->render('inadmin/page/post/list.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'posts' => $posts,
+            'query' => $contentQuery,
+            'queryString' => $queryString ?? '',
+        ]);
     }
 
     /**
@@ -257,29 +263,30 @@ class PageController extends AbstractInachisController
             );
         }
 
-        $this->setPageProperties(['title' =>  $post->getId() !== null ?
+        $this->viewModel->page->title = $post->getId() !== null ?
             'Editing "' . $post->getTitle() . '"' :
-            'New ' . $post->getType(),
-            'tab' => $post->getType()]);
-        $this->data['form'] = $form->createView();
-        $this->data['includeEditor'] = true;
-        $this->data['includeEditorId'] = $post->getId();
-        $this->data['post'] = $post;
-        $this->data['revisions'] = $revisionRepository->getAll(
-            0,
-            25,
-            [
-                'q.page_id = :pageId', [
-                    'pageId' => $post->getId()?->toString() ?: '',
+            'New ' . $post->getType();
+        $this->viewModel->page->tab = $post->getType();
+
+        return $this->render('inadmin/page/post/edit.html.twig', [
+            'viewModel' => $this->viewModel,
+            'allowedTypes' => Image::ALLOWED_MIME_TYPES,
+            'form' => $form->createView(),
+            'includeEditor' => true,
+            'includeEditorId' => $post->getId()?->toString() ?: '',
+            'post' => $post,
+            'revisions' => $revisionRepository->getAll(
+                0,
+                25,
+                [
+                    'q.page_id = :pageId', [
+                        'pageId' => $post->getId()?->toString() ?: '',
+                    ]
+                ], [
+                    [ 'q.versionNumber', 'DESC']
                 ]
-            ], [
-                [ 'q.versionNumber', 'DESC']
-            ]
-        );
-        if ($post->getId() !== null) {
-            $this->data['textStats'] = ReadingTime::getWordCountAndReadingTime($this->data['post']->getContent());
-        }
-        $this->data['allowedTypes'] = Image::ALLOWED_MIME_TYPES;
-        return $this->render('inadmin/page/post/edit.html.twig', $this->data);
+            ),
+            'textStats' => $post->getId() !== null ? ReadingTime::getWordCountAndReadingTime($post->getContent()) : [],
+        ]);
     }
 }

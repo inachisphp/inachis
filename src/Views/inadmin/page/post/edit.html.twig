@@ -1,8 +1,8 @@
 {% extends "inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_post_list', { type: page.tab }) }}">{{ page.tab|title }}s</a>
-    <span>{% if post.id is empty %}New{% else %}Edit{% endif %} {{ page.tab }}</span>
+    <a href="{{ path('incc_post_list', { type: viewModel.page.tab }) }}">{{ viewModel.page.tab|title }}s</a>
+    <span>{% if post.id is empty %}New{% else %}Edit{% endif %} {{ viewModel.page.tab }}</span>
 {% endblock pagetitle %}
 
 {% block content %}
@@ -50,10 +50,10 @@
             <p class="post__link__edit">
                 {{ form_label(form.url) }}
                 {{ form_errors(form.url) }}
-                {{ settings.domain -}}/<input class="field__wide" id="post_url" name="post[url]" type="text" value="{% if post.urls is not empty %}{{ post.urls|first.link }}{% endif %}" />
+                {{ viewModel.settings.domain -}}/<input class="field__wide" id="post_url" name="post[url]" type="text" value="{% if post.urls is not empty %}{{ post.urls|first.link }}{% endif %}" />
                 {% if post.urls is not empty %}
                 <button aria-label="{{ 'admin.post.share.copyLink.help'|trans }}"
-                        data-prefix="{{ settings.domain }}/"
+                        data-prefix="{{ viewModel.settings.domain }}/"
                         data-target="post_url"
                         class="button button--info button--copy"
                         type="button"

@@ -54,9 +54,12 @@ class SecurityPolicyController extends AbstractInachisController
             return $this->redirectToRoute('security_policy');
         }
 
-        $this->setPageProperties(['title' => 'Security Policy', 'tab' => 'policies']);
-        $this->data['policies'] = $policies;
-        $this->data['form'] = $form->createView();
-        return $this->render('inadmin/page/admin/security_policy.html.twig', $this->data);
+        $this->viewModel->page->title = 'Security Policy';
+        $this->viewModel->page->tab = 'policies';
+        return $this->render('inadmin/page/admin/security_policy.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'policies' => $policies,
+        ]);
     }
 }

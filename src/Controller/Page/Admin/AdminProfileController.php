@@ -82,15 +82,18 @@ class AdminProfileController extends AbstractInachisController
             'admin',
             'displayName asc',
         );
-        $this->setPageProperties(['title' => 'Users', 'tab' => 'users']);
-        $this->data['form'] = $form->createView();
-        $this->data['dataset'] = $userRepository->getFiltered(
-            $contentQuery['filters'],
-            $contentQuery['offset'],
-            $contentQuery['limit'],
-        );
-        $this->data['query'] = $contentQuery;
-        return $this->render('inadmin/page/admin/list.html.twig', $this->data);
+        $this->viewModel->page->title = 'Users';
+        $this->viewModel->page->tab = 'users';
+        return $this->render('inadmin/page/admin/list.html.twig', [
+            'viewModel' => $this->viewModel,
+            'dataset' => $userRepository->getFiltered(
+                $contentQuery['filters'],
+                $contentQuery['offset'],
+                $contentQuery['limit'],
+            ),
+            'form' => $form->createView(),
+            'query' => $contentQuery,
+        ]);
     }
 
     /**
@@ -141,7 +144,7 @@ class AdminProfileController extends AbstractInachisController
                 $user->getPreferences()?->setColor(ProfileColorPalette::generate());
                 $userAccountEmailService->registerNewUser(
                     $user,
-                    $this->data,
+                    [ 'viewModel' => $this->viewModel, ],
                     fn (string $token) => $this->generateUrl(
                         'incc_account_new-password',
                         [ 'token' => $token ]
@@ -157,11 +160,13 @@ class AdminProfileController extends AbstractInachisController
             ]));
         }
 
-        $this->setPageProperties(['title' => 'Profile', 'tab' => 'users']);
-        $this->data['user'] = $user;
-        $this->data['form'] = $form->createView();
-        $this->data['heicSupported'] = $imageTransformer->isHEICSupported();
-
-        return $this->render('inadmin/page/admin/profile.html.twig', $this->data);
+        $this->viewModel->page->title = 'Profile';
+        $this->viewModel->page->tab = 'users';
+        return $this->render('inadmin/page/admin/profile.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'heicSupported' => $imageTransformer->isHEICSupported(),
+            'user' => $user,
+        ]);
     }
 }

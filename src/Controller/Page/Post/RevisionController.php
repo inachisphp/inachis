@@ -74,10 +74,11 @@ class RevisionController extends AbstractInachisController
             throw new \RuntimeException('Page has no URLs');
         }
 
-        $this->setPageProperties(['title' => 'Compare Revisions', 'tab' => 'post']);
-        $this->data['page_id'] = $page->getId();
-        $this->data['url'] = $url->getLink();
-        $this->data['title'] = json_decode(
+        $this->viewModel->page->title = 'Compare Revisions';
+        $this->viewModel->page->tab = 'post';
+
+        
+        $title = json_decode(
             DiffHelper::calculate(
                 $revision->getTitle() ?? '',
                 $page->getTitle(),
@@ -89,16 +90,16 @@ class RevisionController extends AbstractInachisController
                 ]
             )
         );
-        if (empty($this->data['title'])) {
-            $this->data['title'] = $page->getTitle();
+        if (empty($title)) {
+            $title = $page->getTitle();
         }
-        $this->data['subTitle'] = json_decode(
+        $subTitle = json_decode(
             DiffHelper::calculate($revision->getSubTitle() ?? '', $page->getSubTitle() ?? '', 'Json')
         );
-        if (empty($this->data['subTitle'])) {
-            $this->data['subTitle'] = $page->getSubTitle();
+        if (empty($subTitle)) {
+            $subTitle = $page->getSubTitle();
         }
-        $this->data['revision_id'] = $revision->getId();
+        
         $content = mb_split(
             PHP_EOL,
             $revision->getContent() ?? ''
@@ -114,10 +115,17 @@ class RevisionController extends AbstractInachisController
                 }
             }
         }
-        $this->data['content'] = $content ? $renderer->render($content) : '';
-        $this->data['diffBlockType'] = \Inachis\Enum\DiffBlockType::class;
 
-        return $this->render('inadmin/page/post/track_changes.html.twig', $this->data);
+        return $this->render('inadmin/page/post/track_changes.html.twig', [
+            'viewModel' => $this->viewModel,
+            'content' => $content ? $renderer->render($content) : '',
+            'diffBlockType' => \Inachis\Enum\DiffBlockType::class,
+            'page_id' => $page->getId(),
+            'revision_id' => $revision->getId(),
+            'subTitle' => $subTitle,
+            'title' => $title,
+            'url' => $url->getLink(),
+        ]);
     }
 
     /**

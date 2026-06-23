@@ -12,28 +12,28 @@
     <p><span class="material-icons" aria-hidden="true">show_chart</span></p>
     <h2>Analytics</h2>
     <p><span>Review your site's analytics data.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_tools_analytics') }}" class="button button--secondary">Review Analytics</a></p>
+    <p><a href="{{ viewModel.settings.domain ~ path('incc_tools_analytics') }}" class="button button--secondary">Review Analytics</a></p>
 </section>
 
 <section class="widget widget-settings">
     <p><span class="material-icons" aria-hidden="true">domain</span></p>
     <h2>System Status</h2>
     <p><span>Check your current server and application settings.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_tools_diagnostics') }}" class="button button--secondary">Review System Status</a></p>
+    <p><a href="{{ viewModel.settings.domain ~ path('incc_tools_diagnostics') }}" class="button button--secondary">Review System Status</a></p>
 </section>
 
 <section class="widget widget-settings">
     <p><span class="material-icons" aria-hidden="true">email</span></p>
     <h2>Email DNS Status</h2>
     <p><span>Check your email DNS configuration for DKIM/DMARC/SPF settings.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_tools_email') }}" class="button button--secondary">Review Email DNS</a></p>
+    <p><a href="{{ viewModel.settings.domain ~ path('incc_tools_email') }}" class="button button--secondary">Review Email DNS</a></p>
 </section>
 
 <section class="widget widget-settings">
     <p><span class="material-icons" aria-hidden="true">storage</span></p>
     <h2>Storage</h2>
     <p><span>Check your storage usage.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_tools_storage') }}" class="button button--secondary">Review Storage</a></p>
+    <p><a href="{{ viewModel.settings.domain ~ path('incc_tools_storage') }}" class="button button--secondary">Review Storage</a></p>
 </section>
 
 {% if environment !== 'prod' %}
@@ -41,7 +41,7 @@
     <p><span class="material-icons" aria-hidden="true">receipt_long</span></p>
     <h2>Logs</h2>
     <p><span>Review application logs.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_tools_logs') }}" class="button button--secondary">Review Logs</a></p>
+    <p><a href="{{ viewModel.settings.domain ~ path('incc_tools_logs') }}" class="button button--secondary">Review Logs</a></p>
 </section>
 {% endif %}
 
@@ -49,28 +49,28 @@
     <p><span class="material-icons" aria-hidden="true">import_export</span></p>
     <h2>Import / Export</h2>
     <p><span>Import or export your site data.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_tools_import') }}" class="button button--secondary">Import / Export</a></p>
+    <p><a href="{{ viewModel.settings.domain ~ path('incc_tools_import') }}" class="button button--secondary">Import / Export</a></p>
 </section>
 
 <!-- section class="widget widget-settings">
     <p><span class="material-icons" aria-hidden="true">backup</span></p>
     <h2>Backup / Restore</h2>
     <p><span>Backup your site and restore from a backup.</span></p>
-    <p><a href="{{ settings.domain }}" class="button button--secondary">Backup / Restore</a></p>
+    <p><a href="{{ viewModel.settings.domain }}" class="button button--secondary">Backup / Restore</a></p>
 </section -->
 
 <section class="widget widget-settings">
     <p><span class="material-icons" aria-hidden="true">construction</span></p>
     <h2>Maintenance Mode</h2>
     <p><span>Put your site in maintenance mode.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_tools_maintenance') }}" class="button button--secondary">Maintenance Mode</a></p>
+    <p><a href="{{ viewModel.settings.domain ~ path('incc_tools_maintenance') }}" class="button button--secondary">Maintenance Mode</a></p>
 </section>
 
 <section class="widget widget-settings widget-settings--danger">
     <p><span class="material-icons" aria-hidden="true">delete_forever</span></p>
     <h2>Data Purge</h2>
     <p><span><strong>Danger:</strong> Delete all content from your site.</span></p>
-    <p><a href="{{ settings.domain }}" class="button button--negative">Purge Data</a></p>
+    <p><a href="{{ viewModel.settings.domain }}" class="button button--negative">Purge Data</a></p>
 </section>
 
 </div>

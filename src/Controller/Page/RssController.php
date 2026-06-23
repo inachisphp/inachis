@@ -9,8 +9,8 @@
 
 namespace Inachis\Controller\Page;
 
-use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Content\{Category, Page};
+use Inachis\Controller\AbstractWebController;
+use Inachis\Entity\Content\Page;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\PageRepository;
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-class RssController extends AbstractInachisController
+class RssController extends AbstractWebController
 {
     /**
      * Helper to log feed subscription requests
@@ -77,16 +77,18 @@ class RssController extends AbstractInachisController
             20
         );
 
-        $this->data['posts'] = iterator_to_array($paginator);
-        /** array<string,string> $this->data['settings'] */
-        $this->data['feed_title'] = $this->data['settings']['siteTitle'];
-        $this->data['feed_description'] = $this->data['settings']['abstract'] ?: 'Blog post updates';
-        $this->data['feed_url'] = $this->data['settings']['domain'] . '/feed';
-
         $response = new Response();
         $response->headers->set('Content-Type', 'application/rss+xml; charset=utf-8');
-
-        return $this->render('web/pages/rss.xml.twig', $this->data, $response);
+        return $this->render('web/pages/rss.xml.twig',
+            [
+                'viewModel' => $this->viewModel,
+                'posts' => iterator_to_array($paginator),
+                'feed_title' => $this->viewModel->settings->siteTitle,
+                'feed_description' => $this->viewModel->settings->abstract ?: 'Blog post updates',
+                'feed_url' => $this->viewModel->settings->domain . '/feed',
+            ],
+            $response
+        );
     }
 
     /**
@@ -127,15 +129,18 @@ class RssController extends AbstractInachisController
             20
         );
 
-        $this->data['posts'] = iterator_to_array($paginator);
-        $this->data['feed_title'] = $this->data['settings']['siteTitle'] . ' - ' . $category->getTitle();
-        $this->data['feed_description'] = $category->getDescription() ?: 'Posts in category ' . $category->getTitle();
-        $this->data['feed_url'] = $this->data['settings']['domain'] . '/feed/' . $category->getTitle();
-
         $response = new Response();
         $response->headers->set('Content-Type', 'application/rss+xml; charset=utf-8');
-
-        return $this->render('web/pages/rss.xml.twig', $this->data, $response);
+        return $this->render(
+            'web/pages/rss.xml.twig', [
+                'viewModel' => $this->viewModel,
+                'posts' => iterator_to_array($paginator),
+                'feed_title' => $this->viewModel->settings->siteTitle . ' - ' . $category->getTitle(),
+                'feed_description' => $category->getDescription() ?: 'Posts in category ' . $category->getTitle(),
+                'feed_url' => $this->viewModel->settings->domain . '/feed' . $category->getTitle(),
+            ],
+            $response
+        );
     }
 
     /**
@@ -151,12 +156,12 @@ class RssController extends AbstractInachisController
             'visible' => true
         ], ['title' => 'ASC']);
 
-        $this->setPageProperties([
-            'title' => 'Subscribe to RSS Feeds',
-            'description' => 'Choose from our range of RSS feeds to stay updated with latest articles.',
+        $this->viewModel->page->title = 'Subscribe to RSS Feeds';
+        $this->viewModel->page->description = 'Choose from our range of RSS feeds to stay updated with latest articles.';
+        return $this->render('web/pages/feeds-list.html.twig',
+        [
+            'viewModel' => $this->viewModel,
+            'categories' => $categories,
         ]);
-        $this->data['categories'] = $categories;
-
-        return $this->render('web/pages/feeds-list.html.twig', $this->data);
     }
 }

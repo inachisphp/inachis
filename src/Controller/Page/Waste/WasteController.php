@@ -14,7 +14,6 @@ use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Waste\WasteRepository;
 use Inachis\Service\Waste\WasteManagerService;
-use PhpParser\Node\NullableType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -78,16 +77,18 @@ class WasteController extends AbstractInachisController
             'waste',
             'modDate desc',
         );
-        $this->data['form'] = $form->createView();
-        $this->data['dataset'] = $wasteRepository->getFiltered(
-            $contentQuery['filters'],
-            $contentQuery['offset'],
-            $contentQuery['limit'],
-            $contentQuery['sort'],
-        );
-        $this->data['query'] = $contentQuery;
-        $this->setPageProperties(['tab' => 'waste']);
-        return $this->render('inadmin/page/waste/list.html.twig', $this->data);
+        $this->viewModel->page->tab = 'waste';
+        return $this->render('inadmin/page/waste/list.html.twig', [
+            'viewModel' => $this->viewModel,
+            'dataset' => $wasteRepository->getFiltered(
+                $contentQuery['filters'],
+                $contentQuery['offset'],
+                $contentQuery['limit'],
+                $contentQuery['sort'],
+            ),
+            'form' => $form->createView(),
+            'query' => $contentQuery,
+        ]);
     }
 
     /**
@@ -113,14 +114,14 @@ class WasteController extends AbstractInachisController
         if ($processItem === null) {
             throw $this->createNotFoundException('The item does not exist or has been permanently deleted');
         }
-
-        $this->data['waste'] = $processItem;
-        $this->data['wasteContent'] = json_decode($processItem->getContent() ?? '', true);
-        $this->setPageProperties(['tab' => 'waste']);
-
         $form = $this->createFormBuilder()->getForm();
-        $this->data['form'] = $form->createView();
 
-        return $this->render('inadmin/page/waste/view.html.twig', $this->data);
+        $this->viewModel->page->tab = 'waste';
+        return $this->render('inadmin/page/waste/view.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'waste' => $processItem,
+            'wasteContent' =>json_decode($processItem->getContent() ?? '', true),
+        ]);
     }
 }

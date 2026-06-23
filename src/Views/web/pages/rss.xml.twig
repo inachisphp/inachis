@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>{{ feed_title }}</title>
-    <link>{{ settings.domain }}</link>
+    <link>{{ viewModel.settings.domain }}</link>
     <description>{{ feed_description }}</description>
     <language>{{ settings.language|default('en') }}</language>
     <pubDate>{{ posts|length > 0 ? posts|first.postDate|date('r') : 'now'|date('r') }}</pubDate>
@@ -11,7 +11,7 @@
     {% for post in posts %}
       <item>
         <title>{{ post.title }}{% if post.subTitle is not empty %} — {{ post.subTitle }}{% endif %}</title>
-        <link>{{ settings.domain }}/{{ post.urls.first.link }}</link>
+        <link>{{ viewModel.settings.domain }}/{{ post.urls.first.link }}</link>
         <description><![CDATA[{{ post.featureSnippet is not empty ? post.featureSnippet : (post.content|striptags|slice(0, 250) ~ '...') }}]]></description>
         <pubDate>{{ post.postDate|date('r') }}</pubDate>
         <guid isPermaLink="true">{{ settings.domain }}/{{ post.urls.first.link }}</guid>

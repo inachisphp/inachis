@@ -40,51 +40,25 @@ abstract class AbstractInachisController extends AbstractController
         protected Security $security,
         protected TranslatorInterface $translator,
         protected WasteRepository $wasteRepository,
-    ) {}
+    ) {
+        parent::__construct($params);
+        $this->configureAdminPageViewModel();
+    }
 
     /**
-     * Sets the default data for the controller.
+     * Sets the default data for the admin controller.
      */
-    public function setDefaults(): void
+    public function configureAdminPageViewModel(): void
     {
         $sessionTimeout = new DateTimeImmutable();
         $sessionTimeout = $sessionTimeout->add(new DateInterval('PT' . ini_get('session.gc_maxlifetime') . 'S'));
 
-        $this->data = [
-            'settings' => [
-                'siteTitle' => $this->params->has('app.config.title')
-                    ? $this->params->get('app.config.title')
-                    : 'Untitled Site',
-                'domain' => $this->getProtocolAndHostname(),
-                'google' => [],
-                'language' => $this->params->has('app.config.locale') 
-                    ? $this->params->get('app.config.locale') 
-                    : 'en',
-                'textDirection' => $this->params->has('app.config.textDirection') 
-                    ? $this->params->get('app.config.textDirection') 
-                    : 'ltr',
-                'abstract' => $this->params->has('app.config.abstract') 
-                    ? $this->params->get('app.config.abstract') 
-                    : '',
-                'geotagContent' => $this->params->has('app.config.geotagContent') 
-                    ? $this->params->get('app.config.geotagContent') 
-                    : false,
-            ],
-            'notifications' => [],
-            'page'          => [
-                'self'          => '',
-                'tab'           => '',
-                'title'         => '',
-                'description'   => '',
-                'keywords'      => '',
-                'modDate'       => '',
-            ],
-            'session' => $this->security->getUser(),
-            'session_timeout' => ini_get('session.gc_maxlifetime'),
-            'session_timeout_time' => $sessionTimeout->format('Y-m-d\TH:i:s'),
-            'deleted_items' => $this->wasteRepository->getWasteCount(),
-        ];
-        $this->data['timeout_template'] = base64_encode($this->renderView('inadmin/dialog/session_timeout.html.twig'));
+        $this->viewModel->session = $this->security->getUser();
+        $this->viewModel->sessionTimeout = intval(ini_get('session.gc_maxlifetime'));
+        $this->viewModel->sessionTimeoutTime = $sessionTimeout->format('Y-m-d\TH:i:s');
+        $this->viewModel->deletedItems = $this->wasteRepository->getWasteCount();
+        // @todo fix the below
+        // $this->viewModel->timeoutTemplate = base64_encode($this->renderView('inadmin/dialog/session_timeout.html.twig'));
     }
 
     /**

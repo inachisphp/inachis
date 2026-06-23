@@ -1,8 +1,8 @@
 {% extends "inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_resource_list', { type: page.type }) }}">{{ page.type|title }}</a>
-    <span>{% if resource.id is empty %}New{% else %}Edit{% endif %} {{ page.type }}</span>
+    <a href="{{ path('incc_resource_list', { type: viewModel.page.type }) }}">{{ viewModel.page.type|title }}</a>
+    <span>{% if resource.id is empty %}New{% else %}Edit{% endif %} {{ viewModel.page.type }}</span>
 {% endblock pagetitle %}
 
 {% block content %}
@@ -31,7 +31,7 @@
         </fieldset>
 
         <fieldset class="edit-image">
-            {% if page.type == 'images' %}
+            {% if viewModel.page.type == 'images' %}
                 {{ include('inadmin/partials/image_preview.html.twig', {
                     id: resource.id,
                     value: resource,
@@ -51,10 +51,10 @@
 
         <fieldset class="edit-properties" id="post__properties">
             <h3>{{ 'admin.resources.properties.title'|trans }}</h3>
-            {% if page.type == 'images' %}
+            {% if viewModel.page.type == 'images' %}
             <p><strong>{{ 'admin.resources.properties.dimensions'|trans }}:</strong> {{ resource.dimensionX ~ ' (w) x ' ~ resource.dimensionY ~ ' (h)' }}</p>
-                {% if channels is not empty or bits is not empty %}
-            <p><strong>{{ 'admin.resources.properties.colourDepth'|trans }}:</strong> {% if bits is not empty %}{{ bits }}-bit{% endif %} {% if channels == 3 %}RGB{% elseif channels == 4 %}CMYK{% endif %}</p>
+                {% if additional.channels is not empty or additional.bits is not empty %}
+            <p><strong>{{ 'admin.resources.properties.colourDepth'|trans }}:</strong> {% if additional.bits is not empty %}{{ additional.bits }}-bit{% endif %} {% if additional.channels == 3 %}RGB{% elseif additional.channels == 4 %}CMYK{% endif %}</p>
                     {% endif %}
             {% endif %}
             <p><strong>{{ 'admin.resources.properties.filename'|trans }}:</strong> {{ resource.filename }}</p>

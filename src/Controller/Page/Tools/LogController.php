@@ -59,11 +59,14 @@ class LogController extends AbstractInachisController
             }
         }
 
-        $this->data['form'] = $form->createView();
-        $this->data['entries'] = $parsedLines;
-        $this->data['filter'] = $filter;
-        $this->setPageProperties(['title' => 'Logs', 'tab' => 'logs']);
-        return $this->render('inadmin/page/tools/log.html.twig', $this->data);
+        $this->viewModel->page->title = 'Logs';
+        $this->viewModel->page->tab = 'logs';
+        return $this->render('inadmin/page/tools/log.html.twig', [
+            'viewModel' => $this->viewModel,
+            'entries' => $parsedLines,
+            'filter' => $filter,
+            'form' => $form->createView(),
+        ]);
     }
 
     /**

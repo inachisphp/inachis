@@ -77,33 +77,32 @@ class ResourceController extends AbstractInachisController
             'title asc',
         );
         if ($repository instanceof ImageRepository && $request->query->getString('altText', '') === 'null') {
-            $this->data['dataset'] = $repository->getImagesWithoutAltText(
+            $dataset = $repository->getImagesWithoutAltText(
                 $contentQuery['offset'],
                 $contentQuery['limit']
             );
         } else {
-            $this->data['dataset'] = $repository->getFiltered(
+            $dataset = $repository->getFiltered(
                 $contentQuery['filters'],
                 $contentQuery['offset'],
                 $contentQuery['limit'],
                 $contentQuery['sort'],
             );
         }
-        $this->setPageProperties([
-            'title' => $type . 's',
-            'type' => strtolower($type) . 's',
-            'tab' => strtolower($type),
-        ]);
-        $this->data['form'] = $form->createView();
-        $this->data['query'] = $contentQuery;
-        if ($request->query->has('upload') && $request->query->getString('upload') === 'true') {
-            $this->data['showUploadDialog'] = true;
-        }
-        $this->data['limitKByte'] = Image::WARNING_FILESIZE;
-        $this->data['limitSize'] = Image::WARNING_DIMENSIONS;
-        $this->data['allowedTypes'] = Image::ALLOWED_MIME_TYPES;
 
-        return $this->render('inadmin/page/resource/list.html.twig', $this->data);
+        $this->viewModel->page->title = $type . 's';
+        $this->viewModel->page->type = strtolower($type) . 's';
+        $this->viewModel->page->tab = strtolower($type);
+        return $this->render('inadmin/page/resource/list.html.twig', [
+            'viewModel' => $this->viewModel,
+            'allowedTypes' => Image::ALLOWED_MIME_TYPES,
+            'dataset' => $dataset,
+            'form' => $form->createView(),
+            'limitKByte' => Image::WARNING_FILESIZE,
+            'limitSize' => Image::WARNING_DIMENSIONS,
+            'query' => $contentQuery,
+            'showUploadDialog' => $request->query->has('upload') && $request->query->getString('upload') === 'true',
+        ]);
     }
 
     /**
@@ -154,9 +153,9 @@ class ResourceController extends AbstractInachisController
         }
         $form = $this->createForm(ResourceType::class, $resource);
         $form->handleRequest($request);
-        $this->data['usages'] = [];
+        $usages = [];
         if ($resource instanceof Image) {
-            $this->data['usages'] = [
+            $usages = [
                 'posts' => $pageRepository->getPostsUsingImage($resource),
                 'series' => $seriesRepository->getSeriesUsingImage($resource),
             ];
@@ -167,9 +166,9 @@ class ResourceController extends AbstractInachisController
             if (isset($request->request->all('resource')['delete'])) {
                 $filename = $imageDirectory . $resource->getFilename();
                 if ($resource instanceof Image &&
-                    isset($this->data['usages']['posts']) && 
-                    $this->data['usages']['posts']->count() === 0 &&
-                    $this->data['usages']['series']->count() === 0 &&
+                    isset($usages['posts']) && 
+                    $usages['posts']->count() === 0 &&
+                    $usages['series']->count() === 0 &&
                     $filesystem->exists($filename)) {
                     try {
                         $wasteManagerService->sendToWaste($resource);
@@ -207,26 +206,30 @@ class ResourceController extends AbstractInachisController
                 ]
             );
         }
-        $this->setPageProperties([
-            'type' => $request->attributes->getString('type'),
-            'title' => sprintf('%s: %s', $type, $resource->getTitle()),
-            'tab' => $type,
-        ]);
-        $this->data['form'] = $form->createView();
-        $this->data['resource'] = $resource;
+     
+        $additional = [];
         if ($resource instanceof Image) {
             try {
                 $sizes = $resource->getImageProperties($imageDirectory);
             } catch (FileNotFoundException $exception) {
                 $this->addFlash('error', 'Associated image file could not be found');
             }
-            $this->data['channels'] = $sizes['channels'] ?? '';
-            $this->data['bits'] = $sizes['bits'] ?? '';
-            $this->data['limitKByte'] = Image::WARNING_FILESIZE;
-            $this->data['limitSize'] = Image::WARNING_DIMENSIONS;
+            $additional['channels'] = $sizes['channels'] ?? '';
+            $additional['bits'] = $sizes['bits'] ?? '';
+            $additional['limitKByte'] = Image::WARNING_FILESIZE;
+            $additional['limitSize'] = Image::WARNING_DIMENSIONS;
         }
 
-        return $this->render('inadmin/page/resource/edit.html.twig', $this->data);
+        $this->viewModel->page->type = $request->attributes->getString('type');
+        $this->viewModel->page->title = sprintf('%s: %s', $type, $resource->getTitle());
+        $this->viewModel->page->tab = $type;
+        return $this->render('inadmin/page/resource/edit.html.twig', [
+            'viewModel' => $this->viewModel,
+            'additional' => $additional,
+            'form' => $form->createView(),
+            'resource' => $resource,
+            'usages' => $usages,
+        ]);
     }
 
     /**
@@ -242,6 +245,13 @@ class ResourceController extends AbstractInachisController
         SluggerInterface $slugger,
         #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory): JsonResponse
     {
+        /** @var array{
+         *     title: string,
+         *     description?: string,
+         *     altText?: string,
+         *     optimise?: bool
+         * } $imageData
+         */
         $imageData = $request->request->all('image');
         $uploadedFileInput = null;
         if ($request->files->has('image')) {
@@ -287,8 +297,12 @@ class ResourceController extends AbstractInachisController
 
             // Step 5: Create safe filename
             $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $title = trim($imageData['title']) !== ''
+                ? $imageData['title']
+                : $originalFilename;
+
             $safeFilename = strtolower(
-                $slugger->slug($imageData['title'] . '-' . uniqid() ?: $originalFilename)
+                (string) $slugger->slug($title . '-' . uniqid())
             );
             $newFilename = $safeFilename . '.' . $uploadedFile->guessExtension();
 
@@ -305,11 +319,11 @@ class ResourceController extends AbstractInachisController
                 ->setDescription($imageData['description'] ?? null)
                 ->setAltText($imageData['altText'] ?? null)
                 ->setFilesize($imageSize)
-                ->setFiletype($imageMimeType)
+                ->setFiletype($imageMimeType ?? '')
                 ->setFilename($newFilename)
                 ->setChecksum($checksum)
-                ->setDimensionX($dimensions[0])
-                ->setDimensionY($dimensions[1]);
+                ->setDimensionX(intval($dimensions[0]))
+                ->setDimensionY(intval($dimensions[1]));
 
             $this->entityManager->persist($image);
             $this->entityManager->flush();

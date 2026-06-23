@@ -5,7 +5,7 @@
 {% endif %}
 <div class="headercontainer">
     <header>
-        <h1>{{ settings.siteTitle }}</h1>
+        <h1>{{ viewModel.settings.siteTitle }}</h1>
         {% include "web/partials/nav.html.twig" %}
         <form action="{{ path('web_search') }}" method="get" role="search" class="site-search" aria-label="Search the site">
             <label for="site-search-input" class="visually-hidden">Search</label>

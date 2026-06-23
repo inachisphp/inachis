@@ -12,6 +12,8 @@ namespace Inachis\Controller\Page\Post;
 use Exception;
 use Inachis\Controller\AbstractWebController;
 use Inachis\Entity\Content\{Category,Page,Series,Tag,Url};
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Repository\Content\UrlRepository;
 use Inachis\Service\Content\ReadingTime;
@@ -88,11 +90,14 @@ class PageWebController extends AbstractWebController
     /**
      * Outputs a page of all pages/posts with the specific tag
      * @param string $tagName
+     * @param PageRepository $pageRepository
      * @return Response
      */
     #[Route("/tag/{tagName}", methods: [ "GET" ])]
-    public function getPostsByTag(string $tagName): Response
-    {
+    public function getPostsByTag(
+        string $tagName,
+        PageRepository $pageRepository,
+    ): Response {
         $tag = $this->entityManager->getRepository(Tag::class)->findOneBy(['title' => $tagName]);
 
         if (!$tag instanceof Tag) {
@@ -103,23 +108,30 @@ class PageWebController extends AbstractWebController
                 )
             );
         }
-        $this->data['filterName'] = 'tag';
-        $this->data['filterValue'] = $tagName;
-        $this->data['content'] = $this->entityManager->getRepository(Page::class)->getPagesWithTag($tag);
 
-        return $this->render('web/pages/homepage.html.twig', $this->data);
+        return $this->render('web/pages/homepage.html.twig', [
+            'viewModel' => $this->viewModel,
+            'filterName' => 'tag',
+            'filterValue' => $tagName,
+            'content' => $pageRepository->getPagesWithTag($tag),
+        ]);
     }
 
     /**
      * Outputs a page of all pages/posts with the specific category
      * 
      * @param string $categoryName
+     * @param CategoryRepository $categoryRepository
+     * @param PageRepository $pageRepository
      * @return Response
      */
     #[Route("/category/{categoryName}", methods: [ "GET" ])]
-    public function getPostsByCategory(string $categoryName): Response
-    {
-        $category = $this->entityManager->getRepository(Category::class)->findOneBy(['title' => $categoryName]);
+    public function getPostsByCategory(
+        string $categoryName,
+        CategoryRepository $categoryRepository,
+        PageRepository $pageRepository
+    ): Response {
+        $category = $categoryRepository->findOneBy(['title' => $categoryName]);
         if (!$category instanceof Category) {
             throw new NotFoundHttpException(
                 sprintf(
@@ -128,11 +140,12 @@ class PageWebController extends AbstractWebController
                 )
             );
         }
-        $this->data['filterName'] = 'category';
-        $this->data['filterValue'] = $categoryName;
-        $this->data['content'] = $this->entityManager->getRepository(Page::class)->getPagesWithCategory($category);
-
-        return $this->render('web/pages/homepage.html.twig', $this->data);
+        return $this->render('web/pages/homepage.html.twig', [
+            'viewModel' => $this->viewModel,
+            'filterName' => 'category',
+            'filterValue' => $categoryName,
+            'content' => $pageRepository->getPagesWithCategory($category),
+        ]);
     }
 
     /**
@@ -164,30 +177,35 @@ class PageWebController extends AbstractWebController
             }
             throw new NotFoundHttpException(sprintf('%s does not exist', $link));
         }
-        $this->data['post'] = $url->getContent();
-        $this->data['url'] = $url->getLink();
-        $this->data['textStats'] = ReadingTime::getWordCountAndReadingTime($this->data['post']->getContent());
 
         /** @var Series|null */
-        $series = $seriesRepository->getPublishedSeriesByPost($this->data['post']);
+        $series = $seriesRepository->getPublishedSeriesByPost($url->getContent());
+        $seriesNav = null;
         if (!empty($series)) {
             /** @var int */
-            $postIndex = $series->getItems()->indexOf($this->data['post']);
-            $this->data['series'] = [
+            $postIndex = $series->getItems()->indexOf($url->getContent());
+            $seriesNav = [
                 'title' => $series->getTitle(),
                 'subTitle' => $series->getSubTitle()
             ];
             if ($postIndex - 1 >= 0) {
-                $this->data['series']['previous'] = $series->getItems()->get($postIndex - 1);
+                $seriesNav['previous'] = $series->getItems()->get($postIndex - 1);
             }
             if ($postIndex + 1 < $series->getItems()->count()) {
-                $this->data['series']['next'] = $series->getItems()->get($postIndex + 1);
+                $seriesNav['next'] = $series->getItems()->get($postIndex + 1);
             }
         }
         $crawlerDetect = new CrawlerDetect();
         if (!$crawlerDetect->isCrawler()) {
             // @todo record page hit by day
         }
-        return $this->render('web/pages/post.html.twig', $this->data);
+        
+        return $this->render('web/pages/post.html.twig', [
+            'viewModel' => $this->viewModel,
+            'post' => $url->getContent(),
+            'series' => $seriesNav,
+            'textStats' => ReadingTime::getWordCountAndReadingTime($url->getContent()->getContent()),
+            'url' => $url->getLink(),
+        ]);
     }
 }

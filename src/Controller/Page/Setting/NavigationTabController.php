@@ -15,7 +15,6 @@ use Inachis\Form\NavigationTabType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\System\NavigationTabRepository;
 use Inachis\Service\Navigation\NavigationTabService;
-use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Repository\Content\CategoryRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -70,16 +69,20 @@ class NavigationTabController extends AbstractInachisController
             'navigationTab',
             'position asc',
         );
-        $this->data['query'] = $contentQuery;
-        $this->data['form'] = $form->createView();
-        $this->data['dataset'] = $navigationTabRepository->getFiltered(
-            $contentQuery['filters'],
-            $contentQuery['offset'],
-            $contentQuery['limit'],
-            $contentQuery['sort'],
-        );
-        $this->setPageProperties(['title' => 'Navigation Tabs', 'tab' => 'settings']);
-        return $this->render('inadmin/page/settings/navigation-list.html.twig', $this->data);
+
+        $this->viewModel->page->title = 'Navigation Tabs';
+        $this->viewModel->page->tab = 'settings';
+        return $this->render('inadmin/page/settings/navigation-list.html.twig', [
+            'viewModel' => $this->viewModel,
+            'dataset' => $navigationTabRepository->getFiltered(
+                $contentQuery['filters'],
+                $contentQuery['offset'],
+                $contentQuery['limit'],
+                $contentQuery['sort'],
+            ),
+            'form' => $form->createView(),
+            'query' => $contentQuery,
+        ]);
     }
 
     /**
@@ -111,10 +114,12 @@ class NavigationTabController extends AbstractInachisController
             return $this->redirectToRoute('incc_settings_navigation_list');
         }
 
-        $this->setPageProperties(['title' => 'Navigation Tab', 'tab' => 'settings']);
-        $this->data['form'] = $form->createView();
-
-        return $this->render('inadmin/page/settings/navigation-edit.html.twig', $this->data);
+        $this->viewModel->page->title = 'Navigation Tab';
+        $this->viewModel->page->tab = 'settings';
+        return $this->render('inadmin/page/settings/navigation-edit.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView()
+        ]);
     }
 
     /**

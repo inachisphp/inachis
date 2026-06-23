@@ -11,7 +11,7 @@ namespace Inachis\Twig;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
-use Inachis\Entity\System\NavigationTab;
+use Inachis\Model\NavigationTabDto;
 use Inachis\Service\Navigation\NavigationTabService;
 
 /**
@@ -37,7 +37,8 @@ class NavigationTabsExtension extends AbstractExtension
 
     /**
      * Returns the list of active navigation tabs
-     * @return array<NavigationTab>
+     * 
+     * @return list<NavigationTabDto>
      */
     public function getTabs(): array
     {

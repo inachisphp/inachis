@@ -30,18 +30,20 @@ class DiagnosticsController extends AbstractInachisController
     public function index(DiagnosticsCollector $collector): Response {
         $results = $collector->collect();
 
-        $this->setPageProperties(['title' => 'Server settings', 'tab' => 'tools']);
-        $this->data['sections'] = $collector->grouped();
-        $this->data['environment'] = $this->getParameter('kernel.environment');
-        $this->data['summary'] = $this->buildSummary($results);
-
-		return $this->render('inadmin/page/tools/server.html.twig', $this->data);
+        $this->viewModel->page->title = 'Server settings';
+        $this->viewModel->page->tab = 'tools';
+		return $this->render('inadmin/page/tools/server.html.twig', [
+            'viewModel' => $this->viewModel,
+            'environment' => $this->getParameter('kernel.environment'),
+            'sections' => $collector->grouped(),
+            'summary' => $this->buildSummary($results),
+        ]);
 	}
 
     /**
      * Build a summary array for the summary cards in Twig
      *
-     * @param list<\Inachis\Diagnostics\CheckResult> $results Array of CheckResult objects
+     * @param list<\Inachis\Diagnostics\CheckResult> $results Array of {@link CheckResult} objects
      * @return array{
      *     database: array{ok: int, warning: int, error: int, info: int},
      *     environment: array{ok: int, warning: int, error: int, info: int},

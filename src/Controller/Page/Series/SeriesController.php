@@ -81,16 +81,20 @@ class SeriesController extends AbstractInachisController
             'series',
             'lastDate desc',
         );
-        $this->data['form'] = $form->createView();
-        $this->data['dataset'] = $seriesRepository->getFiltered(
-            $contentQuery['filters'],
-            $contentQuery['offset'],
-            $contentQuery['limit'],
-            $contentQuery['sort'],
-        );
-        $this->data['query'] = $contentQuery;
-        $this->setPageProperties(['title' => 'Series', 'tab' => 'series']);
-        return $this->render('inadmin/page/series/list.html.twig', $this->data);
+
+        $this->viewModel->page->title = 'Series';
+        $this->viewModel->page->tab = 'series';
+        return $this->render('inadmin/page/series/list.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'dataset' => $seriesRepository->getFiltered(
+                $contentQuery['filters'],
+                $contentQuery['offset'],
+                $contentQuery['limit'],
+                $contentQuery['sort'],
+            ),
+            'query' => $contentQuery,
+        ]);
     }
 
     /**
@@ -105,7 +109,6 @@ class SeriesController extends AbstractInachisController
     public function edit(
         Request $request,
         SeriesRepository $seriesRepository,
-        ImageRepository $imageRepository,
         PageRepository $pageRepository,
         WasteManagerService $wasteManagerService,
     ): Response {
@@ -155,13 +158,16 @@ class SeriesController extends AbstractInachisController
             );
         }
 
-        $this->setPageProperties(['title' => $series->getId() !== null ? 'Editing "' . $series->getTitle() . '"' : 'New Series', 'tab' => 'series']);
-        $this->data['form'] = $form->createView();
-        $this->data['series'] = $series;
-        $this->data['includeEditor'] = true;
-        $this->data['includeEditorId'] = $series->getId();
-        $this->data['allowedTypes'] = Image::ALLOWED_MIME_TYPES;
-        return $this->render('inadmin/page/series/edit.html.twig', $this->data);
+        $this->viewModel->page->title = $series->getId() !== null ? 'Editing "' . $series->getTitle() . '"' : 'New Series';
+        $this->viewModel->page->tab = 'series';
+        return $this->render('inadmin/page/series/edit.html.twig', [
+            'viewModel' => $this->viewModel,
+            'allowedTypes' => Image::ALLOWED_MIME_TYPES,
+            'form' => $form->createView(),
+            'includeEditor' => true,
+            'includeEditorId' => $series->getId()?->toString() ?: '',
+            'series' => $series,
+        ]);
     }
 
     /**
@@ -175,8 +181,9 @@ class SeriesController extends AbstractInachisController
         $form = $this->createForm(SeriesType::class, $series);
         $form->handleRequest($request);
 
-        $this->data['series'] = $series;
-        $this->data['form'] = $form->createView();
-        return $this->render('inadmin/partials/series_contents.html.twig', $this->data);
+        return $this->render('inadmin/partials/series_contents.html.twig', [
+            'form' => $form->createView(),
+            'series' => $series,
+        ]);
     }
 }

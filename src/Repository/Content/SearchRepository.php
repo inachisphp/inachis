@@ -118,7 +118,33 @@ class SearchRepository extends ServiceEntityRepository
         $statement->bindValue('limit', $limit, 'integer');
         $statement->bindValue('offset', $offset,  'integer');
 
+        /** @var list<array{
+         *     id: string,
+         *     title: string,
+         *     sub_title: string,
+         *     content: string,
+         *     type: string,
+         *     contentDate: string,
+         *     mod_date: string,
+         *     author: string,
+         *     relevance: float
+         * }> $results
+         */
         $results = $statement->executeQuery()->fetchAllAssociative();
+        // $results = array_map(
+        //     static fn(array $row): array => [
+        //         'id' => is_string($row['id']) ? $row['id'] : '',
+        //         'title' => is_string($row['title']) ? $row['title'] : '',
+        //         'sub_title' => is_string($row['sub_title']) ? $row['sub_title'] : '',
+        //         'content' => is_string($row['content']) ? $row['content'] : '',
+        //         'type' => is_string($row['type']) ? $row['type'] : '',
+        //         'contentDate' => is_string($row['contentDate']) ? $row['contentDate'] : '',
+        //         'mod_date' => is_string($row['mod_date']) ? $row['mod_date'] : '',
+        //         'author' => null,
+        //         'relevance' => is_float($row['relevance']) ? $row['relevance'] : 0.00,
+        //     ],
+        //     $statement->executeQuery()->fetchAllAssociative()
+        // );
         $total = $this->getSearchTotalResults($keyword, $includeImages);
 
         return new SearchResult($results, (int) $total, $offset, $limit);

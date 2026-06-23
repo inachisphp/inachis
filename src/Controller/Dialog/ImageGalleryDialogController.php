@@ -27,10 +27,11 @@ class ImageGalleryDialogController extends AbstractInachisController
     #[Route('/incc/ax/imageManager/get', methods: [ 'POST' ])]
     public function getImageManagerList(): Response
     {
-        $this->data['form'] = $this->createForm(ImageType::class)->createView();
-        $this->data['allowedTypes'] = Image::ALLOWED_MIME_TYPES;
-        $this->data['dataset'] = [];
-        return $this->render('inadmin/dialog/image-manager.html.twig', $this->data);
+        return $this->render('inadmin/dialog/image-manager.html.twig', [
+            'form' => $this->createForm(ImageType::class)->createView(),
+            'allowedTypes' => Image::ALLOWED_MIME_TYPES,
+            'dataset' => [],
+        ]);
     }
 
     /**
@@ -53,15 +54,17 @@ class ImageGalleryDialogController extends AbstractInachisController
         $filters = array_filter($request->request->all('filter'));
         $offset = $request->attributes->getInt('offset', 0);
         $limit = $request->attributes->getInt('limit', $imageRepository::MAX_ITEMS_TO_SHOW_ADMIN);
-        $this->data['images'] = $imageRepository->getFiltered(
-            $filters,
-            $offset,
-            $limit
-        );
-        $this->data['query'] = [
-            'offset' => $offset,
-            'limit' => $limit
-        ];
-        return $this->render('inadmin/partials/gallery.html.twig', $this->data);
+
+        return $this->render('inadmin/partials/gallery.html.twig', [
+            'images' => $imageRepository->getFiltered(
+                $filters,
+                $offset,
+                $limit
+            ),
+            'query' => [
+                'offset' => $offset,
+                'limit' => $limit
+            ],
+        ]);
     }
 }

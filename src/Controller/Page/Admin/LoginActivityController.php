@@ -36,14 +36,17 @@ class LoginActivityController extends AbstractInachisController
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
-        $this->setPageProperties(['title' => 'Login Activity', 'tab' => 'audit-logs']);
-        $this->data['form'] = $form->createView();
-        $this->data['activities'] = $repository->findRecent(100);
-        $this->data['errors'] = [
-            // 'failedLogins' => $repository->recentFailures(),
-            // 'newDevices' => $repository->newDeviceLogins(),
-        ];
-        return $this->render('inadmin/page/admin/login-activity.html.twig', $this->data);
+        $this->viewModel->page->title = 'Login Activity';
+        $this->viewModel->page->tab = 'audit-logs';
+        return $this->render('inadmin/page/admin/login-activity.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'activities' => $repository->findRecent(100),
+            'errors' => [
+                // 'failedLogins' => $repository->recentFailures(),
+                // 'newDevices' => $repository->newDeviceLogins(),
+            ],
+        ]);
     }
 
     /**
@@ -61,10 +64,13 @@ class LoginActivityController extends AbstractInachisController
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
-        $this->setPageProperties(['title' => 'Login Activity', 'tab' => 'audit-logs']);
-        $this->data['user'] = $user;
-        $this->data['activities'] = $repository->findByUser($user, 100);
-        return $this->render('inadmin/page/admin/login-activity.html.twig', $this->data);
+        $this->viewModel->page->title = 'Login Activity';
+        $this->viewModel->page->tab = 'audit-logs';
+        return $this->render('inadmin/page/admin/login-activity.html.twig', [
+            'viewModel' => $this->viewModel,
+            'activities' => $repository->findByUser($user, 100),
+            'user' => $user,
+        ]);
     }
 
     /**
@@ -78,9 +84,12 @@ class LoginActivityController extends AbstractInachisController
     #[Route('/incc/admin/{username}/login-activity/{id}', name: 'incc_admin_login_activity_view')]
     public function view(Request $request, LoginActivityRepository $repository): Response
     {
-        $this->setPageProperties(['title' => 'Login Activity', 'tab' => 'audit-logs']);
-        $this->data['username'] = $request->attributes->getString('username', '');
-        $this->data['activity'] = $repository->find($request->attributes->getString('id'));
-        return $this->render('inadmin/page/admin/login-activity-view.html.twig', $this->data);
+        $this->viewModel->page->title = 'Login Activity';
+        $this->viewModel->page->tab = 'audit-logs';
+        return $this->render('inadmin/page/admin/login-activity-view.html.twig', [
+            'viewModel' => $this->viewModel,
+            'activity' => $repository->find($request->attributes->getString('id')),
+            'username' => $request->attributes->getString('username', ''),
+        ]);
     }
 }

@@ -50,11 +50,13 @@ class AppearanceController extends AbstractInachisController
             return $this->redirectToRoute('incc_admin_theme'); 
         }
 
-        $this->setPageProperties(['title' => 'Appearance']);
-        $this->data['form'] = $form->createView();
-        $this->data['user'] = [
-            'preferences' => $preferences,
-        ];
-        return $this->render('inadmin/page/admin/theme.html.twig', $this->data);
+        $this->viewModel->page->title = 'Appearance';
+        return $this->render('inadmin/page/admin/theme.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'user' => [
+                'preferences' => $preferences,
+            ],
+        ]);
     }
 }

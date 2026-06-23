@@ -62,17 +62,16 @@ class ContentAnalyticsController extends AbstractInachisController
                 '/' . $url->getLink()
             );
         }
-
-        $this->data['post'] = $post;
-        $this->data['stats'] = [
-            'from' => $fromDate,
-            'to' => $toDate,
-            'viewsPerDay' => $data,
-            'totalViews' => array_sum(array_column($data, 'views')),
-            'topReferrers' => $topReferrers,
-        ];
-
-        return $this->render('inadmin/partials/analytics.html.twig', $this->data);
+        return $this->render('inadmin/partials/analytics.html.twig', [
+            'post' => $post,
+            'stats' => [
+                'from' => $fromDate,
+                'to' => $toDate,
+                'viewsPerDay' => $data,
+                'totalViews' => array_sum(array_column($data, 'views')),
+                'topReferrers' => $topReferrers,
+            ],
+        ]);
     }
 
     /**
@@ -108,17 +107,18 @@ class ContentAnalyticsController extends AbstractInachisController
             $fromDate,
             $toDate,
         );
-        $this->data['post'] = $series;
-        $this->data['stats'] = [
-            'from' => $fromDate,
-            'to' => $toDate,
-            'viewsPerDay' => $data,
-            'totalViews' => array_sum(array_column($data, 'views')),
-            'topReferrers' => $analyticsProvider->getTopReferrersForPage(
-				'/' . ($series->getLastDate()?->format('Y') ?? '') . '/' . $series->getUrl()
-			),
-        ];
 
-        return $this->render('inadmin/partials/analytics.html.twig', $this->data);
+        return $this->render('inadmin/partials/analytics.html.twig', [
+            'post' => $series,
+            'stats' => [
+                'from' => $fromDate,
+                'to' => $toDate,
+                'viewsPerDay' => $data,
+                'totalViews' => array_sum(array_column($data, 'views')),
+                'topReferrers' => $analyticsProvider->getTopReferrersForPage(
+                    '/' . ($series->getLastDate()?->format('Y') ?? '') . '/' . $series->getUrl()
+                ),
+            ]
+        ]);
     }
 }

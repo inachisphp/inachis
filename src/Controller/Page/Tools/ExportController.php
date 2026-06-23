@@ -119,21 +119,26 @@ class ExportController extends AbstractInachisController
             ]);
         }
 
-        $this->setPageProperties(['title' => 'Export', 'tab' => 'export']);
-        $this->data['pages'] = $pageExportService->getAllPages();
-        $this->data['scope'] = $scope;
-        $this->data['format'] = $format;
-        $this->data['contentType'] = $contentType;
-        $this->data['manualPages'] = $pagesPreview ;
-        $this->data['selectedIds'] = $selectedIds;
-        $this->data['previewCount'] = $previewCount;
-        $this->data['filterType'] = $filterType;
-        $this->data['filterStatus'] = $filterStatus;
-        $this->data['filterStartDate'] = $filterStartDate;
-        $this->data['filterEndDate'] = $filterEndDate;
-        $this->data['filterKeyword'] = $filterKeyword;
+        $this->viewModel->page->title = 'Export';
+        $this->viewModel->page->tab = 'export';
+        
+        
 
-        return $this->render('inadmin/page/tools/export.html.twig', $this->data);
+        return $this->render('inadmin/page/tools/export.html.twig', [
+            'viewModel' => $this->viewModel,
+            'pages' => $pageExportService->getAllPages(),
+            'scope' => $scope,
+            'format' => $format,
+            'contentType' => $contentType,
+            'manualPages' => $pagesPreview,
+            'selectedIds' => $selectedIds,
+            'previewCount' => $previewCount,
+            'filterType' => $filterType,
+            'filterStatus' => $filterStatus,
+            'filterStartDate' => $filterStartDate,
+            'filterEndDate' => $filterEndDate,
+            'filterKeyword' => $filterKeyword,
+        ]);
     }
 
     #[Route('incc/ax/tools/export', name: 'incc_tools_export_ajax', methods: ['GET'])]
@@ -186,16 +191,17 @@ class ExportController extends AbstractInachisController
         //     ['keyword' => $query],
         //     $contentType
         // );
-
-        $this->data['form'] = $this->createFormBuilder()->getForm()->createView();
-        $this->data['dataset'] = $items;
-        $this->data['content_type'] = $contentType;
-        $this->data['pagination'] = [
-            'offset' => $page,
-            'total' => $total,
-            'limit' => $limit,
-        ];
-        $this->data['selectedIds'] = $selectedIds;
-        return $this->render('inadmin/partials/export_table.html.twig', $this->data);
+        return $this->render('inadmin/partials/export_table.html.twig', [
+            'viewModel' => $this->viewModel,
+            'dataset' => $items,
+            'content_type' => $contentType,
+            'form' => $this->createFormBuilder()->getForm()->createView(),
+            'pagination' => [
+                'offset' => $page,
+                'total' => $total,
+                'limit' => $limit,
+            ],
+            'selectedIds' => $selectedIds,
+        ]);
     }
 }

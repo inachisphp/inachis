@@ -51,7 +51,8 @@ class ImportController extends AbstractInachisController
         PageImportService $pageImportService,
         PageImportValidator $pageImportValidator
     ): Response {
-        $this->setPageProperties(['title' => 'Import', 'tab' => 'import']);
+        $this->viewModel->page->title = 'Import';
+        $this->viewModel->page->tab = 'import';
 
         if ($request->isMethod('POST')) {
             /** @var UploadedFile|null */
@@ -116,13 +117,15 @@ dump($data);exit;
                 'items' => $dtos,
                 'warnings' => $warnings,
             ]);
-            $this->data['items'] = $dtos;
-            $this->data['warnings'] = $warnings;
-            $this->data['import_type'] = $importType;
-            return $this->render('inadmin/page/tools/import_preview.html.twig', $this->data);
+            return $this->render('inadmin/page/tools/import_preview.html.twig', [
+                'viewModel' => $this->viewModel,
+                'items' => $dtos,
+            ]);
         }
 
-        return $this->render('inadmin/page/tools/import_upload.html.twig', $this->data);
+        return $this->render('inadmin/page/tools/import_upload.html.twig', [
+            'viewModel' => $this->viewModel,
+        ]);
     }
 
     /**

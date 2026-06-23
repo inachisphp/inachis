@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{{ settings.language|default('en') }}" lang="{{ settings.language|default('en') }}" dir="{{ settings.textDirection|default('ltr') }}">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{{ viewModel.settings.language|default('en') }}" lang="{{ viewModel.settings.language|default('en') }}" dir="{{ settings.textDirection|default('ltr') }}">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>{{ page.title }}{% if page.title != '' and settings.siteTitle != '' %} / {% endif %}{{ settings.siteTitle }}</title>
+    <title>{{ viewModel.page.title }}{% if viewModel.page.title != '' and viewModel.settings.siteTitle != '' %} / {% endif %}{{ viewModel.settings.siteTitle }}</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <meta http-equiv="Content-Style-Type" content="text/css" />
     <meta name="robots" content="noindex,nofollow" />
-    <meta name="description" content="{{ settings.siteTitle }} inachis control panel" />
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ settings.domain }}/assets/imgs/incc/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ settings.domain }}/assets/imgs/incc/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ settings.domain }}/assets/imgs/incc/favicon-16x16.png">
-    <link rel="manifest" href="{{ settings.domain }}/assets/imgs/incc/site.webmanifest">
-    <link rel="mask-icon" href="{{ settings.domain }}/assets/imgs/incc/safari-pinned-tab.svg" color="#5bbad5">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ settings.domain }}/assets/imgs/incc/favicon.ico">
+    <meta name="description" content="{{ viewModel.settings.siteTitle }} inachis control panel" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ viewModel.settings.domain }}/assets/imgs/incc/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ viewModel.settings.domain }}/assets/imgs/incc/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ viewModel.settings.domain }}/assets/imgs/incc/favicon-16x16.png">
+    <link rel="manifest" href="{{ viewModel.settings.domain }}/assets/imgs/incc/site.webmanifest">
+    <link rel="mask-icon" href="{{ viewModel.settings.domain }}/assets/imgs/incc/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ viewModel.settings.domain }}/assets/imgs/incc/favicon.ico">
     <meta name="msapplication-TileColor" content="#2b5797">
-    <meta name="msapplication-config" content="{{ settings.domain }}/assets/imgs/incc/browserconfig.xml">
+    <meta name="msapplication-config" content="{{ viewModel.settings.domain }}/assets/imgs/incc/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
 
     {% include "inadmin/structure/metadata.html.twig" %}
@@ -49,13 +49,13 @@
 <div class="layout">
 
 {%- if is_granted('ROLE_USER') %}
-    {% include "inadmin/structure/_menu.html.twig" %}
+    {% include "inadmin/structure/menu.html.twig" %}
     <div class="reading-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div class="reading-progress__bar"></div>
     </div>
     <header class="content-header">
         <h1>{% block pagetitle %}{% endblock pagetitle %}</h1>
-        {% include 'inadmin/structure/_header.html.twig' %}
+        {% include 'inadmin/structure/header.html.twig' %}
     </header>
 {% endif %}
 

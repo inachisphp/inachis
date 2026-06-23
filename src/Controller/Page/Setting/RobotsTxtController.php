@@ -64,10 +64,12 @@ class RobotsTxtController extends AbstractInachisController
             return $this->redirectToRoute('incc_settings_robots');
         }
 
-        $this->setPageProperties(['title' => 'robots.txt Configuration', 'tab' => 'settings']);
-        $this->data['form'] = $form->createView();
-		$this->data['robotsTxt'] = $settingRepository->getValue('robots_txt') ?? '';
-
-        return $this->render('/inadmin/page/settings/robots.html.twig', $this->data);
+        $this->viewModel->page->title = 'robots.txt Configuration';
+        $this->viewModel->page->tab = 'settings';
+        return $this->render('/inadmin/page/settings/robots.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+		    'robotsTxt' => $settingRepository->getValue('robots_txt') ?? '',
+        ]);
     }
 }
