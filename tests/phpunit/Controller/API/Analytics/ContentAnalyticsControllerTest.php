@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Tests\phpunit\Controller;
+namespace Inachis\Tests\phpunit\Controller\API\Analytics;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Inachis\Controller\API\Analytics\ContentAnalyticsController;
