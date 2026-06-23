@@ -12,6 +12,8 @@ namespace Inachis\Controller\Page\Security;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Security\Role;
 use Inachis\Entity\Security\RolePermission;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\RoleType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\Content\CategoryRepository;
@@ -150,6 +152,10 @@ class RolesController extends AbstractInachisController
         $this->viewModel->page->tab = 'roles';
         return $this->render('inadmin/page/security/roles/edit.html.twig', [
             'viewModel' => $this->viewModel,
+            'actions' => array_map(
+                static fn (PermissionAction $a) => $a->value,
+                PermissionAction::cases()
+            ),
             'form' => $form->createView(),
             'permissionMatrix' => $permissionMatrix,
             'role' => $role,
@@ -171,6 +177,9 @@ class RolesController extends AbstractInachisController
     {
         /** @var array<string, array<string, mixed>> $posted */
         $posted = $request->request->all('permissions');
+        if (!is_array($posted)) {
+            $posted = [];
+        }
 
         // Remove all existing permissions; orphanRemoval will delete them.
         foreach ($role->getRolePermissions() as $existing) {
@@ -178,10 +187,25 @@ class RolesController extends AbstractInachisController
         }
 
         foreach ($posted as $resource => $actions) {
+            $resourceEnum = PermissionResource::tryFrom($resource);
+            if ($resourceEnum === null) {
+                continue;
+            }
+
             foreach (array_keys($actions) as $action) {
+                $actionEnum = PermissionAction::tryFrom($action);
+
+                if (
+                    $actionEnum === null ||
+                    !in_array($actionEnum, $resourceEnum->actions(), true)
+                ) {
+                    continue;
+                }
+
                 $perm = new RolePermission();
-                $perm->setResource(strtoupper((string) $resource));
-                $perm->setAction(strtoupper((string) $action));
+                $perm->setResource($resourceEnum);
+                $perm->setAction($actionEnum);
+
                 $role->addRolePermission($perm);
             }
         }
@@ -195,27 +219,18 @@ class RolesController extends AbstractInachisController
      */
     private function buildPermissionMatrix(Role $role): array
     {
-        $resources = ['PAGE', 'SERIES', 'IMAGE', 'TAG', 'CATEGORY'];
-        $actions   = ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'REVIEW', 'PUBLISH'];
-
         $granted = [];
+
         foreach ($role->getRolePermissions() as $perm) {
-            $resource = $perm->getResource();
-            $action   = $perm->getAction();
-            // Wildcard '*' grants everything
-            if ($resource === '*') {
-                foreach ($resources as $r) {
-                    $granted[$r][$action] = true;
-                }
-            } else {
-                $granted[$resource][$action] = true;
-            }
+            $granted[$perm->getResource()->value][$perm->getAction()->value] = true;
         }
 
         $matrix = [];
-        foreach ($resources as $resource) {
-            foreach ($actions as $action) {
-                $matrix[$resource][$action] = $granted[$resource][$action] ?? false;
+
+        foreach (PermissionResource::cases() as $resource) {
+            foreach ($resource->actions() as $action) {
+                $matrix[$resource->value][$action->value] =
+                    $granted[$resource->value][$action->value] ?? false;
             }
         }
 

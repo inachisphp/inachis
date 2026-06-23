@@ -10,6 +10,8 @@
 namespace Inachis\Entity\Security;
 
 use Doctrine\ORM\Mapping as ORM;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 
@@ -26,12 +28,12 @@ class RolePermission
     protected ?UuidInterface $id = null;
 
     // Action enum: CREATE, EDIT, DELETE, VIEW
-    #[ORM\Column(type: 'string', length: 20)]
-    private string $action;
+    #[ORM\Column(enumType: PermissionAction::class)]
+    private PermissionAction $action;
 
     // Resource enum: PAGE, SERIES, IMAGE, TAG, CATEGORY
-    #[ORM\Column(type: 'string', length: 30)]
-    private string $resource;
+    #[ORM\Column(enumType: PermissionResource::class)]
+    private PermissionResource $resource;
 
     #[ORM\ManyToOne(targetEntity: Role::class, inversedBy: 'rolePermissions')]
     #[ORM\JoinColumn(name: 'role_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
@@ -42,23 +44,23 @@ class RolePermission
         return $this->id;
     }
 
-    public function getAction(): string
+    public function getAction(): PermissionAction
     {
         return $this->action;
     }
 
-    public function setAction(string $action): self
+    public function setAction(PermissionAction $action): self
     {
         $this->action = $action;
         return $this;
     }
 
-    public function getResource(): string
+    public function getResource(): PermissionResource
     {
         return $this->resource;
     }
 
-    public function setResource(string $resource): self
+    public function setResource(PermissionResource $resource): self
     {
         $this->resource = $resource;
         return $this;

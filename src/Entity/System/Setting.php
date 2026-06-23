@@ -56,7 +56,7 @@ class Setting
      */
     public function getId(): ?UuidInterface
     {
-        return $this->id;
+        return isset($this->id) ? $this->id : null;
     }
 
     /**

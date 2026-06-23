@@ -472,3 +472,8 @@ td.column--monospaced {
   display: table-row;
   max-height: 500px; // smooth transition
 }
+
+.permission-matrix {
+  thead th, tbody td { text-align: center;}
+  input.permission-matrix__checkbox { width: 3.25rem; }
+}

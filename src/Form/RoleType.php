@@ -65,7 +65,7 @@ class RoleType extends AbstractType
             ->add('description', TextareaType::class, [
                 'attr' => [
                     'aria-labelledby' => 'role__description__label',
-                    'class'           => 'text inline_label',
+                    'class' => 'full-width',
                     'placeholder'     => 'Optional description for this role',
                     'rows'            => 3,
                 ],
@@ -79,8 +79,11 @@ class RoleType extends AbstractType
             ->add('disableReview', CheckboxType::class, [
                 'attr' => [
                     'aria-labelledby' => 'role__disableReview__label',
+                    'class' => 'ui-switch',
+                    'data-label-off' => 'No',
+                    'data-label-on' => 'Yes',
                 ],
-                'label'      => 'Disable review stage for this role',
+                'label' => 'Disable review stage for this role',
                 'label_attr' => [
                     'id' => 'role__disableReview__label',
                 ],
