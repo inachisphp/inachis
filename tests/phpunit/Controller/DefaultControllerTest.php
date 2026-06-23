@@ -11,30 +11,41 @@ namespace Inachis\Tests\phpunit\Controller;
 
 use Inachis\Controller\DefaultController;
 use Inachis\Service\Content\Page\ContentAggregator;
-use PHPUnit\Framework\TestCase;
+use Inachis\Tests\phpunit\Controller\AbstractWebControllerTestCase;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class DefaultControllerTest extends TestCase
+class DefaultControllerTest extends AbstractWebControllerTestCase
 {
     public function testHomepageRendersWithContent(): void
     {
         $mockContent = [
-            '20240101' => 'test value'
+            '20240101' => 'test value',
         ];
+
         $contentProvider = $this->createMock(ContentAggregator::class);
         $contentProvider->expects($this->once())
             ->method('getHomepageContent')
             ->willReturn($mockContent);
 
         $controller = $this->getMockBuilder(DefaultController::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+            ])
             ->onlyMethods(['render'])
             ->getMock();
+
         $controller->expects($this->once())
             ->method('render')
             ->with(
                 'web/pages/homepage.html.twig',
-                ['content' => $mockContent]
+                $this->callback(function (array $vars) use ($mockContent) {
+                    return isset($vars['viewModel'])
+                        && $vars['content'] === $mockContent;
+                })
             )
             ->willReturn(new Response('OK'));
 
@@ -42,5 +53,26 @@ class DefaultControllerTest extends TestCase
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame('OK', $response->getContent());
+    }
+
+    public function testHealthReturnsOkResponse(): void
+    {
+        $controller = new DefaultController(
+            $this->entityManager,
+            $this->params,
+            $this->security,
+            $this->translator
+        );
+
+        $response = $controller->health();
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertIsArray($data);
+        $this->assertSame('ok', $data['status']);
+        $this->assertArrayHasKey('time', $data);
+        $this->assertIsInt($data['time']);
     }
 }
