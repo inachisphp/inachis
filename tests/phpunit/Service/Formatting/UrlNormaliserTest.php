@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Tests\phpunit\Util;
+namespace Inachis\Tests\phpunit\Service\Formatting;
 
 use Inachis\Service\Formatting\UrlNormaliser;
 use PHPUnit\Framework\TestCase;

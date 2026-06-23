@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Tests\phpunit\Util;
+namespace Inachis\Tests\phpunit\Form\Provider;
 
 use Inachis\Form\Provider\TimezoneChoices;
 use DateInvalidTimeZoneException;

@@ -60,8 +60,7 @@ final class PostTypeTest extends TestCase
         $postType = new PostType(
             $this->translator(),
             $this->router(),
-            $this->createStub(Security::class),
-            $this->transformer()
+            $this->createStub(Security::class)
         );
 
         $page = new Page();
@@ -139,8 +138,7 @@ final class PostTypeTest extends TestCase
         $postType = new PostType(
             $this->translator(),
             $this->router(),
-            $this->createStub(Security::class),
-            $this->transformer()
+            $this->createStub(Security::class)
         );
 
         $resolver = new OptionsResolver();

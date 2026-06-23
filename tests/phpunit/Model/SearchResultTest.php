@@ -11,7 +11,6 @@ namespace Inachis\Tests\phpunit\Model;
 
 use Inachis\Model\SearchResult;
 use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Uuid;
 
 class SearchResultTest extends TestCase
 {
@@ -67,8 +66,22 @@ class SearchResultTest extends TestCase
     public function testUpdateResultPropertyByKey(): void
     {
         $this->searchResult->updateResultPropertyByKey(1, 'title', 'test2 edited');
+        $this->searchResult->updateResultPropertyByKey(1, 'sub_title', 'test2 edited');
+        $this->searchResult->updateResultPropertyByKey(1, 'content', 'test2 edited');
+        $this->searchResult->updateResultPropertyByKey(1, 'type', 'test2 edited');
+        $this->searchResult->updateResultPropertyByKey(1, 'author', 'test2 edited');
+        $this->searchResult->updateResultPropertyByKey(1, 'contentDate', '2025-01-01');
+        $this->searchResult->updateResultPropertyByKey(1, 'mod_date', '2025-01-01 01:01:00');
+        $this->searchResult->updateResultPropertyByKey(1, 'url', '/example');
+        $this->searchResult->updateResultPropertyByKey(1, 'relevance', '0.85');
         $results = $this->searchResult->getResults();
         $this->assertEquals('test', $results[0]['title']);
         $this->assertEquals('test2 edited', $results[1]['title']);
+    }
+
+    public function testUpdateResultPropertyByKeyErrorOnNotString(): void
+    {
+        $this->expectException('title must be a string');
+        $this->searchResult->updateResultPropertyByKey(1, 'title', 3);
     }
 }

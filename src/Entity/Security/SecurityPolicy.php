@@ -184,7 +184,7 @@ class SecurityPolicy
      */
     public function getId(): ?UuidInterface
     {
-        return $this->id;
+        return isset($this->id) ? $this->id : null;
     }
 
     public function getName(): string

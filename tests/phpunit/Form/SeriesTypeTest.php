@@ -14,13 +14,30 @@ use Inachis\Form\SeriesType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+// use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+// use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
 class SeriesTypeTest extends TypeTestCase
 {
+    private function translator(): TranslatorInterface
+    {
+        $m = $this->createStub(TranslatorInterface::class);
+        $m->method('trans')->willReturnCallback(fn ($s) => (string) $s);
+        return $m;
+    }
 
     protected function getExtensions(): array
     {
@@ -33,32 +50,93 @@ class SeriesTypeTest extends TypeTestCase
 
     public function testConfigureOptionsSetsDataClass(): void
     {
-        $form = $this->factory->create(SeriesType::class, new Series());
-        $options = $form->getConfig()->getOptions();
+        $seriesType = new SeriesType(
+            $this->createStub(Security::class),
+            $this->translator()
+        );
+        $resolver = new OptionsResolver();
+        $seriesType->configureOptions($resolver);
 
-        $this->assertArrayHasKey('data_class', $options);
+        $options = $resolver->resolve();
+
+        $this->assertSame('form form__post form__series', $options['attr']['class']);
         $this->assertSame(Series::class, $options['data_class']);
     }
 
     public function testBuildFormForNewSeries(): void
     {
-        $form = $this->factory->create(SeriesType::class, new Series());
-        $view = $form->createView();
+        $seriesType = new SeriesType(
+            $this->createStub(Security::class),
+            $this->translator()
+        );
+        $series = new Series();
+        $builder = $this->createMock(FormBuilderInterface::class);
 
-        $expectedFields = [ 'title', 'subTitle', 'url', 'description', 'submit' ];
-        $this->assertSame($expectedFields, array_keys($view->children));
+        $expected = [
+            ['title', TextType::class, $this->anything()],
+            ['subTitle', TextType::class, $this->anything()],
+            ['url', TextType::class, $this->anything()],
+            ['description', TextareaType::class, $this->anything()],
+            ['image', EntityType::class, $this->anything()],
+            ['visibility', CheckboxType::class, $this->anything()],
+            ['submit', SubmitType::class, $this->anything()],
+            ['delete', SubmitType::class, $this->anything()],
+        ];
+
+        $this->expectAddCallsInOrder($builder, $expected);
+        $seriesType->buildForm($builder, ['data' => $series]);
     }
 
     public function testBuildFormForExistingSeries(): void
     {
+        $seriesType = new SeriesType(
+            $this->createStub(Security::class),
+            $this->translator()
+        );
         $series = (new Series())->setId(Uuid::uuid1());
-        $form = $this->factory->create(SeriesType::class, $series);
-        $view = $form->createView();
+        $builder = $this->createMock(FormBuilderInterface::class);
 
-        $expectedFields = [
-            'title', 'subTitle', 'url', 'description', 'firstDate', 'lastDate',
-            'bulkCreate', 'addItem', 'visibility','submit', 'delete', 'remove',
+        $expected = [
+            ['title', TextType::class, $this->anything()],
+            ['subTitle', TextType::class, $this->anything()],
+            ['url', TextType::class, $this->anything()],
+            ['description', TextareaType::class, $this->anything()],
+            ['image', EntityType::class, $this->anything()],
+            ['firstDate', DateType::class, $this->anything()],
+            ['lastDate', DateType::class, $this->anything()],
+            ['bulkCreate', ButtonType::class, $this->anything()],
+            ['addItem', ButtonType::class, $this->anything()],
+            ['visibility', CheckboxType::class, $this->anything()],
+            ['submit', SubmitType::class, $this->anything()],
+            ['delete', SubmitType::class, $this->anything()],
+            ['remove', SubmitType::class, $this->anything()],
         ];
-        $this->assertSame($expectedFields, array_keys($view->children));
+
+        $this->expectAddCallsInOrder($builder, $expected);
+        $seriesType->buildForm($builder, ['data' => $series]);
+    }
+
+    /**
+     * Helper to assert add() calls in exact order
+     */
+    private function expectAddCallsInOrder(FormBuilderInterface $builder, array $expectedCalls): void
+    {
+        $callIndex = 0;
+
+        $builder->expects($this->exactly(count($expectedCalls)))
+            ->method('add')
+            ->willReturnCallback(function ($name, $type, $options) use (&$callIndex, $expectedCalls, $builder) {
+                [$expectedName, $expectedType] = $expectedCalls[$callIndex];
+                $this->assertSame($expectedName, $name);
+                $this->assertSame($expectedType, $type);
+
+                if (isset($options['choice_attr']) && is_callable($options['choice_attr'])) {
+                    $result = $options['choice_attr']('fakeChoice', 'fakeKey', 'fakeValue');
+                    $this->assertSame(['selected' => 'selected'], $result);
+                }
+
+                $callIndex++;
+                return $builder;
+            });
     }
 }

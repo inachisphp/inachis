@@ -67,7 +67,7 @@
         </fieldset>
 
         <fieldset class="edit-usages" id="post_usages">
-            <details>
+            <details open="open">
             <summary>{{ 'admin.resources.usages.title'|trans }}</summary>
             {% if usages.posts|default(null) is not empty or usages.series|default(null) is not empty %}
                 <ol>

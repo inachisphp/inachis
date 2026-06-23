@@ -9,8 +9,6 @@
     {{ form_start(form, {'attr': { 'class': 'col-12 form form__role', 'novalidate': 'novalidate' }}) }}
 
     <div class="content__edit">
-
-        {# ── Basic details ──────────────────────────────────────────────── #}
         <section class="ui-section">
             <fieldset class="multisection">
                 <legend>Role Details</legend>
@@ -28,14 +26,15 @@
                 </p>
 
                 <p class="checkbox-row">
-                    {{ form_widget(form.disableReview) }}
                     {{ form_label(form.disableReview) }}
                     {{ form_errors(form.disableReview) }}
+                    <span class="switch-wrapper">
+                    {{ form_widget(form.disableReview) }}
+                    </span>
                 </p>
             </fieldset>
         </section>
 
-        {# ── Permission matrix ─────────────────────────────────────────── #}
         <section class="ui-section">
             <fieldset class="multisection">
                 <legend>Permissions</legend>
@@ -46,12 +45,11 @@
                 </p>
 
                 <div class="table-responsive">
-                    <table class="table table--row-borders table--darkhead permission-matrix"
+                    <table class="table table--striped table--row-borders table--darkhead permission-matrix"
                            aria-label="Permission matrix for this role">
                         <thead>
                             <tr>
                                 <th scope="col">Resource</th>
-                                {% set actions = ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'REVIEW', 'PUBLISH'] %}
                                 {% for action in actions %}
                                     <th scope="col">
                                         <button type="button"
@@ -71,26 +69,28 @@
                                     <th scope="row">
                                         <button type="button"
                                                 class="button button--ghost permission-matrix__toggle-row"
-                                                data-row="{{ resource|lower }}"
-                                                title="Toggle all {{ resource|lower }} permissions"
-                                                aria-label="Toggle all {{ resource|lower }} permissions">
+                                                data-row="{{ resource|lower }}">
                                             {{ resource|capitalize }}
                                         </button>
                                     </th>
-                                    {% for action, granted in actionMap %}
+
+                                    {% for action in actions %}
                                         <td>
-                                            <label class="visually-hidden"
-                                                   for="perm_{{ resource|lower }}_{{ action|lower }}">
-                                                {{ resource|capitalize }} – {{ action|capitalize }}
-                                            </label>
-                                            <input type="checkbox"
-                                                   id="perm_{{ resource|lower }}_{{ action|lower }}"
-                                                   name="permissions[{{ resource }}][{{ action }}]"
-                                                   value="1"
-                                                   class="permission-matrix__checkbox"
-                                                   data-resource="{{ resource|lower }}"
-                                                   data-action="{{ action|lower }}"
-                                                   {% if granted %}checked{% endif %}>
+                                            {% if action in actionMap|keys %}
+                                                <label class="visually-hidden"
+                                                    for="perm_{{ resource|lower }}_{{ action|lower }}">
+                                                    {{ resource|capitalize }} – {{ action|capitalize }}
+                                                </label>
+
+                                                <input type="checkbox"
+                                                    id="perm_{{ resource|lower }}_{{ action|lower }}"
+                                                    name="permissions[{{ resource }}][{{ action }}]"
+                                                    value="1"
+                                                    class="permission-matrix__checkbox"
+                                                    data-resource="{{ resource|lower }}"
+                                                    data-action="{{ action|lower }}"
+                                                    {% if actionMap[action] %}checked{% endif %}>
+                                            {% endif %}
                                         </td>
                                     {% endfor %}
                                 </tr>
@@ -101,9 +101,8 @@
             </fieldset>
         </section>
 
-    </div>{# /.content__edit #}
+    </div>
 
-    {# ── Fixed action bar ──────────────────────────────────────────────── #}
     <div class="fixed-bottom-bar">
         <p>
             {{ form_widget(form.submit) }}
