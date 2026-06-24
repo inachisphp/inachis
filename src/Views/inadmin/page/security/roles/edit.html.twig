@@ -7,7 +7,11 @@
 
 {% block content %}
     {{ form_start(form, {'attr': { 'class': 'col-12 form form__role', 'novalidate': 'novalidate' }}) }}
-
+    {% if role.systemRole %}
+    <div class="admonition admonition__warning">
+        <p>This is a system role and cannot be edited or removed.</p>
+    </div>
+    {% endif %}
     <div class="content__edit">
         <section class="ui-section">
             <fieldset class="multisection">
@@ -23,14 +27,6 @@
                     {{ form_label(form.description) }}
                     {{ form_errors(form.description) }}
                     {{ form_widget(form.description) }}
-                </p>
-
-                <p class="checkbox-row">
-                    {{ form_label(form.disableReview) }}
-                    {{ form_errors(form.disableReview) }}
-                    <span class="switch-wrapper">
-                    {{ form_widget(form.disableReview) }}
-                    </span>
                 </p>
             </fieldset>
         </section>
@@ -54,42 +50,42 @@
                                     <th scope="col">
                                         <button type="button"
                                                 class="button button--ghost permission-matrix__toggle-col"
-                                                data-col="{{ action|lower }}"
-                                                title="Toggle all {{ action|lower }} permissions"
-                                                aria-label="Toggle all {{ action|lower }} permissions">
-                                            {{ action|capitalize }}
+                                                data-col="{{ action.value|lower }}"
+                                                title="Toggle all {{ action.label()|lower }} permissions"
+                                                aria-label="Toggle all {{ action.label()|lower }} permissions">
+                                            {{ action.label()|capitalize }}
                                         </button>
                                     </th>
                                 {% endfor %}
                             </tr>
                         </thead>
                         <tbody>
-                            {% for resource, actionMap in permissionMatrix %}
+                            {% for resource in resources %}
                                 <tr>
                                     <th scope="row">
                                         <button type="button"
                                                 class="button button--ghost permission-matrix__toggle-row"
-                                                data-row="{{ resource|lower }}">
-                                            {{ resource|capitalize }}
+                                                data-row="{{ resource.value|lower }}">
+                                            {{ resource.label() }}
                                         </button>
                                     </th>
 
                                     {% for action in actions %}
                                         <td>
-                                            {% if action in actionMap|keys %}
+                                            {% if action in resource.actions() %}
                                                 <label class="visually-hidden"
-                                                    for="perm_{{ resource|lower }}_{{ action|lower }}">
-                                                    {{ resource|capitalize }} – {{ action|capitalize }}
+                                                    for="perm_{{ resource.value|lower }}_{{ action.value|lower }}">
+                                                    {{ resource.label() }} – {{ action.label() }}
                                                 </label>
 
                                                 <input type="checkbox"
-                                                    id="perm_{{ resource|lower }}_{{ action|lower }}"
-                                                    name="permissions[{{ resource }}][{{ action }}]"
+                                                    id="perm_{{ resource.value|lower }}_{{ action.value|lower }}"
+                                                    name="permissions[{{ resource.value }}][{{ action.value }}]"
                                                     value="1"
                                                     class="permission-matrix__checkbox"
-                                                    data-resource="{{ resource|lower }}"
-                                                    data-action="{{ action|lower }}"
-                                                    {% if actionMap[action] %}checked{% endif %}>
+                                                    data-resource="{{ resource.value|lower }}"
+                                                    data-action="{{ action.value|lower }}"
+                                                    {% if permissionMatrix[resource.value][action.value] ?? false %}checked{% endif %}>
                                             {% endif %}
                                         </td>
                                     {% endfor %}
@@ -102,7 +98,7 @@
         </section>
 
     </div>
-
+{% if not role.systemRole %}
     <div class="fixed-bottom-bar">
         <p>
             {{ form_widget(form.submit) }}
@@ -111,10 +107,9 @@
             {% endif %}
         </p>
     </div>
+{% endif %}
+    {{ form_end(form, {render_rest: false}) }}
 
-    {{ form_end(form) }}
-
-    {# ── Permission matrix JS ──────────────────────────────────────────── #}
     <script>
     (function () {
         'use strict';

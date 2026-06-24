@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Inachis\Entity\Security\RolePermission;
+use Inachis\Entity\User\User;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 
@@ -28,6 +29,8 @@ class Role
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected ?UuidInterface $id = null;
 
+    #[ORM\Column(type: 'string', length: 50, unique: true)]
+    private string $slug;
 
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     private string $name;
@@ -39,11 +42,18 @@ class Role
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $disableReview = false;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $systemRole = false;
+
     /**
      * @var Collection<int, RolePermission>
      */
     #[ORM\OneToMany(mappedBy: 'role', targetEntity: RolePermission::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $rolePermissions;
+
+    /** @var Collection<int, User> The users that have this role applied */
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'assignedRoles')]
+    private Collection $users;
 
     public function __construct()
     {
@@ -53,6 +63,17 @@ class Role
     public function getId(): ?UuidInterface
     {
         return $this->id;
+    }
+
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
+        return $this;
     }
 
     public function getName(): string
@@ -108,6 +129,17 @@ class Role
     public function removeRolePermission(RolePermission $permission): self
     {
         $this->rolePermissions->removeElement($permission);
+        return $this;
+    }
+
+    public function isSystemRole(): bool
+    {
+        return $this->systemRole;
+    }
+
+    public function setSystemRole(bool $systemRole): self
+    {
+        $this->systemRole = $systemRole;
         return $this;
     }
 }
