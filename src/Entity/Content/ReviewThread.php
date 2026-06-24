@@ -22,7 +22,7 @@ class ReviewThread
 {
     /** @var UuidInterface The unqiue identifier for the review thread */
     #[ORM\Id]
-    #[ORM\Column(type: 'uuid')]
+    #[ORM\Column(type: 'uuid_binary')]
 	#[ORM\GeneratedValue(strategy: 'CUSTOM')]
 	#[ORM\CustomIdGenerator(class: UuidGenerator::class)]
 	private ?UuidInterface $id = null;

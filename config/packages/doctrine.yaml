@@ -11,6 +11,8 @@ doctrine:
 
         profiling_collect_backtrace: '%kernel.debug%'
         schema_filter: '~^(?!analytics_)~'
+        types:
+            uuid_binary:  Ramsey\Uuid\Doctrine\UuidBinaryType
 
     orm:
         validate_xml_mapping: true

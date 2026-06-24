@@ -14,6 +14,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Inachis\Entity\Media\Image;
+use Inachis\Entity\Traits\BidirectionalCollectionTrait;
 use Inachis\Entity\User\User;
 use Inachis\Enum\EditorialStatus;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
@@ -43,6 +44,8 @@ use Ramsey\Uuid\UuidInterface;
 #[ORM\Index(name: "fulltext_title_content", columns: ['title', 'sub_title', 'description'], flags: ["fulltext"])]
 class Series
 {
+    use BidirectionalCollectionTrait;
+
     /**
      * @const string Indicates a Series is public
      */
@@ -57,7 +60,7 @@ class Series
      * @var UuidInterface|null
      */
     #[ORM\Id]
-    #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
+    #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected ?UuidInterface $id = null;
@@ -101,10 +104,7 @@ class Series
     /**
      * @var Collection<int, Page> The array of pages in the series
      */
-    #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Content\Page', fetch: 'EAGER')]
-    #[ORM\JoinTable(name: 'Series_pages')]
-    #[ORM\JoinColumn(name: 'series_id', referencedColumnName: 'id')]
-    #[ORM\InverseJoinColumn(name: 'page_id', referencedColumnName: 'id')]
+    #[ORM\ManyToMany(targetEntity: Page::class, mappedBy: 'series')]
     #[ORM\OrderBy(['postDate' => 'ASC'])]
     protected Collection $items;
 
@@ -319,27 +319,26 @@ class Series
     }
 
     /**
-     * Sets the value of {@link items}.
+     * Adds an item to the {@link items}.
      *
-     * @param Collection<int, Page> $items The array of pages in the series
-     *
+     * @param Page $page The item to add
      * @return Series
      */
-    public function setItems(Collection $items): self
+    public function addItem(Page $page): self
     {
-        $this->items = $items;
+        $this->addBidirectional($this->items, $page, 'addSeries');
         return $this;
     }
 
     /**
-     * Adds an item to the {@link items}.
+     * Remove Page from Series
      *
-     * @param Page $item The item to add
-     * @return Series
+     * @param Page $page
+     * @return self
      */
-    public function addItem(Page $item): self
+    public function removeItem(Page $page): self
     {
-        $this->items->add($item);
+        $this->removeBidirectional($this->items, $page, 'removeSeries');
         return $this;
     }
 

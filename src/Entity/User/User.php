@@ -43,7 +43,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var UuidInterface|null The unique identifier for the {@link User}
      */
     #[ORM\Id]
-    #[ORM\Column(type: "uuid", unique: true, nullable: false)]
+    #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: "CUSTOM")]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected ?UuidInterface $id = null;
@@ -144,7 +144,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: "datetime_immutable")]
     protected ?DateTimeImmutable $passwordModDate = null;
 
-    #[ORM\ManyToMany(targetEntity: Role::class)]
+    #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'user_roles')]
     private Collection $assignedRoles;
 
     /**

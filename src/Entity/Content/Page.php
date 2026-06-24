@@ -11,6 +11,7 @@ namespace Inachis\Entity\Content;
 
 use Inachis\Entity\User\User;
 use Inachis\Entity\Media\Image;
+use Inachis\Entity\Traits\BidirectionalCollectionTrait;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Exception\InvalidTimezoneException;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -63,6 +64,8 @@ use InvalidArgumentException;
 #[ORM\Index(columns: ['title', 'sub_title', 'content'], name: "fulltext_title_content", flags: ["fulltext"])]
 class Page
 {
+    use BidirectionalCollectionTrait;
+
     /**
      * @const string Indicates a Page is public
      */
@@ -87,7 +90,7 @@ class Page
      * @var UuidInterface|null
      */
     #[ORM\Id]
-    #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
+    #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected ?UuidInterface $id = null;
@@ -239,10 +242,13 @@ class Page
     protected Collection $tags;
 
     /**
-     * @var Collection<int, Series>|null  The array of Series that contains this page
+     * @var Collection<int, Series>  The array of Series that contains this page
      */
-    #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Content\Series', inversedBy: 'items')]
-    protected ?Collection $series;
+    #[ORM\ManyToMany(targetEntity: Series::class, inversedBy: 'items')]
+    #[ORM\JoinTable(name: 'Series_pages')]
+    #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'series_id', referencedColumnName: 'id')]
+    protected Collection $series;
 
     /**
      * @var string|null The two character language code this content uses, empty means unknown
@@ -529,9 +535,9 @@ class Page
     /**
      * Returns an array of {@link Series)s assigned to the page.
      *
-     * @return Collection<int,Series>|null The array of {$link Series} entities for the {@link Page}
+     * @return Collection<int,Series> The array of {$link Series} entities for the {@link Page}
      */
-    public function getSeries(): ?Collection
+    public function getSeries(): Collection
     {
         return $this->series;
     }
@@ -816,14 +822,26 @@ class Page
     }
 
     /**
-     * Sets the value of {@link series}.
+     * Adds Series to Page
      *
-     * @param Collection<int, Series> $series The series to assign to the page.
-     * @return Page
+     * @param Series $series
+     * @return self
      */
-    public function setSeries(Collection $series): self
+    public function addSeries(Series $series): self
     {
-        $this->series = $series;
+        $this->addBidirectional($this->series, $series, 'addItem');
+        return $this;
+    }
+
+    /**
+     * Removes Series from Page
+     *
+     * @param Series $series
+     * @return self
+     */
+    public function removeSeries(Series $series): self
+    {
+        $this->removeBidirectional($this->series, $series, 'removeItem');
         return $this;
     }
 
