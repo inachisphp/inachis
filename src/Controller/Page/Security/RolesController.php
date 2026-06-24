@@ -152,12 +152,10 @@ class RolesController extends AbstractInachisController
         $this->viewModel->page->tab = 'roles';
         return $this->render('inadmin/page/security/roles/edit.html.twig', [
             'viewModel' => $this->viewModel,
-            'actions' => array_map(
-                static fn (PermissionAction $a) => $a->value,
-                PermissionAction::cases()
-            ),
+            'actions' => PermissionAction::cases(),
             'form' => $form->createView(),
             'permissionMatrix' => $permissionMatrix,
+            'resources' => PermissionResource::cases(),
             'role' => $role,
         ]);
     }
@@ -215,7 +213,10 @@ class RolesController extends AbstractInachisController
      * Builds a matrix of [resource => [action => bool]] for the template.
      *
      * @param Role $role
-     * @return array<string, array<string, bool>>
+     * @return array<string, array{
+     *     label: string,
+     *     actions: array<string, bool>
+     * }>
      */
     private function buildPermissionMatrix(Role $role): array
     {

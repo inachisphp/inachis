@@ -10,10 +10,14 @@
 namespace Inachis\Entity\User;
 
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Exception;
 use Doctrine\ORM\Mapping as ORM;
 use Inachis\Entity\Security\Role;
 use Inachis\Entity\User\UserPreference;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -102,7 +106,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var array<string> The roles assigned to this user. Currently, not in use.
      */
-    protected array $roles = [];
+    // protected array $roles = [];
 
     /**
      * @var string|null An image to use for the {@link User}
@@ -140,9 +144,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: "datetime_immutable")]
     protected ?DateTimeImmutable $passwordModDate = null;
 
-    #[ORM\ManyToOne(targetEntity: Role::class)]
-    #[ORM\JoinColumn(name: "role_id", referencedColumnName: "id", nullable: true, onDelete: "SET NULL")]
-    private ?Role $role = null;
+    #[ORM\ManyToMany(targetEntity: Role::class)]
+    private Collection $assignedRoles;
 
     /**
      * @var UserPreference|null Preferences for the current {@link User}
@@ -170,6 +173,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $currentTime = new DateTimeImmutable();
         $this->setCreateDate($currentTime);
         $this->setModDate($currentTime);
+        $this->assignedRoles = new ArrayCollection();
     }
 
     /**
@@ -230,31 +234,51 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->displayName;
     }
 
-    public function getRole(): ?Role
+    /**
+     * Gets the roles assigned to this user
+     *
+     * @return Collection
+     */
+    public function getAssignedRoles(): Collection
     {
-        return $this->role;
+        return $this->assignedRoles;
     }
 
     /**
-     * Sets the Role for the current {@link User}
+     * Adds a specific Role to the User
      *
-     * @param Role|null $role
+     * @param Role $role
      * @return self
      */
-    public function setRole(?Role $role): self
+    public function addAssignedRole(Role $role): self
     {
-        $this->role = $role;
+        if (!$this->assignedRoles->contains($role)) {
+            $this->assignedRoles->add($role);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Removes a specific role from the user
+     *
+     * @param Role $role
+     * @return self
+     */
+    public function removeAssignedRole(Role $role): self
+    {
+        $this->assignedRoles->removeElement($role);
+
         return $this;
     }
 
     /**
      * Returns the role(s) for the current {@link User}
-     * 
+     *
      * @return array<string>
      */
     public function getRoles(): array
     {
-//        $roles = $this->roles;
         $roles = [ 'ROLE_ADMIN' ];
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
@@ -442,19 +466,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Sets the role(s) for the current {@link User}
-     *
-     * @param array<string> $roles
-     * @return self
-     */
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
-
-        return $this;
-    }
-
-    /**
      * Sets the value of {@link avatar}.
      *
      * @param string|null $value The value to set
@@ -603,5 +614,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
         $this->plainPassword = null;
+    }
+
+    /**
+     * @deprecated 2.0.0 This will be moved to a resolver
+     *
+     * @param PermissionResource $resource
+     * @param PermissionAction $action
+     * @return boolean
+     */
+    public function hasPermission(
+        PermissionResource $resource,
+        PermissionAction $action
+    ): bool {
+        foreach ($this->assignedRoles as $role) {
+            foreach ($role->getRolePermissions() as $permission) {
+                if (
+                    $permission->getResource() === $resource
+                    && $permission->getAction() === $action
+                ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
