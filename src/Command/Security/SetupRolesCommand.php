@@ -19,6 +19,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
@@ -34,10 +35,31 @@ class SetupRolesCommand extends Command
         parent::__construct();
     }
 
+    protected function configure(): void
+    {
+        $this->addOption(
+            'reset',
+            null,
+            InputOption::VALUE_NONE,
+            'Delete all roles before recreating them'
+        );
+    }
+
     protected function execute(
         InputInterface $input,
         OutputInterface $output,
     ): int {
+        if ($input->getOption('reset')) {
+            foreach ($this->roleRepository->findAll() as $role) {
+                foreach ($role->getUsers() as $user) {
+                    $user->removeAssignedRole($role);
+                }
+                $this->entityManager->remove($role);
+            }
+
+            $this->entityManager->flush();
+        }
+
         $roles = $this->getDefaultRoles();
 
         $output->writeln('<info>Creating system roles...</info>');

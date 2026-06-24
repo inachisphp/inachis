@@ -24,7 +24,7 @@ class Role
      * @var UuidInterface|null The unique identifier for the {@link Role}
      */
     #[ORM\Id]
-    #[ORM\Column(type: "uuid", unique: true, nullable: false)]
+    #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: "CUSTOM")]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected ?UuidInterface $id = null;
@@ -58,6 +58,7 @@ class Role
     public function __construct()
     {
         $this->rolePermissions = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?UuidInterface
@@ -132,14 +133,35 @@ class Role
         return $this;
     }
 
+    /**
+     * Returns the result of testing if this is a system-defined role
+     *
+     * @return bool
+     */
     public function isSystemRole(): bool
     {
         return $this->systemRole;
     }
 
+    /**
+     * Sets the flag of whether this is a system-defined role
+     *
+     * @param bool $systemRole
+     * @return self
+     */
     public function setSystemRole(bool $systemRole): self
     {
         $this->systemRole = $systemRole;
         return $this;
+    }
+
+    /**
+     * Returns a Collection of the {@link User} entities assigned this role
+     *
+     * @return Collection<int,User>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
     }
 }

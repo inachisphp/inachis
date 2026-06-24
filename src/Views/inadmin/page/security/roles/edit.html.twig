@@ -28,6 +28,14 @@
                     {{ form_errors(form.description) }}
                     {{ form_widget(form.description) }}
                 </p>
+
+                <p class="checkbox-row">
+                    {{ form_label(form.disableReview) }}
+                    {{ form_errors(form.disableReview) }}
+                    <span class="switch-wrapper">
+                    {{ form_widget(form.disableReview) }}
+                    </span>
+                </p>
             </fieldset>
         </section>
 
