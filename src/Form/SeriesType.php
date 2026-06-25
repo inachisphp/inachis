@@ -18,6 +18,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -112,11 +113,16 @@ class SeriesType extends AbstractType
                 ],
                 'required' => false,
             ])
-            ->add('image', EntityType::class, [
-                'class' => Image::class,
-                'choice_label' => fn (Image $image) => $image->getFilename(),
+            ->add('image', HiddenType::class, [
+                'mapped' => false,
                 'required' => false,
             ])
+            // ->add('image', EntityType::class, [
+            //     'class' => Image::class,
+            //     'choice_label' => 'filename',
+            //     'choice_value' => static fn (?Image $image) => $image?->getId()?->toString(),
+            //     'required' => false,
+            // ])
         ;
         if (!$newItem) {
             $builder

@@ -120,6 +120,11 @@ class SeriesController extends AbstractInachisController
         $form = $this->createForm(SeriesType::class, $series);
         $form->handleRequest($request);
 
+        if($form->isSubmitted() && !$form->isValid()) {
+            foreach ($form->getErrors(true) as $error) {
+                dump($error->getOrigin()->getName(), $error->getMessage());
+            }
+        }
         if ($form->isSubmitted() && $form->isValid()) {
             $delete = $form->has('delete') ? $form->get('delete') : null;
             $remove = $form->has('remove') ? $form->get('remove') : null;

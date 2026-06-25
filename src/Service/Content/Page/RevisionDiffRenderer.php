@@ -147,21 +147,25 @@ final readonly class RevisionDiffRenderer
     }
 
     /**
-     * Very simple tokenizer (word + punctuation aware enough for CMS text).
+     * Very simple tokenizer (word, punctuation, and newline aware for CMS text).
      *
      * @return list<string>
      */
     private function tokenize(string $text): array
     {
-        $text = str_replace(["\n", "\r"], ' ', $text);
+        // 1. Normalize line endings first, but DO NOT remove them
+        $text = str_replace("\r\n", "\n", $text);
 
-        preg_match_all('/\w+|[^\w\s]|\s+/u', $text, $matches);
+        // 2. Match words, punctuation, newlines specifically (\n), or other standard horizontal spaces
+        preg_match_all('/\w+|\n|[^\w\s]|[ \t]+/u', $text, $matches);
 
         return $matches[0];
     }
 
     /**
-     * Myers-style fallback diff (simplified LCS-based implementation).
+     * A true, memory-efficient Myers Diff algorithm.
+     * Uses a flat array of integers tracking diagonal paths.
+     * Memory complexity: O(D) where D is the edit script length (extremely small).
      *
      * @param list<string> $a
      * @param list<string> $b
@@ -169,50 +173,78 @@ final readonly class RevisionDiffRenderer
      */
     private function diff(array $a, array $b): array
     {
-        $matrix = [];
-        $maxA = count($a);
-        $maxB = count($b);
-
-        for ($i = 0; $i <= $maxA; $i++) {
-            $matrix[$i][0] = $i;
+        $n = count($a);
+        $m = count($b);
+        
+        // Shortcut for empty sides
+        if ($n === 0) {
+            return array_map(static fn($token) => ['insert', $token], $b);
+        }
+        if ($m === 0) {
+            return array_map(static fn($token) => ['delete', $token], $a);
         }
 
-        for ($j = 0; $j <= $maxB; $j++) {
-            $matrix[0][$j] = $j;
-        }
+        $max = $n + $m;
+        $v = [1 => 0];
+        $trace = [];
 
-        for ($i = 1; $i <= $maxA; $i++) {
-            for ($j = 1; $j <= $maxB; $j++) {
-                if ($a[$i - 1] === $b[$j - 1]) {
-                    $matrix[$i][$j] = $matrix[$i - 1][$j - 1];
+        for ($d = 0; $d <= $max; $d++) {
+            for ($k = -$d; $k <= $d; $k += 2) {
+                if ($k === -$d || ($k !== $d && ($v[$k - 1] ?? -1) < ($v[$k + 1] ?? -1))) {
+                    $x = $v[$k + 1] ?? 0;
                 } else {
-                    $matrix[$i][$j] = min(
-                        $matrix[$i - 1][$j] + 1,
-                        $matrix[$i][$j - 1] + 1,
-                        $matrix[$i - 1][$j - 1] + 1
-                    );
+                    $x = ($v[$k - 1] ?? 0) + 1;
+                }
+
+                $y = $x - $k;
+
+                while ($x < $n && $y < $m && $a[$x] === $b[$y]) {
+                    $x++;
+                    $y++;
+                }
+
+                $v[$k] = $x;
+
+                if ($x >= $n && $y >= $m) {
+                    $trace[] = $v;
+                    break 2;
                 }
             }
+            $trace[] = $v;
         }
 
+        // Backtrack to build the edit script
         $ops = [];
-        $i = $maxA;
-        $j = $maxB;
+        $x = $n;
+        $y = $m;
 
-        while ($i > 0 || $j > 0) {
-            if ($i > 0 && $j > 0 && $a[$i - 1] === $b[$j - 1]) {
-                $ops[] = ['equal', $a[$i - 1]];
-                $i--;
-                $j--;
-            } elseif (
-                $j > 0 &&
-                ($i === 0 || $matrix[$i][$j - 1] <= $matrix[$i - 1][$j])
-            ) {
-                $ops[] = ['insert', $b[$j - 1]];
-                $j--;
+        for ($d = count($trace) - 1; $d >= 0; $d--) {
+            $v = $trace[$d];
+            $k = $x - $y;
+
+            if ($k === -$d || ($k !== $d && ($v[$k - 1] ?? -1) < ($v[$k + 1] ?? -1))) {
+                $prevK = $k + 1;
             } else {
-                $ops[] = ['delete', $a[$i - 1]];
-                $i--;
+                $prevK = $k - 1;
+            }
+
+            $prevX = $v[$prevK] ?? 0;
+            $prevY = $prevX - $prevK;
+
+            while ($x > $prevX && $y > $prevY) {
+                $ops[] = ['equal', $a[$x - 1]];
+                $x--;
+                $y--;
+            }
+
+            if ($d > 0) {
+                if ($x > $prevX) {
+                    $ops[] = ['delete', $a[$x - 1]];
+                    $x--;
+                } elseif ($y > $prevY) {
+                    $ops[] = ['insert', $b[$y - 1]];
+                    $y--;
+                }
             }
         }
 

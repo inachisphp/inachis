@@ -17,6 +17,9 @@ use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
+#[ORM\Index(columns: ['thread_id'], name: 'thread_idx')]
+#[ORM\Index(columns: ['author_id'], name: 'author_idx')]
+#[ORM\HasLifecycleCallbacks]
 class ReviewComment
 {
     #[ORM\Id]
@@ -25,12 +28,14 @@ class ReviewComment
 	#[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     private ?UuidInterface $id = null;
 
-    #[ORM\ManyToOne(targetEntity: ReviewThread::class)]
+    #[ORM\ManyToOne(targetEntity: ReviewThread::class, inversedBy: 'comments')]
     private ReviewThread $thread;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     private User $author;
 
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 10000)]
     #[ORM\Column(type: 'text')]
     private string $message;
 
@@ -40,22 +45,39 @@ class ReviewComment
     #[ORM\Column(type: 'datetime_immutable')]
     private DateTimeImmutable $updated;
 
-    public function __construct()
+    public function __construct(
+        ReviewThread $thread,
+        User $author,
+        string $message
+    ) {
+        $this->thread = $thread;
+        $this->author = $author;
+        $this->message = $message;
+
+        $now = new DateTimeImmutable();
+
+        $this->created = $now;
+        $this->updated = $now;
+    }
+
+    #[ORM\PrePersist]
+    public function prePersist(): void
     {
-        $this->created = new DateTimeImmutable();
+        $now = new DateTimeImmutable();
+
+        $this->created = $now;
+        $this->updated = $now;
+    }
+
+    #[ORM\PreUpdate]
+    public function preUpdate(): void
+    {
         $this->updated = new DateTimeImmutable();
     }
 
     public function getId(): ?UuidInterface
     {
         return $this->id;
-    }
-
-    public function setId(?UuidInterface $id): self
-    {
-        $this->id = $id;
-
-        return $this;
     }
 
     public function getThread(): ReviewThread

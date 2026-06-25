@@ -14,6 +14,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Inachis\Entity\Content\{Page, ReviewThread};
 use Inachis\Entity\User\User;
+use Inachis\Enum\ReviewStatus;
 
 /**
  * Repository for handling {@link ReviewThread} entities
@@ -42,8 +43,9 @@ class ReviewThreadRepository extends ServiceEntityRepository
         /** @var array<ReviewThread> */
         return $this->createQueryBuilder('t')
             ->where('t.page = :page')
-            ->andWhere('t.resolved = false')
+            ->andWhere('t.status = :status')
             ->setParameter('page', $page)
+            ->setParameter('status', ReviewStatus::OPEN)
             ->orderBy('t.updated', 'DESC')
             ->getQuery()
             ->getResult();

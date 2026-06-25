@@ -56,7 +56,12 @@ window.Inachis.BulkCreateDialog = {
   },
 
   loadForm(dialog) {
-    fetch(`${window.Inachis.prefix}/ax/bulkCreate/get`, { method: 'POST' })
+    fetch(`${window.Inachis.prefix}/ax/bulkCreate/get`, {
+        method: 'POST',
+        body: new URLSearchParams({
+          title: document.getElementById('series_title').value,
+        }),
+      })
       .then(res => res.text())
       .then(html => {
         dialog.setContent(html);

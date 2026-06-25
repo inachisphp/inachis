@@ -22,6 +22,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -282,11 +283,16 @@ class PostType extends AbstractType
                 ],
                 'required' => false,
             ])
-            ->add('featureImage', EntityType::class, [
-                'class' => Image::class,
-                'choice_label' => fn (Image $image) => $image->getFilename(),
+            ->add('featureImage', HiddenType::class, [
+                'mapped' => false,
                 'required' => false,
             ])
+            // ->add('featureImage', EntityType::class, [
+            //     'class' => Image::class,
+            //     'choice_label' => 'filename',
+            //     'choice_value' => static fn (?Image $image) => $image?->getId()?->toString(),
+            //     'required' => false,
+            // ])
             ->add('featureSnippet', TextareaType::class, [
                 'attr' => [
                     'aria-labelledby' => 'teaser_label',

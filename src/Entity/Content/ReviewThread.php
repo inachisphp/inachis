@@ -14,10 +14,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Inachis\Entity\User\User;
+use Inachis\Enum\ReviewStatus;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 
 #[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 class ReviewThread
 {
     /** @var UuidInterface The unqiue identifier for the review thread */
@@ -41,9 +43,9 @@ class ReviewThread
     #[ORM\OrderBy(['created' => 'ASC'])]
     protected Collection $comments;
 
-    /** @var string The current status of this thread */
-    #[ORM\Column(type: 'string', length: 20)]
-    protected string $status = 'open';
+    /** @var ReviewStatus The current status of this thread */
+    #[ORM\Column(enumType: ReviewStatus::class)]
+    protected ReviewStatus $status = ReviewStatus::OPEN;
 
     /** @var bool Flag indicating if the offsets need rebasing after content change */
     #[ORM\Column(type: 'boolean')]
@@ -85,10 +87,6 @@ class ReviewThread
     #[ORM\ManyToOne(targetEntity: User::class)]
     protected ?User $assignedTo = null;
 
-    /** @var bool Flag indicating if this review is resolved */
-    #[ORM\Column(type: 'boolean')]
-    protected bool $resolved = false;
-
     /** @var DateTimeImmutable The datetime this review was started  */
     #[ORM\Column(type: 'datetime_immutable')]
     protected DateTimeImmutable $created;
@@ -108,7 +106,20 @@ class ReviewThread
     public function __construct()
     {
         $this->comments = new ArrayCollection();
-        $this->created = new DateTimeImmutable();
+    }
+
+    #[ORM\PrePersist]
+    public function prePersist(): void
+    {
+        $now = new DateTimeImmutable();
+
+        $this->created = $now;
+        $this->updated = $now;
+    }
+
+    #[ORM\PreUpdate]
+    public function preUpdate(): void
+    {
         $this->updated = new DateTimeImmutable();
     }
 
@@ -146,25 +157,29 @@ class ReviewThread
         return $this->comments;
     }
 
-    /**
-     * Sets the collection of comments for this review
-     *
-     * @param Collection<int, ReviewComment> $comments
-     * @return self
-     */
-    public function setComments(Collection $comments): self
+    public function addComment(ReviewComment $comment): self
     {
-        $this->comments = $comments;
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setThread($this);
+        }
 
         return $this;
     }
 
-    public function getStatus(): string
+    public function removeComment(ReviewComment $comment): self
+    {
+        $this->comments->removeElement($comment);
+
+        return $this;
+    }
+
+    public function getStatus(): ReviewStatus
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): self
+    public function setStatus(ReviewStatus $status): self
     {
         $this->status = $status;
 
@@ -214,6 +229,12 @@ class ReviewThread
 
     public function setEndOffset(int $endOffset): self
     {
+        if ($endOffset < $this->startOffset) {
+            throw new \InvalidArgumentException(
+                'End offset cannot be before start offset'
+            );
+        }
+
         $this->endOffset = $endOffset;
 
         return $this;
@@ -293,12 +314,30 @@ class ReviewThread
 
     public function isResolved(): bool
     {
-        return $this->resolved;
+        return $this->status === ReviewStatus::RESOLVED;
     }
 
-    public function setResolved(bool $resolved): self
+    public function resolve(User $user): self
     {
-        $this->resolved = $resolved;
+        $this->status = ReviewStatus::RESOLVED;
+        $this->resolvedBy = $user;
+        $this->resolvedAt = new DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function reopen(): self
+    {
+        $this->status = ReviewStatus::OPEN;
+        $this->resolvedBy = null;
+        $this->resolvedAt = null;
+
+        return $this;
+    }
+
+    public function close(): self
+    {
+        $this->status = ReviewStatus::CLOSED;
 
         return $this;
     }

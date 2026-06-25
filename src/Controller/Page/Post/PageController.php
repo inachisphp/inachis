@@ -19,6 +19,7 @@ use Inachis\Enum\EditorialStatus;
 use Inachis\Form\PostType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\Content\{CategoryRepository, PageRepository, ReviewThreadRepository, RevisionRepository};
+use Inachis\Repository\Media\ImageRepository;
 use Inachis\Service\Content\Page\CategoryManager;
 use Inachis\Service\Content\Page\PageBulkActionService;
 use Inachis\Service\Content\Page\ReviewRebaseService;
@@ -172,6 +173,7 @@ class PageController extends AbstractInachisController
         Request $request,
         CategoryManager $categoryManager,
         ContentRevisionCompare $contentRevisionCompare,
+        ImageRepository $imageRepository,
         PageBulkActionService $pageBulkActionService,
         PageRepository $pageRepository,
         RevisionRepository $revisionRepository,
@@ -205,7 +207,9 @@ class PageController extends AbstractInachisController
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
         if($form->isSubmitted() && !$form->isValid()) {
-            dump($form);
+            foreach ($form->getErrors(true) as $error) {
+                dump($error->getOrigin()->getName(), $error->getMessage());
+            }
         }
         if ($form->isSubmitted() && $form->isValid()) {
             $delete = $form->has('delete') ? $form->get('delete') : null;
@@ -218,6 +222,12 @@ class PageController extends AbstractInachisController
                     'incc_post_list',
                     [ 'type' => $type ]
                 );
+            }
+
+            $imageId = $form->get('featureImage')->getData();
+            if ($imageId) {
+                $image = $imageRepository->find($imageId);
+                $post->setFeatureImage($image);
             }
 
             // Update post
@@ -275,17 +285,7 @@ class PageController extends AbstractInachisController
             'includeEditor' => true,
             'includeEditorId' => $post->getId()?->toString() ?: '',
             'post' => $post,
-            'revisions' => $revisionRepository->getAll(
-                0,
-                25,
-                [
-                    'q.page_id = :pageId', [
-                        'pageId' => $post->getId()?->toString() ?: '',
-                    ]
-                ], [
-                    [ 'q.versionNumber', 'DESC']
-                ]
-            ),
+            'revisions' => $revisionRepository->getRevisionsForPage($post),
             'textStats' => $post->getId() !== null ? ReadingTime::getWordCountAndReadingTime($post->getContent()) : [],
         ]);
     }
