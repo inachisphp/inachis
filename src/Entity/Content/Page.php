@@ -36,7 +36,7 @@ use InvalidArgumentException;
  *    featureImage?: string,
  *    featureSnippet?: string,
  *    status: EditorialStatus,
- *    visibility: bool,
+ *    visible: bool,
  *    createDate: string,
  *    postDate: string,
  *    expireDate?: string,
@@ -65,16 +65,6 @@ use InvalidArgumentException;
 class Page
 {
     use BidirectionalCollectionTrait;
-
-    /**
-     * @const string Indicates a Page is public
-     */
-    public const PUBLIC = true;
-
-    /**
-     * @const string Indicates a Page is private
-     */
-    public const PRIVATE = false;
 
     /**
      * @const string Indicates a Page is standalone
@@ -143,7 +133,7 @@ class Page
      * @var bool Determining if a {@link Page} is visible to the public
      */
     #[ORM\Column(type: 'boolean', length: 20)]
-    protected bool $visibility = self::PUBLIC;
+    protected bool $visible = false;
 
     /**
      * @var DateTimeImmutable The date the {@link Page} was created
@@ -378,13 +368,13 @@ class Page
     }
 
     /**
-     * Returns the value of {@link visibility}.
+     * Returns the value of {@link visible}.
      *
      * @return bool The current visibility of the {@link Page}
      */
-    public function getVisibility(): bool
+    public function isVisible(): bool
     {
-        return $this->visibility;
+        return $this->visible;
     }
 
     /**
@@ -679,14 +669,14 @@ class Page
     }
 
     /**
-     * Sets the value of {@link visibility}. Default 'Private'
+     * Sets the value of {@link visible}. Default 'Private'
      *
-     * @param bool $value The visibility of the {@link Page}
+     * @param bool $visible The visibility of the {@link Page}
      * @return Page
      */
-    public function setVisibility(bool $value = self::PRIVATE): self
+    public function setVisible(bool $visible = false): self
     {
-        $this->visibility = $value;
+        $this->visible = $visible;
         return $this;
     }
 

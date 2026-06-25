@@ -68,7 +68,7 @@ final class SeriesXmlWriter extends AbstractXmlExportWriter
         $xml->addChild('url', $item->url);
         $this->optional($xml, 'firstDate', $item->firstDate);
         $this->optional($xml, 'lastDate', $item->lastDate);
-        $this->boolean($xml, 'visibility', $item->visibility, 'public', 'private');
+        $this->boolean($xml, 'visible', $item->visible, 'public', 'private');
 
         $items = $xml->addChild('items');
         foreach ($item->items as $title) {

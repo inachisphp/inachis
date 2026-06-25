@@ -121,7 +121,7 @@ class TagsController extends AbstractInachisController
                 fn($row) => (object) [
                     'id' => $row[0]->getId(),
                     'title' => $row[0]->getTitle(),
-                    'url' => '/incc/tags/' . $row[0]->getId(),
+                    'url' => '/incc/tags/' . $row[0]->getSlug(),
                     'usageCount' => $row['usageCount'],
                 ],
                 $tagRepository->findAllWithUsageCount($offset, $limit)
@@ -168,7 +168,7 @@ class TagsController extends AbstractInachisController
             }
 
             // Move pages across
-            $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$source->getId()?->toString() ?? '']], '*', 0, 0);
+            $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [ $source->getId() ]], '*', 0, 0);
             foreach ($pages as $page) {
                 $page->removeTag($source);
                 $page->addTag($target);
@@ -184,21 +184,26 @@ class TagsController extends AbstractInachisController
     /**
      * Show tag and its pages
      *
-     * @param Tag $tag
+     * @param string $slug
      * @param PageRepository $pageRepository
      * @return Response
      */
-    #[Route('/incc/tags/{id}/{offset}/{limit}', name: 'incc_tag_show', requirements: [ "offset" => "\d+", "limit" => "\d+" ], defaults: [ "offset" => 0, "limit" => 25 ])]
+    #[Route('/incc/tags/{slug}/{offset}/{limit}', name: 'incc_tag_show', requirements: [ "offset" => "\d+", "limit" => "\d+" ], defaults: [ "offset" => 0, "limit" => 25 ])]
     public function show(
-        Tag $tag,
+        string $slug,
         CategoryRepository $categoryRepository,
         PageRepository $pageRepository,
         ContentQueryParameters $contentQueryParameters,
         TagBulkActionService $tagBulkActionService,
+        TagRepository $tagRepository,
         Request $request,
         int $offset = 0,
         int $limit = 25
     ): Response {
+        $tag = $tagRepository->findOneBy([ 'slug' => $slug]);
+        if (empty($tag)) {
+            return $this->redirectToRoute('incc_tags_list');
+        }
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
@@ -219,7 +224,7 @@ class TagsController extends AbstractInachisController
             return $this->redirectToRoute('incc_tag_show', ['id' => $tag->getId()]);
         }
 
-        $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$tag->getId()?->toString() ?? '']], '*', $offset, $limit);
+        $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [ $tag->getId() ]], '*', $offset, $limit);
 
         $this->viewModel->page->title = 'Tags';
         $this->viewModel->page->tab = 'tag';

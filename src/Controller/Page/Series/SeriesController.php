@@ -69,7 +69,7 @@ class SeriesController extends AbstractInachisController
         }
 
         /** @var array{
-         *     filters: array{keyword?:string, visibility?:string},
+         *     filters: array{keyword?:string, visible?:string},
          *     offset: int,
          *     limit: int,
          *     sort: string
@@ -152,7 +152,7 @@ class SeriesController extends AbstractInachisController
             }
 
             $series->setAuthor($this->getCurrentUser());
-            $series->setModDate(new DateTimeImmutable());
+            $series->setUpdatedAt(new DateTimeImmutable());
             $this->entityManager->persist($series);
             $this->entityManager->flush();
 

@@ -53,8 +53,8 @@ readonly class PageBulkActionService
             }
             match ($action) {
                 'delete'  => $this->delete($post),
-                'private'  => $post->setVisibility(Page::PRIVATE),
-                'public' => $post->setVisibility(Page::PUBLIC),
+                'private'  => $post->setVisible(false),
+                'public' => $post->setVisible(true),
                 'rebuild' => $post = $this->rebuild($post),
                 default   => null,
             };
@@ -67,7 +67,7 @@ readonly class PageBulkActionService
                         ->setContent('')
                         ->setAction(sprintf(
                             RevisionRepository::VISIBILITY_CHANGE,
-                            $post->getVisibility()
+                            $post->isVisible()
                         ));
                     $this->entityManager->persist($revision);
                 }

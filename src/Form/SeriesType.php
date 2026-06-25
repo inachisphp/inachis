@@ -166,9 +166,9 @@ class SeriesType extends AbstractType
                     ),
                     'label_html' => true,
                 ])
-                ->add('visibility', CheckboxType::class, [
+                ->add('visible', CheckboxType::class, [
                     'attr' => [
-                        'aria-labelledby' => 'visibility_label',
+                        'aria-labelledby' => 'visiblelabel',
                         'aria-required' => 'false',
                         'class' => 'ui-switch',
                         'data-label-off' => 'private',
@@ -176,7 +176,7 @@ class SeriesType extends AbstractType
                     ],
                     'label' => $this->translator->trans('admin.series.visibility.label', [], 'messages'),
                     'label_attr' => [
-                        'id' => 'visibility_label',
+                        'id' => 'visible_label',
                         'class' => 'inline_label',
                     ],
                     'required' => false,

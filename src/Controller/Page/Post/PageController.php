@@ -93,7 +93,7 @@ class PageController extends AbstractInachisController
 
         /** @var array{
          *     filters: array{
-         *         categories?: array<string>, tags?: array<string>, status?: string, visibility?: bool,
+         *         categories?: array<string>, tags?: array<string>, status?: string, visible?: bool,
          *         keyword?: string, excludeIds?: list<string>, fromDate?: \DateTimeImmutable, toDate?: \DateTimeImmutable
          *     }|array{},
          *     sort: string,

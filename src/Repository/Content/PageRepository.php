@@ -68,7 +68,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
                 $qb->expr()->andX(
                     $qb->expr()->eq('Page_categories.id', ':categoryId'),
                     $qb->expr()->eq('p.status', '\'published\''),
-                    $qb->expr()->eq('p.visibility', '1'),
+                    $qb->expr()->eq('p.visible', '1'),
                     $qb->expr()->eq('p.type', '\'post\'')
                 )
             )
@@ -120,7 +120,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
                 $qb->expr()->andX(
                     $qb->expr()->eq('Page_tags.id', ':tagId'),
                     'p.status=\'published\'',
-                    'p.visibility=\'1\'',
+                    'p.visible=\'1\'',
                     'p.type=\'post\''
                 )
             )
@@ -148,7 +148,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         $qb = $qb
             ->select('COUNT(p) AS numPages')
             ->leftJoin('p.tags', 'Page_tags')
-            ->where('Page_tags.id = :tagId AND p.status = \'published\' AND p.visibility = \'1\' AND p.type = \'post\'')
+            ->where('Page_tags.id = :tagId AND p.status = \'published\' AND p.visible = \'1\' AND p.type = \'post\'')
             ->setParameter('tagId', $tag);
         /** @var int */
         return $qb->getQuery()->getSingleScalarResult();
@@ -198,7 +198,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      *   categories?:array<string>,
      *   tags?:array<string>,
      *   status?:string,
-     *   visibility?:bool,
+     *   visible?:bool,
      *   keyword?:string,
      *   excludeIds?:list<string>,
      *   fromDate?:\DateTimeImmutable,
@@ -241,21 +241,33 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         }
         if (!empty($filters['categories'])) {
             $where[0] .= ' AND c.id IN (:categories)';
-            $where[1]['categories'] = array_is_list($filters['categories']) ? $filters['categories'] : array_keys($filters['categories']);
+            $where[1]['categories'] = [
+                implode(',', array_map(
+                    fn($t) => $t->toString(),
+                    array_is_list($filters['categories']) ? $filters['categories'] : array_keys($filters['categories'])
+                )),
+                'uuid_binary'
+            ];           
             $join[] = ['leftJoin', 'q.categories', 'c'];
         }
         if (!empty($filters['tags'])) {
             $where[0] .= ' AND t.id IN (:tags)';
-            $where[1]['tags'] = array_is_list($filters['tags']) ? $filters['tags'] : array_keys($filters['tags']);
+            $where[1]['tags'] = [
+                implode(',', array_map(
+                    fn($t) => $t->toString(),
+                    array_is_list($filters['tags']) ? $filters['tags'] : array_keys($filters['tags'])
+                )),
+                'uuid_binary'
+            ];
             $join[] = ['leftJoin', 'q.tags', 't'];
         }
         if (!empty($filters['status'])) {
             $where[0] .= ' AND q.status = :status';
             $where[1]['status'] = $filters['status'];
         }
-        if (!empty($filters['visibility'])) {
-            $where[0] .= ' AND q.visibility = :visibility';
-            $where[1]['visibility'] = $filters['visibility'];
+        if (!empty($filters['visible'])) {
+            $where[0] .= ' AND q.visible = :visible';
+            $where[1]['visible'] = $filters['visible'];
         }
         if (!empty($filters['keyword'])) {
             $where[0] .= ' AND (q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.content LIKE :keyword )';

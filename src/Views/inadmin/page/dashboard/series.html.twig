@@ -18,7 +18,7 @@
 				<dt><a aria-label="Edit {{ series.title }}" href="{{ path('incc_series_edit', {'id': series.id}) }}">{{ series.title }}{{ series.subtitle ? ' - ' ~ series.subtitle }}</a></dt>
 				<dd>
 					<span>{{ series.items|length }}</span> posts &middot;
-					<span>Updated: <em>{{ series.modDate|date('jS F Y') }}</em></span>
+					<span>Updated: <em>{{ series.updatedAt|date('jS F Y') }}</em></span>
 				</dd>
 			{% endfor %}
 		</dl>

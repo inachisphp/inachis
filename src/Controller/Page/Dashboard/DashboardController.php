@@ -98,9 +98,9 @@ class DashboardController extends AbstractInachisController
             0,
             5,
             [
-                'q.visibility = :visibility',
+                'q.visible = :visible',
                 [
-                    'visibility' => (string) Series::PRIVATE,
+                    'visible' => false,
                 ],
             ],
             'q.firstDate DESC, q.lastDate'
@@ -109,9 +109,9 @@ class DashboardController extends AbstractInachisController
             0,
             5,
             [
-                'q.visibility != :visibility',
+                'q.visible != :visible',
                 [
-                    'visibility' => (string) Series::PRIVATE,
+                    'visible' => false,
                 ],
             ],
             'q.firstDate DESC, q.lastDate'

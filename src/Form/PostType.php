@@ -130,9 +130,9 @@ class PostType extends AbstractType
                 ],
                 'required' => false,
             ])
-            ->add('visibility', CheckboxType::class, [
+            ->add('visible', CheckboxType::class, [
                 'attr' => [
-                    'aria-labelledby' => 'visibility_label',
+                    'aria-labelledby' => 'visible_label',
                     'aria-required' => 'false',
                     'class' => 'ui-switch',
                     'data-label-off' => $this->translator->trans('admin.post.properties.visibility.private'),
@@ -140,7 +140,7 @@ class PostType extends AbstractType
                 ],
                 'label' => 'admin.post.properties.visibility.label',
                 'label_attr' => [
-                    'id' => 'visibility_label',
+                    'id' => 'visible_label',
                     'class' => 'inline_label',
                 ],
                 'required' => false,

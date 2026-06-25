@@ -36,25 +36,16 @@ use Ramsey\Uuid\UuidInterface;
  *     author?: string,
  *     createDate: string,
  *     modDate: string,
- *     visibility: bool
+ *     visible: bool
  * }
  */
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\SeriesRepository', readOnly: false)]
 #[ORM\Index(name: 'search_idx', columns: ['title'])]
 #[ORM\Index(name: "fulltext_title_content", columns: ['title', 'sub_title', 'description'], flags: ["fulltext"])]
+#[ORM\HasLifecycleCallbacks]
 class Series
 {
     use BidirectionalCollectionTrait;
-
-    /**
-     * @const string Indicates a Series is public
-     */
-    public const PUBLIC = true;
-
-    /**
-     * @const string Indicates a Series is private
-     */
-    public const PRIVATE = false;
 
     /**
      * @var UuidInterface|null
@@ -66,10 +57,10 @@ class Series
     protected ?UuidInterface $id = null;
 
     /**
-     * @var string|null
+     * @var string
      */
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    protected ?string $title = '';
+    protected string $title = '';
 
     /**
      * @var string|null
@@ -78,10 +69,10 @@ class Series
     protected ?string $subTitle = '';
 
     /**
-     * @var string|null
+     * @var string
      */
     #[ORM\Column(type: 'string', length: 255, unique: true, nullable: false)]
-    protected ?string $url = '';
+    protected string $url = '';
 
     /**
      * @var string|null
@@ -111,14 +102,14 @@ class Series
     /**
      * @var Image|null
      */
-    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\Media\Image', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\Media\Image')]
     #[ORM\JoinColumn(name: 'image_id', referencedColumnName: 'id')]
     protected ?Image $image = null;
 
     /**
      * @var User|null The UUID of the {@link User} that created the {@link Series}
      */
-    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User\User', cascade: [ 'detach' ])]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User\User')]
     #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id')]
     protected ?User $author = null;
 
@@ -126,31 +117,42 @@ class Series
      * @var DateTimeImmutable
      */
     #[ORM\Column(type: 'datetime_immutable')]
-    protected DateTimeImmutable $createDate;
+    protected DateTimeImmutable $createdAt;
 
 
     /**
      * @var DateTimeImmutable
      */
     #[ORM\Column(type: 'datetime_immutable')]
-    protected DateTimeImmutable $modDate;
+    protected DateTimeImmutable $updatedAt;
 
     /**
      * @var bool Determining if a {@link Series} is visible to the public
      */
-    #[ORM\Column(type: 'boolean', length: 20)]
-    protected bool $visibility = self::PRIVATE;
+    #[ORM\Column(type: 'boolean')]
+    protected bool $visible = false;
 
     /**
      * Series constructor.
      */
     public function __construct()
     {
-        $this->image = null;
         $this->items = new ArrayCollection();
-        $currentTime = new DateTimeImmutable();
-        $this->setCreateDate($currentTime);
-        $this->setModDate($currentTime);
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        $now = new DateTimeImmutable();
+
+        $this->createdAt ??= $now;
+        $this->updatedAt ??= $now;
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     /**
@@ -164,23 +166,11 @@ class Series
     }
 
     /**
-     * Sets the value of {@link id}.
-     *
-     * @param UuidInterface|null $id The UUID to set
-     * @return Series
-     */
-    public function setId(?UuidInterface $id): self
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
      * Gets the value of {@link title}.
      *
-     * @return string|null
+     * @return string
      */
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -188,10 +178,10 @@ class Series
     /**
      * Sets the value of {@link title}.
      *
-     * @param string|null $title The title to set
+     * @param string $title The title to set
      * @return Series
      */
-    public function setTitle(?string $title): self
+    public function setTitle(string $title): self
     {
         $this->title = $title;
         return $this;
@@ -222,9 +212,9 @@ class Series
     /**
      * Gets the value of {@link url}.
      *
-     * @return string|null
+     * @return string
      */
-    public function getUrl(): ?string
+    public function getUrl(): string
     {
         return $this->url;
     }
@@ -232,10 +222,10 @@ class Series
     /**
      * Sets the value of {@link url}.
      *
-     * @param string|null $url The URL to set
+     * @param string $url The URL to set
      * @return Series
      */
-    public function setUrl(?string $url): self
+    public function setUrl(string $url): self
     {
         $this->url = $url;
         return $this;
@@ -387,76 +377,96 @@ class Series
     }
 
     /**
-     * Gets the value of {@link createDate}.
+     * Gets the value of {@link createdAt}.
      *
-     * @return DateTimeImmutable|null
+     * @return DateTimeImmutable
      */
-    public function getCreateDate(): ?DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
-        return $this->createDate;
+        return $this->createdAt;
     }
 
     /**
-     * Sets the value of {@link createDate}.
+     * Sets the value of {@link createdAt}.
      *
-     * @param DateTimeImmutable $createDate The create date to set
+     * @param DateTimeImmutable $createdAt The create date to set
      * @return Series
      */
-    public function setCreateDate(DateTimeImmutable $createDate): self
+    public function setCreatedAt(DateTimeImmutable $createdAt): self
     {
-        $this->createDate = $createDate;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
 
     /**
-     * Gets the value of {@link modDate}.
+     * Gets the value of {@link updatedAt}.
      *
-     * @return DateTimeImmutable|null
+     * @return DateTimeImmutable
      */
-    public function getModDate(): ?DateTimeImmutable
+    public function getUpdatedAt(): DateTimeImmutable
     {
-        return $this->modDate;
+        return $this->updatedAt;
     }
 
     /**
-     * Sets the value of {@link modDate}.
+     * Sets the value of {@link updatedAt}.
      *
-     * @param DateTimeImmutable $modDate The modification date to set
+     * @param DateTimeImmutable $updatedAt The modification date to set
      * @return Series
      */
-    public function setModDate(DateTimeImmutable $modDate): self
+    public function setUpdatedAt(DateTimeImmutable $updatedAt): self
     {
-        $this->modDate = $modDate;
+        $this->updatedAt = $updatedAt;
         return $this;
     }
 
     /**
-     * Gets the value of {@link visibility}.
+     * Gets the value of {@link visible}.
      *
      * @return bool
      */
-    public function getVisibility(): bool
+    public function isVisible(): bool
     {
-        return $this->visibility;
+        return $this->visible;
     }
 
     /**
-     * Sets the value of {@link visibility}.
+     * Sets the value of {@link visible}.
      *
-     * @param bool $visibility The visibility to set
+     * @param bool $visible The visibility to set
      * @return Series
      */
-    public function setVisibility(bool $visibility = self::PRIVATE): self
+    public function setVisible(bool $visible = false): self
     {
-        $this->visibility = $visibility;
+        $this->visible = $visible;
         return $this;
+    }
+
+    /**
+     * Returns result of testing if this series has Pages/Posts attached to it
+     *
+     * @return bool
+     */
+    public function hasItems(): bool
+    {
+        return !$this->items->isEmpty();
+    }
+
+    /**
+     * Returns the number of items in this Series
+     *
+     * @return int
+     */
+    public function getItemCount(): int
+    {
+        return $this->items->count();
     }
 
     /**
      * Returns the number of public and private items in the series
 
-     * @return array<string, int>
+     * @return array{public: int, private: int}
      */
     public function getItemVisibilityCounts(): array
     {
@@ -467,7 +477,7 @@ class Series
             if (
                 $item->getStatus() === EditorialStatus::PUBLISHED &&
                 !$item->isScheduledPage() &&
-                $item->getVisibility()
+                $item->isVisible()
             ) {
                 $public++;
             } else {

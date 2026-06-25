@@ -35,7 +35,7 @@ final class PageExportNormaliser
         $dto->content = $page->getContent();
         $dto->type = $page->getType();
         $dto->status = $page->getStatus();
-        $dto->visibility = $page->getVisibility();
+        $dto->visible = $page->isVisible();
         $dto->allowComments = $page->isAllowComments();
         $dto->language = $page->getLanguage();
         $dto->timezone = $page->getTimezone();

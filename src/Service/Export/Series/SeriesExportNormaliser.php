@@ -35,7 +35,7 @@ final class SeriesExportNormaliser
         $dto->firstDate = $series->getFirstDate()?->format('Y-m-d');
         $dto->lastDate  = $series->getLastDate()?->format('Y-m-d');
 
-        $dto->visibility = $series->getVisibility();
+        $dto->visible = $series->isVisible();
 
         foreach ($series->getItems() as $page) {
             $dto->items[] = $page->getTitle();

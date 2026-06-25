@@ -6,7 +6,7 @@
 {% endblock pagetitle %}
 
 {% block content %}
-{% set showStats = series.id is not empty and series.visibility == '1' %}
+{% set showStats = series.id is not empty and series.visible == '1' %}
 
 {{ form_start(form, {'attr': { 'class': 'col-12 form form__post form__series' }}) }}
 <div class="content__edit">
@@ -56,10 +56,10 @@
         </p>
         {% if series.items is not empty %}
         <p>
-            {{ form_label(form.visibility) }}
-            {{ form_errors(form.visibility) }}
+            {{ form_label(form.visible) }}
+            {{ form_errors(form.visible) }}
             <span class="switch-wrapper">
-                {{ form_widget(form.visibility) }}
+                {{ form_widget(form.visible) }}
             </span>
         </p>
             {{ form_widget(form.firstDate) }}

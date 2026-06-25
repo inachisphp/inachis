@@ -52,10 +52,10 @@ class ContentAggregator
             0,
             self::ITEMS_TO_SHOW,
             [
-                'q.lastDate < :postDate AND q.visibility = :visibility',
+                'q.lastDate < :postDate AND q.visible = :visible',
                 [
                     'postDate' => new DateTimeImmutable('now'),
-                    'visibility' => Series::PUBLIC,
+                    'visible' => true,
                 ],
             ],
             [['q.lastDate', 'DESC']]
@@ -81,12 +81,12 @@ class ContentAggregator
             }
         }
 
-        $pageQuery = 'q.status = :status AND q.visibility = :visibility AND q.postDate <= :postDate AND q.type = :type';
+        $pageQuery = 'q.status = :status AND q.visible = :visible AND q.postDate <= :postDate AND q.type = :type';
         $pageParameters = [
-            'status'     => EditorialStatus::PUBLISHED,
-            'visibility' => Page::PUBLIC,
-            'postDate'   => new DateTimeImmutable('now'),
-            'type'       => Page::TYPE_POST,
+            'status' => EditorialStatus::PUBLISHED,
+            'visible' => true,
+            'postDate' => new DateTimeImmutable('now'),
+            'type' => Page::TYPE_POST,
         ];
 
         if ($excludePages) {

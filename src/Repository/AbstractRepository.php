@@ -136,7 +136,20 @@ abstract class AbstractRepository extends ServiceEntityRepository
         }
         if (!empty($where[1])) {
             foreach ($where[1] as $key => $value) {
-                $qb = $qb->setParameter($key, $value);
+                $paramValue = $value;
+                $paramType = null;
+
+                // support typed parameters: [value, type]
+                if (is_array($value)) {
+                    $paramValue = $value[0];
+                    $paramType  = $value[1] ?? null;
+                }
+
+                if ($paramType !== null) {
+                    $qb = $qb->setParameter($key, $paramValue, $paramType);
+                } else {
+                    $qb = $qb->setParameter($key, $paramValue);
+                }
             }
         }
         if (!empty($groupBy)) {
