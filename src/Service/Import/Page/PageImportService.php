@@ -67,7 +67,7 @@ final class PageImportService
                 );
 
                 $page->setStatus(EditorialStatus::from($dto->status));
-                $page->setVisibility($dto->visibility ?? Page::PUBLIC);
+                $page->setVisible($dto->visible ?? true);
                 $page->setAllowComments($dto->allowComments ?? false);
                 $page->setLanguage($dto->language ?? '');
                 $page->setTimezone($dto->timezone ?? 'UTC');

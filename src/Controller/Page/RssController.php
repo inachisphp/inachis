@@ -69,7 +69,7 @@ class RssController extends AbstractWebController
         $paginator = $pageRepository->getFilteredOfTypeByPostDate(
             [
                 'status' => EditorialStatus::PUBLISHED->value,
-                'visibility' => Page::PUBLIC,
+                'visible' => true,
                 'toDate' => new \DateTimeImmutable(),
             ],
             Page::TYPE_POST,
@@ -120,7 +120,7 @@ class RssController extends AbstractWebController
         $paginator = $pageRepository->getFilteredOfTypeByPostDate(
             [
                 'status' => EditorialStatus::PUBLISHED->value,
-                'visibility' => Page::PUBLIC,
+                'visible' => true,
                 'toDate' => new \DateTimeImmutable(),
                 'categories' => [$category->getId()?->toString() ?? ''],
             ],

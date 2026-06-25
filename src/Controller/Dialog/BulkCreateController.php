@@ -32,11 +32,10 @@ class BulkCreateController extends AbstractInachisController
      * @return Response
      */
     #[Route("/incc/ax/bulkCreate/get", methods: [ "POST" ])]
-    public function contentList(): Response
+    public function contentList(Request $request): Response
     {
-        // @todo accept 'title' and pass into below
         return $this->render('inadmin/dialog/bulk-create.html.twig', [
-            'pageTitle' => '',
+            'pageTitle' => $request->request->getString('title', ''),
         ]);
     }
 

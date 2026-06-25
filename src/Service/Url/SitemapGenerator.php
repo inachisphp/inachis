@@ -168,7 +168,7 @@ class SitemapGenerator
                 );
             },
             fn(Series $series)
-                => $series->getModDate()
+                => $series->getUpdatedAt()
         );
     }
 

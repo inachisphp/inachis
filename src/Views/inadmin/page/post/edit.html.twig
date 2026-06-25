@@ -73,10 +73,10 @@
         <fieldset class="ui-section" i id="post__properties">
             <legend>{% trans %}admin.post.properties.fieldset{% endtrans %}</legend>
             <p>
-                {{ form_label(form.visibility) }}
-                {{ form_errors(form.visibility) }}
+                {{ form_label(form.visible) }}
+                {{ form_errors(form.visible) }}
                 <span class="switch-wrapper">
-                    {{ form_widget(form.visibility) }}
+                    {{ form_widget(form.visible) }}
 				</span>
             </p>
             <p>
@@ -119,7 +119,7 @@
                 {{ form_errors(form.language) }}
                 {{ form_widget(form.language) }}
             </p>
-            {% if textStats is defined %}
+            {% if textStats|default([]) is not empty %}
                 <p>{% trans with {'%readingTime%': '<strong>' ~ textStats.readingTime ~ '</strong>'} from 'messages' %}admin.post.properties.readingTime{% endtrans %}</p>
             {% endif %}
             {% if post.imageSize is defined and post.imageSize > 0 %}
@@ -190,7 +190,7 @@
                 {% for revision in revisions %}
                     <tr>
                         <th scope="row">{{ revision.versionNumber }}</th>
-                        <td>{{ revision.modDate|date('d/m/Y H:i') }}</td>
+                        <td>{{ revision.createdAt|date('d/m/Y H:i') }}</td>
                         <td>{{ revision.user.displayName }}</td>
                         <td><span class="badge">{{ revision.action }}</span></td>
                         <td>

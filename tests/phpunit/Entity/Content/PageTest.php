@@ -107,10 +107,10 @@ class PageTest extends TestCase
 
     public function testSetAndGetVisibility(): void
     {
-        $this->page->setVisibility();
-        $this->assertEquals(Page::PRIVATE, $this->page->getVisibility());
-        $this->page->setVisibility(Page::PUBLIC);
-        $this->assertEquals(Page::PUBLIC, $this->page->getVisibility());
+        $this->page->setVisible(false);
+        $this->assertEquals(false, $this->page->isVisible());
+        $this->page->setVisible(true);
+        $this->assertEquals(true, $this->page->isVisible());
     }
 
     public function testSetAndGetModDate(): void
@@ -248,16 +248,6 @@ class PageTest extends TestCase
         $this->assertEquals('en', $this->page->getLanguage());
         $this->page->setLanguage('cn');
         $this->assertEquals('cn', $this->page->getLanguage());
-    }
-
-    public function testSetAndGetSeries(): void
-    {
-        $this->assertEmpty($this->page->getSeries());
-        $series = new Series();
-        $collection = new ArrayCollection();
-        $collection->add($series);
-        $this->page->setSeries($collection);
-        $this->assertTrue($this->page->getSeries()->contains($series));
     }
 
     public function testSetAndGetNoindex(): void

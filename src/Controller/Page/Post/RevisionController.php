@@ -216,23 +216,21 @@ class RevisionController extends AbstractInachisController
      * 
      * @param Request $request
      * @param RevisionRepository $revisionRepository
-     * @param PageRepository $pageRepository
      * @return list{0: \Inachis\Entity\Content\Revision, 1: \Inachis\Entity\Content\Page}
      */
     private function loadPageWithRevision(
         Request $request,
         RevisionRepository $revisionRepository,
-        PageRepository $pageRepository
     ): array {
         $revision = $revisionRepository->findOneBy([
             'id' => $request->attributes->getString('id')
         ]);
-        if (empty($revision) || empty($revision->getPageId())) {
+        if (empty($revision) || empty($revision->getPage())) {
             throw new NotFoundHttpException(
                 sprintf('Version history could not be found for %s', $request->attributes->getString('id'))
             );
         }
-        $page = $pageRepository->findOneBy(['id' => $revision->getPageId()]);
+        $page = $revision->getPage();
         if (empty($page) || empty($page->getId())) {
             throw new NotFoundHttpException(
                 sprintf('Page could not be found for revision %s', $request->attributes->getString('id'))

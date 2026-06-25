@@ -14,13 +14,13 @@ use Inachis\Entity\User\User;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use DateTimeImmutable;
-use Exception;
 
 /**
  * Object for handling {@link Page} revisions
  */
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\RevisionRepository', readOnly: false)]
 #[ORM\Index(columns: [ 'page_id', 'user_id' ], name: 'search_idx')]
+#[ORM\HasLifecycleCallbacks]
 class Revision
 {
     /**
@@ -29,18 +29,24 @@ class Revision
      * @var UuidInterface|null The UUID of the {@link Revision}
      */
     #[ORM\Id]
-    #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
+    #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected ?UuidInterface $id = null;
 
     /**
-     * The ID of the {@link Page}
+     * The {@link Page} this revision relates to
      * 
-     * @var string|null The ID of the {@link Page}
+     * @var Page $page
      */
-    #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    protected ?string $page_id;
+    #[ORM\ManyToOne(targetEntity: Page::class)]
+    #[ORM\JoinColumn(
+        name: 'page_id',
+        referencedColumnName: 'id',
+        nullable: true,
+        onDelete: 'SET NULL'
+    )]
+    private ?Page $page = null;
 
     /**
      * The version number of the {@link Revision}
@@ -80,16 +86,16 @@ class Revision
      * @var string|null The contents of the revision
      */
     #[ORM\Column(type: 'text', nullable: true)]
-    protected ?string $content;
+    protected ?string $content = null;
 
     /**
      * The author for the {@link Page}
      * 
      * @var User|null The author for the {@link Page}
      */
-    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User\User', cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User\User')]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
-    protected ?User $user;
+    protected ?User $user = null;
 
     /**
      * The date the {@link Page} was last modified
@@ -97,11 +103,12 @@ class Revision
      * @var DateTimeImmutable The date the {@link Page} was last modified
      */
     #[ORM\Column(type: 'datetime_immutable')]
-    protected DateTimeImmutable $modDate;
+    protected DateTimeImmutable $createdAt;
 
-    public function __construct()
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
     {
-        $this->modDate = new DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     /**
@@ -129,23 +136,22 @@ class Revision
     /**
      * Returns the value of {@link page_id}.
      * 
-     * @return string|null The ID of the {@link Page}
+     * @return Page|null
      */
-    public function getPageId(): ?string
+    public function getPage(): ?Page
     {
-        return $this->page_id;
+        return $this->page;
     }
 
     /**
      * Sets the value of {@link page_id}.
      * 
-     * @param string $page_id The ID of the {@link Page}
+     * @param Page|null $page
      * @return self
      */
-    public function setPageId(string $page_id): self
+    public function setPage(?Page $page): self
     {
-        $this->page_id = $page_id;
-
+        $this->page = $page;
         return $this;
     }
 
@@ -169,7 +175,9 @@ class Revision
     public function setVersionNumber(int $value): self
     {
         if ($value < 1) {
-            throw new Exception('Invalid version number');
+            throw new \InvalidArgumentException(
+                'Version number must be greater than 0'
+            );
         }
         $this->versionNumber = $value;
 
@@ -177,24 +185,24 @@ class Revision
     }
 
     /**
-     * Returns the value of {@link modDate}.
+     * Returns the value of {@link createdAt}.
      * 
      * @return DateTimeImmutable The date the {@link Page} was last modified
      */
-    public function getModDate(): DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
-        return $this->modDate;
+        return $this->createdAt;
     }
 
     /**
-     * Sets the value of {@link modDate}.
+     * Sets the value of {@link createdAt}.
      * 
      * @param DateTimeImmutable $value The date to set
      * @return Revision
      */
-    public function setModDate(DateTimeImmutable $value): self
+    public function setCreatedAt(DateTimeImmutable $value): self
     {
-        $this->modDate = $value;
+        $this->createdAt = $value;
 
         return $this;
     }

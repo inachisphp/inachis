@@ -21,8 +21,8 @@
     {% if series.items is not empty %}
         {% set badges = {
             draft: {
-                field: 'status',
-                condition: 'draft',
+                field: 'isDraft',
+                condition: true,
                 className: 'badge__draft',
             },
             scheduled: {
@@ -31,7 +31,7 @@
                 className: 'badge__scheduled',
             },
             private: {
-                field: 'visibility',
+                field: 'visible',
                 condition: false,
                 className: 'badge__private',
             },

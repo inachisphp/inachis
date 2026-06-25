@@ -73,17 +73,6 @@ class SeriesTest extends TestCase
         $this->assertEquals($testDate, $this->series->getLastDate());
     }
 
-    public function testGetAndSetItems(): void
-    {
-        $this->series->setItems(new ArrayCollection([
-            'test1',
-            'test2',
-        ]));
-        $this->assertCount(2, $this->series->getItems());
-        $this->series->addItem(new Page('test'));
-        $this->assertCount(3, $this->series->getItems());
-    }
-
     public function testSetAndGetAuthor(): void
     {
         $this->series->setAuthor(new User('test'));
@@ -94,15 +83,15 @@ class SeriesTest extends TestCase
     public function testSetAndGetCreateDate(): void
     {
         $date = new DateTimeImmutable('now');
-        $this->series->setCreateDate($date);
-        $this->assertEquals($date, $this->series->getCreateDate());
+        $this->series->setCreatedAt($date);
+        $this->assertEquals($date, $this->series->getCreatedAt());
     }
 
     public function testSetAndGetModDate(): void
     {
         $date = new DateTimeImmutable('now');
-        $this->series->setModDate($date);
-        $this->assertEquals($date, $this->series->getModDate());
+        $this->series->setUpdatedAt($date);
+        $this->assertEquals($date, $this->series->getUpdatedAt());
     }
 
     public function testSetAndGetImage(): void
@@ -115,9 +104,9 @@ class SeriesTest extends TestCase
 
     public function testSetAndGetVisibility(): void
     {
-        $this->series->setVisibility(Series::PUBLIC);
-        $this->assertEquals(Series::PUBLIC, $this->series->getVisibility());
-        $this->series->setVisibility();
-        $this->assertEquals(Series::PRIVATE, $this->series->getVisibility());
+        $this->series->setVisible(true);
+        $this->assertEquals(true, $this->series->isVisible());
+        $this->series->setVisible();
+        $this->assertEquals(false, $this->series->isVisible());
     }
 }

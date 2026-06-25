@@ -69,7 +69,7 @@ class SeriesController extends AbstractInachisController
         }
 
         /** @var array{
-         *     filters: array{keyword?:string, visibility?:string},
+         *     filters: array{keyword?:string, visible?:string},
          *     offset: int,
          *     limit: int,
          *     sort: string
@@ -120,6 +120,11 @@ class SeriesController extends AbstractInachisController
         $form = $this->createForm(SeriesType::class, $series);
         $form->handleRequest($request);
 
+        if($form->isSubmitted() && !$form->isValid()) {
+            foreach ($form->getErrors(true) as $error) {
+                dump($error->getOrigin()->getName(), $error->getMessage());
+            }
+        }
         if ($form->isSubmitted() && $form->isValid()) {
             $delete = $form->has('delete') ? $form->get('delete') : null;
             $remove = $form->has('remove') ? $form->get('remove') : null;
@@ -147,7 +152,7 @@ class SeriesController extends AbstractInachisController
             }
 
             $series->setAuthor($this->getCurrentUser());
-            $series->setModDate(new DateTimeImmutable());
+            $series->setUpdatedAt(new DateTimeImmutable());
             $this->entityManager->persist($series);
             $this->entityManager->flush();
 

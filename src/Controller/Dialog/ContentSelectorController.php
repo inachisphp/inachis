@@ -42,7 +42,7 @@ class ContentSelectorController extends AbstractInachisController
          *   categories?:array<string>,
          *   tags?:array<string>,
          *   status?:string,
-         *   visibility?:bool,
+         *   visible?:bool,
          *   keyword?:string,
          *   excludeIds?:list<string>,
          *   fromDate?:\DateTimeImmutable,

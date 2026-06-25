@@ -48,12 +48,12 @@ readonly class SeriesBulkActionService
             }
             match ($action) {
                 'delete'  => $this->sendToWaste($series),
-                'private'  => $series->setVisibility(Series::PRIVATE),
-                'public' => $series->setVisibility(Series::PUBLIC),
+                'private'  => $series->setVisible(false),
+                'public' => $series->setVisible(true),
                 default => null,
             };
             if ($action !== 'delete') {
-                $series->setModDate(new DateTimeImmutable());
+                $series->setUpdatedAt(new DateTimeImmutable());
                 $this->entityManager->persist($series);
             }
             $count++;

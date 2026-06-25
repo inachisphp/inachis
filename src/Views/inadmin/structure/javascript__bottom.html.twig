@@ -30,7 +30,7 @@
             ],
             autosave: {
                 enabled: true,
-                uniqueId: '{% if includeEditorId|default(null) is not empty %}{{ includeEditorId }}{% else %}new-content-{{ session.id }}-{{ date()|date('Ymd') }}{% endif %}'
+                uniqueId: '{% if includeEditorId|default(null) is not empty %}{{ includeEditorId }}{% else %}new-content-{{ viewModel.session.id }}-{{ date()|date('Ymd') }}{% endif %}'
             },
         {% if editorHighlighting|default(false) %}
             codeSyntaxHighlighting: true,

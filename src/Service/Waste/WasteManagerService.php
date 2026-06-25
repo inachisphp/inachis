@@ -74,7 +74,7 @@ class WasteManagerService
             $data['content'] = $entity->getContent();
             $data['author'] = $entity->getAuthor()?->getId();
             $data['status'] = $entity->getStatus();
-            $data['visibility'] = $entity->getVisibility();
+            $data['visible'] = $entity->isVisible();
             $data['postDate'] = $entity->getPostDate()->format('Y-m-d H:i:s');
             $data['timezone'] = $entity->getTimezone();
             $data['password'] = $entity->getPassword();
@@ -105,7 +105,7 @@ class WasteManagerService
             $data['subTitle'] = $entity->getSubTitle();
             $data['description'] = $entity->getDescription();
             $data['author'] = $entity->getAuthor()?->getId();
-            $data['visibility'] = $entity->getVisibility();
+            $data['visible'] = $entity->isVisible();
             $data['url'] = $entity->getUrl();
             if ($entity->getImage()) {
                 $data['image'] = $entity->getImage()->getId();
@@ -174,7 +174,7 @@ class WasteManagerService
                 $page->setSubTitle($data['subTitle'] ?? null);
                 $page->setContent($data['content'] ?? null);
                 $page->setStatus($data['status']);
-                $page->setVisibility($data['visibility']);
+                $page->setVisible($data['visible']);
                 if (!empty($data['postDate'])) {
                     $page->setPostDate(new DateTimeImmutable($data['postDate']));
                 }
@@ -237,7 +237,7 @@ class WasteManagerService
                 $series->setTitle($data['title'] ?? '');
                 $series->setSubTitle($data['subTitle'] ?? '');
                 $series->setDescription($data['description'] ?? '');
-                $series->setVisibility($data['visibility']);
+                $series->setVisible($data['visible']);
                 $series->setUrl($data['url']);
 
                 if (!empty($data['author'])) {

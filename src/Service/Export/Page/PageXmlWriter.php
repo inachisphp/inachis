@@ -73,7 +73,7 @@ final class PageXmlWriter extends AbstractXmlExportWriter
         $this->optional($xml, 'content', $item->content);
         $xml->addChild('type', $item->type);
         $xml->addChild('status', $item->status);
-        $this->boolean($xml, 'visibility', $item->visibility, 'public', 'private');
+        $this->boolean($xml, 'visible', $item->visible, 'public', 'private');
         $this->boolean($xml, 'allowComments', $item->allowComments);
 
         $categories = $xml->addChild('categories');

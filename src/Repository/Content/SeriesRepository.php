@@ -87,7 +87,8 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
 
     /**
      * Get the published Series associated with a given Page.
-     * This method returns the Series that contains the specified Page as one of its items, and is published (visibility = public).
+     * This method returns the Series that contains the specified Page as one of its items, and is published
+     * (visible = 1).
      * If multiple Series contain the same Page, it will return one of them (the first found).
      *
      * @param Page $page The Page for which to find the associated Series.
@@ -103,10 +104,10 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             ->join('s.items', 'i')
             ->where(':page MEMBER OF s.items')
             ->andWhere('i.status = :status')
-            ->andWhere('s.visibility = :visibility')
+            ->andWhere('s.visible = :visible')
             ->setParameter('page', $page)
             ->setParameter('status', EditorialStatus::PUBLISHED)
-            ->setParameter('visibility', Series::PUBLIC)
+            ->setParameter('visible', true)
             ->orderBy('i.postDate', 'ASC')
             ->getQuery()
             ->getOneOrNullResult();
@@ -130,9 +131,10 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             ->select('s')
             ->where($qb->expr()->like('s.lastDate', ':year'))
             ->andWhere($qb->expr()->like('s.url', ':url'))
-            ->andWhere('s.visibility = \'' . Series::PUBLIC . '\'')
+            ->andWhere('s.visible = :visible')
             ->setParameter('year', $year . '%')
             ->setParameter('url', $url)
+            ->setParameter('visible', true)
             ->getQuery()
             ->getOneOrNullResult();
     }
@@ -140,7 +142,7 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
     /**
      * Get a paginator of Series entities filtered by the given criteria.
      *
-     * @param array{keyword?:string,visibility?:string} $filters
+     * @param array{keyword?:string,visible?:string} $filters
      * @param int $offset
      * @param int $limit
      * @return Paginator<Series>
@@ -155,8 +157,8 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             $where[0] .= ' AND (q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.description LIKE :keyword )';
             $where[1]['keyword'] = '%' . $filters['keyword'] . '%';
         }
-        if (!empty($filters['visibility'])) {
-            $where[0] .= ' AND q.visibility = :visibility';
+        if (!empty($filters['visible'])) {
+            $where[0] .= ' AND q.visible = :visible';
         }
         $sort = match ($sort) {
             'title desc' => [
@@ -216,8 +218,8 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
     {
         return (int) $this->createQueryBuilder('s')
             ->select('COUNT(s.id)')
-            ->where('s.visibility = :visibility')
-            ->setParameter('visibility', Series::PUBLIC)
+            ->where('s.visible = :visible')
+            ->setParameter('visible', true)
             ->getQuery()
             ->getSingleScalarResult();
     }
@@ -235,8 +237,8 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
     ): array {
         /** @var array<Series> */
         return $this->createQueryBuilder('s')
-            ->where('s.visibility = :visibility')
-            ->setParameter('visibility', Series::PUBLIC)
+            ->where('s.visible = :visible')
+            ->setParameter('visible', true)
             ->orderBy('s.lastDate', 'DESC')
             ->setFirstResult($offset)
             ->setMaxResults($limit)

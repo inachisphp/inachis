@@ -37,7 +37,7 @@ final class PageExportDto
     /**
      * @var bool
      */
-    public bool $visibility;
+    public bool $visible;
     /**
      * @var bool
      */

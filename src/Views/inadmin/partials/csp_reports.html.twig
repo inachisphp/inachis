@@ -1,0 +1,77 @@
+<div class="col-6">
+<section class="widget">
+    <form method="get" class="nested-grid">
+        <div class="col-3">
+            <label>Severity</label>
+            <select name="severity" class="form-control">
+                <option value="">All</option>
+                {% for value in ['critical','high','medium','low','info'] %}
+                    <option value="{{ value }}"
+                        {% if activeSeverity == value %}selected{% endif %}>
+                        {{ value|capitalize }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-6">
+            <label>Host</label>
+            <input type="text"
+                   name="host"
+                   value="{{ activeHost }}"
+                   class="form-control"
+                   placeholder="e.g. example.com">
+        </div>
+        <div class="col-3">
+            <button class="button button--secondary">Filter</button>
+        </div>
+
+    </form>
+</section>
+<section class="widget">
+    <header class="widget__header">
+        <h2>Reports</h2>
+    </header>
+    <table class="table table--striped table--hover">
+
+        <thead>
+        <tr>
+            <th>Severity</th>
+            <th>Directive</th>
+            <th>Host</th>
+            <th>Occurrences</th>
+            <th>Last Seen</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for report in reports %}
+            <tr class="{% if report.severity.value == 'critical' %}table-danger{% endif %}">
+                <td>
+                    <span class="badge bg-{{ report.severity.badgeClass }}">
+                        {{ report.severity.label }}
+                    </span>
+                </td>
+                <td><code>{{ report.effectiveDirective }}</code></td>
+                <td>
+                    <a href="{{ path('incc_tools_csp_dashboard', {host: report.host}) }}">
+                        {{ report.host ?? '—' }}
+                    </a>
+                </td>
+                <td>{{ report.occurrences }}</td>
+
+                <td>
+                    {{ report.lastSeenAt ? report.lastSeenAt|date('Y-m-d H:i') : '—' }}
+                </td>
+
+                <td class="text-end">
+                    <a href="{{ path('csp_report_show', {id: report.id}) }}"
+                       class="btn btn-sm btn-outline-primary">
+                        View
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+</div>

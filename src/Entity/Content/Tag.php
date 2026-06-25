@@ -12,6 +12,7 @@ namespace Inachis\Entity\Content;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 /**
  * Object for handling tags that are mapped to content.
@@ -24,7 +25,7 @@ class Tag
      * @var UuidInterface|null The unique identifier for the tag
      */
     #[ORM\Id]
-    #[ORM\Column(type: "uuid", unique: true, nullable: false)]
+    #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: "CUSTOM")]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected ?UuidInterface $id = null;
@@ -46,11 +47,9 @@ class Tag
      *
      * @param string $title The value of the tag
      */
-    public function __construct(string $title = '')
+    public function __construct(string $title)
     {
-        if ($title !== '') {
-            $this->setTitle($title);
-        }
+        $this->setTitle($title);
     }
 
     /**
@@ -84,18 +83,6 @@ class Tag
     }
 
     /**
-     * Sets the unique identifier of the tag.
-     *
-     * @param UuidInterface $value The unique identifier of the tag
-     * @return self
-     */
-    public function setId(UuidInterface $value): self
-    {
-        $this->id = $value;
-        return $this;
-    }
-
-    /**
      * Sets the title of the tag and generates a slug.
      *
      * @param string $value The value of the tag
@@ -103,7 +90,12 @@ class Tag
      */
     public function setTitle(string $value): self
     {
-        $this->title = mb_strtolower(trim($value));
+        $value = trim($value);
+        if ($value === '') {
+            throw new \InvalidArgumentException('Tag title cannot be empty');
+        }
+
+        $this->title = mb_strtolower($value);
         $this->slug = $this->slugify($value);
         return $this;
     }
@@ -116,11 +108,21 @@ class Tag
      */
     private function slugify(string $value): string
     {
-        $value = mb_strtolower($value);
-        $value = preg_replace('/[^a-z0-9]+/i', '-', $value);
-        if ($value === null) {
-            return '';
-        }
-        return trim($value, '-');
+        $slugger = new AsciiSlugger();
+        $slug = $slugger
+            ->slug($value)
+            ->lower()
+            ->toString();
+        return trim($slug, '-');
+    }
+
+    /**
+     * Provides simple Tag to string conversion
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->title;
     }
 }

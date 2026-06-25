@@ -16,7 +16,6 @@ use Inachis\Repository\Content\RevisionRepositoryInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\NonUniqueResultException;
 use Ramsey\Uuid\UuidInterface;
-use DateTimeImmutable;
 
 /**
  * Repository for revision entities
@@ -68,31 +67,48 @@ class RevisionRepository extends AbstractRepository implements RevisionRepositor
     {
         $revision = new Revision();
         return $revision
-            ->setPageId($page->getId()?->toString()?:'')
-            ->setVersionNumber($this->getNextVersionNumberForPageId($page->getId()))
+            ->setPage($page)
+            ->setVersionNumber($this->getNextVersionNumberForPage($page))
             ->setTitle($page->getTitle())
             ->setSubTitle($page->getSubTitle())
             ->setContent($page->getContent())
             ->setUser($page->getAuthor())
-            ->setModDate($page->getModDate());
+        ;
     }
 
     /**
      * Get the next version number for a page
      * 
-     * @param UuidInterface|null $pageId The ID of the page.
+     * @param Page|null $page The ID of the page.
      * @return int The next version number.
      * @throws NonUniqueResultException
      * @throws \Doctrine\ORM\NoResultException
      */
-    public function getNextVersionNumberForPageId(?UuidInterface $pageId): int
+    public function getNextVersionNumberForPage(?Page $page): int
     {
         return ((int) $this->createQueryBuilder('r')
             ->select('MAX(r.versionNumber) as max_version')
-            ->where('r.page_id = :pageId')
-            ->setParameter('pageId', $pageId)
+            ->where('r.page = :page')
+            ->setParameter('page', $page)
             ->getQuery()
             ->getSingleScalarResult()) + 1;
+    }
+
+    /**
+     * Get revisions for a specific page
+     *
+     * @param Page $page
+     * @return array
+     */
+    public function getRevisionsForPage(Page $page)
+    {
+        return $this->createQueryBuilder('r')
+            ->where('r.page = :pageId')
+            ->setParameter('pageId', $page->getId(), 'uuid_binary')
+            ->orderBy('r.versionNumber', 'DESC')
+            ->setMaxResults(25)
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -107,18 +123,17 @@ class RevisionRepository extends AbstractRepository implements RevisionRepositor
     {
         $this->createQueryBuilder('r')
             ->delete()
-            ->where('r.page_id = :pageId')
-            ->setParameter('pageId', $page->getId())
+            ->where('r.page = :page')
+            ->setParameter('page', $page)
             ->getQuery()
             ->execute();
 
         $revision = new Revision();
         $revision
-            ->setPageId($page->getId()?->toString()?:'')
+            ->setPage(null)
             ->setTitle($page->getTitle())
             ->setSubTitle($page->getSubTitle())
             ->setUser($user)
-            ->setModDate(new DateTimeImmutable())
             ->setAction(self::DELETED);
         $this->getEntityManager()->persist($revision);
         $this->getEntityManager()->flush();

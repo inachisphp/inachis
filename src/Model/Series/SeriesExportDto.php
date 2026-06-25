@@ -41,7 +41,7 @@ final class SeriesExportDto
     /**
      * The boolean visibility of the series
      */
-    public bool $visibility;
+    public bool $visible;
 
     /**
      * @var array<int, string> The titles of the posts for series contents

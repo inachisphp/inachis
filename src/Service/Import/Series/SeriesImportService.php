@@ -55,7 +55,7 @@ final class SeriesImportService
                 $series->setDescription($seriesDto->description);
                 $series->setFirstDate(new DateTimeImmutable($seriesDto->firstDate ?: ''));
                 $series->setLastDate(new DateTimeImmutable($seriesDto->lastDate ?: ''));
-                $series->setVisibility(Series::PRIVATE);
+                $series->setVisible(false);
 
                 // Link pages by title
                 foreach ($seriesDto->items as $pageTitle) {
@@ -98,7 +98,7 @@ final class SeriesImportService
      *     description?: string,
      *     firstDate?: string,
      *     lastDate?: string,
-     *     visibility?: bool,
+     *     visible?: bool,
      *     items?: list<string>
      * }> $data
      * @return SeriesExportDto[]
@@ -115,7 +115,7 @@ final class SeriesImportService
             $dto->description = $series['description'] ?? null;
             $dto->firstDate = $series['firstDate'] ?? null;
             $dto->lastDate = $series['lastDate'] ?? null;
-            $dto->visibility = $series['visibility'] ?? true;
+            $dto->visible = $series['visible'] ?? true;
             $dto->items = $series['items'] ?? [];
 
             $dtos[] = $dto;

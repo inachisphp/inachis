@@ -11,6 +11,7 @@ namespace Inachis\Entity\Content;
 
 use Inachis\Entity\User\User;
 use Inachis\Entity\Media\Image;
+use Inachis\Entity\Traits\BidirectionalCollectionTrait;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Exception\InvalidTimezoneException;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -35,7 +36,7 @@ use InvalidArgumentException;
  *    featureImage?: string,
  *    featureSnippet?: string,
  *    status: EditorialStatus,
- *    visibility: bool,
+ *    visible: bool,
  *    createDate: string,
  *    postDate: string,
  *    expireDate?: string,
@@ -63,15 +64,7 @@ use InvalidArgumentException;
 #[ORM\Index(columns: ['title', 'sub_title', 'content'], name: "fulltext_title_content", flags: ["fulltext"])]
 class Page
 {
-    /**
-     * @const string Indicates a Page is public
-     */
-    public const PUBLIC = true;
-
-    /**
-     * @const string Indicates a Page is private
-     */
-    public const PRIVATE = false;
+    use BidirectionalCollectionTrait;
 
     /**
      * @const string Indicates a Page is standalone
@@ -87,7 +80,7 @@ class Page
      * @var UuidInterface|null
      */
     #[ORM\Id]
-    #[ORM\Column(type: 'uuid', unique: true, nullable: false)]
+    #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected ?UuidInterface $id = null;
@@ -140,7 +133,7 @@ class Page
      * @var bool Determining if a {@link Page} is visible to the public
      */
     #[ORM\Column(type: 'boolean', length: 20)]
-    protected bool $visibility = self::PUBLIC;
+    protected bool $visible = false;
 
     /**
      * @var DateTimeImmutable The date the {@link Page} was created
@@ -239,10 +232,13 @@ class Page
     protected Collection $tags;
 
     /**
-     * @var Collection<int, Series>|null  The array of Series that contains this page
+     * @var Collection<int, Series>  The array of Series that contains this page
      */
-    #[ORM\ManyToMany(targetEntity: 'Inachis\Entity\Content\Series', inversedBy: 'items')]
-    protected ?Collection $series;
+    #[ORM\ManyToMany(targetEntity: Series::class, inversedBy: 'items')]
+    #[ORM\JoinTable(name: 'Series_pages')]
+    #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'series_id', referencedColumnName: 'id')]
+    protected Collection $series;
 
     /**
      * @var string|null The two character language code this content uses, empty means unknown
@@ -372,13 +368,13 @@ class Page
     }
 
     /**
-     * Returns the value of {@link visibility}.
+     * Returns the value of {@link visible}.
      *
      * @return bool The current visibility of the {@link Page}
      */
-    public function getVisibility(): bool
+    public function isVisible(): bool
     {
-        return $this->visibility;
+        return $this->visible;
     }
 
     /**
@@ -529,9 +525,9 @@ class Page
     /**
      * Returns an array of {@link Series)s assigned to the page.
      *
-     * @return Collection<int,Series>|null The array of {$link Series} entities for the {@link Page}
+     * @return Collection<int,Series> The array of {$link Series} entities for the {@link Page}
      */
-    public function getSeries(): ?Collection
+    public function getSeries(): Collection
     {
         return $this->series;
     }
@@ -673,14 +669,14 @@ class Page
     }
 
     /**
-     * Sets the value of {@link visibility}. Default 'Private'
+     * Sets the value of {@link visible}. Default 'Private'
      *
-     * @param bool $value The visibility of the {@link Page}
+     * @param bool $visible The visibility of the {@link Page}
      * @return Page
      */
-    public function setVisibility(bool $value = self::PRIVATE): self
+    public function setVisible(bool $visible = false): self
     {
-        $this->visibility = $value;
+        $this->visible = $visible;
         return $this;
     }
 
@@ -816,14 +812,26 @@ class Page
     }
 
     /**
-     * Sets the value of {@link series}.
+     * Adds Series to Page
      *
-     * @param Collection<int, Series> $series The series to assign to the page.
-     * @return Page
+     * @param Series $series
+     * @return self
      */
-    public function setSeries(Collection $series): self
+    public function addSeries(Series $series): self
     {
-        $this->series = $series;
+        $this->addBidirectional($this->series, $series, 'addItem');
+        return $this;
+    }
+
+    /**
+     * Removes Series from Page
+     *
+     * @param Series $series
+     * @return self
+     */
+    public function removeSeries(Series $series): self
+    {
+        $this->removeBidirectional($this->series, $series, 'removeItem');
         return $this;
     }
 

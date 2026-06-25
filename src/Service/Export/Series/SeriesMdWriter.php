@@ -57,7 +57,7 @@ final class SeriesMdWriter implements ExportWriterInterface
             $output .= "description: " . $item->description . "\n";
             $output .= "firstDate: " . $item->firstDate . "\n";
             $output .= "lastDate: " . $item->lastDate . "\n";
-            $output .= "visibility: " . $item->visibility . "\n";
+            $output .= "visible: " . $item->visible . "\n";
             $output .= "items: " . implode(", ", $item->items) . "\n";
             $output .= "---\n";
         }
