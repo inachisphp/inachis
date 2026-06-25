@@ -428,7 +428,7 @@ final class MigrateUuidStorageCommand extends Command
         $fks = [];
         foreach ($rows as $row) {
             $cName = $row['CONSTRAINT_NAME'];
-            
+
             if (!isset($fks[$cName])) {
                 $fks[$cName] = [
                     'constraint' => $cName,
@@ -438,7 +438,7 @@ final class MigrateUuidStorageCommand extends Command
                     'referenced_columns' => []
                 ];
             }
-            
+
             $fks[$cName]['columns'][] = $row['COLUMN_NAME'];
             $fks[$cName]['referenced_columns'][] = $row['REFERENCED_COLUMN_NAME'];
         }
@@ -490,7 +490,7 @@ final class MigrateUuidStorageCommand extends Command
         if ($snapshot && isset($snapshot['primaryKey'])) {
             return $snapshot['primaryKey'];
         }
-        
+
         return [];
     }
 
@@ -648,7 +648,7 @@ final class MigrateUuidStorageCommand extends Command
     {
         $name = $index['name'];
         $columns = $index['columns'];
-        
+
         $binCols = array_map(
             fn($c) => "`{$c}`",
             $columns
@@ -702,16 +702,16 @@ final class MigrateUuidStorageCommand extends Command
             $fk['COLUMN_NAME']
         ]);
     }
-    
+
     //
-    // Functions for performing migration below 
+    // Functions for performing migration below
     // =========================================
-    /// 
+    ///
 
 
     /**
      * Step 0: Snapshot the current schema
-     * 
+     *
      * @param OutputInterface $output
      */
     private function snapshotSchema(OutputInterface $output): void
@@ -745,9 +745,9 @@ final class MigrateUuidStorageCommand extends Command
     private function getSnapshotPayload(string $table): ?array
     {
         $payload = $this->db->fetchOne("
-            SELECT payload 
-            FROM uuid_migration_snapshot 
-            WHERE snapshot_type = 'table' 
+            SELECT payload
+            FROM uuid_migration_snapshot
+            WHERE snapshot_type = 'table'
             AND table_name = ?
         ", [$table]);
 
@@ -771,7 +771,7 @@ final class MigrateUuidStorageCommand extends Command
             FROM information_schema.COLUMNS
             WHERE TABLE_SCHEMA = DATABASE()
             AND (
-                COLUMN_TYPE LIKE 'char(36)%' 
+                COLUMN_TYPE LIKE 'char(36)%'
                 OR COLUMN_TYPE LIKE 'varchar(36)%'
                 OR (DATA_TYPE IN ('char', 'varchar') AND CHARACTER_MAXIMUM_LENGTH = 36)
             )
@@ -782,13 +782,13 @@ final class MigrateUuidStorageCommand extends Command
         foreach ($rows as $row) {
             $table = $row['TABLE_NAME'] ?? $row['table_name'];
             $column = $row['COLUMN_NAME'] ?? $row['column_name'];
-            
+
             $map[$table][] = $column;
             $baseTables[strtolower($table)] = true;
         }
 
         // Pass 2: Grab EVERY SINGLE foreign key relationship in the database.
-        // If it references a table we know is transforming, we MUST include the local column 
+        // If it references a table we know is transforming, we MUST include the local column
         // NO MATTER WHAT ITS CURRENT TYPE IS (char(36), varchar(255), text, etc.)
         $fkRows = $this->db->fetchAllAssociative("
             SELECT
@@ -804,7 +804,7 @@ final class MigrateUuidStorageCommand extends Command
             $refTable = $fk['REFERENCED_TABLE_NAME'] ?? $fk['referenced_table_name'] ?? null;
             $tableName = $fk['TABLE_NAME'] ?? $fk['table_name'] ?? null;
             $columnName = $fk['COLUMN_NAME'] ?? $fk['column_name'] ?? null;
-            
+
             if ($refTable !== null && $tableName !== null && $columnName !== null) {
                 // Case-insensitive check to see if the target table is undergoing a migration
                 if (isset($baseTables[strtolower($refTable)])) {
@@ -827,7 +827,7 @@ final class MigrateUuidStorageCommand extends Command
 
     /**
      * Step 2.1: Add _bin columns for each column being replaced
-     * 
+     *
      * @param string $table
      * @param array<> $uuidColumns
      * @param bool $dryRun
@@ -880,7 +880,7 @@ final class MigrateUuidStorageCommand extends Command
 
     /**
      * Step 3: Backfill _bin columns from ID columns
-     * 
+     *
      * @param string $table
      * @param string $column
      * @return int
@@ -908,7 +908,7 @@ final class MigrateUuidStorageCommand extends Command
 
     /**
      * Step 4.1: Verify there are no empty _bin fields
-     * 
+     *
      * @param string $table
      * @param string $column
      */
@@ -932,7 +932,7 @@ final class MigrateUuidStorageCommand extends Command
 
     /**
      * Step 4.2: Verify UUID_BINARY values relate to UUIDs
-     * 
+     *
      * @param string $table
      * @param string $column
      */
@@ -956,7 +956,7 @@ final class MigrateUuidStorageCommand extends Command
 
     /**
      * Step 4.3: Check binary length is correct
-     * 
+     *
      * @param string $table
      * @param string $column
      */
@@ -985,16 +985,31 @@ final class MigrateUuidStorageCommand extends Command
     {
         $table = $fk['TABLE_NAME'];
         $refTable = $fk['REFERENCED_TABLE_NAME'];
-        
+
         $joinConditions = [];
         $whereConditions = [];
-        
+
         foreach ($fk['columns'] as $index => $column) {
             $refColumn = $fk['referenced_columns'][$index];
-            
+            $shadowColumn = "{$column}_bin";
+
+            // GUARD CLAUSE: If the shadow column doesn't exist, this table/column
+            // wasn't part of this migration run (e.g., already migrated). Skip validation.
+            $columnExists = (int) $this->db->fetchOne("
+                SELECT COUNT(*)
+                FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = ?
+                AND COLUMN_NAME = ?
+            ", [$table, $shadowColumn]);
+
+            if ($columnExists === 0) {
+                return;
+            }
+
             // Match shadow binary columns to the unhexed original targets
-            $joinConditions[] = "t.`{$column}_bin` = UNHEX(REPLACE(r.`$refColumn`, '-', ''))";
-            $whereConditions[] = "t.`{$column}_bin` IS NOT NULL";
+            $joinConditions[] = "t.`{$shadowColumn}` = UNHEX(REPLACE(r.`$refColumn`, '-', ''))";
+            $whereConditions[] = "t.`{$shadowColumn}` IS NOT NULL";
         }
 
         $joinSql = implode(' AND ', $joinConditions);
@@ -1014,7 +1029,7 @@ final class MigrateUuidStorageCommand extends Command
             );
         }
     }
-    
+
     /**
      * Step 5: Drop FKs
      */
@@ -1075,7 +1090,7 @@ final class MigrateUuidStorageCommand extends Command
             $pk = $this->discoverPrimaryKey($table);
 
             if (empty($pk)) {
-                // FALLBACK SAFETY: If it didn't find a PK in the snapshot, 
+                // FALLBACK SAFETY: If it didn't find a PK in the snapshot,
                 // but the table is named 'image' or has an 'id' column being migrated, force it
                 if (in_array('id', $columns, true)) {
                     $pk = ['id'];
@@ -1089,7 +1104,7 @@ final class MigrateUuidStorageCommand extends Command
             } catch (\Throwable $e) {
                 // Suppress if already dropped
             }
-            
+
             $this->createPrimaryKey($table, $pk);
             $output->writeln("  rebuilt PK {$table} on (" . implode(', ', $pk) . ")");
         }
@@ -1124,7 +1139,7 @@ final class MigrateUuidStorageCommand extends Command
 
                 $typeModifier = (isset($index['type']) && $index['type'] === 'FULLTEXT') ? 'FULLTEXT' : ($index['unique'] ? 'UNIQUE' : '');
                 $binCols = array_map(fn($c) => "`{$c}`", $index['columns']);
-                
+
                 $sql = sprintf(
                     "ALTER TABLE `%s` ADD %s INDEX `%s` (%s)",
                     $table,
@@ -1132,7 +1147,7 @@ final class MigrateUuidStorageCommand extends Command
                     $index['name'],
                     implode(',', $binCols)
                 );
-                
+
                 try {
                     $this->db->executeStatement($sql);
                     $output->writeln("  rebuilt index {$table}.{$index['name']}");
@@ -1149,7 +1164,7 @@ final class MigrateUuidStorageCommand extends Command
             foreach ($columns as $column) {
                 $forcedIndexName = "idx_migrated_safety_" . strtolower($column);
                 $sql = "ALTER TABLE `$table` ADD INDEX IF NOT EXISTS `$forcedIndexName` (`$column`)";
-                
+
                 try {
                     $this->db->executeStatement($sql);
                 } catch (\Throwable $e) {
@@ -1185,7 +1200,7 @@ final class MigrateUuidStorageCommand extends Command
             foreach ($foreignKeys as $fk) {
                 $rawTable = $fk['TABLE_NAME'] ?? $fk['table_name'] ?? '';
                 $rawRefTable = $fk['REFERENCED_TABLE_NAME'] ?? $fk['referenced_table_name'] ?? '';
-                
+
                 // Normalize casing against live schema strings
                 $table = $casedTableMap[strtolower($rawTable)] ?? $rawTable;
                 $refTable = $casedTableMap[strtolower($rawRefTable)] ?? $rawRefTable;
@@ -1229,7 +1244,7 @@ final class MigrateUuidStorageCommand extends Command
             }
 
             foreach ($tablesToProcess as $table => $columns) {
-                
+
                 // 2. Check if this table has a multi-column key issue involving '_old' columns
                 $hasLockedConstraints = (int) $this->db->fetchOne("
                     SELECT COUNT(*)
@@ -1248,7 +1263,7 @@ final class MigrateUuidStorageCommand extends Command
                     try {
                         $this->db->executeStatement("ALTER TABLE `$table` DROP INDEX `uniq_page_tag_pair`");
                     } catch (\Throwable $e) { /* Already gone */ }
-                    
+
                     try {
                         $this->db->executeStatement("ALTER TABLE `$table` DROP INDEX `UNIQ_FA0E76BFA76ED395`");
                     } catch (\Throwable $e) { /* Already gone */ }
