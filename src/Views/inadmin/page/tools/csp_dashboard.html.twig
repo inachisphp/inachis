@@ -1,0 +1,117 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <span>CSP Reporting</span>
+{% endblock pagetitle %}
+{% block content %}
+<div class="col-6">
+    <div class="widget__content nested-grid">
+        <article class="col-3 widget-stats__card" aria-labelledby="stats-total-visits">
+            <div class="widget-stats__icon" aria-hidden="true">
+                <span class="material-icons">visibility</span>
+            </div>
+            <div class="widget-stats__content">
+                <h2 id="stats-total-visits">Today</h2>
+                <p class="widget-stats__value">{{ today|number_format }}</p>
+            </div>
+        </article>
+        <article class="col-3 widget-stats__card" aria-labelledby="stats-total-visits">
+            <div class="widget-stats__icon" aria-hidden="true">
+                <span class="material-icons">visibility</span>
+            </div>
+            <div class="widget-stats__content">
+                <h2 id="stats-total-visits">Critical</h2>
+                <p class="widget-stats__value">{{ critical|number_format }}</p>
+            </div>
+        </article>
+        <article class="col-3 widget-stats__card" aria-labelledby="stats-total-visits">
+            <div class="widget-stats__icon" aria-hidden="true">
+                <span class="material-icons">visibility</span>
+            </div>
+            <div class="widget-stats__content">
+                <h2 id="stats-total-visits">Hosts</h2>
+                <p class="widget-stats__value">{{ hosts|number_format }}</p>
+            </div>
+        </article>
+        <article class="col-3 widget-stats__card" aria-labelledby="stats-total-visits">
+            <div class="widget-stats__content">
+                <h2 id="stats-total-visits">Directives</h2>
+                <p class="widget-stats__value">{{ directives|number_format }}</p>
+            </div>
+        </article>
+    </div>
+
+    <section class="widget">
+        <header class="widget__header">
+            <h2>Top Critical</h2>
+        </header>
+        <table class="table table--striped">
+            <thead>
+            <tr>
+                <th>Host</th>
+                <th>Directive</th>
+                <th class="text-end">Hits</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for row in topCritical %}
+                <tr>
+                    <td>{{ row.host ?? '—' }}</td>
+                    <td><code>{{ row.effectiveDirective }}</code></td>
+                    <td class="text-end">{{ row.occurrences }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="widget">
+        <header class="widget__header">
+            <h2>Top Hosts</h2>
+        </header>
+        <table class="table table--striped">
+            <thead>
+                <tr>
+                    <th>Host</th>
+                    <th class="text-end">Count</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in topHosts %}
+                <tr>
+                    <td>{{ row.host ?? 'unknown' }}</td>
+                    <td class="text-end">{{ row.occurrences }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="widget">
+        <header class="widget__header">
+            <h2>Top Directives</h2>
+        </header>
+        <table class="table table--striped">
+            <thead>
+                <tr>
+                    <th>Directive</th>
+                    <th class="text-end">Count</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in topDirectives %}
+                <tr>
+                    <td>{{ row.directive }}</td>
+                    <td class="text-end">{{ row.occurrences }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</div>
+
+{% include 'inadmin/partials/csp_reports.html.twig' %}
+
+{% endblock content %}

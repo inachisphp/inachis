@@ -1,0 +1,55 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <a href="{{ path('incc_tools_csp_dashboard') }}">CSP Reporting</a>
+    <span>CSP Report</span>
+{% endblock pagetitle %}
+{% block content %}
+<div class="col-6">
+    <dl class="row">
+        <dt class="col-sm-3">Severity</dt>
+        <dd class="col-sm-9">
+            <span class="badge bg-{{ report.severity.badgeClass }}">
+                {{ report.severity.label }}
+            </span>
+        </dd>
+
+        <dt class="col-sm-3">Directive</dt>
+        <dd class="col-sm-9"><code>{{ report.effectiveDirective }}</code></dd>
+
+        <dt class="col-sm-3">Blocked URI</dt>
+        <dd class="col-sm-9"><code>{{ report.blockedUri }}</code></dd>
+
+        <dt class="col-sm-3">Document URI</dt>
+        <dd class="col-sm-9"><code>{{ report.documentUri }}</code></dd>
+
+        <dt class="col-sm-3">Host</dt>
+        <dd class="col-sm-9">{{ report.host ?? '—' }}</dd>
+
+        <dt class="col-sm-3">Occurrences</dt>
+        <dd class="col-sm-9">{{ report.occurrences }}</dd>
+
+        <dt class="col-sm-3">First Seen</dt>
+        <dd class="col-sm-9">
+            {{ report.firstSeenAt ? report.firstSeenAt|date('Y-m-d H:i') : '—' }}
+        </dd>
+
+        <dt class="col-sm-3">Last Seen</dt>
+        <dd class="col-sm-9">
+            {{ report.lastSeenAt ? report.lastSeenAt|date('Y-m-d H:i') : '—' }}
+        </dd>
+
+        <dt class="col-sm-3">User Agent</dt>
+        <dd class="col-sm-9"><small>{{ report.userAgent }}</small></dd>
+
+    </dl>
+</div>
+
+<div class="col-6">
+    <h2>Raw Payload</h2>
+    <pre class="mb-0"><code>
+{{ report.payload|json_encode(constant('JSON_PRETTY_PRINT')) }}
+</code></pre>
+</div>
+{% endblock content %}
