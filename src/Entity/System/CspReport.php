@@ -14,17 +14,39 @@ use Inachis\Enum\System\CspSeverity;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 
+/**
+ *  @phpstan-type PayloadShape array{csp-report: array{
+ *     document-uri:string,
+ *     referrer?: string,
+ *     violated-directive: string,
+ *     effective-directive: string,
+ *     original-policy: string,
+ *     blocked-uri: string,
+ *     status-code: int,...
+ * }}|list<array{
+ *     age: int,
+ *     type: string,
+ *     url: string,
+ *     user_agent: string,
+ *     body: array{
+ *         blockedUrl: string,
+ *         disposition: string,
+ *         effectiveDirective: string,
+ *         originalPoliy: string,
+ *         statusCode: int
+ *     }
+ * }|null>
+ */
 #[ORM\Entity]
-#[ORM\Table(
-    indexes: [
-        new ORM\Index(name: 'idx_csp_host', columns: ['host']),
-        new ORM\Index(name: 'idx_csp_directive', columns: ['effective_directive']),
-        new ORM\Index(name: 'idx_csp_severity', columns: ['severity']),
-        new ORM\Index(name: 'idx_csp_last_seen', columns: ['last_seen_at']),
-    ]
-)]
+#[ORM\Table(indexes: [
+    new ORM\Index(name: 'idx_csp_host', columns: ['host']),
+    new ORM\Index(name: 'idx_csp_directive', columns: ['effective_directive']),
+    new ORM\Index(name: 'idx_csp_severity', columns: ['severity']),
+    new ORM\Index(name: 'idx_csp_last_seen', columns: ['last_seen_at']),
+])]
 class CspReport
 {
+    /** @var UuidInterface|null Unique identifier for the CSP Report */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid_binary', unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -85,6 +107,7 @@ class CspReport
     #[ORM\Column]
     private \DateTimeImmutable $firstSeenAt;
 
+    /** @var PayloadShape */
     #[ORM\Column(type: 'json')]
     private array $payload = [];
 
@@ -403,7 +426,7 @@ class CspReport
     }
 
     /**
-     * @return array
+     * @return PayloadShape
      */
     public function getPayload(): array
     {
@@ -411,7 +434,7 @@ class CspReport
     }
 
     /**
-     * @param array $payload
+     * @param PayloadShape $payload
      * @return CspReport
      */
     public function setPayload(array $payload): CspReport

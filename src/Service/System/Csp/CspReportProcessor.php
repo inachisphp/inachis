@@ -15,17 +15,55 @@ use Inachis\Repository\System\CspReportRepository;
 use Inachis\Service\System\Csp\CspReportDtoFactory;
 use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * Processor for CSP reports
+ */
 final readonly class CspReportProcessor
 {
+    /**
+     * Constructor for CspReportProcessor
+     *
+     * @param EntityManagerInterface $entityManager
+     * @param CspReportRepository $repository
+     * @param CspReportDtoFactory $dtoFactory
+     * @param CspNoiseFilter $noiseFilter
+     * @param CspSeverityResolver $severityResolver
+     */
     public function __construct(
         private EntityManagerInterface $entityManager,
         private CspReportRepository $repository,
         private CspReportDtoFactory $dtoFactory,
         private CspNoiseFilter $noiseFilter,
         private CspSeverityResolver $severityResolver,
-    ) {
-    }
+    ) {}
 
+    /**
+     * Creates DTOs from the supplied payload
+     *
+     * @param array{csp-report: array{
+     *     document-uri:string,
+     *     referrer?: string,
+     *     violated-directive: string,
+     *     effective-directive: string,
+     *     original-policy: string,
+     *     blocked-uri: string,
+     *     status-code: int
+     * }}|list<array{
+     *     age: int,
+     *     type: string,
+     *     url: string,
+     *     user_agent: string,
+     *     body: array{
+     *         blockedUrl: string,
+     *         disposition: string,
+     *         effectiveDirective: string,
+     *         originalPoliy: string,
+     *         statusCode: int
+     *     }
+     * }|null> $payload
+     * @param string|null $userAgent
+     * @param string|null $referrer
+     */
     public function process(
         array $payload,
         ?string $userAgent = null,
@@ -39,6 +77,31 @@ final readonly class CspReportProcessor
     }
 
     /**
+     * Creates the DTO(s) from the payload
+     *
+     * @param array{csp-report: array{
+     *     document-uri:string,
+     *     referrer?: string,
+     *     violated-directive: string,
+     *     effective-directive: string,
+     *     original-policy: string,
+     *     blocked-uri: string,
+     *     status-code: int,...
+     * }}|list<array{
+     *     age: int,
+     *     type: string,
+     *     url: string,
+     *     user_agent: string,
+     *     body: array{
+     *         blockedUrl: string,
+     *         disposition: string,
+     *         effectiveDirective: string,
+     *         originalPoliy: string,
+     *         statusCode: int
+     *     }
+     * }|null> $payload
+     * @param string|null $userAgent
+     * @param string|null $referrer
      * @return iterable<CspReportDto>
      */
     private function createDtos(
@@ -91,6 +154,11 @@ final readonly class CspReportProcessor
         }
     }
 
+    /**
+     * Processes the DTO, ignoring if considered 'noise'
+     *
+     * @param CspReportDto $dto
+     */
     private function processDto(CspReportDto $dto): void
     {
         if ($this->noiseFilter->isNoise($dto)) {
@@ -108,6 +176,11 @@ final readonly class CspReportProcessor
         $this->entityManager->persist($report);
     }
 
+    /**
+     * Updates an existing CSP report
+     *
+     * @param CspReport $report
+     */
     private function updateExistingReport(
         CspReport $report,
     ): void {
@@ -120,6 +193,12 @@ final readonly class CspReportProcessor
         );
     }
 
+    /**
+     * Create entity from DTO model
+     *
+     * @param CspReportDto $dto
+     * @return CspReport
+     */
     private function createEntity(
         CspReportDto $dto,
     ): CspReport {

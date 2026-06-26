@@ -19,7 +19,21 @@ final class CspReportDtoFactory
     /**
      * Turns CSP 1.0 reports into a DTO
      *
-     * @param array $report
+     * @param array{
+     *     document-uri?: string,
+     *     blocked-uri?: string,
+     *     effective-directuve?: string,
+     *     violated-directive?: string,
+     *     original-policy?: string,
+     *     source-file?: string,
+     *     line-number?: int,
+     *     column-number?: int,
+     *     disposition?: string,
+     *     status-code?: int,
+     *     referrer: string,
+     *     userAgent: string,
+     *     rawPayload: array<string,int|string|array<string, int|string>>
+     * } $report
      * @param string|null $userAgent
      * @param string|null $referrer
      * @return CspReportDto
@@ -49,7 +63,21 @@ final class CspReportDtoFactory
     /**
      * Turns CSP 2.0 reports into a DTO
      *
-     * @param array $report
+     * @param array{
+     *     documentURL?: string,
+     *     blockedURL?: string,
+     *     effectiveDirective?: string,
+     *     violatedDirective?: string,
+     *     originalPolicy?: string,
+     *     sourceFile?: string,
+     *     lineNumber?: int,
+     *     columnNumber?: int,
+     *     disposition?: string,
+     *     statusCode: int,
+     *     referrer: string,
+     *     userAgent: string,
+     *     rawPayload: array<string,int|string|array<string, int|string>>
+     * } $report
      * @param string|null $userAgent
      * @param string|null $referrer
      * @return CspReportDto

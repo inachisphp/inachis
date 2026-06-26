@@ -170,7 +170,7 @@ class Revision
      * 
      * @param int $value The version number of the {@link Revision}
      * @return self
-     * @throws Exception
+     * @throws \InvalidArgumentException
      */
     public function setVersionNumber(int $value): self
     {

@@ -9,8 +9,28 @@
 
 namespace Inachis\Model\System;
 
+/**
+ * DTO model for CSP Reports
+ */
 final readonly class CspReportDto
 {
+    /**
+     * Constructor for CspReportDto
+     *
+     * @param string|null $documentUri
+     * @param string|null $blockedUri
+     * @param string|null $effectiveDirective
+     * @param string|null $violatedDirective
+     * @param string|null $originalPolicy
+     * @param string|null $sourceFile
+     * @param int|null $lineNumber
+     * @param int|null $columnNumber
+     * @param string|null $disposition
+     * @param int|null $statusCode
+     * @param string|null $referrer
+     * @param string|null $userAgent
+     * @param array<string,int|string|array<string, int|string>> $rawPayload
+     */
     public function __construct(
         public ?string $documentUri,
         public ?string $blockedUri,
@@ -25,15 +45,18 @@ final readonly class CspReportDto
         public ?string $referrer,
         public ?string $userAgent,
         public array $rawPayload,
-    ) {
-    }
+    ) {}
 
+    /**
+     * Returns a string for the hostname that is blocked if set
+     *
+     * @return string|null
+     */
     public function blockedHost(): ?string
     {
         if (!$this->blockedUri) {
             return null;
         }
-
         $host = parse_url($this->blockedUri, PHP_URL_HOST);
 
         return \is_string($host)
@@ -41,12 +64,16 @@ final readonly class CspReportDto
             : null;
     }
 
+    /**
+     * Returns a string for the document host if set
+     *
+     * @return string|null
+     */
     public function documentHost(): ?string
     {
         if (!$this->documentUri) {
             return null;
         }
-
         $host = parse_url($this->documentUri, PHP_URL_HOST);
 
         return \is_string($host)
@@ -54,6 +81,11 @@ final readonly class CspReportDto
             : null;
     }
 
+    /**
+     * Generate a SHA-1 fingerprint from directives
+     *
+     * @return string
+     */
     public function fingerprint(): string
     {
         return sha1(implode('|', [
@@ -65,6 +97,11 @@ final readonly class CspReportDto
         ]));
     }
 
+    /**
+     * Checks directive to see if this is script-src
+     *
+     * @return bool
+     */
     public function isScriptViolation(): bool
     {
         return str_contains(
@@ -73,6 +110,11 @@ final readonly class CspReportDto
         );
     }
 
+    /**
+     * Checks if the source of report is 'noise'
+     *
+     * @return bool
+     */
     public function isExtensionNoise(): bool
     {
         if (!$this->blockedUri) {
