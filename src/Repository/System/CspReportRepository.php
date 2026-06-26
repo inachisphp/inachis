@@ -190,4 +190,19 @@ class CspReportRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Returns a list of blocked URIs per directive
+     * 
+     * @return list<array{effectiveDirective: string, blockedUri: string}>
+     */
+    public function findUniqueDirectivesAndBlockedUris(): array
+    {
+        return $this->createQueryBuilder('r')
+            ->select('DISTINCT r.effectiveDirective, r.blockedUri')
+            ->where('r.effectiveDirective IS NOT NULL')
+            ->andWhere('r.blockedUri IS NOT NULL')
+            ->getQuery()
+            ->getScalarResult();
+    }
 }

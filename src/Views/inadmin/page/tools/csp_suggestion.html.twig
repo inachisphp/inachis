@@ -1,0 +1,44 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <a href="{{ path('incc_tools_csp_dashboard') }}">CSP Reporting</a>
+    <span>Suggested Policy</span>
+{% endblock pagetitle %}
+
+{% block content %}
+<div class="col-6">
+    <h1>Suggested Content Security Policy</h1>
+    <p class="text-muted">Generated dynamically from historical violation report entries.</p>
+
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white font-weight-bold">Raw Policy Header</div>
+        <div class="card-body">
+            <textarea class="form-control text-monospace" rows="4" readonly>{{ policyString }}</textarea>
+            <small class="form-text text-muted mt-2">
+                Copy this string into your <code>Content-Security-Policy</code> response header config.
+            </small>
+        </div>
+    </div>
+</div>
+
+<div class="col-6">
+    <h3>Directive Breakdown</h3>
+    {% if policyArray is empty %}
+        <div class="alert alert-info">No structural metrics found to suggest a policy yet.</div>
+    {% else %}
+        {% for directive, sources in policyArray %}
+            <div class="card mb-3">
+                <div class="card-header bg-secondary text-white font-weight-bold">
+                    {{ directive }}
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for source in sources %}
+                        <li class="list-group-item text-monospace">{{ source }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock content %}

@@ -5,6 +5,29 @@
     <span>CSP Reporting</span>
 {% endblock pagetitle %}
 {% block content %}
+{% if reports is empty %}
+<div class="admonition admonition__info">
+    <header class="admonition__header">
+        <h2><em class="material-icons">security</em> Get Started: Bootstrap Your CSP Tracking</h2>
+    </header>
+
+    <p>
+        No violation logs have been registered yet. To start mapping out your application's external dependencies without breaking current client-side functionality, add the following temporary <strong>Report-Only</strong> header to your application's HTTP response configuration:
+    </p>
+        
+    <div>
+        <button class="button button--secondary" onclick="navigator.clipboard.writeText(document.getElementById('bootstrapCsp').innerText)">
+            <em class="material-icons">content_copy</em> Copy
+        </button>
+        <code id="bootstrapCsp" class="text-success text-monospace word-break-all d-block pr-5" style="white-space: pre-wrap;">Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; report-uri {{ url('csp_report') }};</code>
+    </div>
+        
+    <hr>
+    <p>
+        <em class="material-icons">info</em> This baseline allows standard local mechanics to load seamlessly while cataloging external CDNs, third-party trackers, and asset injects back into this dashboard.
+    </p>
+</div>
+{% else %}
 <div class="col-6">
     <div class="widget__content nested-grid">
         <article class="col-3 widget-stats__card" aria-labelledby="stats-total-visits">
@@ -114,4 +137,5 @@
 
 {% include 'inadmin/partials/csp_reports.html.twig' %}
 
+{% endif %}
 {% endblock content %}
