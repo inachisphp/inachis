@@ -34,23 +34,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity(fields: ['username'], message: 'This username is already taken.')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    /**
-     * Constant for specifying passwords have no expiry time.
-     */
+    /** Constant for specifying passwords have no expiry time. */
     public const NO_PASSWORD_EXPIRY = -1;
 
-    /**
-     * @var UuidInterface|null The unique identifier for the {@link User}
-     */
+    /** @var UuidInterface|null The unique identifier for the {@link User} */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: "CUSTOM")]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected ?UuidInterface $id = null;
 
-    /**
-     * @var string Username of the user
-     */
+    /** @var string Username of the user */
     #[ORM\Column(type: "string", length: 255, nullable: false)]
     #[Assert\NotBlank]
     #[Assert\Regex(
@@ -59,15 +53,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     )]
     protected string $username;
 
-    /**
-     * @var string|null Username of the user
-     */
+    /** @var string|null Username of the user */
     #[ORM\Column(name: 'usernameCanonical', type: "string", length: 255, unique: true, nullable: false)]
     protected ?string $usernameCanonical;
 
-    /**
-     * @var string|null Password for the user
-     */
+    /** @var string|null Password for the user */
     #[ORM\Column(type: "string", length: 512, nullable: false)]
     protected ?string $password;
 
@@ -82,68 +72,49 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     )]
     protected ?string $plainPassword;
 
-    /**
-     * @var string|null The email address of the user
-     */
+    /** @var string|null The email address of the user */
     #[ORM\Column(type: "string", length: 512, nullable: false)]
     #[Assert\Email]
     #[Assert\NotBlank]
     protected ?string $email;
 
-    /**
-     * @var string|null The canonical email address of the user
-     */
+    /** @var string|null The canonical email address of the user */
     #[ORM\Column(name: 'emailCanonical', type: "string", length: 255, unique: true, nullable: false)]
     protected ?string $emailCanonical;
 
-    /**
-     * @var string The display name for the user
-     */
+    /** @var string The display name for the user */
     #[ORM\Column(type: "string", length: 512)]
     #[Assert\NotBlank]
     protected string $displayName = '';
 
-    /**
-     * @var array<string> The roles assigned to this user. Currently, not in use.
-     */
+    /** @var array<string> The roles assigned to this user. Currently, not in use. */
     // protected array $roles = [];
 
-    /**
-     * @var string|null An image to use for the {@link User}
-     */
+    /** @var string|null An image to use for the {@link User} */
     #[ORM\Column(name: 'avatar', type: "string", length: 255, nullable: true)]
     protected ?string $avatar = '';
 
-    /**
-     * @var bool Flag indicating if the {@link User} can sign in
-     */
+    /** @var bool Flag indicating if the {@link User} can sign in */
     #[ORM\Column(type: "boolean")]
     protected bool $isActive = true;
 
-    /**
-     * @var bool Flag indicating if the {@link User} has been "deleted"
-     */
+    /** @var bool Flag indicating if the {@link User} has been "deleted" */
     #[ORM\Column(type: "boolean")]
     protected bool $isRemoved = false;
 
-    /**
-     * @var DateTimeImmutable The date the {@link User} was added
-     */
+    /** @var DateTimeImmutable The date the {@link User} was added */
     #[ORM\Column(type: "datetime_immutable")]
     protected DateTimeImmutable $createDate;
 
-    /**
-     * @var DateTimeImmutable The date the {@link User} was last modified
-     */
+    /** @var DateTimeImmutable The date the {@link User} was last modified */
     #[ORM\Column(type: "datetime_immutable")]
     protected DateTimeImmutable $modDate;
 
-    /**
-     * @var DateTimeImmutable|null The date the password was last modified
-     */
+    /** @var DateTimeImmutable|null The date the password was last modified */
     #[ORM\Column(type: "datetime_immutable")]
     protected ?DateTimeImmutable $passwordModDate = null;
 
+    /** @var Collection<int, Role> The admin roles assigned to this user */
     #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: 'users')]
     #[ORM\JoinTable(name: 'user_roles')]
     private Collection $assignedRoles;
@@ -238,7 +209,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Gets the roles assigned to this user
      *
-     * @return Collection
+     * @return Collection<int,Role>
      */
     public function getAssignedRoles(): Collection
     {

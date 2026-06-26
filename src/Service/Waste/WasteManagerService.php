@@ -231,7 +231,6 @@ class WasteManagerService
                 $series = $this->entityManager->getRepository(Series::class)->findOneBy(['id' => $data['id']]);
                 if (!$series) {
                     $series = new Series();
-                    $series->setId(Uuid::fromString($data['id']));
                 }
                 /** @var SeriesShape $data */
                 $series->setTitle($data['title'] ?? '');

@@ -19,162 +19,116 @@ use Ramsey\Uuid\UuidInterface;
 #[ORM\HasLifecycleCallbacks]
 class SecurityPolicy
 {
-    /**
-     * @var UuidInterface The unique identifier for the {@link SecurityPolicy}
-     */
+    /** @var UuidInterface The unique identifier for the {@link SecurityPolicy} */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     private UuidInterface $id;
 
-    /**
-     * @var string The name of the security policy
-     */
+    /** @var string The name of the security policy */
     #[ORM\Column]
     private string $name = '';
 
-    /**
-     * @var int The minimum length for a password
-     */
+    /** @var int The minimum length for a password */
     #[ORM\Column]
     private int $minLength = 12;
 
-    /**
-     * @var bool Flag indicating if the password must contain an uppercase letter
-     */
+    /** @var bool Flag indicating if the password must contain an uppercase letter */
     #[ORM\Column]
     private bool $requireUppercase = true;
 
-    /**
-     * @var bool Flag indicating if the password must contain a lowercase letter
-     */
+    /** @var bool Flag indicating if the password must contain a lowercase letter */
     #[ORM\Column]
     private bool $requireLowercase = true;
 
-    /**
-     * @var bool Flag indicating if the password must contain a number
-     */
+    /** @var bool Flag indicating if the password must contain a number */
     #[ORM\Column]
     private bool $requireNumber = true;
 
-    /**
-     * @var bool Flag indicating if the password must contain a special character
-     */
+    /** @var bool Flag indicating if the password must contain a special character */
     #[ORM\Column]
     private bool $requireSpecial = true;
 
-    /**
-     * @var string|null Custom regex pattern for password validation
-     */
+    /** @var string|null Custom regex pattern for password validation */
     #[ORM\Column(nullable: true)]
     private ?string $passwordRegex = null;
 
-    /**
-     * @var int|null Password expiration in days, null if never expires
-     */
+    /** @var int|null Password expiration in days, null if never expires */
     #[ORM\Column(nullable: true)]
     private ?int $passwordExpiryDays = null;
 
-    /**
-     * @var int The number of previous passwords to remember
-     */
+    /** @var int The number of previous passwords to remember */
     #[ORM\Column]
     private int $passwordHistory = 5;
 
-    /**
-     * @var int Number of failed login attempts before locking the account
-     */
+    /** @var int Number of failed login attempts before locking the account */
     #[ORM\Column]
     private int $maxFailedLoginAttempts = 5;
 
-    /**
-     * @var int Lockout duration in minutes
-     */
+    /** @var int Lockout duration in minutes */
     #[ORM\Column]
     private int $lockoutDurationMinutes = 15;
 
-    /**
-     * @var bool Flag indicating if administrators must use 2FA
-     */
+    /** @var bool Flag indicating if administrators must use 2FA */
     #[ORM\Column(name: 'admin_require_2fa')]
     private bool $adminRequire2FA = false;
 
-    /**
-     * @var bool Flag indicating if super administrators must use 2FA
-     */
+    /** @var bool Flag indicating if super administrators must use 2FA */
     #[ORM\Column(name: 'super_admin_require_2fa')]
     private bool $superAdminRequire2FA = false;
 
-    /**
-     * @var bool Flag indicating if super administrators must use WebAuthn
-     */
+    /** @var bool Flag indicating if super administrators must use WebAuthn */
     #[ORM\Column(name: 'super_admin_requires_webauthn')]
     private bool $superAdminRequiresWebAuthn = false;
 
-    /**
-     * @var bool Flag indicating if step up is required for sensitive actions
-     */
+    /** @var bool Flag indicating if step up is required for sensitive actions  */
     #[ORM\Column]
     private bool $stepUpForSensitiveActions = true;
 
-    /**
-     * @var DateTimeImmutable The date and time the security policy was created
-     */
+    /** @var DateTimeImmutable The date and time the security policy was created */
     #[ORM\Column(type: 'datetime_immutable')]
     private DateTimeImmutable $createdAt;
 
-    /**
-     * @var DateTimeImmutable The date and time the security policy was updated
-     */
+    /** @var DateTimeImmutable The date and time the security policy was updated */
     #[ORM\Column(type: 'datetime_immutable')]
     private DateTimeImmutable $updatedAt;
 
-    /**
-     * @var bool Flag indicating if the security policy is read-only
-     */
+    /** @var bool Flag indicating if the security policy is read-only */
     #[ORM\Column]
     private bool $isReadOnly = false;
 
-    /**
-     * @var bool Flag indicating if the security policy is active
-     */
+    /** @var bool Flag indicating if the security policy is active */
     #[ORM\Column]
     private bool $isActive = false;
 
+    /**
+     * Default constructor for SecurityPolicy
+     */
     public function __construct()
     {
-        $this->createdAt = new DateTimeImmutable();
-        $this->updatedAt = new DateTimeImmutable();
+        $this->onPrePersist();
     }
 
     /**
      * Set created and updated time on create
      */
     #[ORM\PrePersist]
-    private function onPrePersist(): void {
-        $this->createdAt = new DateTimeImmutable();
-        $this->updatedAt = new DateTimeImmutable();
+    public function onPrePersist(): void
+    {
+        $now = new DateTimeImmutable();
+
+        $this->createdAt = $now;
+        $this->updatedAt = $now;
     }
 
     /**
      * Set updated time on update
      */
     #[ORM\PreUpdate]
-    private function onPreUpdate(): void {
-        $this->updatedAt = new DateTimeImmutable();
-    }
-
-    /**
-     * Set the unique identifier for the {@link SecurityPolicy}
-     * 
-     * @param UuidInterface $value The unique identifier for the {@link SecurityPolicy}
-     * @return self
-     */
-    public function setId(UuidInterface $value): self
+    public function onPreUpdate(): void
     {
-        $this->id = $value;
-        return $this;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     /**
@@ -187,11 +141,22 @@ class SecurityPolicy
         return isset($this->id) ? $this->id : null;
     }
 
+    /**
+     * Returns the name of the policy
+     *
+     * @return string
+     */
     public function getName(): string
     {
         return $this->name;
     }
 
+    /**
+     * Sets the name of the policy
+     *
+     * @param string $name
+     * @return self
+     */
     public function setName(string $name): self
     {
         $this->name = $name;
@@ -220,6 +185,7 @@ class SecurityPolicy
 
     /**
      * Get the minimum length for a password
+     * 
      * @return int
      */
     public function getMinLength(): int
@@ -229,6 +195,7 @@ class SecurityPolicy
 
     /**
      * Set the minimum length for a password
+     * 
      * @param int $minLength
      * @return self
      */
@@ -243,6 +210,7 @@ class SecurityPolicy
 
     /**
      * Get flag indicating if the password must contain an uppercase letter
+     * 
      * @return bool
      */
     public function getRequireUppercase(): bool
@@ -252,6 +220,7 @@ class SecurityPolicy
 
     /**
      * Set flag indicating if the password must contain an uppercase letter
+     * 
      * @param bool $requireUppercase
      * @return self
      */
@@ -263,6 +232,7 @@ class SecurityPolicy
 
     /**
      * Get flag indicating if the password must contain a lowercase letter
+     * 
      * @return bool
      */
     public function getRequireLowercase(): bool
@@ -272,6 +242,7 @@ class SecurityPolicy
 
     /**
      * Set flag indicating if the password must contain a lowercase letter
+     * 
      * @param bool $requireLowercase
      * @return self
      */
@@ -283,6 +254,7 @@ class SecurityPolicy
 
     /**
      * Get flag indicating if the password must contain a number
+     * 
      * @return bool
      */
     public function getRequireNumber(): bool
@@ -292,6 +264,7 @@ class SecurityPolicy
 
     /**
      * Set flag indicating if the password must contain a number
+     * 
      * @param bool $requireNumber
      * @return self
      */
@@ -303,6 +276,7 @@ class SecurityPolicy
 
     /**
      * Get flag indicating if the password must contain a special character
+     * 
      * @return bool
      */
     public function getRequireSpecial(): bool
@@ -312,6 +286,7 @@ class SecurityPolicy
 
     /**
      * Set flag indicating if the password must contain a special character
+     * 
      * @param bool $requireSpecial
      * @return self
      */
@@ -323,6 +298,7 @@ class SecurityPolicy
 
     /**
      * Get custom regex pattern for password validation
+     * 
      * @return string|null
      */
     public function getPasswordRegex(): ?string
@@ -332,6 +308,7 @@ class SecurityPolicy
 
     /**
      * Set custom regex pattern for password validation
+     * 
      * @param string|null $passwordRegex
      * @return self
      */
@@ -348,6 +325,7 @@ class SecurityPolicy
 
     /**
      * Get password expiration in days, null if never expires
+     * 
      * @return int|null
      */
     public function getPasswordExpiryDays(): ?int
@@ -357,6 +335,7 @@ class SecurityPolicy
 
     /**
      * Set password expiration in days, null if never expires
+     * 
      * @param int|null $passwordExpiryDays
      * @return self
      */
@@ -380,6 +359,7 @@ class SecurityPolicy
 
     /**
      * Set the number of previous passwords to remember
+     * 
      * @param int $passwordHistory
      * @return self
      */
@@ -394,6 +374,7 @@ class SecurityPolicy
 
     /**
      * Get number of failed login attempts before locking the account
+     * 
      * @return int
      */
     public function getMaxFailedLoginAttempts(): int
@@ -403,6 +384,7 @@ class SecurityPolicy
 
     /**
      * Set number of failed login attempts before locking the account
+     * 
      * @param int $maxFailedLoginAttempts
      * @return self
      */
@@ -417,6 +399,7 @@ class SecurityPolicy
 
     /**
      * Get lockout duration in minutes
+     * 
      * @return int
      */
     public function getLockoutDurationMinutes(): int
@@ -426,6 +409,7 @@ class SecurityPolicy
 
     /**
      * Set lockout duration in minutes
+     * 
      * @param int $lockoutDurationMinutes
      * @return self
      */
@@ -440,6 +424,7 @@ class SecurityPolicy
 
     /**
      * Get flag indicating if administrators must use 2FA
+     * 
      * @return bool
      */
     public function getAdminRequire2FA(): bool
@@ -449,6 +434,7 @@ class SecurityPolicy
 
     /**
      * Set flag indicating if administrators must use 2FA
+     * 
      * @param bool $adminRequire2FA
      * @return self
      */
@@ -460,6 +446,7 @@ class SecurityPolicy
 
     /**
      * Get flag indicating if super administrators must use 2FA
+     * 
      * @return bool
      */
     public function getSuperAdminRequire2FA(): bool
@@ -469,6 +456,7 @@ class SecurityPolicy
 
     /**
      * Set flag indicating if super administrators must use 2FA
+     * 
      * @param bool $superAdminRequire2FA
      * @return self
      */
@@ -480,6 +468,7 @@ class SecurityPolicy
 
     /**
      * Get flag indicating if super administrators must use WebAuthn
+     * 
      * @return bool
      */
     public function getSuperAdminRequiresWebAuthn(): bool
@@ -489,6 +478,7 @@ class SecurityPolicy
 
     /**
      * Set flag indicating if super administrators must use WebAuthn
+     * 
      * @param bool $superAdminRequiresWebAuthn
      * @return self
      */
@@ -500,6 +490,7 @@ class SecurityPolicy
 
     /**
      * Get flag indicating if step up is required for sensitive actions
+     * 
      * @return bool
      */
     public function getStepUpForSensitiveActions(): bool
@@ -509,6 +500,7 @@ class SecurityPolicy
 
     /**
      * Set flag indicating if step up is required for sensitive actions
+     * 
      * @param bool $stepUpForSensitiveActions
      * @return self
      */
@@ -520,6 +512,7 @@ class SecurityPolicy
 
     /**
      * Get creation timestamp
+     * 
      * @return DateTimeImmutable
      */
     public function getCreatedAt(): DateTimeImmutable
@@ -529,6 +522,7 @@ class SecurityPolicy
 
     /**
      * Get last update timestamp
+     * 
      * @return DateTimeImmutable
      */
     public function getUpdatedAt(): DateTimeImmutable
@@ -538,6 +532,7 @@ class SecurityPolicy
 
     /**
      * Get flag indicating if the security policy is read-only
+     * 
      * @return bool
      */
     public function getIsReadOnly(): bool
@@ -547,6 +542,7 @@ class SecurityPolicy
 
     /**
      * Set flag indicating if the security policy is read-only
+     * 
      * @param bool $isReadOnly
      * @return self
      */
@@ -558,6 +554,7 @@ class SecurityPolicy
 
     /**
      * Get flag indicating if the security policy is active
+     * 
      * @return bool
      */
     public function getIsActive(): bool
@@ -567,6 +564,7 @@ class SecurityPolicy
 
     /**
      * Set flag indicating if the security policy is active
+     * 
      * @param bool $isActive
      * @return self
      */

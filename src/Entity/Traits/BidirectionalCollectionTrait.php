@@ -16,8 +16,8 @@ trait BidirectionalCollectionTrait
     /**
      * Add items to both sides of Many-to-Many relationship
      *
-     * @param Collection $collection
-     * @param object $item
+     * @param Collection<int,\Inachis\Entity\Content\Page>|Collection<int,\Inachis\Entity\Content\Series> $collection
+     * @param \Inachis\Entity\Content\Page|\Inachis\Entity\Content\Series $item
      * @param string $owningMethod
      */
     private function addBidirectional(
@@ -37,8 +37,8 @@ trait BidirectionalCollectionTrait
     /**
      * Removes items from both sides of Many-to-Many relationship
      *
-     * @param Collection $collection
-     * @param object $item
+     * @param Collection<int,\Inachis\Entity\Content\Page>|Collection<int,\Inachis\Entity\Content\Series> $collection
+     * @param \Inachis\Entity\Content\Page|\Inachis\Entity\Content\Series $item
      * @param string $owningMethod
      * @return void
      */
