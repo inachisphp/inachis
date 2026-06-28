@@ -17,11 +17,9 @@
     <p class="text-muted">Generated dynamically from historical violation report entries.</p>
 
     <div class="form card">
-        <div class="card-title">
-            Raw Policy Header
-        </div>
-        <div class="card-body">
-            <p><textarea class="full-width" rows="4" readonly>{{ policyString }}</textarea></p>
+
+        <div class="form card-body">
+            <p><textarea class="full-width" name="policyString" rows="10" readonly>{{ policyString }}</textarea></p>
             <p><small>
                 Copy this string into your <code>Content-Security-Policy</code> response header config.
             </small></p>
