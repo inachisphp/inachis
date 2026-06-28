@@ -26,7 +26,7 @@ use InvalidArgumentException;
 
 /**
  * Object for handling pages of a site.
- * 
+ *
  * @phpstan-type PageShape array{
  *    id: string,
  *    title: string,
@@ -912,7 +912,7 @@ class Page
 
     /**
      * Removes a specific category from the collection
-     * 
+     *
      * @param Category $category
      * @return self
      */
@@ -1056,7 +1056,12 @@ class Page
      */
     public function isArchived(): bool
     {
-        return $this->status === EditorialStatus::ARCHIVED;
+        $today = new DateTimeImmutable('now', new DateTimeZone($this->getTimezone() ?? 'UTC'));
+        $expireDate = new DateTimeImmutable(
+            $this->getExpireDate()?->format('Y-m-d H:i:s') ?? '',
+            new DateTimeZone($this->getTimezone() ?? 'UTC')
+        );
+        return $this->status === EditorialStatus::ARCHIVED || $expireDate->format('YmdHis') < $today->format('YmdHis');
     }
 
     /**

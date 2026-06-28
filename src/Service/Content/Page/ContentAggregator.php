@@ -91,7 +91,7 @@ class ContentAggregator
 
         if ($excludePages) {
             $pageQuery .= ' AND q.id NOT IN (:excludedPages)';
-            $pageParameters['excludedPages'] = $excludePages;
+            $pageParameters['excludedPages'] = [ 'value' => $excludePages, ];
         }
 
         /** @var Paginator<Page> $pages */
