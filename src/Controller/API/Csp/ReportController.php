@@ -23,6 +23,11 @@ final class ReportController extends AbstractController
         Request $request,
         CspReportProcessor $processor
     ): JsonResponse {
+        $contentLength = $request->headers->get('Content-Length');
+        if ($contentLength === null || (int)$contentLength > 10240) {
+            return new Response('', Response::HTTP_REQUEST_ENTITY_TOO_LARGE);
+        }
+        
         $content = $request->getContent();
         if (!$content) {
             return new JsonResponse(status: 204);
