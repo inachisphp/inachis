@@ -219,4 +219,20 @@ class CspReportRepository extends ServiceEntityRepository
             ->getQuery()
             ->getScalarResult();
     }
+
+    /**
+     * Deletes reports older than the specified date
+     *
+     * @param \DateTimeInterface $date
+     * @return int The number of records deleted
+     */
+    public function deleteOldReports(\DateTimeInterface $date): int
+    {
+       return $this->createQueryBuilder('r')
+           ->delete()
+           ->where('r.updatedAt < :date')
+           ->setParameter('date', $date)
+           ->getQuery()
+           ->execute();
+   }
 }
