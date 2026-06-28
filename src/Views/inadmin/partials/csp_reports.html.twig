@@ -1,32 +1,39 @@
+{% if reports is not empty or activeDirective is not empty or activeSeverity is not empty or activeHost is not empty %}
 <div class="col-6">
-<section class="widget">
-    <form method="get" class="nested-grid">
-        <div class="col-3">
-            <label>Severity</label>
-            <select name="severity" class="form-control">
-                <option value="">All</option>
-                {% for value in ['critical','high','medium','low','info'] %}
-                    <option value="{{ value }}"
-                        {% if activeSeverity == value %}selected{% endif %}>
-                        {{ value|capitalize }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-6">
-            <label>Host</label>
-            <input type="text"
-                   name="host"
-                   value="{{ activeHost }}"
-                   class="form-control"
-                   placeholder="e.g. example.com">
-        </div>
-        <div class="col-3">
-            <button class="button button--secondary">Filter</button>
-        </div>
-
-    </form>
+<form method="get" class="form">
+<section class="section-ui">
+        {{ include('inadmin/partials/filters.html.twig', {
+            filters: {
+                Severity: {
+                    '': 'All',
+                    'critical': 'Critical',
+                    'high': 'High',
+                    'medium': 'Medium',
+                    'low': 'Low',
+                    'info': 'Info',
+                },
+                Directive: {
+                    '': 'All',
+                    'script-src': 'script-src',
+                    'style-src': 'style-src',
+                    'connect-src': 'connect-src',
+                },
+            },
+            filter_values: {
+                severity: activeSeverity,
+                directive: activeDirective,
+            },
+            show_search: true,
+            search_id: 'filter__host',
+            search_label: 'Search CSP hosts',
+            search_name: 'host',
+            search_placeholder: 'e.g. example.com',
+            search_value: activeHost,
+        }) }}
+        {# query.filters, #}
 </section>
+</form>
+{% if reports is not empty %}
 <section class="widget">
     <header class="widget__header">
         <h2>Reports</h2>
@@ -75,3 +82,5 @@
     </table>
 </section>
 </div>
+{% endif %}
+{% endif %}

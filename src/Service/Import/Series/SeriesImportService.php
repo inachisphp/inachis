@@ -51,7 +51,7 @@ final class SeriesImportService
                 $series = new Series();
                 $series->setTitle($seriesDto->title);
                 $series->setSubTitle($seriesDto->subTitle);
-                $series->setUrl($seriesDto->url); //@todo need to check if URL is already in use and generate a new one if so
+                $series->setUrl($seriesDto->url); //TODO: need to check if URL is already in use and generate a new one if so
                 $series->setDescription($seriesDto->description);
                 $series->setFirstDate(new DateTimeImmutable($seriesDto->firstDate ?: ''));
                 $series->setLastDate(new DateTimeImmutable($seriesDto->lastDate ?: ''));

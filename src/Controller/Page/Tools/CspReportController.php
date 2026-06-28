@@ -25,7 +25,10 @@ class CspReportController extends AbstractInachisController
         CspReportRepository $repository
     ): Response
     {
-        $severity = $request->query->get('severity');
+        /** @var array<string,string> */
+        $filters = $request->query->all('filter');
+        $severity = $filters['severity'] ?: '';
+        $directive = $filters['directive'] ?: '';
         $host = $request->query->get('host');
 
         $this->viewModel->page->title = 'CSP Reporting';
@@ -43,9 +46,11 @@ class CspReportController extends AbstractInachisController
                 'topCritical' => $repository->findTopCriticalGrouped(),
                 'reports' => $repository->findFiltered(
                     severity: $severity,
-                    host: $host
+                    host: $host,
+                    directive: $directive,
                 ),
                 'activeSeverity' => $severity,
+                'activeDirective' => $directive,
                 'activeHost' => $host,
             ]
         );
@@ -53,13 +58,13 @@ class CspReportController extends AbstractInachisController
 
     /**
      * Show the contents of the CSP report
-     * 
+     *
      * @param CspReport $report
      * @return Response
      */
     #[Route(
-        '/incc/tools/csp/{id}', 
-        name: 'csp_report_show', 
+        '/incc/tools/csp/{id}',
+        name: 'csp_report_show',
         requirements: ['id' => '^(?!suggested-policy|reports).*$']
     )]
     public function show(
