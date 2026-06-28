@@ -26,9 +26,9 @@ class CspReportController extends AbstractInachisController
     ): Response
     {
         /** @var array<string,string> */
-        $filters = $request->query->all('filter');
-        $severity = $filters['severity'] ?: '';
-        $directive = $filters['directive'] ?: '';
+        $filters = $request->query->all('filter') ?? [];
+        $severity = $filters['severity'] ?? '';
+        $directive = $filters['directive'] ?? '';
         $host = $request->query->get('host');
 
         $this->viewModel->page->title = 'CSP Reporting';
@@ -49,8 +49,7 @@ class CspReportController extends AbstractInachisController
                     host: $host,
                     directive: $directive,
                 ),
-                'activeSeverity' => $severity,
-                'activeDirective' => $directive,
+                'filters' => $filters,
                 'activeHost' => $host,
             ]
         );
