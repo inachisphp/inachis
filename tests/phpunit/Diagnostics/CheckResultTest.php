@@ -1,6 +1,6 @@
 <?php
 
-namespace Inachis\Tests\Diagnostics;
+namespace Inachis\Tests\phpunit\Diagnostics;
 
 use Inachis\Diagnostics\CheckResult;
 use PHPUnit\Framework\TestCase;

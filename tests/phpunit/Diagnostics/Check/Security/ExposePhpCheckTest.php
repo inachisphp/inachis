@@ -1,6 +1,6 @@
 <?php
 
-namespace Inachis\Tests\Diagnostics\Check\Security;
+namespace Inachis\Tests\phpunit\Diagnostics\Check\Security;
 
 use Inachis\Diagnostics\Check\Security\ExposePhpCheck;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +17,7 @@ final class ExposePhpCheckTest extends TestCase
     public function testRunOkWithOff(): void
     {
         self::$ini_values['expose_php'] = 'Off';
-        
+
         $check = new ExposePhpCheck();
         $result = $check->run();
 
@@ -28,7 +28,7 @@ final class ExposePhpCheckTest extends TestCase
     public function testRunOkWithZero(): void
     {
         self::$ini_values['expose_php'] = '0';
-        
+
         $check = new ExposePhpCheck();
         $result = $check->run();
 
@@ -38,7 +38,7 @@ final class ExposePhpCheckTest extends TestCase
     public function testRunWarning(): void
     {
         self::$ini_values['expose_php'] = 'On';
-        
+
         $check = new ExposePhpCheck();
         $result = $check->run();
 

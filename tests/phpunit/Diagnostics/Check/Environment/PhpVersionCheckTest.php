@@ -1,6 +1,6 @@
 <?php
 
-namespace Inachis\Tests\Diagnostics\Check\Environment;
+namespace Inachis\Tests\phpunit\Diagnostics\Check\Environment;
 
 use Inachis\Diagnostics\Check\Environment\PhpVersionCheck;
 use PHPUnit\Framework\TestCase;
