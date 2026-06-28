@@ -119,7 +119,7 @@ class PageWebController extends AbstractWebController
 
     /**
      * Outputs a page of all pages/posts with the specific category
-     * 
+     *
      * @param string $categoryName
      * @param CategoryRepository $categoryRepository
      * @param PageRepository $pageRepository
@@ -197,9 +197,9 @@ class PageWebController extends AbstractWebController
         }
         $crawlerDetect = new CrawlerDetect();
         if (!$crawlerDetect->isCrawler()) {
-            // @todo record page hit by day
+            // TODO: record page hit by day
         }
-        
+
         return $this->render('web/pages/post.html.twig', [
             'viewModel' => $this->viewModel,
             'post' => $url->getContent(),

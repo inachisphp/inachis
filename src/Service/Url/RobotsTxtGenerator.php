@@ -31,7 +31,7 @@ class RobotsTxtGenerator
 	/**
 	 * Generate the content of the robots.txt file based on the stored configuration
 	 *
-	 * @todo Add in sitemap once we have a sitemap generator
+	 * TODO: Add in sitemap once we have a sitemap generator
 	 * @return string
 	 */
     public function generate(): string

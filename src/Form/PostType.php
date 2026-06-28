@@ -33,7 +33,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Form for creating and editing a post
- * 
+ *
  * @extends AbstractType<Page>
  */
 class PostType extends AbstractType
@@ -66,7 +66,7 @@ class PostType extends AbstractType
     {
         $newItem = !$options['data'] instanceof Page || empty($options['data']->getId());
         $isScheduled = $options['data'] instanceof Page && $options['data']->getPostDate() > new \DateTimeImmutable('now');
-        // @todo update these based on role permissions
+        // TODO: update these based on role permissions
         $showSave = true;
         $showReview = $options['data'] instanceof Page && $options['data']->getStatus() == EditorialStatus::DRAFT;
         $showPublish = $options['data'] instanceof Page && $options['data']->getStatus() == EditorialStatus::REVIEW;

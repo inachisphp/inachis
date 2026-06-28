@@ -211,7 +211,7 @@ class TagsController extends AbstractInachisController
             $items = $request->request->all('items');
             $action = $request->request->has('delete')  ? 'delete' : null;
 
-            // @todo move the following foreach loop into a TagsBulkActionService and pass it $request
+            // TODO: move the following foreach loop into a TagsBulkActionService and pass it $request
             foreach($items as $item) {
                 $page = $pageRepository->findOneBy(['id' => $item]);
                 if ($page === null) {

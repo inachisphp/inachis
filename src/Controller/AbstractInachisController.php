@@ -57,7 +57,7 @@ abstract class AbstractInachisController extends AbstractController
         $this->viewModel->sessionTimeout = intval(ini_get('session.gc_maxlifetime'));
         $this->viewModel->sessionTimeoutTime = $sessionTimeout->format('Y-m-d\TH:i:s');
         $this->viewModel->deletedItems = $this->wasteRepository->getWasteCount();
-        // @todo fix the below
+        // TODO: fix the below
         // $this->viewModel->timeoutTemplate = base64_encode($this->renderView('inadmin/dialog/session_timeout.html.twig'));
     }
 
@@ -109,7 +109,7 @@ abstract class AbstractInachisController extends AbstractController
 
     /**
      * Redirects to the setup page if there are no admins.
-     * 
+     *
      * @return string
      */
     public function redirectIfNoAdmins(): string
@@ -122,14 +122,14 @@ abstract class AbstractInachisController extends AbstractController
 
     /**
      * Checks if the user is authenticated.
-     * 
+     *
      * @return bool
      */
     protected function isAuthenticated(): bool
     {
         return $this->security->getUser() instanceof User;
     }
-    
+
     /**
      * If the user is trying to access a page such as sign-in but is already authenticated
      * they will be redirected to the dashboard.
@@ -146,7 +146,7 @@ abstract class AbstractInachisController extends AbstractController
 
     /**
      * Redirects to the dashboard if the user is authenticated or to the setup page if there are no admins.
-     * 
+     *
      * @return string|null
      */
     public function redirectIfAuthenticatedOrNoAdmins(): ?string
