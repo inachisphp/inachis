@@ -178,7 +178,7 @@ class CspReportRepository extends ServiceEntityRepository
      * @param string|null $directive
      * @return list<array<string,string>>
      */
-    public function findFiltered(?string $severity, ?string $host, ?string $directive): array
+    public function findFiltered(?string $severity, ?string $host, ?string $directive, ?bool $includeProcessed): array
     {
         $qb = $this->createQueryBuilder('r');
 
@@ -195,6 +195,11 @@ class CspReportRepository extends ServiceEntityRepository
         if ($directive) {
             $qb->andWhere('r.effectiveDirective = :directive')
             ->setParameter('directive', $directive);
+        }
+
+        if (!$includeProcessed) {
+            $qb->andWhere('r.processed = :processed')
+            ->setParameter('processed', false);
         }
 
         /** @var list<array<string,string>> */
@@ -218,6 +223,44 @@ class CspReportRepository extends ServiceEntityRepository
             ->andWhere('r.blockedUri IS NOT NULL')
             ->getQuery()
             ->getScalarResult();
+    }
+
+    /**
+     * Mark similar reports as processed
+     *
+     * @param string $directive
+     * @param string $blockedUri
+     * @return int
+     */
+    public function processSimilarReports(string $directive, string $blockedUri): int
+    {
+        $processedCount = 0;
+        $similarReports = $this->findBy([
+            'violatedDirective' => $directive,
+            'processed' => 0
+        ]);
+
+        $cleanSource = $blockedUri;
+        if (filter_var($blockedUri, FILTER_VALIDATE_URL)) {
+            $parsed = parse_url($blockedUri);
+            $cleanSource = ($parsed['scheme'] ?? 'https') . '://' . ($parsed['host'] ?? '');
+        }
+
+        foreach ($similarReports as $item) {
+            $itemUri = $item->getBlockedUri();
+            $itemSource = $itemUri;
+            
+            if (filter_var($itemUri, FILTER_VALIDATE_URL)) {
+                $parsedItem = parse_url($itemUri);
+                $itemSource = ($parsedItem['scheme'] ?? 'https') . '://' . ($parsedItem['host'] ?? '');
+            }
+            if ($itemSource === $cleanSource) {
+                $item->setProcessed(true);
+                ++$processedCount;
+            }
+        }
+
+        return $processedCount;
     }
 
     /**

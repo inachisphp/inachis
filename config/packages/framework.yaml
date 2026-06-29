@@ -22,6 +22,11 @@ framework:
     php_errors:
         log: true
 
+    cache:
+        pools:
+            csp.cache:
+                adapter: cache.adapter.filesystem # Falls back nicely, or use cache.adapter.apcu
+
 when@test:
     framework:
         test: true

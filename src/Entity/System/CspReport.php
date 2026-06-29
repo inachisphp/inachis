@@ -107,6 +107,9 @@ class CspReport
     #[ORM\Column]
     private \DateTimeImmutable $firstSeenAt;
 
+    #[ORM\Column]
+    private bool $processed = false;
+
     /** @var PayloadShape */
     #[ORM\Column(type: 'json')]
     private array $payload = [];
@@ -463,6 +466,28 @@ class CspReport
     {
         $this->severity = $severity;
 
+        return $this;
+    }
+
+    /**
+     * Gets the processing status of the {@link CspReport} - has it been reviewed
+     *
+     * @return bool
+     */
+    public function isProcessed(): bool
+    {
+        return $this->processed;
+    }
+
+    /**
+     * Sets the processing status of the {@link CspReport}
+     *
+     * @param boolean $processed
+     * @return self
+     */
+    public function setProcessed(bool $processed): self
+    {
+        $this->processed = $processed;
         return $this;
     }
 }

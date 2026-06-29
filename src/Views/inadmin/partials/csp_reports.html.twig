@@ -4,6 +4,10 @@
 <section class="section-ui">
         {{ include('inadmin/partials/filters.html.twig', {
             filters: {
+                Processed: {
+                    '': 'Unprocessed only',
+                    'all': 'All',
+                },
                 Severity: {
                     '': 'All',
                     'critical': 'Critical',
@@ -49,9 +53,9 @@
         </thead>
         <tbody>
         {% for report in reports %}
-            <tr class="{% if report.severity.value == 'critical' %}table-danger{% endif %}">
+            <tr class="{% if report.processed%}row--disabled{% elseif report.severity.value == 'critical' %}table-danger{% endif %}">
                 <td>
-                    <span class="badge bg-{{ report.severity.badgeClass }}">
+                    <span class="badge badge__{{ report.severity.badgeClass }}">
                         {{ report.severity.label }}
                     </span>
                 </td>

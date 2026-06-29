@@ -5,6 +5,9 @@
     <span>CSP Reporting</span>
 {% endblock pagetitle %}
 {% block content %}
+<div class="col-12">
+{{ include('inadmin/partials/tab-sets/csp.html.twig') }}
+<div class="ui-section nested-grid">
 {% if reports is empty and activeDirective is empty and activeSeverity is empty and activeHost is empty %}
 <div class="col-12 admonition admonition__info">
     <header class="admonition__header">
@@ -57,14 +60,6 @@
                 <p class="widget-stats__value">{{ directives|number_format }}</p>
             </div>
         </article>
-    </div>
-
-    <div class="widget">
-        <p>
-            <a href="{{ path('incc_tools_csp_suggested_policy') }}" class="button button--ai">
-                <em class="material-icons">auto_fix_high</em> Generate Rule Suggestions
-            </a>
-        </p>
     </div>
 
 {% if topCritical is not empty%}
@@ -146,4 +141,6 @@
 {% include 'inadmin/partials/csp_reports.html.twig' %}
 
 {% endif %}
+</div>
+</div>
 {% endblock content %}

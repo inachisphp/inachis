@@ -125,4 +125,23 @@ class SettingRepository extends ServiceEntityRepository
 
         return $result;
     }
+
+    /**
+     * Returns the specified setting, or creates it - does not flush
+     *
+     * @param string $name
+     * @param string $default
+     * @return Setting
+     */
+    public function getOrCreateSetting(string $name, string $default): Setting
+    {
+        $setting = $this->findOneBy(['name' => $name]);
+        if (!$setting) {
+            $setting = new Setting();
+            $setting->setName($name);
+            $setting->setValue($default);
+            $this->getEntityManager()->persist($setting);
+        }
+        return $setting;
+    }
 }

@@ -477,3 +477,10 @@ td.column--monospaced {
   th, td { padding: 0.5rem; text-align: center;}
   input.permission-matrix__checkbox { width: 3.25rem; }
 }
+
+.row--disabled {
+  color: var(--color-neutral-450);
+}
+.table-danger {
+  background-color: var(--color-warning-200);
+}

@@ -44,11 +44,11 @@ enum CspSeverity: string
     public function badgeClass(): string
     {
         return match ($this) {
-            self::Critical => 'danger',
-            self::High => 'warning',
-            self::Medium => 'primary',
-            self::Low => 'secondary',
-            self::Info => 'info',
+            self::Critical => 'critical',
+            self::High => 'error',
+            self::Medium => 'warning',
+            self::Low => 'ok',
+            self::Info => 'default',
         };
     }
 
