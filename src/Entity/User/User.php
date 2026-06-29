@@ -142,11 +142,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->setPassword($password);
         $this->setEmail($email);
         $this->setAvatar(null);
-        $now = new DateTimeImmutable();
-        // TODO move to pre-perist functions
-        $this->setCreatedAt($now);
-        $this->setUpdatedAt($now);
         $this->assignedRoles = new ArrayCollection();
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        $now = new DateTimeImmutable();
+
+        $this->createdAt = $now;
+        $this->updatedAt = $now;
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     /**

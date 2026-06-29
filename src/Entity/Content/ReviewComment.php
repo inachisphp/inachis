@@ -53,11 +53,6 @@ class ReviewComment
         $this->thread = $thread;
         $this->author = $author;
         $this->message = $message;
-
-        $now = new DateTimeImmutable();
-
-        $this->created = $now;
-        $this->updated = $now;
     }
 
     #[ORM\PrePersist]

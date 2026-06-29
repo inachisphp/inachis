@@ -5,12 +5,16 @@
     <a href="{{ path('incc_tools_csp_dashboard') }}">CSP Reporting</a>
     <span>CSP Report</span>
 {% endblock pagetitle %}
+
 {% block content %}
+<div class="col-12">
+{{ include('inadmin/partials/tab-sets/csp.html.twig') }}
+<div class="ui-section nested-grid">
 <div class="col-6">
     <dl class="row">
         <dt class="col-sm-3">Severity</dt>
         <dd class="col-sm-9">
-            <span class="badge bg-{{ report.severity.badgeClass }}">
+            <span class="badge badge__{{ report.severity.badgeClass }}">
                 {{ report.severity.label }}
             </span>
         </dd>
@@ -46,10 +50,25 @@
     </dl>
 </div>
 
-<div class="col-6">
+<div class="col-6 card">
     <h2>Raw Payload</h2>
     <pre class="mb-0"><code>
 {{ report.payload|json_encode(constant('JSON_PRETTY_PRINT')) }}
 </code></pre>
 </div>
+</div>
+</div>
+
+{% if not report.isProcessed %}
+<div class="fixed-bottom-bar">
+    <form action="{{ path('csp_report_process', { id: report.id }) }}" method="post">
+        <input type="hidden" name="_token" value="{{ csrf_token('report_' ~ report.id) }}">
+        <input type="hidden" name="fingerprint" value="{{ report.fingerprint }}" />
+        <p>
+            <button name="action" type="submit" value="approve" class="button button--positive">Approve</button>
+            <button name="action" type="submit" value="reject" class="button button--negative">Reject</button>
+        </p>
+    </form>
+</div>
+{% endif %}
 {% endblock content %}

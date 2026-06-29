@@ -88,10 +88,22 @@ class Url
         $this->setContent($content);
         $this->setLink($link);
         $this->setDefault($default);
-        // TODO move into pre-post function
-        $this->setCreatedAt(new DateTimeImmutable());
-        $this->setUpdatedAt(new DateTimeImmutable());
         $this->associateContent();
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        $now = new DateTimeImmutable();
+
+        $this->createdAt = $now;
+        $this->updatedAt = $now;
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     /**

@@ -7,13 +7,16 @@
 {% endblock pagetitle %}
 
 {% block content %}
+<div class="col-12">
+{{ include('inadmin/partials/tab-sets/csp.html.twig') }}
+<div class="ui-section nested-grid">
 {% if policyArray is empty %}
 <div class="col-12 admonition admonition__warning">
         No structural metrics found to suggest a policy yet.
 </div>
 {% else %}
 
-<div class="col-6 ui-section">
+<div class="col-6">
     <p class="text-muted">Generated dynamically from historical violation report entries.</p>
 
     <div class="form card">
@@ -27,7 +30,7 @@
     </div>
 </div>
 
-<div class="col-6 section-ui">
+<div class="col-6">
 
         {% for directive, sources in policyArray %}
             <div class="card">
@@ -43,4 +46,6 @@
         {% endfor %}
 </div>
 {% endif %}
+</div>
+</div>
 {% endblock content %}

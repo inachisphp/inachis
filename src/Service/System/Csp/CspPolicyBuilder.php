@@ -68,12 +68,12 @@ class CspPolicyBuilder
             return $parsed['host'];
         }
 
-        // Fallback for relative or string junk we couldn't parse safely
+        // Fallback for relative or string rubbish we couldn't parse safely
         return !empty($uri) && str_contains($uri, '.') ? $uri : null;
     }
 
     /**
-     * Optional utility to format the policy array into a raw HTTP header string.
+     * Format the policy array into a raw HTTP header string.
      */
     public function stringifyPolicy(array $compiledPolicy): string
     {

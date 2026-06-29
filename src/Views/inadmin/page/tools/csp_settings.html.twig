@@ -1,0 +1,62 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <a href="{{ path('incc_tools_csp_dashboard') }}">CSP Reporting</a>
+    <span>CSP Configuration</span>
+{% endblock pagetitle %}
+
+{% block content %}
+
+<div class="col-12">
+{{ include('inadmin/partials/tab-sets/csp.html.twig') }}
+<form class="form form__csp" method="post" action="{{ path('incc_tools_csp_settings') }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('csp_settings') }}">
+
+<fieldset class="ui-section">
+    <h3>General Directives</h3>
+    <p>
+        <label class="inline_label" for="cspEnabled" id="cspEnabled_label">Enable CSP Headers on Frontend</label>
+        <span class="switch-wrapper">
+            <input aria-labelledby="cspEnabled_label" class="ui-switch" type="checkbox" name="csp_enabled" id="cspEnabled" value="1" {{ enabled ? 'checked' : '' }} data-label-off="disabled" data-label-on="enabled" >
+        </span>
+    </p>
+
+    <p>
+        <label class="inline_label" for="cspReportOnly" id="csp_report_only_label">Enforce "Report-Only" Mode</label>
+        <span class="switch-wrapper">
+            <input aria-labelledby="csp_report_only_label" class="ui-switch" type="checkbox" name="csp_report_only" id="cspReportOnly" value="1" {{ report_only ? 'checked' : '' }}  data-label-off="disabled" data-label-on="enabled">
+        </span>
+        <small class="form-text text-muted d-block">When checked, browsers log errors back to your system but won't block assets or break your site layout.</small>
+    </p>
+</fieldset>
+
+<fieldset class="ui-section">
+    <h3>Directives Config</h3>
+    <small>Separate your safe domains using spaces. Use keywords like <code>self</code> or <code>data-uri</code> safely without adding quotes manually.</small>
+
+    {% set standard_directives = ['default-src', 'script-src', 'style-src', 'img-src', 'font-src', 'connect-src', 'frame-src'] %}
+    
+    {% for directive in standard_directives %}
+        <p>
+            <label class="col-sm-2 col-form-label font-weight-bold"><code>{{ directive }}</code></label>
+                <input type="text" 
+                        class="text full-width" 
+                        name="directives[{{ directive }}]" 
+                        value="{{ policy[directive] is defined ? policy[directive]|join(' ') : '' }}" 
+                        placeholder="e.g. self data-uri https://trustedcdn.com">
+        </p>
+    {% endfor %}
+</form>
+<p>&nbsp;</p>
+</div>
+
+<div class="fixed-bottom-bar">
+    <p>
+        <button type="submit" class="button button--positive">Apply Configuration</button>
+        <a href="{{ path('incc_tools_csp_suggested_policy') }}" class="button button--ai">
+            <em class="material-icons">auto_fix_high</em> Generate Rule Suggestions
+        </a>
+    </p>
+</div>
+{% endblock content %}

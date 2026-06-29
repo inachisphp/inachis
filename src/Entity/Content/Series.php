@@ -166,6 +166,18 @@ class Series
     }
 
     /**
+     * Sets the value of {@link id}.
+     *
+     * @param UuidInterface $value The UUID of the {@link Revision}
+     * @return self
+     */
+    public function setId(UuidInterface $value): self
+    {
+        $this->id = $value;
+        return $this;
+    }
+
+    /**
      * Gets the value of {@link title}.
      *
      * @return string

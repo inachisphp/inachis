@@ -59,16 +59,19 @@ class Image extends AbstractFile
     #[ORM\Column(type: 'string', nullable: true)]
     protected ?string $altText = '';
 
-    /**
-     * Default constructor for {@link Image}.
-     */
-    public function __construct()
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
     {
         $now = new DateTimeImmutable();
-        // TODO Add Pre/Post persist to replace this
-        $this->setCreatedAt($now);
-        $this->setUpdatedAt($now);
-        unset($now);
+
+        $this->createdAt ??= $now;
+        $this->updatedAt ??= $now;
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     /**

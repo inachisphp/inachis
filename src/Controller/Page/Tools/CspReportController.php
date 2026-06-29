@@ -12,6 +12,8 @@ namespace Inachis\Controller\Page\Tools;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\System\CspReport;
 use Inachis\Repository\System\CspReportRepository;
+use Inachis\Repository\System\SettingRepository;
+use Inachis\Service\System\Csp\CspHeaderManager;
 use Inachis\Service\System\Csp\CspPolicyBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,9 +32,10 @@ class CspReportController extends AbstractInachisController
         $severity = $filters['severity'] ?? '';
         $directive = $filters['directive'] ?? '';
         $host = $request->query->get('host');
+        $processed = $filters['processed'] ?? '';
 
         $this->viewModel->page->title = 'CSP Reporting';
-        $this->viewModel->page->tab = 'tools';
+        $this->viewModel->page->tab = 'csp-report';
         return $this->render(
             'inadmin/page/tools/csp_dashboard.html.twig',
             [
@@ -48,6 +51,7 @@ class CspReportController extends AbstractInachisController
                     severity: $severity,
                     host: $host,
                     directive: $directive,
+                    includeProcessed: $processed === 'all',
                 ),
                 'filters' => $filters,
                 'activeHost' => $host,
@@ -64,14 +68,13 @@ class CspReportController extends AbstractInachisController
     #[Route(
         '/incc/tools/csp/{id}',
         name: 'csp_report_show',
-        requirements: ['id' => '^(?!suggested-policy|reports).*$']
+        requirements: ['id' => '^(?!suggested-policy|reports|settings|.*/process).*$']
     )]
     public function show(
         CspReport $report
     ): Response {
-
         $this->viewModel->page->title = 'CSP Report';
-        $this->viewModel->page->tab = 'tools';
+        $this->viewModel->page->tab = 'csp-report';
         return $this->render(
             'inadmin/page/tools/csp_detail.html.twig',
             [
@@ -79,6 +82,43 @@ class CspReportController extends AbstractInachisController
                 'report' => $report,
             ]
         );
+    }
+
+    #[Route('/incc/tools/csp/{id}/process',
+        name: 'csp_report_process',
+        requirements: ['id' => '^(?!suggested-policy|reports|settings).*$']
+    )]
+    public function processPolicyItem(
+        CspReport $report,
+        CspReportRepository $repository,
+        CspHeaderManager $cspHeaderManager,
+        Request $request
+    ): Response {
+        if (!$report) {
+            throw $this->createNotFoundException('Report not found.');
+        }
+        if (!$this->isCsrfTokenValid('report_'.$report->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        match ($request->request->get('action')) {
+            'approve' => [
+                $cspHeaderManager->addReportToPolicy($report),
+                $repository->processSimilarReports(
+                    $report->getViolatedDirective(),
+                    $report->getBlockedUri()
+                ),
+                $this->addFlash('success', 'Domain added to configuration successfully.'),
+            ],
+            'reject' => $this->addFlash('info', 'Report marked as ignored.'),
+            default => throw new \InvalidArgumentException(),
+        };
+
+        $report->setProcessed(true);
+        $this->entityManager->flush();
+        $cspHeaderManager->invalidateCache();
+
+        return $this->redirectToRoute('incc_tools_csp_dashboard');
     }
 
     #[Route('/incc/tools/csp/suggested-policy', name: 'incc_tools_csp_suggested_policy')]
@@ -95,7 +135,7 @@ class CspReportController extends AbstractInachisController
 
 
         $this->viewModel->page->title = 'CSP Policy Suggestion';
-        $this->viewModel->page->tab = 'tools';
+        $this->viewModel->page->tab = 'csp-policy';
         return $this->render(
             'inadmin/page/tools/csp_suggestion.html.twig',
             [
@@ -104,5 +144,63 @@ class CspReportController extends AbstractInachisController
                 'policyString' => $suggestedString,
             ]
         );
+    }
+
+    #[Route('/incc/tools/csp/settings', name: 'incc_tools_csp_settings')]
+    public function settings(
+        Request $request,
+        CspHeaderManager $cspHeaderManager,
+        SettingRepository $settingRepository,
+    ): Response {
+        // 1. Fetch current settings or instantiate defaults
+        $cspEnabled = $settingRepository->getOrCreateSetting('csp_enabled', '0');
+        $cspReportOnly = $settingRepository->getOrCreateSetting('csp_report_only', '1');
+        $cspPolicy = $settingRepository->getOrCreateSetting('csp_policy_frontend', json_encode([
+            'default-src' => ['self'],
+            'script-src' => ['self'],
+            'style-src' => ['self'],
+            'img-src' => ['self', 'data-uri']
+        ]));
+
+        // 2. Handle Form Processing
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('csp_settings', $request->request->get('_token'))) {
+                throw $this->createAccessDeniedException('Invalid CSRF token.');
+            }
+
+            $cspEnabled->setValue($request->request->get('csp_enabled', '0'));
+            $cspReportOnly->setValue($request->request->get('csp_report_only', '0'));
+
+            // Structure incoming inputs into the target array format
+            $rawDirectives = $request->request->all('directives');
+            $cleanPolicy = [];
+            foreach ($rawDirectives as $directiveName => $sourcesString) {
+                if (empty($sourcesString)) {
+                    continue;
+                }
+                // Convert space or comma separated lists into arrays
+                $cleanPolicy[$directiveName] = array_filter(
+                    array_map('trim', preg_split('/[\s,]+/', $sourcesString))
+                );
+            }
+            $cspPolicy->setValue(json_encode($cleanPolicy));
+
+            $this->entityManager->flush();
+
+            // Clear the APCu/Filesystem cache instantly
+            $cspHeaderManager->invalidateCache();
+
+            $this->addFlash('success', 'CSP settings updated and cache warmed.');
+            return $this->redirectToRoute('incc_tools_csp_settings');
+        }
+
+        $this->viewModel->page->title = 'CSP Policy';
+        $this->viewModel->page->tab = 'csp-policy';
+        return $this->render('inadmin/page/tools/csp_settings.html.twig', [
+            'viewModel' => $this->viewModel,
+            'enabled' => $cspEnabled->getValue() === '1',
+            'report_only' => $cspReportOnly->getValue() === '1',
+            'policy' => json_decode($cspPolicy->getValue(), true) ?? []
+        ]);
     }
 }

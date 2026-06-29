@@ -276,16 +276,28 @@ class Page
         $this->setTitle($title);
         $this->setContent($content);
         $this->setAuthor($author);
-        // TODO move into pre-post function
-        $currentTime = new DateTimeImmutable();
-        $this->setCreatedAt($currentTime);
-        $this->setPostDate($currentTime);
-        $this->setUpdatedAt($currentTime);
+        $now = new DateTimeImmutable();
+        $this->setPostDate($now);
         $this->type = $type;
         $this->urls = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->tags = new ArrayCollection();
         $this->series = new ArrayCollection();
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        $now = new DateTimeImmutable();
+
+        $this->createdAt ??= $now;
+        $this->updatedAt ??= $now;
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     /**
