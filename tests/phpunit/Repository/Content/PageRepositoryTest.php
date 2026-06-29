@@ -178,8 +178,8 @@ class PageRepositoryTest extends TestCase
                 ['q.title', 'DESC'],
                 ['q.subTitle', 'DESC'],
             ],
-            'modDate asc' => [['q.modDate', 'ASC']],
-            'modDate desc' => [['q.modDate', 'DESC']],
+            'updatedAt asc' => [['q.updatedAt', 'ASC']],
+            'updatedAt desc' => [['q.updatedAt', 'DESC']],
             'postDate asc' => [['q.postDate', 'ASC']],
             'default' => [['q.postDate', 'DESC']],
         ];

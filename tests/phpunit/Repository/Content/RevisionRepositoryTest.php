@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -50,14 +50,13 @@ class RevisionRepositoryTest extends TestCase
         $uuid = Uuid::uuid1();
         $date = new DateTimeImmutable('now');
         $page = new Page('test page', 'some content');
-        $page->setId($uuid)->setSubTitle('sub-title')->setModDate($date);
+        $page->setId($uuid)->setSubTitle('sub-title')->setUpdatedAt($date);
         $revision = new Revision();
         $revision->setVersionNumber(2)
             ->setTitle('test page')
             ->setSubTitle('sub-title')
             ->setContent('some content')
             ->setUser(null)
-            ->setModDate($date)
             ->setPageId($uuid);
         $this->repository->expects($this->once())
             ->method('getNextVersionNumberForPageId')
@@ -104,7 +103,7 @@ class RevisionRepositoryTest extends TestCase
         $uuid = Uuid::uuid1();
         $date = new DateTimeImmutable('now');
         $page = new Page('test page', 'some content');
-        $page->setId($uuid)->setSubTitle('sub-title')->setModDate($date);
+        $page->setId($uuid)->setSubTitle('sub-title')->setUpdatedAt($date);
 
         $this->repository = $this->getMockBuilder(RevisionRepository::class)
             ->setConstructorArgs([$this->registry])

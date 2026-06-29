@@ -107,7 +107,7 @@ class PageController extends AbstractInachisController
             'post',
             'postDate desc',
         );
-        
+
         if ($request->query->has('category') && $request->query->get('category') === 'null') {
             $posts = $pageRepository->getPagesWithoutCategories($contentQuery['offset'], $contentQuery['limit']);
             $queryString = 'category=null';
@@ -232,7 +232,7 @@ class PageController extends AbstractInachisController
 
             // Update post
             $post->setAuthor($this->getCurrentUser());
-            $post->setModDate(new DateTimeImmutable());
+            $post->setUpdatedAt(new DateTimeImmutable());
             $data = $request->request->all('post');
             $urlManager->apply($post, is_string($data['url']) ? $data['url'] : '');
             $categoryManager->apply($post, is_string($data['categories']) ? $data['categories'] : '');

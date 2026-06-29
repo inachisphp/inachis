@@ -99,7 +99,7 @@ class ContentAggregator
             0,
             self::ITEMS_TO_SHOW,
             [$pageQuery, $pageParameters],
-            'q.postDate DESC, q.modDate'
+            'q.postDate DESC, q.updatedAt'
         );
 
         foreach ($pages as $page) {

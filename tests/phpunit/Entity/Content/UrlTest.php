@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -59,14 +59,14 @@ class UrlTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testSetModDateToNow(): void
+    public function testSetUpdatedAtToNow(): void
     {
         $yesterdayDateTime = new DateTimeImmutable('yesterday');
-        $this->url->setModDate($yesterdayDateTime);
-        $this->url->setModDateToNow();
+        $this->url->setUpdatedAt($yesterdayDateTime);
+        $this->url->setUpdatedAtToNow();
         $this->assertEquals(
             (new DateTimeImmutable('now'))->format('Ymd'),
-            $this->url->getModDate()->format('Ymd')
+            $this->url->getUpdatedAt()->format('Ymd')
         );
     }
 
@@ -81,9 +81,9 @@ class UrlTest extends TestCase
         $this->assertFalse($this->url->validateURL());
     }
 
-    public function testGetCreateDate(): void
+    public function testGetCreatedAt(): void
     {
-        $this->assertGreaterThan(0, $this->url->getCreateDate()->getTimestamp());
+        $this->assertGreaterThan(0, $this->url->getCreatedAt()->getTimestamp());
     }
 
     public function testGetContent(): void

@@ -19,7 +19,7 @@ trait DefaultResourceRepository
 {
     /**
      * Get the disk usage of all images
-     * 
+     *
      * @return int The disk usage in bytes
      */
     public function getDiskUsage(): int
@@ -32,7 +32,7 @@ trait DefaultResourceRepository
     /**
      * Removes the record of the specified file from the database, the associated file
      * is not removed
-     * 
+     *
      * @param AbstractFile $file
      */
     public function remove(AbstractFile $file): void
@@ -43,7 +43,7 @@ trait DefaultResourceRepository
 
     /**
      * Get all resources
-     * 
+     *
      * @param int $offset The offset from which to return results from
      * @param int $limit  The maximum number of results to return
      * @param list{0: string, 1?:array<string, string|list<string>>}|list{} $where
@@ -63,7 +63,7 @@ trait DefaultResourceRepository
 
     /**
      * Returns a filtered list of resource files
-     * 
+     *
      * @param array{keyword?: string} $filters
      * @param int $offset
      * @param int $limit
@@ -93,7 +93,7 @@ trait DefaultResourceRepository
 
     /**
      * Returns an SQL orderBy for the given string
-     * 
+     *
      * @param string|null $orderBy
      * @return list{0: string, 1: string}
      */
@@ -101,12 +101,12 @@ trait DefaultResourceRepository
     {
         return match ($orderBy) {
             'title desc' => ['q.title', 'DESC'],
-            'createDate asc' => ['q.createDate', 'ASC'],
-            'createDate desc' => ['q.createDate', 'DESC'],
+            'createdAt asc' => ['q.createdAt', 'ASC'],
+            'createdAt desc' => ['q.createdAt', 'DESC'],
             'filesize asc' => ['q.filesize', 'ASC'],
             'filesize desc' => ['q.filesize', 'DESC'],
-            'modDate asc' => ['q.modDate', 'ASC'],
-            'modDate desc' => ['q.modDate', 'DESC'],
+            'updatedAt asc' => ['q.updatedAt', 'ASC'],
+            'modupdatedAtDate desc' => ['q.updatedAt', 'DESC'],
             default => ['q.title', 'ASC'],
         };
     }

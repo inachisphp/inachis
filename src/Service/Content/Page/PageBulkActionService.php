@@ -36,7 +36,7 @@ readonly class PageBulkActionService
 
     /**
      * Applies a bulk action to pages
-     * 
+     *
      * @param string $action
      * @param array<string> $ids
      * @return int
@@ -59,7 +59,7 @@ readonly class PageBulkActionService
                 default   => null,
             };
             if ($action !== 'delete') {
-                $post->setModDate(new DateTimeImmutable());
+                $post->setUpdatedAt(new DateTimeImmutable());
                 $this->entityManager->persist($post);
                 if ($action === 'private' || $action === 'public') {
                     $revision = $this->revisionRepository->hydrateNewRevisionFromPage($post);
@@ -114,7 +114,7 @@ readonly class PageBulkActionService
         }
         $url = new Url($post, $link);
         $this->entityManager->persist($url);
-        $post->setModDate(new DateTimeImmutable('now'));
+        $post->setUpdatedAt(new DateTimeImmutable('now'));
 
         return $post;
     }

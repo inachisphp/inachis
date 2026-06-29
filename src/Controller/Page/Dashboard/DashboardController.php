@@ -26,7 +26,7 @@ class DashboardController extends AbstractInachisController
 {
     /**
      * Provides the main dashboard
-     * 
+     *
      * @param Request $request The request made to the controller
      * @return Response
      */
@@ -50,13 +50,13 @@ class DashboardController extends AbstractInachisController
                     'status' => EditorialStatus::DRAFT->value,
                 ],
             ],
-            [ ['q.modDate' , 'DESC'] ]
+            [ ['q.updatedAt' , 'DESC'] ]
         );
         if ($recentDraft->count() > 0) {
             $now = new DateTimeImmutable();
-            $recentDraftTimeAgo = $now->diff($recentDraft->getIterator()->current()->getModDate());
+            $recentDraftTimeAgo = $now->diff($recentDraft->getIterator()->current()->getUpdatedAt());
         }
-            
+
         $drafts = $pageRepository->getAll(
             0,
             5,
@@ -66,7 +66,7 @@ class DashboardController extends AbstractInachisController
                     'status' => EditorialStatus::DRAFT->value,
                 ],
             ],
-            'q.postDate ASC, q.modDate'
+            'q.postDate ASC, q.updatedAt'
         );
         $upcoming = $pageRepository->getAll(
             0,
@@ -78,9 +78,9 @@ class DashboardController extends AbstractInachisController
                     'postDate' => new DateTimeImmutable('now')->format('Y-m-d H:i:s'),
                 ],
             ],
-            'q.postDate ASC, q.modDate'
+            'q.postDate ASC, q.updatedAt'
         );
-    
+
         $posts = $pageRepository->getAll(
             0,
             5,
@@ -91,7 +91,7 @@ class DashboardController extends AbstractInachisController
                     'postDate' => new DateTimeImmutable('now')->format('Y-m-d H:i:s'),
                 ],
             ],
-            'q.postDate DESC, q.modDate'
+            'q.postDate DESC, q.updatedAt'
         );
 
         $draftSeries = $seriesRepository->getAll(
@@ -123,7 +123,7 @@ class DashboardController extends AbstractInachisController
             'dashboard' => [
                 'draftTimeAgo' => $recentDraftTimeAgo ?? 0,
                 'recentDraft' => $recentDraft,
-                
+
                 'drafts' => $drafts,
                 'draftCount' => $drafts->count(),
                 'posts' => $posts,
@@ -186,7 +186,7 @@ class DashboardController extends AbstractInachisController
                     //     new DateTimeImmutable('-7 days'),
                     //     new DateTimeImmutable()
                     // ),
-                ],                
+                ],
             ],
         ]);
     }

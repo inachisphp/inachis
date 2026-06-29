@@ -77,7 +77,7 @@ class PageBulkCreateService
 
             $post = new Page($title);
             $post->setPostDate($date);
-            $post->setModDate(new DateTimeImmutable());
+            $post->setUpdatedAt(new DateTimeImmutable());
             $post->setAuthor($author);
             $post->addUrl(new Url(
                 $post,

@@ -29,7 +29,7 @@ class RevisionController extends AbstractInachisController
 {
     /**
      * Displays the difference between current page and the revision
-     * 
+     *
      * @param Request $request
      * @param PageRepository $pageRepository
      * @param RevisionRepository $revisionRepository
@@ -77,7 +77,7 @@ class RevisionController extends AbstractInachisController
         $this->viewModel->page->title = 'Compare Revisions';
         $this->viewModel->page->tab = 'post';
 
-        
+
         $title = json_decode(
             DiffHelper::calculate(
                 $revision->getTitle() ?? '',
@@ -99,7 +99,7 @@ class RevisionController extends AbstractInachisController
         if (empty($subTitle)) {
             $subTitle = $page->getSubTitle();
         }
-        
+
         $content = mb_split(
             PHP_EOL,
             $revision->getContent() ?? ''
@@ -130,7 +130,7 @@ class RevisionController extends AbstractInachisController
 
     /**
      * Reverts to the selected version
-     * 
+     *
      * @param Request $request
      * @param PageRepository $pageRepository
      * @param RevisionRepository $revisionRepository
@@ -147,7 +147,7 @@ class RevisionController extends AbstractInachisController
         $page->setTitle($revision->getTitle() ?? '')
             ->setSubTitle($revision->getSubTitle())
             ->setContent($revision->getContent())
-            ->setModDate(new DateTimeImmutable())
+            ->setUpdatedAt(new DateTimeImmutable())
             ->setAuthor($this->getCurrentUser());
 
         $newRevision = $revisionRepository->hydrateNewRevisionFromPage($page);
@@ -172,7 +172,7 @@ class RevisionController extends AbstractInachisController
 
     /**
      * Downloads a copy of the specified version as .md file
-     * 
+     *
      * @param Request $request
      * @param RevisionRepository $revisionRepository
      * @return Response
@@ -213,7 +213,7 @@ class RevisionController extends AbstractInachisController
 
     /**
      * Fetches an array containing the revision and page
-     * 
+     *
      * @param Request $request
      * @param RevisionRepository $revisionRepository
      * @return list{0: \Inachis\Entity\Content\Revision, 1: \Inachis\Entity\Content\Page}

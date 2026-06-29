@@ -9,7 +9,7 @@
 <div class="col-12">
     <div class="content__panel">
         <h2 class="h3">Waste Item Details</h2>
-        
+
         <table class="table-responsive table--row-borders">
             <tbody>
                 <tr>
@@ -18,13 +18,13 @@
                 </tr>
                 <tr>
                     <th scope="row">Deleted At</th>
-                    <td>{{ waste.modDate|date('Y-m-d H:i:s') }}</td>
+                    <td>{{ waste.updatedAt|date('Y-m-d H:i:s') }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Title</th>
                     <td>{{ waste.title }}</td>
                 </tr>
-                
+
                 {% if waste.sourceType == 'Page' or waste.sourceType == 'Series' %}
                     {% if wasteContent.subTitle is defined and wasteContent.subTitle %}
                     <tr>
@@ -33,7 +33,7 @@
                     </tr>
                     {% endif %}
                 {% endif %}
-                
+
                 {% if waste.sourceType == 'Page' %}
                     {% if wasteContent.type is defined %}
                     <tr>
@@ -41,7 +41,7 @@
                         <td>{{ wasteContent.type }}</td>
                     </tr>
                     {% endif %}
-                    
+
                     {% if wasteContent.urls is defined and wasteContent.urls|length > 0 %}
                     <tr>
                         <th scope="row">URLs</th>
@@ -54,14 +54,14 @@
                         </td>
                     </tr>
                     {% endif %}
-                    
+
                     {% if wasteContent.tags is defined and wasteContent.tags|length > 0 %}
                     <tr>
                         <th scope="row">Tags (IDs)</th>
                         <td>{{ wasteContent.tags|join(', ') }}</td>
                     </tr>
                     {% endif %}
-                    
+
                     {% if wasteContent.categories is defined and wasteContent.categories|length > 0 %}
                     <tr>
                         <th scope="row">Categories (IDs)</th>
@@ -113,7 +113,7 @@
                 {% endif %}
             </tbody>
         </table>
-        
+
         {% if waste.sourceType == 'Page' and wasteContent.content is defined and wasteContent.content %}
         <h3 class="h4 mt-4">Content</h3>
         <div class="content-preview" style="background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 4px; color: #333">

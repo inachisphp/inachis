@@ -18,6 +18,6 @@ final class PageMetadata
         public string $type = '',
         public string $description = '',
         public string $keywords = '',
-        public string $modDate = '',
+        public string $updatedAt = '',
     ) {}
 }

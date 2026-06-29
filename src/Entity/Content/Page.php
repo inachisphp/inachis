@@ -37,10 +37,10 @@ use InvalidArgumentException;
  *    featureSnippet?: string,
  *    status: EditorialStatus,
  *    visible: bool,
- *    createDate: string,
+ *    createdAt: string,
  *    postDate: string,
  *    expireDate?: string,
- *    modDate: string,
+ *    updatedAt: string,
  *    timezone: string,
  *    password: string,
  *    allowComments: bool,
@@ -139,7 +139,7 @@ class Page
      * @var DateTimeImmutable The date the {@link Page} was created
      */
     #[ORM\Column(type: 'datetime_immutable')]
-    protected DateTimeImmutable $createDate;
+    protected DateTimeImmutable $createdAt;
 
     /**
      * @var DateTimeImmutable The date the {@link Page} was published; a future date indicates the content is scheduled
@@ -157,7 +157,7 @@ class Page
      * @var DateTimeImmutable The date the {@link Page} was last modified
      */
     #[ORM\Column(type: 'datetime_immutable')]
-    protected DateTimeImmutable $modDate;
+    protected DateTimeImmutable $updatedAt;
 
     /**
      * @var string|null The timezone for the publication date; defaults to UTC
@@ -276,10 +276,11 @@ class Page
         $this->setTitle($title);
         $this->setContent($content);
         $this->setAuthor($author);
+        // TODO move into pre-post function
         $currentTime = new DateTimeImmutable();
-        $this->setCreateDate($currentTime);
+        $this->setCreatedAt($currentTime);
         $this->setPostDate($currentTime);
-        $this->setModDate($currentTime);
+        $this->setUpdatedAt($currentTime);
         $this->type = $type;
         $this->urls = new ArrayCollection();
         $this->categories = new ArrayCollection();
@@ -378,13 +379,13 @@ class Page
     }
 
     /**
-     * Returns the value of {@link createDate}.
+     * Returns the value of {@link createdAt}.
      *
      * @return DateTimeImmutable The creation date of the {@link Page}
      */
-    public function getCreateDate(): DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
-        return $this->createDate;
+        return $this->createdAt;
     }
 
     /**
@@ -408,13 +409,13 @@ class Page
     }
 
     /**
-     * Returns the value of {@link modDate}.
+     * Returns the value of {@link updatedAt}.
      *
      * @return DateTimeImmutable The date the {@link Page} was last modified
      */
-    public function getModDate(): DateTimeImmutable
+    public function getUpdatedAt(): DateTimeImmutable
     {
-        return $this->modDate;
+        return $this->updatedAt;
     }
 
     /**
@@ -681,14 +682,14 @@ class Page
     }
 
     /**
-     * Sets the value of {@link createDate}.
+     * Sets the value of {@link createdAt}.
      *
      * @param DateTimeImmutable $value The date to be set
      * @return Page
      */
-    public function setCreateDate(DateTimeImmutable $value): self
+    public function setCreatedAt(DateTimeImmutable $value): self
     {
-        $this->createDate = $value;
+        $this->createdAt = $value;
         return $this;
     }
 
@@ -717,14 +718,14 @@ class Page
     }
 
     /**
-     * Sets the value of {@link modDate}.
+     * Sets the value of {@link updatedAt}.
      *
      * @param DateTimeImmutable $value The date to set
      * @return Page
      */
-    public function setModDate(DateTimeImmutable $value): self
+    public function setUpdatedAt(DateTimeImmutable $value): self
     {
-        $this->modDate = $value;
+        $this->updatedAt = $value;
         return $this;
     }
 

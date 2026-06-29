@@ -170,9 +170,9 @@
         <fieldset class="ui-section" i id="post__history">
             {% if post.id is not empty %}
             <p>
-                {{ form_label(form.modDate) }}
-                {{ form_errors(form.modDate) }}
-                {{ form_widget(form.modDate) }}
+                {{ form_label(form.updatedAt) }}
+                {{ form_errors(form.updatedAt) }}
+                {{ form_widget(form.updatedAt) }}
             </p>
             {% endif %}
             <table class="table table-responsive table-striped table-borderless">
@@ -213,7 +213,7 @@
     <div class="fixed-bottom-bar">
         <p>
             {% if form.submit is defined %}{{ form_widget(form.submit) }}{% endif %}
-            
+
         {% if post.id is not empty %}
             {% if form.review is defined %}{{ form_widget(form.review) }}{% endif %}
             {% if form.publish is defined %}{{ form_widget(form.publish) }}{% endif %}

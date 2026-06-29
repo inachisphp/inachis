@@ -24,7 +24,7 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <meta http-equiv="keywords" content="{{ viewModel.page.keywords }}" />
     <meta http-equiv="Content-Style-Type" content="text/css" />
-    <meta http-equiv="Last-Update" content="{{ viewModel.page.modDate }}" />
+    <meta http-equiv="Last-Update" content="{{ viewModel.page.updatedAt }}" />
     <meta http-equiv="Content-Language" content="{{ viewModel.settings.language }}" />
     <meta http-equiv="imagetoolbar" content="no" />
     <meta name="Author" content="David G. Paul" />
@@ -36,7 +36,7 @@
     <meta name="robots" content="index,follow" />
     <meta name="googlebot" content="NOODP" />
     <meta name="language" content="{{ viewModel.settings.language }}" />
-    <meta name="revised" content="{{ viewModel.page.modDate }}" />
+    <meta name="revised" content="{{ viewModel.page.updatedAt }}" />
 {% if viewModel.settings.geo.lat|default('') is not empty and viewModel.settings.geo.long|default('') is not empty %}
     <meta name="ICBM" content="{{ viewModel.settings.geo.lat }}, {{ viewModel.settings.geo.long }}" />
     <meta name="geo.position" content="{{ viewModel.settings.geo.lat }}, {{ viewModel.settings.geo.long }}" />

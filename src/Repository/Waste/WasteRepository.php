@@ -18,14 +18,14 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Repository for {@link Waste} entities
- * 
+ *
  * @extends AbstractRepository<Waste>
  */
 class WasteRepository extends AbstractRepository implements WasteRepositoryInterface
 {
     /**
      * Creates a new instance of the WasteRepository
-     * 
+     *
      * @param ManagerRegistry $registry The registry
      */
     public function __construct(ManagerRegistry $registry)
@@ -35,7 +35,7 @@ class WasteRepository extends AbstractRepository implements WasteRepositoryInter
 
     /**
      * Deletes all waste for a user
-     * 
+     *
      * @param User $user The user
      * @return int The number of waste items deleted
      */
@@ -56,7 +56,7 @@ class WasteRepository extends AbstractRepository implements WasteRepositoryInter
 
     /**
      * Returns a count of the number of deleted items
-     * 
+     *
      * @return int The number of waste items
      */
     public function getWasteCount(): int
@@ -66,7 +66,7 @@ class WasteRepository extends AbstractRepository implements WasteRepositoryInter
 
     /**
      * Gets filtered waste
-     * 
+     *
      * @param array{keyword?: string} $filters Only keyword(s) should be passed in as the filter
      * @param int $offset The offset
      * @param int $limit The limit
@@ -89,8 +89,8 @@ class WasteRepository extends AbstractRepository implements WasteRepositoryInter
                 ['q.title', 'DESC'],
                 ['q.subTitle', 'DESC'],
             ],
-            'modDate asc' => [['q.modDate', 'ASC']],
-            'modDate desc' => [['q.modDate', 'DESC']],
+            'updatedAt asc' => [['q.modDaupdatedAtte', 'ASC']],
+            'updatedAt desc' => [['q.updatedAt', 'DESC']],
             'lastDate asc' => [['q.lastDate', 'ASC']],
             'lastDate desc' => [
                 ['CASE WHEN q.lastDate IS NULL THEN 1 ELSE 0 END', 'DESC'],

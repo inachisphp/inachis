@@ -80,14 +80,14 @@ class SeriesTest extends TestCase
         $this->assertEquals('test', $this->series->getAuthor()->getUsername());
     }
 
-    public function testSetAndGetCreateDate(): void
+    public function testSetAndGetCreatedAt(): void
     {
         $date = new DateTimeImmutable('now');
         $this->series->setCreatedAt($date);
         $this->assertEquals($date, $this->series->getCreatedAt());
     }
 
-    public function testSetAndGetModDate(): void
+    public function testSetAndGetUpdatedAt(): void
     {
         $date = new DateTimeImmutable('now');
         $this->series->setUpdatedAt($date);

@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -84,11 +84,11 @@ class PageTest extends TestCase
         $this->assertEquals('test', $this->page->getTitle());
     }
 
-    public function testSetAndGetCreateDate(): void
+    public function testSetAndGetCreatedAt(): void
     {
         $currentTime = new DateTimeImmutable('now');
-        $this->page->setCreateDate($currentTime);
-        $this->assertEquals($currentTime, $this->page->getCreateDate());
+        $this->page->setCreatedAt($currentTime);
+        $this->assertEquals($currentTime, $this->page->getCreatedAt());
     }
 
     /**
@@ -113,11 +113,11 @@ class PageTest extends TestCase
         $this->assertEquals(true, $this->page->isVisible());
     }
 
-    public function testSetAndGetModDate(): void
+    public function testSetAndGetUpdatedAt(): void
     {
         $currentTime = new DateTimeImmutable('now');
-        $this->page->setModDate($currentTime);
-        $this->assertEquals($currentTime, $this->page->getModDate());
+        $this->page->setUpdatedAt($currentTime);
+        $this->assertEquals($currentTime, $this->page->getUpdatedAt());
     }
 
     public function testIsAllowComments(): void

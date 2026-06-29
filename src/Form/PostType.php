@@ -345,9 +345,9 @@ class PostType extends AbstractType
         }
         if (!$newItem) {
             $builder
-                ->add('modDate', DateTimeType::class, [
+                ->add('updatedAt', DateTimeType::class, [
                     'attr' => [
-                        'aria-labelledby' => 'modDate_label',
+                        'aria-labelledby' => 'updatedAt_label',
                         'aria-readonly' => 'true',
                         'readOnly' => true,
                     ],
@@ -355,9 +355,9 @@ class PostType extends AbstractType
                     'format' => 'dd/MM/yyyy HH:mm',
                     'html5' => false,
                     'input' => 'datetime_immutable',
-                    'label' => 'admin.post.properties.modDate.label',
+                    'label' => 'admin.post.properties.updatedAt.label',
                     'label_attr' => [
-                        'id' => 'modDate_label',
+                        'id' => 'updatedAt_label',
                         'class' => 'inline_label',
                     ],
                     'model_timezone' => 'UTC',

@@ -33,7 +33,7 @@ class AdminProfileController extends AbstractInachisController
 {
     /**
      * List administrators
-     * 
+     *
      * @param Request $request
      * @param ContentQueryParameters $contentQueryParameters
      * @param UserBulkActionService $userBulkActionService
@@ -115,7 +115,7 @@ class AdminProfileController extends AbstractInachisController
         $id = $request->attributes->getString('id');
         $isNew = ($id === 'new');
 
-        $user = $isNew ? new User(): 
+        $user = $isNew ? new User():
             $userRepository->findOneBy(
                 [ 'username' => $request->attributes->getString('id') ]
             ) ?? new User();
@@ -128,14 +128,14 @@ class AdminProfileController extends AbstractInachisController
         if ($form->isSubmitted() && $form->isValid()) {
             $enableDisable = $form->has('enableDisable') ? $form->get('enableDisable') : null;
             $delete = $form->has('delete') ? $form->get('delete') : null;
-        
+
             if ($enableDisable instanceof \Symfony\Component\Form\ClickableInterface && $enableDisable->isClicked()) {
                 $user->setActive(!$user->isEnabled());
             }
             if ($delete instanceof \Symfony\Component\Form\ClickableInterface && $delete->isClicked()) {
                 $user->setRemoved(true);
             }
-            $user->setModDate(new DateTimeImmutable());
+            $user->setUpdatedAt(new DateTimeImmutable());
 
             if ($isNew) {
                 if (!$user->getPreferences()) {

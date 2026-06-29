@@ -20,7 +20,7 @@
         </dt>
         <dd class="date">
             {% if item.status === 'draft' %}
-            Updated: <em>{{ item.modDate|date('jS F Y', item.timezone) }}</em>
+            Updated: <em>{{ item.updatedAt|date('jS F Y', item.timezone) }}</em>
             {% elseif item.postDate|date('U') > "now"|date('U') %}
             Scheduled for <em>{{ item.postDate|date('jS F Y \\a\\t H:i', item.timezone) }} {{ item.timezone }}</em>
             {% else %}

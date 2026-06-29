@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -94,12 +94,12 @@ class ImageRepositoryTest extends TestCase
         $this->entityManager->expects($this->never())->method('getRepository');
         $orders = [
             'title desc' => ['q.title', 'DESC'],
-            'createDate asc' => ['q.createDate', 'ASC'],
-            'createDate desc' => ['q.createDate', 'DESC'],
+            'createdAt asc' => ['q.createdAt', 'ASC'],
+            'createdAt desc' => ['q.createdAt', 'DESC'],
             'filesize asc' => ['q.filesize', 'ASC'],
             'filesize desc' => ['q.filesize', 'DESC'],
-            'modDate asc' => ['q.modDate', 'ASC'],
-            'modDate desc' => ['q.modDate', 'DESC'],
+            'updatedAt asc' => ['q.updatedAt', 'ASC'],
+            'updatedAt desc' => ['q.updatedAt', 'DESC'],
             'default' => ['q.title', 'ASC'],
         ];
         $reflection = new ReflectionClass($this->repository);

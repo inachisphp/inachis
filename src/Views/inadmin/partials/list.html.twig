@@ -92,7 +92,7 @@
             </span>
                 {% endif %}
             {% endif %}
-            {% if item.modDate is defined and (showDate is not defined or showDate == true) %}
+            {% if item.updatedAt is defined and (showDate is not defined or showDate == true) %}
                 {% set timezone = viewModel.session.user.timezone|default(item.timezone|default('UTC')) %}
                 {% if inline|default(false) == false %}
             <p class="date">
@@ -110,7 +110,7 @@
                 <span class="material-icons" aria-hidden="true">library_books</span> <strong>{{ item.items|length }}</strong> posts
                 {% endif %}
                 <span class="material-icons" aria-hidden="true">history</span>
-                 Updated: <em>{{ item.modDate|date('jS M Y \\a\\t H:i', timezone) }}</em>
+                 Updated: <em>{{ item.updatedAt|date('jS M Y \\a\\t H:i', timezone) }}</em>
                 {% if inline|default(false) == false %}
             </p>
                 {% else %}

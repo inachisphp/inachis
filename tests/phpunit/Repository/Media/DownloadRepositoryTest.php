@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -105,7 +105,7 @@ class DownloadRepositoryTest extends TestCase
         $this->assertEquals($paginator, $result);
     }
 
-    public function testSortByCreateDateAsc(): void
+    public function testSortByCreatedAtAsc(): void
     {
         $this->entityManager->expects($this->never())->method('getRepository');
         $paginator = $this->createStub(Paginator::class);
@@ -115,14 +115,14 @@ class DownloadRepositoryTest extends TestCase
                 0,
                 25,
                 [],
-                [['q.createDate', 'ASC']]
+                [['q.createdAt', 'ASC']]
             )
             ->willReturn($paginator);
-        $result = $this->repository->getFiltered([], 0, 25, 'createDate asc');
+        $result = $this->repository->getFiltered([], 0, 25, 'createdAt asc');
         $this->assertEquals($paginator, $result);
     }
 
-    public function testSortByCreateDateDesc(): void
+    public function testSortByCreatedAtDesc(): void
     {
         $this->entityManager->expects($this->never())->method('getRepository');
         $paginator = $this->createStub(Paginator::class);
@@ -132,14 +132,14 @@ class DownloadRepositoryTest extends TestCase
                 0,
                 25,
                 [],
-                [['q.createDate', 'DESC']]
+                [['q.createdAt', 'DESC']]
             )
             ->willReturn($paginator);
-        $result = $this->repository->getFiltered([], 0, 25, 'createDate desc');
+        $result = $this->repository->getFiltered([], 0, 25, 'createdAt desc');
         $this->assertEquals($paginator, $result);
     }
 
-    public function testSortByModDateDesc(): void
+    public function testSortByUpdatedAtDesc(): void
     {
         $this->entityManager->expects($this->never())->method('getRepository');
         $paginator = $this->createStub(Paginator::class);
@@ -149,14 +149,14 @@ class DownloadRepositoryTest extends TestCase
                 0,
                 25,
                 [],
-                [['q.modDate', 'DESC']]
+                [['q.updatedAt', 'DESC']]
             )
             ->willReturn($paginator);
-        $result = $this->repository->getFiltered([], 0, 25, 'modDate desc');
+        $result = $this->repository->getFiltered([], 0, 25, 'updatedAt desc');
         $this->assertEquals($paginator, $result);
     }
 
-    public function testSortByModDateAsc(): void
+    public function testSortByUpdatedAtAsc(): void
     {
         $this->entityManager->expects($this->never())->method('getRepository');
         $paginator = $this->createStub(Paginator::class);
@@ -166,10 +166,10 @@ class DownloadRepositoryTest extends TestCase
                 0,
                 25,
                 [],
-                [['q.modDate', 'ASC']]
+                [['q.updatedAt', 'ASC']]
             )
             ->willReturn($paginator);
-        $result = $this->repository->getFiltered([], 0, 25, 'modDate asc');
+        $result = $this->repository->getFiltered([], 0, 25, 'updatedAt asc');
         $this->assertEquals($paginator, $result);
     }
 }

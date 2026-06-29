@@ -22,7 +22,7 @@ use Ramsey\Uuid\UuidInterface;
 
 /**
  * Object for handling {@link Series} entities
- * 
+ *
  * @phpstan-type SeriesShape array{
  *     id: string,
  *     title?: string,
@@ -34,8 +34,8 @@ use Ramsey\Uuid\UuidInterface;
  *     items: array<array{id: string}>|array{},
  *     image?: string,
  *     author?: string,
- *     createDate: string,
- *     modDate: string,
+ *     createdAt: string,
+ *     updatedAt: string,
  *     visible: bool
  * }
  */
