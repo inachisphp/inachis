@@ -9,13 +9,13 @@
     <div class="row main-actions">
         {% if show_search|default(false) %}
             {% include('/inadmin/partials/search.html.twig') with {
-                placeholder: 'Search posts…',
-                ariaLabel: 'Search posts',
+                placeholder: search_placeholder|default('Search posts…'),
+                ariaLabel: search_label|default('Search posts'),
                 enterKeyHint: 'search',
-                id: 'filter__keyword',
-                name: 'filter[keyword]',
+                id: search_id|default('filter__keyword'),
+                name: search_name|default('filter[keyword]'),
                 clearBtn: true,
-                value: filter_values['keyword']|default(''),
+                value: search_value|default(filter_values['keyword']|default('')),
             } %}
         {% endif %}
         {% if add_button is defined and add_button is not empty %}

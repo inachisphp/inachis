@@ -91,7 +91,7 @@ class ContentAggregator
 
         if ($excludePages) {
             $pageQuery .= ' AND q.id NOT IN (:excludedPages)';
-            $pageParameters['excludedPages'] = $excludePages;
+            $pageParameters['excludedPages'] = [ 'value' => $excludePages, ];
         }
 
         /** @var Paginator<Page> $pages */
@@ -99,7 +99,7 @@ class ContentAggregator
             0,
             self::ITEMS_TO_SHOW,
             [$pageQuery, $pageParameters],
-            'q.postDate DESC, q.modDate'
+            'q.postDate DESC, q.updatedAt'
         );
 
         foreach ($pages as $page) {

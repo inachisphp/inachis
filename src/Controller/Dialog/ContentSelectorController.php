@@ -25,7 +25,7 @@ class ContentSelectorController extends AbstractInachisController
 {
     /**
      * Get content list
-     * 
+     *
      * @param Request $request
      * @param SeriesRepository $seriesRepository
      * @param PageRepository $pageRepository
@@ -123,7 +123,7 @@ class ContentSelectorController extends AbstractInachisController
                 $series->setLastDate($pageDate);
             }
         }
-        $series->setModDate(new DateTimeImmutable());
+        $series->setUpdatedAt(new DateTimeImmutable());
 
         $this->entityManager->persist($series);
         $this->entityManager->flush();

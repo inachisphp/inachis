@@ -84,13 +84,13 @@ abstract class AbstractFile
      * @var DateTimeImmutable
      */
     #[ORM\Column(type: 'datetime_immutable')]
-    protected DateTimeImmutable $createDate;
+    protected DateTimeImmutable $createdAt;
 
     /**
      * @var DateTimeImmutable
      */
     #[ORM\Column(type: 'datetime_immutable')]
-    protected DateTimeImmutable $modDate;
+    protected DateTimeImmutable $updatedAt;
 
     /**
      * Returns the value of {@link id}.
@@ -173,23 +173,23 @@ abstract class AbstractFile
     }
 
     /**
-     * Returns the value of {@link createDate}.
+     * Returns the value of {@link createdAt}.
      *
      * @return DateTimeImmutable The creation date of the file
      */
-    public function getCreateDate(): DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
-        return $this->createDate;
+        return $this->createdAt;
     }
 
     /**
-     * Returns the value of {@link modDate}.
+     * Returns the value of {@link updatedAt}.
      *
      * @return DateTimeImmutable The date the file was last modified
      */
-    public function getModDate(): DateTimeImmutable
+    public function getUpdatedAt(): DateTimeImmutable
     {
-        return $this->modDate;
+        return $this->updatedAt;
     }
 
     /**
@@ -311,27 +311,27 @@ abstract class AbstractFile
     }
 
     /**
-     * Sets the value of {@link createDate}.
+     * Sets the value of {@link createdAt}.
      *
      * @param DateTimeImmutable $value The date to be set
      * @return static
      */
-    public function setCreateDate(DateTimeImmutable $value): static
+    public function setCreatedAt(DateTimeImmutable $value): static
     {
-        $this->createDate = $value;
+        $this->createdAt = $value;
 
         return $this;
     }
 
     /**
-     * Sets the value of {@link modDate}.
+     * Sets the value of {@link updatedAt}.
      *
      * @param DateTimeImmutable $value Specifies the mod date for the {@link Page}
      * @return static
      */
-    public function setModDate(DateTimeImmutable $value): static
+    public function setUpdatedAt(DateTimeImmutable $value): static
     {
-        $this->modDate = $value;
+        $this->updatedAt = $value;
 
         return $this;
     }

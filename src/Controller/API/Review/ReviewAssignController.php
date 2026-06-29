@@ -27,7 +27,7 @@ class ReviewAssignController extends AbstractController
 {
 	/**
 	 *  Assigns the thread to a User
-	 * 
+	 *
 	 * @param string $id
 	 * @param Request $request
 	 * @param ReviewThreadRepository $threads
@@ -75,7 +75,7 @@ class ReviewAssignController extends AbstractController
 		UserRepository $users
 	): JsonResponse {
 
-		// @todo change this to only show active users with the correct permissions
+		// TODO: change this to only show active users with the correct permissions
 		$reviewers =
 			$users->findBy(['isRemoved' => false, 'isActive' => true]);
 

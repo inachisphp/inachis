@@ -16,7 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Repository for LoginActivity
- * 
+ *
  * @extends ServiceEntityRepository<LoginActivity>
  */
 class LoginActivityRepository extends ServiceEntityRepository
@@ -31,7 +31,7 @@ class LoginActivityRepository extends ServiceEntityRepository
 
     /**
      * Returns the most recent login activity, defaults to 50
-     * 
+     *
      * @param int $limit
      * @return array<int,LoginActivity>
      */
@@ -73,14 +73,14 @@ class LoginActivityRepository extends ServiceEntityRepository
 
     /**
      * Check whether the device has been seen before
-     * 
+     *
      * @param User $user
      * @param string $fingerprint
      * @return bool
      */
     public function deviceExists(User $user, string $fingerprint): bool
     {
-        // @todo Change this so it gets distinct fingerprints instead
+        // TODO: Change this so it gets distinct fingerprints instead
         // $all = $this->createQueryBuilder('l')
         //     ->select('1')
         //     ->where('l.user = :user')
@@ -104,7 +104,7 @@ class LoginActivityRepository extends ServiceEntityRepository
     /**
      * Returns a list of recent failed login attempts in the last 15 minutes (default) to a threshold
      * of 5 (default).
-     * 
+     *
      * @param int $minutes
      * @param int $threshold
      * @return array<int,array{ipAddress: string, attempts:int}>
@@ -128,7 +128,7 @@ class LoginActivityRepository extends ServiceEntityRepository
 
     /**
      * Returns a list of logins where it was from a new device
-     * 
+     *
      * @param int $limit
      * @return array<int,LoginActivity>
      */
@@ -147,7 +147,7 @@ class LoginActivityRepository extends ServiceEntityRepository
     /**
      * Returns a count of login records of a specific type, older than a specified
      * DateTime
-     * 
+     *
      * @param string $type
      * @param DateTimeImmutable $cutoff
      * @return int
@@ -170,7 +170,7 @@ class LoginActivityRepository extends ServiceEntityRepository
     /**
      * Deletes records of a specific type, older than a specified date, in a batch size
      * that defaults to 1000 maximum, witha. callback function provided.
-     * 
+     *
      * @param string $type
      * @param DateTimeImmutable $cutoff
      * @param int $batchSize

@@ -30,7 +30,7 @@ services:
     Inachis\Analytics\Provider\InternalAnalyticsProvider: ~
 
     Inachis\Analytics\AnalyticsProviderInterface:
-        # @todo Google Analytics / Umami / Plausible providers can be swapped in here if desired
+        # TODO: Google Analytics / Umami / Plausible providers can be swapped in here if desired
         alias: Inachis\Analytics\Provider\InternalAnalyticsProvider
 
     Inachis\Diagnostics\Check\:
@@ -47,7 +47,7 @@ services:
               name: doctrine.orm.entity_listener,
               entity: Inachis\Entity\System\Setting,
             }
-            
+
     Inachis\EventListener\LoginSuccessListener:
         tags:
             - { name: 'kernel.event_listener', event: Symfony\Component\Security\Http\Event\LoginSuccessEvent }

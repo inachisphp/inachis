@@ -32,7 +32,7 @@ class AuthStrength
      */
     public function isStrongEnough(User $user, string $level): bool
     {
-        // @todo finish implementing this
+        // TODO: finish implementing this
         return (bool) match ($level) {
             // 'ADMIN' => $user->hasAnySecondFactor(),
             // 'SUPER_ADMIN' => $user->hasStrongSecondFactor(),
@@ -49,7 +49,7 @@ class AuthStrength
      */
     private function hasRecentStepUp(User $user): bool
     {
-        // @todo stored in session with timestamp
+        // TODO: stored in session with timestamp
         return true;
     }
 }

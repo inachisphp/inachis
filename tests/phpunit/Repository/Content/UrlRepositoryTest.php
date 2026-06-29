@@ -127,7 +127,7 @@ class UrlRepositoryTest extends TestCase
                 [
                     [ 'substring(q.link, 1, 10)', 'asc' ],
                     [ 'q.default', 'desc' ],
-                    [ 'q.createDate', 'desc' ],
+                    [ 'q.createdAt', 'desc' ],
                 ]
             )
             ->willReturn($paginator);
@@ -153,7 +153,7 @@ class UrlRepositoryTest extends TestCase
                 [
                     [ 'substring(q.link, 1, 10)', 'asc' ],
                     [ 'q.default', 'desc' ],
-                    [ 'q.createDate', 'desc' ],
+                    [ 'q.createdAt', 'desc' ],
                 ]
             )
             ->willReturn($paginator);
@@ -169,7 +169,7 @@ class UrlRepositoryTest extends TestCase
             'contentDate desc' => [
                 [ 'substring(q.link, 1, 10)', 'desc' ],
                 [ 'q.default', 'desc' ],
-                [ 'q.createDate', 'desc' ],
+                [ 'q.createdAt', 'desc' ],
             ],
             'link asc' => [['q.link', 'ASC']],
             'link desc' => [['q.link', 'DESC']],
@@ -178,7 +178,7 @@ class UrlRepositoryTest extends TestCase
             'default' => [
                 [ 'substring(q.link, 1, 10)', 'asc' ],
                 [ 'q.default', 'desc' ],
-                [ 'q.createDate', 'desc' ],
+                [ 'q.createdAt', 'desc' ],
             ]
         ];
         $reflection = new ReflectionClass($this->repository);

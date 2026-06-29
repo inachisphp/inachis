@@ -65,13 +65,13 @@ class Url
      * @var DateTimeImmutable The date the Url was added
      */
     #[ORM\Column(type: 'datetime_immutable', nullable: false)]
-    protected DateTimeImmutable $createDate;
+    protected DateTimeImmutable $createdAt;
 
     /**
      * @var DateTimeImmutable The date the Url was last modified
      */
     #[ORM\Column(type: 'datetime_immutable', nullable: false)]
-    protected DateTimeImmutable $modDate;
+    protected DateTimeImmutable $updatedAt;
 
     /**
      * Default constructor for entity - by default the
@@ -88,8 +88,9 @@ class Url
         $this->setContent($content);
         $this->setLink($link);
         $this->setDefault($default);
-        $this->setCreateDate(new DateTimeImmutable());
-        $this->setModDate(new DateTimeImmutable());
+        // TODO move into pre-post function
+        $this->setCreatedAt(new DateTimeImmutable());
+        $this->setUpdatedAt(new DateTimeImmutable());
         $this->associateContent();
     }
 
@@ -152,23 +153,23 @@ class Url
     }
 
     /**
-     * Returns the value of {@link createDate}.
+     * Returns the value of {@link createdAt}.
      *
-     * @return DateTimeImmutable The value of {@link createDate}
+     * @return DateTimeImmutable The value of {@link createdAt}
      */
-    public function getCreateDate(): DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
-        return $this->createDate;
+        return $this->createdAt;
     }
 
     /**
-     * Returns the value of {@link modDate}.
+     * Returns the value of {@link updatedAt}.
      *
-     * @return DateTimeImmutable The value of {@link modDate}
+     * @return DateTimeImmutable The value of {@link updatedAt}
      */
-    public function getModDate(): DateTimeImmutable
+    public function getUpdatedAt(): DateTimeImmutable
     {
-        return $this->modDate;
+        return $this->updatedAt;
     }
 
     /**
@@ -221,26 +222,26 @@ class Url
     }
 
     /**
-     * Sets the value of {@link createDate}.
+     * Sets the value of {@link createdAt}.
      *
      * @param DateTimeImmutable $value The value to set
      * @return self
      */
-    public function setCreateDate(DateTimeImmutable $value): self
+    public function setCreatedAt(DateTimeImmutable $value): self
     {
-        $this->createDate = $value;
+        $this->createdAt = $value;
         return $this;
     }
 
     /**
-     * Sets the value of {@link modDate}.
+     * Sets the value of {@link updatedAt}.
      *
      * @param DateTimeImmutable $value The value to set
      * @return self
      */
-    public function setModDate(DateTimeImmutable $value): self
+    public function setUpdatedAt(DateTimeImmutable $value): self
     {
-        $this->modDate = $value;
+        $this->updatedAt = $value;
         return $this;
     }
 
@@ -249,9 +250,9 @@ class Url
      *
      * @return self
      */
-    public function setModDateToNow(): self
+    public function setUpdatedAtToNow(): self
     {
-        $this->setModDate(new DateTimeImmutable());
+        $this->setUpdatedAt(new DateTimeImmutable());
         return $this;
     }
 

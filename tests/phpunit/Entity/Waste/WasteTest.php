@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -60,11 +60,11 @@ class WasteTest extends TestCase
         $this->assertEquals('Test', $this->waste->getContent());
     }
 
-    public function testSetAndGetModDate(): void
+    public function testSetAndGetUpdatedAt(): void
     {
         $date =  new DateTimeImmutable();
-        $this->waste->setModDate($date);
-        $this->assertEquals($date, $this->waste->getModDate());
+        $this->waste->setUpdatedAt($date);
+        $this->assertEquals($date, $this->waste->getUpdatedAt());
     }
 
     public function testSetAndGetUser(): void

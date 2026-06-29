@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -92,16 +92,16 @@ class ImageTest extends TestCase
         $this->assertEquals('test', $this->image->getAuthor()->getUsername());
     }
 
-        public function testSetAndGetCreateDate(): void
+        public function testSetAndGetCreatedAt(): void
     {
-        $this->image->setCreateDate(new DateTimeImmutable('1970-01-02 01:34:56'));
-        $this->assertEquals('1970-01-02 01:34:56', $this->image->getCreateDate()->format('Y-m-d H:i:s'));
+        $this->image->setCreatedAt(new DateTimeImmutable('1970-01-02 01:34:56'));
+        $this->assertEquals('1970-01-02 01:34:56', $this->image->getCreatedAt()->format('Y-m-d H:i:s'));
     }
 
-    public function testSetAndGetModDate(): void
+    public function testSetAndGetUpdatedAt(): void
     {
-        $this->image->setModDate(new DateTimeImmutable('1970-01-02 01:34:56'));
-        $this->assertEquals('1970-01-02 01:34:56', $this->image->getModDate()->format('Y-m-d H:i:s'));
+        $this->image->setUpdatedAt(new DateTimeImmutable('1970-01-02 01:34:56'));
+        $this->assertEquals('1970-01-02 01:34:56', $this->image->getUpdatedAt()->format('Y-m-d H:i:s'));
     }
 
     public function testSetAndGetDimensionX(): void

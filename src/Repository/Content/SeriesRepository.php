@@ -165,8 +165,8 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
                 ['q.title', 'DESC'],
                 ['q.subTitle', 'DESC'],
             ],
-            'modDate asc' => [['q.modDate', 'ASC']],
-            'modDate desc' => [['q.modDate', 'DESC']],
+            'updatedAt asc' => [['q.updatedAt', 'ASC']],
+            'updatedAt desc' => [['q.updatedAt', 'DESC']],
             'lastDate asc' => [['q.lastDate', 'ASC']],
             'lastDate desc' => [
                 ['CASE WHEN q.lastDate IS NULL THEN 1 ELSE 0 END', 'DESC'],

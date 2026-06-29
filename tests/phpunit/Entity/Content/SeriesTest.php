@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -56,7 +56,7 @@ class SeriesTest extends TestCase
     {
         $this->series->setUrl('test');
         $this->assertEquals('test', $this->series->getUrl());
-        // @todo add checks for invalid URLs
+        // TODO: add checks for invalid URLs
     }
 
     public function testGetAndSetFirstDate(): void
@@ -80,14 +80,14 @@ class SeriesTest extends TestCase
         $this->assertEquals('test', $this->series->getAuthor()->getUsername());
     }
 
-    public function testSetAndGetCreateDate(): void
+    public function testSetAndGetCreatedAt(): void
     {
         $date = new DateTimeImmutable('now');
         $this->series->setCreatedAt($date);
         $this->assertEquals($date, $this->series->getCreatedAt());
     }
 
-    public function testSetAndGetModDate(): void
+    public function testSetAndGetUpdatedAt(): void
     {
         $date = new DateTimeImmutable('now');
         $this->series->setUpdatedAt($date);

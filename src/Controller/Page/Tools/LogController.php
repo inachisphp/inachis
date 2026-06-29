@@ -71,7 +71,7 @@ class LogController extends AbstractInachisController
 
     /**
      * Get the last N lines from a file
-     * @todo move this into a service
+     * TODO: move this into a service
      *
      * @param string $file The file to read
      * @param int $maxLines The maximum number of lines to read
@@ -101,7 +101,7 @@ class LogController extends AbstractInachisController
 
     /**
      * Parse a monolog log line
-     * @todo move this into a service
+     * TODO: move this into a service
      *
      * @param string $line The log line to parse
      * @return array{timestamp: string, channel: string, level: string, message: string, raw: string}|null The parsed log line

@@ -23,7 +23,7 @@ final class PluginManager
 
     /**
      * Creates a new instance of the PluginManager
-     * 
+     *
      * @param iterable<PluginInstallerInterface> $installers
      */
     public function __construct(
@@ -42,7 +42,7 @@ final class PluginManager
 
     /**
      * Installs a plugin
-     * 
+     *
      * @param string $name
      * @throws \RuntimeException
      */
@@ -62,7 +62,7 @@ final class PluginManager
 
     /**
      * Checks if a plugin is enabled
-     * 
+     *
      * @param string $name
      * @return bool
      */
@@ -73,7 +73,7 @@ final class PluginManager
 
     /**
      * Gets all installed plugins
-     * 
+     *
      * @return array<string>
      */
     public function getInstalledPlugins(): array
@@ -83,7 +83,7 @@ final class PluginManager
 
     /**
      * Gets the installer for a plugin
-     * 
+     *
      * @param string $pluginClass
      * @return PluginInstallerInterface|null
      */
@@ -94,7 +94,7 @@ final class PluginManager
 
     /**
      * Gets the version of a plugin
-     * 
+     *
      * @param string $pluginClass
      * @return string|null
      */
@@ -105,7 +105,7 @@ final class PluginManager
 
     /**
      * Sets the version of a plugin
-     * 
+     *
      * @param string $pluginClass
      * @param string $version
      */
@@ -118,13 +118,13 @@ final class PluginManager
 
     /**
      * Gets the latest version of a plugin
-     * 
+     *
      * @param string $pluginClass
      * @return string
      */
     public function getLatestVersion(string $pluginClass): string
     {
-        // @todo return latest version (could read from composer or plugin metadata)
+        // TODO: return latest version (could read from composer or plugin metadata)
         // For now, return '1.0.0' or read composer-installed version
         return '1.0.0';
     }

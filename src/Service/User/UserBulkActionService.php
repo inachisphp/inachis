@@ -29,7 +29,7 @@ readonly class UserBulkActionService
 
     /**
      * Apply a bulk action to users
-     * 
+     *
      * @param string $action
      * @param list<string> $ids
      * @return int
@@ -49,7 +49,7 @@ readonly class UserBulkActionService
                 'disable' => $user->setActive(false),
                 default   => null,
             };
-            $user->setModDate(new DateTimeImmutable());
+            $user->setUpdatedAt(new DateTimeImmutable());
             $this->entityManager->persist($user);
             $count++;
         }

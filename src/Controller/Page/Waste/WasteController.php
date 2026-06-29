@@ -75,7 +75,7 @@ class WasteController extends AbstractInachisController
             $request,
             $categoryRepository,
             'waste',
-            'modDate desc',
+            'updatedAt desc',
         );
         $this->viewModel->page->tab = 'waste';
         return $this->render('inadmin/page/waste/list.html.twig', [

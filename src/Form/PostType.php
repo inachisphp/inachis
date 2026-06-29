@@ -33,7 +33,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Form for creating and editing a post
- * 
+ *
  * @extends AbstractType<Page>
  */
 class PostType extends AbstractType
@@ -66,7 +66,7 @@ class PostType extends AbstractType
     {
         $newItem = !$options['data'] instanceof Page || empty($options['data']->getId());
         $isScheduled = $options['data'] instanceof Page && $options['data']->getPostDate() > new \DateTimeImmutable('now');
-        // @todo update these based on role permissions
+        // TODO: update these based on role permissions
         $showSave = true;
         $showReview = $options['data'] instanceof Page && $options['data']->getStatus() == EditorialStatus::DRAFT;
         $showPublish = $options['data'] instanceof Page && $options['data']->getStatus() == EditorialStatus::REVIEW;
@@ -345,9 +345,9 @@ class PostType extends AbstractType
         }
         if (!$newItem) {
             $builder
-                ->add('modDate', DateTimeType::class, [
+                ->add('updatedAt', DateTimeType::class, [
                     'attr' => [
-                        'aria-labelledby' => 'modDate_label',
+                        'aria-labelledby' => 'updatedAt_label',
                         'aria-readonly' => 'true',
                         'readOnly' => true,
                     ],
@@ -355,9 +355,9 @@ class PostType extends AbstractType
                     'format' => 'dd/MM/yyyy HH:mm',
                     'html5' => false,
                     'input' => 'datetime_immutable',
-                    'label' => 'admin.post.properties.modDate.label',
+                    'label' => 'admin.post.properties.updatedAt.label',
                     'label_attr' => [
-                        'id' => 'modDate_label',
+                        'id' => 'updatedAt_label',
                         'class' => 'inline_label',
                     ],
                     'model_timezone' => 'UTC',

@@ -104,11 +104,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /** @var DateTimeImmutable The date the {@link User} was added */
     #[ORM\Column(type: "datetime_immutable")]
-    protected DateTimeImmutable $createDate;
+    protected DateTimeImmutable $createdAt;
 
     /** @var DateTimeImmutable The date the {@link User} was last modified */
     #[ORM\Column(type: "datetime_immutable")]
-    protected DateTimeImmutable $modDate;
+    protected DateTimeImmutable $updatedAt;
 
     /** @var DateTimeImmutable|null The date the password was last modified */
     #[ORM\Column(type: "datetime_immutable")]
@@ -142,9 +142,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->setPassword($password);
         $this->setEmail($email);
         $this->setAvatar(null);
-        $currentTime = new DateTimeImmutable();
-        $this->setCreateDate($currentTime);
-        $this->setModDate($currentTime);
+        $now = new DateTimeImmutable();
+        // TODO move to pre-perist functions
+        $this->setCreatedAt($now);
+        $this->setUpdatedAt($now);
         $this->assignedRoles = new ArrayCollection();
     }
 
@@ -289,23 +290,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Returns the {@link createDate} for the {@link User}.
+     * Returns the {@link createdAt} for the {@link User}.
      *
      * @return DateTimeImmutable The creation date for the user
      */
-    public function getCreateDate(): DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
-        return $this->createDate;
+        return $this->createdAt;
     }
 
     /**
-     * Returns the {@link modDate} for the {@link User}.
+     * Returns the {@link updatedAt} for the {@link User}.
      *
      * @return DateTimeImmutable The modification for the user
      */
-    public function getModDate(): DateTimeImmutable
+    public function getUpdatedAt(): DateTimeImmutable
     {
-        return $this->modDate;
+        return $this->updatedAt;
     }
 
     /**
@@ -477,27 +478,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Sets the {@link createDate} from a DateTime object.
+     * Sets the {@link createdAt} from a DateTime object.
      *
      * @param DateTimeImmutable $value The date to be set
      * @return self
      */
-    public function setCreateDate(DateTimeImmutable $value): self
+    public function setCreatedAt(DateTimeImmutable $value): self
     {
-        $this->createDate = $value;
+        $this->createdAt = $value;
 
         return $this;
     }
 
     /**
-     * Sets the {@link modDate} from a DateTime object.
+     * Sets the {@link updatedAt} from a DateTime object.
      *
      * @param DateTimeImmutable $value The date to set
      * @return self
      */
-    public function setModDate(DateTimeImmutable $value): self
+    public function setUpdatedAt(DateTimeImmutable $value): self
     {
-        $this->modDate = $value;
+        $this->updatedAt = $value;
 
         return $this;
     }

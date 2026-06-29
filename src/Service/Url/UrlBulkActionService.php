@@ -31,7 +31,7 @@ readonly class UrlBulkActionService
 
     /**
      * Apply a bulk action to a list of URLs
-     * 
+     *
      * @param string $action
      * @param array<string> $ids
      * @return int
@@ -62,7 +62,7 @@ readonly class UrlBulkActionService
 
     /**
      * Make a URL the default URL for its content
-     * 
+     *
      * @param Url $url
      * @return void
      */
@@ -76,10 +76,10 @@ readonly class UrlBulkActionService
             ]
         );
         if ($previous_default !== null) {
-            $previous_default->setDefault(false)->setModDate(new DateTimeImmutable());
+            $previous_default->setDefault(false)->setUpdatedAt(new DateTimeImmutable());
             $this->entityManager->persist($previous_default);
         }
-        $url->setDefault(true)->setModDate(new DateTimeImmutable());
+        $url->setDefault(true)->setUpdatedAt(new DateTimeImmutable());
         $this->entityManager->persist($url);
         $this->entityManager->flush();
     }

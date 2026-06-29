@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Image form type for uploads
- * 
+ *
  * @extends AbstractType<mixed>
  */
 class ImageType extends AbstractType
@@ -98,8 +98,8 @@ class ImageType extends AbstractType
 //            ->add('filetype')
 //            ->add('filesize')
 //            ->add('checksum')
-//            ->add('createDate')
-//            ->add('modDate')
+//            ->add('createdAt')
+//            ->add('modupdatedAtDate')
         ;
     }
 

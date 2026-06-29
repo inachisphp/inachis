@@ -128,7 +128,7 @@ class SitemapGenerator
                 );
                 $writer->writeElement(
                     'lastmod',
-                    $content->getModDate()->format('Y-m-d')
+                    $content->getUpdatedAt()->format('Y-m-d')
                 );
                 $writer->endElement();
             }

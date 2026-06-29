@@ -62,7 +62,7 @@
             {% if not (resource.filename starts with 'http')  %}
             <p><strong>{{ 'admin.resources.properties.filesize'|trans }}:</strong> {{ resource.filesize }} bytes ({{ (resource.filesize / 1024 / 1024)|round(2) }} Mb)</p>
             {% endif %}
-            <p><strong>{{ 'admin.resources.properties.modDate'|trans }}:</strong> {{ resource.modDate|date('d F Y') }}</p>
+            <p><strong>{{ 'admin.resources.properties.updatedAt'|trans }}:</strong> {{ resource.updatedAt|date('d F Y') }}</p>
             <p>&nbsp;</p>
         </fieldset>
 

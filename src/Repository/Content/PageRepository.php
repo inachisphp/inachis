@@ -15,10 +15,11 @@ use Inachis\Repository\AbstractRepository;
 use Inachis\Repository\Content\PageRepositoryInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Enum\EditorialStatus;
 
 /**
  * Repository for retrieving {@link Page} entities
- * 
+ *
  * @extends AbstractRepository<Page>
  */
 class PageRepository extends AbstractRepository implements PageRepositoryInterface
@@ -60,20 +61,22 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function getPagesWithCategory(Category $category, int $limit = 0, int $offset = 0)
     {
-        $qb = $this->createQueryBuilder('p');
-        $qb = $qb
+        $now = (new \DateTimeImmutable('now'))->format('Y-m-d H:i:s');
+        $qb = $this->createQueryBuilder('p')
             ->select('p')
-            ->leftJoin('p.categories', 'Page_categories')
-            ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->eq('Page_categories.id', ':categoryId'),
-                    $qb->expr()->eq('p.status', '\'published\''),
-                    $qb->expr()->eq('p.visible', '1'),
-                    $qb->expr()->eq('p.type', '\'post\'')
-                )
-            )
-            ->orderBy('p.postDate', 'DESC')
-            ->setParameter('categoryId', $category->getId());
+            ->leftJoin('p.categories', 'c')
+            ->andWhere('c.id = :categoryId')
+            ->andWhere('p.status = :status')
+            ->andWhere('p.postDate <= :now')
+            ->andWhere('(p.expireDate IS NULL OR p.expireDate >= :now)')
+            ->andWhere('p.visible = :visible')
+            ->andWhere('p.type = :type')
+            ->setParameter('categoryId', $category->getId(), 'uuid_binary')
+            ->setParameter('status', EditorialStatus::PUBLISHED)
+            ->setParameter('now', $now)
+            ->setParameter('visible', true)
+            ->setParameter('type', Page::TYPE_POST)
+            ->orderBy('p.postDate', 'DESC');
         if ($offset > 0) {
             $qb = $qb->setFirstResult($offset);
         }
@@ -92,12 +95,21 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function getPagesWithCategoryCount(Category $category): int
     {
-        $qb = $this->createQueryBuilder('p');
-        $qb = $qb
-            ->select('COUNT(p) AS numPages')
-            ->leftJoin('p.categories', 'Page_categories')
-            ->where('Page_categories.id = :categoryId')
-            ->setParameter('categoryId', $category);
+        $now = (new \DateTimeImmutable('now'))->format('Y-m-d H:i:s');
+        $qb = $this->createQueryBuilder('p')
+            ->select('p')
+            ->leftJoin('p.categories', 'c')
+            ->andWhere('c.id = :categoryId')
+            ->andWhere('p.status = :status')
+            ->andWhere('p.postDate <= :now')
+            ->andWhere('(p.expireDate IS NULL OR p.expireDate >= :now)')
+            ->andWhere('p.visible = :visible')
+            ->andWhere('p.type = :type')
+            ->setParameter('categoryId', $category->getId())
+            ->setParameter('status', EditorialStatus::PUBLISHED)
+            ->setParameter('now', $now)
+            ->setParameter('visible', true)
+            ->setParameter('type', Page::TYPE_POST);
         /** @var int */
         return $qb->getQuery()->getSingleScalarResult();
     }
@@ -112,20 +124,24 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function getPagesWithTag(Tag $tag, int $maxDisplayCount = 0, int $offset = 0): array
     {
-        $qb = $this->createQueryBuilder('p');
-        $qb = $qb
+        $now = new \DateTimeImmutable();
+
+        $qb = $this->createQueryBuilder('p')
             ->select('p')
-            ->leftJoin('p.tags', 'Page_tags')
-            ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->eq('Page_tags.id', ':tagId'),
-                    'p.status=\'published\'',
-                    'p.visible=\'1\'',
-                    'p.type=\'post\''
-                )
-            )
-            ->orderBy('p.postDate', 'DESC')
-            ->setParameter('tagId', $tag->getId());
+            ->leftJoin('p.tags', 't')
+            ->where('t.id = :tagId')
+            ->andWhere('p.status = :status')
+            ->andWhere('p.postDate <= :now')
+            ->andWhere('(p.expireDate >= :now OR p.expireDate IS NULL)')
+            ->andWhere('p.visible = :visible')
+            ->andWhere('p.type = :type')
+            ->setParameter('tagId', $tag->getId(), 'uuid_binary')
+            ->setParameter('status', EditorialStatus::PUBLISHED)
+            ->setParameter('now', $now)
+            ->setParameter('visible', true)
+            ->setParameter('type', Page::TYPE_POST)
+            ->orderBy('p.postDate', 'DESC');
+
         if ($offset > 0) {
             $qb = $qb->setFirstResult($offset);
         }
@@ -144,12 +160,24 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function getPagesWithTagCount(Tag $tag): int
     {
+        $now = new \DateTimeImmutable();
+
         $qb = $this->createQueryBuilder('p');
         $qb = $qb
             ->select('COUNT(p) AS numPages')
             ->leftJoin('p.tags', 'Page_tags')
-            ->where('Page_tags.id = :tagId AND p.status = \'published\' AND p.visible = \'1\' AND p.type = \'post\'')
-            ->setParameter('tagId', $tag);
+            ->where('t.id = :tagId')
+            ->andWhere('p.status = :status')
+            ->andWhere('p.postDate <= :now')
+            ->andWhere('(p.expireDate >= :now OR p.expireDate IS NULL)')
+            ->andWhere('p.visible = :visible')
+            ->andWhere('p.type = :type')
+            ->setParameter('tagId', $tag->getId(), 'uuid_binary')
+            ->setParameter('status', EditorialStatus::PUBLISHED)
+            ->setParameter('now', $now)
+            ->setParameter('visible', true)
+            ->setParameter('type', Page::TYPE_POST);
+
         /** @var int */
         return $qb->getQuery()->getSingleScalarResult();
     }
@@ -184,8 +212,8 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
                 ['q.title', 'DESC'],
                 ['q.subTitle', 'DESC'],
             ],
-            'modDate asc' => [['q.modDate', 'ASC']],
-            'modDate desc' => [['q.modDate', 'DESC']],
+            'updatedAt asc' => [['q.updatedAt', 'ASC']],
+            'updatedAt desc' => [['q.updatedAt', 'DESC']],
             'postDate asc' => [['q.postDate', 'ASC']],
             default => [['q.postDate', 'DESC']],
         };
@@ -242,22 +270,22 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         if (!empty($filters['categories'])) {
             $where[0] .= ' AND c.id IN (:categories)';
             $where[1]['categories'] = [
-                implode(',', array_map(
+                'value' => implode(',', array_map(
                     fn($t) => $t->toString(),
                     array_is_list($filters['categories']) ? $filters['categories'] : array_keys($filters['categories'])
                 )),
-                'uuid_binary'
-            ];           
+                'type' => 'uuid_binary',
+            ];
             $join[] = ['leftJoin', 'q.categories', 'c'];
         }
         if (!empty($filters['tags'])) {
             $where[0] .= ' AND t.id IN (:tags)';
             $where[1]['tags'] = [
-                implode(',', array_map(
-                    fn($t) => $t->toString(),
+                'value' => implode(',', array_map(
+                    fn($t) => $t?->toString(),
                     array_is_list($filters['tags']) ? $filters['tags'] : array_keys($filters['tags'])
                 )),
-                'uuid_binary'
+                'type' => 'uuid_binary',
             ];
             $join[] = ['leftJoin', 'q.tags', 't'];
         }

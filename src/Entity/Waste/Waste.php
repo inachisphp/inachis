@@ -60,11 +60,11 @@ class Waste
      * @var DateTimeImmutable The date the item was added to the bin
      */
     #[ORM\Column(type: 'datetime_immutable')]
-    protected DateTimeImmutable $modDate;
+    protected DateTimeImmutable $updatedAt;
 
     /**
      * Gets the value of {@link id}.
-     * 
+     *
      * @return string|null
      */
     public function getId(): ?string
@@ -74,7 +74,7 @@ class Waste
 
     /**
      * Sets the value of {@link id}.
-     * 
+     *
      * @param UuidInterface $id The id to set
      * @return Waste
      */
@@ -87,7 +87,7 @@ class Waste
 
     /**
      * Gets the value of {@link sourceType}.
-     * 
+     *
      * @return string|null
      */
     public function getSourceType(): ?string
@@ -97,7 +97,7 @@ class Waste
 
     /**
      * Sets the value of {@link sourceType}.
-     * 
+     *
      * @param string|null $sourceType The source type to set
      * @return Waste
      */
@@ -111,7 +111,7 @@ class Waste
 
     /**
      * Gets the value of {@link sourceName}.
-     * 
+     *
      * @return string|null
      */
     public function getSourceName(): ?string
@@ -121,7 +121,7 @@ class Waste
 
     /**
      * Sets the value of {@link sourceName}.
-     * 
+     *
      * @param string|null $sourceName The source name to set
      * @return Waste
      */
@@ -134,7 +134,7 @@ class Waste
 
     /**
      * Gets the value of {@link title}.
-     * 
+     *
      * @return string|null
      */
     public function getTitle(): ?string
@@ -144,7 +144,7 @@ class Waste
 
     /**
      * Sets the value of {@link title}.
-     * 
+     *
      * @param string|null $title The title to set
      * @return Waste
      */
@@ -157,7 +157,7 @@ class Waste
 
     /**
      * Gets the value of {@link content}.
-     * 
+     *
      * @return string|null
      */
     public function getContent(): ?string
@@ -167,7 +167,7 @@ class Waste
 
     /**
      * Sets the value of {@link content}.
-     * 
+     *
      * @param string|null $content The content to set
      * @return Waste
      */
@@ -179,31 +179,31 @@ class Waste
     }
 
     /**
-     * Gets the value of {@link modDate}.
-     * 
+     * Gets the value of {@link updatedAt}.
+     *
      * @return DateTimeImmutable|null The date the content was deleted
      */
-    public function getModDate(): ?DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
-        return $this->modDate;
+        return $this->updatedAt;
     }
 
     /**
-     * Sets the value of {@link modDate}.
-     * 
+     * Sets the value of {@link updatedAt}.
+     *
      * @param DateTimeImmutable $value The modification date to set
      * @return Waste
      */
-    public function setModDate(DateTimeImmutable $value): self
+    public function setUpdatedAt(DateTimeImmutable $value): self
     {
-        $this->modDate = $value;
+        $this->updatedAt = $value;
 
         return $this;
     }
 
     /**
      * Gets the value of {@link user}.
-     * 
+     *
      * @return User
      */
     public function getUser(): ?User

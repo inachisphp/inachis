@@ -124,7 +124,7 @@ final class PostTypeTest extends TestCase
             ['nofollow', CheckboxType::class, $this->anything()],
             ['submit', SubmitType::class, $this->anything()],
             // Extra fields added only for existing item:
-            ['modDate', DateTimeType::class, $this->anything()],
+            ['updatedAt', DateTimeType::class, $this->anything()],
             ['publish', SubmitType::class, $this->anything()],
             ['delete', SubmitType::class, $this->anything()],
         ];

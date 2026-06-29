@@ -1,6 +1,6 @@
 <?php
 
-namespace Inachis\Tests\Diagnostics;
+namespace Inachis\Tests\phpunit\Diagnostics;
 
 use Inachis\Diagnostics\CheckResult;
 use Inachis\Diagnostics\DiagnosticsCollector;
@@ -46,7 +46,7 @@ final class DiagnosticsCollectorTest extends TestCase
 
         $this->assertArrayHasKey('SectionA', $groups);
         $this->assertArrayHasKey('SectionB', $groups);
-        
+
         $this->assertSame('SectionA', $groups['SectionA']['label']);
         $this->assertCount(2, $groups['SectionA']['checks']);
         $this->assertSame($result1, $groups['SectionA']['checks'][0]);

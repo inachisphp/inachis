@@ -12,6 +12,7 @@ namespace Inachis\Controller\Page\Tools;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\System\CspReport;
 use Inachis\Repository\System\CspReportRepository;
+use Inachis\Service\System\Csp\CspPolicyBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -24,9 +25,14 @@ class CspReportController extends AbstractInachisController
         CspReportRepository $repository
     ): Response
     {
-        $severity = $request->query->get('severity');
+        /** @var array<string,string> */
+        $filters = $request->query->all('filter') ?? [];
+        $severity = $filters['severity'] ?? '';
+        $directive = $filters['directive'] ?? '';
         $host = $request->query->get('host');
 
+        $this->viewModel->page->title = 'CSP Reporting';
+        $this->viewModel->page->tab = 'tools';
         return $this->render(
             'inadmin/page/tools/csp_dashboard.html.twig',
             [
@@ -40,18 +46,32 @@ class CspReportController extends AbstractInachisController
                 'topCritical' => $repository->findTopCriticalGrouped(),
                 'reports' => $repository->findFiltered(
                     severity: $severity,
-                    host: $host
+                    host: $host,
+                    directive: $directive,
                 ),
-                'activeSeverity' => $severity,
+                'filters' => $filters,
                 'activeHost' => $host,
             ]
         );
     }
 
-    #[Route('/incc/tools/csp/{id}', name: 'csp_report_show')]
+    /**
+     * Show the contents of the CSP report
+     *
+     * @param CspReport $report
+     * @return Response
+     */
+    #[Route(
+        '/incc/tools/csp/{id}',
+        name: 'csp_report_show',
+        requirements: ['id' => '^(?!suggested-policy|reports).*$']
+    )]
     public function show(
         CspReport $report
     ): Response {
+
+        $this->viewModel->page->title = 'CSP Report';
+        $this->viewModel->page->tab = 'tools';
         return $this->render(
             'inadmin/page/tools/csp_detail.html.twig',
             [
@@ -61,22 +81,27 @@ class CspReportController extends AbstractInachisController
         );
     }
 
-    #[Route('/incc/tools/csp/reports/filter', name: 'csp_reports_filter')]
-    public function filter(
-        Request $request,
-        CspReportRepository $repository
+    #[Route('/incc/tools/csp/suggested-policy', name: 'incc_tools_csp_suggested_policy')]
+    public function suggestedPolicy(
+        CspReportRepository $repository,
+        CspPolicyBuilder $policyBuilder
     ): Response {
-        $severity = $request->query->get('severity');
-        $host = $request->query->get('host');
+        // 1. Grab lightweight scalar entries from DB
+        $rawReports = $repository->findUniqueDirectivesAndBlockedUris();
 
+        // 2. Aggregate and normalize into structural directives
+        $suggestedArray = $policyBuilder->buildPolicyFromReports($rawReports);
+        $suggestedString = $policyBuilder->stringifyPolicy($suggestedArray);
+
+
+        $this->viewModel->page->title = 'CSP Policy Suggestion';
+        $this->viewModel->page->tab = 'tools';
         return $this->render(
-            'inadmin/page/tools/csp_reports.html.twig',
+            'inadmin/page/tools/csp_suggestion.html.twig',
             [
                 'viewModel' => $this->viewModel,
-                'reports' => $repository->findFiltered(
-                    severity: $severity,
-                    host: $host
-                ),
+                'policyArray' => $suggestedArray,
+                'policyString' => $suggestedString,
             ]
         );
     }

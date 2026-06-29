@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -93,18 +93,18 @@ class UserTest extends TestCase
         $this->assertTrue($this->user->hasBeenRemoved());
     }
 
-    public function testSetAndGetCreateDate(): void
+    public function testSetAndGetCreatedAt(): void
     {
         $currentDateTime = new DateTimeImmutable('now');
-        $this->user->setCreateDate($currentDateTime);
-        $this->assertEquals($currentDateTime, $this->user->getCreateDate());
+        $this->user->setCreatedAt($currentDateTime);
+        $this->assertEquals($currentDateTime, $this->user->getCreatedAt());
     }
 
-    public function testSetAndGetModDate(): void
+    public function testSetAndGetUpdatedAt(): void
     {
         $currentDateTime = new DateTimeImmutable('now');
-        $this->user->setModDate($currentDateTime);
-        $this->assertEquals($currentDateTime, $this->user->getModDate());
+        $this->user->setUpdatedAt($currentDateTime);
+        $this->assertEquals($currentDateTime, $this->user->getUpdatedAt());
     }
 
     public function testSetAndGetPasswordModDate(): void

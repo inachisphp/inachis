@@ -84,6 +84,18 @@ ul.widget-stats__list {
                 color: $subscribers-color;
             }
         }
+
+        &--ok {
+            border-left-color: var(--color-progress-good);
+        }
+
+        &--warn {
+            border-left-color: var(--color-progress-warn);
+        }
+
+        &--error {
+            border-left-color: var(--color-progress-bad);
+        }
     }
 
     &__icon {

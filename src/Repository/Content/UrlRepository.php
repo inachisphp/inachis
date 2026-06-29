@@ -17,7 +17,7 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Repository for managing {@link Url} entities
- * 
+ *
  * @extends AbstractRepository<Url>
  */
 class UrlRepository extends AbstractRepository
@@ -103,7 +103,7 @@ class UrlRepository extends AbstractRepository
             'contentDate desc' => [
                 [ 'substring(q.link, 1, 10)', 'desc' ],
                 [ 'q.default', 'desc' ],
-                [ 'q.createDate', 'desc' ],
+                [ 'q.createdAt', 'desc' ],
             ],
             'link asc' => [['q.link', 'ASC']],
             'link desc' => [['q.link', 'DESC']],
@@ -112,7 +112,7 @@ class UrlRepository extends AbstractRepository
             default => [
                 [ 'substring(q.link, 1, 10)', 'asc' ],
                 [ 'q.default', 'desc' ],
-                [ 'q.createDate', 'desc' ],
+                [ 'q.createdAt', 'desc' ],
             ],
         };
     }

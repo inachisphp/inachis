@@ -170,7 +170,7 @@ class SeriesRepositoryTest extends TestCase
         $filters = ['keyword' => 'test'];
         $offset = 0;
         $limit = 10;
-        $sort = 'modDate asc';
+        $sort = 'updatedAt asc';
 
         $paginator = $this->createStub(Paginator::class);
 
@@ -180,7 +180,7 @@ class SeriesRepositoryTest extends TestCase
                 $offset,
                 $limit,
                 $this->callback(fn($where) => is_array($where) && strpos($where[0], 'LIKE :keyword') !== false),
-                [['q.modDate', 'ASC']],
+                [['q.updatedAt', 'ASC']],
             )
             ->willReturn($paginator);
 
@@ -194,7 +194,7 @@ class SeriesRepositoryTest extends TestCase
         $filters = [];
         $offset = 0;
         $limit = 5;
-        $sort = 'modDate asc';
+        $sort = 'updatedAt asc';
 
         $paginator = $this->createStub(Paginator::class);
 
@@ -204,7 +204,7 @@ class SeriesRepositoryTest extends TestCase
                 $offset,
                 $limit,
                 ['1=1', []],
-                [['q.modDate', 'ASC']],
+                [['q.updatedAt', 'ASC']],
             )
             ->willReturn($paginator);
 
@@ -220,7 +220,7 @@ class SeriesRepositoryTest extends TestCase
                 ['q.title', 'DESC'],
                 ['q.subTitle', 'DESC'],
             ],
-            'modDate desc' => [['q.modDate', 'DESC']],
+            'updatedAt desc' => [['q.updatedAt', 'DESC']],
             'lastDate asc' => [['q.lastDate', 'ASC']],
             'lastDate desc' => [
                 ['CASE WHEN q.lastDate IS NULL THEN 1 ELSE 0 END', 'DESC'],

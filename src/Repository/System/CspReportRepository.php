@@ -170,7 +170,15 @@ class CspReportRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findFiltered(?string $severity, ?string $host): array
+    /**
+     * Undocumented function
+     *
+     * @param string|null $severity
+     * @param string|null $host
+     * @param string|null $directive
+     * @return list<array<string,string>>
+     */
+    public function findFiltered(?string $severity, ?string $host, ?string $directive): array
     {
         $qb = $this->createQueryBuilder('r');
 
@@ -184,10 +192,47 @@ class CspReportRepository extends ServiceEntityRepository
             ->setParameter('host', $host);
         }
 
+        if ($directive) {
+            $qb->andWhere('r.effectiveDirective = :directive')
+            ->setParameter('directive', $directive);
+        }
+
+        /** @var list<array<string,string>> */
         return $qb
             ->orderBy('r.lastSeenAt', 'DESC')
             ->setMaxResults(200)
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Returns a list of blocked URIs per directive
+     *
+     * @return list<array{effectiveDirective: string, blockedUri: string}>
+     */
+    public function findUniqueDirectivesAndBlockedUris(): array
+    {
+        return $this->createQueryBuilder('r')
+            ->select('DISTINCT r.effectiveDirective, r.blockedUri')
+            ->where('r.effectiveDirective IS NOT NULL')
+            ->andWhere('r.blockedUri IS NOT NULL')
+            ->getQuery()
+            ->getScalarResult();
+    }
+
+    /**
+     * Deletes reports older than the specified date
+     *
+     * @param \DateTimeInterface $date
+     * @return int The number of records deleted
+     */
+    public function deleteOldReports(\DateTimeInterface $date): int
+    {
+       return $this->createQueryBuilder('r')
+           ->delete()
+           ->where('r.updatedAt < :date')
+           ->setParameter('date', $date)
+           ->getQuery()
+           ->execute();
+   }
 }

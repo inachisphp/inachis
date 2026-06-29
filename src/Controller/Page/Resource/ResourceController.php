@@ -166,7 +166,7 @@ class ResourceController extends AbstractInachisController
             if (isset($request->request->all('resource')['delete'])) {
                 $filename = $imageDirectory . $resource->getFilename();
                 if ($resource instanceof Image &&
-                    isset($usages['posts']) && 
+                    isset($usages['posts']) &&
                     $usages['posts']->count() === 0 &&
                     $usages['series']->count() === 0 &&
                     $filesystem->exists($filename)) {
@@ -194,7 +194,7 @@ class ResourceController extends AbstractInachisController
                 }
             }
             $resource->setAuthor($this->getCurrentUser());
-            $resource->setModDate(new DateTimeImmutable());
+            $resource->setUpdatedAt(new DateTimeImmutable());
             $this->entityManager->persist($resource);
             $this->entityManager->flush();
 
@@ -206,7 +206,7 @@ class ResourceController extends AbstractInachisController
                 ]
             );
         }
-     
+
         $additional = [];
         if ($resource instanceof Image) {
             try {

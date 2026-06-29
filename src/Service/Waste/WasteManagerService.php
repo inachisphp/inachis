@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Manages the waste bin for the application
- * 
+ *
  * @phpstan-import-type ImageShape from \Inachis\Entity\Media\Image
  * @phpstan-import-type PageShape from \Inachis\Entity\Content\Page
  * @phpstan-import-type SeriesShape from \Inachis\Entity\Content\Series
@@ -59,7 +59,7 @@ class WasteManagerService
         /** @var User */
         $deletedBy = $this->security->getUser();
         $waste->setUser($deletedBy);
-        $waste->setModDate(new DateTimeImmutable());
+        $waste->setUpdatedAt(new DateTimeImmutable());
 
         $data = [
             'id' => $entity->getId(),
@@ -191,7 +191,7 @@ class WasteManagerService
                         $page->setAuthor($author);
                     }
                 }
-                
+
                 if(isset($data['featureImage'])) {
                     /** @var Image|null */
                     $image = $this->entityManager->getRepository(Image::class)->findOneBy(['id' => $data['featureImage']]);
@@ -199,7 +199,7 @@ class WasteManagerService
                         $page->setFeatureImage($image);
                     }
                 }
-                
+
 
                 foreach ($data['categories'] as $catId) {
                     $cat = $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $catId]);

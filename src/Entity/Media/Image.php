@@ -16,7 +16,7 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
  * Object for handling images on a site.
- * 
+ *
  * @phpstan-type ImageShape array{
  *    id: string,
  *    title?: string,
@@ -26,8 +26,8 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
  *    filesize: int,
  *    checksum: string,
  *    author?: string,
- *    createDate: string,
- *    modDate: string,
+ *    createdAt: string,
+ *    updatedAt: string,
  *    dimensionX: int,
  *    dimensionY: int,
  *    altText?: string
@@ -65,14 +65,15 @@ class Image extends AbstractFile
     public function __construct()
     {
         $now = new DateTimeImmutable();
-        $this->setCreateDate($now);
-        $this->setModDate($now);
+        // TODO Add Pre/Post persist to replace this
+        $this->setCreatedAt($now);
+        $this->setUpdatedAt($now);
         unset($now);
     }
 
     /**
      * Returns the width of the image
-     * 
+     *
      * @return int
      */
     public function getDimensionX(): int
@@ -82,7 +83,7 @@ class Image extends AbstractFile
 
     /**
      * Returns the height of the image
-     * 
+     *
      * @return int
      */
     public function getDimensionY(): int
@@ -92,7 +93,7 @@ class Image extends AbstractFile
 
     /**
      * Returns alt text for the image
-     * 
+     *
      * @return string|null
      */
     public function getAltText(): ?string
@@ -102,7 +103,7 @@ class Image extends AbstractFile
 
     /**
      * Sets the width of the image
-     * 
+     *
      * @param int $value
      * @return self
      */
@@ -115,7 +116,7 @@ class Image extends AbstractFile
 
     /**
      * Sets the height of the image
-     * 
+     *
      * @param int $value
      * @return self
      */
@@ -128,7 +129,7 @@ class Image extends AbstractFile
 
     /**
      * Sets the alt text for the image
-     * 
+     *
      * @param string|null $value
      * @return self
      */
@@ -141,7 +142,7 @@ class Image extends AbstractFile
 
     /**
      * Gets the properties of the image file using PHP's getimagesize function
-     * 
+     *
      * @param string $imageDirectory
      * @return array<int|string, int|string>|false
      */

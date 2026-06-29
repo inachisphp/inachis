@@ -1,6 +1,6 @@
 <?php
 
-namespace Inachis\Tests\Diagnostics\Check\Environment;
+namespace Inachis\Tests\phpunit\Diagnostics\Check\Environment;
 
 use Inachis\Diagnostics\Check\Environment\PhpSapiCheck;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +17,7 @@ final class PhpSapiCheckTest extends TestCase
     public function testRunOk(): void
     {
         self::$sapi_name = 'fpm-fcgi';
-        
+
         $check = new PhpSapiCheck();
         $result = $check->run();
 
@@ -28,7 +28,7 @@ final class PhpSapiCheckTest extends TestCase
     public function testRunWarning(): void
     {
         self::$sapi_name = 'cli-server';
-        
+
         $check = new PhpSapiCheck();
         $result = $check->run();
 

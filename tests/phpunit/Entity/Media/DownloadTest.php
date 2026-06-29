@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -77,15 +77,15 @@ class DownloadTest extends TestCase
         $this->assertFalse($this->download->verifyChecksum('test123'));
     }
 
-    public function testSetAndGetCreateDate(): void
+    public function testSetAndGetCreatedAt(): void
     {
-        $this->download->setCreateDate(new DateTimeImmutable('1970-01-02 01:34:56'));
-        $this->assertEquals('1970-01-02 01:34:56', $this->download->getCreateDate()->format('Y-m-d H:i:s'));
+        $this->download->setCreatedAt(new DateTimeImmutable('1970-01-02 01:34:56'));
+        $this->assertEquals('1970-01-02 01:34:56', $this->download->getCreatedAt()->format('Y-m-d H:i:s'));
     }
 
-    public function testSetAndGetModDate(): void
+    public function testSetAndGetUpdatedAt(): void
     {
-        $this->download->setModDate(new DateTimeImmutable('1970-01-02 01:34:56'));
-        $this->assertEquals('1970-01-02 01:34:56', $this->download->getModDate()->format('Y-m-d H:i:s'));
+        $this->download->setUpdatedAt(new DateTimeImmutable('1970-01-02 01:34:56'));
+        $this->assertEquals('1970-01-02 01:34:56', $this->download->getUpdatedAt()->format('Y-m-d H:i:s'));
     }
 }

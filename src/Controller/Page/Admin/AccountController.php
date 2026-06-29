@@ -34,7 +34,7 @@ class AccountController extends AbstractInachisController
 {
     /**
      * Login
-     * 
+     *
      * @param Request $request
      * @param AuthenticationUtils $authenticationUtils
      * @return Response The response the controller results in
@@ -62,7 +62,7 @@ class AccountController extends AbstractInachisController
 
     /**
      * Logout
-     * 
+     *
      * @throws \Exception
      */
     #[Route("/incc/logout", name: "incc_logout")]
@@ -73,7 +73,7 @@ class AccountController extends AbstractInachisController
 
     /**
      * Forgot password
-     * 
+     *
      * @param Request $request
      * @param PasswordResetRequestRepository $passwordResetRequestRepository
      * @param RateLimiterFactoryInterface $forgotPasswordIpLimiter
@@ -103,7 +103,7 @@ class AccountController extends AbstractInachisController
                 'X-RateLimit-Retry-After' => $limit->getRetryAfter()->getTimestamp() - time(),
                 'X-RateLimit-Limit' => $limit->getLimit(),
             ];
-            // @todo replace with something better - throw new TooManyRequestsHttpException();
+            // TODO: replace with something better - throw new TooManyRequestsHttpException();
             return new Response('Too many attempts from this IP. Try again later.', 429, $headers);
         }
         $passwordResetRequestRepository->purgeExpiredHashes();
@@ -126,7 +126,7 @@ class AccountController extends AbstractInachisController
                         'X-RateLimit-Retry-After' => $limit->getRetryAfter()->getTimestamp() - time(),
                         'X-RateLimit-Limit' => $limit->getLimit(),
                     ];
-                    // @todo replace with something better - throw new TooManyRequestsHttpException();
+                    // TODO: replace with something better - throw new TooManyRequestsHttpException();
                     return new Response('Too many reset attempts for this account. Try again later.', 429, $headers);
                 }
             }
@@ -218,7 +218,7 @@ class AccountController extends AbstractInachisController
                     'X-RateLimit-Retry-After' => $limit->getRetryAfter()->getTimestamp() - time(),
                     'X-RateLimit-Limit' => $limit->getLimit(),
                 ];
-                // @todo replace with something better - throw new TooManyRequestsHttpException();
+                // TODO: replace with something better - throw new TooManyRequestsHttpException();
                 return new Response('Too many password reset attempts from this IP. Try again later.', 429, $headers);
             };
             /** @var array{

@@ -30,7 +30,7 @@ final class PageView
     public function __construct(
         public SiteSettings $settings,
         public PageMetadata $page,
-        // @todo change this to \Symfony\Component\Security\Core\User\UserInterface|User|null 
+        // TODO: change this to \Symfony\Component\Security\Core\User\UserInterface|User|null
         public array $notifications = [],
         public mixed $session = null,
         public int $sessionTimeout = 0,
