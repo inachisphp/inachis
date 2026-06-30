@@ -326,12 +326,17 @@ window.Inachis.Components = {
 	},
 	initSwitches(selector) {
 		document
-			.querySelectorAll(`${selector} .ui-switch`)
+			.querySelectorAll(`${selector} input.ui-switch`)
 			.forEach((checkbox) => {
 				window.Inachis.SwitchButton.create(checkbox, {
 					onLabel: checkbox.dataset.labelOn || 'On',
 					offLabel: checkbox.dataset.labelOff || 'Off',
 				});
+			});
+		document
+			.querySelectorAll(`${selector} select.ui-switch`)
+			.forEach((selectInput) => {
+				window.Inachis.SwitchSelector.create(selectInput, {});
 			});
 	},
 	initUIToggle() {

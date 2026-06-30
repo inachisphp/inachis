@@ -34,7 +34,7 @@ class CspHeaderListener
         // 2. Frontend Policy: Pulled from fast Cache
         $frontendCsp = $this->cspHeaderManager->getFrontendHeaderConfig();
         if ($frontendCsp !== null) {
-            $response->headers->set('Content-Security-Policy', $frontendCsp);
+            $response->headers->set($frontendCsp['name'], $frontendCsp['value']);
         }
     }
 }

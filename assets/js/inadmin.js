@@ -5,6 +5,7 @@ import './inadmin/components/dialog.js';
 import './inadmin/components/easyMDELinkValidator.js';
 import './inadmin/components/easyMDEReviewPlugin.js';
 import './inadmin/components/optionSelector.js';
+import './inadmin/components/switchSelector.js';
 import './inadmin/components/tabs.js';
 
 import './inadmin/dialogs/_bulkCreate.js';
@@ -29,4 +30,3 @@ import './inadmin/_post__edit.js';
 import './inadmin/_setup.js';
 import './inadmin/_style-hacks.js';
 import './inadmin/_switchButton.js';
-

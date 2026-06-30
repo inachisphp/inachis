@@ -15,19 +15,20 @@
 
 <fieldset class="ui-section">
     <h3>General Directives</h3>
-    <p>
-        <label class="inline_label" for="cspEnabled" id="cspEnabled_label">Enable CSP Headers on Frontend</label>
-        <span class="switch-wrapper">
-            <input aria-labelledby="cspEnabled_label" class="ui-switch" type="checkbox" name="csp_enabled" id="cspEnabled" value="1" {{ enabled ? 'checked' : '' }} data-label-off="disabled" data-label-on="enabled" >
-        </span>
-    </p>
 
     <p>
-        <label class="inline_label" for="cspReportOnly" id="csp_report_only_label">Enforce "Report-Only" Mode</label>
+        <label for="csp_mode" id="csp_mode_label">CSP Mode</label>
+        <select aria-labelledby="csp_mode_label" class="ui-switch" name="csp_mode" id="csp_mode">
+            <option value="disabled"{{ mode == 'disabled' ? 'selected' : '' }}>Disabled</option>
+            <option value="report-only"{{ mode == 'report-only' ? 'selected' : '' }}>Report only</option>
+            <option value="enforce"{{ mode == 'enforce' ? 'selected' : '' }}>Enforced</option>
+        </select>
+    </p>
+    <p>
+        <label class="inline_label" for="csp_upgrade_insecure" id="upgradeInsecurelabel">Upgrade Insecure Requests (Forces HTTP to HTTPS asset upgrades)</label>
         <span class="switch-wrapper">
-            <input aria-labelledby="csp_report_only_label" class="ui-switch" type="checkbox" name="csp_report_only" id="cspReportOnly" value="1" {{ report_only ? 'checked' : '' }}  data-label-off="disabled" data-label-on="enabled">
+            <input aria-labelledby="upgradeInsecure_label" class="ui-switch" type="checkbox" name="csp_upgrade_insecure" id="csp_upgrade_insecure" value="1" {{ upgrade_insecure ? 'checked' : '' }} data-label-off="disabled" data-label-on="enabled" >
         </span>
-        <small class="form-text text-muted d-block">When checked, browsers log errors back to your system but won't block assets or break your site layout.</small>
     </p>
 </fieldset>
 
@@ -36,20 +37,19 @@
     <small>Separate your safe domains using spaces. Use keywords like <code>self</code> or <code>data-uri</code> safely without adding quotes manually.</small>
 
     {% set standard_directives = ['default-src', 'script-src', 'style-src', 'img-src', 'font-src', 'connect-src', 'frame-src'] %}
-    
+
     {% for directive in standard_directives %}
         <p>
             <label class="col-sm-2 col-form-label font-weight-bold"><code>{{ directive }}</code></label>
-                <input type="text" 
-                        class="text full-width" 
-                        name="directives[{{ directive }}]" 
-                        value="{{ policy[directive] is defined ? policy[directive]|join(' ') : '' }}" 
+                <input type="text"
+                        class="text full-width"
+                        name="directives[{{ directive }}]"
+                        value="{{ policy[directive] is defined ? policy[directive]|join(' ') : '' }}"
                         placeholder="e.g. self data-uri https://trustedcdn.com">
         </p>
     {% endfor %}
-</form>
+</fieldset>
 <p>&nbsp;</p>
-</div>
 
 <div class="fixed-bottom-bar">
     <p>
@@ -58,5 +58,8 @@
             <em class="material-icons">auto_fix_high</em> Generate Rule Suggestions
         </a>
     </p>
+</div>
+
+</form>
 </div>
 {% endblock content %}

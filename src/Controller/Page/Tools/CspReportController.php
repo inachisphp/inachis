@@ -28,7 +28,7 @@ class CspReportController extends AbstractInachisController
     ): Response
     {
         /** @var array<string,string> */
-        $filters = $request->query->all('filter') ?? [];
+        $filters = $request->query->all('filter') ?: [];
         $severity = $filters['severity'] ?? '';
         $directive = $filters['directive'] ?? '';
         $host = $request->query->get('host');
@@ -94,19 +94,16 @@ class CspReportController extends AbstractInachisController
         CspHeaderManager $cspHeaderManager,
         Request $request
     ): Response {
-        if (!$report) {
-            throw $this->createNotFoundException('Report not found.');
-        }
-        if (!$this->isCsrfTokenValid('report_'.$report->getId(), $request->request->get('_token'))) {
+        if (!$this->isCsrfTokenValid('report_'.$report->getId(), $request->request->getString('_token'))) {
             throw $this->createAccessDeniedException();
         }
 
-        match ($request->request->get('action')) {
+        match ($request->request->getString('action')) {
             'approve' => [
                 $cspHeaderManager->addReportToPolicy($report),
                 $repository->processSimilarReports(
-                    $report->getViolatedDirective(),
-                    $report->getBlockedUri()
+                    $report->getViolatedDirective() ?: '',
+                    $report->getBlockedUri() ?: '',
                 ),
                 $this->addFlash('success', 'Domain added to configuration successfully.'),
             ],
@@ -153,37 +150,38 @@ class CspReportController extends AbstractInachisController
         SettingRepository $settingRepository,
     ): Response {
         // 1. Fetch current settings or instantiate defaults
-        $cspEnabled = $settingRepository->getOrCreateSetting('csp_enabled', '0');
-        $cspReportOnly = $settingRepository->getOrCreateSetting('csp_report_only', '1');
+        $cspMode = $settingRepository->getOrCreateSetting('csp_mode', 'off');
+        $cspUpgradeInsecure = $settingRepository->getOrCreateSetting('csp_upgrade_insecure', '0');
+
         $cspPolicy = $settingRepository->getOrCreateSetting('csp_policy_frontend', json_encode([
             'default-src' => ['self'],
             'script-src' => ['self'],
             'style-src' => ['self'],
             'img-src' => ['self', 'data-uri']
-        ]));
+        ]) ?: '');
 
         // 2. Handle Form Processing
         if ($request->isMethod('POST')) {
-            if (!$this->isCsrfTokenValid('csp_settings', $request->request->get('_token'))) {
+            if (!$this->isCsrfTokenValid('csp_settings', $request->request->getString('_token'))) {
                 throw $this->createAccessDeniedException('Invalid CSRF token.');
             }
 
-            $cspEnabled->setValue($request->request->get('csp_enabled', '0'));
-            $cspReportOnly->setValue($request->request->get('csp_report_only', '0'));
+            $cspMode->setValue($request->request->getString('csp_mode', 'off'));
+            $cspUpgradeInsecure->setValue($request->request->getString('csp_upgrade_insecure', '0'));
 
             // Structure incoming inputs into the target array format
             $rawDirectives = $request->request->all('directives');
             $cleanPolicy = [];
             foreach ($rawDirectives as $directiveName => $sourcesString) {
-                if (empty($sourcesString)) {
+                if (empty($sourcesString) || !is_string($sourcesString)) {
                     continue;
                 }
                 // Convert space or comma separated lists into arrays
                 $cleanPolicy[$directiveName] = array_filter(
-                    array_map('trim', preg_split('/[\s,]+/', $sourcesString))
+                    array_map('trim', preg_split('/[\s,]+/', $sourcesString) ?: [])
                 );
             }
-            $cspPolicy->setValue(json_encode($cleanPolicy));
+            $cspPolicy->setValue(json_encode($cleanPolicy) ?: '');
 
             $this->entityManager->flush();
 
@@ -198,9 +196,9 @@ class CspReportController extends AbstractInachisController
         $this->viewModel->page->tab = 'csp-policy';
         return $this->render('inadmin/page/tools/csp_settings.html.twig', [
             'viewModel' => $this->viewModel,
-            'enabled' => $cspEnabled->getValue() === '1',
-            'report_only' => $cspReportOnly->getValue() === '1',
-            'policy' => json_decode($cspPolicy->getValue(), true) ?? []
+            'mode' => $cspMode->getValue(), // String: 'off', 'report-only', or 'enforce'
+            'policy' => json_decode($cspPolicy->getValue() ?? '', true) ?? [],
+            'upgrade_insecure' => $cspUpgradeInsecure->getValue() === '1',
         ]);
     }
 }
