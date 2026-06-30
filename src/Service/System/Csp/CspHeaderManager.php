@@ -16,7 +16,7 @@ class CspHeaderManager
 
     /**
      * Get the compiled CSP string for the front-end
-     * 
+     *
      * @return array{}
      */
     public function getFrontendHeaderConfig(): ?array
@@ -24,20 +24,23 @@ class CspHeaderManager
         return $this->cspCache->get('csp_frontend_config', function (ItemInterface $item) {
             $item->expiresAfter(null);
 
-            $enabledSetting = $this->settingRepository->findOneBy(['name' => 'csp_enabled']);
-            if (!$enabledSetting || $enabledSetting->getValue() !== '1') {
+            $modeSetting = $this->settingRepository->findOneBy(['name' => 'csp_mode']);
+            $mode = $modeSetting ? $modeSetting->getValue() : 'off';
+            if ($mode === 'off') {
                 return null;
             }
 
-            $reportOnlySetting = $this->settingRepository->findOneBy(['name' => 'csp_report_only']);
-            $headerName = ($reportOnlySetting && $reportOnlySetting->getValue() === '1') 
-                ? 'Content-Security-Policy-Report-Only' 
+            $headerName = ($mode === 'report-only')
+                ? 'Content-Security-Policy-Report-Only'
                 : 'Content-Security-Policy';
 
             $policySetting = $this->settingRepository->findOneBy(['name' => 'csp_policy_frontend']);
+            $upgradeSetting = $this->settingRepository->findOneBy(['name' => 'csp_upgrade_insecure']);
+
+            $upgradeInsecure = ($upgradeSetting && $upgradeSetting->getValue() === '1');
             $headerValue = ($policySetting && $policySetting->getValue())
-                ? $this->compileJsonToCspString($policySetting->getValue())
-                : "default-src 'self';";
+                ? $this->compileJsonToCspString($policySetting->getValue(), $upgradeInsecure)
+                : "default-src 'self'; report-uri /api/csp/report;";
 
             return [
                 'name' => $headerName,
@@ -56,23 +59,28 @@ class CspHeaderManager
 
     /**
      * Compiles a JSON policy schema into a raw CSP header value
-     * 
+     *
      * @param string $jsonConfig The JSON string to convert into a header
+     * @param bool $upgradeInsecure Whether or not HTTP requests should be upgraded to HTTPS automatically
      * @return string The compiled CSP header value
      */
-    private function compileJsonToCspString(string $jsonConfig): string
+    private function compileJsonToCspString(string $jsonConfig, bool $upgradeInsecure = false): string
     {
         $config = json_decode($jsonConfig, true);
         if (!is_array($config)) {
-            return "default-src 'self';";
+            return "default-src 'self'; report-uri /api/csp/report;";
         }
 
         $directives = [];
+        if ($upgradeInsecure) {
+            $directives[] = 'upgrade-insecure-requests';
+        }
+
         foreach ($config as $directive => $sources) {
             if (empty($sources) || !is_array($sources)) {
                 continue;
             }
-            
+
             // Map keywords to wrapped versions (e.g., self -> 'self', data -> data:)
             $cleanedSources = array_map(function ($source) {
                 $source = trim($source);
@@ -87,6 +95,8 @@ class CspHeaderManager
 
             $directives[] = $directive . ' ' . implode(' ', $cleanedSources);
         }
+
+        $directives[] = 'report-uri /api/csp/report';
 
         return implode('; ', $directives) . ';';
     }
@@ -107,15 +117,18 @@ class CspHeaderManager
         ]);
 
         $policySetting = $this->settingRepository->getOrCreateSetting(
-            'csp_policy_frontend', 
+            'csp_policy_frontend',
             $defaultPolicyJson
         );
         $policy = json_decode($policySetting->getValue(), true) ?? [];
 
         // 4. Normalize the directive from the incoming report
-        $rawDirective = $report->getViolatedDirective(); 
+        $rawDirective = $report->getEffectiveDirective();
+        if (empty($rawDirective)) {
+            return;
+        }
         $directive = str_replace(['-elem', '-attr'], '', $rawDirective);
-        
+
         // 5. Extract and clean the blocked URI scheme/host
         $blockedUri = $report->getBlockedUri();
         if (empty($blockedUri)) {
@@ -123,7 +136,11 @@ class CspHeaderManager
         }
 
         $cleanSource = $blockedUri;
-        if (filter_var($blockedUri, FILTER_VALIDATE_URL)) {
+        if (in_array(strtolower($cleanSource), ['inline', 'unsafe-inline'])) {
+            $cleanSource = 'unsafe-inline';
+        } elseif (in_array(strtolower($cleanSource), ['eval', 'unsafe-eval'])) {
+            $cleanSource = 'unsafe-eval';
+        } elseif (filter_var($blockedUri, FILTER_VALIDATE_URL)) {
             $parsed = parse_url($blockedUri);
             $cleanSource = ($parsed['scheme'] ?? 'https') . '://' . ($parsed['host'] ?? '');
         }
