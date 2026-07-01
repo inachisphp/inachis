@@ -273,7 +273,7 @@ class PostType extends AbstractType
                     'aria-labelledby' => 'latlong_label',
                     'aria-required' => 'false',
                     'class' => 'ui-map',
-                    'data-google-key' => '{{ settings.google.key }}',
+                    'data-google-key' => '{{ viewModel.settings.google.key }}',
                 ],
                 'label' => 'admin.post.properties.location.label',
                 'label_attr' => [

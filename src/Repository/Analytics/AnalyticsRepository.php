@@ -60,7 +60,7 @@ class AnalyticsRepository
 			FROM analytics_page_view
 			GROUP BY path
 			ORDER BY total DESC
-			LIMIT ' . (int) $limit
+			LIMIT ' . $limit
 		)->fetchAllAssociative();
 	}
 

@@ -210,10 +210,10 @@
 <p class="preheader">{% block preheader %}Preheader text goes here - 85-199 chars{% endblock preheader %}</></p>
 
 <p>
-    <a href="{{ settings.domain }}/incc" style="text-decoration:none;">
+    <a href="{{ viewModel.settings.domain }}/incc" style="text-decoration:none;">
         <center>
         {% block email_logo %}
-            <img src="{{ logo }}" alt="{{ settings.siteTitle }}" width="150" />
+            <img src="{{ logo }}" alt="{{ viewModel.settings.siteTitle }}" width="150" />
         {% endblock email_logo %}
         </center>
     </a>
@@ -222,25 +222,25 @@
 {% block content %}
 {% endblock content %}
 <p><center>Best wishes,</center></p>
-<p><center>{{ settings.siteTitle|default(settings.domain) }}</center></p>
+<p><center>{{ viewModel.settings.siteTitle|default(viewModel.settings.domain) }}</center></p>
 
 <p>
-{% if settings is defined and settings.twitter is defined and settings.twitter is not empty %}
-    <a href="https://twitter.com/{{ settings.twitter }}" class="twitter-follow-button" data-show-count="false"><span>Follow @{{ settings.twitter }}</span></a>
+{% if viewModel.settings is defined and viewModel.settings.twitter is defined and viewModel.settings.twitter is not empty %}
+    <a href="https://twitter.com/{{ viewModel.settings.twitter }}" class="twitter-follow-button" data-show-count="false"><span>Follow @{{ viewModel.settings.twitter }}</span></a>
 {% endif %}
-{% if settings.facebookUrl is defined and settings.facebookUrl is not empty %}
-    <a href="https://www.facebook.com/{{ settings.facebookUrl }}" class="facebook-follow-button" data-show-count="false"><span>Facebook</span></a>
+{% if viewModel.settings.facebookUrl is defined and viewModel.settings.facebookUrl is not empty %}
+    <a href="https://www.facebook.com/{{ viewModel.settings.facebookUrl }}" class="facebook-follow-button" data-show-count="false"><span>Facebook</span></a>
 {% endif %}
-{% if settings.pinterest is defined and settings.pinterest is not empty %}
-    <a href="http://www.pinterest.com/{{ settings.pinterest }}/" class="pinterest-follow-button" data-show-count="false"><span>Pinterest</span></a>
+{% if viewModel.settings.pinterest is defined and viewModel.settings.pinterest is not empty %}
+    <a href="http://www.pinterest.com/{{ viewModel.settings.pinterest }}/" class="pinterest-follow-button" data-show-count="false"><span>Pinterest</span></a>
 {% endif %}
-{% if settings.instagram is defined and settings.instagram is not empty %}
-    <a href="https://instagram.com/{{ settings.instagram }}/" class="googleplus-follow-button" data-show-count="false"><span>Instagram</span></a>
+{% if viewModel.settings.instagram is defined and viewModel.settings.instagram is not empty %}
+    <a href="https://instagram.com/{{ viewModel.settings.instagram }}/" class="googleplus-follow-button" data-show-count="false"><span>Instagram</span></a>
 {% endif %}
 </p>
 
 {% block settings_unsubscribe %}
-<p><center><a href="{{ settings.domain }}">Edit email settings</a> | <a href="{{ settings.domain }}">Unsubscribe</a></center></p>
+<p><center><a href="{{ viewModel.settings.domain }}">Edit email settings</a> | <a href="{{ viewModel.settings.domain }}">Unsubscribe</a></center></p>
 {% endblock settings_unsubscribe %}
 </body>
 </html>

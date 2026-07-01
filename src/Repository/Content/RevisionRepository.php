@@ -15,7 +15,6 @@ use Inachis\Repository\AbstractRepository;
 use Inachis\Repository\Content\RevisionRepositoryInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\NonUniqueResultException;
-use Ramsey\Uuid\UuidInterface;
 
 /**
  * Repository for revision entities
@@ -98,10 +97,11 @@ class RevisionRepository extends AbstractRepository implements RevisionRepositor
      * Get revisions for a specific page
      *
      * @param Page $page
-     * @return array
+     * @return list<Revision>
      */
     public function getRevisionsForPage(Page $page)
     {
+        /** @var list<Revision> */
         return $this->createQueryBuilder('r')
             ->where('r.page = :pageId')
             ->setParameter('pageId', $page->getId(), 'uuid_binary')

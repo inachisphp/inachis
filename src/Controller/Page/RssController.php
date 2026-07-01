@@ -117,12 +117,13 @@ class RssController extends AbstractWebController
             throw new NotFoundHttpException(sprintf('Category %s not found', $categoryName));
         }
 
+        // TODO: change categories to use sub-categories also
         $paginator = $pageRepository->getFilteredOfTypeByPostDate(
             [
-                'status' => EditorialStatus::PUBLISHED->value,
+                'status' => EditorialStatus::PUBLISHED,
                 'visible' => true,
                 'toDate' => new \DateTimeImmutable(),
-                'categories' => [$category->getId()?->toString() ?? ''],
+                'categories' => [ $category->getId() ],
             ],
             Page::TYPE_POST,
             20,

@@ -143,7 +143,9 @@ abstract class AbstractRepository extends ServiceEntityRepository
                 // support typed parameters: [value, type]
                 if (is_array($value)) {
                     $paramValue = $value['value'];
-                    $paramType  = $value['type'] ?? null;
+                    $paramType  = !empty($value['type']) && is_string($value['type']) ?
+                        $value['type'] :
+                        null;
                 }
                 if ($paramType !== null) {
                     $qb = $qb->setParameter($key, $paramValue, $paramType);

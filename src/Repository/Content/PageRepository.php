@@ -90,7 +90,8 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      *   keyword?:string,
      *   excludeIds?:list<string>,
      *   fromDate?:\DateTimeImmutable,
-     *   toDate?:\DateTimeImmutable
+     *   toDate?:\DateTimeImmutable,
+     *   expired?:string
      * } $filters
      * @param string $type
      * @param int $limit
@@ -131,7 +132,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             $where[0] .= ' AND c.id IN (:categories)';
             $where[1]['categories'] = [
                 'value' => implode(',', array_map(
-                    fn($t) => $t->toString(),
+                    fn($t) => $t,
                     array_is_list($filters['categories']) ? $filters['categories'] : array_keys($filters['categories'])
                 )),
                 'type' => 'uuid_binary',
@@ -163,7 +164,9 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         }
         if (!empty($filters['excludeIds'])) {
             $where[0] .= ' AND q.id NOT IN (:excludeIds)';
-            $where[1]['excludeIds'] = $filters['excludeIds'];
+            $where[1]['excludeIds'] = [
+                'value' => $filters['excludeIds'],
+            ];
         }
         if (!empty($filters['fromDate'])) {
             $where[0] .= ' AND q.postDate >= :fromDate';
@@ -296,6 +299,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function getFilteredIds(array $ids): array
     {
+        /** @var list<Page> */
         return $this->createQueryBuilder('p')
             ->select('p')
             ->where('p.id IN (:ids)')
@@ -312,6 +316,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function getPostsUsingImage(Image $image): array
     {
+        /** @var list<Page> */
         return $this->createQueryBuilder('p')
             ->select('p')
             ->where('p.content LIKE :filename OR p.featureImage = :image')
@@ -330,6 +335,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function getTopPagesByImageSize(int $limit = 10): array
     {
+        /** @var list<Page> */
         return $this->createQueryBuilder('p')
             ->select('p')
             ->orderBy('p.imageSize', 'DESC')

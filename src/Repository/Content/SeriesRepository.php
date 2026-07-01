@@ -275,7 +275,7 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      */
     public function findRecentPublished(int $limit = 5): array
     {
-        /** @var array<Page> */
+        /** @var array<Series> */
         return $this->createQueryBuilder('s')
             ->where('s.visible = :visible')
             ->setParameter('visible', true)
@@ -285,5 +285,4 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             ->getQuery()
             ->getResult();
     }
-
 }

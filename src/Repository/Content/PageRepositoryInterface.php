@@ -55,7 +55,8 @@ interface PageRepositoryInterface
      *   keyword?:string,
      *   excludeIds?:list<string>,
      *   fromDate?:\DateTimeImmutable,
-     *   toDate?:\DateTimeImmutable
+     *   toDate?:\DateTimeImmutable,
+     *   expired?:string
      * } $filters
      * @param string $type
      * @param int $limit

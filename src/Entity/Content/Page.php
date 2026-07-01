@@ -292,7 +292,7 @@ class Page
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
-        $this->updatedAt ??= new DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]

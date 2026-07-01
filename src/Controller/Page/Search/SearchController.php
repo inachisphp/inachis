@@ -80,7 +80,7 @@ class SearchController extends AbstractInachisController
                 number_format($result['relevance'], 2)
             );
             $author = $userRepository->findOneBy([
-                'id' => $uuidString,
+                'id' => $result['author'] !== null ? Uuid::fromBytes($result['author'])->toString() : '',
             ]);
             $results->updateResultPropertyByKey(
                 $key,
