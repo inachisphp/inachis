@@ -75,10 +75,8 @@ class NavigationTabController extends AbstractInachisController
         return $this->render('inadmin/page/settings/navigation-list.html.twig', [
             'viewModel' => $this->viewModel,
             'dataset' => $navigationTabRepository->getFiltered(
-                $contentQuery['filters'],
-                $contentQuery['offset'],
                 $contentQuery['limit'],
-                $contentQuery['sort'],
+                $contentQuery['offset'],
             ),
             'form' => $form->createView(),
             'query' => $contentQuery,

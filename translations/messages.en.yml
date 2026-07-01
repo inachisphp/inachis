@@ -95,6 +95,8 @@ admin.post.revision.changes: 'Changes'
 admin.post.revision.view: 'View'
 admin.post.revision.download: 'Download'
 admin.post.revision.revert: 'Revert'
+admin.post.expired: 'This post has expired and is no longer visible to the public.'
+admin.post.expired.help: 'You can change the expiry date in the properties tab to make it visible again.'
 
 admin.series.title: 'Series'
 admin.series.help: 'View list of series'

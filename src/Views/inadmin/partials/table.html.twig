@@ -82,7 +82,7 @@
                     {% endif %}
                     {% if column.source is defined and attribute(item, column.source) is defined %}
                         {% if column.source_type is defined and column.source_type == 'date' %}
-                            {{ attribute(item, column.source)|date('d/m/Y') }}
+                            {{ attribute(item, column.source)|date('d/m/Y', viewModel.session.preferences.timezone) }}
                         {% elseif column.source_type is defined and column.source_type == 'title' %}
                             {{ attribute(attribute(item, column.source), 'title') }}
                         {% elseif column.source_type is defined and column.source_type == 'count' %}

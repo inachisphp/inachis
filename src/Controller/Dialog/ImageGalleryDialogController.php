@@ -38,12 +38,12 @@ class ImageGalleryDialogController extends AbstractInachisController
      * @param Request $request
      * @return Response
      */
-    #[Route('/incc/ax/imageManager/getImages/{offset}/{limit}',
+    #[Route('/incc/ax/imageManager/getImages/{limit}/{offset}',
         requirements: [
+            "limit" => "\d+",
             "offset" => "\d+",
-            "limit" => "\d+"
         ],
-        defaults: [ "offset" => 0, "limit" => 25 ],
+        defaults: [ "limit" => 25, "offset" => 0, ],
         methods: [ "POST" ],
     )]
     public function getImageList(
@@ -52,18 +52,18 @@ class ImageGalleryDialogController extends AbstractInachisController
     ): Response {
         /** @var array{keyword?: string} */
         $filters = array_filter($request->request->all('filter'));
-        $offset = $request->attributes->getInt('offset', 0);
         $limit = $request->attributes->getInt('limit', $imageRepository::MAX_ITEMS_TO_SHOW_ADMIN);
+        $offset = $request->attributes->getInt('offset', 0);
 
         return $this->render('inadmin/partials/gallery.html.twig', [
             'images' => $imageRepository->getFiltered(
                 $filters,
+                $limit,
                 $offset,
-                $limit
             ),
             'query' => [
+                'limit' => $limit,
                 'offset' => $offset,
-                'limit' => $limit
             ],
         ]);
     }

@@ -76,6 +76,7 @@ window.Inachis.Components = {
 			});
 		});
 	},
+	// TODO: Make this generic and apply to any input with a datepicker, not just the post date
 	initDatePicker() {
 		const postDateSelector = document.querySelector('#post_postDate');
 		if (!postDateSelector) return;

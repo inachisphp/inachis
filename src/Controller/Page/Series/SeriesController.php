@@ -37,13 +37,13 @@ class SeriesController extends AbstractInachisController
      * @return Response
      */
     #[Route(
-        "/incc/series/list/{offset}/{limit}",
+        "/incc/series/list/{limit}/{offset}",
         name: 'incc_series_list',
         requirements: [
+            "limit" => "\d+",
             "offset" => "\d+",
-            "limit" => "\d+"
         ],
-        defaults: [ "offset" => 0, "limit" => 10 ],
+        defaults: [ "limit" => 10, "offset" => 0, ],
         methods: [ "GET", "POST" ]
     )]
     public function list(
@@ -89,8 +89,8 @@ class SeriesController extends AbstractInachisController
             'form' => $form->createView(),
             'dataset' => $seriesRepository->getFiltered(
                 $contentQuery['filters'],
-                $contentQuery['offset'],
                 $contentQuery['limit'],
+                $contentQuery['offset'],
                 $contentQuery['sort'],
             ),
             'query' => $contentQuery,

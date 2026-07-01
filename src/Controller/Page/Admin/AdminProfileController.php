@@ -41,13 +41,13 @@ class AdminProfileController extends AbstractInachisController
      * @return Response
      */
     #[Route(
-        "/incc/admin/list/{offset}/{limit}",
+        "/incc/admin/list/{limit}/{offset}",
         name: 'incc_admin_list',
         requirements: [
+            "limit" => "\d+",
             "offset" => "\d+",
-            "limit" => "\d+"
         ],
-        defaults: [ "offset" => 0, "limit" => 25 ],
+        defaults: [ "limit" => 25, "offset" => 0, ],
         methods: [ "GET", "POST" ]
     )]
     public function list(
@@ -88,8 +88,8 @@ class AdminProfileController extends AbstractInachisController
             'viewModel' => $this->viewModel,
             'dataset' => $userRepository->getFiltered(
                 $contentQuery['filters'],
-                $contentQuery['offset'],
                 $contentQuery['limit'],
+                $contentQuery['offset'],
             ),
             'form' => $form->createView(),
             'query' => $contentQuery,
@@ -119,6 +119,12 @@ class AdminProfileController extends AbstractInachisController
             $userRepository->findOneBy(
                 [ 'username' => $request->attributes->getString('id') ]
             ) ?? new User();
+        $preferences = $user->getPreferences();
+        if ($preferences === null) {
+            $preferences = new UserPreference($user);
+            $user->setPreferences($preferences);
+            $this->entityManager->persist($preferences);
+        }
         /** @var Form $form */
         $form = $this->createForm(UserType::class, $user, [
             'validation_groups' => [ '' ],
@@ -135,13 +141,9 @@ class AdminProfileController extends AbstractInachisController
             if ($delete instanceof \Symfony\Component\Form\ClickableInterface && $delete->isClicked()) {
                 $user->setRemoved(true);
             }
-            $user->setUpdatedAt(new DateTimeImmutable());
 
             if ($isNew) {
-                if (!$user->getPreferences()) {
-                    $user->setPreferences(new UserPreference($user));
-                }
-                $user->getPreferences()?->setColor(ProfileColorPalette::generate());
+                $preferences->setColor(ProfileColorPalette::generate());
                 $userAccountEmailService->registerNewUser(
                     $user,
                     [ 'viewModel' => $this->viewModel, ],
@@ -150,8 +152,18 @@ class AdminProfileController extends AbstractInachisController
                         [ 'token' => $token ]
                     )
                 );
+                $this->entityManager->persist($user);
             }
-            $this->entityManager->persist($user);
+            $preferences->setTimezone(
+                $request->request->all('user')['timezone'] ?? $preferences->getTimezone()
+            );
+            $preferences->setLocale(
+                $request->request->all('user')['locale'] ?? $preferences->getLocale()
+            );
+            $preferences->setColor(
+                $request->request->all('user')['color'] ?? $preferences->getColor()
+            );
+
             $this->entityManager->flush();
 
             $this->addFlash('success', 'User details saved.');

@@ -73,8 +73,8 @@ class RssController extends AbstractWebController
                 'toDate' => new \DateTimeImmutable(),
             ],
             Page::TYPE_POST,
+            20,
             0,
-            20
         );
 
         $response = new Response();
@@ -125,8 +125,8 @@ class RssController extends AbstractWebController
                 'categories' => [$category->getId()?->toString() ?? ''],
             ],
             Page::TYPE_POST,
+            20,
             0,
-            20
         );
 
         $response = new Response();

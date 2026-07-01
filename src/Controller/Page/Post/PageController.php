@@ -52,14 +52,14 @@ class PageController extends AbstractInachisController
      * @throws Exception
      */
     #[Route(
-        "/incc/{type}/list/{offset}/{limit}",
+        "/incc/{type}/list/{limit}/{offset}",
         name: "incc_post_list",
         requirements: [
             "type" => "post|page",
+            "limit" => "\d+",
             "offset" => "\d+",
-            "limit" => "\d+"
         ],
-        defaults: [ "offset" => 0, "limit" => 10 ],
+        defaults: [ "limit" => 10, "offset" => 0, ],
         methods: [ "GET", "POST" ]
     )]
     public function list(
@@ -109,23 +109,23 @@ class PageController extends AbstractInachisController
         );
 
         if ($request->query->has('category') && $request->query->get('category') === 'null') {
-            $posts = $pageRepository->getPagesWithoutCategories($contentQuery['offset'], $contentQuery['limit']);
+            $posts = $pageRepository->getPagesWithoutCategories($contentQuery['limit'], $contentQuery['offset']);
             $queryString = 'category=null';
         } elseif ($request->query->has('tag') && $request->query->get('tag') === 'null') {
-            $posts = $pageRepository->getPagesWithoutTags($contentQuery['offset'], $contentQuery['limit']);
+            $posts = $pageRepository->getPagesWithoutTags($contentQuery['limit'], $contentQuery['offset']);
             $queryString = 'tag=null';
         } elseif ($request->query->has('featureImage') && $request->query->get('featureImage') === 'null') {
-            $posts = $pageRepository->getPagesWithoutFeatureImage($contentQuery['offset'], $contentQuery['limit']);
+            $posts = $pageRepository->getPagesWithoutFeatureImage($contentQuery['limit'], $contentQuery['offset'], );
             $queryString = 'featureImage=null';
         } elseif ($request->query->has('sharingMessage') && $request->query->get('sharingMessage') === 'null') {
-            $posts = $pageRepository->getPagesWithoutSharingMessage($contentQuery['offset'], $contentQuery['limit']);
+            $posts = $pageRepository->getPagesWithoutSharingMessage($contentQuery['limit'], $contentQuery['offset']);
             $queryString = 'sharingMessage=null';
         } else {
             $posts = $pageRepository->getFilteredOfTypeByPostDate(
                 $contentQuery['filters'],
                 $type,
-                $contentQuery['offset'],
                 $contentQuery['limit'],
+                $contentQuery['offset'],
                 $contentQuery['sort'],
             );
         }

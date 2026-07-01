@@ -33,10 +33,10 @@ class UrlController extends AbstractInachisController
      * @throws OptimisticLockException
      */
     #[Route(
-        "/incc/url/list/{offset}/{limit}",
+        "/incc/url/list/{limit}/{offset}",
         name: "incc_url_list",
-        requirements: [ "offset" => "\d+", "limit" => "\d+" ],
-        defaults: [ "offset" => 0, "limit" => 20 ],
+        requirements: [ "limit" => "\d+", "offset" => "\d+", ],
+        defaults: [ "limit" => 20, "offset" => 0, ],
         methods: [ "GET", "POST" ]
     )]
     public function list(
@@ -76,8 +76,8 @@ class UrlController extends AbstractInachisController
             'viewModel' => $this->viewModel,
             'dataset' => $urlRepository->getFiltered(
                 $contentQuery['filters'],
-                $contentQuery['offset'],
                 $contentQuery['limit'],
+                $contentQuery['offset'],
                 $contentQuery['sort'],
             ),
             'form' => $form->createView(),

@@ -36,6 +36,7 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\Media\ImageRepository', readOnly: false)]
 #[ORM\Index(columns: ['title', 'filename', 'filetype'], name: 'search_idx')]
 #[ORM\Index(columns: ['title', 'alt_text', 'description'], name: "fulltext_title_content", flags: ["fulltext"])]
+#[ORM\HasLifecycleCallbacks]
 class Image extends AbstractFile
 {
     /** @var list<string> */

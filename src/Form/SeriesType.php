@@ -10,9 +10,7 @@
 namespace Inachis\Form;
 
 use Inachis\Entity\Content\Series;
-use Inachis\Entity\Media\Image;
 use Inachis\Entity\User\User;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
@@ -133,6 +131,7 @@ class SeriesType extends AbstractType
                     ],
                     'input' => 'datetime_immutable',
                     'required' => false,
+                    'view_timezone' => $userTimezone,
                     'widget' => 'single_text',
                 ])
                 ->add('lastDate', DateType::class, [
@@ -142,6 +141,7 @@ class SeriesType extends AbstractType
                     ],
                     'input' => 'datetime_immutable',
                     'required' => false,
+                    'view_timezone' => $userTimezone,
                     'widget' => 'single_text',
                 ])
                 ->add('bulkCreate', ButtonType::class, [

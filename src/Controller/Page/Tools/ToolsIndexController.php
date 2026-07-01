@@ -52,7 +52,7 @@ class ToolsIndexController extends AbstractInachisController
             'viewModel' => $this->viewModel,
             'environment' => $this->getParameter('kernel.environment'),
             'storage' => [
-                'biggestImages' => $imageRepository->getAll(0, 10, [], [['q.filesize', 'DESC']]),
+                'biggestImages' => $imageRepository->getAll(10, 0, [], [['q.filesize', 'DESC']]),
                 'images' => $imageRepository->getDiskUsage(),
                 'topPagesBySize' => $pageRepository->getTopPagesByImageSize(25),
             ],

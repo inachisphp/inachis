@@ -495,4 +495,110 @@ class AnalyticsRepository
             ]
         );
     }
+
+    /**
+     * Returns an associative array of views today, yesterday, this month and last month
+     * along with unique visitors this month and last month.
+     *
+     * @return array{
+     *     viewsToday: int,
+     *     viewsYesterday: int,
+     *     viewsThisMonth: int,
+     *     viewsLastMonth: int,
+     *     uniqueVisitorsThisMonth: int,
+     *     uniqueVisitorsLastMonth: int
+     * }
+     */
+    public function getDashboardSummary(): array
+    {
+        $today = new \DateTimeImmutable('today');
+        $yesterday = $today->modify('-1 day');
+
+        $thisMonth = $today->modify('first day of this month');
+        $lastMonth = $today->modify('first day of last month');
+
+        /** @var array{
+         *     views_today:string|int|null,
+         *     views_yesterday:string|int|null,
+         *     views_this_month:string|int|null,
+         *     views_last_month:string|int|null
+         * } $views
+         */
+        $views = $this->db->fetchAssociative(
+            '
+            SELECT
+                COALESCE(SUM(CASE
+                    WHEN date = :today
+                    THEN views
+                    ELSE 0
+                END), 0) AS views_today,
+
+                COALESCE(SUM(CASE
+                    WHEN date = :yesterday
+                    THEN views
+                    ELSE 0
+                END), 0) AS views_yesterday,
+
+                COALESCE(SUM(CASE
+                    WHEN date >= :thisMonth
+                    THEN views
+                    ELSE 0
+                END), 0) AS views_this_month,
+
+                COALESCE(SUM(CASE
+                    WHEN date >= :lastMonth
+                    AND date < :thisMonth
+                    THEN views
+                    ELSE 0
+                END), 0) AS views_last_month
+
+            FROM analytics_page_view
+            ',
+            [
+                'today' => $today->format('Y-m-d'),
+                'yesterday' => $yesterday->format('Y-m-d'),
+                'thisMonth' => $thisMonth->format('Y-m-d'),
+                'lastMonth' => $lastMonth->format('Y-m-d'),
+            ]
+        );
+
+        /** @var array{
+         *     unique_this_month:string|int|null,
+         *     unique_last_month:string|int|null
+         * } $visitors
+         */
+        $visitors = $this->db->fetchAssociative(
+            '
+            SELECT
+                COUNT(DISTINCT CASE
+                    WHEN date >= :thisMonth
+                    THEN visitor_hash
+                    ELSE NULL
+                END) AS unique_this_month,
+
+                COUNT(DISTINCT CASE
+                    WHEN date >= :lastMonth
+                    AND date < :thisMonth
+                    THEN visitor_hash
+                    ELSE NULL
+                END) AS unique_last_month
+
+            FROM analytics_unique_visitor
+            ',
+            [
+                'thisMonth' => $thisMonth->format('Y-m-d'),
+                'lastMonth' => $lastMonth->format('Y-m-d'),
+            ]
+        );
+
+        return [
+            'viewsToday' => (int) ($views['views_today'] ?? 0),
+            'viewsYesterday' => (int) ($views['views_yesterday'] ?? 0),
+            'viewsThisMonth' => (int) ($views['views_this_month'] ?? 0),
+            'viewsLastMonth' => (int) ($views['views_last_month'] ?? 0),
+
+            'uniqueVisitorsThisMonth' => (int) ($visitors['unique_this_month'] ?? 0),
+            'uniqueVisitorsLastMonth' => (int) ($visitors['unique_last_month'] ?? 0),
+        ];
+    }
 }

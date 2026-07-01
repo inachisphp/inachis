@@ -41,7 +41,6 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
     public function remove(Series $series): void
     {
         $this->getEntityManager()->remove($series);
-        $this->getEntityManager()->flush();
     }
 
     /**
@@ -129,10 +128,12 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
         /** @var Series|null */
         return $qb
             ->select('s')
-            ->where($qb->expr()->like('s.lastDate', ':year'))
-            ->andWhere($qb->expr()->like('s.url', ':url'))
+            ->where('s.lastDate >= :start')
+            ->andWhere('s.lastDate < :end')
+            ->andWhere($qb->expr()->eq('s.url', ':url'))
             ->andWhere('s.visible = :visible')
-            ->setParameter('year', $year . '%')
+            ->setParameter('start', $year . '-01-01')
+            ->setParameter('end', $year . '-12-31')
             ->setParameter('url', $url)
             ->setParameter('visible', true)
             ->getQuery()
@@ -143,11 +144,11 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      * Get a paginator of Series entities filtered by the given criteria.
      *
      * @param array{keyword?:string,visible?:string} $filters
-     * @param int $offset
      * @param int $limit
+     * @param int $offset
      * @return Paginator<Series>
      */
-    public function getFiltered(array $filters, int $offset, int $limit, string $sort = ''): Paginator
+    public function getFiltered(array $filters,int $limit,  int $offset, string $sort = ''): Paginator
     {
         $where = [
             '1=1',
@@ -178,8 +179,8 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             ],
         };
         return $this->getAll(
-            $offset,
             $limit,
+            $offset,
             $where,
             $sort
         );
@@ -197,8 +198,8 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
     public function getSeriesUsingImage(Image $image): Paginator
     {
         return $this->getAll(
-            0,
             25,
+            0,
             [
                 'q.description LIKE :filename OR q.image = :image',
                 [
@@ -227,22 +228,62 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
     /**
      * Return a batch of public series, ordered by lastDate desc, with pagination.
      *
-     * @param int $offset
      * @param int $limit
+     * @param int $offset
      * @return array<Series>
      */
     public function findPublicSeriesBatch(
+        int $limit,
         int $offset,
-        int $limit
     ): array {
         /** @var array<Series> */
         return $this->createQueryBuilder('s')
             ->where('s.visible = :visible')
             ->setParameter('visible', true)
             ->orderBy('s.lastDate', 'DESC')
+            ->setMaxResults($limit)
             ->setFirstResult($offset)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Returns an array of {@link Series} that are recent drafts
+     * ordered by the date of the attached content
+     *
+     * @param int $limit
+     * @return array<Series>
+     */
+    public function findRecentDrafts(int $limit = 5): array
+    {
+        /** @var array<Series> */
+        return $this->createQueryBuilder('s')
+            ->where('s.visible = :visible')
+            ->setParameter('visible', false)
+            ->orderBy('s.firstDate', 'DESC')
+            ->addOrderBy('s.lastDate', 'ASC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Returns an array of recently published {@link Series}
+     *
+     * @param int $limit
+     * @return array<Series>
+     */
+    public function findRecentPublished(int $limit = 5): array
+    {
+        /** @var array<Page> */
+        return $this->createQueryBuilder('s')
+            ->where('s.visible = :visible')
+            ->setParameter('visible', true)
+            ->orderBy('s.firstDate', 'DESC')
+            ->addOrderBy('s.lastDate', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
 }

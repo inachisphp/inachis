@@ -92,8 +92,8 @@ final class PageExportService extends AbstractExportService
         return $this->pageRepository->getFilteredOfTypeByPostDate(
             array_filter($filter),
             $filter_type,
-            0,
             10000,
+            0,
         );
     }
 

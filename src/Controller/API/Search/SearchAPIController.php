@@ -45,7 +45,7 @@ class SearchAPIController extends AbstractController
             ]);
         }
 
-        $results = $searchRepository->searchPublic($keyword, 0, 10);
+        $results = $searchRepository->searchPublic($keyword, 10);
         $items = [];
 
         foreach ($results->getResults() as $result) {

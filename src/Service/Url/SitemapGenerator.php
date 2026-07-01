@@ -155,10 +155,10 @@ class SitemapGenerator
             $dir,
             'series',
             $this->seriesRepository->countPublicSeries(),
-            fn(int $offset, int $limit)
+            fn(int $limit, int $offset,)
                 => $this->seriesRepository->findPublicSeriesBatch(
+                    $limit,
                     $offset,
-                    $limit
                 ),
             function (Series $series): string {
                 return sprintf(

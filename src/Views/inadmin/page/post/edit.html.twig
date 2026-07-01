@@ -6,6 +6,17 @@
 {% endblock pagetitle %}
 
 {% block content %}
+
+    {% if post.hasExpired %}
+        <div class="col-12 admonition admonition__warning">
+            <h2 class="admonition__title">
+                <span class="material-icons" aria-hidden="true">warning</span>
+                {% trans %}admin.post.expired{% endtrans %}
+            </h2>
+            <p>{% trans %}admin.post.expired.help{% endtrans %}</p>
+        </div>
+    {% endif %}
+
     {% set showStats = post.id is not empty and post.status|default('') == 'published' %}
 
     {{ form_start(form, {'attr': { 'class': 'col-12 form form__post' }}) }}
@@ -190,7 +201,7 @@
                 {% for revision in revisions %}
                     <tr>
                         <th scope="row">{{ revision.versionNumber }}</th>
-                        <td>{{ revision.createdAt|date('d/m/Y H:i') }}</td>
+                        <td>{{ revision.createdAt|date('d/m/Y H:i', viewModel.session.preferences.timezone) }}</td>
                         <td>{{ revision.user.displayName }}</td>
                         <td><span class="badge">{{ revision.action }}</span></td>
                         <td>

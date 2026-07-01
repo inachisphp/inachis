@@ -98,6 +98,7 @@ class PageWebController extends AbstractWebController
         string $tagName,
         PageRepository $pageRepository,
     ): Response {
+        // TODO Change this to use slug
         $tag = $this->entityManager->getRepository(Tag::class)->findOneBy(['title' => $tagName]);
 
         if (!$tag instanceof Tag) {
@@ -113,7 +114,7 @@ class PageWebController extends AbstractWebController
             'viewModel' => $this->viewModel,
             'filterName' => 'tag',
             'filterValue' => $tagName,
-            'content' => $pageRepository->getPagesWithTag($tag),
+            'content' => $pageRepository->getLiveContentWithTag($tag),
         ]);
     }
 
@@ -131,6 +132,7 @@ class PageWebController extends AbstractWebController
         CategoryRepository $categoryRepository,
         PageRepository $pageRepository
     ): Response {
+        // TODO change this to use slug
         $category = $categoryRepository->findOneBy(['title' => $categoryName]);
         if (!$category instanceof Category) {
             throw new NotFoundHttpException(
@@ -144,7 +146,7 @@ class PageWebController extends AbstractWebController
             'viewModel' => $this->viewModel,
             'filterName' => 'category',
             'filterValue' => $categoryName,
-            'content' => $pageRepository->getPagesWithCategory($category),
+            'content' => $pageRepository->getLiveContentWithCategory($category),
         ]);
     }
 

@@ -1,6 +1,5 @@
-{% if dashboard.recentDraft|default([]) is not empty  %}
+{% if dashboard.recentDraft|default(null) is not empty  %}
     {% set showResume = true %}
-    {% set item = dashboard.recentDraft|first %}
 {% else %}
     {% set showResume = false %}
 {% endif %}
@@ -12,8 +11,8 @@
     <div class="nested-grid">
         {% if showResume %}
         <div class="col-6 ui-section rounded">
-            <a href="/incc/{{ item.type }}/{{ (item.urls|first).link }}" class="button button--positive button--large">Resume writing</a>
-            <h4>{{ item.title }}{{ item.subtitle ? ' - ' ~ item.subtitle }}</h4>
+            <a href="/incc/{{ dashboard.recentDraft.type }}/{{ (dashboard.recentDraft.urls|first).link }}" class="button button--positive button--large">Resume writing</a>
+            <h4>{{ dashboard.recentDraft.title }}{{ dashboard.recentDraft.subtitle ? ' - ' ~ dashboard.recentDraft.subtitle }}</h4>
             <p class="date">
                 Last edited:
                 {% if dashboard.draftTimeAgo.days > 0 %}

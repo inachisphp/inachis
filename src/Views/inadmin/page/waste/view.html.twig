@@ -18,7 +18,7 @@
                 </tr>
                 <tr>
                     <th scope="row">Deleted At</th>
-                    <td>{{ waste.updatedAt|date('Y-m-d H:i:s') }}</td>
+                    <td>{{ waste.updatedAt|date('Y-m-d H:i:s', viewModel.session.preferences.timezone) }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Title</th>

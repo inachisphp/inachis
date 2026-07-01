@@ -12,11 +12,8 @@ namespace Inachis\Controller\Page\Dashboard;
 use DateTimeImmutable;
 use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Content\Series;
-use Inachis\Enum\EditorialStatus;
 use Inachis\Repository\Content\{PageRepository, SeriesRepository};
 use Inachis\Repository\Media\ImageRepository;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -27,12 +24,10 @@ class DashboardController extends AbstractInachisController
     /**
      * Provides the main dashboard
      *
-     * @param Request $request The request made to the controller
      * @return Response
      */
     #[Route('/incc', name: "incc_dashboard", methods: [ 'GET' ])]
     public function default(
-        Request $request,
         AnalyticsProviderInterface $analytics,
         ImageRepository $imageRepository,
         PageRepository $pageRepository,
@@ -41,81 +36,20 @@ class DashboardController extends AbstractInachisController
         $this->viewModel->page->title = 'Dashboard';
         $this->viewModel->page->tab = 'dashboard';
 
-        $recentDraft = $pageRepository->getAll(
-            0,
-            1,
-            [
-                'q.status = :status',
-                [
-                    'status' => EditorialStatus::DRAFT->value,
-                ],
-            ],
-            [ ['q.updatedAt' , 'DESC'] ]
-        );
-        if ($recentDraft->count() > 0) {
+        $recentDraft = $pageRepository->findMostRecentlyEditedDraft();
+        if ($recentDraft) {
             $now = new DateTimeImmutable();
-            $recentDraftTimeAgo = $now->diff($recentDraft->getIterator()->current()->getUpdatedAt());
+            $recentDraftTimeAgo = $now->diff($recentDraft->getUpdatedAt());
         }
 
-        $drafts = $pageRepository->getAll(
-            0,
-            5,
-            [
-                'q.status = :status',
-                [
-                    'status' => EditorialStatus::DRAFT->value,
-                ],
-            ],
-            'q.postDate ASC, q.updatedAt'
-        );
-        $upcoming = $pageRepository->getAll(
-            0,
-            5,
-            [
-                'q.status = :status AND q.postDate > :postDate',
-                [
-                    'status' => EditorialStatus::PUBLISHED->value,
-                    'postDate' => new DateTimeImmutable('now')->format('Y-m-d H:i:s'),
-                ],
-            ],
-            'q.postDate ASC, q.updatedAt'
-        );
+        $draftPosts = $pageRepository->findRecentDrafts(5);
+        $upcoming = $pageRepository->findUpcoming(5);
+        $recentPosts = $pageRepository->findRecentPublished(5);
+        $counts = $pageRepository->getDashboardCounts();
 
-        $posts = $pageRepository->getAll(
-            0,
-            5,
-            [
-                'q.status = :status AND q.postDate <= :postDate',
-                [
-                    'status' => EditorialStatus::PUBLISHED->value,
-                    'postDate' => new DateTimeImmutable('now')->format('Y-m-d H:i:s'),
-                ],
-            ],
-            'q.postDate DESC, q.updatedAt'
-        );
-
-        $draftSeries = $seriesRepository->getAll(
-            0,
-            5,
-            [
-                'q.visible = :visible',
-                [
-                    'visible' => false,
-                ],
-            ],
-            'q.firstDate DESC, q.lastDate'
-        );
-        $series = $seriesRepository->getAll(
-            0,
-            5,
-            [
-                'q.visible != :visible',
-                [
-                    'visible' => false,
-                ],
-            ],
-            'q.firstDate DESC, q.lastDate'
-        );
+        $draftSeries = $seriesRepository->findRecentDrafts(5);
+        $recentSeries = $seriesRepository->findRecentPublished(5);
+        $analyticsSummary = $analytics->getDashboardSummary();
 
 
         return $this->render('inadmin/page/dashboard/dashboard.html.twig', [
@@ -124,15 +58,15 @@ class DashboardController extends AbstractInachisController
                 'draftTimeAgo' => $recentDraftTimeAgo ?? 0,
                 'recentDraft' => $recentDraft,
 
-                'drafts' => $drafts,
-                'draftCount' => $drafts->count(),
-                'posts' => $posts,
-                'publishCount' => $posts->count(),
+                'drafts' => $draftPosts,
+                'draftCount' => $counts['drafts'],
+                'posts' => $recentPosts,
+                'publishCount' => $counts['published'],
                 'upcoming' => $upcoming,
-                'upcomingCount' => $upcoming->count(),
+                'upcomingCount' => $counts['upcoming'],
 
                 'draftSeries' => $draftSeries,
-                'series' => $series,
+                'series' => $recentSeries,
 
                 'alerts' => [
                     'altText' => [
@@ -157,35 +91,8 @@ class DashboardController extends AbstractInachisController
                     ],
                 ],
                 'analytics' => [
+                    ...$analyticsSummary,
                     'topPages' => $analytics->getTopPages(5),
-                    'viewsToday' => $analytics->getTotalViews(
-                        new DateTimeImmutable(),
-                        new DateTimeImmutable()
-                    ),
-                    'viewsYesterday' => $analytics->getTotalViews(
-                        new DateTimeImmutable('-1 day'),
-                        new DateTimeImmutable('-1 day')
-                    ),
-                    'viewsThisMonth' => $analytics->getTotalViews(
-                        new DateTimeImmutable('first day of this month'),
-                        new DateTimeImmutable()
-                    ),
-                    'viewsLastMonth' => $analytics->getTotalViews(
-                        new DateTimeImmutable('first day of last month'),
-                        new DateTimeImmutable('last day of last month')
-                    ),
-                    'uniqueVisitorsThisMonth' => $analytics->getMonthlyUniqueVisitors(
-                        new DateTimeImmutable('first day of this month'),
-                        new DateTimeImmutable()
-                    ),
-                    'uniqueVisitorsLastMonth' => $analytics->getMonthlyUniqueVisitors(
-                        new DateTimeImmutable('first day of last month'),
-                        new DateTimeImmutable('last day of last month')
-                    ),
-                    // 'pageViewsPerDay' => $analytics->getPageViewsPerDay(
-                    //     new DateTimeImmutable('-7 days'),
-                    //     new DateTimeImmutable()
-                    // ),
                 ],
             ],
         ]);

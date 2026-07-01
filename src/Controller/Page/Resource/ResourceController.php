@@ -37,14 +37,14 @@ class ResourceController extends AbstractInachisController
      * @return Response
      * @throws \Exception
      */
-    #[Route("/incc/resources/{type}/{offset}/{limit}",
+    #[Route("/incc/resources/{type}/{limit}/{offset}",
         name: "incc_resource_list",
         requirements: [
             "type" => "(images|downloads)",
+            "limit" => "\d+",
             "offset" => "\d+",
-            "limit" => "\d+"
         ],
-        defaults: [ "offset" => 0, "limit" => 25 ],
+        defaults: [ "limit" => 25, "offset" => 0, ],
         methods: [ "GET", "POST" ],
     )]
     public function list(
@@ -78,14 +78,14 @@ class ResourceController extends AbstractInachisController
         );
         if ($repository instanceof ImageRepository && $request->query->getString('altText', '') === 'null') {
             $dataset = $repository->getImagesWithoutAltText(
+                $contentQuery['limit'],
                 $contentQuery['offset'],
-                $contentQuery['limit']
             );
         } else {
             $dataset = $repository->getFiltered(
                 $contentQuery['filters'],
-                $contentQuery['offset'],
                 $contentQuery['limit'],
+                $contentQuery['offset'],
                 $contentQuery['sort'],
             );
         }
@@ -167,7 +167,7 @@ class ResourceController extends AbstractInachisController
                 $filename = $imageDirectory . $resource->getFilename();
                 if ($resource instanceof Image &&
                     isset($usages['posts']) &&
-                    $usages['posts']->count() === 0 &&
+                    empty($usages['posts']) &&
                     $usages['series']->count() === 0 &&
                     $filesystem->exists($filename)) {
                     try {

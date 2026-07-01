@@ -152,4 +152,19 @@ interface AnalyticsProviderInterface
      * @return list<array{user_agent: string, total: numeric-string}>
      */
     public function getTopBots(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 15): array;
+
+    /**
+     * Returns an associative array of views today, yesterday, this month and last month
+     * along with unique visitors this month and last month.
+     *
+     * @return array{
+     *     viewsToday: int,
+     *     viewsYesterday: int,
+     *     viewsThisMonth: int,
+     *     viewsLastMonth: int,
+     *     uniqueVisitorsThisMonth: int,
+     *     uniqueVisitorsLastMonth: int
+     * }
+     */
+    public function getDashboardSummary(): array;
 }

@@ -29,8 +29,8 @@ interface ResourceRepositoryInterface
     /**
      * Get all resources
      * 
-     * @param int $offset The offset from which to return results from
      * @param int $limit  The maximum number of results to return
+     * @param int $offset The offset from which to return results from
      * @param list{0: string, 1?:array<string, string|list<string>>}|list{} $where
      * @param list<list{0: string, 1: string}>|string|list{} $order
      * @param list<string>|list{} $groupBy
@@ -38,8 +38,8 @@ interface ResourceRepositoryInterface
      * @return Paginator<T>
      */
     public function getAll(
-        int $offset = 0,
         int $limit = 25,
+        int $offset = 0,
         array $where = [],
         array|string $order = [],
         array $groupBy = [],
@@ -58,11 +58,11 @@ interface ResourceRepositoryInterface
      * Get all resources with the given filters
      * 
      * @param array{keyword?: string} $filters
-     * @param int $offset
      * @param int $limit
+     * @param int $offset
      * @param string|null $sortBy
      * @return Paginator<T>
      */
-    public function getFiltered(array $filters, int $offset, int $limit, ?string $sortBy = 'title asc'): Paginator;
+    public function getFiltered(array $filters, int $limit, int $offset, ?string $sortBy = 'title asc'): Paginator;
 }
 

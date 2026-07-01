@@ -37,7 +37,7 @@ class SearchWebController extends AbstractWebController
         $results = [];
         $total = 0;
         if ($keyword !== '') {
-            $searchResults = $searchRepository->searchPublic($keyword, $offset, $limit);
+            $searchResults = $searchRepository->searchPublic($keyword, $limit, $offset);
             $total = $searchResults->getTotal();
 
             foreach ($searchResults->getResults() as $result) {

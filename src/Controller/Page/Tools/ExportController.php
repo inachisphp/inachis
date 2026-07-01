@@ -89,8 +89,8 @@ class ExportController extends AbstractInachisController
                         $items = $pageRepository->getFilteredOfTypeByPostDate(
                             array_filter($filter),
                             '*',
-                            0,
                             10000,
+                            0,
                         );
                     }
                     $exportService = $seriesExportService;
@@ -166,8 +166,8 @@ class ExportController extends AbstractInachisController
                 $items = $pageRepository->getFilteredOfTypeByPostDate(
                     ['keyword' => $query],
                     '*',
-                    $offset,
                     $limit,
+                    $offset,
                     'parent_id',
                 );
                 //$total = get count - make sure results limited to 50
@@ -176,8 +176,8 @@ class ExportController extends AbstractInachisController
             case 'series':
                 $items = $seriesRepository->getFiltered(
                     ['keyword' => $query],
+                    $limit,
                     $offset,
-                    $limit
                 );
                 //$total = get count - make sure results limited to 50
                 break;
@@ -198,8 +198,8 @@ class ExportController extends AbstractInachisController
             'form' => $this->createFormBuilder()->getForm()->createView(),
             'pagination' => [
                 'offset' => $page,
-                'total' => $total,
                 'limit' => $limit,
+                'total' => $total,
             ],
             'selectedIds' => $selectedIds,
         ]);

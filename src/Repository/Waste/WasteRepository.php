@@ -68,17 +68,17 @@ class WasteRepository extends AbstractRepository implements WasteRepositoryInter
      * Gets filtered waste
      *
      * @param array{keyword?: string} $filters Only keyword(s) should be passed in as the filter
-     * @param int $offset The offset
      * @param int $limit The limit
+     * @param int $offset The offset
      * @param string $sort The sort
      * @return Paginator<Waste> The paginator
      */
-    public function getFiltered(array $filters, int $offset, int $limit, string $sort): Paginator
+    public function getFiltered(array $filters, int $limit, int $offset, string $sort): Paginator
     {
         $where = [];
         if (!empty($filters['keyword'])) {
             $where = [
-                '(q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.description LIKE :keyword )',
+                '(q.title LIKE :keyword OR q.content LIKE :keyword )',
                 [
                     'keyword' => '%' . $filters['keyword']  . '%',
                 ],
@@ -87,23 +87,16 @@ class WasteRepository extends AbstractRepository implements WasteRepositoryInter
         $sort = match ($sort) {
             'title desc' => [
                 ['q.title', 'DESC'],
-                ['q.subTitle', 'DESC'],
             ],
-            'updatedAt asc' => [['q.modDaupdatedAtte', 'ASC']],
+            'updatedAt asc' => [['q.updatedAt', 'ASC']],
             'updatedAt desc' => [['q.updatedAt', 'DESC']],
-            'lastDate asc' => [['q.lastDate', 'ASC']],
-            'lastDate desc' => [
-                ['CASE WHEN q.lastDate IS NULL THEN 1 ELSE 0 END', 'DESC'],
-                ['q.lastDate', 'DESC']
-            ],
             default => [
                 ['q.title', 'ASC'],
-                ['q.subTitle', 'ASC'],
             ],
         };
         return $this->getAll(
-            $offset,
             $limit,
+            $offset,
             $where,
             $sort
         );

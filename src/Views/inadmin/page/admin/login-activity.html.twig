@@ -61,7 +61,7 @@
             {% set url = path('incc_admin_all_login_activity_view', { id: activity.id}) %}
         {% endif %}
         <tr class="{{ activity.type == 'failure' ? 'table-danger' : '' }}">
-            <td>{{ activity.loggedAt|date('Y-m-d H:i:s') }}</td>
+            <td>{{ activity.loggedAt|date('Y-m-d H:i:s', viewModel.session.preferences.timezone) }}</td>
             <td>
                 {{ activity.user ? activity.user.userIdentifier : activity.username }}
             </td>

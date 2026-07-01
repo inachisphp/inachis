@@ -14,6 +14,7 @@ use Inachis\Controller\AbstractInachisController;
 use Inachis\Repository\Content\SearchRepository;
 use Inachis\Repository\Content\UrlRepository;
 use Inachis\Repository\User\UserRepository;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -27,13 +28,13 @@ class SearchController extends AbstractInachisController
      * @return Response
      * @throws Exception|\Doctrine\DBAL\Exception
      */
-    #[Route("/incc/search/results/{keyword}/{offset}/{limit}",
+    #[Route("/incc/search/results/{keyword}/{limit}/{offset}",
         name: "incc_search_results",
         requirements: [
+            "limit" => "\d+",
             "offset" => "\d+",
-            "limit" => "\d+"
         ],
-        defaults: [ "keyword" => null, "offset" => 0, "limit" => 25 ],
+        defaults: [ "keyword" => null, "limit" => 25, "offset" => 0, ],
         methods: [ "GET", "POST" ],
     )]
     public function results(
@@ -61,8 +62,8 @@ class SearchController extends AbstractInachisController
 
         $results = $searchRepository->search(
             $request->attributes->getString('keyword'),
-            $request->attributes->getInt('offset'),
             $request->attributes->getInt('limit'),
+            $request->attributes->getInt('offset'),
             $sort,
         );
 
@@ -70,13 +71,16 @@ class SearchController extends AbstractInachisController
 
 
         foreach ($results->getResults() as $key => $result) {
+            $uuidString = Uuid::fromBytes($result['id'])->toString();
+            // $results->updateResultPropertyByKey($key, 'id', $uuidString);
+            
             $results->updateResultPropertyByKey(
                 $key,
                 'relevance',
                 number_format($result['relevance'], 2)
             );
             $author = $userRepository->findOneBy([
-                'id' => $result['author'],
+                'id' => $uuidString,
             ]);
             $results->updateResultPropertyByKey(
                 $key,
@@ -90,7 +94,7 @@ class SearchController extends AbstractInachisController
                         'url',
                         $this->generateUrl('incc_resource_edit', [
                             'type' => 'images',
-                            'filename' => $result['id']]
+                            'filename' => $uuidString]
                         )
                     );
                     break;
@@ -99,14 +103,14 @@ class SearchController extends AbstractInachisController
                     $results->updateResultPropertyByKey(
                         $key,
                         'url',
-                        $this->generateUrl('incc_series_edit', ['id' => $result['id']])
+                        $this->generateUrl('incc_series_edit', ['id' => $uuidString])
                     );
                     break;
 
                 case 'Page':
                 case 'Post':
                     $link = $urlRepository->findOneBy([
-                        'content' => $result['id'],
+                        'content' => $uuidString,
                         'default' => true,
                     ]);
                     $results->updateResultPropertyByKey(
@@ -121,7 +125,6 @@ class SearchController extends AbstractInachisController
             }
         }
         
-
         return $this->render('inadmin/page/search/results.html.twig', [
             'viewModel' => $this->viewModel,
             'form' => $form->createView(),

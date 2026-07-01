@@ -29,14 +29,14 @@ class WasteController extends AbstractInachisController
      * @return Response
      */
     #[Route(
-        "/incc/waste/{offset}/{limit}",
+        "/incc/waste/{limit}/{offset}",
         requirements: [
+          "limit" => "\d+",
           "offset" => "\d+",
-          "limit" => "\d+"
         ],
         defaults: [
+            "limit" => 10,
             "offset" => 0,
-            "limit" => 10
         ],
         methods: [ 'GET', 'POST' ],
         name: "incc_waste_list"
@@ -82,8 +82,8 @@ class WasteController extends AbstractInachisController
             'viewModel' => $this->viewModel,
             'dataset' => $wasteRepository->getFiltered(
                 $contentQuery['filters'],
-                $contentQuery['offset'],
                 $contentQuery['limit'],
+                $contentQuery['offset'],
                 $contentQuery['sort'],
             ),
             'form' => $form->createView(),

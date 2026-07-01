@@ -27,11 +27,6 @@ enum EditorialStatus: string
 	case PUBLISHED = 'published';
 
 	/**
-	 * @const string Indicates a Page has been archived
-	 */
-	case ARCHIVED = 'archived';
-
-	/**
 	 * Returns an array of all possible values for this enum.
 	 *
 	 * @return string[] An array of all possible values for this enum
@@ -52,7 +47,6 @@ enum EditorialStatus: string
 			self::DRAFT => 'Draft',
 			self::REVIEW => 'In Review',
 			self::PUBLISHED => 'Published',
-			self::ARCHIVED => 'Archived',
 		};
 	}
 }

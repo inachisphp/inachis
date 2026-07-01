@@ -15,7 +15,7 @@
 
 <div class="col-12 widget-data-list">
     <section class="ui-section">
-        <p><strong>Time:</strong> {{ activity.loggedAt|date('Y-m-d H:i:s') }}</p>
+        <p><strong>Time:</strong> {{ activity.loggedAt|date('Y-m-d H:i:s', viewModel.session.preferences.timezone) }}</p>
         <p><strong>User:</strong> {{ (activity.user ? activity.user.userIdentifier : activity.username)|default('Unknown') }}</p>
         <p><strong>Type:</strong> {{ activity.type }}</p>
         <p><strong>IP Address:</strong> {{ activity.ipAddress }}</p>

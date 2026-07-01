@@ -13,6 +13,8 @@ use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Entity\Content\{Page, Series};
 use Inachis\Repository\Analytics\AnalyticsRepository;
 use Inachis\Repository\Content\{SeriesRepository, UrlRepository};
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Internal analytics provider
@@ -23,6 +25,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
 {
     public function __construct(
         private AnalyticsRepository $analyticsRepository,
+        private CacheInterface $cache,
         private SeriesRepository $seriesRepository,
         private UrlRepository $urlRepository,
     ) {}
@@ -35,11 +38,19 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      */
     public function getTopPages(int $limit = 10): array
     {
-        $rows = $this->analyticsRepository->getTopPages($limit);
-        return array_map(function ($row) {
-            $row['title'] = $this->resolveTitle($row['path']);
-            return $row;
-        }, $rows);
+        return $this->cache->get(
+            'analytics_top_pages_' . $limit,
+            function (ItemInterface $item) use ($limit) {
+                $item->expiresAfter(600);
+
+                $rows = $this->analyticsRepository->getTopPages($limit);
+
+                return array_map(function ($row) {
+                    $row['title'] = $this->resolveTitle($row['path']);
+                    return $row;
+                }, $rows);
+            }
+        );
     }
 
     /**
@@ -265,5 +276,23 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
     public function getTopBots(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 15): array
     {
         return $this->analyticsRepository->getTopBots($from, $to, $limit);
+    }
+
+    /**
+     * Returns an associative array of views today, yesterday, this month and last month
+     * along with unique visitors this month and last month.
+     *
+     * @return array{
+     *     viewsToday: int,
+     *     viewsYesterday: int,
+     *     viewsThisMonth: int,
+     *     viewsLastMonth: int,
+     *     uniqueVisitorsThisMonth: int,
+     *     uniqueVisitorsLastMonth: int
+     * }
+     */
+    public function getDashboardSummary(): array
+    {
+        return $this->analyticsRepository->getDashboardSummary();
     }
 }

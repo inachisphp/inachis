@@ -10,7 +10,7 @@
 namespace Inachis\Model;
 
 use Inachis\Entity\Content\Category;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
+use Inachis\Repository\Content\CategoryRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -21,45 +21,47 @@ class ContentQueryParameters
     /**
      * Constructor for ContentQueryParameters class
      *
-     * @param array $filters
+     * @param array{filters: array<string,mixed>, sort: string, offset: int, limit: int}|array{} $filters
      * @param string $sort
-     * @param int $offset
      * @param int $limit
+     * @param int $offset
      */
     public function __construct(
         protected array $filters = [],
         protected string $sort = '',
+        protected int $limit = 10,
         protected int $offset = 0,
-        protected int $limit = 10
     ) {}
 
     /**
      * Process the request and return the query parameters
      *
      * @param Request $request
-     * @param ServiceEntityRepositoryInterface $repository
+     * @param CategoryRepository $categoryRepository
      * @param string $prefix
      * @param string $sortDefault
-     * @return array<string, mixed>
+     * @return array{filters: array<string,mixed>|array{}, sort: string, offset: int, limit: int}
      */
     public function process (
         Request $request,
-        ServiceEntityRepositoryInterface $repository,
+        CategoryRepository $categoryRepository,
         string $prefix = '',
         string $sortDefault = '',
     ): array {
-        $this->filters = array_filter($request->request->all('filter', []));
-        $this->sort = $request->request->get('sort', $sortDefault);
+        $this->filters = array_filter($request->request->all('filter'));
+        $this->sort = $request->request->getString('sort') ?: $sortDefault;
 
         if (isset($this->filters['categories']) && is_array($this->filters['categories']) && array_is_list($this->filters['categories'])) {
-            if (method_exists($repository, 'getEntityManager')) {
-                $categories = $repository->getEntityManager()->getRepository(Category::class)->findBy(['id' => $this->filters['categories']]);
-                $categoryFilter = [];
-                foreach ($categories as $category) {
-                    $categoryFilter[$category->getId()->toString()] = $category->getTitle();
+            /** @var list<Category> */
+            $categories = $categoryRepository->findBy(['id' => $this->filters['categories']]);
+            $categoryFilter = [];
+            foreach ($categories as $category) {
+                $id = $category->getId()?->toString() ?: '';
+                if (!empty($id)) {
+                    $categoryFilter[$id] = $category->getTitle();
                 }
-                $this->filters['categories'] = $categoryFilter;
             }
+            $this->filters['categories'] = $categoryFilter;
         }
 
         if ($request->isMethod(Request::METHOD_POST)) {
@@ -67,13 +69,16 @@ class ContentQueryParameters
             $request->getSession()->set($prefix . '_sort', $this->sort);
         } elseif ($request->getSession()->has($prefix . '_filters')) {
             $this->filters = $request->getSession()->get($prefix . '_filters', '');
-            $this->sort = $request->getSession()->get($prefix . '_sort', '');
+            $sort = $request->getSession()->get($prefix . '_sort', '');
+            $this->sort = is_string($sort) ? $sort : '';
         }
-        $this->offset = (int) $request->attributes->get('offset', 0);
-        $this->limit = (int) $request->attributes->get(
+        $limit = $request->attributes->getInt(
             'limit',
-            $repository->getMaxItemsToShow(),
+            $categoryRepository->getMaxItemsToShow(),
         );
+        $offset = $request->attributes->getInt('offset', 0);
+        $this->limit = is_numeric($limit) ? (int) $limit : 10;
+        $this->offset = is_numeric($offset) ? (int) $offset : 0;
 
         return [
             'filters' => $this->filters,
