@@ -40,8 +40,8 @@ class TagRepository extends AbstractRepository
     public function findByTitleLike(string $title): Paginator
     {
         return $this->getAll(
-            0,
             25,
+            0,
             [
                 'q.title LIKE :title',
                 [
@@ -115,11 +115,11 @@ class TagRepository extends AbstractRepository
     /**
      * Gets all tags with usage count.
      *
-     * @param int $offset
      * @param int $limit
+     * @param int $offset
      * @return list<array{0:Tag, usageCount:int}>
      */
-    public function findAllWithUsageCount(int $offset = 0, int $limit = 0): array
+    public function findAllWithUsageCount(int $limit = 0, int $offset = 0): array
     {
         $qb = $this->getEntityManager()->createQuery(
             'SELECT t, COUNT(p.id) AS usageCount
@@ -128,12 +128,11 @@ class TagRepository extends AbstractRepository
              GROUP BY t.id
              ORDER BY t.title ASC'
         );
-
-        if ($offset > 0) {
-            $qb = $qb->setFirstResult($offset);
-        }
         if ($limit > 0) {
             $qb = $qb->setMaxResults($limit);
+        }
+        if ($offset > 0) {
+            $qb = $qb->setFirstResult($offset);
         }
 
         /** @var list<array{0:Tag, usageCount:int}> */
@@ -156,19 +155,19 @@ class TagRepository extends AbstractRepository
     /**
      * Return a batch of tags, ordered by title, with pagination.
      *
-     * @param int $offset
      * @param int $limit
+     * @param int $offset
      * @return array<int,Tag>
      */
     public function findBatch(
+        int $limit,
         int $offset,
-        int $limit
     ): array {
         /** @var array<int,Tag> $result */
         $result = $this->createQueryBuilder('t')
             ->orderBy('t.title', 'ASC')
-            ->setFirstResult($offset)
             ->setMaxResults($limit)
+            ->setFirstResult($offset)
             ->getQuery()
             ->getResult();
         return $result;

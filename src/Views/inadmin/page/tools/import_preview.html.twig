@@ -39,7 +39,7 @@
                         <td>{{ item.type }}</td>
                         <td>{{ item.categories|map(c => c.path)|join(', ')|replace({'/': ' > '}) }}</td>
                         <td>{{ item.tags|map(t => t.title)|join(', ') }}</td>
-                        <td>{{ item.postDate ? item.postDate|date('Y-m-d H:i') : '' }}</td>
+                        <td>{{ item.postDate ? item.postDate|date('Y-m-d H:i', viewModel.session.preferences.timezone) : '' }}</td>
                     {% elseif import_type == 'series' %}
                         <td>{{ item.title }}</td>
                         <td>{{ item.subTitle }}</td>

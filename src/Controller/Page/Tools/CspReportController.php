@@ -11,6 +11,7 @@ namespace Inachis\Controller\Page\Tools;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\System\CspReport;
+use Inachis\Enum\System\CspDirective;
 use Inachis\Repository\System\CspReportRepository;
 use Inachis\Repository\System\SettingRepository;
 use Inachis\Service\System\Csp\CspHeaderManager;
@@ -192,10 +193,20 @@ class CspReportController extends AbstractInachisController
             return $this->redirectToRoute('incc_tools_csp_settings');
         }
 
+        $policyData = json_decode($cspPolicy->getValue() ?? '', true) ?? [];
+        $displayDirectives = CspDirective::primary();
+        foreach (CspDirective::advanced() as $advancedDirective) {
+            if (isset($policyData[$advancedDirective->value])) {
+                $displayDirectives[] = $advancedDirective;
+            }
+        }
+
         $this->viewModel->page->title = 'CSP Policy';
         $this->viewModel->page->tab = 'csp-policy';
         return $this->render('inadmin/page/tools/csp_settings.html.twig', [
             'viewModel' => $this->viewModel,
+            'standard_directives' => $displayDirectives,
+            'enum_advanced' => CspDirective::advanced(),
             'mode' => $cspMode->getValue(), // String: 'off', 'report-only', or 'enforce'
             'policy' => json_decode($cspPolicy->getValue() ?? '', true) ?? [],
             'upgrade_insecure' => $cspUpgradeInsecure->getValue() === '1',

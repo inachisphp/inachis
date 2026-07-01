@@ -48,17 +48,15 @@ class NavigationTabRepository extends AbstractRepository
     /**
      * Returns paginated tabs ordered by position
      *
-     * @param array{} $filters
-     * @param int $offset
      * @param int $limit
-     * @param string $sort
+     * @param int $offset
      * @return Paginator<NavigationTab>
      */
-    public function getFiltered(array $filters, int $offset, int $limit, string $sort = ''): Paginator
+    public function getFiltered(int $limit,  int $offset): Paginator
     {
         return $this->getAll(
-            $offset,
             $limit,
+            $offset,
             [],
             [
                 [ 'q.position', 'ASC' ],

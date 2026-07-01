@@ -1,0 +1,40 @@
+<p class="ui-directive-row mb-4">
+    <label class="font-weight-bold d-block mb-1">
+        {{ directive.displayName }}
+        <small>(<code>{{ directive.value }}</code>)</small>
+    </label>
+
+    <input type="text"
+        id="directive_{{ directive.value }}"
+        class="text full-width csp-tag-input"
+        name="directives[{{ directive.value }}]"
+        value="{{ policy[directive.value] is defined ? policy[directive.value]|join(' ') : '' }}"
+        placeholder="{{ directive.placeholder }}"
+    >
+
+    <small>{{ directive.description }}</small>
+
+    {% if directive.value in ['script-src', 'script-src-elem', 'style-src', 'style-src-elem'] %}
+        <span>
+            <label class="inline_label text-danger small">
+                <input type="checkbox" 
+                       class="checkbox csp-keyword-toggle" 
+                       data-directive="{{ directive.value }}" 
+                       value="unsafe-inline"
+                       {{ policy[directive.value] is defined and 'unsafe-inline' in policy[directive.value] ? 'checked' : '' }}> 
+                ⚠️ Allow 'unsafe-inline'
+            </label>
+            
+            {% if 'script' in directive.value %}
+                <label class="inline_label text-danger small">
+                    <input type="checkbox" 
+                           class="checkbox csp-keyword-toggle" 
+                           data-directive="{{ directive.value }}" 
+                           value="unsafe-eval"
+                           {{ policy[directive.value] is defined and 'unsafe-eval' in policy[directive.value] ? 'checked' : '' }}> 
+                    ⚠️ Allow 'unsafe-eval'
+                </label>
+            {% endif %}
+        </span>
+    {% endif %}
+</p>

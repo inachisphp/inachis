@@ -20,6 +20,7 @@ use Ramsey\Uuid\UuidInterface;
  */
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\UrlRepository', readOnly: false)]
 #[ORM\Index(columns: ['linkCanonical'], name: 'search_idx')]
+#[ORM\HasLifecycleCallbacks]
 class Url
 {
     /**
@@ -290,10 +291,10 @@ class Url
     }
 
     /**
-     * Checks if the linked content is live - i.e. not draft, archived, or scheduled
+     * Checks if the linked content is live - i.e. not draft, expired, or scheduled
      */
     public function isContentLive(): bool
     {
-        return !$this->content->isDraft() && !$this->content->isScheduledPage() && !$this->content->isArchived();
+        return !$this->content->isDraft() && !$this->content->isScheduledPage() && !$this->content->hasExpired();
     }
 }

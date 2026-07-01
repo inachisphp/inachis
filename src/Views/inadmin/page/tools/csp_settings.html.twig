@@ -32,22 +32,37 @@
     </p>
 </fieldset>
 
+{# templates/inadmin/page/tools/csp_settings.html.twig #}
+{# ... keep header and top of the form the same ... #}
+
 <fieldset class="ui-section">
     <h3>Directives Config</h3>
-    <small>Separate your safe domains using spaces. Use keywords like <code>self</code> or <code>data-uri</code> safely without adding quotes manually.</small>
+    <div class="admonition admonition__info">
+        <p>Type custom domains and hit <strong>Space</strong> or <strong>Comma</strong> to create a rule tag. Use the quick-toggles for critical keyword settings.</p>
+    </div>
 
-    {% set standard_directives = ['default-src', 'script-src', 'style-src', 'img-src', 'font-src', 'connect-src', 'frame-src'] %}
+    <div id="csp-directives-wrapper">
+        {% for directive in standard_directives %}
+            {{ include('inadmin/partials/csp_directive_row.html.twig', { 'directive': directive, 'policy': policy }) }}
+        {% endfor %}
+    </div>
 
-    {% for directive in standard_directives %}
-        <p>
-            <label class="col-sm-2 col-form-label font-weight-bold"><code>{{ directive }}</code></label>
-                <input type="text"
-                        class="text full-width"
-                        name="directives[{{ directive }}]"
-                        value="{{ policy[directive] is defined ? policy[directive]|join(' ') : '' }}"
-                        placeholder="e.g. self data-uri https://trustedcdn.com">
-        </p>
-    {% endfor %}
+    <!-- p>
+        <button class="button button--add">+ Add Advanced Directive</button>
+    </p -->
+
+    <p>
+        <label for="add_advanced_directive">Need more control?</label>
+        <select id="add_advanced_directive" class="ui-select" style="max-width: 300px;">
+            <option value="">-- Add Advanced Directive --</option>
+            {# Loop through remaining directives not already in primary list #}
+            {% for adv in enum_advanced %}
+                {% if policy[adv.value] is not defined %}
+                    <option value="{{ adv.value }}" data-display="{{ adv.displayName }}" data-desc="{{ adv.description }}" data-placeholder="{{ adv.placeholder }}">{{ adv.value }} ({{ adv.displayName }})</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </p>
 </fieldset>
 <p>&nbsp;</p>
 
@@ -62,4 +77,71 @@
 
 </form>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Helper function to turn a text input into TomSelect tags
+    function initTomSelect(el) {
+        if (el.tomselect) return;
+        new TomSelect(el, {
+            plugins: ['remove_button'],
+            createOnBlur: true,
+            create: true,
+            delimiter: ' ',
+            placeholder: el.getAttribute('placeholder') || 'Add source...',
+            onItemAdd: function() { this.setTextboxValue(''); }
+        });
+    }
+
+    // Initialize existing primary elements
+    document.querySelectorAll('.csp-tag-input').forEach(initTomSelect);
+
+    // Watch checkboxes to add/remove special keywords dynamically from TomSelect
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('csp-keyword-toggle')) {
+            const directive = e.target.dataset.directive;
+            const keyword = e.target.value;
+            const tsInput = document.getElementById('directive_' + directive).tomselect;
+
+            if (e.target.checked) {
+                tsInput.addItem(keyword);
+            } else {
+                tsInput.removeItem(keyword);
+            }
+        }
+    });
+
+    // Handle "Add Advanced Directive" selection
+    const advancedSelect = document.getElementById('add_advanced_directive');
+    advancedSelect.addEventListener('change', function() {
+        const value = this.value;
+        if (!value) return;
+
+        const option = this.options[this.selectedIndex];
+        const display = option.dataset.display;
+        const desc = option.dataset.desc;
+        const placeholder = option.dataset.placeholder;
+
+        const wrapper = document.getElementById('csp-directives-wrapper');
+        
+        // Generate clean structural row HTML matching partial layout
+        const rowHtml = `
+            <p class="ui-directive-row animate-fade-in">
+                <label class="font-weight-bold">
+                    ${display} <br> <small><code>${value}</code></small>
+                </label>
+                <input type="text" class="text full-width csp-tag-input" id="directive_${value}" name="directives[${value}]" value="" placeholder="${placeholder}">
+                <small class="d-block text-muted">${desc}</small>
+            </p>
+        `;
+
+        wrapper.insertAdjacentHTML('beforeend', rowHtml);
+        initTomSelect(document.getElementById('directive_' + value));
+        
+        // Remove option from dropdown so it can't be added twice
+        option.remove();
+        this.value = "";
+    });
+});
+</script>
 {% endblock content %}

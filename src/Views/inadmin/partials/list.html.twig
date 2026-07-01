@@ -105,12 +105,12 @@
                 {% endif %}
                 {% if item.items is defined %}
                     {% if item.firstDate is not empty %}
-                <span class="material-icons" aria-hidden="true">date_range</span>{{ item.firstDate|date("M j, Y") }} to {{ item.lastDate|date("M j, Y") }}
+                <span class="material-icons" aria-hidden="true">date_range</span>{{ item.firstDate|date("M j, Y", viewModel.session.preferences.timezone) }} to {{ item.lastDate|date("M j, Y", viewModel.session.preferences.timezone) }}
                     {% endif %}
                 <span class="material-icons" aria-hidden="true">library_books</span> <strong>{{ item.items|length }}</strong> posts
                 {% endif %}
                 <span class="material-icons" aria-hidden="true">history</span>
-                 Updated: <em>{{ item.updatedAt|date('jS M Y \\a\\t H:i', timezone) }}</em>
+                 Updated: <em>{{ item.updatedAt|date('jS M Y \\a\\t H:i', viewModel.session.preferences.timezone) }}</em>
                 {% if inline|default(false) == false %}
             </p>
                 {% else %}
@@ -138,6 +138,7 @@
         'filters': filters,
         'filter_values': filter_values,
         'show_search': show_search,
+        'show_category_filter': show_category_filter,
         'add_button': add_button,
     } only %}
     <section class="paginated-list">

@@ -59,14 +59,14 @@ class SearchRepository extends ServiceEntityRepository
      * Perform search across all available types
      * 
      * @param string $keyword
-     * @param int $offset
      * @param int $limit
+     * @param int $offset
      * @param string $orderBy
      * @return SearchResult
      */
-    public function search(?string $keyword, int $offset = 0, int $limit = 25, string  $orderBy = 'relevance DESC, contentDate DESC'): SearchResult
+    public function search(?string $keyword, int $limit = 25, int $offset = 0, string  $orderBy = 'relevance DESC, contentDate DESC'): SearchResult
     {
-        return $this->searchWithScope($keyword, $offset, $limit, $orderBy, true);
+        return $this->searchWithScope($keyword, $limit, $offset, $orderBy, true);
     }
 
     /**
@@ -74,40 +74,40 @@ class SearchRepository extends ServiceEntityRepository
      * as {@link Image} resukts
      * 
      * @param string $keyword
-     * @param int $offset
      * @param int $limit
+     * @param int $offset
      * @param string $orderBy
      * @return SearchResult
      */
-    public function searchPublic(?string $keyword, int $offset = 0, int $limit = 25, string $orderBy = 'relevance DESC, contentDate DESC'): SearchResult
+    public function searchPublic(?string $keyword, int $limit = 25, int $offset = 0, string $orderBy = 'relevance DESC, contentDate DESC'): SearchResult
     {
-        return $this->searchWithScope($keyword, $offset, $limit, $orderBy, false);
+        return $this->searchWithScope($keyword, $limit, $offset, $orderBy, false);
     }
 
     /**
      * Performs the actual search
      * 
      * @param string|null $keyword
-     * @param int $offset
      * @param int $limit
+     * @param int $offset
      * @param string $orderBy
      * @param bool $includeImages
      * @return SearchResult
      */
-    private function searchWithScope(?string $keyword, int $offset, int $limit, string $orderBy, bool $includeImages): SearchResult
+    private function searchWithScope(?string $keyword, int $limit, int $offset, string $orderBy, bool $includeImages): SearchResult
     {
         if (empty($keyword)) {
-            return new SearchResult([], 0, $offset, $limit);
+            return new SearchResult([], 0, $limit, $offset);
         }
 
         $orderBy = $this->determineOrderBy($orderBy);
         $sql = sprintf('%s ORDER BY %s LIMIT :limit OFFSET :offset;',
             $this->getSQLUnion([
-                'p.id, p.title as title, p.sub_title, p.content, CONCAT(UCASE(LEFT(type, 1)), LCASE(SUBSTRING(type, 2))) AS type, p.post_date AS contentDate, p.mod_date, p.author_id as author,
+                'p.id, p.title as title, p.sub_title, p.content, CONCAT(UCASE(LEFT(type, 1)), LCASE(SUBSTRING(type, 2))) AS type, p.post_date AS contentDate, p.updated_at, p.author_id as author,
                 MATCH(p.title, p.sub_title, p.content) AGAINST(:kw IN NATURAL LANGUAGE MODE) AS relevance',
-                's.id, s.title as title, s.sub_title, s.description AS content, \'Series\' AS type, s.last_date AS contentDate, s.mod_date, s.author_id AS author,
+                's.id, s.title as title, s.sub_title, s.description AS content, \'Series\' AS type, s.last_date AS contentDate, s.updated_at, s.author_id AS author,
                 MATCH(s.title, s.sub_title, s.description) AGAINST(:kw IN NATURAL LANGUAGE MODE) AS relevance',
-                'i.id, i.title as title, i.filename as sub_title, i.alt_text as content, \'Image\' as type, mod_date as contentDate, i.mod_date, i.author_id as author,
+                'i.id, i.title as title, i.filename as sub_title, i.alt_text as content, \'Image\' as type, updated_at as contentDate, i.updated_at, i.author_id as author,
                 MATCH(i.title, i.alt_text, i.description) AGAINST(:kw IN NATURAL LANGUAGE MODE) AS relevance',
             ], $includeImages),
             $orderBy,
@@ -125,7 +125,7 @@ class SearchRepository extends ServiceEntityRepository
          *     content: string,
          *     type: string,
          *     contentDate: string,
-         *     mod_date: string,
+         *     updatedAt: string,
          *     author: string,
          *     relevance: float
          * }> $results
@@ -139,7 +139,7 @@ class SearchRepository extends ServiceEntityRepository
         //         'content' => is_string($row['content']) ? $row['content'] : '',
         //         'type' => is_string($row['type']) ? $row['type'] : '',
         //         'contentDate' => is_string($row['contentDate']) ? $row['contentDate'] : '',
-        //         'mod_date' => is_string($row['mod_date']) ? $row['mod_date'] : '',
+        //         'updated_at' => is_string($row['updated_at']) ? $row['updated_at'] : '',
         //         'author' => null,
         //         'relevance' => is_float($row['relevance']) ? $row['relevance'] : 0.00,
         //     ],
@@ -147,7 +147,7 @@ class SearchRepository extends ServiceEntityRepository
         // );
         $total = $this->getSearchTotalResults($keyword, $includeImages);
 
-        return new SearchResult($results, (int) $total, $offset, $limit);
+        return new SearchResult($results, (int) $total, $limit, $offset);
     }
 
     /**

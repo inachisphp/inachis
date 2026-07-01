@@ -20,8 +20,8 @@ interface PageRepositoryInterface
     /**
      * Get all pages
      * 
-     * @param int $offset The offset from which to return results from
      * @param int $limit  The maximum number of results to return
+     * @param int $offset The offset from which to return results from
      * @param list{0: string, 1?:array<string, string|list<string>>}|list{} $where
      * @param list<list{0: string, 1: string}>|string|list{} $order
      * @param list<string>|list{} $groupBy
@@ -29,8 +29,8 @@ interface PageRepositoryInterface
      * @return Paginator<Page>
      */
     public function getAll(
-        int $offset = 0,
         int $limit = 25,
+        int $offset = 0,
         array $where = [],
         array|string $order = [],
         array $groupBy = [],
@@ -55,19 +55,20 @@ interface PageRepositoryInterface
      *   keyword?:string,
      *   excludeIds?:list<string>,
      *   fromDate?:\DateTimeImmutable,
-     *   toDate?:\DateTimeImmutable
+     *   toDate?:\DateTimeImmutable,
+     *   expired?:string
      * } $filters
      * @param string $type
-     * @param int $offset
      * @param int $limit
+     * @param int $offset
      * @param string $sort
      * @return Paginator<Page>
      */
     public function getFilteredOfTypeByPostDate(
         array $filters,
         string $type,
-        int $offset,
         int $limit,
+        int $offset,
         string $sort
     ): Paginator;
 }

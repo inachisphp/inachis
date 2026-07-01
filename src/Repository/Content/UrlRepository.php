@@ -121,15 +121,15 @@ class UrlRepository extends AbstractRepository
      * Find a URL by its link, with an optional parameter to exclude a specific ID.
      *
      * @param array{keyword?:string} $filters
-     * @param int $offset
      * @param int $limit
+     * @param int $offset
      * @param string $sort
      * @return Paginator<Url>
      */
     public function getFiltered(
         array $filters,
-        int $offset,
         int $limit,
+        int $offset,
         string $sort = 'postDate desc'
     ): Paginator {
         $where = [];
@@ -142,8 +142,8 @@ class UrlRepository extends AbstractRepository
             ];
         }
         return $this->getAll(
-            $offset,
             $limit,
+            $offset,
             $where,
             $this->determineOrderBy($sort),
             [],
@@ -184,13 +184,13 @@ class UrlRepository extends AbstractRepository
      * such as being the default URL for a page, having the page be visible and published, and not
      * being marked as noindex.
      *
-     * @param int $offset
      * @param int $limit
+     * @param int $offset
      * @return array<Url>
      */
     public function findSitemapUrlsBatch(
+        int $limit,
         int $offset,
-        int $limit
     ): array {
         $now = new \DateTimeImmutable();
 
@@ -209,8 +209,8 @@ class UrlRepository extends AbstractRepository
             ->setParameter('status', EditorialStatus::PUBLISHED)
             ->setParameter('now', $now)
             ->orderBy('p.postDate', 'DESC')
-            ->setFirstResult($offset)
             ->setMaxResults($limit)
+            ->setFirstResult($offset)
             ->getQuery()
             ->getResult();
         return $results;

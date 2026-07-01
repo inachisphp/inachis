@@ -79,8 +79,8 @@ class RolesController extends AbstractInachisController
             'form' => $form->createView(),
             'dataset' => $roleRepository->getFiltered(
                 $contentQuery['filters'],
-                $contentQuery['offset'],
                 $contentQuery['limit'],
+                $contentQuery['offset'],
             ),
             'query' => $contentQuery,
         ]);

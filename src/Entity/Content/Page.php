@@ -62,6 +62,7 @@ use InvalidArgumentException;
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\PageRepository', readOnly: false)]
 #[ORM\Index(columns: ['title', 'author_id', 'image_id'], name: 'search_idx')]
 #[ORM\Index(columns: ['title', 'sub_title', 'content'], name: "fulltext_title_content", flags: ["fulltext"])]
+#[ORM\HasLifecycleCallbacks]
 class Page
 {
     use BidirectionalCollectionTrait;
@@ -273,12 +274,15 @@ class Page
         ?User $author = null,
         string $type = self::TYPE_POST
     ) {
-        $this->setTitle($title);
-        $this->setContent($content);
-        $this->setAuthor($author);
-        $now = new DateTimeImmutable();
-        $this->setPostDate($now);
+        $this->title = $title;
+        $this->content = $content;
+        $this->author = $author;
         $this->type = $type;
+
+        $now = new DateTimeImmutable();
+        $this->createdAt = $now;
+        $this->updatedAt = $now;
+        $this->postDate = $now;
         $this->urls = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->tags = new ArrayCollection();
@@ -288,10 +292,7 @@ class Page
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
-        $now = new DateTimeImmutable();
-
-        $this->createdAt ??= $now;
-        $this->updatedAt ??= $now;
+        $this->updatedAt = new DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]
@@ -1063,18 +1064,18 @@ class Page
     }
 
     /**
-     * Determines if the current page/post is archived.
+     * Determines if the current page/post has expired.
      *
-     * @return bool The result of testing if the page is archived
+     * @return bool The result of testing if the page has expired
      */
-    public function isArchived(): bool
+    public function hasExpired(): bool
     {
         $today = new DateTimeImmutable('now', new DateTimeZone($this->getTimezone() ?? 'UTC'));
         $expireDate = new DateTimeImmutable(
             $this->getExpireDate()?->format('Y-m-d H:i:s') ?? '',
             new DateTimeZone($this->getTimezone() ?? 'UTC')
         );
-        return $this->status === EditorialStatus::ARCHIVED || $expireDate->format('YmdHis') < $today->format('YmdHis');
+        return $expireDate->format('YmdHis') < $today->format('YmdHis');
     }
 
     /**

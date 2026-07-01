@@ -1,5 +1,10 @@
-{% set totalPages = (total / limit)|round(0, 'ceil') %}
+{% if limit <= 0 %}
+    {% set limit = 1 %}
+{% endif %}
+{% set totalPages = max(1, (total / limit)|round(0, 'ceil')) %}
 {% set lastPageOffset = (totalPages - 1) * limit %}
+{% set offset = min(offset, lastPageOffset) %}
+{% set offset = max(offset, 0) %}
 {% set currentPageIndex = (offset / limit)|round(0, 'floor') %}
 {% set halfWindow = (maxPagesToShow / 2)|round(0, 'floor') %}
 {% set startPageIndex = currentPageIndex - halfWindow %}
@@ -13,8 +18,10 @@
 {% endif %}
 {% set pagination_start = offset %}
 {% set pagination_end = min(offset + limit - 1, total) %}
+{% set querySuffix = querystring is defined and querystring ? '?' ~ querystring : '' %}
 
 {% block pagination %}
+{% if totalPages > 1 or hideSinglePageNav|default(false) %}
 <section class="pagination--row">
 
 {% if showSummary is defined and showSummary %}
@@ -36,18 +43,18 @@
 
 {% if startPageIndex > 0 %}
             <li class="page-item">
-                <a href="{{ result_url ~ '/0/' ~ limit ~ (querystring is defined and querystring ? '?' ~ querystring : '') }}"
-                   aria-label="Go to first page" class="page-link">1</a>
+                <a href="{{ result_url ~ '/' ~ limit  ~ '/0' ~ querySuffix }}"
+                   aria-label="Go to first page" class="page-link" rel="first">1</a>
             </li>
 
     {% if startPageIndex > 1 %}
-            <li class="pagination-spacer" aria-hidden="true"><span aria-hidden="true">…</span></li>
+            <li class="pagination-spacer" aria-hidden="true">…</li>
     {% endif %}
 {% endif %}
 
 {% if showFirstNext|default(false) %}
             <li class="page-item{% if currentPageIndex <= 0 %} disabled{% endif %}">
-                <a href="{{ result_url ~ '/' ~ max(0, (currentPageIndex - 1) * limit) ~ '/' ~ limit ~ (querystring is defined and querystring ? '?' ~ querystring : '') }}"
+                <a href="{{ result_url ~ '/' ~ limit ~ '/' ~ max(0, (currentPageIndex - 1) * limit) ~ querySuffix }}"
                    rel="prev"
                    aria-label="Go to previous page"
                    class="page-link"
@@ -60,9 +67,9 @@
 {% for pageIndex in range(startPageIndex, endPageIndex) %}
     {% set pageNum = pageIndex + 1 %}
             <li class="page-item{% if pageIndex == currentPageIndex %} current{% endif %}">
-                <a href="{{ result_url ~ '/' ~ (pageIndex * limit) ~ '/' ~ limit ~ (querystring is defined and querystring ? '?' ~ querystring : '') }}"
+                <a href="{{ result_url ~ '/' ~ limit ~ '/' ~ (pageIndex * limit) ~ querySuffix }}"
                    class="page-link"
-                   aria-label="Go to page {{ pageNum }}"
+                   aria-label="{% if pageIndex == currentPageIndex %}Current page, page {{ pageNum }}" aria-current="page{% else %}Go to page {{ pageNum }}{% endif %}"
                    {% if pageIndex == currentPageIndex %}aria-current="page"{% endif %}>
                     {{ pageNum }}
                 </a>
@@ -71,7 +78,7 @@
 
 {% if showFirstNext|default(false) %}
             <li class="page-item{% if currentPageIndex >= totalPages - 1 %} disabled{% endif %}">
-                <a href="{{ result_url ~ '/' ~ min(lastPageOffset, (currentPageIndex + 1) * limit) ~ '/' ~ limit ~ (querystring is defined and querystring ? '?' ~ querystring : '') }}"
+                <a href="{{ result_url ~ '/' ~ min(lastPageOffset, (currentPageIndex + 1) * limit) ~ '/' ~ limit ~ querySuffix }}"
                    rel="next"
                    aria-label="Go to next page"
                    class="page-link"
@@ -83,12 +90,12 @@
 
 {% if endPageIndex < totalPages - 1 %}
     {% if endPageIndex < totalPages - 2 %}
-            <li class="pagination-spacer" aria-hidden="true"><span aria-hidden="true">…</span></li>
+            <li class="pagination-spacer" aria-hidden="true">…</li>
     {% endif %}
             <li class="page-item">
-                <a href="{{ result_url ~ '/' ~ lastPageOffset ~ '/' ~ limit ~ (querystring is defined and querystring ? '?' ~ querystring : '') }}"
+                <a href="{{ result_url ~ '/' ~ limit ~ '/' ~ lastPageOffset ~ querySuffix }}"
                    aria-label="Go to last page"
-                   class="page-link">
+                   class="page-link" rel="last">
                     {{ totalPages }}
                 </a>
             </li>
@@ -96,4 +103,5 @@
         </ul>
     </nav>
 </section>
+{% endif %}
 {% endblock pagination %}

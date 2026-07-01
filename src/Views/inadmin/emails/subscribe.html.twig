@@ -8,7 +8,7 @@
                     <table cellpadding="0" cellspacing="0" width="600" class="w320">
                         <tr>
                             <td align="left" class="mobile-padding" style="padding:20px">
-                                <p>Thank you for subscribing to <strong>{{ settings.siteTitle|default(settings.domain) }}</strong>.</p>
+                                <p>Thank you for subscribing to <strong>{{ viewModel.settings.siteTitle|default(settings.domain) }}</strong>.</p>
                                 <p>We will email you with any new blog posts; but before we can do this - please click the link below to confirm it was you.</p>
 
                                 <div style="padding:20px 0;">
@@ -17,7 +17,7 @@
                                         <w:anchorlock/>
                                         <center>
                                     <![endif]-->
-                                    <a href="{{ settings.domain }}/subscribe/complete/{{ '%TOKEN%' }}" class="button--cta">Subscribe!</a>
+                                    <a href="{{ viewModel.settings.domain }}/subscribe/complete/{{ '%TOKEN%' }}" class="button--cta">Subscribe!</a>
                                     <!--[if mso]>
                                         </center>
                                     </v:rect>

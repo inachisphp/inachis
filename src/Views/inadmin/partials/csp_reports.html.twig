@@ -68,7 +68,7 @@
                 <td>{{ report.occurrences }}</td>
 
                 <td>
-                    {{ report.lastSeenAt ? report.lastSeenAt|date('Y-m-d H:i') : '—' }}
+                    {{ report.lastSeenAt ? report.lastSeenAt|date('Y-m-d H:i', viewModel.session.preferences.timezone) : '—' }}
                 </td>
 
                 <td class="text-end">

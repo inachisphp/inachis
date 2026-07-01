@@ -18,7 +18,7 @@
 				<dt><a aria-label="Edit {{ series.title }}" href="{{ path('incc_series_edit', {'id': series.id}) }}">{{ series.title }}{{ series.subtitle ? ' - ' ~ series.subtitle }}</a></dt>
 				<dd>
 					<span>{{ series.items|length }}</span> posts &middot;
-					<span>Updated: <em>{{ series.updatedAt|date('jS F Y') }}</em></span>
+					<span>Updated: <em>{{ series.updatedAt|date('jS F Y', viewModel.session.preferences.timezone) }}</em></span>
 				</dd>
 			{% endfor %}
 		</dl>
@@ -30,9 +30,9 @@
 				<dd>
 					<span>{{ series.items|length }}</span> posts &middot;
 					<span>
-						<em>{{ series.firstDate|date('jS F') }}</em>
+						<em>{{ series.firstDate|date('jS F', viewModel.session.preferences.timezone) }}</em>
 						&mdash;
-						<em>{{ series.lastDate|date('jS F Y') }}</em>
+						<em>{{ series.lastDate|date('jS F Y', viewModel.session.preferences.timezone) }}</em>
 					</span>
 				</dd>
 			{% endfor %}

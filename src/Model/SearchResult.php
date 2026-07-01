@@ -24,17 +24,17 @@ class SearchResult implements IteratorAggregate
      * 
      * @param list<
      *     array{id: string, title: string, sub_title: string, content: string, type: string, 
-     *         contentDate: string, mod_date: string, author: string, relevance: float}
+     *         contentDate: string, updatedAt: string, author: string, relevance: float}
      * > $results The search results
      * @param int $total The total number of search results
-     * @param int $offset The offset of the search results
      * @param int $limit The limit of the search results
+     * @param int $offset The offset of the search results
      */
     public function __construct(
         private array $results,
         private readonly int $total,
+        private readonly int $limit,
         private readonly int $offset,
-        private readonly int $limit
     ) {}
 
     /**
@@ -83,7 +83,7 @@ class SearchResult implements IteratorAggregate
      * @return list<
      *     array{
      *         id: string, title: string, sub_title: string, content: string, type: string, 
-     *         contentDate: string, mod_date: string, author: string, relevance: float
+     *         contentDate: string, updatedAt: string, author: string, relevance: float
      *     }
      * > The search results
      */
@@ -112,7 +112,7 @@ class SearchResult implements IteratorAggregate
             'type',
             'author',
             'contentDate',
-            'mod_date',
+            'updated_at',
             'url' => $this->updateStringProperty($key, $property, $value),
 
             'relevance' => $this->updateRelevanceProperty($key, $value),
@@ -144,7 +144,7 @@ class SearchResult implements IteratorAggregate
             'type' => $this->results[$key]['type'] = $value,
             'author' => $this->results[$key]['author'] = $value,
             'contentDate' => $this->results[$key]['contentDate'] = $value,
-            'mod_date' => $this->results[$key]['mod_date'] = $value,
+            'updatedAt' => $this->results[$key]['updated_at'] = $value,
             'url' => $this->results[$key]['url'] = $value,
 
             default => throw new \InvalidArgumentException(

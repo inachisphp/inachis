@@ -6,6 +6,17 @@
 {% endblock pagetitle %}
 
 {% block content %}
+
+    {% if post.hasExpired %}
+        <div class="col-12 admonition admonition__warning">
+            <h2 class="admonition__title">
+                <span class="material-icons" aria-hidden="true">warning</span>
+                {% trans %}admin.post.expired{% endtrans %}
+            </h2>
+            <p>{% trans %}admin.post.expired.help{% endtrans %}</p>
+        </div>
+    {% endif %}
+
     {% set showStats = post.id is not empty and post.status|default('') == 'published' %}
 
     {{ form_start(form, {'attr': { 'class': 'col-12 form form__post' }}) }}
@@ -125,7 +136,7 @@
             {% if post.imageSize is defined and post.imageSize > 0 %}
                 <p><strong>Total size of images used:</strong> {{ post.imageSize }} bytes ({{ (post.imageSize / 1024 / 1024)|round(2) }} Mb)</p>
             {% endif %}
-            {% if settings.geotagContent is defined and settings.geotagContent and settings.google.key is defined and settings.google.key is not empty %}
+            {% if viewModel.settings.geotagContent is defined and viewModel.settings.geotagContent and viewModel.settings.google.key is defined and viewModel.settings.google.key is not empty %}
             <p>
                 {{ form_label(form.latlong) }}
                 {{ form_errors(form.latlong) }}
@@ -190,7 +201,7 @@
                 {% for revision in revisions %}
                     <tr>
                         <th scope="row">{{ revision.versionNumber }}</th>
-                        <td>{{ revision.createdAt|date('d/m/Y H:i') }}</td>
+                        <td>{{ revision.createdAt|date('d/m/Y H:i', viewModel.session.preferences.timezone) }}</td>
                         <td>{{ revision.user.displayName }}</td>
                         <td><span class="badge">{{ revision.action }}</span></td>
                         <td>

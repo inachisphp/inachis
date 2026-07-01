@@ -84,10 +84,11 @@ abstract class AbstractRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns all entries for the current repository.
+     * Returns all entries for the current repository using Paginator; if you don't need pagination,
+     * do NOT use this function - use a findAll instead.
      *
-     * @param int $offset The offset from which to return results from
      * @param int $limit  The maximum number of results to return
+     * @param int $offset The offset from which to return results from
      * @param list{0: string, 1?:array<string, mixed>}|list{} $where
      * @param list<list{0: string, 1: string}>|string|list{} $order
      * @param list<string>|list{} $groupBy
@@ -95,8 +96,8 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * @return Paginator<T> The result of fetching the objects
      */
     public function getAll(
-        int $offset = 0,
         int $limit = 25,
+        int $offset = 0,
         array $where = [],
         array|string $order = [],
         array $groupBy = [],
@@ -142,7 +143,9 @@ abstract class AbstractRepository extends ServiceEntityRepository
                 // support typed parameters: [value, type]
                 if (is_array($value)) {
                     $paramValue = $value['value'];
-                    $paramType  = $value['type'] ?? null;
+                    $paramType  = !empty($value['type']) && is_string($value['type']) ?
+                        $value['type'] :
+                        null;
                 }
                 if ($paramType !== null) {
                     $qb = $qb->setParameter($key, $paramValue, $paramType);
@@ -158,11 +161,11 @@ abstract class AbstractRepository extends ServiceEntityRepository
         }
 
         $query = $qb->getQuery();
-        if ($offset > 0) {
-            $query = $query->setFirstResult($offset);
-        }
         if ($limit > 0) {
             $query = $query->setMaxResults($limit);
+        }
+        if ($offset > 0) {
+            $query = $query->setFirstResult($offset);
         }
 
         /** @var Paginator<T> */

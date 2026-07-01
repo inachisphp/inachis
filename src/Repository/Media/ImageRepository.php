@@ -13,6 +13,8 @@ use Inachis\Entity\Media\Image;
 use Inachis\Repository\AbstractRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Image repository
@@ -31,23 +33,25 @@ class ImageRepository extends AbstractRepository implements ResourceRepositoryIn
     /**
      * @param ManagerRegistry $registry
      */
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        private CacheInterface $cache,
+        ManagerRegistry $registry
+    ) {
         parent::__construct($registry, Image::class);
     }
 
     /**
      * Get all images that do not have alt text
      *
-     * @param int $offset
      * @param int $limit
+     * @param int $offset
      * @return Paginator<Image>
      */
-    public function getImagesWithoutAltText(int $offset = 0, int $limit = 0): Paginator
+    public function getImagesWithoutAltText(int $limit = 0, int $offset = 0): Paginator
     {
         return $this->getAll(
-            offset: $offset,
             limit: $limit,
+            offset: $offset,
             where: [
                 'q.altText IS NULL OR q.altText = :emptyString',
                 [
@@ -67,12 +71,16 @@ class ImageRepository extends AbstractRepository implements ResourceRepositoryIn
      */
     public function getImagesWithoutAltTextCount(): int
     {
-        $qb = $this->createQueryBuilder('i');
-        $qb = $qb
-            ->select('COUNT(i)')
-            ->where('i.altText IS NULL OR i.altText = :emptyString')
-            ->setParameter('emptyString', '');
-        /** @var int */
-        return $qb->getQuery()->getSingleScalarResult();
+        return $this->cache->get('images_without_alt_text_count', function (ItemInterface $item) {
+            $item->expiresAfter(7200);
+
+            $qb = $this->createQueryBuilder('i');
+
+            return (int) $qb->select('COUNT(i)')
+                ->where('i.altText IS NULL OR i.altText = :emptyString')
+                ->setParameter('emptyString', '')
+                ->getQuery()
+                ->getSingleScalarResult();
+        });
     }
 }

@@ -12,11 +12,9 @@ namespace Inachis\Form;
 use DateTimeImmutable;
 use IntlException;
 use Inachis\Entity\Content\{Category,Page,Tag};
-use Inachis\Entity\Media\Image;
 use Inachis\Entity\User\User;
 use Inachis\Enum\EditorialStatus;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -275,7 +273,7 @@ class PostType extends AbstractType
                     'aria-labelledby' => 'latlong_label',
                     'aria-required' => 'false',
                     'class' => 'ui-map',
-                    'data-google-key' => '{{ settings.google.key }}',
+                    'data-google-key' => '{{ viewModel.settings.google.key }}',
                 ],
                 'label' => 'admin.post.properties.location.label',
                 'label_attr' => [

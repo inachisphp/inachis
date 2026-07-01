@@ -6,13 +6,13 @@
             <h2>Data range</h2>
         </header>
         <p class="admonition__content">
-            {{ stats.from|date('jS F Y') }} &mdash; {{ stats.to|date('jS F Y') }}
+            {{ stats.from|date('jS F Y', viewModel.session.preferences.timezone) }} &mdash; {{ stats.to|date('jS F Y', viewModel.session.preferences.timezone) }}
         </p>
 		{% set best = stats.viewsPerDay
 			|sort((a, b) => b.views <=> a.views)
 			|first
 		%}
-		<p>Best day: {{ best.date|date('jS F Y') }} ({{ best.views }} views)</p>
+		<p>Best day: {{ best.date|date('jS F Y', viewModel.session.preferences.timezone) }} ({{ best.views }} views)</p>
     </section>
 
     <section class="widget ui-section rounded">

@@ -66,8 +66,8 @@ class CategoryRepository extends AbstractRepository implements CategoryRepositor
     public function findByTitleLike(string $title): Paginator
     {
         return $this->getAll(
-            0,
             25,
+            0,
             [
                 'q.title LIKE :title',
                 [
@@ -94,19 +94,19 @@ class CategoryRepository extends AbstractRepository implements CategoryRepositor
     /**
      * Return a batch of categories, ordered by title, with pagination.
      *
-     * @param integer $offset
      * @param integer $limit
+     * @param integer $offset
      * @return array<int,Category>
      */
     public function findBatch(
+        int $limit,
         int $offset,
-        int $limit
     ): array {
         /** @var array<int,Category> */
         return $this->createQueryBuilder('c')
             ->orderBy('c.title', 'ASC')
-            ->setFirstResult($offset)
             ->setMaxResults($limit)
+            ->setFirstResult($offset)
             ->getQuery()
             ->getResult();
     }

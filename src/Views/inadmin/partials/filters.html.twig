@@ -9,7 +9,7 @@
     <div class="row main-actions">
         {% if show_search|default(false) %}
             {% include('/inadmin/partials/search.html.twig') with {
-                placeholder: search_placeholder|default('Search posts…'),
+                placeholder: search_placeholder|default('Search…'),
                 ariaLabel: search_label|default('Search posts'),
                 enterKeyHint: 'search',
                 id: search_id|default('filter__keyword'),

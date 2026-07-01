@@ -32,6 +32,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: [ 'usernameCanonical', 'emailCanonical' ], name: 'search_idx')]
 #[UniqueEntity(fields: ['email'], message: 'This email address is already used.')]
 #[UniqueEntity(fields: ['username'], message: 'This username is already taken.')]
+#[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /** Constant for specifying passwords have no expiry time. */
@@ -337,7 +338,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getPreferences(): ?UserPreference
     {
-        return $this->preferences ?? new UserPreference($this);
+        return $this->preferences;
     }
 
     /**

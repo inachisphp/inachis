@@ -13,7 +13,7 @@
             <h2>Data range</h2>
         </header>
         <p class="admonition__content">
-            {{ analytics.from|date('jS F Y') }} &mdash; {{ analytics.to|date('jS F Y') }}
+            {{ analytics.from|date('jS F Y', viewModel.session.preferences.timezone) }} &mdash; {{ analytics.to|date('jS F Y', viewModel.session.preferences.timezone) }}
         </p>
     </section>
 

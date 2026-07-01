@@ -9,10 +9,10 @@ Your account was accessed from a new device:
 
 IP Address: {{ ip }}
 User Agent: {{ userAgent }}
-Time: {{ time|date('Y-m-d \a\t H:i') }}
+Time: {{ time|date('Y-m-d \a\t H:i', viewModel.session.preferences.timezone) }}
 
 If you do not recognize this activity, please change your password immediately.
 
-Change my password: {{ settings.domain }}
+Change my password: {{ viewModel.settings.domain }}
 
 {% endblock content %}

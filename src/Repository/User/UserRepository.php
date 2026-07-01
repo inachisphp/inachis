@@ -46,11 +46,11 @@ class UserRepository extends AbstractRepository
      * Gets filtered users
      * 
      * @param array{keyword?: string} $filters The filters
-     * @param int $offset The offset
      * @param int $limit The limit
+     * @param int $offset The offset
      * @return Paginator<User> The paginator
      */
-    public function getFiltered(array $filters, int $offset, int $limit): Paginator
+    public function getFiltered(array $filters, int $limit, int $offset): Paginator
     {
         $where = [
             'q.isRemoved = \'0\'',
@@ -61,8 +61,8 @@ class UserRepository extends AbstractRepository
             $where[1]['keyword'] = '%' . $filters['keyword']  . '%';
         }
         return $this->getAll(
-            $offset,
             $limit,
+            $offset,
             $where,
             [
                 [ 'q.displayName', 'ASC' ],

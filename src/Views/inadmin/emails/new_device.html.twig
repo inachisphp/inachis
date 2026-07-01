@@ -1,6 +1,6 @@
 {% extends "inadmin/emails/email-layout.html.twig" %}
 
-{% block title %}New device sign-in detected for {{ settings.siteTitle }}{% endblock title %}
+{% block title %}New device sign-in detected for {{ viewModel.settings.siteTitle }}{% endblock title %}
 
 {% block preheader %}
 We have detected a new device sign-in for your account.
@@ -22,7 +22,7 @@ We have detected a new device sign-in for your account.
                                 <ul>
                                     <li>IP Address: <strong>{{ ip }}</strong></li>
                                     <li>User Agent: <strong>{{ userAgent }}</strong></li>
-                                    <li>Time: <strong>{{ time|date('Y-m-d \a\t H:i') }}</strong></li>
+                                    <li>Time: <strong>{{ time|date('Y-m-d \a\t H:i', viewModel.session.preferences.timezone) }}</strong></li>
                                 </ul>
 
                                 <p>If you do not recognize this activity, please change your password immediately.</p>
@@ -33,7 +33,7 @@ We have detected a new device sign-in for your account.
                                         <w:anchorlock/>
                                         <center>
                                     <![endif]-->
-                                    <a href="{{ settings.domain }}" class="button--cta">Change my password</a>
+                                    <a href="{{ viewModel.settings.domain }}" class="button--cta">Change my password</a>
                                     <!--[if mso]>
                                     </center>
                                     </v:rect>

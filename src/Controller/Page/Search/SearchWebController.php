@@ -13,6 +13,7 @@ use Inachis\Repository\Content\SearchRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Repository\Content\UrlRepository;
 use Inachis\Controller\AbstractWebController;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -37,25 +38,25 @@ class SearchWebController extends AbstractWebController
         $results = [];
         $total = 0;
         if ($keyword !== '') {
-            $searchResults = $searchRepository->searchPublic($keyword, $offset, $limit);
+            $searchResults = $searchRepository->searchPublic($keyword, $limit, $offset);
             $total = $searchResults->getTotal();
 
             foreach ($searchResults->getResults() as $result) {
                 /** @var array<string, mixed> $result */
                 $type = is_scalar($result['type'] ?? null) ? strtolower((string) $result['type']) : '';
-                $id = is_scalar($result['id'] ?? null) ? (string) $result['id'] : '';
+                $uuidString = Uuid::fromBytes($result['id'])->toString();
                 $title = is_scalar($result['title'] ?? null) ? (string) $result['title'] : '';
                 $excerpt = is_scalar($result['content'] ?? null) ? (string) $result['content'] : '';
 
                 if ($type === 'series') {
-                    $entity = $seriesRepository->find($id);
+                    $entity = $seriesRepository->find($uuidString);
                     $url = $entity !== null && is_scalar($entity->getUrl())
                         ? '/series/' . ltrim((string) $entity->getUrl(), '/')
                         : null;
                 } else {
                     /** @var \Inachis\Entity\Content\Url|null $contentUrl */
                     $contentUrl = $urlRepository->findOneBy([
-                        'content' => $id,
+                        'content' => $uuidString,
                         'default' => true,
                     ]);
                     $url = $contentUrl instanceof \Inachis\Entity\Content\Url
@@ -64,7 +65,7 @@ class SearchWebController extends AbstractWebController
                 }
 
                 $results[] = [
-                    'id' => $id,
+                    'id' => $uuidString,
                     'title' => $title,
                     'type' => $type === 'series' ? 'series' : $type,
                     'excerpt' => $excerpt,

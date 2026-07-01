@@ -11,6 +11,11 @@
             condition: 'true',
             className: 'badge__draft',
         },
+        expired: {
+            field: 'hasExpired',
+            condition: true,
+            className: 'badge__critical',
+        },
         scheduled: {
             field: 'isScheduledPage',
             condition: true,
@@ -123,13 +128,18 @@
             Status: {
                 '': 'All',
                 'draft': 'Draft',
+                'review': 'In Review',
                 'published': 'Published',
             },
             Visibility: {
                 '': 'All',
                 'private': 'Private',
                 'public': 'Public',
-            }
+            },
+            Expired: {
+                '': 'All',
+                'expired': 'Expired',
+            },
         },
 
         filter_values: query.filters,
@@ -146,6 +156,7 @@
         show_category_filter: true,
         show_select_deselect: true,
         show_search: true,
+        search_placeholder: 'Search posts…',
         showSummary: true,
         zebra: true,
     }

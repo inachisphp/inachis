@@ -49,8 +49,8 @@ class ContentAggregator
 
         /** @var Paginator<Series> $series */
         $series = $this->seriesRepository->getAll(
-            0,
             self::ITEMS_TO_SHOW,
+            0,
             [
                 'q.lastDate < :postDate AND q.visible = :visible',
                 [
@@ -96,8 +96,8 @@ class ContentAggregator
 
         /** @var Paginator<Page> $pages */
         $pages = $this->pageRepository->getAll(
-            0,
             self::ITEMS_TO_SHOW,
+            0,
             [$pageQuery, $pageParameters],
             'q.postDate DESC, q.updatedAt'
         );
