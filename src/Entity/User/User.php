@@ -18,6 +18,7 @@ use Inachis\Entity\Security\Role;
 use Inachis\Entity\User\UserPreference;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
+use Inachis\Validator\Constraints\PasswordPolicy;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -71,6 +72,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\PasswordStrength(
         minScore: Assert\PasswordStrength::STRENGTH_WEAK,
     )]
+    #[PasswordPolicy]
     protected ?string $plainPassword;
 
     /** @var string|null The email address of the user */
@@ -264,7 +266,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        $roles = [ 'ROLE_ADMIN' ];
+        $roles = [];
+        foreach ($this->assignedRoles as $role) {
+            $slug = strtoupper($role->getSlug());
+            $roles[] = 'ROLE_' . $slug;
+            if ($slug === 'ADMIN' || $slug === 'ADMINISTRATOR') {
+                $roles[] = 'ROLE_ADMIN';
+            }
+        }
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
