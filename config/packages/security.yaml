@@ -52,7 +52,7 @@ security:
     access_control:
         - { path: ^/health$, roles: PUBLIC_ACCESS, ips: [127.0.0.1, ::1, 10.0.0.0/8, 192.168.0.0/16] }
         - { path: ^/incc/(login|forgot-password|new-password|logout|api/calculate-password-strength)$, roles: PUBLIC_ACCESS }
-        - { path: ^/incc, roles: ROLE_ADMIN }
+        - { path: ^/incc, roles: ROLE_USER }
         - { path: ^/.*, roles: PUBLIC_ACCESS }
 
 when@test:
