@@ -6,7 +6,7 @@
 {% endblock pagetitle %}
 {% block content %}
 <div class="col-12">
-    {% include 'inadmin/partials/table.html.twig' with {
+    {% include 'inadmin/partials/components/view_content.html.twig' with {
         dataset: entries ?? [],
         type: 'log',
         table_name: 'Application log',
@@ -37,6 +37,7 @@
             },
             { title: 'Message', source: 'message', className: 'column--monospaced' },
         ],
+        view_setting: 'table',
         zebra: true,
         filters: [],
         filter_values: {

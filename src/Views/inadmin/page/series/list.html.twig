@@ -4,10 +4,17 @@
     <span>Series</span>
 {% endblock pagetitle %}
 
-{% block content %}
+{% set badges = {
+    'private': {
+        'field': 'visible',
+        'condition': false,
+        'className': 'badge__private'
+    },
+} %}
 
+{% block content %}
 <div class="col-12">
-    {% include 'inadmin/partials/list.html.twig' with {
+    {% include 'inadmin/partials/components/view_content.html.twig' with {
         'className': 'form__series',
         'type': 'series',
 
@@ -20,6 +27,7 @@
         'slug': 'id',
 
         'add_button': {
+            image: 'create_new_folder',
             'text': 'Create Series',
             'url': path('incc_series_new'),
         },
@@ -34,10 +42,10 @@
         },
         'filter_values': query.filters,
         'show_select_deselect': true,
-        'show_search': true,
+        show_search: true,
         search_placeholder: 'Search series…',
         showSummary: true,
-        'zebra': true,
+        zebra: true,
 
         'actions': {
             'private': {
@@ -93,13 +101,38 @@
             'title desc': 'Title: Z-A',
         },
 
-        'badges': {
-            'private': {
-                'field': 'visible',
-                'condition': false,
-                'className': 'badge__private'
+        'badges': badges,
+
+
+        columns: [
+            {
+                title: 'Title',
+                source: 'title',
+                slug: 'id',
             },
-        }
+            {
+                title: 'Sub-title',
+                source: 'subTitle',
+            },
+            {
+                title: 'First Date',
+                source: 'firstDate',
+                source_type: 'date',
+            },
+            {
+                title: 'Last Date',
+                source: 'lastDate',
+                source_type: 'date',
+            },
+            {
+                title: 'Status',
+                flex: true,
+                badges: badges,
+            }
+        ],
+
+        view_modes: [ 'list', 'table' ],
+        view_setting: query.view_setting|default('list'),
     }
 %}
 </div>

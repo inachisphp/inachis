@@ -16,9 +16,6 @@ use Exception;
 use Doctrine\ORM\Mapping as ORM;
 use Inachis\Entity\Security\Role;
 use Inachis\Entity\User\UserPreference;
-use Inachis\Enum\Security\PermissionAction;
-use Inachis\Enum\Security\PermissionResource;
-use Inachis\Validator\Constraints\PasswordPolicy;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -36,9 +33,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    /** Constant for specifying passwords have no expiry time. */
-    public const NO_PASSWORD_EXPIRY = -1;
-
     /** @var UuidInterface|null The unique identifier for the {@link User} */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
@@ -115,7 +109,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /** @var DateTimeImmutable|null The date the password was last modified */
     #[ORM\Column(type: "datetime_immutable")]
-    protected ?DateTimeImmutable $passwordModDate = null;
+    protected ?DateTimeImmutable $passwordChangedAt = null;
+
+    /** @var DateTimeImmutable|null The date the user last logged in */
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $lastLoginAt = null;
 
     /** @var Collection<int, Role> The admin roles assigned to this user */
     #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: 'users')]
@@ -127,6 +125,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?UserPreference $preferences = null;
+
+    #[ORM\Column(name: 'totp_secret', type: 'string', length: 255, nullable: true)]
+    private ?string $totpSecret = null;
+
+    #[ORM\Column(name: 'totp_enabled', type: 'boolean')]
+    private bool $totpEnabled = false;
 
     /**
      * Default constructor for {@link User}. If a password is passed into
@@ -331,13 +335,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Returns the {@link passwordModDate} for the {@link User}.
+     * Returns the {@link passwordChangedAt} for the {@link User}.
      *
      * @return DateTimeImmutable|null The password last modification date for the user
      */
-    public function getPasswordModDate(): ?DateTimeImmutable
+    public function getPasswordChangedAt(): ?DateTimeImmutable
     {
-        return $this->passwordModDate;
+        return $this->passwordChangedAt;
+    }
+
+    /**
+     * Returns the {@link lastLoginAt} for the {@link User}.
+     *
+     * @return DateTimeImmutable|null The last login date for the user
+     */
+    public function getLastLoginAt(): ?DateTimeImmutable
+    {
+        return $this->lastLoginAt;
     }
 
     /**
@@ -415,7 +429,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->password = $value;
         if ($value !== null) {
-            $this->passwordModDate = $now ?? new DateTimeImmutable();
+            $this->passwordChangedAt = $now ?? new DateTimeImmutable();
         }
         return $this;
     }
@@ -499,40 +513,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Sets the {@link createdAt} from a DateTime object.
+     * Sets the {@link passwordChangedAt} from a DateTime object.
      *
-     * @param DateTimeImmutable $value The date to be set
+     * @param DateTimeImmutable $value The date to set
      * @return self
      */
-    public function setCreatedAt(DateTimeImmutable $value): self
+    public function setPasswordChangedAt(DateTimeImmutable $value): self
     {
-        $this->createdAt = $value;
+        $this->passwordChangedAt = $value;
 
         return $this;
     }
 
     /**
-     * Sets the {@link updatedAt} from a DateTime object.
+     * Sets the {@link lastLoginAt} from a DateTime object.
      *
      * @param DateTimeImmutable $value The date to set
      * @return self
      */
-    public function setUpdatedAt(DateTimeImmutable $value): self
+    public function setLastLoginAt(DateTimeImmutable $value): self
     {
-        $this->updatedAt = $value;
-
-        return $this;
-    }
-
-    /**
-     * Sets the {@link passwordModDate} from a DateTime object.
-     *
-     * @param DateTimeImmutable $value The date to set
-     * @return self
-     */
-    public function setPasswordModDate(DateTimeImmutable $value): self
-    {
-        $this->passwordModDate = $value;
+        $this->lastLoginAt = $value;
 
         return $this;
     }
@@ -567,23 +568,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Determines if the password has expired by adding {@link expiryDays}
-     * to the {@link passwordMoDate} and comparing it to the current time.
-     * This function can also be used with a notification period to determine
-     * if the user should be alerted.
-     *
-     * @param int $expiryDays The number of days the password expires after
-     * @return bool The result of testing the {@link passwordModDate}
-     */
-    public function hasCredentialsExpired(int $expiryDays = self::NO_PASSWORD_EXPIRY): bool
-    {
-        if ($expiryDays === self::NO_PASSWORD_EXPIRY || $this->passwordModDate === null) {
-            return false;
-        }
-        return $this->passwordModDate->modify("+{$expiryDays} days") <= new DateTimeImmutable();
-    }
-
-    /**
      * Confirms provided address is generally in the right sort of format
      * to be an email address.
      *
@@ -600,6 +584,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         );
     }
 
+    public function getTotpSecret(): ?string
+    {
+        return $this->totpSecret;
+    }
+
+    public function setTotpSecret(?string $totpSecret): self
+    {
+        $this->totpSecret = $totpSecret;
+        return $this;
+    }
+
+    public function isTotpEnabled(): bool
+    {
+        return $this->totpEnabled;
+    }
+
+    public function setTotpEnabled(bool $totpEnabled): self
+    {
+        $this->totpEnabled = $totpEnabled;
+        return $this;
+    }
+
     /**
      * Removes the password for this {@link User}
      *
@@ -608,30 +614,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
         $this->plainPassword = null;
-    }
-
-    /**
-     * @deprecated 2.0.0 This will be moved to a resolver
-     *
-     * @param PermissionResource $resource
-     * @param PermissionAction $action
-     * @return boolean
-     */
-    public function hasPermission(
-        PermissionResource $resource,
-        PermissionAction $action
-    ): bool {
-        foreach ($this->assignedRoles as $role) {
-            foreach ($role->getRolePermissions() as $permission) {
-                if (
-                    $permission->getResource() === $resource
-                    && $permission->getAction() === $action
-                ) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 }

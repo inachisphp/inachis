@@ -161,4 +161,14 @@ class Image extends AbstractFile
         }
         return getimagesize($fullImagePath);
     }
+
+    /**
+     * Returns the dimensions fo the image as a string (w x h)
+     *
+     * @return string
+     */
+    public function getDimensionsString(): string
+    {
+        return $this->dimensionX . ' x ' . $this->dimensionY;
+    }
 }

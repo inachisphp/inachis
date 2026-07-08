@@ -20,7 +20,7 @@
             {% if content_type != 'series' %}
                 <td>{{ item.title }}</td>
                 <td>{{ item.type }}</td>
-                <td><span class="badge badge__{{ item.status }}">{{ item.status }}</span></td>
+                <td><span class="badge badge__{{ item.status.value }}">{{ item.status.value }}</span></td>
                 <td>{{ item.categories|map(c => c.title)|join(', ') }}</td>
                 <td>{{ item.tags|map(t => t.title)|join(', ') }}</td>
             {% else %}

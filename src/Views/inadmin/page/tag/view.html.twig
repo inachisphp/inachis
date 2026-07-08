@@ -7,7 +7,7 @@
 
 {% block content %}
 <div class="col-12">
-	{% include 'inadmin/partials/table.html.twig' with {
+	{% include 'inadmin/partials/components/view_content.html.twig' with {
 		className: 'form__tag col-6',
 		type: 'post',
 		additional_classes: 'default',
@@ -43,7 +43,7 @@
 			offset: query.offset,
 			limit: query.limit,
 		}),
-
+		view_setting: 'table',
 		show_select_deselect: true,
 		zebra: true,
 

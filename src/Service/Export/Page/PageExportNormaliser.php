@@ -34,7 +34,7 @@ final class PageExportNormaliser
         $dto->subTitle = $page->getSubTitle();
         $dto->content = $page->getContent();
         $dto->type = $page->getType();
-        $dto->status = $page->getStatus();
+        $dto->status = $page->getStatus()->value;
         $dto->visible = $page->isVisible();
         $dto->allowComments = $page->isAllowComments();
         $dto->language = $page->getLanguage();

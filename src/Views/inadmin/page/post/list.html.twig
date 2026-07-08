@@ -50,7 +50,7 @@
 
 <div class="col-12">
     {% include 'inadmin/partials/tab-sets/posts.html.twig' %}
-    {% include 'inadmin/partials/list.html.twig' with {
+    {% include 'inadmin/partials/components/view_content.html.twig' with {
         className: 'form__posts',
         type: 'post',
         dataset: posts,
@@ -64,6 +64,7 @@
         slug: 'urls[0].link',
 
         add_button: {
+            image: 'note_add',
             text: 'Create ' ~ viewModel.page.tab|capitalize,
             url: link_new,
         },
@@ -124,6 +125,28 @@
             }
         },
 
+        columns: [
+            {
+                title: 'Title',
+                source: 'title',
+                slug: 'urls[0].link',
+            },
+            {
+                title: 'Sub-title',
+                source: 'subTitle',
+            },
+            {
+                title: 'Post Date',
+                source: 'postDate',
+                source_type: 'date',
+            },
+            {
+                title: 'Status',
+                flex: true,
+                badges: badges,
+            }
+        ],
+
         filters: {
             Status: {
                 '': 'All',
@@ -158,6 +181,8 @@
         show_search: true,
         search_placeholder: 'Search posts…',
         showSummary: true,
+        view_modes: [ 'list', 'table' ],
+        view_setting: query.view_setting|default('list'),
         zebra: true,
     }
     %}
