@@ -31,7 +31,7 @@ class UserPreferencesExtension extends AbstractExtension implements GlobalsInter
      */
     public function getGlobals(): array
     {
-        if ($this->security->getUser() && $this->security->isGranted('ROLE_ADMIN')) {
+        if ($this->security->getUser() && $this->security->isGranted('ROLE_USER')) {
             return [
                 'userPreference' => $this->preferenceProvider->get(),
             ];

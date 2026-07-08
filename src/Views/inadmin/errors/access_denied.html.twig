@@ -1,0 +1,12 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <span>Access Denied</span>
+{% endblock pagetitle %}
+
+{% block content %}
+<section class="ui-section col-12">
+	<p class="content-warning">{{ message }}</p>
+	<p class="centred"><img src="/assets/imgs/incc/no-access.png" alt="Access denied" />
+</section>
+{% endblock content %}
