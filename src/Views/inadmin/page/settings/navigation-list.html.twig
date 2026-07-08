@@ -5,7 +5,7 @@
 {% endblock pagetitle %}
 {% block content %}
 <div class="col-12">
-    {% include 'inadmin/partials/table.html.twig' with {
+    {% include 'inadmin/partials/components/view_content.html.twig' with {
         type: 'tabs',
 
         table_name: 'Navigation Tabs list',
@@ -64,6 +64,7 @@
         },
 
         url_result: path('incc_settings_navigation_list'),
+        view_setting: 'table',
         zebra: true,
 
         actions: {

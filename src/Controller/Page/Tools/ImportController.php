@@ -9,7 +9,6 @@
 
 namespace Inachis\Controller\Page\Tools;
 
-use Doctrine\ORM\EntityManager;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\User\User;
 use Inachis\Model\Import\ImportOptionsDto;
@@ -42,7 +41,6 @@ class ImportController extends AbstractInachisController
     #[Route('/incc/tools/import', name: 'incc_tools_import', methods: ['GET', 'POST'])]
     public function import(
         Request $request,
-        EntityManager $entityManager,
         ImportDetector $importDetector,
         CategoryImportService $categoryImportService,
         CategoryImportValidator $categoryImportValidator,
@@ -77,7 +75,7 @@ class ImportController extends AbstractInachisController
                         $data = json_decode(json_encode($xml), true)['category'];
                         break;
                     case 'md':
-                        $parser = new MarkdownFileParser($entityManager);
+                        $parser = new MarkdownFileParser($this->entityManager);
                         $data = $parser->parse($content);
 dump($data);exit;
                         break;

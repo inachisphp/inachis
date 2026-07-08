@@ -18,7 +18,7 @@
     </section>
     <section class="admin__search">
         <form action="{{ path('incc_search_results', { 'keyword': ' '}) }}" aria-label="Search content" method="post" role="search">
-            {% include 'inadmin/partials/search.html.twig' with {
+            {% include 'inadmin/partials/components/search.html.twig' with {
                 ariaLabel: 'Search all content',
                 clearBtn: true,
                 enterKeyHint: 'search',

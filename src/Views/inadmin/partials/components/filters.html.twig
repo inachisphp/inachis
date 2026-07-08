@@ -1,6 +1,5 @@
 {% block filter %}
     {% set isEmptyFilterValues = (filter_values|default(null)) is empty %}
-
 {% if filters is defined and filters is not empty or show_search|default(false) or (sort_options is defined and sort_options is not empty) or add_button|default(null) is not empty %}
 
 <section class="filter-bar sticky-nav" aria-label="Filter and sort content list">
@@ -8,7 +7,7 @@
     {% if add_button|default(null) is not empty or show_search|default(false) %}
     <div class="row main-actions">
         {% if show_search|default(false) %}
-            {% include('/inadmin/partials/search.html.twig') with {
+            {% include('/inadmin/partials/components/search.html.twig') with {
                 placeholder: search_placeholder|default('Search…'),
                 ariaLabel: search_label|default('Search posts'),
                 enterKeyHint: 'search',
@@ -36,7 +35,7 @@
     </div>
     {% endif %}
 
-    {% if filters|default(null) is not empty or sort_options|default(null) is not empty %}
+    {% if filters|default(null) is not empty or sort_options|default(null) is not empty or view_modes|default(null) is not empty %}
     <div class="row secondary-controls">
         {% if filters|default(null) is not empty %}
         <button type="button" class="filter__toggle icon-badge-wrapper" id="toggle-filters" aria-expanded="{{ isEmptyFilterValues ? 'false' : 'true' }}" aria-controls="filter__options">
@@ -46,7 +45,30 @@
         </button>
         {% endif %}
         {% if sort_options|default(null) is not empty %}
-            {{ include('/inadmin/partials/sort-by.html.twig') }}
+            {{ include('/inadmin/partials/components/sort-by.html.twig') }}
+        {% endif %}
+
+        {% if view_modes|default([])|length > 1 %}
+        <div class="grid-toggle">
+            {% if view_modes is defined and 'grid' in view_modes %}
+            <button aria-pressed="{{ view_setting == 'grid' ? 'true' : 'false' }}" class="button button--grid" id="grid-toggle" name="view" value="grid" title="Grid view" type="submit">
+                <span class="material-icons" aria-hidden="true">grid_view</span>
+                <span class="btn-text">Grid view</span>
+            </button>
+            {% endif %}
+            {% if view_modes is defined and 'list' in view_modes %}
+            <button aria-pressed="{{ view_setting == 'list' ? 'true' : 'false' }}" class="button button--list" id="list-toggle" name="view" value="list" title="List view" type="submit">
+                <span class="material-icons" aria-hidden="true">list</span>
+                <span class="btn-text">List view</span>
+            </button>
+            {% endif %}
+            {% if view_modes is defined and 'table' in view_modes %}
+            <button aria-pressed="{{ view_setting == 'table' ? 'true' : 'false' }}" class="button button--compact" id="compact-toggle" name="view" value="table" title="Table view" type="submit">
+                <span class="material-icons" aria-hidden="true">table_view</span>
+                <span class="btn-text">Table view</span>
+            </button>
+            {% endif %}
+        </div>
         {% endif %}
     </div>
     {% endif %}
@@ -87,6 +109,7 @@
     </p>
 </div>
 {% endif %}
+
 </section>
 
 {% endif %}

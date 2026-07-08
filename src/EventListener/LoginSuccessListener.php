@@ -82,7 +82,7 @@ class LoginSuccessListener
                     ])
             );
         }
-
+        $user->setLastLoginAt(new \DateTimeImmutable());
         $this->entityManager->persist($activity);
         $this->entityManager->flush();
     }  

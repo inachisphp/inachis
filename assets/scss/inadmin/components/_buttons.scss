@@ -3,9 +3,12 @@
 
 .button,
 .button:visited {
+    align-items: center;
     background-color: $bg-surface;
     border: 1px solid $border-color-input;
     border-radius: $radius-standard;
+    display: inline-flex;
+    gap: 0.5rem;
     padding: 0.5em 0.75em;
     text-decoration: none;
     text-wrap-mode: nowrap;
@@ -30,17 +33,6 @@
 
     &:disabled {
         opacity: 0.5;
-    }
-
-    span:nth-of-type(2),
-    i:nth-last-of-type(1) {
-        margin-top: 0.2em;
-    }
-
-    span,
-    i {
-        display: inline-block;
-        vertical-align: middle;
     }
 
     &.button--positive {

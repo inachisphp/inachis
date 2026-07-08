@@ -1,0 +1,111 @@
+{% for item in dataset.iterator %}
+    {% if slug is defined %}
+        {% if '.' in slug %}
+            {% set slug_exploded = slug|split('.')  %}
+            {% set slug_object = item %}
+            {% for part in slug_exploded %}
+                {% if '[' in part %}
+                    {% set part = part|split('[')[0] %}
+                    {% if attribute(slug_object, part)[0] is defined %}
+                        {% set slug_object = attribute(slug_object, part)[0] %}
+                    {% else %}
+                        {% set slug_object = '' %}
+                    {% endif %}
+                {% elseif attribute(slug_object, part) is defined %}
+                    {% set slug_object = attribute(slug_object, part) %}
+                {% else %}
+                    {% set slug_object = '' %}
+                {% endif %}
+            {% endfor %}
+        {% elseif attribute(item, slug) is defined %}
+            {% set slug_object = attribute(item, slug) %}
+        {% else %}
+            {% set slug_object = '' %}
+        {% endif %}
+    {% endif %}
+<article id="{{ type ~ '-' ~ item.id }}" class="{{ type }} {{ additional_classes|default(null) }} hentry">
+    {% if actions|default(null) is not empty %}
+        <input class="checkbox" id="{{ type }}-{{ item.id }}__input" type="checkbox" name="items[]" value="{{ item.id }}" />
+    {% endif %}
+    {% if slug is defined %}
+    <a aria-label="Edit {% if item.title is defined %}{{ item.title }}{% elseif item.displayName is defined %}{{ item.displayName }}{% endif %}" href="/incc/{{ slug_prefix }}/{{ slug_object }}">
+    {% endif %}
+    {% if inline|default(false) == false %}
+        <h2>
+    {% else %}
+        <strong>
+    {% endif %}
+            <!-- label for="post-{{ item.id }}__input" -->
+            {% if item.title is defined %}
+                {{ item.title }}
+            {% elseif item.displayName is defined %}
+                {{ item.displayName }}
+            {% elseif item_title is defined and attribute(item, item_title) is defined %}
+                {{ attribute(item, item_title) }}
+            {% endif %}
+
+            {% if item.subTitle|default(null) is not empty %}
+                &mdash; {{ item.subTitle }}
+            {% endif %}
+
+            {% if badges|default(null) is not empty %}
+                <span>
+                    {{ include('inadmin/partials/badge.html.twig') }}
+                </span>
+            {% endif %}
+
+        {% if inline|default(false) == false %}
+        </h2>
+        {% else %}
+        </strong>
+        {% endif %}
+    {% if slug is defined %}
+    </a>
+    {% endif %}
+    {% if snippet_description|default('true') != 'false' %}
+        {% if '.' in snippet_description %}
+            {% set snippet_parts = snippet_description|split('.') %}
+            {% set snippet_text =attribute(attribute(item, snippet_parts[0]), snippet_parts[1])|markdown_to_html|striptags %}
+        {% else %}
+            {% set snippet_text = attribute(item, snippet_description|default('content'))|default('')|markdown_to_html|striptags %}
+        {% endif %}
+        {% if inline|default(false) == false %}
+    <p>
+        {% else %}
+    <span>
+        {% endif %}
+        {{ snippet_text|slice(0, 300) }}
+        {% if snippet_text|length > 300 %}…{% endif %}
+        {% if inline|default(false) == false %}
+    </p>
+        {% else %}
+    </span>
+        {% endif %}
+    {% endif %}
+    {% if item.updatedAt is defined and (showDate is not defined or showDate == true) %}
+        {% set timezone = viewModel.session.user.timezone|default(item.timezone|default('UTC')) %}
+        {% if inline|default(false) == false %}
+    <p class="date">
+        {% else %}
+    <span class="date">
+        {% endif %}
+        {% if item.postDate|default(false) %}
+        <span class="material-icons" aria-hidden="true">event</span>
+        <em>{{ item.postDate|date('jS M Y \\a\\t H:i', timezone) }}</em>
+        {% endif %}
+        {% if item.items is defined %}
+            {% if item.firstDate is not empty %}
+        <span class="material-icons" aria-hidden="true">date_range</span>{{ item.firstDate|date("M j, Y", viewModel.session.preferences.timezone) }} to {{ item.lastDate|date("M j, Y", viewModel.session.preferences.timezone) }}
+            {% endif %}
+        <span class="material-icons" aria-hidden="true">library_books</span> <strong>{{ item.items|length }}</strong> posts
+        {% endif %}
+        <span class="material-icons" aria-hidden="true">history</span>
+            Updated: <em>{{ item.updatedAt|date('jS M Y \\a\\t H:i', viewModel.session.preferences.timezone) }}</em>
+        {% if inline|default(false) == false %}
+    </p>
+        {% else %}
+    </span>
+        {% endif %}
+    {% endif %}
+</article>
+{%  endfor %}

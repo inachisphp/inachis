@@ -16,7 +16,6 @@ use Inachis\Entity\Media\Image;
 use Inachis\Form\SeriesType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\Content\CategoryRepository;
-use Inachis\Repository\Media\ImageRepository;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Service\Content\Series\SeriesBulkActionService;

@@ -57,7 +57,9 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             [
                 'q.id IN (:ids)',
                 [
-                    'ids' => $ids,
+                    'ids' => [
+                        'value' => $ids,
+                    ],
                 ]
             ]
         );

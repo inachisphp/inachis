@@ -23,6 +23,23 @@
 		width: auto;
 	}
 
+	.grid-toggle {
+		border: 1px solid $border-color;
+		border-radius: $radius-standard;
+
+		button {
+			border: none;
+
+			&[aria-pressed="true"] {
+				background: $input-focus-ring;
+				color: $action-primary;
+			}
+			.btn-text {
+				display: none;
+			}
+		}
+	}
+
 	.filter__toggle {
 		align-items: center;
 		border: 1px solid $border-color-dark;
