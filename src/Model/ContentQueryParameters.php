@@ -31,6 +31,7 @@ class ContentQueryParameters
         protected string $sort = '',
         protected int $limit = 10,
         protected int $offset = 0,
+        protected string $view_setting = 'list',
     ) {}
 
     /**
@@ -50,6 +51,7 @@ class ContentQueryParameters
     ): array {
         $this->filters = array_filter($request->request->all('filter'));
         $this->sort = $request->request->getString('sort') ?: $sortDefault;
+        $this->view_setting = $request->request->getString('view') ?: 'list';
 
         if (isset($this->filters['categories']) && is_array($this->filters['categories']) && array_is_list($this->filters['categories'])) {
             /** @var list<Category> */
@@ -67,10 +69,13 @@ class ContentQueryParameters
         if ($request->isMethod(Request::METHOD_POST)) {
             $request->getSession()->set($prefix . '_filters', $this->filters);
             $request->getSession()->set($prefix . '_sort', $this->sort);
+            $request->getSession()->set($prefix . '_view', $this->view_setting);
         } elseif ($request->getSession()->has($prefix . '_filters')) {
             $this->filters = $request->getSession()->get($prefix . '_filters', '');
             $sort = $request->getSession()->get($prefix . '_sort', '');
             $this->sort = is_string($sort) ? $sort : '';
+            $view_setting = $request->getSession()->get($prefix . '_view', '');
+            $this->view_setting = is_string($view_setting) ? $view_setting : '';
         }
         $limit = $request->attributes->getInt(
             'limit',
@@ -85,6 +90,7 @@ class ContentQueryParameters
             'sort' => $this->sort,
             'offset' => $this->offset,
             'limit' => $this->limit,
+            'view_setting' => $this->view_setting,
         ];
     }
 }

@@ -8,7 +8,7 @@
     <div class="col-12">
         {% include 'inadmin/partials/tab-sets/users.html.twig' %}
 
-        {% include 'inadmin/partials/table.html.twig' with {
+        {% include 'inadmin/partials/components/view_content.html.twig' with {
             className: 'form__users',
             type: 'users',
 
@@ -48,12 +48,13 @@
                 },
                 {
                     title: 'Last Login',
-                    source: '',
+                    source: 'lastLoginAt',
+                    source_type: 'date',
                     hideOnMobile: true,
                 },
                 {
                     title: 'Password Last Modified',
-                    source: 'passwordModDate',
+                    source: 'passwordChangedAt',
                     source_type: 'date',
                     hideOnMobile: true,
                 },
@@ -65,13 +66,49 @@
 
             slug_prefix: 'admin',
 
-            filters: [],
+            'filters': {
+                'Status': {
+                    '': 'All',
+                    'enabled': 'Enabled',
+                    'disabled': 'Disabled',
+                },
+                'Last Sign-in': {
+                    '': 'All',
+                    '30': 'Over 30 days',
+                    '90': 'Over 90 days',
+                    '180': 'Over 180 days',
+                    '365': 'Over 365 days',
+                },
+                'Password Modified': {
+                    '': 'All',
+                    '30': 'Over 30 days',
+                    '90': 'Over 90 days',
+                    '180': 'Over 180 days',
+                    '365': 'Over 365 days',
+                },
+                '2FA Status': {
+                    '': 'All',
+                    'enabled': 'Enabled',
+                    'disabled': 'Disabled',
+                },
+            },
             filter_values: query.filters,
             show_search: true,
             search_placeholder: 'Search users…',
             show_select_deselect: true,
+            sort_options: {
+                'createdAt desc': 'Created: Newest',
+                'createdAt asc': 'Created: Oldest',
+                'updatedAt desc': 'Modified: Newest',
+                'updatedAt asc': 'Modified: Oldest',
+                'displayName desc': 'Name: Z-A',
+                'displayName asc': 'Name: A-Z',
+                'username asc': 'Username: A-Z',
+                'username desc': 'Username: Z-A',
+            },
 
             add_button: {
+                image: 'person_add',
                 text: 'Create Admin',
                 url: path('incc_admin_edit', { id: 'new' }),
             },
@@ -111,7 +148,9 @@
                     value: '1',
                     title: 'Delete',
                 }
-            }
+            },
+            view_setting: 'table',
+
         } %}
     </div>
 {% endblock content %}

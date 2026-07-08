@@ -48,9 +48,10 @@ class UserRepository extends AbstractRepository
      * @param array{keyword?: string} $filters The filters
      * @param int $limit The limit
      * @param int $offset The offset
+     * @param string $sort The sort order
      * @return Paginator<User> The paginator
      */
-    public function getFiltered(array $filters, int $limit, int $offset): Paginator
+    public function getFiltered(array $filters, int $limit, int $offset, string $sort = ''): Paginator
     {
         $where = [
             'q.isRemoved = \'0\'',
@@ -60,13 +61,37 @@ class UserRepository extends AbstractRepository
             $where[0] .= ' AND (q.displayName LIKE :keyword OR q.username LIKE :keyword OR q.email LIKE :keyword )';
             $where[1]['keyword'] = '%' . $filters['keyword']  . '%';
         }
+        if (!empty($filters['status'])) {
+            $where[0] .= ' AND q.isActive = :active';
+            $where[1]['active'] = $filters['status'] === 'enabled';
+        }
+        if (!empty($filters['last sign-in'])) {
+            $where[0] .= ' AND q.lastLoginAt <= :lastLoginAt';
+            $where[1]['lastLoginAt'] = new \DateTime('-' . $filters['last sign-in'] . ' days');
+        }
+        if (!empty($filters['password modified'])) {
+            $where[0] .= ' AND q.passwordChangedAt <= :passwordModified';
+            $where[1]['passwordModified'] = new \DateTime('-' . $filters['password modified'] . ' days');
+        }
+        if (!empty($filters['2fa status'])) {
+            $where[0] .= ' AND q.totpEnabled = :totpEnabled';
+            $where[1]['totpEnabled'] = $filters['2fa status'];
+        }
+        $sort = match ($sort) {
+            'createdAt asc' => [['q.createdAt', 'ASC']],
+            'createdAt desc' => [['q.createdAt', 'DESC']],
+            'updatedAt asc' => [['q.updatedAt', 'ASC']],
+            'updatedAt desc' => [['q.updatedAt', 'DESC']],
+            'username asc' => [['q.username', 'ASC']],
+            'username desc' => [['q.username', 'DESC']],
+            'displayName desc' => [['q.displayName', 'DESC']],
+            default => [['q.displayName', 'ASC']],
+        };
         return $this->getAll(
             $limit,
             $offset,
             $where,
-            [
-                [ 'q.displayName', 'ASC' ],
-            ]
+            $sort
         );
     }
 }

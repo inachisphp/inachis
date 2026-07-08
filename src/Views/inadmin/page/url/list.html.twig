@@ -10,7 +10,7 @@
 
     {% block url_list %}
         <div class="col-12 widget-data-list">
-            {% include 'inadmin/partials/table.html.twig' with {
+            {% include 'inadmin/partials/components/view_content.html.twig' with {
                 className: 'form__url',
                 type: 'url',
                 additional_classes: 'default',
@@ -72,7 +72,8 @@
                         icon: 'delete_forever',
                         title: 'Delete',
                     },
-                }
+                },
+                view_setting: 'table',
             }
             %}
         </div>

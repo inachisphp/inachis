@@ -53,7 +53,7 @@ class ChangePasswordController extends AbstractInachisController
             ChangePasswordType::class,
             null,
             [
-                'last_modified' => $currentUser->getPasswordModDate()?->format('d F Y'),
+                'last_modified' => $currentUser->getPasswordChangedAt()?->format('d F Y'),
             ]
         );
         $form->handleRequest($request);
@@ -65,7 +65,7 @@ class ChangePasswordController extends AbstractInachisController
             }
             $hashedPassword = $passwordHasher->hashPassword($user, $plaintextPassword);
             $user->setPassword($hashedPassword);
-            $user->setPasswordModDate(new DateTimeImmutable());
+            $user->setPasswordChangedAt(new DateTimeImmutable());
             if (!$passwordHasher->isPasswordValid($user, $plaintextPassword)) {
                 throw new AccessDeniedHttpException();
             }

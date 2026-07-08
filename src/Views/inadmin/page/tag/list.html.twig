@@ -7,7 +7,7 @@
 {% block content %}
 <div class="col-12">
     {% include 'inadmin/partials/tab-sets/posts.html.twig' %}
-	{% include 'inadmin/partials/table.html.twig' with {
+	{% include 'inadmin/partials/components/view_content.html.twig' with {
 		className: 'form__tag col-6',
 		type: 'tag',
 		additional_classes: 'default',
@@ -35,6 +35,7 @@
 		url_result: path('incc_tags_list'),
 
 		show_select_deselect: true,
+		view_setting: 'table',
 		zebra: true,
 
 		actions: {

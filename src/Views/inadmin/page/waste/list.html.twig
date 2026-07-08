@@ -9,7 +9,7 @@
 {% block waste %}
 
 <div class="col-12">
-{% include 'inadmin/partials/table.html.twig' with {
+{% include 'inadmin/partials/components/view_content.html.twig' with {
     'className': 'form__waste',
     'type': 'waste',
 
@@ -63,10 +63,10 @@
             'title': 'Delete',
             'value': '1',
             'name': 'delete',
-            },
-        }
-    }
-%}
+        },
+    },
+    view_setting: 'table'
+} %}
 </div>
 
 {% endblock waste %}

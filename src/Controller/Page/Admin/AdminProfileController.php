@@ -9,19 +9,22 @@
 
 namespace Inachis\Controller\Page\Admin;
 
-use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\User\{User,UserPreference};
 use Inachis\Form\UserType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\User\UserPasskeyRepository;
 use Inachis\Repository\User\UserRepository;
+use Inachis\Security\Authentication\PasskeyService;
+use Inachis\Security\Authentication\TotpService;
 use Inachis\Service\User\UserBulkActionService;
 use Inachis\Service\User\UserAccountEmailService;
 use Inachis\Transformer\ImageTransformer;
 use Inachis\Service\User\ProfileColorPalette;
 use Random\RandomException;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -90,6 +93,7 @@ class AdminProfileController extends AbstractInachisController
                 $contentQuery['filters'],
                 $contentQuery['limit'],
                 $contentQuery['offset'],
+                $contentQuery['sort'],
             ),
             'form' => $form->createView(),
             'query' => $contentQuery,
@@ -180,5 +184,221 @@ class AdminProfileController extends AbstractInachisController
             'heicSupported' => $imageTransformer->isHEICSupported(),
             'user' => $user,
         ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // TOTP management
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns the TOTP setup data (secret + QR code URI) for the current user.
+     *
+     * @param TotpService $totpService
+     * @return JsonResponse
+     */
+    #[Route("/incc/admin/security/totp/setup", name: "incc_admin_totp_setup", methods: ["GET"])]
+    public function totpSetup(TotpService $totpService): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->security->getUser();
+
+        if ($user->isTotpEnabled()) {
+            return new JsonResponse(['error' => 'TOTP is already enabled.'], 400);
+        }
+
+        $secret = $totpService->generateSecret();
+        // Store provisionally in the session; only persisted once confirmed
+        $this->container->get('request_stack')->getCurrentRequest()?->getSession()
+            ->set('inachis.totp.pending_secret', $secret);
+
+        return new JsonResponse([
+            'secret' => $secret,
+            'qrUri'  => $totpService->getQrCodeUri($user->getUserIdentifier(), $secret),
+        ]);
+    }
+
+    /**
+     * Confirms and enables TOTP for the current user by verifying a code
+     * against the pending secret stored in the session.
+     *
+     * @param Request     $request
+     * @param TotpService $totpService
+     * @return JsonResponse
+     */
+    #[Route("/incc/admin/security/totp/enable", name: "incc_admin_totp_enable", methods: ["POST"])]
+    public function totpEnable(Request $request, TotpService $totpService): JsonResponse
+    {
+        /** @var User $user */
+        $user    = $this->security->getUser();
+        $session = $request->getSession();
+        $secret  = $session->get('inachis.totp.pending_secret');
+
+        if (empty($secret)) {
+            return new JsonResponse(['error' => 'No pending TOTP setup found. Request setup first.'], 400);
+        }
+
+        $body = json_decode($request->getContent(), true);
+        $code = trim($body['code'] ?? '');
+
+        if (!$totpService->verifyCode($secret, $code)) {
+            return new JsonResponse(['error' => 'Invalid code. Please try again.'], 400);
+        }
+
+        $user->setTotpSecret($secret);
+        $user->setTotpEnabled(true);
+        $this->entityManager->flush();
+
+        $session->remove('inachis.totp.pending_secret');
+
+        return new JsonResponse(['success' => true]);
+    }
+
+    /**
+     * Disables TOTP for the current user.
+     *
+     * @param Request     $request
+     * @param TotpService $totpService
+     * @return JsonResponse
+     */
+    #[Route("/incc/admin/security/totp/disable", name: "incc_admin_totp_disable", methods: ["POST"])]
+    public function totpDisable(Request $request, TotpService $totpService): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->security->getUser();
+
+        $body = json_decode($request->getContent(), true);
+        $code = trim($body['code'] ?? '');
+
+        if (!$user->isTotpEnabled() || empty($user->getTotpSecret())) {
+            return new JsonResponse(['error' => 'TOTP is not enabled.'], 400);
+        }
+
+        if (!$totpService->verifyCode((string) $user->getTotpSecret(), $code)) {
+            return new JsonResponse(['error' => 'Invalid code.'], 400);
+        }
+
+        $user->setTotpSecret(null);
+        $user->setTotpEnabled(false);
+        $this->entityManager->flush();
+
+        $request->getSession()->remove('inachis.2fa.totp_verified');
+
+        return new JsonResponse(['success' => true]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Passkey management
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns a WebAuthn creation challenge so the browser can register a new passkey.
+     *
+     * @param Request        $request
+     * @param PasskeyService $passkeyService
+     * @return JsonResponse
+     */
+    #[Route("/incc/admin/security/passkey/register/challenge", name: "incc_admin_passkey_register_challenge", methods: ["GET"])]
+    public function passkeyRegisterChallenge(Request $request, PasskeyService $passkeyService): JsonResponse
+    {
+        /** @var User $user */
+        $user      = $this->security->getUser();
+        $challenge = $passkeyService->generateChallenge();
+        $request->getSession()->set('inachis.passkey.register_challenge', $challenge);
+
+        $options = $passkeyService->buildCreationOptions($user, $challenge, $request->getHost());
+        return new JsonResponse($options);
+    }
+
+    /**
+     * Verifies the browser's registration response and saves the new passkey.
+     *
+     * @param Request        $request
+     * @param PasskeyService $passkeyService
+     * @return JsonResponse
+     */
+    #[Route("/incc/admin/security/passkey/register/verify", name: "incc_admin_passkey_register_verify", methods: ["POST"])]
+    public function passkeyRegisterVerify(Request $request, PasskeyService $passkeyService): JsonResponse
+    {
+        /** @var User $user */
+        $user      = $this->security->getUser();
+        $session   = $request->getSession();
+        $challenge = $session->get('inachis.passkey.register_challenge');
+
+        if (empty($challenge)) {
+            return new JsonResponse(['error' => 'No active registration challenge.'], 400);
+        }
+
+        $body = json_decode($request->getContent(), true);
+        if (!is_array($body)) {
+            return new JsonResponse(['error' => 'Invalid request body.'], 400);
+        }
+
+        try {
+            $passkey = $passkeyService->verifyAndSaveRegistration(
+                $user,
+                $challenge,
+                $request->getHost(),
+                $body,
+                $body['name'] ?? null,
+            );
+        } catch (\RuntimeException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 400);
+        }
+
+        $session->remove('inachis.passkey.register_challenge');
+
+        return new JsonResponse([
+            'success' => true,
+            'id'      => (string) $passkey->getId(),
+            'name'    => $passkey->getName(),
+        ]);
+    }
+
+    /**
+     * Lists all passkeys registered for the current user.
+     *
+     * @param UserPasskeyRepository $passkeyRepository
+     * @return JsonResponse
+     */
+    #[Route("/incc/admin/security/passkey/list", name: "incc_admin_passkey_list", methods: ["GET"])]
+    public function passkeyList(UserPasskeyRepository $passkeyRepository): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->security->getUser();
+
+        $passkeys = array_map(
+            static fn($pk) => [
+                'id'        => (string) $pk->getId(),
+                'name'      => $pk->getName(),
+                'createdAt' => $pk->getCreatedAt()->format('Y-m-d H:i'),
+            ],
+            $passkeyRepository->findByUser($user)
+        );
+
+        return new JsonResponse($passkeys);
+    }
+
+    /**
+     * Deletes a specific passkey belonging to the current user.
+     *
+     * @param string                $id
+     * @param UserPasskeyRepository $passkeyRepository
+     * @return JsonResponse
+     */
+    #[Route("/incc/admin/security/passkey/{id}", name: "incc_admin_passkey_delete", methods: ["DELETE"])]
+    public function passkeyDelete(string $id, UserPasskeyRepository $passkeyRepository): JsonResponse
+    {
+        /** @var User $user */
+        $user    = $this->security->getUser();
+        $passkey = $passkeyRepository->find($id);
+
+        if ($passkey === null || (string) $passkey->getUser()->getId() !== (string) $user->getId()) {
+            return new JsonResponse(['error' => 'Passkey not found.'], 404);
+        }
+
+        $this->entityManager->remove($passkey);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['success' => true]);
     }
 }

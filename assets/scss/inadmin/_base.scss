@@ -51,6 +51,10 @@ body .visually-hidden {
   }
 }
 
+.centred { 
+  text-align: center;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
