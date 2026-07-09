@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Controller used for changing password for an administrator {@link User}
@@ -28,14 +27,13 @@ class ChangePasswordController extends AbstractInachisController
 {
     /**
      * Controller for the change-password tab in the admin interface
-     * 
+     *
      * @param Request $request
      * @param UserPasswordHasherInterface $passwordHasher
      * @param UserRepository $userRepository
      * @return Response
      */
     #[Route("/incc/admin/{id}/change-password", name: "incc_admin_change_password", methods: [ "GET", "POST" ])]
-    #[IsGranted('ROLE_ADMIN')]
     public function changePasswordTab(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,

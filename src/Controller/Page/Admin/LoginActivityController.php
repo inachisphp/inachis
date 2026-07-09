@@ -15,17 +15,15 @@ use Inachis\Repository\User\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Login activity controller
  */
-#[IsGranted('ROLE_ADMIN')]
 class LoginActivityController extends AbstractInachisController
 {
     /**
      * Login activity index
-     * 
+     *
      * @param LoginActivityRepository $repository
      * @param Request $request
      * @return Response
@@ -51,7 +49,7 @@ class LoginActivityController extends AbstractInachisController
 
     /**
      * Login activity by user
-     * 
+     *
      * @param Request $request
      * @param UserRepository $userRepository
      * @param LoginActivityRepository $repository
@@ -75,7 +73,7 @@ class LoginActivityController extends AbstractInachisController
 
     /**
      * Login activity view
-     * 
+     *
      * @param Request $request
      * @param LoginActivityRepository $repository
      * @return Response

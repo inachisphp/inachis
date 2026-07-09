@@ -14,12 +14,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Link Validation Controller
  */
-#[IsGranted('ROLE_ADMIN')]
 final class LinkValidationController
 {
 	private string $baseUrl;

@@ -15,9 +15,7 @@ use Inachis\Diagnostics\DiagnosticsCollector;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 class DiagnosticsController extends AbstractInachisController
 {
     /**

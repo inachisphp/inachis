@@ -11,6 +11,7 @@ namespace Inachis\Controller;
 
 use Inachis\Controller\AbstractController;
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Factory\PageViewFactory;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -28,10 +29,11 @@ abstract class AbstractWebController extends AbstractController
      */
     public function __construct(
         protected EntityManagerInterface $entityManager,
+        protected PageViewFactory $pageViewFactory,
         protected ParameterBagInterface $params,
         protected Security $security,
         protected TranslatorInterface $translator,
     ) {
-        parent::__construct($params);
+        parent::__construct($params, $pageViewFactory);
     }
 }

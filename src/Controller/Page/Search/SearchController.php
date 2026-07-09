@@ -18,9 +18,7 @@ use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 class SearchController extends AbstractInachisController
 {
     /**
@@ -73,7 +71,7 @@ class SearchController extends AbstractInachisController
         foreach ($results->getResults() as $key => $result) {
             $uuidString = Uuid::fromBytes($result['id'])->toString();
             // $results->updateResultPropertyByKey($key, 'id', $uuidString);
-            
+
             $results->updateResultPropertyByKey(
                 $key,
                 'relevance',
@@ -124,7 +122,7 @@ class SearchController extends AbstractInachisController
                     );
             }
         }
-        
+
         return $this->render('inadmin/page/search/results.html.twig', [
             'viewModel' => $this->viewModel,
             'form' => $form->createView(),

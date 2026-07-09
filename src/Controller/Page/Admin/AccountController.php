@@ -32,7 +32,6 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Account controller
@@ -77,7 +76,6 @@ class AccountController extends AbstractInachisController
      * @param TotpService $totpService
      * @return Response
      */
-    #[IsGranted('ROLE_ADMIN')]
     #[Route("/incc/login/totp", name: "incc_account_login_totp", methods: ["GET", "POST"])]
     public function totpVerify(Request $request, TotpService $totpService): Response
     {

@@ -18,12 +18,10 @@ use Inachis\Service\Export\Series\SeriesExportService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Controller for exporting pages and posts
  */
-#[IsGranted('ROLE_ADMIN')]
 class ExportController extends AbstractInachisController
 {
     /**
@@ -121,8 +119,8 @@ class ExportController extends AbstractInachisController
 
         $this->viewModel->page->title = 'Export';
         $this->viewModel->page->tab = 'export';
-        
-        
+
+
 
         return $this->render('inadmin/page/tools/export.html.twig', [
             'viewModel' => $this->viewModel,

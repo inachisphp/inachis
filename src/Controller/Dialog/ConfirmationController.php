@@ -13,21 +13,19 @@ use Inachis\Controller\AbstractInachisController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 class ConfirmationController extends AbstractInachisController
 {
     /**
      * Renders a confirmation dialog
-     * 
+     *
      * @param Request $request
      * @return Response
      */
     #[Route("/incc/ax/confirmation/get", methods: [ "POST" ])]
     public function contentList(Request $request): Response
     {
-        
+
         return $this->render('inadmin/dialog/confirmation.html.twig', [
             'title' => $request->request->getString('title', '') ?: sprintf(
                 '<%s>',

@@ -16,12 +16,10 @@ use Inachis\Service\Content\Page\ReviewPageService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Review controller
  */
-#[IsGranted('ROLE_ADMIN')]
 class ReviewController extends AbstractInachisController
 {
 	/**
@@ -69,10 +67,10 @@ class ReviewController extends AbstractInachisController
     ): JsonResponse {
         /** @var array{
          *     message: string,
-         *     startOffset: int, 
-         *     endOffset: int, 
-         *     selectedText: string, 
-         *     contextBefore?: string, 
+         *     startOffset: int,
+         *     endOffset: int,
+         *     selectedText: string,
+         *     contextBefore?: string,
          *     contextAfter?: string,...
          * }
          */
@@ -156,7 +154,7 @@ class ReviewController extends AbstractInachisController
 
     /**
      * Reopens the specified thread
-     * 
+     *
      * @param ReviewPageService $reviewService
      * @param ReviewThread $thread
      * @return JsonResponse

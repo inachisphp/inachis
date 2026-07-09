@@ -200,7 +200,7 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
                         return [PermissionResource::SERIES, PermissionAction::DELETE];
                     }
                 }
-                $seriesId = $request->attributes->get('seriesId');
+                $seriesId = $request->attributes->get('id');
                 if ($seriesId === 'new' || $seriesId === null) {
                     return [PermissionResource::SERIES, PermissionAction::CREATE];
                 }

@@ -17,12 +17,10 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Controller for handling Themes
  */
-#[IsGranted('ROLE_ADMIN')]
 final class ThemeController extends AbstractInachisController
 {
     /**
