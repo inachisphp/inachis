@@ -27,25 +27,25 @@ final class Version20260206152726 extends AbstractMigration
     {
         // Default Policy
         $this->addSql("
-            INSERT INTO security_policy 
+            INSERT INTO security_policy
                 (id, name, min_length, require_uppercase, require_lowercase, require_number, require_special, password_history, max_failed_login_attempts, lockout_duration_minutes, password_expiry_days, admin_require_2fa, super_admin_require_2fa, super_admin_requires_webauthn, step_up_for_sensitive_actions, created_at, updated_at, is_read_only, is_active)
-            SELECT UUID(), 'Custom', 8, 1, 1, 1, 1, 0, 10, 15, 0, 0, 0, 0, 1, NOW(), NOW(), 0, 1
+            SELECT UNHEX(REPLACE(UUID(), '-', '')), 'Custom', 8, 1, 1, 1, 1, 0, 10, 15, 0, 0, 0, 0, 1, NOW(), NOW(), 0, 1
             WHERE NOT EXISTS (SELECT 1 FROM security_policy WHERE name='Custom')
         ");
 
         // Basic Policy
         $this->addSql("
-            INSERT INTO security_policy 
+            INSERT INTO security_policy
                 (id, name, min_length, require_uppercase, require_lowercase, require_number, require_special, password_history, max_failed_login_attempts, lockout_duration_minutes, password_expiry_days, admin_require_2fa, super_admin_require_2fa, super_admin_requires_webauthn, step_up_for_sensitive_actions, created_at, updated_at, is_read_only, is_active)
-            SELECT UUID(), 'Basic', 8, 1, 1, 1, 1, 0, 10, 15, 0, 0, 0, 0, 1, NOW(), NOW(), 0, 1
+            SELECT UNHEX(REPLACE(UUID(), '-', '')), 'Basic', 8, 1, 1, 1, 1, 0, 10, 15, 0, 0, 0, 0, 1, NOW(), NOW(), 0, 1
             WHERE NOT EXISTS (SELECT 1 FROM security_policy WHERE name='Basic')
         ");
 
         // Strict Policy
         $this->addSql("
-            INSERT INTO security_policy 
+            INSERT INTO security_policy
                 (id, name, min_length, require_uppercase, require_lowercase, require_number, require_special, password_history, max_failed_login_attempts, lockout_duration_minutes, password_expiry_days, admin_require_2fa, super_admin_require_2fa, super_admin_requires_webauthn, step_up_for_sensitive_actions, created_at, updated_at, is_read_only, is_active)
-            SELECT UUID(), 'Strict', 16, 1, 1, 1, 1, 10, 5, 60, 60, 1, 1, 1, 1, NOW(), NOW(), 1, 0
+            SELECT UNHEX(REPLACE(UUID(), '-', '')), 'Strict', 16, 1, 1, 1, 1, 10, 5, 60, 60, 1, 1, 1, 1, NOW(), NOW(), 1, 0
             WHERE NOT EXISTS (SELECT 1 FROM security_policy WHERE name='Strict')
         ");
     }

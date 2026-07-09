@@ -53,11 +53,13 @@
         {% endif %}
     </script>
     {% endif %}
+    <template id="session-timeout-template">
+        {% include 'inadmin/dialog/session_timeout.html.twig' %}
+    </template>
     <script>
         window.Inachis.SessionTimeout.init({
             sessionTimeout: {{ viewModel.sessionTimeout|default(1440) }},
             sessionEndTime: '{{ viewModel.sessionTimeoutTime }}Z',
-            templateEncoded: '{{ viewModel.timeoutTemplate }}',
         });
     </script>
 {% endif %}

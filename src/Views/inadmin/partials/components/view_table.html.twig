@@ -84,6 +84,14 @@
                         {{ attribute(item, column.source)|length }}
                     {% elseif column.source_type is defined and column.source_type == 'boolean' %}
                         {{ attribute(item, column.source) ? 'Yes' : 'No' }}
+                    {% elseif column.source_type is defined and column.source_type == 'object' %}
+                        {% if attribute(item, column.source) is iterable %}
+                            {% for object in attribute(item, column.source) %}
+                                {{ attribute(object, column.object_field)}}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {{ attribute(attribute(item, column.source), column.object_field)|default('-') }}
+                        {% endif %}
                     {% else %}
                         {% if column.maxLength is defined %}
                             {{ attribute(item, column.source)|slice(0, column.maxLength) }}

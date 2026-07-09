@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 /**
  * Controller for managing roles and role permissions.
@@ -133,6 +134,10 @@ class RolesController extends AbstractInachisController
                 return $this->redirectToRoute('incc_admin_role_index');
             }
 
+            if ($isNew || $role->getSlug() === '') {
+                $role->setSlug($this->createUniqueSlug($role->getName(), $roleRepository));
+            }
+
             // Synchronise permissions: rebuild from posted checkboxes.
             $this->syncPermissions($request, $role);
 
@@ -218,6 +223,29 @@ class RolesController extends AbstractInachisController
      *     actions: array<string, bool>
      * }>
      */
+    private function createUniqueSlug(string $name, RoleRepository $roleRepository): string
+    {
+        $baseSlug = (new AsciiSlugger())
+            ->slug($name)
+            ->lower()
+            ->toString();
+
+        $baseSlug = trim($baseSlug, '-');
+        if ($baseSlug === '') {
+            $baseSlug = 'role';
+        }
+
+        $slug = $baseSlug;
+        $counter = 2;
+
+        while ($roleRepository->findOneBy(['slug' => $slug]) !== null) {
+            $slug = $baseSlug . '-' . $counter;
+            ++$counter;
+        }
+
+        return $slug;
+    }
+
     private function buildPermissionMatrix(Role $role): array
     {
         $granted = [];

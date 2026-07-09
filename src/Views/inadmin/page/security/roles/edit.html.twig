@@ -7,6 +7,9 @@
 
 {% block content %}
     {{ form_start(form, {'attr': { 'class': 'col-12 form form__role', 'novalidate': 'novalidate' }}) }}
+
+    {{ form_errors(form) }}
+
     {% if role.systemRole %}
     <div class="admonition admonition__warning">
         <p>This is a system role and cannot be edited or removed.</p>
@@ -116,6 +119,7 @@
         </p>
     </div>
 {% endif %}
+    {{ form_row(form._token) }}
     {{ form_end(form, {render_rest: false}) }}
 
     <script>

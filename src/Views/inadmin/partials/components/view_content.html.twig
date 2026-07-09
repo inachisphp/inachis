@@ -36,6 +36,10 @@
     {% endif %}
 {% else %}
 
+{% if view_setting|default('') not in view_modes|default([]) and view_modes|default([]) is not empty %}
+    {% set view_setting = view_default|default('') %}
+{% endif %}
+
     {# Show the content view #}
     {% if view_setting|default('list') == 'grid' %}
         {{ include('inadmin/partials/components/view_grid.html.twig') }}
