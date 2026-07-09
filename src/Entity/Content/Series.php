@@ -42,6 +42,7 @@ use Ramsey\Uuid\UuidInterface;
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\SeriesRepository', readOnly: false)]
 #[ORM\Index(name: 'search_idx', columns: ['title'])]
 #[ORM\Index(name: "fulltext_title_content", columns: ['title', 'sub_title', 'description'], flags: ["fulltext"])]
+#[ORM\Index(columns: ['image_id'], name: 'series_image_idx')]
 #[ORM\HasLifecycleCallbacks]
 class Series
 {

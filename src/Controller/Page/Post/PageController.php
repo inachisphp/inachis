@@ -65,9 +65,10 @@ class PageController extends AbstractInachisController
     )]
     public function list(
         Request $request,
-        ViewStateManager $viewStateManager,
+        CategoryRepository $categoryRepository,
         PageBulkActionService $pageBulkActionService,
         PageRepository $pageRepository,
+        ViewStateManager $viewStateManager,
         string $type = 'post',
 
     ): Response {
@@ -104,6 +105,7 @@ class PageController extends AbstractInachisController
             $params = ContentQueryParameters::fromRequest(
                 $request,
                 $params,
+                $categoryRepository,
             );
 
             $viewStateManager->save(
@@ -111,6 +113,12 @@ class PageController extends AbstractInachisController
                 'post',
                 $params,
             );
+
+            return $this->redirectToRoute('incc_post_list', [
+                'type' => $request->attributes->getString('type'),
+                'limit' => $request->attributes->getInt('limit'),
+                'offset' => 0,
+            ]);
         }
 
         if ($request->query->has('category') && $request->query->get('category') === 'null') {

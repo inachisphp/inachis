@@ -49,9 +49,10 @@ class SeriesController extends AbstractInachisController
     )]
     public function list(
         Request $request,
-        ViewStateManager $viewStateManager,
+        CategoryRepository $categoryRepository,
         SeriesBulkActionService $seriesBulkActionService,
-        SeriesRepository $seriesRepository
+        SeriesRepository $seriesRepository,
+        ViewStateManager $viewStateManager,
     ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
@@ -81,6 +82,7 @@ class SeriesController extends AbstractInachisController
             $params = ContentQueryParameters::fromRequest(
                 $request,
                 $params,
+                $categoryRepository,
             );
 
             $viewStateManager->save(
@@ -88,6 +90,11 @@ class SeriesController extends AbstractInachisController
                 'series',
                 $params,
             );
+
+            return $this->redirectToRoute('incc_series_list', [
+                'limit' => $request->attributes->getInt('limit'),
+                'offset' => 0,
+            ]);
         }
 
         $this->viewModel->page->title = 'Series';

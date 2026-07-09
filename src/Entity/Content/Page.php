@@ -62,6 +62,7 @@ use InvalidArgumentException;
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\PageRepository', readOnly: false)]
 #[ORM\Index(columns: ['title', 'author_id', 'image_id'], name: 'search_idx')]
 #[ORM\Index(columns: ['title', 'sub_title', 'content'], name: "fulltext_title_content", flags: ["fulltext"])]
+#[ORM\Index(columns: ['image_id'], name: 'page_feature_image_idx')]
 #[ORM\HasLifecycleCallbacks]
 class Page
 {

@@ -9,6 +9,8 @@
 
 namespace Inachis\Model;
 
+use Inachis\Entity\Content\Category;
+use Inachis\Repository\Content\CategoryRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -40,17 +42,64 @@ class ContentQueryParameters
     public static function fromRequest(
         Request $request,
         self $current,
+        CategoryRepository $categoryRepository,
     ): self {
 
-        $filters = array_filter(
-            $request->request->all('filter')
-        );
+        $filters = $current->getFilters();
+
+        /*
+        * If the filter form was submitted, replace the existing filters.
+        * This allows filters to be cleared.
+        */
+        if ($request->request->has('filter')) {
+
+            $filters = $request->request->all('filter');
+
+            /*
+            * Normalise empty category selection from Tom Select.
+            */
+            if (($filters['categories'] ?? null) === '') {
+                $filters['categories'] = [];
+            }
+
+            /*
+            * Remove empty scalar filters.
+            */
+            $filters = array_filter(
+                $filters,
+                static fn (mixed $value): bool => $value !== '' && $value !== [],
+            );
+
+            /*
+            * Convert category UUIDs into category labels.
+            */
+            if (
+                isset($filters['categories']) &&
+                is_array($filters['categories']) &&
+                array_is_list($filters['categories'])
+            ) {
+                /** @var list<Category> $categories */
+                $categories = $categoryRepository->findBy([
+                    'id' => $filters['categories'],
+                ]);
+
+                $categoryFilter = [];
+
+                foreach ($categories as $category) {
+
+                    $id = $category->getId()?->toString();
+
+                    if ($id !== null) {
+                        $categoryFilter[$id] = $category->getTitle();
+                    }
+                }
+
+                $filters['categories'] = $categoryFilter;
+            }
+        }
 
         return new self(
-            filters: $filters !== []
-                ? $filters
-                : $current->getFilters(),
-
+            filters: $filters,
             sort: $request->request->getString('sort')
                 ?: $current->getSort(),
 

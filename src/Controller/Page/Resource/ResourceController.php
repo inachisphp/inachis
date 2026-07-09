@@ -51,9 +51,10 @@ class ResourceController extends AbstractInachisController
     )]
     public function list(
         Request $request,
-        ViewStateManager $viewStateManager,
+        CategoryRepository $categoryRepository,
         DownloadRepository $downloadRepository,
         ImageRepository $imageRepository,
+        ViewStateManager $viewStateManager,
     ): Response {
         $typeClass = match($request->attributes->getString('type')) {
             'downloads' => Download::class,
@@ -84,6 +85,7 @@ class ResourceController extends AbstractInachisController
             $params = ContentQueryParameters::fromRequest(
                 $request,
                 $params,
+                $categoryRepository,
             );
 
             $viewStateManager->save(
@@ -91,6 +93,12 @@ class ResourceController extends AbstractInachisController
                 strtolower($type),
                 $params,
             );
+
+            return $this->redirectToRoute('incc_resource_list', [
+                'type' => $request->attributes->getString('type'),
+                'limit' => $request->attributes->getInt('limit'),
+                'offset' => $request->attributes->getInt('offset'),
+            ]);
         }
 
         if ($repository instanceof ImageRepository && $request->query->getString('altText', '') === 'null') {

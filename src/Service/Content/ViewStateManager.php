@@ -23,9 +23,21 @@ final readonly class ViewStateManager
     public function __construct(
         private Security $security,
         private UserViewStateRepository $repository,
-    ) {
-    }
+    ) {}
 
+    /**
+     * Loads content view settings. It will load the defaults for this view,
+     * apply session-stored values over the top if set, and if not set, will
+     * check the database for stored values and apply those instead over the
+     * top if set.
+     * 
+     * Priority: POST > Session > DB > Defaults
+     *
+     * @param Request $request
+     * @param string $context
+     * @param ViewStateDefaults $defaults
+     * @return ContentQueryParameters
+     */
     public function load(
         Request $request,
         string $context,
@@ -37,24 +49,11 @@ final readonly class ViewStateManager
             'sort' => $defaults->getSort(),
             'view' => $defaults->getView(),
         ];
-
         $session = $request->getSession();
-
-        /*
-        * Session
-        */
-        $sessionState = $session->get(
-            "view_state.$context",
-            null,
-        );
+        $sessionState = $session->get("view_state.$context", null);
 
         if (is_array($sessionState)) {
-
-            $state = array_replace_recursive(
-                $state,
-                $sessionState,
-            );
-
+            $state = array_replace_recursive($state, $sessionState);
         } else {
 
             /*
