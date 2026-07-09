@@ -10,11 +10,12 @@
 - Added page for managing Tags
 - Added CSP reporting and policy manager,
 - Added option to switch between list - grid - table view styles
-- View States - it will now remember view style, filters, sorting options between sesssions for each context
+- Added resources filter to identify duplicate resources and unused images
 
 ### Changed
 
 - Added expiry date to Page content types
+- View States will now remember view style, filters, sorting options between sesssions for each context
 - Re-organises Repository and Entity classes into more logical folders - this is a breaking change for backwards compatibility
 - PHPStan now passes fully on codebase, and PHPUnit has complete-ish code coverage
 
