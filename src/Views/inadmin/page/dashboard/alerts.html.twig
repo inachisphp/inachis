@@ -5,7 +5,7 @@
                 <p><span>High</span> {{ dashboard.alerts.altText.count }} images without alt text <a href="{{ path('incc_resource_list', { 'type': 'images' }) }}?altText=null">Fix &rarr;</a></p>
             {% endif %}
             {% if dashboard.alerts.categories.count > 0 %}
-                <p><span>High</span> {{ dashboard.alerts.categories.count }} pages without categories <a href="/incc/post/list?category=null">Fix &rarr;</a></p>
+                <p><span>High</span> {{ dashboard.alerts.categories.count }} pages without categories <a href="/incc/post/list?issue=categories">Fix &rarr;</a></p>
             {% endif %}
         </article>
     {% endif %}

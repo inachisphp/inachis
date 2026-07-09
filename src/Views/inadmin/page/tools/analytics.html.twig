@@ -107,7 +107,7 @@
 							—
 						{% endif %}
 					</td>
-                    <td>{{ (page.current / analytics.totalViews * 100)|number_format(1) }}</td>
+                    <td>{{ analytics.totalViews > 0 ? (page.current / analytics.totalViews * 100)|number_format(1) : 0 }}</td>
 				</tr>
 			{% else %}
 				<tr><td colspan="4">No data</td></tr>
@@ -192,7 +192,7 @@
                 <tr>
                     <td>{{ ref.domain }}</td>
                     <td>{{ ref.total }}</td>
-                    <td>{{ (ref.total / analytics.totalViews * 100)|number_format(1) }}</td>
+                    <td>{{ analytics.totalViews > 1 ? (ref.total / analytics.totalViews * 100)|number_format(1) : 0 }}</td>
                 </tr>
             {% else %}
                 <tr><td colspan="3">No data</td></tr>

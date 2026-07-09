@@ -106,6 +106,18 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         int $offset,
         string $sort = 'postDate desc'
     ): Paginator {
+        $allowedIssueFilters = ['categories', 'image', 'snippet', 'tags'];
+        if (
+            !empty($filters['issues']) &&
+            in_array($filters['issues'], $allowedIssueFilters)
+        ) {
+            return match($filters['issues']) {
+                'categories' => $this->getPagesWithoutCategories($limit, $offset),
+                'image' => $this->getPagesWithoutFeatureImage($limit, $offset),
+                'snippet' => $this->getPagesWithoutSharingMessage($limit, $offset),
+                'tags' => $this->getPagesWithoutTags($limit, $offset),
+            };
+        }
         $join = [];
         if (isset($filters['categories']) && empty($filters['categories'])) {
             unset($filters['categories']);
@@ -151,8 +163,18 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             $join[] = ['leftJoin', 'q.tags', 't'];
         }
         if (!empty($filters['status'])) {
-            $where[0] .= ' AND q.status = :status';
-            $where[1]['status'] = $filters['status'];
+            if ($filters['status'] === 'expired') {
+                $now = (new \DateTimeImmutable('now'))->format('Y-m-d H:i:s');
+                // if ($filters['expired'] === 'expired') {
+                $where[0] .= ' AND q.expireDate IS NOT NULL AND q.expireDate < :now';
+                // } else {
+                //     $where[0] .= ' AND (q.expireDate IS NULL OR q.expireDate >= :now)';
+                // }
+                $where[1]['now'] = $now;
+            } else {
+                $where[0] .= ' AND q.status = :status';
+                $where[1]['status'] = $filters['status'];
+            }
         }
         if (isset($filters['visibility'])) {
             $where[0] .= ' AND q.visible = :visible';
@@ -175,15 +197,6 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         if (!empty($filters['toDate'])) {
             $where[0] .= ' AND q.postDate <= :toDate';
             $where[1]['toDate'] = $filters['toDate'];
-        }
-        if (!empty($filters['expired'])) {
-            $now = (new \DateTimeImmutable('now'))->format('Y-m-d H:i:s');
-            if ($filters['expired'] === 'expired') {
-                $where[0] .= ' AND q.expireDate IS NOT NULL AND q.expireDate < :now';
-            } else {
-                $where[0] .= ' AND (q.expireDate IS NULL OR q.expireDate >= :now)';
-            }
-            $where[1]['now'] = $now;
         }
 
         return $this->getAll(
@@ -420,7 +433,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             {
                 $item->expiresAfter(7200);
                 $item->tag(['page_metrics']);
-                
+
                 $qb = $this->createQueryBuilder('p');
                 $qb = $qb
                     ->select('COUNT(p)')
