@@ -76,20 +76,29 @@ window.Inachis.Components = {
 			});
 		});
 	},
-	// TODO: Make this generic and apply to any input with a datepicker, not just the post date
+
 	initDatePicker() {
-		const postDateSelector = document.querySelector('#post_postDate');
-		if (!postDateSelector) return;
-		const datePicker = new DatePicker('#post_postDate', {
-			onChange: (formattedDate) => {
-				if (window.Inachis?.PostEdit) {
-					document.querySelector('#post_url').value = window.Inachis.PostEdit.getUrlFromTitle();
-				}
-			},
-			format: 'dd/mm/yyyy HH:ii',
-			materialIcons: true,
+		const datePickers = document.querySelectorAll('.ui-datepicker');
+		if (!datePickers.length) return;
+
+		datePickers.forEach((input) => {
+			const format = input.dataset.format || 'dd/mm/yyyy HH:ii';
+			const onChangeName = input.dataset.onChange;
+
+			new DatePicker(input, {
+				format,
+				materialIcons: true,
+				onChange: (formattedDate) => {
+					const callback = this[onChangeName];
+
+					if (typeof callback === 'function') {
+						callback.call(this, formattedDate, input);
+					}
+				},
+			});
 		});
 	},
+
 	initExportButton() {
 		const exportButton = document.querySelector('.button--export');
 		if (!exportButton) return;
@@ -354,6 +363,13 @@ window.Inachis.Components = {
 				targetElement.setAttribute('aria-hidden', targetElement.classList.contains('visually-hidden'));
 			});
 		});
+	},
+
+	updatePostUrl(formattedDate, input) {
+		if (window.Inachis?.PostEdit) {
+			document.querySelector('#post_url').value =
+				window.Inachis.PostEdit.getUrlFromTitle();
+		}
 	},
 
 	toggleActionBar() {
