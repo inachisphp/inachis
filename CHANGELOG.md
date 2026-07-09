@@ -8,6 +8,9 @@
 - Added Role-based permissions with default configurations for editors/admins/etc.
 - Added Review Threads. There is now the option to add inline comments to content for reviewers to peruse before publishing/scheduling content to be live
 - Added page for managing Tags
+- Added CSP reporting and policy manager,
+- Added option to switch between list - grid - table view styles
+- View States - it will now remember view style, filters, sorting options between sesssions for each context
 
 ### Changed
 
