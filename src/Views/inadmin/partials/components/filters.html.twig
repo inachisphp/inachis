@@ -1,7 +1,16 @@
 {% block filter %}
-    {% set isEmptyFilterValues = (filter_values|default(null)) is empty %}
-{% if filters is defined and filters is not empty or show_search|default(false) or (sort_options is defined and sort_options is not empty) or add_button|default(null) is not empty %}
 
+{% set hasToolbarFeatures =
+    filters|default([]) is not empty
+    or show_search|default(false)
+    or sort_options|default([]) is not empty
+    or add_button|default(null) is not empty
+    or view_modes|default([]) is not empty
+%}
+{% set hasContent = dataset|default([]) is not empty %}
+{% set hasAppliedFilters = filter_values|default([]) is not empty %}
+
+{% if hasToolbarFeatures and (hasContent or hasAppliedFilters) %}
 <section class="filter-bar sticky-nav" aria-label="Filter and sort content list">
 <div id="toolbar-form" class="toolbar-container">
     {% if add_button|default(null) is not empty or show_search|default(false) %}
@@ -38,9 +47,9 @@
     {% if filters|default(null) is not empty or sort_options|default(null) is not empty or view_modes|default(null) is not empty %}
     <div class="row secondary-controls">
         {% if filters|default(null) is not empty %}
-        <button type="button" class="filter__toggle icon-badge-wrapper" id="toggle-filters" aria-expanded="{{ isEmptyFilterValues ? 'false' : 'true' }}" aria-controls="filter__options">
+        <button type="button" class="filter__toggle icon-badge-wrapper" id="toggle-filters" aria-expanded="{{ hasAppliedFilters ? 'true' : 'false' }}" aria-controls="filter__options">
             <span class="material-icons" aria-hidden="true">filter_list</span>
-            <span id="global-filter-dot" class="filter-indicator"{% if isEmptyFilterValues %} hidden{% endif %}></span>
+            <span id="global-filter-dot" class="filter-indicator"{% if not hasAppliedFilters %} hidden{% endif %}></span>
             <span>Filters</span>
         </button>
         {% endif %}
@@ -75,7 +84,7 @@
 </div>
 
 {% if filters|default(null) is not empty %}
-<div id="filter__options" class="collapsible{% if not isEmptyFilterValues %} is-open"{% else %}" hidden{% endif %}>
+<div id="filter__options" class="collapsible{% if hasAppliedFilters %} is-open"{% else %}" hidden{% endif %}>
 <div class="filter__inner">
     {% for filter_name, filter in filters %}
     <span class="filter__section-{{ filter_name|lower }}">

@@ -108,7 +108,12 @@ class ResourceType extends AbstractType
                     'data-entity' => 'image',
                     'data-title' => $options['data'] instanceof AbstractFile ? $options['data']->getTitle() : 'Unknown',
                 ],
-                'label' => $this->translator->trans('admin.button.delete', [], 'messages'),
+                'label' => sprintf(
+                    '<span class="material-icons">%s</span> <span>%s</span>',
+                    'delete',
+                    $this->translator->trans('admin.button.delete', [], 'messages')
+                ),
+                'label_html' => true,
             ])
         ;
     }
