@@ -72,8 +72,6 @@
     </ul>
 
     {{ include ('inadmin/partials/components/view_content.html.twig', {
-        type: viewModel.page.tab,
-
         add_button: viewModel.page.tab == 'image' ? imageAddButton : downloadAddButton,
 
         columns: columns,
@@ -82,17 +80,24 @@
             Usage: {
                 '': 'All',
                 'notinuse': 'Not in use',
-            }
+            },
+            Duplicates: {
+                '': 'All',
+                'duplicates': 'Duplicates',
+                'unique': 'Unique',
+            },
         },
         filter_values: query.filters,
 
-        offset: query.offset,
         limit: query.limit,
-        total: dataset.count,
-        url_result: path('incc_resource_list', { type: viewModel.page.type }),
+        offset: query.offset,
 
         'slug_prefix': 'resources/' ~ viewModel.page.type,
         'slug': 'id',
+
+        total: dataset.count,
+        type: viewModel.page.tab,
+        url_result: path('incc_resource_list', { type: viewModel.page.type }),
 
         show_search: true,
         sort_options: {

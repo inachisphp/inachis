@@ -87,6 +87,18 @@ trait DefaultResourceRepository
                 $where[1]['unusedIds'] = [ 'value' => $ids ];
             }
         }
+        if (!empty($filters['duplicates'])) {
+            $operator = $filters['duplicates'] === 'duplicates' ? 'EXISTS' : 'NOT EXISTS';
+
+            $where[0] .= sprintf('
+                AND %s (
+                    SELECT i2.id
+                    FROM Inachis\Entity\Media\Image i2
+                    WHERE i2.checksum = q.checksum
+                    AND i2.id <> q.id
+                )
+            ', $operator);
+        }
 
         return $this->getAll(
             $limit,
