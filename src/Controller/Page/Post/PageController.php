@@ -18,6 +18,7 @@ use Inachis\Entity\Media\Image;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Form\PostType;
 use Inachis\Model\ContentQueryParameters;
+use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\{CategoryRepository, PageRepository, ReviewThreadRepository, RevisionRepository};
 use Inachis\Repository\Media\ImageRepository;
 use Inachis\Service\Content\Page\CategoryManager;
@@ -25,7 +26,7 @@ use Inachis\Service\Content\Page\PageBulkActionService;
 use Inachis\Service\Content\Page\ReviewRebaseService;
 use Inachis\Service\Content\Page\TagManager;
 use Inachis\Service\Content\Page\UrlManager;
-use Inachis\Service\Content\{ContentRevisionCompare, ReadingTime};
+use Inachis\Service\Content\{ContentRevisionCompare, ReadingTime, ViewStateManager};
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -64,8 +65,7 @@ class PageController extends AbstractInachisController
     )]
     public function list(
         Request $request,
-        CategoryRepository $categoryRepository,
-        ContentQueryParameters $contentQueryParameters,
+        ViewStateManager $viewStateManager,
         PageBulkActionService $pageBulkActionService,
         PageRepository $pageRepository,
         string $type = 'post',
@@ -91,51 +91,57 @@ class PageController extends AbstractInachisController
             );
         }
 
-        /** @var array{
-         *     filters: array{
-         *         categories?: array<string>, tags?: array<string>, status?: string, visible?: bool,
-         *         keyword?: string, excludeIds?: list<string>, fromDate?: \DateTimeImmutable, toDate?: \DateTimeImmutable
-         *     }|array{},
-         *     sort: string,
-         *     offset: int,
-         *     limit: int
-         * }
-         */
-        $contentQuery = $contentQueryParameters->process(
+        $params = $viewStateManager->load(
             $request,
-            $categoryRepository,
             'post',
-            'postDate desc',
+            new ViewStateDefaults(
+                sort: 'postDate desc',
+                view: 'list',
+            ),
         );
 
+        if ($request->isMethod(Request::METHOD_POST)) {
+            $params = ContentQueryParameters::fromRequest(
+                $request,
+                $params,
+            );
+
+            $viewStateManager->save(
+                $request->getSession(),
+                'post',
+                $params,
+            );
+        }
+
         if ($request->query->has('category') && $request->query->get('category') === 'null') {
-            $posts = $pageRepository->getPagesWithoutCategories($contentQuery['limit'], $contentQuery['offset']);
+            $posts = $pageRepository->getPagesWithoutCategories($params->getLimit(), $params->getOffset());
             $queryString = 'category=null';
         } elseif ($request->query->has('tag') && $request->query->get('tag') === 'null') {
-            $posts = $pageRepository->getPagesWithoutTags($contentQuery['limit'], $contentQuery['offset']);
+            $posts = $pageRepository->getPagesWithoutTags($params->getLimit(), $params->getOffset());
             $queryString = 'tag=null';
         } elseif ($request->query->has('featureImage') && $request->query->get('featureImage') === 'null') {
-            $posts = $pageRepository->getPagesWithoutFeatureImage($contentQuery['limit'], $contentQuery['offset'], );
+            $posts = $pageRepository->getPagesWithoutFeatureImage($params->getLimit(), $params->getOffset(), );
             $queryString = 'featureImage=null';
         } elseif ($request->query->has('sharingMessage') && $request->query->get('sharingMessage') === 'null') {
-            $posts = $pageRepository->getPagesWithoutSharingMessage($contentQuery['limit'], $contentQuery['offset']);
+            $posts = $pageRepository->getPagesWithoutSharingMessage($params->getLimit(), $params->getOffset());
             $queryString = 'sharingMessage=null';
         } else {
             $posts = $pageRepository->getFilteredOfTypeByPostDate(
-                $contentQuery['filters'],
+                $params->getFilters(),
                 $type,
-                $contentQuery['limit'],
-                $contentQuery['offset'],
-                $contentQuery['sort'],
+                $params->getLimit(),
+                $params->getOffset(),
+                $params->getSort(),
             );
         }
+
         $this->viewModel->page->title = ucfirst($type) . 's';
         $this->viewModel->page->tab = $type;
         return $this->render('inadmin/page/post/list.html.twig', [
             'viewModel' => $this->viewModel,
             'form' => $form->createView(),
             'posts' => $posts,
-            'query' => $contentQuery,
+            'query' => $params,
             'queryString' => $queryString ?? '',
         ]);
     }

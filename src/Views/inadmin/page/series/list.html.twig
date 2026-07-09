@@ -93,10 +93,10 @@
         },
 
         'sort_options': {
-            'lastDate asc': 'Newest',
-            'lastDate desc': 'Oldest',
-            'updatedAt asc': 'Modfied: Newest',
-            'updatedAt desc': 'Modfiied: Oldest',
+            'lastDate desc': 'Newest',
+            'lastDate asc': 'Oldest',
+            'updatedAt desc': 'Modfied: Newest',
+            'updatedAt asc': 'Modfiied: Oldest',
             'title asc': 'Title: A-Z',
             'title desc': 'Title: Z-A',
         },
@@ -132,7 +132,7 @@
         ],
 
         view_modes: [ 'list', 'table' ],
-        view_setting: query.view_setting|default('list'),
+        view_setting: query.view|default('list'),
     }
 %}
 </div>

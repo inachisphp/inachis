@@ -9,8 +9,6 @@
 
 namespace Inachis\Model;
 
-use Inachis\Entity\Content\Category;
-use Inachis\Repository\Content\CategoryRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -25,72 +23,85 @@ class ContentQueryParameters
      * @param string $sort
      * @param int $limit
      * @param int $offset
+     * @param string $view
      */
     public function __construct(
         protected array $filters = [],
         protected string $sort = '',
         protected int $limit = 10,
         protected int $offset = 0,
-        protected string $view_setting = 'list',
+        protected string $view = 'list',
     ) {}
 
     /**
-     * Process the request and return the query parameters
-     *
-     * @param Request $request
-     * @param CategoryRepository $categoryRepository
-     * @param string $prefix
-     * @param string $sortDefault
-     * @return array{filters: array<string,mixed>|array{}, sort: string, offset: int, limit: int}
+     * Creates a new instance using the current values as defaults and
+     * overriding them with any values supplied in the request.
      */
-    public function process (
+    public static function fromRequest(
         Request $request,
-        CategoryRepository $categoryRepository,
-        string $prefix = '',
-        string $sortDefault = '',
-    ): array {
-        $this->filters = array_filter($request->request->all('filter'));
-        $this->sort = $request->request->getString('sort') ?: $sortDefault;
-        $this->view_setting = $request->request->getString('view') ?: 'list';
+        self $current,
+    ): self {
 
-        if (isset($this->filters['categories']) && is_array($this->filters['categories']) && array_is_list($this->filters['categories'])) {
-            /** @var list<Category> */
-            $categories = $categoryRepository->findBy(['id' => $this->filters['categories']]);
-            $categoryFilter = [];
-            foreach ($categories as $category) {
-                $id = $category->getId()?->toString() ?: '';
-                if (!empty($id)) {
-                    $categoryFilter[$id] = $category->getTitle();
-                }
-            }
-            $this->filters['categories'] = $categoryFilter;
-        }
-
-        if ($request->isMethod(Request::METHOD_POST)) {
-            $request->getSession()->set($prefix . '_filters', $this->filters);
-            $request->getSession()->set($prefix . '_sort', $this->sort);
-            $request->getSession()->set($prefix . '_view', $this->view_setting);
-        } elseif ($request->getSession()->has($prefix . '_filters')) {
-            $this->filters = $request->getSession()->get($prefix . '_filters', '');
-            $sort = $request->getSession()->get($prefix . '_sort', '');
-            $this->sort = is_string($sort) ? $sort : '';
-            $view_setting = $request->getSession()->get($prefix . '_view', '');
-            $this->view_setting = is_string($view_setting) ? $view_setting : '';
-        }
-        $limit = $request->attributes->getInt(
-            'limit',
-            $categoryRepository->getMaxItemsToShow(),
+        $filters = array_filter(
+            $request->request->all('filter')
         );
-        $offset = $request->attributes->getInt('offset', 0);
-        $this->limit = is_numeric($limit) ? (int) $limit : 10;
-        $this->offset = is_numeric($offset) ? (int) $offset : 0;
 
+        return new self(
+            filters: $filters !== []
+                ? $filters
+                : $current->getFilters(),
+
+            sort: $request->request->getString('sort')
+                ?: $current->getSort(),
+
+            limit: $request->attributes->getInt(
+                'limit',
+                $current->getLimit(),
+            ),
+
+            offset: $request->attributes->getInt(
+                'offset',
+                $current->getOffset(),
+            ),
+
+            view: $request->request->getString('view')
+                ?: $current->getView(),
+        );
+    }
+
+    public function getFilters(): array
+    {
+        return $this->filters;
+    }
+
+    public function getSort(): string
+    {
+        return $this->sort;
+    }
+
+    public function getLimit(): int
+    {
+        return $this->limit;
+    }
+
+    public function getOffset(): int
+    {
+        return $this->offset;
+    }
+
+    public function getView(): string
+    {
+        return $this->view;
+    }
+
+    public function toArray(): array
+    {
         return [
             'filters' => $this->filters,
             'sort' => $this->sort,
             'offset' => $this->offset,
             'limit' => $this->limit,
-            'view_setting' => $this->view_setting,
+            'view' => $this->view,
         ];
     }
 }

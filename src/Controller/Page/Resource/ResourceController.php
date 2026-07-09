@@ -14,8 +14,10 @@ use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Media\{Download, Image};
 use Inachis\Form\ResourceType;
 use Inachis\Model\ContentQueryParameters;
+use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\{CategoryRepository, PageRepository, SeriesRepository};
 use Inachis\Repository\Media\{DownloadRepository, ImageRepository};
+use Inachis\Service\Content\ViewStateManager;
 use Inachis\Service\Resource\ImageFileService;
 use Inachis\Service\Waste\WasteManagerService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -49,8 +51,7 @@ class ResourceController extends AbstractInachisController
     )]
     public function list(
         Request $request,
-        CategoryRepository $categoryRepository,
-        ContentQueryParameters $contentQueryParameters,
+        ViewStateManager $viewStateManager,
         DownloadRepository $downloadRepository,
         ImageRepository $imageRepository,
     ): Response {
@@ -69,24 +70,40 @@ class ResourceController extends AbstractInachisController
             ]))
             ->getForm();
         $form->handleRequest($request);
-        /** @var array{filters: array{keyword?: string}, offset: int, limit: int, sort: string} */
-        $contentQuery = $contentQueryParameters->process(
+                
+        $params = $viewStateManager->load(
             $request,
-            $categoryRepository,
             strtolower($type),
-            'title asc',
+            new ViewStateDefaults(
+                sort: 'title asc',
+                view: 'grid',
+            ),
         );
+
+        if ($request->isMethod(Request::METHOD_POST)) {
+            $params = ContentQueryParameters::fromRequest(
+                $request,
+                $params,
+            );
+
+            $viewStateManager->save(
+                $request->getSession(),
+                strtolower($type),
+                $params,
+            );
+        }
+
         if ($repository instanceof ImageRepository && $request->query->getString('altText', '') === 'null') {
             $dataset = $repository->getImagesWithoutAltText(
-                $contentQuery['limit'],
-                $contentQuery['offset'],
+                $params->getLimit(),
+                $params->getOffset(),
             );
         } else {
             $dataset = $repository->getFiltered(
-                $contentQuery['filters'],
-                $contentQuery['limit'],
-                $contentQuery['offset'],
-                $contentQuery['sort'],
+                $params->getFilters(),
+                $params->getLimit(),
+                $params->getOffset(),
+                $params->getSort(),
             );
         }
 
@@ -100,7 +117,7 @@ class ResourceController extends AbstractInachisController
             'form' => $form->createView(),
             'limitKByte' => Image::WARNING_FILESIZE,
             'limitSize' => Image::WARNING_DIMENSIONS,
-            'query' => $contentQuery,
+            'query' => $params,
             'showUploadDialog' => $request->query->has('upload') && $request->query->getString('upload') === 'true',
         ]);
     }

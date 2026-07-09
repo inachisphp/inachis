@@ -1,0 +1,196 @@
+<?php
+
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
+namespace Inachis\Service\Content;
+
+use Inachis\Entity\User\User;
+use Inachis\Entity\User\UserViewState;
+use Inachis\Model\ContentQueryParameters;
+use Inachis\Model\Page\ViewStateDefaults;
+use Inachis\Repository\User\UserViewStateRepository;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
+final readonly class ViewStateManager
+{
+    public function __construct(
+        private Security $security,
+        private UserViewStateRepository $repository,
+    ) {
+    }
+
+    public function load(
+        Request $request,
+        string $context,
+        ViewStateDefaults $defaults,
+    ): ContentQueryParameters {
+
+        $state = [
+            'filters' => $defaults->getFilters(),
+            'sort' => $defaults->getSort(),
+            'view' => $defaults->getView(),
+        ];
+
+        $session = $request->getSession();
+
+        /*
+        * Session
+        */
+        $sessionState = $session->get(
+            "view_state.$context",
+            null,
+        );
+
+        if (is_array($sessionState)) {
+
+            $state = array_replace_recursive(
+                $state,
+                $sessionState,
+            );
+
+        } else {
+
+            /*
+            * Database
+            */
+            /** @var User|null $user */
+            $user = $this->security->getUser();
+
+            if ($user instanceof User) {
+
+                $saved = $this->repository->findFor(
+                    $user,
+                    $context,
+                );
+
+                if ($saved !== null) {
+
+                    $state = array_replace_recursive(
+                        $state,
+                        $saved->getState(),
+                    );
+
+                    /*
+                    * Warm the session cache.
+                    */
+                    $session->set(
+                        "view_state.$context",
+                        $saved->getState(),
+                    );
+                }
+            }
+        }
+
+        /*
+        * Request overrides.
+        */
+        $requestState = [
+            'filters' => array_filter(
+                $request->request->all('filter'),
+            ),
+            'sort' => $request->request->getString('sort'),
+            'view' => $request->request->getString('view'),
+        ];
+
+        $requestState = array_filter(
+            $requestState,
+            static fn (mixed $value): bool => $value !== '' && $value !== [],
+        );
+
+        if ($requestState !== []) {
+            $state = array_replace_recursive(
+                $state,
+                $requestState,
+            );
+        }
+
+        return new ContentQueryParameters(
+            filters: $state['filters'],
+            sort: $state['sort'],
+            limit: $request->attributes->getInt('limit', 10),
+            offset: $request->attributes->getInt('offset', 0),
+            view: $state['view'],
+        );
+    }
+
+    public function save(
+        SessionInterface $session,
+        string $context,
+        ContentQueryParameters $parameters,
+    ): void {
+
+        $state = [
+            'filters' => $parameters->getFilters(),
+            'sort' => $parameters->getSort(),
+            'view' => $parameters->getView(),
+        ];
+
+        /*
+        * Update the session first. This acts as our cache so subsequent
+        * requests don't need to query the database.
+        */
+        $session->set(
+            "view_state.$context",
+            $state,
+        );
+
+        /** @var User|null $user */
+        $user = $this->security->getUser();
+
+        /*
+        * Anonymous users only persist to the session.
+        */
+        if (!$user instanceof User) {
+            return;
+        }
+
+        $saved = $this->repository->findFor(
+            $user,
+            $context,
+        );
+
+        if ($saved === null) {
+            $saved = new UserViewState(
+                $user,
+                $context,
+            );
+        }
+
+        $saved->setState($state);
+
+        $this->repository->save($saved);
+    }
+
+    public function clear(
+        SessionInterface $session,
+        string $context,
+    ): void {
+
+        $session->remove(
+            "view_state.$context",
+        );
+
+        /** @var User|null $user */
+        $user = $this->security->getUser();
+
+        if (!$user instanceof User) {
+            return;
+        }
+
+        $saved = $this->repository->findFor(
+            $user,
+            $context,
+        );
+
+        if ($saved !== null) {
+            $this->repository->remove($saved);
+        }
+    }
+}

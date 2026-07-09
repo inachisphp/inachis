@@ -15,10 +15,12 @@ use Inachis\Entity\Content\Series;
 use Inachis\Entity\Media\Image;
 use Inachis\Form\SeriesType;
 use Inachis\Model\ContentQueryParameters;
+use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Service\Content\Series\SeriesBulkActionService;
+use Inachis\Service\Content\ViewStateManager;
 use Inachis\Service\Waste\WasteManagerService;
 use Inachis\Service\Formatting\UrlNormaliser;
 use Symfony\Component\HttpFoundation\Request;
@@ -47,8 +49,7 @@ class SeriesController extends AbstractInachisController
     )]
     public function list(
         Request $request,
-        CategoryRepository $categoryRepository,
-        ContentQueryParameters $contentQueryParameters,
+        ViewStateManager $viewStateManager,
         SeriesBulkActionService $seriesBulkActionService,
         SeriesRepository $seriesRepository
     ): Response {
@@ -66,20 +67,28 @@ class SeriesController extends AbstractInachisController
             }
             return $this->redirectToRoute('incc_series_list');
         }
-
-        /** @var array{
-         *     filters: array{keyword?:string, visible?:string},
-         *     offset: int,
-         *     limit: int,
-         *     sort: string
-         * } 
-         */
-        $contentQuery = $contentQueryParameters->process(
+                
+        $params = $viewStateManager->load(
             $request,
-            $categoryRepository,
             'series',
-            'lastDate desc',
+            new ViewStateDefaults(
+                sort: 'lastDate desc',
+                view: 'list',
+            ),
         );
+
+        if ($request->isMethod(Request::METHOD_POST)) {
+            $params = ContentQueryParameters::fromRequest(
+                $request,
+                $params,
+            );
+
+            $viewStateManager->save(
+                $request->getSession(),
+                'series',
+                $params,
+            );
+        }
 
         $this->viewModel->page->title = 'Series';
         $this->viewModel->page->tab = 'series';
@@ -87,12 +96,12 @@ class SeriesController extends AbstractInachisController
             'viewModel' => $this->viewModel,
             'form' => $form->createView(),
             'dataset' => $seriesRepository->getFiltered(
-                $contentQuery['filters'],
-                $contentQuery['limit'],
-                $contentQuery['offset'],
-                $contentQuery['sort'],
+                $params->getFilters(),
+                $params->getLimit(),
+                $params->getOffset(),
+                $params->getSort(),
             ),
-            'query' => $contentQuery,
+            'query' => $params,
         ]);
     }
 
