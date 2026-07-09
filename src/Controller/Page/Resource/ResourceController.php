@@ -188,10 +188,13 @@ class ResourceController extends AbstractInachisController
                 if ($resource instanceof Image &&
                     isset($usages['posts']) &&
                     empty($usages['posts']) &&
-                    $usages['series']->count() === 0 &&
-                    $filesystem->exists($filename)) {
+                    $usages['series']->count() === 0) {
                     try {
-                        $wasteManagerService->sendToWaste($resource);
+                        if (!$filesystem->exists($filename)) {
+                            $this->addFlash('error', 'The file for this resource does not exist and so will not be recoverable.');
+                        } else {
+                            $wasteManagerService->sendToWaste($resource);
+                        }
                         $repository->remove($resource);
                         $this->addFlash('success', 'Resource deleted.');
                         return $this->redirectToRoute(
@@ -211,6 +214,8 @@ class ResourceController extends AbstractInachisController
                             ]
                         );
                     }
+                } else {
+                    $this->addFlash('error', 'Can\'t remove file as it is in use');
                 }
             }
             $resource->setAuthor($this->getCurrentUser());

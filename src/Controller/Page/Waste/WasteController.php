@@ -65,10 +65,14 @@ class WasteController extends AbstractInachisController
                     }
                 }
             }
+            $this->addFlash('success', sprintf(
+                '%d item(s) have been %s',
+                count($request->request->all('items')),
+                $request->request->getString('recover', '') !== '' ? 'recovered' : 'deleted',
+            ));
             return $this->redirectToRoute(
                 'incc_waste_list',
                 [],
-                Response::HTTP_PERMANENTLY_REDIRECT
             );
         }
 
