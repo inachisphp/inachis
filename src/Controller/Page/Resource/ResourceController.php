@@ -82,16 +82,11 @@ class ResourceController extends AbstractInachisController
         );
 
         if ($request->isMethod(Request::METHOD_POST)) {
-            $params = ContentQueryParameters::fromRequest(
+            $viewStateManager->update(
                 $request,
-                $params,
-                $categoryRepository,
-            );
-
-            $viewStateManager->save(
-                $request->getSession(),
                 strtolower($type),
                 $params,
+                $categoryRepository,
             );
 
             return $this->redirectToRoute('incc_resource_list', [

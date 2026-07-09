@@ -94,7 +94,7 @@
         <p class="admonition admonition__info start-hidden" aria-live="polite" aria-atomic="true">
             <strong>{{ selectedIds|default([])|length }}</strong> items will be exported.
         </p>
-        {% include 'inadmin/partials/search.html.twig' with {
+        {% include 'inadmin/partials/components/search.html.twig' with {
             placeholder: 'Search…',
             ariaLabel: 'Search',
             enterKeyHint: 'search',

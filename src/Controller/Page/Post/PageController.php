@@ -94,7 +94,7 @@ class PageController extends AbstractInachisController
 
         $params = $viewStateManager->load(
             $request,
-            'post',
+            $type,
             new ViewStateDefaults(
                 sort: 'postDate desc',
                 view: 'list',
@@ -102,16 +102,11 @@ class PageController extends AbstractInachisController
         );
 
         if ($request->isMethod(Request::METHOD_POST)) {
-            $params = ContentQueryParameters::fromRequest(
+            $viewStateManager->update(
                 $request,
+                $type,
                 $params,
                 $categoryRepository,
-            );
-
-            $viewStateManager->save(
-                $request->getSession(),
-                'post',
-                $params,
             );
 
             return $this->redirectToRoute('incc_post_list', [

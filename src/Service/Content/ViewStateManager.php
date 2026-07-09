@@ -13,6 +13,7 @@ use Inachis\Entity\User\User;
 use Inachis\Entity\User\UserViewState;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
+use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\User\UserViewStateRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -119,12 +120,18 @@ final readonly class ViewStateManager
         );
     }
 
+    /**
+     * Update the session and database with the current View settings
+     *
+     * @param SessionInterface $session
+     * @param string $context
+     * @param ContentQueryParameters $parameters
+     */
     public function save(
         SessionInterface $session,
         string $context,
         ContentQueryParameters $parameters,
     ): void {
-
         $state = [
             'filters' => $parameters->getFilters(),
             'sort' => $parameters->getSort(),
@@ -135,17 +142,10 @@ final readonly class ViewStateManager
         * Update the session first. This acts as our cache so subsequent
         * requests don't need to query the database.
         */
-        $session->set(
-            "view_state.$context",
-            $state,
-        );
+        $session->set("view_state.$context", $state);
 
         /** @var User|null $user */
         $user = $this->security->getUser();
-
-        /*
-        * Anonymous users only persist to the session.
-        */
         if (!$user instanceof User) {
             return;
         }
@@ -156,29 +156,27 @@ final readonly class ViewStateManager
         );
 
         if ($saved === null) {
-            $saved = new UserViewState(
-                $user,
-                $context,
-            );
+            $saved = new UserViewState($user, $context);
         }
-
         $saved->setState($state);
 
         $this->repository->save($saved);
     }
 
+    /**
+     * Clears the Session and DB for the specified context for this user
+     *
+     * @param SessionInterface $session
+     * @param string $context
+     */
     public function clear(
         SessionInterface $session,
         string $context,
     ): void {
-
-        $session->remove(
-            "view_state.$context",
-        );
+        $session->remove("view_state.$context");
 
         /** @var User|null $user */
         $user = $this->security->getUser();
-
         if (!$user instanceof User) {
             return;
         }
@@ -191,5 +189,52 @@ final readonly class ViewStateManager
         if ($saved !== null) {
             $this->repository->remove($saved);
         }
+    }
+
+    /**
+     * Loads and returns {@link ContentQueryParameters} for the current 
+     * request context
+     *
+     * @param Request $request
+     * @param string $context
+     * @param ViewStateDefaults $defaults
+     * @param CategoryRepository $categoryRepository
+     * @return ContentQueryParameters
+     */
+    public function build(
+        Request $request,
+        string $context,
+        ViewStateDefaults $defaults,
+        CategoryRepository $categoryRepository,
+    ): ContentQueryParameters {
+        $state = $this->load($request, $context, $defaults);
+
+        return ContentQueryParameters::fromRequest($request, $state, $categoryRepository);
+    }
+
+    /**
+     * Creates a DTO from the Request parameters and updates the 
+     * session and DB values for this context.
+     *
+     * @param Request $request
+     * @param string $context
+     * @param ContentQueryParameters $current
+     * @param CategoryRepository $categoryRepository
+     * @return ContentQueryParameters
+     */
+    public function update(
+        Request $request,
+        string $context,
+        ContentQueryParameters $current,
+        CategoryRepository $categoryRepository,
+    ): ContentQueryParameters {
+        $params = ContentQueryParameters::fromRequest(
+            $request,
+            $current,
+            $categoryRepository,
+        );
+        $this->save($request->getSession(), $context, $params);
+
+        return $params;
     }
 }

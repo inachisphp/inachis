@@ -79,16 +79,11 @@ class SeriesController extends AbstractInachisController
         );
 
         if ($request->isMethod(Request::METHOD_POST)) {
-            $params = ContentQueryParameters::fromRequest(
+            $viewStateManager->update(
                 $request,
-                $params,
-                $categoryRepository,
-            );
-
-            $viewStateManager->save(
-                $request->getSession(),
                 'series',
                 $params,
+                $categoryRepository,
             );
 
             return $this->redirectToRoute('incc_series_list', [

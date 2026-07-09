@@ -16,18 +16,18 @@ use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\RoleType;
 use Inachis\Model\ContentQueryParameters;
+use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Security\RoleRepository;
+use Inachis\Service\Content\ViewStateManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
 /**
  * Controller for managing roles and role permissions.
  */
-#[IsGranted('ROLE_ADMIN')]
 class RolesController extends AbstractInachisController
 {
     /**
@@ -42,8 +42,8 @@ class RolesController extends AbstractInachisController
     public function index(
         Request $request,
         CategoryRepository $categoryRepository,
-        ContentQueryParameters $contentQueryParameters,
         RoleRepository $roleRepository,
+        ViewStateManager $viewStateManager,
     ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
@@ -66,24 +66,33 @@ class RolesController extends AbstractInachisController
             return $this->redirectToRoute('incc_admin_role_index');
         }
 
-        /** @var array{filters: array{keyword?: string}, offset: int, limit: int, sort?: string} */
-        $contentQuery = $contentQueryParameters->process(
+        $params = $viewStateManager->build(
             $request,
+            'roles',
+            new ViewStateDefaults(
+                sort: 'displayName asc',
+                view: 'list',
+            ),
             $categoryRepository,
-            'admin',
-            'displayName asc',
         );
+
+        // $contentQuery = $contentQueryParameters->process(
+        //     $request,
+        //     $categoryRepository,
+        //     'admin',
+        //     'displayName asc',
+        // );
         $this->viewModel->page->title = 'Roles';
         $this->viewModel->page->tab = 'roles';
         return $this->render('inadmin/page/security/roles/list.html.twig', [
             'viewModel' => $this->viewModel,
             'form' => $form->createView(),
             'dataset' => $roleRepository->getFiltered(
-                $contentQuery['filters'],
-                $contentQuery['limit'],
-                $contentQuery['offset'],
+                $params->getFilters(),
+                $params->getLimit(),
+                $params->getOffset(),
             ),
-            'query' => $contentQuery,
+            'query' => $params,
         ]);
     }
 

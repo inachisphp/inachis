@@ -13,8 +13,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Content\Tag;
 use Inachis\Model\ContentQueryParameters;
+use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\{CategoryRepository, PageRepository,TagRepository};
 use Inachis\Service\Content\Page\TagBulkActionService;
+use Inachis\Service\Content\ViewStateManager;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -78,9 +80,9 @@ class TagsController extends AbstractInachisController
     public function index(
         Request $request,
         CategoryRepository $categoryRepository,
-        ContentQueryParameters $contentQueryParameters,
         TagBulkActionService $tagBulkActionService,
         TagRepository $tagRepository,
+        ViewStateManager $viewStateManager,
         int $limit = 25,
         int $offset = 0,
     ): Response {
@@ -106,11 +108,14 @@ class TagsController extends AbstractInachisController
             return $this->redirectToRoute('incc_tags_list');
         }
 
-        $contentQuery = $contentQueryParameters->process(
+        $params = $viewStateManager->build(
             $request,
+            'tags',
+            new ViewStateDefaults(
+                sort: 'title asc',
+                view: 'table',
+            ),
             $categoryRepository,
-            'tag',
-            'title',
         );
 
         $this->viewModel->page->title = 'Tags';
@@ -127,7 +132,7 @@ class TagsController extends AbstractInachisController
                 $tagRepository->findAllWithUsageCount($limit, $offset)
             ),
             'form' => $form->createView(),
-            'query' => $contentQuery,
+            'query' => $params,
             'total' => $tagRepository->getAllCount(),
         ]);
     }
