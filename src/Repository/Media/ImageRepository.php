@@ -83,4 +83,46 @@ class ImageRepository extends AbstractRepository implements ResourceRepositoryIn
                 ->getSingleScalarResult();
         });
     }
+
+    /**
+     * Get a list of the IDs for Image not used in {@link Page} or
+     * {@link Series} objects
+     *
+     * @return list<string>
+     */
+    private function getUnusedResourceIds(): array
+    {
+        $sql = '
+            SELECT i.id
+            FROM image i
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM page p
+                WHERE p.image_id = i.id
+            )
+            AND NOT EXISTS (
+                SELECT 1
+                FROM series s
+                WHERE s.image_id = i.id
+            )
+            AND NOT EXISTS (
+                SELECT 1
+                FROM page p2
+                WHERE p2.content LIKE CONCAT("%/imgs/", i.filename, "%")
+            )
+            AND NOT EXISTS (
+                SELECT 1
+                FROM series s2
+                WHERE s2.description LIKE CONCAT("%/imgs/", i.filename, "%")
+            )
+        ';
+
+        return array_column(
+            $this->getEntityManager()
+                ->getConnection()
+                ->executeQuery($sql)
+                ->fetchAllAssociative(),
+            'id'
+        );
+    }
 }

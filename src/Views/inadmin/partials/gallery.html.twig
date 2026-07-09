@@ -16,7 +16,7 @@
             </li>
         {% endfor %}
     </ol>
-    {{ include('inadmin/partials/pagination.html.twig', {
+    {{ include('inadmin/partials/components/pagination.html.twig', {
         offset: query.offset,
         limit: query.limit,
         maxPagesToShow: 5,

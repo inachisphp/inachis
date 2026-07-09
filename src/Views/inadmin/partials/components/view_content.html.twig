@@ -8,7 +8,7 @@
 }) }}
 
 <section class="ui-section paginated-list{%- if zebra|default(false) %} zebra{% endif %}">
-{% if filter_values|default(null) is not empty %}
+{% if filter_values|default(null) is not empty and dataset|default(null) is empty %}
     <p class="content-warning">
         <i class="material-icons" aria-hidden="true">info_outline</i>
         <span>Oops! We couldn't find anything</span>

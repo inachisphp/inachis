@@ -14,8 +14,10 @@ use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Media\{Download, Image};
 use Inachis\Form\ResourceType;
 use Inachis\Model\ContentQueryParameters;
+use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\{CategoryRepository, PageRepository, SeriesRepository};
 use Inachis\Repository\Media\{DownloadRepository, ImageRepository};
+use Inachis\Service\Content\ViewStateManager;
 use Inachis\Service\Resource\ImageFileService;
 use Inachis\Service\Waste\WasteManagerService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -50,9 +52,9 @@ class ResourceController extends AbstractInachisController
     public function list(
         Request $request,
         CategoryRepository $categoryRepository,
-        ContentQueryParameters $contentQueryParameters,
         DownloadRepository $downloadRepository,
         ImageRepository $imageRepository,
+        ViewStateManager $viewStateManager,
     ): Response {
         $typeClass = match($request->attributes->getString('type')) {
             'downloads' => Download::class,
@@ -69,24 +71,42 @@ class ResourceController extends AbstractInachisController
             ]))
             ->getForm();
         $form->handleRequest($request);
-        /** @var array{filters: array{keyword?: string}, offset: int, limit: int, sort: string} */
-        $contentQuery = $contentQueryParameters->process(
+                
+        $params = $viewStateManager->load(
             $request,
-            $categoryRepository,
             strtolower($type),
-            'title asc',
+            new ViewStateDefaults(
+                sort: 'title asc',
+                view: 'grid',
+            ),
         );
+
+        if ($request->isMethod(Request::METHOD_POST)) {
+            $viewStateManager->update(
+                $request,
+                strtolower($type),
+                $params,
+                $categoryRepository,
+            );
+
+            return $this->redirectToRoute('incc_resource_list', [
+                'type' => $request->attributes->getString('type'),
+                'limit' => $request->attributes->getInt('limit'),
+                'offset' => $request->attributes->getInt('offset'),
+            ]);
+        }
+
         if ($repository instanceof ImageRepository && $request->query->getString('altText', '') === 'null') {
             $dataset = $repository->getImagesWithoutAltText(
-                $contentQuery['limit'],
-                $contentQuery['offset'],
+                $params->getLimit(),
+                $params->getOffset(),
             );
         } else {
             $dataset = $repository->getFiltered(
-                $contentQuery['filters'],
-                $contentQuery['limit'],
-                $contentQuery['offset'],
-                $contentQuery['sort'],
+                $params->getFilters(),
+                $params->getLimit(),
+                $params->getOffset(),
+                $params->getSort(),
             );
         }
 
@@ -100,7 +120,7 @@ class ResourceController extends AbstractInachisController
             'form' => $form->createView(),
             'limitKByte' => Image::WARNING_FILESIZE,
             'limitSize' => Image::WARNING_DIMENSIONS,
-            'query' => $contentQuery,
+            'query' => $params,
             'showUploadDialog' => $request->query->has('upload') && $request->query->getString('upload') === 'true',
         ]);
     }
@@ -168,10 +188,13 @@ class ResourceController extends AbstractInachisController
                 if ($resource instanceof Image &&
                     isset($usages['posts']) &&
                     empty($usages['posts']) &&
-                    $usages['series']->count() === 0 &&
-                    $filesystem->exists($filename)) {
+                    $usages['series']->count() === 0) {
                     try {
-                        $wasteManagerService->sendToWaste($resource);
+                        if (!$filesystem->exists($filename)) {
+                            $this->addFlash('error', 'The file for this resource does not exist and so will not be recoverable.');
+                        } else {
+                            $wasteManagerService->sendToWaste($resource);
+                        }
                         $repository->remove($resource);
                         $this->addFlash('success', 'Resource deleted.');
                         return $this->redirectToRoute(
@@ -191,6 +214,8 @@ class ResourceController extends AbstractInachisController
                             ]
                         );
                     }
+                } else {
+                    $this->addFlash('error', 'Can\'t remove file as it is in use');
                 }
             }
             $resource->setAuthor($this->getCurrentUser());

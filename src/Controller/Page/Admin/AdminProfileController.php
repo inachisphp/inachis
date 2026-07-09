@@ -13,11 +13,13 @@ use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\User\{User,UserPreference};
 use Inachis\Form\UserType;
 use Inachis\Model\ContentQueryParameters;
+use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\User\UserPasskeyRepository;
 use Inachis\Repository\User\UserRepository;
 use Inachis\Security\Authentication\PasskeyService;
 use Inachis\Security\Authentication\TotpService;
+use Inachis\Service\Content\ViewStateManager;
 use Inachis\Service\User\UserBulkActionService;
 use Inachis\Service\User\UserAccountEmailService;
 use Inachis\Transformer\ImageTransformer;
@@ -29,9 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 class AdminProfileController extends AbstractInachisController
 {
     /**
@@ -56,9 +56,9 @@ class AdminProfileController extends AbstractInachisController
     public function list(
         Request $request,
         CategoryRepository $categoryRepository,
-        ContentQueryParameters $contentQueryParameters,
         UserBulkActionService $userBulkActionService,
         UserRepository $userRepository,
+        ViewStateManager $viewStateManager,
     ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
@@ -78,25 +78,28 @@ class AdminProfileController extends AbstractInachisController
             return $this->redirectToRoute('incc_admin_list');
         }
 
-        /** @var array{filters: array{keyword?: string}, offset: int, limit: int, sort: string} */
-        $contentQuery = $contentQueryParameters->process(
+        $params = $viewStateManager->build(
             $request,
-            $categoryRepository,
             'admin',
-            'displayName asc',
+            new ViewStateDefaults(
+                sort: 'displayName asc',
+                view: 'list',
+            ),
+            $categoryRepository,
         );
+
         $this->viewModel->page->title = 'Users';
         $this->viewModel->page->tab = 'users';
         return $this->render('inadmin/page/admin/list.html.twig', [
             'viewModel' => $this->viewModel,
             'dataset' => $userRepository->getFiltered(
-                $contentQuery['filters'],
-                $contentQuery['limit'],
-                $contentQuery['offset'],
-                $contentQuery['sort'],
+                $params->getFilters(),
+                $params->getLimit(),
+                $params->getOffset(),
+                $params->getSort(),
             ),
             'form' => $form->createView(),
-            'query' => $contentQuery,
+            'query' => $params,
         ]);
     }
 

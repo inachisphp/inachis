@@ -11,8 +11,10 @@ namespace Inachis\Controller\Page\Waste;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Model\ContentQueryParameters;
+use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Waste\WasteRepository;
+use Inachis\Service\Content\ViewStateManager;
 use Inachis\Service\Waste\WasteManagerService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,9 +46,9 @@ class WasteController extends AbstractInachisController
     public function list(
         Request $request,
         CategoryRepository $categoryRepository,
-        ContentQueryParameters $contentQueryParameters,
         WasteRepository $wasteRepository,
         WasteManagerService $wasteManagerService,
+        ViewStateManager $viewStateManager,
     ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $form = $this->createFormBuilder()->getForm();
@@ -63,31 +65,38 @@ class WasteController extends AbstractInachisController
                     }
                 }
             }
+            $this->addFlash('success', sprintf(
+                '%d item(s) have been %s',
+                count($request->request->all('items')),
+                $request->request->getString('recover', '') !== '' ? 'recovered' : 'deleted',
+            ));
             return $this->redirectToRoute(
                 'incc_waste_list',
                 [],
-                Response::HTTP_PERMANENTLY_REDIRECT
             );
         }
 
-        /** @var array{filters: array{keyword?: string}|array{}, sort: string, offset: int, limit: int} */
-        $contentQuery = $contentQueryParameters->process(
+        $params = $viewStateManager->build(
             $request,
-            $categoryRepository,
             'waste',
-            'updatedAt desc',
+            new ViewStateDefaults(
+                sort: 'updatedAt desc',
+                view: 'list',
+            ),
+            $categoryRepository,
         );
+
         $this->viewModel->page->tab = 'waste';
         return $this->render('inadmin/page/waste/list.html.twig', [
             'viewModel' => $this->viewModel,
             'dataset' => $wasteRepository->getFiltered(
-                $contentQuery['filters'],
-                $contentQuery['limit'],
-                $contentQuery['offset'],
-                $contentQuery['sort'],
+                $params->getFilters(),
+                $params->getLimit(),
+                $params->getOffset(),
+                $params->getSort(),
             ),
             'form' => $form->createView(),
-            'query' => $contentQuery,
+            'query' => $params,
         ]);
     }
 

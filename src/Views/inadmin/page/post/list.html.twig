@@ -5,6 +5,7 @@
 {% endblock pagetitle %}
 
 {% block content %}
+
     {% set badges = {
         draft: {
             field: 'isdraft',
@@ -156,8 +157,8 @@
             },
             Visibility: {
                 '': 'All',
-                'private': 'Private',
-                'public': 'Public',
+                '0': 'Private',
+                '1': 'Public',
             },
             Expired: {
                 '': 'All',
@@ -182,7 +183,7 @@
         search_placeholder: 'Search posts…',
         showSummary: true,
         view_modes: [ 'list', 'table' ],
-        view_setting: query.view_setting|default('list'),
+        view_setting: query.view|default('list'),
         zebra: true,
     }
     %}

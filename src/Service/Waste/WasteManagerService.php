@@ -173,7 +173,7 @@ class WasteManagerService
                 $page->setTitle($data['title']);
                 $page->setSubTitle($data['subTitle'] ?? null);
                 $page->setContent($data['content'] ?? null);
-                $page->setStatus($data['status']);
+                $page->setStatus(EditorialStatus::from($data['status']));
                 $page->setVisible($data['visible']);
                 if (!empty($data['postDate'])) {
                     $page->setPostDate(new DateTimeImmutable($data['postDate']));

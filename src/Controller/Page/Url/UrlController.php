@@ -13,8 +13,10 @@ use Doctrine\ORM\OptimisticLockException;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Content\Url;
 use Inachis\Model\ContentQueryParameters;
+use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\UrlRepository;
+use Inachis\Service\Content\ViewStateManager;
 use Inachis\Service\Url\UrlBulkActionService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,9 +44,9 @@ class UrlController extends AbstractInachisController
     public function list(
         Request $request,
         CategoryRepository $categoryRepository,
-        ContentQueryParameters $contentQueryParameters,
         UrlBulkActionService $urlBulkActionService,
         UrlRepository $urlRepository,
+        ViewStateManager $viewStateManager,
     ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
@@ -61,27 +63,42 @@ class UrlController extends AbstractInachisController
             }
             return $this->redirectToRoute('incc_url_list');
         }
-
-        /** @var array{filters: array{keyword?: string}|array{}, sort: string, offset: int, limit: int} */
-        $contentQuery = $contentQueryParameters->process(
+        
+        $params = $viewStateManager->load(
             $request,
-            $categoryRepository,
             'url',
-            'contentDate asc',
+            new ViewStateDefaults(
+                sort: 'contentDate asc',
+                view: 'table',
+            ),
         );
+
+        if ($request->isMethod(Request::METHOD_POST)) {
+            $viewStateManager->update(
+                $request,
+                'url',
+                $params,
+                $categoryRepository,
+            );
+
+            return $this->redirectToRoute('incc_url_list', [
+                'limit' => $request->attributes->getInt('limit'),
+                'offset' => 0,
+            ]);
+        }
 
         $this->viewModel->page->title = 'URLs';
         $this->viewModel->page->tab = 'url';
         return $this->render('inadmin/page/url/list.html.twig', [
             'viewModel' => $this->viewModel,
             'dataset' => $urlRepository->getFiltered(
-                $contentQuery['filters'],
-                $contentQuery['limit'],
-                $contentQuery['offset'],
-                $contentQuery['sort'],
+                $params->getFilters(),
+                $params->getLimit(),
+                $params->getOffset(),
+                $params->getSort(),
             ),
             'form' => $form->createView(),
-            'query' => $contentQuery,
+            'query' => $params,
         ]);
     }
 

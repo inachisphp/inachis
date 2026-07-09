@@ -30,7 +30,7 @@
             <input class="text" type="number" id="retry_after" name="retry_after" value="{{ config.retry_after }}">
         </p>
 
-        {% include 'inadmin/partials/action_bar.html.twig' with {
+        {% include 'inadmin/partials/components/action_bar.html.twig' with {
             actions: {
                 toggle: {
                     button_class: enabled ? 'button--positive' : 'button--negative',

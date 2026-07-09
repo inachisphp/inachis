@@ -32,9 +32,6 @@
     </p>
 </fieldset>
 
-{# templates/inadmin/page/tools/csp_settings.html.twig #}
-{# ... keep header and top of the form the same ... #}
-
 <fieldset class="ui-section">
     <h3>Directives Config</h3>
     <div class="admonition admonition__info">
@@ -68,9 +65,13 @@
 
 <div class="fixed-bottom-bar">
     <p>
-        <button type="submit" class="button button--positive">Apply Configuration</button>
+        <button type="submit" class="button button--positive">
+            <span class="material-icons" aria-hidden="true">save</span> 
+            <span class="btn-text">Apply Configuration</span>
+        </button>
         <a href="{{ path('incc_tools_csp_suggested_policy') }}" class="button button--ai">
-            <em class="material-icons">auto_fix_high</em> Generate Rule Suggestions
+            <span class="material-icons" aria-hidden="true">auto_fix_high</span> 
+            <span class="btn-text">Generate Rule Suggestions</span>
         </a>
     </p>
 </div>

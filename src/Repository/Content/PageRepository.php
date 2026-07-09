@@ -154,9 +154,9 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             $where[0] .= ' AND q.status = :status';
             $where[1]['status'] = $filters['status'];
         }
-        if (!empty($filters['visible'])) {
+        if (isset($filters['visibility'])) {
             $where[0] .= ' AND q.visible = :visible';
-            $where[1]['visible'] = $filters['visible'];
+            $where[1]['visible'] = $filters['visibility'];
         }
         if (!empty($filters['keyword'])) {
             $where[0] .= ' AND (q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.content LIKE :keyword )';

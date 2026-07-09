@@ -72,15 +72,34 @@ trait DefaultResourceRepository
      */
     public function getFiltered(array $filters, int $limit, int $offset, ?string $sortBy = 'title asc'): Paginator
     {
-        $where = [];
+        $where = [
+            '1=1',
+            [],
+        ];
         if (!empty($filters['keyword'])) {
-            $where = [
-                '(q.altText LIKE :keyword OR q.title LIKE :keyword OR q.description LIKE :keyword )',
-                [
-                    'keyword' => '%' . $filters['keyword']  . '%',
-                ],
-            ];
+            $where[0] .= ' AND (q.altText LIKE :keyword OR q.title LIKE :keyword OR q.description LIKE :keyword )';
+            $where[1]['keyword'] = '%' . $filters['keyword']  . '%';
         }
+        if (!empty($filters['usage']) && $filters['usage'] === 'notinuse') {
+            $ids = $this->getUnusedResourceIds();
+            if (!empty($ids)) {
+                $where[0] .= ' AND q.id IN (:unusedIds)';
+                $where[1]['unusedIds'] = [ 'value' => $ids ];
+            }
+        }
+        if (!empty($filters['duplicates'])) {
+            $operator = $filters['duplicates'] === 'duplicates' ? 'EXISTS' : 'NOT EXISTS';
+
+            $where[0] .= sprintf('
+                AND %s (
+                    SELECT i2.id
+                    FROM Inachis\Entity\Media\Image i2
+                    WHERE i2.checksum = q.checksum
+                    AND i2.id <> q.id
+                )
+            ', $operator);
+        }
+
         return $this->getAll(
             $limit,
             $offset,
@@ -106,8 +125,19 @@ trait DefaultResourceRepository
             'filesize asc' => ['q.filesize', 'ASC'],
             'filesize desc' => ['q.filesize', 'DESC'],
             'updatedAt asc' => ['q.updatedAt', 'ASC'],
-            'modupdatedAtDate desc' => ['q.updatedAt', 'DESC'],
+            'updatedAt desc' => ['q.updatedAt', 'DESC'],
             default => ['q.title', 'ASC'],
         };
+    }
+
+    /**
+     * Get a list of the IDs for Resources not used in {@link Page} or
+     * {@link Series} objects
+     *
+     * @return list<string>
+     */
+    protected function getUnusedResourceIds(): array
+    {
+        return [];
     }
 }
