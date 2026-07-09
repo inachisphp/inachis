@@ -9,6 +9,7 @@
 
 namespace Inachis\Form;
 
+use Inachis\Validator\Constraints\PasswordPolicy;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -122,15 +123,7 @@ class ChangePasswordType extends AbstractType
                 ],
                 'constraints' => [
                     new Assert\NotBlank(),
-                    new Assert\Length(
-                        min: 8,
-                        max: 4096,
-                        minMessage: 'Your password should be at least 8 characters',
-                    ),
-                    new Assert\PasswordStrength(
-                        minScore: Assert\PasswordStrength::STRENGTH_WEAK,
-                        message: 'Your password must be more complex. See the below guidance.',
-                    ),
+                    new PasswordPolicy(),
                 ],
                 'label' => 'New password',
                 'label_attr' => [

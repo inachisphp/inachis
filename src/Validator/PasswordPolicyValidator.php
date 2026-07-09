@@ -8,18 +8,21 @@
 
 namespace Inachis\Validator;
 
-use Inachis\Entity\Security\SecurityPolicy;
-use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Service\Security\ActiveSecurityPolicyService;
+use Inachis\Validator\Constraints\PasswordPolicy;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
+use Symfony\Component\Validator\Constraints\PasswordStrength;
+use Symfony\Component\Validator\Constraints\PasswordStrengthValidator;
 
 /**
  * PasswordPolicyValidator class
  */
 class PasswordPolicyValidator extends ConstraintValidator
 {
-    public function __construct(private EntityManagerInterface $entityManager) {}
+    public function __construct(private ActiveSecurityPolicyService $activeSecurityPolicyService) {}
 
     /**
      * Validate the password policy
@@ -30,6 +33,10 @@ class PasswordPolicyValidator extends ConstraintValidator
      */
     public function validate(mixed $value, Constraint $constraint): void
     {
+        if (!$constraint instanceof PasswordPolicy) {
+            throw new UnexpectedTypeException($constraint, PasswordPolicy::class);
+        }
+
         if (null === $value || '' === $value) {
             return;
         }
@@ -37,29 +44,35 @@ class PasswordPolicyValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'string');
         }
 
-        $policy = $this->entityManager->getRepository(SecurityPolicy::class)->find(1);
+        $policy = $this->activeSecurityPolicyService->getActivePolicy();
         if (!$policy) {
             return;
         }
 
         if (strlen($value) < $policy->getMinLength()) {
-            $this->context->buildViolation('Minimum length is '.$policy->getMinLength())->addViolation();
+            $this->context->buildViolation(strtr($constraint->minLengthMessage, ['{{ minLength }}' => (string) $policy->getMinLength()]))
+                ->addViolation();
         }
 
         if ($policy->getRequireUppercase() && !preg_match('/[A-Z]/', $value)) {
-            $this->context->buildViolation('Must contain an uppercase letter')->addViolation();
+            $this->context->buildViolation($constraint->uppercaseMessage)->addViolation();
         }
 
         if ($policy->getRequireLowercase() && !preg_match('/[a-z]/', $value)) {
-            $this->context->buildViolation('Must contain a lowercase letter')->addViolation();
+            $this->context->buildViolation($constraint->lowercaseMessage)->addViolation();
         }
 
         if ($policy->getRequireNumber() && !preg_match('/\d/', $value)) {
-            $this->context->buildViolation('Must contain a number')->addViolation();
+            $this->context->buildViolation($constraint->numberMessage)->addViolation();
         }
 
         if ($policy->getRequireSpecial() && !preg_match('/[^a-zA-Z0-9]/', $value)) {
-            $this->context->buildViolation('Must contain a special character')->addViolation();
+            $this->context->buildViolation($constraint->specialMessage)->addViolation();
+        }
+
+        $strength = PasswordStrengthValidator::estimateStrength($value);
+        if ($strength < PasswordStrength::STRENGTH_WEAK) {
+            $this->context->buildViolation($constraint->strengthMessage)->addViolation();
         }
     }
 }

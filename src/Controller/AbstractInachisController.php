@@ -12,6 +12,7 @@ namespace Inachis\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Controller\AbstractController;
 use Inachis\Entity\User\User;
+use Inachis\Factory\PageViewFactory;
 use Inachis\Repository\Waste\WasteRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -40,25 +41,11 @@ abstract class AbstractInachisController extends AbstractController
         protected Security $security,
         protected TranslatorInterface $translator,
         protected WasteRepository $wasteRepository,
+        PageViewFactory $pageViewFactory,
     ) {
-        parent::__construct($params);
-        $this->configureAdminPageViewModel();
-    }
+        parent::__construct($params, $pageViewFactory);
 
-    /**
-     * Sets the default data for the admin controller.
-     */
-    public function configureAdminPageViewModel(): void
-    {
-        $sessionTimeout = new DateTimeImmutable();
-        $sessionTimeout = $sessionTimeout->add(new DateInterval('PT' . ini_get('session.gc_maxlifetime') . 'S'));
-
-        $this->viewModel->session = $this->security->getUser();
-        $this->viewModel->sessionTimeout = intval(ini_get('session.gc_maxlifetime'));
-        $this->viewModel->sessionTimeoutTime = $sessionTimeout->format('Y-m-d\TH:i:s');
-        $this->viewModel->deletedItems = $this->wasteRepository->getWasteCount();
-        // TODO: fix the below
-        // $this->viewModel->timeoutTemplate = base64_encode($this->renderView('inadmin/dialog/session_timeout.html.twig'));
+        $this->viewModel = $pageViewFactory->createAdmin();
     }
 
     /**

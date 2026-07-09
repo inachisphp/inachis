@@ -16,6 +16,7 @@ use Inachis\Entity\Security\RolePermission;
 use Inachis\Entity\User\User;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 #[ORM\Entity]
 class Role
@@ -30,7 +31,7 @@ class Role
     protected ?UuidInterface $id = null;
 
     #[ORM\Column(type: 'string', length: 50, unique: true)]
-    private string $slug;
+    private string $slug = '';
 
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     private string $name;
@@ -84,7 +85,12 @@ class Role
 
     public function setName(string $name): self
     {
-        $this->name = $name;
+        $this->name = trim($name);
+
+        if ($this->slug === '') {
+            $this->slug = $this->slugify($this->name);
+        }
+
         return $this;
     }
 
@@ -163,5 +169,16 @@ class Role
     public function getUsers(): Collection
     {
         return $this->users;
+    }
+
+    private function slugify(string $value): string
+    {
+        $slugger = new AsciiSlugger();
+        $slug = $slugger
+            ->slug($value)
+            ->lower()
+            ->toString();
+
+        return trim($slug, '-');
     }
 }

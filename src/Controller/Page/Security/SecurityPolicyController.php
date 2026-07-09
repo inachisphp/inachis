@@ -6,7 +6,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Controller\Page\Admin;
+namespace Inachis\Controller\Page\Security;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Controller\AbstractInachisController;
@@ -24,11 +24,14 @@ class SecurityPolicyController extends AbstractInachisController
     #[Route('/incc/admin/security-policy', name: 'incc_admin_security_policy', priority: 100)]
     public function edit(
         Request $request,
-        EntityManagerInterface $em
+        EntityManagerInterface $entityManager,
     ): Response {
         // Fetch the three policies (assume always exactly 3)
-        $policies = $em->getRepository(SecurityPolicy::class)->findBy([], ['createdAt' => 'ASC']);
+        $policies = $entityManager->getRepository(SecurityPolicy::class)->findBy([], ['createdAt' => 'ASC']);
+        if (count($policies) !== 3) {
+            throw new \RuntimeException('Expected exactly 3 security policies, found ' . count($policies));
 
+        }
         // First policy editable
         $firstPolicy = $policies[0];
 
@@ -36,7 +39,7 @@ class SecurityPolicyController extends AbstractInachisController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em->flush();
+            $entityManager->flush();
             $this->addFlash('success', 'Security policy updated!');
             return $this->redirectToRoute('security_policy');
         }
@@ -49,7 +52,7 @@ class SecurityPolicyController extends AbstractInachisController
                 $policy->setIsActive($policy->getId()?->toString() === $activeId);
             }
 
-            $em->flush();
+            $entityManager->flush();
             $this->addFlash('success', 'Active policy updated!');
             return $this->redirectToRoute('security_policy');
         }

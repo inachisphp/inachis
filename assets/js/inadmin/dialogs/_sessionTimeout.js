@@ -11,7 +11,6 @@ window.Inachis.SessionTimeout = {
         sessionTimeout: 1440, // seconds
         warnBeforeTimeout: 120, // seconds
         sessionEndTime: '',
-        templateEncoded: '',
     },
 
     init(options = {}) {
@@ -30,7 +29,13 @@ window.Inachis.SessionTimeout = {
     },
 
     showAlert() {
-        const content = atob(this.options.templateEncoded);
+        const template = document.getElementById('session-timeout-template');
+        if (!template) {
+            console.warn('Session timeout template not found');
+            return;
+        }
+
+        const content = template.innerHTML;
 
         this.dialogInstance = new Dialog({
             id: 'dialog__sessionTimeout',

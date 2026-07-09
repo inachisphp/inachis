@@ -65,6 +65,17 @@
                     {{ form_widget(form.timezone) }}
                     {{ form_errors(form.timezone) }}
             </fieldset>
+ 
+            {% if form.assignedRoles is defined %}
+            <fieldset class="multisection">
+                <legend>Security Roles</legend>
+                <div class="form-checkbox-group">
+                    {{ form_label(form.assignedRoles) }}
+                    {{ form_widget(form.assignedRoles) }}
+                    {{ form_errors(form.assignedRoles) }}
+                </div>
+            </fieldset>
+            {% endif %}
 
     {% if app.user.username == user.username %}
             <fieldset class="multisection">

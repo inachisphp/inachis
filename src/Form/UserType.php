@@ -9,9 +9,11 @@
 
 namespace Inachis\Form;
 
+use Inachis\Entity\Security\Role;
 use Inachis\Entity\User\User;
 use Inachis\Service\User\ProfileColorPalette;
 use Inachis\Form\Provider\TimezoneChoices;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -24,14 +26,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Form type for creating and editing users
- * 
+ *
  * @extends AbstractType<User>
  */
 class UserType extends AbstractType
 {
     /**
      * Creates a new instance of {@link UserType}
-     * 
+     *
      * @param TranslatorInterface $translator The translator service
      * @param Security $security The security service
      */
@@ -42,7 +44,7 @@ class UserType extends AbstractType
 
     /**
      * Builds the form
-     * 
+     *
      * @param FormBuilderInterface<User|null> $builder The form builder
      * @param array<string, mixed> $options The form options
      */
@@ -101,7 +103,25 @@ class UserType extends AbstractType
                     'id' => 'user__timezone__label',
                 ],
                 'property_path' => 'preferences.timezone',
-            ])
+            ]);
+
+        if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted('ROLE_EDIT')) {
+            $builder->add('assignedRoles', EntityType::class, [
+                'class' => Role::class,
+                'choice_label' => 'name',
+                'choice_value' => static fn (?Role $role) => $role?->getId()?->toString(),
+                'multiple' => true,
+                'expanded' => true,
+                'by_reference' => false,
+                'label' => 'Assigned Roles',
+                'label_attr' => [
+                    'class' => 'inline_label',
+                ],
+                'required' => false,
+            ]);
+        }
+
+        $builder
             ->add('avatar', HiddenType::class)
             ->add('submit', SubmitType::class, [
                 'attr' => [
@@ -175,7 +195,7 @@ class UserType extends AbstractType
 
     /**
      * Configures the options for the form
-     * 
+     *
      * @param OptionsResolver $resolver The options resolver
      */
     public function configureOptions(OptionsResolver $resolver): void
