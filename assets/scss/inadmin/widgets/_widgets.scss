@@ -56,4 +56,25 @@ section.widget-settings {
   p span {
     font-size: 0.85em;
   }
+
+  .widget__alert, .widget__ok {
+    font-size: 0.9rem;
+    margin: 0 0 0.5rem 0;
+    padding: 0.5rem;
+    text-align: left;
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  .widget__alert {
+    background-color: var(--color-flash-warning-bg);
+  }
+
+  .widget__ok {
+    background-color: var(  --color-flash-success-bg);
+  }
 }

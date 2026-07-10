@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Service\Url;
+namespace Inachis\Service\Discovery\Generator;
 
 use Inachis\Repository\System\SettingRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -30,8 +30,7 @@ class RobotsTxtGenerator
 
 	/**
 	 * Generate the content of the robots.txt file based on the stored configuration
-	 *
-	 * TODO: Add in sitemap once we have a sitemap generator
+	 * 
 	 * @return string
 	 */
     public function generate(): string
