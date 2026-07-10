@@ -21,7 +21,7 @@ interface AnalyticsProviderInterface
 {
     /**
      * Get total page views per day between two dates.
-     * 
+     *
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
      * @return list<array{date: string, total: numeric-string}>
@@ -30,15 +30,17 @@ interface AnalyticsProviderInterface
 
     /**
      * Get most visited pages.
-     * 
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
      * @param int $limit
      * @return list<array{path: string, total: numeric-string, title: string}>
      */
-    public function getTopPages(int $limit = 10): array;
+    public function getTopPages(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array;
 
     /**
      * Get total views in a date range.
-     * 
+     *
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
      * @return int
@@ -56,36 +58,52 @@ interface AnalyticsProviderInterface
 
     /**
      * Get the most common paths that result in a 4xx or 5xx error.
-     * 
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
      * @param int $limit
      * @return list<array{path: string, code: string, hits: numeric-string}>
      */
-    public function getTopErrors(int $limit = 10): array;
+    public function getTopErrors(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array;
 
     /**
      * Get trending pages
      *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param \DateTimeInterface $previousFrom
+     * @param \DateTimeInterface $previousTo
      * @param int $limit
      * @return list<array{path: string, current: int, previous: int, change: float|int|null}>
      */
-    public function getTrendingPages(int $limit = 10): array;
+    public function getTrendingPages(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        \DateTimeInterface $previousFrom,
+        \DateTimeInterface $previousTo,
+        int $limit = 10,
+    ): array;
 
     /**
      * Get the most common referring domains.
-     * 
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
      * @param int $limit
      * @return list<array{domain: string, total: numeric-string}>
      */
-    public function getTopReferrers(int $limit = 10): array;
+    public function getTopReferrers(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array;
 
     /**
      * Get the most common referring domains for a specific page.
-     * 
+     *
      * @param string $path
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
      * @param int $limit
      * @return list<array{domain: string, total: numeric-string}>
      */
-    public function getTopReferrersForPage(string $path, int $limit = 10): array;
+    public function getTopReferrersForPage(string $path, \DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array;
 
     /**
      * Get page views per day for paths
@@ -119,7 +137,7 @@ interface AnalyticsProviderInterface
 
     /**
      * Get top visitor countries/regions.
-     * 
+     *
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
      * @param int $limit
@@ -129,7 +147,7 @@ interface AnalyticsProviderInterface
 
     /**
      * Get RSS subscriber stats over time.
-     * 
+     *
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
      * @return list<array{date: string, subscribers: int}>
@@ -138,14 +156,14 @@ interface AnalyticsProviderInterface
 
     /**
      * Get current subscribers per feed path.
-     * 
+     *
      * @return list<array{path: string, subscribers: numeric-string}>
      */
     public function getCurrentSubscribersPerFeed(): array;
 
     /**
      * Get top bot user-agents in the given date range.
-     * 
+     *
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
      * @param int $limit

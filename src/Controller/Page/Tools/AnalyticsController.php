@@ -9,8 +9,10 @@
 
 namespace Inachis\Controller\Page\Tools;
 
+use Inachis\Analytics\AnalyticsPeriodFactory;
 use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Controller\AbstractInachisController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -23,44 +25,48 @@ class AnalyticsController extends AbstractInachisController
      * @return Response
      */
     #[Route('/incc/tools/analytics', name: 'incc_tools_analytics')]
-    public function index(AnalyticsProviderInterface $analytics): Response
-    {
-        $to = new \DateTimeImmutable();
-        $from = $to->modify('-30 days');
+    public function index(
+        AnalyticsProviderInterface $analytics,
+        Request $request,
+    ): Response {
+        $period = AnalyticsPeriodFactory::fromRequest($request);
+        $previous = $period->previous();
 
-        $viewsPerDay = $analytics->getPageViewsPerDay($from, $to);
-        $top404s = $analytics->getTopErrors(10);
-        $totalViews = $analytics->getTotalViews($from, $to);
-		$uniqueVisitors = $analytics->getMonthlyUniqueVisitors($from, $to);
+        $viewsPerDay = $analytics->getPageViewsPerDay($period->from, $period->to);
+        $top404s = $analytics->getTopErrors($period->from, $period->to, 10);
+        $totalViews = $analytics->getTotalViews($period->from, $period->to);
+        $uniqueVisitors = $analytics->getMonthlyUniqueVisitors($period->from, $period->to);
 
-		$prevFrom = $from->modify('-30 days');
-		$prevTo = $from;
-
-		$prevViews = $analytics->getTotalViews($prevFrom, $prevTo);
+        $prevViews = $analytics->getTotalViews($previous->from, $previous->to);
 
 		$change = $prevViews > 0
 			? (($totalViews - $prevViews) / $prevViews) * 100
 			: null;
-		$trending = $analytics->getTrendingPages(10);
-        $topReferrers = $analytics->getTopReferrers(10);
+		$trending = $analytics->getTrendingPages(
+            $period->from,
+            $period->to,
+            $previous->from,
+            $previous->to,
+            10
+        );
+        $topReferrers = $analytics->getTopReferrers($period->from, $period->to, 10);
 
-        $topRegions = $analytics->getTopRegions($from, $to, 10);
-        $subscriberStats = $analytics->getSubscriberStatsOverTime($from, $to);
+        $topRegions = $analytics->getTopRegions($period->from, $period->to, 10);
+        $subscriberStats = $analytics->getSubscriberStatsOverTime($period->from, $period->to);
         $subscribersPerFeed = $analytics->getCurrentSubscribersPerFeed();
         $totalSubscribers = array_sum(array_column($subscribersPerFeed, 'subscribers'));
-        $topBots = $analytics->getTopBots($from, $to, 15);
+        $topBots = $analytics->getTopBots($period->from, $period->to, 15);
 
         $this->viewModel->page->title = 'Analytics';
         $this->viewModel->page->tab = 'tools';
         return $this->render('inadmin/page/tools/analytics.html.twig', [
             'viewModel' => $this->viewModel,
             'analytics' => [
+                'period' => $period,
                 'viewsPerDay' => $viewsPerDay,
                 'top404s' => $top404s,
                 'totalViews' => $totalViews,
                 'uniqueVisitors' => $uniqueVisitors,
-                'from' => $from,
-                'to' => $to,
                 'change' => $change,
                 'trending' => $trending,
                 'topReferrers' => $topReferrers,

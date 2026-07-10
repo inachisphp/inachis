@@ -17,6 +17,15 @@
 	margin: 0 auto;
 	max-width: 1400px;
 
+	&.analytics-toolbar {
+		display: block;
+		margin: 0;
+
+		form.grid-toggle {
+			border: none;
+		}
+	}
+
 	input[type=Search],
 	select {
 		border-color: transparent;

@@ -32,18 +32,23 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
 
     /**
      * Get top pages
-     * 
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
      * @param int $limit
      * @return list<array{path: string, total: numeric-string, title: string}>
      */
-    public function getTopPages(int $limit = 10): array
-    {
+    public function getTopPages(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
         return $this->cache->get(
             'analytics_top_pages_' . $limit,
-            function (ItemInterface $item) use ($limit) {
+            function (ItemInterface $item) use ($from, $to, $limit) {
                 $item->expiresAfter(600);
 
-                $rows = $this->analyticsRepository->getTopPages($limit);
+                $rows = $this->analyticsRepository->getTopPages($from, $to, $limit);
 
                 return array_map(function ($row) {
                     $row['title'] = $this->resolveTitle($row['path']);
@@ -60,8 +65,10 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * @param \DateTimeInterface $to
      * @return list<array{date: string, total: numeric-string}>
      */
-    public function getPageViewsPerDay(\DateTimeInterface $from, \DateTimeInterface $to): array
-    {
+    public function getPageViewsPerDay(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
         return $this->analyticsRepository->getPageViewsPerDay($from, $to);
     }
 
@@ -92,49 +99,65 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
     /**
      * Get the most common paths that result in a 4xx or 5xx error.
      *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
      * @param int $limit
      * @return list<array{path: string, code: string, hits: numeric-string}>
      */
-    public function getTopErrors(int $limit = 10): array
+    public function getTopErrors(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array
     {
-        return $this->analyticsRepository->getTopErrors($limit);
+        return $this->analyticsRepository->getTopErrors($from, $to, $limit);
     }
 
     /**
      * Get trending pages
      *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param \DateTimeInterface $previousFrom
+     * @param \DateTimeInterface $previousTo
      * @param int $limit
      * @return list<array{path: string, current: int, previous: int, change: float|int|null}>
      */
-    public function getTrendingPages(int $limit = 10): array
+    public function getTrendingPages(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        \DateTimeInterface $previousFrom,
+        \DateTimeInterface $previousTo,
+        int $limit = 10,
+    ): array
     {
         return array_map(function ($row) {
             $row['title'] = $this->resolveTitle($row['path']);
             return $row;
-        }, $this->analyticsRepository->getTrendingPages($limit));
+        }, $this->analyticsRepository->getTrendingPages($from, $to, $previousFrom, $previousTo, $limit));
     }
 
     /**
      * Get the most common referring domains.
      *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
      * @param int $limit
      * @return list<array{domain: string, total: numeric-string}>
      */
-    public function getTopReferrers(int $limit = 10): array
+    public function getTopReferrers(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array
     {
-        return $this->analyticsRepository->getTopReferrers($limit);
+        return $this->analyticsRepository->getTopReferrers($from, $to, $limit);
     }
 
     /**
      * Get the most common referring domains for a specific page.
      *
      * @param string $path
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
      * @param int $limit
      * @return list<array{domain: string, total: numeric-string}>
      */
-    public function getTopReferrersForPage(string $path, int $limit = 10): array
+    public function getTopReferrersForPage(string $path, \DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array
     {
-        return $this->analyticsRepository->getTopReferrersForPage($path, $limit);
+        return $this->analyticsRepository->getTopReferrersForPage($path, $from, $to, $limit);
     }
 
     /**

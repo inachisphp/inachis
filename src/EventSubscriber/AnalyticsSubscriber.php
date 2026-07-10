@@ -55,6 +55,8 @@ class AnalyticsSubscriber implements EventSubscriberInterface
         if (str_starts_with($path, '/.git/')) return;
         if (str_starts_with($path, '/wp-content/')) return;
         if (str_starts_with($path, '/wp-admin/')) return;
+        if (str_starts_with($path, '/llms.txt')) return;
+        if (str_starts_with($path, '/robots.txt')) return;
         if (str_ends_with($path, '.xml')) return;
 
         $dir = __DIR__ . '/../../var/analytics';
