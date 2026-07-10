@@ -3,8 +3,10 @@
     <a href="{{ path('incc_settings_index') }}">Settings</a>
     <span>robots.txt Configuration</span>
 {% endblock pagetitle %}
+
 {% block content %}
 <div class="col-12 content__edit">
+{% include "/inadmin/partials/tab-sets/discovery.html.twig" %}
 {{ form_start(form, {'attr': { 'class': 'form form__post form__tabs' }}) }}
     <section class="ui-section">
 		<p>

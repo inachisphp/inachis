@@ -30,13 +30,6 @@
 </section>
 
 <section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">extension</span></p>
-    <h2>Integrations</h2>
-    <p><span>Manage your integrations</span></p>
-    <p><a href="{{ viewModel.settings.domain }}" class="button button--secondary">Manage Integrations</a></p>
-</section>
-
-<section class="widget widget-settings">
     <p><span class="material-icons" aria-hidden="true">security</span></p>
     <h2>Security</h2>
     <p><span>Manage your security settings</span></p>
@@ -45,9 +38,10 @@
 
 <section class="widget widget-settings">
     <p><span class="material-icons" aria-hidden="true">android</span></p>
-    <h2>Manage Robots.txt</h2>
-    <p><span>Manage your Robots.txt rules</span></p>
-    <p><a href="{{ viewModel.settings.domain ~ path('incc_settings_robots') }}" class="button button--secondary">Manage Robots.txt</a></p>
+    <h2>Crawlers &amp; Discovery</h2>
+    <p><span>Manage robots.txt, llms.txt, etc. to help search engines
+and AI services</span></p>
+    <p><a href="{{ viewModel.settings.domain ~ path('incc_settings_robots') }}" class="button button--secondary">Manage Discovery</a></p>
 </section>
 
 <section class="widget widget-settings">

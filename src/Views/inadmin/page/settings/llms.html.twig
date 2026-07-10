@@ -1,0 +1,58 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_settings_index') }}">Settings</a>
+    <span>Crawlers &amp; Discovery</span>
+{% endblock pagetitle %}
+
+{% block content %}
+<div class="col-12 content__edit">
+
+{% include "/inadmin/partials/tab-sets/discovery.html.twig" %}
+
+{{ form_start(form, {'attr': { 'class': 'form form__post form__tabs' }}) }}
+
+    <section class="ui-section">
+        <h2>About llms.txt</h2>
+
+        <p>
+            <code>llms.txt</code> is a machine-readable document intended to help
+            AI assistants and large language models understand your website and
+            discover its most important content. Support is still evolving, but
+            publishing one can improve how AI services interpret your site.
+        </p>
+
+        <p>
+            If this document is left empty, We will generate a basic
+            <code>llms.txt</code> automatically using your site's metadata.
+        </p>
+    </section>
+
+    <section class="ui-section">
+        <p>
+            {{ form_label(form.llms_txt) }}
+            {{ form_errors(form.llms_txt) }}
+            {{ form_widget(form.llms_txt) }}
+        </p>
+    </section>
+
+    <div class="fixed-bottom-bar">
+        <p>
+            {{ form_widget(form.submit) }}
+
+            <a
+                class="button button--secondary"
+                href="{{ path('web_llms_txt') }}"
+                target="_blank"
+                title="{% trans %}admin.button.viewLive{% endtrans %}"
+            >
+                <span class="material-icons" aria-hidden="true">exit_to_app</span>
+                {% trans %}admin.button.viewLive{% endtrans %}
+            </a>
+        </p>
+    </div>
+
+{{ form_end(form) }}
+
+</div>
+{% endblock content %}

@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Controller\Page\Setting;
+namespace Inachis\Controller\Page\Setting\Discovery;
 
 use Inachis\Controller\AbstractController;
 use Inachis\Service\Url\RobotsTxtGenerator;
