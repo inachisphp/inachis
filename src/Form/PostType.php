@@ -162,6 +162,9 @@ class PostType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'postDate_label',
                     'aria-required' => 'false',
+                    'class' => 'ui-datepicker',
+                    'data-format' => 'dd/mm/yyyy HH:ii',
+                    'data-on-change' => 'updatePostUrl',
                 ],
                 'format'=> 'dd/MM/yyyy HH:mm',
                 'html5' => false,
@@ -184,6 +187,8 @@ class PostType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'expireDate_label',
                     'aria-required' => 'false',
+                    'class' => 'ui-datepicker',
+                    'data-format' => 'dd/mm/yyyy HH:ii',
                 ],
                 'format' => 'dd/MM/yyyy HH:mm',
                 'html5' => false,

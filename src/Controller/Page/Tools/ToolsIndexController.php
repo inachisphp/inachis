@@ -14,9 +14,7 @@ use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Media\ImageRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 class ToolsIndexController extends AbstractInachisController
 {
     /**
@@ -27,7 +25,7 @@ class ToolsIndexController extends AbstractInachisController
     #[Route("/incc/tools", name: 'incc_tools_index')]
     public function index(): Response
     {
-        
+
         $this->viewModel->page->title = 'Tools';
         $this->viewModel->page->tab = 'tools';
         return $this->render('inadmin/page/tools/list.html.twig', [

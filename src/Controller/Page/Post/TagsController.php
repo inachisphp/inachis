@@ -203,9 +203,9 @@ class TagsController extends AbstractInachisController
         string $slug,
         CategoryRepository $categoryRepository,
         PageRepository $pageRepository,
-        ContentQueryParameters $contentQueryParameters,
         TagBulkActionService $tagBulkActionService,
         TagRepository $tagRepository,
+        ViewStateManager $viewStateManager,
         Request $request,
         int $limit = 25,
         int $offset = 0,
@@ -236,18 +236,23 @@ class TagsController extends AbstractInachisController
 
         $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [ $tag->getId() ]], '*', $limit, $offset);
 
+        $params = $viewStateManager->build(
+            $request,
+            'tags-page',
+            new ViewStateDefaults(
+                sort: 'title asc',
+                view: 'table',
+            ),
+            $categoryRepository,
+        );
+
         $this->viewModel->page->title = 'Tags';
         $this->viewModel->page->tab = 'tag';
         return $this->render('inadmin/page/tag/view.html.twig', [
             'viewModel' => $this->viewModel,
             'dataset' => $pages,
             'form' => $form->createView(),
-            'query' => $contentQueryParameters->process(
-                $request,
-                $categoryRepository,
-                'page',
-                'title'
-            ),
+            'query' => $params,
             'total' => $pages->count(),
             'tag' => $tag,
         ]);

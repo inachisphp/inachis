@@ -13,9 +13,7 @@ use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Controller\AbstractInachisController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 class AnalyticsController extends AbstractInachisController
 {
     /**
@@ -45,7 +43,7 @@ class AnalyticsController extends AbstractInachisController
 			: null;
 		$trending = $analytics->getTrendingPages(10);
         $topReferrers = $analytics->getTopReferrers(10);
-        
+
         $topRegions = $analytics->getTopRegions($from, $to, 10);
         $subscriberStats = $analytics->getSubscriberStatsOverTime($from, $to);
         $subscribersPerFeed = $analytics->getCurrentSubscribersPerFeed();

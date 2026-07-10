@@ -45,7 +45,6 @@ class PageController extends AbstractInachisController
      * List posts
 
      * @param Request $request
-     * @param ContentQueryParameters $contentQueryParameters
      * @param PageBulkActionService $pageBulkActionService
      * @param PageRepository $pageRepository
      * @param string $type
@@ -92,6 +91,12 @@ class PageController extends AbstractInachisController
             );
         }
 
+        if ($request->query->has('issue')) {
+            $request->request->set('filter', [
+                'issues' => $request->query->getString('issue', ''),
+            ]);
+        }
+
         $params = $viewStateManager->load(
             $request,
             $type,
@@ -116,27 +121,13 @@ class PageController extends AbstractInachisController
             ]);
         }
 
-        if ($request->query->has('category') && $request->query->get('category') === 'null') {
-            $posts = $pageRepository->getPagesWithoutCategories($params->getLimit(), $params->getOffset());
-            $queryString = 'category=null';
-        } elseif ($request->query->has('tag') && $request->query->get('tag') === 'null') {
-            $posts = $pageRepository->getPagesWithoutTags($params->getLimit(), $params->getOffset());
-            $queryString = 'tag=null';
-        } elseif ($request->query->has('featureImage') && $request->query->get('featureImage') === 'null') {
-            $posts = $pageRepository->getPagesWithoutFeatureImage($params->getLimit(), $params->getOffset(), );
-            $queryString = 'featureImage=null';
-        } elseif ($request->query->has('sharingMessage') && $request->query->get('sharingMessage') === 'null') {
-            $posts = $pageRepository->getPagesWithoutSharingMessage($params->getLimit(), $params->getOffset());
-            $queryString = 'sharingMessage=null';
-        } else {
-            $posts = $pageRepository->getFilteredOfTypeByPostDate(
-                $params->getFilters(),
-                $type,
-                $params->getLimit(),
-                $params->getOffset(),
-                $params->getSort(),
-            );
-        }
+        $posts = $pageRepository->getFilteredOfTypeByPostDate(
+            $params->getFilters(),
+            $type,
+            $params->getLimit(),
+            $params->getOffset(),
+            $params->getSort(),
+        );
 
         $this->viewModel->page->title = ucfirst($type) . 's';
         $this->viewModel->page->tab = $type;

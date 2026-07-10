@@ -8,10 +8,14 @@
 - Added Role-based permissions with default configurations for editors/admins/etc.
 - Added Review Threads. There is now the option to add inline comments to content for reviewers to peruse before publishing/scheduling content to be live
 - Added page for managing Tags
+- Added CSP reporting and policy manager,
+- Added option to switch between list - grid - table view styles
+- Added resources filter to identify duplicate resources and unused images
 
 ### Changed
 
 - Added expiry date to Page content types
+- View States will now remember view style, filters, sorting options between sesssions for each context
 - Re-organises Repository and Entity classes into more logical folders - this is a breaking change for backwards compatibility
 - PHPStan now passes fully on codebase, and PHPUnit has complete-ish code coverage
 

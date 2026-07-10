@@ -15,14 +15,12 @@ use Inachis\Repository\Content\{PageRepository, SeriesRepository};
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 class ContentAnalyticsController extends AbstractInachisController
 {
     /**
      *  Gets statistics for the specified post
-     * 
+     *
      * @param Request $request
      * @param AnalyticsProviderInterface $analyticsProvider
      * @param PageRepository $pageRepository
@@ -76,7 +74,7 @@ class ContentAnalyticsController extends AbstractInachisController
 
     /**
      * Returns statistics for the specified series
-     * 
+     *
      * @param Request $request
      * @param AnalyticsProviderInterface $analyticsProvider
      * @param SeriesRepository $seriesRepository

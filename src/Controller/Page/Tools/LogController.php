@@ -13,12 +13,10 @@ use Inachis\Controller\AbstractInachisController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Controller for displaying application logs
  */
-#[IsGranted('ROLE_ADMIN')]
 class LogController extends AbstractInachisController
 {
     /**

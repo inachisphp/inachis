@@ -81,7 +81,20 @@ table {
 
   .badgecol {
     text-align: center;
-    width: 6rem;
+    max-width: 40ch;
+  }
+
+  .col-count {
+      width: 12ch;
+      text-align: center;
+      white-space: nowrap;
+      text-wrap: wrap;
+  }
+
+  .col-date {
+      width: 13ch;
+      white-space: nowrap;
+      text-wrap: wrap;
   }
 
   // Body

@@ -14,17 +14,15 @@ use Inachis\Service\System\Domain\DomainEmailAnalyser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Controller for displaying email settings
  */
-#[IsGranted('ROLE_ADMIN')]
 class EmailSettingController extends AbstractInachisController
 {
 	/**
 	 * Display summary of DNS settings for email
-	 
+
 	 * @param Request $request
 	 * @param DomainEmailAnalyser $domainEmailAnalyser
 	 * @return Response

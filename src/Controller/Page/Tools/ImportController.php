@@ -22,14 +22,12 @@ use Inachis\Service\Import\Page\PageImportValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Inachis\Service\Parser\MarkdownFileParser;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Controller for importing pages and posts
  */
-#[IsGranted('ROLE_ADMIN')]
 class ImportController extends AbstractInachisController
 {
     /**

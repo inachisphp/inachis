@@ -10,25 +10,63 @@
     {% if dashboard.alerts|default([]) is not empty %}
         <div class="col-12">
             {% include "inadmin/page/dashboard/alerts.html.twig" %}
+        <h2>Welcome back {{ app.user.displayName }},</h2>
         </div>
     {% endif %}
     <div class="col-6">
-        <h2>Welcome back {{ app.user.displayName }},</h2>
         {% include "inadmin/page/dashboard/actions.html.twig" %}
-        {% if dashboard.alerts.tags.count > 0 or dashboard.alerts.categories.count > 0 or dashboard.alerts.featureImage.count > 0 or dashboard.alerts.sharingMessage.count > 0 %}
-        <div class="widget widget-alerts">
-            <article class="alert_priority__medium">
-                {% if dashboard.alerts.tags.count > 0 %}
-                    <p><span>Med</span> {{ dashboard.alerts.tags.count }} pages without tags <a href="/incc/post/list/?tag=null">Fix &rarr;</a></p>
-                {% endif %}
-                {% if dashboard.alerts.featureImage.count > 0 %}
-                    <p><span>Med</span> {{ dashboard.alerts.featureImage.count }} pages without feature images <a href="/incc/post/list/?featureImage=null">Fix &rarr;</a></p>
-                {% endif %}
-                {% if dashboard.alerts.sharingMessage.count > 0 %}
-                    <p><span>Med</span> {{ dashboard.alerts.sharingMessage.count }} pages without sharing messages <a href="/incc/post/list/?sharingMessage=null">Fix &rarr;</a></p>
-                {% endif %}
+        {% set allAlerts = [
+            {
+                label: 'images without alt text',
+                link: path('incc_resource_list', { 'type': 'images' }) ~ '?altText=null',
+                priority: 'HIGH',
+                count: dashboard.alerts.altText.count
+            },
+            {
+                label: 'pages without categories',
+                link: '/incc/post/list?issue=categories',
+                priority: 'HIGH',
+                count: dashboard.alerts.categories.count
+            },
+            {
+                label: 'pages without tags',
+                link: '/incc/post/list/?issue=tags',
+                priority: 'MED',
+                count: dashboard.alerts.tags.count
+            },
+            {
+                label: 'pages missing an image',
+                link: '/incc/post/list/?issue=image',
+                priority: 'LOW',
+                count: dashboard.alerts.featureImage.count
+            },
+            {
+                label: 'pages without a snippet',
+                link: '/incc/post/list/?issue=snippet',
+                priority: 'LOW',
+                count: dashboard.alerts.sharingMessage.count
+            },
+        ] %}
+
+        {% if allAlerts|filter(a => a.count > 0)|length > 0 %}
+        <section class="ui-section widget widget-audit rounded">
+            <header class="widget__header">
+                <h2>
+                    <span>Content Audit</span>
+                </h2>
+            </header>
+            <article>
+                {% for alert in allAlerts %}
+                    {% if alert.count > 0 %}
+                <p class="alert alert_priority__{{ alert.priority|lower }}">
+                    <span>{{ alert.priority}}</span>
+                    {{ alert.count }} {{ alert.label|lower }}
+                    <a href="{{ alert.link|default('#') }}">Fix &rarr;</a>
+                </p>
+                    {% endif %}
+                {% endfor %}
             </article>
-        </div>
+        </section>
         {% endif %}
     </div>
 
