@@ -83,7 +83,7 @@ class AdminProfileController extends AbstractInachisController
             'admin',
             new ViewStateDefaults(
                 sort: 'displayName asc',
-                view: 'list',
+                view: 'table',
             ),
             $categoryRepository,
         );

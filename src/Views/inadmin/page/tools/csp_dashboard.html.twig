@@ -72,7 +72,7 @@
             <tr>
                 <th>Host</th>
                 <th>Directive</th>
-                <th class="text-end">Hits</th>
+                <th class="col-count">Hits</th>
             </tr>
             </thead>
 
@@ -81,7 +81,7 @@
                 <tr>
                     <td>{{ row.host ?? '—' }}</td>
                     <td><code>{{ row.effectiveDirective }}</code></td>
-                    <td class="text-end">{{ row.occurrences }}</td>
+                    <td class="col-count">{{ row.occurrences }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -98,14 +98,14 @@
             <thead>
                 <tr>
                     <th>Host</th>
-                    <th class="text-end">Count</th>
+                    <th class="col-count">Count</th>
                 </tr>
             </thead>
             <tbody>
             {% for row in topHosts %}
                 <tr>
                     <td>{{ row.host ?? 'unknown' }}</td>
-                    <td class="text-end">{{ row.occurrences }}</td>
+                    <td class="col-count">{{ row.occurrences }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -122,14 +122,14 @@
             <thead>
                 <tr>
                     <th>Directive</th>
-                    <th class="text-end">Count</th>
+                    <th class="col-count">Count</th>
                 </tr>
             </thead>
             <tbody>
             {% for row in topDirectives %}
                 <tr>
                     <td>{{ row.directive }}</td>
-                    <td class="text-end">{{ row.occurrences }}</td>
+                    <td class="col-count">{{ row.occurrences }}</td>
                 </tr>
             {% endfor %}
             </tbody>
