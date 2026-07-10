@@ -4,8 +4,6 @@
 {% endblock pagetitle %}
 
 {% block content %}
-{% block settings_pre %}{% endblock settings_pre %}
-{% block settings %}
 <div class="col-12 widget-container">
 
 <section class="widget widget-settings">
@@ -41,7 +39,7 @@
     <h2>Crawlers &amp; Discovery</h2>
     <p><span>Manage robots.txt, llms.txt, etc. to help search engines
 and AI services</span></p>
-    <p><a href="{{ viewModel.settings.domain ~ path('incc_settings_robots') }}" class="button button--secondary">Manage Discovery</a></p>
+    <p><a href="{{ viewModel.settings.domain ~ path('incc_settings_discovery') }}" class="button button--secondary">Manage Discovery</a></p>
 </section>
 
 <section class="widget widget-settings">
@@ -52,7 +50,5 @@ and AI services</span></p>
 </section>
 
 </div>
-{% endblock settings %}
-{% block settings_post %}{% endblock settings_post %}
 {% endblock content %}
 

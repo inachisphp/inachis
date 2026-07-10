@@ -1,6 +1,11 @@
 {% include '/inadmin/partials/tabs.html.twig' with {
     tabs: [
         {
+            id: 'discovery',
+            title: 'Discovery',
+            url: path('incc_settings_discovery')
+        },
+        {
             id: 'robots',
             title: 'robots.txt',
             url: path('incc_settings_robots')
@@ -9,6 +14,11 @@
             id: 'llms',
             title: 'llms.txt',
             url: path('incc_settings_llms')
-        }
+        },
+        {
+            id: 'security',
+            title: 'security.txt',
+            url: path('incc_settings_security')
+        },
     ]
 } %}

@@ -14,24 +14,15 @@
 
     <section class="ui-section">
         <div class="admonition admonition__info">
-            <h2>About llms.txt</h2>
-
-            <p>
-                <code>llms.txt</code> is a machine-readable document intended to help
-                AI assistants and large language models understand your website and
-                discover its most important content. Support is still evolving, but
-                publishing one can improve how AI services interpret your site.
-            </p>
-
-            <p>
-                If this document is left empty, We will generate a basic
-                <code>llms.txt</code> automatically using your site's metadata.
+            <p>The Expires field should be reviewed regularly.
+                If you are using the default security policy, update this date
+                whenever you review or change your security contact process.
             </p>
         </div>
         <p>
-            {{ form_label(form.llms_txt) }}
-            {{ form_errors(form.llms_txt) }}
-            {{ form_widget(form.llms_txt) }}
+            {{ form_label(form.security_txt) }}
+            {{ form_errors(form.security_txt) }}
+            {{ form_widget(form.security_txt) }}
         </p>
     </section>
 
@@ -41,7 +32,7 @@
 
             <a
                 class="button button--secondary"
-                href="{{ path('web_llms_txt') }}"
+                href="{{ path('web_security_txt') }}"
                 target="_blank"
                 title="{% trans %}admin.button.viewLive{% endtrans %}"
             >

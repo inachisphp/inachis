@@ -1,7 +1,7 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 {% block pagetitle %}
     <a href="{{ path('incc_settings_index') }}">Settings</a>
-    <span>robots.txt Configuration</span>
+    <span>Crawlers &amp; Discovery</span>
 {% endblock pagetitle %}
 
 {% block content %}
@@ -18,8 +18,9 @@
     <div class="fixed-bottom-bar">
         <p>
             {{ form_widget(form.submit) }}
-			<a class="button button--secondary" href="{{ path('web_robots_txt') }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons" aria-hidden="true">exit_to_app</span>
-                    {% trans %}admin.button.viewLive{% endtrans %}</a>
+			<a class="button button--secondary" href="{{ path('web_robots_txt') }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}">
+                <span class="material-icons" aria-hidden="true">exit_to_app</span>
+                {% trans %}admin.button.viewLive{% endtrans %}</a>
         </p>
     </div>
 {{ form_end(form) }}

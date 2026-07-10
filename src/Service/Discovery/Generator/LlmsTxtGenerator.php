@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Service\Url;
+namespace Inachis\Service\Discovery\Generator;
 
 use Inachis\Repository\System\SettingRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -26,8 +26,7 @@ class LlmsTxtGenerator
     public function __construct(
         private readonly SettingRepository $settingRepository,
         private readonly RequestStack $requestStack,
-    ) {
-    }
+    ) {}
 
     /**
      * Generate the llms.txt content.
@@ -64,20 +63,19 @@ class LlmsTxtGenerator
             ?? ''
         );
 
-        $content = "# {$title}";
+        $content = sprintf(
+            "# %s",
+            $title
+        );
 
         if ($description !== '') {
-            $content .= "\n\n> {$description}";
+            $content .= sprintf(
+                "\n\n> %s",
+                $description
+            );
         }
 
-        $content .= <<<TXT
-
-
-## Main pages
-
-- /
-
-TXT;
+        $content .= "\n\n## Main pages\n\n- /\n";
 
         return $content;
     }
@@ -90,38 +88,66 @@ TXT;
      */
     private function appendResources(string $content): string
     {
-        $request = $this->requestStack->getCurrentRequest();
-
-        $baseUrl = '';
-
-        if ($request) {
-            $baseUrl = $request->getSchemeAndHttpHost();
-        }
-
         $resources = [];
 
         if (!preg_match('/^##\s+Resources$/mi', $content)) {
             $resources[] = '## Resources';
         }
 
+        $sitemap = $this->getSitemapUrl();
+
         if (!preg_match('/^Sitemap:/mi', $content)) {
-            $resources[] = sprintf(
-                'Sitemap: %s/sitemap.xml',
-                $baseUrl
-            );
+            $resources[] = sprintf('Sitemap: %s', $sitemap);
         }
 
+        $feed = $this->getFeedUrl();
         if (!preg_match('/^RSS:/mi', $content)) {
-            $resources[] = sprintf(
-                'RSS: %s/feed',
-                $baseUrl
-            );
+            $resources[] = sprintf('RSS: %s', $feed);
         }
 
-        if (!empty($resources)) {
-            $content .= "\n\n" . implode("\n", $resources);
+        if ($resources !== []) {
+            $content .= "\n\n" . implode(
+                "\n",
+                $resources
+            );
         }
 
         return rtrim($content) . PHP_EOL;
+    }
+
+    /**
+     * Get the sitemap URL.
+     *
+     * @return string
+     */
+    private function getSitemapUrl(): string
+    {
+        return $this->getBaseUrl() . '/sitemap.xml';
+    }
+
+    /**
+     * Get the RSS feed URL if available.
+     *
+     * @return string|null
+     */
+    private function getFeedUrl(): ?string
+    {
+        return $this->getBaseUrl() . '/feed';
+    }
+
+    /**
+     * Get the current site base URL.
+     *
+     * @return string
+     */
+    private function getBaseUrl(): string
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if ($request) {
+            return $request->getSchemeAndHttpHost();
+        }
+
+        return '';
     }
 }

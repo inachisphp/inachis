@@ -7,7 +7,7 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Service\Url;
+namespace Inachis\Service\Discovery\Generator;
 
 use Inachis\Entity\Content\Category;
 use Inachis\Entity\Content\Series;

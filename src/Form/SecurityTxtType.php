@@ -16,24 +16,20 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Form for editing llms.txt.
- *
- * @extends AbstractType<array{
- *     llms_txt?: string,
- *     submit?: string,
- * }>
- */
-class LlmsTxtType extends AbstractType
+class SecurityTxtType extends AbstractType
 {
+    /**
+     * Constructor
+     *
+     * @param TranslatorInterface $translator
+     */
     public function __construct(
-        private readonly TranslatorInterface $translator
-    ) {
-    }
+        private TranslatorInterface $translator
+    ) {}
 
     /**
      * @param FormBuilderInterface<array{
-     *     llms_txt?: string,
+     *     security_txt?: string,
      *     submit?: string,
      * }|null> $builder
      * @param array<string, mixed> $options
@@ -43,16 +39,14 @@ class LlmsTxtType extends AbstractType
         array $options
     ): void {
         $builder
-            ->add('llms_txt', TextareaType::class, [
+            ->add('security_txt', TextareaType::class, [
                 'attr' => [
                     'aria-labelledby' => 'title_label',
-                    'autofocus' => 'true',
+                    'autofocus' => true,
                     'class' => 'text halfwidth',
-                    'rows' => 20,
-                    'spellcheck' => 'false',
+                    'rows' => 15,
                 ],
-                'label' => 'Enter the contents of your llms.txt file below. The sitemap and feed URLs will be appended automatically.
-',
+                'label' => 'security.txt',
                 'label_attr' => [
                     'id' => 'title_label',
                 ],
@@ -75,7 +69,7 @@ class LlmsTxtType extends AbstractType
     }
 
     /**
-     * Configure options for the form
+     * Configure the options
      *
      * @param OptionsResolver $resolver
      * @return void
@@ -85,7 +79,7 @@ class LlmsTxtType extends AbstractType
     ): void {
         $resolver->setDefaults([
             'attr' => [
-                'class' => 'form form__post form__tab',
+                'class' => 'form form__post form__tabs',
             ],
         ]);
     }

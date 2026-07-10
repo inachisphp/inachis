@@ -97,14 +97,37 @@ class LlmsTxtController extends AbstractTextFileController
         if ($content === '') {
             $this->addFlash(
                 'warning',
-                'Your llms.txt file is empty.'
+                'Your llms.txt file is empty. We will generate a default document.'
             );
+
+            return;
         }
 
         if (!preg_match('/^#\s+.+$/m', $content)) {
             $this->addFlash(
                 'info',
                 'Consider adding a Markdown heading as the document title.'
+            );
+        }
+
+        if (!preg_match('/^>\s*.+$/m', $content)) {
+            $this->addFlash(
+                'info',
+                'Consider adding a short description after the title.'
+            );
+        }
+
+        if (!preg_match('/^##\s+.+$/m', $content)) {
+            $this->addFlash(
+                'info',
+                'Consider adding sections to help AI systems discover your content.'
+            );
+        }
+
+        if (!preg_match('/^Sitemap:/mi', $content)) {
+            $this->addFlash(
+                'info',
+                'Consider including a sitemap URL.'
             );
         }
     }
