@@ -60,6 +60,8 @@ class AggregateAnalyticsCommand extends Command
                     $this->processSubscriberFile($file);
                 } elseif (str_contains($file, '/bot-')) {
                     $this->processBotFile($file);
+                } elseif (str_contains($file, '/security-')) {
+                    $this->processSecurityFile($file);
                 }
 
                 $output->writeln(sprintf('Processed %s', basename($file)));
@@ -458,7 +460,7 @@ class AggregateAnalyticsCommand extends Command
 
     /**
      * Ensures no path is stored with more than 255 characters
-     * 
+     *
      * @param string $path The path to normalise
      * @return string The normalised path
      */
@@ -470,7 +472,7 @@ class AggregateAnalyticsCommand extends Command
     /**
      * Exclude obvious vulnerability scans from statistics - they should
      * be dealt with through other means
-     * 
+     *
      * @param string $path The path to check for ignoring
      * @return bool Should the current path be ignored
      */
@@ -492,5 +494,116 @@ class AggregateAnalyticsCommand extends Command
         }
 
         return false;
+    }
+
+    /**
+     * Processes security event logs.
+     *
+     * @param string $file
+     */
+    private function processSecurityFile(string $file): void
+    {
+        $handle = fopen($file, 'r');
+
+        if (!$handle) {
+            return;
+        }
+
+        /**
+         * @var array<string,int>
+         */
+        $events = [];
+
+        while (($line = fgets($handle)) !== false) {
+
+            /**
+             * @var array{
+             *     date?:string,
+             *     ip?:string,
+             *     path?:string,
+             *     type?:string,
+             *     severity?:string,
+             *     ua?:string
+             * } $data
+             */
+            $data = json_decode($line, true);
+
+            if (
+                !$data ||
+                !isset(
+                    $data['date'],
+                    $data['ip'],
+                    $data['path'],
+                    $data['type'],
+                    $data['severity']
+                )
+            ) {
+                continue;
+            }
+
+
+            $path = $this->normalisePath($data['path']);
+
+            $key = implode('|', [
+                $data['date'],
+                $data['type'],
+                $data['severity'],
+                $path,
+                $data['ip'],
+            ]);
+
+            $events[$key] = ($events[$key] ?? 0) + 1;
+        }
+
+        fclose($handle);
+
+
+        foreach ($events as $key => $hits) {
+
+            [
+                $date,
+                $type,
+                $severity,
+                $path,
+                $ip
+            ] = explode('|', $key);
+
+
+            $this->db->executeStatement(
+                '
+                INSERT INTO analytics_security_event
+                (
+                    date,
+                    type,
+                    severity,
+                    path,
+                    ip,
+                    ip_hash,
+                    hits
+                )
+                VALUES
+                (
+                    :date,
+                    :type,
+                    :severity,
+                    :path,
+                    :ip,
+                    :ip_hash,
+                    :hits
+                )
+                ON DUPLICATE KEY UPDATE
+                    hits = hits + :hits
+                ',
+                [
+                    'date' => $date,
+                    'type' => $type,
+                    'severity' => $severity,
+                    'path' => $path,
+                    'ip' => $ip,
+                    'ip_hash' => hash('sha256', $ip),
+                    'hits' => $hits,
+                ]
+            );
+        }
     }
 }

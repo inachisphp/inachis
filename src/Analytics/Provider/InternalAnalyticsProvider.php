@@ -32,18 +32,23 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
 
     /**
      * Get top pages
-     * 
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
      * @param int $limit
      * @return list<array{path: string, total: numeric-string, title: string}>
      */
-    public function getTopPages(int $limit = 10): array
-    {
+    public function getTopPages(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
         return $this->cache->get(
             'analytics_top_pages_' . $limit,
-            function (ItemInterface $item) use ($limit) {
+            function (ItemInterface $item) use ($from, $to, $limit) {
                 $item->expiresAfter(600);
 
-                $rows = $this->analyticsRepository->getTopPages($limit);
+                $rows = $this->analyticsRepository->getTopPages($from, $to, $limit);
 
                 return array_map(function ($row) {
                     $row['title'] = $this->resolveTitle($row['path']);
@@ -60,8 +65,10 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
      * @param \DateTimeInterface $to
      * @return list<array{date: string, total: numeric-string}>
      */
-    public function getPageViewsPerDay(\DateTimeInterface $from, \DateTimeInterface $to): array
-    {
+    public function getPageViewsPerDay(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
         return $this->analyticsRepository->getPageViewsPerDay($from, $to);
     }
 
@@ -92,49 +99,65 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
     /**
      * Get the most common paths that result in a 4xx or 5xx error.
      *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
      * @param int $limit
      * @return list<array{path: string, code: string, hits: numeric-string}>
      */
-    public function getTopErrors(int $limit = 10): array
+    public function getTopErrors(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array
     {
-        return $this->analyticsRepository->getTopErrors($limit);
+        return $this->analyticsRepository->getTopErrors($from, $to, $limit);
     }
 
     /**
      * Get trending pages
      *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param \DateTimeInterface $previousFrom
+     * @param \DateTimeInterface $previousTo
      * @param int $limit
      * @return list<array{path: string, current: int, previous: int, change: float|int|null}>
      */
-    public function getTrendingPages(int $limit = 10): array
+    public function getTrendingPages(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        \DateTimeInterface $previousFrom,
+        \DateTimeInterface $previousTo,
+        int $limit = 10,
+    ): array
     {
         return array_map(function ($row) {
             $row['title'] = $this->resolveTitle($row['path']);
             return $row;
-        }, $this->analyticsRepository->getTrendingPages($limit));
+        }, $this->analyticsRepository->getTrendingPages($from, $to, $previousFrom, $previousTo, $limit));
     }
 
     /**
      * Get the most common referring domains.
      *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
      * @param int $limit
      * @return list<array{domain: string, total: numeric-string}>
      */
-    public function getTopReferrers(int $limit = 10): array
+    public function getTopReferrers(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array
     {
-        return $this->analyticsRepository->getTopReferrers($limit);
+        return $this->analyticsRepository->getTopReferrers($from, $to, $limit);
     }
 
     /**
      * Get the most common referring domains for a specific page.
      *
      * @param string $path
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
      * @param int $limit
      * @return list<array{domain: string, total: numeric-string}>
      */
-    public function getTopReferrersForPage(string $path, int $limit = 10): array
+    public function getTopReferrersForPage(string $path, \DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array
     {
-        return $this->analyticsRepository->getTopReferrersForPage($path, $limit);
+        return $this->analyticsRepository->getTopReferrersForPage($path, $from, $to, $limit);
     }
 
     /**
@@ -294,5 +317,175 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
     public function getDashboardSummary(): array
     {
         return $this->analyticsRepository->getDashboardSummary();
+    }
+
+    /**
+     * Total number of 4xx/5xx responses.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return integer
+     */
+    public function getTotalErrors(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+    ): int {
+        return $this->analyticsRepository->getTotalErrors($from, $to);
+    }
+
+    /**
+     * Get security dashboard summary.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     *
+     * @return array{
+     *     total:int,
+     *     uniqueIps:int,
+     *     high:int,
+     *     critical:int
+     * }
+     */
+    public function getSecuritySummary(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
+        return $this->analyticsRepository->getSecuritySummary($from, $to);
+    }
+
+    /**
+     * Get most targeted paths.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     *
+     * @return list<array{path:string,total:numeric-string}>
+     */
+    public function getTopSecurityPaths(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
+        return $this->analyticsRepository->getTopSecurityPaths($from, $to, $limit);
+    }
+
+    /**
+     * Get most common security event types.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     *
+     * @return list<array{type:string,total:numeric-string}>
+     */
+    public function getTopSecurityTypes(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
+        return $this->analyticsRepository->getTopSecurityTypes($from, $to, $limit);
+    }
+
+    /**
+     * Get IP addresses generating the most security events.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     *
+     * @return list<array{ip:string,total:numeric-string}>
+     */
+    public function getTopSecurityIps(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
+        return $this->analyticsRepository->getTopSecurityIps($from, $to, $limit);
+    }
+
+    /**
+     * Get security events over time.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     *
+     * @return list<array{date:string,total:numeric-string}>
+     */
+    public function getSecurityEventsPerDay(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
+        return $this->analyticsRepository->getSecurityEventsPerDay($from, $to);
+    }
+
+    /**
+     * Get recent security events.
+     *
+     * @param int $limit
+     *
+     * @return list<array{
+     *     date:string,
+     *     type:string,
+     *     severity:int,
+     *     path:string,
+     *     ip:string,
+     *     hits:int
+     * }>
+     */
+    public function getRecentSecurityEvents(
+        int $limit = 20
+    ): array {
+        return $this->analyticsRepository->getRecentSecurityEvents($limit);
+    }
+
+    /**
+     * Get highest severity events.
+     *
+     * Useful for an "active threats" panel.
+     *
+     * @param int $limit
+     *
+     * @return list<array{
+     *     date:string,
+     *     type:string,
+     *     severity:int,
+     *     path:string,
+     *     ip:string,
+     *     hits:int
+     * }>
+     */
+    public function getCriticalSecurityEvents(
+        int $limit = 10
+    ): array {
+        return $this->analyticsRepository->getCriticalSecurityEvents($limit);
+    }
+
+    /**
+     * Get security activity by HTTP method.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     *
+     * @return list<array{method:string,total:numeric-string}>
+     */
+    public function getSecurityMethods(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
+        return $this->analyticsRepository->getSecurityMethods($from, $to);
+    }
+
+    /**
+     * Get security events grouped by type.
+     *
+     * @return list<array{type:string,total:numeric-string}>
+     */
+    public function getSecurityEventsByType(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
+        return $this->analyticsRepository->getSecurityEventsByType($from, $to, $limit);
     }
 }

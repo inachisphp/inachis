@@ -48,19 +48,29 @@ class AnalyticsRepository
 	/**
 	 * Get top pages
 	 *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
 	 * @param int $limit
 	 * @return list<array{path: string, total: numeric-string}>
 	 */
-	public function getTopPages(int $limit = 10): array
-	{
+	public function getTopPages(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
         /** @var list<array{path: string, total: numeric-string}> */
 		return $this->db->executeQuery(
 			'
 			SELECT path, SUM(views) as total
 			FROM analytics_page_view
+            WHERE date BETWEEN :from AND :to
 			GROUP BY path
 			ORDER BY total DESC
-			LIMIT ' . $limit
+			LIMIT ' . $limit,
+            [
+                'from' => $from->format('Y-m-d'),
+                'to'   => $to->format('Y-m-d'),
+            ]
 		)->fetchAllAssociative();
 	}
 
@@ -71,8 +81,10 @@ class AnalyticsRepository
 	 * @param \DateTimeInterface $to
 	 * @return list<array{date: string, total: numeric-string}>
 	 */
-	public function getPageViewsPerDay(\DateTimeInterface $from, \DateTimeInterface $to): array
-    {
+	public function getPageViewsPerDay(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
         /** @var list<array{date: string, total: numeric-string}> */
         return $this->db->fetchAllAssociative(
             '
@@ -142,88 +154,104 @@ class AnalyticsRepository
 	/**
      * Get the most common paths that result in a 4xx or 5xx error.
      *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
      * @param int $limit
      * @return list<array{path: string, code: string, hits: numeric-string}>
      */
-    public function getTopErrors(int $limit = 10): array
-    {
+    public function getTopErrors(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
         /** @var list<array{path: string, code: string, hits: numeric-string}> */
         return $this->db->fetchAllAssociative('
             SELECT path, code, SUM(hits) AS hits
             FROM analytics_errors
+            WHERE date BETWEEN :from AND :to
             GROUP BY path
             ORDER BY hits DESC
-            LIMIT ' . (int) $limit
+            LIMIT ' . (int) $limit,
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
         );
     }
 
     /**
-     * Get trending pages
+     * Get trending pages by comparing two date ranges.
      *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param \DateTimeInterface $previousFrom
+     * @param \DateTimeInterface $previousTo
      * @param int $limit
      * @return list<array{path: string, current: int, previous: int, change: float|int|null}>
      */
-    public function getTrendingPages(int $limit = 10): array
-    {
-        $now = new \DateTimeImmutable();
-
-        $thisWeekStart = $now->modify('monday this week')->format('Y-m-d');
-        $lastWeekStart = $now->modify('monday last week')->format('Y-m-d');
-        $lastWeekEnd   = $now->modify('sunday last week')->format('Y-m-d');
-
-        /** @var list<array{path: string, total: numeric-string}> $current This week */
+    public function getTrendingPages(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        \DateTimeInterface $previousFrom,
+        \DateTimeInterface $previousTo,
+        int $limit = 10
+    ): array {
+        /** @var list<array{path: string, total: numeric-string}> $current */
         $current = $this->db->fetchAllAssociative(
             '
             SELECT path, SUM(views) AS total
             FROM analytics_page_view
-            WHERE date >= :start
+            WHERE date BETWEEN :from AND :to
             GROUP BY path
             ',
-            ['start' => $thisWeekStart]
+            [
+                'from' => $from->format('Y-m-d'),
+                'to'   => $to->format('Y-m-d'),
+            ]
         );
 
-        /** @var list<array{path: string, total: numeric-string}> $previous Last Week */
+        /** @var list<array{path: string, total: numeric-string}> $previous */
         $previous = $this->db->fetchAllAssociative(
             '
             SELECT path, SUM(views) AS total
             FROM analytics_page_view
-            WHERE date BETWEEN :start AND :end
+            WHERE date BETWEEN :from AND :to
             GROUP BY path
             ',
             [
-                'start' => $lastWeekStart,
-                'end'   => $lastWeekEnd,
+                'from' => $previousFrom->format('Y-m-d'),
+                'to'   => $previousTo->format('Y-m-d'),
             ]
         );
 
-        // Index previous
-        $prevMap = [];
+        $previousMap = [];
         foreach ($previous as $row) {
-            $prevMap[$row['path']] = (int) $row['total'];
+            $previousMap[$row['path']] = (int) $row['total'];
         }
 
-        // Build result
         $results = [];
 
         foreach ($current as $row) {
             $path = $row['path'];
             $currentViews = (int) $row['total'];
-            $prevViews = $prevMap[$path] ?? 0;
+            $previousViews = $previousMap[$path] ?? 0;
 
-            $change = $prevViews > 0
-                ? (($currentViews - $prevViews) / $prevViews) * 100
+            $change = $previousViews > 0
+                ? (($currentViews - $previousViews) / $previousViews) * 100
                 : null;
 
             $results[] = [
                 'path' => $path,
                 'current' => $currentViews,
-                'previous' => $prevViews,
+                'previous' => $previousViews,
                 'change' => $change,
             ];
         }
 
-        // Sort by current views
-        usort($results, fn ($a, $b) => $b['current'] <=> $a['current']);
+        usort(
+            $results,
+            static fn(array $a, array $b): int => $b['current'] <=> $a['current']
+        );
 
         return array_slice($results, 0, $limit);
     }
@@ -231,19 +259,29 @@ class AnalyticsRepository
     /**
      * Get the most common referring domains.
      *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
      * @param int $limit
      * @return list<array{domain: string, total: numeric-string}>
      */
-    public function getTopReferrers(int $limit = 10): array
-    {
+    public function getTopReferrers(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
         /** @var list<array{domain: string, total: numeric-string}> */
         return $this->db->fetchAllAssociative(
             '
             SELECT domain, SUM(hits) AS total
             FROM analytics_referrer
+            WHERE date BETWEEN :from AND :to
             GROUP BY domain
             ORDER BY total DESC
-            LIMIT ' . (int) $limit
+            LIMIT ' . (int) $limit,
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
         );
     }
 
@@ -251,21 +289,32 @@ class AnalyticsRepository
      * Get the most common referring domains for a specific page.
      *
      * @param string $path
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
      * @param int $limit
      * @return list<array{domain: string, total: numeric-string}>
      */
-    public function getTopReferrersForPage(string $path, int $limit = 10): array
-    {
+    public function getTopReferrersForPage(
+        string $path,
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
         /** @var list<array{domain: string, total: numeric-string}> */
         return $this->db->fetchAllAssociative(
             '
             SELECT domain, SUM(hits) AS total
             FROM analytics_referrer
             WHERE path = :path
+            AND date BETWEEN :from AND :to
             GROUP BY domain
             ORDER BY total DESC
             LIMIT ' . (int) $limit,
-            ['path' => $path]
+            [
+                'path' => $path,
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
         );
     }
 
@@ -277,8 +326,11 @@ class AnalyticsRepository
      * @param \DateTimeInterface $to
      * @return list<array{date: string, views: int}>
      */
-    public function getPageViewsPerDayForPaths(array $paths, \DateTimeInterface $from, \DateTimeInterface $to): array
-    {
+    public function getPageViewsPerDayForPaths(
+        array $paths,
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
         if (empty($paths)) {
             return [];
         }
@@ -303,7 +355,7 @@ class AnalyticsRepository
             ]
         )->fetchAllAssociative();
 
-        return $this->fillMissingDates($data, $from, $to);
+        return $this->fillMissingSeries($data, $from, $to, 'views');
     }
 
     /**
@@ -341,39 +393,6 @@ class AnalyticsRepository
     }
 
     /**
-     * Fill in missing dates
-     *
-     * @param list<array{date:string, total:int|string|null}> $data
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @return list<array{date: string, views: int}>
-     */
-    public function fillMissingDates(array $data, \DateTimeInterface $from, \DateTimeInterface $to): array
-    {
-        $indexed = [];
-        foreach ($data as $row) {
-            $indexed[$row['date']] = (int) $row['total'];
-        }
-
-        $result = [];
-        $current = new \DateTimeImmutable($from->format('Y-m-d'));
-        $end = new \DateTimeImmutable($to->format('Y-m-d'));
-
-        while ($current <= $end) {
-            $key = $current->format('Y-m-d');
-
-            $result[] = [
-                'date' => $key,
-                'views' => $indexed[$key] ?? 0,
-            ];
-
-            $current = $current->modify('+1 day');
-        }
-
-        return $result;
-    }
-
-    /**
      * Get top visitor countries/regions.
      *
      * @param \DateTimeInterface $from
@@ -406,8 +425,10 @@ class AnalyticsRepository
      * @param \DateTimeInterface $to
      * @return list<array{date: string, subscribers: int}>
      */
-    public function getSubscriberStatsOverTime(\DateTimeInterface $from, \DateTimeInterface $to): array
-    {
+    public function getSubscriberStatsOverTime(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
         /** @var list<array{date:string,total:int|string|null}> $data */
         $data = $this->db->fetchAllAssociative(
             '
@@ -423,28 +444,13 @@ class AnalyticsRepository
             ]
         );
 
-        // Fill missing dates
-        $indexed = [];
-        foreach ($data as $row) {
-            $indexed[$row['date']] = (int) $row['total'];
-        }
-
-        $result = [];
-        $current = new \DateTimeImmutable($from->format('Y-m-d'));
-        $end = new \DateTimeImmutable($to->format('Y-m-d'));
-
-        while ($current <= $end) {
-            $key = $current->format('Y-m-d');
-
-            $result[] = [
-                'date' => $key,
-                'subscribers' => $indexed[$key] ?? 0,
-            ];
-
-            $current = $current->modify('+1 day');
-        }
-
-        return $result;
+        /** @var list<array{date:string,subscribers:int}> */
+        return $this->fillMissingSeries(
+            $data,
+            $from,
+            $to,
+            'subscribers'
+        );
     }
 
     /**
@@ -600,5 +606,357 @@ class AnalyticsRepository
             'uniqueVisitorsThisMonth' => (int) ($visitors['unique_this_month'] ?? 0),
             'uniqueVisitorsLastMonth' => (int) ($visitors['unique_last_month'] ?? 0),
         ];
+    }
+
+    /**
+     * Fill missing dates in a time series.
+     *
+     * The query should return rows with a "date" column and a "total" column.
+     *
+     * @param list<array{date:string,total:int|string|null}> $data
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param string $valueKey The key to use in the returned array (e.g. "views", "subscribers")
+     * @return list<array{date:string}>
+     */
+    private function fillMissingSeries(
+        array $data,
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        string $valueKey
+    ): array {
+        $indexed = [];
+
+        foreach ($data as $row) {
+            $indexed[$row['date']] = (int) $row['total'];
+        }
+
+        $result = [];
+
+        $current = new \DateTimeImmutable($from->format('Y-m-d'));
+        $end = new \DateTimeImmutable($to->format('Y-m-d'));
+
+        while ($current <= $end) {
+            $date = $current->format('Y-m-d');
+
+            $result[] = [
+                'date' => $date,
+                $valueKey => $indexed[$date] ?? 0,
+            ];
+
+            $current = $current->modify('+1 day');
+        }
+
+        return $result;
+    }
+
+    /**
+     * Total number of 4xx/5xx responses.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return integer
+     */
+    public function getTotalErrors(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+    ): int {
+        return (int) $this->db->fetchOne(
+            '
+            SELECT COALESCE(SUM(hits), 0)
+            FROM analytics_errors
+            WHERE date BETWEEN :from AND :to
+            ',
+            [
+                'from' => $from->format('Y-m-d'),
+                'to'   => $to->format('Y-m-d'),
+            ]
+        );
+    }
+
+    /**
+     * Get security dashboard summary.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     *
+     * @return array{
+     *     total:int,
+     *     uniqueIps:int,
+     *     high:int,
+     *     critical:int
+     * }
+     */
+    public function getSecuritySummary(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
+        $result = $this->db->fetchAssociative(
+            '
+            SELECT
+                COALESCE(SUM(hits), 0) AS total,
+                COUNT(DISTINCT ip_hash) AS unique_ips,
+                COALESCE(SUM(CASE WHEN severity BETWEEN 6 AND 8 THEN hits ELSE 0 END), 0) AS high,
+                COALESCE(SUM(CASE WHEN severity >= 9 THEN hits ELSE 0 END), 0) AS critical
+            FROM analytics_security_event
+            WHERE date BETWEEN :from AND :to
+            ',
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
+        );
+
+        return [
+            'total' => (int) ($result['total'] ?? 0),
+            'uniqueIps' => (int) ($result['unique_ips'] ?? 0),
+            'high' => (int) ($result['high'] ?? 0),
+            'critical' => (int) ($result['critical'] ?? 0),
+        ];
+    }
+
+    /**
+     * Get most targeted paths.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     *
+     * @return list<array{path:string,total:numeric-string}>
+     */
+    public function getTopSecurityPaths(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT
+                path,
+                SUM(hits) AS total
+            FROM analytics_security_event
+            WHERE date BETWEEN :from AND :to
+            GROUP BY path
+            ORDER BY total DESC
+            LIMIT ' . (int) $limit,
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
+        );
+    }
+
+    /**
+     * Get most common security event types.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     *
+     * @return list<array{type:string,total:numeric-string}>
+     */
+    public function getTopSecurityTypes(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT
+                type,
+                SUM(hits) AS total
+            FROM analytics_security_event
+            WHERE date BETWEEN :from AND :to
+            GROUP BY type
+            ORDER BY total DESC
+            LIMIT ' . (int) $limit,
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
+        );
+    }
+
+    /**
+     * Get IP addresses generating the most security events.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     *
+     * @return list<array{ip:string,total:numeric-string}>
+     */
+    public function getTopSecurityIps(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT
+                ip,
+                SUM(hits) AS total
+            FROM analytics_security_event
+            WHERE date BETWEEN :from AND :to
+            GROUP BY ip
+            ORDER BY total DESC
+            LIMIT ' . (int) $limit,
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
+        );
+    }
+
+    /**
+     * Get security events over time.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     *
+     * @return list<array{date:string,total:numeric-string}>
+     */
+    public function getSecurityEventsPerDay(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT
+                date,
+                SUM(hits) AS total
+            FROM analytics_security_event
+            WHERE date BETWEEN :from AND :to
+            GROUP BY date
+            ORDER BY date ASC
+            ',
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
+        );
+    }
+
+    /**
+     * Get recent security events.
+     *
+     * @param int $limit
+     *
+     * @return list<array{
+     *     date:string,
+     *     type:string,
+     *     severity:int,
+     *     path:string,
+     *     ip:string,
+     *     hits:int
+     * }>
+     */
+    public function getRecentSecurityEvents(
+        int $limit = 20
+    ): array {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT
+                date,
+                type,
+                severity,
+                path,
+                ip,
+                hits
+            FROM analytics_security_event
+            ORDER BY id DESC
+            LIMIT ' . (int) $limit
+        );
+    }
+
+    /**
+     * Get highest severity events.
+     *
+     * Useful for an "active threats" panel.
+     *
+     * @param int $limit
+     *
+     * @return list<array{
+     *     date:string,
+     *     type:string,
+     *     severity:int,
+     *     path:string,
+     *     ip:string,
+     *     hits:int
+     * }>
+     */
+    public function getCriticalSecurityEvents(
+        int $limit = 10
+    ): array {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT
+                date,
+                type,
+                severity,
+                path,
+                ip,
+                hits
+            FROM analytics_security_event
+            WHERE severity >= 9
+            ORDER BY severity DESC, hits DESC
+            LIMIT ' . (int) $limit
+        );
+    }
+
+    /**
+     * Get security activity by HTTP method.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     *
+     * @return list<array{method:string,total:numeric-string}>
+     */
+    public function getSecurityMethods(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT
+                method,
+                SUM(hits) AS total
+            FROM analytics_security_event
+            WHERE date BETWEEN :from AND :to
+            GROUP BY method
+            ORDER BY total DESC
+            ',
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
+        );
+    }
+
+    /**
+     * Get security events grouped by type.
+     *
+     * @return list<array{type:string,total:numeric-string}>
+     */
+    public function getSecurityEventsByType(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT
+                type,
+                SUM(hits) AS total
+            FROM analytics_security_event
+            WHERE date BETWEEN :from AND :to
+            GROUP BY type
+            ORDER BY total DESC
+            LIMIT ' . (int) $limit,
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
+        );
     }
 }
