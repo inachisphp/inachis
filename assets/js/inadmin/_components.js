@@ -83,6 +83,7 @@ window.Inachis.Components = {
 
 		datePickers.forEach((input) => {
 			const format = input.dataset.format || 'dd/mm/yyyy HH:ii';
+			const target = input.dataset.target || null;
 			const onChangeName = input.dataset.onChange;
 
 			new DatePicker(input, {
@@ -90,6 +91,14 @@ window.Inachis.Components = {
 				materialIcons: true,
 				onChange: (formattedDate) => {
 					const callback = this[onChangeName];
+
+					if (null !== target) {
+						const targetElement = document.querySelector(target);
+						if (targetElement) {
+							const [day, month, year] = formattedDate.split('/');
+							targetElement.value = `${year}-${month}-${day}`;
+						}
+					}
 
 					if (typeof callback === 'function') {
 						callback.call(this, formattedDate, input);

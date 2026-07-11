@@ -15,6 +15,9 @@ use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Service\Content\ViewStateManager;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Determine the analytics period to show
+ */
 class AnalyticsPeriodResolver
 {
     public function __construct(
@@ -22,6 +25,12 @@ class AnalyticsPeriodResolver
     ) {}
 
     /**
+     * Returns an {@link AnalyticsPeriod} for the current view based
+     * on stored preferences and requested tab.
+     *
+     * @param Request $request
+     * @param string $stateKey
+     * @return AnalyticsPeriod
      * @throws InvalidAnalyticsPeriodException
      */
     public function resolve(

@@ -37,19 +37,37 @@
             <div class="form-group">
                 <label for="analytics-from">From</label>
                 <input
-                    id="analytics-from"
-                    name="from"
-                    type="date"
-                    value="{{ analytics.period.from|date('Y-m-d') }}">
+					class="ui-datepicker"
+					data-format="dd/mm/YYYY"
+					data-target="#analytics-from-value"
+					id="analytics-from"
+					type="text"
+					value="{{ analytics.period.from|date('d/m/Y') }}"
+				>
+
+				<input
+					type="hidden"
+					id="analytics-from-value"
+					name="from"
+					value="{{ analytics.period.from|date('Y-m-d') }}"
+				>
             </div>
 
             <div class="form-group">
                 <label for="analytics-to">To</label>
                 <input
+					class="ui-datepicker"
+					data-format="dd/mm/YYYY"
+					data-target="#analytics-to-value"
                     id="analytics-to"
-                    name="to"
-                    type="date"
-                    value="{{ analytics.period.to|date('Y-m-d') }}">
+                    type="text"
+                    value="{{ analytics.period.to|date('d/m/Y') }}">
+				<input
+					type="hidden"
+					id="analytics-to-value"
+					name="to"
+					value="{{ analytics.period.to|date('Y-m-d') }}"
+				>
             </div>
 
             <button class="button button--add" type="submit">
@@ -127,12 +145,14 @@
                 <h2 id="stats-peak-views">Peak Views</h2>
 
                 <p class="widget-stats__value">
-                    {{ analytics.peakViews.total|number_format }}
+                    {{ analytics.peakViews.total|default(0)|number_format }}
                 </p>
 
+                {% if analytics.peakViews %}
                 <small class="widget-stats__meta">
                     {{ analytics.peakViews.date|date('jS F Y', viewModel.session.preferences.timezone) }}
                 </small>
+                {% endif %}
             </div>
         </article>
 

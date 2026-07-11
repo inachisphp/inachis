@@ -2,6 +2,7 @@
 
 {% block pagetitle %}
     <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <a href="{{ path('incc_tools_analytics') }}">Analytics</a>
     <span>Security Events</span>
 {% endblock pagetitle %}
 
@@ -18,9 +19,62 @@
         <button aria-pressed="{{ security.period.range == '7d' ? 'true' : 'false' }}" class="button button--grid" name="range" value="7d">7 Days</button>
         <button aria-pressed="{{ security.period.range == '30d' ? 'true' : 'false' }}" class="button button--grid" name="range" value="30d">30 Days</button>
         <button aria-pressed="{{ security.period.range == '90d' ? 'true' : 'false' }}" class="button button--grid" name="range" value="90d">90 Days</button>
+        <button
+            aria-pressed="{{ security.period.range == 'custom' ? 'true' : 'false' }}"
+            class="ui-toggle button button--grid"
+            data-target=".analytics-custom-range"
+            data-target-state="hidden"
+            name="range"
+            type="button"
+            value="custom"
+        >
+            Custom…
+        </button>
     </form>
 
     <section class="admonition admonition__info">
+		<form class="analytics-custom-range visually-hidden">
+            <input type="hidden" name="range" value="custom">
+            <div class="form-group">
+                <label for="security-from">From</label>
+                <input
+					class="ui-datepicker"
+					data-format="dd/mm/YYYY"
+					data-target="#security-from-value"
+					id="analytics-from"
+					type="text"
+					value="{{ security.period.from|date('d/m/Y') }}"
+				>
+
+				<input
+					type="hidden"
+					id="security-from-value"
+					name="from"
+					value="{{ security.period.from|date('Y-m-d') }}"
+				>
+            </div>
+
+            <div class="form-group">
+                <label for="analytics-to">To</label>
+                <input
+					class="ui-datepicker"
+					data-format="dd/mm/YYYY"
+					data-target="#security-to-value"
+                    id="security-to"
+                    type="text"
+                    value="{{ security.period.to|date('d/m/Y') }}">
+				<input
+					type="hidden"
+					id="security-to-value"
+					name="to"
+					value="{{ security.period.to|date('Y-m-d') }}"
+				>
+            </div>
+
+            <button class="button button--add" type="submit">
+                Apply
+            </button>
+        </form>
         <header class="admonition__header">
             <h2>Showing {{ security.period.label }}</h2>
         </header>

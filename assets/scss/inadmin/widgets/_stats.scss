@@ -230,6 +230,14 @@ ul.widget-stats__list {
     }
 }
 
+.analytics-custom-range {
+    display: flex;
+    align-items: center;
+    input {
+        margin-right: 1rem;
+    }
+}
+
 /* Tablet Range: 2 per row */
 @media (min-width: $breakpoint-medium) and (max-width: $breakpoint-xlarge) {
   .widget__content.nested-grid {
