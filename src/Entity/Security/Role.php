@@ -14,6 +14,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Inachis\Entity\Security\RolePermission;
 use Inachis\Entity\User\User;
+use Inachis\Enum\Security\MfaRequirement;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\String\Slugger\AsciiSlugger;
@@ -31,13 +32,17 @@ class Role
     protected ?UuidInterface $id = null;
 
     #[ORM\Column(type: 'string', length: 50, unique: true)]
-    private string $slug = '';
+    private string $identifier;
 
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     private string $name;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $description = null;
+
+    /** @var MfaRequirement MFA requirement for administrators. */
+    #[ORM\Column(enumType: MfaRequirement::class)]
+    private MfaRequirement $mfaRequirement = MfaRequirement::ANY;
 
     // Flag to disable review stage for this role
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
@@ -67,14 +72,14 @@ class Role
         return $this->id;
     }
 
-    public function getSlug(): string
+    public function getIdentifier(): string
     {
-        return $this->slug;
+        return $this->identifier;
     }
 
-    public function setSlug(string $slug): self
+    public function setIdentifier(string $identifier): self
     {
-        $this->slug = $slug;
+        $this->identifier = $identifier;
         return $this;
     }
 
@@ -87,8 +92,8 @@ class Role
     {
         $this->name = trim($name);
 
-        if ($this->slug === '') {
-            $this->slug = $this->slugify($this->name);
+        if ($this->identifier === '') {
+            $this->identifier = $this->slugify($this->name);
         }
 
         return $this;
@@ -102,6 +107,30 @@ class Role
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * Returns the MFA requirement for this role
+     *
+     * @return MfaRequirement
+     */
+    public function getMfaRequirement(): MfaRequirement
+    {
+        return $this->mfaRequirement;
+    }
+
+    /**
+     * Sets the MFA requirement for this role
+     *
+     * @param MfaRequirement $requirement
+     * @return self
+     */
+    public function setMfaRequirement(
+        MfaRequirement $requirement
+    ): self {
+        $this->mfaRequirement = $requirement;
+
         return $this;
     }
 
@@ -180,5 +209,19 @@ class Role
             ->toString();
 
         return trim($slug, '-');
+    }
+
+    /**
+     * Determines if this is an administrator role.
+     *
+     * @return bool
+     */
+    public function isAdministrator(): bool
+    {
+        return in_array(
+            strtolower($this->identifier),
+            ['admin', 'administrator'],
+            true,
+        );
     }
 }

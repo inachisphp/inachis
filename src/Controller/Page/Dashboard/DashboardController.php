@@ -49,6 +49,13 @@ class DashboardController extends AbstractInachisController
         $recentSeries = $seriesRepository->findRecentPublished(5);
         $analyticsSummary = $analytics->getDashboardSummary();
 
+        $from = new \DateTimeImmutable('first day of this week');
+        $today = new \DateTimeImmutable('today');
+        if ($from == $today) {
+            $from = $from->modify('-1 week');
+        }
+        $to = new \DateTimeImmutable();
+
 
         return $this->render('inadmin/page/dashboard/dashboard.html.twig', [
             'viewModel' => $this->viewModel,
@@ -90,7 +97,7 @@ class DashboardController extends AbstractInachisController
                 ],
                 'analytics' => [
                     ...$analyticsSummary,
-                    'topPages' => $analytics->getTopPages(5),
+                    'topPages' => $analytics->getTopPages($from, $to, 5),
                 ],
             ],
         ]);

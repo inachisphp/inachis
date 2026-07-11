@@ -272,7 +272,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $roles = [];
         foreach ($this->assignedRoles as $role) {
-            $slug = strtoupper($role->getSlug());
+            $slug = strtoupper($role->getIdentifier());
             $roles[] = 'ROLE_' . $slug;
             if ($slug === 'ADMIN' || $slug === 'ADMINISTRATOR') {
                 $roles[] = 'ROLE_ADMIN';
@@ -284,6 +284,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
+    /**
+     * Determines if this user is an administrator.
+     *
+     * @return bool
+     */
+    public function isAdministrator(): bool
+    {
+        foreach ($this->assignedRoles as $role) {
+            if ($role->isAdministrator()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
     /**
      * Returns the {@link avatar} for the {@link User}.
      *

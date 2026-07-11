@@ -11,6 +11,7 @@ namespace Inachis\Controller\Page\Admin;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\User\{User,UserPreference};
+use Inachis\Exception\User\CannotRemoveLastAdministratorException;
 use Inachis\Form\UserType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
@@ -24,6 +25,7 @@ use Inachis\Service\User\UserBulkActionService;
 use Inachis\Service\User\UserAccountEmailService;
 use Inachis\Transformer\ImageTransformer;
 use Inachis\Service\User\ProfileColorPalette;
+use Inachis\Service\User\UserProtectionService;
 use Random\RandomException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -71,8 +73,12 @@ class AdminProfileController extends AbstractInachisController
                 ($request->request->has('disable') ? 'disable' : null));
 
             if ($action !== null) {
-                $count = $userBulkActionService->apply($action, $items);
-                $this->addFlash('success', "Action '$action' applied to $count users.");
+                try {
+                    $count = $userBulkActionService->apply($action, $items);
+                    $this->addFlash('success', "Action '$action' applied to $count users.");
+                } catch (CannotRemoveLastAdministratorException $e) {
+                    $this->addFlash('error', $e->getMessage());
+                }
             }
 
             return $this->redirectToRoute('incc_admin_list');
@@ -117,6 +123,7 @@ class AdminProfileController extends AbstractInachisController
         Request $request,
         ImageTransformer $imageTransformer,
         UserAccountEmailService $userAccountEmailService,
+        UserProtectionService $userProtectionService,
         UserRepository $userRepository,
     ): Response {
         $id = $request->attributes->getString('id');
@@ -132,51 +139,95 @@ class AdminProfileController extends AbstractInachisController
             $user->setPreferences($preferences);
             $this->entityManager->persist($preferences);
         }
+        $originalRoles = $user->getAssignedRoles()->toArray();
+
         /** @var Form $form */
         $form = $this->createForm(UserType::class, $user, [
             'validation_groups' => [ '' ],
         ]);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $enableDisable = $form->has('enableDisable') ? $form->get('enableDisable') : null;
-            $delete = $form->has('delete') ? $form->get('delete') : null;
+        if ($form->isSubmitted()) {
+            foreach ($originalRoles as $role) {
+                if (
+                    $role->isAdministrator() &&
+                    !$user->getAssignedRoles()->contains($role)
+                ) {
+                    try {
+                        $userProtectionService->assertAdministratorCanBeRemoved();
+                    } catch (CannotRemoveLastAdministratorException $e) {
+                        $form->get('assignedRoles')->addError(
+                            new \Symfony\Component\Form\FormError($e->getMessage())
+                        );
+                    }
 
-            if ($enableDisable instanceof \Symfony\Component\Form\ClickableInterface && $enableDisable->isClicked()) {
-                $user->setActive(!$user->isEnabled());
+                    break;
+                }
             }
-            if ($delete instanceof \Symfony\Component\Form\ClickableInterface && $delete->isClicked()) {
-                $user->setRemoved(true);
-            }
+            if ($form->isValid()) {
+                $enableDisable = $form->has('enableDisable') ? $form->get('enableDisable') : null;
+                $delete = $form->has('delete') ? $form->get('delete') : null;
 
-            if ($isNew) {
-                $preferences->setColor(ProfileColorPalette::generate());
-                $userAccountEmailService->registerNewUser(
-                    $user,
-                    [ 'viewModel' => $this->viewModel, ],
-                    fn (string $token) => $this->generateUrl(
-                        'incc_account_new-password',
-                        [ 'token' => $token ]
-                    )
+                if ($enableDisable instanceof \Symfony\Component\Form\ClickableInterface && $enableDisable->isClicked()) {
+                    try {
+                        if ($user->isEnabled() && $user->isAdministrator()) {
+                            $userProtectionService->assertAdministratorCanBeRemoved();
+                        }
+
+                        $user->setActive(!$user->isEnabled());
+                    } catch (CannotRemoveLastAdministratorException $e) {
+                        $this->addFlash('error', $e->getMessage());
+
+                        return $this->redirectToRoute('incc_admin_edit', [
+                            'id' => $user->getUsername(),
+                        ]);
+                    }
+                }
+                if ($delete instanceof \Symfony\Component\Form\ClickableInterface && $delete->isClicked()) {
+                    try {
+                        if ($user->isAdministrator()) {
+                            $userProtectionService->assertAdministratorCanBeRemoved();
+                        }
+
+                        $user->setRemoved(true);
+                    } catch (CannotRemoveLastAdministratorException $e) {
+                        $this->addFlash('error', $e->getMessage());
+
+                        return $this->redirectToRoute('incc_admin_edit', [
+                            'id' => $user->getUsername(),
+                        ]);
+                    }
+                }
+
+                if ($isNew) {
+                    $preferences->setColor(ProfileColorPalette::generate());
+                    $userAccountEmailService->registerNewUser(
+                        $user,
+                        [ 'viewModel' => $this->viewModel, ],
+                        fn (string $token) => $this->generateUrl(
+                            'incc_account_new-password',
+                            [ 'token' => $token ]
+                        )
+                    );
+                    $this->entityManager->persist($user);
+                }
+                $preferences->setTimezone(
+                    $request->request->all('user')['timezone'] ?? $preferences->getTimezone()
                 );
-                $this->entityManager->persist($user);
+                $preferences->setLocale(
+                    $request->request->all('user')['locale'] ?? $preferences->getLocale()
+                );
+                $preferences->setColor(
+                    $request->request->all('user')['color'] ?? $preferences->getColor()
+                );
+
+                $this->entityManager->flush();
+
+                $this->addFlash('success', 'User details saved.');
+                return $this->redirect($this->generateUrl('incc_admin_edit', [
+                    'id' => $user->getUsername(),
+                ]));
             }
-            $preferences->setTimezone(
-                $request->request->all('user')['timezone'] ?? $preferences->getTimezone()
-            );
-            $preferences->setLocale(
-                $request->request->all('user')['locale'] ?? $preferences->getLocale()
-            );
-            $preferences->setColor(
-                $request->request->all('user')['color'] ?? $preferences->getColor()
-            );
-
-            $this->entityManager->flush();
-
-            $this->addFlash('success', 'User details saved.');
-            return $this->redirect($this->generateUrl('incc_admin_edit', [
-                'id' => $user->getUsername(),
-            ]));
         }
 
         $this->viewModel->page->title = 'Profile';

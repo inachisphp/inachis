@@ -22,6 +22,7 @@ readonly class UserBulkActionService
      * @param EntityManagerInterface $entityManager
      */
     public function __construct(
+        private UserProtectionService $userProtectionService,
         private UserRepository $userRepository,
         private EntityManagerInterface $entityManager,
     ) {}
@@ -35,21 +36,32 @@ readonly class UserBulkActionService
      */
     public function apply(string $action, array $ids): int
     {
-        $count = 0;
+        $users = [];
+
         foreach ($ids as $id) {
             /** @var \Inachis\Entity\User\User|null $user */
             $user = $this->userRepository->find($id);
             if (null === $user || empty($user->getUsername())) {
                 continue;
             }
+            $users[] = $user;
+        }
+
+        if (in_array($action, ['delete', 'disable'], true)) {
+            $this->userProtectionService->assertAdministratorsCanBeRemoved($users);
+        }
+
+        $count = 0;
+
+        foreach ($users as $user) {
             match ($action) {
                 'delete'  => $user->setRemoved(true),
                 'enable'  => $user->setActive(true),
                 'disable' => $user->setActive(false),
-                default   => null,
+                default => null,
             };
             $this->entityManager->persist($user);
-            $count++;
+            ++$count;
         }
 
         $this->entityManager->flush();

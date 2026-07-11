@@ -10,8 +10,8 @@ namespace Inachis\Controller\Page\Security;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Security\SecurityPolicy;
 use Inachis\Form\SecurityPolicyType;
+use Inachis\Repository\Security\SecurityPolicyRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -25,13 +25,14 @@ class SecurityPolicyController extends AbstractInachisController
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
+        SecurityPolicyRepository $securityPolicyRepository,
     ): Response {
         // Fetch the three policies (assume always exactly 3)
-        $policies = $entityManager->getRepository(SecurityPolicy::class)->findBy([], ['createdAt' => 'ASC']);
+        $policies = $securityPolicyRepository->findBy([], ['createdAt' => 'ASC']);
         if (count($policies) !== 3) {
             throw new \RuntimeException('Expected exactly 3 security policies, found ' . count($policies));
-
         }
+        
         // First policy editable
         $firstPolicy = $policies[0];
 
