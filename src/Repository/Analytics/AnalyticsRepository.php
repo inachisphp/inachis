@@ -169,7 +169,7 @@ class AnalyticsRepository
             SELECT path, code, SUM(hits) AS hits
             FROM analytics_errors
             WHERE date BETWEEN :from AND :to
-            GROUP BY path, code
+            GROUP BY path
             ORDER BY hits DESC
             LIMIT ' . (int) $limit,
             [
@@ -648,5 +648,315 @@ class AnalyticsRepository
         }
 
         return $result;
+    }
+
+    /**
+     * Total number of 4xx/5xx responses.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return integer
+     */
+    public function getTotalErrors(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+    ): int {
+        return (int) $this->db->fetchOne(
+            '
+            SELECT COALESCE(SUM(hits), 0)
+            FROM analytics_errors
+            WHERE date BETWEEN :from AND :to
+            ',
+            [
+                'from' => $from->format('Y-m-d'),
+                'to'   => $to->format('Y-m-d'),
+            ]
+        );
+    }
+
+    /**
+     * Get security dashboard summary.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     *
+     * @return array{
+     *     total:int,
+     *     uniqueIps:int,
+     *     high:int,
+     *     critical:int
+     * }
+     */
+    public function getSecuritySummary(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
+        $result = $this->db->fetchAssociative(
+            '
+            SELECT
+                COALESCE(SUM(hits), 0) AS total,
+                COUNT(DISTINCT ip_hash) AS unique_ips,
+                COALESCE(SUM(CASE WHEN severity BETWEEN 6 AND 8 THEN hits ELSE 0 END), 0) AS high,
+                COALESCE(SUM(CASE WHEN severity >= 9 THEN hits ELSE 0 END), 0) AS critical
+            FROM analytics_security_event
+            WHERE date BETWEEN :from AND :to
+            ',
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
+        );
+
+        return [
+            'total' => (int) ($result['total'] ?? 0),
+            'uniqueIps' => (int) ($result['unique_ips'] ?? 0),
+            'high' => (int) ($result['high'] ?? 0),
+            'critical' => (int) ($result['critical'] ?? 0),
+        ];
+    }
+
+    /**
+     * Get most targeted paths.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     *
+     * @return list<array{path:string,total:numeric-string}>
+     */
+    public function getTopSecurityPaths(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT
+                path,
+                SUM(hits) AS total
+            FROM analytics_security_event
+            WHERE date BETWEEN :from AND :to
+            GROUP BY path
+            ORDER BY total DESC
+            LIMIT ' . (int) $limit,
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
+        );
+    }
+
+    /**
+     * Get most common security event types.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     *
+     * @return list<array{type:string,total:numeric-string}>
+     */
+    public function getTopSecurityTypes(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT
+                type,
+                SUM(hits) AS total
+            FROM analytics_security_event
+            WHERE date BETWEEN :from AND :to
+            GROUP BY type
+            ORDER BY total DESC
+            LIMIT ' . (int) $limit,
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
+        );
+    }
+
+    /**
+     * Get IP addresses generating the most security events.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     *
+     * @return list<array{ip:string,total:numeric-string}>
+     */
+    public function getTopSecurityIps(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT
+                ip,
+                SUM(hits) AS total
+            FROM analytics_security_event
+            WHERE date BETWEEN :from AND :to
+            GROUP BY ip
+            ORDER BY total DESC
+            LIMIT ' . (int) $limit,
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
+        );
+    }
+
+    /**
+     * Get security events over time.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     *
+     * @return list<array{date:string,total:numeric-string}>
+     */
+    public function getSecurityEventsPerDay(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT
+                date,
+                SUM(hits) AS total
+            FROM analytics_security_event
+            WHERE date BETWEEN :from AND :to
+            GROUP BY date
+            ORDER BY date ASC
+            ',
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
+        );
+    }
+
+    /**
+     * Get recent security events.
+     *
+     * @param int $limit
+     *
+     * @return list<array{
+     *     date:string,
+     *     type:string,
+     *     severity:int,
+     *     path:string,
+     *     ip:string,
+     *     hits:int
+     * }>
+     */
+    public function getRecentSecurityEvents(
+        int $limit = 20
+    ): array {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT
+                date,
+                type,
+                severity,
+                path,
+                ip,
+                hits
+            FROM analytics_security_event
+            ORDER BY id DESC
+            LIMIT ' . (int) $limit
+        );
+    }
+
+    /**
+     * Get highest severity events.
+     *
+     * Useful for an "active threats" panel.
+     *
+     * @param int $limit
+     *
+     * @return list<array{
+     *     date:string,
+     *     type:string,
+     *     severity:int,
+     *     path:string,
+     *     ip:string,
+     *     hits:int
+     * }>
+     */
+    public function getCriticalSecurityEvents(
+        int $limit = 10
+    ): array {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT
+                date,
+                type,
+                severity,
+                path,
+                ip,
+                hits
+            FROM analytics_security_event
+            WHERE severity >= 9
+            ORDER BY severity DESC, hits DESC
+            LIMIT ' . (int) $limit
+        );
+    }
+
+    /**
+     * Get security activity by HTTP method.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     *
+     * @return list<array{method:string,total:numeric-string}>
+     */
+    public function getSecurityMethods(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT
+                method,
+                SUM(hits) AS total
+            FROM analytics_security_event
+            WHERE date BETWEEN :from AND :to
+            GROUP BY method
+            ORDER BY total DESC
+            ',
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
+        );
+    }
+
+    /**
+     * Get security events grouped by type.
+     *
+     * @return list<array{type:string,total:numeric-string}>
+     */
+    public function getSecurityEventsByType(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
+        return $this->db->fetchAllAssociative(
+            '
+            SELECT
+                type,
+                SUM(hits) AS total
+            FROM analytics_security_event
+            WHERE date BETWEEN :from AND :to
+            GROUP BY type
+            ORDER BY total DESC
+            LIMIT ' . (int) $limit,
+            [
+                'from' => $from->format('Y-m-d'),
+                'to' => $to->format('Y-m-d'),
+            ]
+        );
     }
 }

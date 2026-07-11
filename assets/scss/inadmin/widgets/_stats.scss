@@ -51,7 +51,7 @@ ul.widget-stats__list {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        &--total {
+        &--average {
             border-left-color: $color-brand-500;
 
             .widget-stats__icon {
@@ -60,7 +60,25 @@ ul.widget-stats__list {
             }
         }
 
-        &--today {
+        &--peak {
+            border-left-color: $color-brand-400;
+
+            .widget-stats__icon {
+                background-color: $color-brand-100;
+                color: $color-brand-400;
+            }
+        }
+
+        &--404 {
+            border-left-color: var(--color-danger-500);
+
+            .widget-stats__icon {
+                background-color: var(--color-danger-300);
+                color: var(--color-danger-100);
+            }
+        }
+
+        &--total {
             border-left-color: $success-color;
 
             .widget-stats__icon {

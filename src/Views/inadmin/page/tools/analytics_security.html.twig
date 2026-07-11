@@ -1,0 +1,357 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <span>Security Events</span>
+{% endblock pagetitle %}
+
+
+{% block content %}
+
+<div class="col-12 toolbar-container analytics-toolbar">
+
+    {{ include('inadmin/partials/tab-sets/analytics.html.twig') }}
+
+    <form class="grid-toggle" method="get">
+        <button aria-pressed="{{ security.period.range == 'today' ? 'true' : 'false' }}" class="button button--grid" name="range" value="today">Today</button>
+        <button aria-pressed="{{ security.period.range == 'yesterday' ? 'true' : 'false' }}" class="button button--grid" name="range" value="yesterday">Yesterday</button>
+        <button aria-pressed="{{ security.period.range == '7d' ? 'true' : 'false' }}" class="button button--grid" name="range" value="7d">7 Days</button>
+        <button aria-pressed="{{ security.period.range == '30d' ? 'true' : 'false' }}" class="button button--grid" name="range" value="30d">30 Days</button>
+        <button aria-pressed="{{ security.period.range == '90d' ? 'true' : 'false' }}" class="button button--grid" name="range" value="90d">90 Days</button>
+    </form>
+
+    <section class="admonition admonition__info">
+        <header class="admonition__header">
+            <h2>Showing {{ security.period.label }}</h2>
+        </header>
+
+        <p class="admonition__content">
+            {{ security.period.from|date('jS F Y', viewModel.session.preferences.timezone) }}
+
+            {% if security.period.to != security.period.from %}
+                &mdash;
+                {{ security.period.to|date('jS F Y', viewModel.session.preferences.timezone) }}
+            {% endif %}
+        </p>
+    </section>
+
+</div>
+
+
+<section class="col-12 widget ui-section rounded">
+
+<header class="widget__header">
+    <h2>Security Overview</h2>
+</header>
+
+<div class="widget__content nested-grid">
+
+    <article class="col-3 widget-stats__card widget-stats__card--total">
+        <div class="widget-stats__icon">
+            <span class="material-icons">security</span>
+        </div>
+
+        <div class="widget-stats__content">
+            <h2>Events</h2>
+            <p class="widget-stats__value">
+                {{ security.summary.total|number_format }}
+            </p>
+        </div>
+    </article>
+
+
+    <article class="col-3 widget-stats__card">
+        <div class="widget-stats__icon">
+            <span class="material-icons">language</span>
+        </div>
+
+        <div class="widget-stats__content">
+            <h2>IPs</h2>
+            <p class="widget-stats__value">
+                {{ security.summary.uniqueIps|number_format }}
+            </p>
+        </div>
+    </article>
+
+
+    <article class="col-3 widget-stats__card widget-stats__card--404">
+        <div class="widget-stats__icon">
+            <span class="material-icons">warning</span>
+        </div>
+
+        <div class="widget-stats__content">
+            <h2>High</h2>
+            <p class="widget-stats__value">
+                {{ security.summary.high|number_format }}
+            </p>
+        </div>
+    </article>
+
+
+    <article class="col-3 widget-stats__card">
+        <div class="widget-stats__icon">
+            <span class="material-icons">dangerous</span>
+        </div>
+
+        <div class="widget-stats__content">
+            <h2>Critical</h2>
+            <p class="widget-stats__value">
+                {{ security.summary.critical|number_format }}
+            </p>
+        </div>
+    </article>
+
+</div>
+
+</section>
+
+
+<section class="col-6 widget">
+
+<header class="widget__header">
+    <h2>Events Over Time</h2>
+
+    <button
+        class="button button--icon chart-download"
+        type="button"
+        data-chart="securityChart"
+        data-filename="security">
+        <span class="material-icons">download</span>
+    </button>
+
+</header>
+
+<canvas id="securityChart"></canvas>
+
+</section>
+
+
+<section class="col-6 widget">
+
+<header class="widget__header">
+    <h2>Event Types</h2>
+</header>
+
+<table>
+
+<thead>
+<tr>
+    <th>Type</th>
+    <th class="col-count">Hits</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for event in security.eventsByType %}
+
+<tr>
+    <td>{{ event.type }}</td>
+    <td class="col-count">{{ event.total|number_format }}</td>
+</tr>
+
+{% else %}
+
+<tr>
+    <td colspan="2">
+        No security events recorded.
+    </td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</section>
+
+
+
+<section class="col-6 widget">
+
+<header class="widget__header">
+    <h2>Most Targeted Paths</h2>
+</header>
+
+<table>
+
+<thead>
+<tr>
+    <th>Path</th>
+    <th class="col-count">Hits</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for path in security.topPaths %}
+
+<tr>
+    <td>
+        <code class="inline">{{ path.path }}</code>
+    </td>
+    <td class="col-count">
+        {{ path.total|number_format }}
+    </td>
+</tr>
+
+{% else %}
+
+<tr>
+<td colspan="2">No suspicious paths recorded.</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</section>
+
+
+
+<section class="col-6 widget">
+
+<header class="widget__header">
+    <h2>Top IP Addresses</h2>
+</header>
+
+<table>
+
+<thead>
+<tr>
+    <th>IP</th>
+    <th class="col-count">Hits</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for ip in security.topIps %}
+
+<tr>
+    <td>
+        <code class="inline">{{ ip.ip }}</code>
+    </td>
+
+    <td class="col-count">
+        {{ ip.total|number_format }}
+    </td>
+</tr>
+
+{% else %}
+
+<tr>
+<td colspan="2">No suspicious IP activity recorded.</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</section>
+
+
+
+<section class="col-12 widget">
+
+<header class="widget__header">
+    <h2>Recent Security Events</h2>
+</header>
+
+<table>
+
+<thead>
+<tr>
+    <th>Date</th>
+    <th>Type</th>
+    <th>Severity</th>
+    <th>Path</th>
+    <th>IP</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for event in security.recentEvents %}
+
+<tr>
+
+<td>
+{{ event.date|date('jS M Y') }}
+</td>
+
+<td>
+{{ event.type }}
+</td>
+
+<td>
+
+{% if event.severity >= 9 %}
+    <span class="widget-stats__trend--down">Critical</span>
+{% elseif event.severity >= 6 %}
+    <span class="widget-stats__trend--down">High</span>
+{% elseif event.severity >= 3 %}
+    Medium
+{% else %}
+    Low
+{% endif %}
+
+</td>
+
+<td>
+<code class="inline">{{ event.path }}</code>
+</td>
+
+<td>
+<code class="inline">{{ event.ip }}</code>
+</td>
+
+</tr>
+
+{% else %}
+
+<tr>
+<td colspan="5">No events.</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</section>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const securityChart = new Chart(
+    document.getElementById('securityChart'),
+    {
+        type: 'line',
+        data: {
+            labels: {{ security.eventsPerDay|map(e => e.date)|json_encode|raw }},
+            datasets: [
+                {
+                    label: 'Security Events',
+                    data: {{ security.eventsPerDay|map(e => e.total)|json_encode|raw }},
+                    fill: false,
+                    tension: 0.2
+                }
+            ]
+        }
+    }
+);
+
+</script>
+
+
+{% endblock content %}

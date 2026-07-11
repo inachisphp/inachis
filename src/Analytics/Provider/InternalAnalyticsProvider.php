@@ -318,4 +318,174 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
     {
         return $this->analyticsRepository->getDashboardSummary();
     }
+
+    /**
+     * Total number of 4xx/5xx responses.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @return integer
+     */
+    public function getTotalErrors(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+    ): int {
+        return $this->analyticsRepository->getTotalErrors($from, $to);
+    }
+
+    /**
+     * Get security dashboard summary.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     *
+     * @return array{
+     *     total:int,
+     *     uniqueIps:int,
+     *     high:int,
+     *     critical:int
+     * }
+     */
+    public function getSecuritySummary(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
+        return $this->analyticsRepository->getSecuritySummary($from, $to);
+    }
+
+    /**
+     * Get most targeted paths.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     *
+     * @return list<array{path:string,total:numeric-string}>
+     */
+    public function getTopSecurityPaths(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
+        return $this->analyticsRepository->getTopSecurityPaths($from, $to, $limit);
+    }
+
+    /**
+     * Get most common security event types.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     *
+     * @return list<array{type:string,total:numeric-string}>
+     */
+    public function getTopSecurityTypes(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
+        return $this->analyticsRepository->getTopSecurityTypes($from, $to, $limit);
+    }
+
+    /**
+     * Get IP addresses generating the most security events.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param int $limit
+     *
+     * @return list<array{ip:string,total:numeric-string}>
+     */
+    public function getTopSecurityIps(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
+        return $this->analyticsRepository->getTopSecurityIps($from, $to, $limit);
+    }
+
+    /**
+     * Get security events over time.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     *
+     * @return list<array{date:string,total:numeric-string}>
+     */
+    public function getSecurityEventsPerDay(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
+        return $this->analyticsRepository->getSecurityEventsPerDay($from, $to);
+    }
+
+    /**
+     * Get recent security events.
+     *
+     * @param int $limit
+     *
+     * @return list<array{
+     *     date:string,
+     *     type:string,
+     *     severity:int,
+     *     path:string,
+     *     ip:string,
+     *     hits:int
+     * }>
+     */
+    public function getRecentSecurityEvents(
+        int $limit = 20
+    ): array {
+        return $this->analyticsRepository->getRecentSecurityEvents($limit);
+    }
+
+    /**
+     * Get highest severity events.
+     *
+     * Useful for an "active threats" panel.
+     *
+     * @param int $limit
+     *
+     * @return list<array{
+     *     date:string,
+     *     type:string,
+     *     severity:int,
+     *     path:string,
+     *     ip:string,
+     *     hits:int
+     * }>
+     */
+    public function getCriticalSecurityEvents(
+        int $limit = 10
+    ): array {
+        return $this->analyticsRepository->getCriticalSecurityEvents($limit);
+    }
+
+    /**
+     * Get security activity by HTTP method.
+     *
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     *
+     * @return list<array{method:string,total:numeric-string}>
+     */
+    public function getSecurityMethods(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to
+    ): array {
+        return $this->analyticsRepository->getSecurityMethods($from, $to);
+    }
+
+    /**
+     * Get security events grouped by type.
+     *
+     * @return list<array{type:string,total:numeric-string}>
+     */
+    public function getSecurityEventsByType(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10
+    ): array {
+        return $this->analyticsRepository->getSecurityEventsByType($from, $to, $limit);
+    }
 }

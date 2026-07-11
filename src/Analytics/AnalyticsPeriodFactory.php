@@ -9,6 +9,7 @@
 
 namespace Inachis\Analytics;
 
+use Inachis\Exception\InvalidAnalyticsPeriodException;
 use Symfony\Component\HttpFoundation\Request;
 
 final class AnalyticsPeriodFactory
@@ -99,14 +100,18 @@ final class AnalyticsPeriodFactory
         $to = $request->query->get('to');
 
         if (!$from || !$to) {
-            return self::fallback();
+            throw new InvalidAnalyticsPeriodException(
+                'Both a start and end date are required.'
+            );
         }
 
         try {
             $fromDate = new \DateTimeImmutable($from);
             $toDate = new \DateTimeImmutable($to);
         } catch (\Throwable) {
-            return self::fallback();
+            throw new InvalidAnalyticsPeriodException(
+                'The selected dates are invalid.'
+            );
         }
 
         if ($fromDate > $toDate) {
@@ -120,7 +125,9 @@ final class AnalyticsPeriodFactory
 
         $maxDays = 365;
         if ($fromDate->diff($toDate)->days > $maxDays) {
-            $fromDate = $toDate->modify("-{$maxDays} days");
+            throw new InvalidAnalyticsPeriodException(
+                'Custom date ranges cannot exceed one year.'
+            );
         }
 
         return new AnalyticsPeriod(

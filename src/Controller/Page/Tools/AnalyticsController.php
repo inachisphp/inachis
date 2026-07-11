@@ -9,9 +9,10 @@
 
 namespace Inachis\Controller\Page\Tools;
 
-use Inachis\Analytics\AnalyticsPeriodFactory;
+use Inachis\Analytics\AnalyticsPeriodResolver;
 use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Controller\AbstractInachisController;
+use Inachis\Exception\InvalidAnalyticsPeriodException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -27,15 +28,33 @@ class AnalyticsController extends AbstractInachisController
     #[Route('/incc/tools/analytics', name: 'incc_tools_analytics')]
     public function index(
         AnalyticsProviderInterface $analytics,
+        AnalyticsPeriodResolver $periodResolver,
         Request $request,
     ): Response {
-        $period = AnalyticsPeriodFactory::fromRequest($request);
+        try {
+            $period = $periodResolver->resolve(
+                $request,
+                'analytics'
+            );
+        } catch (InvalidAnalyticsPeriodException $e) {
+            $this->addFlash('warning', $e->getMessage());
+
+            return $this->redirectToRoute(
+                'incc_tools_analytics',
+                [
+                    'range' => '30d',
+                ]
+            );
+        }
         $previous = $period->previous();
 
         $viewsPerDay = $analytics->getPageViewsPerDay($period->from, $period->to);
         $top404s = $analytics->getTopErrors($period->from, $period->to, 10);
         $totalViews = $analytics->getTotalViews($period->from, $period->to);
         $uniqueVisitors = $analytics->getMonthlyUniqueVisitors($period->from, $period->to);
+
+        $total404s = $analytics->getTotalErrors($period->from, $period->to);
+        $previous404s = $analytics->getTotalErrors($previous->from, $previous->to);
 
         $prevViews = $analytics->getTotalViews($previous->from, $previous->to);
 
@@ -58,22 +77,48 @@ class AnalyticsController extends AbstractInachisController
         $topBots = $analytics->getTopBots($period->from, $period->to, 15);
 
         $this->viewModel->page->title = 'Analytics';
-        $this->viewModel->page->tab = 'tools';
+        $this->viewModel->page->tab = 'analytics';
         return $this->render('inadmin/page/tools/analytics.html.twig', [
             'viewModel' => $this->viewModel,
             'analytics' => [
                 'period' => $period,
+
+                'totalViews' => $totalViews,
+                'previousTotalViews' => $prevViews,
+                'averageViewsPerDay' => round(
+                    $totalViews / max(
+                        1,
+                        $period->from->diff($period->to)->days + 1
+                    ),
+                    1
+                ),
+                'peakViews' => array_reduce(
+                    $viewsPerDay,
+                    static function ($carry, $row) {
+                        return ($carry === null || $row['total'] > $carry['total'])
+                            ? $row
+                            : $carry;
+                    }
+                ),
+                'uniqueVisitors' => $uniqueVisitors,
+                'viewsPerVisitor' => $uniqueVisitors > 0
+                    ? round($totalViews / $uniqueVisitors, 2)
+                    : 0,
+                'totalSubscribers' => $totalSubscribers,
+                'total404s' => $total404s,
+                'previous404s' => $previous404s,
+                'errorChange' => $previous404s > 0
+                    ? (($total404s - $previous404s) / $previous404s) * 100
+                    : null,
+
                 'viewsPerDay' => $viewsPerDay,
                 'top404s' => $top404s,
-                'totalViews' => $totalViews,
-                'uniqueVisitors' => $uniqueVisitors,
                 'change' => $change,
                 'trending' => $trending,
                 'topReferrers' => $topReferrers,
                 'topRegions' => $topRegions,
                 'subscriberStats' => $subscriberStats,
                 'subscribersPerFeed' => $subscribersPerFeed,
-                'totalSubscribers' => $totalSubscribers,
                 'topBots' => $topBots,
             ],
         ]);
