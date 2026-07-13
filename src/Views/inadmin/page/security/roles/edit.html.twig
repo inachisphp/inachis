@@ -7,13 +7,13 @@
 
 {% block content %}
     {{ form_start(form, {'attr': { 'class': 'col-12 form form__role', 'novalidate': 'novalidate' }}) }}
-
     {{ form_errors(form) }}
 
     {% if role.systemRole %}
-    <div class="admonition admonition__warning">
-        <p>This is a system role and cannot be edited or removed.</p>
-    </div>
+        {{ include('inadmin/partials/components/admonition.html.twig', {
+            type: 'warning',
+            text: 'This is a system role and cannot be edited or removed.',
+        })}}
     {% endif %}
     <div class="content__edit">
         <section class="ui-section">

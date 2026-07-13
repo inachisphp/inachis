@@ -80,27 +80,48 @@
 
 {% if true %}
 <fieldset class="ui-section" id="user__auth">
-    {% if not user.isTotpEnabled %}
-        <p>
-            {{ form_widget(form.enableTotp) }}
-        </p>
-    {% else %}
-    <section class="admonition admonition__tip">
-        <header class="admonition__title">
-            <span class="material-icons">verified_user</span>
-            <span>Two-Factor Authentication is enabled</span>
-        </header>
-        <p>Enabled on <strong>{{ user.totp.enabledAt|date('l jS F Y \\a\\t H:i', viewModel.session.preferences.timezone) }}</strong></p>
-    </section>
-    <p>
-         {{ form_widget(form.disableTotp) }}
-    </p>
-    <section class="admonition {% if remainingRecoveryCodes >= 4 %}admonition__tip{% elseif remainingRecoveryCodes >= 1 %}admonition__warning{% else %}admonition__danger{% endif %}">
-        <header class="admonition__title">Recovery Codes</header>
-        <p>Remaining: <strong>{{ remainingRecoveryCodes }}</strong></p>
-        <p>Recovery codes can be used once if you lose access to your authenticator.</p>
-        <p>{{ form_widget(form.regenerateCodes) }}</p>
-    {% endif %}
+<div class="nested-grid">
+    <div class="col-6">
+        {% if not user.isTotpEnabled %}
+            <p>
+                {{ form_widget(form.enableTotp) }}
+            </p>
+        {% else %}
+            {% embed 'inadmin/partials/components/admonition.html.twig' with {
+                type: 'tip',
+                title: 'Two-Factor Authentication is enabled',
+                icon: 'verified_user',
+            } %}
+                {% block text %}
+                <p>Enabled on <strong>{{ user.totp.enabledAt|date('l jS F Y \\a\\t H:i', viewModel.session.preferences.timezone) }}</strong></p>
+                {% endblock text %}
+            {% endembed %}
+            <p>{{ form_widget(form.disableTotp) }}</p>
+            {% embed 'inadmin/partials/components/admonition.html.twig' with {
+                type: remainingRecoveryCodes >= 4
+                    ? 'tip'
+                    : (remainingRecoveryCodes >= 1 ? 'warning' : 'danger'),
+                title: 'Recovery Codes',
+                show_icon: false,
+            } %}
+                {% block text %}
+            <p>Remaining: <strong>{{ remainingRecoveryCodes }}</strong></p>
+            <p>Recovery codes can be used once if you lose access to your authenticator.</p>
+            <p>{{ form_widget(form.regenerateCodes) }}</p>
+                {% endblock text %}
+            {% endembed %}
+        {% endif %}
+    </div>
+    <div class="col-6">
+        {% embed 'inadmin/partials/components/admonition.html.twig' with {
+            type: 'info',
+            title: 'WebAuthn / Passkeys',
+            icon: 'info',
+            text: 'Coming soon…',
+        } %}
+        {% endembed %}
+    </div>
+</div>
 </fieldset>
 {% endif %}
 

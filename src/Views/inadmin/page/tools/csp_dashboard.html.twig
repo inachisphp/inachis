@@ -9,11 +9,13 @@
 {{ include('inadmin/partials/tab-sets/csp.html.twig') }}
 <div class="ui-section nested-grid">
 {% if reports is empty and activeDirective is empty and activeSeverity is empty and activeHost is empty %}
-<div class="col-12 admonition admonition__info">
-    <header class="admonition__header">
-        <h2><em class="material-icons">security</em> Get Started: Bootstrap Your CSP Tracking</h2>
-    </header>
-
+        {% embed 'inadmin/partials/components/admonition.html.twig' with {
+            type: 'info',
+            title: 'Get Started: Bootstrap Your CSP Tracking',
+            class: 'col-12',
+            icon: 'security',
+        } %}
+            {% block text %}
     <p>
         No violation logs have been registered yet. To start mapping out your application's external dependencies without breaking current client-side functionality, add the following temporary <strong>Report-Only</strong> header to your application's HTTP response configuration:
     </p>
@@ -31,7 +33,9 @@
     <p>
         <em class="material-icons">info</em> This baseline allows standard local mechanics to load seamlessly while cataloging external CDNs, third-party trackers, and asset injects back into this dashboard.
     </p>
-</div>
+            {% endblock text %}
+        {% endembed %}
+
 {% else %}
 <div class="col-6">
     <div class="widget__content nested-grid">

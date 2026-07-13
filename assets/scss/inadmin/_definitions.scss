@@ -288,3 +288,11 @@ $badge-colors: (
     warning: (bg: #ffc107, text: #333),
     ok: (bg: #28A745, text: #fff),
 );
+
+$admonition-colors: (
+    danger: (bg: #FFEBEC, accent: #e13238),
+    info: (bg: #e5f7ff, accent: #006699),
+    note: (bg: #fdfdfe, accent: #d4d5d8),
+    tip: (bg: #e6f6e6, accent: #009940),
+    warning: (bg: #fff8e6, accent: #e6a700),
+);

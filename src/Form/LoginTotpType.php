@@ -45,14 +45,17 @@ class LoginTotpType extends AbstractType
     {
         $builder
            ->add('code', TextType::class, [
-                'label' => 'Authentication code',
                 'attr' => [
+                    'aria-required' => 'true',
                     'autocomplete' => 'one-time-code',
+                    'class' => 'auth-code-field',
                     'inputmode' => 'numeric',
                     'maxlength' => 6,
                     'pattern' => '[0-9]{6}',
+                    'placeholder' => '••••••',
                     'required' => true,
                 ],
+                'label' => 'Authentication code',
             ])
             ->add('verify', SubmitType::class, [
                 'attr' => [

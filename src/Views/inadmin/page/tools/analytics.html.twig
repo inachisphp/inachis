@@ -74,8 +74,9 @@
                 Apply
             </button>
         </form>
-        <header class="admonition__header">
-            <h2>Showing {{ analytics.period.label }}</h2>
+        <header class="admonition__title">
+            <span class="material-icons">info</span>
+            <span>Showing {{ analytics.period.label }}</span>
         </header>
         <p class="admonition__content">
             {{ analytics.period.from|date('jS F Y', viewModel.session.preferences.timezone) }}

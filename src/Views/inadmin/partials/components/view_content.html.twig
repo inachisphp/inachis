@@ -49,6 +49,7 @@
         {{ include('inadmin/partials/components/view_table.html.twig') }}
     {% endif %}
 
+    {% if show_pagination is not defined or show_pagination %}
     {{ include('inadmin/partials/components/pagination.html.twig', {
         offset: offset + 1,
         limit: limit,
@@ -57,6 +58,7 @@
         result_url: url_result,
         total: total,
     }) }}
+    {% endif %}
     {% if actions|default(null) is not empty %}
         {% include 'inadmin/partials/components/action_bar.html.twig' %}
     {% endif %}

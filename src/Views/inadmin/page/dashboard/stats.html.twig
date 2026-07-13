@@ -76,7 +76,8 @@
         </ul>
     </section>
 {% else %}
-<section class="admonition admonition__info" role="note" aria-labelledby="stats-no-data">
-    <p id="stats-no-data">Statistics will appear here when you have published posts that have had visitors.</p>
-</section>
+    {{ include('inadmin/partials/components/admonition.html.twig', {
+        type: 'info',
+        text: 'Statistics will appear here when you have published posts that have had visitors.',
+    })}}
 {% endif %}

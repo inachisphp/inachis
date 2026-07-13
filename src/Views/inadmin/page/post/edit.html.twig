@@ -8,13 +8,46 @@
 {% block content %}
 
     {% if post.hasExpired %}
-        <div class="col-12 admonition admonition__warning">
-            <h2 class="admonition__title">
-                <span class="material-icons" aria-hidden="true">warning</span>
-                {% trans %}admin.post.expired{% endtrans %}
-            </h2>
-            <p>{% trans %}admin.post.expired.help{% endtrans %}</p>
-        </div>
+        {% set publishStatus = {
+            icon: 'warning',
+            label: 'admin.post.expired'|trans,
+            help: 'admin.post.expired.help'|trans,
+            className: 'warning',
+        } %}
+    {% elseif post.isScheduledPage %}
+        {% set publishStatus = {
+            label: 'Scheduled for ' ~ post.postDate|date('l jS F Y \\a\\t H:i', viewModel.session.preferences.timezone),
+            className: 'tip'
+        } %}
+    {% elseif post.status.value == 'review' %}
+        {% set publishStatus = { label: 'Under Review', className: 'info' } %}
+    {% elseif post.status.value == 'published' %}
+        {% if post.visible == true %}
+            {% set publishStatus = { label: 'Online', className: 'tip' } %}
+        {% else %}
+            {% set publishStatus = {
+                icon: 'warning',
+                label: 'Offline',
+                help: 'Change visibility to \'public\' to make this content available',
+                className: 'danger',
+            } %}
+        {% endif %}
+    {% endif %}
+
+    {% if publishStatus|default({}) %}
+    <div class="col-12 admonition admonition__{{ publishStatus.className }}">
+        {% if publishStatus.help|default('') %}
+        <header class="admonition__title">
+            {% if publishStatus.icon|default(null) %}
+            <span class="material-icons" aria-hidden="true">{{ publishStatus.icon }}</span>
+            {% endif %}
+            <strong>Published Status: </strong> {{ publishStatus.label}}
+        </header>
+        <p>{{ publishStatus.help }}</p>
+        {% else %}
+            <strong>Published Status: </strong> {{ publishStatus.label}}
+        {% endif %}
+    </div>
     {% endif %}
 
     {% set showStats = post.id is not empty and post.status|default('') == 'published' %}
@@ -88,7 +121,7 @@
                 {{ form_errors(form.visible) }}
                 <span class="switch-wrapper">
                     {{ form_widget(form.visible) }}
-				</span>
+                </span>
             </p>
             <p>
                 {{ form_label(form.showTableOfContents) }}

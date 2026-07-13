@@ -13,12 +13,13 @@
 {{ form_start(form, {'attr': { 'class': 'form form__post form__tabs' }}) }}
 
     <section class="ui-section">
-        <div class="admonition admonition__info">
-            <p>The Expires field should be reviewed regularly.
+        {{ include('inadmin/partials/components/admonition.html.twig', {
+            type: 'info',
+            show_title: false,
+            text: 'The Expires field should be reviewed regularly.
                 If you are using the default security policy, update this date
-                whenever you review or change your security contact process.
-            </p>
-        </div>
+                whenever you review or change your security contact process.',
+        })}}
         <p>
             {{ form_label(form.security_txt) }}
             {{ form_errors(form.security_txt) }}

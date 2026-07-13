@@ -8,7 +8,13 @@
 {% block content %}
 
 <section class="ui-section col-12 nested-grid">
-    <div class="admonition admonition__info col-6">
+    {% embed 'inadmin/partials/components/admonition.html.twig' with {
+        class: 'col-6',
+        show_icon: false,
+        show_title: false,
+        type: 'info',
+    } %}
+        {% block text %}
         <p>
             Scan the QR code using your authenticator
             application.
@@ -24,7 +30,8 @@
             <li>Authy</li>
             <li>Any RFC 6238 compatible application</li>
         </ul>
-    </div>
+        {% endblock text %}
+    {% endembed %}
 
     <div class="col-6">
         <img src="{{ qrCode }}" alt="TOTP QR Code" width="200" height="200" />

@@ -1,5 +1,6 @@
 @use '../definitions' as *;
 @use 'sass:color';
+@use 'sass:map';
 
 .admonition {
   border-left: 3px solid transparent;
@@ -14,10 +15,15 @@
     font-weight: bold;
     margin-bottom: 1em;
     text-transform: uppercase;
+  }
 
-    .material-icons {
-      margin-right: 1rem;
-    }
+  .material-icons {
+    margin-right: 1rem;
+    vertical-align: middle;
+  }
+
+  span {
+    vertical-align: middle;
   }
 
   &.admonition-with-action {
@@ -29,35 +35,22 @@
   }
 }
 
-.admonition__tip {
-  background-color: #e6f6e6;
-  border-left-color: #009940;
-  .material-icons, strong {
-    color: #009940;
-  }
-}
+@each $name, $colors in $admonition-colors {
+    .admonition__#{$name}{
+        background-color: map.get($colors, bg);
+        border-left-color: map.get($colors, accent);
 
-.admonition__info {
-  background-color: $color-brand-050;
-  border-left-color: $action-primary;
-  .material-icons, strong {
-    color: $action-primary;
-  }
-}
-
-.admonition__warning {
-  background-color: $alert-warning-bg;
-  border-left-color: $alert-warning-border;
-  .material-icons, strong {
-    color: $alert-warning-border;
-  }
-}
-
-.admonition__danger {
-  background-color: #FFEBEC;
-  border-left-color: #e13238;
-  .material-icons, strong {
-    color: #e13238;
-  }
-
+        .material-icons {
+            color: map.get($colors, accent);
+        }
+        strong {
+          color: color.adjust(map.get($colors, accent), $lightness:-10%)
+        }
+        code {
+          background-color: color.adjust(map.get($colors, bg), $lightness:-5%);
+          border: 1px solid color.adjust(map.get($colors, bg), $lightness:-20%);
+          border-radius: $radius-standard;
+          padding:0 0.25rem;
+        }
+    }
 }

@@ -26,9 +26,15 @@ class LoginRecoveryCodeType extends AbstractType
             [
                 'label' => 'Recovery code',
                 'attr' => [
-                    'autocomplete' => 'one-time-code',
-                    'spellcheck' => 'false',
+                    'aria-required' => 'true',
                     'autocapitalize' => 'characters',
+                    'autocomplete' => 'one-time-code',
+                    'class' => 'auth-code-field ',
+                    'maxlength' => 9,
+                    'pattern' => '[0-9A-Za-z]{4}-[0-9A-Za-z]{4}',
+                    'placeholder' => '••••-••••',
+                    'required' => true,
+                    'spellcheck' => 'false',
                 ],
             ]
         )

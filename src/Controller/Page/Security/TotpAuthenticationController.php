@@ -16,8 +16,6 @@ use Inachis\Form\LoginTotpType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
@@ -35,6 +33,12 @@ class TotpAuthenticationController extends AbstractInachisController
     public function index(
         SessionInterface $session,
     ): Response {
+        if (!$session->has('security.totp_pending')) {
+            return $this->redirectToRoute(
+                'incc_account_login'
+            );
+        }
+        
         $user = $this->getCurrentUser();
         if (!$user instanceof User) {
             return $this->redirectToRoute('incc_account_login');

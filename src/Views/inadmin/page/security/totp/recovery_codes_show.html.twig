@@ -7,12 +7,13 @@
 
 {% block content %}
 <article class="col-12 ui-section">
-    <section class="admonition admonition__warning">
-        <header class="admonition__title">Important</header>
-        <p>These recovery codes will only be shown once.
-        Store them somewhere safe such as a password manager or print them.
-        Each code can only be used once.</p>
-    </section>
+    {{ include('inadmin/partials/components/admonition.html.twig', {
+        type: 'warning',
+        title: 'Important',
+        text: 'These recovery codes will only be shown once.
+            Store them somewhere safe such as a password manager or print them.
+            Each code can only be used once.',
+    })}}
 
     <div class="card">
     {% for code in codes %}

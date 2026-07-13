@@ -6,10 +6,16 @@
 {% endblock pagetitle %}
 {% block content %}
 <div class="col-12 content__edit">
-    <section class="admonition admonition__info">
+    {% embed 'inadmin/partials/components/admonition.html.twig' with {
+        type: 'info',
+        show_title: false,
+        show_icon: false,
+    } %}
+        {% block text %}
         <p>Current IP: <strong>{{ current_ip }}</strong></p>
         <p>Status: <strong>{{ enabled ? 'Enabled' : 'Disabled' }}</strong></p>
-    </section>
+        {% endblock text %}
+    {% endembed %}
 
     <form class="form form__post" method="post">
     <fieldset class="ui-section">
