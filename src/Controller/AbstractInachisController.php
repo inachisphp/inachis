@@ -17,8 +17,7 @@ use Inachis\Repository\Waste\WasteRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use DateTimeImmutable;
-use DateInterval;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Abstract controller for Inachis.
@@ -42,6 +41,7 @@ abstract class AbstractInachisController extends AbstractController
         protected TranslatorInterface $translator,
         protected WasteRepository $wasteRepository,
         PageViewFactory $pageViewFactory,
+        protected RequestStack $requestStack,
     ) {
         parent::__construct($params, $pageViewFactory);
 
@@ -117,6 +117,22 @@ abstract class AbstractInachisController extends AbstractController
         return $this->security->getUser() instanceof User;
     }
 
+    protected function requiresTwoFactor(): bool
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        return $request?->getSession()->get(
+            'security.totp_pending',
+            false
+        ) ?? false;
+    }
+
+    protected function isFullyAuthenticated(): bool
+    {
+        return $this->isAuthenticated()
+            && !$this->requiresTwoFactor();
+    }
+
     /**
      * If the user is trying to access a page such as sign-in but is already authenticated
      * they will be redirected to the dashboard.
@@ -125,7 +141,7 @@ abstract class AbstractInachisController extends AbstractController
      */
     public function redirectIfAuthenticated(): string
     {
-        if ($this->isAuthenticated()) {
+        if ($this->isFullyAuthenticated()) {
             return 'incc_dashboard';
         }
         return '';

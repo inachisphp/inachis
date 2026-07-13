@@ -1,0 +1,78 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incc_admin_list') }}">Users</a>
+    <span>Enable Two-Factor Authentication</span>
+{% endblock pagetitle %}
+
+{% block content %}
+
+<section class="ui-section col-12 nested-grid">
+    <div class="admonition admonition__info col-6">
+        <p>
+            Scan the QR code using your authenticator
+            application.
+        </p>
+
+        <p>
+            Supported applications include:
+        </p>
+
+        <ul>
+            <li>Google Authenticator</li>
+            <li>Microsoft Authenticator</li>
+            <li>Authy</li>
+            <li>Any RFC 6238 compatible application</li>
+        </ul>
+    </div>
+
+    <div class="col-6">
+        <img src="{{ qrCode }}" alt="TOTP QR Code" width="200" height="200" />
+        <details>
+            <summary>
+                Can't scan the QR code?
+            </summary>
+            <p>Enter this secret manually:</p>
+
+            <code>{{ secret }}</code>
+        </details>
+    </div>
+</section>
+<section class="ui-section col-12">
+    <h2>Confirm setup</h2>
+    <p>Enter the six-digit code shown in your authenticator application.</p>
+
+    <form method="post" action="{{ path('incc_admin_totp_confirm') }}">
+        <p>
+            <label for="code">Authentication code</label>
+            <input
+                type="text"
+                id="code"
+                name="code"
+                class="text"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="6"
+                pattern="[0-9]{6}"
+                required
+            >
+        </p>
+
+        <p>
+            <button type="submit" class="button button--positive">
+                <span class="material-icons">verified_user</span>
+                <span class="btn-text">Enable Two-Factor Authentication</span>
+            </button>
+            <a href="{{ path('incc_admin_totp_cancel') }}" type="submit" class="button button--negative">
+                <span class="btn-txt">Cancel</span>
+            </a>
+        </p>
+        <input
+            type="hidden"
+            name="_token"
+            value="{{ csrf_token('totp_setup') }}"
+        >
+    </form>
+</section>
+
+{% endblock content %}

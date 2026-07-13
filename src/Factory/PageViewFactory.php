@@ -60,6 +60,10 @@ class PageViewFactory
             new \DateInterval('PT' . ini_get('session.gc_maxlifetime') . 'S')
         );
 
+        $view->twoFactorPending = $this->requestStack?->getSession()->get(
+            'security.totp_pending',
+            false
+        ) ?? false;
         $view->session = $this->security->getUser();
         $view->sessionTimeout = (int) ini_get('session.gc_maxlifetime');
         $view->sessionTimeoutTime = $sessionTimeout->format('Y-m-d\TH:i:s');

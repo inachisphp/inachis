@@ -30,6 +30,39 @@
     /* Red */
 }
 
+.role-card {
+    align-items: flex-start;
+    cursor: pointer;
+    display: flex;
+    padding: 1rem 1rem 0 1rem;
+    transition: background-color 0.2s, border-color 0.2s;
+
+    input[type=checkbox]:focus-visible {
+        outline: 2px solid #2563eb;
+        outline-offset: 2px;
+    }
+    &:nth-child(even) {
+		background-color: $bg-panel;
+    }
+    &.is-selected {
+		background-color: $table-selected !important;
+		outline: 2px solid $table-selected;
+    }
+    &:hover {
+        background-color: $color-neutral-100;
+    }
+    .role-card-content {
+        margin-left: 1rem;
+
+        .role-title {
+            font-weight: 600;
+        }
+    }
+    .role-description {
+        font-size: 0.875rem;
+    }
+}
+
 /* Status text inside card */
 .diagnostics-status {
     font-weight: 600;

@@ -9,13 +9,14 @@
   padding: 1em;
 
   .admonition__title {
-    display: block;
+    align-items: center;
+    display: flex;
     font-weight: bold;
     margin-bottom: 1em;
     text-transform: uppercase;
 
     .material-icons {
-      vertical-align: middle;
+      margin-right: 1rem;
     }
   }
 
@@ -28,12 +29,35 @@
   }
 }
 
+.admonition__tip {
+  background-color: #e6f6e6;
+  border-left-color: #009940;
+  .material-icons, strong {
+    color: #009940;
+  }
+}
+
 .admonition__info {
   background-color: $color-brand-050;
   border-left-color: $action-primary;
+  .material-icons, strong {
+    color: $action-primary;
+  }
 }
 
 .admonition__warning {
   background-color: $alert-warning-bg;
   border-left-color: $alert-warning-border;
+  .material-icons, strong {
+    color: $alert-warning-border;
+  }
+}
+
+.admonition__danger {
+  background-color: #FFEBEC;
+  border-left-color: #e13238;
+  .material-icons, strong {
+    color: #e13238;
+  }
+
 }

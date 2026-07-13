@@ -40,7 +40,7 @@
 
 <a href="#main-content" class="skip-link">Skip to content</a>
 
-{%- if is_granted('ROLE_USER') %}
+{%- if is_granted('ROLE_USER') and not viewModel.twoFactorPending %}
 <button class="menu-toggle mobile-menu-toggle" aria-label="Toggle menu">
     <span class="material-icons">menu</span>
 </button>
@@ -48,7 +48,7 @@
 
 <div class="layout">
 
-{%- if is_granted('ROLE_USER') %}
+{%- if is_granted('ROLE_USER') and not viewModel.twoFactorPending %}
     {% include "inadmin/structure/menu.html.twig" %}
     <div class="reading-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div class="reading-progress__bar"></div>

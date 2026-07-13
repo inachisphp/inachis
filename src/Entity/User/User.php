@@ -16,6 +16,8 @@ use Exception;
 use Doctrine\ORM\Mapping as ORM;
 use Inachis\Entity\Security\Role;
 use Inachis\Entity\User\UserPreference;
+use Inachis\Entity\User\UserRecoveryCode;
+use Inachis\Entity\User\UserTotp;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -84,9 +86,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank]
     protected string $displayName = '';
 
-    /** @var array<string> The roles assigned to this user. Currently, not in use. */
-    // protected array $roles = [];
-
     /** @var string|null An image to use for the {@link User} */
     #[ORM\Column(name: 'avatar', type: "string", length: 255, nullable: true)]
     protected ?string $avatar = '';
@@ -126,11 +125,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?UserPreference $preferences = null;
 
-    #[ORM\Column(name: 'totp_secret', type: 'string', length: 255, nullable: true)]
-    private ?string $totpSecret = null;
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: UserTotp::class, cascade: ['persist', 'remove'])]
+    private ?UserTotp $totp = null;
 
-    #[ORM\Column(name: 'totp_enabled', type: 'boolean')]
-    private bool $totpEnabled = false;
+    #[ORM\OneToMany(
+        mappedBy: 'user',
+        targetEntity: UserRecoveryCode::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    private Collection $recoveryCodes;
 
     /**
      * Default constructor for {@link User}. If a password is passed into
@@ -150,6 +154,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->setEmail($email);
         $this->setAvatar(null);
         $this->assignedRoles = new ArrayCollection();
+        $this->recoveryCodes = new ArrayCollection();
     }
 
     #[ORM\PrePersist]
@@ -571,6 +576,84 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * Returns the User's {@link UserTotp}
+     *
+     * @return UserTotp
+     */
+    public function getTotp(): ?UserTotp
+    {
+        return $this->totp;
+    }
+
+    /**
+     * Sets the TOTP for the User
+     *
+     * @param UserTotp|null $totp
+     * @return self
+     */
+    public function setTotp(?UserTotp $totp): self
+    {
+        $this->totp = $totp;
+
+        return $this;
+    }
+
+    /**
+     * Get the recovery codes for the user
+     * 
+     * @return Collection<int, UserRecoveryCode>
+     */
+    public function getRecoveryCodes(): Collection
+    {
+        return $this->recoveryCodes;
+    }
+
+    /**
+     * Add a recovery code
+     *
+     * @param UserRecoveryCode $recoveryCode
+     * @return self
+     */
+    public function addRecoveryCode(UserRecoveryCode $recoveryCode): self
+    {
+        if (!$this->recoveryCodes->contains($recoveryCode)) {
+            $this->recoveryCodes->add($recoveryCode);
+            $recoveryCode->setUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove a recovery code
+     *
+     * @param UserRecoveryCode $recoveryCode
+     * @return self
+     */
+    public function removeRecoveryCode(UserRecoveryCode $recoveryCode): self
+    {
+        if ($this->recoveryCodes->removeElement($recoveryCode)) {
+            // Leave the owning side consistent.
+            if ($recoveryCode->getUser() === $this) {
+                // No setter to null because the relation is non-nullable.
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Checks if TOTP is configured
+     *
+     * @return boolean
+     */
+    public function isTotpEnabled(): bool
+    {
+        return $this->getTotp() !== null &&
+            $this->getTotp()->getEnabledAt() !== null;
+    }
+
+    /**
      * Removes the credentials for the current {@link User} along
      * with personal information other than "displayName".
      */
@@ -598,28 +681,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             '[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/',
             $this->email ?? ''
         );
-    }
-
-    public function getTotpSecret(): ?string
-    {
-        return $this->totpSecret;
-    }
-
-    public function setTotpSecret(?string $totpSecret): self
-    {
-        $this->totpSecret = $totpSecret;
-        return $this;
-    }
-
-    public function isTotpEnabled(): bool
-    {
-        return $this->totpEnabled;
-    }
-
-    public function setTotpEnabled(bool $totpEnabled): self
-    {
-        $this->totpEnabled = $totpEnabled;
-        return $this;
     }
 
     /**
