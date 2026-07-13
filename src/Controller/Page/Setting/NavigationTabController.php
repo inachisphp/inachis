@@ -12,10 +12,11 @@ namespace Inachis\Controller\Page\Setting;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\System\NavigationTab;
 use Inachis\Form\NavigationTabType;
-use Inachis\Model\ContentQueryParameters;
+use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\System\NavigationTabRepository;
 use Inachis\Service\Navigation\NavigationTabService;
 use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Service\Content\ViewStateManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -31,18 +32,18 @@ class NavigationTabController extends AbstractInachisController
      *
      * @param Request $request
      * @param CategoryRepository $categoryRepository
-     * @param ContentQueryParameters $contentQueryParameters
      * @param NavigationTabRepository $navigationTabRepository
      * @param NavigationTabService $navigationTabService
+     * @param ViewStateManager $viewStateManager
      * @return Response
      */
     #[Route('/incc/settings/navigation', name: 'incc_settings_navigation_list')]
     public function index(
         Request $request,
         CategoryRepository $categoryRepository,
-        ContentQueryParameters $contentQueryParameters,
         NavigationTabRepository $navigationTabRepository,
         NavigationTabService $navigationTabService,
+        ViewStateManager $viewStateManager,
     ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
@@ -61,11 +62,14 @@ class NavigationTabController extends AbstractInachisController
             return $this->redirectToRoute('incc_settings_navigation_list');
         }
 
-        $contentQuery = $contentQueryParameters->process(
+        $params = $viewStateManager->build(
             $request,
-            $categoryRepository,
             'navigationTab',
-            'position asc',
+            new ViewStateDefaults(
+                sort: 'position asc',
+                view: 'table',
+            ),
+            $categoryRepository,
         );
 
         $this->viewModel->page->title = 'Navigation Tabs';
@@ -73,11 +77,11 @@ class NavigationTabController extends AbstractInachisController
         return $this->render('inadmin/page/settings/navigation-list.html.twig', [
             'viewModel' => $this->viewModel,
             'dataset' => $navigationTabRepository->getFiltered(
-                $contentQuery['limit'],
-                $contentQuery['offset'],
+                $params->getLimit(),
+                $params->getOffset(),
             ),
             'form' => $form->createView(),
-            'query' => $contentQuery,
+            'query' => $params,
         ]);
     }
 

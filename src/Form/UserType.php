@@ -118,6 +118,11 @@ class UserType extends AbstractType
                     'class' => 'inline_label',
                 ],
                 'required' => false,
+                'choice_attr' => static function (Role $role) {
+                    return [
+                        'class' => 'checkbox',
+                    ];
+                },
             ]);
         }
 
@@ -189,6 +194,38 @@ class UserType extends AbstractType
                         ),
                         'label_html' => true,
                     ]);
+            }
+            if ($currentUser->isTotpEnabled()) {
+                $builder->add('disableTotp', SubmitType::class, [
+                    'attr' => [
+                        'class' => 'button button--negative',
+                    ],
+                    'label' => sprintf(
+                        '<span class="material-icons">%s</span> %s',
+                        'gpp_bad',
+                        'Disable Two-Factor Authentication'
+                    ),
+                    'label_html' => true,
+                ]);
+                $builder->add('regenerateCodes', SubmitType::class, [
+                    'attr' => [
+                        'class' => 'button button--add',
+                    ],
+                    'label' =>  'Generate New Recovery Codes',
+                    'label_html' => true,
+                ]);
+            } else {
+                $builder->add('enableTotp', SubmitType::class, [
+                    'attr' => [
+                        'class' => 'button button--positive',
+                    ],
+                    'label' => sprintf(
+                        '<span class="material-icons">%s</span> %s',
+                        'verified_user',
+                        'Enable Two-Factor Authentication'
+                    ),
+                    'label_html' => true,
+                ]);
             }
         }
     }

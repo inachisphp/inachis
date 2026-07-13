@@ -11,20 +11,14 @@ namespace Inachis\Controller\Page\Admin;
 
 use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\User\User;
 use Inachis\Form\ChangePasswordType;
 use Inachis\Form\ForgotPasswordType;
 use Inachis\Form\LoginType;
 use Inachis\Repository\User\PasswordResetRequestRepository;
-use Inachis\Repository\User\UserPasskeyRepository;
 use Inachis\Repository\User\UserRepository;
-use Inachis\Security\Authentication\PasskeyService;
-use Inachis\Security\Authentication\TotpService;
-use Inachis\Security\Authentication\TwoFactorAuthenticationListener;
 use Inachis\Service\User\PasswordResetTokenService;
 use Inachis\Service\User\UserAccountEmailService;
 use Random\RandomException;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -64,120 +58,6 @@ class AccountController extends AbstractInachisController
             'expired'   => $request->query->has('expired'),
             'error'     => $authenticationUtils->getLastAuthenticationError(),
         ]);
-    }
-
-    /**
-     * TOTP verification page shown after successful password authentication.
-     *
-     * Redirects to the dashboard if TOTP is already verified for this session
-     * or if the user does not have TOTP enabled.
-     *
-     * @param Request     $request
-     * @param TotpService $totpService
-     * @return Response
-     */
-    #[Route("/incc/login/totp", name: "incc_account_login_totp", methods: ["GET", "POST"])]
-    public function totpVerify(Request $request, TotpService $totpService): Response
-    {
-        /** @var User|null $user */
-        $user = $this->security->getUser();
-
-        if (!$user instanceof User || !$user->isTotpEnabled()) {
-            return $this->redirectToRoute('incc_dashboard');
-        }
-
-        $session = $request->getSession();
-
-        if ($session->get(TwoFactorAuthenticationListener::SESSION_TOTP_VERIFIED_KEY) === true) {
-            return $this->redirectToRoute('incc_dashboard');
-        }
-
-        $error = null;
-
-        if ($request->isMethod('POST')) {
-            $code = trim($request->request->getString('totp_code'));
-            if ($totpService->verifyCode((string) $user->getTotpSecret(), $code)) {
-                $session->set(TwoFactorAuthenticationListener::SESSION_TOTP_VERIFIED_KEY, true);
-                return $this->redirectToRoute('incc_dashboard');
-            }
-            $error = 'Invalid code. Please try again.';
-        }
-
-        $this->viewModel->page->title = 'Two-Factor Authentication';
-        return $this->render('inadmin/page/admin/totp_verify.html.twig', [
-            'viewModel' => $this->viewModel,
-            'error'     => $error,
-        ]);
-    }
-
-    /**
-     * Returns a WebAuthn challenge for passkey-based login.
-     *
-     * @param Request        $request
-     * @param PasskeyService $passkeyService
-     * @return JsonResponse
-     */
-    #[Route("/incc/login/passkey/challenge", name: "incc_account_login_passkey_challenge", methods: ["GET"])]
-    public function passkeyChallenge(Request $request, PasskeyService $passkeyService): JsonResponse
-    {
-        $challenge = $passkeyService->generateChallenge();
-        $request->getSession()->set('inachis.passkey.login_challenge', $challenge);
-
-        $rpId    = $request->getHost();
-        $options = $passkeyService->buildRequestOptions(null, $challenge, $rpId);
-
-        return new JsonResponse($options);
-    }
-
-    /**
-     * Verifies a passkey assertion and logs the user in.
-     *
-     * @param Request              $request
-     * @param PasskeyService       $passkeyService
-     * @param UserPasskeyRepository $passkeyRepository
-     * @return JsonResponse
-     */
-    #[Route("/incc/login/passkey/verify", name: "incc_account_login_passkey_verify", methods: ["POST"])]
-    public function passkeyVerify(
-        Request $request,
-        PasskeyService $passkeyService,
-        UserPasskeyRepository $passkeyRepository,
-    ): JsonResponse {
-        $session   = $request->getSession();
-        $challenge = $session->get('inachis.passkey.login_challenge');
-
-        if (empty($challenge)) {
-            return new JsonResponse(['error' => 'No active challenge.'], 400);
-        }
-
-        $body = json_decode($request->getContent(), true);
-        if (!is_array($body)) {
-            return new JsonResponse(['error' => 'Invalid JSON body.'], 400);
-        }
-
-        $credentialId = $body['id'] ?? '';
-        $passkey      = $passkeyRepository->findByCredentialId($credentialId);
-
-        if ($passkey === null) {
-            return new JsonResponse(['error' => 'Passkey not recognised.'], 401);
-        }
-
-        try {
-            $passkeyService->verifyAssertion(
-                $passkey,
-                $challenge,
-                $request->getHost(),
-                $body,
-            );
-        } catch (\RuntimeException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 401);
-        }
-
-        $session->remove('inachis.passkey.login_challenge');
-        // Mark TOTP as satisfied when using a passkey (passkeys provide user verification)
-        $session->set(TwoFactorAuthenticationListener::SESSION_TOTP_VERIFIED_KEY, true);
-
-        return new JsonResponse(['redirect' => $this->generateUrl('incc_dashboard')]);
     }
 
     /**

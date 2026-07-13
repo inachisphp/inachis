@@ -37,5 +37,6 @@ final class PageView
         public string $sessionTimeoutTime = '',
         public int $deletedItems = 0,
         public string $timeoutTemplate = '',
+        public bool $twoFactorPending = false,
     ) {}
 }

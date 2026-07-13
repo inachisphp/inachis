@@ -34,9 +34,14 @@
 
 <fieldset class="ui-section">
     <h3>Directives Config</h3>
-    <div class="admonition admonition__info">
-        <p>Type custom domains and hit <strong>Space</strong> or <strong>Comma</strong> to create a rule tag. Use the quick-toggles for critical keyword settings.</p>
-    </div>
+    {% embed 'inadmin/partials/components/admonition.html.twig' with {
+        type: 'info',
+        show_title: false,
+    } %}
+        {% block text %}
+        Type custom domains and hit <strong>Space</strong> or <strong>Comma</strong> to create a rule tag. Use the quick-toggles for critical keyword settings.
+        {% endblock text %}
+    {% endembed %}
 
     <div id="csp-directives-wrapper">
         {% for directive in standard_directives %}

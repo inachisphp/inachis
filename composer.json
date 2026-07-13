@@ -19,6 +19,7 @@
         "doctrine/doctrine-bundle": "^3.0",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.5",
+        "endroid/qr-code": "^6.1",
         "google/apiclient": "^2.18",
         "jaybizzle/crawler-detect": "^1.2",
         "jfcherng/php-diff": "^7.0",

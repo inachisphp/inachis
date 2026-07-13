@@ -94,4 +94,22 @@ class UserRepository extends AbstractRepository
             $sort
         );
     }
+
+    /**
+     * Returns a count of {@link User}s with Administrator role
+     *
+     * @return int
+     */
+    public function countActiveAdministrators(): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(DISTINCT u.id)')
+            ->join('u.assignedRoles', 'r')
+            ->where('u.isRemoved = false')
+            ->andWhere('u.isActive = true')
+            ->andWhere('LOWER(r.identifier) IN (:roles)')
+            ->setParameter('roles', ['admin', 'administrator'])
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

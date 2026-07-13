@@ -5,7 +5,17 @@
         {
             id: 'profile',
             title: 'Profile',
-            url: path('incc_admin_edit', { 'id': user.username } ),
+            url: path('incc_admin_edit', { 'id': user.username } ) ~ '#user__profile',
+        },
+        {
+            id: 'roles',
+            title: 'Roles',
+            url: path('incc_admin_edit', { 'id': user.username } ) ~ '#user__roles',
+        },
+        {
+            id: 'auth',
+            title: 'Authentication',
+            url: path('incc_admin_edit', { 'id': user.username } ) ~ '#user__auth',
         },
         {
             id: 'change-password',
@@ -14,11 +24,9 @@
             displayCondition: app.user.username == user.username,
         },
         {
-            id: 'login-activity',
+            id: 'audit-logs',
             title: 'Audit Logs',
             url: path('incc_admin_login_activity', { 'id': user.username }),
         }
     ]
 }) }}
-<!-- Two-factor authentication -->
-<!-- Access -->

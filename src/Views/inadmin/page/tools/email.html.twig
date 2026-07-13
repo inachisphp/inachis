@@ -10,7 +10,7 @@
 {% block settings_pre %}{% endblock settings_pre %}
 
 {% block settings %}
-<div class="col-12">
+<div class="col-6">
 
 {% if report.issues %}
 		{% for error in report.issues %}
@@ -27,45 +27,50 @@
 {% endfor %}
 {% endif %}
 
-<section class="admonition admonition__info">
-	<h3 class="admonition__title">Mail Authentication</h3>
-	<p><strong>Domain:</strong> {{ report.domain }}</p>
+{% embed 'inadmin/partials/components/admonition.html.twig' with {
+	type: 'info',
+	title: 'Mail Authentication',
+} %}
+	{% block text %}
+	<p><strong>Domain:</strong> <code>{{ report.domain }}</code></p>
 	<p><strong>MX:</strong>
 	{% if report.mxRecords %}
 		{% for record in report.mxRecords %}
-			{{ record['target'] }} (Priority: {{ record['pri']}}, TTL: {{ record['ttl'] }} seconds)
+			<code>{{ record['target'] }}</code> (Priority: {{ record['pri']}}, TTL: {{ record['ttl'] }} seconds)
 		{% endfor %}
 	{% else %}
-	Not configured
+		<code>Not configured</code>
 	{% endif %}
 	</p>
 	<p><strong>DMARC:</strong>
-		{{ report.dmarcRecords|default(['Not configured'])|join(' | ') }}
+		<code>{{ report.dmarcRecords|default(['Not configured'])|join(' | ') }}</code>
 	</p>
 	<p><strong>SPF:</strong>
-		{{ report.spfRecords|default(['Not configured'])|join(' | ') }}
+		<code>{{ report.spfRecords|default(['Not configured'])|join(' | ') }}</code>
 	</p>
 	<p><strong>DKIM:</strong>
-		{{ report.dkimRecords|default(['Not configured'])|join(' | ') }}
+		<code>{{ report.dkimRecords|default(['Not configured'])|join(' | ') }}</code>
 	</p>
 	<p><strong>BIMI:</strong>
-		{{ report.bimiRecord|default(['Not configured'])|join(' | ') }}
+		<code>{{ report.bimiRecord|default(['Not configured'])|join(' | ') }}</code>
 	</p>
 	<p><strong>TLS-RPT:</strong>
 	{% if report.tlsRptRecords %}
 		{% for record in report.tlsRptRecords %}
-			{{ record['txt'] }} (TTL: {{ record['ttl'] }} seconds)
+			<code>{{ record['txt'] }}</code> (TTL: {{ record['ttl'] }} seconds)
 		{% endfor %}
 	{% else %}
-	Not configured
+		<code>Not configured</code>
 	{% endif %}
 	</p>
 	<p><strong>CAA:</strong>
-		{{ report.caaRecords|default(['Not configured'])|join(' | ') }}
+		<code>{{ report.caaRecords|default(['Not configured'])|join(' | ') }}</code>
 	</p>
-</section>
+	{% endblock text %}
+{% endembed %}
+</div>
 
-<section>
+<section class="col-6 ui-section">
 	<h3>Notes</h3>
 	<p>DMARC and SPF settings are important to ensure the deliverability of emails.</p>
 
@@ -85,7 +90,6 @@
 	<p><code>none</code> tells mailservers to do nothing, so is useful when making sure there are no issues. After a period of time, you can then change this to <code>quarantine</code>, or <code>reject</code>.</p>
 	<p><code>rua</code> is an email address to receive reports to</p>
 </section>
-</div>
 {% endblock settings %}
 
 {% block settings_post %}{% endblock settings_post %}

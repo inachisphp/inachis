@@ -9,8 +9,14 @@
     this.links = this.items.map(li => li.querySelector("a"));
     this.panels = this.links.map(link => {
       const href = link.getAttribute('href');
-      return href && href.startsWith('#')
-        ? document.querySelector(href)
+      if (!href) {
+        return null;
+      }
+
+      const url = new URL(href, window.location.href);
+
+      return url.hash
+        ? document.querySelector(url.hash)
         : null;
     });
     this.init();
@@ -48,6 +54,23 @@
       link.setAttribute("tabindex", "-1");
 
       link.addEventListener("click", e => {
+        const href = link.getAttribute("href");
+
+        if (!href) {
+          return;
+        }
+
+        const targetUrl = new URL(href, window.location.href);
+        const currentUrl = new URL(window.location.href);
+
+        const samePage =
+          targetUrl.pathname === currentUrl.pathname &&
+          targetUrl.search === currentUrl.search;
+
+        if (!samePage) {
+          return;
+        }
+
         e.preventDefault();
 
         const liEl = this.items[i];
@@ -99,6 +122,19 @@
       panel.setAttribute("aria-labelledby", tabId);
       panel.hidden = true;
     });
+
+    const hash = window.location.hash;
+
+    if (hash) {
+      const index = this.links.findIndex(link => {
+        const url = new URL(link.href, window.location.href);
+        return url.hash === hash;
+      });
+
+      if (index !== -1) {
+        this.activeIndex = index;
+      }
+    }
     this.activate(this.activeIndex, false);
   };
 

@@ -13,9 +13,11 @@
 {{ form_start(form, {'attr': { 'class': 'form form__post form__tabs' }}) }}
 
     <section class="ui-section">
-        <div class="admonition admonition__info">
-            <h2>About llms.txt</h2>
-
+        {% embed 'inadmin/partials/components/admonition.html.twig' with {
+            type: 'info',
+            title: 'About llms.txt',
+        } %}
+            {% block text %}
             <p>
                 <code>llms.txt</code> is a machine-readable document intended to help
                 AI assistants and large language models understand your website and
@@ -27,7 +29,9 @@
                 If this document is left empty, We will generate a basic
                 <code>llms.txt</code> automatically using your site's metadata.
             </p>
-        </div>
+            {% endblock text %}
+        {% endembed %}
+
         <p>
             {{ form_label(form.llms_txt) }}
             {{ form_errors(form.llms_txt) }}

@@ -1,7 +1,7 @@
 {% if series.id is not empty %}
     {% if series.firstDate is not empty and series.lastDate is not empty %}
         {% set counts = series.itemVisibilityCounts %}
-        {{ include('inadmin/partials/admonition.html.twig', {
+        {{ include('inadmin/partials/components/admonition.html.twig', {
             show_title: false,
             'type': 'info',
             'text': series.firstDate|formatLocalTime('jS F Y') ~
