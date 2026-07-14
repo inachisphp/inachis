@@ -44,7 +44,6 @@
     </div>
     {% endif %}
 
-    {% if filters|default(null) is not empty or sort_options|default(null) is not empty or view_modes|default(null) is not empty %}
     <div class="row secondary-controls">
         {% if filters|default(null) is not empty %}
         <button type="button" class="filter__toggle icon-badge-wrapper" id="toggle-filters" aria-expanded="{{ hasAppliedFilters ? 'true' : 'false' }}" aria-controls="filter__options">
@@ -80,7 +79,6 @@
         </div>
         {% endif %}
     </div>
-    {% endif %}
 </div>
 
 {% if filters|default(null) is not empty %}
