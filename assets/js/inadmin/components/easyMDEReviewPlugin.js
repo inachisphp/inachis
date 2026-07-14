@@ -6,6 +6,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
         this.pageId = options.pageId;
         this.endpoint = options.endpoint;
 		this.sidebarContainer = options.sidebarContainer || '#review-sidebar-container';
+		this.sidebarView = 'list';
 
 		this.activeThreadId = null;
 		this.statusButton = null;
@@ -120,11 +121,12 @@ window.Inachis.EasyMDEReviewPlugin = class {
 		sidebar.className = 'review-sidebar';
 		sidebar.innerHTML = `
 			<div class="review-sidebar-header">
-				Reviews
+				<!-- span>Reviews</span -->
+				<a href="#" class="review-toggle-resolved">
+            		Show resolved</a>
 			</div>
-
 			<div class="review-sidebar-body">
-				No review selected
+
 			</div>
 		`;
 
@@ -139,6 +141,19 @@ window.Inachis.EasyMDEReviewPlugin = class {
 		}
 
 		this.sidebar = sidebar;
+
+		const toggle = sidebar.querySelector(
+			'.review-toggle-resolved'
+		);
+
+		toggle.onclick = event => {
+			event.preventDefault();
+			this.showResolved = !this.showResolved;
+			toggle.textContent = this.showResolved
+				? 'Hide resolved'
+				: 'Show resolved';
+			this.showThreadList();
+		};
 	}
 
     createStatusBarButton() {
@@ -212,21 +227,8 @@ window.Inachis.EasyMDEReviewPlugin = class {
 		const body = this.sidebar.querySelector(
 			'.review-sidebar-body'
 		);
-
+    	this.activeThreadId = null;
 		body.innerHTML = '';
-		const toggle = document.createElement('a');
-		toggle.href = '#';
-		toggle.className = 'review-toggle-resolved';
-		toggle.textContent = this.showResolved
-				? 'Hide resolved reviews'
-				: 'Show resolved reviews';
-		toggle.onclick = event => {
-			event.preventDefault();
-			this.showResolved = !this.showResolved;
-			this.showThreadList();
-		};
-		console.log(toggle);
-		body.appendChild(toggle);
 
 		const visibleThreads = this.threads.filter(thread => {
 			if (!this.showResolved) {
@@ -485,6 +487,15 @@ window.Inachis.EasyMDEReviewPlugin = class {
 				body.appendChild(item);
 			});
 		}
+
+		const header = document.createElement('div');
+		header.className = 'review-thread-header';
+		header.innerHTML = `
+			<a href="#"
+			class="review-back-link">
+			← All Reviews
+			</a>
+		`;
 
 		if (!thread.resolved) {
 			body.appendChild(this.createReplyForm(thread));

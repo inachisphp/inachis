@@ -15,17 +15,17 @@
             <th scope="col"></th>
         {% endif %}
         {% if actions|default(null) is not empty %}
-            <th scope="col">
+            <th class="col-select" scope="col">
                 <label for="select-all" class="visually-hidden">Select all rows</label>
                 <input aria-label="Select all rows" class="selectAllNone" id="select-all" name="selectAllNone" type="checkbox"  />
             </th>
         {% endif %}
         {% for column in columns %}
             <th class="
-            {% if column.hideOnMobile|default(false) %}hide-on-mobile{% endif %}
-            {% if column.badges|default([]) %}badgecol{% endif %}
-            {% if column.source_type|default('') in [ 'numeric', 'count'] %}col-count{% endif %}
-            {% if column.source_type|default('') in [ 'boolean', 'date'] %}col-date{% endif %}
+            {%- if column.hideOnMobile|default(false) %}hide-on-mobile {% endif %}
+            {%- if column.badges|default([]) %}badgecol {% endif %}
+            {%- if column.source_type|default('') in [ 'numeric', 'count'] %}col-count {% endif %}
+            {%- if column.source_type|default('') in [ 'boolean', 'date'] %}col-date {% endif -%}
             " scope="col">
                 {{ column.title }}
             </th>
@@ -43,7 +43,7 @@
             <td class="handle">☰</td>
         {% endif %}
         {% if actions|default(null) is not empty %}
-            <td>
+            <td class="col-select">
                 <input class="checkbox" id="{{ type }}-{{ item.id }}__input" type="checkbox" name="items[]" value="{{ item.id }}" />
             </td>
         {% endif %}
@@ -72,13 +72,13 @@
                     {% set slug_object = '' %}
                 {% endif %}
             {% endif %}
-            <{% if column.header is defined and column.header %}th scope="row"{% else %}td class="
-                {% if column.flex|default(false) %}table--flex{% endif %}
-                {% if column.source_type|default('') in [ 'numeric', 'count'] %}col-count{% endif %}
-                {% if column.source_type|default('') in [ 'boolean', 'date' ] %}col-date{% endif %}
-                {% if column.badges|default([]) %}badgecol{% endif %}
-                {% if column.hideOnMobile|default(false) %}hide-on-mobile{% endif %}
-                {% if column.className is defined %}{{ column.className == 'use_self' ? attribute(item, column.source) : column.className }}{% endif %}
+            <{% if column.header is defined and column.header %}th scope="row"{% else %}td class="{%
+                if column.flex|default(false) %}table--flex {% endif %}
+                {%- if column.source_type|default('') in [ 'numeric', 'count'] %}col-count {% endif %}
+                {%- if column.source_type|default('') in [ 'boolean', 'date' ] %}col-date {% endif %}
+                {%- if column.badges|default([]) %}badgecol {% endif %}
+                {%- if column.hideOnMobile|default(false) %}hide-on-mobile {% endif %}
+                {%- if column.className is defined %}{{ column.className == 'use_self' ? attribute(item, column.source) : column.className }}{% endif -%}
             "{% endif %}>
                 {% if column.slug is defined %}
                     {% if column.slug_prefix is defined %}
