@@ -64,7 +64,7 @@ class ReviewPageService
             ->setCreated(new DateTimeImmutable())
             ->setUpdated(new DateTimeImmutable());
 
-        $comment = new ReviewComment();
+        $comment = new ReviewComment($thread, $author, $message);
 
         $comment
             ->setThread($thread)

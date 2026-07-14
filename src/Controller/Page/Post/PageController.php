@@ -206,6 +206,8 @@ class PageController extends AbstractInachisController
         }
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
+        $threads = $reviewThreadRepository->findOpenForPage($post);
+
         if($form->isSubmitted() && !$form->isValid()) {
             foreach ($form->getErrors(true) as $error) {
                 dump($error->getOrigin()->getName(), $error->getMessage());
@@ -213,6 +215,7 @@ class PageController extends AbstractInachisController
         }
         if ($form->isSubmitted() && $form->isValid()) {
             $delete = $form->has('delete') ? $form->get('delete') : null;
+            $review = $form->has('review') ? $form->get('review') : null;
             $publish = $form->has('publish') ? $form->get('publish') : null;
 
             // Handle delete action
@@ -239,6 +242,11 @@ class PageController extends AbstractInachisController
             $tagManager->apply($post, is_string($data['tags']) ? $data['tags'] : '');
 
             // Publish the {@link Page}
+            if ($review instanceof ClickableInterface && $review->isClicked()) {
+                $post->setStatus(EditorialStatus::REVIEW);
+            }
+
+            // Publish the {@link Page}
             if ($publish instanceof ClickableInterface && $publish->isClicked()) {
                 $post->setStatus(EditorialStatus::PUBLISHED);
             }
@@ -257,8 +265,6 @@ class PageController extends AbstractInachisController
                 $this->entityManager->persist($revision);
             }
             $this->entityManager->persist($post);
-
-            $threads = $reviewThreadRepository->findOpenForPage($post);
             foreach ($threads as $thread) {
                 $reviewRebaseService->rebase($thread, $post->getContent() ?: '');
             }
