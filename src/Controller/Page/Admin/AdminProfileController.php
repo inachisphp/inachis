@@ -13,12 +13,12 @@ use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\User\{User,UserPreference};
 use Inachis\Exception\User\CannotRemoveLastAdministratorException;
 use Inachis\Form\UserType;
-use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\User\UserRepository;
 use Inachis\Security\Authentication\RecoveryCodeManager;
 use Inachis\Security\Authentication\TotpManager;
+use Inachis\Security\Authentication\TrustedDeviceManager;
 use Inachis\Service\Content\ViewStateManager;
 use Inachis\Service\User\UserBulkActionService;
 use Inachis\Service\User\UserAccountEmailService;
@@ -116,12 +116,18 @@ class AdminProfileController extends AbstractInachisController
      * @throws RandomException
      * @throws TransportExceptionInterface
      */
-    #[Route("/incc/admin/{id}", name: "incc_admin_edit", methods: [ "GET", "POST" ], priority: -100)]
+    #[Route(
+        "/incc/admin/{id}",
+        name: "incc_admin_edit",
+        methods: [ "GET", "POST" ],
+        priority: -100
+    )]
     public function edit(
         Request $request,
         ImageTransformer $imageTransformer,
         RecoveryCodeManager $recoveryCodeManager,
         TotpManager $totpManager,
+        TrustedDeviceManager $trustedDeviceManager,
         UserAccountEmailService $userAccountEmailService,
         UserProtectionService $userProtectionService,
         UserRepository $userRepository,
@@ -205,6 +211,7 @@ class AdminProfileController extends AbstractInachisController
                 if ($disableTotp instanceof \Symfony\Component\Form\ClickableInterface && $disableTotp->isClicked()) {
                     // todo: change this to disable not remove?
                     $totpManager->disable($user);
+                    $trustedDeviceManager->removeAll($user);
                     $this->addFlash('success', 'Two-Factor Authentication has been disabled');
 
                     return $this->redirectToRoute('incc_admin_edit', [
@@ -260,6 +267,11 @@ class AdminProfileController extends AbstractInachisController
             'remainingRecoveryCodes' => $recoveryCodeManager->getRemainingCount(
                 $this->getCurrentUser()
             ),
+            'currentTrustedDevice' => $trustedDeviceManager->getCurrentTrustedDevice(
+                $user,
+                $request
+            ),
+            'trustedDevices' => $trustedDeviceManager->getTrustedDevices($user),
             'user' => $user,
         ]);
     }

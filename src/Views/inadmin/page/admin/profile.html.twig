@@ -15,6 +15,17 @@
 {% endif %}
 <fieldset class="ui-section" id="user__profile">
     <legend>Personal Information</legend>
+    {% if user.id is not empty and app.user.id != user.id and user.isTotpEnabled %}
+        {% embed 'inadmin/partials/components/admonition.html.twig' with {
+            type: 'tip',
+            title: 'Two-Factor Authentication is enabled',
+            icon: 'verified_user',
+        } %}
+            {% block text %}
+            <p>Enabled on <strong>{{ user.totp.enabledAt|date('l jS F Y \\a\\t H:i', viewModel.session.preferences.timezone) }}</strong></p>
+            {% endblock text %}
+        {% endembed %}
+    {% endif %}
     {% if user.id is not defined or user.id is empty %}
     <p>
         {{ form_label(form.username) }}
@@ -78,7 +89,7 @@
 </fieldset>
 {% endif %}
 
-{% if true %}
+{% if user.id is not empty and app.user.id == user.id %}
 <fieldset class="ui-section" id="user__auth">
 <div class="nested-grid">
     <div class="col-6">
@@ -92,29 +103,72 @@
             </p>
         {% else %}
             {% embed 'inadmin/partials/components/admonition.html.twig' with {
-                type: 'tip',
+                type: remainingRecoveryCodes >= 4
+                    ? 'tip'
+                    : (remainingRecoveryCodes >= 1 ? 'warning' : 'danger'),
                 title: 'Two-Factor Authentication is enabled',
                 icon: 'verified_user',
             } %}
                 {% block text %}
                 <p>Enabled on <strong>{{ user.totp.enabledAt|date('l jS F Y \\a\\t H:i', viewModel.session.preferences.timezone) }}</strong></p>
+                <p>Recovery codes remaining: <strong>{{ remainingRecoveryCodes }}</strong></p>
+                <p>Recovery codes can be used once if you lose access to your authenticator.</p>
                 {% endblock text %}
             {% endembed %}
-            <p>{{ form_widget(form.disableTotp) }}</p>
-            {% embed 'inadmin/partials/components/admonition.html.twig' with {
-                type: remainingRecoveryCodes >= 4
-                    ? 'tip'
-                    : (remainingRecoveryCodes >= 1 ? 'warning' : 'danger'),
-                title: 'Recovery Codes',
-                show_icon: false,
-            } %}
-                {% block text %}
-            <p>Remaining: <strong>{{ remainingRecoveryCodes }}</strong></p>
-            <p>Recovery codes can be used once if you lose access to your authenticator.</p>
-            <p>{{ form_widget(form.regenerateCodes) }}</p>
-                {% endblock text %}
-            {% endembed %}
+            <p>{{ form_widget(form.regenerateCodes) }} {{ form_widget(form.disableTotp) }}</p>
         {% endif %}
+        {% if trustedDevices|default([]) is not empty %}
+            {% include 'inadmin/partials/components/view_table.html.twig' with {
+                className: 'form__roles',
+                type: 'userTrustedDevice',
+
+                table_name: 'Trusted Devices',
+                table_class: 'table-responsive table--row-borders table--darkhead',
+                table_desc: 'This table lists the devices trusted by the current user.',
+                columns: [
+                    {
+                        title: 'Device',
+                        slug: 'id',
+                        source: 'displayName',
+                        header: true,
+                    },
+                    {
+                        title: 'Trusted Until',
+                        source: 'expiresAt',
+                        source_type: 'date',
+                    },
+                    {
+                        title: 'Last Used',
+                        source: 'lastUsedAt',
+                        source_type: 'date',
+                    },
+                    {
+                        title: '',
+                        badges: {
+                            'Current Device': {
+                                'field': 'id',
+                                'condition': currentTrustedDevice.id,
+                                'className': 'badge__hotlink'
+                            }
+                        }
+                    },
+                ],
+                dataset: trustedDevices,
+
+                slug_prefix: 'admin/trusted_devices',
+
+                show_search: false,
+                show_select_deselect: false,
+                zebra: true,
+            } %}
+        {% endif %}
+        <p>
+            <button class="button button--add">
+                <span class="material-icons">phonelink_erase</span>
+                <span class="btn-text">Remove all trusted devices</span>
+            </button>
+        </p>
+        <p>&nbsp;</p>
     </div>
     <div class="col-6">
         {% embed 'inadmin/partials/components/admonition.html.twig' with {
@@ -132,7 +186,7 @@
 <div class="fixed-bottom-bar">
     <p>
         {{ form_widget(form.submit) }}
-        {% if user.id is not empty and app.user.username != user.username %}
+        {% if user.id is not empty and app.user.id != user.id %}
             {{ form_widget(form.enableDisable) }}
             {{ form_widget(form.delete) }}
         {% endif %}

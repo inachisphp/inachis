@@ -16,12 +16,13 @@
             id: 'auth',
             title: 'Authentication',
             url: path('incc_admin_edit', { 'id': user.username } ) ~ '#user__auth',
+            displayCondition: app.user.id == user.id,
         },
         {
             id: 'change-password',
             title: 'Change Password',
             url: path('incc_admin_change_password', { 'id': user.username }),
-            displayCondition: app.user.username == user.username,
+            displayCondition: app.user.id == user.id,
         },
         {
             id: 'audit-logs',

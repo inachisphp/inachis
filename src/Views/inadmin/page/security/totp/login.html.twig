@@ -7,6 +7,10 @@
     Enter the six-digit code from your authenticator application.
 </p>
 {{ form_row(form.code) }}
+<div>
+    {{ form_widget(form.trustDevice) }}
+    {{ form_label(form.trustDevice) }}
+</div>
 {{ form_row(form.verify) }}
 
 <p class="recovery-action-row">

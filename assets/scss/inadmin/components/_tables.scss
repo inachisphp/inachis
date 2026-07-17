@@ -101,8 +101,17 @@ table {
       text-wrap: wrap;
   }
 
+  .col-datetime {
+      width: 22ch;
+      white-space: nowrap;
+      text-wrap: wrap;
+  }
+
   // Body
   tbody {
+    th {
+      text-align: left;
+    }
     tr {
       transition: background 0.15s ease;
 

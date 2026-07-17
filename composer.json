@@ -24,6 +24,7 @@
         "jaybizzle/crawler-detect": "^1.2",
         "jfcherng/php-diff": "^7.0",
         "league/commonmark": "^2.8",
+        "matomo/device-detector": "^6.5",
         "phpdocumentor/reflection-docblock": "^6.0",
         "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.0",

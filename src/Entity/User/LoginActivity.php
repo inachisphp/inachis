@@ -12,6 +12,7 @@ namespace Inachis\Entity\User;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Inachis\Entity\User\User;
+use Inachis\Enum\Security\LoginResultType;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -36,10 +37,10 @@ class LoginActivity
     private ?User $user = null;
 
     /**
-     * @var string The result of the login (success|failure)
+     * @var LoginResultType The result of the login (success|failure)
      */
-    #[ORM\Column(type: 'string', length: 255)]
-    private string $type;
+    #[ORM\Column(type: 'string', length: 255, enumType: LoginResultType::class)]
+    private LoginResultType $type;
 
     /**
      * @var DateTimeImmutable|null The date and time of the attempt
@@ -83,7 +84,7 @@ class LoginActivity
      * record login attempts.
      *
      * @param User|null $user
-     * @param string $type
+     * @param LoginResultType $type
      * @param string|null $ip
      * @param string|null $userAgent
      * @param string|null $sessionId
@@ -92,7 +93,7 @@ class LoginActivity
      */
     public function __construct(
         ?User $user,
-        string $type,
+        LoginResultType $type,
         ?string $ip = null,
         ?string $userAgent = null,
         ?string $sessionId = null,
@@ -126,9 +127,9 @@ class LoginActivity
     }
 
     /**
-     * @return string
+     * @return LoginResultType
      */
-    public function getType(): string
+    public function getType(): LoginResultType
     {
         return $this->type;
     }
@@ -202,10 +203,10 @@ class LoginActivity
     }
 
     /**
-     * @param string $type
+     * @param LoginResultType $type
      * @return self
      */
-    public function setType(string $type): self
+    public function setType(LoginResultType $type): self
     {
         $this->type = $type;
         return $this;

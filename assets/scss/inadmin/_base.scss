@@ -55,6 +55,9 @@ body .visually-hidden {
   text-align: center;
 }
 
+.small { font-size: 0.85rem; }
+.text-muted { color: $text-muted; }
+
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;

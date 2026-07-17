@@ -10,8 +10,11 @@
 namespace Inachis\Controller\Page\Admin;
 
 use Inachis\Controller\AbstractInachisController;
+use Inachis\Model\Page\ViewStateDefaults;
+use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\User\LoginActivityRepository;
 use Inachis\Repository\User\UserRepository;
+use Inachis\Service\Content\ViewStateManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -29,21 +32,36 @@ class LoginActivityController extends AbstractInachisController
      * @return Response
      */
     #[Route('/incc/admin/login-activity', name: 'incc_admin_login_activity_index')]
-    public function index(LoginActivityRepository $repository, Request $request): Response
-    {
+    public function index(
+        CategoryRepository $categoryRepository,
+        LoginActivityRepository $repository,
+        Request $request,
+        ViewStateManager $viewStateManager,
+    ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
+
+        $params = $viewStateManager->build(
+            $request,
+            'admin',
+            new ViewStateDefaults(
+                sort: 'loggedAt desc',
+                view: 'table',
+            ),
+            $categoryRepository,
+        );
 
         $this->viewModel->page->title = 'Login Activity';
         $this->viewModel->page->tab = 'audit-logs';
         return $this->render('inadmin/page/admin/login-activity.html.twig', [
             'viewModel' => $this->viewModel,
+            'activities' => $repository->getFiltered($params),
             'form' => $form->createView(),
-            'activities' => $repository->findRecent(100),
             'errors' => [
                 // 'failedLogins' => $repository->recentFailures(),
                 // 'newDevices' => $repository->newDeviceLogins(),
             ],
+            'query' => $params,
         ]);
     }
 

@@ -18,68 +18,72 @@
         {% include 'inadmin/partials/tab-sets/users.html.twig' %}
     {% endif %}
 
-{# {% include 'inadmin/partials/components/view_content.html.twig' with {
-    type: 'loginActivity',
-    dataset: activities,
-    columns: [
-        {
-            title: 'Time'
-        },
-        {
-            title: 'User'
-        },
-        {
-            title: 'Type'
-        },
-        {
-            title: 'IP'
-        },
-        {
-            title: 'User-agent'
-        },
-    ],
-} %} #}
+    {% if user|default(null) %}
+        {% set path = 'incc_admin_login_activity_view' %}
+        {% set path_params = { username: 'user.username', id: 'item.id', } %}
+        {% set show_search = false %}
+    {% else %}
+        {% set path = 'incc_admin_all_login_activity_view' %}
+        {% set path_params = { id: 'item.id', } %}
+        {% set show_search = true %}
+    {% endif %}
 
+    {% include 'inadmin/partials/components/view_content.html.twig' with {
+        type: 'LoginActivity',
 
-<form name="post" method="post" class="form form__post">
-<table class="table table--striped">
-    <thead>
-        <tr>
-            <th>Time</th>
-            <th>User</th>
-            <th>Type</th>
-            <th>IP</th>
-            <th>User Agent</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for activity in activities %}
-        {% if user|default(null) %}
-            {% set url = path('incc_admin_login_activity_view', { username: user.username, id: activity.id}) %}
-        {% else %}
-            {% set url = path('incc_admin_all_login_activity_view', { id: activity.id}) %}
-        {% endif %}
-        <tr class="{{ activity.type == 'failure' ? 'table-danger' : '' }}">
-            <td>{{ activity.loggedAt|date('Y-m-d H:i:s', viewModel.session.preferences.timezone) }}</td>
-            <td>
-                {{ activity.user ? activity.user.userIdentifier : activity.username }}
-            </td>
-            <td>
-                {% if activity.type == 'success' %}
-                    <span class="badge badge__ok">Success</span>
-                {% else %}
-                    <span class="badge badge__issue">Failure</span>
-                {% endif %}
-            </td>
-            <td>{{ activity.ipAddress }}</td>
-            <td class="text-muted small">{{ activity.userAgent|slice(0, 80) }}</td>
-            <td><a href="{{ url }}">view</a></td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
-</form>
+        table_name: 'Login Activity',
+        table_class: 'table-responsive table--row-borders table--darkhead',
+        table_desc: 'This table shows user login activity.',
 
+        dataset: activities,
+        columns: [
+            {
+                title: 'Time',
+                source: 'loggedAt',
+                source_type: 'datetime',
+                dateFormat: 'd/m/Y H:i:s',
+                path: path,
+                path_params: path_params,
+            },
+            {
+                title: 'User',
+                source: 'username',
+            },
+            {
+                title: 'Type',
+                badges: [
+                    {
+                        label: 'type.label',
+                        varClassName: 'type.className',
+                    }
+                ],
+            },
+            {
+                title: 'IP',
+                source: 'ipAddress',
+            },
+            {
+                title: 'User-agent',
+                source: 'userAgent',
+                className: 'text-muted small',
+                maxLength: 70,
+            },
+        ],
+        filter_values: query.filters|default([]),
+        rowHighlighting: [
+            {
+                className: 'table-danger',
+                field: 'type.value',
+                equals: 'failure'
+            }
+        ],
+        slug_prefix: 'admin/trusted_devices',
+
+        show_pagination: false,
+        show_search: show_search,
+        show_select_deselect: false,
+        view_setting: 'table',
+        zebra: true,
+    } %}
 </div>
 {% endblock content %}

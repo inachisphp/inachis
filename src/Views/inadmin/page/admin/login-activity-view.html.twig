@@ -17,7 +17,7 @@
     <section class="ui-section">
         <p><strong>Time:</strong> {{ activity.loggedAt|date('Y-m-d H:i:s', viewModel.session.preferences.timezone) }}</p>
         <p><strong>User:</strong> {{ (activity.user ? activity.user.userIdentifier : activity.username)|default('Unknown') }}</p>
-        <p><strong>Type:</strong> {{ activity.type }}</p>
+        <p><strong>Type:</strong> {{ activity.type.value }}</p>
         <p><strong>IP Address:</strong> {{ activity.ipAddress }}</p>
         <p><strong>User Agent:</strong> {{ activity.userAgent }}</p>
         <p><strong>Extra Data:</strong></p>

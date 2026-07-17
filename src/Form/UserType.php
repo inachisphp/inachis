@@ -50,7 +50,14 @@ class UserType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $newUser = !isset($options['data']) || !($options['data'] instanceof User) || $options['data']->getId() === null;
+        $newUser = !isset($options['data']) 
+            || !($options['data'] instanceof User) 
+            || $options['data']->getId() === null;
+        $currentUser = $this->security->getUser();
+        if (!$currentUser instanceof User) {
+            throw new \LogicException();
+        }
+        $isCurrentUser = $currentUser->getId() === $options['data']->getId();
         $builder
             ->add('username', $newUser ? TextType::class : HiddenType::class, [
                 'attr' => [
@@ -105,7 +112,10 @@ class UserType extends AbstractType
                 'property_path' => 'preferences.timezone',
             ]);
 
-        if ($this->security->isGranted('ROLE_ADMIN') || $this->security->isGranted('ROLE_EDIT')) {
+        if (
+            $this->security->isGranted('ROLE_ADMIN') 
+            || $this->security->isGranted('ROLE_EDIT')
+        ) {
             $builder->add('assignedRoles', EntityType::class, [
                 'class' => Role::class,
                 'choice_label' => 'name',
@@ -141,27 +151,7 @@ class UserType extends AbstractType
             ])
         ;
         if (!$newUser) {
-            $builder->add('color', ChoiceType::class, [
-                'attr' => [
-                    'aria-labelledby' => 'user__color__label',
-                ],
-                'choices' => array_combine(ProfileColorPalette::getAll(), ProfileColorPalette::getAll()),
-                'choice_attr' => function ($choice, $key, $value) {
-                    return ['data-color' => $value];
-                },
-                'expanded' => true,
-                'label' => 'Color',
-                'label_attr' => [
-                    'id' => 'user__color__label'
-                ],
-                'multiple' => false,
-                'property_path' => 'preferences.color',
-            ]);
-            $currentUser = $this->security->getUser();
-            if (!$currentUser instanceof User) {
-                throw new \LogicException();
-            }
-            if ($options['data']->getId() !== $currentUser->getId()) {
+            if (!$isCurrentUser) {
                 $builder
                     ->add('delete', SubmitType::class, [
                         'attr' => [
@@ -195,37 +185,59 @@ class UserType extends AbstractType
                         'label_html' => true,
                     ]);
             }
-            if ($currentUser->isTotpEnabled()) {
-                $builder->add('disableTotp', SubmitType::class, [
+            else {
+                $builder->add('color', ChoiceType::class, [
                     'attr' => [
-                        'class' => 'button button--negative',
+                        'aria-labelledby' => 'user__color__label',
                     ],
-                    'label' => sprintf(
-                        '<span class="material-icons">%s</span> %s',
-                        'gpp_bad',
-                        'Disable Two-Factor Authentication'
-                    ),
-                    'label_html' => true,
-                ]);
-                $builder->add('regenerateCodes', SubmitType::class, [
-                    'attr' => [
-                        'class' => 'button button--add',
+                    'choices' => array_combine(ProfileColorPalette::getAll(), ProfileColorPalette::getAll()),
+                    'choice_attr' => function ($choice, $key, $value) {
+                        return ['data-color' => $value];
+                    },
+                    'expanded' => true,
+                    'label' => 'Color',
+                    'label_attr' => [
+                        'id' => 'user__color__label'
                     ],
-                    'label' =>  'Generate New Recovery Codes',
-                    'label_html' => true,
+                    'multiple' => false,
+                    'property_path' => 'preferences.color',
                 ]);
-            } else {
-                $builder->add('enableTotp', SubmitType::class, [
-                    'attr' => [
-                        'class' => 'button button--positive',
-                    ],
-                    'label' => sprintf(
-                        '<span class="material-icons">%s</span> %s',
-                        'verified_user',
-                        'Enable Two-Factor Authentication'
-                    ),
-                    'label_html' => true,
-                ]);
+                if ($currentUser->isTotpEnabled()) {
+                    $builder->add('disableTotp', SubmitType::class, [
+                        'attr' => [
+                            'class' => 'button button--negative',
+                        ],
+                        'label' => sprintf(
+                            '<span class="material-icons">%s</span> %s',
+                            'gpp_bad',
+                            'Disable Two-Factor Authentication'
+                        ),
+                        'label_html' => true,
+                    ]);
+                    $builder->add('regenerateCodes', SubmitType::class, [
+                        'attr' => [
+                            'class' => 'button button--add',
+                        ],
+                        'label' => sprintf(
+                            '<span class="material-icons">%s</span> %s',
+                            'loop',
+                            'Generate New Recovery Codes'
+                        ),
+                        'label_html' => true,
+                    ]);
+                } else {
+                    $builder->add('enableTotp', SubmitType::class, [
+                        'attr' => [
+                            'class' => 'button button--positive',
+                        ],
+                        'label' => sprintf(
+                            '<span class="material-icons">%s</span> %s',
+                            'verified_user',
+                            'Enable Two-Factor Authentication'
+                        ),
+                        'label_html' => true,
+                    ]);
+                }
             }
         }
     }
