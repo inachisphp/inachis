@@ -32,7 +32,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
                 this.loadReviewers(),
                 this.loadThreads()
             ]);
-            
+
 			this.updateStatusButton();
             this.showThreadList();
         } catch (error) {
@@ -48,7 +48,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
                 body: JSON.stringify({ userId })
             });
             if (!response.ok) throw new Error('Assignment failed');
-            
+
             await this.loadThreads();
             const updated = this.findThreadById(threadId);
             if (updated) this.openThread(updated);
@@ -109,7 +109,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
         this.reviewers.forEach(user => {
             const isSelected = thread.assignedTo && String(thread.assignedTo.id) === String(user.id);
             select.appendChild(
-                this.ui('option', { 
+                this.ui('option', {
                     value: user.id,
                     ...(isSelected ? { selected: 'selected' } : {})
                 }, user.name)
@@ -147,8 +147,14 @@ window.Inachis.EasyMDEReviewPlugin = class {
     createReplyForm(thread) {
         const textarea = this.ui('textarea', {
             className: 'review-reply-text',
-            placeholder: 'Reply to this review...',
-            rows: '4'
+            placeholder: 'Reply…',
+            rows: '1'
+        });
+
+        // Auto-expand on input
+        textarea.addEventListener('input', () => {
+            textarea.style.height = 'auto';
+            textarea.style.height = `${textarea.scrollHeight}px`;
         });
 
         const btn = this.ui('button', {
@@ -159,6 +165,10 @@ window.Inachis.EasyMDEReviewPlugin = class {
                 if (!message) return;
                 btn.disabled = true;
                 await this.replyToThread(thread.id, message);
+
+                // Reset size after sending
+                textarea.value = '';
+                textarea.style.height = 'auto';
             }
         }, 'Reply');
 
@@ -166,61 +176,97 @@ window.Inachis.EasyMDEReviewPlugin = class {
     }
 
     createResolveButton(thread) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'button button--positive review-resolve-button';
-        button.textContent = 'Resolve';
-        button.onclick = () => {
-            this.showResolveConfirmation(thread);
-        };
-        return button;
+        return this.ui(
+            'button',
+            {
+                type: 'button',
+                className: 'button button--positive review-resolve-button',
+                onclick: () => this.showResolveConfirmation(thread),
+            },
+            this.ui(
+                'span',
+                { className: 'material-icons' },
+                'check'
+            ),
+            'Resolve'
+        );
     }
 
 	createSidebar() {
-		const sidebar = document.createElement('div');
-		sidebar.className = 'review-sidebar';
-		sidebar.innerHTML = `
-			<div class="review-sidebar-header">
-				<span>
-					<span class="material-icons">reviews</span> 
-					Reviews
-				</span>
-				<span>
-					<a href="#" class="material-icons review-toggle-resolved">filter_list</a>
-					<a href="#" id="review-sidebar-close" class="material-icons">close</a>
-				</span>
-			</div>
-			<div class="review-sidebar-body">
-			</div>
-		`;
+        const toggle = this.ui(
+            'a',
+            {
+                href: '#',
+                className: 'material-icons review-toggle-resolved',
+                onclick: event => {
+                    event.preventDefault();
+                    this.showResolved = !this.showResolved;
+                    toggle.textContent = this.showResolved
+                        ? 'filter_list_off'
+                        : 'filter_list';
 
-		const container = document.querySelector(this.sidebarContainer);
-		if (container) {
-			container.appendChild(sidebar);
-		} else {
-			document.body.appendChild(sidebar);
-		}
+                    this.showThreadList();
+                },
+            },
+            'filter_list'
+        );
 
-		this.sidebar = sidebar;
+        const closeBtn = this.ui(
+            'a',
+            {
+                href: '#',
+                id: 'review-sidebar-close',
+                className: 'material-icons',
+                onclick: event => {
+                    event.preventDefault();
+                    this.toggleSidebar();
+                },
+            },
+            'close'
+        );
 
-		const toggle = sidebar.querySelector('.review-toggle-resolved');
-		toggle.onclick = event => {
-			event.preventDefault();
-			this.showResolved = !this.showResolved;
-			toggle.textContent = this.showResolved
-				? 'filter_list_off'
-				: 'filter_list';
-			this.showThreadList();
-		};
-		
-		const closeBtn = sidebar.querySelector('#review-sidebar-close');
-        if (closeBtn) {
-            closeBtn.onclick = event => {
-                event.preventDefault();
-                this.toggleSidebar();
-            };
+        const sidebar = this.ui(
+            'div',
+            { className: 'review-sidebar' },
+
+            this.ui(
+                'div',
+                { className: 'review-sidebar-header' },
+
+                this.ui(
+                    'span',
+                    {},
+                    this.ui(
+                        'span',
+                        { className: 'material-icons' },
+                        'reviews'
+                    ),
+                    'Reviews'
+                ),
+
+                this.ui(
+                    'span',
+                    {},
+                    toggle,
+                    closeBtn
+                )
+            ),
+
+            this.ui(
+                'div',
+                { className: 'review-sidebar-body' }
+            )
+        );
+
+        const container = document.querySelector(this.sidebarContainer);
+        if (container) {
+            container.appendChild(sidebar);
+        } else {
+            document.body.appendChild(sidebar);
         }
-	}
+
+        this.sidebar = sidebar;
+    }
 
     createStatusBarButton() {
 		const bar = this.mde.element.parentElement.querySelector('.editor-statusbar');
@@ -279,6 +325,45 @@ window.Inachis.EasyMDEReviewPlugin = class {
 		return this.threads.find(thread => String(thread.id) === String(id));
     }
 
+    /**
+     * Formats an ISO string or Date object into a human-readable relative timestamp.
+     * @param {string|Date} dateInput
+     * @returns {string}
+     */
+    formatTimeAgo(dateInput) {
+        if (!dateInput) return '';
+
+        const date = new Date(dateInput);
+        const now = new Date();
+        const secondsAgo = Math.floor((now - date) / 1000);
+
+        if (isNaN(secondsAgo)) return '';
+
+        // Less than a minute
+        if (secondsAgo < 60) return 'Just now';
+
+        // Minutes (1–59m)
+        const minutes = Math.floor(secondsAgo / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+
+        // Hours (1–23h)
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h ago`;
+
+        // Days (1–6 days)
+        const days = Math.floor(hours / 24);
+        if (days === 1) return 'Yesterday';
+        if (days < 7) return `${days}d ago`;
+
+        // Older than a week: standard date formatting (e.g., "Oct 24" or "Oct 24, 2025")
+        const isSameYear = date.getFullYear() === now.getFullYear();
+        return date.toLocaleDateString(undefined, {
+            month: 'short',
+            day: 'numeric',
+            ...(isSameYear ? {} : { year: 'numeric' })
+        });
+    }
+
     hideCommentButton() {
         this.commentButton.style.display = 'none';
     }
@@ -316,8 +401,14 @@ window.Inachis.EasyMDEReviewPlugin = class {
 
         const textarea = this.ui('textarea', {
             className: 'review-new-thread-message',
-            rows: '5',
+            rows: '1',
             placeholder: 'Enter review comment...'
+        });
+
+        // Auto-expand on input
+        textarea.addEventListener('input', () => {
+            textarea.style.height = 'auto';
+            textarea.style.height = `${textarea.scrollHeight}px`;
         });
 
         const submitBtn = this.ui('button', {
@@ -357,61 +448,94 @@ window.Inachis.EasyMDEReviewPlugin = class {
             )
         );
 
+        if (!thread.resolved) {
+            body.appendChild(this.createResolveButton(thread));
+        }
+
+
         if (thread.needsRebase) {
-            body.appendChild(this.ui('div', { className: 'review-warning' }, 
+            body.appendChild(this.ui('div', { className: 'review-warning' },
                 '⚠ This review could not be automatically relocated after content changes.'
             ));
         }
-		
-		const rawText = thread.selectedText || '';
-        const isLongText = rawText.length > 120 || rawText.includes('\n');
 
-		const summaryText = isLongText 
-            ? rawText.split('\n').slice(0, 2).join('\n').substring(0, 120).trim() + '...'
-            : rawText;
+		// const rawText = thread.selectedText || '';
+        // const isLongText = rawText.length > 120 || rawText.includes('\n');
 
-		const blockquote = this.ui('blockquote', { 
-            className: isLongText ? 'review-preview-truncatable' : '',
-            title: isLongText ? 'Click to expand full selection text' : '',
-            style: isLongText ? 'cursor: pointer;' : '',
-            onclick: () => {
-                if (!isLongText) return;
-                // Toggle between full text and summary view on click
-                const isExpanded = blockquote.dataset.expanded === 'true';
-                blockquote.textContent = isExpanded ? summaryText : rawText;
-                blockquote.dataset.expanded = isExpanded ? 'false' : 'true';
-            }
-        }, summaryText);
+		// const summaryText = isLongText
+        //     ? rawText.split('\n').slice(0, 2).join('\n').substring(0, 120).trim() + '...'
+        //     : rawText;
 
-        // Selected context block
-        body.appendChild(
-            this.ui('div', { className: 'review-thread-title' },
-                this.ui('strong', {}, 'Selected text'),
-                blockquote
-            )
-        );
+		// const blockquote = this.ui('blockquote', {
+        //     className: isLongText ? 'review-preview-truncatable' : '',
+        //     title: isLongText ? 'Click to expand full selection text' : '',
+        //     style: isLongText ? 'cursor: pointer;' : '',
+        //     onclick: () => {
+        //         if (!isLongText) return;
+        //         // Toggle between full text and summary view on click
+        //         const isExpanded = blockquote.dataset.expanded === 'true';
+        //         blockquote.textContent = isExpanded ? summaryText : rawText;
+        //         blockquote.dataset.expanded = isExpanded ? 'false' : 'true';
+        //     }
+        // }, summaryText);
 
-        body.appendChild(this.createAssignmentBox(thread));
+        // // Selected context block
+        // body.appendChild(
+        //     this.ui('div', { className: 'review-thread-title' },
+        //         this.ui('strong', {}, 'Selected text'),
+        //         blockquote
+        //     )
+        // );
 
         // Thread comments iteration
+        // Thread comments iteration
         if (thread.comments?.length) {
-            thread.comments.forEach(comment => {
-                body.appendChild(
-                    this.ui('div', { className: 'review-comment' },
-                        this.ui('div', { className: 'review-comment-author' }, comment.author?.name || 'Unknown'),
-                        this.ui('div', { className: 'review-comment-message' }, comment.message)
-                    )
-                );
-            });
+            const threadCard = this.ui('div', { className: 'review-thread-card' });
+
+            // 1. Render primary/first comment as the header
+            const primaryComment = thread.comments[0];
+            const primaryTime = this.formatTimeAgo(primaryComment.created);
+
+            const primaryEl = this.ui('div', { className: 'review-comment review-comment--primary' },
+                this.ui('div', { className: 'review-comment-header' },
+                    this.ui('strong', { className: 'review-comment-author' }, primaryComment.author?.name || 'Unknown'),
+                    primaryTime && this.ui('span', { className: 'review-comment-time' }, primaryTime)
+                ),
+                this.ui('div', { className: 'review-comment-message' }, primaryComment.message)
+            );
+            threadCard.appendChild(primaryEl);
+
+            // 2. Render remaining comments as indented replies
+            if (thread.comments.length > 1) {
+                const repliesContainer = this.ui('div', { className: 'review-replies-list' });
+
+                thread.comments.slice(1).forEach(reply => {
+                    const replyTime = this.formatTimeAgo(reply.created);
+
+                    repliesContainer.appendChild(
+                        this.ui('div', { className: 'review-comment review-comment--reply' },
+                            this.ui('div', { className: 'review-comment-header' },
+                                this.ui('strong', { className: 'review-comment-author' }, reply.author?.name || 'Unknown'),
+                                replyTime && this.ui('span', { className: 'review-comment-time' }, replyTime)
+                            ),
+                            this.ui('div', { className: 'review-comment-message' }, reply.message)
+                        )
+                    );
+                });
+
+                threadCard.appendChild(repliesContainer);
+            }
+
+            body.appendChild(threadCard);
         }
 
         if (!thread.resolved) {
+            body.appendChild(this.createAssignmentBox(thread));
             body.appendChild(this.createReplyForm(thread));
-            body.appendChild(this.createResolveButton(thread));
         } else {
             body.appendChild(this.createReopenButton(thread));
         }
-        
+
         setTimeout(() => {
             this.renderThreads();
         }, 0);
@@ -558,7 +682,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
             body.appendChild(item);
         });
     }
-	
+
 	syncMarkerOffsets() {
         this.markers.forEach(marker => {
             const pos = marker.find();
@@ -586,7 +710,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
 
             const body = this.sidebar.querySelector('.review-sidebar-body');
             body.innerHTML = '';
-            
+
             const successMsg = document.createElement('p');
             successMsg.textContent = 'Review resolved.';
             body.appendChild(successMsg);
@@ -607,7 +731,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
      */
     ui(type, props = {}, ...children) {
         const el = document.createElement(type);
-        
+
         Object.entries(props).forEach(([key, value]) => {
             if (key.startsWith('on') && typeof value === 'function') {
                 // Attach event listeners (e.g., onclick -> click)

@@ -1,6 +1,7 @@
 @use '../definitions' as *;
 @use 'sass:color';
 
+// Layout Containers
 #review-sidebar-container {
   grid-column: 3;
   grid-row: 2;
@@ -8,124 +9,208 @@
 }
 
 .review-sidebar {
+  width: 15rem;
+  margin: 1rem 0 6rem 0;
+  overflow-y: auto;
   background: $reviewbar-bg;
   border: 1px solid transparent;
   border-radius: 0.5rem;
-  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.06),
-              -1px 0 4px rgba(0, 0, 0, 0.03);
-  margin: 1rem 0 6rem 0;
-  overflow-y: auto;
-  width: 15rem;
+  box-shadow:
+    -4px 0 24px rgba(0, 0, 0, 0.06),
+    -1px 0 4px rgba(0, 0, 0, 0.03);
 
-  .review-sidebar-header {
-    background-color: $bg-panel;
-    border-bottom: 1px solid $border-color;
+  &-header {
     display: flex;
-    font-weight: bold;
     justify-content: space-between;
     padding: 0.5rem;
+    font-weight: bold;
+    background-color: $bg-panel;
+    border-bottom: 1px solid $border-color;
 
     span {
       vertical-align: middle;
     }
-    a, a:visited { color: $text-main; text-decoration: none; }
+
+    a,
+    a:visited {
+      color: $text-main;
+      text-decoration: none;
+    }
   }
 
-  .review-sidebar-body {
+  &-body {
     padding: 0.1rem;
 
     & > p {
       margin: 1rem;
     }
+
     blockquote {
-      background-color: $bg-surface;
       padding: 0.25rem;
+      background-color: $bg-surface;
     }
   }
-  .review-thread-header {
-    background: $border-color-dark;
-    margin-bottom: 1.5rem;
+}
 
-    a, a:visited {
-      border-bottom: 2px solid transparent;
+// Thread & Navigation Controls
+.review-thread {
+  &-header {
+    margin-bottom: 1.5rem;
+    background: $border-color-dark;
+
+    a,
+    a:visited {
       display: inline-block;
       padding: 0.5rem;
       text-decoration: none;
+      border-bottom: 2px solid transparent;
     }
+
     a:hover {
+      color: $text-main;
       background-color: $border-color;
       border-color: $link-color;
-      color: $text-main;
     }
   }
 
-  .review-comment {
-    margin-bottom: 15px;
-    padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 0.5rem;
-    background: #fff;
+  &-card {
+    padding: 12px;
+    margin-bottom: 16px;
   }
 }
 
-.cm-review-highlight {
-    background: rgba(255, 215, 0, 0.35);
-    cursor: pointer;
-}
-.cm-review-highlight-active {
-    background:
-      rgba(255,140,0,.45);
-    cursor:pointer;
-}
+// Comment Components & Thread Structure
+.review-comment {
+  padding: 1rem;
+  margin-bottom: 15px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
 
-.review-status-button {
-    cursor: pointer;
-    margin-left: 10px;
-}
+  &--primary {
+    padding-bottom: 8px;
+  }
 
-.review-comment-button {
+  &--reply {
+    padding: 8px 10px;
+    background: #f8fafc;
+    border-radius: 6px;
+  }
+
+  &-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+
+  &-author {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1a202c;
+  }
+
+  &-time {
+    font-size: 0.75rem;
+    color: #718096;
+  }
+
+  &-message {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: #334155;
+  }
+
+  &-button {
     z-index: 99999;
-    border: none;
-    border-radius: 4px;
     padding: 6px 10px;
     cursor: pointer;
-}
-.review-selection-preview {
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
-  background: #fafafa;
-  font-size: 0.9em;
+    border: none;
+    border-radius: 4px;
+  }
 }
 
-.review-new-thread-message {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.review-resolve-confirmation {
-  margin-top: 12px;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.review-confirm-actions {
+.review-replies-list {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+  padding-left: 12px;
+  margin-top: 8px;
+  border-left: 2px solid #cbd5e1;
 }
 
-.review-confirm-message {
-  margin-bottom: 8px;
+// Review States, Forms & Status Controls
+.review {
+  &-status-button {
+    margin-left: 10px;
+    cursor: pointer;
+  }
+
+  &-selection-preview {
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+    background: #fafafa;
+    border: 1px solid #ddd;
+  }
+
+  &-resolve-confirmation {
+    padding: 12px;
+    margin-top: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  &-confirm-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  &-confirm-message {
+    margin-bottom: 8px;
+  }
+
+  &-toggle-resolved {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  &-status-resolved {
+    display: flex;
+    font-size: 0.35rem;
+    opacity: 0.7;
+  }
+
+  &-assignment {
+    padding: 1rem 0.5rem 0.5rem 0.5rem;
+    border-top: 1px solid #aaa;
+  }
+
+  &-reply-form {
+    padding: 0.5rem;
+  }
+
+  &-reply-text,
+  &-new-thread-message {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 38px;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    resize: none;
+    overflow-y: hidden;
+    transition: height 0.1s ease-out;
+  }
 }
 
-.review-toggle-resolved {
-  display:block;
-  margin-bottom:10px;
-}
+// CodeMirror Highlighting Overlays
+.cm-review-highlight {
+  cursor: pointer;
+  background: rgba(255, 215, 0, 0.35);
 
-.review-status-resolved {
-  display: flex;
-  font-size: .35rem;
-  opacity:.7;
+  &-active {
+    cursor: pointer;
+    background: rgba(255, 140, 0, 0.45);
+  }
 }
