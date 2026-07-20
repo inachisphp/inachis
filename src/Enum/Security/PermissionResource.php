@@ -95,6 +95,11 @@ enum PermissionResource: string
         };
     }
 
+    /**
+     * Returns a human-friendly label for the permission resource
+     *
+     * @return string
+     */
     public function label(): string
     {
         return match ($this) {
@@ -122,5 +127,55 @@ enum PermissionResource: string
             self::THEME => 'Themes',
             self::ROBOTS => 'robots.txt',
         };
+    }
+
+    /**
+     * Return the contents of the permission groups
+     *
+     * @return list<array<string, string>>
+     */
+    public static function grouped(): array
+    {
+        return [
+            [
+                'group' => PermissionGroup::CONTENT,
+                'resources' => [
+                    self::PAGE,
+                    self::SERIES,
+                    self::IMAGE,
+                    self::CATEGORY,
+                    self::TAG,
+                ],
+            ],
+            [
+                'group' => PermissionGroup::USERS,
+                'resources' => [
+                    self::USER,
+                    self::ROLE,
+                    self::PASSWORD_POLICY,
+                ],
+            ],
+            [
+                'group' => PermissionGroup::SETTINGS,
+                'resources' => [
+                    self::NAVIGATION,
+                    self::THEME,
+                    self::ROBOTS,
+                ],
+            ],
+            [
+                'group' => PermissionGroup::TOOLS,
+                'resources' => [
+                    self::ANALYTICS,
+                    self::AUDIT_LOG,
+                    self::SYSTEM_STATUS,
+                    self::ERROR_LOG,
+                    self::EMAIL_DNS,
+                    self::IMPORT_EXPORT,
+                    self::STORAGE,
+                    self::MAINTENANCE,
+                ],
+            ],
+        ];
     }
 }

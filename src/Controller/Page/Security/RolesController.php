@@ -20,6 +20,7 @@ use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Security\RoleRepository;
 use Inachis\Service\Content\ViewStateManager;
+use Inachis\Validator\Security\RolePermissionValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -35,10 +36,15 @@ class RolesController extends AbstractInachisController
      *
      * @param RoleRepository $roleRepository
      * @param CategoryRepository $categoryRepository
-     * @param ContentQueryParameters $contentQueryParameters
+     * @param RoleRepository $roleRepository
+     * @param ViewStateManager $viewStateManager
      * @return Response The response the controller results in
      */
-    #[Route('/incc/security/roles', name: 'incc_admin_role_index', methods: ['GET', 'POST'])]
+    #[Route(
+        '/incc/security/roles',
+        name: 'incc_admin_role_index',
+        methods: ['GET', 'POST']
+    )]
     public function index(
         Request $request,
         CategoryRepository $categoryRepository,
@@ -54,10 +60,28 @@ class RolesController extends AbstractInachisController
                 $count = 0;
                 foreach ($items as $roleId) {
                     $role = $roleRepository->find($roleId);
-                    if ($role !== null) {
-                        $this->entityManager->remove($role);
-                        ++$count;
+                    if ($role === null) {
+                        continue;
                     }
+                    if (!$role->canBeDeleted()) {
+                        $this->addFlash(
+                            'error',
+                            sprintf(
+                                'The role "%s" is currently assigned to %d user(s) and cannot be deleted.',
+                                $role->getName(),
+                                $role->getUserCount(),
+                            )
+                        );
+
+                        return $this->redirectToRoute(
+                            'incc_admin_role_edit',
+                            [
+                                'roleId' => (string) $role->getId(),
+                            ]
+                        );
+                    }
+                    $this->entityManager->remove($role);
+                    ++$count;
                 }
                 $this->entityManager->flush();
                 $this->addFlash('success', "Deleted $count role(s).");
@@ -115,6 +139,7 @@ class RolesController extends AbstractInachisController
     )]
     public function edit(
         Request $request,
+        RolePermissionValidator $rolePermissionValidator,
         RoleRepository $roleRepository,
         string $roleId,
     ): Response {
@@ -135,7 +160,27 @@ class RolesController extends AbstractInachisController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $delete = $form->has('delete') ? $form->get('delete') : null;
-            if ($delete instanceof \Symfony\Component\Form\ClickableInterface && $delete->isClicked() && !$isNew) {
+            if (
+                $delete instanceof \Symfony\Component\Form\ClickableInterface &&
+                $delete->isClicked() && !$isNew
+            ) {
+                if (!$role->canBeDeleted()) {
+                    $this->addFlash(
+                        'error',
+                        sprintf(
+                            'The role "%s" is currently assigned to %d user(s) and cannot be deleted.',
+                            $role->getName(),
+                            $role->getUserCount(),
+                        )
+                    );
+
+                    return $this->redirectToRoute(
+                        'incc_admin_role_edit',
+                        [
+                            'roleId' => (string) $role->getId(),
+                        ]
+                    );
+                }
                 $roleName = $role->getName();
                 $this->entityManager->remove($role);
                 $this->entityManager->flush();
@@ -143,12 +188,16 @@ class RolesController extends AbstractInachisController
                 return $this->redirectToRoute('incc_admin_role_index');
             }
 
-            if ($isNew || $role->getSlug() === '') {
-                $role->setSlug($this->createUniqueSlug($role->getName(), $roleRepository));
-            }
-
             // Synchronise permissions: rebuild from posted checkboxes.
             $this->syncPermissions($request, $role);
+
+            $warnings = $rolePermissionValidator->validate(
+                $request->request->all('permissions')
+            );
+
+            foreach ($warnings as $warning) {
+                $this->addFlash('warning', $warning);
+            }
 
             $this->entityManager->persist($role);
             $this->entityManager->flush();
@@ -162,12 +211,22 @@ class RolesController extends AbstractInachisController
         // Build a structured permission matrix to pass to the template.
         $permissionMatrix = $this->buildPermissionMatrix($role);
 
+        $permissionImplications = [];
+        foreach (PermissionAction::cases() as $action) {
+            $permissionImplications[strtolower($action->value)] = array_map(
+                fn(PermissionAction $implied) => strtolower($implied->value),
+                $action->requires()
+            );
+        }
+
         $this->viewModel->page->title = $isNew ? 'New Role' : 'Edit Role';
         $this->viewModel->page->tab = 'roles';
         return $this->render('inadmin/page/security/roles/edit.html.twig', [
             'viewModel' => $this->viewModel,
             'actions' => PermissionAction::cases(),
             'form' => $form->createView(),
+            'permissionGroups' => PermissionResource::grouped(),
+            'permissionImplications' => $permissionImplications,
             'permissionMatrix' => $permissionMatrix,
             'resources' => PermissionResource::cases(),
             'role' => $role,

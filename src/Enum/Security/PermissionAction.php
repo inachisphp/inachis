@@ -12,23 +12,60 @@ namespace Inachis\Enum\Security;
 enum PermissionAction: string
 {
     case MANAGE = 'MANAGE';
-    case VIEW = 'VIEW';
     case CREATE = 'CREATE';
+    case VIEW = 'VIEW';
     case EDIT = 'EDIT';
     case DELETE = 'DELETE';
     case REVIEW = 'REVIEW';
     case PUBLISH = 'PUBLISH';
 
+    /**
+     * Returns a friendly name for the {@link PermissionAction}
+     *
+     * @return string
+     */
     public function label(): string
     {
         return match ($this) {
             self::MANAGE => 'Manage',
-            self::VIEW => 'View',
             self::CREATE => 'Create',
+            self::VIEW => 'View',
             self::EDIT => 'Edit',
             self::DELETE => 'Delete',
             self::REVIEW => 'Review',
             self::PUBLISH => 'Publish',
+        };
+    }
+
+    /**
+     * Defines action inheritance, for example, having the ability to create
+     * something implies they can edit and view it.
+     *
+     * @return array<string, list<string>>
+     */
+    public function requires(): array
+    {
+        return match ($this) {
+            self::PUBLISH => [
+                self::REVIEW,
+                self::EDIT,
+                self::VIEW,
+            ],
+
+            self::REVIEW => [
+                self::EDIT,
+                self::VIEW,
+            ],
+
+            self::EDIT => [
+                self::VIEW,
+            ],
+
+            self::DELETE => [
+                self::VIEW,
+            ],
+
+            default => [],
         };
     }
 }

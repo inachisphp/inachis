@@ -15,6 +15,7 @@ use Inachis\Exception\User\CannotRemoveLastAdministratorException;
 use Inachis\Form\UserType;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Security\RoleRepository;
 use Inachis\Repository\User\UserRepository;
 use Inachis\Security\Authentication\RecoveryCodeManager;
 use Inachis\Security\Authentication\TotpManager;
@@ -56,6 +57,7 @@ class AdminProfileController extends AbstractInachisController
     public function list(
         Request $request,
         CategoryRepository $categoryRepository,
+        RoleRepository $roleRepository,
         UserBulkActionService $userBulkActionService,
         UserRepository $userRepository,
         ViewStateManager $viewStateManager,
@@ -96,14 +98,10 @@ class AdminProfileController extends AbstractInachisController
         $this->viewModel->page->tab = 'users';
         return $this->render('inadmin/page/admin/list.html.twig', [
             'viewModel' => $this->viewModel,
-            'dataset' => $userRepository->getFiltered(
-                $params->getFilters(),
-                $params->getLimit(),
-                $params->getOffset(),
-                $params->getSort(),
-            ),
+            'dataset' => $userRepository->getFiltered($params),
             'form' => $form->createView(),
             'query' => $params,
+            'roles' => $roleRepository->getRoleNames(25),
         ]);
     }
 
@@ -229,6 +227,7 @@ class AdminProfileController extends AbstractInachisController
 
                 if ($isNew) {
                     $preferences->setColor(ProfileColorPalette::generate());
+                    $this->entityManager->persist($user);
                     $userAccountEmailService->registerNewUser(
                         $user,
                         [ 'viewModel' => $this->viewModel, ],
@@ -237,7 +236,6 @@ class AdminProfileController extends AbstractInachisController
                             [ 'token' => $token ]
                         )
                     );
-                    $this->entityManager->persist($user);
                 }
                 $preferences->setTimezone(
                     $request->request->all('user')['timezone'] ?? $preferences->getTimezone()

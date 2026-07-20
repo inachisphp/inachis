@@ -12,6 +12,7 @@ namespace Inachis\Repository\User;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use Inachis\Entity\User\User;
+use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\AbstractRepository;
 
 /**
@@ -45,18 +46,18 @@ class UserRepository extends AbstractRepository
     /**
      * Gets filtered users
      * 
-     * @param array{keyword?: string} $filters The filters
-     * @param int $limit The limit
-     * @param int $offset The offset
-     * @param string $sort The sort order
+     * @param ContentQueryParameters $params
      * @return Paginator<User> The paginator
      */
-    public function getFiltered(array $filters, int $limit, int $offset, string $sort = ''): Paginator
+    public function getFiltered(ContentQueryParameters $params): Paginator
     {
+        $filters = $params->getFilters();
+        $joins = [];
         $where = [
             'q.isRemoved = \'0\'',
             []
         ];
+
         if (!empty($filters['keyword'])) {
             $where[0] .= ' AND (q.displayName LIKE :keyword OR q.username LIKE :keyword OR q.email LIKE :keyword )';
             $where[1]['keyword'] = '%' . $filters['keyword']  . '%';
@@ -64,6 +65,11 @@ class UserRepository extends AbstractRepository
         if (!empty($filters['status'])) {
             $where[0] .= ' AND q.isActive = :active';
             $where[1]['active'] = $filters['status'] === 'enabled';
+        }
+        if (!empty($filters['role'])) {
+            $joins[] = ['join', 'q.assignedRoles', 'r'];
+            $where[0] .= ' AND r.identifier = :role';
+            $where[1]['role'] = $filters['role'];
         }
         if (!empty($filters['last sign-in'])) {
             $where[0] .= ' AND q.lastLoginAt <= :lastLoginAt';
@@ -77,7 +83,8 @@ class UserRepository extends AbstractRepository
             $where[0] .= ' AND q.totpEnabled = :totpEnabled';
             $where[1]['totpEnabled'] = $filters['2fa status'];
         }
-        $sort = match ($sort) {
+        
+        $sort = match ($params->getSort()) {
             'createdAt asc' => [['q.createdAt', 'ASC']],
             'createdAt desc' => [['q.createdAt', 'DESC']],
             'updatedAt asc' => [['q.updatedAt', 'ASC']],
@@ -87,11 +94,14 @@ class UserRepository extends AbstractRepository
             'displayName desc' => [['q.displayName', 'DESC']],
             default => [['q.displayName', 'ASC']],
         };
+
         return $this->getAll(
-            $limit,
-            $offset,
+            $params->getLimit(),
+            $params->getOffset(),
             $where,
-            $sort
+            $sort,
+            [ 'q.id' ],
+            $joins,
         );
     }
 

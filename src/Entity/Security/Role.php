@@ -32,7 +32,7 @@ class Role
     protected ?UuidInterface $id = null;
 
     #[ORM\Column(type: 'string', length: 50, unique: true)]
-    private string $identifier;
+    private string $identifier = '';
 
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     private string $name;
@@ -223,5 +223,26 @@ class Role
             ['admin', 'administrator'],
             true,
         );
+    }
+
+    /**
+     * Returns the number of users currently assigned this role.
+     * 
+     * @return int
+     */
+    public function getUserCount(): int
+    {
+        return $this->users->count();
+    }
+
+    /**
+     * Determines whether the role can safely be deleted.
+     * 
+     * @return bool
+     */
+    public function canBeDeleted(): bool
+    {
+        return !$this->systemRole
+            && $this->getUserCount() === 0;
     }
 }
