@@ -10,8 +10,6 @@
 namespace Inachis\Controller\Page\Security;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Security\Authentication\RecoveryCodeManager;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;

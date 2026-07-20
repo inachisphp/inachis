@@ -17,6 +17,7 @@ window.Inachis = {
 		window.Inachis.ImageManager.init();
 		window.Inachis.MergeTags.init();
 		window.Inachis.PostEdit.init();
+		window.Inachis.PermissionMatrix.init();
 	},
 
 	initOnClick(selector, handler) {

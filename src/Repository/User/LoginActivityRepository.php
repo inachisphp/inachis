@@ -12,7 +12,9 @@ namespace Inachis\Repository\User;
 use DateTimeImmutable;
 use Inachis\Entity\User\{LoginActivity, User};
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Model\ContentQueryParameters;
 
 /**
  * Repository for LoginActivity
@@ -33,19 +35,44 @@ class LoginActivityRepository extends ServiceEntityRepository
      * Returns the most recent login activity, defaults to 50
      *
      * @param int $limit
-     * @return array<int,LoginActivity>
+     * @return Paginator<LoginActivity>
      */
-    public function findRecent(int $limit = 50): array
+    public function findRecent(int $limit = 50): Paginator
     {
-        /** @var array<int,LoginActivity> $result */
-        $result = $this->createQueryBuilder('l')
+        $query = $this->createQueryBuilder('l')
             ->leftJoin('l.user', 'u')
             ->addSelect('u')
             ->orderBy('l.loggedAt', 'DESC')
             ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
-        return $result;
+            ->getQuery();
+
+        return new Paginator($query, false);
+    }
+
+    /**
+     * Returns the most recent login activity, defaults to 50
+     *
+     * @param ContentQueryParameters $params
+     * @return Paginator<LoginActivity>
+     */
+    public function getFiltered(ContentQueryParameters $params): Paginator
+    {
+        $query = $this->createQueryBuilder('l')
+            ->leftJoin('l.user', 'u')
+            ->addSelect('u');
+        $filters = $params->getFilters();
+        if (!empty($filters['keyword']) && is_string($filters['keyword'])) {
+            $query
+                ->where('u.username LIKE :username')
+                ->setParameter('username', $filters['keyword']);
+        }
+        [$field, $direction] = $this->determineOrderBy($params->getSort());
+        $query
+            ->orderBy($field, $direction)
+            ->setMaxResults($params->getLimit())
+            ->getQuery();
+
+        return new Paginator($query, false);
     }
 
     /**
@@ -53,22 +80,21 @@ class LoginActivityRepository extends ServiceEntityRepository
      * showing 50 records.
      *
      * @param User $user
-     * @param integer $limit
-     * @return array<int,LoginActivity>
+     * @param int $limit
+     * @return Paginator<LoginActivity>
      */
-    public function findByUser(User $user, int $limit = 50): array
+    public function findByUser(User $user, int $limit = 50): Paginator
     {
-        /** @var array<int,LoginActivity> $result */
-        $result = $this->createQueryBuilder('l')
+        $query = $this->createQueryBuilder('l')
             ->leftJoin('l.user', 'u')
             ->addSelect('u')
             ->where('l.user = :user')
-            ->setParameter('user', $user)
+            ->setParameter('user', $user->getId(), 'uuid_binary')
             ->orderBy('l.loggedAt', 'DESC')
             ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
-        return $result;
+            ->getQuery();
+
+        return new Paginator($query, false);
     }
 
     /**
@@ -85,7 +111,7 @@ class LoginActivityRepository extends ServiceEntityRepository
         //     ->select('1')
         //     ->where('l.user = :user')
         //     ->andWhere('l.type = :type')
-        //     ->setParameter('user', $user)
+            // ->setParameter('user', $user->getId(), 'uuid_binary')
         //     ->setParameter('type', 'success')
         //     ->setMaxResults(50)
         //     ->getQuery()
@@ -220,5 +246,18 @@ class LoginActivityRepository extends ServiceEntityRepository
         } while (count($ids) === $batchSize);
 
         return $totalDeleted;
+    }
+
+    /**
+     * Determine the order by clause for the query builder
+     *
+     * @param string $orderBy
+     * @return list{0: string, 1: string}
+     */
+    protected function determineOrderBy(string $orderBy): array
+    {
+        return match ($orderBy) {
+            default => ['l.loggedAt', 'DESC'],
+        };
     }
 }

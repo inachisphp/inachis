@@ -1,25 +1,33 @@
 <?php
 
+/**
+ * This file is part of the inachis framework
+ *
+ * @package Inachis
+ * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ */
+
+
 namespace Inachis\Service\Content\Page;
 
 use Inachis\Entity\Content\ReviewThread;
 
 class ReviewRebaseService
 {
+	/**
+	 * Recalculate offsets for selected text after edits
+	 *
+	 * @param ReviewThread $thread
+	 * @param string $newContent
+	 * @return bool
+	 */
     public function rebase(ReviewThread $thread, string $newContent): bool
 	{
-
-		$selectedText =
-			$thread->getSelectedText();
-
-		$contextBefore =
-			$thread->getContextBefore();
-
-		$contextAfter =
-			$thread->getContextAfter();
+		$selectedText = $thread->getSelectedText();
+		$contextBefore = $thread->getContextBefore();
+		$contextAfter = $thread->getContextAfter();
 
 		$matches = [
-
 			// Best match
 			[
 				'needle' =>
@@ -60,32 +68,16 @@ class ReviewRebaseService
 		];
 
 		foreach ($matches as $match) {
-
-			$position = strpos(
-				$newContent,
-				$match['needle']
-			);
-
+			$position = strpos($newContent, $match['needle']);
 			if ($position === false) {
 				continue;
 			}
 
-			$currentStart =
-				$position +
-				$match['offset'];
+			$currentStart = $position + $match['offset'];
+			$currentEnd = $currentStart + strlen($selectedText);
 
-			$currentEnd =
-				$currentStart +
-				strlen($selectedText);
-
-			$thread->setCurrentStartOffset(
-				$currentStart
-			);
-
-			$thread->setCurrentEndOffset(
-				$currentEnd
-			);
-
+			$thread->setCurrentStartOffset($currentStart);
+			$thread->setCurrentEndOffset($currentEnd);
 			$thread->setNeedsRebase(false);
 
 			return true;

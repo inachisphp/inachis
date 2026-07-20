@@ -13,12 +13,13 @@ use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\User\{User,UserPreference};
 use Inachis\Exception\User\CannotRemoveLastAdministratorException;
 use Inachis\Form\UserType;
-use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Security\RoleRepository;
 use Inachis\Repository\User\UserRepository;
 use Inachis\Security\Authentication\RecoveryCodeManager;
 use Inachis\Security\Authentication\TotpManager;
+use Inachis\Security\Authentication\TrustedDeviceManager;
 use Inachis\Service\Content\ViewStateManager;
 use Inachis\Service\User\UserBulkActionService;
 use Inachis\Service\User\UserAccountEmailService;
@@ -56,6 +57,7 @@ class AdminProfileController extends AbstractInachisController
     public function list(
         Request $request,
         CategoryRepository $categoryRepository,
+        RoleRepository $roleRepository,
         UserBulkActionService $userBulkActionService,
         UserRepository $userRepository,
         ViewStateManager $viewStateManager,
@@ -96,14 +98,10 @@ class AdminProfileController extends AbstractInachisController
         $this->viewModel->page->tab = 'users';
         return $this->render('inadmin/page/admin/list.html.twig', [
             'viewModel' => $this->viewModel,
-            'dataset' => $userRepository->getFiltered(
-                $params->getFilters(),
-                $params->getLimit(),
-                $params->getOffset(),
-                $params->getSort(),
-            ),
+            'dataset' => $userRepository->getFiltered($params),
             'form' => $form->createView(),
             'query' => $params,
+            'roles' => $roleRepository->getRoleNames(25),
         ]);
     }
 
@@ -116,12 +114,18 @@ class AdminProfileController extends AbstractInachisController
      * @throws RandomException
      * @throws TransportExceptionInterface
      */
-    #[Route("/incc/admin/{id}", name: "incc_admin_edit", methods: [ "GET", "POST" ], priority: -100)]
+    #[Route(
+        "/incc/admin/{id}",
+        name: "incc_admin_edit",
+        methods: [ "GET", "POST" ],
+        priority: -100
+    )]
     public function edit(
         Request $request,
         ImageTransformer $imageTransformer,
         RecoveryCodeManager $recoveryCodeManager,
         TotpManager $totpManager,
+        TrustedDeviceManager $trustedDeviceManager,
         UserAccountEmailService $userAccountEmailService,
         UserProtectionService $userProtectionService,
         UserRepository $userRepository,
@@ -205,6 +209,7 @@ class AdminProfileController extends AbstractInachisController
                 if ($disableTotp instanceof \Symfony\Component\Form\ClickableInterface && $disableTotp->isClicked()) {
                     // todo: change this to disable not remove?
                     $totpManager->disable($user);
+                    $trustedDeviceManager->removeAll($user);
                     $this->addFlash('success', 'Two-Factor Authentication has been disabled');
 
                     return $this->redirectToRoute('incc_admin_edit', [
@@ -222,6 +227,7 @@ class AdminProfileController extends AbstractInachisController
 
                 if ($isNew) {
                     $preferences->setColor(ProfileColorPalette::generate());
+                    $this->entityManager->persist($user);
                     $userAccountEmailService->registerNewUser(
                         $user,
                         [ 'viewModel' => $this->viewModel, ],
@@ -230,7 +236,6 @@ class AdminProfileController extends AbstractInachisController
                             [ 'token' => $token ]
                         )
                     );
-                    $this->entityManager->persist($user);
                 }
                 $preferences->setTimezone(
                     $request->request->all('user')['timezone'] ?? $preferences->getTimezone()
@@ -260,6 +265,11 @@ class AdminProfileController extends AbstractInachisController
             'remainingRecoveryCodes' => $recoveryCodeManager->getRemainingCount(
                 $this->getCurrentUser()
             ),
+            'currentTrustedDevice' => $trustedDeviceManager->getCurrentTrustedDevice(
+                $user,
+                $request
+            ),
+            'trustedDevices' => $trustedDeviceManager->getTrustedDevices($user),
             'user' => $user,
         ]);
     }

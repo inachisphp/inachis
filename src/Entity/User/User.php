@@ -68,7 +68,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\PasswordStrength(
         minScore: Assert\PasswordStrength::STRENGTH_WEAK,
     )]
-    #[PasswordPolicy]
     protected ?string $plainPassword;
 
     /** @var string|null The email address of the user */
@@ -136,6 +135,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     )]
     private Collection $recoveryCodes;
 
+    #[ORM\OneToMany(
+        mappedBy: 'user',
+        targetEntity: UserTrustedDevice::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    private Collection $trustedDevices;
+
     /**
      * Default constructor for {@link User}. If a password is passed into
      * the constructor it will use {@link setPasswordHash} to store a hashed
@@ -155,6 +162,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->setAvatar(null);
         $this->assignedRoles = new ArrayCollection();
         $this->recoveryCodes = new ArrayCollection();
+        $this->trustedDevices = new ArrayCollection();
     }
 
     #[ORM\PrePersist]
@@ -638,6 +646,45 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 // No setter to null because the relation is non-nullable.
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserTrustedDevice>
+     */
+    public function getTrustedDevices(): Collection
+    {
+        return $this->trustedDevices;
+    }
+
+    /**
+     * Add a trusted device
+     *
+     * @param UserTrustedDevice $device
+     * @return self
+     */
+    public function addTrustedDevice(
+        UserTrustedDevice $device
+    ): self {
+        if (!$this->trustedDevices->contains($device)) {
+            $this->trustedDevices->add($device);
+            $device->setUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove a trusted device
+     *
+     * @param UserTrustedDevice $device
+     * @return self
+     */
+    public function removeTrustedDevice(
+        UserTrustedDevice $device
+    ): self {
+        $this->trustedDevices->removeElement($device);
 
         return $this;
     }

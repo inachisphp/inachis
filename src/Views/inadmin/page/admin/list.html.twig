@@ -27,7 +27,7 @@
                     source: 'username',
                 },
                 {
-                    title: 'Role',
+                    title: 'Roles',
                     source: 'assignedRoles',
                     source_type: 'object',
                     object_field: 'name',
@@ -53,13 +53,27 @@
                     },
                 },
                 {
+                    title: '2FA Status',
+                    badges: {
+                        '2FA': {
+                            field: 'isTotpEnabled',
+                            condition: true,
+                            className: 'badge__active',
+                        },
+                        'n/a': {
+                            default: true,
+                        }
+
+                    }
+                },
+                {
                     title: 'Last Login',
                     source: 'lastLoginAt',
                     source_type: 'date',
                     hideOnMobile: true,
                 },
                 {
-                    title: 'Password Last Modified',
+                    title: 'Password Modified',
                     source: 'passwordChangedAt',
                     source_type: 'date',
                     hideOnMobile: true,
@@ -78,6 +92,7 @@
                     'enabled': 'Enabled',
                     'disabled': 'Disabled',
                 },
+                'Role': roles,
                 'Last Sign-in': {
                     '': 'All',
                     '30': 'Over 30 days',

@@ -13,6 +13,7 @@ use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\User\User;
 use Inachis\Security\Authentication\RecoveryCodeManager;
 use Inachis\Security\Authentication\TotpManager;
+use Inachis\Security\Authentication\TrustedDeviceManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -77,6 +78,7 @@ class TotpSetupController extends AbstractInachisController
      *
      * @param Request $request
      * @param SessionInterface $session
+     * @param TrustedDeviceManager $trustedDeviceManager
      * @return Response
      */
     #[Route('/incc/security/totp/setup', name: 'incc_admin_totp_confirm', methods: ['POST'])]
@@ -85,9 +87,9 @@ class TotpSetupController extends AbstractInachisController
         Request $request,
         SessionInterface $session,
         TotpManager $totpManager,
+        TrustedDeviceManager $trustedDeviceManager,
     ): Response {
-        /** @var User $user */
-        $user = $this->getUser();
+        $user = $this->getCurrentUser();
         if ($user === null) {
             throw $this->createAccessDeniedException();
         }
@@ -106,16 +108,15 @@ class TotpSetupController extends AbstractInachisController
             $secret,
             $code
         )) {
-            $this->addFlash(
-                'error',
-                'The authentication code was invalid.'
-            );
+            $this->addFlash('error', 'The authentication code was invalid.');
 
             return $this->redirectToRoute(
                 'incc_admin_totp_confirm'
             );
         }
 
+        $trustedDeviceManager->removeAll($user);
+        
         /*
          * Remove the temporary secret once it has
          * successfully been persisted.

@@ -10,6 +10,8 @@
 namespace Inachis\Service\User;
 
 use Inachis\Entity\User\User;
+use Inachis\Factory\PageViewFactory;
+use Inachis\Model\System\PageView;
 use Inachis\Service\File\Base64EncodeFile;
 use Random\RandomException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -22,6 +24,8 @@ use Symfony\Component\Mime\Address;
  */
 readonly class UserAccountEmailService
 {
+    protected PageView $viewModel;
+
     /**
      * @param MailerInterface $mailer
      * @param PasswordResetTokenService $tokenService
@@ -29,7 +33,10 @@ readonly class UserAccountEmailService
     public function __construct(
         private MailerInterface $mailer,
         private PasswordResetTokenService $tokenService,
-    ) {}
+        PageViewFactory $pageViewFactory,
+    ) {
+        $this->viewModel = $pageViewFactory->create();
+    }
 
     /**
      * Send a forgot password email to a user
@@ -59,11 +66,12 @@ readonly class UserAccountEmailService
             ->htmlTemplate('inadmin/emails/forgot-password.html.twig')
             ->textTemplate('inadmin/emails/forgot-password.txt.twig')
             ->context([
-                'ipAddress' => $data['clientIP'] ?? '',
-                'url' => $urlGenerator($tokenData['token']) ?? '',
+                'viewModel' => $this->viewModel,
                 'expiresAt' => $tokenData['expiresAt']->format('l jS F Y \a\\t H:i'),
-                'settings' => $data['settings'] ?? [],
+                'ipAddress' => $data['clientIP'] ?? '',
                 'logo' => Base64EncodeFile::encode('public/assets/imgs/incc/inachis.png'),
+                'settings' => $data['settings'] ?? [],
+                'url' => $urlGenerator($tokenData['token']) ?? '',
             ]);
         $this->mailer->send($email);
     }
@@ -78,15 +86,23 @@ readonly class UserAccountEmailService
      * @throws RandomException
      * @throws TransportExceptionInterface
      */
-    public function registerNewUser(User $user, array $settings, callable $urlGenerator): void
-    {
+    public function registerNewUser(
+        User $user,
+        array $settings,
+        callable $urlGenerator
+    ): void {
         $emailAddress = $user->getEmail();
         if (empty($emailAddress)) {
             return;
         }
+
         $tokenData = $this->tokenService->createResetRequestForEmail($emailAddress);
-        if (empty($tokenData) || empty($tokenData['token']) 
-            || empty($tokenData['expiresAt']) || !($tokenData['expiresAt'] instanceof \DateTimeImmutable)) {
+        if (
+            empty($tokenData) ||
+            empty($tokenData['token']) || 
+            empty($tokenData['expiresAt']) || 
+            !($tokenData['expiresAt'] instanceof \DateTimeImmutable)
+        ) {
             return;
         }
 
@@ -98,11 +114,12 @@ readonly class UserAccountEmailService
             ->htmlTemplate('inadmin/emails/registration.html.twig')
             ->textTemplate('inadmin/emails/registration.txt.twig')
             ->context([
-                'name' => $user->getDisplayName(),
-                'url' => $urlGenerator($tokenData['token']),
+                'viewModel' => $this->viewModel,
                 'expiresAt' => $tokenData['expiresAt']->format('l jS F Y \a\\t H:i'),
-                'settings' => $settings,
                 'logo' => Base64EncodeFile::encode('public/assets/imgs/incc/inachis.png'),
+                'name' => $user->getDisplayName(),
+                'settings' => $settings,
+                'url' => $urlGenerator($tokenData['token']),
             ])
         ;
         $this->mailer->send($email);

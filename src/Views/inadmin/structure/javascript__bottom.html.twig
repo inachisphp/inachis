@@ -45,8 +45,8 @@
             endpoint: "/incc/api/validate-links",
             coloriseBadge: true,
         });
-        {% if includeEditorId|default(null) is not empty and post is defined %}
-        new window.Inachis.EasyMDEReviewPlugin(easymde, {
+        {% if includeEditorId|default(null) is not empty and post is defined and post.status.value == 'review' %}
+        const reviewPlugin = new window.Inachis.EasyMDEReviewPlugin(easymde, {
             pageId: '{{ includeEditorId }}',
             endpoint: "/incc/api/review"
         });

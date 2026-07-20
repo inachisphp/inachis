@@ -87,7 +87,7 @@ class ReviewPageService
         User $author,
         string $message
     ): ReviewComment {
-        $comment = new ReviewComment();
+        $comment = new ReviewComment($thread, $author, $message);
 
         $comment
             ->setThread($thread)
@@ -110,12 +110,7 @@ class ReviewPageService
         ReviewThread $thread,
         User $resolvedBy
     ): ReviewThread {
-        $thread
-            ->setResolved(true)
-            ->setResolvedBy($resolvedBy)
-            ->setResolvedAt(new DateTimeImmutable())
-            ->setUpdated(new DateTimeImmutable());
-
+        $thread->resolve($resolvedBy)->setUpdated(new DateTimeImmutable());
         $this->entityManager->flush();
 
         return $thread;
@@ -127,12 +122,7 @@ class ReviewPageService
     public function reopenThread(
         ReviewThread $thread
     ): ReviewThread {
-        $thread
-            ->setResolved(false)
-            ->setResolvedBy(null)
-            ->setResolvedAt(null)
-            ->setUpdated(new DateTimeImmutable());
-
+        $thread->reopen()->setUpdated(new DateTimeImmutable());
         $this->entityManager->flush();
 
         return $thread;

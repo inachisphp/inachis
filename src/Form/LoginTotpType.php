@@ -10,6 +10,7 @@
 namespace Inachis\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -56,6 +57,13 @@ class LoginTotpType extends AbstractType
                     'required' => true,
                 ],
                 'label' => 'Authentication code',
+            ])
+            ->add('trustDevice', CheckboxType::class, [
+                'attr' => [
+                    'class' => 'checkbox',
+                ],
+                'label' => 'Trust this device for 30 days',
+                'required' => false,
             ])
             ->add('verify', SubmitType::class, [
                 'attr' => [

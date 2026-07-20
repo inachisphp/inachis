@@ -1,12 +1,24 @@
 {% if badges|default(null) is not empty %}
     {% set badges_used = false %}
     {% for badgeName,badge in badges %}
-        {%- if (badge.field is defined and attribute(item, badge.field) == badge.condition)
+        {%- if (badge.field is defined and property(item, badge.field) == badge.condition)
                 or (badge.default|default(false) == true and not badges_used)
                 or (badge.context is defined and attribute(_context, badge.context) == badge.condition)
+                or (badge.label is defined and property(item, badge.label)|default('') is not empty)
         %}
             {% set badges_used = true %}
-            <span class="badge {{ badge.className }}">{{ badgeName }}</span>
+            {% if badge.varClassName is defined and badge.varClassName is not empty %}
+                {% set badgeClass = property(item, badge.varClassName) %}
+            {% else %}
+                {% set badgeClass = badge.className|default('') %}
+            {% endif %}
+            <span class="badge {{ badgeClass }}">
+            {% if badge.label is defined and badge.label is not empty %}
+                {{ property(item, badge.label) }}
+            {% else %}
+                {{ badgeName }}
+            {% endif %}
+            </span>
         {% endif -%}
     {% endfor %}
 {% endif %}

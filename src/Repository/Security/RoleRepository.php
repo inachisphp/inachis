@@ -19,9 +19,49 @@ use Inachis\Repository\AbstractRepository;
  */
 class RoleRepository extends AbstractRepository
 {
+    /**
+     * Constructor
+     *
+     * @param ManagerRegistry $registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Role::class);
+    }
+
+    /**
+     * Gets an associative array of role names as 'identifier' => 'name'
+     *
+     * @param integer $limit
+     * @return array<string, string>
+     */
+    public function getRoleNames($limit = 25)
+    {
+        $rows = $this->createQueryBuilder('r')
+            ->select('r.identifier, r.name')
+            ->orderBy('r.name', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_column($rows, 'name', 'identifier');
+    }
+
+    /**
+     * Returns a {@link Role} by the provided identifier
+     *
+     * @param string $identifier
+     * @return Role
+     */
+    public function getRoleByIdentifier(string $identifier)
+    {
+        /** @var Role */
+        return $this->createQueryBuilder('r')
+            ->select('r.identifier, r.name')
+            ->where('identifier = :identifier')
+            ->setParameter('identifier', $identifier)
+            ->getQuery()
+            ->getSingleResult();
     }
 
     /**

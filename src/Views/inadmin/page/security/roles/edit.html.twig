@@ -6,150 +6,163 @@
 {% endblock pagetitle %}
 
 {% block content %}
-    {{ form_start(form, {'attr': { 'class': 'col-12 form form__role', 'novalidate': 'novalidate' }}) }}
-    {{ form_errors(form) }}
+{{ form_start(form, {'attr': { 'class': 'col-12 form form__role', 'novalidate': 'novalidate' }}) }}
+{{ form_errors(form) }}
 
-    {% if role.systemRole %}
-        {{ include('inadmin/partials/components/admonition.html.twig', {
-            type: 'warning',
-            text: 'This is a system role and cannot be edited or removed.',
-        })}}
-    {% endif %}
-    <div class="content__edit">
-        <section class="ui-section">
-            <fieldset class="multisection">
-                <legend>Role Details</legend>
+{% if role.systemRole %}
+    {{ include('inadmin/partials/components/admonition.html.twig', {
+        type: 'warning',
+        text: 'This is a system role and cannot be edited or removed.',
+    })}}
+{% endif %}
+<div class="content__edit">
+    <section class="ui-section">
+        <fieldset class="multisection">
+            <legend>Role Details</legend>
 
-                <p>
-                    {{ form_label(form.name) }}
-                    {{ form_errors(form.name) }}
-                    {{ form_widget(form.name) }}
-                </p>
+            <p>
+                {{ form_label(form.name) }}
+                {{ form_errors(form.name) }}
+                {{ form_widget(form.name) }}
+            </p>
 
-                <p>
-                    {{ form_label(form.description) }}
-                    {{ form_errors(form.description) }}
-                    {{ form_widget(form.description) }}
-                </p>
+            <p>
+                {{ form_label(form.description) }}
+                {{ form_errors(form.description) }}
+                {{ form_widget(form.description) }}
+            </p>
 
-                <p class="checkbox-row">
-                    {{ form_label(form.disableReview) }}
-                    {{ form_errors(form.disableReview) }}
-                    <span class="switch-wrapper">
-                    {{ form_widget(form.disableReview) }}
-                    </span>
-                </p>
-            </fieldset>
-        </section>
+            <p class="checkbox-row">
+                {{ form_label(form.disableReview) }}
+                {{ form_errors(form.disableReview) }}
+                <span class="switch-wrapper">
+                {{ form_widget(form.disableReview) }}
+                </span>
+            </p>
+        </fieldset>
+        <div class="role-stat">
+            <span class="material-icons">group</span>
+            {% if role.userCount == 0 %}
+            No users 
+            {% else %}
+            <strong>{{ role.userCount }}</strong>
+            {{ role.userCount == 1 ? 'user' : 'users' }}
+            {% endif %}
+            assigned to this role.
+        </div>
+    </section>
 
-        <section class="ui-section">
-            <fieldset class="multisection">
-                <legend>Permissions</legend>
+    <section class="ui-section">
+        <fieldset class="multisection">
+            <legend>Permissions</legend>
 
-                <p class="hint">
-                    Select the actions each resource type allows for this role.
-                    Use the column and row toggles to grant or revoke all at once.
-                </p>
+            <p class="hint">
+                Select the actions each resource type allows for this role.
+                Use the column and row toggles to grant or revoke all at once.
+            </p>
+            <p class="permission-search">
+                <label for="permission-filter" class="visually-hidden">
+                    Search permissions
+                </label>
 
-                <div class="table-responsive">
-                    <table class="table table--striped table--row-borders table--darkhead permission-matrix"
-                           aria-label="Permission matrix for this role">
-                        <thead>
+                <input
+                    type="search"
+                    id="permission-filter"
+                    class="text full-width"
+                    placeholder="Search permissions..."
+                    autocomplete="off">
+            </p>
+            <div class="table-responsive">
+                <table class="table table--striped table--row-borders table--darkhead permission-matrix"
+                        aria-label="Permission matrix for this role">
+                    <thead>
+                        <tr>
+                            <th scope="col" colspan="2">Item</th>
+                            {% for action in actions %}
+                                <th scope="col" class="table-header-alternate">
+                                    <button type="button"
+                                            class="button button--ghost permission-matrix__toggle-col"
+                                            data-col="{{ action.value|lower }}"
+                                            title="Toggle all {{ action.label()|lower }} permissions"
+                                            aria-label="Toggle all {{ action.label()|lower }} permissions">
+                                        {{ action.label()|capitalize }}
+                                    </button>
+                                </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for section in permissionGroups %}
+                        {% set group = section.group %}
+                        {% set resources = section.resources %} 
+                        {% for resource in resources %}
                             <tr>
-                                <th scope="col">Resource</th>
+                                {% if loop.first %}
+                                <th rowspan="{{ resources|length }}">
+                                    <span class="material-icons" aria-hidden="true">
+                                        {{ group.icon() }}
+                                    </span>
+                                    {{ group.label() }}
+                                </th>
+                                {% endif %}
+                                <th scope="row">
+                                    <button type="button"
+                                            class="button button--ghost permission-matrix__toggle-row"
+                                            data-row="{{ resource.value|lower }}">
+                                        {{ resource.label() }}
+                                    </button>
+                                </th>
+
                                 {% for action in actions %}
-                                    <th scope="col">
-                                        <button type="button"
-                                                class="button button--ghost permission-matrix__toggle-col"
-                                                data-col="{{ action.value|lower }}"
-                                                title="Toggle all {{ action.label()|lower }} permissions"
-                                                aria-label="Toggle all {{ action.label()|lower }} permissions">
-                                            {{ action.label()|capitalize }}
-                                        </button>
-                                    </th>
+                                    <td class="cell--border-right">
+                                        {% if action in resource.actions() %}
+                                            <label class="visually-hidden"
+                                                for="perm_{{ resource.value|lower }}_{{ action.value|lower }}">
+                                                {{ resource.label() }} – {{ action.label() }}
+                                            </label>
+
+                                            <input type="checkbox"
+                                                id="perm_{{ resource.value|lower }}_{{ action.value|lower }}"
+                                                name="permissions[{{ resource.value }}][{{ action.value }}]"
+                                                value="1"
+                                                class="permission-matrix__checkbox"
+                                                data-resource="{{ resource.value|lower }}"
+                                                data-action="{{ action.value|lower }}"
+                                                {% if permissionMatrix[resource.value][action.value] ?? false %}checked{% endif %}>
+                                        {% endif %}
+                                    </td>
                                 {% endfor %}
                             </tr>
-                        </thead>
-                        <tbody>
-                            {% for resource in resources %}
-                                <tr>
-                                    <th scope="row">
-                                        <button type="button"
-                                                class="button button--ghost permission-matrix__toggle-row"
-                                                data-row="{{ resource.value|lower }}">
-                                            {{ resource.label() }}
-                                        </button>
-                                    </th>
+                        {% endfor %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </fieldset>
+    </section>
 
-                                    {% for action in actions %}
-                                        <td>
-                                            {% if action in resource.actions() %}
-                                                <label class="visually-hidden"
-                                                    for="perm_{{ resource.value|lower }}_{{ action.value|lower }}">
-                                                    {{ resource.label() }} – {{ action.label() }}
-                                                </label>
-
-                                                <input type="checkbox"
-                                                    id="perm_{{ resource.value|lower }}_{{ action.value|lower }}"
-                                                    name="permissions[{{ resource.value }}][{{ action.value }}]"
-                                                    value="1"
-                                                    class="permission-matrix__checkbox"
-                                                    data-resource="{{ resource.value|lower }}"
-                                                    data-action="{{ action.value|lower }}"
-                                                    {% if permissionMatrix[resource.value][action.value] ?? false %}checked{% endif %}>
-                                            {% endif %}
-                                        </td>
-                                    {% endfor %}
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </fieldset>
-        </section>
-
-    </div>
+</div>
 {% if not role.systemRole %}
     <div class="fixed-bottom-bar">
         <p>
             {{ form_widget(form.submit) }}
             {% if role.id is not empty %}
-                {{ form_widget(form.delete) }}
+                {{ form_widget(form.delete, {
+                    attr: {
+                        disabled: not role.canBeDeleted,
+                        title: role.canBeDeleted
+                            ? ''
+                            : 'Roles assigned to users cannot be deleted.'
+                    }
+                }) }}
             {% endif %}
         </p>
     </div>
 {% endif %}
-    {{ form_row(form._token) }}
-    {{ form_end(form, {render_rest: false}) }}
+{{ form_row(form._token) }}
+{{ form_end(form, {render_rest: false}) }}
 
-    <script>
-    (function () {
-        'use strict';
-
-        /** Toggle all checkboxes in a row (resource) */
-        document.querySelectorAll('.permission-matrix__toggle-row').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                var row  = btn.dataset.row;
-                var boxes = document.querySelectorAll(
-                    '.permission-matrix__checkbox[data-resource="' + row + '"]'
-                );
-                var allChecked = Array.from(boxes).every(function (b) { return b.checked; });
-                boxes.forEach(function (b) { b.checked = !allChecked; });
-            });
-        });
-
-        /** Toggle all checkboxes in a column (action) */
-        document.querySelectorAll('.permission-matrix__toggle-col').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                var col   = btn.dataset.col;
-                var boxes = document.querySelectorAll(
-                    '.permission-matrix__checkbox[data-action="' + col + '"]'
-                );
-                var allChecked = Array.from(boxes).every(function (b) { return b.checked; });
-                boxes.forEach(function (b) { b.checked = !allChecked; });
-            });
-        });
-    }());
-    </script>
-
+<script>
+window.Inachis.PermissionMatrix.implications = {{ permissionImplications|json_encode|raw }};
+</script>
 {% endblock content %}

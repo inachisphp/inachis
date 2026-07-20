@@ -26,6 +26,7 @@ import './inadmin/_map.js';
 import './inadmin/_menu.js';
 import './inadmin/_notifications.js';
 import './inadmin/_penzai.js';
+import './inadmin/_permission-matrix.js';
 import './inadmin/_post__edit.js';
 import './inadmin/_setup.js';
 import './inadmin/_style-hacks.js';

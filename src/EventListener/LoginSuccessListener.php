@@ -10,11 +10,9 @@
 namespace Inachis\EventListener;
 
 use Inachis\Entity\User\{LoginActivity, User};
-use Inachis\Repository\User\LoginActivityRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Enum\Security\LoginResultType;
+use Inachis\Security\Authentication\LoginSuccessRecorder;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 /**
@@ -23,16 +21,10 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 class LoginSuccessListener
 {
     /**
-     * @param EntityManagerInterface $entityManager
-     * @param RequestStack $requestStack
-     * @param LoginActivityRepository $loginActivityRepository
-     * @param MailerInterface $mailer
+     * @param LoginSuccessRecorder $recorder
      */
     public function __construct(
-        protected EntityManagerInterface $entityManager,
-        protected RequestStack $requestStack,
-        protected LoginActivityRepository $loginActivityRepository,
-        protected MailerInterface $mailer,
+        protected readonly LoginSuccessRecorder $recorder,
     ) {}
 
     /**
@@ -42,48 +34,20 @@ class LoginSuccessListener
      */
     public function __invoke(LoginSuccessEvent $event): void
     {
-        $request = $event->getRequest();
-        /** @var User $user */
         $user = $event->getUser();
-        $firewallName = $event->getFirewallName();
-        $ip = $request->getClientIp();
-        $userAgent = $request->headers->get('User-Agent');
-        $sessionId = $request->getSession()->getId();
-        $fingerprint = hash('sha512', $ip . '|' . $userAgent);
-        $activity = new LoginActivity(
-            $user,
-            'success',
-            $ip,
-            $userAgent,
-            $sessionId,
-            null,
-            [
-                'fingerprint' => $fingerprint,
-                'roles' => $user->getRoles(),
-            ]
-        );
-
-        $isKnownDevice = $this->loginActivityRepository->deviceExists(
-            $user,
-            $fingerprint
-        );
-
-        if (!$isKnownDevice && !empty($user->getEmail())) {
-            $this->mailer->send(
-                (new TemplatedEmail())
-                    ->to($user->getEmail())
-                    ->subject('New device sign-in detected')
-                    ->htmlTemplate('emails/new_device.html.twig')
-                    ->textTemplate('emails/new_device.txt.twig')
-                    ->context([
-                        'ip' => $ip,
-                        'userAgent' => $userAgent,
-                        'time' => new \DateTimeImmutable(),
-                    ])
-            );
+        if (!$user instanceof User) {
+            return;
         }
-        $user->setLastLoginAt(new \DateTimeImmutable());
-        $this->entityManager->persist($activity);
-        $this->entityManager->flush();
+
+        // If TOTP is pending, the login is not yet complete.
+        if ($event->getRequest()->getSession()->has('security.2fa_pending')) {
+            return;
+        }
+
+        $this->recorder->record(
+            $user,
+            $event->getRequest(),
+            LoginResultType::TYPE_SUCCESS,
+        );
     }  
 }

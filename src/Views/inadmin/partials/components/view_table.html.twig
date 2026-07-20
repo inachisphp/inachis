@@ -1,13 +1,17 @@
-{% set table_class = table_class|default('') ~ (zebra|default(false) ? ' table--striped' : '') %}
-{% set table_class = table_class ~ (show_select_deselect|default(false) ? ' table--selectable' : '') %}
-{% set table_class = table_class ~ (sortable|default(false) ? ' table--dragdrop' : '') %}
+{% set tableClasses = [
+    'table',
+    table_class|default(null),
+    zebra is defined and zebra ? 'table--striped',
+    show_select_deselect is defined and show_select_deselect  ? 'table--selectable',
+    sortable is defined and sortable ? 'table--dragdrop',
+]|filter(v => v) %}
 
 {% if table_desc|default('') is not empty %}
 <p id="table-desc" class="visually-hidden">
     {{ table_desc }}
 </p>
 {% endif %}
-<table {%- if table_desc|default('') is not empty %} aria-describedby="table-desc"{% endif %} class="table {{ table_class|default('') }}">
+<table {%- if table_desc|default('') is not empty %} aria-describedby="table-desc"{% endif %} class="{{ tableClasses|join(' ') }}">
     {%if table_name|default(null) %}<caption class="visually-hidden">{{ table_name }}</caption>{% endif %}
     <thead>
         <tr>
@@ -21,16 +25,19 @@
             </th>
         {% endif %}
         {% for column in columns %}
-            <th class="
-            {%- if column.hideOnMobile|default(false) %}hide-on-mobile {% endif %}
-            {%- if column.badges|default([]) %}badgecol {% endif %}
-            {%- if column.source_type|default('') in [ 'numeric', 'count'] %}col-count {% endif %}
-            {%- if column.source_type|default('') in [ 'boolean', 'date'] %}col-date {% endif -%}
-            " scope="col">
+            {% set cellClasses = [
+                column.badges|default([]) is not empty ? 'badgecol',
+                column.hideOnMobile|default(false) ? 'hide-on-mobile',
+                column.source_type|default('') in [ 'numeric', 'count' ] ? 'col-count',
+                column.source_type|default('') in [ 'boolean', 'date' ] ? 'col-date',
+                column.source_type|default('') == 'datetime' ? 'col-datetime',
+            ]|filter(v => v) %}
+
+            <th class="{{ cellClasses|join(' ') }}" scope="col">
                 {{ column.title }}
             </th>
         {% endfor %}
-        {% if sortable is defined and sortable %}
+        {% if (sortable is defined and sortable) or (show_action_list is defined and show_action_list) %}
             <th class="col-actions" scope="col">Actions</th>
         {% endif %}
         </tr>
@@ -38,7 +45,13 @@
     <tbody>
     {% if dataset.iterator|default(null) %}{% set dataset = dataset.iterator %}{% endif %}
     {% for item in dataset %}
-        <tr>
+        {% set rowClasses = [] %}
+        {% for rule in rowHighlighting|default([]) %}
+            {% if property(item, rule.field) == rule.equals %}
+                {% set rowClasses = rowClasses|merge([rule.className]) %}
+            {% endif %}
+        {% endfor %}
+        <tr{% if rowClasses is not empty %} class="{{ rowClasses|join(' ') }}"{% endif %}>
         {% if sortable is defined and sortable %}
             <td class="handle">☰</td>
         {% endif %}
@@ -48,38 +61,35 @@
             </td>
         {% endif %}
         {% for column in columns %}
+            {# Calculate URL if required #}
             {% if column.slug is defined %}
-                {% if '.' in column.slug %}
-                    {% set slug_exploded = column.slug|split('.')  %}
-                    {% set slug_object = item %}
-                    {% for part in slug_exploded %}
-                        {% if '[' in part %}
-                            {% set part = part|split('[')[0] %}
-                            {% if attribute(slug_object, part)[0] is defined %}
-                                {% set slug_object = attribute(slug_object, part)[0] %}
-                            {% else %}
-                                {% set slug_object = '' %}
-                            {% endif %}
-                        {% elseif attribute(slug_object, part) is defined %}
-                            {% set slug_object = attribute(slug_object, part) %}
-                        {% else %}
-                            {% set slug_object = '' %}
-                        {% endif %}
-                    {% endfor %}
-                {% elseif attribute(item, column.slug) is defined %}
-                    {% set slug_object = attribute(item, column.slug) %}
-                {% else %}
-                    {% set slug_object = '' %}
-                {% endif %}
+                {% set slug_object = property(item, column.slug) %}
+            {% elseif column.path is defined %}
+                {% set path_params = {} %}
+
+                {% for paramName, paramSource in column.path_params %}
+                    {% set path_params = path_params|merge({
+                        (paramName): property(item, paramSource|replace({'item.': ''}))|default(null)
+                    }) %}
+                {% endfor %}
+
+                {% set url = path(column.path, path_params) %}
             {% endif %}
-            <{% if column.header is defined and column.header %}th scope="row"{% else %}td class="{%
-                if column.flex|default(false) %}table--flex {% endif %}
-                {%- if column.source_type|default('') in [ 'numeric', 'count'] %}col-count {% endif %}
-                {%- if column.source_type|default('') in [ 'boolean', 'date' ] %}col-date {% endif %}
-                {%- if column.badges|default([]) %}badgecol {% endif %}
-                {%- if column.hideOnMobile|default(false) %}hide-on-mobile {% endif %}
-                {%- if column.className is defined %}{{ column.className == 'use_self' ? attribute(item, column.source) : column.className }}{% endif -%}
-            "{% endif %}>
+            {# Calculate cell classes #}
+            {% set cellClasses = [
+                column.flex|default(false) ? 'table--flex',
+                column.source_type|default('') in ['numeric', 'count'] ? 'col-count',
+                column.source_type|default('') in ['boolean', 'date'] ? 'col-date',
+                column.source_type|default('') == 'datetime' ? 'col-datetime',
+                column.badges|default([]) is not empty ? 'badgecol',
+                column.hideOnMobile|default(false) ? 'hide-on-mobile',
+                column.className is defined ? (
+                    column.className == 'use_self'
+                        ? property(item, column.source)
+                        : column.className
+                ),
+            ]|filter(v => v) %}
+            <{% if column.header is defined and column.header %}th scope="row"{% else %}td class="{{ cellClasses|join(' ') }}"{% endif %}>
                 {% if column.slug is defined %}
                     {% if column.slug_prefix is defined %}
                         <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incc/{{ attribute(item, column.slug_prefix) }}/{{ slug_object }}">
@@ -88,12 +98,16 @@
                     {% endif %}
                 {% elseif column.url is defined and column.url is not empty %}
                         <a aria-label="Edit {{ attribute(item, 'title') }}" href="{{ attribute(item, column.url) }}">
+                {% elseif url is defined and url is not empty and column.path is defined %}
+                        <a aria-label="Edit" href="{{ url }}">
                 {% endif %}
                 {% if column.source is defined and attribute(item, column.source) is defined %}
                     {% if column.source_type is defined and column.source_type == 'date' %}
                         {{ attribute(item, column.source)|date('d/m/Y', viewModel.session.preferences.timezone) }}
+                    {% elseif column.source_type is defined and column.source_type == 'datetime' %}
+                        {{ attribute(item, column.source)|date(column.dateFormat|default('d/m/Y H:i'), viewModel.session.preferences.timezone) }}
                     {% elseif column.source_type is defined and column.source_type == 'title' %}
-                        {{ attribute(attribute(item, column.source), 'title') }}
+                        {{ property(item, column.source ~ '.title') }}
                     {% elseif column.source_type is defined and column.source_type == 'count' %}
                         {{ attribute(item, column.source)|length }}
                     {% elseif column.source_type is defined and column.source_type == 'boolean' %}
@@ -109,7 +123,7 @@
                     {% else %}
                         {% if column.maxLength is defined %}
                             {{ attribute(item, column.source)|slice(0, column.maxLength) }}
-                            {% if attribute(item, column.source)|length > 300 %}…{% endif %}
+                            {% if attribute(item, column.source)|length > column.maxLength %}…{% endif %}
                         {% else %}
                             {{ attribute(item, column.source)|default('-') }}
                         {% endif %}

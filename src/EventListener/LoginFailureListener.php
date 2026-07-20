@@ -11,6 +11,7 @@ namespace Inachis\EventListener;
 
 use Inachis\Entity\User\LoginActivity;
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Enum\Security\LoginResultType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 
@@ -50,7 +51,7 @@ class LoginFailureListener
 
         $activity = new LoginActivity(
             null,
-            'failure',
+            LoginResultType::TYPE_FAILURE,
             $ip,
             $userAgent,
             null,

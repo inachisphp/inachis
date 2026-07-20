@@ -72,6 +72,10 @@ table {
       text-align: left;
       white-space: nowrap;
     }
+    tr th.table-header-alternate {
+      background-color: #000;
+      text-align: center;
+    }
   }
 
   .shortcol {
@@ -101,8 +105,17 @@ table {
       text-wrap: wrap;
   }
 
+  .col-datetime {
+      width: 22ch;
+      white-space: nowrap;
+      text-wrap: wrap;
+  }
+
   // Body
   tbody {
+    th {
+      text-align: left;
+    }
     tr {
       transition: background 0.15s ease;
 
@@ -491,8 +504,22 @@ td.column--monospaced {
 }
 
 .permission-matrix {
-  th, td { padding: 0.5rem; text-align: center;}
+
+  th, td {
+    padding: 0.5rem;
+    text-align: center;
+  }
+  td.cell--border-right {
+    border: 1px solid $border-color-dark;
+    width: 13ch;
+    &.permission--selected {
+      background-color: var(--color-progress-good);
+    }
+    &.permission--implied { opacity: 0.75; }
+  }
+  thead tr th, tbody th { text-align: left; }
   input.permission-matrix__checkbox { width: 3.25rem; }
+  span.material-icons { vertical-align: middle; margin-right: 0.5rem; }
 }
 
 .row--disabled {

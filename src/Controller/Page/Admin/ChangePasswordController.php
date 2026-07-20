@@ -14,6 +14,7 @@ use Exception;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Form\ChangePasswordType;
 use Inachis\Repository\User\UserRepository;
+use Inachis\Security\Authentication\TrustedDeviceManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -29,6 +30,7 @@ class ChangePasswordController extends AbstractInachisController
      * Controller for the change-password tab in the admin interface
      *
      * @param Request $request
+     * @param TrustedDeviceManager $trustedDeviceManager
      * @param UserPasswordHasherInterface $passwordHasher
      * @param UserRepository $userRepository
      * @return Response
@@ -36,6 +38,7 @@ class ChangePasswordController extends AbstractInachisController
     #[Route("/incc/admin/{id}/change-password", name: "incc_admin_change_password", methods: [ "GET", "POST" ])]
     public function changePasswordTab(
         Request $request,
+        TrustedDeviceManager $trustedDeviceManager,
         UserPasswordHasherInterface $passwordHasher,
         UserRepository $userRepository,
     ): Response {
@@ -67,8 +70,9 @@ class ChangePasswordController extends AbstractInachisController
             if (!$passwordHasher->isPasswordValid($user, $plaintextPassword)) {
                 throw new AccessDeniedHttpException();
             }
-            $this->addFlash('success', 'Password updated.');
+            $trustedDeviceManager->removeAll($user);
             $this->entityManager->flush();
+            $this->addFlash('success', 'Password updated.');
         }
 
         $this->viewModel->page->title = 'Change Password';
