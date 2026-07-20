@@ -23,7 +23,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
 		this.createSidebar();
         this.createStatusBarButton();
         this.createCommentButton();
-
+		this.attachCodeMirrorListeners();
         this.attachSelectionListener();
 
 		try {
@@ -40,48 +40,59 @@ window.Inachis.EasyMDEReviewPlugin = class {
         }
     }
 
-    async loadThreads() {
-        const response = await fetch(`${this.endpoint}/page/${this.pageId}`);
-		if (!response.ok) throw new Error('Failed to fetch threads');
-        this.threads = await response.json();
-        this.renderThreads();
-		this.updateStatusButton();
+    async assignThread(threadId, userId) {
+        try {
+            const response = await fetch(`${this.endpoint}/thread/${threadId}/assign`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId })
+            });
+            if (!response.ok) throw new Error('Assignment failed');
+            
+            await this.loadThreads();
+            const updated = this.findThreadById(threadId);
+            if (updated) this.openThread(updated);
+        } catch (error) {
+            console.error(error);
+        }
     }
 
-	async loadReviewers() {
-		const response = await fetch(`${this.endpoint}/reviewers`);
-		if (!response.ok) throw new Error('Failed to fetch reviewers');
-		this.reviewers =await response.json();
-	}
+	attachCodeMirrorListeners() {
+        this.cm.getWrapperElement().addEventListener('click', (event) => {
+            const highlight = event.target.closest('[data-thread-id]');
+            if (!highlight) return;
 
-    renderThreads() {
-        this.clearMarkers();
-        this.threads.forEach(thread => {
-            if (thread.resolved) return;
+            event.preventDefault();
+            event.stopPropagation();
 
-			// Handle edge cases where offsets might be missing or out of bounds
-            const startIdx = thread.currentStartOffset ?? thread.startOffset ?? 0;
-            const endIdx = thread.currentEndOffset ?? thread.endOffset ?? 0;
-
-            const marker = this.cm.markText(
-				this.cm.posFromIndex(startIdx),
-                this.cm.posFromIndex(endIdx),
-                {
-                    className:
-						thread.id === this.activeThreadId
-							? 'cm-review-highlight-active'
-							: 'cm-review-highlight',
-                    attributes: {
-                        'data-thread-id': thread.id
-                    }
+            const thread = this.findThreadById(highlight.dataset.threadId);
+            if (thread) {
+                if (this.activeThreadId !== thread.id) {
+                    this.jumpToThread(thread);
                 }
-            );
-            marker.reviewThread = thread;
-            this.markers.push(marker);
+                this.openThread(thread);
+            }
         });
 
-        // Wait for CodeMirror to sync DOM before binding click event listeners
-        setTimeout(() => this.attachHighlightEvents(), 0);
+        this.cm.on('change', () => {
+            this.syncMarkerOffsets();
+        });
+    }
+
+    attachSelectionListener() {
+        // Debounce to prevent layout thrashing during active drag selections
+        let timeout;
+        this.cm.on('cursorActivity', () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                const selection = this.cm.getSelection();
+                if (!selection || !selection.trim()) {
+                    this.hideCommentButton();
+                    return;
+                }
+                this.showCommentButton();
+            }, 100);
+        });
     }
 
     clearMarkers() {
@@ -89,24 +100,80 @@ window.Inachis.EasyMDEReviewPlugin = class {
         this.markers = [];
     }
 
-    findThreadById(id) {
-		return this.threads.find(thread => String(thread.id) === String(id));
+    createAssignmentBox(thread) {
+        const select = this.ui('select', {
+            className: 'review-assignee-select',
+            onchange: () => this.assignThread(thread.id, select.value)
+        }, this.ui('option', { value: '' }, 'Unassigned'));
+
+        this.reviewers.forEach(user => {
+            const isSelected = thread.assignedTo && String(thread.assignedTo.id) === String(user.id);
+            select.appendChild(
+                this.ui('option', { 
+                    value: user.id,
+                    ...(isSelected ? { selected: 'selected' } : {})
+                }, user.name)
+            );
+        });
+
+        return this.ui('div', { className: 'review-assignment' }, select);
     }
 
-    attachHighlightEvents() {
-        document.querySelectorAll('[data-thread-id]').forEach(el => {
-			if (el.dataset.reviewBound) return;
+    createCommentButton() {
+        const button = document.createElement('button');
+        button.className = 'review-comment-button';
+        button.textContent = '💬';
+        button.style.display = 'none';
+        document.body.appendChild(button);
 
-			el.dataset.reviewBound = '1';
-			el.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const thread = this.findThreadById(el.dataset.threadId);
-                if (thread) {
-                    this.jumpToThread(thread);
-                    this.openThread(thread);
-                }
-            });
-		});
+        button.onclick = () => {
+            this.openCommentDialog();
+        };
+
+        this.commentButton = button;
+    }
+
+	createReopenButton(thread) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'button review-reopen-button';
+        button.textContent = 'Reopen Review';
+        button.onclick = async () => {
+            await this.reopenThread(thread.id);
+        };
+        return button;
+    }
+
+    createReplyForm(thread) {
+        const textarea = this.ui('textarea', {
+            className: 'review-reply-text',
+            placeholder: 'Reply to this review...',
+            rows: '4'
+        });
+
+        const btn = this.ui('button', {
+            type: 'button',
+            className: 'button button--add review-reply-button',
+            onclick: async () => {
+                const message = textarea.value.trim();
+                if (!message) return;
+                btn.disabled = true;
+                await this.replyToThread(thread.id, message);
+            }
+        }, 'Reply');
+
+        return this.ui('div', { className: 'review-reply-form' }, textarea, btn);
+    }
+
+    createResolveButton(thread) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'button button--positive review-resolve-button';
+        button.textContent = 'Resolve';
+        button.onclick = () => {
+            this.showResolveConfirmation(thread);
+        };
+        return button;
     }
 
 	createSidebar() {
@@ -155,13 +222,6 @@ window.Inachis.EasyMDEReviewPlugin = class {
         }
 	}
 
-	toggleSidebar() {
-		const container = document.querySelector(this.sidebarContainer);
-        if (container) {
-            container.classList.toggle('visually-hidden');
-        }
-	}
-
     createStatusBarButton() {
 		const bar = this.mde.element.parentElement.querySelector('.editor-statusbar');
 		if (!bar) return;
@@ -177,149 +237,6 @@ window.Inachis.EasyMDEReviewPlugin = class {
 		this.statusButton = button;
 		this.updateStatusButton();
 	}
-
-    createCommentButton() {
-        const button = document.createElement('button');
-        button.className = 'review-comment-button';
-        button.textContent = '💬';
-        button.style.display = 'none';
-        document.body.appendChild(button);
-
-        button.onclick = () => {
-            this.openCommentDialog();
-        };
-
-        this.commentButton = button;
-    }
-
-	createReopenButton(thread) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'button review-reopen-button';
-        button.textContent = 'Reopen Review';
-        button.onclick = async () => {
-            await this.reopenThread(thread.id);
-        };
-        return button;
-    }
-
-    attachSelectionListener() {
-        // Debounce to prevent layout thrashing during active drag selections
-        let timeout;
-        this.cm.on('cursorActivity', () => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                const selection = this.cm.getSelection();
-                if (!selection || !selection.trim()) {
-                    this.hideCommentButton();
-                    return;
-                }
-                this.showCommentButton();
-            }, 100);
-        });
-    }
-
-    showThreadList() {
-        const body = this.sidebar.querySelector('.review-sidebar-body');
-        this.activeThreadId = null;
-        body.innerHTML = '';
-
-        const visibleThreads = this.threads.filter(thread => this.showResolved || !thread.resolved);
-
-        if (!visibleThreads.length) {
-            body.innerHTML = '<p class="review-empty-state">No open reviews</p>';
-            return;
-        }
-
-        visibleThreads.forEach(thread => {
-            const item = document.createElement('div');
-            item.className = 'review-thread-item';
-            
-            // XSS Prevention via context-safe text assignment
-            const titleEl = document.createElement('strong');
-            titleEl.textContent = (thread.selectedText || '').substring(0, 60);
-            item.appendChild(titleEl);
-
-            if (thread.resolved) {
-                const badge = document.createElement('span');
-                badge.className = 'review-status-resolved badge badge__ok';
-                badge.textContent = 'Resolved';
-                item.appendChild(badge);
-            }
-
-            const countEl = document.createElement('div');
-            countEl.className = 'review-comment-count';
-            countEl.textContent = `${thread.comments?.length || 0} comment(s)`;
-            item.appendChild(countEl);
-
-            item.onclick = () => {
-                this.jumpToThread(thread);
-                this.openThread(thread);
-            };
-
-            body.appendChild(item);
-        });
-    }
-
-    showCommentButton() {
-        const selection = window.getSelection();
-        if (!selection.rangeCount) return;
-
-        const from = this.cm.getCursor('from');
-        const to = this.cm.getCursor('to');
-        const start = this.cm.cursorCoords(from, 'page');
-        const end = this.cm.cursorCoords(to, 'page');
-        const left = (start.left + end.left) / 2;
-        const top = Math.min(start.top, end.top);
-
-        this.commentButton.style.display = 'block';
-        this.commentButton.style.position = 'absolute';
-        this.commentButton.style.left = `${left}px`;
-        this.commentButton.style.top = `${top - 40}px`;
-    }
-
-    hideCommentButton() {
-        this.commentButton.style.display = 'none';
-    }
-
-    openCommentDialog() {
-        const body = this.sidebar.querySelector('.review-sidebar-body');
-        body.innerHTML = '';
-
-        const wrapper = document.createElement('div');
-        wrapper.className = 'review-new-thread';
-        
-        const h3 = document.createElement('h3');
-        h3.textContent = 'Create Review';
-        wrapper.appendChild(h3);
-
-        const preview = document.createElement('div');
-        preview.className = 'review-selection-preview';
-        preview.textContent = this.cm.getSelection();
-        wrapper.appendChild(preview);
-
-        const textarea = document.createElement('textarea');
-        textarea.className = 'review-new-thread-message';
-        textarea.rows = 5;
-        textarea.placeholder = 'Enter review comment...';
-        wrapper.appendChild(textarea);
-
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'button button--add';
-        button.textContent = 'Create Review';
-        
-        button.onclick = async () => {
-            const message = textarea.value.trim();
-            if (!message) return;
-
-            button.disabled = true; // Prevent double submission
-            await this.createThread(message);
-        };
-        wrapper.appendChild(button);
-
-        body.appendChild(wrapper);
-    }
 
     async createThread(message) {
         const from = this.cm.indexFromPos(this.cm.getCursor('from'));
@@ -358,60 +275,133 @@ window.Inachis.EasyMDEReviewPlugin = class {
         }
     }
 
+    findThreadById(id) {
+		return this.threads.find(thread => String(thread.id) === String(id));
+    }
+
+    hideCommentButton() {
+        this.commentButton.style.display = 'none';
+    }
+
+    jumpToThread(thread) {
+        const startIdx = thread.currentStartOffset ?? thread.startOffset;
+        const endIdx = thread.currentEndOffset ?? thread.endOffset;
+        if (startIdx === undefined || endIdx === undefined) return;
+
+        const from = this.cm.posFromIndex(startIdx);
+        const to = this.cm.posFromIndex(endIdx);
+
+        this.cm.focus();
+        this.cm.setSelection(from, to);
+        this.cm.scrollIntoView(from, 150);
+    }
+
+	async loadReviewers() {
+		const response = await fetch(`${this.endpoint}/reviewers`);
+		if (!response.ok) throw new Error('Failed to fetch reviewers');
+		this.reviewers =await response.json();
+	}
+
+    async loadThreads() {
+        const response = await fetch(`${this.endpoint}/page/${this.pageId}`);
+		if (!response.ok) throw new Error('Failed to fetch threads');
+        this.threads = await response.json();
+        this.renderThreads();
+		this.updateStatusButton();
+    }
+
+    openCommentDialog() {
+        const body = this.sidebar.querySelector('.review-sidebar-body');
+        body.innerHTML = '';
+
+        const textarea = this.ui('textarea', {
+            className: 'review-new-thread-message',
+            rows: '5',
+            placeholder: 'Enter review comment...'
+        });
+
+        const submitBtn = this.ui('button', {
+            type: 'button',
+            className: 'button button--add',
+            onclick: async () => {
+                const message = textarea.value.trim();
+                if (!message) return;
+                submitBtn.disabled = true;
+                await this.createThread(message);
+            }
+        }, 'Create Review');
+
+        const wrapper = this.ui('div', { className: 'review-new-thread' },
+            this.ui('h3', {}, 'Create Review'),
+            this.ui('div', { className: 'review-selection-preview' }, this.cm.getSelection()),
+            textarea,
+            submitBtn
+        );
+
+        body.appendChild(wrapper);
+    }
+
     openThread(thread) {
         this.activeThreadId = thread.id;
         const body = this.sidebar.querySelector('.review-sidebar-body');
         body.innerHTML = '';
 
-        // Header Navigation Back Link
-        const header = document.createElement('div');
-        header.className = 'review-thread-header';
-        const backLink = document.createElement('a');
-        backLink.href = '#';
-        backLink.className = 'review-back-link';
-        backLink.textContent = '← All Reviews';
-        backLink.onclick = (e) => {
-            e.preventDefault();
-            this.showThreadList();
-        };
-        header.appendChild(backLink);
-        body.appendChild(header);
+        // Back link header
+        body.appendChild(
+            this.ui('div', { className: 'review-thread-header' },
+                this.ui('a', {
+                    href: '#',
+                    className: 'review-back-link',
+                    onclick: (e) => { e.preventDefault(); this.showThreadList(); }
+                }, '← All Reviews')
+            )
+        );
 
         if (thread.needsRebase) {
-            const warning = document.createElement('div');
-            warning.className = 'review-warning';
-            warning.textContent = '⚠ This review could not be automatically relocated after content changes.';
-            body.appendChild(warning);
+            body.appendChild(this.ui('div', { className: 'review-warning' }, 
+                '⚠ This review could not be automatically relocated after content changes.'
+            ));
         }
+		
+		const rawText = thread.selectedText || '';
+        const isLongText = rawText.length > 120 || rawText.includes('\n');
 
-        const title = document.createElement('div');
-        title.className = 'review-thread-title';
-        const strong = document.createElement('strong');
-        strong.textContent = 'Selected text';
-        const blockquote = document.createElement('blockquote');
-        blockquote.textContent = thread.selectedText;
-        title.appendChild(strong);
-        title.appendChild(blockquote);
-        body.appendChild(title);
+		const summaryText = isLongText 
+            ? rawText.split('\n').slice(0, 2).join('\n').substring(0, 120).trim() + '...'
+            : rawText;
+
+		const blockquote = this.ui('blockquote', { 
+            className: isLongText ? 'review-preview-truncatable' : '',
+            title: isLongText ? 'Click to expand full selection text' : '',
+            style: isLongText ? 'cursor: pointer;' : '',
+            onclick: () => {
+                if (!isLongText) return;
+                // Toggle between full text and summary view on click
+                const isExpanded = blockquote.dataset.expanded === 'true';
+                blockquote.textContent = isExpanded ? summaryText : rawText;
+                blockquote.dataset.expanded = isExpanded ? 'false' : 'true';
+            }
+        }, summaryText);
+
+        // Selected context block
+        body.appendChild(
+            this.ui('div', { className: 'review-thread-title' },
+                this.ui('strong', {}, 'Selected text'),
+                blockquote
+            )
+        );
 
         body.appendChild(this.createAssignmentBox(thread));
 
+        // Thread comments iteration
         if (thread.comments?.length) {
             thread.comments.forEach(comment => {
-                const item = document.createElement('div');
-                item.className = 'review-comment';
-
-                const author = document.createElement('div');
-                author.className = 'review-comment-author';
-                author.textContent = comment.author?.name || 'Unknown';
-
-                const msg = document.createElement('div');
-                msg.className = 'review-comment-message';
-                msg.textContent = comment.message;
-
-                item.appendChild(author);
-                item.appendChild(msg);
-                body.appendChild(item);
+                body.appendChild(
+                    this.ui('div', { className: 'review-comment' },
+                        this.ui('div', { className: 'review-comment-author' }, comment.author?.name || 'Unknown'),
+                        this.ui('div', { className: 'review-comment-message' }, comment.message)
+                    )
+                );
             });
         }
 
@@ -421,7 +411,54 @@ window.Inachis.EasyMDEReviewPlugin = class {
         } else {
             body.appendChild(this.createReopenButton(thread));
         }
-        this.renderThreads();
+        
+        setTimeout(() => {
+            this.renderThreads();
+        }, 0);
+    }
+
+    renderThreads() {
+		this.syncMarkerOffsets();
+        this.clearMarkers();
+
+        this.threads.forEach(thread => {
+            if (thread.resolved) return;
+
+			// Handle edge cases where offsets might be missing or out of bounds
+            const startIdx = thread.currentStartOffset ?? thread.startOffset ?? 0;
+            const endIdx = thread.currentEndOffset ?? thread.endOffset ?? 0;
+
+			if (startIdx === endIdx && startIdx === 0) return;
+
+            const marker = this.cm.markText(
+				this.cm.posFromIndex(startIdx),
+                this.cm.posFromIndex(endIdx),
+                {
+                    className: thread.id === this.activeThreadId
+						? 'cm-review-highlight-active'
+						: 'cm-review-highlight',
+                    attributes: {
+                        'data-thread-id': String(thread.id)
+                    }
+                }
+            );
+            marker.reviewThread = thread;
+            this.markers.push(marker);
+        });
+    }
+
+    async reopenThread(threadId) {
+        try {
+            const response = await fetch(`${this.endpoint}/thread/${threadId}/reopen`, { method: 'POST' });
+            if (!response.ok) throw new Error('Server error reopening thread');
+
+            await this.loadThreads();
+            const thread = this.findThreadById(threadId);
+            if (thread) this.openThread(thread);
+        } catch (error) {
+            console.error(error);
+            alert('Failed to reopen review');
+        }
     }
 
     async replyToThread(threadId, message) {
@@ -443,6 +480,101 @@ window.Inachis.EasyMDEReviewPlugin = class {
             alert('Failed to add reply');
         }
     }
+
+    showCommentButton() {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const from = this.cm.getCursor('from');
+        const to = this.cm.getCursor('to');
+        const start = this.cm.cursorCoords(from, 'page');
+        const end = this.cm.cursorCoords(to, 'page');
+        const left = (start.left + end.left) / 2;
+        const top = Math.min(start.top, end.top);
+
+        this.commentButton.style.display = 'block';
+        this.commentButton.style.position = 'absolute';
+        this.commentButton.style.left = `${left}px`;
+        this.commentButton.style.top = `${top - 40}px`;
+    }
+
+    showResolveConfirmation(thread) {
+        const body = this.sidebar.querySelector('.review-sidebar-body');
+        const existing = body.querySelector('.review-resolve-confirmation');
+        if (existing) { return existing.remove(); }
+
+        const confirmBtn = this.ui('button', {
+            type: 'button',
+            className: 'button button--positive',
+            onclick: async () => {
+                confirmBtn.disabled = true;
+                await this.resolveThread(thread.id);
+            }
+        }, 'Resolve');
+
+        const container = this.ui('div', { className: 'review-resolve-confirmation' },
+            this.ui('p', {}, 'Resolve this review?'),
+            confirmBtn,
+            this.ui('button', {
+                type: 'button',
+                className: 'button',
+                onclick: () => container.remove()
+            }, 'Cancel')
+        );
+
+        body.appendChild(container);
+    }
+
+    showThreadList() {
+        const body = this.sidebar.querySelector('.review-sidebar-body');
+        this.activeThreadId = null;
+        body.innerHTML = '';
+
+        const visibleThreads = this.threads.filter(
+			thread => this.showResolved || !thread.resolved
+		);
+
+        if (!visibleThreads.length) {
+            body.innerHTML = '<p class="review-empty-state">No open reviews</p>';
+			body.appendChild(this.ui('p', {
+				className: 'review-empty-state'
+			}, 'No open reviews'));
+            return;
+        }
+
+        visibleThreads.forEach(thread => {
+            const item = this.ui('div', {
+                className: 'review-thread-item',
+                onclick: () => {
+                    this.jumpToThread(thread);
+                    this.openThread(thread);
+                }
+            },
+                this.ui('strong', {}, (thread.selectedText || '').substring(0, 60)),
+                thread.resolved && this.ui('span', { className: 'review-status-resolved badge badge__ok' }, 'Resolved'),
+                this.ui('div', { className: 'review-comment-count' }, `${thread.comments?.length || 0} comment(s)`)
+            );
+
+            body.appendChild(item);
+        });
+    }
+	
+	syncMarkerOffsets() {
+        this.markers.forEach(marker => {
+            const pos = marker.find();
+            if (pos && marker.reviewThread) {
+                marker.reviewThread.currentStartOffset = this.cm.indexFromPos(pos.from);
+                marker.reviewThread.currentEndOffset = this.cm.indexFromPos(pos.to);
+            }
+        });
+    }
+
+	toggleSidebar() {
+		const container = document.querySelector(this.sidebarContainer);
+        if (container) {
+            container.classList.toggle('visually-hidden');
+        }
+	}
 
     async resolveThread(threadId) {
         try {
@@ -467,155 +599,41 @@ window.Inachis.EasyMDEReviewPlugin = class {
         }
     }
 
-    jumpToThread(thread) {
-        const startIdx = thread.currentStartOffset ?? thread.startOffset;
-        const endIdx = thread.currentEndOffset ?? thread.endOffset;
-        if (startIdx === undefined || endIdx === undefined) return;
+	/**
+     * Helper to declaratively build DOM elements safely.
+     * @param {string} type - HTML Tag name (e.g., 'div', 'button')
+     * @param {Object} props - HTML attributes, className, or event listeners (e.g., onclick)
+     * @param {...(HTMLElement|string)} children - Child elements or text strings
+     */
+    ui(type, props = {}, ...children) {
+        const el = document.createElement(type);
+        
+        Object.entries(props).forEach(([key, value]) => {
+            if (key.startsWith('on') && typeof value === 'function') {
+                // Attach event listeners (e.g., onclick -> click)
+                el.addEventListener(key.substring(2).toLowerCase(), value);
+            } else if (key === 'className') {
+                el.className = value;
+            } else if (value !== undefined && value !== null) {
+                el.setAttribute(key, String(value));
+            }
+        });
 
-        const from = this.cm.posFromIndex(startIdx);
-        const to = this.cm.posFromIndex(endIdx);
+        children.flat().forEach(child => {
+            if (child === undefined || child === null || child === false) return;
+            if (typeof child === 'string' || typeof child === 'number') {
+                el.appendChild(document.createTextNode(String(child)));
+            } else {
+                el.appendChild(child);
+            }
+        });
 
-        this.cm.focus();
-        this.cm.setSelection(from, to);
-        this.cm.scrollIntoView(from, 150);
-    }
-
-    async reopenThread(threadId) {
-        try {
-            const response = await fetch(`${this.endpoint}/thread/${threadId}/reopen`, { method: 'POST' });
-            if (!response.ok) throw new Error('Server error reopening thread');
-
-            await this.loadThreads();
-            const thread = this.findThreadById(threadId);
-            if (thread) this.openThread(thread);
-        } catch (error) {
-            console.error(error);
-            alert('Failed to reopen review');
-        }
+        return el;
     }
 
     updateStatusButton() {
         if (!this.statusButton) return;
         const openCount = this.threads.filter(thread => !thread.resolved).length;
         this.statusButton.textContent = `💬 Reviews (${openCount})`;
-    }
-
-    createReplyForm(thread) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'review-reply-form';
-
-        const textarea = document.createElement('textarea');
-        textarea.className = 'review-reply-text';
-        textarea.placeholder = 'Reply to this review...';
-        textarea.rows = 4;
-
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'button button--add review-reply-button';
-        button.textContent = 'Reply';
-
-        button.onclick = async () => {
-            const message = textarea.value.trim();
-            if (!message) return;
-            button.disabled = true;
-            await this.replyToThread(thread.id, message);
-        };
-
-        wrapper.appendChild(textarea);
-        wrapper.appendChild(button);
-        return wrapper;
-    }
-
-    createAssignmentBox(thread) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'review-assignment';
-
-        const select = document.createElement('select');
-        select.className = 'review-assignee-select';
-        
-        const defaultOpt = document.createElement('option');
-        defaultOpt.value = '';
-        defaultOpt.textContent = 'Unassigned';
-        select.appendChild(defaultOpt);
-
-        this.reviewers.forEach(user => {
-            const option = document.createElement('option');
-            option.value = user.id;
-            option.textContent = user.name;
-            if (thread.assignedTo && String(thread.assignedTo.id) === String(user.id)) {
-                option.selected = true;
-            }
-            select.appendChild(option);
-        });
-
-        select.onchange = () => {
-            this.assignThread(thread.id, select.value);
-        };
-
-        wrapper.appendChild(select);
-        return wrapper;
-    }
-
-    async assignThread(threadId, userId) {
-        try {
-            const response = await fetch(`${this.endpoint}/thread/${threadId}/assign`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId })
-            });
-            if (!response.ok) throw new Error('Assignment failed');
-            
-            await this.loadThreads();
-            const updated = this.findThreadById(threadId);
-            if (updated) this.openThread(updated);
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    createResolveButton(thread) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'button button--positive review-resolve-button';
-        button.textContent = 'Resolve';
-        button.onclick = () => {
-            this.showResolveConfirmation(thread);
-        };
-        return button;
-    }
-
-    showResolveConfirmation(thread) {
-        const body = this.sidebar.querySelector('.review-sidebar-body');
-        const existing = body.querySelector('.review-resolve-confirmation');
-        if (existing) {
-            existing.remove();
-            return;
-        }
-
-        const container = document.createElement('div');
-        container.className = 'review-resolve-confirmation';
-
-        const p = document.createElement('p');
-        p.textContent = 'Resolve this review?';
-        container.appendChild(p);
-
-        const confirmBtn = document.createElement('button');
-        confirmBtn.type = 'button';
-        confirmBtn.className = 'button button--positive';
-        confirmBtn.textContent = 'Resolve';
-        confirmBtn.onclick = async () => {
-            confirmBtn.disabled = true;
-            await this.resolveThread(thread.id);
-        };
-
-        const cancelBtn = document.createElement('button');
-        cancelBtn.type = 'button';
-        cancelBtn.className = 'button';
-        cancelBtn.textContent = 'Cancel';
-        cancelBtn.onclick = () => container.remove();
-
-        container.appendChild(confirmBtn);
-        container.appendChild(cancelBtn);
-        body.appendChild(container);
     }
 };
