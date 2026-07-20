@@ -123,7 +123,7 @@ class ChangePasswordType extends AbstractType
                 ],
                 'constraints' => [
                     new Assert\NotBlank(),
-                    new PasswordPolicy(),
+                    // new PasswordPolicy(),
                 ],
                 'label' => 'New password',
                 'label_attr' => [

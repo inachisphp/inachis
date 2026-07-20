@@ -18,6 +18,8 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\RateLimiter\RateLimit;
 
 /**
  * Abstract controller for Inachis.
@@ -155,5 +157,28 @@ abstract class AbstractInachisController extends AbstractController
     public function redirectIfAuthenticatedOrNoAdmins(): ?string
     {
         return $this->redirectIfAuthenticated() ?: $this->redirectIfNoAdmins();
+    }
+
+    /**
+     * Sends a 'Too many requests' response
+     *
+     * @param string $message
+     * @param RateLimit $limit
+     * @return Response
+     */
+    protected function tooManyRequests(string $message, RateLimit $limit): Response
+    {
+        return new Response(
+            $message,
+            Response::HTTP_TOO_MANY_REQUESTS,
+            [
+                'X-RateLimit-Remaining' => (string) $limit->getRemainingTokens(),
+                'X-RateLimit-Retry-After' => (string) max(
+                    0,
+                    $limit->getRetryAfter()->getTimestamp() - time()
+                ),
+                'X-RateLimit-Limit' => (string) $limit->getLimit(),
+            ]
+        );
     }
 }

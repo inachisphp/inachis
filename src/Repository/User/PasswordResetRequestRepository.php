@@ -63,10 +63,10 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
     {
         /** @var PasswordResetRequest|null */
         return $this->createQueryBuilder('r')
-            ->andWhere('r.user = :user')
+            ->andWhere('r.user = :userId')
             ->andWhere('r.used = false')
             ->andWhere('r.expiresAt > :now')
-            ->setParameter('user', $user)
+            ->setParameter('userId', $user->getId(), 'uuid_binary')
             ->setParameter('now', new DateTimeImmutable())
             ->orderBy('r.createdAt', 'DESC')
             ->setMaxResults(1)

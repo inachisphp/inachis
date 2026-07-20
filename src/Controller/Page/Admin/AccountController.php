@@ -11,6 +11,8 @@ namespace Inachis\Controller\Page\Admin;
 
 use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\User\LoginActivity;
+use Inachis\Enum\Security\LoginResultType;
 use Inachis\Form\ChangePasswordType;
 use Inachis\Form\ForgotPasswordType;
 use Inachis\Form\LoginType;
@@ -98,13 +100,10 @@ class AccountController extends AbstractInachisController
         $ipLimiter = $forgotPasswordIpLimiter->create($request->getClientIp() ?? 'unknown');
         $limit = $ipLimiter->consume(1);
         if (!$limit->isAccepted()) {
-            $headers = [
-                'X-RateLimit-Remaining' => $limit->getRemainingTokens(),
-                'X-RateLimit-Retry-After' => $limit->getRetryAfter()->getTimestamp() - time(),
-                'X-RateLimit-Limit' => $limit->getLimit(),
-            ];
-            // TODO: replace with something better - throw new TooManyRequestsHttpException();
-            return new Response('Too many attempts from this IP. Try again later.', 429, $headers);
+            return $this->tooManyRequests(
+                'Too many requests. Try again later.',
+                $limit
+            );
         }
         $passwordResetRequestRepository->purgeExpiredHashes();
 
@@ -121,13 +120,10 @@ class AccountController extends AbstractInachisController
                 $accountLimiter = $forgotPasswordAccountLimiter->create(strtolower($emailAddress));
                 $limit = $accountLimiter->consume(1);
                 if (!$limit->isAccepted()) {
-                    $headers = [
-                        'X-RateLimit-Remaining' => $limit->getRemainingTokens(),
-                        'X-RateLimit-Retry-After' => $limit->getRetryAfter()->getTimestamp() - time(),
-                        'X-RateLimit-Limit' => $limit->getLimit(),
-                    ];
-                    // TODO: replace with something better - throw new TooManyRequestsHttpException();
-                    return new Response('Too many reset attempts for this account. Try again later.', 429, $headers);
+                    return $this->tooManyRequests(
+                        'Too many reset attempts. Try again later.',
+                        $limit
+                    );
                 }
             }
             $user = $userRepository->findOneBy([
@@ -146,6 +142,7 @@ class AccountController extends AbstractInachisController
                             [ 'token' => $token ]
                         )
                     );
+                    $this->entityManager->flush();
                 } catch (TransportExceptionInterface $e) {
                     $this->addFlash('warning', 'Error while sending mail: ' . $e->getMessage());
                 }
@@ -173,7 +170,11 @@ class AccountController extends AbstractInachisController
      * @param string $token
      * @return Response
      */
-    #[Route("/incc/new-password/{token}", name: "incc_account_new-password", methods: [ "GET", "POST" ])]
+    #[Route(
+        '/incc/new-password/{token}', 
+        name: "incc_account_new-password", 
+        methods: [ "GET", "POST" ]
+    )]
     public function newPassword(
         Request $request,
         PasswordResetTokenService $tokenService,
@@ -213,13 +214,10 @@ class AccountController extends AbstractInachisController
             $limiter = $forgotPasswordIpLimiter->create($request->getClientIp() ?? 'unknown');
             $limit = $limiter->consume(1);
             if (!$limit->isAccepted()) {
-                $headers = [
-                    'X-RateLimit-Remaining' => $limit->getRemainingTokens(),
-                    'X-RateLimit-Retry-After' => $limit->getRetryAfter()->getTimestamp() - time(),
-                    'X-RateLimit-Limit' => $limit->getLimit(),
-                ];
-                // TODO: replace with something better - throw new TooManyRequestsHttpException();
-                return new Response('Too many password reset attempts from this IP. Try again later.', 429, $headers);
+                return $this->tooManyRequests(
+                    'Too many reset attempts. Try again later.',
+                    $limit
+                );
             };
             /** @var array{
              *     change_password: array{
@@ -242,6 +240,14 @@ class AccountController extends AbstractInachisController
                 return $this->redirectToRoute('incc_account_forgot-password');
             }
             $plainPassword = $data['change_password']['new_password'];
+
+            $activity = new LoginActivity(
+                $user,
+                LoginResultType::TYPE_PASSWORD_RESET,
+                $request->getClientIp(),
+                $request->headers->get('User-Agent')
+            );
+            $this->entityManager->persist($activity);
 
             $hashed = $passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashed);

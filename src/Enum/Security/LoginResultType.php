@@ -17,6 +17,8 @@ enum LoginResultType: string
     case TYPE_SUCCESS_TRUSTED = 'success_trusted_device';
     case TYPE_FAILURE = 'failure';
 
+    case TYPE_PASSWORD_RESET = 'password_reset';
+
     public function label(): string
     {
         return match ($this) {
@@ -26,6 +28,8 @@ enum LoginResultType: string
             self::TYPE_SUCCESS_RECOVERY => 'Success - Recovery Code',
             self::TYPE_SUCCESS_TRUSTED => 'Success - Trusted Device',
             self::TYPE_FAILURE => 'Failure',
+
+            self::TYPE_PASSWORD_RESET => 'Password Reset',
         };
     }
 
@@ -38,6 +42,8 @@ enum LoginResultType: string
             self::TYPE_SUCCESS_RECOVERY => 'badge__ok',
             self::TYPE_SUCCESS_TRUSTED => 'badge__ok',
             self::TYPE_FAILURE => 'badge__issue',
+
+            self::TYPE_PASSWORD_RESET => 'badge__warning',
         };
     }
 }
