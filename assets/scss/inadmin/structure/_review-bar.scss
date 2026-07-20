@@ -54,8 +54,8 @@
 
 // Thread & Navigation Controls
 .review-thread {
-  &-header {
-    margin-bottom: 1.5rem;
+  &-navigation {
+    // margin-bottom: 1.5rem;
     background: $border-color-dark;
 
     a,
@@ -78,6 +78,60 @@
     margin-bottom: 16px;
   }
 }
+
+/* Card Container */
+// .review-thread-card {
+//     background: #ffffff;
+//     border: 1px solid #e2e8f0;
+//     border-radius: 8px;
+//     margin-bottom: 12px;
+//     overflow: hidden; /* Keeps header/footer rounded corners clean */
+//     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+// }
+
+// /* Card Header Toolbar (Assignee) */
+.review-card-header-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    padding: 6px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.review-assignee-select {
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    background-color: #ffffff;
+}
+
+// /* Card Inner Padding for Comments */
+// .review-comment--primary {
+//     padding: 12px 12px 6px 12px;
+// }
+
+// /* Card Footer Toolbar (Resolve Button) */
+.review-card-footer-toolbar {
+    display: flex;
+    justify-content: flex-end;
+}
+
+// .review-resolve-button {
+//     font-size: 0.8rem;
+//     padding: 4px 10px;
+//     display: inline-flex;
+//     align-items: center;
+//     gap: 4px;
+// }
+
+// /* Reply box spacing below card */
+// .review-reply-form {
+//     margin-top: 8px;
+// }
 
 // Comment Components & Thread Structure
 .review-comment {
@@ -136,7 +190,7 @@
   gap: 12px;
   padding-top: 8px;
   padding-left: 12px;
-  margin-top: 8px;
+  margin-bottom: 1rem;
   border-left: 2px solid #cbd5e1;
 }
 

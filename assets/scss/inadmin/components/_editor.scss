@@ -321,10 +321,6 @@ div.EasyMDEContainer {
     box-sizing: border-box;
 }
 
-.review-reply-button,
-.review-resolve-button {
-    margin-top: 10px;
-}
 
 .review-thread-item {
     padding:10px;
@@ -355,8 +351,7 @@ div.EasyMDEContainer {
 }
 
 .cm-review-highlight-active {
-    background:
-        rgba(255,140,0,.45);
+    background: rgba(255,140,0,.45);
     cursor:pointer;
 }
 

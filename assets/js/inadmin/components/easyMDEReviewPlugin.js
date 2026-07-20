@@ -116,7 +116,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
             );
         });
 
-        return this.ui('div', { className: 'review-assignment' }, select);
+        return select;
     }
 
     createCommentButton() {
@@ -439,7 +439,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
 
         // Back link header
         body.appendChild(
-            this.ui('div', { className: 'review-thread-header' },
+            this.ui('div', { className: 'review-thread-navigation' },
                 this.ui('a', {
                     href: '#',
                     className: 'review-back-link',
@@ -448,64 +448,39 @@ window.Inachis.EasyMDEReviewPlugin = class {
             )
         );
 
-        if (!thread.resolved) {
-            body.appendChild(this.createResolveButton(thread));
-        }
-
-
         if (thread.needsRebase) {
             body.appendChild(this.ui('div', { className: 'review-warning' },
                 '⚠ This review could not be automatically relocated after content changes.'
             ));
         }
 
-		// const rawText = thread.selectedText || '';
-        // const isLongText = rawText.length > 120 || rawText.includes('\n');
+        // --- UNIFIED THREAD CARD ---
+        const threadCard = this.ui('div', { className: 'review-thread-card' });
 
-		// const summaryText = isLongText
-        //     ? rawText.split('\n').slice(0, 2).join('\n').substring(0, 120).trim() + '...'
-        //     : rawText;
+        // 1. Thread Header Toolbar (Assignee selection)
+        const headerToolbar = this.ui('div', { className: 'review-card-header-toolbar' },
+            this.ui('span', { className: 'review-assign-label' }, 'Assigned to:'),
+            !thread.resolved ? this.createAssignmentBox(thread) : this.ui('span', { className: 'review-assignee-name' }, thread.assignedTo?.name || 'Unassigned')
+        );
+        body.appendChild(headerToolbar);
 
-		// const blockquote = this.ui('blockquote', {
-        //     className: isLongText ? 'review-preview-truncatable' : '',
-        //     title: isLongText ? 'Click to expand full selection text' : '',
-        //     style: isLongText ? 'cursor: pointer;' : '',
-        //     onclick: () => {
-        //         if (!isLongText) return;
-        //         // Toggle between full text and summary view on click
-        //         const isExpanded = blockquote.dataset.expanded === 'true';
-        //         blockquote.textContent = isExpanded ? summaryText : rawText;
-        //         blockquote.dataset.expanded = isExpanded ? 'false' : 'true';
-        //     }
-        // }, summaryText);
-
-        // // Selected context block
-        // body.appendChild(
-        //     this.ui('div', { className: 'review-thread-title' },
-        //         this.ui('strong', {}, 'Selected text'),
-        //         blockquote
-        //     )
-        // );
-
-        // Thread comments iteration
-        // Thread comments iteration
+        // 2. Comments & Replies
         if (thread.comments?.length) {
-            const threadCard = this.ui('div', { className: 'review-thread-card' });
-
-            // 1. Render primary/first comment as the header
             const primaryComment = thread.comments[0];
             const primaryTime = this.formatTimeAgo(primaryComment.created);
 
-            const primaryEl = this.ui('div', { className: 'review-comment review-comment--primary' },
-                this.ui('div', { className: 'review-comment-header' },
-                    this.ui('strong', { className: 'review-comment-author' }, primaryComment.author?.name || 'Unknown'),
-                    primaryTime && this.ui('span', { className: 'review-comment-time' }, primaryTime)
-                ),
-                this.ui('div', { className: 'review-comment-message' }, primaryComment.message)
+            // Top primary comment
+            threadCard.appendChild(
+                this.ui('div', { className: 'review-comment review-comment--primary' },
+                    this.ui('div', { className: 'review-comment-header' },
+                        this.ui('strong', { className: 'review-comment-author' }, primaryComment.author?.name || 'Unknown'),
+                        primaryTime && this.ui('span', { className: 'review-comment-time' }, primaryTime)
+                    ),
+                    this.ui('div', { className: 'review-comment-message' }, primaryComment.message)
+                )
             );
-            threadCard.appendChild(primaryEl);
 
-            // 2. Render remaining comments as indented replies
+            // Nested replies list
             if (thread.comments.length > 1) {
                 const repliesContainer = this.ui('div', { className: 'review-replies-list' });
 
@@ -525,15 +500,22 @@ window.Inachis.EasyMDEReviewPlugin = class {
 
                 threadCard.appendChild(repliesContainer);
             }
-
-            body.appendChild(threadCard);
         }
 
+        // 3. Card Footer Actions (Resolve or Reopen)
+        const footerToolbar = this.ui('div', { className: 'review-card-footer-toolbar' });
         if (!thread.resolved) {
-            body.appendChild(this.createAssignmentBox(thread));
-            body.appendChild(this.createReplyForm(thread));
+            footerToolbar.appendChild(this.createResolveButton(thread));
         } else {
-            body.appendChild(this.createReopenButton(thread));
+            footerToolbar.appendChild(this.createReopenButton(thread));
+        }
+        threadCard.appendChild(footerToolbar);
+
+        body.appendChild(threadCard);
+
+        // 4. Reply Form (Docked at bottom of thread)
+        if (!thread.resolved) {
+            body.appendChild(this.createReplyForm(thread));
         }
 
         setTimeout(() => {
