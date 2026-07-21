@@ -124,9 +124,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?UserPreference $preferences = null;
 
+    /** @var UserTotp|null TOTP settings for the user */
     #[ORM\OneToOne(mappedBy: 'user', targetEntity: UserTotp::class, cascade: ['persist', 'remove'])]
     private ?UserTotp $totp = null;
 
+    /** @var Collection<int, UserRecoveryCode> Recovery codes used by 2FA */
     #[ORM\OneToMany(
         mappedBy: 'user',
         targetEntity: UserRecoveryCode::class,
@@ -135,6 +137,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     )]
     private Collection $recoveryCodes;
 
+    /** @var Collection<int, UserTrustedDevice> Trusted devices for user's 2FA */
     #[ORM\OneToMany(
         mappedBy: 'user',
         targetEntity: UserTrustedDevice::class,

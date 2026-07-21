@@ -14,6 +14,11 @@ use Doctrine\Persistence\ManagerRegistry;
 use Inachis\Entity\User\User;
 use Inachis\Entity\User\UserViewState;
 
+/**
+ * Repository for UserViewState
+ * 
+ * @extends ServiceEntityRepository<UserViewState>
+ */
 class UserViewStateRepository extends ServiceEntityRepository
 {
     /**
@@ -26,6 +31,13 @@ class UserViewStateRepository extends ServiceEntityRepository
         parent::__construct($registry, UserViewState::class);
     }
 
+    /**
+     * Finds user view state for context (e.g. Page) and User
+     *
+     * @param User $user
+     * @param string $context
+     * @return UserViewState|null
+     */
     public function findFor(User $user, string $context): ?UserViewState
     {
         return $this->findOneBy([
@@ -34,6 +46,12 @@ class UserViewStateRepository extends ServiceEntityRepository
         ]);
     }
 
+    /**
+     * Saves the current view state of this context
+     *
+     * @param UserViewState $state
+     * @return void
+     */
     public function save(UserViewState $state): void
     {
         $this->getEntityManager()->persist($state);

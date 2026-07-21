@@ -41,7 +41,7 @@ enum PermissionAction: string
      * Defines action inheritance, for example, having the ability to create
      * something implies they can edit and view it.
      *
-     * @return array<string, list<string>>
+     * @return list<PermissionAction>
      */
     public function requires(): array
     {

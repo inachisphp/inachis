@@ -11,6 +11,9 @@ namespace Inachis\Enum\Security;
 
 use Inachis\Enum\Security\PermissionAction;
 
+/**
+ * Enum used to identify {@link Role} items
+ */
 enum PermissionResource: string
 {
     case PAGE = 'PAGE';
@@ -39,7 +42,7 @@ enum PermissionResource: string
     case ROBOTS = 'ROBOTS';
 
     /**
-     * @return PermissionAction[]
+     * @return list<PermissionAction>
      */
     public function actions(): array
     {
@@ -132,7 +135,7 @@ enum PermissionResource: string
     /**
      * Return the contents of the permission groups
      *
-     * @return list<array<string, string>>
+     * @return list<array{group: PermissionGroup, resources:list<PermissionResource>}>
      */
     public static function grouped(): array
     {

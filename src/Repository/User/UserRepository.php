@@ -58,7 +58,7 @@ class UserRepository extends AbstractRepository
             []
         ];
 
-        if (!empty($filters['keyword'])) {
+        if (!empty($filters['keyword']) && is_string($filters['keyword'])) {
             $where[0] .= ' AND (q.displayName LIKE :keyword OR q.username LIKE :keyword OR q.email LIKE :keyword )';
             $where[1]['keyword'] = '%' . $filters['keyword']  . '%';
         }
@@ -71,11 +71,11 @@ class UserRepository extends AbstractRepository
             $where[0] .= ' AND r.identifier = :role';
             $where[1]['role'] = $filters['role'];
         }
-        if (!empty($filters['last sign-in'])) {
+        if (!empty($filters['last sign-in']) && is_numeric($filters['last sign-in'])) {
             $where[0] .= ' AND q.lastLoginAt <= :lastLoginAt';
             $where[1]['lastLoginAt'] = new \DateTime('-' . $filters['last sign-in'] . ' days');
         }
-        if (!empty($filters['password modified'])) {
+        if (!empty($filters['password modified']) && is_numeric($filters['password modified'])) {
             $where[0] .= ' AND q.passwordChangedAt <= :passwordModified';
             $where[1]['passwordModified'] = new \DateTime('-' . $filters['password modified'] . ' days');
         }
