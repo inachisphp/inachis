@@ -62,6 +62,9 @@ window.Inachis.ConfirmationPrompt = {
             warning: this.targetEl.dataset.warning ?? '',
             action: this.targetEl.dataset.confirm ?? '',
         });
+        if (this.targetEl.dataset.hidehelp) {
+            params.append('hideHelp', true);
+        }
 
         try {
             const response = await fetch(

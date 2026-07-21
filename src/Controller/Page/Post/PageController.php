@@ -241,7 +241,7 @@ class PageController extends AbstractInachisController
             $categoryManager->apply($post, is_string($data['categories']) ? $data['categories'] : '');
             $tagManager->apply($post, is_string($data['tags']) ? $data['tags'] : '');
 
-            // Publish the {@link Page}
+            // Send the {@link Page} for review
             if ($review instanceof ClickableInterface && $review->isClicked()) {
                 $post->setStatus(EditorialStatus::REVIEW);
             }
@@ -249,6 +249,12 @@ class PageController extends AbstractInachisController
             // Publish the {@link Page}
             if ($publish instanceof ClickableInterface && $publish->isClicked()) {
                 $post->setStatus(EditorialStatus::PUBLISHED);
+
+                // Auto-resolve or close any remaining open review threads
+                foreach ($threads as $thread) {
+                    $thread->resolve($this->getCurrentUser());
+                    $this->entityManager->persist($thread);
+                }
             }
 
             // Update revisions to show published

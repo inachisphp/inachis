@@ -9,13 +9,18 @@
     {% set badges = {
         draft: {
             field: 'isdraft',
-            condition: 'true',
+            condition: true,
             className: 'badge__draft',
         },
         expired: {
             field: 'hasExpired',
             condition: true,
             className: 'badge__critical',
+        },
+        'in review': {
+            field: 'isInReview',
+            condition: true,
+            className: 'badge__inreview',
         },
         scheduled: {
             field: 'isScheduledPage',

@@ -1065,6 +1065,16 @@ class Page
     }
 
     /**
+     * Determines if current page/post is being reviewed
+     *
+     * @return bool
+     */
+    public function isInReview(): bool
+    {
+        return $this->status === EditorialStatus::REVIEW;
+    }
+
+    /**
      * Determines if the current page/post has expired.
      *
      * @return bool The result of testing if the page has expired
