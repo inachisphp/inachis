@@ -72,6 +72,13 @@ class RolesController extends AbstractInachisController
                         ->setDescription($source->getDescription())
                         ->setDisableReview($source->isDisableReview())
                         ->setSystemRole(false);
+                    foreach ($source->getRolePermissions() as $permission) {
+                        $clonePermission = new RolePermission();
+                        $clonePermission
+                            ->setResource($permission->getResource())
+                            ->setAction($permission->getAction());
+                        $clone->addRolePermission($clonePermission);
+                    }
                     $this->entityManager->persist($clone);
                     ++$count;
                 }
