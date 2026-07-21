@@ -54,9 +54,31 @@ class RolesController extends AbstractInachisController
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && !empty($request->request->all('items'))) {
+        if (
+            $form->isSubmitted() && 
+            $form->isValid() && 
+            !empty($request->request->all('items')
+        )) {
             $items = $request->request->all('items');
-            if ($request->request->has('delete')) {
+            if ($request->request->has('clone')) {
+                $count = 0;
+                foreach ($items as $roleId) {
+                    $source = $roleRepository->find($roleId);
+                    if ($source === null) {
+                        continue;
+                    }
+                    $clone = new Role();
+                    $clone->setName($source->getName() . ' (Copy)')
+                        ->setDescription($source->getDescription())
+                        ->setDisableReview($source->isDisableReview())
+                        ->setSystemRole(false);
+                    $this->entityManager->persist($clone);
+                    ++$count;
+                }
+                $this->entityManager->flush();
+                $this->addFlash('success', "Cloned $count role(s).");
+
+            } else if ($request->request->has('delete')) {
                 $count = 0;
                 foreach ($items as $roleId) {
                     $role = $roleRepository->find($roleId);
