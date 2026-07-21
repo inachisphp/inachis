@@ -14,7 +14,10 @@
         </div>
     {% endif %}
     <div class="col-6">
+    {% if can('PAGE', ['CREATE', 'EDIT']) or can('IMAGE', 'CREATE') or can('SERIES', 'CREATE') %}
         {% include "inadmin/page/dashboard/actions.html.twig" %}
+    {% endif %}
+    {% if can('PAGE', 'EDIT') and can('IMAGE', 'EDIT') and allAlerts|filter(a => a.count > 0)|length > 0 %}
         {% set allAlerts = [
             {
                 label: 'images without alt text',
@@ -47,8 +50,6 @@
                 count: dashboard.alerts.sharingMessage.count
             },
         ] %}
-
-        {% if allAlerts|filter(a => a.count > 0)|length > 0 %}
         <section class="ui-section widget widget-audit rounded">
             <header class="widget__header">
                 <h2>
@@ -67,20 +68,24 @@
                 {% endfor %}
             </article>
         </section>
-        {% endif %}
+    {% endif %}
     </div>
 
+{% if can('ANALYTICS', 'VIEW') %}
     <div class="col-6">
         {% include "inadmin/page/dashboard/stats.html.twig" %}
     </div>
-
+{% endif %}
+{% if can('PAGE', 'VIEW') %}
     <div class="col-6">
         {% include "inadmin/page/dashboard/posts.html.twig" %}
     </div>
+{% endif %}
+{% if can('SERIES', 'VIEW') %}
     <div class="col-6">
         {% include "inadmin/page/dashboard/series.html.twig" %}
-        {% include "inadmin/page/dashboard/comments.html.twig" %}
     </div>
+{% endif %}
 {% endblock dashboard %}
 {% block dashboard_post %}{% endblock dashboard_post %}
 {% endblock content %}

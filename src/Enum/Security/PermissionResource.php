@@ -19,6 +19,7 @@ enum PermissionResource: string
     case PAGE = 'PAGE';
     case SERIES = 'SERIES';
     case IMAGE = 'IMAGE';
+    case DOWNLOAD = 'DOWNLOAD';
     case TAG = 'TAG';
     case CATEGORY = 'CATEGORY';
 
@@ -59,6 +60,7 @@ enum PermissionResource: string
 
             self::CATEGORY,
             self::IMAGE,
+            self::DOWNLOAD,
             self::NAVIGATION,
             self::TAG,
             self::USER => [
@@ -109,6 +111,7 @@ enum PermissionResource: string
             self::PAGE => 'Pages',
             self::SERIES => 'Series',
             self::IMAGE => 'Images',
+            self::DOWNLOAD => 'Downloads',
             self::TAG => 'Tags',
             self::CATEGORY => 'Categories',
 
@@ -146,6 +149,7 @@ enum PermissionResource: string
                     self::PAGE,
                     self::SERIES,
                     self::IMAGE,
+                    self::DOWNLOAD,
                     self::CATEGORY,
                     self::TAG,
                 ],
@@ -180,5 +184,20 @@ enum PermissionResource: string
                 ],
             ],
         ];
+    }
+
+    /**
+     * @return list<PermissionResource>
+     */
+    public static function resourcesForGroup(
+        PermissionGroup $group,
+    ): array {
+        foreach (self::grouped() as $permissionGroup) {
+            if ($permissionGroup['group'] === $group) {
+                return $permissionGroup['resources'];
+            }
+        }
+
+        return [];
     }
 }

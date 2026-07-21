@@ -52,6 +52,7 @@ enum PermissionAction: string
                 self::VIEW,
             ],
 
+            self::CREATE,
             self::REVIEW => [
                 self::EDIT,
                 self::VIEW,

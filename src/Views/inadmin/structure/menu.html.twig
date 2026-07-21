@@ -3,6 +3,7 @@
         <h1><span>Inachis</span></h1>
     </header>
     <ul>
+{% if canAny([['PAGE', 'CREATE'], ['SERIES', 'CREATE']]) %}
         <li class="menu-add has-submenu">
             <a href="#" class="submenu-toggle" role="button" aria-haspopup="true" aria-expanded="false" tabindex="0" data-tooltip="New">
                 <i class="material-icons" aria-hidden="true">edit</i>
@@ -10,6 +11,7 @@
                 <span class="material-icons arrow" aria-hidden="true">chevron_right</span>
             </a>
             <ul class="submenu">
+{% if can('PAGE', 'CREATE') %}
                 <li>
                     <a href="{{ viewModel.settings.domain ~ path('incc_post_edit', { type: 'post'}) }}/post/new"
                         data-action="new-post"
@@ -19,6 +21,8 @@
                         <span>{% trans %}admin.menu.add.post.title{% endtrans %}</span>
                     </a>
                 </li>
+{% endif %}
+{% if can('SERIES', 'CREATE') %}
                 <li>
                     <a href="{{ viewModel.settings.domain ~ path('incc_post_edit', { type: 'page'}) }}/new"
                         data-tooltip="{% trans %}admin.menu.add.page.help{% endtrans %}"
@@ -27,8 +31,10 @@
                         <span>{% trans %}admin.menu.add.page.title{% endtrans %}</span>
                     </a>
                 </li>
+{% endif %}
             </ul>
         </li>
+{% endif %}
 
         <li class="{{ viewModel.page.tab|activeMenu('dashboard') }}">
             <a href="{{ viewModel.settings.domain ~ path('incc_dashboard') }}"
@@ -38,6 +44,7 @@
                 <span>{% trans %}admin.dashboard.title{% endtrans %}</span>
             </a>
         </li>
+{% if can('PAGE', 'VIEW') %}
         <li class="{{ viewModel.page.tab|activeMenu('post') ~ viewModel.page.tab|activeMenu('page') }}">
             <a href="{{ viewModel.settings.domain ~ path('incc_post_list', {'type': 'post'}) }}"
                 data-tooltip="{% trans %}admin.posts.help{% endtrans %}"
@@ -45,6 +52,8 @@
                 <i class="material-icons" aria-hidden="true">library_books</i>
                 <span>{% trans %}admin.posts.title{% endtrans %}</span></a>
         </li>
+{% endif %}
+{% if can('SERIES', 'VIEW') %}
         <li class="{{ viewModel.page.tab|activeMenu('series') }}">
             <a href="{{ viewModel.settings.domain ~ path('incc_series_list') }}"
                 data-tooltip="{% trans %}admin.series.help{% endtrans %}"
@@ -53,6 +62,8 @@
                 <span>{% trans %}admin.series.title{% endtrans %}</span>
             </a>
         </li>
+{% endif %}
+{% if canAny([['IMAGE', 'VIEW'], ['DOWNLOAD', 'VIEW']]) %}
         <li class="{{ viewModel.page.tab|activeMenu('Image') }}">
             <a href="{{ viewModel.settings.domain ~ path('incc_resource_list', { type: 'images' }) }}"
                 data-tooltip="{% trans %}admin.resources.help{% endtrans %}"
@@ -61,7 +72,8 @@
                 <span>{% trans %}admin.resources.title{% endtrans %}</span>
             </a>
         </li>
-
+{% endif %}
+{% if can('PAGE', 'VIEW') or canGroup('USERS') or canWaste() or canGroup('TOOLS') or canGroup('SETTINGS') %}
         <li class="has-submenu">
             <a href="#admin__nav-settings"
                 class="submenu-toggle"
@@ -74,7 +86,9 @@
                 <span>{% trans %}admin.menu.more.title{% endtrans %}</span>
                 <span class="material-icons arrow" aria-hidden="true">chevron_right</span>
             </a>
+
             <ul class="submenu">
+{% if can('PAGE', 'VIEW') %}
                 <li class="{{ viewModel.page.tab|activeMenu('url') }}">
                     <a href="{{ viewModel.settings.domain ~ path('incc_url_list') }}"
                         data-tooltop="{% trans %}admin.urls.help{% endtrans %}"
@@ -82,6 +96,8 @@
                         <i class="material-icons" aria-hidden="true">insert_link</i>
                         <span>{% trans %}admin.urls.title{% endtrans %}</span></a>
                 </li>
+{% endif %}
+{% if canGroup('USERS') %}
                 <li class="{{ viewModel.page.tab|activeMenu('users') ~ viewModel.page.tab|activeMenu('audit-logs') ~ viewModel.page.tab|activeMenu('policies') }}">
                     <a href="{{ viewModel.settings.domain ~ path('incc_admin_list') }}"
                         data-tooltip="{% trans %}admin.user.help{% endtrans %}"
@@ -90,6 +106,8 @@
                         <span>{% trans %}admin.user.title{% endtrans %}</span>
                     </a>
                 </li>
+{% endif %}
+{% if canWaste() %}
                 <li class="{{ viewModel.page.tab|activeMenu('waste') }}">
                     <a href="{{ viewModel.settings.domain ~ path('incc_waste_list') }}"
                         data-tooltip="Manage deleted content"
@@ -102,6 +120,8 @@
                         <span>Bin</span>
                     </a>
                 </li>
+{% endif %}
+{% if canGroup('TOOLS') %}
                 <li class="{{ viewModel.page.tab|activeMenu('tools') ~ viewModel.page.tab|activeMenu('import') ~ viewModel.page.tab|activeMenu('export') ~ viewModel.page.tab|activeMenu('analytics') ~ viewModel.page.tab|activeMenu('analytics_security') }}">
                     <a href="{{ viewModel.settings.domain ~ path('incc_tools_index') }}"
                         data-tooltip="System Tools"
@@ -109,6 +129,8 @@
                         <i class="material-icons" aria-hidden="true">build</i>
                         <span>Tools</span></a>
                 </li>
+{% endif %}
+{% if canGroup('SETTINGS') %}
                 <li class="{{ viewModel.page.tab|activeMenu('settings') }}">
                     <a href="{{ viewModel.settings.domain ~ path('incc_settings_index') }}"
                         data-tooltip="Settings"
@@ -116,10 +138,11 @@
                         <i class="material-icons" aria-hidden="true">settings</i>
                         <span>Settings</span></a>
                 </li>
+{% endif %}
             </ul>
         </li>
     </ul>
-
+{% endif %}
     <ul class="menu-view-site">
         <li>
             <a href="/" data-tooltip="View site">
