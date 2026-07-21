@@ -1,5 +1,7 @@
 <form class="form">
+    {% if hideHelp is not defined or not hideHelp %}
     <p>Are you sure you want to delete <strong>{{ title }}</strong>?</p>
+    {% endif %}
     {{ include('inadmin/partials/components/admonition.html.twig', {
         'type': 'warning',
         'text': warning,

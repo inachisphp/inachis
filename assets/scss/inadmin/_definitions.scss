@@ -166,6 +166,7 @@ $sidebar-text: #fff;
 
 // -- Review bar
 $reviewbar-bg: var(--color-neutral-300);
+$reviewbar-shadow: -4px 0 24px rgba(0, 0, 0, 0.06), -1px 0 4px rgba(0, 0, 0, 0.03);
 
 // -- Alerts
 $alert-danger-bg: var(--color-danger-100);
@@ -279,6 +280,7 @@ $badge-colors: (
     scheduled: (bg: #007BFF, text: #fff),
     private: (bg: #6C757D, text: #fff),
     hotlinked: (bg: #E83E8C, text: #fff),
+    inreview: (bg: #6f42c1, text: #fff),
     issue: (bg: #DC3545, text: #fff),
     active: (bg: #28A745, text: #fff),
     newuser: (bg: #17A2B8, text: #fff),

@@ -277,6 +277,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
 		button.style.cursor = 'pointer';
 		button.onclick = () => {
 			this.showThreadList();
+            this.toggleSidebar();
 		};
 
 		bar.appendChild(button);
@@ -364,6 +365,10 @@ window.Inachis.EasyMDEReviewPlugin = class {
         });
     }
 
+    hasOpenReviews() {
+        return this.threads.some(thread => !thread.resolved);
+    }
+
     hideCommentButton() {
         this.commentButton.style.display = 'none';
     }
@@ -393,6 +398,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
         this.threads = await response.json();
         this.renderThreads();
 		this.updateStatusButton();
+        this.updatePublishButtonGuard();
     }
 
     openCommentDialog() {
@@ -641,7 +647,6 @@ window.Inachis.EasyMDEReviewPlugin = class {
 		);
 
         if (!visibleThreads.length) {
-            body.innerHTML = '<p class="review-empty-state">No open reviews</p>';
 			body.appendChild(this.ui('p', {
 				className: 'review-empty-state'
 			}, 'No open reviews'));
@@ -735,6 +740,28 @@ window.Inachis.EasyMDEReviewPlugin = class {
         });
 
         return el;
+    }
+
+    updatePublishButtonGuard() {
+        const publishBtn = document.querySelector('#post_publish');
+        if (!publishBtn) return;
+
+        if (this.hasOpenReviews()) {
+            const openCount = this.threads.filter(t => !t.resolved).length;
+
+            // Attaching data-confirm triggers your ConfirmationPrompt script
+            publishBtn.setAttribute('data-confirm', 'publish');
+            publishBtn.setAttribute('data-hideHelp', 'true');
+            publishBtn.setAttribute('data-title', 'Unresolved Reviews Warning');
+            publishBtn.setAttribute('data-warning', `There are currently ${openCount} unresolved review(s) on this post.`);
+            publishBtn.setAttribute('data-confirm-text', 'Publish Anyway');
+        } else {
+            // Remove data-confirm so normal form submission or action proceeds without a modal
+            publishBtn.removeAttribute('data-confirm');
+            publishBtn.removeAttribute('data-title');
+            publishBtn.removeAttribute('data-warning');
+            publishBtn.removeAttribute('data-confirm-text');
+        }
     }
 
     updateStatusButton() {

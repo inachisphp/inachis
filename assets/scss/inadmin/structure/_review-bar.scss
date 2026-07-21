@@ -9,23 +9,21 @@
 }
 
 .review-sidebar {
-  width: 15rem;
-  margin: 1rem 0 6rem 0;
-  overflow-y: auto;
   background: $reviewbar-bg;
   border: 1px solid transparent;
   border-radius: 0.5rem;
-  box-shadow:
-    -4px 0 24px rgba(0, 0, 0, 0.06),
-    -1px 0 4px rgba(0, 0, 0, 0.03);
+  box-shadow: $reviewbar-shadow;
+  margin: 1rem 0 6rem 0;
+  overflow-y: auto;
+  width: 15rem;
 
   &-header {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem;
-    font-weight: bold;
     background-color: $bg-panel;
     border-bottom: 1px solid $border-color;
+    display: flex;
+    font-weight: bold;
+    justify-content: space-between;
+    padding: 0.5rem 0.5rem 0 0.5rem;
 
     span {
       vertical-align: middle;
@@ -46,8 +44,8 @@
     }
 
     blockquote {
-      padding: 0.25rem;
       background-color: $bg-surface;
+      padding: 0.25rem;
     }
   }
 }
@@ -55,15 +53,12 @@
 // Thread & Navigation Controls
 .review-thread {
   &-navigation {
-    // margin-bottom: 1.5rem;
-    background: $border-color-dark;
-
     a,
     a:visited {
+      border-bottom: 2px solid transparent;
       display: inline-block;
       padding: 0.5rem;
       text-decoration: none;
-      border-bottom: 2px solid transparent;
     }
 
     a:hover {
@@ -74,71 +69,40 @@
   }
 
   &-card {
-    padding: 12px;
     margin-bottom: 16px;
+    padding: 12px;
   }
 }
 
-/* Card Container */
-// .review-thread-card {
-//     background: #ffffff;
-//     border: 1px solid #e2e8f0;
-//     border-radius: 8px;
-//     margin-bottom: 12px;
-//     overflow: hidden; /* Keeps header/footer rounded corners clean */
-//     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-// }
-
-// /* Card Header Toolbar (Assignee) */
 .review-card-header-toolbar {
-    display: flex;
     align-items: center;
-    justify-content: space-between;
-    background: #f8fafc;
-    padding: 6px 12px;
+    background-color: #f8fafc;
     border-bottom: 1px solid #e2e8f0;
-    font-size: 0.8rem;
     color: #64748b;
+    display: flex;
+    font-size: 0.8rem;
+    justify-content: space-between;
+    padding: 6px 12px;
 }
 
 .review-assignee-select {
+    background-color: $color-neutral-000;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
     font-size: 0.8rem;
     padding: 2px 6px;
-    border-radius: 4px;
-    border: 1px solid #cbd5e1;
-    background-color: #ffffff;
 }
 
-// /* Card Inner Padding for Comments */
-// .review-comment--primary {
-//     padding: 12px 12px 6px 12px;
-// }
-
-// /* Card Footer Toolbar (Resolve Button) */
 .review-card-footer-toolbar {
     display: flex;
     justify-content: flex-end;
 }
 
-// .review-resolve-button {
-//     font-size: 0.8rem;
-//     padding: 4px 10px;
-//     display: inline-flex;
-//     align-items: center;
-//     gap: 4px;
-// }
-
-// /* Reply box spacing below card */
-// .review-reply-form {
-//     margin-top: 8px;
-// }
-
-// Comment Components & Thread Structure
 .review-comment {
   padding: 1rem;
   margin-bottom: 15px;
-  background: #fff;
-  border: 1px solid #ddd;
+  background: $color-neutral-000;
+  border: 1px solid $color-neutral-400;
   border-radius: 0.5rem;
 
   &--primary {
@@ -206,13 +170,13 @@
     margin-bottom: 10px;
     font-size: 0.9em;
     background: #fafafa;
-    border: 1px solid #ddd;
+    border: 1px solid $color-neutral-400;
   }
 
   &-resolve-confirmation {
     padding: 12px;
     margin-top: 12px;
-    border: 1px solid #ddd;
+    border: 1px solid $color-neutral-400;
     border-radius: 4px;
   }
 
@@ -238,7 +202,7 @@
 
   &-assignment {
     padding: 1rem 0.5rem 0.5rem 0.5rem;
-    border-top: 1px solid #aaa;
+    border-top: 1px solid $color-neutral-450;
   }
 
   &-reply-form {
