@@ -17,6 +17,7 @@ use Inachis\Repository\Content\PageRepositoryInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use Inachis\Enum\EditorialStatus;
+use Ramsey\Uuid\Uuid;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
@@ -185,9 +186,15 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             $where[1]['keyword'] = '%' . $filters['keyword'] . '%';
         }
         if (!empty($filters['excludeIds'])) {
+            $binaryIds = array_map(
+                fn($id) => $id instanceof \Ramsey\Uuid\UuidInterface 
+                    ? $id->getBytes() 
+                    : Uuid::fromString($id)->getBytes(),
+                $filters['excludeIds']
+            );
             $where[0] .= ' AND q.id NOT IN (:excludeIds)';
             $where[1]['excludeIds'] = [
-                'value' => $filters['excludeIds'],
+                'value' => $binaryIds,
             ];
         }
         if (!empty($filters['fromDate'])) {
@@ -312,11 +319,17 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function getFilteredIds(array $ids): array
     {
+        $binaryIds = array_map(
+            fn($id) => $id instanceof \Ramsey\Uuid\UuidInterface 
+                ? $id->getBytes() 
+                : Uuid::fromString($id)->getBytes(),
+            $ids
+        );
         /** @var list<Page> */
         return $this->createQueryBuilder('p')
             ->select('p')
             ->where('p.id IN (:ids)')
-            ->setParameter('ids', $ids)
+            ->setParameter('ids', $binaryIds)
             ->getQuery()
             ->getResult();
     }
