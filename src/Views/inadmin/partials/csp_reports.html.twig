@@ -46,7 +46,7 @@
             <th>Severity</th>
             <th>Directive</th>
             <th>Host</th>
-            <th>Occurrences</th>
+            <th class="col-count">Count</th>
             <th>Last Seen</th>
             <th></th>
         </tr>
@@ -65,7 +65,7 @@
                         {{ report.host ?? '—' }}
                     </a>
                 </td>
-                <td>{{ report.occurrences }}</td>
+                <td class="col-count">{{ report.occurrences }}</td>
 
                 <td>
                     {{ report.lastSeenAt ? report.lastSeenAt|date('Y-m-d H:i', viewModel.session.preferences.timezone) : '—' }}

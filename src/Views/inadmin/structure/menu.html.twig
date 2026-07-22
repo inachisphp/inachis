@@ -73,40 +73,6 @@
             </a>
         </li>
 {% endif %}
-{% if can('PAGE', 'VIEW') or canGroup('USERS') or canWaste() or canGroup('TOOLS') or canGroup('SETTINGS') %}
-        <li class="has-submenu">
-            <a href="#admin__nav-settings"
-                class="submenu-toggle"
-                role="button" aria-haspopup="true"
-                aria-expanded="false"
-                tabindex="0"
-                data-tooltip="{% trans %}admin.menu.more.help{% endtrans %}"
-                title="{% trans %}admin.menu.more.help{% endtrans %}">
-                <i class="material-icons" aria-hidden="true">more_horiz</i>
-                <span>{% trans %}admin.menu.more.title{% endtrans %}</span>
-                <span class="material-icons arrow" aria-hidden="true">chevron_right</span>
-            </a>
-
-            <ul class="submenu">
-{% if can('PAGE', 'VIEW') %}
-                <li class="{{ viewModel.page.tab|activeMenu('url') }}">
-                    <a href="{{ viewModel.settings.domain ~ path('incc_url_list') }}"
-                        data-tooltop="{% trans %}admin.urls.help{% endtrans %}"
-                        title="{% trans %}admin.urls.help{% endtrans %}">
-                        <i class="material-icons" aria-hidden="true">insert_link</i>
-                        <span>{% trans %}admin.urls.title{% endtrans %}</span></a>
-                </li>
-{% endif %}
-{% if canGroup('USERS') %}
-                <li class="{{ viewModel.page.tab|activeMenu('users') ~ viewModel.page.tab|activeMenu('audit-logs') ~ viewModel.page.tab|activeMenu('policies') }}">
-                    <a href="{{ viewModel.settings.domain ~ path('incc_admin_list') }}"
-                        data-tooltip="{% trans %}admin.user.help{% endtrans %}"
-                        title="{% trans %}admin.user.help{% endtrans %}">
-                        <i class="material-icons" aria-hidden="true">people</i>
-                        <span>{% trans %}admin.user.title{% endtrans %}</span>
-                    </a>
-                </li>
-{% endif %}
 {% if canWaste() %}
                 <li class="{{ viewModel.page.tab|activeMenu('waste') }}">
                     <a href="{{ viewModel.settings.domain ~ path('incc_waste_list') }}"
@@ -121,6 +87,42 @@
                     </a>
                 </li>
 {% endif %}
+
+{% if can('PAGE', 'VIEW') or canGroup('USERS') or canGroup('TOOLS') or canGroup('SETTINGS') %}
+        <li class="has-submenu">
+            <a href="#admin__nav-settings"
+                class="submenu-toggle"
+                role="button" aria-haspopup="true"
+                aria-expanded="false"
+                tabindex="0"
+                data-tooltip="{% trans %}admin.menu.more.help{% endtrans %}"
+                title="{% trans %}admin.menu.more.help{% endtrans %}">
+                <i class="material-icons" aria-hidden="true">more_horiz</i>
+                <span>{% trans %}admin.menu.more.title{% endtrans %}</span>
+                <span class="material-icons arrow" aria-hidden="true">chevron_right</span>
+            </a>
+
+            <ul class="submenu">
+{% if canGroup('SECURITY') %}
+                <li class="{{ viewModel.page.tab|activeMenu('security') ~ viewModel.page.tab|activeMenu('policies') }}">
+                    <a href="{{ viewModel.settings.domain ~ path('incc_security_list') }}"
+                        data-tooltop="{% trans %}admin.security.help{% endtrans %}"
+                        title="{% trans %}admin.security.help{% endtrans %}">
+                        <i class="material-icons" aria-hidden="true">security</i>
+                        <span>{% trans %}admin.security.title{% endtrans %}</span></a>
+                </li>
+{% endif %}
+{% if canGroup('USERS') %}
+                <li class="{{ viewModel.page.tab|activeMenu('users') ~ viewModel.page.tab|activeMenu('audit-logs') }}">
+                    <a href="{{ viewModel.settings.domain ~ path('incc_admin_list') }}"
+                        data-tooltip="{% trans %}admin.user.help{% endtrans %}"
+                        title="{% trans %}admin.user.help{% endtrans %}">
+                        <i class="material-icons" aria-hidden="true">people</i>
+                        <span>{% trans %}admin.user.title{% endtrans %}</span>
+                    </a>
+                </li>
+{% endif %}
+
 {% if canGroup('TOOLS') %}
                 <li class="{{ viewModel.page.tab|activeMenu('tools') ~ viewModel.page.tab|activeMenu('import') ~ viewModel.page.tab|activeMenu('export') ~ viewModel.page.tab|activeMenu('analytics') ~ viewModel.page.tab|activeMenu('analytics_security') }}">
                     <a href="{{ viewModel.settings.domain ~ path('incc_tools_index') }}"

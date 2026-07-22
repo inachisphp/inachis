@@ -5,87 +5,97 @@
 {% endblock pagetitle %}
 
 {% block content %}
-{% block dashboard_pre %}{% endblock dashboard_pre %}
-{% block dashboard %}
-    {% if dashboard.alerts|default([]) is not empty %}
-        <div class="col-12">
-            {% include "inadmin/page/dashboard/alerts.html.twig" %}
-        <h2>Welcome back {{ app.user.displayName }},</h2>
-        </div>
-    {% endif %}
-    <div class="col-6">
-    {% if can('PAGE', ['CREATE', 'EDIT']) or can('IMAGE', 'CREATE') or can('SERIES', 'CREATE') %}
-        {% include "inadmin/page/dashboard/actions.html.twig" %}
-    {% endif %}
-    {% if can('PAGE', 'EDIT') and can('IMAGE', 'EDIT') and allAlerts|filter(a => a.count > 0)|length > 0 %}
-        {% set allAlerts = [
-            {
-                label: 'images without alt text',
-                link: path('incc_resource_list', { 'type': 'images' }) ~ '?altText=null',
-                priority: 'HIGH',
-                count: dashboard.alerts.altText.count
-            },
-            {
-                label: 'pages without categories',
-                link: '/incc/post/list?issue=categories',
-                priority: 'HIGH',
-                count: dashboard.alerts.categories.count
-            },
-            {
-                label: 'pages without tags',
-                link: '/incc/post/list/?issue=tags',
-                priority: 'MED',
-                count: dashboard.alerts.tags.count
-            },
-            {
-                label: 'pages missing an image',
-                link: '/incc/post/list/?issue=image',
-                priority: 'LOW',
-                count: dashboard.alerts.featureImage.count
-            },
-            {
-                label: 'pages without a snippet',
-                link: '/incc/post/list/?issue=snippet',
-                priority: 'LOW',
-                count: dashboard.alerts.sharingMessage.count
-            },
-        ] %}
-        <section class="ui-section widget widget-audit rounded">
-            <header class="widget__header">
-                <h2>
-                    <span>Content Audit</span>
-                </h2>
-            </header>
-            <article>
-                {% for alert in allAlerts %}
-                    {% if alert.count > 0 %}
-                <p class="alert alert_priority__{{ alert.priority|lower }}">
-                    <span>{{ alert.priority}}</span>
-                    {{ alert.count }} {{ alert.label|lower }}
-                    <a href="{{ alert.link|default('#') }}">Fix &rarr;</a>
-                </p>
-                    {% endif %}
-                {% endfor %}
-            </article>
-        </section>
-    {% endif %}
-    </div>
 
-{% if can('ANALYTICS', 'VIEW') %}
-    <div class="col-6">
-        {% include "inadmin/page/dashboard/stats.html.twig" %}
-    </div>
+{% set allAlerts = [
+    {
+        label: 'images without alt text',
+        link: path('incc_resource_list', { 'type': 'images' }) ~ '?altText=null',
+        priority: 'HIGH',
+        resource: 'IMAGE',
+        count: dashboard.alerts.altText.count
+    },
+    {
+        label: 'pages without categories',
+        link: '/incc/post/list?issue=categories',
+        priority: 'HIGH',
+        resource: 'PAGE',
+        count: dashboard.alerts.categories.count
+    },
+    {
+        label: 'pages without tags',
+        link: '/incc/post/list/?issue=tags',
+        priority: 'MED',
+        resource: 'PAGE',
+        count: dashboard.alerts.tags.count
+    },
+    {
+        label: 'pages missing an image',
+        link: '/incc/post/list/?issue=image',
+        priority: 'LOW',
+        resource: 'PAGE',
+        count: dashboard.alerts.featureImage.count
+    },
+    {
+        label: 'pages without a snippet',
+        link: '/incc/post/list/?issue=snippet',
+        priority: 'LOW',
+        resource: 'PAGE',
+        count: dashboard.alerts.sharingMessage.count
+    },
+] %}
+
+<div class="col-12">
+    {% if dashboard.alerts|default([]) is not empty %}
+        {% include "inadmin/page/dashboard/alerts.html.twig" %}
+    {% endif %}
+    <h2>Welcome back {{ app.user.displayName }},</h2>
+</div>
+
+<div class="col-6">
+{% set showResume = dashboard.recentDraft|default(null) is not empty and can('PAGE', 'EDIT') %}
+
+{% if showResume or canAny([['PAGE', 'CREATE'], ['SERIES', 'CREATE'], ['IMAGE', 'CREATE'] ]) %}
+    {% include 'inadmin/page/dashboard/actions.html.twig' %}
+{% else %}
+    {% include 'inadmin/page/dashboard/overview.html.twig' %}
 {% endif %}
-{% if can('PAGE', 'VIEW') %}
-    <div class="col-6">
-        {% include "inadmin/page/dashboard/posts.html.twig" %}
-    </div>
+
+{% if allAlerts|filter(a => a.count > 0)|length > 0 %}
+    <section class="ui-section widget widget-audit rounded">
+        <header class="widget__header">
+            <h2>
+                <span>Content Audit</span>
+            </h2>
+        </header>
+        <article>
+            {% for alert in allAlerts %}
+                {% if alert.count > 0 %}
+            <p class="alert alert_priority__{{ alert.priority|lower }}">
+                <span>{{ alert.priority}}</span>
+                {{ alert.count }} {{ alert.label|lower }}
+                {% if can(alert.resource, 'EDIT') %}
+                <a href="{{ alert.link|default('#') }}">Fix &rarr;</a>
+                {% endif %}
+            </p>
+                {% endif %}
+            {% endfor %}
+        </article>
+    </section>
 {% endif %}
-{% if can('SERIES', 'VIEW') %}
-    <div class="col-6">
-        {% include "inadmin/page/dashboard/series.html.twig" %}
-    </div>
+</div>
+
+<div class="col-6">
+    {% include "inadmin/page/dashboard/stats.html.twig" %}
+</div>
+{% if canResource('PAGE') %}
+<div class="col-6">
+    {% include "inadmin/page/dashboard/posts.html.twig" %}
+</div>
 {% endif %}
-{% endblock dashboard %}
-{% block dashboard_post %}{% endblock dashboard_post %}
+{% if canResource('SERIES') %}
+<div class="col-6">
+    {% include "inadmin/page/dashboard/series.html.twig" %}
+</div>
+{% endif %}
+
 {% endblock content %}

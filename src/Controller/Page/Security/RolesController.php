@@ -19,6 +19,7 @@ use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Security\RoleRepository;
+use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\ViewStateManager;
 use Inachis\Validator\Security\RolePermissionValidator;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,6 +45,10 @@ class RolesController extends AbstractInachisController
         '/incc/security/roles',
         name: 'incc_admin_role_index',
         methods: ['GET', 'POST']
+    )]
+    #[RequiresPermission(
+        resource: PermissionResource::ROLE,
+        action: PermissionAction::MANAGE
     )]
     public function index(
         Request $request,
@@ -165,6 +170,10 @@ class RolesController extends AbstractInachisController
         name: 'incc_admin_role_edit',
         requirements: ['roleId' => '[0-9a-f\-]{36}|new'],
         methods: ['GET', 'POST']
+    )]
+    #[RequiresPermission(
+        resource: PermissionResource::ROLE,
+        action: PermissionAction::MANAGE
     )]
     public function edit(
         Request $request,
@@ -312,37 +321,11 @@ class RolesController extends AbstractInachisController
     }
 
     /**
-     * Builds a matrix of [resource => [action => bool]] for the template.
+     * Builds the permissions matrix
      *
      * @param Role $role
-     * @return array<string, array{
-     *     label: string,
-     *     actions: array<string, bool>
-     * }>
+     * @return array<string, array<string, string>>
      */
-    private function createUniqueSlug(string $name, RoleRepository $roleRepository): string
-    {
-        $baseSlug = (new AsciiSlugger())
-            ->slug($name)
-            ->lower()
-            ->toString();
-
-        $baseSlug = trim($baseSlug, '-');
-        if ($baseSlug === '') {
-            $baseSlug = 'role';
-        }
-
-        $slug = $baseSlug;
-        $counter = 2;
-
-        while ($roleRepository->findOneBy(['slug' => $slug]) !== null) {
-            $slug = $baseSlug . '-' . $counter;
-            ++$counter;
-        }
-
-        return $slug;
-    }
-
     private function buildPermissionMatrix(Role $role): array
     {
         $granted = [];

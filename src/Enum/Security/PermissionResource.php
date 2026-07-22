@@ -28,6 +28,8 @@ enum PermissionResource: string
     case PASSWORD_POLICY = 'PASSWORD_POLICY';
     case AUDIT_LOG = 'AUDIT_LOG';
 
+    case PRIVACY_GDPR = 'PRIVACY_GDPR';
+
     case ANALYTICS = 'ANALYTICS';
     case SYSTEM_STATUS = 'SYSTEM_STATUS';
     case EMAIL_DNS = 'EMAIL_DNS';
@@ -35,12 +37,12 @@ enum PermissionResource: string
     case STORAGE = 'STORAGE';
     case IMPORT_EXPORT = 'IMPORT_EXPORT';
     case MAINTENANCE = 'MAINTENANCE';
+    case CSP_POLICY = 'CSP_POLICY';
     // case BACKUP;
 
-    // case SETTINGS = 'SETTINGS';
     case NAVIGATION = 'NAVIGATION';
     case THEME = 'THEME';
-    case ROBOTS = 'ROBOTS';
+    case CRAWLER = 'CRAWLER';
 
     /**
      * @return list<PermissionAction>
@@ -82,6 +84,8 @@ enum PermissionResource: string
                 PermissionAction::MANAGE,
             ],
 
+            self::PRIVACY_GDPR,
+            self::CSP_POLICY,
             self::MAINTENANCE => [
                 PermissionAction::VIEW,
                 PermissionAction::EDIT,
@@ -96,7 +100,10 @@ enum PermissionResource: string
                 PermissionAction::VIEW,
             ],
 
-            self::ROBOTS => [ PermissionAction::EDIT ],
+            self::CRAWLER => [
+                PermissionAction::VIEW,
+                PermissionAction::EDIT,
+            ],
         };
     }
 
@@ -119,6 +126,8 @@ enum PermissionResource: string
             self::ROLE => 'Roles',
             self::PASSWORD_POLICY => 'Password Policies',
             self::AUDIT_LOG => 'Audit Logs',
+            
+            self::PRIVACY_GDPR => 'GDPR Policy',
 
             self::ANALYTICS => 'Analytics',
             self::SYSTEM_STATUS => 'System Status',
@@ -126,12 +135,13 @@ enum PermissionResource: string
             self::IMPORT_EXPORT => 'Import/Export',
             self::MAINTENANCE => 'Maintenance Mode',
             self::ERROR_LOG => 'Error Log',
-            self::STORAGE => 'Storage',
+            self::STORAGE => 'Storage Usage',
             // self::BACKUP => 'Backups',
+            self::CSP_POLICY => 'Content Security Policy',
 
             self::NAVIGATION => 'Navigation',
             self::THEME => 'Themes',
-            self::ROBOTS => 'robots.txt',
+            self::CRAWLER => 'Crawlers and Discovery',
         };
     }
 
@@ -158,28 +168,35 @@ enum PermissionResource: string
                 'group' => PermissionGroup::USERS,
                 'resources' => [
                     self::USER,
+                    self::AUDIT_LOG,
                     self::ROLE,
+                ],
+            ],
+            [
+                'group' => PermissionGroup::SECURITY,
+                'resources' => [
+                    self::CSP_POLICY,
+                    self::EMAIL_DNS,
+                    self::SYSTEM_STATUS,
                     self::PASSWORD_POLICY,
+                    self::PRIVACY_GDPR,
                 ],
             ],
             [
                 'group' => PermissionGroup::SETTINGS,
                 'resources' => [
                     self::NAVIGATION,
+                    self::CRAWLER,
                     self::THEME,
-                    self::ROBOTS,
                 ],
             ],
             [
                 'group' => PermissionGroup::TOOLS,
                 'resources' => [
                     self::ANALYTICS,
-                    self::AUDIT_LOG,
-                    self::SYSTEM_STATUS,
                     self::ERROR_LOG,
-                    self::EMAIL_DNS,
-                    self::IMPORT_EXPORT,
                     self::STORAGE,
+                    self::IMPORT_EXPORT,
                     self::MAINTENANCE,
                 ],
             ],

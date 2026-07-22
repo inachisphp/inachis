@@ -1,4 +1,5 @@
 {% extends "/inadmin/structure/main.html.twig" %}
+
 {% block pagetitle %}
     <span>Settings</span>
 {% endblock pagetitle %}
@@ -6,49 +7,45 @@
 {% block content %}
 <div class="col-12 widget-container">
 
+{% if can('NAVIGATION', 'VIEW') %}
 <section class="widget widget-settings">
     <p><span class="material-icons" aria-hidden="true">tab</span></p>
-    <h2>Tabs</h2>
-    <p><span>Manage your tabs</span></p>
+    <h2>Tabs &amp; Navigation</h2>
+    <p><span>Manage site navigation and main menu links</span></p>
     <p><a href="{{ viewModel.settings.domain ~ path('incc_settings_navigation_list') }}" class="button button--secondary">Manage Tabs</a></p>
 </section>
+{% endif %}
 
+{% if can('THEME', 'MANAGE') %}
 <section class="widget widget-settings">
     <p><span class="material-icons" aria-hidden="true">format_paint</span></p>
-    <h2>Themes</h2>
-    <p><span>Manage and apply your themes</span></p>
+    <h2>Themes &amp; Styling</h2>
+    <p><span>Manage and apply visual presentation themes</span></p>
     <p><a href="{{ viewModel.settings.domain ~ path('incc_settings_themes') }}" class="button button--secondary">Manage Themes</a></p>
 </section>
+{% endif %}
 
-<!-- section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">extension</span></p>
-    <h2>Plug-ins</h2>
-    <p><span>Manage your plugins</span></p>
-    <p><a href="{{ viewModel.settings.domain }}" class="button button--secondary">Manage Plugins</a></p>
-</section>
-
-<section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">security</span></p>
-    <h2>Security</h2>
-    <p><span>Manage your security settings</span></p>
-    <p><a href="{{ viewModel.settings.domain }}" class="button button--secondary">Manage Security</a></p>
-</section -->
-
+{% if can('CRAWLER', 'VIEW') %}
 <section class="widget widget-settings">
     <p><span class="material-icons" aria-hidden="true">android</span></p>
     <h2>Crawlers &amp; Discovery</h2>
-    <p><span>Manage robots.txt, llms.txt, etc. to help search engines
-and AI services</span></p>
+    <p><span>Manage robots.txt, llms.txt, and AI engine discovery</span></p>
     <p><a href="{{ viewModel.settings.domain ~ path('incc_settings_discovery') }}" class="button button--secondary">Manage Discovery</a></p>
 </section>
+{% endif %}
 
+{# System Information Widget #}
 <section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">commit</span></p>
-    <h2>Version {{ version.version }}</h2>
-    <p><span>Commit: {{ version.commit }}</span></p>
-    <p><span>Build date: {{ version.build_date }}</span></p>
+    <p><span class="material-icons" aria-hidden="true">info</span></p>
+    <h2>System Information</h2>
+    <p>
+        <span>Version: {{ version.version }}</span><br>
+        <span>Commit: {{ version.commit }}</span><br>
+    </p>
+    <p>
+        <small class="text-muted">Build date: {{ version.build_date }}</small>
+    </p>
 </section>
 
 </div>
 {% endblock content %}
-

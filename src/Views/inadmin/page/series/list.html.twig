@@ -26,11 +26,11 @@
         'slug_prefix': 'series/edit',
         'slug': 'id',
 
-        'add_button': {
+        'add_button': can('SERIES', 'CREATE') ? {
             image: 'create_new_folder',
             'text': 'Create Series',
             'url': path('incc_series_new'),
-        },
+        } : null,
         'url_result': path('incc_series_list'),
 
         'filters': {
@@ -48,22 +48,22 @@
         zebra: true,
 
         'actions': {
-            'private': {
+            'private': can('SERIES', 'EDIT') ? {
                 'button_class': 'button--secondary button--privacy',
                 'data': {
                     'form-action': ''
                 },
                 'icon': 'visibility_off',
                 'title': 'Make private',
-            },
-            'public': {
+            } : null,
+            'public': can('SERIES', 'EDIT') ? {
                 'button_class': 'button--secondary button--privacy',
                 'data': {
                     'form-action': ''
                 },
                 'icon': 'visibility',
                 'title': 'Make public',
-            },
+            } : null,
             'export': {
                 'button_class': 'button--secondary button--export',
                 'button_type': 'button',
@@ -75,7 +75,7 @@
                 'icon': 'cloud_download',
                 'title': 'Export',
             },
-            'delete': {
+            'delete': can('SERIES', 'DELETE') ? {
                 'button_class': 'button--negative button--delete button--confirm',
                 'data': {
                     'confirm': 'delete',
@@ -89,8 +89,8 @@
                 'name': 'delete',
                 'value': '1',
                 'title': 'Delete',
-            },
-        },
+            } : null,
+        }|filter(v => v is not null),
 
         'sort_options': {
             'lastDate desc': 'Newest',

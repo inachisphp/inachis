@@ -35,6 +35,7 @@
     <div class="fixed-bottom-bar">
         <form method="post">
             <p>
+            {% if can('PAGE', 'EDIT') %}
                 <button class="button button--negative button--delete button--confirm"
                     data-confirm="revert"
                     data-confirm-text="Yes, revert"
@@ -45,6 +46,7 @@
                     name="doRevert" type="submit">
                     <span class="material-icons" aria-hidden="true">undo</span> <span>Revert</span>
                 </button>
+            {% endif %}
                 <a href="{{ path('incc_post_download', { 'id': revision_id }) }}" class="button button--secondary">
                     <span class="material-icons" aria-hidden="true">save_alt</span> {% trans %}admin.post.revision.download{% endtrans %}
                 </a>

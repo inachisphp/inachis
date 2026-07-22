@@ -16,11 +16,13 @@ use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Url;
 use Inachis\Entity\Media\Image;
 use Inachis\Enum\EditorialStatus;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\PostType;
-use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\{CategoryRepository, PageRepository, ReviewThreadRepository, RevisionRepository};
 use Inachis\Repository\Media\ImageRepository;
+use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\Page\CategoryManager;
 use Inachis\Service\Content\Page\PageBulkActionService;
 use Inachis\Service\Content\Page\ReviewRebaseService;
@@ -31,12 +33,10 @@ use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Page controller
  */
-#[IsGranted('ROLE_ADMIN')]
 class PageController extends AbstractInachisController
 {
     public const ITEMS_TO_SHOW = 20;
@@ -61,6 +61,10 @@ class PageController extends AbstractInachisController
         ],
         defaults: [ "limit" => 10, "offset" => 0, ],
         methods: [ "GET", "POST" ]
+    )]
+    #[RequiresPermission(
+        resource: PermissionResource::PAGE,
+        action: PermissionAction::VIEW
     )]
     public function list(
         Request $request,
@@ -168,6 +172,10 @@ class PageController extends AbstractInachisController
             "day" => "\d+"
         ],
         methods: [ "GET", "POST" ]
+    )]
+    #[RequiresPermission(
+        resource: PermissionResource::PAGE,
+        action: PermissionAction::VIEW
     )]
     public function edit(
         Request $request,

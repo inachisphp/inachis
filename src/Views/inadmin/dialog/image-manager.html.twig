@@ -16,6 +16,8 @@
 <section class="gallery">
     <div class="loader"></div>
 </section>
+
+{% if can('IMAGE', 'CREATE') %}
 <section class="ui-dialog-image-uploader visually-hidden">
     {{ form_start(form, {
         'attr': { 'class': 'filepond form nested-grid' },
@@ -59,4 +61,5 @@
     {{ form_row(form._token) }}
     {{ form_end(form, { 'render_rest': false }) }}
 </section>
+{% endif %}
 <script>window.Inachis.ImageManager._init();</script>

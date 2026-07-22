@@ -14,6 +14,9 @@ use IntlException;
 use Inachis\Entity\Content\{Category,Page,Tag};
 use Inachis\Entity\User\User;
 use Inachis\Enum\EditorialStatus;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
+use Inachis\Security\Authorisation\PermissionResolver;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\Form\AbstractType;
@@ -47,6 +50,7 @@ class PostType extends AbstractType
      * @throws IntlException
      */
     public function __construct(
+        private PermissionResolver $permissionResolver,
         private readonly TranslatorInterface $translator,
         private RouterInterface $router,
         private Security $security,
@@ -62,17 +66,40 @@ class PostType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $newItem = !$options['data'] instanceof Page || empty($options['data']->getId());
-        $isScheduled = $options['data'] instanceof Page && $options['data']->getPostDate() > new \DateTimeImmutable('now');
-        // TODO: update these based on role permissions
-        $showSave = true;
-        $showReview = $options['data'] instanceof Page && $options['data']->getStatus() == EditorialStatus::DRAFT;
-        $showPublish = $options['data'] instanceof Page && $options['data']->getStatus() == EditorialStatus::REVIEW;
-        $showDelete = true;
         $user = $this->security->getUser();
         $userTimezone = $user instanceof User
             ? $user->getPreferences()?->getTimezone()
             : 'UTC';
+
+        $newItem = !$options['data'] instanceof Page || empty($options['data']->getId());
+        $isScheduled = $options['data'] instanceof Page && $options['data']->getPostDate() > new \DateTimeImmutable('now');
+        
+        $allowEdit = $this->permissionResolver->hasPermission(
+            $user,
+            PermissionResource::PAGE,
+            !$newItem ? PermissionAction::EDIT : PermissionAction::CREATE,
+        );
+        $showReview = $this->permissionResolver->hasPermission(
+                $user,
+                PermissionResource::PAGE,
+                PermissionAction::REVIEW
+            ) &&
+            $options['data'] instanceof Page && 
+            $options['data']->getStatus() == EditorialStatus::DRAFT
+        ;
+        $showPublish = $this->permissionResolver->hasPermission(
+                $user,
+                PermissionResource::PAGE,
+                PermissionAction::PUBLISH
+            ) && 
+            $options['data'] instanceof Page && 
+            $options['data']->getStatus() == EditorialStatus::REVIEW
+        ;
+        $showDelete = $this->permissionResolver->hasPermission(
+            $user,
+            PermissionResource::PAGE,
+            PermissionAction::DELETE
+        );
         $builder
             ->add('title', TextType::class, [
                 'attr' => [
@@ -82,6 +109,7 @@ class PostType extends AbstractType
                     'class' => 'editor__title text',
                     'placeholder' => 'admin.post.title.placeholder',
                 ],
+                'disabled' => !$allowEdit,
                 'label' => 'admin.post.title.label',
                 'label_attr' => [
                     'id' => 'title_label',
@@ -95,6 +123,7 @@ class PostType extends AbstractType
                     'class' => 'editor__sub-title text inline_label',
                     'placeholder' => 'admin.post.subTitle.placeholder',
                 ],
+                'disabled' => !$allowEdit,
                 'label' => 'admin.post.subTitle.label',
                 'label_attr' => [
                     'id' => 'subTitle_label',
@@ -108,6 +137,7 @@ class PostType extends AbstractType
                     'aria-required' => 'false',
                     'class' => 'field__wide',
                 ],
+                'disabled' => !$allowEdit,
                 'label' => 'admin.post.url.label',
                 'label_attr' => [
                     'id' => 'url_label',
@@ -121,6 +151,7 @@ class PostType extends AbstractType
                     'aria-required'   => 'false',
                     'class' => 'mde_editor',
                 ],
+                'disabled' => !$allowEdit,
                 'label' => 'admin.post.content.label',
                 'label_attr' => [
                     'class' => 'hidden',
@@ -136,6 +167,7 @@ class PostType extends AbstractType
                     'data-label-off' => $this->translator->trans('admin.post.properties.visibility.private'),
                     'data-label-on' => $this->translator->trans('admin.post.properties.visibility.public'),
                 ],
+                'disabled' => !$allowEdit,
                 'label' => 'admin.post.properties.visibility.label',
                 'label_attr' => [
                     'id' => 'visible_label',
@@ -151,6 +183,7 @@ class PostType extends AbstractType
                     'data-label-off' => $this->translator->trans('admin.post.properties.showTableOfContents.off'),
                     'data-label-on' => $this->translator->trans('admin.post.properties.showTableOfContents.on'),
                 ],
+                'disabled' => !$allowEdit,
                 'label' => 'admin.post.properties.showTableOfContents.label',
                 'label_attr' => [
                     'id' => 'showTableOfContents_label',
@@ -166,6 +199,7 @@ class PostType extends AbstractType
                     'data-format' => 'dd/mm/yyyy HH:ii',
                     'data-on-change' => 'updatePostUrl',
                 ],
+                'disabled' => !$allowEdit,
                 'format'=> 'dd/MM/yyyy HH:mm',
                 'html5' => false,
                 'input' => 'datetime_immutable',
@@ -190,6 +224,7 @@ class PostType extends AbstractType
                     'class' => 'ui-datepicker',
                     'data-format' => 'dd/mm/yyyy HH:ii',
                 ],
+                'disabled' => !$allowEdit,
                 'format' => 'dd/MM/yyyy HH:mm',
                 'html5' => false,
                 'input' => 'datetime_immutable',
@@ -229,6 +264,7 @@ class PostType extends AbstractType
                         JSON_THROW_ON_ERROR
                     ),
                 ],
+                'disabled' => !$allowEdit,
                 'label'      => 'admin.post.properties.categories.label',
                 'label_attr' => [
                     'id' => 'categories_label',
@@ -256,6 +292,7 @@ class PostType extends AbstractType
                     'data-tags' => 'true',
                     'data-url' => $this->router->generate('api_tags_list'),
                 ],
+                'disabled' => !$allowEdit,
                 'label' => 'admin.post.properties.tags.label',
                 'label_attr' => [
                     'id' => 'tags_label',
@@ -269,6 +306,7 @@ class PostType extends AbstractType
                     $this->emojisTransliterator->transliterate(':uk: English') => 'en_GB',
                     $this->emojisTransliterator->transliterate(':fr: Français') => 'fr_FR',
                 ],
+                'disabled' => !$allowEdit,
                 'duplicate_preferred_choices' => false,
                 'empty_data' => 'en_GB',
                 'preferred_choices' => [ 'en_GB' ],
@@ -280,6 +318,7 @@ class PostType extends AbstractType
                     'class' => 'ui-map',
                     'data-google-key' => '{{ viewModel.settings.google.key }}',
                 ],
+                'disabled' => !$allowEdit,
                 'label' => 'admin.post.properties.location.label',
                 'label_attr' => [
                     'id' => 'latlong_label'
@@ -287,6 +326,7 @@ class PostType extends AbstractType
                 'required' => false,
             ])
             ->add('featureImage', HiddenType::class, [
+                'disabled' => !$allowEdit,
                 'mapped' => false,
                 'required' => false,
             ])
@@ -303,6 +343,7 @@ class PostType extends AbstractType
                     'class' => 'full-width',
                     'rows' => 3,
                 ],
+                'disabled' => !$allowEdit,
                 'label' => 'admin.post.sharing.featureSnippet.label',
                 'label_attr' => [
                     'id' => 'teaser_label',
@@ -315,6 +356,7 @@ class PostType extends AbstractType
                     'aria-required' => 'false',
                     'class' => 'checkbox',
                 ],
+                'disabled' => !$allowEdit,
                 'label' => 'admin.post.sharing.noindex.label',
                 'label_attr' => [
                     'id' => 'noindex_label',
@@ -327,13 +369,14 @@ class PostType extends AbstractType
                     'aria-required' => 'false',
                     'class' => 'checkbox',
                 ],
+                'disabled' => !$allowEdit,
                 'label' => 'admin.post.sharing.nofollow.label',
                 'label_attr' => [
                     'id' => 'nofollow_label',
                 ],
                 'required' => false,
             ]);
-        if ($showSave) {
+        if ($allowEdit) {
             $builder->add('submit', SubmitType::class, [
                 'attr' => [
                     'class' => 'button button--positive',

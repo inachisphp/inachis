@@ -12,18 +12,19 @@ namespace Inachis\Controller\Page\Post;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Content\Tag;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\{CategoryRepository, PageRepository,TagRepository};
+use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\Page\TagBulkActionService;
 use Inachis\Service\Content\ViewStateManager;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 class TagsController extends AbstractInachisController
 {
     /**
@@ -76,6 +77,10 @@ class TagsController extends AbstractInachisController
         name: 'incc_tags_list',
         requirements: [ "limit" => "\d+", "offset" => "\d+", ],
         defaults: [ "limit" => 20, "offset" => 0, ]
+    )]
+    #[RequiresPermission(
+        resource: PermissionResource::TAG,
+        action: PermissionAction::VIEW
     )]
     public function index(
         Request $request,

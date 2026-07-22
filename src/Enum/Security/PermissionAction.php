@@ -27,7 +27,7 @@ enum PermissionAction: string
     public function label(): string
     {
         return match ($this) {
-            self::MANAGE => 'Manage',
+            self::MANAGE => 'Administer',
             self::CREATE => 'Create',
             self::VIEW => 'View',
             self::EDIT => 'Edit',

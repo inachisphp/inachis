@@ -10,8 +10,11 @@ namespace Inachis\Controller\Page\Security;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Controller\AbstractInachisController;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\SecurityPolicyType;
 use Inachis\Repository\Security\SecurityPolicyRepository;
+use Inachis\Security\Attribute\RequiresPermission;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -22,6 +25,10 @@ use Symfony\Component\Routing\Attribute\Route;
 class SecurityPolicyController extends AbstractInachisController
 {
     #[Route('/incc/admin/security-policy', name: 'incc_admin_security_policy', priority: 100)]
+    #[RequiresPermission(
+        resource: PermissionResource::PASSWORD_POLICY,
+        action: PermissionAction::MANAGE
+    )]
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,

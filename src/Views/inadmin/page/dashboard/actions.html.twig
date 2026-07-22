@@ -1,9 +1,3 @@
-{% if dashboard.recentDraft|default(null) is not empty  %}
-    {% set showResume = true %}
-{% else %}
-    {% set showResume = false %}
-{% endif %}
-
 <section class="widget widget-actions ui-section rounded">
     <header class="widget__header">
         <h3>Activity Hub</h3>
@@ -25,28 +19,36 @@
             </p>
         </div>
         {% endif %}
+        {% if canAny([['PAGE', 'CREATE'], ['SERIES', 'CREATE'], ['IMAGE', 'CREATE'] ]) %}
         <div class="{% if showResume %}col-6{% else %}col-12{% endif %} ui-section rounded">
             <h4>Quick Create</h4>
             <div class="icon-grid">
+            {% if can('PAGE', 'CREATE') %}
             <a href="/incc/page/new" class="icon-item">
                 <div class="icon-box green">
                     <span class="material-icons">add_circle</span>
                 </div>
                 <span>New Post</span>
             </a>
+            {% endif %}
+            {% if can('IMAGE', 'CREATE') %}
             <a href="{{ path('incc_resource_list', { 'type': 'images' }) }}?upload=true" class="icon-item">
                 <div class="icon-box blue">
                     <span class="material-icons">cloud_upload</span>
                 </div>
                 <span>Upload Image</span>
             </a>
+            {% endif %}
+            {% if can('SERIES', 'CREATE') %}
             <a href="/incc/series/new" class="icon-item">
                 <div class="icon-box purple">
                     <span class="material-icons">chrome_reader_mode</span>
                 </div>
                 <span>New Series</span>
             </a>
+            {% endif %}
+            </div>
         </div>
-        </div>
+        {% endif %}
     </div>
 </section>

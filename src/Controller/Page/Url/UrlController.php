@@ -11,19 +11,19 @@ namespace Inachis\Controller\Page\Url;
 
 use Doctrine\ORM\OptimisticLockException;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Content\Url;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\UrlRepository;
+use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\ViewStateManager;
 use Inachis\Service\Url\UrlBulkActionService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 class UrlController extends AbstractInachisController
 {
     /**
@@ -40,6 +40,10 @@ class UrlController extends AbstractInachisController
         requirements: [ "limit" => "\d+", "offset" => "\d+", ],
         defaults: [ "limit" => 20, "offset" => 0, ],
         methods: [ "GET", "POST" ]
+    )]
+    #[RequiresPermission(
+        resource: PermissionResource::PAGE,
+        action: PermissionAction::VIEW
     )]
     public function list(
         Request $request,

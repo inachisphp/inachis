@@ -9,6 +9,10 @@
 
 namespace Inachis\Form;
 
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
+use Inachis\Security\Authorisation\PermissionResolver;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -31,7 +35,11 @@ class RobotsTxtType extends AbstractType
      *
      * @param TranslatorInterface $translator
      */
-    public function __construct(private TranslatorInterface $translator) {}
+    public function __construct(
+        private PermissionResolver $permissionResolver,
+        private Security $security,
+        private readonly TranslatorInterface $translator,
+    ) {}
 
     /**
      * Build the form
@@ -44,21 +52,29 @@ class RobotsTxtType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('robots_txt', TextareaType::class, [
-                'attr' => [
-                    'aria-labelledby' => 'title_label',
-                    'autofocus' => 'true',
-                    'class' => 'text halfwidth',
-                    'rows' => 15,
-                ],
-                'label' => $this->translator->trans('admin.setting.robots_txt.label', [], 'messages'),
-                'label_attr' => [
-                    'id' => 'title_label',
-                ],
-                'required' => false,
-            ])
-            ->add('submit', SubmitType::class, [
+        $user = $this->security->getUser();
+        $allowEdit = $this->permissionResolver->hasPermission(
+            $user,
+            PermissionResource::CRAWLER,
+            PermissionAction::EDIT
+        );
+
+        $builder->add('robots_txt', TextareaType::class, [
+            'attr' => [
+                'aria-labelledby' => 'title_label',
+                'autofocus' => 'true',
+                'class' => 'text halfwidth',
+                'rows' => 15,
+            ],
+            'disabled' => !$allowEdit,
+            'label' => $this->translator->trans('admin.setting.robots_txt.label', [], 'messages'),
+            'label_attr' => [
+                'id' => 'title_label',
+            ],
+            'required' => false,
+        ]);
+        if ($allowEdit) {
+            $builder->add('submit', SubmitType::class, [
                 'attr' => [
                     'class' => 'button button--positive',
                 ],
@@ -68,8 +84,9 @@ class RobotsTxtType extends AbstractType
                     $this->translator->trans('admin.button.save', [], 'messages')
                 ),
                 'label_html' => true,
-            ])
-        ;
+            ]);
+        }
+            
     }
 
     /**

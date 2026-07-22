@@ -69,40 +69,40 @@
         slug_prefix: viewModel.page.tab,
         slug: 'urls[0].link',
 
-        add_button: {
+        add_button: can('PAGE', 'CREATE') ? {
             image: 'note_add',
             text: 'Create ' ~ viewModel.page.tab|capitalize,
             url: link_new,
-        },
+        }: [],
         url_result: path('incc_post_list'),
 
         badges: badges,
 
         actions: {
-            private: {
+            private: can('PAGE', 'EDIT') ? {
                 button_class: 'button--secondary button--privacy',
                 data: {
                     'form-action': ''
                 },
                 icon: 'visibility_off',
                 title: 'Make private',
-            },
-            public: {
+            } : null,
+            public: can('PAGE', 'EDIT') ? {
                 button_class: 'button--secondary button--privacy',
                 data: {
                     'form-action': ''
                 },
                 icon: 'visibility',
                 title: 'Make public',
-            },
-            rebuild: {
+            } : null,
+            rebuild: can('PAGE', 'EDIT') ? {
                 button_class: 'button--secondary',
                 data: {
                     'form-action': ''
                 },
                 'icon': 'hub',
                 title: 'Recreate Link'
-            },
+            } : null,
             export: {
                 button_class: 'button--secondary button--export',
                 button_type: 'button',
@@ -114,7 +114,7 @@
                 icon: 'cloud_download',
                 'title': 'Export',
             },
-            delete: {
+            delete: can('PAGE', 'DELETE') ? {
                 button_class: 'button--negative button--delete button--confirm',
                 data: {
                     confirm: 'delete',
@@ -128,8 +128,8 @@
                 'name': 'delete',
                 'value': '1',
                 'title': 'Delete',
-            }
-        },
+            } : null
+        }|filter(v => v is not null),
 
         columns: [
             {

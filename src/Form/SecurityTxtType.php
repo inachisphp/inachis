@@ -9,6 +9,10 @@
 
 namespace Inachis\Form;
 
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
+use Inachis\Security\Authorisation\PermissionResolver;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -24,7 +28,9 @@ class SecurityTxtType extends AbstractType
      * @param TranslatorInterface $translator
      */
     public function __construct(
-        private TranslatorInterface $translator
+        private PermissionResolver $permissionResolver,
+        private Security $security,
+        private readonly TranslatorInterface $translator,
     ) {}
 
     /**
@@ -38,21 +44,29 @@ class SecurityTxtType extends AbstractType
         FormBuilderInterface $builder,
         array $options
     ): void {
-        $builder
-            ->add('security_txt', TextareaType::class, [
-                'attr' => [
-                    'aria-labelledby' => 'title_label',
-                    'autofocus' => true,
-                    'class' => 'text halfwidth',
-                    'rows' => 15,
-                ],
-                'label' => 'security.txt',
-                'label_attr' => [
-                    'id' => 'title_label',
-                ],
-                'required' => false,
-            ])
-            ->add('submit', SubmitType::class, [
+        $user = $this->security->getUser();
+        $allowEdit = $this->permissionResolver->hasPermission(
+            $user,
+            PermissionResource::CRAWLER,
+            PermissionAction::EDIT
+        );
+
+        $builder->add('security_txt', TextareaType::class, [
+            'attr' => [
+                'aria-labelledby' => 'title_label',
+                'autofocus' => true,
+                'class' => 'text halfwidth',
+                'rows' => 15,
+            ],
+            'disabled' => !$allowEdit,
+            'label' => 'security.txt',
+            'label_attr' => [
+                'id' => 'title_label',
+            ],
+            'required' => false,
+        ]);
+        if ($allowEdit) {
+            $builder->add('submit', SubmitType::class, [
                 'attr' => [
                     'class' => 'button button--positive',
                 ],
@@ -66,6 +80,7 @@ class SecurityTxtType extends AbstractType
                 ),
                 'label_html' => true,
             ]);
+        }
     }
 
     /**

@@ -12,6 +12,11 @@
   z-index: 50;
   right: 0;
 
+  p {
+    display: flex;
+    gap: 1rem;
+  }
+
   @media (min-width: $breakpoint-medium) {
     left: $sidebar-collapsed;
     transition: left 0.3s ease;

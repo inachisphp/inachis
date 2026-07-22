@@ -11,11 +11,14 @@ namespace Inachis\Controller\Page\Setting;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\System\NavigationTab;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\NavigationTabType;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\System\NavigationTabRepository;
 use Inachis\Service\Navigation\NavigationTabService;
 use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\ViewStateManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,6 +41,10 @@ class NavigationTabController extends AbstractInachisController
      * @return Response
      */
     #[Route('/incc/settings/navigation', name: 'incc_settings_navigation_list')]
+    #[RequiresPermission(
+        resource: PermissionResource::NAVIGATION,
+        action: PermissionAction::VIEW
+    )]
     public function index(
         Request $request,
         CategoryRepository $categoryRepository,
@@ -94,6 +101,10 @@ class NavigationTabController extends AbstractInachisController
      * @return Response
      */
     #[Route('/incc/settings/navigation/edit/{id}', name: 'incc_settings_navigation_edit')]
+    #[RequiresPermission(
+        resource: PermissionResource::NAVIGATION,
+        action: PermissionAction::VIEW
+    )]
     public function edit(
         Request $request,
         NavigationTabRepository $navigationTabRepository,
@@ -130,6 +141,10 @@ class NavigationTabController extends AbstractInachisController
      * @return Response
      */
     #[Route('/incc/settings/navigation/{id}/up', name: 'incc_settings_navigation_up', methods: ['POST'])]
+    #[RequiresPermission(
+        resource: PermissionResource::NAVIGATION,
+        action: PermissionAction::EDIT
+    )]
     public function moveUp(
         NavigationTab $tab,
         NavigationTabService $manager
@@ -147,6 +162,10 @@ class NavigationTabController extends AbstractInachisController
      * @return Response
      */
     #[Route('/incc/settings/navigation/{id}/down', name: 'incc_settings_navigation_down', methods: ['POST'])]
+    #[RequiresPermission(
+        resource: PermissionResource::NAVIGATION,
+        action: PermissionAction::EDIT
+    )]
     public function moveDown(
         NavigationTab $tab,
         NavigationTabService $manager
@@ -164,6 +183,10 @@ class NavigationTabController extends AbstractInachisController
      * @return JsonResponse
      */
     #[Route('/incc/settings/navigation/reorder', name: 'incc_settings_navigation_reorder', methods: ['POST'])]
+    #[RequiresPermission(
+        resource: PermissionResource::NAVIGATION,
+        action: PermissionAction::EDIT
+    )]
     public function reorder(
         Request $request,
         NavigationTabService $manager,

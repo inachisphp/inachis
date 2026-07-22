@@ -17,7 +17,9 @@
     </section>
     <div class="fixed-bottom-bar">
         <p>
-            {{ form_widget(form.submit) }}
+            {% if form.submit is defined %}
+                {{ form_widget(form.submit) }}
+            {% endif %}
 			<a class="button button--secondary" href="{{ path('web_robots_txt') }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}">
                 <span class="material-icons" aria-hidden="true">exit_to_app</span>
                 {% trans %}admin.button.viewLive{% endtrans %}</a>

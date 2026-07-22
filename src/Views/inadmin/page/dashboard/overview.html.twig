@@ -1,0 +1,71 @@
+<section class="ui-section widget widget-audit rounded">
+    <header class="widget__header">
+        <h2><span>Content Health Summary</span></h2>
+    </header>
+    <article>
+        <div class="chart-container">
+            <canvas id="contentHealthChart"></canvas>
+        </div>
+    </article>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const canvas1 = document.getElementById('contentHealthChart');
+    const ctx1 = canvas1.getContext('2d');
+
+    canvas1.style.maxHeight = '180px';
+    canvas1.style.width = '100%';
+    
+    // Prepare Twig data for Chart.js
+    const labels = [
+        {% for alert in allAlerts  %}
+            "{{ alert.label|capitalize }}",
+        {% endfor %}
+    ];
+    
+    const dataCounts = [
+        {% for alert in allAlerts  %}
+            {{ alert.count }},
+        {% endfor %}
+    ];
+
+    new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: dataCounts,
+                backgroundColor: [
+                    '#e63946', // High Priority (Red)
+                    '#f4a261', // Medium Priority (Orange)
+                    '#457b9d', // Low Priority (Blue/Teal)
+                    '#2a9d8f', 
+                    '#8d99ae'
+                ],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: { boxWidth: 12, padding: 10 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return ` ${context.label}: ${context.raw} items`;
+                        }
+                    }
+                }
+            },
+            cutout: '70%'
+        }
+    });
+});
+</script>

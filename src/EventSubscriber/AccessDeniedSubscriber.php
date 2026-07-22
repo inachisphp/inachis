@@ -9,7 +9,6 @@
 
 namespace Inachis\EventSubscriber;
 
-use Inachis\Controller\AbstractInachisController;
 use Inachis\Factory\PageViewFactory;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,10 +40,9 @@ class AccessDeniedSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // Leave API requests alone
         if (str_starts_with($request->getPathInfo(), '/api')) {
-        return;
-    }
+            return;
+        }
 
 		$viewModel = str_starts_with($request->getPathInfo(), '/incc')
 			? $this->pageViewFactory->createAdmin()
