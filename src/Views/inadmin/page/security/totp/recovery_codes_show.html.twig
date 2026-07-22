@@ -1,7 +1,7 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_admin_list') }}">Users</a>
+    <a href="{{ path('incp_admin_list') }}">Users</a>
     <span>Recovery Codes</span>
 {% endblock pagetitle %}
 
@@ -30,7 +30,7 @@
         </button>
 
         <a
-            href="{{ path('incc_admin_edit', {'id': viewModel.session.username }) }}"
+            href="{{ path('incp_admin_edit', {'id': viewModel.session.username }) }}"
             class="button button--positive">
             I've Saved These Codes
         </a>

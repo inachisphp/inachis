@@ -29,7 +29,7 @@ class WasteController extends AbstractInachisController
      * @return Response
      */
     #[Route(
-        "/incc/waste/{limit}/{offset}",
+        "/incp/waste/{limit}/{offset}",
         requirements: [
           "limit" => "\d+",
           "offset" => "\d+",
@@ -39,7 +39,7 @@ class WasteController extends AbstractInachisController
             "offset" => 0,
         ],
         methods: [ 'GET', 'POST' ],
-        name: "incc_waste_list"
+        name: "incp_waste_list"
     )]
     public function list(
         Request $request,
@@ -69,7 +69,7 @@ class WasteController extends AbstractInachisController
                 $request->request->getString('recover', '') !== '' ? 'recovered' : 'deleted',
             ));
             return $this->redirectToRoute(
-                'incc_waste_list',
+                'incp_waste_list',
                 [],
             );
         }
@@ -104,12 +104,12 @@ class WasteController extends AbstractInachisController
      * @return Response
      */
     #[Route(
-        "/incc/waste/{id}",
+        "/incp/waste/{id}",
         requirements: [
             "id" => "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
         ],
         methods: [ 'GET' ],
-        name: "incc_waste_view"
+        name: "incp_waste_view"
     )]
     public function view(
         string $id,

@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
         name: '{{ paramName }}',
         allowMultiple: {{ (uploadMultiple ?? true) ? 'true' : 'false' }},
         maxFiles: {{ maxFiles|default(1) }},
+        required: {{ (required ?? true) ? 'true' : 'false' }},
     {% if not (autoUpload ?? true) %}
         instantUpload: false,
         server: null,

@@ -44,18 +44,18 @@ class TwoFactorRequestSubscriber implements EventSubscriberInterface
         $route = $request->attributes->get('_route');
 
         $allowedRoutes = [
-            'incc_account_login',
-            'inadmin_totp_login',
-            'inadmin_totp_login_verify',
-            'inadmin_recovery_code_login',
-            'inadmin_recovery_code_verify',
-            'incc_logout',
+            'incp_account_login',
+            'incp_totp_login',
+            'incp_totp_login_verify',
+            'incp_recovery_code_login',
+            'incp_recovery_code_verify',
+            'incp_logout',
         ];
         if (in_array($route, $allowedRoutes, true)) {
             return;
         }
         $event->setResponse(
-            new RedirectResponse('/incc/login/totp')
+            new RedirectResponse('/incp/login/totp')
         );
     }
 }

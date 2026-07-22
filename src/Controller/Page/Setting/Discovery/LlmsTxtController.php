@@ -28,7 +28,7 @@ class LlmsTxtController extends AbstractTextFileController
      * @param SettingRepository $settingRepository
      * @return Response
      */
-    #[Route('/incc/settings/llms', name: 'incc_settings_llms')]
+    #[Route('/incp/settings/llms', name: 'incp_settings_llms')]
     public function edit(
         Request $request,
         SettingRepository $settingRepository

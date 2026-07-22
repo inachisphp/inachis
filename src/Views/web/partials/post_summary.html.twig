@@ -36,10 +36,10 @@
         </p>
         <p class="post-details">
             {% if post.items is defined %}
-                <time datetime="YYY-mm-dd">{{ post.firstDate|date("F j, Y") }} to {{ post.lastDate|date("F j, Y") }}</time> |
+                <time datetime="YYY-mm-dd">{{ post.firstDate|date("F j, Y", viewModel.settings.displayTimezone) }} to {{ post.lastDate|date("F j, Y", viewModel.settings.displayTimezone) }}</time> |
                 <strong>{{ post.items|length }}</strong> post{{ post.items|length != 1 ? 's' : '' }}
             {% else %}
-                <time datetime="YYYY-MM-DD">{{ post.postDate|date("F j, Y") }}</time>
+                <time datetime="YYYY-MM-DD">{{ post.postDate|date("F j, Y", viewModel.settings.displayTimezone) }}</time>
             {% endif %}
         </p>
     </div>

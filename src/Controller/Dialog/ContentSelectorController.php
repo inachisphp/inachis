@@ -29,7 +29,7 @@ class ContentSelectorController extends AbstractInachisController
      * @param PageRepository $pageRepository
      * @return Response
      */
-    #[Route("/incc/ax/contentSelector/get", methods: [ "POST" ])]
+    #[Route("/incp/ax/contentSelector/get", methods: [ "POST" ])]
     public function contentList(
         Request $request,
         SeriesRepository $seriesRepository,
@@ -89,7 +89,7 @@ class ContentSelectorController extends AbstractInachisController
      * @param PageRepository $pageRepository
      * @return Response
      */
-    #[Route("/incc/ax/contentSelector/save", methods: [ "POST" ])]
+    #[Route("/incp/ax/contentSelector/save", methods: [ "POST" ])]
     public function saveContent(
         Request $request,
         SeriesRepository $seriesRepository,

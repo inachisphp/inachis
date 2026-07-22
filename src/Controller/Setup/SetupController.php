@@ -20,18 +20,18 @@ class SetupController extends AbstractInachisController
      * @param UserRepository $userRepository
      * @return Response
      */
-    #[Route("/setup", name: 'incc_setup_stage1', methods: [ "GET", "POST" ])]
+    #[Route("/setup", name: 'incp_setup_stage1', methods: [ "GET", "POST" ])]
     public function stage1(UserRepository $userRepository): Response
     {
         if ($userRepository->getAllCount() > 0) {
             return $this->redirectToRoute(
-                'incc_dashboard',
+                'incp_dashboard',
                 [],
                 Response::HTTP_PERMANENTLY_REDIRECT
             );
         }
         $form = $this->createFormBuilder()->getForm();
-        
+
         $this->viewModel->page->title = 'Inachis Install';
         return $this->render('setup/stage-1.html.twig', [
             'viewModel' => $this->viewModel,

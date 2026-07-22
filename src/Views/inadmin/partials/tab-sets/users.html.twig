@@ -3,17 +3,17 @@
         canResource('USER') ? {
             id: 'users',
             title: 'Users',
-            url: path('incc_admin_list'),
+            url: path('incp_admin_list'),
         } : null,
         can('ROLE', 'MANAGE') ? {
             'id': 'roles',
             'title': 'Roles',
-            'url': path('incc_admin_role_index'),
+            'url': path('incp_admin_role_index'),
         } : null,
         can('AUDIT_LOG', 'VIEW') ? {
             id: 'audit-logs',
             title: 'Audit Logs',
-            url: path('incc_admin_login_activity_index'),
+            url: path('incp_admin_login_activity_index'),
         } : null,
     ]|filter(v => v is not null)
 }) }}

@@ -40,6 +40,7 @@ class PageViewFactory
             textDirection: $this->getStringParameter('app.config.textDirection', 'ltr'),
             abstract: $this->getStringParameter('app.config.abstract', ''),
             geotagContent: $this->getBoolParameter('app.config.geotagContent', false),
+            displayTimezone: $this->getStringParameter('app.config.displayTimezone', 'UTC'),
         );
 
         return new PageView(

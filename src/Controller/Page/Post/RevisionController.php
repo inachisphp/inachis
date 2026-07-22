@@ -36,7 +36,7 @@ class RevisionController extends AbstractInachisController
      * @param RevisionRepository $revisionRepository
      * @return Response
      */
-    #[Route("/incc/page/diff/{id}", methods: [ "GET" ])]
+    #[Route("/incp/page/diff/{id}", methods: [ "GET" ])]
     public function diff(
         Request $request,
         PageRepository $pageRepository,
@@ -138,7 +138,7 @@ class RevisionController extends AbstractInachisController
      * @return Response
      * @throws Exception
      */
-    #[Route("/incc/page/diff/{id}", methods: [ "POST" ])]
+    #[Route("/incp/page/diff/{id}", methods: [ "POST" ])]
     #[RequiresPermission(
         resource: PermissionResource::PAGE,
         action: PermissionAction::EDIT
@@ -169,7 +169,7 @@ class RevisionController extends AbstractInachisController
 
         $this->addFlash('notice', sprintf('Content reverted to version %s.', $revision->getVersionNumber()));
         return $this->redirect(
-            '/incc/' .
+            '/incp/' .
             $page->getType() . '/' .
             $url->getLink()
         );
@@ -182,7 +182,7 @@ class RevisionController extends AbstractInachisController
      * @param RevisionRepository $revisionRepository
      * @return Response
      */
-    #[Route("/incc/page/download/{id}", name: "incc_post_download", methods: [ "GET" ])]
+    #[Route("/incp/page/download/{id}", name: "incp_post_download", methods: [ "GET" ])]
     public function download(
         Request $request,
         RevisionRepository $revisionRepository,

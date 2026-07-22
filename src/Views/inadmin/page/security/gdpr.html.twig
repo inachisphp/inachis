@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="col-12">
-    <form method="post" action="{{ path('incc_security_privacy_save') }}" class="nested-grid">
+    <form method="post" action="{{ path('incp_security_privacy_save') }}" class="nested-grid">
         <section class="ui-section widget col-6">
             <header class="widget__header">
                 <p>
@@ -82,7 +82,7 @@
                     </div>
                     <div class="col-12 col-md-6 d-flex gap-2">
                         {# Data Export Action #}
-                        <form method="post" action="{{ path('incc_security_privacy_export_user') }}" style="display:inline;">
+                        <form method="post" action="{{ path('incp_security_privacy_export_user') }}" style="display:inline;">
                             <input type="hidden" name="user_identifier" class="js-target-user-input">
                             <button type="submit" class="button button--secondary">
                                 <span class="material-icons" aria-hidden="true">download</span> Export Personal Data
@@ -91,7 +91,7 @@
 
                         {# User Anonymization Action #}
                         {% if can('PRIVACY_GDPR', 'DELETE') %}
-                        <form method="post" action="{{ path('incc_security_privacy_anonymize_user') }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to permanently anonymize this user?');">
+                        <form method="post" action="{{ path('incp_security_privacy_anonymize_user') }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to permanently anonymize this user?');">
                             <input type="hidden" name="_token" value="{{ csrf_token('anonymize_user') }}">
                             <input type="hidden" name="user_identifier" class="js-target-user-input">
                             <button type="submit" class="button button--negative">

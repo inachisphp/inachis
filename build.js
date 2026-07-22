@@ -57,12 +57,12 @@ const builds = {
         js: {
             ...jsBaseConfig,
             entryPoints: [path.join(ROOT, "assets/js/inadmin.js")],
-            outfile: path.join(ROOT, "public/assets/js/incc/scripts.min.js")
+            outfile: path.join(ROOT, "public/assets/js/incp/scripts.min.js")
         },
         scss: {
             ...scssBaseConfig,
             entryPoints: [path.join(ROOT, "assets/scss/inadmin/styles.scss")],
-            outfile: path.join(ROOT, "public/assets/css/incc/styles.min.css")
+            outfile: path.join(ROOT, "public/assets/css/incp/styles.min.css")
         }
     },
     web: {
@@ -89,9 +89,9 @@ const color = {
 async function optimizeImages() {
     const targets = [
         {
-            label: 'incc',
-            input: path.join(ROOT, "assets/imgs/incc"),
-            output: path.join(ROOT, "public/assets/imgs/incc")
+            label: 'incp',
+            input: path.join(ROOT, "assets/imgs/incp"),
+            output: path.join(ROOT, "public/assets/imgs/incp")
         },
         {
             label: 'web',
@@ -152,8 +152,8 @@ async function optimizeImages() {
 }
 
 async function copyIconsAndManifests() {
-    const srcDir = path.join(ROOT, "assets/imgs/incc");
-    const destDir = path.join(ROOT, "public/assets/imgs/incc");
+    const srcDir = path.join(ROOT, "assets/imgs/incp");
+    const destDir = path.join(ROOT, "public/assets/imgs/incp");
     const filesToCopy = ['.ico', 'browserconfig.xml', 'site.webmanifest'];
 
     fs.mkdirSync(destDir, { recursive: true });
@@ -182,8 +182,8 @@ async function copyExtraLibraries() {
         "node_modules/tom-select/dist/js/tom-select.complete.min.js"
     ];
 
-    const destDirJs = path.join(ROOT, "public/assets/js/incc/");
-    const destDirCss = path.join(ROOT, "public/assets/css/incc/");
+    const destDirJs = path.join(ROOT, "public/assets/js/incp/");
+    const destDirCss = path.join(ROOT, "public/assets/css/incp/");
     if (!fs.existsSync(destDirJs)) fs.mkdirSync(destDirJs, { recursive: true });
     if (!fs.existsSync(destDirCss)) fs.mkdirSync(destDirCss, { recursive: true });
 

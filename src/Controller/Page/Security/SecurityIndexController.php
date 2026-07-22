@@ -20,7 +20,7 @@ class SecurityIndexController extends AbstractInachisController
      *
      * @return Response
      */
-    #[Route("/incc/security", name: 'incc_security_list')]
+    #[Route("/incp/security", name: 'incp_security_list')]
     public function index(): Response
     {
         $this->viewModel->page->title = 'Security & Privacy';

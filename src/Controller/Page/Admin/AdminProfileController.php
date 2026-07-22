@@ -48,8 +48,8 @@ class AdminProfileController extends AbstractInachisController
      * @return Response
      */
     #[Route(
-        "/incc/admin/list/{limit}/{offset}",
-        name: 'incc_admin_list',
+        "/incp/admin/list/{limit}/{offset}",
+        name: 'incp_admin_list',
         requirements: [
             "limit" => "\d+",
             "offset" => "\d+",
@@ -88,7 +88,7 @@ class AdminProfileController extends AbstractInachisController
                 }
             }
 
-            return $this->redirectToRoute('incc_admin_list');
+            return $this->redirectToRoute('incp_admin_list');
         }
 
         $params = $viewStateManager->build(
@@ -122,8 +122,8 @@ class AdminProfileController extends AbstractInachisController
      * @throws TransportExceptionInterface
      */
     #[Route(
-        "/incc/admin/{id}",
-        name: "incc_admin_edit",
+        "/incp/admin/{id}",
+        name: "incp_admin_edit",
         methods: [ "GET", "POST" ],
         priority: -100
     )]
@@ -193,7 +193,7 @@ class AdminProfileController extends AbstractInachisController
                     } catch (CannotRemoveLastAdministratorException $e) {
                         $this->addFlash('error', $e->getMessage());
 
-                        return $this->redirectToRoute('incc_admin_edit', [
+                        return $this->redirectToRoute('incp_admin_edit', [
                             'id' => $user->getUsername(),
                         ]);
                     }
@@ -208,7 +208,7 @@ class AdminProfileController extends AbstractInachisController
                     } catch (CannotRemoveLastAdministratorException $e) {
                         $this->addFlash('error', $e->getMessage());
 
-                        return $this->redirectToRoute('incc_admin_edit', [
+                        return $this->redirectToRoute('incp_admin_edit', [
                             'id' => $user->getUsername(),
                         ]);
                     }
@@ -219,17 +219,17 @@ class AdminProfileController extends AbstractInachisController
                     $trustedDeviceManager->removeAll($user);
                     $this->addFlash('success', 'Two-Factor Authentication has been disabled');
 
-                    return $this->redirectToRoute('incc_admin_edit', [
+                    return $this->redirectToRoute('incp_admin_edit', [
                         'id' => $user->getUsername(),
                     ]);
                 }
                 if ($enableTotp instanceof \Symfony\Component\Form\ClickableInterface && $enableTotp->isClicked()) {
-                    return $this->redirectToRoute('incc_admin_totp_setup');
+                    return $this->redirectToRoute('incp_admin_totp_setup');
                 }
                 if ($regenerateCodes instanceof \Symfony\Component\Form\ClickableInterface && $regenerateCodes->isClicked()) {
                     $codes = $recoveryCodeManager->generate($this->getCurrentUser());
                     $request->getSession()->set('recovery_codes', $codes);
-                    return $this->redirectToRoute('incc_security_recovery_codes_generate');
+                    return $this->redirectToRoute('incp_security_recovery_codes_generate');
                 }
 
                 if ($isNew) {
@@ -239,7 +239,7 @@ class AdminProfileController extends AbstractInachisController
                         $user,
                         [ 'viewModel' => $this->viewModel, ],
                         fn (string $token) => $this->generateUrl(
-                            'incc_account_new-password',
+                            'incp_account_new-password',
                             [ 'token' => $token ]
                         )
                     );
@@ -257,7 +257,7 @@ class AdminProfileController extends AbstractInachisController
                 $this->entityManager->flush();
 
                 $this->addFlash('success', 'User details saved.');
-                return $this->redirect($this->generateUrl('incc_admin_edit', [
+                return $this->redirect($this->generateUrl('incp_admin_edit', [
                     'id' => $user->getUsername(),
                 ]));
             }

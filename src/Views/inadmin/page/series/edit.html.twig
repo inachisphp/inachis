@@ -1,7 +1,7 @@
 {% extends "inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_series_list') }}">Series</a>
+    <a href="{{ path('incp_series_list') }}">Series</a>
     <span>{% if series.id is empty %}New{% else %}Edit{% endif %} Series</span>
 {% endblock pagetitle %}
 
@@ -22,7 +22,7 @@
         </li>
         {% endif %}
         {% if showStats %}
-        <li data-source="{{ path('incc_api_series_stats', { 'id': series.id }) }}" class="tab--lazyload">
+        <li data-source="{{ path('incp_api_series_stats', { 'id': series.id }) }}" class="tab--lazyload">
             <a href="#series__stats">{% trans %}admin.posts.tabs.stats{% endtrans %}</a>
         </li>
         {% endif %}
@@ -84,17 +84,17 @@
 
 <div class="fixed-bottom-bar">
     <p>
-        {% if form.submit|default(null) %}
+        {% if form.submit is defined %}
         {{ form_widget(form.submit) }}
         {% endif %}
-        {%  if series.id is not empty and form.delete|default(null) %}
+        {%  if series.id is not empty and form.delete is defined %}
         {{ form_widget(form.delete) }}
         {% endif %}
         {%  if series.id is not empty and series.items|length > 0 %}
             <a class="button button--secondary" href="{{ path('web_series_view', { 'year': series.lastDate|date('Y'), 'title': series.url}) }}" target="_blank" title="View Live"><span class="material-icons" aria-hidden="true">exit_to_app</span> View Live</a>
             <span class="series__controls visually-hidden">
             with selected:
-            {% if form.remove|default(null) %}
+            {% if form.remove is defined %}
             {{ form_widget(form.remove) }}
             {% endif %}
         {%  endif %}

@@ -5,7 +5,7 @@
                 {% set filename = '/imgs/' ~ filename %}
             {% endif %}
         <li>
-            <a href="{{ path('incc_resource_edit', { type: viewModel.page.type, filename: item.id }) }}" title="{{ item.title }}">
+            <a href="{{ path('incp_resource_edit', { type: viewModel.page.type, filename: item.id }) }}" title="{{ item.title }}">
                 <span><img alt="{{ item.altText }}" src="{{ filename }}" /></span>
                 {{ item.title|u.truncate(35, '...', false) }}
             </a>

@@ -5,15 +5,15 @@
     <link>{{ viewModel.settings.domain }}</link>
     <description>{{ feed_description }}</description>
     <language>{{ viewModel.settings.language|default('en') }}</language>
-    <pubDate>{{ posts|length > 0 ? posts|first.postDate|date('r') : 'now'|date('r') }}</pubDate>
-    <lastBuildDate>{{ 'now'|date('r') }}</lastBuildDate>
+    <pubDate>{{ posts|length > 0 ? posts|first.postDate|date('r', viewModel.settings.displayTimezone) : 'now'|date('r', viewModel.settings.displayTimezone) }}</pubDate>
+    <lastBuildDate>{{ 'now'|date('r', viewModel.settings.displayTimezone) }}</lastBuildDate>
     <atom:link href="{{ feed_url }}" rel="self" type="application/rss+xml" />
     {% for post in posts %}
       <item>
         <title>{{ post.title }}{% if post.subTitle is not empty %} — {{ post.subTitle }}{% endif %}</title>
         <link>{{ viewModel.settings.domain }}/{{ post.urls.first.link }}</link>
         <description><![CDATA[{{ post.featureSnippet is not empty ? post.featureSnippet : (post.content|striptags|slice(0, 250) ~ '...') }}]]></description>
-        <pubDate>{{ post.postDate|date('r') }}</pubDate>
+        <pubDate>{{ post.postDate|date('r', viewModel.settings.displayTimezone) }}</pubDate>
         <guid isPermaLink="true">{{ viewModel.settings.domain }}/{{ post.urls.first.link }}</guid>
         {% if post.author is not empty %}
           <author>{{ post.author.email|default('no-reply@davidgpaul.co.uk') }} ({{ post.author.displayName|default(post.author.username) }})</author>

@@ -29,7 +29,7 @@ class ExportController extends AbstractInachisController
      * @param PageExportService $pageExportService
      * @return Response
      */
-    #[Route('incc/tools/export', name: 'incc_tools_export', methods: ['GET', 'POST'])]
+    #[Route('incp/tools/export', name: 'incp_tools_export', methods: ['GET', 'POST'])]
     public function export(
         Request $request,
         CategoryExportService $categoryExportService,
@@ -67,7 +67,7 @@ class ExportController extends AbstractInachisController
                     } elseif ($scope === 'manual') {
                         if (empty($selectedIds)) {
                             $this->addFlash('error', 'No pages selected for export.');
-                            return $this->redirectToRoute('incc_tools_export');
+                            return $this->redirectToRoute('incp_tools_export');
                         }
                         $items = $pageExportService->getPagesByIds($selectedIds);
                     }  elseif ($scope === 'filtered') {
@@ -82,7 +82,7 @@ class ExportController extends AbstractInachisController
                     } elseif ($scope === 'manual') {
                         if (empty($selectedIds)) {
                             $this->addFlash('error', 'No series selected for export.');
-                            return $this->redirectToRoute('incc_tools_export');
+                            return $this->redirectToRoute('incp_tools_export');
                         }
                         $items = $seriesExportService->getSeriesByIds($selectedIds);
                     }  elseif ($scope === 'filtered') {
@@ -101,7 +101,7 @@ class ExportController extends AbstractInachisController
                 $exportedData = $exportService->export($items, $format);
             } catch (\InvalidArgumentException $e) {
                 $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('incc_tools_export');
+                return $this->redirectToRoute('incp_tools_export');
             }
 
             $filename = $contentType . '-export-' . date('Y-m-d-His') . '.' . $format;
@@ -141,7 +141,7 @@ class ExportController extends AbstractInachisController
         ]);
     }
 
-    #[Route('incc/ax/tools/export', name: 'incc_tools_export_ajax', methods: ['GET'])]
+    #[Route('incp/ax/tools/export', name: 'incp_tools_export_ajax', methods: ['GET'])]
     public function exportAjax(
         Request $request,
         PageRepository $pageRepository,

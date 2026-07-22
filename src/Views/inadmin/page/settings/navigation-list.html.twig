@@ -1,6 +1,6 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 {% block pagetitle %}
-    <a href="{{ path('incc_settings_index') }}">Settings</a>
+    <a href="{{ path('incp_settings_index') }}">Settings</a>
     <span>Navigation Tabs</span>
 {% endblock pagetitle %}
 {% block content %}
@@ -60,10 +60,10 @@
 
         add_button: can('NAVIGATION', 'CREATE') ? {
             text: 'Create Tab',
-            url: path('incc_settings_navigation_edit', { id: 'new' }),
+            url: path('incp_settings_navigation_edit', { id: 'new' }),
         } : null,
 
-        url_result: path('incc_settings_navigation_list'),
+        url_result: path('incp_settings_navigation_list'),
         view_setting: 'table',
         zebra: true,
 

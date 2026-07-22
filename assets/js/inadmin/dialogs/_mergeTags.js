@@ -105,7 +105,7 @@ window.Inachis.MergeTags = {
 		const payload = new URLSearchParams();
 		payload.append('target', target.value);
 		sources.forEach(id => payload.append('sources[]', id));
-		fetch('/incc/tags/merge', {
+		fetch('/incp/tags/merge', {
 			method: 'POST',
 			body: payload
 		})

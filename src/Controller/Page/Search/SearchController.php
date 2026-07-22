@@ -26,8 +26,8 @@ class SearchController extends AbstractInachisController
      * @return Response
      * @throws Exception|\Doctrine\DBAL\Exception
      */
-    #[Route("/incc/search/results/{keyword}/{limit}/{offset}",
-        name: "incc_search_results",
+    #[Route("/incp/search/results/{keyword}/{limit}/{offset}",
+        name: "incp_search_results",
         requirements: [
             "limit" => "\d+",
             "offset" => "\d+",
@@ -44,7 +44,7 @@ class SearchController extends AbstractInachisController
         if ($request->attributes->getString('keyword') === ' ' && !empty($request->request->getString('keyword', ''))) {
             $keyword = str_replace('/', '', $request->request->getString('keyword', ''));
             $keyword = preg_replace('/(?:%25)*2[fF]/', '', $keyword);
-            return $this->redirectToRoute('incc_search_results', ['keyword' => $keyword]);
+            return $this->redirectToRoute('incp_search_results', ['keyword' => $keyword]);
         }
 
         $form = $this->createFormBuilder()->getForm();
@@ -90,7 +90,7 @@ class SearchController extends AbstractInachisController
                     $results->updateResultPropertyByKey(
                         $key,
                         'url',
-                        $this->generateUrl('incc_resource_edit', [
+                        $this->generateUrl('incp_resource_edit', [
                             'type' => 'images',
                             'filename' => $uuidString]
                         )
@@ -101,7 +101,7 @@ class SearchController extends AbstractInachisController
                     $results->updateResultPropertyByKey(
                         $key,
                         'url',
-                        $this->generateUrl('incc_series_edit', ['id' => $uuidString])
+                        $this->generateUrl('incp_series_edit', ['id' => $uuidString])
                     );
                     break;
 
@@ -115,7 +115,7 @@ class SearchController extends AbstractInachisController
                         $key,
                         'url',
                         sprintf(
-                            '/incc/%s/%s',
+                            '/incp/%s/%s',
                             strtolower($result['type']),
                             !empty($link) ? $link->getLink() : ''
                         ),

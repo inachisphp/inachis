@@ -22,7 +22,7 @@ class ImageGalleryDialogController extends AbstractInachisController
     /**
      * @return Response
      */
-    #[Route('/incc/ax/imageManager/get', methods: [ 'POST' ])]
+    #[Route('/incp/ax/imageManager/get', methods: [ 'POST' ])]
     public function getImageManagerList(): Response
     {
         return $this->render('inadmin/dialog/image-manager.html.twig', [
@@ -36,7 +36,7 @@ class ImageGalleryDialogController extends AbstractInachisController
      * @param Request $request
      * @return Response
      */
-    #[Route('/incc/ax/imageManager/getImages/{limit}/{offset}',
+    #[Route('/incp/ax/imageManager/getImages/{limit}/{offset}',
         requirements: [
             "limit" => "\d+",
             "offset" => "\d+",

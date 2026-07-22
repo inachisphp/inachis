@@ -5,7 +5,7 @@
     <dl>
     {% for item in items %}
         <dt>
-            <a aria-label="Edit {{ item.title }}" href="{{ '/incc/' ~ item.type ~ '/' ~ item.urls[0].link }}">
+            <a aria-label="Edit {{ item.title }}" href="{{ '/incp/' ~ item.type ~ '/' ~ item.urls[0].link }}">
                 {{ item.title }}{{ item.subtitle ? ' - ' ~ item.subtitle }}
                 {{ include('inadmin/partials/badge.html.twig', {
                     'item': item,

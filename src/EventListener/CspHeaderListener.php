@@ -25,7 +25,7 @@ class CspHeaderListener
         $path = $request->getPathInfo();
 
         // 1. Admin Policy: Hard-coded & strict for safety
-        if (str_starts_with($path, '/incc')) {
+        if (str_starts_with($path, '/incp')) {
             // $adminCsp = "default-src 'self'; script-src 'self'; style-src 'self' fonts.googleapis.com cdn.jsdelivr.net; object-src 'none'; report-uri https://localhost/api/csp/report";
             // $response->headers->set('Content-Security-Policy', $adminCsp);
             return;

@@ -65,10 +65,10 @@
 <div class="col-12">
     <ul class="ui-tabs">
         <li role="tab" class="{% if viewModel.page.tab == 'image' %} ui-state-active{% endif %}">
-            <a href="{{ viewModel.settings.domain ~ path('incc_resource_list', { type: 'images' }) }}">Images</a>
+            <a href="{{ viewModel.settings.domain ~ path('incp_resource_list', { type: 'images' }) }}">Images</a>
         </li>
         <li role="tab" class="{% if viewModel.page.tab == 'download' %} ui-state-active{% endif %}">
-            <a href="{{ viewModel.settings.domain ~ path('incc_resource_list', { type: 'downloads' }) }}">Downloads</a>
+            <a href="{{ viewModel.settings.domain ~ path('incp_resource_list', { type: 'downloads' }) }}">Downloads</a>
         </li>
     </ul>
 
@@ -98,7 +98,7 @@
 
         total: dataset.count,
         type: viewModel.page.tab,
-        url_result: path('incc_resource_list', { type: viewModel.page.type }),
+        url_result: path('incp_resource_list', { type: viewModel.page.type }),
 
         show_search: true,
         sort_options: {

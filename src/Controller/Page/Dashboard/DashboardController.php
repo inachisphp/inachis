@@ -24,7 +24,7 @@ class DashboardController extends AbstractInachisController
      *
      * @return Response
      */
-    #[Route('/incc', name: "incc_dashboard", methods: [ 'GET' ])]
+    #[Route('/incp', name: "incp_dashboard", methods: [ 'GET' ])]
     public function default(
         AnalyticsProviderInterface $analytics,
         ImageRepository $imageRepository,

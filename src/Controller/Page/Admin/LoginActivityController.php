@@ -34,7 +34,7 @@ class LoginActivityController extends AbstractInachisController
      * @param Request $request
      * @return Response
      */
-    #[Route('/incc/admin/login-activity', name: 'incc_admin_login_activity_index')]
+    #[Route('/incp/admin/login-activity', name: 'incp_admin_login_activity_index')]
     #[RequiresPermission(
         resource: PermissionResource::AUDIT_LOG,
         action: PermissionAction::VIEW
@@ -80,7 +80,7 @@ class LoginActivityController extends AbstractInachisController
      * @param LoginActivityRepository $repository
      * @return Response
      */
-    #[Route('/incc/admin/{id}/login-activity', name: 'incc_admin_login_activity')]
+    #[Route('/incp/admin/{id}/login-activity', name: 'incp_admin_login_activity')]
     #[RequiresPermission(
         resource: PermissionResource::USER,
         action: PermissionAction::VIEW
@@ -107,8 +107,8 @@ class LoginActivityController extends AbstractInachisController
      * @param LoginActivityRepository $repository
      * @return Response
      */
-    #[Route('/incc/admin/login-activity/{id}', name: 'incc_admin_all_login_activity_view')]
-    #[Route('/incc/admin/{username}/login-activity/{id}', name: 'incc_admin_login_activity_view')]
+    #[Route('/incp/admin/login-activity/{id}', name: 'incp_admin_all_login_activity_view')]
+    #[Route('/incp/admin/{username}/login-activity/{id}', name: 'incp_admin_login_activity_view')]
     #[RequiresPermission(
         resource: PermissionResource::AUDIT_LOG,
         action: PermissionAction::VIEW

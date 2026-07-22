@@ -15,7 +15,7 @@
     <div id="widget-series__drafts">
 		<dl>
 			{% for series in dashboard.draftSeries %}
-				<dt><a aria-label="Edit {{ series.title }}" href="{{ path('incc_series_edit', {'id': series.id}) }}">{{ series.title }}{{ series.subtitle ? ' - ' ~ series.subtitle }}</a></dt>
+				<dt><a aria-label="Edit {{ series.title }}" href="{{ path('incp_series_edit', {'id': series.id}) }}">{{ series.title }}{{ series.subtitle ? ' - ' ~ series.subtitle }}</a></dt>
 				<dd>
 					<span>{{ series.items|length }}</span> posts &middot;
 					<span>Updated: <em>{{ series.updatedAt|date('jS F Y', viewModel.session.preferences.timezone) }}</em></span>
@@ -26,7 +26,7 @@
 	<div id="widget-series__published">
 		<dl>
 			{% for series in dashboard.series %}
-				<dt><a aria-label="Edit {{ series.title }}" href="{{ path('incc_series_edit', {'id': series.id}) }}">{{ series.title }}{{ series.subtitle ? ' - ' ~ series.subtitle }}</a></dt>
+				<dt><a aria-label="Edit {{ series.title }}" href="{{ path('incp_series_edit', {'id': series.id}) }}">{{ series.title }}{{ series.subtitle ? ' - ' ~ series.subtitle }}</a></dt>
 				<dd>
 					<span>{{ series.items|length }}</span> posts &middot;
 					<span>
@@ -38,7 +38,7 @@
 			{% endfor %}
 		</dl>
 		<p class="view-all">
-			<a aria-label="View all series" href="{{ path('incc_series_list') }}">View all series &rarr;</a>
+			<a aria-label="View all series" href="{{ path('incp_series_list') }}">View all series &rarr;</a>
 		</p>
 	</div>
 </section>

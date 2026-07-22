@@ -25,7 +25,7 @@ class AnalyticsSecurityController extends AbstractInachisController
      * @param AnalyticsProviderInterface $analytics
      * @return Response
      */
-    #[Route('/incc/tools/analytics/security', name: 'incc_tools_analytics_security')]
+    #[Route('/incp/tools/analytics/security', name: 'incp_tools_analytics_security')]
     #[Route('/admin/analytics/security', name: 'admin_analytics_security')]
     public function index(
 		AnalyticsProviderInterface $analytics,
@@ -42,7 +42,7 @@ class AnalyticsSecurityController extends AbstractInachisController
 			$this->addFlash('warning', $e->getMessage());
 
 			return $this->redirectToRoute(
-				'incc_tools_analytics_security',
+				'incp_tools_analytics_security',
 				[
 					'range' => '30d',
 				]

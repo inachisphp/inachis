@@ -104,7 +104,7 @@ abstract class AbstractInachisController extends AbstractController
     public function redirectIfNoAdmins(): string
     {
         if ($this->entityManager->getRepository(User::class)->count([]) == 0) {
-            return 'incc_setup_stage1';
+            return 'incp_setup_stage1';
         }
         return '';
     }
@@ -144,7 +144,7 @@ abstract class AbstractInachisController extends AbstractController
     public function redirectIfAuthenticated(): string
     {
         if ($this->isFullyAuthenticated()) {
-            return 'incc_dashboard';
+            return 'incp_dashboard';
         }
         return '';
     }

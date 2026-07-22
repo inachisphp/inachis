@@ -25,7 +25,7 @@ class SessionTimeoutDialogController extends AbstractInachisController
      *
      * @return JsonResponse
      */
-    #[Route('/incc/keep-alive', methods: [ 'POST' ])]
+    #[Route('/incp/keep-alive', methods: [ 'POST' ])]
     public function keepAlive(): JsonResponse
     {
         return new JsonResponse([
@@ -42,7 +42,7 @@ class SessionTimeoutDialogController extends AbstractInachisController
      * @param Request $request
      * @return Response
      */
-    #[Route('/incc/ax/sessionTimeout/get', methods: [ 'POST' ])]
+    #[Route('/incp/ax/sessionTimeout/get', methods: [ 'POST' ])]
     public function showDialog(Request $request): Response
     {
         return $this->render('inadmin/dialog/session_timeout.html.twig');

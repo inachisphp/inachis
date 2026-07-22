@@ -44,7 +44,7 @@ class AccessDeniedSubscriber implements EventSubscriberInterface
             return;
         }
 
-		$viewModel = str_starts_with($request->getPathInfo(), '/incc')
+		$viewModel = str_starts_with($request->getPathInfo(), '/incp')
 			? $this->pageViewFactory->createAdmin()
 			: $this->pageViewFactory->create();
 

@@ -30,7 +30,7 @@ final class ThemeController extends AbstractInachisController
      * @param ThemeManager $themeManager
      * @return Response
      */
-    #[Route('/incc/settings/themes', name: 'incc_settings_themes', methods: ['GET'])]
+    #[Route('/incp/settings/themes', name: 'incp_settings_themes', methods: ['GET'])]
     public function index(ThemeScanner $themeScanner, ThemeManager $themeManager): Response
     {
         $this->viewModel->page->title = 'Themes';
@@ -49,15 +49,15 @@ final class ThemeController extends AbstractInachisController
      * @param ThemeScanner $themeScanner
      * @return Response
      */
-    #[Route('/incc/settings/themes/rescan',
-        name: 'incc_settings_themes_rescan',
+    #[Route('/incp/settings/themes/rescan',
+        name: 'incp_settings_themes_rescan',
         methods: ['GET'])]
     public function rescan(ThemeScanner $themeScanner): Response
     {
         $themeScanner->rescanThemes();
         $this->addFlash('success', 'Theme folders rescanned.');
 
-        return $this->redirectToRoute('incc_settings_themes');
+        return $this->redirectToRoute('incp_settings_themes');
     }
 
     /**
@@ -69,8 +69,8 @@ final class ThemeController extends AbstractInachisController
      * @param FeatureRegistry $featureRegistry
      * @return Response
      */
-    #[Route('/incc/settings/themes/{slug}/activate',
-        name: 'incc_settings_theme_activate',
+    #[Route('/incp/settings/themes/{slug}/activate',
+        name: 'incp_settings_theme_activate',
         methods: ['POST'])]
     public function activate(
         string $slug,
@@ -98,13 +98,13 @@ final class ThemeController extends AbstractInachisController
                 )
             );
 
-            return $this->redirectToRoute('incc_settings_themes');
+            return $this->redirectToRoute('incp_settings_themes');
         }
 
         $themeManager->setActiveTheme($slug);
         $this->addFlash('success', sprintf('Theme "%s" activated.', $theme->name));
 
-        return $this->redirectToRoute('incc_settings_themes');
+        return $this->redirectToRoute('incp_settings_themes');
     }
 
     /**
@@ -114,7 +114,7 @@ final class ThemeController extends AbstractInachisController
      * @param ThemeScanner $themeScanner
      * @return BinaryFileResponse
      */
-    #[Route('/incc/settings/themes/{slug}/screenshot', name: 'incc_settings_theme_screenshot', methods: ['GET'])]
+    #[Route('/incp/settings/themes/{slug}/screenshot', name: 'incp_settings_theme_screenshot', methods: ['GET'])]
     public function screenshot(string $slug, ThemeScanner $themeScanner): Response
     {
         $theme = $themeScanner->getTheme($slug);

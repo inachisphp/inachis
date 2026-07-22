@@ -36,7 +36,7 @@ class ImportController extends AbstractInachisController
      * @param PageImportValidator $pageImportValidator
      * @return Response
      */
-    #[Route('/incc/tools/import', name: 'incc_tools_import', methods: ['GET', 'POST'])]
+    #[Route('/incp/tools/import', name: 'incp_tools_import', methods: ['GET', 'POST'])]
     public function import(
         Request $request,
         ImportDetector $importDetector,
@@ -56,7 +56,7 @@ class ImportController extends AbstractInachisController
 
             if (!$uploadedFile) {
                 $this->addFlash('error', 'No file uploaded.');
-                return $this->redirectToRoute('incc_tools_import');
+                return $this->redirectToRoute('incp_tools_import');
             }
 
             $content = file_get_contents($uploadedFile->getPathname()) ?: '';
@@ -82,7 +82,7 @@ dump($data);exit;
                 }
             } catch (\Throwable $e) {
                 $this->addFlash('error', 'Error parsing file: ' . $e->getMessage());
-                return $this->redirectToRoute('incc_tools_import');
+                return $this->redirectToRoute('incp_tools_import');
             }
 
             $importType = $importDetector->detectImportType($data);
@@ -105,7 +105,7 @@ dump($data);exit;
 
                 default:
                     $this->addFlash('error', 'Unknown import type.');
-                    return $this->redirectToRoute('incc_tools_import');
+                    return $this->redirectToRoute('incp_tools_import');
             }
 
             $request->getSession()->set('import_preview', [
@@ -129,7 +129,7 @@ dump($data);exit;
      * @param PageImportService $pageImportService
      * @return Response
      */
-    #[Route('/incc/tools/import/execute', name: 'incc_tools_import_process', methods: ['POST'])]
+    #[Route('/incp/tools/import/execute', name: 'incp_tools_import_process', methods: ['POST'])]
     public function importExecute(
         Request $request,
         CategoryImportService $categoryImportService,
@@ -141,7 +141,7 @@ dump($data);exit;
 
         if (!$importPreview || empty($importPreview['items'])) {
             $this->addFlash('error', 'No items to import.');
-            return $this->redirectToRoute('incc_tools_import');
+            return $this->redirectToRoute('incp_tools_import');
         }
 
         $importType = $importPreview['type'];
@@ -204,7 +204,7 @@ dump($data);exit;
 
             default:
                 $this->addFlash('error', 'Invalid import type.');
-                return $this->redirectToRoute('incc_tools_import');
+                return $this->redirectToRoute('incp_tools_import');
         }
 
         if ($resultSummary['items'] > 0) {
@@ -221,6 +221,6 @@ dump($data);exit;
 
         $session->remove('import_preview');
 
-        return $this->redirectToRoute('incc_tools_index');
+        return $this->redirectToRoute('incp_tools_index');
     }
 }

@@ -35,7 +35,7 @@ class ChangePasswordController extends AbstractInachisController
      * @param UserRepository $userRepository
      * @return Response
      */
-    #[Route("/incc/admin/{id}/change-password", name: "incc_admin_change_password", methods: [ "GET", "POST" ])]
+    #[Route("/incp/admin/{id}/change-password", name: "incp_admin_change_password", methods: [ "GET", "POST" ])]
     public function changePasswordTab(
         Request $request,
         TrustedDeviceManager $trustedDeviceManager,

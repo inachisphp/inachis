@@ -1,7 +1,7 @@
 {% extends "inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <a href="{{ path('incp_tools_index') }}">Tools</a>
     <span>Storage</span>
 {% endblock pagetitle %}
 
@@ -52,7 +52,7 @@
     <tbody>
             {% for page in storage.topPagesBySize %}
         <tr>
-            <td><a href="/incc/{{ page.type }}/{{ page.urls|first.link }}">{{ page.title }}</a></td>
+            <td><a href="/incp/{{ page.type }}/{{ page.urls|first.link }}">{{ page.title }}</a></td>
             <td>{{ page.imageSize }} bytes ({{ (page.imageSize / 1024 / 1024)|round(2) }} Mb)</td>
         </tr>
             {% endfor %}

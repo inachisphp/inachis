@@ -29,9 +29,9 @@
         'add_button': can('SERIES', 'CREATE') ? {
             image: 'create_new_folder',
             'text': 'Create Series',
-            'url': path('incc_series_new'),
+            'url': path('incp_series_new'),
         } : null,
-        'url_result': path('incc_series_list'),
+        'url_result': path('incp_series_list'),
 
         'filters': {
             'Visibility': {
@@ -69,7 +69,7 @@
                 'button_type': 'button',
                 'data': {
                     'content-type': 'series',
-                    'form-action': path('incc_tools_export'),
+                    'form-action': path('incp_tools_export'),
                     'scope': 'manual',
                 },
                 'icon': 'cloud_download',

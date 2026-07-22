@@ -46,7 +46,7 @@ class AnalyticsSubscriber implements EventSubscriberInterface
         $path = $path ? rtrim($path, '/') : '';
 
         // if ($request->getMethod() !== 'GET') return;
-        if (str_starts_with($path, '/incc')) return;
+        if (str_starts_with($path, '/incp')) return;
         if (str_starts_with($path, '/_profiler')) return;
         if (str_starts_with($path, '/_wdt')) return;
         if (str_starts_with($path, '/assets')) return;

@@ -34,7 +34,7 @@ class TwoFactorAuthenticationSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * If the user has TOTP enabled, validate a trusted device cookie first. If 
+     * If the user has TOTP enabled, validate a trusted device cookie first. If
      * the device is not trusted, redirect to TOTP verification.
      *
      * @param LoginSuccessEvent $event
@@ -58,7 +58,7 @@ class TwoFactorAuthenticationSubscriber implements EventSubscriberInterface
             );
 
             $response = new RedirectResponse(
-                $this->urlGenerator->generate('incc_dashboard')
+                $this->urlGenerator->generate('incp_dashboard')
             );
             $response->headers->setCookie($trustedDeviceCookie);
             $event->setResponse($response);
@@ -76,7 +76,7 @@ class TwoFactorAuthenticationSubscriber implements EventSubscriberInterface
         $event->setResponse(
             new RedirectResponse(
                 $this->urlGenerator->generate(
-                    'inadmin_totp_login'
+                    'incp_totp_login'
                 )
             )
         );

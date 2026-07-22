@@ -33,7 +33,7 @@ class PrivacyController extends AbstractInachisController
     /**
      * Renders the Privacy & GDPR management page
      */
-    #[Route('/incc/security/privacy', name: 'incc_security_privacy', methods: ['GET'])]
+    #[Route('/incp/security/privacy', name: 'incp_security_privacy', methods: ['GET'])]
     public function index(
         SettingRepository $settingRepository,
     ): Response {
@@ -58,7 +58,7 @@ class PrivacyController extends AbstractInachisController
     /**
      * Handles saving Privacy & GDPR configuration
      */
-    #[Route('/incc/security/privacy/save', name: 'incc_security_privacy_save', methods: ['POST'])]
+    #[Route('/incp/security/privacy/save', name: 'incp_security_privacy_save', methods: ['POST'])]
     public function save(Request $request): Response
     {
         // Enforce EDIT permission
@@ -66,7 +66,7 @@ class PrivacyController extends AbstractInachisController
 
         if (!$this->isCsrfTokenValid('privacy_save', $request->request->get('_token'))) {
             $this->addFlash('error', 'Invalid CSRF token.');
-            return $this->redirectToRoute('incc_security_privacy');
+            return $this->redirectToRoute('incp_security_privacy');
         }
 
         $gdprData = $request->request->all('gdpr');
@@ -90,13 +90,13 @@ class PrivacyController extends AbstractInachisController
 
         $this->addFlash('success', 'Privacy and GDPR settings updated successfully.');
 
-        return $this->redirectToRoute('incc_security_privacy');
+        return $this->redirectToRoute('incp_security_privacy');
     }
 
     /**
      * Handles Subject Access Request (SAR) Personal Data Export
      */
-    #[Route('/incc/security/privacy/export-user', name: 'incc_security_privacy_export_user', methods: ['POST'])]
+    #[Route('/incp/security/privacy/export-user', name: 'incp_security_privacy_export_user', methods: ['POST'])]
     public function exportUserData(Request $request): Response
     {
         $this->denyAccessUnlessGranted('PRIVACY_GDPR', 'VIEW');
@@ -133,14 +133,14 @@ class PrivacyController extends AbstractInachisController
     /**
      * Handles Right to be Forgotten / User Anonymization
      */
-    #[Route('/incc/security/privacy/anonymize-user', name: 'incc_security_privacy_anonymize_user', methods: ['POST'])]
+    #[Route('/incp/security/privacy/anonymize-user', name: 'incp_security_privacy_anonymize_user', methods: ['POST'])]
     public function anonymizeUser(Request $request): Response
     {
         $this->denyAccessUnlessGranted('PRIVACY_GDPR', 'DELETE');
 
         if (!$this->isCsrfTokenValid('anonymize_user', $request->request->get('_token'))) {
             $this->addFlash('error', 'Invalid CSRF token.');
-            return $this->redirectToRoute('incc_security_privacy');
+            return $this->redirectToRoute('incp_security_privacy');
         }
 
         $emailOrUsername = trim((string) $request->request->get('user_identifier'));
@@ -148,7 +148,7 @@ class PrivacyController extends AbstractInachisController
 
         if (!$user) {
             $this->addFlash('error', sprintf('User "%s" not found.', $emailOrUsername));
-            return $this->redirectToRoute('incc_security_privacy');
+            return $this->redirectToRoute('incp_security_privacy');
         }
 
         // Perform anonymization (Scramble email, username, display name)
@@ -162,7 +162,7 @@ class PrivacyController extends AbstractInachisController
 
         $this->addFlash('success', sprintf('User "%s" has been anonymized.', $emailOrUsername));
 
-        return $this->redirectToRoute('incc_security_privacy');
+        return $this->redirectToRoute('incp_security_privacy');
     }
 
     /**

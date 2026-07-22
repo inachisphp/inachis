@@ -24,7 +24,7 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class SecurityPolicyController extends AbstractInachisController
 {
-    #[Route('/incc/admin/security-policy', name: 'incc_admin_security_policy', priority: 100)]
+    #[Route('/incp/admin/security-policy', name: 'incp_admin_security_policy', priority: 100)]
     #[RequiresPermission(
         resource: PermissionResource::PASSWORD_POLICY,
         action: PermissionAction::MANAGE
@@ -39,7 +39,7 @@ class SecurityPolicyController extends AbstractInachisController
         if (count($policies) !== 3) {
             throw new \RuntimeException('Expected exactly 3 security policies, found ' . count($policies));
         }
-        
+
         // First policy editable
         $firstPolicy = $policies[0];
 

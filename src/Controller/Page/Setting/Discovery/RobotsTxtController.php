@@ -28,7 +28,7 @@ class RobotsTxtController extends AbstractTextFileController
      * @param SettingRepository $settingRepository
      * @return Response
      */
-    #[Route('/incc/settings/robots', name: 'incc_settings_robots')]
+    #[Route('/incp/settings/robots', name: 'incp_settings_robots')]
     public function edit(
         Request $request,
         SettingRepository $settingRepository

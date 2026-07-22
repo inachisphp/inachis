@@ -37,7 +37,7 @@ final class LinkValidationController
 	 * @param Request $request
 	 * @return JsonResponse
 	 */
-    #[Route('/incc/api/validate-links', name: 'api_validate_links', methods: ['POST'])]
+    #[Route('/incp/api/validate-links', name: 'api_validate_links', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {
 		// Referrer protection

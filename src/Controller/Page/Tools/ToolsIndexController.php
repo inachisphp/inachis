@@ -22,7 +22,7 @@ class ToolsIndexController extends AbstractInachisController
      *
      * @return Response
      */
-    #[Route("/incc/tools", name: 'incc_tools_index')]
+    #[Route("/incp/tools", name: 'incp_tools_index')]
     public function index(): Response
     {
 
@@ -41,7 +41,7 @@ class ToolsIndexController extends AbstractInachisController
      * @param PageRepository $pageRepository
      * @return Response
      */
-    #[Route("/incc/tools/storage", name: 'incc_tools_storage')]
+    #[Route("/incp/tools/storage", name: 'incp_tools_storage')]
     public function storage(ImageRepository $imageRepository, PageRepository $pageRepository): Response
     {
         $this->viewModel->page->title = 'Storage';

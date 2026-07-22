@@ -3,6 +3,7 @@ parameters:
 
     app.config.title: 'Wandering the World'
     app.config.locale: 'en'
+    app.config.displayTimezone: '%env(APP_DEFAULT_TIMEZONE)%'
     app.domain: '%env(APP_DOMAIN)%'
 
     password_reset.ttl: '%env(PASSWORD_RESET_TTL)%'

@@ -49,9 +49,9 @@
         }) %}
     {% endif %}
 
-    {% set link_new = path('incc_post_edit', {'type': 'post'}) ~ '/post/new' %}
+    {% set link_new = path('incp_post_edit', {'type': 'post'}) ~ '/post/new' %}
     {% if viewModel.page.tab == 'page' %}
-        {% set link_new = path('incc_post_edit', {'type': 'page'}) ~ '/new' %}
+        {% set link_new = path('incp_post_edit', {'type': 'page'}) ~ '/new' %}
     {% endif %}
 
 <div class="col-12">
@@ -74,7 +74,7 @@
             text: 'Create ' ~ viewModel.page.tab|capitalize,
             url: link_new,
         }: [],
-        url_result: path('incc_post_list'),
+        url_result: path('incp_post_list'),
 
         badges: badges,
 
@@ -108,7 +108,7 @@
                 button_type: 'button',
                 data: {
                     'content-type': 'post',
-                    'form-action': path('incc_tools_export'),
+                    'form-action': path('incp_tools_export'),
                     'scope': 'manual',
                 },
                 icon: 'cloud_download',

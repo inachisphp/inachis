@@ -1,8 +1,8 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_tools_index') }}">Tools</a>
-    <a href="{{ path('incc_tools_csp_dashboard') }}">CSP Reporting</a>
+    <a href="{{ path('incp_tools_index') }}">Tools</a>
+    <a href="{{ path('incp_tools_csp_dashboard') }}">CSP Reporting</a>
     <span>CSP Configuration</span>
 {% endblock pagetitle %}
 
@@ -10,7 +10,7 @@
 
 <div class="col-12">
 {{ include('inadmin/partials/tab-sets/csp.html.twig') }}
-<form class="form form__csp" method="post" action="{{ path('incc_tools_csp_settings') }}">
+<form class="form form__csp" method="post" action="{{ path('incp_tools_csp_settings') }}">
     <input type="hidden" name="_token" value="{{ csrf_token('csp_settings') }}">
 
 <fieldset class="ui-section">
@@ -71,11 +71,11 @@
 <div class="fixed-bottom-bar">
     <p>
         <button type="submit" class="button button--positive">
-            <span class="material-icons" aria-hidden="true">save</span> 
+            <span class="material-icons" aria-hidden="true">save</span>
             <span class="btn-text">Apply Configuration</span>
         </button>
-        <a href="{{ path('incc_tools_csp_suggested_policy') }}" class="button button--ai">
-            <span class="material-icons" aria-hidden="true">auto_fix_high</span> 
+        <a href="{{ path('incp_tools_csp_suggested_policy') }}" class="button button--ai">
+            <span class="material-icons" aria-hidden="true">auto_fix_high</span>
             <span class="btn-text">Generate Rule Suggestions</span>
         </a>
     </p>
@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const placeholder = option.dataset.placeholder;
 
         const wrapper = document.getElementById('csp-directives-wrapper');
-        
+
         // Generate clean structural row HTML matching partial layout
         const rowHtml = `
             <p class="ui-directive-row animate-fade-in">
@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         wrapper.insertAdjacentHTML('beforeend', rowHtml);
         initTomSelect(document.getElementById('directive_' + value));
-        
+
         // Remove option from dropdown so it can't be added twice
         option.remove();
         this.value = "";

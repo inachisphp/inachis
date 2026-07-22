@@ -29,7 +29,7 @@ class BulkCreateController extends AbstractInachisController
      *
      * @return Response
      */
-    #[Route("/incc/ax/bulkCreate/get", methods: [ "POST" ])]
+    #[Route("/incp/ax/bulkCreate/get", methods: [ "POST" ])]
     public function contentList(Request $request): Response
     {
         return $this->render('inadmin/dialog/bulk-create.html.twig', [
@@ -45,7 +45,7 @@ class BulkCreateController extends AbstractInachisController
      * @return Response
      * @throws Exception
      */
-    #[Route("/incc/ax/bulkCreate/save", methods: [ "POST" ])]
+    #[Route("/incp/ax/bulkCreate/save", methods: [ "POST" ])]
     public function saveContent(Request $request, PageBulkCreateService $bulkCreatePost): Response {
         /** @var User|null $user */
         $user = $this->getUser();
