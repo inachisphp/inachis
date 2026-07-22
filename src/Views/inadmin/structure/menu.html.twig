@@ -73,20 +73,6 @@
             </a>
         </li>
 {% endif %}
-{% if canWaste() %}
-                <li class="{{ viewModel.page.tab|activeMenu('waste') }}">
-                    <a href="{{ viewModel.settings.domain ~ path('incc_waste_list') }}"
-                        data-tooltip="Manage deleted content"
-                        title="Manage deleted content">
-                        <i class="material-icons" aria-hidden="true">delete</i>
-                    {% if viewModel.deletedItems > 0 %}
-                            {% if viewModel.deletedItems > 99 %}{% set deletedItems = '99+' %}{% endif %}
-                            <span class="badge">{{ deletedItems|default(viewModel.deletedItems) }}</span>
-                    {% endif %}
-                        <span>Bin</span>
-                    </a>
-                </li>
-{% endif %}
 
 {% if can('PAGE', 'VIEW') or canGroup('USERS') or canGroup('TOOLS') or canGroup('SETTINGS') %}
         <li class="has-submenu">
@@ -146,6 +132,20 @@
     </ul>
 {% endif %}
     <ul class="menu-view-site">
+{% if canWaste() %}
+        <li class="{{ viewModel.page.tab|activeMenu('waste') }}">
+            <a href="{{ viewModel.settings.domain ~ path('incc_waste_list') }}"
+                data-tooltip="Manage deleted content"
+                title="Manage deleted content">
+                <i class="material-icons" aria-hidden="true">delete</i>
+            {% if viewModel.deletedItems > 0 %}
+                    {% if viewModel.deletedItems > 99 %}{% set deletedItems = '99+' %}{% endif %}
+                    <span class="badge">{{ deletedItems|default(viewModel.deletedItems) }}</span>
+            {% endif %}
+                <span>Bin</span>
+            </a>
+        </li>
+{% endif %}
         <li>
             <a href="/" data-tooltip="View site">
                 <i class="material-icons" aria-hidden="true">exit_to_app</i>

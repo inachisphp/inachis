@@ -15,10 +15,5 @@
             title: 'Audit Logs',
             url: path('incc_admin_login_activity_index'),
         } : null,
-        can('PASSWORD_POLICY', 'MANAGE') ? {
-            id: 'policies',
-            title: 'Policies',
-            url: path('incc_admin_security_policy'),
-        } : null,
     ]|filter(v => v is not null)
 }) }}

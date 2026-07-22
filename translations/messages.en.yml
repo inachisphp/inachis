@@ -146,6 +146,9 @@ admin.resources.images.copyLink.help: 'Copy Image Link to Clipboard'
 admin.urls.title: 'URLs'
 admin.urls.help: 'View list of defined URLs'
 
+admin.security.title: 'Security & Privacy'
+admin.security.help: 'Manage and review security for your site'
+
 admin.dialog.categories.title: 'Categories'
 
 admin.dialog.confirm.title: 'Are you sure?'

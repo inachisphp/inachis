@@ -6,25 +6,25 @@
 
 {% block content %}
 <div class="col-12">
-    <form method="post" action="{{ path('incc_security_privacy_save') }}">
-        
-        {# --- SECTION 1: COOKIE CONSENT BANNER --- #}
-        <section class="ui-section widget rounded mb-4 p-4">
-            <header class="widget__header border-bottom pb-2 mb-3 d-flex align-items-center">
-                <span class="material-icons me-2 text-primary" aria-hidden="true">cookie</span>
-                <h2 class="h5 m-0">Cookie Consent Banner</h2>
+    <form method="post" action="{{ path('incc_security_privacy_save') }}" class="nested-grid">
+        <section class="ui-section widget col-6">
+            <header class="widget__header">
+                <p>
+                    <span class="material-icons" aria-hidden="true">cookie</span>
+                    <strong>Cookie Consent Banner</strong>
+                </p>
             </header>
-            <article class="row g-3">
-                <div class="col-12 col-md-6">
-                    <label for="gdpr_banner_enabled" class="form-label font-weight-bold">Enable Consent Banner</label>
-                    <select id="gdpr_banner_enabled" name="gdpr[banner_enabled]" class="form-control" {% if not can('PRIVACY_GDPR', 'EDIT') %}disabled{% endif %}>
-                        <option value="1" {% if privacy.banner_enabled == '1' %}selected{% endif %}>Enabled (Show to Visitors)</option>
-                        <option value="0" {% if privacy.banner_enabled == '0' %}selected{% endif %}>Disabled</option>
-                    </select>
-                    <small class="text-muted">Displays a consent banner to EU/UK visitors prior to setting non-essential cookies.</small>
-                </div>
+            <article>
+                <p>
+                    <label id="gdpr_banner_enabled_label" class="inline_label" for="gdpr_banner_enabled">Visibility</label>
 
-                <div class="col-12 col-md-6">
+                    <span class="switch-wrapper">
+                        <input type="checkbox" id="gdpr_banner_enabled" name="gdpr[banner_enabled]" aria-labelledby="gdpr_banner_enabled_label" aria-required="false" class="ui-switch switch-button-input" data-label-off="Disabled" data-label-on="Enabled (Show to Visitors)" value="1" {% if privacy.banner_enabled == '1' %}checked="checked"{% endif %}>
+                    </span>
+                </p>
+                <p><small class="text-muted">Displays a consent banner to EU/UK visitors prior to setting non-essential cookies.</small></p>
+
+                <div>
                     <label for="gdpr_consent_mode" class="form-label font-weight-bold">Consent Enforcement Mode</label>
                     <select id="gdpr_consent_mode" name="gdpr[consent_mode]" class="form-control" {% if not can('PRIVACY_GDPR', 'EDIT') %}disabled{% endif %}>
                         <option value="opt_in" {% if privacy.consent_mode == 'opt_in' %}selected{% endif %}>Strict Opt-In (Block scripts until accepted)</option>
@@ -33,21 +33,22 @@
                     <small class="text-muted">Strict Opt-In is required for strict ePrivacy / GDPR compliance.</small>
                 </div>
 
-                <div class="col-12 mt-3">
+                <div>
                     <label for="gdpr_banner_message" class="form-label font-weight-bold">Banner Message Text</label>
                     <textarea id="gdpr_banner_message" name="gdpr[banner_message]" class="form-control" rows="3" {% if not can('PRIVACY_GDPR', 'EDIT') %}readonly{% endif %}>{{ privacy.banner_message|default('We use cookies to improve your browsing experience and analyze site traffic.') }}</textarea>
                 </div>
             </article>
         </section>
 
-        {# --- SECTION 2: IP ANONYMIZATION & DATA RETENTION --- #}
-        <section class="ui-section widget rounded mb-4 p-4">
-            <header class="widget__header border-bottom pb-2 mb-3 d-flex align-items-center">
-                <span class="material-icons me-2 text-primary" aria-hidden="true">visibility_off</span>
-                <h2 class="h5 m-0">IP Anonymization &amp; Logging</h2>
+        <section class="ui-section widget col-6">
+            <header class="widget__header">
+                <p>
+                    <span class="material-icons" aria-hidden="true">visibility_off</span>
+                    <strong>IP Anonymization &amp; Logging</strong>
+                </p>
             </header>
-            <article class="row g-3">
-                <div class="col-12 col-md-6">
+            <article>
+                <div>
                     <label for="gdpr_anonymize_ips" class="form-label font-weight-bold">Anonymize IP Addresses</label>
                     <select id="gdpr_anonymize_ips" name="gdpr[anonymize_ips]" class="form-control" {% if not can('PRIVACY_GDPR', 'EDIT') %}disabled{% endif %}>
                         <option value="1" {% if privacy.anonymize_ips == '1' %}selected{% endif %}>Enabled (Mask last octet e.g., 192.168.1.xxx)</option>
@@ -64,15 +65,16 @@
             </article>
         </section>
 
-        {# --- SECTION 3: USER DATA EXPORTS (SAR / ERASURE) --- #}
-        <section class="ui-section widget rounded mb-4 p-4">
-            <header class="widget__header border-bottom pb-2 mb-3 d-flex align-items-center">
-                <span class="material-icons me-2 text-primary" aria-hidden="true">download_for_offline</span>
-                <h2 class="h5 m-0">User Data Requests (SAR / Erasure)</h2>
+        <section class="ui-section widget col-6">
+            <header class="widget__header">
+                <p>
+                    <span class="material-icons" aria-hidden="true">download_for_offline</span>
+                    <strong>User Data Requests (SAR / Erasure)</strong>
+                </p>
             </header>
             <article>
                 <p class="text-muted mb-3">Execute Subject Access Requests (SAR) or process "Right to be Forgotten" account deletions for specific users.</p>
-                
+
                 <div class="row g-3 align-items-end">
                     <div class="col-12 col-md-6">
                         <label for="sar_user_email" class="form-label font-weight-bold">Target User Email / Username</label>
@@ -113,15 +115,13 @@
 
         {# --- FORM ACTIONS --- #}
         {% if can('PRIVACY_GDPR', 'EDIT') %}
-        <div class="d-flex justify-content-end mt-4">
-            <button type="submit" class="button button--primary">
-                Save Privacy Settings
-            </button>
-        </div>
-        {% else %}
-        <div class="alert alert-info mt-4" role="alert">
-            <span class="material-icons" aria-hidden="true">info</span>
-            You are viewing these privacy settings in <strong>Read-Only</strong> mode.
+        <div class="fixed-bottom-bar">
+            <p>
+                <button type="submit" class="button button--positive">
+                    <span class="material-icons">save</span>
+                    <span>Save Privacy Settings</span>
+                </button>
+            </p>
         </div>
         {% endif %}
 

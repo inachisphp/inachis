@@ -71,6 +71,10 @@
                 display: none;
             }
 
+            span.badge {
+                display: flex;
+            }
+
             .layout.expanded & span {
                 display: inline;
             }
