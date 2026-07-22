@@ -41,7 +41,9 @@
 
     <div class="fixed-bottom-bar">
         <p>
-            {{ form_widget(form.submit) }}
+            {% if form.submit is defined %}
+                {{ form_widget(form.submit) }}
+            {% endif %}
 
             <a
                 class="button button--secondary"

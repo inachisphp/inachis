@@ -13,8 +13,11 @@ use DateTimeImmutable;
 use Exception;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Content\Url;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
 use Inachis\Service\Parser\ArrayToMarkdown;
 use Inachis\Repository\Content\{PageRepository, RevisionRepository};
+use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\Page\RevisionDiffRenderer;
 use Jfcherng\Diff\DiffHelper;
 use Symfony\Component\HttpFoundation\Request;
@@ -136,6 +139,10 @@ class RevisionController extends AbstractInachisController
      * @throws Exception
      */
     #[Route("/incc/page/diff/{id}", methods: [ "POST" ])]
+    #[RequiresPermission(
+        resource: PermissionResource::PAGE,
+        action: PermissionAction::EDIT
+    )]
     public function doRevert(
         Request $request,
         PageRepository $pageRepository,
@@ -183,7 +190,7 @@ class RevisionController extends AbstractInachisController
         $revision = $revisionRepository->findOneBy([
             'id' => $request->attributes->getString('id')
         ]);
-        if (empty($revision) || empty($revision->getPageId())) {
+        if (empty($revision) || empty($revision->getPage())) {
             throw new NotFoundHttpException(
                 sprintf('Version history could not be found for %s', $request->attributes->getString('id'))
             );

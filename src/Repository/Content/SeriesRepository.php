@@ -17,6 +17,7 @@ use Inachis\Repository\Content\SeriesRepositoryInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use Ramsey\Uuid\Uuid;
 
 /**
  * @extends AbstractRepository<Series>
@@ -51,6 +52,12 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      */
     public function getFilteredIds(array $ids): Paginator
     {
+        $binaryIds = array_map(
+                fn($id) => $id instanceof \Ramsey\Uuid\UuidInterface 
+                    ? $id->getBytes() 
+                    : Uuid::fromString($id)->getBytes(),
+                $ids,
+            );
         return $this->getAll(
             0,
             0,
@@ -58,7 +65,7 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
                 'q.id IN (:ids)',
                 [
                     'ids' => [
-                        'value' => $ids,
+                        'value' => $binaryIds,
                     ],
                 ]
             ]

@@ -15,8 +15,12 @@
         }) }}
     {% endif %}
     <p class="series__controls">
+    {% if form.bulkCreate|default(null) %}
         {{ form_widget(form.bulkCreate) }}
+    {% endif %}
+    {% if form.addItem|default(null) %}
         {{ form_widget(form.addItem) }}
+    {% endif %}
     </p>
     {% if series.items is not empty %}
         {% set badges = {

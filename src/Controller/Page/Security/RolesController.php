@@ -19,6 +19,7 @@ use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Security\RoleRepository;
+use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\ViewStateManager;
 use Inachis\Validator\Security\RolePermissionValidator;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,6 +46,10 @@ class RolesController extends AbstractInachisController
         name: 'incc_admin_role_index',
         methods: ['GET', 'POST']
     )]
+    #[RequiresPermission(
+        resource: PermissionResource::ROLE,
+        action: PermissionAction::MANAGE
+    )]
     public function index(
         Request $request,
         CategoryRepository $categoryRepository,
@@ -54,9 +59,38 @@ class RolesController extends AbstractInachisController
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && !empty($request->request->all('items'))) {
+        if (
+            $form->isSubmitted() && 
+            $form->isValid() && 
+            !empty($request->request->all('items')
+        )) {
             $items = $request->request->all('items');
-            if ($request->request->has('delete')) {
+            if ($request->request->has('clone')) {
+                $count = 0;
+                foreach ($items as $roleId) {
+                    $source = $roleRepository->find($roleId);
+                    if ($source === null) {
+                        continue;
+                    }
+                    $clone = new Role();
+                    $clone->setName($source->getName() . ' (Copy)')
+                        ->setDescription($source->getDescription())
+                        ->setDisableReview($source->isDisableReview())
+                        ->setSystemRole(false);
+                    foreach ($source->getRolePermissions() as $permission) {
+                        $clonePermission = new RolePermission();
+                        $clonePermission
+                            ->setResource($permission->getResource())
+                            ->setAction($permission->getAction());
+                        $clone->addRolePermission($clonePermission);
+                    }
+                    $this->entityManager->persist($clone);
+                    ++$count;
+                }
+                $this->entityManager->flush();
+                $this->addFlash('success', "Cloned $count role(s).");
+
+            } else if ($request->request->has('delete')) {
                 $count = 0;
                 foreach ($items as $roleId) {
                     $role = $roleRepository->find($roleId);
@@ -136,6 +170,10 @@ class RolesController extends AbstractInachisController
         name: 'incc_admin_role_edit',
         requirements: ['roleId' => '[0-9a-f\-]{36}|new'],
         methods: ['GET', 'POST']
+    )]
+    #[RequiresPermission(
+        resource: PermissionResource::ROLE,
+        action: PermissionAction::MANAGE
     )]
     public function edit(
         Request $request,
@@ -283,37 +321,11 @@ class RolesController extends AbstractInachisController
     }
 
     /**
-     * Builds a matrix of [resource => [action => bool]] for the template.
+     * Builds the permissions matrix
      *
      * @param Role $role
-     * @return array<string, array{
-     *     label: string,
-     *     actions: array<string, bool>
-     * }>
+     * @return array<string, array<string, string>>
      */
-    private function createUniqueSlug(string $name, RoleRepository $roleRepository): string
-    {
-        $baseSlug = (new AsciiSlugger())
-            ->slug($name)
-            ->lower()
-            ->toString();
-
-        $baseSlug = trim($baseSlug, '-');
-        if ($baseSlug === '') {
-            $baseSlug = 'role';
-        }
-
-        $slug = $baseSlug;
-        $counter = 2;
-
-        while ($roleRepository->findOneBy(['slug' => $slug]) !== null) {
-            $slug = $baseSlug . '-' . $counter;
-            ++$counter;
-        }
-
-        return $slug;
-    }
-
     private function buildPermissionMatrix(Role $role): array
     {
         $granted = [];

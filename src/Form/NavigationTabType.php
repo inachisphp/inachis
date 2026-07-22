@@ -10,6 +10,10 @@
 namespace Inachis\Form;
 
 use Inachis\Entity\System\NavigationTab;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
+use Inachis\Security\Authorisation\PermissionResolver;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -30,7 +34,11 @@ class NavigationTabType extends AbstractType
      *
      * @param TranslatorInterface $translator
      */
-    public function __construct(private TranslatorInterface $translator) {}
+    public function __construct(
+        private PermissionResolver $permissionResolver,
+        private Security $security,
+        private TranslatorInterface $translator,
+    ) {}
 
     /**
      * Build the form
@@ -39,6 +47,15 @@ class NavigationTabType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $user = $this->security->getUser();
+        $newItem = !$options['data'] instanceof NavigationTab || 
+            empty($options['data']->getId());
+        $allowEdit = $this->permissionResolver->hasPermission(
+            $user,
+            PermissionResource::NAVIGATION,
+            $newItem ? PermissionAction::CREATE : PermissionAction::EDIT,
+        );
+
         $builder
             ->add('title', TextType::class, [
                 'attr' => [
@@ -49,6 +66,7 @@ class NavigationTabType extends AbstractType
                     'placeholder' => $this->translator->trans('admin.navigation.title.placeholder', [], 'messages'),
                     'maxlength' => 100,
                 ],
+                'disabled' => !$allowEdit,
                 'label' => $this->translator->trans('admin.navigation.title.label', [], 'messages'),
                 'label_attr' => [
                     'id' => 'title_label',
@@ -62,6 +80,7 @@ class NavigationTabType extends AbstractType
                     'placeholder' => $this->translator->trans('admin.navigation.url.placeholder', [], 'messages'),
                     'maxlength' => 255,
                 ],
+                'disabled' => !$allowEdit,
                 'label' => $this->translator->trans('admin.navigation.url.label', [], 'messages'),
                 'label_attr' => [
                     'id' => 'url_label',
@@ -75,14 +94,16 @@ class NavigationTabType extends AbstractType
                     'data-label-off' => $this->translator->trans('admin.post.properties.visibility.private'),
                     'data-label-on' => $this->translator->trans('admin.post.properties.visibility.public'),
                 ],
+                'disabled' => !$allowEdit,
                 'label' => $this->translator->trans('admin.navigation.isActive.label', [], 'messages'),
                 'label_attr' => [
                     'id' => 'isActive_label',
                     'class' => 'inline_label',
                 ],
                 'required' => false,
-            ])
-            ->add('submit', SubmitType::class, [
+            ]);
+        if ($allowEdit) {
+            $builder->add('submit', SubmitType::class, [
                 'attr' => [
                     'class' => 'button button--positive',
                 ],
@@ -92,8 +113,8 @@ class NavigationTabType extends AbstractType
                     $this->translator->trans('admin.button.save', [], 'messages')
                 ),
                 'label_html' => true,
-            ])
-        ;
+            ]);
+        }
     }
 
     /**

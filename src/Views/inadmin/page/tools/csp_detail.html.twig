@@ -59,7 +59,7 @@
 </div>
 </div>
 
-{% if not report.isProcessed %}
+{% if not report.isProcessed and can('CSP_POLICY', 'EDIT') %}
 <div class="fixed-bottom-bar">
     <form action="{{ path('csp_report_process', { id: report.id }) }}" method="post">
         <input type="hidden" name="_token" value="{{ csrf_token('report_' ~ report.id) }}">

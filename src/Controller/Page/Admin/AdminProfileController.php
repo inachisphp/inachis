@@ -11,12 +11,15 @@ namespace Inachis\Controller\Page\Admin;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\User\{User,UserPreference};
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
 use Inachis\Exception\User\CannotRemoveLastAdministratorException;
 use Inachis\Form\UserType;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Security\RoleRepository;
 use Inachis\Repository\User\UserRepository;
+use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Security\Authentication\RecoveryCodeManager;
 use Inachis\Security\Authentication\TotpManager;
 use Inachis\Security\Authentication\TrustedDeviceManager;
@@ -53,6 +56,10 @@ class AdminProfileController extends AbstractInachisController
         ],
         defaults: [ "limit" => 25, "offset" => 0, ],
         methods: [ "GET", "POST" ]
+    )]
+    #[RequiresPermission(
+        resource: PermissionResource::USER,
+        action: PermissionAction::VIEW
     )]
     public function list(
         Request $request,

@@ -11,8 +11,11 @@ namespace Inachis\Form;
 
 use Inachis\Entity\Security\Role;
 use Inachis\Entity\User\User;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
 use Inachis\Service\User\ProfileColorPalette;
 use Inachis\Form\Provider\TimezoneChoices;
+use Inachis\Security\Authorisation\PermissionResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
@@ -38,6 +41,7 @@ class UserType extends AbstractType
      * @param Security $security The security service
      */
     public function __construct(
+        private PermissionResolver $permissionResolver,
         private TranslatorInterface $translator,
         private Security $security
     ) {}
@@ -58,6 +62,19 @@ class UserType extends AbstractType
             throw new \LogicException();
         }
         $isCurrentUser = $currentUser->getId() === $options['data']->getId();
+
+        $allowEdit = $this->permissionResolver->hasPermission(
+            $currentUser,
+            PermissionResource::USER,
+            $newUser ? PermissionAction::CREATE : PermissionAction::EDIT,
+        );
+
+        $allowDelete = $this->permissionResolver->hasPermission(
+            $currentUser,
+            PermissionResource::USER,
+            PermissionAction::DELETE,
+        );
+
         $builder
             ->add('username', $newUser ? TextType::class : HiddenType::class, [
                 'attr' => [

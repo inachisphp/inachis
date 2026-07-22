@@ -13,12 +13,15 @@ use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Content\Series;
 use Inachis\Entity\Media\Image;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\SeriesType;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
+use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\Series\SeriesBulkActionService;
 use Inachis\Service\Content\ViewStateManager;
 use Inachis\Service\Waste\WasteManagerService;
@@ -26,9 +29,7 @@ use Inachis\Service\Formatting\UrlNormaliser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 class SeriesController extends AbstractInachisController
 {
     /**
@@ -46,6 +47,10 @@ class SeriesController extends AbstractInachisController
         ],
         defaults: [ "limit" => 10, "offset" => 0, ],
         methods: [ "GET", "POST" ]
+    )]
+    #[RequiresPermission(
+        resource: PermissionResource::SERIES,
+        action: PermissionAction::VIEW
     )]
     public function list(
         Request $request,
@@ -116,6 +121,10 @@ class SeriesController extends AbstractInachisController
      */
     #[Route("/incc/series/edit/{id}", name: "incc_series_edit", methods: [ "GET", "POST" ])]
     #[Route("/incc/series/new", name: "incc_series_new", methods: [ "GET", "POST" ])]
+    #[RequiresPermission(
+        resource: PermissionResource::SERIES,
+        action: PermissionAction::VIEW
+    )]
     public function edit(
         Request $request,
         SeriesRepository $seriesRepository,
@@ -190,6 +199,10 @@ class SeriesController extends AbstractInachisController
      * @return Response
      */
     #[Route("/incc/series/contents/{id}", name: "incc_series_contents", methods: [ "POST" ])]
+    #[RequiresPermission(
+        resource: PermissionResource::SERIES,
+        action: PermissionAction::VIEW
+    )]
     public function contents(Request $request, SeriesRepository $seriesRepository): Response
     {
         $series = $seriesRepository->findOneBy(['id' => $request->attributes->getString('id')]);

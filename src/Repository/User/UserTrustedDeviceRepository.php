@@ -35,10 +35,11 @@ class UserTrustedDeviceRepository extends AbstractRepository
      * Returns all active trusted devices for a user.
      *
      * @param User $user
-     * @return UserTrustedDevice[]
+     * @return list<UserTrustedDevice>
      */
     public function getTrustedDevices(User $user): array
     {
+        /** @var list<UserTrustedDevice> */
         return $this->createQueryBuilder('d')
             ->where('d.user = :user')
             ->andWhere('d.expiresAt > :now')
@@ -62,6 +63,7 @@ class UserTrustedDeviceRepository extends AbstractRepository
         string $selector
     ): ?UserTrustedDevice
     {
+        /** @var UserTrustedDevice|null */
         return $this->createQueryBuilder('d')
             ->where('d.user = :user')
             ->andWhere('d.selector = :selector')

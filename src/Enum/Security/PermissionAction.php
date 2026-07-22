@@ -27,7 +27,7 @@ enum PermissionAction: string
     public function label(): string
     {
         return match ($this) {
-            self::MANAGE => 'Manage',
+            self::MANAGE => 'Administer',
             self::CREATE => 'Create',
             self::VIEW => 'View',
             self::EDIT => 'Edit',
@@ -41,7 +41,7 @@ enum PermissionAction: string
      * Defines action inheritance, for example, having the ability to create
      * something implies they can edit and view it.
      *
-     * @return array<string, list<string>>
+     * @return list<PermissionAction>
      */
     public function requires(): array
     {
@@ -52,6 +52,7 @@ enum PermissionAction: string
                 self::VIEW,
             ],
 
+            self::CREATE,
             self::REVIEW => [
                 self::EDIT,
                 self::VIEW,

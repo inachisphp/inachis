@@ -27,11 +27,13 @@
             </span>
         </p>
     </section>
+    {% if form.submit is defined %}
     <div class="fixed-bottom-bar">
         <p>
             {{ form_widget(form.submit) }}
         </p>
     </div>
+    {% endif %}
 {{ form_end(form) }}
 </div>
 {% endblock content %}

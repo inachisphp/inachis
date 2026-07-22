@@ -82,14 +82,11 @@ class PasswordResetTokenService
             $request->markUsed();
             $this->entityManager->persist($request);
         }
-
         $raw = bin2hex(random_bytes(32));
         $hash = hash_hmac('sha256', $raw, $this->appSecret);
         $expires = new DateTimeImmutable(sprintf('+%d seconds', $this->ttlSeconds));
-
         $passwordResetRequest = new PasswordResetRequest($user, $hash, $expires);
         $this->entityManager->persist($passwordResetRequest);
-        $this->entityManager->flush();
 
         return [
             'token' => $raw,

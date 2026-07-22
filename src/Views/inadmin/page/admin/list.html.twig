@@ -92,7 +92,7 @@
                     'enabled': 'Enabled',
                     'disabled': 'Disabled',
                 },
-                'Role': roles,
+                'Role': { '': 'All'}|merge(roles),
                 'Last Sign-in': {
                     '': 'All',
                     '30': 'Over 30 days',
@@ -116,7 +116,7 @@
             filter_values: query.filters,
             show_search: true,
             search_placeholder: 'Search users…',
-            show_select_deselect: true,
+            show_select_deselect: can('USER', ['EDIT', 'DELETE']),
             sort_options: {
                 'createdAt desc': 'Created: Newest',
                 'createdAt asc': 'Created: Oldest',
@@ -128,33 +128,33 @@
                 'username desc': 'Username: Z-A',
             },
 
-            add_button: {
+            add_button: can('USER', 'CREATE') ? {
                 image: 'person_add',
                 text: 'Create Admin',
                 url: path('incc_admin_edit', { id: 'new' }),
-            },
+            } : null,
 
             url_result: path('incc_admin_list'),
             zebra: true,
 
             actions: {
-                enable: {
+                enable: can('USER', 'EDIT') ? {
                     button_class: 'button--secondary',
                     'data': {
                         'form-action': '',
                     },
                     icon: 'person_outline',
                     title: 'admin.button.enable'|trans,
-                },
-                disable: {
+                } : null,
+                disable: can('USER', 'EDIT') ? {
                     button_class: 'button--secondary',
                     'data': {
                         'form-action': '',
                     },
                     icon: 'person_off',
                     title: 'admin.button.disable'|trans,
-                },
-                delete: {
+                } : null,
+                delete: can('USER', 'DELETE') ? {
                     button_class: 'button--negative button--delete button--confirm',
                     'data': {
                         'confirm': 'delete',
@@ -168,8 +168,8 @@
                     name: 'delete',
                     value: '1',
                     title: 'Delete',
-                }
-            },
+                } : null,
+            }|filter(v => v is not null),
             view_setting: 'table',
 
         } %}

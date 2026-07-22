@@ -10,10 +10,13 @@
 namespace Inachis\Controller\Page\Admin;
 
 use Inachis\Controller\AbstractInachisController;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\User\LoginActivityRepository;
 use Inachis\Repository\User\UserRepository;
+use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\ViewStateManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,6 +35,10 @@ class LoginActivityController extends AbstractInachisController
      * @return Response
      */
     #[Route('/incc/admin/login-activity', name: 'incc_admin_login_activity_index')]
+    #[RequiresPermission(
+        resource: PermissionResource::AUDIT_LOG,
+        action: PermissionAction::VIEW
+    )]
     public function index(
         CategoryRepository $categoryRepository,
         LoginActivityRepository $repository,
@@ -74,6 +81,10 @@ class LoginActivityController extends AbstractInachisController
      * @return Response
      */
     #[Route('/incc/admin/{id}/login-activity', name: 'incc_admin_login_activity')]
+    #[RequiresPermission(
+        resource: PermissionResource::USER,
+        action: PermissionAction::VIEW
+    )]
     public function loginActivity(Request $request, UserRepository $userRepository, LoginActivityRepository $repository): Response
     {
         $user = $userRepository->findByUsername($request->attributes->getString('id'));
@@ -98,6 +109,10 @@ class LoginActivityController extends AbstractInachisController
      */
     #[Route('/incc/admin/login-activity/{id}', name: 'incc_admin_all_login_activity_view')]
     #[Route('/incc/admin/{username}/login-activity/{id}', name: 'incc_admin_login_activity_view')]
+    #[RequiresPermission(
+        resource: PermissionResource::AUDIT_LOG,
+        action: PermissionAction::VIEW
+    )]
     public function view(Request $request, LoginActivityRepository $repository): Response
     {
         $this->viewModel->page->title = 'Login Activity';

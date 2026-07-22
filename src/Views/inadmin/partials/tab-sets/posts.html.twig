@@ -11,9 +11,14 @@
             url: path('incc_post_list', {'type': 'page'}),
         },
         {
+            id: 'url',
+            title: 'admin.urls.title'|trans,
+            url: path('incc_url_list'),
+        },
+        canResource('TAG') ? {
             id: 'tag',
             title: 'Tags',
             url: path('incc_tags_list'),
-        }
-    ]
+        } : null,
+    ]|filter(v => v is not null)
 }) }}

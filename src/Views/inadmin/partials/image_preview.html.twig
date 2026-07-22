@@ -10,7 +10,8 @@
         additionalClass is defined and additionalClass is not empty %} class="{{ additionalClass }}"{%
         endif %} src="{{ filename }}" />
     {% endif %}
-    {% if show_gallery_button|default(true) %}
+    {% if show_gallery_button|default(true) and can('IMAGE', 'VIEW') %}
+        {# todo: add permissions check here #}
         {% if filename is not empty %}
             <button class="button button--info button--confirm"
 

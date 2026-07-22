@@ -40,7 +40,9 @@ class ExportController extends AbstractInachisController
         $contentType = $request->request->getString('content_type') ?? 'post';
         $scope = $request->request->getString('scope') ?? 'all';
         $format = $request->request->getString('format') ?? 'json';
-        $selectedIds = array_filter(explode(',', $request->request->get('selectedIds') ?? ''));
+        $selectedIds = array_filter(
+            explode(',', $request->request->get('selectedIds') ?? '')
+        );
         $filter = $request->request->all('filter');
         $filterType = $filter['type'] ?? null;
         $filterStatus = $filter['status'] ?? null;

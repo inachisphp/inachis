@@ -12,11 +12,13 @@ namespace Inachis\Controller\Page\Resource;
 use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Media\{Download, Image};
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\ResourceType;
-use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\{CategoryRepository, PageRepository, SeriesRepository};
 use Inachis\Repository\Media\{DownloadRepository, ImageRepository};
+use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\ViewStateManager;
 use Inachis\Service\Resource\ImageFileService;
 use Inachis\Service\Waste\WasteManagerService;
@@ -28,10 +30,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-#[IsGranted('ROLE_ADMIN')]
 class ResourceController extends AbstractInachisController
 {
     /**
@@ -48,6 +48,13 @@ class ResourceController extends AbstractInachisController
         ],
         defaults: [ "limit" => 25, "offset" => 0, ],
         methods: [ "GET", "POST" ],
+    )]
+    #[RequiresPermission(
+        resource: [
+            PermissionResource::IMAGE,
+            PermissionResource::DOWNLOAD,
+        ],
+        action: PermissionAction::VIEW
     )]
     public function list(
         Request $request,

@@ -59,10 +59,12 @@
         <header class="widget__header">
             <h2>
                 <span>Popular Posts</span>
+                {% if can('ANALYTICS', 'VIEW') %}
                 <a href="{{ path('incc_tools_analytics') }}"
                    class="widget__header__link"
                    title="View analytics for all posts"
                 >View All</a>
+                {% endif %}
             </h2>
         </header>
         <ul class="widget-stats__list" aria-labelledby="stats-popular-posts">

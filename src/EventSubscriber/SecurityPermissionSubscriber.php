@@ -12,6 +12,7 @@ namespace Inachis\EventSubscriber;
 use Inachis\Entity\User\User;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
+use Inachis\Security\Attribute\PermissionAttributeReader;
 use Inachis\Security\Authorisation\PermissionResolver;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -26,7 +27,8 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private Security $security,
-        private PermissionResolver $permissionResolver
+        private PermissionAttributeReader $attributeReader,
+        private PermissionResolver $permissionResolver,
     ) {}
 
     public static function getSubscribedEvents(): array
@@ -75,20 +77,37 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $permission = $this->resolvePermission($controllerClass, $method, $request);
-        if ($permission === null) {
-            // Fail-closed default: if we can't map a route, deny access to non-super-admins
-            throw new AccessDeniedHttpException('Access Denied. You do not have permission to access this resource.');
-        }
+        $permissions = $this->attributeReader->getPermissions(
+            $controller[0],
+            $method
+        );
 
-        [$resource, $action] = $permission;
+        if ($permissions !== []) {
+            foreach ($permissions as $permission) {
+                $allowed = false;
+                foreach ($permission->resources() as $resource) {
+                    if (
+                        $this->permissionResolver->hasPermission(
+                            $user,
+                            $resource,
+                            $permission->action
+                        )
+                    ) {
+                        $allowed = true;
+                        break;
+                    }
+                }
 
-        if (!$this->permissionResolver->hasPermission($user, $resource, $action)) {
-            throw new AccessDeniedHttpException(sprintf(
-                'Access Denied. You do not have the %s permission for %s.',
-                $action->label(),
-                $resource->label()
-            ));
+                if (!$allowed) {
+                    throw new AccessDeniedHttpException(sprintf(
+                        'Access denied. %s permission required for %s.',
+                        $permission->action->label(),
+                        $permission->resource->label(),
+                    ));
+                }
+            }
+
+            return;
         }
     }
 

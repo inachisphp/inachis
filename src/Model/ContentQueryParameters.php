@@ -21,7 +21,12 @@ class ContentQueryParameters
     /**
      * Constructor for ContentQueryParameters class
      *
-     * @param array{filters: array<string,mixed>, sort: string, offset: int, limit: int}|array{} $filters
+     * @param array{
+     *     filters: array<string,mixed>,
+     *     sort: string,
+     *     limit: int,
+     *     offset: int
+     * }|array{} $filters
      * @param string $sort
      * @param int $limit
      * @param int $offset

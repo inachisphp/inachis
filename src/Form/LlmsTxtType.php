@@ -9,6 +9,10 @@
 
 namespace Inachis\Form;
 
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
+use Inachis\Security\Authorisation\PermissionResolver;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -27,9 +31,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LlmsTxtType extends AbstractType
 {
     public function __construct(
+        private PermissionResolver $permissionResolver,
+        private Security $security,
         private readonly TranslatorInterface $translator
-    ) {
-    }
+    ) {}
 
     /**
      * @param FormBuilderInterface<array{
@@ -42,23 +47,30 @@ class LlmsTxtType extends AbstractType
         FormBuilderInterface $builder,
         array $options
     ): void {
-        $builder
-            ->add('llms_txt', TextareaType::class, [
-                'attr' => [
-                    'aria-labelledby' => 'title_label',
-                    'autofocus' => 'true',
-                    'class' => 'text halfwidth',
-                    'rows' => 20,
-                    'spellcheck' => 'false',
-                ],
-                'label' => 'Enter the contents of your llms.txt file below. The sitemap and feed URLs will be appended automatically.
-',
-                'label_attr' => [
-                    'id' => 'title_label',
-                ],
-                'required' => false,
-            ])
-            ->add('submit', SubmitType::class, [
+        $user = $this->security->getUser();
+        $allowEdit = $this->permissionResolver->hasPermission(
+            $user,
+            PermissionResource::CRAWLER,
+            PermissionAction::EDIT
+        );
+        
+        $builder->add('llms_txt', TextareaType::class, [
+            'attr' => [
+                'aria-labelledby' => 'title_label',
+                'autofocus' => 'true',
+                'class' => 'text halfwidth',
+                'rows' => 20,
+                'spellcheck' => 'false',
+            ],
+            'disabled' => !$allowEdit ? 'disabled' : '',
+            'label' => 'Enter the contents of your llms.txt file below. The sitemap and feed URLs will be appended automatically.',
+            'label_attr' => [
+                'id' => 'title_label',
+            ],
+            'required' => false,
+        ]);
+        if ($allowEdit) {
+            $builder->add('submit', SubmitType::class, [
                 'attr' => [
                     'class' => 'button button--positive',
                 ],
@@ -72,6 +84,7 @@ class LlmsTxtType extends AbstractType
                 ),
                 'label_html' => true,
             ]);
+        }
     }
 
     /**

@@ -16,6 +16,7 @@ enum PermissionGroup: string
 {
     case CONTENT = 'CONTENT';
     case USERS = 'USERS';
+    case SECURITY = 'SECURITY';
     case SETTINGS = 'SETTINGS';
     case TOOLS = 'TOOLS';
 
@@ -28,7 +29,8 @@ enum PermissionGroup: string
     {
         return match ($this) {
             self::CONTENT => 'Content',
-            self::USERS => 'Users & Security',
+            self::USERS => 'Users & Permissions',
+            self::SECURITY => 'Security & Privacy',
             self::SETTINGS => 'Settings',
             self::TOOLS => 'Tools',
         };
@@ -44,6 +46,7 @@ enum PermissionGroup: string
         return match ($this) {
             self::CONTENT => 'article',
             self::USERS => 'admin_panel_settings',
+            self::SECURITY => 'security',
             self::SETTINGS => 'settings',
             self::TOOLS => 'construction',
         };

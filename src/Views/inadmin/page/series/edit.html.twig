@@ -84,15 +84,19 @@
 
 <div class="fixed-bottom-bar">
     <p>
+        {% if form.submit|default(null) %}
         {{ form_widget(form.submit) }}
-        {%  if series.id is not empty %}
+        {% endif %}
+        {%  if series.id is not empty and form.delete|default(null) %}
         {{ form_widget(form.delete) }}
         {% endif %}
         {%  if series.id is not empty and series.items|length > 0 %}
             <a class="button button--secondary" href="{{ path('web_series_view', { 'year': series.lastDate|date('Y'), 'title': series.url}) }}" target="_blank" title="View Live"><span class="material-icons" aria-hidden="true">exit_to_app</span> View Live</a>
             <span class="series__controls visually-hidden">
             with selected:
+            {% if form.remove|default(null) %}
             {{ form_widget(form.remove) }}
+            {% endif %}
         {%  endif %}
         </span>
     </p>

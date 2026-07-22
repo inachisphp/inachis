@@ -1,24 +1,24 @@
 {{ include('inadmin/partials/tabs.html.twig', {
     tabs: [
-        {
+        canResource('USER') ? {
             id: 'users',
             title: 'Users',
             url: path('incc_admin_list'),
-        },
-        {
+        } : null,
+        can('ROLE', 'MANAGE') ? {
             'id': 'roles',
             'title': 'Roles',
             'url': path('incc_admin_role_index'),
-        },
-        {
+        } : null,
+        can('AUDIT_LOG', 'VIEW') ? {
             id: 'audit-logs',
             title: 'Audit Logs',
             url: path('incc_admin_login_activity_index'),
-        },
-        {
+        } : null,
+        can('PASSWORD_POLICY', 'MANAGE') ? {
             id: 'policies',
             title: 'Policies',
             url: path('incc_admin_security_policy'),
-        }
-    ]
+        } : null,
+    ]|filter(v => v is not null)
 }) }}

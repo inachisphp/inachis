@@ -11,11 +11,15 @@ namespace Inachis\Enum\Security;
 
 use Inachis\Enum\Security\PermissionAction;
 
+/**
+ * Enum used to identify {@link Role} items
+ */
 enum PermissionResource: string
 {
     case PAGE = 'PAGE';
     case SERIES = 'SERIES';
     case IMAGE = 'IMAGE';
+    case DOWNLOAD = 'DOWNLOAD';
     case TAG = 'TAG';
     case CATEGORY = 'CATEGORY';
 
@@ -24,6 +28,8 @@ enum PermissionResource: string
     case PASSWORD_POLICY = 'PASSWORD_POLICY';
     case AUDIT_LOG = 'AUDIT_LOG';
 
+    case PRIVACY_GDPR = 'PRIVACY_GDPR';
+
     case ANALYTICS = 'ANALYTICS';
     case SYSTEM_STATUS = 'SYSTEM_STATUS';
     case EMAIL_DNS = 'EMAIL_DNS';
@@ -31,15 +37,15 @@ enum PermissionResource: string
     case STORAGE = 'STORAGE';
     case IMPORT_EXPORT = 'IMPORT_EXPORT';
     case MAINTENANCE = 'MAINTENANCE';
+    case CSP_POLICY = 'CSP_POLICY';
     // case BACKUP;
 
-    // case SETTINGS = 'SETTINGS';
     case NAVIGATION = 'NAVIGATION';
     case THEME = 'THEME';
-    case ROBOTS = 'ROBOTS';
+    case CRAWLER = 'CRAWLER';
 
     /**
-     * @return PermissionAction[]
+     * @return list<PermissionAction>
      */
     public function actions(): array
     {
@@ -56,6 +62,7 @@ enum PermissionResource: string
 
             self::CATEGORY,
             self::IMAGE,
+            self::DOWNLOAD,
             self::NAVIGATION,
             self::TAG,
             self::USER => [
@@ -77,6 +84,8 @@ enum PermissionResource: string
                 PermissionAction::MANAGE,
             ],
 
+            self::PRIVACY_GDPR,
+            self::CSP_POLICY,
             self::MAINTENANCE => [
                 PermissionAction::VIEW,
                 PermissionAction::EDIT,
@@ -91,7 +100,10 @@ enum PermissionResource: string
                 PermissionAction::VIEW,
             ],
 
-            self::ROBOTS => [ PermissionAction::EDIT ],
+            self::CRAWLER => [
+                PermissionAction::VIEW,
+                PermissionAction::EDIT,
+            ],
         };
     }
 
@@ -106,6 +118,7 @@ enum PermissionResource: string
             self::PAGE => 'Pages',
             self::SERIES => 'Series',
             self::IMAGE => 'Images',
+            self::DOWNLOAD => 'Downloads',
             self::TAG => 'Tags',
             self::CATEGORY => 'Categories',
 
@@ -113,6 +126,8 @@ enum PermissionResource: string
             self::ROLE => 'Roles',
             self::PASSWORD_POLICY => 'Password Policies',
             self::AUDIT_LOG => 'Audit Logs',
+            
+            self::PRIVACY_GDPR => 'GDPR Policy',
 
             self::ANALYTICS => 'Analytics',
             self::SYSTEM_STATUS => 'System Status',
@@ -120,19 +135,20 @@ enum PermissionResource: string
             self::IMPORT_EXPORT => 'Import/Export',
             self::MAINTENANCE => 'Maintenance Mode',
             self::ERROR_LOG => 'Error Log',
-            self::STORAGE => 'Storage',
+            self::STORAGE => 'Storage Usage',
             // self::BACKUP => 'Backups',
+            self::CSP_POLICY => 'Content Security Policy',
 
             self::NAVIGATION => 'Navigation',
             self::THEME => 'Themes',
-            self::ROBOTS => 'robots.txt',
+            self::CRAWLER => 'Crawlers and Discovery',
         };
     }
 
     /**
      * Return the contents of the permission groups
      *
-     * @return list<array<string, string>>
+     * @return list<array{group: PermissionGroup, resources:list<PermissionResource>}>
      */
     public static function grouped(): array
     {
@@ -143,6 +159,7 @@ enum PermissionResource: string
                     self::PAGE,
                     self::SERIES,
                     self::IMAGE,
+                    self::DOWNLOAD,
                     self::CATEGORY,
                     self::TAG,
                 ],
@@ -151,31 +168,53 @@ enum PermissionResource: string
                 'group' => PermissionGroup::USERS,
                 'resources' => [
                     self::USER,
+                    self::AUDIT_LOG,
                     self::ROLE,
+                ],
+            ],
+            [
+                'group' => PermissionGroup::SECURITY,
+                'resources' => [
+                    self::CSP_POLICY,
+                    self::EMAIL_DNS,
+                    self::SYSTEM_STATUS,
                     self::PASSWORD_POLICY,
+                    self::PRIVACY_GDPR,
                 ],
             ],
             [
                 'group' => PermissionGroup::SETTINGS,
                 'resources' => [
                     self::NAVIGATION,
+                    self::CRAWLER,
                     self::THEME,
-                    self::ROBOTS,
                 ],
             ],
             [
                 'group' => PermissionGroup::TOOLS,
                 'resources' => [
                     self::ANALYTICS,
-                    self::AUDIT_LOG,
-                    self::SYSTEM_STATUS,
                     self::ERROR_LOG,
-                    self::EMAIL_DNS,
-                    self::IMPORT_EXPORT,
                     self::STORAGE,
+                    self::IMPORT_EXPORT,
                     self::MAINTENANCE,
                 ],
             ],
         ];
+    }
+
+    /**
+     * @return list<PermissionResource>
+     */
+    public static function resourcesForGroup(
+        PermissionGroup $group,
+    ): array {
+        foreach (self::grouped() as $permissionGroup) {
+            if ($permissionGroup['group'] === $group) {
+                return $permissionGroup['resources'];
+            }
+        }
+
+        return [];
     }
 }
