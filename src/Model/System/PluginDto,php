@@ -10,15 +10,15 @@ namespace Inachis\Model\System;
 
 final class PluginDto
 {
-    public string $slug;
+    public string $identifier;
 
     public string $name;
 
-    public string $description;
+    public string $version = '1.0.0';
 
-    public string $version;
+    public string $author = '';
 
-    public string $author;
+    public string $description = '';
 
     public string $homepage = '';
 
@@ -26,12 +26,18 @@ final class PluginDto
 
     public string $path;
 
-    /** @var list<string> */
+    /**
+     * @var list<string>
+     */
     public array $features = [];
 
-    /** @var array<string,mixed> */
+    /**
+     * @var array<string,mixed>
+     */
     public array $requires = [];
 
-    /** @var array<string,mixed> */
+    /**
+     * @var array<string,mixed>
+     */
     public array $suggests = [];
 }
