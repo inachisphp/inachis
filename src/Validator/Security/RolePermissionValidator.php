@@ -17,7 +17,7 @@ final class RolePermissionValidator
     /**
      * Validate a permission matrix.
      *
-     * @param array<string, array<string, mixed>> $permissions
+     * @param array<string, array<string, numeric-string>> $permissions
      * @return string[]
      */
     public function validate(array $permissions): array
@@ -26,8 +26,7 @@ final class RolePermissionValidator
 
         foreach ($permissions as $resource => $actions) {
             $resourceEnum = PermissionResource::tryFrom($resource);
-
-            if ($resourceEnum === null || !is_array($actions)) {
+            if ($resourceEnum === null) {
                 continue;
             }
 
