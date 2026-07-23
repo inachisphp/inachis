@@ -1,7 +1,7 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_admin_role_index') }}">Roles</a>
+    <a href="{{ path('incp_admin_role_index') }}">Roles</a>
     <span>{% if role.id is empty %}New Role{% else %}Edit Role{% endif %}</span>
 {% endblock pagetitle %}
 
@@ -43,7 +43,7 @@
         <div class="role-stat">
             <span class="material-icons">group</span>
             {% if role.userCount == 0 %}
-            No users 
+            No users
             {% else %}
             <strong>{{ role.userCount }}</strong>
             {{ role.userCount == 1 ? 'user' : 'users' }}
@@ -94,7 +94,7 @@
                     <tbody>
                     {% for section in permissionGroups %}
                         {% set group = section.group %}
-                        {% set resources = section.resources %} 
+                        {% set resources = section.resources %}
                         {% for resource in resources %}
                             <tr>
                                 {% if loop.first %}

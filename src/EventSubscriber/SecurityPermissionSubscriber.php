@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Subscriber to enforce permissions across routes starting with /incc
+ * Subscriber to enforce permissions across routes starting with /incp
  */
 class SecurityPermissionSubscriber implements EventSubscriberInterface
 {
@@ -43,13 +43,13 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $path = $request->getPathInfo();
 
-        // Only check routes starting with /incc
-        if (!str_starts_with($path, '/incc')) {
+        // Only check routes starting with /incp
+        if (!str_starts_with($path, '/incp')) {
             return;
         }
 
-        // Exclude public paths under /incc
-        if (preg_match('#^/incc/(login|forgot-password|new-password|logout|api/calculate-password-strength)($|/)#', $path)) {
+        // Exclude public paths under /incp
+        if (preg_match('#^/incp/(login|forgot-password|new-password|logout|api/calculate-password-strength)($|/)#', $path)) {
             return;
         }
 

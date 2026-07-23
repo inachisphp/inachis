@@ -24,7 +24,7 @@ class DiagnosticsController extends AbstractInachisController
      * @param DiagnosticsCollector $collector
      * @return Response
      */
-    #[Route('/incc/tools/server', name: 'incc_tools_diagnostics')]
+    #[Route('/incp/tools/server', name: 'incp_tools_diagnostics')]
     public function index(DiagnosticsCollector $collector): Response {
         $results = $collector->collect();
 
@@ -92,7 +92,7 @@ class DiagnosticsController extends AbstractInachisController
      * @param DiagnosticsCollector $collector
      * @return JsonResponse
      */
-    #[Route('/incc/tools/server.json', name: 'incc_tools_diagnostics_json')]
+    #[Route('/incp/tools/server.json', name: 'incp_tools_diagnostics_json')]
     public function serverJson(DiagnosticsCollector $collector): JsonResponse {
         return $this->json([
             'generated_at' => (new DateTimeImmutable())->format(DATE_ATOM),

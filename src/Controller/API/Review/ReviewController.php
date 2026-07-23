@@ -33,7 +33,7 @@ class ReviewController extends AbstractInachisController
      * @param ReviewNormaliser $normaliser
 	 * @return JsonResponse A JSON response containing an array of review threads, each with its comments and author information
 	 */
-    #[Route('/incc/api/review/page/{id}', methods: ['GET'])]
+    #[Route('/incp/api/review/page/{id}', methods: ['GET'])]
     public function list(
         Page $page,
         ReviewPageService $reviewService,
@@ -58,7 +58,7 @@ class ReviewController extends AbstractInachisController
      * @param ReviewNormaliser $normaliser
 	 * @return JsonResponse
 	 */
-    #[Route('/incc/api/review/page/{id}', methods: ['POST'])]
+    #[Route('/incp/api/review/page/{id}', methods: ['POST'])]
     public function create(
         Request $request,
         Page $page,
@@ -105,7 +105,7 @@ class ReviewController extends AbstractInachisController
 	 * @param ReviewThread $thread
 	 * @return JsonResponse
 	 */
-    #[Route('/incc/api/review/thread/{id}/reply', methods: ['POST'])]
+    #[Route('/incp/api/review/thread/{id}/reply', methods: ['POST'])]
     public function reply(
         Request $request,
         ReviewPageService $reviewService,
@@ -137,7 +137,7 @@ class ReviewController extends AbstractInachisController
 	 * @param ReviewThread $thread
 	 * @return JsonResponse
 	 */
-    #[Route('/incc/api/review/thread/{id}/resolve', methods: ['POST'])]
+    #[Route('/incp/api/review/thread/{id}/resolve', methods: ['POST'])]
     public function resolve(
         ReviewPageService $reviewService,
         ReviewThread $thread,
@@ -159,7 +159,7 @@ class ReviewController extends AbstractInachisController
      * @param ReviewThread $thread
      * @return JsonResponse
      */
-	#[Route('/incc/api/review/thread/{id}/reopen', methods: ['POST'])]
+	#[Route('/incp/api/review/thread/{id}/reopen', methods: ['POST'])]
 	public function reopen(
         ReviewPageService $reviewService,
         ReviewThread $thread,

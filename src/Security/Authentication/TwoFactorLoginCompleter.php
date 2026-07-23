@@ -52,7 +52,7 @@ class TwoFactorLoginCompleter
      * Responsible for:
      * - clearing the pending 2FA session state
      * - redirecting the user to their destination
-     * 
+     *
      * Used by both 2FA codes, and recovery code routes
      *
      * @param Request $request
@@ -69,7 +69,7 @@ class TwoFactorLoginCompleter
 
         $target = $session->get(
             'security.pending_2fa_target',
-            $this->urlGenerator->generate('incc_dashboard')
+            $this->urlGenerator->generate('incp_dashboard')
         );
 
         $session->remove('security.totp_pending');

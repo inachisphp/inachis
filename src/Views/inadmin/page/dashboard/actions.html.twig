@@ -5,7 +5,7 @@
     <div class="nested-grid">
         {% if showResume %}
         <div class="col-6 ui-section rounded">
-            <a href="/incc/{{ dashboard.recentDraft.type }}/{{ (dashboard.recentDraft.urls|first).link }}" class="button button--positive button--large">Resume writing</a>
+            <a href="/incp/{{ dashboard.recentDraft.type }}/{{ (dashboard.recentDraft.urls|first).link }}" class="button button--positive button--large">Resume writing</a>
             <h4>{{ dashboard.recentDraft.title }}{{ dashboard.recentDraft.subtitle ? ' - ' ~ dashboard.recentDraft.subtitle }}</h4>
             <p class="date">
                 Last edited:
@@ -24,7 +24,7 @@
             <h4>Quick Create</h4>
             <div class="icon-grid">
             {% if can('PAGE', 'CREATE') %}
-            <a href="/incc/page/new" class="icon-item">
+            <a href="/incp/page/new" class="icon-item">
                 <div class="icon-box green">
                     <span class="material-icons">add_circle</span>
                 </div>
@@ -32,7 +32,7 @@
             </a>
             {% endif %}
             {% if can('IMAGE', 'CREATE') %}
-            <a href="{{ path('incc_resource_list', { 'type': 'images' }) }}?upload=true" class="icon-item">
+            <a href="{{ path('incp_resource_list', { 'type': 'images' }) }}?upload=true" class="icon-item">
                 <div class="icon-box blue">
                     <span class="material-icons">cloud_upload</span>
                 </div>
@@ -40,7 +40,7 @@
             </a>
             {% endif %}
             {% if can('SERIES', 'CREATE') %}
-            <a href="/incc/series/new" class="icon-item">
+            <a href="/incp/series/new" class="icon-item">
                 <div class="icon-box purple">
                     <span class="material-icons">chrome_reader_mode</span>
                 </div>

@@ -19,8 +19,8 @@ use Symfony\Component\Routing\Attribute\Route;
 class UserTrustedDevicesController extends AbstractInachisController
 {
     #[Route(
-        '/incc/trusted-devices/{deviceId}/rename',
-        name: 'inadmin_security_trusted_device_rename',
+        '/incp/trusted-devices/{deviceId}/rename',
+        name: 'incp_security_trusted_device_rename',
         methods: ['POST']
     )]
     public function renameTrustedDevice(
@@ -39,7 +39,7 @@ class UserTrustedDevicesController extends AbstractInachisController
 
         if ($displayName === '') {
             $this->addFlash('error', 'Device name cannot be empty.');
-            return $this->redirectToRoute('incc_admin_edit', [
+            return $this->redirectToRoute('incp_admin_edit', [
                 'id' => $this->getCurrentUser()->getUsername()
             ]);
         }
@@ -58,14 +58,14 @@ class UserTrustedDevicesController extends AbstractInachisController
 
         $this->addFlash('success', 'Trusted device renamed.');
 
-        return $this->redirectToRoute('incc_admin_edit', [
+        return $this->redirectToRoute('incp_admin_edit', [
             'id' => $this->getCurrentUser()->getUsername()
         ]);
     }
 
     #[Route(
-        '/incc/admin/trusted-devices/{id}/remove',
-        name: 'inadmin_security_trusted_device_remove',
+        '/incp/admin/trusted-devices/{id}/remove',
+        name: 'incp_security_trusted_device_remove',
         methods: ['POST']
     )]
     public function removeTrustedDevice(
@@ -86,7 +86,7 @@ class UserTrustedDevicesController extends AbstractInachisController
 
         $trustedDeviceManager->remove($device);
 
-        $response = $this->redirectToRoute('incc_admin_edit', [
+        $response = $this->redirectToRoute('incp_admin_edit', [
             'id' => $this->getCurrentUser()->getUsername()
         ]);
 
@@ -105,8 +105,8 @@ class UserTrustedDevicesController extends AbstractInachisController
     }
 
     #[Route(
-        '/incc/admin/trusted-devices/remove-all',
-        name: 'inadmin_security_trusted_device_remove_all',
+        '/incp/admin/trusted-devices/remove-all',
+        name: 'incp_security_trusted_device_remove_all',
         methods: ['POST']
     )]
     public function removeAllTrustedDevices(
@@ -116,7 +116,7 @@ class UserTrustedDevicesController extends AbstractInachisController
             $this->getCurrentUser()
         );
 
-        $response = $this->redirectToRoute('incc_admin_edit', [
+        $response = $this->redirectToRoute('incp_admin_edit', [
             'id' => $this->getCurrentUser()->getUsername()
         ]);
 

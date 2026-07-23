@@ -1,6 +1,6 @@
 window.Inachis = {
 	_debug: false,
-	prefix: '/incc',
+	prefix: '/incp',
 
 	_log(msg) {
 		if (this._debug) {

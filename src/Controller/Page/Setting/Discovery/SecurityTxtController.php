@@ -27,8 +27,8 @@ class SecurityTxtController extends AbstractTextFileController
      * @return Response
      */
     #[Route(
-        '/incc/settings/security',
-        name: 'incc_settings_security'
+        '/incp/settings/security',
+        name: 'incp_settings_security'
     )]
     public function edit(
         Request $request,
@@ -109,7 +109,7 @@ class SecurityTxtController extends AbstractTextFileController
      */
     protected function getRedirectRoute(): string
     {
-        return 'incc_settings_security';
+        return 'incp_settings_security';
     }
 
     /**

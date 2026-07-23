@@ -44,7 +44,7 @@ class PageWebController extends AbstractWebController
         methods: ["GET" ]
     )]
     #[Route(
-        "/incc/preview/{year}/{month}/{day}/{title}",
+        "/incp/preview/{year}/{month}/{day}/{title}",
         requirements: [
             "year" => "\d{4}",
             "month" => "\d{2}",

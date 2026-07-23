@@ -40,7 +40,7 @@ readonly class UserAccountEmailService
 
     /**
      * Send a forgot password email to a user
-     * 
+     *
      * @param User $user
      * @param array<string, mixed> $data
      * @param callable $urlGenerator
@@ -53,7 +53,7 @@ readonly class UserAccountEmailService
             return;
         }
         $tokenData = $this->tokenService->createResetRequestForEmail($emailAddress);
-        if (empty($tokenData) || empty($tokenData['token']) 
+        if (empty($tokenData) || empty($tokenData['token'])
             || empty($tokenData['expiresAt']) || !($tokenData['expiresAt'] instanceof \DateTimeImmutable)) {
             return;
         }
@@ -69,7 +69,7 @@ readonly class UserAccountEmailService
                 'viewModel' => $this->viewModel,
                 'expiresAt' => $tokenData['expiresAt']->format('l jS F Y \a\\t H:i'),
                 'ipAddress' => $data['clientIP'] ?? '',
-                'logo' => Base64EncodeFile::encode('public/assets/imgs/incc/inachis.png'),
+                'logo' => Base64EncodeFile::encode('public/assets/imgs/incp/inachis.png'),
                 'settings' => $data['settings'] ?? [],
                 'url' => $urlGenerator($tokenData['token']) ?? '',
             ]);
@@ -78,7 +78,7 @@ readonly class UserAccountEmailService
 
     /**
      * Register a new user and send them an email
-     * 
+     *
      * @param User $user
      * @param array<string, mixed> $settings
      * @param callable $urlGenerator
@@ -99,8 +99,8 @@ readonly class UserAccountEmailService
         $tokenData = $this->tokenService->createResetRequestForEmail($emailAddress);
         if (
             empty($tokenData) ||
-            empty($tokenData['token']) || 
-            empty($tokenData['expiresAt']) || 
+            empty($tokenData['token']) ||
+            empty($tokenData['expiresAt']) ||
             !($tokenData['expiresAt'] instanceof \DateTimeImmutable)
         ) {
             return;
@@ -116,7 +116,7 @@ readonly class UserAccountEmailService
             ->context([
                 'viewModel' => $this->viewModel,
                 'expiresAt' => $tokenData['expiresAt']->format('l jS F Y \a\\t H:i'),
-                'logo' => Base64EncodeFile::encode('public/assets/imgs/incc/inachis.png'),
+                'logo' => Base64EncodeFile::encode('public/assets/imgs/incp/inachis.png'),
                 'name' => $user->getDisplayName(),
                 'settings' => $settings,
                 'url' => $urlGenerator($tokenData['token']),

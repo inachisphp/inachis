@@ -39,8 +39,8 @@ class ResourceController extends AbstractInachisController
      * @return Response
      * @throws \Exception
      */
-    #[Route("/incc/resources/{type}/{limit}/{offset}",
-        name: "incc_resource_list",
+    #[Route("/incp/resources/{type}/{limit}/{offset}",
+        name: "incp_resource_list",
         requirements: [
             "type" => "(images|downloads)",
             "limit" => "\d+",
@@ -73,12 +73,12 @@ class ResourceController extends AbstractInachisController
             default => $imageRepository,
         };
         $form = $this->createFormBuilder()
-            ->setAction($this->generateUrl('incc_resource_list', [
+            ->setAction($this->generateUrl('incp_resource_list', [
                 'type' => strtolower($type) . 's',
             ]))
             ->getForm();
         $form->handleRequest($request);
-                
+
         $params = $viewStateManager->load(
             $request,
             strtolower($type),
@@ -96,7 +96,7 @@ class ResourceController extends AbstractInachisController
                 $categoryRepository,
             );
 
-            return $this->redirectToRoute('incc_resource_list', [
+            return $this->redirectToRoute('incp_resource_list', [
                 'type' => $request->attributes->getString('type'),
                 'limit' => $request->attributes->getInt('limit'),
                 'offset' => $request->attributes->getInt('offset'),
@@ -138,8 +138,8 @@ class ResourceController extends AbstractInachisController
      * @param string $imageDirectory
      * @return Response
      */
-    #[Route('/incc/resources/{type}/{filename}',
-        name: "incc_resource_edit",
+    #[Route('/incp/resources/{type}/{filename}',
+        name: "incp_resource_edit",
         requirements: [
             "type" => "(images|downloads)",
         ],
@@ -170,7 +170,7 @@ class ResourceController extends AbstractInachisController
         ]);
         if (empty($resource)) {
             return $this->redirectToRoute(
-                'incc_resource_list',
+                'incp_resource_list',
                 [
                     'type' => $request->attributes->getString('type'),
 
@@ -205,7 +205,7 @@ class ResourceController extends AbstractInachisController
                         $repository->remove($resource);
                         $this->addFlash('success', 'Resource deleted.');
                         return $this->redirectToRoute(
-                            'incc_resource_list',
+                            'incp_resource_list',
                             [
                                 'type' => $request->attributes->getString('type'),
 
@@ -215,7 +215,7 @@ class ResourceController extends AbstractInachisController
                     } catch (\Exception $e) {
                         $this->addFlash('error', 'Failed to remove file.');
                         return $this->redirectToRoute(
-                            'incc_resource_edit', [
+                            'incp_resource_edit', [
                                 'type' => $request->attributes->getString('type'),
                                 'filename' => $resource->getId(),
                             ]
@@ -232,7 +232,7 @@ class ResourceController extends AbstractInachisController
 
             $this->addFlash('success', 'Content saved.');
             return $this->redirectToRoute(
-                'incc_resource_edit', [
+                'incp_resource_edit', [
                     'type' => $request->attributes->getString('type'),
                     'filename' => $resource->getId(),
                 ]
@@ -270,7 +270,7 @@ class ResourceController extends AbstractInachisController
      * @param string $imageDirectory
      * @return JsonResponse
      */
-    #[Route("/incc/resource/image/upload", name: "incc_resource_upload_image", methods: [ "POST", "PUT" ])]
+    #[Route("/incp/resource/image/upload", name: "incp_resource_upload_image", methods: [ "POST", "PUT" ])]
     public function uploadImage(
         Request $request,
         ImageFileService $imageFileService,

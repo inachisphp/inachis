@@ -15,10 +15,10 @@
         }) }}
     {% endif %}
     <p class="series__controls">
-    {% if form.bulkCreate|default(null) %}
+    {% if form.bulkCreate is defined %}
         {{ form_widget(form.bulkCreate) }}
     {% endif %}
-    {% if form.addItem|default(null) %}
+    {% if form.addItem is defined %}
         {{ form_widget(form.addItem) }}
     {% endif %}
     </p>
@@ -65,7 +65,7 @@
                     </td>
                     <td>
                         <label id="series_item_{{ loop.index }}_label" for="series_item_{{ loop.index }}">
-                            <a aria-label="Edit item" href="/incc/{{ item.type }}/{{ item.urls|first.link|default('') }}" title="Edit {{ item.title }}">{{ item.title }}{% if item.subTitle is not empty %} - {{ item.subTitle }}{% endif %}</a></label>
+                            <a aria-label="Edit item" href="/incp/{{ item.type }}/{{ item.urls|first.link|default('') }}" title="Edit {{ item.title }}">{{ item.title }}{% if item.subTitle is not empty %} - {{ item.subTitle }}{% endif %}</a></label>
                     </td>
                     <td>
                         {{ item.postDate|formatLocalTime('jS F Y') }}

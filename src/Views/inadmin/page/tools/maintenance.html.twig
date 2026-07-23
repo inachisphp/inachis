@@ -1,7 +1,7 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <a href="{{ path('incp_tools_index') }}">Tools</a>
     <span>Maintenance Mode</span>
 {% endblock pagetitle %}
 {% block content %}
@@ -58,7 +58,7 @@
                     name: 'preview',
                     value: 'preview',
                     title: 'Preview',
-                    href: path('incc_tools_maintenance_preview')
+                    href: path('incp_tools_maintenance_preview')
                 }
             }
         } %}

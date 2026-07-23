@@ -39,8 +39,8 @@ class SeriesController extends AbstractInachisController
      * @return Response
      */
     #[Route(
-        "/incc/series/list/{limit}/{offset}",
-        name: 'incc_series_list',
+        "/incp/series/list/{limit}/{offset}",
+        name: 'incp_series_list',
         requirements: [
             "limit" => "\d+",
             "offset" => "\d+",
@@ -71,9 +71,9 @@ class SeriesController extends AbstractInachisController
                 $count = $seriesBulkActionService->apply($action, $items);
                 $this->addFlash('success', "Action '$action' applied to $count series.");
             }
-            return $this->redirectToRoute('incc_series_list');
+            return $this->redirectToRoute('incp_series_list');
         }
-                
+
         $params = $viewStateManager->load(
             $request,
             'series',
@@ -91,7 +91,7 @@ class SeriesController extends AbstractInachisController
                 $categoryRepository,
             );
 
-            return $this->redirectToRoute('incc_series_list', [
+            return $this->redirectToRoute('incp_series_list', [
                 'limit' => $request->attributes->getInt('limit'),
                 'offset' => 0,
             ]);
@@ -114,13 +114,13 @@ class SeriesController extends AbstractInachisController
 
     /**
      * Create/Edit Series
-     * 
+     *
      * @param Request $request
      * @return Response
      * @throws \Exception
      */
-    #[Route("/incc/series/edit/{id}", name: "incc_series_edit", methods: [ "GET", "POST" ])]
-    #[Route("/incc/series/new", name: "incc_series_new", methods: [ "GET", "POST" ])]
+    #[Route("/incp/series/edit/{id}", name: "incp_series_edit", methods: [ "GET", "POST" ])]
+    #[Route("/incp/series/new", name: "incp_series_new", methods: [ "GET", "POST" ])]
     #[RequiresPermission(
         resource: PermissionResource::SERIES,
         action: PermissionAction::VIEW
@@ -151,7 +151,7 @@ class SeriesController extends AbstractInachisController
             if ($delete instanceof \Symfony\Component\Form\ClickableInterface && $delete->isClicked()) {
                 $wasteManagerService->sendToWaste($series);
                 $seriesRepository->remove($series);
-                return $this->redirect($this->generateUrl('incc_series_list'));
+                return $this->redirect($this->generateUrl('incp_series_list'));
             }
             if (empty($request->request->all('series')['url'])) {
                 $series->setUrl(
@@ -177,7 +177,7 @@ class SeriesController extends AbstractInachisController
 
             $this->addFlash('success', 'Content saved.');
             return $this->redirect(
-                '/incc/series/edit/' .
+                '/incp/series/edit/' .
                 $series->getId() . '/'
             );
         }
@@ -198,7 +198,7 @@ class SeriesController extends AbstractInachisController
      * @param Request $request
      * @return Response
      */
-    #[Route("/incc/series/contents/{id}", name: "incc_series_contents", methods: [ "POST" ])]
+    #[Route("/incp/series/contents/{id}", name: "incp_series_contents", methods: [ "POST" ])]
     #[RequiresPermission(
         resource: PermissionResource::SERIES,
         action: PermissionAction::VIEW

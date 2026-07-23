@@ -42,8 +42,8 @@ class RolesController extends AbstractInachisController
      * @return Response The response the controller results in
      */
     #[Route(
-        '/incc/security/roles',
-        name: 'incc_admin_role_index',
+        '/incp/security/roles',
+        name: 'incp_admin_role_index',
         methods: ['GET', 'POST']
     )]
     #[RequiresPermission(
@@ -60,8 +60,8 @@ class RolesController extends AbstractInachisController
         $form->handleRequest($request);
 
         if (
-            $form->isSubmitted() && 
-            $form->isValid() && 
+            $form->isSubmitted() &&
+            $form->isValid() &&
             !empty($request->request->all('items')
         )) {
             $items = $request->request->all('items');
@@ -108,7 +108,7 @@ class RolesController extends AbstractInachisController
                         );
 
                         return $this->redirectToRoute(
-                            'incc_admin_role_edit',
+                            'incp_admin_role_edit',
                             [
                                 'roleId' => (string) $role->getId(),
                             ]
@@ -121,7 +121,7 @@ class RolesController extends AbstractInachisController
                 $this->addFlash('success', "Deleted $count role(s).");
             }
 
-            return $this->redirectToRoute('incc_admin_role_index');
+            return $this->redirectToRoute('incp_admin_role_index');
         }
 
         $params = $viewStateManager->build(
@@ -166,8 +166,8 @@ class RolesController extends AbstractInachisController
      * @return Response The response the controller results in
      */
     #[Route(
-        '/incc/security/roles/{roleId}',
-        name: 'incc_admin_role_edit',
+        '/incp/security/roles/{roleId}',
+        name: 'incp_admin_role_edit',
         requirements: ['roleId' => '[0-9a-f\-]{36}|new'],
         methods: ['GET', 'POST']
     )]
@@ -189,7 +189,7 @@ class RolesController extends AbstractInachisController
             $role = $roleRepository->find($roleId);
             if ($role === null) {
                 $this->addFlash('error', 'Role not found.');
-                return $this->redirectToRoute('incc_admin_role_index');
+                return $this->redirectToRoute('incp_admin_role_index');
             }
         }
 
@@ -213,7 +213,7 @@ class RolesController extends AbstractInachisController
                     );
 
                     return $this->redirectToRoute(
-                        'incc_admin_role_edit',
+                        'incp_admin_role_edit',
                         [
                             'roleId' => (string) $role->getId(),
                         ]
@@ -223,7 +223,7 @@ class RolesController extends AbstractInachisController
                 $this->entityManager->remove($role);
                 $this->entityManager->flush();
                 $this->addFlash('success', "Role '$roleName' has been deleted.");
-                return $this->redirectToRoute('incc_admin_role_index');
+                return $this->redirectToRoute('incp_admin_role_index');
             }
 
             // Synchronise permissions: rebuild from posted checkboxes.
@@ -241,7 +241,7 @@ class RolesController extends AbstractInachisController
             $this->entityManager->flush();
 
             $this->addFlash('success', 'Role saved.');
-            return $this->redirectToRoute('incc_admin_role_edit', [
+            return $this->redirectToRoute('incp_admin_role_edit', [
                 'roleId' => (string) $role->getId(),
             ]);
         }

@@ -28,7 +28,7 @@
         <input class="checkbox" id="{{ type }}-{{ item.id }}__input" type="checkbox" name="items[]" value="{{ item.id }}" />
     {% endif %}
     {% if slug is defined %}
-    <a aria-label="Edit {% if item.title is defined %}{{ item.title }}{% elseif item.displayName is defined %}{{ item.displayName }}{% endif %}" href="/incc/{{ slug_prefix }}/{{ slug_object }}">
+    <a aria-label="Edit {% if item.title is defined %}{{ item.title }}{% elseif item.displayName is defined %}{{ item.displayName }}{% endif %}" href="/incp/{{ slug_prefix }}/{{ slug_object }}">
     {% endif %}
     {% if inline|default(false) == false %}
         <h2>

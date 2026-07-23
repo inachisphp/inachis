@@ -16,6 +16,7 @@ use Inachis\Entity\User\User;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
+use Inachis\Provider\TimezoneProvider;
 use Inachis\Security\Authorisation\PermissionResolver;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Emoji\EmojiTransliterator;
@@ -51,6 +52,7 @@ class PostType extends AbstractType
      */
     public function __construct(
         private PermissionResolver $permissionResolver,
+        private readonly TimezoneProvider $timezoneProvider,
         private readonly TranslatorInterface $translator,
         private RouterInterface $router,
         private Security $security,
@@ -67,13 +69,11 @@ class PostType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $user = $this->security->getUser();
-        $userTimezone = $user instanceof User
-            ? $user->getPreferences()?->getTimezone()
-            : 'UTC';
+        $userTimezone = $this->timezoneProvider->getForUser($user);
 
         $newItem = !$options['data'] instanceof Page || empty($options['data']->getId());
         $isScheduled = $options['data'] instanceof Page && $options['data']->getPostDate() > new \DateTimeImmutable('now');
-        
+
         $allowEdit = $this->permissionResolver->hasPermission(
             $user,
             PermissionResource::PAGE,
@@ -84,15 +84,15 @@ class PostType extends AbstractType
                 PermissionResource::PAGE,
                 PermissionAction::REVIEW
             ) &&
-            $options['data'] instanceof Page && 
+            $options['data'] instanceof Page &&
             $options['data']->getStatus() == EditorialStatus::DRAFT
         ;
         $showPublish = $this->permissionResolver->hasPermission(
                 $user,
                 PermissionResource::PAGE,
                 PermissionAction::PUBLISH
-            ) && 
-            $options['data'] instanceof Page && 
+            ) &&
+            $options['data'] instanceof Page &&
             $options['data']->getStatus() == EditorialStatus::REVIEW
         ;
         $showDelete = $this->permissionResolver->hasPermission(

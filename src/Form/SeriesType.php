@@ -13,6 +13,7 @@ use Inachis\Entity\Content\Series;
 use Inachis\Entity\User\User;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
+use Inachis\Provider\TimezoneProvider;
 use Inachis\Security\Authorisation\PermissionResolver;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
@@ -29,7 +30,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Form for creating and editing a series
- * 
+ *
  * @extends AbstractType<Series>
  */
 class SeriesType extends AbstractType
@@ -43,6 +44,7 @@ class SeriesType extends AbstractType
     public function __construct(
         private PermissionResolver $permissionResolver,
         private Security $security,
+        private readonly TimezoneProvider $timezoneProvider,
         private readonly TranslatorInterface $translator,
     ) {}
 
@@ -55,11 +57,9 @@ class SeriesType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $user = $this->security->getUser();
-        $userTimezone = $user instanceof User
-            ? $user->getPreferences()?->getTimezone()
-            : 'UTC';
+        $userTimezone = $this->timezoneProvider->getForUser($user);
 
-        $newItem = !$options['data'] instanceof Series || 
+        $newItem = !$options['data'] instanceof Series ||
             empty($options['data']->getId());
         $allowEdit = $this->permissionResolver->hasPermission(
             $user,
@@ -76,7 +76,7 @@ class SeriesType extends AbstractType
             PermissionResource::SERIES,
             PermissionAction::DELETE
         );
-        
+
         $builder
             ->add('title', TextType::class, [
                 'attr' => [
@@ -268,7 +268,7 @@ class SeriesType extends AbstractType
                     'label_html' => true,
                 ]);
             }
-            
+
         }
     }
 

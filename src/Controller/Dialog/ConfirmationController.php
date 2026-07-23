@@ -22,7 +22,7 @@ class ConfirmationController extends AbstractInachisController
      * @param Request $request
      * @return Response
      */
-    #[Route("/incc/ax/confirmation/get", methods: [ "POST" ])]
+    #[Route("/incp/ax/confirmation/get", methods: [ "POST" ])]
     public function contentList(Request $request): Response
     {
         $data = [

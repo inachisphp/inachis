@@ -27,7 +27,7 @@ class ContentAnalyticsController extends AbstractInachisController
      * @param string $id
      * @return Response
      */
-    #[Route("/incc/api/stats/post/{id}", name: "incc_api_post_stats", methods: [ "POST" ])]
+    #[Route("/incp/api/stats/post/{id}", name: "incp_api_post_stats", methods: [ "POST" ])]
     public function postStats(
         Request $request,
         AnalyticsProviderInterface $analyticsProvider,
@@ -81,7 +81,7 @@ class ContentAnalyticsController extends AbstractInachisController
      * @param string $id
      * @return Response
      */
-    #[Route("/incc/api/stats/series/{id}", name: "incc_api_series_stats", methods: [ "POST" ])]
+    #[Route("/incp/api/stats/series/{id}", name: "incp_api_series_stats", methods: [ "POST" ])]
     public function seriesStats(
         Request $request,
         AnalyticsProviderInterface $analyticsProvider,

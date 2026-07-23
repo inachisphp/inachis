@@ -52,8 +52,8 @@ class PageController extends AbstractInachisController
      * @throws Exception
      */
     #[Route(
-        "/incc/{type}/list/{limit}/{offset}",
-        name: "incc_post_list",
+        "/incp/{type}/list/{limit}/{offset}",
+        name: "incp_post_list",
         requirements: [
             "type" => "post|page",
             "limit" => "\d+",
@@ -90,7 +90,7 @@ class PageController extends AbstractInachisController
                 $this->addFlash('success', "Action '$action' applied to $count $type.");
             }
             return $this->redirectToRoute(
-                'incc_post_list',
+                'incp_post_list',
                 [ 'type' => $type ]
             );
         }
@@ -118,7 +118,7 @@ class PageController extends AbstractInachisController
                 $categoryRepository,
             );
 
-            return $this->redirectToRoute('incc_post_list', [
+            return $this->redirectToRoute('incp_post_list', [
                 'type' => $request->attributes->getString('type'),
                 'limit' => $request->attributes->getInt('limit'),
                 'offset' => 0,
@@ -155,16 +155,16 @@ class PageController extends AbstractInachisController
      * @throws Exception
      */
     #[Route(
-        "/incc/{type}/{title}",
-        name: "incc_post_edit",
+        "/incp/{type}/{title}",
+        name: "incp_post_edit",
         requirements: [ "type" => "page|post"],
         defaults: [ "type" => "post" ],
         methods: [ "GET", "POST" ],
         priority: -10,
     )]
     #[Route(
-        "/incc/{type}/{year}/{month}/{day}/{title}",
-        name: "incc_post_edit_1",
+        "/incp/{type}/{year}/{month}/{day}/{title}",
+        name: "incp_post_edit_1",
         requirements: [
             "type" => "post",
             "year" => "\d+",
@@ -192,13 +192,13 @@ class PageController extends AbstractInachisController
         string $type = 'post',
         ?string $title = null
     ): Response {
-        $url = preg_replace('/\/?incc\/(page|post)\/?/', '', $request->getRequestUri());
+        $url = preg_replace('/\/?incp\/(page|post)\/?/', '', $request->getRequestUri());
         $url = $this->entityManager->getRepository(Url::class)->findBy(['link' => $url]);
         $title = $title === 'new' ? null : $title;
         // If content with this URL doesn't exist, then redirect
         if (empty($url) && null !== $title) {
             return $this->redirectToRoute(
-                'incc_post_list',
+                'incp_post_list',
                 ['type' => $type]
             );
         }
@@ -214,7 +214,9 @@ class PageController extends AbstractInachisController
         }
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
-        $threads = $reviewThreadRepository->findOpenForPage($post);
+        if ($post->getId()) {
+            $threads = $reviewThreadRepository->findOpenForPage($post);
+        }
 
         if($form->isSubmitted() && !$form->isValid()) {
             foreach ($form->getErrors(true) as $error) {
@@ -230,7 +232,7 @@ class PageController extends AbstractInachisController
             if ($delete instanceof ClickableInterface && $delete->isClicked()) {
                 $pageBulkActionService->delete($post);
                 return $this->redirectToRoute(
-                    'incc_post_list',
+                    'incp_post_list',
                     [ 'type' => $type ]
                 );
             }
@@ -259,9 +261,11 @@ class PageController extends AbstractInachisController
                 $post->setStatus(EditorialStatus::PUBLISHED);
 
                 // Auto-resolve or close any remaining open review threads
-                foreach ($threads as $thread) {
-                    $thread->resolve($this->getCurrentUser());
-                    $this->entityManager->persist($thread);
+                if ($post->getId()) {
+                    foreach ($threads as $thread) {
+                        $thread->resolve($this->getCurrentUser());
+                        $this->entityManager->persist($thread);
+                    }
                 }
             }
 
@@ -279,15 +283,17 @@ class PageController extends AbstractInachisController
                 $this->entityManager->persist($revision);
             }
             $this->entityManager->persist($post);
-            foreach ($threads as $thread) {
-                $reviewRebaseService->rebase($thread, $post->getContent() ?: '');
+            if (isset($threads)) {
+                foreach ($threads as $thread) {
+                    $reviewRebaseService->rebase($thread, $post->getContent() ?: '');
+                }
             }
             $this->entityManager->flush();
 
             $this->addFlash('success', 'Content saved.');
             $firstLink = $post->getUrls()[0];
             return $this->redirect(
-                '/incc/' .
+                '/incp/' .
                 $post->getType() . '/' .
                 $firstLink?->getLink()
             );

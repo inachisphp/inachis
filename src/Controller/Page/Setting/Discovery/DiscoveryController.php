@@ -23,8 +23,8 @@ class DiscoveryController extends AbstractInachisController
      * @return Response
      */
     #[Route(
-        '/incc/settings/discovery',
-        name: 'incc_settings_discovery'
+        '/incp/settings/discovery',
+        name: 'incp_settings_discovery'
     )]
     public function index(
         DiscoveryStatusService $discoveryStatusService

@@ -26,7 +26,7 @@ class MaintenanceController extends AbstractInachisController
      * @param Request $request The request
      * @return Response
      */
-    #[Route('/incc/tools/maintenance', name: 'incc_tools_maintenance')]
+    #[Route('/incp/tools/maintenance', name: 'incp_tools_maintenance')]
     public function index(Request $request, MaintenanceManager $manager): Response
     {
         $config = $manager->getConfig();
@@ -49,7 +49,7 @@ class MaintenanceController extends AbstractInachisController
             }
 
             $this->addFlash('success', 'Maintenance settings updated.');
-            return $this->redirectToRoute('incc_tools_maintenance');
+            return $this->redirectToRoute('incp_tools_maintenance');
         }
 
         $this->viewModel->page->title = 'Maintenance Mode';
@@ -68,7 +68,7 @@ class MaintenanceController extends AbstractInachisController
      * @param MaintenanceManager $manager
      * @return Response
      */
-    #[Route('/incc/tools/maintenance/preview', name: 'incc_tools_maintenance_preview')]
+    #[Route('/incp/tools/maintenance/preview', name: 'incp_tools_maintenance_preview')]
     public function preview(MaintenanceManager $manager): Response
     {
         $config = $manager->getConfig();

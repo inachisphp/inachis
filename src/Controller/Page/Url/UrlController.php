@@ -35,8 +35,8 @@ class UrlController extends AbstractInachisController
      * @throws OptimisticLockException
      */
     #[Route(
-        "/incc/url/list/{limit}/{offset}",
-        name: "incc_url_list",
+        "/incp/url/list/{limit}/{offset}",
+        name: "incp_url_list",
         requirements: [ "limit" => "\d+", "offset" => "\d+", ],
         defaults: [ "limit" => 20, "offset" => 0, ],
         methods: [ "GET", "POST" ]
@@ -65,9 +65,9 @@ class UrlController extends AbstractInachisController
                 $count = $urlBulkActionService->apply($action, $items);
                 $this->addFlash('success', "Action '$action' applied to $count urls.");
             }
-            return $this->redirectToRoute('incc_url_list');
+            return $this->redirectToRoute('incp_url_list');
         }
-        
+
         $params = $viewStateManager->load(
             $request,
             'url',
@@ -85,7 +85,7 @@ class UrlController extends AbstractInachisController
                 $categoryRepository,
             );
 
-            return $this->redirectToRoute('incc_url_list', [
+            return $this->redirectToRoute('incp_url_list', [
                 'limit' => $request->attributes->getInt('limit'),
                 'offset' => 0,
             ]);
@@ -112,7 +112,7 @@ class UrlController extends AbstractInachisController
      * @return Response
      */
     #[Route(
-        "/incc/ax/check-url-usage",
+        "/incp/ax/check-url-usage",
         methods: [ "POST" ]
     )]
     public function checkUrlUsage(

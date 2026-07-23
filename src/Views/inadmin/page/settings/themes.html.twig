@@ -1,7 +1,7 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_settings_index') }}">Settings</a>
+    <a href="{{ path('incp_settings_index') }}">Settings</a>
     <span>Themes</span>
 {% endblock pagetitle %}
 
@@ -27,7 +27,7 @@
             </div>
 
             <div>
-                <a class="button button--secondary" href="{{ path('incc_settings_themes_rescan') }}">Rescan now</a>
+                <a class="button button--secondary" href="{{ path('incp_settings_themes_rescan') }}">Rescan now</a>
             </div>
         </section>
 
@@ -36,11 +36,11 @@
                 <div>
                     <div class="ui-image-header">
                         {% if theme.screenshot %}
-                            <a href="{{ path('incc_settings_theme_screenshot', { slug: theme.slug }) }}" target="_blank" rel="noopener">
-                                <img src="{{ path('incc_settings_theme_screenshot', { slug: theme.slug }) }}" alt="{{ theme.name }} screenshot">
+                            <a href="{{ path('incp_settings_theme_screenshot', { slug: theme.slug }) }}" target="_blank" rel="noopener">
+                                <img src="{{ path('incp_settings_theme_screenshot', { slug: theme.slug }) }}" alt="{{ theme.name }} screenshot">
                             </a>
                         {% else %}
-                            <img src="{{ path('incc_settings_theme_screenshot', { slug: 'default' }) }}" alt="Default screenshot">
+                            <img src="{{ path('incp_settings_theme_screenshot', { slug: 'default' }) }}" alt="Default screenshot">
                         {% endif %}
                     </div>
 
@@ -91,7 +91,7 @@
                             {% if activeTheme.slug == theme.slug %}
                                 <button type="button" class="button button--positive" disabled>Active</button>
                             {% else %}
-                                <form method="post" action="{{ path('incc_settings_theme_activate', { slug: theme.slug }) }}">
+                                <form method="post" action="{{ path('incp_settings_theme_activate', { slug: theme.slug }) }}">
                                     <button type="submit" class="button button--positive">Activate</button>
                                 </form>
                             {% endif %}

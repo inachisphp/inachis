@@ -22,7 +22,7 @@ class SettingsIndexController extends AbstractInachisController
      * @param VersionService $versionService
      * @return Response
      */
-    #[Route("/incc/settings", name: 'incc_settings_index')]
+    #[Route("/incp/settings", name: 'incp_settings_index')]
     public function index(VersionService $versionService): Response
     {
         $this->viewModel->page->title = 'Settings';

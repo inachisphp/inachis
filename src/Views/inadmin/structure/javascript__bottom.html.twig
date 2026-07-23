@@ -42,13 +42,13 @@
             {{ app.session.set('clearAutosave', false) }}
         {% endif %}
         new window.Inachis.EasyMDELinkValidator(easymde, {
-            endpoint: "/incc/api/validate-links",
+            endpoint: "/incp/api/validate-links",
             coloriseBadge: true,
         });
         {% if includeEditorId|default(null) is not empty and post is defined and post.status.value == 'review' %}
         const reviewPlugin = new window.Inachis.EasyMDEReviewPlugin(easymde, {
             pageId: '{{ includeEditorId }}',
-            endpoint: "/incc/api/review"
+            endpoint: "/incp/api/review"
         });
         {% endif %}
     </script>

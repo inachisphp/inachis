@@ -29,7 +29,7 @@ class AppearanceController extends AbstractInachisController
      * @param UserPreferenceProvider $userPreferenceProvider
      * @return Response
      */
-    #[Route("/incc/admin/theme", name: "incc_admin_theme", methods: [ "GET", "POST" ])]
+    #[Route("/incp/admin/theme", name: "incp_admin_theme", methods: [ "GET", "POST" ])]
     public function edit(Request $request, UserPreferenceProvider $userPreferenceProvider): Response
     {
         /** @var UserPreference */
@@ -45,7 +45,7 @@ class AppearanceController extends AbstractInachisController
 
             $userPreferenceProvider->save($preferences);
 
-            return $this->redirectToRoute('incc_admin_theme');
+            return $this->redirectToRoute('incp_admin_theme');
         }
 
         $this->viewModel->page->title = 'Appearance';

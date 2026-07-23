@@ -1,8 +1,8 @@
 {% extends "inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_post_list', { type: viewModel.page.tab }) }}">{{ viewModel.page.tab|title }}s</a>
-    <a href="/incc/{{ viewModel.page.tab }}/{{ url }}">Edit {{ viewModel.page.tab }}</a>
+    <a href="{{ path('incp_post_list', { type: viewModel.page.tab }) }}">{{ viewModel.page.tab|title }}s</a>
+    <a href="/incp/{{ viewModel.page.tab }}/{{ url }}">Edit {{ viewModel.page.tab }}</a>
     <span>Track Changes</span>
 {% endblock pagetitle %}
 
@@ -47,10 +47,10 @@
                     <span class="material-icons" aria-hidden="true">undo</span> <span>Revert</span>
                 </button>
             {% endif %}
-                <a href="{{ path('incc_post_download', { 'id': revision_id }) }}" class="button button--secondary">
+                <a href="{{ path('incp_post_download', { 'id': revision_id }) }}" class="button button--secondary">
                     <span class="material-icons" aria-hidden="true">save_alt</span> {% trans %}admin.post.revision.download{% endtrans %}
                 </a>
-                <a href="/incc/post/{{ url }}" class="button button--info">
+                <a href="/incp/post/{{ url }}" class="button button--info">
                     <span>Cancel</span>
                 </a>
             </p>

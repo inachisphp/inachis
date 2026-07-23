@@ -34,7 +34,7 @@ class TagsController extends AbstractInachisController
      * @param TagRepository $tagRepository
      * @return Response
      */
-    #[Route("incc/ax/tagList/get", methods: [ "POST" ], name: 'api_tags_list')]
+    #[Route("incp/ax/tagList/get", methods: [ "POST" ], name: 'api_tags_list')]
     public function getTagManagerListContent(Request $request, TagRepository $tagRepository): Response
     {
         /** @var \Doctrine\ORM\Tools\Pagination\Paginator<Tag> */
@@ -73,8 +73,8 @@ class TagsController extends AbstractInachisController
      * @return Response
      */
     #[Route(
-        '/incc/tags/{limit}/{offset}',
-        name: 'incc_tags_list',
+        '/incp/tags/{limit}/{offset}',
+        name: 'incp_tags_list',
         requirements: [ "limit" => "\d+", "offset" => "\d+", ],
         defaults: [ "limit" => 20, "offset" => 0, ]
     )]
@@ -110,7 +110,7 @@ class TagsController extends AbstractInachisController
             }
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('incc_tags_list');
+            return $this->redirectToRoute('incp_tags_list');
         }
 
         $params = $viewStateManager->build(
@@ -131,7 +131,7 @@ class TagsController extends AbstractInachisController
                 fn($row) => (object) [
                     'id' => $row[0]->getId(),
                     'title' => $row[0]->getTitle(),
-                    'url' => '/incc/tags/' . $row[0]->getSlug(),
+                    'url' => '/incp/tags/' . $row[0]->getSlug(),
                     'usageCount' => $row['usageCount'],
                 ],
                 $tagRepository->findAllWithUsageCount($limit, $offset)
@@ -151,7 +151,7 @@ class TagsController extends AbstractInachisController
      * @param EntityManagerInterface $entityManager
      * @return Response
      */
-    #[Route('/incc/tags/merge', name: 'incc_tags_merge', methods: ['POST'])]
+    #[Route('/incp/tags/merge', name: 'incp_tags_merge', methods: ['POST'])]
     public function mergeTags(
         Request $request,
         PageRepository $pageRepository,
@@ -199,8 +199,8 @@ class TagsController extends AbstractInachisController
      * @return Response
      */
     #[Route(
-        '/incc/tags/{slug}/{limit}/{offset}',
-        name: 'incc_tag_show',
+        '/incp/tags/{slug}/{limit}/{offset}',
+        name: 'incp_tag_show',
         requirements: [ "limit" => "\d+", "offset" => "\d+", ],
         defaults: [  "limit" => 25, "offset" => 0, ]
     )]
@@ -217,7 +217,7 @@ class TagsController extends AbstractInachisController
     ): Response {
         $tag = $tagRepository->findOneBy([ 'slug' => $slug]);
         if (empty($tag)) {
-            return $this->redirectToRoute('incc_tags_list');
+            return $this->redirectToRoute('incp_tags_list');
         }
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
@@ -236,7 +236,7 @@ class TagsController extends AbstractInachisController
             }
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('incc_tag_show', ['id' => $tag->getId()]);
+            return $this->redirectToRoute('incp_tag_show', ['id' => $tag->getId()]);
         }
 
         $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [ $tag->getId() ]], '*', $limit, $offset);

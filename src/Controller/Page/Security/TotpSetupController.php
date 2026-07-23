@@ -33,7 +33,7 @@ class TotpSetupController extends AbstractInachisController
      * @param SessionInterface $session
      * @return Response
      */
-    #[Route('/incc/security/totp/setup', name: 'incc_admin_totp_setup', methods: ['GET'])]
+    #[Route('/incp/security/totp/setup', name: 'incp_admin_totp_setup', methods: ['GET'])]
     public function setup(
         SessionInterface $session,
         TotpManager $totpManager,
@@ -81,7 +81,7 @@ class TotpSetupController extends AbstractInachisController
      * @param TrustedDeviceManager $trustedDeviceManager
      * @return Response
      */
-    #[Route('/incc/security/totp/setup', name: 'incc_admin_totp_confirm', methods: ['POST'])]
+    #[Route('/incp/security/totp/setup', name: 'incp_admin_totp_confirm', methods: ['POST'])]
     public function confirm(
         RecoveryCodeManager $recoveryCodeManager,
         Request $request,
@@ -97,7 +97,7 @@ class TotpSetupController extends AbstractInachisController
         $secret = $session->get('totp.setup.secret');
         if ($secret === null) {
             return $this->redirectToRoute(
-                'incc_admin_totp_confirm'
+                'incp_admin_totp_confirm'
             );
         }
 
@@ -111,12 +111,12 @@ class TotpSetupController extends AbstractInachisController
             $this->addFlash('error', 'The authentication code was invalid.');
 
             return $this->redirectToRoute(
-                'incc_admin_totp_confirm'
+                'incp_admin_totp_confirm'
             );
         }
 
         $trustedDeviceManager->removeAll($user);
-        
+
         /*
          * Remove the temporary secret once it has
          * successfully been persisted.
@@ -132,7 +132,7 @@ class TotpSetupController extends AbstractInachisController
         $codes = $recoveryCodeManager->generate($this->getCurrentUser());
         $request->getSession()->set('recovery_codes', $codes);
 
-        return $this->redirectToRoute('incc_security_recovery_codes_generate');
+        return $this->redirectToRoute('incp_security_recovery_codes_generate');
     }
 
     /**
@@ -141,7 +141,7 @@ class TotpSetupController extends AbstractInachisController
      * @param SessionInterface $session
      * @return Response
      */
-    #[Route('/incc/security/totp/setup/cancel', name: 'incc_admin_totp_cancel', methods: ['GET'])]
+    #[Route('/incp/security/totp/setup/cancel', name: 'incp_admin_totp_cancel', methods: ['GET'])]
     public function cancel(
         SessionInterface $session,
     ): Response {
@@ -149,7 +149,7 @@ class TotpSetupController extends AbstractInachisController
         $session->remove('totp.setup.uri');
         $session->remove('totp.setup.qr');
 
-        return $this->redirectToRoute('incc_admin_edit', [
+        return $this->redirectToRoute('incp_admin_edit', [
             'id' => $this->getCurrentUser()->getUsername(),
         ]);
     }

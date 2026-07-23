@@ -3,22 +3,22 @@
         {
             id: 'post',
             title: 'Posts',
-            url: path('incc_post_list', {'type': 'post'}),
+            url: path('incp_post_list', {'type': 'post'}),
         },
         {
             id: 'page',
             title: 'Pages',
-            url: path('incc_post_list', {'type': 'page'}),
+            url: path('incp_post_list', {'type': 'page'}),
         },
         {
             id: 'url',
             title: 'admin.urls.title'|trans,
-            url: path('incc_url_list'),
+            url: path('incp_url_list'),
         },
         canResource('TAG') ? {
             id: 'tag',
             title: 'Tags',
-            url: path('incc_tags_list'),
+            url: path('incp_tags_list'),
         } : null,
     ]|filter(v => v is not null)
 }) }}

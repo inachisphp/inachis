@@ -1,7 +1,7 @@
 {% extends "inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_resource_list', { type: viewModel.page.type }) }}">{{ viewModel.page.type|title }}</a>
+    <a href="{{ path('incp_resource_list', { type: viewModel.page.type }) }}">{{ viewModel.page.type|title }}</a>
     <span>{% if resource.id is empty %}New{% else %}Edit{% endif %} {{ viewModel.page.type }}</span>
 {% endblock pagetitle %}
 
@@ -75,9 +75,9 @@
                         {% for image_use in content_uses %}
                             {% set link = '' %}
                             {% if content_type == 'series' %}
-                                {% set link = path('incc_series_edit', {id: image_use.id}) %}
+                                {% set link = path('incp_series_edit', {id: image_use.id}) %}
                             {% elseif content_type == 'posts' %}
-                                {% set link = '/incc/' ~ image_use.type ~ '/' ~ image_use.urls[0].link %}
+                                {% set link = '/incp/' ~ image_use.type ~ '/' ~ image_use.urls[0].link %}
                             {% endif %}
                             <li>
                                 {{ content_type|title }}: <a href="{{ link }}">{{ image_use.title }} {% if image_use.subTitle is not empty %} &mdash; {{ image_use.subTitle }}{% endif %}</a>

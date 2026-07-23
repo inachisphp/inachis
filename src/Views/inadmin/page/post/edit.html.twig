@@ -1,7 +1,7 @@
 {% extends "inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_post_list', { type: viewModel.page.tab }) }}">{{ viewModel.page.tab|title }}s</a>
+    <a href="{{ path('incp_post_list', { type: viewModel.page.tab }) }}">{{ viewModel.page.tab|title }}s</a>
     <span>{% if post.id is empty %}New{% else %}Edit{% endif %} {{ viewModel.page.tab }}</span>
 {% endblock pagetitle %}
 
@@ -70,7 +70,7 @@
             </li>
             {% endif %}
             {% if showStats %}
-            <li data-source="{{ path('incc_api_post_stats', { 'id': post.id }) }}" class="tab--lazyload">
+            <li data-source="{{ path('incp_api_post_stats', { 'id': post.id }) }}" class="tab--lazyload">
                 <a href="#post__stats">{% trans %}admin.posts.tabs.stats{% endtrans %}</a>
             </li>
             {% endif %}
@@ -263,7 +263,7 @@
             {% if form.publish is defined %}{{ form_widget(form.publish) }}{% endif %}
             {% if form.delete is defined %}{{ form_widget(form.delete) }}{% endif %}
             {%  if not post.isDraft %}
-                <a class="button button--secondary" href="{% if previewMode %}/incc/preview{% endif %}/{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons" aria-hidden="true">exit_to_app</span>
+                <a class="button button--secondary" href="{% if previewMode %}/incp/preview{% endif %}/{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons" aria-hidden="true">exit_to_app</span>
                     {% trans %}admin.button.viewLive{% endtrans %}</a>
             {%  endif %}
         {% endif %}

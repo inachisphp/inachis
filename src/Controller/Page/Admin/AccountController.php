@@ -41,7 +41,7 @@ class AccountController extends AbstractInachisController
      * @param AuthenticationUtils $authenticationUtils
      * @return Response The response the controller results in
      */
-    #[Route("/incc/login", name: "incc_account_login")]
+    #[Route("/incp/login", name: "incp_account_login")]
     public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
     {
         $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();
@@ -67,7 +67,7 @@ class AccountController extends AbstractInachisController
      *
      * @throws \Exception
      */
-    #[Route("/incc/logout", name: "incc_logout")]
+    #[Route("/incp/logout", name: "incp_logout")]
     public function logout(): void
     {
         throw new \LogicException('This method is blank and will be intercepted by the logout key on your firewall.');
@@ -84,7 +84,7 @@ class AccountController extends AbstractInachisController
      * @return Response
      * @throws RandomException
      */
-    #[Route("/incc/forgot-password", name: "incc_account_forgot-password", methods: [ "GET", "POST" ])]
+    #[Route("/incp/forgot-password", name: "incp_account_forgot-password", methods: [ "GET", "POST" ])]
     public function forgotPassword(
         Request $request,
         PasswordResetRequestRepository $passwordResetRequestRepository,
@@ -138,7 +138,7 @@ class AccountController extends AbstractInachisController
                             'clientIP' => $request->getClientIp(),
                         ],
                         fn (string $token) => $this->generateUrl(
-                            'incc_account_new-password',
+                            'incp_account_new-password',
                             [ 'token' => $token ]
                         )
                     );
@@ -171,8 +171,8 @@ class AccountController extends AbstractInachisController
      * @return Response
      */
     #[Route(
-        '/incc/new-password/{token}', 
-        name: "incc_account_new-password", 
+        '/incp/new-password/{token}',
+        name: "incp_account_new-password",
         methods: [ "GET", "POST" ]
     )]
     public function newPassword(
@@ -190,7 +190,7 @@ class AccountController extends AbstractInachisController
 
         if (!$token || strlen($token) !== 64) {
             $this->addFlash('warning', 'Invalid token.');
-            return $this->redirectToRoute('incc_account_forgot-password');
+            return $this->redirectToRoute('incp_account_forgot-password');
         }
         $changePassword = $request->request->all('change_password');
         if ($changePassword === []) {
@@ -232,12 +232,12 @@ class AccountController extends AbstractInachisController
             ]);
             if (!$user) {
                 $this->addFlash('error', 'Invalid token.');
-                return $this->redirectToRoute('incc_account_forgot-password');
+                return $this->redirectToRoute('incp_account_forgot-password');
             }
             $resetRequest = $tokenService->validateTokenForUser($token, $user);
             if (!$resetRequest) {
                 $this->addFlash('error', 'Invalid or expired reset token.');
-                return $this->redirectToRoute('incc_account_forgot-password');
+                return $this->redirectToRoute('incp_account_forgot-password');
             }
             $plainPassword = $data['change_password']['new_password'];
 
@@ -257,7 +257,7 @@ class AccountController extends AbstractInachisController
             $this->entityManager->flush();
 
             $this->addFlash('success', 'Your password has been reset. You can now log in.');
-            return $this->redirectToRoute('incc_account_login');
+            return $this->redirectToRoute('incp_account_login');
         }
 
         return $this->render('inadmin/page/admin/new-password.html.twig', [

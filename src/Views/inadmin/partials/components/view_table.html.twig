@@ -92,9 +92,9 @@
             <{% if column.header is defined and column.header %}th scope="row"{% else %}td class="{{ cellClasses|join(' ') }}"{% endif %}>
                 {% if column.slug is defined %}
                     {% if column.slug_prefix is defined %}
-                        <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incc/{{ attribute(item, column.slug_prefix) }}/{{ slug_object }}">
+                        <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incp/{{ attribute(item, column.slug_prefix) }}/{{ slug_object }}">
                     {% elseif slug_prefix is defined %}
-                        <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incc/{{ slug_prefix }}/{{ slug_object }}">
+                        <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incp/{{ slug_prefix }}/{{ slug_object }}">
                     {% endif %}
                 {% elseif column.url is defined and column.url is not empty %}
                         <a aria-label="Edit {{ attribute(item, 'title') }}" href="{{ attribute(item, column.url) }}">

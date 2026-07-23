@@ -1,7 +1,7 @@
 {% extends "inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_tags_list') }}">{{ 'Tags'|trans }}</a>
+    <a href="{{ path('incp_tags_list') }}">{{ 'Tags'|trans }}</a>
 	<span>{{ tag.title }}</span>
 {% endblock pagetitle %}
 
@@ -38,7 +38,7 @@
 		limit: query.limit,
 		offset: query.offset,
 		total: total,
-		url_result: path('incc_tag_show', {
+		url_result: path('incp_tag_show', {
 			slug: tag.slug,
 			offset: query.offset,
 			limit: query.limit,

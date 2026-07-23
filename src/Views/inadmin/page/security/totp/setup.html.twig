@@ -1,7 +1,7 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_admin_list') }}">Users</a>
+    <a href="{{ path('incp_admin_list') }}">Users</a>
     <span>Enable Two-Factor Authentication</span>
 {% endblock pagetitle %}
 
@@ -49,7 +49,7 @@
     <h2>Confirm setup</h2>
     <p>Enter the six-digit code shown in your authenticator application.</p>
 
-    <form method="post" action="{{ path('incc_admin_totp_confirm') }}">
+    <form method="post" action="{{ path('incp_admin_totp_confirm') }}">
         <p>
             <label for="code">Authentication code</label>
             <input
@@ -70,7 +70,7 @@
                 <span class="material-icons">verified_user</span>
                 <span class="btn-text">Enable Two-Factor Authentication</span>
             </button>
-            <a href="{{ path('incc_admin_totp_cancel') }}" type="submit" class="button button--negative">
+            <a href="{{ path('incp_admin_totp_cancel') }}" type="submit" class="button button--negative">
                 <span class="btn-txt">Cancel</span>
             </a>
         </p>

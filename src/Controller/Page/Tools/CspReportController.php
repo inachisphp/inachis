@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class CspReportController extends AbstractInachisController
 {
-    #[Route('/incc/tools/csp', name:'incc_tools_csp_dashboard')]
+    #[Route('/incp/tools/csp', name:'incp_tools_csp_dashboard')]
     public function dashboard(
         Request $request,
         CspReportRepository $repository
@@ -67,7 +67,7 @@ class CspReportController extends AbstractInachisController
      * @return Response
      */
     #[Route(
-        '/incc/tools/csp/{id}',
+        '/incp/tools/csp/{id}',
         name: 'csp_report_show',
         requirements: ['id' => '^(?!suggested-policy|reports|settings|.*/process).*$']
     )]
@@ -85,7 +85,7 @@ class CspReportController extends AbstractInachisController
         );
     }
 
-    #[Route('/incc/tools/csp/{id}/process',
+    #[Route('/incp/tools/csp/{id}/process',
         name: 'csp_report_process',
         requirements: ['id' => '^(?!suggested-policy|reports|settings).*$']
     )]
@@ -116,10 +116,10 @@ class CspReportController extends AbstractInachisController
         $this->entityManager->flush();
         $cspHeaderManager->invalidateCache();
 
-        return $this->redirectToRoute('incc_tools_csp_dashboard');
+        return $this->redirectToRoute('incp_tools_csp_dashboard');
     }
 
-    #[Route('/incc/tools/csp/suggested-policy', name: 'incc_tools_csp_suggested_policy')]
+    #[Route('/incp/tools/csp/suggested-policy', name: 'incp_tools_csp_suggested_policy')]
     public function suggestedPolicy(
         CspReportRepository $repository,
         CspPolicyBuilder $policyBuilder
@@ -144,7 +144,7 @@ class CspReportController extends AbstractInachisController
         );
     }
 
-    #[Route('/incc/tools/csp/settings', name: 'incc_tools_csp_settings')]
+    #[Route('/incp/tools/csp/settings', name: 'incp_tools_csp_settings')]
     public function settings(
         Request $request,
         CspHeaderManager $cspHeaderManager,
@@ -190,7 +190,7 @@ class CspReportController extends AbstractInachisController
             $cspHeaderManager->invalidateCache();
 
             $this->addFlash('success', 'CSP settings updated and cache warmed.');
-            return $this->redirectToRoute('incc_tools_csp_settings');
+            return $this->redirectToRoute('incp_tools_csp_settings');
         }
 
         $policyData = json_decode($cspPolicy->getValue() ?? '', true) ?? [];

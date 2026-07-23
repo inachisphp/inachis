@@ -33,7 +33,7 @@ class ReviewAssignController extends AbstractController
 	 * @param EntityManagerInterface $entityManager
 	 * @return JsonResponse
 	 */
-	#[Route('/incc/api/review/thread/{id}/assign', methods: ['POST'])]
+	#[Route('/incp/api/review/thread/{id}/assign', methods: ['POST'])]
 	public function assign(
 		string $id,
 		Request $request,
@@ -68,7 +68,7 @@ class ReviewAssignController extends AbstractController
 	 * @param UserRepository $users
 	 * @return JsonResponse
 	 */
-	#[Route('/incc/api/review/reviewers', methods: ['GET'])]
+	#[Route('/incp/api/review/reviewers', methods: ['GET'])]
 	public function reviewers(
 		UserRepository $users
 	): JsonResponse {

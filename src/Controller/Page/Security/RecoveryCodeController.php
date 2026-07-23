@@ -33,8 +33,8 @@ class RecoveryCodeController extends AbstractInachisController
      * @return Response
      */
     #[Route(
-        '/incc/security/recovery-codes',
-        name: 'incc_security_recovery_codes_generate',
+        '/incp/security/recovery-codes',
+        name: 'incp_security_recovery_codes_generate',
         methods: ['GET']
     )]
     public function show(SessionInterface $session): Response
@@ -49,7 +49,7 @@ class RecoveryCodeController extends AbstractInachisController
             );
 
             return $this->redirectToRoute(
-                'incc_admin_list', [
+                'incp_admin_list', [
                     'id' => $this->getCurrentUser()->getUsername(),
                 ]
             );

@@ -29,7 +29,7 @@ class CategoryDialogController extends AbstractInachisController
      * @param CategoryRepository $categoryRepository
      * @return Response
      */
-    #[Route("/incc/ax/categoryManager/get", methods: [ "POST" ])]
+    #[Route("/incp/ax/categoryManager/get", methods: [ "POST" ])]
     public function getCategoryManagerContent(CategoryRepository $categoryRepository): Response
     {
         return $this->render('inadmin/dialog/category-manager.html.twig', [
@@ -43,7 +43,7 @@ class CategoryDialogController extends AbstractInachisController
      * @param CategoryRepository $categoryRepository
      * @return Response
      */
-    #[Route("/incc/ax/categoryManager/list", methods: [ "POST" ])]
+    #[Route("/incp/ax/categoryManager/list", methods: [ "POST" ])]
     public function getCategoryManagerList(CategoryRepository $categoryRepository): Response
     {
         return $this->render('inadmin/dialog/category-manager-list.html.twig', [
@@ -58,7 +58,7 @@ class CategoryDialogController extends AbstractInachisController
      * @param CategoryRepository $categoryRepository
      * @return Response
      */
-    #[Route("incc/ax/categoryList/get", methods: [ "POST" ])]
+    #[Route("incp/ax/categoryList/get", methods: [ "POST" ])]
     public function getCategoryManagerListContent(Request $request, CategoryRepository $categoryRepository): Response
     {
         /** @var array<int, Category> $categories */
@@ -103,7 +103,7 @@ class CategoryDialogController extends AbstractInachisController
      * @param CategoryRepository $categoryRepository
      * @return Response
      */
-    #[Route("incc/ax/categoryManager/save", methods: [ "POST" ])]
+    #[Route("incp/ax/categoryManager/save", methods: [ "POST" ])]
     public function saveCategoryManagerContent(
         Request $request,
         CategoryRepository $categoryRepository
@@ -136,7 +136,7 @@ class CategoryDialogController extends AbstractInachisController
      * @param PageRepository $pageRepository
      * @return JsonResponse
      */
-    #[Route("incc/ax/categoryManager/usage", methods: [ "POST" ])]
+    #[Route("incp/ax/categoryManager/usage", methods: [ "POST" ])]
     public function getCategoryUsages(
         Request $request,
         CategoryRepository $categoryRepository,
@@ -164,7 +164,7 @@ class CategoryDialogController extends AbstractInachisController
      * @param PageRepository $pageRepository
      * @return Response
      */
-    #[Route("incc/ax/categoryManager/delete", methods: [ "POST" ])]
+    #[Route("incp/ax/categoryManager/delete", methods: [ "POST" ])]
     public function deleteCategory(
         Request $request,
         CategoryRepository $categoryRepository,

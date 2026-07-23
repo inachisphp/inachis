@@ -27,7 +27,7 @@ class EmailSettingController extends AbstractInachisController
 	 * @param DomainEmailAnalyser $domainEmailAnalyser
 	 * @return Response
 	 */
-    #[Route("/incc/tools/email", name: "incc_tools_email")]
+    #[Route("/incp/tools/email", name: "incp_tools_email")]
     public function index(
 		Request $request,
 		DomainEmailAnalyser $domainEmailAnalyser,

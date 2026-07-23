@@ -40,7 +40,7 @@ class NavigationTabController extends AbstractInachisController
      * @param ViewStateManager $viewStateManager
      * @return Response
      */
-    #[Route('/incc/settings/navigation', name: 'incc_settings_navigation_list')]
+    #[Route('/incp/settings/navigation', name: 'incp_settings_navigation_list')]
     #[RequiresPermission(
         resource: PermissionResource::NAVIGATION,
         action: PermissionAction::VIEW
@@ -66,7 +66,7 @@ class NavigationTabController extends AbstractInachisController
                 $count = $navigationTabService->apply($action, $items);
                 $this->addFlash('success', "Action '$action' applied to $count tabs");
             }
-            return $this->redirectToRoute('incc_settings_navigation_list');
+            return $this->redirectToRoute('incp_settings_navigation_list');
         }
 
         $params = $viewStateManager->build(
@@ -100,7 +100,7 @@ class NavigationTabController extends AbstractInachisController
      * @param NavigationTabService $navigationTabService
      * @return Response
      */
-    #[Route('/incc/settings/navigation/edit/{id}', name: 'incc_settings_navigation_edit')]
+    #[Route('/incp/settings/navigation/edit/{id}', name: 'incp_settings_navigation_edit')]
     #[RequiresPermission(
         resource: PermissionResource::NAVIGATION,
         action: PermissionAction::VIEW
@@ -122,7 +122,7 @@ class NavigationTabController extends AbstractInachisController
 
         if ($form->isSubmitted() && $form->isValid() && $tab instanceof NavigationTab) {
             $navigationTabService->add($tab);
-            return $this->redirectToRoute('incc_settings_navigation_list');
+            return $this->redirectToRoute('incp_settings_navigation_list');
         }
 
         $this->viewModel->page->title = 'Navigation Tab';
@@ -140,7 +140,7 @@ class NavigationTabController extends AbstractInachisController
      * @param NavigationTabService $manager
      * @return Response
      */
-    #[Route('/incc/settings/navigation/{id}/up', name: 'incc_settings_navigation_up', methods: ['POST'])]
+    #[Route('/incp/settings/navigation/{id}/up', name: 'incp_settings_navigation_up', methods: ['POST'])]
     #[RequiresPermission(
         resource: PermissionResource::NAVIGATION,
         action: PermissionAction::EDIT
@@ -151,7 +151,7 @@ class NavigationTabController extends AbstractInachisController
     ): Response {
         $manager->moveUp($tab);
 
-        return $this->redirectToRoute('incc_settings_navigation_list');
+        return $this->redirectToRoute('incp_settings_navigation_list');
     }
 
     /**
@@ -161,7 +161,7 @@ class NavigationTabController extends AbstractInachisController
      * @param NavigationTabService $manager
      * @return Response
      */
-    #[Route('/incc/settings/navigation/{id}/down', name: 'incc_settings_navigation_down', methods: ['POST'])]
+    #[Route('/incp/settings/navigation/{id}/down', name: 'incp_settings_navigation_down', methods: ['POST'])]
     #[RequiresPermission(
         resource: PermissionResource::NAVIGATION,
         action: PermissionAction::EDIT
@@ -172,7 +172,7 @@ class NavigationTabController extends AbstractInachisController
     ): Response {
         $manager->moveDown($tab);
 
-        return $this->redirectToRoute('incc_settings_navigation_list');
+        return $this->redirectToRoute('incp_settings_navigation_list');
     }
 
     /**
@@ -182,7 +182,7 @@ class NavigationTabController extends AbstractInachisController
      * @param NavigationTabService $manager
      * @return JsonResponse
      */
-    #[Route('/incc/settings/navigation/reorder', name: 'incc_settings_navigation_reorder', methods: ['POST'])]
+    #[Route('/incp/settings/navigation/reorder', name: 'incp_settings_navigation_reorder', methods: ['POST'])]
     #[RequiresPermission(
         resource: PermissionResource::NAVIGATION,
         action: PermissionAction::EDIT

@@ -25,7 +25,7 @@ class AnalyticsController extends AbstractInachisController
      * @param AnalyticsProviderInterface $analytics
      * @return Response
      */
-    #[Route('/incc/tools/analytics', name: 'incc_tools_analytics')]
+    #[Route('/incp/tools/analytics', name: 'incp_tools_analytics')]
     public function index(
         AnalyticsProviderInterface $analytics,
         AnalyticsPeriodResolver $periodResolver,
@@ -40,7 +40,7 @@ class AnalyticsController extends AbstractInachisController
             $this->addFlash('warning', $e->getMessage());
 
             return $this->redirectToRoute(
-                'incc_tools_analytics',
+                'incp_tools_analytics',
                 [
                     'range' => '30d',
                 ]

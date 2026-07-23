@@ -30,5 +30,6 @@ final class SiteSettings
         public string $textDirection,
         public string $abstract,
         public bool $geotagContent,
+        public string $displayTimezone,
     ) {}
 }

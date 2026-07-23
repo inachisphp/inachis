@@ -2,11 +2,11 @@
 
 {% block pagetitle %}
     {% if username|default(null) %}
-    <a href="{{ path('incc_admin_list') }}">Users</a>
-    <a href="{{ path('incc_admin_login_activity', { 'id': activity.user.username }) }}">Edit User</a>
+    <a href="{{ path('incp_admin_list') }}">Users</a>
+    <a href="{{ path('incp_admin_login_activity', { 'id': activity.user.username }) }}">Edit User</a>
     <span>Audit Log Entry</span>
     {% else %}
-    <a href="{{ path('incc_admin_login_activity_index') }}">Audit Logs</a>
+    <a href="{{ path('incp_admin_login_activity_index') }}">Audit Logs</a>
     <span>Audit Log Entry</span>
     {% endif %}
 {% endblock pagetitle %}

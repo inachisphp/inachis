@@ -9,35 +9,35 @@
 {% set allAlerts = [
     {
         label: 'images without alt text',
-        link: path('incc_resource_list', { 'type': 'images' }) ~ '?altText=null',
+        link: path('incp_resource_list', { 'type': 'images' }) ~ '?altText=null',
         priority: 'HIGH',
         resource: 'IMAGE',
         count: dashboard.alerts.altText.count
     },
     {
         label: 'pages without categories',
-        link: '/incc/post/list?issue=categories',
+        link: '/incp/post/list?issue=categories',
         priority: 'HIGH',
         resource: 'PAGE',
         count: dashboard.alerts.categories.count
     },
     {
         label: 'pages without tags',
-        link: '/incc/post/list/?issue=tags',
+        link: '/incp/post/list/?issue=tags',
         priority: 'MED',
         resource: 'PAGE',
         count: dashboard.alerts.tags.count
     },
     {
         label: 'pages missing an image',
-        link: '/incc/post/list/?issue=image',
+        link: '/incp/post/list/?issue=image',
         priority: 'LOW',
         resource: 'PAGE',
         count: dashboard.alerts.featureImage.count
     },
     {
         label: 'pages without a snippet',
-        link: '/incc/post/list/?issue=snippet',
+        link: '/incp/post/list/?issue=snippet',
         priority: 'LOW',
         resource: 'PAGE',
         count: dashboard.alerts.sharingMessage.count

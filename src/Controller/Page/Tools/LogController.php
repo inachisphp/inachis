@@ -25,7 +25,7 @@ class LogController extends AbstractInachisController
      * @param Request $request The request
      * @return Response The response
      */
-    #[Route('/incc/tools/logs', name: 'incc_tools_logs')]
+    #[Route('/incp/tools/logs', name: 'incp_tools_logs')]
     public function showLogs(Request $request): Response
     {
         /** @var string */

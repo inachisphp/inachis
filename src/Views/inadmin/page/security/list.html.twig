@@ -12,7 +12,7 @@
     <p><span class="material-icons" aria-hidden="true">health_and_safety</span></p>
     <h2>System Health &amp; Diagnostics</h2>
     <p><span>Inspect server configuration, memory, security headers, and environmental health.</span></p>
-    <p><a href="{{ viewModel.settings.domain ~ path('incc_tools_diagnostics') }}" class="button button--secondary">View Status</a></p>
+    <p><a href="{{ viewModel.settings.domain ~ path('incp_tools_diagnostics') }}" class="button button--secondary">View Status</a></p>
 </section>
 {% endif %}
 
@@ -21,7 +21,7 @@
     <p><span class="material-icons" aria-hidden="true">mark_email_read</span></p>
     <h2>Email &amp; DNS Authentication</h2>
     <p><span>Verify SPF, DKIM, DMARC, and domain security compliance.</span></p>
-    <p><a href="{{ viewModel.settings.domain ~ path('incc_tools_email') }}" class="button button--secondary">Check Mail Security</a></p>
+    <p><a href="{{ viewModel.settings.domain ~ path('incp_tools_email') }}" class="button button--secondary">Check Mail Security</a></p>
 </section>
 {% endif %}
 
@@ -30,7 +30,7 @@
     <p><span class="material-icons" aria-hidden="true">verified_user</span></p>
     <h2>Privacy &amp; GDPR</h2>
     <p><span>Manage cookie consent banners, user data exports, and IP anonymization settings.</span></p>
-    <p><a href="{{ viewModel.settings.domain ~ path('incc_security_privacy')  }}" class="button button--secondary">Manage Privacy</a></p>
+    <p><a href="{{ viewModel.settings.domain ~ path('incp_security_privacy')  }}" class="button button--secondary">Manage Privacy</a></p>
 </section>
 {% endif %}
 
@@ -39,7 +39,7 @@
     <p><span class="material-icons" aria-hidden="true">policy</span></p>
     <h2>Content Security Policy</h2>
     <p><span>Configure CSP directives and monitor real-time violation reports.</span></p>
-    <p><a href="{{ viewModel.settings.domain ~ path('incc_tools_csp_dashboard') }}" class="button button--secondary">Manage CSP</a></p>
+    <p><a href="{{ viewModel.settings.domain ~ path('incp_tools_csp_dashboard') }}" class="button button--secondary">Manage CSP</a></p>
 </section>
 {% endif %}
 
@@ -48,7 +48,7 @@
     <p><span class="material-icons" aria-hidden="true">password</span></p>
     <h2>Password Policy</h2>
     <p><span>Define password complexity, expiration, and session security rules.</span></p>
-    <p><a href="{{ viewModel.settings.domain ~ path('incc_admin_security_policy') }}" class="button button--secondary">Manage Policy</a></p>
+    <p><a href="{{ viewModel.settings.domain ~ path('incp_admin_security_policy') }}" class="button button--secondary">Manage Policy</a></p>
 </section>
 {% endif %}
 

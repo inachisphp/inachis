@@ -25,7 +25,7 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class TwoFactorAuthenticationController extends AbstractInachisController
 {
-    private const LOGIN_ROUTE = 'incc_account_login';
+    private const LOGIN_ROUTE = 'incp_account_login';
 
     /**
      * Display the TOTP challenge form.
@@ -34,7 +34,7 @@ class TwoFactorAuthenticationController extends AbstractInachisController
      * @param TwoFactorLoginCompleter $completer
      * @return Response
      */
-    #[Route('/incc/login/totp', name: 'inadmin_totp_login', methods: ['GET'])]
+    #[Route('/incp/login/totp', name: 'incp_totp_login', methods: ['GET'])]
     public function totpForm(
         Request $request,
         TwoFactorLoginCompleter $completer,
@@ -57,7 +57,7 @@ class TwoFactorAuthenticationController extends AbstractInachisController
      * @param TwoFactorLoginCompleter $completer
      * @return Response
      */
-    #[Route('/incc/login/totp', name: 'inadmin_totp_login_verify', methods: ['POST'])]
+    #[Route('/incp/login/totp', name: 'incp_totp_login_verify', methods: ['POST'])]
     public function totpVerify(
         Request $request,
         TotpManager $totpManager,
@@ -66,7 +66,7 @@ class TwoFactorAuthenticationController extends AbstractInachisController
         if (!$completer->isValid($request)) {
             return $this->redirectToRoute(self::LOGIN_ROUTE);
         }
-        
+
         $form = $this->createForm(LoginTotpType::class)->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -79,7 +79,7 @@ class TwoFactorAuthenticationController extends AbstractInachisController
                 );
             }
             $this->addFlash('error', 'Invalid authentication code.');
-            return $this->redirectToRoute('inadmin_totp_login');
+            return $this->redirectToRoute('incp_totp_login');
         }
 
         return $this->render('inadmin/page/security/totp/login.html.twig', [
@@ -95,7 +95,7 @@ class TwoFactorAuthenticationController extends AbstractInachisController
      * @param TwoFactorLoginCompleter $completer
      * @return Response
      */
-    #[Route('/incc/login/recovery', name: 'inadmin_recovery_code_login', methods: ['GET'])]
+    #[Route('/incp/login/recovery', name: 'incp_recovery_code_login', methods: ['GET'])]
     public function recoveryForm(
         Request $request,
         TwoFactorLoginCompleter $completer,
@@ -120,7 +120,7 @@ class TwoFactorAuthenticationController extends AbstractInachisController
      * @param TwoFactorLoginCompleter $completer
      * @return Response
      */
-    #[Route('/incc/login/recovery', name: 'inadmin_recovery_code_verify', methods: ['POST'])]
+    #[Route('/incp/login/recovery', name: 'incp_recovery_code_verify', methods: ['POST'])]
     public function recoveryVerify(
         Request $request,
         RecoveryCodeManager $recoveryCodeManager,
@@ -136,13 +136,13 @@ class TwoFactorAuthenticationController extends AbstractInachisController
             $code = (string) $form->get('code')->getData();
             if ($recoveryCodeManager->verify($this->getCurrentUser(), $code)) {
                 return $completer->complete(
-                    $request, 
+                    $request,
                     LoginResultType::TYPE_SUCCESS_RECOVERY,
                     false
                 );
             }
             $this->addFlash('error', 'Invalid recovery code.');
-            return $this->redirectToRoute('inadmin_recovery_code_login');
+            return $this->redirectToRoute('incp_recovery_code_login');
         }
 
         return $this->render('inadmin/page/security/totp/recovery_login.html.twig', [
