@@ -15,6 +15,7 @@ use Inachis\Repository\Content\{PageRepository, SeriesRepository};
 use Inachis\Service\Content\TextCleaner;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use DateTimeImmutable;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Content aggregator service
@@ -89,9 +90,16 @@ class ContentAggregator
             'type' => Page::TYPE_POST,
         ];
 
+        // todo: move this to repository function
         if ($excludePages) {
+            $binaryIds = array_map(
+                fn($id) => $id instanceof \Ramsey\Uuid\UuidInterface
+                    ? $id->getBytes()
+                    : Uuid::fromString($id)->getBytes(),
+                $excludePages,
+            );
             $pageQuery .= ' AND q.id NOT IN (:excludedPages)';
-            $pageParameters['excludedPages'] = [ 'value' => $excludePages, ];
+            $pageParameters['excludedPages'] = [ 'value' => $binaryIds, ];
         }
 
         /** @var Paginator<Page> $pages */
