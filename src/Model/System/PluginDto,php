@@ -24,7 +24,15 @@ final class PluginDto
 
     public string $license = '';
 
-    public string $path;
+    /**
+     * Absolute path to the plugin directory.
+     */
+    public string $directory;
+
+    /**
+     * Absolute path to plugin.yaml.
+     */
+    public string $manifestPath;
 
     /**
      * @var list<string>
