@@ -11,11 +11,10 @@
 namespace Inachis\Service\Theme;
 
 use Inachis\Model\System\ThemeDto;
+use Inachis\Service\ManifestLoader;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Yaml;
 
 final readonly class ThemeScanner
 {
@@ -36,6 +35,7 @@ final readonly class ThemeScanner
         private string $projectDir,
         private CacheItemPoolInterface $cache,
         private LoggerInterface $logger,
+        private ManifestLoader $manifestLoader,
     ) {}
 
     /**
@@ -197,71 +197,20 @@ final readonly class ThemeScanner
         }
 
         $manifestFile = $themePath . '/theme.yaml';
+        $manifest = $this->manifestLoader->load($manifestFile);
 
-        if (!is_file($manifestFile)) {
+        if (null === $manifest) {
             return null;
         }
-
-        try {
-            $manifest = Yaml::parseFile($manifestFile, Yaml::PARSE_EXCEPTION_ON_ALIAS);
-        } catch (ParseException $exception) {
-            $this->logger->warning(sprintf(
-                'Failed to parse theme manifest "%s": %s',
-                $manifestFile,
-                $exception->getMessage()
-            ));
-
+        
+        if (!$this->isValidManifest($manifest, $themePath)) {
             return null;
         }
-
-        if (!is_array($manifest)) {
-            return null;
-        }
-
-        foreach (['slug', 'name'] as $requiredField) {
-            if (
-                !isset($manifest[$requiredField]) ||
-                !is_string($manifest[$requiredField]) ||
-                '' === trim($manifest[$requiredField])
-            ) {
-                $this->logger->warning(sprintf(
-                    'Theme "%s" is missing required field "%s".',
-                    basename($themePath),
-                    $requiredField
-                ));
-
-                return null;
-            }
-        }
-
-        $screenshot = null;
-
-        foreach (['screenshot.png', 'screenshot.jpg', 'screenshot.webp'] as $file) {
-            if (is_file($themePath . '/' . $file)) {
-                $screenshot = $themePath . '/' . $file;
-                break;
-            }
-        }
-
-        $theme = new ThemeDto();
-        $theme->slug = (string) $manifest['slug'];
-        $theme->name = (string) $manifest['name'];
-        $theme->version = is_string($manifest['version']) ? $manifest['version'] : '1.0.0';
-        $theme->author = is_string($manifest['author']) ? $manifest['author'] : '';
-        $theme->description = is_string($manifest['description']) ? $manifest['description'] : '';
-        $theme->path = $themePath;
-        $theme->screenshot = $screenshot;
-
-        $theme->requiredFeatures = $this->extractFeatures(
-            $manifest,
-            'requires'
+    
+        return $this->createThemeDto(
+            $themePath,
+            $manifest
         );
-        $theme->suggestedFeatures = $this->extractFeatures(
-            $manifest,
-            'suggests'
-        );
-
-        return $theme;
     }
 
     /**
@@ -304,5 +253,60 @@ final readonly class ThemeScanner
             // $this->projectDir . '/themes',
             $this->projectDir . '/templates/themes',
         ];
+    }
+    
+    private function isValidManifest(
+        array $manifest,
+        string $themePath
+    ): bool {
+        foreach (['slug', 'name'] as $requiredField) {
+            if (
+                !isset($manifest[$requiredField]) ||
+                !is_string($manifest[$requiredField]) ||
+                '' === trim($manifest[$requiredField])
+            ) {
+                $this->logger->warning(sprintf(
+                    'Theme "%s" is missing required field "%s".',
+                    basename($themePath),
+                    $requiredField
+                ));
+
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function createThemeDto(
+        string $themePath,
+        array $manifest
+    ): ThemeDto {
+        $screenshot = null;
+        foreach (['screenshot.png', 'screenshot.jpg', 'screenshot.webp'] as $file) {
+            if (is_file($themePath . '/' . $file)) {
+                $screenshot = $themePath . '/' . $file;
+                break;
+            }
+        }
+        
+        $theme = new ThemeDto();
+        $theme->slug = (string) $manifest['slug'];
+        $theme->name = (string) $manifest['name'];
+        $theme->version = is_string($manifest['version']) ? $manifest['version'] : '1.0.0';
+        $theme->author = is_string($manifest['author']) ? $manifest['author'] : '';
+        $theme->description = is_string($manifest['description']) ? $manifest['description'] : '';
+        $theme->path = $themePath;
+        $theme->screenshot = $screenshot;
+
+        $theme->requiredFeatures = $this->extractFeatures(
+            $manifest,
+            'requires'
+        );
+        $theme->suggestedFeatures = $this->extractFeatures(
+            $manifest,
+            'suggests'
+        );
+
+        return $theme;
     }
 }
