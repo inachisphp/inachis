@@ -52,6 +52,7 @@ class AdminProfileControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
             ])
             ->onlyMethods([
                 'addFlash',
@@ -126,6 +127,7 @@ class AdminProfileControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
             ])
             ->onlyMethods([
                 'addFlash',

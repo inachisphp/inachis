@@ -16,6 +16,11 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use Inachis\Factory\PageViewFactory;
+use Inachis\Model\System\PageMetadata;
+use Inachis\Model\System\PageView;
+use Inachis\Model\System\SiteSettings;
+
 abstract class InachisControllerTestCase extends TestCase
 {
     protected EntityManagerInterface $entityManager;
@@ -23,6 +28,7 @@ abstract class InachisControllerTestCase extends TestCase
     protected Security $security;
     protected TranslatorInterface $translator;
     protected WasteRepository $wasteRepository;
+    protected PageViewFactory $pageViewFactory;
 
     protected function setUp(): void
     {
@@ -33,5 +39,13 @@ abstract class InachisControllerTestCase extends TestCase
         $this->security = $this->createStub(Security::class);
         $this->translator = $this->createStub(TranslatorInterface::class);
         $this->wasteRepository = $this->createMock(WasteRepository::class);
+
+        $siteSettings = new SiteSettings('Wandering the World', 'http://localhost', [], 'en', 'ltr', '', false);
+        $pageMetadata = new PageMetadata();
+        $pageView = new PageView($siteSettings, $pageMetadata);
+
+        $this->pageViewFactory = $this->createMock(PageViewFactory::class);
+        $this->pageViewFactory->method('create')->willReturn($pageView);
+        $this->pageViewFactory->method('createAdmin')->willReturn($pageView);
     }
 }
