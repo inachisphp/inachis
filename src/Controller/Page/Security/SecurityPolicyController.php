@@ -10,6 +10,7 @@ namespace Inachis\Controller\Page\Security;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Security\SecurityPolicy;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\SecurityPolicyType;
@@ -24,7 +25,11 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class SecurityPolicyController extends AbstractInachisController
 {
-    #[Route('/incp/admin/security-policy', name: 'incp_admin_security_policy', priority: 100)]
+    #[Route(
+        '/incp/admin/security-policy',
+        name: 'incp_admin_security_policy',
+        priority: 100
+    )]
     #[RequiresPermission(
         resource: PermissionResource::PASSWORD_POLICY,
         action: PermissionAction::MANAGE
@@ -34,43 +39,97 @@ class SecurityPolicyController extends AbstractInachisController
         EntityManagerInterface $entityManager,
         SecurityPolicyRepository $securityPolicyRepository,
     ): Response {
-        // Fetch the three policies (assume always exactly 3)
-        $policies = $securityPolicyRepository->findBy([], ['createdAt' => 'ASC']);
+        $policies = $securityPolicyRepository->findAll();
+
         if (count($policies) !== 3) {
-            throw new \RuntimeException('Expected exactly 3 security policies, found ' . count($policies));
+            throw new \RuntimeException(
+                sprintf(
+                    'Expected exactly 3 security policies, found %d',
+                    count($policies)
+                )
+            );
         }
 
-        // First policy editable
-        $firstPolicy = $policies[0];
+        $selectedIdentifier = $request->query->getString(
+            'policy',
+            'custom'
+        );
 
-        $form = $this->createForm(SecurityPolicyType::class, $firstPolicy);
-        $form->handleRequest($request);
+        $selectedPolicy = null;
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-            $this->addFlash('success', 'Security policy updated!');
-            return $this->redirectToRoute('security_policy');
+        foreach ($policies as $policy) {
+            if ($policy->getIdentifier() === $selectedIdentifier) {
+                $selectedPolicy = $policy;
+                break;
+            }
         }
 
-        // Active policy selection
-        if ($request->isMethod('POST') && $request->request->has('active_policy')) {
+        if (!$selectedPolicy instanceof SecurityPolicy) {
+            throw $this->createNotFoundException();
+        }
+
+
+        $form = $this->createForm(
+                SecurityPolicyType::class,
+                $selectedPolicy
+            );
+
+        if (!$selectedPolicy->isReadOnly()) {
+
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $entityManager->flush();
+
+                $this->addFlash(
+                    'success',
+                    'Security policy updated.'
+                );
+
+                return $this->redirectToRoute(
+                    'incp_admin_security_policy',
+                    [
+                        'policy' => $selectedPolicy->getIdentifier(),
+                    ]
+                );
+            }
+        }
+
+        if (
+            $request->isMethod('POST') &&
+            $request->request->has('active_policy')
+        ) {
             $activeId = $request->request->getString('active_policy');
 
             foreach ($policies as $policy) {
-                $policy->setIsActive($policy->getId()?->toString() === $activeId);
+                $policy->setActive(
+                    $policy->getId()?->toString() === $activeId
+                );
             }
 
             $entityManager->flush();
-            $this->addFlash('success', 'Active policy updated!');
-            return $this->redirectToRoute('security_policy');
+
+            $this->addFlash(
+                'success',
+                'Active security policy updated.'
+            );
+
+            return $this->redirectToRoute(
+                'incp_admin_security_policy'
+            );
         }
 
-        $this->viewModel->page->title = 'Security Policy';
-        $this->viewModel->page->tab = 'policies';
-        return $this->render('inadmin/page/admin/security_policy.html.twig', [
-            'viewModel' => $this->viewModel,
-            'form' => $form->createView(),
-            'policies' => $policies,
-        ]);
+        $this->viewModel->page->title = 'Security Policies';
+        $this->viewModel->page->tab = $selectedPolicy->getIdentifier();
+
+        return $this->render(
+            'inadmin/page/admin/security_policy.html.twig',
+            [
+                'viewModel' => $this->viewModel,
+                'form' => $form?->createView(),
+                'policy' => $selectedPolicy,
+                'policies' => $policies,
+            ]
+        );
     }
 }

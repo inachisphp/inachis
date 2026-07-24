@@ -9,112 +9,225 @@ namespace Inachis\Entity\Security;
 
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Inachis\Enum\Security\AuthenticationPolicy;
+use Inachis\Enum\Security\PasswordStrengthLevel;
+use Inachis\Enum\Security\SensitiveAction;
+use Inachis\Repository\Security\SecurityPolicyRepository;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Entity for handling security policy.
+ * Defines the security policy enforced by the application.
+ *
+ * A security policy determines password requirements, authentication
+ * requirements and step-up authentication behaviour. It does not describe
+ * implementation details such as rate limiting, which should instead be
+ * configured using Symfony's Security and RateLimiter components.
+ *
+ * Only one security policy should normally be active at any given time.
  */
-#[ORM\Entity]
+#[Assert\Expression(
+    expression: 'this.maximumPasswordLength === null or this.minimumPasswordLength <= this.maximumPasswordLength',
+    message: 'Maximum password length cannot be smaller than minimum password length.'
+)]
+#[ORM\Entity(repositoryClass: SecurityPolicyRepository::class)]
 #[ORM\HasLifecycleCallbacks]
+#[ORM\Index(columns: ['active'])]
 class SecurityPolicy
 {
-    /** @var UuidInterface The unique identifier for the {@link SecurityPolicy} */
+    public const DEFAULT_IDENTIFIER = 'default';
+
+    public const STRICT_IDENTIFIER = 'strict';
+
+    public const CUSTOM_IDENTIFIER = 'custom';
+
+    /**
+     * Unique identifier.
+     */
     #[ORM\Id]
-    #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
+    #[ORM\Column(type: 'uuid_binary', unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    private UuidInterface $id;
+    private ?UuidInterface $id = null;
 
-    /** @var string The name of the security policy */
-    #[ORM\Column]
+    /**
+     * Human-readable name of the policy.
+     */
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 100)]
+    #[ORM\Column(length: 100)]
     private string $name = '';
 
-    /** @var int The minimum length for a password */
-    #[ORM\Column]
-    private int $minLength = 12;
+    /**
+     * Stable machine-readable identifier.
+     * Built-in policies use a fixed identifier so they can always be
+     * referenced regardless of their display name.
+     */
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 50)]
+    #[Assert\Regex(
+        pattern: '/^[a-z0-9][a-z0-9_-]*$/',
+        message: 'The identifier may only contain lowercase letters, numbers, underscores and hyphens.'
+    )]
+    #[ORM\Column(length: 50, unique: true)]
+    private string $identifier = '';
 
-    /** @var bool Flag indicating if the password must contain an uppercase letter */
-    #[ORM\Column]
-    private bool $requireUppercase = true;
+    /**
+     * Optional description explaining the purpose of this policy.
+     */
+    #[Assert\Length(max: 1000)]
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $description = null;
 
-    /** @var bool Flag indicating if the password must contain a lowercase letter */
+    /**
+     * Monotonically increasing version number.
+     *
+     * Increment whenever the effective behaviour of the policy changes.
+     * This can be used for auditing and determining which policy version
+     * was in effect when a user's credentials were created.
+     */
+    #[Assert\Positive]
     #[ORM\Column]
-    private bool $requireLowercase = true;
+    private int $version = 1;
 
-    /** @var bool Flag indicating if the password must contain a number */
+    /**
+     * Minimum permitted password length.
+     *
+     * Modern password guidance recommends encouraging long passphrases
+     * rather than enforcing arbitrary composition rules.
+     */
+    #[Assert\Positive]
     #[ORM\Column]
-    private bool $requireNumber = true;
+    private int $minimumPasswordLength = 14;
 
-    /** @var bool Flag indicating if the password must contain a special character */
-    #[ORM\Column]
-    private bool $requireSpecial = true;
-
-    /** @var string|null Custom regex pattern for password validation */
+    /**
+     * Maximum permitted password length.
+     *
+     * A value of null indicates that no application-imposed maximum exists.
+     */
+    #[Assert\Positive]
     #[ORM\Column(nullable: true)]
-    private ?string $passwordRegex = null;
+    private ?int $maximumPasswordLength = null;
 
-    /** @var int|null Password expiration in days, null if never expires */
+    /**
+     * Minimum password strength required.
+     *
+     * The password validation service determines how each strength level
+     * is evaluated.
+     */
+    #[ORM\Column(enumType: PasswordStrengthLevel::class)]
+    private PasswordStrengthLevel $passwordStrength =
+        PasswordStrengthLevel::STANDARD;
+
+    /**
+     * Whether passwords found in known public data breaches should be rejected.
+     */
+    #[ORM\Column]
+    private bool $rejectCompromisedPasswords = true;
+
+    /**
+     * Number of previously used passwords that cannot be reused.
+     *
+     * A value of zero disables password history enforcement.
+     */
+    #[Assert\PositiveOrZero]
+    #[ORM\Column]
+    private int $passwordReuseLimit = 5;
+
+    /**
+     * Minimum number of days a password must be retained before it may be
+     * changed again.
+     *
+     * A value of null disables this restriction.
+     */
+    #[Assert\Positive]
     #[ORM\Column(nullable: true)]
-    private ?int $passwordExpiryDays = null;
+    private ?int $minimumPasswordAgeDays = null;
 
-    /** @var int The number of previous passwords to remember */
+    /**
+     * Maximum password lifetime in days.
+     *
+     * A value of null indicates that passwords do not expire.
+     *
+     * Password expiry is generally discouraged by modern security guidance,
+     * but remains available where organisational policies require it.
+     */
+    #[Assert\Positive]
+    #[ORM\Column(nullable: true)]
+    private ?int $passwordLifetimeDays = null;
+
+    /**
+     * Authentication requirements for administrator accounts.
+     */
+    #[ORM\Column(enumType: AuthenticationPolicy::class)]
+    private AuthenticationPolicy $administratorPolicy =
+        AuthenticationPolicy::MFA_REQUIRED;
+
+    /**
+     * Authentication requirements for super administrator accounts.
+     */
+    #[ORM\Column(enumType: AuthenticationPolicy::class)]
+    private AuthenticationPolicy $superAdministratorPolicy =
+        AuthenticationPolicy::WEBAUTHN_REQUIRED;
+
+    /**
+     * Whether step-up authentication is required for sensitive actions.
+     *
+     * When enabled, actions listed in {@see $stepUpRequiredActions} require
+     * a recent authentication challenge before being performed.
+     */
     #[ORM\Column]
-    private int $passwordHistory = 5;
+    private bool $requireStepUpAuthentication = true;
 
-    /** @var int Number of failed login attempts before locking the account */
+    /**
+     * Sensitive actions that require step-up authentication.
+     * Values are stored as the string values of {@see SensitiveAction}.
+     * 
+     * @var list<string>
+     */
+    #[ORM\Column(type: 'json')]
+    private array $stepUpRequiredActions = [
+        SensitiveAction::ROLE_MANAGEMENT->value,
+        SensitiveAction::SECURITY_CONFIGURATION_CHANGE->value,
+        SensitiveAction::MFA_RESET->value,
+    ];
+
+    /**
+     * Indicates whether this policy is managed by the application.
+     *
+     * Read-only policies cannot be modified through the administration
+     * interface and are intended for built-in policies shipped with
+     * the application.
+     */
     #[ORM\Column]
-    private int $maxFailedLoginAttempts = 5;
+    private bool $readOnly = false;
 
-    /** @var int Lockout duration in minutes */
+    /**
+     * Indicates whether this is the currently active security policy.
+     *
+     * The application should ensure that only one policy is active at
+     * any given time.
+     */
     #[ORM\Column]
-    private int $lockoutDurationMinutes = 15;
+    private bool $active = false;
 
-    /** @var bool Flag indicating if administrators must use 2FA */
-    #[ORM\Column(name: 'admin_require_2fa')]
-    private bool $adminRequire2FA = false;
-
-    /** @var bool Flag indicating if super administrators must use 2FA */
-    #[ORM\Column(name: 'super_admin_require_2fa')]
-    private bool $superAdminRequire2FA = false;
-
-    /** @var bool Flag indicating if super administrators must use WebAuthn */
-    #[ORM\Column(name: 'super_admin_requires_webauthn')]
-    private bool $superAdminRequiresWebAuthn = false;
-
-    /** @var bool Flag indicating if step up is required for sensitive actions  */
-    #[ORM\Column]
-    private bool $stepUpForSensitiveActions = true;
-
-    /** @var DateTimeImmutable The date and time the security policy was created */
+    /**
+     * Date and time the policy was created.
+     */
     #[ORM\Column(type: 'datetime_immutable')]
     private DateTimeImmutable $createdAt;
 
-    /** @var DateTimeImmutable The date and time the security policy was updated */
+    /**
+     * Date and time the policy was last modified.
+     */
     #[ORM\Column(type: 'datetime_immutable')]
     private DateTimeImmutable $updatedAt;
 
-    /** @var bool Flag indicating if the security policy is read-only */
-    #[ORM\Column]
-    private bool $isReadOnly = false;
-
-    /** @var bool Flag indicating if the security policy is active */
-    #[ORM\Column]
-    private bool $isActive = false;
-
     /**
-     * Default constructor for SecurityPolicy
+     * Constructor.
      */
     public function __construct()
-    {
-        $this->onPrePersist();
-    }
-
-    /**
-     * Set created and updated time on create
-     */
-    #[ORM\PrePersist]
-    public function onPrePersist(): void
     {
         $now = new DateTimeImmutable();
 
@@ -122,29 +235,31 @@ class SecurityPolicy
         $this->updatedAt = $now;
     }
 
-    /**
-     * Set updated time on update
-     */
     #[ORM\PreUpdate]
-    public function onPreUpdate(): void
+    public function updateTimestamp(): void
     {
         $this->updatedAt = new DateTimeImmutable();
     }
 
-    /**
-     * Get the unique identifier for the {@link SecurityPolicy}
-     * 
-     * @return UuidInterface|null The unique identifier for the {@link SecurityPolicy}
+    #[ORM\PrePersist]
+    public function initialiseTimestamp(): void
+    {
+        $now = new DateTimeImmutable();
+
+        $this->createdAt = $now;
+        $this->updatedAt = $now;
+    }
+
+        /**
+     * Get the unique identifier.
      */
     public function getId(): ?UuidInterface
     {
-        return isset($this->id) ? $this->id : null;
+        return $this->id;
     }
 
     /**
-     * Returns the name of the policy
-     *
-     * @return string
+     * Get the policy name.
      */
     public function getName(): string
     {
@@ -152,368 +267,450 @@ class SecurityPolicy
     }
 
     /**
-     * Sets the name of the policy
-     *
-     * @param string $name
-     * @return self
+     * Set the policy name.
      */
     public function setName(string $name): self
     {
-        $this->name = $name;
+        $this->name = trim($name);
+
         return $this;
     }
 
-    // /**
-    //  * Get flag indicating if the password policy should be enforced
-    //  * @return bool
-    //  */
-    // public function getEnforcePasswordPolicy(): bool
-    // {
-    //     return $this->enforcePasswordPolicy;
-    // }
-
-    // /**
-    //  * Set flag indicating if the password policy should be enforced
-    //  * @param bool $enforcePasswordPolicy
-    //  * @return self
-    //  */
-    // public function setEnforcePasswordPolicy(bool $enforcePasswordPolicy): self
-    // {
-    //     $this->enforcePasswordPolicy = $enforcePasswordPolicy;
-    //     return $this;
-    // }
-
     /**
-     * Get the minimum length for a password
-     * 
-     * @return int
+     * Get the identifier
+     *
+     * @return string
      */
-    public function getMinLength(): int
+    public function getIdentifier(): string
     {
-        return $this->minLength;
+        return $this->identifier;
     }
 
     /**
-     * Set the minimum length for a password
-     * 
-     * @param int $minLength
+     * Sets the identifier
+     *
+     * @param string $identifier
      * @return self
      */
-    public function setMinLength(int $minLength): self
+    public function setIdentifier(string $identifier): self
     {
-        if ($minLength < 1) {
-            throw new \InvalidArgumentException('Password minimum length must be at least 1.');
+        $this->identifier = trim(strtolower($identifier));
+
+        return $this;
+    }
+
+    /**
+     * Get the policy description.
+     */
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    /**
+     * Set the policy description.
+     */
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description !== null
+            ? trim($description)
+            : null;
+
+        return $this;
+    }
+
+    /**
+     * Get the policy version.
+     */
+    public function getVersion(): int
+    {
+        return $this->version;
+    }
+
+    /**
+     * Increment the policy version.
+     */
+    public function incrementVersion(): self
+    {
+        $this->version++;
+
+        return $this;
+    }
+
+    /**
+     * Get the minimum permitted password length.
+     */
+    public function getMinimumPasswordLength(): int
+    {
+        return $this->minimumPasswordLength;
+    }
+
+    /**
+     * Set the minimum permitted password length.
+     */
+    public function setMinimumPasswordLength(int $length): self
+    {
+        if ($length < 1) {
+            throw new \InvalidArgumentException(
+                'Minimum password length must be positive.'
+            );
         }
-        $this->minLength = $minLength;
-        return $this;
-    }
 
-    /**
-     * Get flag indicating if the password must contain an uppercase letter
-     * 
-     * @return bool
-     */
-    public function getRequireUppercase(): bool
-    {
-        return $this->requireUppercase;
-    }
-
-    /**
-     * Set flag indicating if the password must contain an uppercase letter
-     * 
-     * @param bool $requireUppercase
-     * @return self
-     */
-    public function setRequireUppercase(bool $requireUppercase): self
-    {
-        $this->requireUppercase = $requireUppercase;
-        return $this;
-    }
-
-    /**
-     * Get flag indicating if the password must contain a lowercase letter
-     * 
-     * @return bool
-     */
-    public function getRequireLowercase(): bool
-    {
-        return $this->requireLowercase;
-    }
-
-    /**
-     * Set flag indicating if the password must contain a lowercase letter
-     * 
-     * @param bool $requireLowercase
-     * @return self
-     */
-    public function setRequireLowercase(bool $requireLowercase): self
-    {
-        $this->requireLowercase = $requireLowercase;
-        return $this;
-    }
-
-    /**
-     * Get flag indicating if the password must contain a number
-     * 
-     * @return bool
-     */
-    public function getRequireNumber(): bool
-    {
-        return $this->requireNumber;
-    }
-
-    /**
-     * Set flag indicating if the password must contain a number
-     * 
-     * @param bool $requireNumber
-     * @return self
-     */
-    public function setRequireNumber(bool $requireNumber): self
-    {
-        $this->requireNumber = $requireNumber;
-        return $this;
-    }
-
-    /**
-     * Get flag indicating if the password must contain a special character
-     * 
-     * @return bool
-     */
-    public function getRequireSpecial(): bool
-    {
-        return $this->requireSpecial;
-    }
-
-    /**
-     * Set flag indicating if the password must contain a special character
-     * 
-     * @param bool $requireSpecial
-     * @return self
-     */
-    public function setRequireSpecial(bool $requireSpecial): self
-    {
-        $this->requireSpecial = $requireSpecial;
-        return $this;
-    }
-
-    /**
-     * Get custom regex pattern for password validation
-     * 
-     * @return string|null
-     */
-    public function getPasswordRegex(): ?string
-    {
-        return $this->passwordRegex;
-    }
-
-    /**
-     * Set custom regex pattern for password validation
-     * 
-     * @param string|null $passwordRegex
-     * @return self
-     */
-    public function setPasswordRegex(?string $passwordRegex): self
-    {
-        if ($passwordRegex !== null) {
-            if (@preg_match($passwordRegex, '') === false) {
-                throw new \InvalidArgumentException('Invalid regex pattern provided.');
-            }
+        if (
+            $this->maximumPasswordLength !== null &&
+            $length > $this->maximumPasswordLength
+        ) {
+            throw new \InvalidArgumentException(
+                'Minimum password length cannot exceed maximum password length.'
+            );
         }
-        $this->passwordRegex = $passwordRegex;
+
+        $this->minimumPasswordLength = $length;
+
         return $this;
     }
 
     /**
-     * Get password expiration in days, null if never expires
-     * 
-     * @return int|null
+     * Get the maximum permitted password length.
      */
-    public function getPasswordExpiryDays(): ?int
+    public function getMaximumPasswordLength(): ?int
     {
-        return $this->passwordExpiryDays;
+        return $this->maximumPasswordLength;
     }
 
     /**
-     * Set password expiration in days, null if never expires
-     * 
-     * @param int|null $passwordExpiryDays
-     * @return self
+     * Set the maximum permitted password length.
      */
-    public function setPasswordExpiryDays(?int $passwordExpiryDays): self
+    public function setMaximumPasswordLength(?int $length): self
     {
-        if ($passwordExpiryDays !== null && $passwordExpiryDays < 1) {
-            throw new \InvalidArgumentException('Password expiry must be positive or null.');
+        if (
+            $length !== null &&
+            $length < $this->minimumPasswordLength
+        ) {
+            throw new \InvalidArgumentException(
+                'Maximum password length cannot be smaller than minimum password length.'
+            );
         }
-        $this->passwordExpiryDays = $passwordExpiryDays;
+
+        $this->maximumPasswordLength = $length;
+
         return $this;
     }
 
     /**
-     * Get the number of previous passwords to remember
-     * @return int
+     * Get the required password strength level.
      */
-    public function getPasswordHistory(): int
+    public function getPasswordStrength(): PasswordStrengthLevel
     {
-        return $this->passwordHistory;
+        return $this->passwordStrength;
     }
 
     /**
-     * Set the number of previous passwords to remember
-     * 
-     * @param int $passwordHistory
-     * @return self
+     * Set the required password strength level.
      */
-    public function setPasswordHistory(int $passwordHistory): self
+    public function setPasswordStrength(
+        PasswordStrengthLevel $strength
+    ): self {
+        $this->passwordStrength = $strength;
+
+        return $this;
+    }
+
+    /**
+     * Returns whether compromised passwords should be rejected.
+     */
+    public function getRejectCompromisedPasswords(): bool
     {
-        if ($passwordHistory < 0) {
-            throw new \InvalidArgumentException('Password history must be zero or positive.');
+        return $this->rejectCompromisedPasswords;
+    }
+
+    /**
+     * Set whether compromised passwords should be rejected.
+     */
+    public function setRejectCompromisedPasswords(
+        bool $reject
+    ): self {
+        $this->rejectCompromisedPasswords = $reject;
+
+        return $this;
+    }
+
+    /**
+     * Get the number of previous passwords that cannot be reused.
+     */
+    public function getPasswordReuseLimit(): int
+    {
+        return $this->passwordReuseLimit;
+    }
+
+    /**
+     * Set the password reuse limit.
+     */
+    public function setPasswordReuseLimit(int $limit): self
+    {
+        if ($limit < 0) {
+            throw new \InvalidArgumentException(
+                'Password reuse limit cannot be negative.'
+            );
         }
-        $this->passwordHistory = $passwordHistory;
+
+        $this->passwordReuseLimit = $limit;
+
         return $this;
     }
 
     /**
-     * Get number of failed login attempts before locking the account
-     * 
-     * @return int
+     * Get the minimum password age in days.
      */
-    public function getMaxFailedLoginAttempts(): int
+    public function getMinimumPasswordAgeDays(): ?int
     {
-        return $this->maxFailedLoginAttempts;
+        return $this->minimumPasswordAgeDays;
     }
 
     /**
-     * Set number of failed login attempts before locking the account
-     * 
-     * @param int $maxFailedLoginAttempts
-     * @return self
+     * Set the minimum password age in days.
      */
-    public function setMaxFailedLoginAttempts(int $maxFailedLoginAttempts): self
+    public function setMinimumPasswordAgeDays(?int $days): self
     {
-        if ($maxFailedLoginAttempts < 1) {
-            throw new \InvalidArgumentException('Max failed login attempts must be at least 1.');
+        if ($days !== null && $days < 1) {
+            throw new \InvalidArgumentException(
+                'Minimum password age must be positive.'
+            );
         }
-        $this->maxFailedLoginAttempts = $maxFailedLoginAttempts;
+
+        $this->minimumPasswordAgeDays = $days;
+
         return $this;
     }
 
     /**
-     * Get lockout duration in minutes
-     * 
-     * @return int
+     * Get the maximum password lifetime in days.
      */
-    public function getLockoutDurationMinutes(): int
+    public function getPasswordLifetimeDays(): ?int
     {
-        return $this->lockoutDurationMinutes;
+        return $this->passwordLifetimeDays;
     }
 
     /**
-     * Set lockout duration in minutes
-     * 
-     * @param int $lockoutDurationMinutes
-     * @return self
+     * Set the maximum password lifetime in days.
      */
-    public function setLockoutDurationMinutes(int $lockoutDurationMinutes): self
+    public function setPasswordLifetimeDays(?int $days): self
     {
-        if ($lockoutDurationMinutes < 1) {
-            throw new \InvalidArgumentException('Lockout duration must be at least 1 minute.');
+        if ($days !== null && $days < 1) {
+            throw new \InvalidArgumentException(
+                'Password lifetime must be positive.'
+            );
         }
-        $this->lockoutDurationMinutes = $lockoutDurationMinutes;
+
+        $this->passwordLifetimeDays = $days;
+
         return $this;
     }
 
     /**
-     * Get flag indicating if administrators must use 2FA
-     * 
-     * @return bool
+     * Returns whether password expiry is enabled.
      */
-    public function getAdminRequire2FA(): bool
+    public function hasPasswordExpiry(): bool
     {
-        return $this->adminRequire2FA;
+        return $this->passwordLifetimeDays !== null;
     }
 
     /**
-     * Set flag indicating if administrators must use 2FA
-     * 
-     * @param bool $adminRequire2FA
-     * @return self
+     * Returns whether password history is enabled.
      */
-    public function setAdminRequire2FA(bool $adminRequire2FA): self
+    public function hasPasswordHistory(): bool
     {
-        $this->adminRequire2FA = $adminRequire2FA;
+        return $this->passwordReuseLimit > 0;
+    }
+
+    /**
+     * Returns whether a maximum password length is configured.
+     */
+    public function hasMaximumPasswordLength(): bool
+    {
+        return $this->maximumPasswordLength !== null;
+    }
+
+    /**
+     * Get administrator authentication requirements.
+     */
+    public function getAdministratorPolicy(): AuthenticationPolicy
+    {
+        return $this->administratorPolicy;
+    }
+
+    /**
+     * Set administrator authentication requirements.
+     */
+    public function setAdministratorPolicy(
+        AuthenticationPolicy $policy
+    ): self {
+        $this->administratorPolicy = $policy;
+
         return $this;
     }
 
     /**
-     * Get flag indicating if super administrators must use 2FA
-     * 
-     * @return bool
+     * Get super administrator authentication requirements.
      */
-    public function getSuperAdminRequire2FA(): bool
+    public function getSuperAdministratorPolicy(): AuthenticationPolicy
     {
-        return $this->superAdminRequire2FA;
+        return $this->superAdministratorPolicy;
     }
 
     /**
-     * Set flag indicating if super administrators must use 2FA
-     * 
-     * @param bool $superAdminRequire2FA
-     * @return self
+     * Set super administrator authentication requirements.
      */
-    public function setSuperAdminRequire2FA(bool $superAdminRequire2FA): self
-    {
-        $this->superAdminRequire2FA = $superAdminRequire2FA;
+    public function setSuperAdministratorPolicy(
+        AuthenticationPolicy $policy
+    ): self {
+        $this->superAdministratorPolicy = $policy;
+
         return $this;
     }
 
     /**
-     * Get flag indicating if super administrators must use WebAuthn
-     * 
-     * @return bool
+     * Returns whether step-up authentication is required.
      */
-    public function getSuperAdminRequiresWebAuthn(): bool
+    public function getRequireStepUpAuthentication(): bool
     {
-        return $this->superAdminRequiresWebAuthn;
+        return $this->requireStepUpAuthentication;
     }
 
     /**
-     * Set flag indicating if super administrators must use WebAuthn
-     * 
-     * @param bool $superAdminRequiresWebAuthn
-     * @return self
+     * Set whether step-up authentication is required.
      */
-    public function setSuperAdminRequiresWebAuthn(bool $superAdminRequiresWebAuthn): self
-    {
-        $this->superAdminRequiresWebAuthn = $superAdminRequiresWebAuthn;
+    public function setRequireStepUpAuthentication(
+        bool $required
+    ): self {
+        $this->requireStepUpAuthentication = $required;
+
         return $this;
     }
 
     /**
-     * Get flag indicating if step up is required for sensitive actions
-     * 
-     * @return bool
+     * Get actions requiring step-up authentication.
+     *
+     * @return list<SensitiveAction>
      */
-    public function getStepUpForSensitiveActions(): bool
+    public function getStepUpRequiredActions(): array
     {
-        return $this->stepUpForSensitiveActions;
+        return array_map(
+            static fn (string $action): SensitiveAction => SensitiveAction::from($action),
+            $this->stepUpRequiredActions
+        );
     }
 
     /**
-     * Set flag indicating if step up is required for sensitive actions
-     * 
-     * @param bool $stepUpForSensitiveActions
-     * @return self
+     * Set actions requiring step-up authentication.
+     *
+     * @param list<SensitiveAction> $actions
      */
-    public function setStepUpForSensitiveActions(bool $stepUpForSensitiveActions): self
-    {
-        $this->stepUpForSensitiveActions = $stepUpForSensitiveActions;
+    public function setStepUpRequiredActions(
+        array $actions
+    ): self {
+        $this->stepUpRequiredActions = array_map(
+            static fn (SensitiveAction $action): string => $action->value,
+            $actions
+        );
+
         return $this;
     }
 
     /**
-     * Get creation timestamp
-     * 
-     * @return DateTimeImmutable
+     * Add an action requiring step-up authentication.
+     */
+    public function addStepUpRequiredAction(
+        SensitiveAction $action
+    ): self {
+        if (!in_array($action->value, $this->stepUpRequiredActions, true)) {
+            $this->stepUpRequiredActions[] = $action->value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove an action requiring step-up authentication.
+     */
+    public function removeStepUpRequiredAction(
+        SensitiveAction $action
+    ): self {
+        $this->stepUpRequiredActions = array_values(
+            array_filter(
+                $this->stepUpRequiredActions,
+                static fn (string $value): bool => $value !== $action->value
+            )
+        );
+
+        return $this;
+    }
+
+    /**
+     * Remove all step-up authentication requirements.
+     */
+    public function clearStepUpRequiredActions(): self
+    {
+        $this->stepUpRequiredActions = [];
+
+        return $this;
+    }
+
+    /**
+     * Determines whether an action requires step-up authentication.
+     */
+    public function requiresStepUpFor(
+        SensitiveAction $action
+    ): bool {
+        if (!$this->requireStepUpAuthentication) {
+            return false;
+        }
+
+        return in_array(
+            $action->value,
+            $this->stepUpRequiredActions,
+            true
+        );
+    }
+
+    /**
+     * Returns whether this policy is read-only.
+     */
+    public function isReadOnly(): bool
+    {
+        return $this->readOnly;
+    }
+
+    /**
+     * Set whether this policy is read-only.
+     */
+    public function setReadOnly(bool $readOnly): self
+    {
+        $this->readOnly = $readOnly;
+
+        return $this;
+    }
+
+    /**
+     * Returns whether this policy is active.
+     */
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    /**
+     * Set whether this policy is active.
+     */
+    public function setActive(bool $active): self
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * Get creation timestamp.
      */
     public function getCreatedAt(): DateTimeImmutable
     {
@@ -521,56 +718,10 @@ class SecurityPolicy
     }
 
     /**
-     * Get last update timestamp
-     * 
-     * @return DateTimeImmutable
+     * Get last update timestamp.
      */
     public function getUpdatedAt(): DateTimeImmutable
     {
         return $this->updatedAt;
-    }
-
-    /**
-     * Get flag indicating if the security policy is read-only
-     * 
-     * @return bool
-     */
-    public function getIsReadOnly(): bool
-    {
-        return $this->isReadOnly;
-    }
-
-    /**
-     * Set flag indicating if the security policy is read-only
-     * 
-     * @param bool $isReadOnly
-     * @return self
-     */
-    public function setIsReadOnly(bool $isReadOnly): self
-    {
-        $this->isReadOnly = $isReadOnly;
-        return $this;
-    }
-
-    /**
-     * Get flag indicating if the security policy is active
-     * 
-     * @return bool
-     */
-    public function getIsActive(): bool
-    {
-        return $this->isActive;
-    }
-
-    /**
-     * Set flag indicating if the security policy is active
-     * 
-     * @param bool $isActive
-     * @return self
-     */
-    public function setIsActive(bool $isActive): self
-    {
-        $this->isActive = $isActive;
-        return $this;
     }
 }
