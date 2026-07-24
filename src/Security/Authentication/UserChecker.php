@@ -9,14 +9,19 @@
 
 namespace Inachis\Security\Authentication;
 
+use Inachis\Entity\User\User;
+use Inachis\Security\Policy\SecurityPolicyManager;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;
-use Inachis\Entity\User\User;
 
 class UserChecker implements UserCheckerInterface
 {
+    public function __construct(
+        // private readonly SecurityPolicyManager $securityPolicyManager,
+    ) {}
+
     public function checkPreAuth(UserInterface $user): void
     {
         if (!$user instanceof User) {
@@ -33,10 +38,23 @@ class UserChecker implements UserCheckerInterface
     }
 
     /**
+     * Performs post-authentication checks.
+     *
      * @param UserInterface $user
-     * @return void
+     * @param TokenInterface|null $token
      */
-    public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void
-    {
+    public function checkPostAuth(
+        UserInterface $user,
+        ?TokenInterface $token = null
+    ): void {
+        if (!$user instanceof User) {
+            return;
+        }
+
+        // if ($this->securityPolicyManager->isPasswordExpired($user)) {
+        //     throw new CustomUserMessageAccountStatusException(
+        //         'Your password has expired. Please reset it before signing in.'
+        //     );
+        // }
     }
 }
