@@ -14,7 +14,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Inachis\Entity\Security\RolePermission;
 use Inachis\Entity\User\User;
-use Inachis\Enum\Security\MfaRequirement;
+use Inachis\Enum\Security\AuthenticationPolicy;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\String\Slugger\AsciiSlugger;
@@ -40,9 +40,9 @@ class Role
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $description = null;
 
-    /** @var MfaRequirement MFA requirement for administrators. */
-    #[ORM\Column(enumType: MfaRequirement::class)]
-    private MfaRequirement $mfaRequirement = MfaRequirement::ANY;
+    /** @var AuthenticationPolicy MFA requirement for administrators. */
+    #[ORM\Column(enumType: AuthenticationPolicy::class)]
+    private AuthenticationPolicy $authenticationPolicy = AuthenticationPolicy::PASSWORD_REQUIRED;
 
     // Flag to disable review stage for this role
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
@@ -113,23 +113,23 @@ class Role
     /**
      * Returns the MFA requirement for this role
      *
-     * @return MfaRequirement
+     * @return AuthenticationPolicy
      */
-    public function getMfaRequirement(): MfaRequirement
+    public function getAuthenticationPolicy(): AuthenticationPolicy
     {
-        return $this->mfaRequirement;
+        return $this->authenticationPolicy;
     }
 
     /**
      * Sets the MFA requirement for this role
      *
-     * @param MfaRequirement $requirement
+     * @param AuthenticationPolicy $requirement
      * @return self
      */
-    public function setMfaRequirement(
-        MfaRequirement $requirement
+    public function setAuthenticationPolicy(
+        AuthenticationPolicy $requirement
     ): self {
-        $this->mfaRequirement = $requirement;
+        $this->authenticationPolicy = $requirement;
 
         return $this;
     }

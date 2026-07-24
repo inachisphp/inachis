@@ -93,31 +93,29 @@ class UserTest extends TestCase
         $this->assertTrue($this->user->hasBeenRemoved());
     }
 
-    public function testSetAndGetCreatedAt(): void
+    public function testSGetCreatedAt(): void
     {
         $currentDateTime = new DateTimeImmutable('now');
-        $this->user->setCreatedAt($currentDateTime);
         $this->assertEquals($currentDateTime, $this->user->getCreatedAt());
     }
 
     public function testSetAndGetUpdatedAt(): void
     {
         $currentDateTime = new DateTimeImmutable('now');
-        $this->user->setUpdatedAt($currentDateTime);
         $this->assertEquals($currentDateTime, $this->user->getUpdatedAt());
     }
 
-    public function testSetAndGetPasswordModDate(): void
+    public function testSetAndGetPasswordChangedAt(): void
     {
         $currentDateTime = new DateTimeImmutable('now');
-        $this->user->setPasswordModDate($currentDateTime);
-        $this->assertEquals($currentDateTime, $this->user->getPasswordModDate());
+        $this->user->setPasswordChangedAt($currentDateTime);
+        $this->assertEquals($currentDateTime, $this->user->getPasswordChangedAt());
     }
 
     public function testHasCredentialsExpired(): void
     {
         $this->assertFalse($this->user->hasCredentialsExpired());
-        $this->user->setPasswordModDate(new DateTimeImmutable('-20 days'));
+        $this->user->setPasswordChangedAt(new DateTimeImmutable('-20 days'));
         $this->assertTrue($this->user->hasCredentialsExpired(10));
     }
 

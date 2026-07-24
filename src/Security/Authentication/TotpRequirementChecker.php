@@ -10,7 +10,7 @@
 namespace Inachis\Security\Authentication;
 
 use Inachis\Entity\User\User;
-use Inachis\Enum\Security\MfaRequirement;
+use Inachis\Enum\Security\AuthenticationPolicy;
 
 /**
  * Checks TOTP requirements for {@link Role} and {@link User}
@@ -26,7 +26,8 @@ class TotpRequirementChecker
     public function requiresTotp(User $user): bool
     {
         foreach ($user->getAssignedRoles() as $role) {
-            if ($role->getMfaRequirement() == MfaRequirement::TOTP) {
+            if ($role->getAuthenticationPolicy() == AuthenticationPolicy::TOTP_REQUIRED ||
+                $role->getAuthenticationPolicy() == AuthenticationPolicy::MFA_REQUIRED) {
                 return true;
             }
         }

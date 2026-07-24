@@ -1,73 +1,285 @@
-{% form_theme form with _self %}
 {% extends "/inadmin/structure/main.html.twig" %}
 
-{% block form_row %}
-<p>
-    {{ form_label(form) }}
-    {{ form_widget(form) }}
-    {{ form_errors(form) }}
-</p>
-{% endblock %}
-
 {% block pagetitle %}
-    <span>Policies</span>
+    <span>Security Policies</span>
 {% endblock pagetitle %}
 
 {% block content %}
-<div class="content__edit col-12">
-    {% include 'inadmin/partials/tab-sets/users.html.twig' %}
-    <section class="ui-section nested-grid">
-    
-    {{ form_start(form, { 'attr' : { 'class': 'col-6 form form__post' } }) }}
-    <fieldset class="ui-tabs-panel">
-        <h2>Edit Custom Security Policy</h2>
-        {{ form_widget(form) }} 
-    </fieldset>
-    <div class="fixed-bottom-bar">
-    <p>
-        <button class="button button--positive">
-            <span class="material-icons" aria-hidden="true">save</span>
-            <span>Save</span>
-        </button>
-    </p>
-    </div>
-    {{ form_end(form) }}
+<div class="content__edit col-12"> 
+{% set tabs = [] %}
+{% for item in policies %}
+    {% set tabs = tabs|merge([{
+        id: item.getIdentifier,
+        title: item.name,
+        url: path('incp_admin_security_policy', { policy: item.identifier }),
+    }]) %}
+{% endfor %}
+{% include 'inadmin/partials/tabs.html.twig' with {
+    label: 'Security policies',
+    tabs: tabs,
+ } %}
 
-    <form class="col-6">
-    <table class="table">
-        <caption>Active Security Policy</caption>
-        <thead>
-            <tr>
-                <th>Active</th>
-                <th>Name</th>
-                <th>Requires 2FA</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for policy in policies %}
-                <tr>
-                    <td>
-                        <input type="radio" name="active_policy" value="{{ policy.id }}"
-                            {% if policy.isActive %}checked{% endif %}>
-                    </td>
-                    <td>{{ policy.name }}</td>
-                    <td>{{ policy.adminRequire2FA ? 'Yes' : 'No' }}</td>
-                </tr>
-            {% endfor %}
-            <tr>
-                <td>
-                    <input type="radio" name="active_policy" value="" {% if policies|filter(p => p.isActive)|length == 0 %}checked{% endif %}>
-                </td>
-                <td colspan="2"><em>None</em></td>
-            </tr>
-        </tbody>
-    </table>
-    <p>
-        <button class="button button--secondary">
-            <span>Set Active Policy</span>
-        </button>
-    </p>
-    </form>
+<section class="ui-section">
+{{ form_start(form, { attr: { class: 'col-8 form' } }) }}
+
+    <div class="nested-grid">
+
+        <section class="col-8">
+
+            {% if form %}
+
+                {{ form_start(form, {
+                    attr: {
+                        class: 'form'
+                    }
+                }) }}
+
+                <fieldset class="ui-tabs-panel">
+
+                    <h2>
+                        Edit {{ policy.name }} Policy
+                    </h2>
+
+                    <h3>General</h3>
+
+                    {{ form_row(form.name) }}
+                    {{ form_row(form.description) }}
+
+                    <h3>Password Requirements</h3>
+
+                    {{ form_row(form.minimumPasswordLength) }}
+                    {{ form_row(form.maximumPasswordLength) }}
+                    {{ form_row(form.passwordStrength) }}
+
+                    <h3>Password Management</h3>
+
+                    {{ form_row(form.rejectCompromisedPasswords) }}
+                    {{ form_row(form.passwordReuseLimit) }}
+                    {{ form_row(form.minimumPasswordAgeDays) }}
+                    {{ form_row(form.passwordLifetimeDays) }}
+
+                    <h3>Authentication</h3>
+
+                    {{ form_row(form.administratorPolicy) }}
+                    {{ form_row(form.superAdministratorPolicy) }}
+
+                    <h3>Step-up Authentication</h3>
+
+                    {{ form_row(form.requireStepUpAuthentication) }}
+                    {{ form_row(form.stepUpRequiredActions) }}
+
+                </fieldset>
+
+                <div class="fixed-bottom-bar">
+                    <p>
+                        <button class="button button--positive">
+                            <span class="material-icons" aria-hidden="true">
+                                save
+                            </span>
+                            <span>
+                                Save Policy
+                            </span>
+                        </button>
+                    </p>
+                </div>
+
+                {{ form_end(form) }}
+
+            {% else %}
+
+                <section class="ui-tabs-panel">
+
+                    <h2>
+                        {{ policy.name }}
+
+                        {% if policy.readOnly %}
+                            <small>
+                                Built-in policy
+                            </small>
+                        {% endif %}
+                    </h2>
+
+                    {% if policy.description %}
+                        <p>
+                            {{ policy.description }}
+                        </p>
+                    {% endif %}
+
+
+                    <h3>Password Requirements</h3>
+
+                    <dl>
+                        <dt>
+                            Minimum password length
+                        </dt>
+                        <dd>
+                            {{ policy.minimumPasswordLength }}
+                        </dd>
+
+                        <dt>
+                            Maximum password length
+                        </dt>
+                        <dd>
+                            {% if policy.maximumPasswordLength %}
+                                {{ policy.maximumPasswordLength }}
+                            {% else %}
+                                No limit
+                            {% endif %}
+                        </dd>
+
+                        <dt>
+                            Password strength
+                        </dt>
+                        <dd>
+                            {{ policy.passwordStrength.label }}
+                        </dd>
+
+                        <dt>
+                            Reject compromised passwords
+                        </dt>
+                        <dd>
+                            {{ policy.rejectCompromisedPasswords
+                                ? 'Yes'
+                                : 'No'
+                            }}
+                        </dd>
+                    </dl>
+
+
+                    <h3>Password Management</h3>
+
+                    <dl>
+                        <dt>
+                            Password reuse limit
+                        </dt>
+                        <dd>
+                            {{ policy.passwordReuseLimit }}
+                        </dd>
+
+                        <dt>
+                            Minimum password age
+                        </dt>
+                        <dd>
+                            {% if policy.minimumPasswordAgeDays %}
+                                {{ policy.minimumPasswordAgeDays }} days
+                            {% else %}
+                                Not enforced
+                            {% endif %}
+                        </dd>
+
+                        <dt>
+                            Password lifetime
+                        </dt>
+                        <dd>
+                            {% if policy.passwordLifetimeDays %}
+                                {{ policy.passwordLifetimeDays }} days
+                            {% else %}
+                                No expiry
+                            {% endif %}
+                        </dd>
+                    </dl>
+
+
+                    <h3>Authentication</h3>
+
+                    <dl>
+                        <dt>
+                            Administrators
+                        </dt>
+                        <dd>
+                            {{ policy.administratorPolicy.label }}
+                        </dd>
+
+                        <dt>
+                            Super administrators
+                        </dt>
+                        <dd>
+                            {{ policy.superAdministratorPolicy.label }}
+                        </dd>
+                    </dl>
+
+
+                    <h3>Step-up Authentication</h3>
+
+                    <dl>
+                        <dt>
+                            Enabled
+                        </dt>
+                        <dd>
+                            {{ policy.requireStepUpAuthentication
+                                ? 'Yes'
+                                : 'No'
+                            }}
+                        </dd>
+
+                        {% if policy.stepUpRequiredActions %}
+                            <dt>
+                                Required actions
+                            </dt>
+                            <dd>
+                                <ul>
+                                    {% for action in policy.stepUpRequiredActions %}
+                                        <li>
+                                            {{ action }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </dd>
+                        {% endif %}
+                    </dl>
+
+                </section>
+
+            {% endif %}
+
+        </section>
+
+
+        <aside class="col-4">
+            <h2>Active Policy</h2>
+
+            <form method="post">
+
+                    <fieldset>
+
+                        {% for item in policies %}
+
+                            <p>
+                                <label>
+                                    <input
+                                        class="checkbox"
+                                        type="radio"
+                                        name="active_policy"
+                                        value="{{ item.id }}"
+                                        {% if item.active %}
+                                            checked
+                                        {% endif %}
+                                    >
+
+                                    {{ item.name }}
+
+                                    {% if item.readOnly %}
+                                        <small>
+                                            (Built-in)
+                                        </small>
+                                    {% endif %}
+                                </label>
+                            </p>
+
+                        {% endfor %}
+
+                    </fieldset>
+
+                    <button class="button button--secondary">
+                        Set Active Policy
+                    </button>
+
+                </form>
+
+        </aside>
+
+    </div>
+
 </section>
 </div>
-{% endblock content %}
+{% endblock %}
