@@ -134,3 +134,10 @@ services:
     # Inachis\Service\ImageResizer\ImageResizerInterface:
     #     factory: ['Inachis\Service\ImageResizer\ImageResizerFactory', 'create']
     #     public: true
+
+when@dev:
+    services:
+        Inachis\Build\:
+            resource: '../build/src/'
+            autowire: true
+            autoconfigure: true

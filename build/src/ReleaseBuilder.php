@@ -12,10 +12,12 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RuntimeException;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class ReleaseBuilder
 {
     public function __construct(
+        #[Autowire('%kernel.project_dir%')]
         private string $projectRoot,
     ) {}
 
@@ -52,13 +54,7 @@ final readonly class ReleaseBuilder
     private function prepareWorkspace(string $workspace): void
     {
         $this->removeDirectory($workspace);
-
-        if (!mkdir($workspace, 0775, true) && !is_dir($workspace)) {
-            throw new RuntimeException(sprintf(
-                'Unable to create workspace "%s".',
-                $workspace
-            ));
-        }
+        $this->createDirectory($workspace);
     }
 
     private function copyEntry(
@@ -100,12 +96,7 @@ final readonly class ReleaseBuilder
         string $source,
         string $destination,
     ): void {
-        if (!mkdir($destination, 0775, true) && !is_dir($destination)) {
-            throw new RuntimeException(sprintf(
-                'Unable to create directory "%s".',
-                $destination
-            ));
-        }
+        $this->createDirectory($destination);
 
         $iterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator(
@@ -121,12 +112,7 @@ final readonly class ReleaseBuilder
                 . $iterator->getSubPathName();
 
             if ($item->isDir()) {
-                if (!mkdir($target, 0775, true) && !is_dir($target)) {
-                    throw new RuntimeException(sprintf(
-                        'Unable to create directory "%s".',
-                        $target
-                    ));
-                }
+                $this->createDirectory($target);
 
                 continue;
             }
@@ -140,11 +126,11 @@ final readonly class ReleaseBuilder
         }
     }
 
-    private function copyFile(
-        string $source,
-        string $destination,
-    ): void {
-        $directory = dirname($destination);
+    private function createDirectory(string $directory): void
+    {
+        if (is_dir($directory)) {
+            return;
+        }
 
         if (!mkdir($directory, 0775, true) && !is_dir($directory)) {
             throw new RuntimeException(sprintf(
@@ -152,6 +138,14 @@ final readonly class ReleaseBuilder
                 $directory
             ));
         }
+    }
+
+    private function copyFile(
+        string $source,
+        string $destination,
+    ): void {
+        $directory = dirname($destination);
+        $this->createDirectory($directory);
 
         if (!copy($source, $destination)) {
             throw new RuntimeException(sprintf(

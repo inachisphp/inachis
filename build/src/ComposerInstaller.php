@@ -17,7 +17,7 @@ final class ComposerInstaller implements BuildStepInterface
     {
         return 100;
     }
-    
+
     public function execute(
         ReleaseWorkspace $workspace,
         SymfonyStyle $io,
@@ -26,16 +26,30 @@ final class ComposerInstaller implements BuildStepInterface
             'Installing production Composer dependencies...'
         );
 
-        $process = new Process([
+        $arguments = [
             'composer',
             'install',
             '--prefer-dist',
             '--no-interaction',
-            $workspace->definition->composerNoDev ? '--no-dev' : '',
-            $workspace->definition->composerOptimizeAutoloader ? 
-                '--optimize-autoloader' :
-                '',
-        ]);
+            // '--no-scripts',
+        ];
+
+        if ($workspace->definition->composerNoDev) {
+            $arguments[] = '--no-dev';
+        }
+
+        if ($workspace->definition->composerOptimizeAutoloader) {
+            $arguments[] = '--optimize-autoloader';
+        }
+
+        $process = new Process(
+            $arguments,
+            $workspace->path,
+            [
+                'APP_ENV' => 'prod',
+                'APP_DEBUG' => '0',
+            ]
+        );
 
         $process->setWorkingDirectory($workspace->path);
         $process->setTimeout(null);
