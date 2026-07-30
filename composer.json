@@ -96,6 +96,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Inachis\\Build\\": "build/src/",
             "Inachis\\Tests\\": "tests/"
         }
     },

@@ -1,0 +1,69 @@
+{
+    "name": "inachis",
+    "composer": {
+        "install": true,
+        "noDev": true,
+        "optimizeAutoloader": true
+    },
+    "persistent": [
+        "public/uploads",
+        "var"
+    ],
+    "contents": [
+        {
+            "type": "directory",
+            "path": "bin"
+        },
+        {
+            "type": "directory",
+            "path": "config"
+        },
+        {
+            "type": "directory",
+            "path": "migrations"
+        },
+        {
+            "type": "directory",
+            "path": "public"
+        },
+        {
+            "type": "directory",
+            "path": "src"
+        },
+        {
+            "type": "directory",
+            "path": "templates"
+        },
+        {
+            "type": "directory",
+            "path": "translations",
+            "optional": true
+        },
+        {
+            "type": "file",
+            "path": ".env",
+            "optional": true
+        },
+        {
+            "type": "file",
+            "path": "composer.json"
+        },
+        {
+            "type": "file",
+            "path": "composer.lock"
+        },
+        {
+            "type": "file",
+            "path": "CHANGELOG.md",
+            "optional": true
+        },
+        {
+            "type": "file",
+            "path": "LICENSE.md"
+        },
+        {
+            "type": "file",
+            "path": "README.md"
+        }
+    ]
+}
