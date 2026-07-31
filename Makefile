@@ -1,4 +1,4 @@
-.PHONY: help build-release check-update apply-update phpstan phpunit qa clean
+.PHONY: help release release-patch release-minor release-major build-release check-update apply-update apply-update-force phpstan phpunit qa clean
 
 # Color output helpers
 CYAN := \033[36m
@@ -6,10 +6,47 @@ GREEN := \033[32m
 YELLOW := \033[33m
 RESET := \033[0m
 
+TYPE ?= patch
+
 help: ## Display available commands
 	@echo "$(CYAN)Inachis Framework Management & Build Commands$(RESET)"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-18s$(RESET) %s\n", $$1, $$2}'
+
+release: ## Bump version, update CHANGELOG.md, commit, and tag (TYPE=patch|minor|major)
+	@echo "$(CYAN)Checking git status...$(RESET)"
+	@if [ -n "$$(git status --porcelain)" ]; then \
+		echo "$(YELLOW)Error: Working directory is dirty. Commit or stash changes first.$(RESET)"; \
+		exit 1; \
+	fi
+	@echo "$(CYAN)Fetching latest changes...$(RESET)"
+	git pull origin main
+	$(eval NEW_VERSION := $(shell php bin/console app:release:bump $(TYPE) | grep 'VERSION=' | cut -d'=' -f2))
+	@if [ -z "$(NEW_VERSION)" ]; then \
+		echo "$(YELLOW)Error: Failed to generate new version number.$(RESET)"; \
+		exit 1; \
+	fi
+	@echo "$(CYAN)Staging release files...$(RESET)"
+	git add composer.json CHANGELOG.md
+	@echo "$(CYAN)Committing release...$(RESET)"
+	git commit -m "chore(release): prepare v$(NEW_VERSION)"
+	@echo "$(CYAN)Tagging v$(NEW_VERSION)...$(RESET)"
+	git tag -a "v$(NEW_VERSION)" -m "Release v$(NEW_VERSION)"
+	@echo "$(CYAN)Pushing commits and tags to origin...$(RESET)"
+	git push origin main
+	git push origin "v$(NEW_VERSION)"
+	@echo ""
+	@echo "$(GREEN)✅ Release v$(NEW_VERSION) tagged and pushed successfully!$(RESET)"
+	@echo "$(CYAN)👉 Next step: Run 'make build-release' to package release binaries.$(RESET)"
+
+release-patch: ## Shortcut to trigger a patch version bump release (x.x.X)
+	@$(MAKE) release TYPE=patch
+
+release-minor: ## Shortcut to trigger a minor version bump release (x.X.0)
+	@$(MAKE) release TYPE=minor
+
+release-major: ## Shortcut to trigger a major version bump release (X.0.0)
+	@$(MAKE) release TYPE=major
 
 build-release: ## Build release zip package and JSON manifest (build/dist/)
 	@echo "$(CYAN)Building release package...$(RESET)"

@@ -77,9 +77,16 @@ final readonly class ReleaseDefinitionLoader
             );
         }
 
+        $composer = $data['composer'] ?? [];
+
         return new ReleaseDefinition(
             name: $data['name'],
             contents: $contents,
+            persistent: (array) ($data['persistent'] ?? []),
+            commands: (array) ($data['commands'] ?? []),
+            composerInstall: (bool) ($composer['install'] ?? true),
+            composerNoDev: (bool) ($composer['noDev'] ?? true),
+            composerOptimizeAutoloader: (bool) ($composer['optimizeAutoloader'] ?? true),
         );
     }
 }

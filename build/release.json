@@ -16,6 +16,14 @@
     "contents": [
         {
             "type": "directory",
+            "path": "assets"
+        },
+        {
+            "type": "file",
+            "path": "build.js"
+        },
+        {
+            "type": "directory",
             "path": "bin"
         },
         {

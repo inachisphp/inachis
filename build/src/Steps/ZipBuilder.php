@@ -12,13 +12,15 @@ use Inachis\Build\BuildStepInterface;
 use Inachis\Build\ReleaseWorkspace;
 use RuntimeException;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use ZipArchive;
 
+#[AsTaggedItem(priority: 50)]
 final class ZipBuilder implements BuildStepInterface
 {
     public static function priority(): int
     {
-        return 10;
+        return 50;
     }
 
     public function execute(

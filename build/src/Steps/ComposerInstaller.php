@@ -11,13 +11,15 @@ namespace Inachis\Build\Steps;
 use Inachis\Build\BuildStepInterface;
 use Inachis\Build\ReleaseWorkspace;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\Process\Process;
 
+#[AsTaggedItem(priority: 200)]
 final class ComposerInstaller implements BuildStepInterface
 {
     public static function priority(): int
     {
-        return 100;
+        return 200;
     }
 
     public function execute(

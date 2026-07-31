@@ -13,12 +13,14 @@ use Inachis\Build\ReleaseWorkspace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 
+#[AsTaggedItem(priority: 100)]
 final class ManifestGenerator implements BuildStepInterface
 {
     public static function priority(): int
     {
-        return 50;
+        return 100;
     }
 
     public function execute(

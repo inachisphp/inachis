@@ -11,9 +11,11 @@ namespace Inachis\Build\Steps;
 use Inachis\Build\BuildStepInterface;
 use Inachis\Build\ReleaseWorkspace;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
+#[AsTaggedItem(priority: 150)]
 final class CommandRunner implements BuildStepInterface
 {
     /**
@@ -22,7 +24,7 @@ final class CommandRunner implements BuildStepInterface
      */
     public static function priority(): int
     {
-        return 40;
+        return 150;
     }
 
     public function execute(
@@ -37,7 +39,7 @@ final class CommandRunner implements BuildStepInterface
         foreach ($workspace->definition->commands as $command) {
             $io->comment(sprintf(
                 'Running "%s" in %s...',
-                $command, 
+                $command,
                 $workspace->path
             ));
 
@@ -57,8 +59,8 @@ final class CommandRunner implements BuildStepInterface
                 });
             } catch (ProcessFailedException $exception) {
                 $io->error(sprintf(
-                    'Command "%s" failed: %s', 
-                    $command, 
+                    'Command "%s" failed: %s',
+                    $command,
                     $exception->getMessage()
                 ));
                 throw $exception;

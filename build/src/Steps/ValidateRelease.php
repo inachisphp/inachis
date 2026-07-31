@@ -12,12 +12,14 @@ use Inachis\Build\BuildStepInterface;
 use Inachis\Build\ReleaseWorkspace;
 use RuntimeException;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 
+#[AsTaggedItem(priority: 125)]
 final class ValidateRelease implements BuildStepInterface
 {
     public static function priority(): int
     {
-        return 200;
+        return 125;
     }
 
     public function execute(

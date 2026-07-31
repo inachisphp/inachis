@@ -6,15 +6,19 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Build;
+namespace Inachis\Build\Steps;
 
+use Inachis\Build\BuildStepInterface;
+use Inachis\Build\ReleaseWorkspace;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 
+#[AsTaggedItem(priority: 0)]
 final class CleanupRelease implements BuildStepInterface
 {
     public static function priority(): int
     {
-        return 75;
+        return 0;
     }
 
     public function execute(
@@ -28,6 +32,10 @@ final class CleanupRelease implements BuildStepInterface
             '.env.local',
             '.env.local.php',
             '.DS_Store',
+            'build.js',
+            'assets',
+            'node_modules',
+            'package.json',
             'var/cache',
             'var/log',
         ];
