@@ -1,12 +1,16 @@
 {
     "name": "inachis",
+    "commands": [
+        "npm ci",
+        "npm run build"
+    ],
     "composer": {
         "install": true,
         "noDev": true,
         "optimizeAutoloader": true
     },
     "persistent": [
-        "public/uploads",
+        "public/imgs",
         "var"
     ],
     "contents": [
@@ -24,7 +28,19 @@
         },
         {
             "type": "directory",
-            "path": "public"
+            "path": "public/assets/css/incp"
+        },
+        {
+            "type": "directory",
+            "path": "public/assets/imgs/incp"
+        },
+        {
+            "type": "directory",
+            "path": "public/assets/js/incp"
+        },
+        {
+            "type": "file",
+            "path": "public/index.php"
         },
         {
             "type": "directory",

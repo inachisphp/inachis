@@ -6,8 +6,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Build;
+namespace Inachis\Build\Steps;
 
+use Inachis\Build\BuildStepInterface;
+use Inachis\Build\ReleaseWorkspace;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
 
@@ -31,7 +33,7 @@ final class ComposerInstaller implements BuildStepInterface
             'install',
             '--prefer-dist',
             '--no-interaction',
-            // '--no-scripts',
+            '--no-scripts',
         ];
 
         if ($workspace->definition->composerNoDev) {
@@ -42,15 +44,13 @@ final class ComposerInstaller implements BuildStepInterface
             $arguments[] = '--optimize-autoloader';
         }
 
-        $process = new Process(
-            $arguments,
-            $workspace->path,
-            [
-                'APP_ENV' => 'prod',
-                'APP_DEBUG' => '0',
-            ]
-        );
-
+        $process = new Process($arguments, $workspace->path);
+        $process->setEnv([
+            ...$_SERVER,
+            ...$_ENV,
+            'APP_ENV' => 'prod',
+            'APP_DEBUG' => '0',
+        ]);
         $process->setWorkingDirectory($workspace->path);
         $process->setTimeout(null);
 

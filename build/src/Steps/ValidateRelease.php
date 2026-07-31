@@ -6,8 +6,10 @@
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
 
-namespace Inachis\Build;
+namespace Inachis\Build\Steps;
 
+use Inachis\Build\BuildStepInterface;
+use Inachis\Build\ReleaseWorkspace;
 use RuntimeException;
 use Symfony\Component\Console\Style\SymfonyStyle;
 

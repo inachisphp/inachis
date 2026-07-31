@@ -37,3 +37,7 @@ deploy.php
 maintenance.html
 sitemap.xml
 sitemaps/
+
+build/workspace
+build/dist
+

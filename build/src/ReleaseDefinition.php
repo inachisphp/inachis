@@ -17,6 +17,10 @@ final readonly class ReleaseDefinition
         public string $name,
         public array $contents,
         public array $persistent = [],
+        /**
+         * @param list<string> $commands
+         */
+        public array $commands = [],
         public bool $composerInstall = true,
         public bool $composerNoDev = true,
         public bool $composerOptimizeAutoloader = true,
