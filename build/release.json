@@ -27,18 +27,6 @@
             "path": "migrations"
         },
         {
-            "type": "directory",
-            "path": "public/assets/css/incp"
-        },
-        {
-            "type": "directory",
-            "path": "public/assets/imgs/incp"
-        },
-        {
-            "type": "directory",
-            "path": "public/assets/js/incp"
-        },
-        {
             "type": "file",
             "path": "public/index.php"
         },
@@ -76,6 +64,14 @@
         {
             "type": "file",
             "path": "LICENSE.md"
+        },
+        {
+            "type": "file",
+            "path": "package.json"
+        },
+        {
+            "type": "file",
+            "path": "package-lock.json"
         },
         {
             "type": "file",

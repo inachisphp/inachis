@@ -14,33 +14,56 @@ use Inachis\Updater\Release\Manifest;
 use Inachis\Updater\Release\ManifestFactory;
 use JsonException;
 use RuntimeException;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Cache\ItemInterface;
 
 final readonly class GithubReleaseProvider implements ReleaseProviderInterface
 {
     private const API = 'https://api.github.com/repos/%s/%s/releases';
 
+    /**
+     * @param int $cacheTtl Cache TTL in seconds (default: 3600 / 1 hour)
+     */
     public function __construct(
         #[Autowire(value: 'inachisphp')]
         private string $owner,
         #[Autowire(value: 'inachis')]
         private string $repository,
         private Downloader $downloader,
+        private CacheInterface $cache,
         private ManifestFactory $manifestFactory = new ManifestFactory(),
+        private int $cacheTtl = 3600,
     ) {}
 
     public function latest(): Manifest
     {
-        return $this->fetchRelease(
-            sprintf(self::API . '/latest', $this->owner, $this->repository)
-        );
+        $cacheKey = sprintf('inachis_updater_latest_%s_%s', $this->owner, $this->repository);
+        return $this->cache->get($cacheKey, function (ItemInterface $item): Manifest {
+            $item->expiresAfter($this->cacheTtl);
+
+            return $this->fetchRelease(
+                sprintf(self::API . '/latest', $this->owner, $this->repository)
+            );
+        });
     }
 
     public function version(string $version): Manifest
     {
-        return $this->fetchRelease(
-            sprintf(self::API . '/tags/%s', $this->owner, $this->repository, rawurlencode($version))
+        $cacheKey = sprintf(
+            'inachis_updater_version_%s_%s_%s',
+            $this->owner,
+            $this->repository,
+            md5($version)
         );
+
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($version): Manifest {
+            $item->expiresAfter($this->cacheTtl);
+
+            return $this->fetchRelease(
+                sprintf(self::API . '/tags/%s', $this->owner, $this->repository, rawurlencode($version))
+            );
+        });
     }
 
     public function download(Manifest $manifest, string $destination): void
