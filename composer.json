@@ -8,7 +8,7 @@
             "name": "David G. Paul"
         }
     ],
-    "version": "1.0.0",
+    "version": "1.1.0",
     "require": {
         "php": ">=8.4",
         "ext-fileinfo": "*",
@@ -96,6 +96,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Inachis\\Build\\": "build/src/",
             "Inachis\\Tests\\": "tests/"
         }
     },

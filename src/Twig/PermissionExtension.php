@@ -9,7 +9,6 @@
 
 namespace Inachis\Twig;
 
-use Inachis\Entity\User\User;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionGroup;
 use Inachis\Enum\Security\PermissionResource;
@@ -18,37 +17,67 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
+/**
+ * Permissions helper for Twig that allows easy checking of permissions for the
+ * current user to determine if elements should be displayed.
+ */
 final class PermissionExtension extends AbstractExtension
 {
+    /**
+     * Constructor.
+     *
+     * @param PermissionManager $permissionManager
+     * @param Security $security
+     */
     public function __construct(
         private readonly PermissionManager $permissionManager,
         private readonly Security $security,
     ) {}
 
+    /**
+     * Returns the Twig functions exposed by this extension.
+     *
+     * @return list<TwigFunction> The array of callable functions
+     */
     public function getFunctions(): array
     {
         return [
             new TwigFunction('can', $this->can(...)),
-            new TwigFunction('canAny', [$this, 'canAny']),
-            new TwigFunction('canGroup', [$this, 'canGroup']),
-            new TwigFunction('canResource', [$this, 'canResource']),
-            new TwigFunction('canWaste', [$this, 'canWaste']),
+            new TwigFunction('canAny', $this->canAny(...)),
+            new TwigFunction('canGroup', $this->canGroup(...)),
+            new TwigFunction('canResource', $this->canResource(...)),
+            new TwigFunction('canWaste', $this->canWaste(...)),
         ];
     }
 
+    /**
+     * Checks whether the current user has permission for one or more actions on
+     * the given resource.
+     *
+     * Examples:
+     * - can('PAGE', 'EDIT')
+     * - can('PAGE', ['VIEW', 'EDIT'])
+     *
+     * If $requireAll is true, the user must have every action. Otherwise, having
+     * any one action is sufficient.
+     *
+     * @param PermissionResource|string $resource
+     * @param PermissionAction|string|list<PermissionAction|string> $actions
+     * @param bool $requireAll Whether all actions are required.
+     * @return bool
+     */
     public function can(
         PermissionResource|string $resource,
         PermissionAction|string|array $actions,
         bool $requireAll = false,
     ): bool {
+        /** @var \Inachis\Entity\User\User|null */
         $user = $this->security->getUser();
-
         if ($user === null) {
             return false;
         }
 
         $resource = $this->normaliseResource($resource);
-
         $actions = array_map(
             fn (PermissionAction|string $action) => $this->normaliseAction($action),
             (array) $actions
@@ -64,7 +93,6 @@ final class PermissionExtension extends AbstractExtension
             if ($requireAll && !$allowed) {
                 return false;
             }
-
             if (!$requireAll && $allowed) {
                 return true;
             }
@@ -74,7 +102,14 @@ final class PermissionExtension extends AbstractExtension
     }
 
     /**
-     * @param array<array{0: PermissionResource|string, 1: PermissionAction|string|array}> $checks
+     * Checks whether the current user has any of the supplied permissions.
+     *
+     * @param list<array{
+     *     0: PermissionResource|string,
+     *     1: PermissionAction|string|list<PermissionAction|string>
+     * }> $checks
+     *
+     * @return bool
      */
     public function canAny(array $checks): bool
     {
@@ -83,10 +118,16 @@ final class PermissionExtension extends AbstractExtension
                 return true;
             }
         }
-
         return false;
     }
 
+    /**
+     * Checks if the user has permissions for any {@link PermissionResource} in
+     * this group.
+     *
+     * @param PermissionGroup|string $group
+     * @return bool
+     */
     public function canGroup(
         PermissionGroup|string $group,
     ): bool {
@@ -101,6 +142,12 @@ final class PermissionExtension extends AbstractExtension
         return false;
     }
 
+    /**
+     * Checks if the user has any permission for the given {@link PermissionResource}
+     *
+     * @param PermissionResource|string $resource
+     * @return bool
+     */
     public function canResource(
         PermissionResource|string $resource,
     ): bool {
@@ -112,13 +159,28 @@ final class PermissionExtension extends AbstractExtension
         );
     }
 
+    /**
+     * Checks if the user needs access to the Waste bin based on what resources
+     * they have delete access for
+     *
+     * @return bool
+     */
     public function canWaste(): bool
     {
-        return $this->permissionManager->canAccessWaste(
-            $this->security->getUser()
-        );
+        $user = $this->security->getUser();
+        if (!$user instanceof \Inachis\Entity\User\User) {
+            return false;
+        }
+
+        return $this->permissionManager->canAccessWaste($user);
     }
 
+    /**
+     * Normalise string or PermissionResource into a PermissionResource
+     *
+     * @param PermissionResource|string $resource
+     * @return PermissionResource
+     */
     private function normaliseResource(
         PermissionResource|string $resource,
     ): PermissionResource {
@@ -129,6 +191,12 @@ final class PermissionExtension extends AbstractExtension
         return PermissionResource::from(strtoupper($resource));
     }
 
+    /**
+     * Normalise string or PermissionAction into a PermissionAction
+     *
+     * @param PermissionAction|string $action
+     * @return PermissionAction
+     */
     private function normaliseAction(
         PermissionAction|string $action,
     ): PermissionAction {
@@ -139,6 +207,12 @@ final class PermissionExtension extends AbstractExtension
         return PermissionAction::from(strtoupper($action));
     }
 
+    /**
+     * Normalise a string or PermissionGroup into a PermissionGroup
+     *
+     * @param PermissionGroup|string $group
+     * @return PermissionGroup
+     */
     private function normaliseGroup(
         PermissionGroup|string $group,
     ): PermissionGroup {

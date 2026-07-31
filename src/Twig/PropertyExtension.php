@@ -15,13 +15,26 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
+/**
+ * Used to simplify Twig accessing object/array propteries such as 
+ * object.linkedObject.property
+ */
 final class PropertyExtension extends AbstractExtension
 {
+    /**
+     * Constructor
+     *
+     * @param PropertyAccessorInterface $propertyAccessor
+     */
     public function __construct(
         private readonly PropertyAccessorInterface $propertyAccessor,
-    ) {
-    }
+    ) {}
 
+    /**
+     * Retuns the functions this will make available to Twig
+     *
+     * @return list<TwigFunction> Provides access to property callable function
+     */
     public function getFunctions(): array
     {
         return [
@@ -29,9 +42,18 @@ final class PropertyExtension extends AbstractExtension
         ];
     }
 
+    /**
+     * Returns the value at the given property path.
+     *
+     * @param object|array<mixed> $object Object or array to read from.
+     * @param string|null $path Property path. If null or empty, the 
+     *     original value is returned.
+     * @return mixed Returns the resolved value, the original value if no path 
+     *     is given, or null if the property cannot be accessed.
+     */
     public function property(mixed $object, ?string $path): mixed
     {
-        if (!$path) {
+        if ($path === null || $path === '') {
             return $object;
         }
 

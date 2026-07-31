@@ -14,9 +14,16 @@ use Inachis\Controller\Page\Admin\AccountController;
 use Inachis\Entity\User\{PasswordResetRequest, User};
 use Inachis\Repository\User\PasswordResetRequestRepository;
 use Inachis\Repository\User\UserRepository;
+use Inachis\Repository\User\UserPasskeyRepository;
+use Inachis\Security\Authentication\TotpService;
+use Inachis\Security\Authentication\PasskeyService;
+use Inachis\Security\Authentication\TwoFactorAuthenticationListener;
 use Inachis\Service\User\PasswordResetTokenService;
 use Inachis\Service\User\UserAccountEmailService;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Random\RandomException;
@@ -25,8 +32,6 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
@@ -49,10 +54,11 @@ class AccountControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
             ])
             ->onlyMethods([
                 'addFlash', 'createForm', 'createFormBuilder', 'redirectIfAuthenticatedOrNoAdmins',
-                'redirectToRoute', 'render'
+                'redirectToRoute', 'render', 'generateUrl'
             ])
             ->getMock();
         $this->controller->method('render')
@@ -596,4 +602,255 @@ class AccountControllerTest extends InachisControllerTestCase
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/incc/login', $result->getTargetUrl());
     }
+
+    public function testTotpVerifyRedirectsIfNoUserOrNotEnabled(): void
+    {
+        $request = new Request([], [], [], [], [], [
+            'REQUEST_URI' => '/incc/login/totp',
+        ]);
+        // Set session
+        $session = new Session(new MockArraySessionStorage());
+        $request->setSession($session);
+
+        $totpService = $this->createMock(TotpService::class);
+
+        // Case 1: No user logged in
+        $this->security->method('getUser')->willReturn(null);
+        $this->controller->expects($this->exactly(2))
+            ->method('redirectToRoute')
+            ->with('incc_dashboard')
+            ->willReturn(new RedirectResponse('/incc/dashboard'));
+
+        $result = $this->controller->totpVerify($request, $totpService);
+        $this->assertInstanceOf(RedirectResponse::class, $result);
+
+        // Case 2: User logged in but TOTP not enabled
+        $user = new User();
+        $user->setTotpEnabled(false);
+        $this->security->method('getUser')->willReturn($user);
+
+        $result2 = $this->controller->totpVerify($request, $totpService);
+        $this->assertInstanceOf(RedirectResponse::class, $result2);
+    }
+
+    public function testTotpVerifyRedirectsIfAlreadyVerified(): void
+    {
+        $request = new Request([], [], [], [], [], [
+            'REQUEST_URI' => '/incc/login/totp',
+        ]);
+        $session = new Session(new MockArraySessionStorage());
+        $session->set(TwoFactorAuthenticationListener::SESSION_TOTP_VERIFIED_KEY, true);
+        $request->setSession($session);
+
+        $user = new User();
+        $user->setTotpEnabled(true);
+        $this->security->method('getUser')->willReturn($user);
+
+        $totpService = $this->createMock(TotpService::class);
+
+        $this->controller->expects($this->once())
+            ->method('redirectToRoute')
+            ->with('incc_dashboard')
+            ->willReturn(new RedirectResponse('/incc/dashboard'));
+
+        $result = $this->controller->totpVerify($request, $totpService);
+        $this->assertInstanceOf(RedirectResponse::class, $result);
+    }
+
+    public function testTotpVerifyGetRendersForm(): void
+    {
+        $request = new Request([], [], [], [], [], [
+            'REQUEST_URI' => '/incc/login/totp',
+        ]);
+        $session = new Session(new MockArraySessionStorage());
+        $request->setSession($session);
+
+        $user = new User();
+        $user->setTotpEnabled(true);
+        $this->security->method('getUser')->willReturn($user);
+
+        $totpService = $this->createMock(TotpService::class);
+
+        $result = $this->controller->totpVerify($request, $totpService);
+        $this->assertEquals('rendered:inadmin/page/admin/totp_verify.html.twig', $result->getContent());
+    }
+
+    public function testTotpVerifyPostWithInvalidCode(): void
+    {
+        $request = new Request([], ['totp_code' => '111111'], [], [], [], [
+            'REQUEST_URI' => '/incc/login/totp',
+        ]);
+        $request->setMethod('POST');
+        $session = new Session(new MockArraySessionStorage());
+        $request->setSession($session);
+
+        $user = new User();
+        $user->setTotpEnabled(true);
+        $user->setTotpSecret('SECRET');
+        $this->security->method('getUser')->willReturn($user);
+
+        $totpService = $this->createMock(TotpService::class);
+        $totpService->expects($this->once())
+            ->method('verifyCode')
+            ->with('SECRET', '111111')
+            ->willReturn(false);
+
+        $result = $this->controller->totpVerify($request, $totpService);
+        $this->assertEquals('rendered:inadmin/page/admin/totp_verify.html.twig', $result->getContent());
+        self::assertFalse($session->has(TwoFactorAuthenticationListener::SESSION_TOTP_VERIFIED_KEY));
+    }
+
+    public function testTotpVerifyPostWithValidCode(): void
+    {
+        $request = new Request([], ['totp_code' => '123456'], [], [], [], [
+            'REQUEST_URI' => '/incc/login/totp',
+        ]);
+        $request->setMethod('POST');
+        $session = new Session(new MockArraySessionStorage());
+        $request->setSession($session);
+
+        $user = new User();
+        $user->setTotpEnabled(true);
+        $user->setTotpSecret('SECRET');
+        $this->security->method('getUser')->willReturn($user);
+
+        $totpService = $this->createMock(TotpService::class);
+        $totpService->expects($this->once())
+            ->method('verifyCode')
+            ->with('SECRET', '123456')
+            ->willReturn(true);
+
+        $this->controller->expects($this->once())
+            ->method('redirectToRoute')
+            ->with('incc_dashboard')
+            ->willReturn(new RedirectResponse('/incc/dashboard'));
+
+        $result = $this->controller->totpVerify($request, $totpService);
+        $this->assertInstanceOf(RedirectResponse::class, $result);
+        self::assertTrue($session->get(TwoFactorAuthenticationListener::SESSION_TOTP_VERIFIED_KEY));
+    }
+
+    public function testPasskeyChallenge(): void
+    {
+        $request = new Request([], [], [], [], [], [
+            'HTTP_HOST' => 'localhost',
+            'REQUEST_URI' => '/incc/login/passkey/challenge',
+        ]);
+        $session = new Session(new MockArraySessionStorage());
+        $request->setSession($session);
+
+        $passkeyService = $this->createMock(PasskeyService::class);
+        $passkeyService->expects($this->once())
+            ->method('generateChallenge')
+            ->willReturn('CHALLENGE_STRING');
+        $passkeyService->expects($this->once())
+            ->method('buildRequestOptions')
+            ->with(null, 'CHALLENGE_STRING', 'localhost')
+            ->willReturn(['challenge' => 'CHALLENGE_STRING']);
+
+        $result = $this->controller->passkeyChallenge($request, $passkeyService);
+        $this->assertInstanceOf(JsonResponse::class, $result);
+        $this->assertEquals('CHALLENGE_STRING', $session->get('inachis.passkey.login_challenge'));
+
+        $data = json_decode((string) $result->getContent(), true);
+        $this->assertEquals('CHALLENGE_STRING', $data['challenge']);
+    }
+
+    public function testPasskeyVerifyMissingChallenge(): void
+    {
+        $request = new Request([], [], [], [], [], [
+            'REQUEST_URI' => '/incc/login/passkey/verify',
+        ]);
+        $session = new Session(new MockArraySessionStorage());
+        $request->setSession($session);
+
+        $passkeyService = $this->createMock(PasskeyService::class);
+        $passkeyRepository = $this->createMock(UserPasskeyRepository::class);
+
+        $result = $this->controller->passkeyVerify($request, $passkeyService, $passkeyRepository);
+        $this->assertInstanceOf(JsonResponse::class, $result);
+        $this->assertEquals(400, $result->getStatusCode());
+
+        $data = json_decode((string) $result->getContent(), true);
+        $this->assertEquals('No active challenge.', $data['error']);
+    }
+
+    public function testPasskeyVerifyInvalidJson(): void
+    {
+        $request = new Request([], [], [], [], [], [
+            'REQUEST_URI' => '/incc/login/passkey/verify',
+        ], 'invalid json');
+        $session = new Session(new MockArraySessionStorage());
+        $session->set('inachis.passkey.login_challenge', 'CHALLENGE');
+        $request->setSession($session);
+
+        $passkeyService = $this->createMock(PasskeyService::class);
+        $passkeyRepository = $this->createMock(UserPasskeyRepository::class);
+
+        $result = $this->controller->passkeyVerify($request, $passkeyService, $passkeyRepository);
+        $this->assertInstanceOf(JsonResponse::class, $result);
+        $this->assertEquals(400, $result->getStatusCode());
+    }
+
+    public function testPasskeyVerifyUnknownPasskey(): void
+    {
+        $request = new Request([], [], [], [], [], [
+            'HTTP_HOST' => 'localhost',
+            'REQUEST_URI' => '/incc/login/passkey/verify',
+        ], json_encode(['id' => 'UNKNOWN_ID']));
+        $session = new Session(new MockArraySessionStorage());
+        $session->set('inachis.passkey.login_challenge', 'CHALLENGE');
+        $request->setSession($session);
+
+        $passkeyService = $this->createMock(PasskeyService::class);
+        $passkeyRepository = $this->createMock(UserPasskeyRepository::class);
+        $passkeyRepository->expects($this->once())
+            ->method('findByCredentialId')
+            ->with('UNKNOWN_ID')
+            ->willReturn(null);
+
+        $result = $this->controller->passkeyVerify($request, $passkeyService, $passkeyRepository);
+        $this->assertInstanceOf(JsonResponse::class, $result);
+        $this->assertEquals(401, $result->getStatusCode());
+    }
+
+    public function testPasskeyVerifySuccess(): void
+    {
+        $request = new Request([], [], [], [], [], [
+            'HTTP_HOST' => 'localhost',
+            'REQUEST_URI' => '/incc/login/passkey/verify',
+        ], json_encode(['id' => 'VALID_ID', 'response' => []]));
+        $session = new Session(new MockArraySessionStorage());
+        $session->set('inachis.passkey.login_challenge', 'CHALLENGE');
+        $request->setSession($session);
+
+        $passkey = $this->createMock(\Inachis\Entity\User\UserPasskey::class);
+
+        $passkeyService = $this->createMock(PasskeyService::class);
+        $passkeyRepository = $this->createMock(UserPasskeyRepository::class);
+        $passkeyRepository->expects($this->once())
+            ->method('findByCredentialId')
+            ->with('VALID_ID')
+            ->willReturn($passkey);
+
+        $passkeyService->expects($this->once())
+            ->method('verifyAssertion')
+            ->with($passkey, 'CHALLENGE', 'localhost', $this->callback('is_array'))
+            ->willReturn(true);
+
+        $this->controller->expects($this->once())
+            ->method('generateUrl')
+            ->with('incc_dashboard')
+            ->willReturn('/incc/dashboard');
+
+        $result = $this->controller->passkeyVerify($request, $passkeyService, $passkeyRepository);
+        $this->assertInstanceOf(JsonResponse::class, $result);
+        $this->assertEquals(200, $result->getStatusCode());
+
+        $data = json_decode((string) $result->getContent(), true);
+        $this->assertEquals('/incc/dashboard', $data['redirect']);
+        self::assertFalse($session->has('inachis.passkey.login_challenge'));
+        self::assertTrue($session->get(TwoFactorAuthenticationListener::SESSION_TOTP_VERIFIED_KEY));
+    }
 }
+

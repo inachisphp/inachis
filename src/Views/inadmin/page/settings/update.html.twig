@@ -1,0 +1,67 @@
+{% extends 'inadmin/structure/main.html.twig' %}
+
+{% block content %}
+
+{% if isUpToDate %}
+    {% embed 'inadmin/partials/components/admonition.html.twig' with {
+        type: 'tip',
+        title: 'System Update',
+        class: 'col-12',
+        icon: 'security',
+    } %}
+        {% block text %}
+        <strong>You are on the latest version!</strong> Inachis v{{ currentVersion }} is up to date.
+        {% endblock text %}
+    {% endembed %}
+{% elseif error %}
+    {% include 'inadmin/partials/components/admonition.html.twig' with {
+        type: 'danger',
+        title: 'System Update',
+        class: 'col-12',
+        icon: 'security',
+        text: error,
+    } %}
+{% endif %}
+
+{% if updatePlan and latestManifest %}
+<section class="ui-section col-12">
+    {% include 'inadmin/partials/components/admonition.html.twig' with {
+        text: 'Update Available: v' ~ latestManifest.version,
+        type: 'info',
+    } %}
+
+    {% if latestManifest.publishedAt %}
+    <p><small>Released: {{ latestManifest.publishedAt|date('F j, Y') }}</small></p>
+    {% endif %}
+    <p><strong>Installed Version:</strong> v{{ currentVersion }}</p>
+    <p><strong>Target Version:</strong> v{{ latestManifest.version }}</p>
+
+    <p><strong>Database Migrations Required:</strong> 
+        {% if updatePlan.requiresMigration %}
+            <span class="badge badge__critical">Yes</span>
+        {% else %}
+            <span class="badge">No</span>
+        {% endif %}
+    </p>
+    <p><strong>Package Name:</strong> <code>{{ latestManifest.package }}</code></p>
+
+
+    {% if latestManifest.releaseNotes %}
+        <h2>Release Notes &amp; Changelog</h2>
+        <div style="max-height: 300px; overflow-y: auto;">
+            {{ latestManifest.releaseNotes|nl2br }}
+        </div>
+    {% endif %}
+
+    <form action="{# #}" method="POST" onsubmit="return confirm('Are you sure you want to update? The system will briefly enter maintenance mode during deployment.');">
+        <input type="hidden" name="_token" value="{{ csrf_token('system_update') }}">
+        <button type="submit" class="button button--positive">
+            <span class="material-icons">upgrade</span>
+            <span class="btn-text">Download &amp; Apply Update (v{{ latestManifest.version }})</span>
+        </button>
+    </form>
+</section>
+
+{% endif %}
+
+{% endblock %}

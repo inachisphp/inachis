@@ -1,5 +1,5 @@
 {% if displayTabsCondition is not defined or displayTabsCondition %}
-<ul class="ui-tabs">
+<ul class="ui-tabs"{% if label is defined %} aria-label="{{ label }}"{% endif %}>
 {% for tab in tabs %}
     {% if tab.displayCondition is not defined or tab.displayCondition %}
     <li role="tab" class="ui-tabs-tab ui-tab{% if viewModel.page.tab == tab.id %} ui-state-active{% endif %}">

@@ -179,10 +179,10 @@ enum PermissionResource: string
                 'group' => PermissionGroup::SECURITY,
                 'resources' => [
                     self::CSP_POLICY,
+                    self::PRIVACY_GDPR,
                     self::EMAIL_DNS,
                     self::SYSTEM_STATUS,
                     self::PASSWORD_POLICY,
-                    self::PRIVACY_GDPR,
                 ],
             ],
             [

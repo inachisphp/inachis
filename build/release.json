@@ -1,0 +1,81 @@
+{
+    "name": "inachis",
+    "commands": [
+        "npm ci",
+        "npm run build"
+    ],
+    "composer": {
+        "install": true,
+        "noDev": true,
+        "optimizeAutoloader": true
+    },
+    "persistent": [
+        "public/imgs",
+        "var"
+    ],
+    "contents": [
+        {
+            "type": "directory",
+            "path": "bin"
+        },
+        {
+            "type": "directory",
+            "path": "config"
+        },
+        {
+            "type": "directory",
+            "path": "migrations"
+        },
+        {
+            "type": "file",
+            "path": "public/index.php"
+        },
+        {
+            "type": "directory",
+            "path": "src"
+        },
+        {
+            "type": "directory",
+            "path": "templates"
+        },
+        {
+            "type": "directory",
+            "path": "translations",
+            "optional": true
+        },
+        {
+            "type": "file",
+            "path": ".env",
+            "optional": true
+        },
+        {
+            "type": "file",
+            "path": "composer.json"
+        },
+        {
+            "type": "file",
+            "path": "composer.lock"
+        },
+        {
+            "type": "file",
+            "path": "CHANGELOG.md",
+            "optional": true
+        },
+        {
+            "type": "file",
+            "path": "LICENSE.md"
+        },
+        {
+            "type": "file",
+            "path": "package.json"
+        },
+        {
+            "type": "file",
+            "path": "package-lock.json"
+        },
+        {
+            "type": "file",
+            "path": "README.md"
+        }
+    ]
+}

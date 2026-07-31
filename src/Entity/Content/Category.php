@@ -12,9 +12,9 @@ namespace Inachis\Entity\Content;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Inachis\Entity\Media\Image;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 /**
  * Object for handling categories on a site.
@@ -44,17 +44,17 @@ class Category
     #[ORM\Column(type: 'text', nullable: true)]
     protected ?string $description = '';
 
-    /**
-     * @var Image|null The UUID of the image
-     */
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    protected ?Image $image = null;
+    // /**
+    //  * @var Image|null The UUID of the image
+    //  */
+    // #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    // protected ?Image $image = null;
 
-    /**
-     * @var Image|null The UUID of the image
-     */
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    protected ?Image $icon = null;
+    // /**
+    //  * @var Image|null The UUID of the image
+    //  */
+    // #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    // protected ?Image $icon = null;
 
     /**
      * @var bool Whether this category should be visible
@@ -69,9 +69,13 @@ class Category
     protected ?Category $parent = null;
 
     /**
+     * @todo consier adding orphanRemoval: true in future
      * @var Collection<int, Category> The array of child categories if applicable
      */
-    #[ORM\OneToMany(targetEntity: 'Inachis\Entity\Content\Category', mappedBy: 'parent')]
+    #[ORM\OneToMany(
+        targetEntity: 'Inachis\Entity\Content\Category',
+        mappedBy: 'parent'
+    )]
     #[ORM\OrderBy(['title' => 'ASC'])]
     protected Collection $children;
 
@@ -118,25 +122,25 @@ class Category
         return $this->description;
     }
 
-    /**
-     * Returns the value of {@link image}.
-     *
-     * @return Image|null The image for {@link Category}
-     */
-    public function getImage(): ?Image
-    {
-        return $this->image;
-    }
+    // /**
+    //  * Returns the value of {@link image}.
+    //  *
+    //  * @return Image|null The image for {@link Category}
+    //  */
+    // public function getImage(): ?Image
+    // {
+    //     return $this->image;
+    // }
 
-    /**
-     * Returns the value of {@link icon}.
-     *
-     * @return Image|null The 'icon' for the {@link Category}
-     */
-    public function getIcon(): ?Image
-    {
-        return $this->icon;
-    }
+    // /**
+    //  * Returns the value of {@link icon}.
+    //  *
+    //  * @return Image|null The 'icon' for the {@link Category}
+    //  */
+    // public function getIcon(): ?Image
+    // {
+    //     return $this->icon;
+    // }
 
     /**
      * @return bool
@@ -151,6 +155,7 @@ class Category
      *
      * @return Category|null The parent {@link Category} if applicable
      */
+    #[Ignore]
     public function getParent(): ?Category
     {
         return $this->parent;
@@ -205,31 +210,31 @@ class Category
         return $this;
     }
 
-    /**
-     * Sets the value of {@link image}.
-     *
-     * @param Image|null $value The UUID or URL of the image for {@link Category}
-     * @return self
-     */
-    public function setImage(?Image $value): self
-    {
-        $this->image = $value;
+    // /**
+    //  * Sets the value of {@link image}.
+    //  *
+    //  * @param Image|null $value The UUID or URL of the image for {@link Category}
+    //  * @return self
+    //  */
+    // public function setImage(?Image $value): self
+    // {
+    //     $this->image = $value;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    /**
-     * Sets the value of {@link icon}.
-     *
-     * @param Image|null $value The UUID or URL of the image for {@link Category}
-     * @return self
-     */
-    public function setIcon(?Image $value): self
-    {
-        $this->icon = $value;
+    // /**
+    //  * Sets the value of {@link icon}.
+    //  *
+    //  * @param Image|null $value The UUID or URL of the image for {@link Category}
+    //  * @return self
+    //  */
+    // public function setIcon(?Image $value): self
+    // {
+    //     $this->icon = $value;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     /**
      * @param bool $value
@@ -250,6 +255,12 @@ class Category
      */
     public function setParent(?Category $parent = null): self
     {
+        if ($parent === $this) {
+            throw new \InvalidArgumentException(
+                'Category cannot be its own parent'
+            );
+        }
+
         $this->parent = $parent;
 
         return $this;
@@ -259,10 +270,33 @@ class Category
      * Adds a child category to the current {@link Category}.
      *
      * @param Category $category The {@link Category} to add
+     * @return self
      */
-    public function addChild(Category $category): void
+    public function addChild(Category $category): self
     {
-        $this->children[] = $category;
+        if (!$this->children->contains($category)) {
+            $this->children->add($category);
+            $category->setParent($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Removes a child category to the current {@link Category}.
+     *
+     * @param Category $category
+     * @return self
+     */
+    public function removeChild(Category $category): self
+    {
+        if ($this->children->removeElement($category)) {
+            if ($category->getParent() === $this) {
+                $category->setParent(null);
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -272,7 +306,7 @@ class Category
      */
     public function isRootCategory(): bool
     {
-        return empty($this->getParent());
+        return $this->parent === null;
     }
 
     /**
@@ -282,28 +316,28 @@ class Category
      */
     public function isChildCategory(): bool
     {
-        return !empty($this->getParent());
+        return $this->parent !== null;
     }
 
-    /**
-     * Returns the result of testing if the category has an image to use.
-     *
-     * @return bool Result of testing if {@link image} is empty
-     */
-    public function hasImage(): bool
-    {
-        return !empty($this->getImage());
-    }
+    // /**
+    //  * Returns the result of testing if the category has an image to use.
+    //  *
+    //  * @return bool Result of testing if {@link image} is empty
+    //  */
+    // public function hasImage(): bool
+    // {
+    //     return !empty($this->getImage());
+    // }
 
-    /**
-     * Returns the result of testing if the category has an icon to use.
-     *
-     * @return bool Result of testing if {@link icon} is empty
-     */
-    public function hasIcon(): bool
-    {
-        return !empty($this->getIcon());
-    }
+    // /**
+    //  * Returns the result of testing if the category has an icon to use.
+    //  *
+    //  * @return bool Result of testing if {@link icon} is empty
+    //  */
+    // public function hasIcon(): bool
+    // {
+    //     return !empty($this->getIcon());
+    // }
 
     /**
      * Returns the full path for the category.
