@@ -34,6 +34,10 @@ final class PluginDto
      */
     public string $manifestPath;
 
+    public string $twigNamespace = '';
+
+    public string $twigPath = 'templates';
+
     /**
      * @var list<string>
      */

@@ -41,6 +41,7 @@ enum PermissionResource: string
     // case BACKUP;
 
     case NAVIGATION = 'NAVIGATION';
+    case PLUGIN = 'PLUGIN';
     case THEME = 'THEME';
     case CRAWLER = 'CRAWLER';
 
@@ -80,6 +81,7 @@ enum PermissionResource: string
             self::IMPORT_EXPORT,
             self::PASSWORD_POLICY,
             self::ROLE,
+            self::PLUGIN,
             self::THEME => [
                 PermissionAction::MANAGE,
             ],
@@ -126,7 +128,7 @@ enum PermissionResource: string
             self::ROLE => 'Roles',
             self::PASSWORD_POLICY => 'Password Policies',
             self::AUDIT_LOG => 'Audit Logs',
-            
+
             self::PRIVACY_GDPR => 'GDPR Policy',
 
             self::ANALYTICS => 'Analytics',
@@ -140,6 +142,7 @@ enum PermissionResource: string
             self::CSP_POLICY => 'Content Security Policy',
 
             self::NAVIGATION => 'Navigation',
+            self::PLUGIN => 'Plugins & Addons',
             self::THEME => 'Themes',
             self::CRAWLER => 'Crawlers and Discovery',
         };
@@ -187,6 +190,7 @@ enum PermissionResource: string
                 'resources' => [
                     self::NAVIGATION,
                     self::CRAWLER,
+                    self::PLUGIN,
                     self::THEME,
                 ],
             ],

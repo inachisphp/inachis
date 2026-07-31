@@ -74,7 +74,7 @@ class SetupRolesCommand extends Command
 
             if (!$role instanceof Role) {
                 $role = new Role();
-                $role->setSlug($roleData['slug']);
+                $role->setIdentifier($roleData['slug']);
             }
 
             $role
