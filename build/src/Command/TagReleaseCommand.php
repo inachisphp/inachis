@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Process\Process;
 
 #[AsCommand(
     name: 'inachis:release',
@@ -48,6 +49,22 @@ final class ReleaseBumpCommand extends Command
             $io->error(sprintf('Invalid bump type "%s". Allowed values: major, minor, patch.', $type));
             return Command::FAILURE;
         }
+
+        // 0. Pre-flight check: Run composer validate
+        $io->section('Validating composer configuration');
+
+        $process = new Process(
+            ['composer', 'validate', '--strict', '--no-check-publish'],
+            $this->projectDir
+        );
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            $io->error("Composer validation failed:\n" . $process->getErrorOutput() . $process->getOutput());
+            return Command::FAILURE;
+        }
+
+        $io->writeln('<info>✓</info> Composer configuration is valid.');
 
         $composerPath = $this->projectDir . '/composer.json';
         $changelogPath = $this->projectDir . '/CHANGELOG.md';
@@ -85,8 +102,17 @@ final class ReleaseBumpCommand extends Command
         // 3. Update CHANGELOG.md
         if (file_exists($changelogPath)) {
             $changelog = (string) file_get_contents($changelogPath);
-            $today = (new \DateTimeImmutable())->format('Y-m-d');
 
+            // Check if there is actual content under Unreleased
+            preg_match('/## \[Unreleased\]\s*\n(.*?)(?=\n## |$)/s', $changelog, $matches);
+            $unreleasedContent = trim($matches[1] ?? '');
+
+            if (empty($unreleasedContent)) {
+                $io->error('CHANGELOG.md has no notes under "## [Unreleased]". Add release notes before bumping!');
+                return Command::FAILURE;
+            }
+
+            $today = (new \DateTimeImmutable())->format('Y-m-d');
             $replacement = "## [Unreleased]\n\n## [{$newVersion}] - {$today}";
             $changelog = preg_replace('/## \[Unreleased\]/i', $replacement, $changelog, 1);
 

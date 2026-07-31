@@ -1,4 +1,4 @@
-.PHONY: help release release-patch release-minor release-major build-release check-update apply-update apply-update-force phpstan phpunit qa clean
+.PHONY: help release release-patch release-minor release-major build-release publish-release check-update apply-update apply-update-force phpstan phpunit qa clean
 
 # Color output helpers
 CYAN := \033[36m
@@ -52,6 +52,22 @@ build-release: ## Build release zip package and JSON manifest (build/dist/)
 	@echo "$(CYAN)Building release package...$(RESET)"
 	@php bin/console inachis:build
 
+publish-release:
+	@echo "Extracting release notes from CHANGELOG..."
+	$(eval LATEST_TAG := $(shell git describe --tags --abbrev=0))
+	$(eval NOTES := $(shell php -r ' \
+		$$cl = file_get_contents("CHANGELOG.md"); \
+		preg_match("/## \['"$$(echo $(LATEST_TAG) | sed 's/^v//')"'\].*?\n(.*?)(?=\n## |$$)/s", $$cl, $$m); \
+		echo trim($$m[1] ?? "Release $(LATEST_TAG)"); \
+	'))
+
+	@echo "Creating GitHub Release for $(LATEST_TAG)..."
+	gh release create "$(LATEST_TAG)" build/dist/*.zip build/dist/*.json \
+		--title "$(LATEST_TAG)" \
+		--notes "$(NOTES)"
+
+	@echo "✅ GitHub release published with attached binaries!"
+
 check-update: ## Check GitHub for available core updates without installing
 	@echo "$(CYAN)Checking for system updates...$(RESET)"
 	@php bin/console inachis:system:update --check-only
@@ -76,6 +92,6 @@ qa: phpstan phpunit ## Run full QA suite (PHPStan + PHPUnit)
 
 clean: ## Clean local build artifacts and temporary download files
 	@echo "$(YELLOW)Cleaning build directory and temporary archives...$(RESET)"
-	@rm -rf build/dist/*
+	@rm -rf build/dist/ build/workspace
 	@rm -f /tmp/inachis-*.zip /tmp/*.download
 	@echo "$(GREEN)Cleanup complete.$(RESET)"

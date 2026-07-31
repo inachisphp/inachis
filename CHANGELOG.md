@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## [2.0.0] 2026-??-??
+## [Unreleased]
 
 ### Added
 
@@ -11,6 +11,7 @@
 - Added CSP reporting and policy manager,
 - Added option to switch between list - grid - table view styles
 - Added resources filter to identify duplicate resources and unused images
+- Added auto-updater
 
 ### Changed
 
