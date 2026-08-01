@@ -47,12 +47,14 @@ final class ComposerInstaller implements BuildStepInterface
         }
 
         $process = new Process($arguments, $workspace->path);
-        $process->setEnv([
-            ...$_SERVER,
-            ...$_ENV,
-            'APP_ENV' => 'prod',
-            'APP_DEBUG' => '0',
-        ]);
+        // Filter out array values (like $_SERVER['argv']) before string casting
+        $envVars = array_filter(
+            [...$_SERVER, ...$_ENV, 'APP_ENV' => 'prod', 'APP_DEBUG' => '0'],
+            static fn ($value) => is_scalar($value) || $value === null
+        );
+
+        $process = new Process($arguments, $workspace->path);
+        $process->setEnv(array_map('strval', $envVars));
         $process->setWorkingDirectory($workspace->path);
         $process->setTimeout(null);
 

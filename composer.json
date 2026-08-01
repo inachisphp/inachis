@@ -20,7 +20,6 @@
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.5",
         "endroid/qr-code": "^6.1",
-        "google/apiclient": "^2.18",
         "jaybizzle/crawler-detect": "^1.2",
         "jfcherng/php-diff": "^7.0",
         "league/commonmark": "^2.8",
@@ -107,7 +106,6 @@
         "symfony/polyfill-php56": "*"
     },
     "scripts": {
-        "pre-autoload-dump": "Google\\Task\\Composer::cleanup",
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install --symlink --relative %PUBLIC_DIR%": "symfony-cmd",
@@ -142,9 +140,6 @@
             "allow-contrib": true,
             "docker": true,
             "require": "8.*"
-        },
-        "google/apiclient-services": [
-            "Analytics"
-        ]
+        }
     }
 }

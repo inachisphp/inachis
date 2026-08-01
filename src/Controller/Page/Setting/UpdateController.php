@@ -22,6 +22,7 @@ use Inachis\Updater\Provider\GithubReleaseProvider;
 use Inachis\Updater\ReleaseCleaner;
 use Inachis\Updater\ReleaseInstaller;
 use Inachis\Updater\ReleaseLocator;
+use Inachis\Updater\ReleaseRollback;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -41,6 +42,7 @@ final class UpdateController extends AbstractInachisController
         private readonly ReleaseInstaller $releaseInstaller,
         private readonly ReleaseCleaner $releaseCleaner,
         private readonly ReleaseLocator $releaseLocator,
+        private readonly ReleaseRollback $releaseRollback,
         private readonly Downloader $downloader,
         protected EntityManagerInterface $entityManager,
         protected ParameterBagInterface $params,
@@ -54,7 +56,7 @@ final class UpdateController extends AbstractInachisController
     }
 
     /**
-     * Display update status, current version, latest version, and release notes.
+     * Display update status, current version, latest version, and rollback targets.
      */
     #[Route('/incp/settings/updater', name: 'incp_settings_update', methods: ['GET'])]
     public function index(Request $request): Response
@@ -68,12 +70,16 @@ final class UpdateController extends AbstractInachisController
             $latestManifest = $this->releaseProvider->latest();
             $updatePlan = $this->updatePlanner->plan($currentVersion, $latestManifest);
         } catch (NoUpdateAvailableException) {
-            // System is up to date — not an error condition
+            // System is up to date
         } catch (IncompatibleVersionException $e) {
             $error = $e->getMessage();
         } catch (Throwable $e) {
             $error = sprintf('Unable to check for updates: %s', $e->getMessage());
         }
+
+        // Get available previous releases for rollback
+        $availableRollbacks = $this->releaseRollback->availableRollbacks();
+        $rollbackCandidate = $availableRollbacks[0] ?? null;
 
         return $this->render('inadmin/page/settings/update.html.twig', [
             'viewModel' => $this->viewModel,
@@ -81,6 +87,8 @@ final class UpdateController extends AbstractInachisController
             'currentVersion' => $currentVersion,
             'latestManifest' => $latestManifest,
             'updatePlan' => $updatePlan,
+            'rollbackCandidate' => $rollbackCandidate,
+            'olderRollbacks' => array_slice($availableRollbacks, 1),
             'error' => $error,
             'isUpToDate' => $updatePlan === null && $error === null,
         ]);
@@ -92,7 +100,6 @@ final class UpdateController extends AbstractInachisController
     #[Route('/incp/settings/updater/apply', name: 'incp_settings_update_apply', methods: ['POST'])]
     public function apply(Request $request): Response
     {
-        // CSRF verification check
         if (!$this->isCsrfTokenValid('system_update', (string) $request->request->get('_token'))) {
             $this->addFlash('danger', 'Invalid security token. Please try again.');
             return $this->redirectToRoute('incp_settings_update');
@@ -104,11 +111,9 @@ final class UpdateController extends AbstractInachisController
             $manifest = $this->releaseProvider->latest();
             $plan = $this->updatePlanner->plan($currentVersion, $manifest);
 
-            // 1. Download zip archive to temporary location
             $tempArchive = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $plan->package;
             $this->releaseProvider->download($manifest, $tempArchive);
 
-            // 2. Define shared file & directory mappings (mirroring your manual symlink steps)
             $sharedDir = $this->releaseLocator->sharedDirectory();
             $sharedMappings = [
                 '.env'                   => $sharedDir . '/.env',
@@ -118,13 +123,9 @@ final class UpdateController extends AbstractInachisController
                 'public/maintenance.html' => $sharedDir . '/public/maintenance.html',
             ];
 
-            // 3. Install, execute Doctrine migrations, and atomically swap symlinks
             $this->releaseInstaller->install($manifest, $tempArchive, $sharedMappings);
-
-            // 4. Prune older release folders (keeping current + 2 rollback releases)
             $this->releaseCleaner->prune(keep: 3);
 
-            // Clean up temporary download file
             if (file_exists($tempArchive)) {
                 unlink($tempArchive);
             }
@@ -133,6 +134,27 @@ final class UpdateController extends AbstractInachisController
 
         } catch (Throwable $exception) {
             $this->addFlash('danger', sprintf('Update failed: %s', $exception->getMessage()));
+        }
+
+        return $this->redirectToRoute('incp_settings_update');
+    }
+
+    /**
+     * Atomically roll back to the previous release.
+     */
+    #[Route('/incp/settings/updater/rollback', name: 'incp_settings_update_rollback', methods: ['POST'])]
+    public function rollback(Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('system_rollback', (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Invalid security token. Please try again.');
+            return $this->redirectToRoute('incp_settings_update');
+        }
+
+        try {
+            $revertedRelease = $this->releaseRollback->rollback();
+            $this->addFlash('success', sprintf('Successfully rolled back to v%s!', $revertedRelease->version));
+        } catch (Throwable $exception) {
+            $this->addFlash('danger', sprintf('Rollback failed: %s', $exception->getMessage()));
         }
 
         return $this->redirectToRoute('incp_settings_update');

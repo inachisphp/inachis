@@ -59,6 +59,30 @@ final class CleanupRelease implements BuildStepInterface
             );
         }
 
+        // Remove tests, docs, and git repos inside vendor/
+        $vendorDir = $workspace->path . '/vendor';
+
+        $patternsToClean = [
+            '/*/*/tests',
+            '/*/*/test',
+            '/*/*/Tests',
+            '/*/*/doc',
+            '/*/*/docs',
+            '/*/*/*.md',
+            '/*/*/phpunit.xml*',
+            '/*/*/.git*',
+        ];
+
+        foreach ($patternsToClean as $pattern) {
+            foreach (glob($vendorDir . $pattern) as $path) {
+                if (is_dir($path)) {
+                    self::remove($path);
+                } elseif (is_file($path)) {
+                    unlink($path);
+                }
+            }
+        }
+
         return $workspace;
     }
 

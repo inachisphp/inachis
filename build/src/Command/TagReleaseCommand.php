@@ -21,7 +21,7 @@ use Symfony\Component\Process\Process;
     name: 'inachis:release',
     description: 'Bumps version in composer.json and updates CHANGELOG.md',
 )]
-final class ReleaseBumpCommand extends Command
+final class TagReleaseCommand extends Command
 {
     public function __construct(
         #[Autowire('%kernel.project_dir%')]

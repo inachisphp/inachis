@@ -58,4 +58,39 @@ final class VersionService
     {
         return $this->version['build_date'];
     }
+
+    /**
+     * Tests if the current framework version satisfies a given constraint.
+     */
+    public function satisfies(string $constraint): bool
+    {
+        $version = $this->getVersion();
+        $constraint = trim($constraint);
+
+        if (str_starts_with($constraint, '^')) {
+            $min = substr($constraint, 1);
+            $parts = explode('.', $min);
+            $nextMajor = ((int) ($parts[0] ?? 0)) + 1;
+            $max = $nextMajor . '.0.0';
+
+            return version_compare($version, $min, '>=')
+                && version_compare($version, $max, '<');
+        }
+
+        if (str_starts_with($constraint, '~')) {
+            $min = substr($constraint, 1);
+            $parts = explode('.', $min);
+            $nextMinor = ((int) ($parts[1] ?? 0)) + 1;
+            $max = ($parts[0] ?? 0) . '.' . $nextMinor . '.0';
+
+            return version_compare($version, $min, '>=')
+                && version_compare($version, $max, '<');
+        }
+
+        if (preg_match('/^(>=|<=|>|<|!=|=)\s*(.+)$/', $constraint, $matches)) {
+            return version_compare($version, $matches[2], $matches[1]);
+        }
+
+        return version_compare($version, $constraint, '==');
+    }
 }

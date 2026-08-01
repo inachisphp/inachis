@@ -7,61 +7,129 @@
         type: 'tip',
         title: 'System Update',
         class: 'col-12',
-        icon: 'security',
+        icon: 'check_circle',
     } %}
         {% block text %}
-        <strong>You are on the latest version!</strong> Inachis v{{ currentVersion }} is up to date.
+        Inachis <strong>v{{ currentVersion }}</strong> is running the latest core framework release.
         {% endblock text %}
     {% endembed %}
 {% elseif error %}
     {% include 'inadmin/partials/components/admonition.html.twig' with {
         type: 'danger',
-        title: 'System Update',
+        title: 'Update Check Error',
         class: 'col-12',
-        icon: 'security',
+        icon: 'error',
         text: error,
     } %}
 {% endif %}
 
 {% if updatePlan and latestManifest %}
 <section class="ui-section col-12">
-    {% include 'inadmin/partials/components/admonition.html.twig' with {
-        text: 'Update Available: v' ~ latestManifest.version,
+    {% embed 'inadmin/partials/components/admonition.html.twig' with {
         type: 'info',
+        icon: 'update',
     } %}
+        {% block text %}
+            <strong>Update Available: v{{ latestManifest.version }}</strong> — A new version is available for deployment.
+            {% if latestManifest.publishedAt %}
+                <span class="text-muted">(Released {{ latestManifest.publishedAt|date('F j, Y') }})</span>
+            {% endif %}
+        {% endblock text %}
+    {% endembed %}
 
-    {% if latestManifest.publishedAt %}
-    <p><small>Released: {{ latestManifest.publishedAt|date('F j, Y') }}</small></p>
-    {% endif %}
-    <p><strong>Installed Version:</strong> v{{ currentVersion }}</p>
-    <p><strong>Target Version:</strong> v{{ latestManifest.version }}</p>
+    <div class="update-summary-grid">
+        <p class="version-flow font-mono">
+            <span class="version-step">
+                <span class="version-label">Installed</span>
+                <span class="badge">v{{ currentVersion }}</span>
+            </span>
+            <span class="version-arrow">➔</span>
+            <span class="version-step">
+                <span class="version-label">Target</span>
+                <span class="badge badge--highlight">v{{ latestManifest.version }}</span>
+            </span>
+        </p>
 
-    <p><strong>Database Migrations Required:</strong> 
-        {% if updatePlan.requiresMigration %}
-            <span class="badge badge__critical">Yes</span>
-        {% else %}
-            <span class="badge">No</span>
-        {% endif %}
-    </p>
-    <p><strong>Package Name:</strong> <code>{{ latestManifest.package }}</code></p>
+        <div class="update-meta-chips">
+            <div class="meta-chip">
+                <span class="meta-label">Database Migrations</span>
+                {% if updatePlan.requiresMigration %}
+                    <span class="badge badge__critical">Yes (Backup Required)</span>
+                {% else %}
+                    <span class="badge">No</span>
+                {% endif %}
+            </div>
 
+            <div class="meta-chip">
+                <span class="meta-label">Package</span>
+                <code class="badge">{{ latestManifest.package }}</code>
+            </div>
+        </div>
+    </div>
 
     {% if latestManifest.releaseNotes %}
-        <h2>Release Notes &amp; Changelog</h2>
-        <div style="max-height: 300px; overflow-y: auto;">
+    <div class="changelog-card">
+        <h2>Release Notes &amp; Changelog (v{{ latestManifest.version }})</h2>
+        <div class="changelog-body">
             {{ latestManifest.releaseNotes|nl2br }}
         </div>
+    </div>
     {% endif %}
 
-    <form action="{# #}" method="POST" onsubmit="return confirm('Are you sure you want to update? The system will briefly enter maintenance mode during deployment.');">
+
+    <form action="{{ path('incp_settings_update_apply') }}" method="POST" onsubmit="return confirm('Are you sure you want to update to v{{ latestManifest.version }}? The system will briefly enter maintenance mode.');">
         <input type="hidden" name="_token" value="{{ csrf_token('system_update') }}">
-        <button type="submit" class="button button--positive">
-            <span class="material-icons">upgrade</span>
+        <button type="submit" class="button button--positive button--large">
+            <span class="material-icons">download</span>
             <span class="btn-text">Download &amp; Apply Update (v{{ latestManifest.version }})</span>
         </button>
     </form>
-</section>
 
+    <p class="update-warning text-muted">
+        <span class="material-icons">lock</span>
+        Ensure your database is backed up before applying core updates.
+    </p>
+</section>
+{% endif %}
+
+{% if rollbackCandidate %}
+<section class="ui-section col-12 rollback-section">
+    <div class="rollback-card">
+        <div class="rollback-header">
+            <h3>Previous Release Rollback</h3>
+            <span class="badge">Available Target: v{{ rollbackCandidate.version }}</span>
+        </div>
+
+        <p class="text-muted">
+            You can instantly switch your active environment back to <strong>v{{ rollbackCandidate.version }}</strong>.
+            This operates as an atomic path swap and puts the site briefly into maintenance mode during execution.
+        </p>
+
+        <form action="{{ path('incp_settings_update_rollback') }}" method="POST" onsubmit="return confirm('Are you sure you want to roll back to v{{ rollbackCandidate.version }}?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('system_rollback') }}">
+            <button type="submit" class="button button--negative">
+                <span class="material-icons">undo</span>
+                <span class="btn-text">Rollback to v{{ rollbackCandidate.version }}</span>
+            </button>
+        </form>
+
+        {% if olderRollbacks is not empty %}
+        <div class="older-releases-list">
+            <h4 class="text-muted font-mono text-xs uppercase tracking-wider">Archived Releases (Read-Only)</h4>
+            <ul class="release-history-items">
+                {% for archive in olderRollbacks %}
+                    <li class="release-history-item text-muted">
+                        <span class="material-icons text-sm">history</span>
+                        <span class="badge badge--disabled">v{{ archive.version }}</span>
+                        <code class="font-mono text-xs">{{ archive.identifier }}</code>
+                        <span class="text-xs italic">(Sequential rollback required)</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</section>
 {% endif %}
 
 {% endblock %}
