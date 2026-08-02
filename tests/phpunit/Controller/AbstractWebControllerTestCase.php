@@ -33,7 +33,7 @@ abstract class AbstractWebControllerTestCase extends TestCase
         parent::setUp();
 
         $this->params = $this->createMock(ParameterBagInterface::class);
-        $this->params->expects($this->atLeastOnce())
+        $this->params->expects($this->any())
             ->method('has')
             ->willReturn(false);
 
@@ -41,12 +41,29 @@ abstract class AbstractWebControllerTestCase extends TestCase
         $this->security = $this->createStub(Security::class);
         $this->translator = $this->createStub(TranslatorInterface::class);
 
-        $siteSettings = new SiteSettings('Wandering the World', 'http://localhost', [], 'en', 'ltr', '', false);
+        $siteSettings = new SiteSettings('Wandering the World', 'http://localhost', [], 'en', 'ltr', '', false, 'UTC');
         $pageMetadata = new PageMetadata();
         $pageView = new PageView($siteSettings, $pageMetadata);
 
         $this->pageViewFactory = $this->createMock(PageViewFactory::class);
         $this->pageViewFactory->method('create')->willReturn($pageView);
         $this->pageViewFactory->method('createAdmin')->willReturn($pageView);
+    }
+
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $class
+     * @return T
+     */
+    protected function createController(string $class): object
+    {
+        return new $class(
+            $this->entityManager,
+            $this->pageViewFactory,
+            $this->params,
+            $this->security,
+            $this->translator,
+        );
     }
 }
