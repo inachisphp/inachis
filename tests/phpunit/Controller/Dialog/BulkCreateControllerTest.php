@@ -24,7 +24,7 @@ class BulkCreateControllerTest extends WebTestCase
     public function testContentList(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/bulkCreate/get'
+            'REQUEST_URI' => '/incp/ax/bulkCreate/get'
         ]);
 
         $this->controller = $this->getMockBuilder(BulkCreateController::class)
@@ -51,7 +51,7 @@ class BulkCreateControllerTest extends WebTestCase
             'categories' => ['test-category'],
             'seriesId' => Uuid::uuid1()->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/bulkCreate/get'
+            'REQUEST_URI' => '/incp/ax/bulkCreate/get'
         ]);
         $bulkCreatePost = $this->createStub(PageBulkCreateService::class);
         $this->controller = $this->getMockBuilder(BulkCreateController::class)
@@ -80,7 +80,7 @@ class BulkCreateControllerTest extends WebTestCase
             'categories' => ['test-category'],
             'seriesId' => Uuid::uuid1()->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/bulkCreate/get'
+            'REQUEST_URI' => '/incp/ax/bulkCreate/get'
         ]);
         $this->assertArrayHasKey('title', $request->request->all());
         $bulkCreatePost = $this->createMock(PageBulkCreateService::class);
@@ -113,7 +113,7 @@ class BulkCreateControllerTest extends WebTestCase
             'categories' => ['test-category'],
             'seriesId' => Uuid::uuid1()->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/bulkCreate/get'
+            'REQUEST_URI' => '/incp/ax/bulkCreate/get'
         ]);
         $bulkCreatePost = $this->createMock(PageBulkCreateService::class);
         $bulkCreatePost->expects($this->once())->method('create')->willReturn(7);

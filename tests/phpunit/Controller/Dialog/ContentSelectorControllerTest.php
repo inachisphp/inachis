@@ -30,7 +30,7 @@ class ContentSelectorControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'seriesId' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/contentSelector/get'
+            'REQUEST_URI' => '/incp/ax/contentSelector/get'
         ]);
         $controller = $this->getMockBuilder(ContentSelectorController::class)
             ->setConstructorArgs([
@@ -65,7 +65,7 @@ class ContentSelectorControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'seriesId' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/contentSelector/save'
+            'REQUEST_URI' => '/incp/ax/contentSelector/save'
         ]);
         $controller = $this->getMockBuilder(ContentSelectorController::class)
             ->setConstructorArgs([
@@ -100,7 +100,7 @@ class ContentSelectorControllerTest extends InachisControllerTestCase
             ],
             'seriesId' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/contentSelector/save'
+            'REQUEST_URI' => '/incp/ax/contentSelector/save'
         ]);
         $controller = $this->getMockBuilder(ContentSelectorController::class)
             ->setConstructorArgs([
@@ -139,7 +139,7 @@ class ContentSelectorControllerTest extends InachisControllerTestCase
             ],
             'seriesId' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/contentSelector/save'
+            'REQUEST_URI' => '/incp/ax/contentSelector/save'
         ]);
         $controller = $this->getMockBuilder(ContentSelectorController::class)
             ->setConstructorArgs([

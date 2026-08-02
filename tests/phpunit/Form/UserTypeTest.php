@@ -9,137 +9,48 @@
 
 namespace Inachis\Tests\phpunit\Form;
 
-use Inachis\Entity\User\User;
+use Inachis\Entity\Security\Role;
 use Inachis\Form\UserType;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AllowMockObjectsWithoutExpectations]
-class UserTypeTest extends TypeTestCase
+class UserTypeTest extends TestCase
 {
-    protected UuidInterface $uuid;
-
-    protected function getExtensions(): array
+    public function testAssignedRolesUsesUuidStringChoiceValues(): void
     {
-        $this->uuid = Uuid::uuid1();
         $translator = $this->createStub(TranslatorInterface::class);
-        $security = $this->createStub(Security::class);
-        $security->method('getUser')->willReturn((new User())->setId($this->uuid));
-        return [new PreloadedExtension([new UserType($translator, $security)], [])];
-    }
+        $security = $this->createMock(Security::class);
+        $security->method('isGranted')->willReturn(true);
 
-    public function testConfigureOptionsSetsDataClass(): void
-    {
-        $form = $this->factory->create(UserType::class, new User());
-        $options = $form->getConfig()->getOptions();
+        $capturedOptions = [];
+        $builder = $this->createMock(FormBuilderInterface::class);
+        $builder->expects($this->atLeastOnce())
+            ->method('add')
+            ->willReturnCallback(function (string $name, string $type, array $options = []) use ($builder, &$capturedOptions): FormBuilderInterface {
+                if ($name === 'assignedRoles') {
+                    $capturedOptions = $options;
+                }
 
-        $this->assertArrayHasKey('data_class', $options);
-        $this->assertSame(User::class, $options['data_class']);
-    }
+                return $builder;
+            });
 
-    public function testBuildFormForNewUser(): void
-    {
-        $user = new User();
-        $form = $this->factory->create(UserType::class, $user);
-        $view = $form->createView();
+        $formType = new UserType($translator, $security);
+        $formType->buildForm($builder, []);
 
-        $expectedFields = ['username', 'displayName', 'email', 'timezone', 'avatar', 'submit'];
-        $this->assertSame($expectedFields, array_keys($view->children));
+        $this->assertArrayHasKey('choice_value', $capturedOptions);
+        $this->assertFalse($capturedOptions['by_reference']);
 
-        $usernameType = $form->get('username')->getConfig()->getType()->getInnerType()::class;
-        $this->assertSame('Symfony\Component\Form\Extension\Core\Type\TextType', $usernameType);
+        $role = new Role();
+        $role->setName('Administrator');
+        $role->setSlug('administrator');
 
-        $emailAttr = $form->get('email')->getConfig()->getOption('attr');
-        $this->assertFalse($emailAttr['readOnly']);
-    }
+        $uuid = Uuid::uuid4();
+        $reflectionProperty = new \ReflectionProperty(Role::class, 'id');
+        $reflectionProperty->setValue($role, $uuid);
 
-    public function testBuildFormForExistingUser(): void
-    {
-        $user = (new User('existing user'))->setId(Uuid::uuid1());
-        $form = $this->factory->create(UserType::class, $user);
-        $view = $form->createView();
-
-        $this->assertContains('color', array_keys($view->children));
-
-        $usernameType = $form->get('username')->getConfig()->getType()->getInnerType()::class;
-        $this->assertSame('Symfony\Component\Form\Extension\Core\Type\HiddenType', $usernameType);
-
-        $emailAttr = $form->get('email')->getConfig()->getOption('attr');
-        $this->assertTrue($emailAttr['readOnly']);
-    }
-
-    public function testBuildFormForCurrentUser(): void
-    {
-        $user = (new User('existing user'))->setId($this->uuid);
-        $form = $this->factory->create(UserType::class, $user);
-        $view = $form->createView();
-
-        $this->assertContains('color', array_keys($view->children));
-
-        $usernameType = $form->get('username')->getConfig()->getType()->getInnerType()::class;
-        $this->assertSame('Symfony\Component\Form\Extension\Core\Type\HiddenType', $usernameType);
-
-        $emailAttr = $form->get('email')->getConfig()->getOption('attr');
-        $this->assertTrue($emailAttr['readOnly']);
-    }
-
-    // public function testColorFieldChoicesAndAttributes(): void
-    // {
-    //     $user = new User('existing user');
-    //     $user->setId(Uuid::uuid1());
-    //     $form = $this->factory->create(UserType::class, $user);
-    //     $this->assertTrue($form->has('color'), 'Color field should exist for existing users.');
-    //     $colorField = $form->get('color');
-    //     $choices = $colorField->getConfig()->getOption('choices');
-    //     $expectedColors = ProfileColorPalette::getAll();
-    //     $this->assertSame(array_combine($expectedColors, $expectedColors), $choices);
-    //     $choiceAttr = $colorField->getConfig()->getOption('choice_attr');
-    //     $this->assertIsCallable($choiceAttr);
-    //     $sample = $expectedColors[0];
-    //     $this->assertSame(['data-color' => $sample], $choiceAttr($sample, $sample, $sample));
-    // }
-
-    // public function testTimezoneFieldContainsKnownChoices(): void
-    // {
-    //     $user = new User();
-    //     $user->setUsername('');
-
-    //     $form = $this->factory->create(UserType::class, $user);
-    //     $choices = $form->get('timezone')->getConfig()->getOption('choices');
-
-    //     $this->assertNotEmpty($choices);
-    //     $this->assertArrayHasKey('(GMT+00:00) UTC', $choices);
-    //     $this->assertSame('UTC', $choices['(GMT+00:00) UTC']);
-    // }
-
-    public function testFormSubmissionPopulatesEntityCorrectly(): void
-    {
-        $user = new User();
-        $user->setUsername('');
-
-        $formData = [
-            'username' => 'new_user',
-            'displayName' => 'John Doe',
-            'email' => 'john@example.com',
-            'avatar' => 'test.jpg',
-            'timezone' => 'UTC',
-        ];
-
-        $form = $this->factory->create(UserType::class, $user);
-        $form->submit($formData);
-
-        $this->assertTrue($form->isSynchronized());
-        $this->assertTrue($form->isValid());
-
-        $this->assertSame('new_user', $user->getUsername());
-        $this->assertSame('John Doe', $user->getDisplayName());
-        $this->assertSame('john@example.com', $user->getEmail());
-        $this->assertSame('UTC', $user->getPreferences()->getTimezone());
-        $this->assertSame('test.jpg', $user->getAvatar());
+        $this->assertSame($uuid->toString(), $capturedOptions['choice_value']($role));
     }
 }

@@ -43,7 +43,7 @@ class ImageGalleryDialogControllerTest extends WebTestCase
                 return new Response('rendered:' . $template);
             });
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/imageManager/getImages/50/25'
+            'REQUEST_URI' => '/incp/ax/imageManager/getImages/50/25'
         ]);
         $paginator = $this->createStub(Paginator::class);
         $imageRepository = $this->getMockBuilder(ImageRepository::class)

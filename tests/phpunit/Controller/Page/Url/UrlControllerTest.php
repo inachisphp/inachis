@@ -33,7 +33,7 @@ class UrlControllerTest extends InachisControllerTestCase
             'offset' => '50',
             'limit' => '50',
         ], [], [], [
-            'REQUEST_URI' => '/incc/url/list/50/25'
+            'REQUEST_URI' => '/incp/url/list/50/25'
         ]);
             $controller = $this->getMockBuilder(UrlController::class)
             ->setConstructorArgs([
@@ -81,7 +81,7 @@ class UrlControllerTest extends InachisControllerTestCase
             'offset' => '50',
             'limit' => '50',
         ], [], [], [
-            'REQUEST_URI' => '/incc/url/list/50/25'
+            'REQUEST_URI' => '/incp/url/list/50/25'
         ]);
         $controller = $this->getMockBuilder(UrlController::class)
             ->setConstructorArgs([
@@ -103,8 +103,8 @@ class UrlControllerTest extends InachisControllerTestCase
             ->method('createFormBuilder')->willReturn($formBuilder);
         $controller->expects($this->once())
             ->method('redirectToRoute')
-            ->with('incc_url_list')
-            ->willReturn(new RedirectResponse('/incc/url/list/50/25'));
+            ->with('incp_url_list')
+            ->willReturn(new RedirectResponse('/incp/url/list/50/25'));
         $contentQueryParameters = $this->createStub(ContentQueryParameters::class);
         $urlBulkActionService = $this->createStub(UrlBulkActionService::class);
         $urlBulkActionService->method('apply')->willReturn(2);
@@ -112,7 +112,7 @@ class UrlControllerTest extends InachisControllerTestCase
 
         $result = $controller->list($request, $contentQueryParameters, $urlBulkActionService, $urlRepository);
         $this->assertInstanceOf(RedirectResponse::class, $result);
-        $this->assertSame('/incc/url/list/50/25', $result->headers->get('Location'));
+        $this->assertSame('/incp/url/list/50/25', $result->headers->get('Location'));
     }
 
     /**
@@ -126,7 +126,7 @@ class UrlControllerTest extends InachisControllerTestCase
             'id' => $uuid,
             'url' => 'test-url',
         ], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/check-url-usage'
+            'REQUEST_URI' => '/incp/ax/check-url-usage'
         ]);
         $urlRepository = $this->createMock(UrlRepository::class);
         $urlRepository->expects($this->once())

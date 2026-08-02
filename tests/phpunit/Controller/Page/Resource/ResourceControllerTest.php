@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -45,7 +45,7 @@ class ResourceControllerTest extends InachisControllerTestCase
         $request = new Request([], [], [
             'type' => 'images',
         ], [], [], [
-            'REQUEST_URI' => '/incc/resources/{type}/{offset}/{limit}'
+            'REQUEST_URI' => '/incp/resources/{type}/{offset}/{limit}'
         ]);
         $downloadRepository = $this->createStub(DownloadRepository::class);
         $paginator = $this->createStub(Paginator::class);
@@ -89,7 +89,7 @@ class ResourceControllerTest extends InachisControllerTestCase
             'filename' => Uuid::uuid1(),
             'type' => 'images',
         ], [], [], [
-            'REQUEST_URI' => '/incc/resources/{type}/{filename}'
+            'REQUEST_URI' => '/incp/resources/{type}/{filename}'
         ]);
         $this->controller = $this->getMockBuilder(ResourceController::class)
             ->setConstructorArgs([
@@ -132,7 +132,7 @@ class ResourceControllerTest extends InachisControllerTestCase
             'filename' => Uuid::uuid1(),
             'type' => 'images',
         ], [], [], [
-            'REQUEST_URI' => '/incc/resources/{type}/{filename}'
+            'REQUEST_URI' => '/incp/resources/{type}/{filename}'
         ]);
         $this->controller = $this->getMockBuilder(ResourceController::class)
             ->setConstructorArgs([
@@ -146,7 +146,7 @@ class ResourceControllerTest extends InachisControllerTestCase
             ->getMock();
         $this->controller->expects($this->once())
             ->method('redirectToRoute')
-            ->with('incc_resource_list', ['type' => 'images'])
+            ->with('incp_resource_list', ['type' => 'images'])
             ->willReturn(new RedirectResponse('/resources/images'));
         $filesystem = $this->createStub(Filesystem::class);
         $downloadRepository = $this->createStub(DownloadRepository::class);
@@ -178,7 +178,7 @@ class ResourceControllerTest extends InachisControllerTestCase
             'filename' => Uuid::uuid1(),
             'type' => 'images',
         ], [], [], [
-            'REQUEST_URI' => '/incc/resources/{type}/{filename}'
+            'REQUEST_URI' => '/incp/resources/{type}/{filename}'
         ]);
         $image = (new Image())->setId(Uuid::uuid1());
         $this->controller = $this->getMockBuilder(ResourceController::class)
@@ -193,7 +193,7 @@ class ResourceControllerTest extends InachisControllerTestCase
             ->getMock();
         $this->controller->expects($this->once())
             ->method('redirectToRoute')
-            ->with('incc_resource_list', ['type' => 'images', ])
+            ->with('incp_resource_list', ['type' => 'images', ])
             ->willReturn(new RedirectResponse('/resources/images'));
         $form = $this->createMock(Form::class);
         $form->expects($this->once())->method('isSubmitted')->willReturn(true);
@@ -233,7 +233,7 @@ class ResourceControllerTest extends InachisControllerTestCase
             'filename' => Uuid::uuid1(),
             'type' => 'images',
         ], [], [], [
-            'REQUEST_URI' => '/incc/resources/{type}/{filename}'
+            'REQUEST_URI' => '/incp/resources/{type}/{filename}'
         ]);
         $image = (new Image())->setId(Uuid::uuid1());
         $this->controller = $this->getMockBuilder(ResourceController::class)
@@ -248,7 +248,7 @@ class ResourceControllerTest extends InachisControllerTestCase
             ->getMock();
         $this->controller->expects($this->once())
             ->method('redirectToRoute')
-            ->with('incc_resource_edit', ['type' => 'images', 'filename' => $image->getId(), ])
+            ->with('incp_resource_edit', ['type' => 'images', 'filename' => $image->getId(), ])
             ->willReturn(new RedirectResponse('/resources/images'));
         $form = $this->createMock(Form::class);
         $form->expects($this->once())->method('isSubmitted')->willReturn(true);
@@ -288,7 +288,7 @@ class ResourceControllerTest extends InachisControllerTestCase
             'filename' => Uuid::uuid1(),
             'type' => 'images',
         ], [], [], [
-            'REQUEST_URI' => '/incc/resources/{type}/{filename}'
+            'REQUEST_URI' => '/incp/resources/{type}/{filename}'
         ]);
         $image = (new Image())->setId(Uuid::uuid1());
         $this->controller = $this->getMockBuilder(ResourceController::class)
@@ -303,7 +303,7 @@ class ResourceControllerTest extends InachisControllerTestCase
             ->getMock();
         $this->controller->expects($this->once())
             ->method('redirectToRoute')
-            ->with('incc_resource_edit', ['type' => 'images', 'filename' => $image->getId()])
+            ->with('incp_resource_edit', ['type' => 'images', 'filename' => $image->getId()])
             ->willReturn(new RedirectResponse('/resources/images'));
         $form = $this->createMock(Form::class);
         $form->expects($this->once())->method('isSubmitted')->willReturn(true);
@@ -335,7 +335,7 @@ class ResourceControllerTest extends InachisControllerTestCase
     public function testUploadImageNoFile(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/resource/image/upload'
+            'REQUEST_URI' => '/incp/resource/image/upload'
         ]);
         $this->controller = $this->getMockBuilder(ResourceController::class)
             ->setConstructorArgs([
@@ -366,7 +366,7 @@ class ResourceControllerTest extends InachisControllerTestCase
                 'imageFile' => $this->createStub(UploadedFile::class),
             ],
         ], [
-            'REQUEST_URI' => '/incc/resource/image/upload'
+            'REQUEST_URI' => '/incp/resource/image/upload'
         ]);
         $this->controller = $this->getMockBuilder(ResourceController::class)
             ->setConstructorArgs([
@@ -409,7 +409,7 @@ class ResourceControllerTest extends InachisControllerTestCase
                 'imageFile' => $file,
             ],
         ], [
-            'REQUEST_URI' => '/incc/resource/image/upload'
+            'REQUEST_URI' => '/incp/resource/image/upload'
         ]);
         $this->controller = $this->getMockBuilder(ResourceController::class)
             ->setConstructorArgs([
@@ -461,7 +461,7 @@ class ResourceControllerTest extends InachisControllerTestCase
                 'imageFile' => $file,
             ],
         ], [
-            'REQUEST_URI' => '/incc/resource/image/upload'
+            'REQUEST_URI' => '/incp/resource/image/upload'
         ]);
         $this->controller = $this->getMockBuilder(ResourceController::class)
             ->setConstructorArgs([

@@ -32,7 +32,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
     public function setUp(): void
     {
         parent::setUp();
-        
+
         $this->controller = $this->getMockBuilder(CategoryDialogController::class)
             ->setConstructorArgs([
                 $this->entityManager,
@@ -68,7 +68,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
     public function testGetCategoryManagerListContentRootCategory(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/categoryList/get'
+            'REQUEST_URI' => '/incp/ax/categoryList/get'
         ]);
         $category = (new Category('test-category'))->setId(Uuid::uuid1());
         $this->categoryRepository->expects($this->once())
@@ -86,7 +86,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'q' => 'test-category',
         ], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/categoryList/get'
+            'REQUEST_URI' => '/incp/ax/categoryList/get'
         ]);
         $category = (new Category('test-category'))->setId(Uuid::uuid1());
         $paginator = $this->getMockBuilder(Paginator::class)
@@ -113,7 +113,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'id' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => 'incc/ax/categoryManager/save'
+            'REQUEST_URI' => 'incp/ax/categoryManager/save'
         ]);
         $category = (new Category('test-category'))->setId($uuid);
         $this->categoryRepository->expects($this->atLeastOnce())
@@ -130,7 +130,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
             'id' => '-1',
             'parentID' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => 'incc/ax/categoryManager/save'
+            'REQUEST_URI' => 'incp/ax/categoryManager/save'
         ]);
         $this->categoryRepository->expects($this->once())
             ->method('findOneBy')
@@ -148,7 +148,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'id' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => 'incc/ax/categoryManager/usage'
+            'REQUEST_URI' => 'incp/ax/categoryManager/usage'
         ]);
         $category = (new Category('test-category'))->setId($uuid);
         $category->addChild(new Category('test-sub-category'));
@@ -172,7 +172,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'id' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => 'incc/ax/categoryManager/delete'
+            'REQUEST_URI' => 'incp/ax/categoryManager/delete'
         ]);
         $category = (new Category('test-category'))->setId($uuid);
         $category->addChild(new Category('test-sub-category'));
@@ -197,7 +197,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'id' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => 'incc/ax/categoryManager/delete'
+            'REQUEST_URI' => 'incp/ax/categoryManager/delete'
         ]);
         $category = (new Category('test-category'))->setId($uuid);
         $category->addChild(new Category('test-sub-category'));

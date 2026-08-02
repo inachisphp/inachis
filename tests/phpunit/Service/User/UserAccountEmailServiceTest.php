@@ -13,6 +13,7 @@ use Inachis\Entity\User\User;
 use Inachis\Service\User\PasswordResetTokenService;
 use Inachis\Service\User\UserAccountEmailService;
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Factory\PageViewFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
@@ -21,13 +22,14 @@ class UserAccountEmailServiceTest extends TestCase
 {
     private MailerInterface $mailer;
     private PasswordResetTokenService $tokenService;
-    private EntityManagerInterface $entityManager;
+    private PageViewFactory $pageViewFactory;
     private array $settings;
 
     protected function setUp(): void
     {
         $this->mailer = $this->createMock(MailerInterface::class);
         $this->tokenService = $this->createMock(PasswordResetTokenService::class);
+        $this->pageViewFactory = $this->createMock(PageViewFactory::class);
 
         $this->settings = [
             'clientIP' => '127.0.0.1',
@@ -52,7 +54,7 @@ class UserAccountEmailServiceTest extends TestCase
             ->with('john@example.com')
             ->willReturn($fakeTokenData);
 
-        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->pageViewFactory = $this->createStub(PageViewFactory::class);
 
         $this->mailer->expects($this->once())
             ->method('send')
@@ -75,7 +77,7 @@ class UserAccountEmailServiceTest extends TestCase
         $service = new UserAccountEmailService(
             $this->mailer,
             $this->tokenService,
-            $this->entityManager,
+            $this->pageViewFactory,
         );
 
         $urlGenerator = fn(string $token) => "https://site/reset/$token";
@@ -110,7 +112,7 @@ class UserAccountEmailServiceTest extends TestCase
                 $this->assertEquals('inadmin/emails/forgot-password.txt.twig', $email->getTextTemplate());
 
                 $context = $email->getContext();
-                $this->assertEquals('/incc/new-password/' . $fakeTokenData['token'], $context['url']);
+                $this->assertEquals('/incp/new-password/' . $fakeTokenData['token'], $context['url']);
                 $this->assertStringContainsString('data:image/png;base64,', $context['logo']);
 
                 return true;
@@ -122,7 +124,7 @@ class UserAccountEmailServiceTest extends TestCase
             $this->entityManager,
         );
 
-        $urlGenerator = fn(string $token) => "/incc/new-password/$token";
+        $urlGenerator = fn(string $token) => "/incp/new-password/$token";
         $service->sendForgotPasswordEmail($user, $this->settings, $urlGenerator);
     }
 }

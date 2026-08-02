@@ -40,7 +40,7 @@ class SeriesControllerTest extends InachisControllerTestCase
             'offset' => '50',
             'limit' => '25',
         ], [], [], [
-            'REQUEST_URI' => '/incc/series/list/50/25'
+            'REQUEST_URI' => '/incp/series/list/50/25'
         ]);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([
@@ -89,7 +89,7 @@ class SeriesControllerTest extends InachisControllerTestCase
             'offset' => '50',
             'limit' => '25',
         ], [], [], [
-            'REQUEST_URI' => '/incc/series/list/50/25'
+            'REQUEST_URI' => '/incp/series/list/50/25'
         ]);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([
@@ -112,8 +112,8 @@ class SeriesControllerTest extends InachisControllerTestCase
         $controller->expects($this->once())->method('createFormBuilder')->willReturn($formBuilder);
         $controller->expects($this->once())
             ->method('redirectToRoute')
-            ->with('incc_series_list')
-            ->willReturn(new RedirectResponse('/incc/series/list/50/25'));
+            ->with('incp_series_list')
+            ->willReturn(new RedirectResponse('/incp/series/list/50/25'));
         $contentQueryParameters = $this->createStub(ContentQueryParameters::class);
         $seriesBulkActionService = $this->createMock(SeriesBulkActionService::class);
         $seriesBulkActionService->expects($this->once())
@@ -122,7 +122,7 @@ class SeriesControllerTest extends InachisControllerTestCase
 
         $result = $controller->list($request, $contentQueryParameters, $seriesBulkActionService, $seriesRepository);
         $this->assertInstanceOf(RedirectResponse::class, $result);
-        $this->assertSame('/incc/series/list/50/25', $result->headers->get('Location'));
+        $this->assertSame('/incp/series/list/50/25', $result->headers->get('Location'));
     }
 
     /**
@@ -134,7 +134,7 @@ class SeriesControllerTest extends InachisControllerTestCase
         $request = new Request([], [], [
             'id' => $uuid->toString(),
         ], [], [], [
-            'REQUEST_URI' => '/incc/series/edit/' . $uuid->toString(),
+            'REQUEST_URI' => '/incp/series/edit/' . $uuid->toString(),
         ]);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([
@@ -176,7 +176,7 @@ class SeriesControllerTest extends InachisControllerTestCase
         ], [
             'id' => null,
         ], [], [], [
-            'REQUEST_URI' => '/incc/series/new',
+            'REQUEST_URI' => '/incp/series/new',
         ]);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([
@@ -225,7 +225,7 @@ class SeriesControllerTest extends InachisControllerTestCase
         ], [
             'id' => null,
         ], [], [], [
-            'REQUEST_URI' => '/incc/series/new',
+            'REQUEST_URI' => '/incp/series/new',
         ]);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([
@@ -273,7 +273,7 @@ class SeriesControllerTest extends InachisControllerTestCase
             ], [
                 'id' => null,
             ], [], [], [
-                'REQUEST_URI' => '/incc/series/new',
+                'REQUEST_URI' => '/incp/series/new',
             ]);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([
@@ -314,7 +314,7 @@ class SeriesControllerTest extends InachisControllerTestCase
         $request = new Request([], [], [
             'id' => Uuid::uuid1(),
         ], [], [], [
-            'REQUEST_URI' => '/incc/series/contents/test',
+            'REQUEST_URI' => '/incp/series/contents/test',
         ]);
         $seriesRepository = $this->createStub(SeriesRepository::class);
         $form = $this->createStub(Form::class);

@@ -33,7 +33,7 @@ class ContentQueryParametersTest extends TestCase
             'offset' => 50,
             'limit' => 25,
         ], [], [], [
-            'REQUEST_URI' => '/incc/post/list',
+            'REQUEST_URI' => '/incp/post/list',
         ]);
 
         parent::setUp();

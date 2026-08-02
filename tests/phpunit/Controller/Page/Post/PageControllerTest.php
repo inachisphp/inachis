@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -38,7 +38,7 @@ class PageControllerTest extends InachisControllerTestCase
     public function testGetPostAdminRedirectsWhenUrlMissing(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/post/some-post'
+            'REQUEST_URI' => '/incp/post/some-post'
         ]);
         $request->setSession(new Session(new MockArraySessionStorage()));
         $pageRepository = $this->createStub(PageRepository::class);
@@ -66,7 +66,7 @@ class PageControllerTest extends InachisControllerTestCase
             ->getMock();
         $controller->expects($this->once())
             ->method('redirectToRoute')
-            ->with('incc_post_list', ['type' => 'post'])
+            ->with('incp_post_list', ['type' => 'post'])
             ->willReturn(new RedirectResponse('/redirected'));
         $revisionRepository = $this->createStub(RevisionRepository::class);
 
@@ -93,7 +93,7 @@ class PageControllerTest extends InachisControllerTestCase
     public function testGetPostAdminWithNewPostRendersForm(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/post/new'
+            'REQUEST_URI' => '/incp/post/new'
         ]);
         $request->setSession(new Session(new MockArraySessionStorage()));
 

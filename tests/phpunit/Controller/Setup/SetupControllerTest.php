@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -40,7 +40,7 @@ class SetupControllerTest extends InachisControllerTestCase
             ->getMock();
         $controller->expects($this->once())
             ->method('redirectToRoute')
-            ->with('incc_dashboard')
+            ->with('incp_dashboard')
             ->willReturn(new RedirectResponse('/'));
         $result = $controller->stage1($userRepository);
         $this->assertInstanceOf(RedirectResponse::class, $result);

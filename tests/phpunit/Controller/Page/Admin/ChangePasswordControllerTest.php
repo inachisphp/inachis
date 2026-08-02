@@ -38,7 +38,7 @@ class ChangePasswordControllerTest extends InachisControllerTestCase
         ], [
             'id' => Uuid::uuid1(),
         ], [], [], [
-            'REQUEST_URI' => '/incc/admin/{id}/change-password'
+            'REQUEST_URI' => '/incp/admin/{id}/change-password'
         ]);
         $user = (new User('test-user'))->setId(Uuid::uuid1());
         $security = $this->createMock(Security::class);
@@ -83,7 +83,7 @@ class ChangePasswordControllerTest extends InachisControllerTestCase
         ], [
             'id' => Uuid::uuid1(),
         ], [], [], [
-            'REQUEST_URI' => '/incc/admin/{id}/change-password'
+            'REQUEST_URI' => '/incp/admin/{id}/change-password'
         ]);
         $user = (new User('test-user'))->setId(Uuid::uuid1());
         $security = $this->createMock(Security::class);
@@ -123,7 +123,7 @@ class ChangePasswordControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'password' => 'Testpa$$word123',
         ], [], [], [], [
-            'REQUEST_URI' => '/incc/api/calculate-password-strength'
+            'REQUEST_URI' => '/incp/api/calculate-password-strength'
         ]);
         $controller = new ChangePasswordController(
             $this->entityManager,

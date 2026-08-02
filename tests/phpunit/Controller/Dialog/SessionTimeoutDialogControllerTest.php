@@ -44,7 +44,7 @@ class SessionTimeoutDialogControllerTest extends InachisControllerTestCase
     public function testShowDialog(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/sessionTimeout/get'
+            'REQUEST_URI' => '/incp/ax/sessionTimeout/get'
         ]);
         $this->controller = $this->getMockBuilder(SessionTimeoutDialogController::class)
             ->disableOriginalConstructor()

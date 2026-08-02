@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -17,6 +17,7 @@ use Inachis\Entity\Content\Url;
 use Inachis\Repository\Analytics\AnalyticsRepository;
 use Inachis\Repository\Content\{PageRepository, SeriesRepository, UrlRepository};
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class InternalAnalyticsProviderTest extends TestCase
 {
@@ -30,11 +31,14 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
+            $this->createStub(CacheInterface::class),
             $this->createStub(SeriesRepository::class),
-            $this->createStub(UrlRepository::class)
+            $this->createStub(UrlRepository::class),
         );
 
-        $result = $analyticsProvider->getTopPages();
+        $from = new DateTimeImmutable('2023-01-01');
+        $to = new DateTimeImmutable('2023-01-01');
+        $result = $analyticsProvider->getTopPages($from, $to, 2);
         $this->assertEquals([
             ['path' => '/', 'total' => 10, 'title' => 'Home'],
             ['path' => '/test', 'total' => 3, 'title' => '/test'],
@@ -53,6 +57,7 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
+            $this->createStub(CacheInterface::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -69,6 +74,7 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
+            $this->createStub(CacheInterface::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -85,6 +91,7 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
+            $this->createStub(CacheInterface::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -104,6 +111,7 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
+            $this->createStub(CacheInterface::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -136,6 +144,7 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
+            $this->createStub(CacheInterface::class),
             $seriesRepository,
             $urlRepository,
         );
@@ -162,6 +171,7 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
+            $this->createStub(CacheInterface::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -183,6 +193,7 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
+            $this->createStub(CacheInterface::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -201,6 +212,7 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
+            $this->createStub(CacheInterface::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
@@ -218,13 +230,14 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
+            $this->createStub(CacheInterface::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
         $testDate = new DateTimeImmutable('now');
 
         $result = $analyticsProvider->getPageStatsOverTime(new Page(), $testDate, $testDate);
-        $this->assertEquals([], $result);        
+        $this->assertEquals([], $result);
     }
 
     public function testGetSeriesStatsOverTime(): void
@@ -235,13 +248,14 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
+            $this->createStub(CacheInterface::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
         $testDate = new DateTimeImmutable('now');
 
         $result = $analyticsProvider->getSeriesStatsOverTime(new Series(), $testDate, $testDate);
-        $this->assertEquals([], $result);      
+        $this->assertEquals([], $result);
     }
 
     public function testGetTopRegions(): void
@@ -252,13 +266,14 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
+            $this->createStub(CacheInterface::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
         $testDate = new DateTimeImmutable('now');
 
         $result = $analyticsProvider->getTopRegions($testDate, $testDate, 10);
-        $this->assertEquals([], $result);   
+        $this->assertEquals([], $result);
     }
 
     public function testGetSubscriberStatsOverTime(): void
@@ -269,13 +284,14 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
+            $this->createStub(CacheInterface::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
         $testDate = new DateTimeImmutable('now');
 
         $result = $analyticsProvider->getSubscriberStatsOverTime($testDate, $testDate);
-        $this->assertEquals([], $result);   
+        $this->assertEquals([], $result);
     }
 
     public function testGetCurrentSubscribersPerFeed(): void
@@ -286,12 +302,13 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
+            $this->createStub(CacheInterface::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
 
         $result = $analyticsProvider->getCurrentSubscribersPerFeed();
-        $this->assertEquals([], $result);   
+        $this->assertEquals([], $result);
     }
 
     public function testGetTopBots(): void
@@ -302,12 +319,13 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $analyticsProvider = new InternalAnalyticsProvider(
             $analyticsRepository,
+            $this->createStub(CacheInterface::class),
             $this->createStub(SeriesRepository::class),
             $this->createStub(UrlRepository::class)
         );
         $testDate = new DateTimeImmutable('now');
 
         $result = $analyticsProvider->getTopBots($testDate, $testDate);
-        $this->assertEquals([], $result);   
+        $this->assertEquals([], $result);
     }
 }

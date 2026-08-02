@@ -26,7 +26,7 @@ class ConfirmationControllerTest extends InachisControllerTestCase
     public function testContentList(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/confirmation/get'
+            'REQUEST_URI' => '/incp/ax/confirmation/get'
         ]);
         $controller = $this->getMockBuilder(ConfirmationController::class)
             ->setConstructorArgs([

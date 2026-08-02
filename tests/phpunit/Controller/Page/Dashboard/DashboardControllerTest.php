@@ -27,7 +27,7 @@ class DashboardControllerTest extends InachisControllerTestCase
     public function testDefault(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/'
+            'REQUEST_URI' => '/incp/'
         ]);
         $controller = $this->getMockBuilder(DashboardController::class)
             ->setConstructorArgs([
@@ -51,7 +51,7 @@ class DashboardControllerTest extends InachisControllerTestCase
         $analytics->expects($this->once())->method('getTopPages')->willReturn([]);
         $analytics->expects($this->atLeastOnce())->method('getTotalViews')->willReturn(2);
         $analytics->expects($this->atLeastOnce())->method('getMonthlyUniqueVisitors')->willReturn(3);
-        
+
         $result = $controller->default(
             $request,
             $analytics,

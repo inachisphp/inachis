@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -74,7 +74,7 @@ class SearchControllerTest extends InachisControllerTestCase
             'offset' => 50,
             'limit' => 25,
         ], [], [], [
-            'REQUEST_URI' => '/incc/search/results/{keyword}/{offset}/{limit}',
+            'REQUEST_URI' => '/incp/search/results/{keyword}/{offset}/{limit}',
         ]);
         $request->setMethod(Request::METHOD_POST);
         $request->setSession(new Session(new MockArraySessionStorage()));
@@ -135,7 +135,7 @@ class SearchControllerTest extends InachisControllerTestCase
             'offset' => 50,
             'limit' => 25,
         ], [], [], [
-            'REQUEST_URI' => '/incc/search/results/ /{offset}/{limit}',
+            'REQUEST_URI' => '/incp/search/results/ /{offset}/{limit}',
         ]);
 
         $searchRepository = $this->createStub(SearchRepository::class);
@@ -144,7 +144,7 @@ class SearchControllerTest extends InachisControllerTestCase
 
         $result = $this->controller->results($request, $searchRepository, $urlRepository, $userRepository);
         $this->assertInstanceOf(RedirectResponse::class, $result);
-        $this->assertEquals('redirected:incc_search_results', $result->headers->get('Location'));
+        $this->assertEquals('redirected:incp_search_results', $result->headers->get('Location'));
     }
 
     /**
@@ -157,7 +157,7 @@ class SearchControllerTest extends InachisControllerTestCase
             'offset' => 50,
             'limit' => 25,
         ], [], [], [
-            'REQUEST_URI' => '/incc/search/results/{keyword}/{offset}/{limit}',
+            'REQUEST_URI' => '/incp/search/results/{keyword}/{offset}/{limit}',
         ]);
         $session = new Session(new MockArraySessionStorage());
         $session->set('search_sort', 'from session');

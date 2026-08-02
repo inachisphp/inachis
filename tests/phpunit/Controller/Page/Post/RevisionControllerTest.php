@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -29,7 +29,7 @@ class RevisionControllerTest extends InachisControllerTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->controller = $this->getMockBuilder(RevisionController::class)
             ->setConstructorArgs([
                 $this->entityManager,
@@ -45,7 +45,7 @@ class RevisionControllerTest extends InachisControllerTestCase
     public function testDiffEmptyRevision()
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/page/diff/{id}'
+            'REQUEST_URI' => '/incp/page/diff/{id}'
         ]);
         $pageRepository = $this->createStub(PageRepository::class);
         $revisionRepository = $this->createMock(RevisionRepository::class);
@@ -59,7 +59,7 @@ class RevisionControllerTest extends InachisControllerTestCase
     public function testDiffPageNotFound()
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/page/diff/{id}'
+            'REQUEST_URI' => '/incp/page/diff/{id}'
         ]);
         $pageRepository = $this->createStub(PageRepository::class);
         $revisionRepository = $this->createMock(RevisionRepository::class);
@@ -78,7 +78,7 @@ class RevisionControllerTest extends InachisControllerTestCase
     public function testDiff()
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/page/diff/{id}'
+            'REQUEST_URI' => '/incp/page/diff/{id}'
         ]);
         $pageRepository = $this->createMock(PageRepository::class);
         $page = (new Page('test-page'))->setId(Uuid::uuid1())
@@ -102,7 +102,7 @@ class RevisionControllerTest extends InachisControllerTestCase
     public function testDoRevert()
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/page/diff/{id}'
+            'REQUEST_URI' => '/incp/page/diff/{id}'
         ]);
         $pageRepository = $this->createMock(PageRepository::class);
         $page = (new Page('test-page'))->setId(Uuid::uuid1())
@@ -114,7 +114,7 @@ class RevisionControllerTest extends InachisControllerTestCase
         $revisionRepository->expects($this->once())->method('findOneBy')->willReturn($revision);
         $this->controller->expects($this->once())
             ->method('redirect')
-            ->willReturn(new RedirectResponse('/incc/post/'));
+            ->willReturn(new RedirectResponse('/incp/post/'));
         $this->controller->doRevert($request, $pageRepository, $revisionRepository);
     }
 
@@ -124,7 +124,7 @@ class RevisionControllerTest extends InachisControllerTestCase
     public function testDownload()
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/page/download/{id}'
+            'REQUEST_URI' => '/incp/page/download/{id}'
         ]);
         $revisionRepository = $this->createMock(RevisionRepository::class);
         $revision = (new Revision())->setPageId(Uuid::uuid1())->setTitle('')->setContent('test');
@@ -145,7 +145,7 @@ class RevisionControllerTest extends InachisControllerTestCase
     public function testDownloadRevisionNotFound()
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/page/download/{id}'
+            'REQUEST_URI' => '/incp/page/download/{id}'
         ]);
         $revisionRepository = $this->createMock(RevisionRepository::class);
         $revisionRepository->expects($this->once())->method('findOneBy')->willReturn(null);

@@ -71,6 +71,18 @@ class RoleTest extends TestCase
     }
 
     #[Test]
+    public function nameChangesDoNotReplaceTheInitialSlug(): void
+    {
+        $this->role->setName('Administrator');
+
+        self::assertSame('administrator', $this->role->getSlug());
+
+        $this->role->setName('Super Administrator');
+
+        self::assertSame('administrator', $this->role->getSlug());
+    }
+
+    #[Test]
     public function manageRolePermissions(): void
     {
         $permission = new RolePermission();

@@ -35,7 +35,7 @@ class BulkCreateDataTest extends TestCase
     public function testFromRequestNoFormData(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/series/some-post'
+            'REQUEST_URI' => '/incp/series/some-post'
         ]);
         $this->expectExceptionMessage('Form data is missing.');
         BulkCreateData::fromRequest($request);
