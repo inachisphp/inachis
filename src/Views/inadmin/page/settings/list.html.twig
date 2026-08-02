@@ -50,11 +50,9 @@
     <h2>System Information</h2>
     <p>
         <span>Version: {{ version.version }}</span><br>
-        <span>Commit: {{ version.commit }}</span><br>
-    </p>
-    <p>
         <small class="text-muted">Build date: {{ version.build_date }}</small>
     </p>
+    <p><a href="{{ viewModel.settings.domain ~ path('incp_settings_update') }}" class="button button--secondary">Update / Rollback</a></p>
 </section>
 
 </div>

@@ -70,6 +70,12 @@ final class ValidateRelease implements BuildStepInterface
         return $workspace;
     }
 
+    /**
+     * Make sure not 'forbidden' files are included in the release.
+     *
+     * @param ReleaseWorkspace $workspace
+     * @param list<string> $forbidden
+     */
     private function validateForbiddenFiles(
         ReleaseWorkspace $workspace,
         array $forbidden,

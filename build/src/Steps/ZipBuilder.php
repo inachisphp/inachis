@@ -10,7 +10,10 @@ namespace Inachis\Build\Steps;
 
 use Inachis\Build\BuildStepInterface;
 use Inachis\Build\ReleaseWorkspace;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use RuntimeException;
+use SplFileInfo;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use ZipArchive;
@@ -39,13 +42,28 @@ final class ZipBuilder implements BuildStepInterface
             );
         }
 
+        $manifestContent = file_get_contents($manifestPath);
+        if ($manifestContent === false) {
+            throw new RuntimeException(
+                'Unable to read manifest file.'
+            );
+        }
+
+        /** @var mixed $manifest */
         $manifest = json_decode(
-            file_get_contents($manifestPath),
+            $manifestContent,
             true,
             flags: JSON_THROW_ON_ERROR
         );
 
-        $version = $manifest['version'] ?? 'unknown';
+        if (!is_array($manifest)) {
+            throw new RuntimeException(
+                'Invalid manifest JSON format.'
+            );
+        }
+
+        /** @var string $version */
+        $version = is_string($manifest['version'] ?? null) ? $manifest['version'] : 'unknown';
 
         $dist = dirname($workspace->path)
             . DIRECTORY_SEPARATOR
@@ -104,18 +122,20 @@ final class ZipBuilder implements BuildStepInterface
         ZipArchive $zip,
         string $directory,
     ): void {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator(
+        /** @var RecursiveIteratorIterator<RecursiveDirectoryIterator> $iterator */
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator(
                 $directory,
-                \RecursiveDirectoryIterator::SKIP_DOTS
+                RecursiveDirectoryIterator::SKIP_DOTS
             ),
-            \RecursiveIteratorIterator::SELF_FIRST
+            RecursiveIteratorIterator::SELF_FIRST
         );
 
+        /** @var SplFileInfo $file */
         foreach ($iterator as $file) {
-
+            $pathname = $file->getPathname();
             $path = substr(
-                $file->getPathname(),
+                $pathname,
                 strlen($directory) + 1
             );
 
@@ -124,10 +144,7 @@ final class ZipBuilder implements BuildStepInterface
                 continue;
             }
 
-            if (!$zip->addFile(
-                $file->getPathname(),
-                $path
-            )) {
+            if (!$zip->addFile($pathname, $path)) {
                 throw new RuntimeException(
                     sprintf(
                         'Unable to add "%s" to archive.',

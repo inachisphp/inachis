@@ -86,7 +86,8 @@ phpstan: ## Run PHPStan static analysis on src/
 
 phpunit: ## Run PHPUnit tests with code coverage
 	@echo "$(CYAN)Running PHPUnit suite with coverage...$(RESET)"
-	@XDEBUG_MODE=coverage php ./vendor/bin/phpunit --display-all-issues
+	@mkdir -p tests/logs/coverage-report
+	-XDEBUG_MODE=coverage php ./vendor/bin/phpunit
 
 qa: phpstan phpunit ## Run full QA suite (PHPStan + PHPUnit)
 

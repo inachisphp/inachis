@@ -106,6 +106,12 @@ final class ManifestGenerator implements BuildStepInterface
         );
     }
 
+    /**
+     * Gets the version number from composer.json
+     *
+     * @param ReleaseWorkspace $workspace
+     * @return string
+     */
     private function getVersion(
         ReleaseWorkspace $workspace
     ): string {
