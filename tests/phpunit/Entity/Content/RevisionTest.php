@@ -10,7 +10,7 @@
 namespace Inachis\Tests\phpunit\Entity\Content;
 
 use DateTimeImmutable;
-use Exception;
+use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Revision;
 use Inachis\Entity\User\User;
 use PHPUnit\Framework\TestCase;
@@ -18,74 +18,139 @@ use Ramsey\Uuid\Uuid;
 
 class RevisionTest extends TestCase
 {
-    protected Revision $revision;
+    private Revision $revision;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->revision = new Revision();
-        parent::setUp();
     }
 
     public function testGetAndSetId(): void
     {
-        $uuid = Uuid::uuid1();
+        $uuid = Uuid::uuid4();
+
         $this->revision->setId($uuid);
-        $this->assertEquals($uuid, $this->revision->getId());
+
+        $this->assertSame($uuid, $this->revision->getId());
     }
 
-    public function testGetAndSetPageId(): void
+    public function testGetAndSetPage(): void
     {
-        $uuid = Uuid::uuid1();
-        $this->revision->setPageId($uuid);
-        $this->assertEquals($uuid, $this->revision->getPageId());
+        $page = new Page();
+
+        $this->revision->setPage($page);
+
+        $this->assertSame($page, $this->revision->getPage());
     }
 
-    /**
-     * @throws Exception
-     */
+    public function testPageCanBeNull(): void
+    {
+        $this->revision->setPage(null);
+
+        $this->assertNull($this->revision->getPage());
+    }
+
     public function testGetAndSetVersionNumber(): void
     {
         $this->revision->setVersionNumber(223);
-        $this->assertEquals(223, $this->revision->getVersionNumber());
-        $this->expectException(Exception::class);
-        $this->revision->setVersionNumber(-1);
+
+        $this->assertSame(223, $this->revision->getVersionNumber());
     }
 
-    public function testGetAndSetUpdatedAt(): void
+    public function testVersionNumberMustBePositive(): void
     {
-        $testDate = new DateTimeImmutable();
-        $this->revision->setUpdatedAt($testDate);
-        $this->assertEquals($testDate, $this->revision->getUpdatedAt());
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Version number must be greater than 0');
+
+        $this->revision->setVersionNumber(0);
+    }
+
+    public function testGetAndSetCreatedAt(): void
+    {
+        $date = new DateTimeImmutable('2025-01-01 12:34:56');
+
+        $this->revision->setCreatedAt($date);
+
+        $this->assertSame($date, $this->revision->getCreatedAt());
+    }
+
+    public function testOnPrePersistSetsCreatedAt(): void
+    {
+        $this->revision->onPrePersist();
+
+        $this->assertInstanceOf(
+            DateTimeImmutable::class,
+            $this->revision->getCreatedAt()
+        );
     }
 
     public function testGetAndSetUser(): void
     {
-        $testUser = new User();
-        $this->revision->setUser($testUser);
-        $this->assertEquals($testUser, $this->revision->getUser());
+        $user = new User();
+
+        $this->revision->setUser($user);
+
+        $this->assertSame($user, $this->revision->getUser());
+    }
+
+    public function testUserCanBeNull(): void
+    {
+        $this->revision->setUser(null);
+
+        $this->assertNull($this->revision->getUser());
     }
 
     public function testGetAndSetAction(): void
     {
         $this->revision->setAction('Updated content');
-        $this->assertEquals('Updated content', $this->revision->getAction());
+
+        $this->assertSame(
+            'Updated content',
+            $this->revision->getAction()
+        );
     }
 
     public function testGetAndSetTitle(): void
     {
-        $this->revision->setTitle('Test');
-        $this->assertEquals('Test', $this->revision->getTitle());
+        $this->revision->setTitle('Test title');
+
+        $this->assertSame(
+            'Test title',
+            $this->revision->getTitle()
+        );
     }
 
     public function testGetAndSetSubTitle(): void
     {
-        $this->revision->setSubTitle('Test');
-        $this->assertEquals('Test', $this->revision->getSubTitle());
+        $this->revision->setSubTitle('Test subtitle');
+
+        $this->assertSame(
+            'Test subtitle',
+            $this->revision->getSubTitle()
+        );
+    }
+
+    public function testSubTitleCanBeNull(): void
+    {
+        $this->revision->setSubTitle(null);
+
+        $this->assertNull($this->revision->getSubTitle());
     }
 
     public function testGetAndSetContent(): void
     {
-        $this->revision->setContent('Test');
-        $this->assertEquals('Test', $this->revision->getContent());
+        $this->revision->setContent('Test content');
+
+        $this->assertSame(
+            'Test content',
+            $this->revision->getContent()
+        );
+    }
+
+    public function testContentCanBeNull(): void
+    {
+        $this->revision->setContent(null);
+
+        $this->assertNull($this->revision->getContent());
     }
 }

@@ -16,7 +16,7 @@ use Inachis\Repository\User\UserRepository;
  * Service for determining of a {@link User} can be removed/disabled or
  * have 'admin' {@link Role} removed based on if they are the last administrator
  */
-final readonly class UserProtectionService
+final readonly class UserProtectionService implements UserProtectionServiceInterface
 {
     /**
      * Constructor

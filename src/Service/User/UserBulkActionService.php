@@ -10,6 +10,7 @@
 namespace Inachis\Service\User;
 
 use Inachis\Repository\User\UserRepository;
+use Inachis\Service\User\UserProtectionServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -18,11 +19,12 @@ use Doctrine\ORM\EntityManagerInterface;
 readonly class UserBulkActionService
 {
     /**
+     * @param UserProtectionServiceInterface $userProtectionService
      * @param UserRepository $userRepository
      * @param EntityManagerInterface $entityManager
      */
     public function __construct(
-        private UserProtectionService $userProtectionService,
+        private UserProtectionServiceInterface $userProtectionService,
         private UserRepository $userRepository,
         private EntityManagerInterface $entityManager,
     ) {}

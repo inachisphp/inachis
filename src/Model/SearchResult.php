@@ -21,9 +21,9 @@ class SearchResult implements IteratorAggregate
 {
     /**
      * Creates a new instance of {@link SearchResult}
-     * 
+     *
      * @param list<
-     *     array{id: string, title: string, sub_title: string, content: string, type: string, 
+     *     array{id: string, title: string, sub_title: string, content: string, type: string,
      *         contentDate: string, updatedAt: string, author: string, relevance: float}
      * > $results The search results
      * @param int $total The total number of search results
@@ -39,7 +39,7 @@ class SearchResult implements IteratorAggregate
 
     /**
      * Returns an iterator for the search results
-     * 
+     *
      * @return Traversable<int, array<string|int, mixed>> The iterator for the search results
      */
     public function getIterator(): Traversable
@@ -49,7 +49,7 @@ class SearchResult implements IteratorAggregate
 
     /**
      * Returns the total number of search results
-     * 
+     *
      * @return int The total number of search results
      */
     public function getTotal(): int
@@ -59,7 +59,7 @@ class SearchResult implements IteratorAggregate
 
     /**
      * Returns the offset of the search results
-     * 
+     *
      * @return int The offset of the search results
      */
     public function getOffset(): int
@@ -69,7 +69,7 @@ class SearchResult implements IteratorAggregate
 
     /**
      * Returns the limit of the search results
-     * 
+     *
      * @return int The limit of the search results
      */
     public function getLimit(): int
@@ -79,10 +79,10 @@ class SearchResult implements IteratorAggregate
 
     /**
      * Returns the search results
-     * 
+     *
      * @return list<
      *     array{
-     *         id: string, title: string, sub_title: string, content: string, type: string, 
+     *         id: string, title: string, sub_title: string, content: string, type: string,
      *         contentDate: string, updatedAt: string, author: string, relevance: float
      *     }
      * > The search results
@@ -94,7 +94,7 @@ class SearchResult implements IteratorAggregate
 
     /**
      * Updates a property of a specific search result
-     * 
+     *
      * @param int $key The key of the search result
      * @param string $property
      * @param mixed $value
@@ -112,7 +112,7 @@ class SearchResult implements IteratorAggregate
             'type',
             'author',
             'contentDate',
-            'updated_at',
+            'updatedAt',
             'url' => $this->updateStringProperty($key, $property, $value),
 
             'relevance' => $this->updateRelevanceProperty($key, $value),
@@ -144,7 +144,7 @@ class SearchResult implements IteratorAggregate
             'type' => $this->results[$key]['type'] = $value,
             'author' => $this->results[$key]['author'] = $value,
             'contentDate' => $this->results[$key]['contentDate'] = $value,
-            'updatedAt' => $this->results[$key]['updated_at'] = $value,
+            'updatedAt' => $this->results[$key]['updatedAt'] = $value,
             'url' => $this->results[$key]['url'] = $value,
 
             default => throw new \InvalidArgumentException(

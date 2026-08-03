@@ -39,24 +39,24 @@ final readonly class ThemeManager
     ) {}
 
 	/**
-	 * Returns the slug for the currently active theme
+	 * Returns the identifier for the currently active theme
 	 *
 	 * @return string
 	 */
-    public function getActiveThemeSlug(): string
+    public function getActiveThemeIdentifier(): string
     {
         return $this->settings->getValue(self::SETTING_ACTIVE_THEME)
             ?? 'default';
     }
 
 	/**
-	 * Sets the active theme based on the provided slug
+	 * Sets the active theme based on the provided identifier
 	 *
-	 * @param string $slug
+	 * @param string $identifier
 	 */
-	public function setActiveTheme(string $slug): void
+	public function setActiveTheme(string $identifier): void
 	{
-		$this->settings->setValue(self::SETTING_ACTIVE_THEME, $slug);
+		$this->settings->setValue(self::SETTING_ACTIVE_THEME, $identifier);
 		$this->cache->deleteItem(self::CACHE_KEY_ACTIVE_THEME);
 		$this->cache->deleteItem('theme.twig.paths');
 	}
@@ -73,13 +73,28 @@ final readonly class ThemeManager
         if ($cacheItem->isHit()) {
             $cachedTheme = $cacheItem->get();
 
-            if ($cachedTheme instanceof ThemeDto) {
+            if ($cachedTheme instanceof ThemeDto && $cachedTheme->isCompatible) {
                 return $cachedTheme;
             }
         }
 
-        $slug = $this->getActiveThemeSlug();
-        $theme = $this->themeScanner->getTheme($slug) ?? $this->createFallbackTheme($slug);
+        $identifier = $this->getActiveThemeIdentifier();
+        $theme = $this->themeScanner->getTheme($identifier);
+
+        if (null === $theme) {
+            $theme = $this->createFallbackTheme($identifier);
+            $theme->isFallback = true;
+            $theme->requestedIdentifier = $identifier;
+            $theme->fallbackReason = 'not_found';
+        }
+        elseif (!$theme->isCompatible) {
+            $incompatibleTheme = $theme;
+            $theme = $this->createFallbackTheme('default');
+            $theme->isFallback = true;
+            $theme->requestedIdentifier = $identifier;
+            $theme->fallbackReason = 'incompatible_version';
+            $theme->requiredInachisVersion = $incompatibleTheme->requiredInachisVersion;
+        }
 
         $cacheItem->set($theme);
         $this->cache->save($cacheItem);
@@ -88,14 +103,14 @@ final readonly class ThemeManager
     }
 
 	/**
-	 * Returns the result of testing if the theme specified by the slug is installed
+	 * Returns the result of testing if the theme specified by the identifier is installed
 	 *
-	 * @param string $slug
+	 * @param string $identifier
 	 * @return boolean
 	 */
-    public function isThemeInstalled(string $slug): bool
+    public function isThemeInstalled(string $identifier): bool
     {
-        return null !== $this->themeScanner->getTheme($slug);
+        return null !== $this->themeScanner->getTheme($identifier);
     }
 
 	/**
@@ -106,10 +121,10 @@ final readonly class ThemeManager
 	 */
     public function getActiveThemePath(): string
     {
-        $slug = $this->getActiveThemeSlug();
+        $identifier = $this->getActiveThemeIdentifier();
         $themePaths = [
-            // sprintf('%s/themes/%s', $this->projectDir, $slug),
-            sprintf('%s/templates/themes/%s', $this->projectDir, $slug),
+            // sprintf('%s/themes/%s', $this->projectDir, $identifier),
+            sprintf('%s/templates/themes/%s', $this->projectDir, $identifier),
         ];
 
         foreach ($themePaths as $themePath) {
@@ -151,7 +166,7 @@ final readonly class ThemeManager
     {
         return sprintf(
             '/themes/%s/assets/%s',
-            $this->getActiveThemeSlug(),
+            $this->getActiveThemeIdentifier(),
             ltrim($relativePath, '/')
         );
     }
@@ -160,14 +175,14 @@ final readonly class ThemeManager
 	 * Returns a model of a fallback theme for when active theme fails
 	 * to load.
 	 *
-	 * @param string $slug
+	 * @param string $identifier
 	 * @return ThemeDto
 	 */
-    private function createFallbackTheme(string $slug): ThemeDto
+    private function createFallbackTheme(string $identifier): ThemeDto
     {
         $theme = new ThemeDto();
-        $theme->slug = $slug;
-        $theme->name = ucfirst($slug) . ' Theme';
+        $theme->identifier = $identifier;
+        $theme->name = ucfirst($identifier) . ' Theme';
         $theme->version = '1.0.0';
         $theme->author = '';
         $theme->description = '';

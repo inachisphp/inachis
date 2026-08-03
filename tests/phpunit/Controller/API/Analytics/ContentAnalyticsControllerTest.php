@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -73,7 +73,12 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
 
         $analytics->expects($this->once())
             ->method('getTopReferrersForPage')
-            ->with('/my-post')
+            ->with(
+                '/my-post',
+                $this->isInstanceOf(\DateTimeImmutable::class),
+                $this->isInstanceOf(\DateTimeImmutable::class),
+                10
+            )
             ->willReturn([]);
 
         $controller = $this->getMockBuilder(ContentAnalyticsController::class)
@@ -148,8 +153,16 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
 
         $analytics->expects($this->once())
             ->method('getTopReferrersForPage')
-            ->with('/my-post')
-            ->willReturn([]);
+            ->with(
+                '/my-post',
+                $this->callback(
+                    fn (\DateTimeImmutable $d) => $d->format('Y-m-d') === '2025-01-01'
+                ),
+                $this->callback(
+                    fn (\DateTimeImmutable $d) => $d->format('Y-m-d') === '2025-01-31'
+                ),
+                10
+            );
 
         $controller = $this->getMockBuilder(ContentAnalyticsController::class)
             ->setConstructorArgs([
@@ -210,7 +223,16 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
 
         $analytics->expects($this->once())
             ->method('getTopReferrersForPage')
-            ->with('/2025/test-series')
+            ->with(
+                '/2025/test-series',
+                $this->callback(
+                    fn (\DateTimeImmutable $d) => $d->format('Y-m-d') === '2025-01-01'
+                ),
+                $this->callback(
+                    fn (\DateTimeImmutable $d) => $d->format('Y-m-d') === '2025-01-31'
+                ),
+                10
+            )
             ->willReturn([]);
 
         $controller = $this->getMockBuilder(ContentAnalyticsController::class)
@@ -273,7 +295,21 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
 
         $analytics->expects($this->once())
             ->method('getTopReferrersForPage')
-            ->with('/2025/test-series')
+            ->with(
+                '/2025/test-series',
+                $this->callback(function (\DateTimeImmutable $from) {
+                    $days = (new \DateTimeImmutable())->diff($from)->days;
+
+                    return $days >= 89 && $days <= 91;
+                }),
+                $this->callback(function (\DateTimeImmutable $to) {
+                    return abs(
+                        (new \DateTimeImmutable())->getTimestamp()
+                        - $to->getTimestamp()
+                    ) < 5;
+                }),
+                10
+            )
             ->willReturn([]);
 
         $controller = $this->getMockBuilder(ContentAnalyticsController::class)

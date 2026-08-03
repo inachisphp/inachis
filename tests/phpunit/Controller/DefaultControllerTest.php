@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -11,7 +11,6 @@ namespace Inachis\Tests\phpunit\Controller;
 
 use Inachis\Controller\DefaultController;
 use Inachis\Service\Content\Page\ContentAggregator;
-use Inachis\Tests\phpunit\Controller\AbstractWebControllerTestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -31,6 +30,7 @@ class DefaultControllerTest extends AbstractWebControllerTestCase
         $controller = $this->getMockBuilder(DefaultController::class)
             ->setConstructorArgs([
                 $this->entityManager,
+                $this->pageViewFactory,
                 $this->params,
                 $this->security,
                 $this->translator,
@@ -43,8 +43,10 @@ class DefaultControllerTest extends AbstractWebControllerTestCase
             ->with(
                 'web/pages/homepage.html.twig',
                 $this->callback(function (array $vars) use ($mockContent) {
-                    return isset($vars['viewModel'])
-                        && $vars['content'] === $mockContent;
+                    $this->assertArrayHasKey('viewModel', $vars);
+                    $this->assertSame($mockContent, $vars['content']);
+
+                    return true;
                 })
             )
             ->willReturn(new Response('OK'));
@@ -57,12 +59,8 @@ class DefaultControllerTest extends AbstractWebControllerTestCase
 
     public function testHealthReturnsOkResponse(): void
     {
-        $controller = new DefaultController(
-            $this->entityManager,
-            $this->params,
-            $this->security,
-            $this->translator
-        );
+        /** @var DefaultController $controller */
+        $controller = $this->createController(DefaultController::class);
 
         $response = $controller->health();
 
