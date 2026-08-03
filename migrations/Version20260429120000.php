@@ -14,99 +14,103 @@ final class Version20260429120000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('
-            CREATE TABLE analytics_page_view (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                path VARCHAR(255) NOT NULL,
-                date DATE NOT NULL,
-                views INTEGER NOT NULL DEFAULT 0
-            )
-        ');
+        $analyticsPageView = $schema->createTable('analytics_page_view');
+        $analyticsPageView->addColumn('id', 'integer', [
+            'autoincrement' => true,
+        ]);
+        $analyticsPageView->addColumn('path', 'string', [
+            'length' => 255,
+        ]);
+        $analyticsPageView->addColumn('date', 'date');
+        $analyticsPageView->addColumn('views', 'integer', [
+            'default' => 0,
+        ]);
+        $analyticsPageView->setPrimaryKey(['id']);
+        $analyticsPageView->addUniqueIndex(
+            ['path', 'date'],
+            'uniq_path_date'
+        );
+        $analyticsPageView->addIndex(
+            ['date'],
+            'idx_analytics_page_view_date'
+        );
 
-        $this->addSql('
-            CREATE UNIQUE INDEX uniq_path_date
-            ON analytics_page_view (path, date)
-        ');
+        $analyticsUniqueVisitor = $schema->createTable('analytics_unique_visitor');
+        $analyticsUniqueVisitor->addColumn('id', 'integer', [
+            'autoincrement' => true,
+        ]);
+        $analyticsUniqueVisitor->addColumn('visitor_hash', 'string', [
+            'length' => 64,
+        ]);
+        $analyticsUniqueVisitor->addColumn('date', 'date');
+        $analyticsUniqueVisitor->setPrimaryKey(['id']);
+        $analyticsUniqueVisitor->addUniqueIndex(
+            ['visitor_hash', 'date'],
+            'uniq_visitor_date'
+        );
+        $analyticsUniqueVisitor->addIndex(
+            ['date'],
+            'idx_analytics_unique_visitor_date'
+        );
 
-        $this->addSql('
-            CREATE TABLE analytics_unique_visitor (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                visitor_hash CHAR(64) NOT NULL,
-                date DATE NOT NULL
-            )
-        ');
+        $analyticsErrors = $schema->createTable('analytics_errors');
+        $analyticsErrors->addColumn('id', 'integer', [
+            'autoincrement' => true,
+        ]);
+        $analyticsErrors->addColumn('path', 'string', [
+            'length' => 255,
+        ]);
+        $analyticsErrors->addColumn('date', 'date');
+        $analyticsErrors->addColumn('code', 'integer', [
+            'default' => 0,
+        ]);
+        $analyticsErrors->addColumn('hits', 'integer', [
+            'default' => 0,
+        ]);
+        $analyticsErrors->setPrimaryKey(['id']);
+        $analyticsErrors->addUniqueIndex(
+            ['path', 'date', 'code'],
+            'uniq_path_date_code'
+        );
+        $analyticsErrors->addIndex(
+            ['date'],
+            'idx_analytics_errors_date'
+        );
+        $analyticsErrors->addIndex(
+            ['code'],
+            'idx_analytics_errors_code'
+        );
 
-        $this->addSql('
-            CREATE UNIQUE INDEX uniq_visitor_date
-            ON analytics_unique_visitor (visitor_hash, date)
-        ');
-
-        $this->addSql('
-            CREATE TABLE analytics_errors (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                path VARCHAR(255) NOT NULL,
-                date DATE NOT NULL,
-                code INTEGER NOT NULL DEFAULT 0,
-                hits INTEGER NOT NULL DEFAULT 0
-            )
-        ');
-
-        $this->addSql('
-            CREATE UNIQUE INDEX uniq_path_date_code
-            ON analytics_errors (path, date, code)
-        ');
-
-        $this->addSql('
-            CREATE TABLE analytics_referrer (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                domain VARCHAR(255) NOT NULL,
-                path VARCHAR(255) NOT NULL,
-                date DATE NOT NULL,
-                hits INTEGER NOT NULL DEFAULT 0
-            )
-        ');
-
-        $this->addSql('
-            CREATE UNIQUE INDEX uniq_domain_path_date
-            ON analytics_referrer (domain, path, date)
-        ');
-
-        $this->addSql('
-            CREATE INDEX idx_analytics_referrer_domain
-            ON analytics_referrer (domain)
-        ');
-
-        $this->addSql('
-            CREATE INDEX idx_analytics_page_view_date
-            ON analytics_page_view (date)
-        ');
-
-        $this->addSql('
-            CREATE INDEX idx_analytics_unique_visitor_date
-            ON analytics_unique_visitor (date)
-        ');
-
-        $this->addSql('
-            CREATE INDEX idx_analytics_errors_date
-            ON analytics_errors (date)
-        ');
-
-        $this->addSql('
-            CREATE INDEX idx_analytics_errors_code
-            ON analytics_errors (code)
-        ');
+        $analyticsReferrer = $schema->createTable('analytics_referrer');
+        $analyticsReferrer->addColumn('id', 'integer', [
+            'autoincrement' => true,
+        ]);
+        $analyticsReferrer->addColumn('domain', 'string', [
+            'length' => 255,
+        ]);
+        $analyticsReferrer->addColumn('path', 'string', [
+            'length' => 255,
+        ]);
+        $analyticsReferrer->addColumn('date', 'date');
+        $analyticsReferrer->addColumn('hits', 'integer', [
+            'default' => 0,
+        ]);
+        $analyticsReferrer->setPrimaryKey(['id']);
+        $analyticsReferrer->addUniqueIndex(
+            ['domain', 'path', 'date'],
+            'uniq_domain_path_date'
+        );
+        $analyticsReferrer->addIndex(
+            ['domain'],
+            'idx_analytics_referrer_domain'
+        );
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('DROP INDEX idx_analytics_page_view_date ON analytics_page_view');
-        $this->addSql('DROP INDEX idx_analytics_unique_visitor_date ON analytics_unique_visitor');
-        $this->addSql('DROP INDEX idx_analytics_errors_date ON analytics_errors');
-        $this->addSql('DROP INDEX idx_analytics_errors_code ON analytics_errors');
-        $this->addSql('DROP INDEX idx_analytics_referrer_domain ON analytics_referrer');
-        $this->addSql('DROP TABLE analytics_page_view');
-        $this->addSql('DROP TABLE analytics_unique_visitor');
-        $this->addSql('DROP TABLE analytics_errors');
-        $this->addSql('DROP TABLE analytics_referrer');
+        $schema->dropTable('analytics_page_view');
+        $schema->dropTable('analytics_unique_visitor');
+        $schema->dropTable('analytics_errors');
+        $schema->dropTable('analytics_referrer');
     }
 }
