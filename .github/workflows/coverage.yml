@@ -1,4 +1,4 @@
-name: Test Coverage
+name: Coverage
 
 on:
   push:
@@ -39,16 +39,20 @@ jobs:
           mkdir -p data
           touch data/database.sqlite
 
+      - name: Run migrations
+        env:
+          APP_ENV: test
+          DATABASE_URL: sqlite:///%kernel.project_dir%/data/database.sqlite
+        run: php bin/console doctrine:migrations:migrate --no-interaction
+
       - name: Run PHPUnit with coverage
         env:
           APP_ENV: test
           XDEBUG_MODE: coverage
           DATABASE_URL: sqlite:///%kernel.project_dir%/data/database.sqlite
-        run: |
-          vendor/bin/phpunit \
-            --coverage-clover=coverage.xml
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
-      - name: Upload coverage artifact
+      - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
           name: phpunit-coverage
