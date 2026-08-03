@@ -129,7 +129,11 @@
         "post-update-cmd": [
             "@auto-scripts",
             "@setup-git-hook"
-        ]
+        ],
+        "phpstan": "phpstan analyse --memory-limit=-1 src/",
+        "phpcs": "php-cs-fixer fix --dry-run --diff --verbose",
+        "phpcs-fix": "php-cs-fixer fix --verbose",
+        "test": "phpunit"
     },
     "conflict": {
         "symfony/symfony": "*"

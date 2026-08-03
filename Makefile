@@ -1,4 +1,4 @@
-.PHONY: help headers fix-headers release release-patch release-minor release-major build-release publish-release check-update apply-update apply-update-force phpstan phpunit qa clean
+.PHONY: help headers fix-headers release release-patch release-minor release-major build-release publish-release check-update apply-update apply-update-force phpcs phpcs-fix phpstan phpunit qa clean
 
 # Color output helpers
 CYAN := \033[36m
@@ -86,16 +86,24 @@ apply-update-force: ## Run system updater non-interactively (useful for CI/cron)
 	@echo "$(CYAN)Running forced system update...$(RESET)"
 	@php bin/console inachis:system:update --force --no-interaction
 
+phpcs:
+	@echo "$(CYAN)Running PHP-CS-Fixer (dry run)...$(RESET)"
+	@composer phpcs
+
+phpcs-fix:
+	@echo "$(CYAN)Fixing PHP coding standards...$(RESET)"
+	@composer phpcs-fix
+
 phpstan: ## Run PHPStan static analysis on src/
 	@echo "$(CYAN)Running PHPStan analysis...$(RESET)"
-	@PHPSTAN_TABLE_ERROR_FORMATTER_FORCE_SHOW_ALL_ERRORS=1 vendor/bin/phpstan analyse --memory-limit=-1 src/
+	@PHPSTAN_TABLE_ERROR_FORMATTER_FORCE_SHOW_ALL_ERRORS=1 composer phpstan
 
 phpunit: ## Run PHPUnit tests with code coverage
 	@echo "$(CYAN)Running PHPUnit suite with coverage...$(RESET)"
 	@mkdir -p tests/logs/coverage-report
-	-XDEBUG_MODE=coverage php ./vendor/bin/phpunit
+	-XDEBUG_MODE=coverage composer test
 
-qa: phpstan phpunit ## Run full QA suite (PHPStan + PHPUnit)
+qa: phpcs phpstan phpunit ## Run full QA suite (PHPStan + PHPUnit)
 
 clean: ## Clean local build artifacts and temporary download files
 	@echo "$(YELLOW)Cleaning build directory and temporary archives...$(RESET)"
