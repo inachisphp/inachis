@@ -1,4 +1,4 @@
-.PHONY: help release release-patch release-minor release-major build-release publish-release check-update apply-update apply-update-force phpstan phpunit qa clean
+.PHONY: help headers fix-headers release release-patch release-minor release-major build-release publish-release check-update apply-update apply-update-force phpstan phpunit qa clean
 
 # Color output helpers
 CYAN := \033[36m
@@ -12,6 +12,12 @@ help: ## Display available commands
 	@echo "$(CYAN)Inachis Framework Management & Build Commands$(RESET)"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-18s$(RESET) %s\n", $$1, $$2}'
+
+headers:
+	php bin/console inachis:build:file-headers
+
+fix-headers:
+	php bin/console inachis:build:file-headers --fix
 
 release: ## Bump version, update CHANGELOG.md, commit, and tag (TYPE=patch|minor|major)
 	@echo "$(CYAN)Checking git status...$(RESET)"
