@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    name: Verify release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, intl, pdo_sqlite, sqlite3, xml, ctype, iconv
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Prepare test environment
+        run: |
+          cp .env.test .env.test.local
+          mkdir -p data
+          touch data/database.sqlite
+
+      - name: Run migrations
+        env:
+          APP_ENV: test
+          DATABASE_URL: sqlite:///%kernel.project_dir%/data/database.sqlite
+        run: php bin/console doctrine:migrations:migrate --no-interaction
+
+      - name: Run PHPUnit
+        env:
+          APP_ENV: test
+          DATABASE_URL: sqlite:///%kernel.project_dir%/data/database.sqlite
+        run: vendor/bin/phpunit
+
+
+  release:
+    name: Create GitHub Release
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true

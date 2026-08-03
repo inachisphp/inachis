@@ -1,0 +1,83 @@
+name: Bug report
+description: Report a reproducible problem with Inachis
+title: "[Bug]: "
+labels:
+  - bug
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a problem with Inachis.
+        Please provide enough information for the issue to be reproduced.
+
+  - type: input
+    id: version
+    attributes:
+      label: Inachis version
+      description: Which version or commit are you using?
+      placeholder: "v2.0.0 or commit hash"
+    validations:
+      required: true
+
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP version
+      description: What PHP version is running?
+      placeholder: "PHP 8.5.3"
+    validations:
+      required: true
+
+  - type: input
+    id: symfony-version
+    attributes:
+      label: Symfony version
+      description: What Symfony version is installed?
+      placeholder: "Symfony 8.0.x"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: database
+    attributes:
+      label: Database
+      options:
+        - MariaDB
+        - MySQL
+        - PostgreSQL
+        - SQLite
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Describe the problem
+      description: What happened?
+      placeholder: |
+        Explain what went wrong.
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: How can someone reproduce this?
+      placeholder: |
+        1. Install plugin X
+        2. Configure setting Y
+        3. Visit page Z
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What should have happened?
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Include error messages or stack traces.
+      render: shell

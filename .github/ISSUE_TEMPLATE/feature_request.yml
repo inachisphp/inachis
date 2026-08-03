@@ -1,0 +1,63 @@
+name: Feature request
+description: Suggest an improvement or new capability for Inachis
+title: "[Feature]: "
+labels:
+  - enhancement
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement to Inachis.
+        Please describe the problem this feature would solve and how it should work.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What problem would this feature solve?
+      placeholder: |
+        Describe the current limitation or workflow problem.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the feature you would like to see.
+      placeholder: |
+        Explain how you think this should work.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area affected
+      options:
+        - Core framework
+        - Administration UI
+        - Plugin system
+        - Theme system
+        - Security
+        - Database / Doctrine
+        - Developer tooling
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Are there other ways to solve this problem?
+      placeholder: |
+        Describe any workarounds or alternative approaches.
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional information
+      description: Add screenshots, examples, or technical details.
