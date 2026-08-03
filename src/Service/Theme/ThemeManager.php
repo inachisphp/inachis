@@ -9,7 +9,7 @@
 
 namespace Inachis\Service\Theme;
 
-use Inachis\Model\System\ThemeDto;
+use Inachis\Model\System\Theme;
 use Psr\Cache\CacheItemPoolInterface;
 use Inachis\Repository\System\SettingRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -64,16 +64,16 @@ final readonly class ThemeManager
 	/**
 	 * Returns a DTO (model) of the currently active theme
 	 *
-	 * @return ThemeDto
+	 * @return Theme
 	 */
-    public function getActiveTheme(): ThemeDto
+    public function getActiveTheme(): Theme
     {
         $cacheItem = $this->cache->getItem(self::CACHE_KEY_ACTIVE_THEME);
 
         if ($cacheItem->isHit()) {
             $cachedTheme = $cacheItem->get();
 
-            if ($cachedTheme instanceof ThemeDto && $cachedTheme->isCompatible) {
+            if ($cachedTheme instanceof Theme && $cachedTheme->isCompatible) {
                 return $cachedTheme;
             }
         }
@@ -176,18 +176,23 @@ final readonly class ThemeManager
 	 * to load.
 	 *
 	 * @param string $identifier
-	 * @return ThemeDto
+	 * @return Theme
 	 */
-    private function createFallbackTheme(string $identifier): ThemeDto
+    private function createFallbackTheme(string $identifier): Theme
     {
-        $theme = new ThemeDto();
-        $theme->identifier = $identifier;
-        $theme->name = ucfirst($identifier) . ' Theme';
-        $theme->version = '1.0.0';
-        $theme->author = '';
-        $theme->description = '';
-        $theme->path = $this->getActiveThemePath();
-        $theme->screenshot = null;
+        $theme = new Theme(
+            identifier: 'default',
+            name: 'Default Theme',
+            version: '1.0.0',
+            author: '',
+            description: '',
+            homepage: '',
+            license: '',
+            path: $this->getDefaultThemePath(),
+        );
+
+        $theme->isFallback = true;
+        $theme->requestedIdentifier = $identifier;
 
         return $theme;
     }
