@@ -42,3 +42,8 @@ sitemaps/
 
 build/workspace
 build/dist
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
