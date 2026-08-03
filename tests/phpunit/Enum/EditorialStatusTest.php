@@ -21,7 +21,7 @@ class EditorialStatusTest extends TestCase
     public function valuesReturnsAllPossibleValues(): void
     {
         self::assertSame(
-            ['draft', 'review', 'published', 'archived'],
+            ['draft', 'review', 'published',],
             EditorialStatus::values()
         );
     }
@@ -32,6 +32,5 @@ class EditorialStatusTest extends TestCase
         self::assertSame('Draft', EditorialStatus::DRAFT->label());
         self::assertSame('In Review', EditorialStatus::REVIEW->label());
         self::assertSame('Published', EditorialStatus::PUBLISHED->label());
-        self::assertSame('Archived', EditorialStatus::ARCHIVED->label());
     }
 }

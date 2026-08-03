@@ -21,7 +21,7 @@ class ReviewStatusTest extends TestCase
     public function valuesReturnsAllPossibleValues(): void
     {
         self::assertSame(
-            ['pending', 'approved', 'rejected'],
+            ['open', 'resolved', 'closed',],
             ReviewStatus::values()
         );
     }
@@ -29,8 +29,8 @@ class ReviewStatusTest extends TestCase
     #[Test]
     public function labelReturnsCorrectLabel(): void
     {
-        self::assertSame('pending', ReviewStatus::PENDING->label());
-        self::assertSame('approved', ReviewStatus::APPROVED->label());
-        self::assertSame('rejected', ReviewStatus::REJECTED->label());
+        self::assertSame('open', ReviewStatus::OPEN->label());
+        self::assertSame('resolved', ReviewStatus::RESOLVED->label());
+        self::assertSame('closed', ReviewStatus::CLOSED->label());
     }
 }
