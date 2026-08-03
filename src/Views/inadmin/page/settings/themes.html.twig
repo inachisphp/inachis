@@ -6,6 +6,14 @@
 {% endblock pagetitle %}
 
 {% block content %}
+{% if activeTheme.isFallback and activeTheme.fallbackReason == 'incompatible_version' %}
+    <div aria-live="polite" class="col-12 flash-error">
+        <span class="material-icons" aria-hidden="true">warning</span>
+        <strong>Theme Warning:</strong> The requested theme "<code>{{ activeTheme.requestedIdentifier }}</code>"
+        requires Inachis <code>{{ activeTheme.requiredInachisVersion }}</code> and is incompatible
+        with your current version. Falling back to default theme.
+    </div>
+{% endif %}
     <div class="col-12 nested-grid">
         <section class="col-12 admonition admonition-with-action admonition__info">
             <div>
@@ -36,19 +44,22 @@
                 <div>
                     <div class="ui-image-header">
                         {% if theme.screenshot %}
-                            <a href="{{ path('incp_settings_theme_screenshot', { slug: theme.slug }) }}" target="_blank" rel="noopener">
-                                <img src="{{ path('incp_settings_theme_screenshot', { slug: theme.slug }) }}" alt="{{ theme.name }} screenshot">
+                            <a href="{{ path('incp_settings_theme_screenshot', { identifier: theme.identifier }) }}" target="_blank" rel="noopener">
+                                <img src="{{ path('incp_settings_theme_screenshot', { identifier: theme.identifier }) }}" alt="{{ theme.name }} screenshot">
                             </a>
                         {% else %}
-                            <img src="{{ path('incp_settings_theme_screenshot', { slug: 'default' }) }}" alt="Default screenshot">
+                            <img src="{{ path('incp_settings_theme_screenshot', { identifier: 'default' }) }}" alt="Default screenshot">
                         {% endif %}
                     </div>
 
                     <div>
                         <div class="header__with-badge">
                             <h3>{{ theme.name }}</h3>
-                            {% if activeTheme.slug == theme.slug %}
+                            {% if activeTheme.identifier == theme.identifier %}
                                 <span class="badge badge__active">Active</span>
+                            {% endif %}
+                            {% if not theme.isCompatible %}
+                                <span class="badge badge__critical">Not Compatible</span>
                             {% endif %}
                         </div>
 
@@ -88,10 +99,10 @@
                         </div>
 
                         <div>
-                            {% if activeTheme.slug == theme.slug %}
+                            {% if activeTheme.identifier == theme.identifier %}
                                 <button type="button" class="button button--positive" disabled>Active</button>
                             {% else %}
-                                <form method="post" action="{{ path('incp_settings_theme_activate', { slug: theme.slug }) }}">
+                                <form method="post" action="{{ path('incp_settings_theme_activate', { identifier: theme.identifier }) }}">
                                     <button type="submit" class="button button--positive">Activate</button>
                                 </form>
                             {% endif %}

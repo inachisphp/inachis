@@ -63,25 +63,25 @@ final class ThemeController extends AbstractInachisController
     /**
      * Activates the specified theme
      *
-     * @param string $slug
+     * @param string $identifier
      * @param ThemeScanner $themeScanner
      * @param ThemeManager $themeManager
      * @param FeatureRegistry $featureRegistry
      * @return Response
      */
-    #[Route('/incp/settings/themes/{slug}/activate',
+    #[Route('/incp/settings/themes/{identifier}/activate',
         name: 'incp_settings_theme_activate',
         methods: ['POST'])]
     public function activate(
-        string $slug,
+        string $identifier,
         ThemeScanner $themeScanner,
         ThemeManager $themeManager,
         FeatureRegistry $featureRegistry,
     ): Response {
-        $theme = $themeScanner->getTheme($slug);
+        $theme = $themeScanner->getTheme($identifier);
 
         if (null === $theme) {
-            throw new NotFoundHttpException(sprintf('Theme "%s" not found.', $slug));
+            throw new NotFoundHttpException(sprintf('Theme "%s" not found.', $identifier));
         }
 
         $missingFeatures = array_values(array_filter(
@@ -101,25 +101,25 @@ final class ThemeController extends AbstractInachisController
             return $this->redirectToRoute('incp_settings_themes');
         }
 
-        $themeManager->setActiveTheme($slug);
+        $themeManager->setActiveTheme($identifier);
         $this->addFlash('success', sprintf('Theme "%s" activated.', $theme->name));
 
         return $this->redirectToRoute('incp_settings_themes');
     }
 
     /**
-     * Returns the screenshot for the specified theme based on the slug provided
+     * Returns the screenshot for the specified theme based on the identifier provided
      *
-     * @param string $slug
+     * @param string $identifier
      * @param ThemeScanner $themeScanner
      * @return BinaryFileResponse
      */
-    #[Route('/incp/settings/themes/{slug}/screenshot', name: 'incp_settings_theme_screenshot', methods: ['GET'])]
-    public function screenshot(string $slug, ThemeScanner $themeScanner): Response
+    #[Route('/incp/settings/themes/{identifier}/screenshot', name: 'incp_settings_theme_screenshot', methods: ['GET'])]
+    public function screenshot(string $identifier, ThemeScanner $themeScanner): Response
     {
-        $theme = $themeScanner->getTheme($slug);
+        $theme = $themeScanner->getTheme($identifier);
         if (null === $theme || null === $theme->screenshot || !is_file($theme->screenshot)) {
-            throw new NotFoundHttpException(sprintf('Screenshot for theme "%s" not found.', $slug));
+            throw new NotFoundHttpException(sprintf('Screenshot for theme "%s" not found.', $identifier));
         }
 
         return new BinaryFileResponse($theme->screenshot);

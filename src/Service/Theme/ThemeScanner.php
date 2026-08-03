@@ -10,8 +10,10 @@
 
 namespace Inachis\Service\Theme;
 
+use Composer\Semver\Semver;
 use Inachis\Model\System\ThemeDto;
 use Inachis\Service\ManifestLoader;
+use Inachis\Service\System\VersionService;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -33,6 +35,7 @@ final readonly class ThemeScanner
     public function __construct(
         #[Autowire('%kernel.project_dir%')]
         private string $projectDir,
+        private VersionService $versionService,
         private CacheItemPoolInterface $cache,
         private LoggerInterface $logger,
         private ManifestLoader $manifestLoader,
@@ -123,7 +126,7 @@ final readonly class ThemeScanner
     public function scanThemes(array &$errors = []): array
     {
         $themes = [];
-        $seenSlugs = [];
+        $seenIdentifiers = [];
 
         foreach ($this->getThemeRoots() as $themesDirectory) {
             if (!is_dir($themesDirectory)) {
@@ -144,17 +147,17 @@ final readonly class ThemeScanner
                     continue;
                 }
 
-                if (isset($seenSlugs[$theme->slug])) {
+                if (isset($seenIdentifiers[$theme->identifier])) {
                     $this->logger->warning(sprintf(
-                        'Duplicate theme slug "%s" found.',
-                        $theme->slug
+                        'Duplicate theme identifier "%s" found.',
+                        $theme->identifier
                     ));
-                    $errors[] = sprintf('Duplicate theme slug "%s" found.', $theme->slug);
+                    $errors[] = sprintf('Duplicate theme identifier "%s" found.', $theme->identifier);
 
                     continue;
                 }
 
-                $seenSlugs[$theme->slug] = true;
+                $seenIdentifiers[$theme->identifier] = true;
                 $themes[] = $theme;
             }
         }
@@ -170,13 +173,13 @@ final readonly class ThemeScanner
     /**
      * Gets a specific theme
      *
-     * @param string $slug
+     * @param string $identifier
      * @return ThemeDto|null
      */
-    public function getTheme(string $slug): ?ThemeDto
+    public function getTheme(string $identifier): ?ThemeDto
     {
         foreach ($this->getThemes() as $theme) {
-            if ($theme->slug === $slug) {
+            if ($theme->identifier === $identifier) {
                 return $theme;
             }
         }
@@ -202,11 +205,11 @@ final readonly class ThemeScanner
         if (null === $manifest) {
             return null;
         }
-        
+
         if (!$this->isValidManifest($manifest, $themePath)) {
             return null;
         }
-    
+
         return $this->createThemeDto(
             $themePath,
             $manifest
@@ -254,12 +257,12 @@ final readonly class ThemeScanner
             $this->projectDir . '/templates/themes',
         ];
     }
-    
+
     private function isValidManifest(
         array $manifest,
         string $themePath
     ): bool {
-        foreach (['slug', 'name'] as $requiredField) {
+        foreach (['identifier', 'name'] as $requiredField) {
             if (
                 !isset($manifest[$requiredField]) ||
                 !is_string($manifest[$requiredField]) ||
@@ -288,15 +291,21 @@ final readonly class ThemeScanner
                 break;
             }
         }
-        
+
         $theme = new ThemeDto();
-        $theme->slug = (string) $manifest['slug'];
+        $theme->identifier = (string) $manifest['identifier'];
         $theme->name = (string) $manifest['name'];
         $theme->version = is_string($manifest['version']) ? $manifest['version'] : '1.0.0';
         $theme->author = is_string($manifest['author']) ? $manifest['author'] : '';
         $theme->description = is_string($manifest['description']) ? $manifest['description'] : '';
         $theme->path = $themePath;
         $theme->screenshot = $screenshot;
+
+        $requires = $manifest['requires'] ?? [];
+        if (is_array($requires) && isset($requires['inachis']) && is_string($requires['inachis'])) {
+            $theme->requiredInachisVersion = $requires['inachis'];
+            $theme->isCompatible = $this->versionService->satisfies($theme->requiredInachisVersion);
+        }
 
         $theme->requiredFeatures = $this->extractFeatures(
             $manifest,
