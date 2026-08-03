@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -10,7 +10,6 @@
 namespace Inachis\Tests\phpunit\Entity\Content;
 
 use Inachis\Entity\Content\Category;
-use Inachis\Entity\Media\Image;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -18,96 +17,138 @@ class CategoryTest extends TestCase
 {
     protected Category $category;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->category = new Category();
+
         parent::setUp();
     }
 
     public function testGetAndSetId(): void
     {
         $uuid = Uuid::uuid1();
+
         $this->category->setId($uuid);
-        $this->assertEquals($uuid->toString(), $this->category->getId());
+
+        $this->assertSame($uuid, $this->category->getId());
     }
 
     public function testGetAndSetTitle(): void
     {
         $this->category->setTitle('test');
-        $this->assertEquals('test', $this->category->getTitle());
+
+        $this->assertSame('test', $this->category->getTitle());
     }
 
     public function testGetAndSetDescription(): void
     {
         $this->category->setDescription('test');
-        $this->assertEquals('test', $this->category->getDescription());
-    }
 
-    public function testGetAndSetImage(): void
-    {
-        $image = new Image();
-        $this->category->setImage($image);
-        $this->assertEquals($image, $this->category->getImage());
-        $this->category->setImage(null);
-        $this->assertEquals(null, $this->category->getImage());
-    }
-
-    public function testGetAndSetIcon(): void
-    {
-        $image = new Image();
-        $this->category->setIcon($image);
-        $this->assertEquals($image, $this->category->getIcon());
+        $this->assertSame('test', $this->category->getDescription());
     }
 
     public function testGetAndSetParent(): void
     {
-        $this->category->setParent(new Category('test-parent'));
-        $this->assertEquals('test-parent', $this->category->getParent()->getTitle());
+        $parent = new Category('Parent');
+
+        $this->category->setParent($parent);
+
+        $this->assertSame($parent, $this->category->getParent());
+        $this->assertSame('Parent', $this->category->getParent()?->getTitle());
+    }
+
+    public function testCannotBeOwnParent(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Category cannot be its own parent');
+
+        $this->category->setParent($this->category);
     }
 
     public function testAddChild(): void
     {
-        $this->category->addChild(new Category('first child'));
-        $this->assertNotEmpty($this->category->getChildren());
+        $child = new Category('Child');
+
+        $this->category->addChild($child);
+
+        $this->assertCount(1, $this->category->getChildren());
+        $this->assertTrue($this->category->getChildren()->contains($child));
+        $this->assertSame($this->category, $child->getParent());
+    }
+
+    public function testAddChildDoesNotDuplicate(): void
+    {
+        $child = new Category('Child');
+
+        $this->category->addChild($child);
+        $this->category->addChild($child);
+
+        $this->assertCount(1, $this->category->getChildren());
+    }
+
+    public function testRemoveChild(): void
+    {
+        $child = new Category('Child');
+
+        $this->category->addChild($child);
+
+        $this->assertCount(1, $this->category->getChildren());
+        $this->assertSame($this->category, $child->getParent());
+
+        $this->category->removeChild($child);
+
+        $this->assertCount(0, $this->category->getChildren());
+        $this->assertNull($child->getParent());
     }
 
     public function testIsRootCategory(): void
     {
         $this->assertTrue($this->category->isRootCategory());
-        $this->category->setParent(new Category('Darth Vader'));
+
+        $this->category->setParent(new Category('Parent'));
+
         $this->assertFalse($this->category->isRootCategory());
     }
 
-    public function testHasImage(): void
+    public function testIsChildCategory(): void
     {
-        $this->assertFalse($this->category->hasImage());
-        $this->category->setImage(new Image());
-        $this->assertTrue($this->category->hasImage());
+        $this->assertFalse($this->category->isChildCategory());
+
+        $this->category->setParent(new Category('Parent'));
+
+        $this->assertTrue($this->category->isChildCategory());
     }
 
-    public function testHasIcon(): void
+    public function testGetFullPathForRootCategory(): void
     {
-        $image = new Image();
-        $this->assertFalse($this->category->hasIcon());
-        $this->category->setIcon($image);
-        $this->assertTrue($this->category->hasIcon());
+        $this->category->setTitle('Root');
+
+        $this->assertSame('Root', $this->category->getFullPath());
     }
 
-    public function testGetFullPath(): void
+    public function testGetFullPathForChildCategory(): void
     {
-        $this->category->setTitle('Darth Vader');
-        $this->category->addChild(new Category('Luke Skywalker'));
-        $this->category->getChildren()[0]->setParent(new Category('Darth Vader'));
-        $this->assertEquals(
+        $parent = new Category('Darth Vader');
+        $child = new Category('Luke Skywalker');
+
+        $parent->addChild($child);
+
+        $this->assertSame(
             'Darth Vader/Luke Skywalker',
-            $this->category->getChildren()[0]->getFullPath()
+            $child->getFullPath()
         );
     }
 
     public function testSetAndGetVisible(): void
     {
         $this->assertTrue($this->category->isVisible());
+
         $this->category->setVisible(false);
+
         $this->assertFalse($this->category->isVisible());
+
+        $this->category->setVisible(true);
+
+        $this->assertTrue($this->category->isVisible());
     }
 }

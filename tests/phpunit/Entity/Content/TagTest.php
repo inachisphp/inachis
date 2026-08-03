@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the inachis framework
- * 
+ *
  * @package Inachis
  * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
  */
@@ -15,24 +15,76 @@ use Ramsey\Uuid\Uuid;
 
 class TagTest extends TestCase
 {
-    protected ?Tag $tag;
+    private Tag $tag;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
-        $this->tag = new Tag();
-        parent::setUp();
+        $this->tag = new Tag('Test Tag');
+    }
+
+    public function testConstructorSetsTitleAndSlug(): void
+    {
+        $this->assertSame('test tag', $this->tag->getTitle());
+        $this->assertSame('test-tag', $this->tag->getSlug());
     }
 
     public function testSetAndGetId(): void
     {
-        $uuid = Uuid::uuid1();
+        $uuid = Uuid::uuid4();
+
         $this->tag->setId($uuid);
-        $this->assertEquals($uuid, $this->tag->getId());
+
+        $this->assertSame($uuid, $this->tag->getId());
     }
 
     public function testSetAndGetTitle(): void
     {
-        $this->tag->setTitle('test');
-        $this->assertEquals('test', $this->tag->getTitle());
+        $this->tag->setTitle('My New Tag');
+
+        $this->assertSame('my new tag', $this->tag->getTitle());
+    }
+
+    public function testSetTitleUpdatesSlug(): void
+    {
+        $this->tag->setTitle('My New Tag');
+
+        $this->assertSame('my-new-tag', $this->tag->getSlug());
+    }
+
+    public function testTitleIsTrimmed(): void
+    {
+        $this->tag->setTitle('   My Tag   ');
+
+        $this->assertSame('my tag', $this->tag->getTitle());
+        $this->assertSame('my-tag', $this->tag->getSlug());
+    }
+
+    public function testEmptyTitleThrowsException(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Tag title cannot be empty');
+
+        $this->tag->setTitle('');
+    }
+
+    public function testWhitespaceTitleThrowsException(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Tag title cannot be empty');
+
+        $this->tag->setTitle('      ');
+    }
+
+    public function testSlugHandlesSpecialCharacters(): void
+    {
+        $this->tag->setTitle('Café & Restaurant');
+
+        $this->assertSame('café & restaurant', $this->tag->getTitle());
+        $this->assertSame('cafe-restaurant', $this->tag->getSlug());
+    }
+
+    public function testToStringReturnsTitle(): void
+    {
+        $this->assertSame('test tag', (string) $this->tag);
     }
 }
