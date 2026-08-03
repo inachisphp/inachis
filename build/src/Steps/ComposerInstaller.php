@@ -46,7 +46,6 @@ final class ComposerInstaller implements BuildStepInterface
             $arguments[] = '--optimize-autoloader';
         }
 
-        $process = new Process($arguments, $workspace->path);
         // Filter out array values (like $_SERVER['argv']) before string casting
         $envVars = array_filter(
             [...$_SERVER, ...$_ENV, 'APP_ENV' => 'prod', 'APP_DEBUG' => '0'],

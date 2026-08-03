@@ -9,25 +9,17 @@ const ROOT = process.cwd();
 const isWatch = process.argv.includes("--watch");
 const isProd = !isWatch;
 
-(() => {
-    const composerJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'composer.json'), 'utf-8'));
-    const versionFilePath = path.join(ROOT, 'config/version.php');
+const versionFile = path.join(ROOT, "config/version.json");
 
-    const version = composerJson.version || 'dev';
-    const commit = process.env.GIT_COMMIT || 'dev';
-    const buildDate = new Date().toISOString();
+if (fs.existsSync(versionFile)) {
+    const version = JSON.parse(
+        fs.readFileSync(versionFile, "utf8")
+    );
 
-    const versionFileContent = `<?php
-return [
-    'version' => '${version}',
-    'commit' => '${commit}',
-    'build_date' => '${buildDate}',
-];
-`;
-
-    fs.writeFileSync(versionFilePath, versionFileContent);
-    console.log(`📄 Generated version file: ${versionFilePath}`);
-})();
+    console.log(
+        `Building Inachis ${version.version} (${version.commit})`
+    );
+}
 
 const jsBaseConfig = {
     bundle: true,

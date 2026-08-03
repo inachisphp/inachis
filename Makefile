@@ -27,7 +27,7 @@ release: ## Bump version, update CHANGELOG.md, commit, and tag (TYPE=patch|minor
 		exit 1; \
 	fi
 	@echo "$(CYAN)Staging release files...$(RESET)"
-	git add composer.json CHANGELOG.md
+	git add CHANGELOG.md
 	@echo "$(CYAN)Committing release...$(RESET)"
 	git commit -m "chore(release): prepare v$(NEW_VERSION)"
 	@echo "$(CYAN)Tagging v$(NEW_VERSION)...$(RESET)"
