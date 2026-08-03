@@ -9,55 +9,92 @@ final class Version20260429120000 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Create analytics_page_view and analytics_unique_visitor tables';
+        return 'Create analytics tracking tables';
     }
 
     public function up(Schema $schema): void
     {
         $this->addSql('
             CREATE TABLE analytics_page_view (
-                id BIGINT AUTO_INCREMENT NOT NULL,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 path VARCHAR(255) NOT NULL,
                 date DATE NOT NULL,
-                views INT NOT NULL DEFAULT 0,
-                UNIQUE INDEX uniq_path_date (path, date),
-                PRIMARY KEY(id)
-            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB
+                views INTEGER NOT NULL DEFAULT 0
+            )
         ');
+
+        $this->addSql('
+            CREATE UNIQUE INDEX uniq_path_date
+            ON analytics_page_view (path, date)
+        ');
+
         $this->addSql('
             CREATE TABLE analytics_unique_visitor (
-                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 visitor_hash CHAR(64) NOT NULL,
-                date DATE NOT NULL,
-                UNIQUE KEY uniq_visitor_date (visitor_hash, date)
-            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB
+                date DATE NOT NULL
+            )
         ');
+
+        $this->addSql('
+            CREATE UNIQUE INDEX uniq_visitor_date
+            ON analytics_unique_visitor (visitor_hash, date)
+        ');
+
         $this->addSql('
             CREATE TABLE analytics_errors (
-                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 path VARCHAR(255) NOT NULL,
                 date DATE NOT NULL,
-                code INT NOT NULL DEFAULT 0,
-                hits INT NOT NULL DEFAULT 0,
-                UNIQUE KEY uniq_path_date_code (path, date, code)
-            ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB
+                code INTEGER NOT NULL DEFAULT 0,
+                hits INTEGER NOT NULL DEFAULT 0
+            )
         ');
+
+        $this->addSql('
+            CREATE UNIQUE INDEX uniq_path_date_code
+            ON analytics_errors (path, date, code)
+        ');
+
         $this->addSql('
             CREATE TABLE analytics_referrer (
-                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 domain VARCHAR(255) NOT NULL,
                 path VARCHAR(255) NOT NULL,
                 date DATE NOT NULL,
-                hits INT NOT NULL DEFAULT 0,
-                UNIQUE KEY uniq_domain_path_date (domain, path, date),
-                INDEX idx_domain (domain)
-            );
+                hits INTEGER NOT NULL DEFAULT 0
+            )
         ');
-        $this->addSql('CREATE INDEX idx_analytics_page_view_date ON analytics_page_view (date)');
-        $this->addSql('CREATE INDEX idx_analytics_unique_visitor_date ON analytics_unique_visitor (date)');
-        $this->addSql('CREATE INDEX idx_analytics_errors_date ON analytics_errors (date)');
-        $this->addSql('CREATE INDEX idx_analytics_errors_code ON analytics_errors (code)');
-        $this->addSql('CREATE INDEX idx_analytics_referrer_domain ON analytics_referrer (domain)');
+
+        $this->addSql('
+            CREATE UNIQUE INDEX uniq_domain_path_date
+            ON analytics_referrer (domain, path, date)
+        ');
+
+        $this->addSql('
+            CREATE INDEX idx_analytics_referrer_domain
+            ON analytics_referrer (domain)
+        ');
+
+        $this->addSql('
+            CREATE INDEX idx_analytics_page_view_date
+            ON analytics_page_view (date)
+        ');
+
+        $this->addSql('
+            CREATE INDEX idx_analytics_unique_visitor_date
+            ON analytics_unique_visitor (date)
+        ');
+
+        $this->addSql('
+            CREATE INDEX idx_analytics_errors_date
+            ON analytics_errors (date)
+        ');
+
+        $this->addSql('
+            CREATE INDEX idx_analytics_errors_code
+            ON analytics_errors (code)
+        ');
     }
 
     public function down(Schema $schema): void
