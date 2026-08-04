@@ -65,8 +65,8 @@
         <input type="hidden" name="_token" value="{{ csrf_token('report_' ~ report.id) }}">
         <input type="hidden" name="fingerprint" value="{{ report.fingerprint }}" />
         <p>
-            <button name="action" type="submit" value="approve" class="button button--positive">Approve</button>
-            <button name="action" type="submit" value="reject" class="button button--negative">Reject</button>
+            <button name="action" type="submit" value="approve" class="btn btn--primary">Approve</button>
+            <button name="action" type="submit" value="reject" class="btn btn--danger">Reject</button>
         </p>
     </form>
 </div>

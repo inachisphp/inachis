@@ -5,7 +5,7 @@ window.Inachis.MergeTags = {
     selectedTagIds: [],
 
     init() {
-        this.mergeTagsLink = document.querySelector('.button--merge');
+        this.mergeTagsLink = document.querySelector('.btn--merge');
         if (!this.mergeTagsLink) return;
 
         this.mergeTagsLink.addEventListener('click', e => {
@@ -34,13 +34,13 @@ window.Inachis.MergeTags = {
 			buttons: [
 				{
 					text: 'Merge',
-					class: 'button button--positive',
+					class: 'btn btn--primary',
 					disabled: true,
 					click: () => this.submitMerge(this, this.selectedTagIds)
 				},
 				{
 					text: 'Cancel',
-					class: 'button button--info',
+					class: 'btn btn--info',
 					click() {
 						this.close();
 					}

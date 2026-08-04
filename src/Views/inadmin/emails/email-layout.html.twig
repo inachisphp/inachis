@@ -107,7 +107,7 @@
             margin: 0 auto;
         }
 
-        .button--cta {
+        .btn--cta {
             background-color:#D84A38;
             color:#fff;
             display:inline-block;
@@ -226,16 +226,16 @@
 
 <p>
 {% if viewModel.settings is defined and viewModel.settings.twitter is defined and viewModel.settings.twitter is not empty %}
-    <a href="https://twitter.com/{{ viewModel.settings.twitter }}" class="twitter-follow-button" data-show-count="false"><span>Follow @{{ viewModel.settings.twitter }}</span></a>
+    <a href="https://twitter.com/{{ viewModel.settings.twitter }}" class="twitter-follow-btn" data-show-count="false"><span>Follow @{{ viewModel.settings.twitter }}</span></a>
 {% endif %}
 {% if viewModel.settings.facebookUrl is defined and viewModel.settings.facebookUrl is not empty %}
-    <a href="https://www.facebook.com/{{ viewModel.settings.facebookUrl }}" class="facebook-follow-button" data-show-count="false"><span>Facebook</span></a>
+    <a href="https://www.facebook.com/{{ viewModel.settings.facebookUrl }}" class="facebook-follow-btn" data-show-count="false"><span>Facebook</span></a>
 {% endif %}
 {% if viewModel.settings.pinterest is defined and viewModel.settings.pinterest is not empty %}
-    <a href="http://www.pinterest.com/{{ viewModel.settings.pinterest }}/" class="pinterest-follow-button" data-show-count="false"><span>Pinterest</span></a>
+    <a href="http://www.pinterest.com/{{ viewModel.settings.pinterest }}/" class="pinterest-follow-btn" data-show-count="false"><span>Pinterest</span></a>
 {% endif %}
 {% if viewModel.settings.instagram is defined and viewModel.settings.instagram is not empty %}
-    <a href="https://instagram.com/{{ viewModel.settings.instagram }}/" class="googleplus-follow-button" data-show-count="false"><span>Instagram</span></a>
+    <a href="https://instagram.com/{{ viewModel.settings.instagram }}/" class="googleplus-follow-btn" data-show-count="false"><span>Instagram</span></a>
 {% endif %}
 </p>
 

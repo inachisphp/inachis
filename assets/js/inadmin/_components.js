@@ -18,14 +18,14 @@ window.Inachis.Components = {
 		this.initSwitches('');
 		this.initUIToggle();
 
-		document.querySelectorAll('.image_preview .button--confirm').forEach(button => {
+		document.querySelectorAll('.image_preview .btn--confirm').forEach(button => {
 			button.addEventListener('click', (event) => {
 				event.preventDefault();
 				const imagePreview = button.closest('.image_preview');
 				if (!imagePreview) return;
 				const hiddenInput = imagePreview.querySelector('input[type="hidden"]');
 				if (hiddenInput) hiddenInput.value = '';
-				imagePreview.querySelectorAll('img, button.button--confirm').forEach(el => {
+				imagePreview.querySelectorAll('img, button.btn--confirm').forEach(el => {
 					el.remove();
 				});
 			});
@@ -64,7 +64,7 @@ window.Inachis.Components = {
 		});
 	},
 	initCopyPaste(selector) {
-		document.querySelectorAll(`${selector}.button--copy`).forEach(button => {
+		document.querySelectorAll(`${selector}.btn--copy`).forEach(button => {
 			button.addEventListener('click', async () => {
 				const textSource = document.querySelector(`#${button.dataset.target}`);
 				const copyText = (button.dataset.prefix ?? '') + textSource.value;
@@ -109,7 +109,7 @@ window.Inachis.Components = {
 	},
 
 	initExportButton() {
-		const exportButton = document.querySelector('.button--export');
+		const exportButton = document.querySelector('.btn--export');
 		if (!exportButton) return;
 
 		exportButton.addEventListener('click', () => {
@@ -172,7 +172,7 @@ window.Inachis.Components = {
 		});
 	},
 	initPasswordToggle() {
-		const passwordToggles = document.querySelectorAll('button.button--password-toggle');
+		const passwordToggles = document.querySelectorAll('button.btn--password-toggle');
 		passwordToggles.forEach(toggle => {
 			toggle.closest('div,p').classList.add('password-wrapper');
 			toggle.addEventListener('click', () => {

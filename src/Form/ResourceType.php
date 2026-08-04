@@ -109,7 +109,7 @@ class ResourceType extends AbstractType
             $builder
                 ->add('generate_alt_text', ButtonType::class, [
                     'attr' => [
-                        'class' => 'button button--ai',
+                        'class' => 'btn btn--ai',
                         'id' => 'generate_alt_text',
                     ],
                     'label' => sprintf(
@@ -121,7 +121,7 @@ class ResourceType extends AbstractType
                 ])
                 ->add('submit', SubmitType::class, [
                     'attr' => [
-                        'class' => 'button button--positive',
+                        'class' => 'btn btn--primary',
                     ],
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> <span>%s</span>',
@@ -136,7 +136,7 @@ class ResourceType extends AbstractType
                 'attr' => [
                     'data-confirm' => 'delete',
                     'data-confirm-text' => 'Yes, delete',
-                    'class' => 'button button--negative button--confirm',
+                    'class' => 'btn btn--danger btn--confirm',
                     'data-entity' => 'image',
                     'data-title' => $options['data'] instanceof AbstractFile ? $options['data']->getTitle() : 'Unknown',
                 ],

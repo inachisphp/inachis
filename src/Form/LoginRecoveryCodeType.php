@@ -39,7 +39,7 @@ class LoginRecoveryCodeType extends AbstractType
         )
         ->add('verify', SubmitType::class, [
             'attr' => [
-                'class' => 'button button--positive',
+                'class' => 'btn btn--primary',
             ],
         ]);
     }

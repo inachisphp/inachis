@@ -31,7 +31,7 @@ window.Inachis.CategoryManager = {
           buttons: [
             {
               text: 'Close',
-              class: 'button button--info',
+              class: 'btn btn--info',
               click() {
                 this.close();
               }

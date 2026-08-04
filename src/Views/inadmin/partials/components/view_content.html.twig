@@ -23,7 +23,7 @@
         {% set tagname = add_button.type|default('a') %}
     <p class="centred">
         <{{ tagname }}
-            class="button button--add {{ add_button.class|default('') }}"
+            class="btn btn--add {{ add_button.class|default('') }}"
     {% for dataName,dataValue in add_button.data|default(null) %}
         data-{{ dataName }}="{{ dataValue }}"
     {% endfor %}

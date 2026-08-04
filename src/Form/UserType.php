@@ -157,7 +157,7 @@ class UserType extends AbstractType
             ->add('avatar', HiddenType::class)
             ->add('submit', SubmitType::class, [
                 'attr' => [
-                    'class' => 'button button--positive',
+                    'class' => 'btn btn--primary',
                 ],
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> %s',
@@ -174,7 +174,7 @@ class UserType extends AbstractType
                         'attr' => [
                             'data-confirm' => 'delete',
                             'data-confirm-text' => 'Yes, delete',
-                            'class' => 'button button--negative button--confirm',
+                            'class' => 'btn btn--danger btn--confirm',
                             'data-entity' => 'user',
                             'data-title' => sprintf(
                                 '%s (%s)',
@@ -192,7 +192,7 @@ class UserType extends AbstractType
                     ])
                     ->add('enableDisable', SubmitType::class, [
                         'attr' => [
-                            'class' => 'button button--secondary',
+                            'class' => 'btn btn--secondary',
                         ],
                         'label' => sprintf(
                             '<span class="material-icons">%s</span> %s',
@@ -221,7 +221,7 @@ class UserType extends AbstractType
                 if ($currentUser->isTotpEnabled()) {
                     $builder->add('disableTotp', SubmitType::class, [
                         'attr' => [
-                            'class' => 'button button--negative',
+                            'class' => 'btn btn--danger',
                         ],
                         'label' => sprintf(
                             '<span class="material-icons">%s</span> %s',
@@ -232,7 +232,7 @@ class UserType extends AbstractType
                     ]);
                     $builder->add('regenerateCodes', SubmitType::class, [
                         'attr' => [
-                            'class' => 'button button--add',
+                            'class' => 'btn btn--add',
                         ],
                         'label' => sprintf(
                             '<span class="material-icons">%s</span> %s',
@@ -244,7 +244,7 @@ class UserType extends AbstractType
                 } else {
                     $builder->add('enableTotp', SubmitType::class, [
                         'attr' => [
-                            'class' => 'button button--positive',
+                            'class' => 'btn btn--primary',
                         ],
                         'label' => sprintf(
                             '<span class="material-icons">%s</span> %s',

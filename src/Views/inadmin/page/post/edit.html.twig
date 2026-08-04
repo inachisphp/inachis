@@ -99,7 +99,7 @@
                 <button aria-label="{{ 'admin.post.share.copyLink.help'|trans }}"
                         data-prefix="{{ viewModel.settings.domain }}/"
                         data-target="post_url"
-                        class="button button--info button--copy"
+                        class="btn btn--info btn--copy"
                         type="button"
                 >
                     <span class="material-icons" aria-hidden="true">content_paste</span>
@@ -238,7 +238,7 @@
                         <td>{{ revision.user.displayName }}</td>
                         <td><span class="badge">{{ revision.action }}</span></td>
                         <td>
-                            <a href="{{ path('inachis_page_post_revision_diff', { 'id': revision.id}) }}" class="button button--info"><span class="material-icons" aria-hidden="true">compare_arrows</span> {% trans %}admin.post.revision.view{% endtrans %}</a>
+                            <a href="{{ path('inachis_page_post_revision_diff', { 'id': revision.id}) }}" class="btn btn--info"><span class="material-icons" aria-hidden="true">compare_arrows</span> {% trans %}admin.post.revision.view{% endtrans %}</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -263,7 +263,7 @@
             {% if form.publish is defined %}{{ form_widget(form.publish) }}{% endif %}
             {% if form.delete is defined %}{{ form_widget(form.delete) }}{% endif %}
             {%  if not post.isDraft %}
-                <a class="button button--secondary" href="{% if previewMode %}/incp/preview{% endif %}/{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons" aria-hidden="true">exit_to_app</span>
+                <a class="btn btn--secondary" href="{% if previewMode %}/incp/preview{% endif %}/{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons" aria-hidden="true">exit_to_app</span>
                     {% trans %}admin.button.viewLive{% endtrans %}</a>
             {%  endif %}
         {% endif %}

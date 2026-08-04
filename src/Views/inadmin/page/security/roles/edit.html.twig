@@ -81,7 +81,7 @@
                             {% for action in actions %}
                                 <th scope="col" class="table-header-alternate">
                                     <button type="button"
-                                            class="button button--ghost permission-matrix__toggle-col"
+                                            class="btn btn--ghost permission-matrix__toggle-col"
                                             data-col="{{ action.value|lower }}"
                                             title="Toggle all {{ action.label()|lower }} permissions"
                                             aria-label="Toggle all {{ action.label()|lower }} permissions">
@@ -107,7 +107,7 @@
                                 {% endif %}
                                 <th scope="row">
                                     <button type="button"
-                                            class="button button--ghost permission-matrix__toggle-row"
+                                            class="btn btn--ghost permission-matrix__toggle-row"
                                             data-row="{{ resource.value|lower }}">
                                         {{ resource.label() }}
                                     </button>

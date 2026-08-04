@@ -90,7 +90,7 @@ class LoginType extends AbstractType
                 ),
                 'label_html' => true,
                 'attr' => [
-                    'class' => 'button button--positive',
+                    'class' => 'btn btn--primary',
                 ],
             ]);
     }

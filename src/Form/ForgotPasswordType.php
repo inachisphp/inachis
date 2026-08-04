@@ -58,7 +58,7 @@ class ForgotPasswordType extends AbstractType
             ->add('resetPassword', SubmitType::class, [
                 'label' => $this->translator->trans('admin.reset_password'),
                 'attr' => [
-                    'class' => 'button button--positive',
+                    'class' => 'btn btn--primary',
                 ],
             ])
         ;

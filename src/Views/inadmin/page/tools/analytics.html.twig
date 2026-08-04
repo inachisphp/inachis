@@ -11,16 +11,16 @@
 <div class="col-12 toolbar-container analytics-toolbar">
 {{ include('inadmin/partials/tab-sets/analytics.html.twig') }}
     <form class="grid-toggle" method="get">
-        <button aria-pressed="{{ analytics.period.range == 'today' ? 'true' : 'false' }}" class="button button--grid" name="range" value="today">Today</button>
-        <button aria-pressed="{{ analytics.period.range == 'yesterday' ? 'true' : 'false' }}" class="button button--grid" name="range" value="yesterday">Yesterday</button>
-        <button aria-pressed="{{ analytics.period.range == '7d' ? 'true' : 'false' }}" class="button button--grid" name="range" value="7d">7 Days</button>
-        <button aria-pressed="{{ analytics.period.range == '30d' ? 'true' : 'false' }}" class="button button--grid" name="range" value="30d">30 Days</button>
-        <button aria-pressed="{{ analytics.period.range == '90d' ? 'true' : 'false' }}" class="button button--grid" name="range" value="90d">90 Days</button>
-        <button aria-pressed="{{ analytics.period.range == 'this-month' ? 'true' : 'false' }}" class="button button--grid" name="range" value="this-month">Month</button>
-        <button aria-pressed="{{ analytics.period.range == 'this-year' ? 'true' : 'false' }}" class="button button--grid" name="range" value="this-year">Year</button>
+        <button aria-pressed="{{ analytics.period.range == 'today' ? 'true' : 'false' }}" class="btn btn--grid" name="range" value="today">Today</button>
+        <button aria-pressed="{{ analytics.period.range == 'yesterday' ? 'true' : 'false' }}" class="btn btn--grid" name="range" value="yesterday">Yesterday</button>
+        <button aria-pressed="{{ analytics.period.range == '7d' ? 'true' : 'false' }}" class="btn btn--grid" name="range" value="7d">7 Days</button>
+        <button aria-pressed="{{ analytics.period.range == '30d' ? 'true' : 'false' }}" class="btn btn--grid" name="range" value="30d">30 Days</button>
+        <button aria-pressed="{{ analytics.period.range == '90d' ? 'true' : 'false' }}" class="btn btn--grid" name="range" value="90d">90 Days</button>
+        <button aria-pressed="{{ analytics.period.range == 'this-month' ? 'true' : 'false' }}" class="btn btn--grid" name="range" value="this-month">Month</button>
+        <button aria-pressed="{{ analytics.period.range == 'this-year' ? 'true' : 'false' }}" class="btn btn--grid" name="range" value="this-year">Year</button>
         <button
             aria-pressed="{{ analytics.period.range == 'custom' ? 'true' : 'false' }}"
-            class="ui-toggle button button--grid"
+            class="ui-toggle btn btn--grid"
             data-target=".analytics-custom-range"
             data-target-state="hidden"
             name="range"
@@ -70,7 +70,7 @@
 				>
             </div>
 
-            <button class="button button--add" type="submit">
+            <button class="btn btn--add" type="submit">
                 Apply
             </button>
         </form>
@@ -226,7 +226,7 @@
     <header class="widget__header">
         <h2>Traffic</h2>
         <button
-            class="button button--icon chart-download"
+            class="btn btn--icon chart-download"
             type="button"
             data-chart="trafficChart"
             data-filename="traffic"
@@ -394,7 +394,7 @@
         <h2>RSS Subscribers</h2>
 
         <button
-            class="button button--icon chart-download"
+            class="btn btn--icon chart-download"
             type="button"
             data-chart="subscribersChart"
             data-filename="subscribers"

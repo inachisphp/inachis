@@ -172,7 +172,7 @@ class SeriesType extends AbstractType
             if ($allowBulkCreate) {
                 $builder->add('bulkCreate', ButtonType::class, [
                     'attr' => [
-                        'class' => 'button button--add bulk-create__link',
+                        'class' => 'btn btn--add bulk-create__link',
                     ],
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> %s',
@@ -185,7 +185,7 @@ class SeriesType extends AbstractType
             if ($allowEdit) {
                 $builder->add('addItem', ButtonType::class, [
                     'attr' => [
-                        'class' => 'button button--info content-selector__link',
+                        'class' => 'btn btn--info content-selector__link',
                     ],
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> %s',
@@ -216,7 +216,7 @@ class SeriesType extends AbstractType
             $builder
                 ->add('submit', SubmitType::class, [
                     'attr' => [
-                        'class' => 'button button--positive',
+                        'class' => 'btn btn--primary',
                     ],
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> %s',
@@ -227,7 +227,7 @@ class SeriesType extends AbstractType
                 ])
     //            ->add('publish', SubmitType::class, [
     //                'attr' => [
-    //                    'class' => 'button button--info',
+    //                    'class' => 'btn btn--info',
     //                ],
     //                'label' => $this->translator->trans('admin.button.publish', [], 'messages'),
     //            ])
@@ -239,7 +239,7 @@ class SeriesType extends AbstractType
                     'attr' => [
                         'data-confirm' => 'delete',
                         'data-confirm-text' => 'Yes, delete',
-                        'class' => 'button button--negative button--confirm',
+                        'class' => 'btn btn--danger btn--confirm',
                         'data-entity' => 'series',
                         'data-title' => $options['data']->getTitle(),
                     ],
@@ -254,7 +254,7 @@ class SeriesType extends AbstractType
             if ($allowEdit) {
                 $builder->add('remove', SubmitType::class, [
                     'attr' => [
-                        'class' => 'button button--negative',
+                        'class' => 'btn btn--danger',
                     ],
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> %s',

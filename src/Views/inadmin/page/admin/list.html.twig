@@ -139,7 +139,7 @@
 
             actions: {
                 enable: can('USER', 'EDIT') ? {
-                    button_class: 'button--secondary',
+                    button_class: 'btn--secondary',
                     'data': {
                         'form-action': '',
                     },
@@ -147,7 +147,7 @@
                     title: 'admin.button.enable'|trans,
                 } : null,
                 disable: can('USER', 'EDIT') ? {
-                    button_class: 'button--secondary',
+                    button_class: 'btn--secondary',
                     'data': {
                         'form-action': '',
                     },
@@ -155,7 +155,7 @@
                     title: 'admin.button.disable'|trans,
                 } : null,
                 delete: can('USER', 'DELETE') ? {
-                    button_class: 'button--negative button--delete button--confirm',
+                    button_class: 'btn--danger btn--delete btn--confirm',
                     'data': {
                         'confirm': 'delete',
                         'confirm-text': 'Yes, delete',

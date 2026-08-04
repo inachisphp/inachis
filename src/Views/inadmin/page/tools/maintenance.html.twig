@@ -39,21 +39,21 @@
         {% include 'inadmin/partials/components/action_bar.html.twig' with {
             actions: {
                 toggle: {
-                    button_class: enabled ? 'button--positive' : 'button--negative',
+                    button_class: enabled ? 'btn--primary' : 'btn--danger',
                     button_type: 'submit',
                     name: 'toggle',
                     value: enabled ? 'off' : 'on',
                     title: enabled ? 'Disable Maintenance' : 'Enable Maintenance'
                 },
                 save: {
-                    button_class: 'button--secondary',
+                    button_class: 'btn--secondary',
                     button_type: 'submit',
                     name: 'save',
                     value: 'save',
                     title: 'Save Config & Generate Page'
                 },
                 preview: {
-                    button_class: 'button--info',
+                    button_class: 'btn--info',
                     button_type: 'button',
                     name: 'preview',
                     value: 'preview',

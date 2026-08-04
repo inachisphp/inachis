@@ -39,6 +39,7 @@ $radius-round: 50%;
     --color-neutral-900: #000000;
 
     // Primitives - Brand
+    --color-brand-025: #e2e8f0;
     --color-brand-050: #e5f7ff;
     --color-brand-100: #b3e0ff;
     --color-brand-200: #80d4ff;
@@ -164,6 +165,12 @@ $sidebar-active: #069;
 $sidebar-active-bg: #333;
 $sidebar-text: #fff;
 
+// -- Floating Overlay & Shell Tokens
+$bg-floating-shell: var(--color-floating-shell, rgba(30, 41, 59, 0.92)) !default;
+$border-floating-shell: var(--color-floating-border, rgba(255, 255, 255, 0.12)) !default;
+$text-floating-muted: var(--color-floating-text-muted, rgba(255, 255, 255, 0.75)) !default;
+$shadow-floating: var(--shadow-floating-elevation, 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.15)) !default;
+
 // -- Review bar
 $reviewbar-bg: var(--color-neutral-300);
 $reviewbar-shadow: -4px 0 24px rgba(0, 0, 0, 0.06), -1px 0 4px rgba(0, 0, 0, 0.03);
@@ -226,11 +233,12 @@ $color-neutral-800: var(--color-neutral-800);
 $color-neutral-850: var(--color-neutral-850);
 $color-neutral-900: var(--color-neutral-900);
 
+$color-brand-025: var(--color-brand-025);
 $color-brand-050: var(--color-brand-050);
 $color-brand-100: var(--color-brand-100);
 $color-brand-300: var(--color-brand-300);
-$color-brand-500: var(--color-brand-500);
 $color-brand-400: var(--color-brand-400);
+$color-brand-500: var(--color-brand-500);
 $color-brand-700: var(--color-brand-700);
 
 $reading-indicator: var(--color-brand-400);
@@ -265,6 +273,16 @@ $flash-autosave-discard: var(--color-flash-autosave-discard);
 $input-focus-border: var(--color-brand-500);
 $input-focus-ring: var(--color-brand-050);
 
+// -- Buttons
+$color-primary: $color-brand-500 !default;
+$color-primary-hover: $color-brand-400 !default;
+$color-primary-light: #eff6ff !default;
+$color-secondary: #64748b !default;
+$color-secondary-hover: #475569 !default;
+$color-outline: $color-brand-025;
+$color-outline-hover: color.adjust(#e2e8f0, $lightness: -10%);
+
+
 $pagination-border-radius: 5px;
 $table-mobile-break: 600px !default;
 $success-color: var(--color-success-500);
@@ -298,3 +316,5 @@ $admonition-colors: (
     tip: (bg: #e6f6e6, accent: #009940),
     warning: (bg: #fff8e6, accent: #e6a700),
 );
+
+$transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1) !default;

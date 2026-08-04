@@ -79,7 +79,7 @@
 
     <form action="{{ path('incp_settings_update_apply') }}" method="POST" onsubmit="return confirm('Are you sure you want to update to v{{ latestManifest.version }}? The system will briefly enter maintenance mode.');">
         <input type="hidden" name="_token" value="{{ csrf_token('system_update') }}">
-        <button type="submit" class="button button--positive button--large">
+        <button type="submit" class="btn btn--primary btn--lg">
             <span class="material-icons">download</span>
             <span class="btn-text">Download &amp; Apply Update (v{{ latestManifest.version }})</span>
         </button>
@@ -107,7 +107,7 @@
 
         <form action="{{ path('incp_settings_update_rollback') }}" method="POST" onsubmit="return confirm('Are you sure you want to roll back to v{{ rollbackCandidate.version }}?');">
             <input type="hidden" name="_token" value="{{ csrf_token('system_rollback') }}">
-            <button type="submit" class="button button--negative">
+            <button type="submit" class="btn btn--danger">
                 <span class="material-icons">undo</span>
                 <span class="btn-text">Rollback to v{{ rollbackCandidate.version }}</span>
             </button>

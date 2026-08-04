@@ -31,13 +31,13 @@ window.Inachis.BulkCreateDialog = {
       buttons: [
         {
           text: 'Create',
-          class: 'button button--positive',
+          class: 'btn btn--primary',
           disabled: true,
           click: () => this.createPosts()
         },
         {
           text: 'Close',
-          class: 'button button--info',
+          class: 'btn btn--info',
           click() {
             this.close();
           }

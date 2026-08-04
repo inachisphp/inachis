@@ -114,7 +114,7 @@ window.Inachis.PostEdit = {
 
 		const button = document.createElement('button');
 		button.type = 'button';
-		button.className = 'button button--negative';
+		button.className = 'btn btn--danger';
 		button.textContent = 'Discard';
 
 		button.addEventListener('click', event => {

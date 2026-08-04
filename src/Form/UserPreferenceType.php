@@ -85,7 +85,7 @@ class UserPreferenceType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'high_contrast_label',
                     'aria-required' => 'false',
-                    'class' => 'ui-switch switch-button-input',
+                    'class' => 'ui-switch switch-btn-input',
                     'data-label-on' => 'enabled',
                     'data-label-off' => 'disabled',
                 ],
@@ -190,12 +190,12 @@ class UserPreferenceType extends AbstractType
             // ])
             ->add('submit', SubmitType::class, [
                 'attr' => [
-                    'class' => 'button button--positive',
+                    'class' => 'btn btn--primary',
                 ],
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> %s',
                     'save',
-                    $this->translator->trans('admin.button.save', [], 'messages'),
+                    $this->translator->trans('admin.btn.save', [], 'messages'),
                 ),
                 'label_html' => true,
             ]);

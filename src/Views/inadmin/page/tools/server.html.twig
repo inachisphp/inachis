@@ -20,7 +20,7 @@
     } %}
 {% endif %}
 
-<p><a href="{{ viewModel.settings.domain ~ path('incp_tools_diagnostics_json') }}" class="button button--secondary"><span class="material-icons" aria-hidden="true">download</span> Download Report</a></p>
+<p><a href="{{ viewModel.settings.domain ~ path('incp_tools_diagnostics_json') }}" class="btn btn--secondary"><span class="material-icons" aria-hidden="true">download</span> Download Report</a></p>
 
 {% include 'inadmin/partials/diagnostics/summary.html.twig' with { summary: summary } %}
 

@@ -35,7 +35,7 @@
             </div>
 
             <div>
-                <a class="button button--secondary" href="{{ path('incp_settings_themes_rescan') }}">Rescan now</a>
+                <a class="btn btn--secondary" href="{{ path('incp_settings_themes_rescan') }}">Rescan now</a>
             </div>
         </section>
 
@@ -100,10 +100,10 @@
 
                         <div>
                             {% if activeTheme.identifier == theme.identifier %}
-                                <button type="button" class="button button--positive" disabled>Active</button>
+                                <button type="button" class="btn btn--primary" disabled>Active</button>
                             {% else %}
                                 <form method="post" action="{{ path('incp_settings_theme_activate', { identifier: theme.identifier }) }}">
-                                    <button type="submit" class="button button--positive">Activate</button>
+                                    <button type="submit" class="btn btn--primary">Activate</button>
                                 </form>
                             {% endif %}
                         </div>

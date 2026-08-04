@@ -7,7 +7,7 @@
         {% endif %}
         {% for key, action in actions %}
             {% set elementType = action.href ?? '' ? 'a' : 'button' %}
-            <{{ elementType }}{% if action.href ?? '' %} href="{{ action.href }}"{% endif %} class="button {{ action.button_class|default(null) }}"{%-
+            <{{ elementType }}{% if action.href ?? '' %} href="{{ action.href }}"{% endif %} class="btn {{ action.button_class|default(null) }}"{%-
                 if action.data is defined and action.data is not empty %}
                 {% for datakey, datavalue in action.data %} data-{{ datakey }}="{{ datavalue }}"{% endfor %}
                     {%- endif %}{%-

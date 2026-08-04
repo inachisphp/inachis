@@ -6,7 +6,7 @@ window.Inachis.ImageManager = {
     allowedTypes: [],
     buttons: [
         {
-            class: 'button button--positive',
+            class: 'btn btn--primary',
             disabled: true,
             text: 'Choose Image',
             click() {
@@ -15,7 +15,7 @@ window.Inachis.ImageManager = {
         },
         {
             text: 'Close',
-            class: 'button button--info',
+            class: 'btn btn--info',
             click() {
                 this.close();
             }
@@ -97,7 +97,7 @@ window.Inachis.ImageManager = {
         });
         this.updateDialogButtons();
 
-        document.querySelectorAll('.ui-dialog-secondary-bar .button--add')
+        document.querySelectorAll('.ui-dialog-secondary-bar .btn--add')
             .forEach(a => {
                 a.addEventListener('click', () => this.toggleUploadImage());
             });

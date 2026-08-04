@@ -91,7 +91,7 @@ class RoleType extends AbstractType
             ])
             ->add('submit', SubmitType::class, [
                 'attr' => [
-                    'class' => 'button button--positive',
+                    'class' => 'btn btn--primary',
                 ],
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> %s',
@@ -105,7 +105,7 @@ class RoleType extends AbstractType
         if (!$isNew) {
             $builder->add('delete', SubmitType::class, [
                 'attr' => [
-                    'class' => 'button button--negative button--confirm',
+                    'class' => 'btntton--negative btn--confirm',
                     'data-confirm' => 'delete',
                     'data-confirm-text' => 'Yes, delete',
                     'data-entity' => 'role',

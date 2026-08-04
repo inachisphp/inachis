@@ -19,7 +19,7 @@
                     <label id="gdpr_banner_enabled_label" class="inline_label" for="gdpr_banner_enabled">Visibility</label>
 
                     <span class="switch-wrapper">
-                        <input type="checkbox" id="gdpr_banner_enabled" name="gdpr[banner_enabled]" aria-labelledby="gdpr_banner_enabled_label" aria-required="false" class="ui-switch switch-button-input" data-label-off="Disabled" data-label-on="Enabled (Show to Visitors)" value="1" {% if privacy.banner_enabled == '1' %}checked="checked"{% endif %}>
+                        <input type="checkbox" id="gdpr_banner_enabled" name="gdpr[banner_enabled]" aria-labelledby="gdpr_banner_enabled_label" aria-required="false" class="ui-switch switch-btn-input" data-label-off="Disabled" data-label-on="Enabled (Show to Visitors)" value="1" {% if privacy.banner_enabled == '1' %}checked="checked"{% endif %}>
                     </span>
                 </p>
                 <p><small class="text-muted">Displays a consent banner to EU/UK visitors prior to setting non-essential cookies.</small></p>
@@ -84,7 +84,7 @@
                         {# Data Export Action #}
                         <form method="post" action="{{ path('incp_security_privacy_export_user') }}" style="display:inline;">
                             <input type="hidden" name="user_identifier" class="js-target-user-input">
-                            <button type="submit" class="button button--secondary">
+                            <button type="submit" class="btn btn--secondary">
                                 <span class="material-icons" aria-hidden="true">download</span> Export Personal Data
                             </button>
                         </form>
@@ -94,7 +94,7 @@
                         <form method="post" action="{{ path('incp_security_privacy_anonymize_user') }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to permanently anonymize this user?');">
                             <input type="hidden" name="_token" value="{{ csrf_token('anonymize_user') }}">
                             <input type="hidden" name="user_identifier" class="js-target-user-input">
-                            <button type="submit" class="button button--negative">
+                            <button type="submit" class="btn btn--danger">
                                 <span class="material-icons" aria-hidden="true">delete</span> Anonymize User
                             </button>
                         </form>
@@ -117,7 +117,7 @@
         {% if can('PRIVACY_GDPR', 'EDIT') %}
         <div class="fixed-bottom-bar">
             <p>
-                <button type="submit" class="button button--positive">
+                <button type="submit" class="btn btn--primary">
                     <span class="material-icons">save</span>
                     <span>Save Privacy Settings</span>
                 </button>

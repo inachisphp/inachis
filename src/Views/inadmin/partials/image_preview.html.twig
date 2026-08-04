@@ -13,11 +13,11 @@
     {% if show_gallery_button|default(true) and can('IMAGE', 'VIEW') %}
         {# todo: add permissions check here #}
         {% if filename is not empty %}
-            <button class="button button--info button--confirm"
+            <button class="btn btn--info btn--confirm"
 
             ><span class="material-icons" aria-hidden="true">hide_image</span> Remove Image</button>
         {% endif %}
-    <button class="button button--info dialog__link"
+    <button class="btn btn--info dialog__link"
             data-allowed-types="{{ allowedTypes|default([])|join(',') }}"
             data-dialog="imageManager"
             data-target="{{ id }}"

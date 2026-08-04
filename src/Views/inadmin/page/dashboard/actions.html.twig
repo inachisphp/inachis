@@ -5,7 +5,7 @@
     <div class="nested-grid">
         {% if showResume %}
         <div class="col-6 ui-section rounded">
-            <a href="/incp/{{ dashboard.recentDraft.type }}/{{ (dashboard.recentDraft.urls|first).link }}" class="button button--positive button--large">Resume writing</a>
+            <a href="/incp/{{ dashboard.recentDraft.type }}/{{ (dashboard.recentDraft.urls|first).link }}" class="btn btn--primary btn--lg">Resume writing</a>
             <h4>{{ dashboard.recentDraft.title }}{{ dashboard.recentDraft.subtitle ? ' - ' ~ dashboard.recentDraft.subtitle }}</h4>
             <p class="date">
                 Last edited:

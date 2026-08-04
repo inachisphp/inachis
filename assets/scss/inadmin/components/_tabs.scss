@@ -1,60 +1,85 @@
-@use 'sass:color';
 @use '../definitions' as *;
+
+// ==========================================================================
+// Tabbed Navigation System (.ui-tabs)
+// ==========================================================================
 
 .ui-tabs,
 .ui-tabs-external {
-	background: $bg-surface;
-	border: 1px solid $border-color;
-	border-top-left-radius: 1em;
-	border-top-right-radius: 1em;
-	border-bottom: none;
+  background-color: $bg-surface;
+  border: 1px solid $border-color;
+  border-bottom: 1px solid $border-color;
+  border-radius: $radius-standard $radius-standard 0 0;
+  
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  list-style-type: none;
+  margin: 1rem 0 0 0;
+  padding: 0.375rem 0.5rem 0 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none; // Hides scrollbar on narrow views
 
-	clear: both;
-	display: block;
-	font-size: 0.9em;
-	list-style-type: none;
-	margin: 1em 0 0 0;
-	padding: 0.5em 0 0 0.5rem;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
-	&::after {
-		content: ' ';
-		clear: both;
-		display: block;
-	}
+  li {
+    margin: 0;
+    padding: 0;
+    border-bottom: 3px solid transparent;
+    border-radius: $radius-standard $radius-standard 0 0;
+    transition: background-color $transition-base, border-color $transition-base;
 
-	a,
-	a:visited {
-		color: $text-muted;
-		display: inline-block;
-		text-decoration: none;
-		padding: 0.6rem;
-	}
+    &:hover {
+      background-color: $bg-body;
+      border-bottom-color: rgba(0, 102, 153, 0.4);
 
-	li {
-		border-bottom: 3px solid transparent;
-		float: left;
-		margin: 0 5px 0;
+      a,
+      a:visited {
+        color: $text-main;
+      }
+    }
 
-		&:hover {
-			background-color: $border-color;
-			border-bottom-color: $action-primary-hover;
-		}
-	}
+    // Active tab state (jQuery UI class or custom active class)
+    &.ui-state-active,
+    &.is-active {
+      border-bottom: 3px solid $action-primary;
+      background-color: transparent;
 
-	.ui-state-active {
-		border-bottom: 3px solid $action-primary;
+      a,
+      a:visited {
+        color: $action-primary;
+        font-weight: 700;
+      }
+    }
+  }
 
-		a,
-		a:visited {
-			color: $action-primary;
-			font-weight: bold;
-		}
-	}
+  a,
+  a:visited {
+    color: $text-muted;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    text-decoration: none;
+    padding: 0.5rem 0.875rem;
+    font-weight: 500;
+    transition: color $transition-base;
+
+    .material-icons {
+      font-size: 1.125rem;
+    }
+  }
 }
 
-
-// .form__post fieldset.ui-tabs-panel {
-// 	background: $bg-surface;
-// 	border: 1px solid $border-color;
-// 	margin: 0;
-// }
+// Connected Fieldset / Panel Styling
+.ui-tabs-panel,
+.form fieldset.ui-tabs-panel {
+  background-color: $bg-surface;
+  border: 1px solid $border-color;
+  border-top: none;
+  border-radius: 0 0 $radius-standard $radius-standard;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}

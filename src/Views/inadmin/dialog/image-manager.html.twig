@@ -3,7 +3,7 @@
         <label class="ui-helper-hidden-accessible" for="ui-dialog-search-input">Search</label>
         <input class="text ui-icon-search" id="ui-dialog-search-input" placeholder="Filter by name" type="search" />
         <!-- button class="material-icons" type="submit">search</button -->
-        <a class="button button--add" href="#"><span class="material-icons" aria-hidden="true">cloud_upload</span> Upload a new Image</a>
+        <a class="btn btn--add" href="#"><span class="material-icons" aria-hidden="true">cloud_upload</span> Upload a new Image</a>
     </form>
     <p id="images_count">
         Showing <strong>0</strong>-<strong>0</strong> of <strong>0</strong> images
@@ -55,7 +55,7 @@
                 {{ form_widget(form.description) }}
             </p>
             <p>
-                <button class="button button--positive" type="submit"><span class="material-icons" aria-hidden="true">save</span> Save Image</button>
+                <button class="btn btn--primary" type="submit"><span class="material-icons" aria-hidden="true">save</span> Save Image</button>
             </p>
         </fieldset>
     {{ form_row(form._token) }}

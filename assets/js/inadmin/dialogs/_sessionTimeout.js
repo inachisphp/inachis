@@ -45,7 +45,7 @@ window.Inachis.SessionTimeout = {
             buttons: [
                 {
                     text: 'Keep me signed-in',
-                    class: 'button button--positive',
+                    class: 'btn btn--primary',
                     click: async () => {
                         await this.continue();
                         this.dialogInstance.close();
@@ -53,7 +53,7 @@ window.Inachis.SessionTimeout = {
                 },
                 {
                     text: 'Log off now',
-                    class: 'button button--negative',
+                    class: 'btn btn--danger',
                     click: () => {
                         this.logOff();
                     },

@@ -374,7 +374,7 @@ class PostType extends AbstractType
         if ($allowEdit) {
             $builder->add('submit', SubmitType::class, [
                 'attr' => [
-                    'class' => 'button button--positive',
+                    'class' => 'btn btn--primary',
                 ],
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> <span>%s</span>',
@@ -408,7 +408,7 @@ class PostType extends AbstractType
             if ($showReview) {
                 $builder->add('review', SubmitType::class, [
                     'attr' => [
-                        'class' => 'button button--secondary',
+                        'class' => 'btn btn--secondary',
                     ],
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> <span>%s</span>',
@@ -421,7 +421,7 @@ class PostType extends AbstractType
             if ($showPublish) {
                 $builder->add('publish', SubmitType::class, [
                     'attr' => [
-                        'class' => 'button button--secondary',
+                        'class' => 'btn btn--secondary',
                     ],
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> <span>%s</span>',
@@ -437,7 +437,7 @@ class PostType extends AbstractType
                     'attr' => [
                         'data-confirm' => 'delete',
                         'data-confirm-text' => 'Yes, delete',
-                        'class' => 'button button--negative button--confirm',
+                        'class' => 'btn btn--danger btn--confirm',
                         'data-entity' => $options['data']->getType(),
                         'data-title' => $options['data']->getTitle(),
                     ],

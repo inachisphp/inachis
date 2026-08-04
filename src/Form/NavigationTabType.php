@@ -104,7 +104,7 @@ class NavigationTabType extends AbstractType
         if ($allowEdit) {
             $builder->add('submit', SubmitType::class, [
                 'attr' => [
-                    'class' => 'button button--positive',
+                    'class' => 'btn btn--primary',
                 ],
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> %s',

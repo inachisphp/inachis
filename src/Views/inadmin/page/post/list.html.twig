@@ -80,7 +80,7 @@
 
         actions: {
             private: can('PAGE', 'EDIT') ? {
-                button_class: 'button--secondary button--privacy',
+                button_class: 'btn--secondary btn--privacy',
                 data: {
                     'form-action': ''
                 },
@@ -88,7 +88,7 @@
                 title: 'Make private',
             } : null,
             public: can('PAGE', 'EDIT') ? {
-                button_class: 'button--secondary button--privacy',
+                button_class: 'btn--secondary btn--privacy',
                 data: {
                     'form-action': ''
                 },
@@ -96,7 +96,7 @@
                 title: 'Make public',
             } : null,
             rebuild: can('PAGE', 'EDIT') ? {
-                button_class: 'button--secondary',
+                button_class: 'btn--secondary',
                 data: {
                     'form-action': ''
                 },
@@ -104,7 +104,7 @@
                 title: 'Recreate Link'
             } : null,
             export: {
-                button_class: 'button--secondary button--export',
+                button_class: 'btn--secondary btn--export',
                 button_type: 'button',
                 data: {
                     'content-type': 'post',
@@ -115,7 +115,7 @@
                 'title': 'Export',
             },
             delete: can('PAGE', 'DELETE') ? {
-                button_class: 'button--negative button--delete button--confirm',
+                button_class: 'btn--danger btn--delete btn--confirm',
                 data: {
                     confirm: 'delete',
                     'confirm-text': 'Yes, delete',

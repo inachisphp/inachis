@@ -34,12 +34,12 @@ window.Inachis.ConfirmationPrompt = {
         return [
             {
                 text: 'Cancel',
-                class: 'button button--info',
+                class: 'btn btn--info',
                 click: () => this.dialog.close(),
             },
             {
                 text: this.targetEl.dataset.confirmText || 'Confirm',
-                class: 'button button--negative',
+                class: 'btn btn--danger',
                 click: () => this.confirm(),
             },
         ];

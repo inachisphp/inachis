@@ -136,7 +136,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
 	createReopenButton(thread) {
         const button = document.createElement('button');
         button.type = 'button';
-        button.className = 'button review-reopen-button';
+        button.className = 'btn review-reopen-button';
         button.textContent = 'Reopen Review';
         button.onclick = async () => {
             await this.reopenThread(thread.id);
@@ -159,7 +159,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
 
         const btn = this.ui('button', {
             type: 'button',
-            className: 'button button--add review-reply-button',
+            className: 'btn btn--add review-reply-button',
             onclick: async () => {
                 const message = textarea.value.trim();
                 if (!message) return;
@@ -180,7 +180,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
             'button',
             {
                 type: 'button',
-                className: 'button button--positive review-resolve-button',
+                className: 'btn btn--primary review-resolve-button',
                 onclick: () => this.showResolveConfirmation(thread),
             },
             this.ui(
@@ -419,7 +419,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
 
         const submitBtn = this.ui('button', {
             type: 'button',
-            className: 'button button--add',
+            className: 'btn btn--add',
             onclick: async () => {
                 const message = textarea.value.trim();
                 if (!message) return;
@@ -617,7 +617,7 @@ window.Inachis.EasyMDEReviewPlugin = class {
 
         const confirmBtn = this.ui('button', {
             type: 'button',
-            className: 'button button--positive',
+            className: 'button btn--primary',
             onclick: async () => {
                 confirmBtn.disabled = true;
                 await this.resolveThread(thread.id);

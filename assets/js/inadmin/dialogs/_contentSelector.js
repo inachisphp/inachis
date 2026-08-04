@@ -31,13 +31,13 @@ window.Inachis.ContentSelectorDialog = {
       buttons: [
         {
           text: 'Attach to series',
-          class: 'button button--positive',
+          class: 'btn btn--primary',
           disabled: true,
           click: () => this.addContentToSeries()
         },
         {
           text: 'Close',
-          class: 'button button--info',
+          class: 'btn btn--info',
           click() {
             this.close();
           }
@@ -167,10 +167,10 @@ window.Inachis.ContentSelectorDialog = {
       })
       .catch(() => {
         submitBtn.textContent = 'Failed to save';
-        submitBtn.classList.add('button--negative');
+        submitBtn.classList.add('btn--danger');
         setTimeout(() => {
           submitBtn.disabled = false;
-          submitBtn.classList.remove('button--negative');
+          submitBtn.classList.remove('btn--danger');
           submitBtn.textContent = 'Attach to series';
         }, 1200);
       });

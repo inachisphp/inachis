@@ -3,7 +3,7 @@
         <div class="col-12 flash"></div>
         <fieldset class="col-6">
             <p>
-                <button class="button button--add" id="dialog__imageManager__addnew" type="button">
+                <button class="btn btn--add" id="dialog__imageManager__addnew" type="button">
                     <span class="material-icons" aria-hidden="true">add</span>
                     <span class="btn-text">Add new category</span>
                 </button>
@@ -39,12 +39,12 @@
             </p>
             <p>
     {% if can('CATEGORY', ['EDIT', 'CREATE' ]) %}
-                <button class="button button--positive" id="dialog__categoryManager__save" type="submit">Save</button>
+                <button class="btn btn--primary" id="dialog__categoryManager__save" type="submit">Save</button>
     {% endif %}
     {% if can('CATEGORY', 'DELETE') %}
-                <button aria-disabled="true" class="button button--negative" disabled="disabled" id="dialog__categoryManager__delete" type="button">Delete</button>
+                <button aria-disabled="true" class="btn btn--danger" disabled="disabled" id="dialog__categoryManager__delete" type="button">Delete</button>
     {% endif %}
-                <a class="button button--info" id="dialog__categoryManager__cancel" title="Cancel">Cancel</a>
+                <a class="btn btn--info" id="dialog__categoryManager__cancel" title="Cancel">Cancel</a>
             </p>
             <p hidden class="info">Note: This category cannot be removed as content is assigned</p>
         </fieldset>

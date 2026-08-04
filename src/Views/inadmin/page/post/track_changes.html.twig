@@ -36,7 +36,7 @@
         <form method="post">
             <p>
             {% if can('PAGE', 'EDIT') %}
-                <button class="button button--negative button--delete button--confirm"
+                <button class="btn btn--danger btn--delete btn--confirm"
                     data-confirm="revert"
                     data-confirm-text="Yes, revert"
                     data-entity="post"
@@ -47,10 +47,10 @@
                     <span class="material-icons" aria-hidden="true">undo</span> <span>Revert</span>
                 </button>
             {% endif %}
-                <a href="{{ path('incp_post_download', { 'id': revision_id }) }}" class="button button--secondary">
+                <a href="{{ path('incp_post_download', { 'id': revision_id }) }}" class="btn btn--secondary">
                     <span class="material-icons" aria-hidden="true">save_alt</span> {% trans %}admin.post.revision.download{% endtrans %}
                 </a>
-                <a href="/incp/post/{{ url }}" class="button button--info">
+                <a href="/incp/post/{{ url }}" class="btn btn--info">
                     <span>Cancel</span>
                 </a>
             </p>

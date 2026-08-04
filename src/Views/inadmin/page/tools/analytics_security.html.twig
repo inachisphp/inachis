@@ -14,14 +14,14 @@
     {{ include('inadmin/partials/tab-sets/analytics.html.twig') }}
 
     <form class="grid-toggle" method="get">
-        <button aria-pressed="{{ security.period.range == 'today' ? 'true' : 'false' }}" class="button button--grid" name="range" value="today">Today</button>
-        <button aria-pressed="{{ security.period.range == 'yesterday' ? 'true' : 'false' }}" class="button button--grid" name="range" value="yesterday">Yesterday</button>
-        <button aria-pressed="{{ security.period.range == '7d' ? 'true' : 'false' }}" class="button button--grid" name="range" value="7d">7 Days</button>
-        <button aria-pressed="{{ security.period.range == '30d' ? 'true' : 'false' }}" class="button button--grid" name="range" value="30d">30 Days</button>
-        <button aria-pressed="{{ security.period.range == '90d' ? 'true' : 'false' }}" class="button button--grid" name="range" value="90d">90 Days</button>
+        <button aria-pressed="{{ security.period.range == 'today' ? 'true' : 'false' }}" class="btn btn--grid" name="range" value="today">Today</button>
+        <button aria-pressed="{{ security.period.range == 'yesterday' ? 'true' : 'false' }}" class="btn btn--grid" name="range" value="yesterday">Yesterday</button>
+        <button aria-pressed="{{ security.period.range == '7d' ? 'true' : 'false' }}" class="btn btn--grid" name="range" value="7d">7 Days</button>
+        <button aria-pressed="{{ security.period.range == '30d' ? 'true' : 'false' }}" class="btn btn--grid" name="range" value="30d">30 Days</button>
+        <button aria-pressed="{{ security.period.range == '90d' ? 'true' : 'false' }}" class="btn btn--grid" name="range" value="90d">90 Days</button>
         <button
             aria-pressed="{{ security.period.range == 'custom' ? 'true' : 'false' }}"
-            class="ui-toggle button button--grid"
+            class="ui-toggle btn btn--grid"
             data-target=".analytics-custom-range"
             data-target-state="hidden"
             name="range"
@@ -71,7 +71,7 @@
 				>
             </div>
 
-            <button class="button button--add" type="submit">
+            <button class="btn btn--add" type="submit">
                 Apply
             </button>
         </form>
@@ -167,7 +167,7 @@
     <h2>Events Over Time</h2>
 
     <button
-        class="button button--icon chart-download"
+        class="btn btn--icon chart-download"
         type="button"
         data-chart="securityChart"
         data-filename="security">

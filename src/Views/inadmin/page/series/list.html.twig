@@ -49,7 +49,7 @@
 
         'actions': {
             'private': can('SERIES', 'EDIT') ? {
-                'button_class': 'button--secondary button--privacy',
+                'button_class': 'btn--secondary btn--privacy',
                 'data': {
                     'form-action': ''
                 },
@@ -57,7 +57,7 @@
                 'title': 'Make private',
             } : null,
             'public': can('SERIES', 'EDIT') ? {
-                'button_class': 'button--secondary button--privacy',
+                'button_class': 'btn--secondary btn--privacy',
                 'data': {
                     'form-action': ''
                 },
@@ -65,7 +65,7 @@
                 'title': 'Make public',
             } : null,
             'export': {
-                'button_class': 'button--secondary button--export',
+                'button_class': 'btn--secondary btn--export',
                 'button_type': 'button',
                 'data': {
                     'content-type': 'series',
@@ -76,7 +76,7 @@
                 'title': 'Export',
             },
             'delete': can('SERIES', 'DELETE') ? {
-                'button_class': 'button--negative button--delete button--confirm',
+                'button_class': 'btn--danger btn--delete btn--confirm',
                 'data': {
                     'confirm': 'delete',
                     'confirm-text': 'Yes, delete',
