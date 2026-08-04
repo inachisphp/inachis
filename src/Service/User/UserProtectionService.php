@@ -13,18 +13,17 @@ use Inachis\Repository\User\UserRepository;
 
 /**
  * Service for determining of a {@link User} can be removed/disabled or
- * have 'admin' {@link Role} removed based on if they are the last administrator
+ * have 'admin' {@link Role} removed based on if they are the last administrator.
  */
 final readonly class UserProtectionService implements UserProtectionServiceInterface
 {
     /**
-     * Constructor
-     *
-     * @param UserRepository $userRepository
+     * Constructor.
      */
     public function __construct(
         private readonly UserRepository $userRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Determines if the {@link User} can be deleted, disabled, or the
@@ -40,8 +39,6 @@ final readonly class UserProtectionService implements UserProtectionServiceInter
     /**
      * Determines if the {@link User}s can be deleted, disabled, or a
      * role removed from them.
-     *
-     * @param iterable $users
      */
     public function assertAdministratorsCanBeRemoved(iterable $users): void
     {

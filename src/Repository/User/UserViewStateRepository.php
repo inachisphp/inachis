@@ -14,15 +14,15 @@ use Inachis\Entity\User\User;
 use Inachis\Entity\User\UserViewState;
 
 /**
- * Repository for UserViewState
- * 
+ * Repository for UserViewState.
+ *
  * @extends ServiceEntityRepository<UserViewState>
  */
 class UserViewStateRepository extends ServiceEntityRepository
 {
     /**
-     * Creates a new instance of the WasteRepository
-     * 
+     * Creates a new instance of the WasteRepository.
+     *
      * @param ManagerRegistry $registry The registry
      */
     public function __construct(ManagerRegistry $registry)
@@ -31,11 +31,7 @@ class UserViewStateRepository extends ServiceEntityRepository
     }
 
     /**
-     * Finds user view state for context (e.g. Page) and User
-     *
-     * @param User $user
-     * @param string $context
-     * @return UserViewState|null
+     * Finds user view state for context (e.g. Page) and User.
      */
     public function findFor(User $user, string $context): ?UserViewState
     {
@@ -46,10 +42,7 @@ class UserViewStateRepository extends ServiceEntityRepository
     }
 
     /**
-     * Saves the current view state of this context
-     *
-     * @param UserViewState $state
-     * @return void
+     * Saves the current view state of this context.
      */
     public function save(UserViewState $state): void
     {

@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Inachis\Enum;
 
 /**
- * Specifies the available change types for content changes
+ * Specifies the available change types for content changes.
  */
 enum DiffBlockType: string
 {

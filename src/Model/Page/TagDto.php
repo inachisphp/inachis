@@ -9,12 +9,9 @@ declare(strict_types=1);
 namespace Inachis\Model\Page;
 
 /**
- * Data Transfer Object for tag
-     */
+ * Data Transfer Object for tag.
+ */
 final class TagDto
 {
-    /**
-     * @var string
-     */
     public string $title;
 }

@@ -9,50 +9,39 @@ declare(strict_types=1);
 namespace Inachis\Command\User;
 
 use Inachis\Message\CleanupLoginActivityMessage;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * Advisable to add this to Windows Scheduler or Linux Cron
  * e.g.
- * 0 2 * * * /usr/bin/php /path/to/your/project/bin/console inachis:cleanup-login-activity
+ * 0 2 * * * /usr/bin/php /path/to/your/project/bin/console inachis:cleanup-login-activity.
  */
 #[AsCommand(
     name: 'inachis:user:cleanup-login-activity',
-    description: 'Deletes old login activity, successful older than 12 months, failed older than 90 days.'
+    description: 'Deletes old login activity, successful older than 12 months, failed older than 90 days.',
 )]
 class CleanupLoginActivityCommand extends Command
 {
-    /**
-     * @param MessageBusInterface $messenger
-     */
     public function __construct(protected MessageBusInterface $messenger)
     {
         parent::__construct();
     }
 
-    /**
-     * @return void
-     */
     protected function configure(): void
     {
         $this->addOption(
             'dry-run',
             null,
             InputOption::VALUE_NONE,
-            'Preview how many records would be deleted without actually deleting them.'
+            'Preview how many records would be deleted without actually deleting them.',
         );
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $dryRun = (bool) $input->getOption('dry-run');

@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Controller\API\Review;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Controller\API\Review\ReviewAssignController;
 use Inachis\Entity\Content\ReviewThread;
@@ -19,7 +18,6 @@ use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ReviewAssignControllerTest extends TestCase
@@ -52,7 +50,7 @@ class ReviewAssignControllerTest extends TestCase
         $request = new Request(
             content: json_encode([
                 'userId' => 'user-id',
-            ])
+            ]),
         );
 
         $controller = $this->getMockBuilder(ReviewAssignController::class)
@@ -68,7 +66,7 @@ class ReviewAssignControllerTest extends TestCase
             $request,
             $threads,
             $users,
-            $entityManager
+            $entityManager,
         );
 
         $this->assertInstanceOf(JsonResponse::class, $response);
@@ -77,7 +75,7 @@ class ReviewAssignControllerTest extends TestCase
 
         $this->assertSame(
             ['success' => true],
-            $data
+            $data,
         );
     }
 
@@ -100,7 +98,7 @@ class ReviewAssignControllerTest extends TestCase
             $request,
             $threads,
             $users,
-            $entityManager
+            $entityManager,
         );
     }
 
@@ -122,7 +120,7 @@ class ReviewAssignControllerTest extends TestCase
         $request = new Request(
             content: json_encode([
                 'userId' => 'user-id',
-            ])
+            ]),
         );
 
         $controller = new ReviewAssignController();
@@ -134,7 +132,7 @@ class ReviewAssignControllerTest extends TestCase
             $request,
             $threads,
             $users,
-            $entityManager
+            $entityManager,
         );
     }
 
@@ -204,7 +202,7 @@ class ReviewAssignControllerTest extends TestCase
 
         $this->assertSame(
             [],
-            json_decode($response->getContent(), true)
+            json_decode($response->getContent(), true),
         );
     }
 }

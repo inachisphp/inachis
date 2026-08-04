@@ -14,5 +14,6 @@ final readonly class ReleaseInstance
         public string $identifier,
         public string $version,
         public string $path,
-    ) {}
+    ) {
+    }
 }

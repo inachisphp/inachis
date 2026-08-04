@@ -9,10 +9,13 @@ declare(strict_types=1);
 namespace Inachis\Tests\phpunit\Controller\API\Analytics;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Inachis\Controller\API\Analytics\ContentAnalyticsController;
 use Inachis\Analytics\AnalyticsProviderInterface;
-use Inachis\Entity\Content\{Page,Series,Url};
-use Inachis\Repository\Content\{PageRepository,SeriesRepository};
+use Inachis\Controller\API\Analytics\ContentAnalyticsController;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
+use Inachis\Entity\Content\Url;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Tests\phpunit\Controller\AbstractInachisControllerTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,14 +37,14 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
             $this->params,
             $this->security,
             $this->translator,
-            $this->wasteRepository
+            $this->wasteRepository,
         );
 
         $response = $controller->postStats(
             new Request(),
             $analytics,
             $repository,
-            '123'
+            '123',
         );
 
         $this->assertSame('', $response->getContent());
@@ -76,7 +79,7 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
                 '/my-post',
                 $this->isInstanceOf(\DateTimeImmutable::class),
                 $this->isInstanceOf(\DateTimeImmutable::class),
-                10
+                10,
             )
             ->willReturn([]);
 
@@ -97,8 +100,8 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
                 'inadmin/partials/analytics.html.twig',
                 $this->callback(function (array $vars) use ($post) {
                     return $vars['post'] === $post
-                        && $vars['stats']['totalViews'] === 30;
-                })
+                        && 30 === $vars['stats']['totalViews'];
+                }),
             )
             ->willReturn(new Response('OK'));
 
@@ -106,7 +109,7 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
             new Request(),
             $analytics,
             $repository,
-            '123'
+            '123',
         );
 
         $this->assertSame('OK', $response->getContent());
@@ -142,11 +145,11 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
             ->with(
                 $post,
                 $this->callback(function (\DateTimeImmutable $date) {
-                    return $date->format('Y-m-d') === '2025-01-01';
+                    return '2025-01-01' === $date->format('Y-m-d');
                 }),
                 $this->callback(function (\DateTimeImmutable $date) {
-                    return $date->format('Y-m-d') === '2025-01-31';
-                })
+                    return '2025-01-31' === $date->format('Y-m-d');
+                }),
             )
             ->willReturn([]);
 
@@ -155,12 +158,12 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
             ->with(
                 '/my-post',
                 $this->callback(
-                    fn (\DateTimeImmutable $d) => $d->format('Y-m-d') === '2025-01-01'
+                    fn (\DateTimeImmutable $d) => '2025-01-01' === $d->format('Y-m-d'),
                 ),
                 $this->callback(
-                    fn (\DateTimeImmutable $d) => $d->format('Y-m-d') === '2025-01-31'
+                    fn (\DateTimeImmutable $d) => '2025-01-31' === $d->format('Y-m-d'),
                 ),
-                10
+                10,
             );
 
         $controller = $this->getMockBuilder(ContentAnalyticsController::class)
@@ -182,7 +185,7 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
             $request,
             $analytics,
             $repository,
-            '123'
+            '123',
         );
     }
 
@@ -210,13 +213,11 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
             ->with(
                 $series,
                 $this->callback(
-                    fn (\DateTimeImmutable $d) =>
-                        $d->format('Y-m-d') === '2025-01-01'
+                    fn (\DateTimeImmutable $d) => '2025-01-01' === $d->format('Y-m-d'),
                 ),
                 $this->callback(
-                    fn (\DateTimeImmutable $d) =>
-                        $d->format('Y-m-d') === '2025-01-31'
-                )
+                    fn (\DateTimeImmutable $d) => '2025-01-31' === $d->format('Y-m-d'),
+                ),
             )
             ->willReturn([]);
 
@@ -225,12 +226,12 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
             ->with(
                 '/2025/test-series',
                 $this->callback(
-                    fn (\DateTimeImmutable $d) => $d->format('Y-m-d') === '2025-01-01'
+                    fn (\DateTimeImmutable $d) => '2025-01-01' === $d->format('Y-m-d'),
                 ),
                 $this->callback(
-                    fn (\DateTimeImmutable $d) => $d->format('Y-m-d') === '2025-01-31'
+                    fn (\DateTimeImmutable $d) => '2025-01-31' === $d->format('Y-m-d'),
                 ),
-                10
+                10,
             )
             ->willReturn([]);
 
@@ -253,7 +254,7 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
             $request,
             $analytics,
             $repository,
-            '123'
+            '123',
         );
     }
 
@@ -286,9 +287,9 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
                 $this->callback(function (\DateTimeImmutable $to) {
                     return abs(
                         (new \DateTimeImmutable())->getTimestamp()
-                        - $to->getTimestamp()
+                        - $to->getTimestamp(),
                     ) < 5;
-                })
+                }),
             )
             ->willReturn([]);
 
@@ -304,10 +305,10 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
                 $this->callback(function (\DateTimeImmutable $to) {
                     return abs(
                         (new \DateTimeImmutable())->getTimestamp()
-                        - $to->getTimestamp()
+                        - $to->getTimestamp(),
                     ) < 5;
                 }),
-                10
+                10,
             )
             ->willReturn([]);
 
@@ -330,7 +331,7 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
             $request,
             $analytics,
             $repository,
-            '123'
+            '123',
         );
     }
 
@@ -353,14 +354,14 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
             $this->params,
             $this->security,
             $this->translator,
-            $this->wasteRepository
+            $this->wasteRepository,
         );
 
         $response = $controller->seriesStats(
             $request,
             $analytics,
             $repository,
-            '123'
+            '123',
         );
 
         $this->assertInstanceOf(Response::class, $response);

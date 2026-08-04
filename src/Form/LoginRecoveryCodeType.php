@@ -17,7 +17,7 @@ class LoginRecoveryCodeType extends AbstractType
 {
     public function buildForm(
         FormBuilderInterface $builder,
-        array $options
+        array $options,
     ): void {
         $builder->add(
             'code',
@@ -35,7 +35,7 @@ class LoginRecoveryCodeType extends AbstractType
                     'required' => true,
                     'spellcheck' => 'false',
                 ],
-            ]
+            ],
         )
         ->add('verify', SubmitType::class, [
             'attr' => [

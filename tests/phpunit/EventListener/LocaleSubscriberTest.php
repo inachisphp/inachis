@@ -22,6 +22,7 @@ class LocaleSubscriberTest extends TestCase
     private function createEvent(Request $request): RequestEvent
     {
         $kernel = $this->createStub(HttpKernelInterface::class);
+
         return new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
     }
 

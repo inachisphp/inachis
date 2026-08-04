@@ -13,9 +13,20 @@ use Inachis\Diagnostics\CheckResult;
 
 final class SessionCacheExpireCheck implements CheckInterface
 {
-    public function getId(): string { return 'session_cache_expire'; }
-    public function getLabel(): string { return 'session.cache_expire'; }
-    public function getSection(): string { return 'Environment'; }
+    public function getId(): string
+    {
+        return 'session_cache_expire';
+    }
+
+    public function getLabel(): string
+    {
+        return 'session.cache_expire';
+    }
+
+    public function getSection(): string
+    {
+        return 'Environment';
+    }
 
     public function run(): CheckResult
     {
@@ -33,9 +44,9 @@ final class SessionCacheExpireCheck implements CheckInterface
             $this->getId(),
             $this->getLabel(),
             $status,
-            $value . ' minutes',
-            $status === 'ok' ? 'Session cache expiration is acceptable.' : 'Session cache expiration is high; may cause stale content.',
-            $status !== 'ok' ? 'Consider reducing session.cache_expire to <= 720 minutes.' : null,
+            $value.' minutes',
+            'ok' === $status ? 'Session cache expiration is acceptable.' : 'Session cache expiration is high; may cause stale content.',
+            'ok' !== $status ? 'Consider reducing session.cache_expire to <= 720 minutes.' : null,
             $this->getSection(),
             '',
         );

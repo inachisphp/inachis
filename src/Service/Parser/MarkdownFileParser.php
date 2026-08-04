@@ -8,42 +8,34 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Parser;
 
-use DateTimeImmutable;
-use Exception;
+use Doctrine\Persistence\ObjectManager;
 use Inachis\Entity\Content\Category;
 use Inachis\Entity\Content\Page;
-use Doctrine\Persistence\ObjectManager;
 
 class MarkdownFileParser
 {
     /**
-     * Regular expression for matching an H1 from markdown
+     * Regular expression for matching an H1 from markdown.
      */
     public const PARSE_TITLE = '/^# (.+)$/m';
 
     /**
-     * Regular expression for matching an H2 from markdown
+     * Regular expression for matching an H2 from markdown.
      */
     public const PARSE_SUBTITLE = '/^## (.+)$/m';
 
     /**
-     * Regular expression for matching dates in YYYY-mm-dd format
+     * Regular expression for matching dates in YYYY-mm-dd format.
      */
     public const PARSE_DATE = '/^(\d{4}-\d{2}-\d{2})( \d{2}:\d{2})?(:\d{2})?$/m';
 
     /**
-     * Regular expression for matching a slash-separated category path
+     * Regular expression for matching a slash-separated category path.
      */
     public const PARSE_CATEGORY_PATH = '/^[a-z0-9 &]+(\/[a-z0-9 &]+)*$/mi';
 
-    /**
-     * @var ObjectManager
-     */
     private ObjectManager $em;
 
-    /**
-     * @param ObjectManager $em
-     */
     public function __construct(ObjectManager $em)
     {
         $this->em = $em;
@@ -54,31 +46,30 @@ class MarkdownFileParser
      * Row 1 - subtitle / post date
      * Row 2 - postdate / category
      * Row 3 - Category / null
-     * Row 4+ - Post content
-     * @param string $markdown
-     * @return Page
-     * @throws Exception
+     * Row 4+ - Post content.
+     *
+     * @throws \Exception
      */
     public function parse(string $markdown): Page
     {
         $page = new Page();
         $markdown = preg_split('/\R/', trim($markdown));
         if (!$markdown || count($markdown) < 2) {
-            throw new Exception('Invalid blog markdown format.');
+            throw new \Exception('Invalid blog markdown format.');
         }
 
         $offset = 1;
         if (preg_match(self::PARSE_TITLE, $markdown[0], $match)) {
             $page->setTitle(trim($match[1]));
         } else {
-            throw new Exception('Invalid blog markdown format - entry must start with a title.');
+            throw new \Exception('Invalid blog markdown format - entry must start with a title.');
         }
         if (preg_match(self::PARSE_SUBTITLE, $markdown[1], $match)) {
             $page->setSubTitle(trim($match[1]));
             ++$offset;
         }
         if (preg_match(self::PARSE_DATE, $markdown[$offset], $match)) {
-            $page->setPostDate(new DateTimeImmutable($match[0]));
+            $page->setPostDate(new \DateTimeImmutable($match[0]));
             ++$offset;
         }
         if (preg_match(self::PARSE_CATEGORY_PATH, $markdown[$offset], $match)) {
@@ -96,9 +87,10 @@ class MarkdownFileParser
     }
 
     /**
-     * Resolves a category path to a {@link Category}
-     * 
+     * Resolves a category path to a {@link Category}.
+     *
      * @param array<string> $path The category path
+     *
      * @return Category|null The resolved {@link Category}
      */
     private function resolveCategoryPath(array $path): ?Category
@@ -114,7 +106,7 @@ class MarkdownFileParser
             $title = str_replace('-', ' ', trim($segment));
 
             $criteria = ['title' => $title];
-            if ($parent !== null) {
+            if (null !== $parent) {
                 $criteria['parent'] = $parent;
             }
             $category = $repo->findOneBy($criteria);

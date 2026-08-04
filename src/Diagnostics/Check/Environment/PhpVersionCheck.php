@@ -15,11 +15,24 @@ final class PhpVersionCheck implements CheckInterface
 {
     private string $recommended = '8.3';
 
-    public function __construct(private string $currentVersion = PHP_VERSION) {}
+    public function __construct(private string $currentVersion = PHP_VERSION)
+    {
+    }
 
-    public function getId(): string { return 'php_version'; }
-    public function getLabel(): string { return 'PHP Version'; }
-    public function getSection(): string { return 'Environment'; }
+    public function getId(): string
+    {
+        return 'php_version';
+    }
+
+    public function getLabel(): string
+    {
+        return 'PHP Version';
+    }
+
+    public function getSection(): string
+    {
+        return 'Environment';
+    }
 
     public function run(): CheckResult
     {
@@ -33,9 +46,9 @@ final class PhpVersionCheck implements CheckInterface
             $status,
             $version,
             $details,
-            $status === 'ok' ? null : "Upgrade PHP to {$this->recommended} or later.",
+            'ok' === $status ? null : "Upgrade PHP to {$this->recommended} or later.",
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }

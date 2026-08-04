@@ -8,19 +8,21 @@ declare(strict_types=1);
 
 namespace Inachis\Validator;
 
-use Inachis\Model\Domain\ValidationIssue;
 use Inachis\Model\Domain\Severity;
+use Inachis\Model\Domain\ValidationIssue;
 
 /**
- * Validates TLS-RPT records
- * 
+ * Validates TLS-RPT records.
+ *
  * @phpstan-import-type DnsTxtRecord from \Inachis\Service\System\Domain\DnsResolverInterface
  */
 final class TlsRptValidator
 {
     /**
-     * Validate TLS-RPT records
+     * Validate TLS-RPT records.
+     *
      * @param list<DnsTxtRecord> $records
+     *
      * @return list<ValidationIssue>
      */
     public function validate(array $records): array

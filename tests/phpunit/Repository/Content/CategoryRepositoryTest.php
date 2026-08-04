@@ -8,14 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Repository\Content;
 
-use Inachis\Entity\Content\Category;
-use Inachis\Repository\Content\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Entity\Content\Category;
+use Inachis\Repository\Content\CategoryRepository;
 use PHPUnit\Framework\TestCase;
 
 class CategoryRepositoryTest extends TestCase
@@ -87,7 +87,7 @@ class CategoryRepositoryTest extends TestCase
                     'q.title LIKE :title',
                     ['title' => '%test%'],
                 ],
-                'q.title'
+                'q.title',
             )
             ->willReturn($paginator);
 

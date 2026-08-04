@@ -54,7 +54,7 @@ class TwoFactorRequestSubscriber implements EventSubscriberInterface
             return;
         }
         $event->setResponse(
-            new RedirectResponse('/incp/login/totp')
+            new RedirectResponse('/incp/login/totp'),
         );
     }
 }

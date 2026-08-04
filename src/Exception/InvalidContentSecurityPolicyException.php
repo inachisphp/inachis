@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Exception;
 
-use Exception;
-
-class InvalidContentSecurityPolicyException extends Exception
+class InvalidContentSecurityPolicyException extends \Exception
 {
 }

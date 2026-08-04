@@ -25,7 +25,7 @@ final class Base64EncodeFileTest extends TestCase
 
         $imageContent = base64_decode(
             'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAn8B9Un8D2MAAAAASUVORK5CYII=',
-            true
+            true,
         );
 
         $this->assertNotFalse($imageContent);
@@ -52,7 +52,7 @@ final class Base64EncodeFileTest extends TestCase
 
         $this->assertSame(
             file_get_contents($this->tempFile),
-            base64_decode($base64, true)
+            base64_decode($base64, true),
         );
     }
 
@@ -60,7 +60,7 @@ final class Base64EncodeFileTest extends TestCase
     {
         $this->assertSame(
             '',
-            Base64EncodeFile::encode('tests/tmp/does-not-exist.png')
+            Base64EncodeFile::encode('tests/tmp/does-not-exist.png'),
         );
     }
 
@@ -68,7 +68,7 @@ final class Base64EncodeFileTest extends TestCase
     {
         $this->assertSame(
             '',
-            Base64EncodeFile::encode('../../../../../../etc/hosts')
+            Base64EncodeFile::encode('../../../../../../etc/hosts'),
         );
     }
 
@@ -76,7 +76,7 @@ final class Base64EncodeFileTest extends TestCase
     {
         $this->assertSame(
             '',
-            Base64EncodeFile::encode('/../../../../../../etc/hosts')
+            Base64EncodeFile::encode('/../../../../../../etc/hosts'),
         );
     }
 
@@ -91,7 +91,7 @@ final class Base64EncodeFileTest extends TestCase
 
             $this->assertStringStartsWith(
                 'data:image/jpg;base64,',
-                $result
+                $result,
             );
         } finally {
             @unlink($jpg);

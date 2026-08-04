@@ -8,12 +8,12 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\Url;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Url;
 use Inachis\Repository\Content\UrlRepository;
 use Inachis\Service\Url\UrlBulkActionService;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -41,7 +41,7 @@ class UrlBulkActionServiceTest extends TestCase
 
         $this->urlBulkActionService = new UrlBulkActionService(
             $this->urlRepository,
-            $this->entityManager
+            $this->entityManager,
         );
     }
 
@@ -54,7 +54,7 @@ class UrlBulkActionServiceTest extends TestCase
         $this->urlRepository->method('findOneBy')->willReturn(null);
         $this->urlBulkActionService = new UrlBulkActionService(
             $this->urlRepository,
-            $this->entityManager
+            $this->entityManager,
         );
         $result = $this->urlBulkActionService->apply('', [Uuid::uuid1()->toString()]);
         $this->assertEquals(0, $result);

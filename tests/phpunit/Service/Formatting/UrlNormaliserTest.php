@@ -10,7 +10,6 @@ namespace Inachis\Tests\phpunit\Service\Formatting;
 
 use Inachis\Service\Formatting\UrlNormaliser;
 use PHPUnit\Framework\TestCase;
-use TypeError;
 
 class UrlNormaliserTest extends TestCase
 {
@@ -32,7 +31,7 @@ class UrlNormaliserTest extends TestCase
 
     public function testFromUriException(): void
     {
-        $this->expectException(TypeError::class);
+        $this->expectException(\TypeError::class);
         UrlNormaliser::toUri(['string-in-an-array']);
     }
 
@@ -40,11 +39,11 @@ class UrlNormaliserTest extends TestCase
     {
         $this->assertEquals(
             'something-really-cool',
-            UrlNormaliser::fromUri('https://something.local/2018/03/12/something-really-cool')
+            UrlNormaliser::fromUri('https://something.local/2018/03/12/something-really-cool'),
         );
         $this->assertEquals(
             'something-really-cool',
-            UrlNormaliser::fromUri('/2018/03/12/something-really-cool')
+            UrlNormaliser::fromUri('/2018/03/12/something-really-cool'),
         );
         $this->assertEquals('something-really-cool', UrlNormaliser::fromUri('something-really-cool'));
         $this->assertEquals('something-really-cool', UrlNormaliser::fromUri('something-really-cool/'));

@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace Inachis\Repository\Media;
 
-use Inachis\Entity\Media\AbstractFile;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Inachis\Entity\Media\AbstractFile;
 
 /**
  * @template T of AbstractFile
@@ -17,7 +17,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 trait DefaultResourceRepository
 {
     /**
-     * Get the disk usage of all images
+     * Get the disk usage of all images.
      *
      * @return int The disk usage in bytes
      */
@@ -25,14 +25,13 @@ trait DefaultResourceRepository
     {
         $qb = $this->createQueryBuilder('r');
         $qb->select('SUM(r.filesize)');
+
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
      * Removes the record of the specified file from the database, the associated file
-     * is not removed
-     *
-     * @param AbstractFile $file
+     * is not removed.
      */
     public function remove(AbstractFile $file): void
     {
@@ -41,14 +40,15 @@ trait DefaultResourceRepository
     }
 
     /**
-     * Get all resources
+     * Get all resources.
      *
-     * @param int $limit  The maximum number of results to return
-     * @param int $offset The offset from which to return results from
-     * @param list{0: string, 1?:array<string, string|list<string>>}|list{} $where
-     * @param list<list{0: string, 1: string}>|string|list{} $order
-     * @param list<string>|list{} $groupBy
+     * @param int                                                            $limit   The maximum number of results to return
+     * @param int                                                            $offset  The offset from which to return results from
+     * @param list{0: string, 1?:array<string, string|list<string>>}|list{}  $where
+     * @param list<list{0: string, 1: string}>|string|list{}                 $order
+     * @param list<string>|list{}                                            $groupBy
      * @param list<list{0: string, 1: string, 2: string, 3?: string}>|list{} $join
+     *
      * @return Paginator<T>
      */
     abstract public function getAll(
@@ -57,16 +57,14 @@ trait DefaultResourceRepository
         array $where = [],
         array|string $order = [],
         array $groupBy = [],
-        array $join = []
+        array $join = [],
     ): Paginator;
 
     /**
-     * Returns a filtered list of resource files
+     * Returns a filtered list of resource files.
      *
      * @param array{keyword?: string} $filters
-     * @param int $limit
-     * @param int $offset
-     * @param string|null $sortBy
+     *
      * @return Paginator<T>
      */
     public function getFiltered(array $filters, int $limit, int $offset, ?string $sortBy = 'title asc'): Paginator
@@ -77,17 +75,17 @@ trait DefaultResourceRepository
         ];
         if (!empty($filters['keyword'])) {
             $where[0] .= ' AND (q.altText LIKE :keyword OR q.title LIKE :keyword OR q.description LIKE :keyword )';
-            $where[1]['keyword'] = '%' . $filters['keyword']  . '%';
+            $where[1]['keyword'] = '%'.$filters['keyword'].'%';
         }
-        if (!empty($filters['usage']) && $filters['usage'] === 'notinuse') {
+        if (!empty($filters['usage']) && 'notinuse' === $filters['usage']) {
             $ids = $this->getUnusedResourceIds();
             if (!empty($ids)) {
                 $where[0] .= ' AND q.id IN (:unusedIds)';
-                $where[1]['unusedIds'] = [ 'value' => $ids ];
+                $where[1]['unusedIds'] = ['value' => $ids];
             }
         }
         if (!empty($filters['duplicates'])) {
-            $operator = $filters['duplicates'] === 'duplicates' ? 'EXISTS' : 'NOT EXISTS';
+            $operator = 'duplicates' === $filters['duplicates'] ? 'EXISTS' : 'NOT EXISTS';
 
             $where[0] .= sprintf('
                 AND %s (
@@ -105,14 +103,13 @@ trait DefaultResourceRepository
             $where,
             [
                 $this->determineOrderBy($sortBy),
-            ]
+            ],
         );
     }
 
     /**
-     * Returns an SQL orderBy for the given string
+     * Returns an SQL orderBy for the given string.
      *
-     * @param string|null $orderBy
      * @return list{0: string, 1: string}
      */
     protected function determineOrderBy(?string $orderBy): array
@@ -131,7 +128,7 @@ trait DefaultResourceRepository
 
     /**
      * Get a list of the IDs for Resources not used in {@link Page} or
-     * {@link Series} objects
+     * {@link Series} objects.
      *
      * @return list<string>
      */

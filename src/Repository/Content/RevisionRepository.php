@@ -8,45 +8,43 @@ declare(strict_types=1);
 
 namespace Inachis\Repository\Content;
 
-use Inachis\Entity\Content\{Page,Revision};
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Revision;
 use Inachis\Entity\User\User;
 use Inachis\Repository\AbstractRepository;
-use Inachis\Repository\Content\RevisionRepositoryInterface;
-use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\ORM\NonUniqueResultException;
 
 /**
- * Repository for revision entities
- * 
+ * Repository for revision entities.
+ *
  * @extends AbstractRepository<Revision>
  */
 class RevisionRepository extends AbstractRepository implements RevisionRepositoryInterface
 {
     /**
-     * The action type for a deleted revision
+     * The action type for a deleted revision.
      */
     public const DELETED = 'Deleted';
     /**
-     * The action type for a published revision
+     * The action type for a published revision.
      */
     public const PUBLISHED = 'Published';
     /**
-     * The action type for an updated revision
+     * The action type for an updated revision.
      */
     public const UPDATED = 'Updated';
     /**
-     * The action type for a visibility change revision
+     * The action type for a visibility change revision.
      */
     public const VISIBILITY_CHANGE = 'Visibility changed to %s';
     /**
-     * The action type for a reverted revision
+     * The action type for a reverted revision.
      */
     public const REVERTED = 'Reverted to version %s';
 
     /**
-     * RevisionRepository constructor
-     * 
-     * @param ManagerRegistry $registry
+     * RevisionRepository constructor.
      */
     public function __construct(ManagerRegistry $registry)
     {
@@ -54,16 +52,19 @@ class RevisionRepository extends AbstractRepository implements RevisionRepositor
     }
 
     /**
-     * Hydrate a new revision from a page
-     * 
-     * @param Page $page The page to hydrate the revision from.
-     * @return Revision The hydrated revision.
+     * Hydrate a new revision from a page.
+     *
+     * @param Page $page the page to hydrate the revision from
+     *
+     * @return Revision the hydrated revision
+     *
      * @throws NonUniqueResultException
      * @throws \Exception
      */
     public function hydrateNewRevisionFromPage(Page $page): Revision
     {
         $revision = new Revision();
+
         return $revision
             ->setPage($page)
             ->setVersionNumber($this->getNextVersionNumberForPage($page))
@@ -75,10 +76,12 @@ class RevisionRepository extends AbstractRepository implements RevisionRepositor
     }
 
     /**
-     * Get the next version number for a page
-     * 
-     * @param Page|null $page The ID of the page.
-     * @return int The next version number.
+     * Get the next version number for a page.
+     *
+     * @param Page|null $page the ID of the page
+     *
+     * @return int the next version number
+     *
      * @throws NonUniqueResultException
      * @throws \Doctrine\ORM\NoResultException
      */
@@ -93,14 +96,13 @@ class RevisionRepository extends AbstractRepository implements RevisionRepositor
     }
 
     /**
-     * Get revisions for a specific page
+     * Get revisions for a specific page.
      *
-     * @param Page $page
      * @return list<Revision>
      */
     public function getRevisionsForPage(Page $page)
     {
-        /** @var list<Revision> */
+        /* @var list<Revision> */
         return $this->createQueryBuilder('r')
             ->where('r.page = :pageId')
             ->setParameter('pageId', $page->getId(), 'uuid_binary')
@@ -111,11 +113,13 @@ class RevisionRepository extends AbstractRepository implements RevisionRepositor
     }
 
     /**
-     * Delete a page and record the deletion as a revision
-     * 
-     * @param Page $page The page to delete.
-     * @param User|null $user The user performing the deletion.
-     * @return Revision The recorded revision.
+     * Delete a page and record the deletion as a revision.
+     *
+     * @param Page      $page the page to delete
+     * @param User|null $user the user performing the deletion
+     *
+     * @return Revision the recorded revision
+     *
      * @throws \Exception
      */
     public function deleteAndRecordByPage(Page $page, ?User $user): Revision

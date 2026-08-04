@@ -8,20 +8,20 @@ declare(strict_types=1);
 
 namespace Inachis\Repository\Content;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
 use Inachis\Entity\Content\Tag;
 use Inachis\Repository\AbstractRepository;
-use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
- * Repository for {@link Tag} entities
- * 
+ * Repository for {@link Tag} entities.
+ *
  * @extends AbstractRepository<Tag>
  */
 class TagRepository extends AbstractRepository
 {
     /**
-     * Creates a new instance of the TagRepository
+     * Creates a new instance of the TagRepository.
      *
      * @param ManagerRegistry $registry The registry
      */
@@ -31,9 +31,10 @@ class TagRepository extends AbstractRepository
     }
 
     /**
-     * Finds tags by title
+     * Finds tags by title.
      *
      * @param string $title The title to search for
+     *
      * @return Paginator<Tag> The paginator
      */
     public function findByTitleLike(string $title): Paginator
@@ -44,18 +45,16 @@ class TagRepository extends AbstractRepository
             [
                 'q.title LIKE :title',
                 [
-                    'title' => '%' . $title . '%',
+                    'title' => '%'.$title.'%',
                 ],
             ],
-            'q.title'
+            'q.title',
         );
     }
 
     /**
      * Normalises a tag title.
      *
-     * @param string $value
-     * @return string
      * @throws \InvalidArgumentException if the normalised value is empty
      */
     private function normalise(string $value): string
@@ -64,7 +63,7 @@ class TagRepository extends AbstractRepository
         $value = mb_strtolower($value);
         $value = (string) preg_replace('/\s+/', ' ', $value);
 
-        if ($value === '') {
+        if ('' === $value) {
             throw new \InvalidArgumentException('Tag cannot be empty');
         }
 
@@ -73,9 +72,6 @@ class TagRepository extends AbstractRepository
 
     /**
      * Gets a tag by its title, or creates it if it doesn't exist.
-     *
-     * @param string $title
-     * @return Tag
      */
     public function getOrCreate(string $title): Tag
     {
@@ -84,7 +80,7 @@ class TagRepository extends AbstractRepository
 
         // Fast path
         $existing = $this->findOneBy(['title' => $normalised]);
-        if ($existing !== null) {
+        if (null !== $existing) {
             return $existing;
         }
 
@@ -94,28 +90,24 @@ class TagRepository extends AbstractRepository
 
         try {
             $em->flush();
+
             return $tag;
         } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException) {
             // Another request created it
             $em->detach($tag);
 
             $existing = $this->findOneBy(['title' => $normalised]);
-            if ($existing !== null) {
+            if (null !== $existing) {
                 return $existing;
             }
 
-            throw new \RuntimeException(sprintf(
-                'Failed to create or retrieve tag "%s"',
-                $normalised
-            ));
+            throw new \RuntimeException(sprintf('Failed to create or retrieve tag "%s"', $normalised));
         }
     }
 
     /**
      * Gets all tags with usage count.
      *
-     * @param int $limit
-     * @param int $offset
      * @return list<array{0:Tag, usageCount:int}>
      */
     public function findAllWithUsageCount(int $limit = 0, int $offset = 0): array
@@ -125,7 +117,7 @@ class TagRepository extends AbstractRepository
              FROM Inachis\Entity\Content\Tag t
              LEFT JOIN Inachis\Entity\Content\Page p WITH t MEMBER OF p.tags
              GROUP BY t.id
-             ORDER BY t.title ASC'
+             ORDER BY t.title ASC',
         );
         if ($limit > 0) {
             $qb = $qb->setMaxResults($limit);
@@ -134,14 +126,12 @@ class TagRepository extends AbstractRepository
             $qb = $qb->setFirstResult($offset);
         }
 
-        /** @var list<array{0:Tag, usageCount:int}> */
+        /* @var list<array{0:Tag, usageCount:int}> */
         return $qb->getResult();
     }
 
     /**
-     * retund a count of tags
-     *
-     * @return int
+     * retund a count of tags.
      */
     public function countTags(): int
     {
@@ -154,8 +144,6 @@ class TagRepository extends AbstractRepository
     /**
      * Return a batch of tags, ordered by title, with pagination.
      *
-     * @param int $limit
-     * @param int $offset
      * @return array<int,Tag>
      */
     public function findBatch(
@@ -169,6 +157,7 @@ class TagRepository extends AbstractRepository
             ->setFirstResult($offset)
             ->getQuery()
             ->getResult();
+
         return $result;
     }
 }

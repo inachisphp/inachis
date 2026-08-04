@@ -24,10 +24,11 @@ final class DashboardCacheListener
 {
     public function __construct(
         private TagAwareCacheInterface $cache,
-    ) {}
+    ) {
+    }
 
     public function __invoke(
-        PostPersistEventArgs|PostUpdateEventArgs|PostRemoveEventArgs $args
+        PostPersistEventArgs|PostUpdateEventArgs|PostRemoveEventArgs $args,
     ): void {
         $entity = $args->getObject();
 

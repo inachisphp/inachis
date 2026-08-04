@@ -8,9 +8,9 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Form\DataTransformer;
 
-use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
 use PHPUnit\Framework\TestCase;
 
 class ArrayCollectionToArrayTransformerTest extends TestCase

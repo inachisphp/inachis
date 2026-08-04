@@ -21,22 +21,33 @@ final class SymfonyFilePermissionsCheck implements CheckInterface
         'var/sessions',
     ];
 
-    public function getId(): string { return 'file_permissions'; }
-    public function getLabel(): string { return 'Symfony File Permissions'; }
-    public function getSection(): string { return 'Environment'; }
+    public function getId(): string
+    {
+        return 'file_permissions';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Symfony File Permissions';
+    }
+
+    public function getSection(): string
+    {
+        return 'Environment';
+    }
 
     public function run(): CheckResult
     {
         $issues = [];
         foreach ($this->paths as $path) {
-            if (!is_dir('/../' . $path)) {
+            if (!is_dir('/../'.$path)) {
                 $issues[] = "$path does not exist.";
                 continue;
             }
-            if (!is_writable('/../' . $path)) {
+            if (!is_writable('/../'.$path)) {
                 $issues[] = "$path is not writable.";
             }
-            $perms = fileperms('/../' . $path) & 0777;
+            $perms = fileperms('/../'.$path) & 0777;
             if (($perms & 0x02) && ($perms & 0x08)) {
                 $issues[] = "$path is world-writable.";
             }
@@ -50,10 +61,10 @@ final class SymfonyFilePermissionsCheck implements CheckInterface
             $this->getLabel(),
             $status,
             $value,
-            $status === 'ok' ? 'All Symfony writable directories are correctly configured.' : 'Some directories have permission issues.',
-            $status === 'ok' ? null : 'Ensure var/cache, var/log, var/sessions are writable by PHP, but not world-writable.',
+            'ok' === $status ? 'All Symfony writable directories are correctly configured.' : 'Some directories have permission issues.',
+            'ok' === $status ? null : 'Ensure var/cache, var/log, var/sessions are writable by PHP, but not world-writable.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }

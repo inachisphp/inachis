@@ -21,7 +21,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 )]
 class GenerateSitemapCommand extends Command
 {
-    /** @var string */
     private string $publicDir;
 
     public function __construct(
@@ -30,7 +29,7 @@ class GenerateSitemapCommand extends Command
         private readonly string $projectDir,
     ) {
         parent::__construct();
-        $this->publicDir = rtrim($projectDir, '/') . '/public';
+        $this->publicDir = rtrim($projectDir, '/').'/public';
     }
 
     /**
@@ -42,15 +41,11 @@ class GenerateSitemapCommand extends Command
     }
 
     /**
-     * Execute the command
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return integer
+     * Execute the command.
      */
     protected function execute(
         InputInterface $input,
-        OutputInterface $output
+        OutputInterface $output,
     ): int {
         try {
             $this->generator->generate();
@@ -58,18 +53,16 @@ class GenerateSitemapCommand extends Command
             $output->writeln(
                 sprintf(
                     '<info>Sitemap generated in %s/sitemap.xml</info>',
-                    $this->publicDir
-                )
+                    $this->publicDir,
+                ),
             );
 
             return Command::SUCCESS;
-
         } catch (\Throwable $e) {
-
             $output->writeln(
                 '<error>Failed to generate sitemap: '
-                . $e->getMessage()
-                . '</error>'
+                .$e->getMessage()
+                .'</error>',
             );
 
             return Command::FAILURE;

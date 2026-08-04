@@ -8,12 +8,12 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Repository\Media;
 
-use Inachis\Entity\Media\Download;
-use Inachis\Repository\Media\DownloadRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Entity\Media\Download;
+use Inachis\Repository\Media\DownloadRepository;
 use PHPUnit\Framework\TestCase;
 
 class DownloadRepositoryTest extends TestCase
@@ -28,7 +28,7 @@ class DownloadRepositoryTest extends TestCase
 
         $this->repository = $this->getMockBuilder(DownloadRepository::class)
             ->setConstructorArgs([$registry])
-            ->onlyMethods([ 'getEntityManager', 'getAll' ])
+            ->onlyMethods(['getEntityManager', 'getAll'])
             ->getMock();
 
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);
@@ -58,7 +58,7 @@ class DownloadRepositoryTest extends TestCase
                 0,
                 25,
                 [],
-                [['q.title', 'ASC']]
+                [['q.title', 'ASC']],
             )
             ->willReturn($paginator);
         $result = $this->repository->getFiltered([], 0, 25);
@@ -80,7 +80,7 @@ class DownloadRepositoryTest extends TestCase
                         'keyword' => '%test%',
                     ],
                 ],
-                [['q.title', 'ASC']]
+                [['q.title', 'ASC']],
             )
             ->willReturn($paginator);
         $result = $this->repository->getFiltered(['keyword' => 'test'], 0, 25);
@@ -97,7 +97,7 @@ class DownloadRepositoryTest extends TestCase
                 0,
                 25,
                 [],
-                [['q.title', 'DESC']]
+                [['q.title', 'DESC']],
             )
             ->willReturn($paginator);
         $result = $this->repository->getFiltered([], 0, 25, 'title desc');
@@ -114,7 +114,7 @@ class DownloadRepositoryTest extends TestCase
                 0,
                 25,
                 [],
-                [['q.createdAt', 'ASC']]
+                [['q.createdAt', 'ASC']],
             )
             ->willReturn($paginator);
         $result = $this->repository->getFiltered([], 0, 25, 'createdAt asc');
@@ -131,7 +131,7 @@ class DownloadRepositoryTest extends TestCase
                 0,
                 25,
                 [],
-                [['q.createdAt', 'DESC']]
+                [['q.createdAt', 'DESC']],
             )
             ->willReturn($paginator);
         $result = $this->repository->getFiltered([], 0, 25, 'createdAt desc');
@@ -148,7 +148,7 @@ class DownloadRepositoryTest extends TestCase
                 0,
                 25,
                 [],
-                [['q.updatedAt', 'DESC']]
+                [['q.updatedAt', 'DESC']],
             )
             ->willReturn($paginator);
         $result = $this->repository->getFiltered([], 0, 25, 'updatedAt desc');
@@ -165,7 +165,7 @@ class DownloadRepositoryTest extends TestCase
                 0,
                 25,
                 [],
-                [['q.updatedAt', 'ASC']]
+                [['q.updatedAt', 'ASC']],
             )
             ->willReturn($paginator);
         $result = $this->repository->getFiltered([], 0, 25, 'updatedAt asc');

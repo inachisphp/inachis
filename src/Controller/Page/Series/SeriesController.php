@@ -8,14 +8,12 @@ declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Series;
 
-use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Content\Series;
 use Inachis\Entity\Media\Image;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\SeriesType;
-use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\PageRepository;
@@ -23,33 +21,27 @@ use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\Series\SeriesBulkActionService;
 use Inachis\Service\Content\ViewStateManager;
-use Inachis\Service\Waste\WasteManagerService;
 use Inachis\Service\Formatting\UrlNormaliser;
+use Inachis\Service\Waste\WasteManagerService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class SeriesController extends AbstractInachisController
 {
-    /**
-     * @param Request $request
-     * @param ContentQueryParameters $contentQueryParameters
-     * @param SeriesRepository $seriesRepository
-     * @return Response
-     */
     #[Route(
-        "/incp/series/list/{limit}/{offset}",
+        '/incp/series/list/{limit}/{offset}',
         name: 'incp_series_list',
         requirements: [
-            "limit" => "\d+",
-            "offset" => "\d+",
+            'limit' => "\d+",
+            'offset' => "\d+",
         ],
-        defaults: [ "limit" => 10, "offset" => 0, ],
-        methods: [ "GET", "POST" ]
+        defaults: ['limit' => 10, 'offset' => 0],
+        methods: ['GET', 'POST'],
     )]
     #[RequiresPermission(
         resource: PermissionResource::SERIES,
-        action: PermissionAction::VIEW
+        action: PermissionAction::VIEW,
     )]
     public function list(
         Request $request,
@@ -66,10 +58,11 @@ class SeriesController extends AbstractInachisController
             $action = $request->request->has('delete') ? 'delete' :
                 ($request->request->has('private') ? 'private' :
                     ($request->request->has('public') ? 'public' : null));
-            if ($action !== null) {
+            if (null !== $action) {
                 $count = $seriesBulkActionService->apply($action, $items);
                 $this->addFlash('success', "Action '$action' applied to $count series.");
             }
+
             return $this->redirectToRoute('incp_series_list');
         }
 
@@ -98,6 +91,7 @@ class SeriesController extends AbstractInachisController
 
         $this->viewModel->page->title = 'Series';
         $this->viewModel->page->tab = 'series';
+
         return $this->render('inadmin/page/series/list.html.twig', [
             'viewModel' => $this->viewModel,
             'form' => $form->createView(),
@@ -112,17 +106,15 @@ class SeriesController extends AbstractInachisController
     }
 
     /**
-     * Create/Edit Series
+     * Create/Edit Series.
      *
-     * @param Request $request
-     * @return Response
      * @throws \Exception
      */
-    #[Route("/incp/series/edit/{id}", name: "incp_series_edit", methods: [ "GET", "POST" ])]
-    #[Route("/incp/series/new", name: "incp_series_new", methods: [ "GET", "POST" ])]
+    #[Route('/incp/series/edit/{id}', name: 'incp_series_edit', methods: ['GET', 'POST'])]
+    #[Route('/incp/series/new', name: 'incp_series_new', methods: ['GET', 'POST'])]
     #[RequiresPermission(
         resource: PermissionResource::SERIES,
-        action: PermissionAction::VIEW
+        action: PermissionAction::VIEW,
     )]
     public function edit(
         Request $request,
@@ -130,7 +122,7 @@ class SeriesController extends AbstractInachisController
         PageRepository $pageRepository,
         WasteManagerService $wasteManagerService,
     ): Response {
-        $series = $request->attributes->getString('id', '') !== ''
+        $series = '' !== $request->attributes->getString('id', '')
             ? $seriesRepository->findOneBy([
                 'id' => $request->attributes->getString('id'),
             ]) ?? new Series()
@@ -138,7 +130,7 @@ class SeriesController extends AbstractInachisController
         $form = $this->createForm(SeriesType::class, $series);
         $form->handleRequest($request);
 
-        if($form->isSubmitted() && !$form->isValid()) {
+        if ($form->isSubmitted() && !$form->isValid()) {
             foreach ($form->getErrors(true) as $error) {
                 dump($error->getOrigin()->getName(), $error->getMessage());
             }
@@ -150,16 +142,17 @@ class SeriesController extends AbstractInachisController
             if ($delete instanceof \Symfony\Component\Form\ClickableInterface && $delete->isClicked()) {
                 $wasteManagerService->sendToWaste($series);
                 $seriesRepository->remove($series);
+
                 return $this->redirect($this->generateUrl('incp_series_list'));
             }
             if (empty($request->request->all('series')['url'])) {
                 $series->setUrl(
-                    UrlNormaliser::toUri($series->getTitle() ?? '')
+                    UrlNormaliser::toUri($series->getTitle() ?? ''),
                 );
             }
             if ($remove instanceof \Symfony\Component\Form\ClickableInterface && $remove->isClicked()) {
                 $deleteItems = $pageRepository->findBy([
-                    'id' => $request->request->all('series')['itemList']
+                    'id' => $request->request->all('series')['itemList'],
                 ]);
                 foreach ($deleteItems as $deleteItem) {
                     $series->getItems()->removeElement($deleteItem);
@@ -170,19 +163,21 @@ class SeriesController extends AbstractInachisController
             }
 
             $series->setAuthor($this->getCurrentUser());
-            $series->setUpdatedAt(new DateTimeImmutable());
+            $series->setUpdatedAt(new \DateTimeImmutable());
             $this->entityManager->persist($series);
             $this->entityManager->flush();
 
             $this->addFlash('success', 'Content saved.');
+
             return $this->redirect(
-                '/incp/series/edit/' .
-                $series->getId() . '/'
+                '/incp/series/edit/'.
+                $series->getId().'/',
             );
         }
 
-        $this->viewModel->page->title = $series->getId() !== null ? 'Editing "' . $series->getTitle() . '"' : 'New Series';
+        $this->viewModel->page->title = null !== $series->getId() ? 'Editing "'.$series->getTitle().'"' : 'New Series';
         $this->viewModel->page->tab = 'series';
+
         return $this->render('inadmin/page/series/edit.html.twig', [
             'viewModel' => $this->viewModel,
             'allowedTypes' => Image::ALLOWED_MIME_TYPES,
@@ -193,14 +188,10 @@ class SeriesController extends AbstractInachisController
         ]);
     }
 
-    /**
-     * @param Request $request
-     * @return Response
-     */
-    #[Route("/incp/series/contents/{id}", name: "incp_series_contents", methods: [ "POST" ])]
+    #[Route('/incp/series/contents/{id}', name: 'incp_series_contents', methods: ['POST'])]
     #[RequiresPermission(
         resource: PermissionResource::SERIES,
-        action: PermissionAction::VIEW
+        action: PermissionAction::VIEW,
     )]
     public function contents(Request $request, SeriesRepository $seriesRepository): Response
     {

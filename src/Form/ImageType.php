@@ -17,18 +17,17 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Image form type for uploads
+ * Image form type for uploads.
  *
  * @extends AbstractType<mixed>
  */
 class ImageType extends AbstractType
 {
     /**
-     * Build the form
+     * Build the form.
      *
      * @param FormBuilderInterface<mixed> $builder
-     * @param array<string, mixed> $options
-     * @return void
+     * @param array<string, mixed>        $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -40,7 +39,7 @@ class ImageType extends AbstractType
                 ],
                 'label' => 'Image file',
                 'label_attr' => [
-                    'id' => 'image-uploader__filename__label'
+                    'id' => 'image-uploader__filename__label',
                 ],
             ])
             ->add('optimiseImage', CheckboxType::class, [
@@ -49,9 +48,9 @@ class ImageType extends AbstractType
                     'checked' => 'checked',
                     'class' => 'checkbox',
                 ],
-                'label' => 'Optimize image (Convert to WebP/AVIF and limit dimensions to ' . Image::WARNING_DIMENSIONS . 'x' . Image::WARNING_DIMENSIONS . 'px)',
+                'label' => 'Optimize image (Convert to WebP/AVIF and limit dimensions to '.Image::WARNING_DIMENSIONS.'x'.Image::WARNING_DIMENSIONS.'px)',
                 'label_attr' => [
-                    'id' => 'image-uploader__optimiseImage__label'
+                    'id' => 'image-uploader__optimiseImage__label',
                 ],
                 'mapped' => false,
                 'required' => false,
@@ -63,9 +62,8 @@ class ImageType extends AbstractType
                 ],
                 'label' => 'Title',
                 'label_attr' => [
-                    'id' => 'image-uploader__title__label'
+                    'id' => 'image-uploader__title__label',
                 ],
-
             ])
             ->add('altText', TextareaType::class, [
                 'attr' => [
@@ -75,9 +73,8 @@ class ImageType extends AbstractType
                 ],
                 'label' => 'Alt Text',
                 'label_attr' => [
-                    'id' => 'image-uploader__altText__label'
+                    'id' => 'image-uploader__altText__label',
                 ],
-
             ])
             ->add('description', TextareaType::class, [
                 'attr' => [
@@ -87,9 +84,8 @@ class ImageType extends AbstractType
                 ],
                 'label' => 'Caption',
                 'label_attr' => [
-                    'id' => 'image-uploader__description__label'
+                    'id' => 'image-uploader__description__label',
                 ],
-
             ])
 
 //            ->add('dimensionX')
@@ -103,10 +99,7 @@ class ImageType extends AbstractType
     }
 
     /**
-     * Configure options
-     *
-     * @param OptionsResolver $resolver
-     * @return void
+     * Configure options.
      */
     public function configureOptions(OptionsResolver $resolver): void
     {

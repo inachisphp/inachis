@@ -9,62 +9,52 @@ declare(strict_types=1);
 namespace Inachis\Service\Theme;
 
 use Inachis\Model\System\ThemeDto;
-use Psr\Cache\CacheItemPoolInterface;
 use Inachis\Repository\System\SettingRepository;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class ThemeManager
 {
-	/** @var string */
+    /** @var string */
     public const SETTING_ACTIVE_THEME = 'theme.active';
 
-	/** @var string */
+    /** @var string */
     private const CACHE_KEY_ACTIVE_THEME = 'theme.active.dto';
 
-	/**
-	 * Constructor for ThemeManager
-	 *
-	 * @param SettingRepository $settings
-	 * @param ThemeScanner $themeScanner
-	 * @param CacheItemPoolInterface $cache
-	 * @param string $projectDir
-	 */
+    /**
+     * Constructor for ThemeManager.
+     */
     public function __construct(
         private SettingRepository $settings,
         private ThemeScanner $themeScanner,
-    	private CacheItemPoolInterface $cache,
+        private CacheItemPoolInterface $cache,
         #[Autowire('%kernel.project_dir%')]
         private string $projectDir,
-    ) {}
+    ) {
+    }
 
-	/**
-	 * Returns the identifier for the currently active theme
-	 *
-	 * @return string
-	 */
+    /**
+     * Returns the identifier for the currently active theme.
+     */
     public function getActiveThemeIdentifier(): string
     {
         return $this->settings->getValue(self::SETTING_ACTIVE_THEME)
             ?? 'default';
     }
 
-	/**
-	 * Sets the active theme based on the provided identifier
-	 *
-	 * @param string $identifier
-	 */
-	public function setActiveTheme(string $identifier): void
-	{
-		$this->settings->setValue(self::SETTING_ACTIVE_THEME, $identifier);
-		$this->cache->deleteItem(self::CACHE_KEY_ACTIVE_THEME);
-		$this->cache->deleteItem('theme.twig.paths');
-	}
+    /**
+     * Sets the active theme based on the provided identifier.
+     */
+    public function setActiveTheme(string $identifier): void
+    {
+        $this->settings->setValue(self::SETTING_ACTIVE_THEME, $identifier);
+        $this->cache->deleteItem(self::CACHE_KEY_ACTIVE_THEME);
+        $this->cache->deleteItem('theme.twig.paths');
+    }
 
-	/**
-	 * Returns a DTO (model) of the currently active theme
-	 *
-	 * @return ThemeDto
-	 */
+    /**
+     * Returns a DTO (model) of the currently active theme.
+     */
     public function getActiveTheme(): ThemeDto
     {
         $cacheItem = $this->cache->getItem(self::CACHE_KEY_ACTIVE_THEME);
@@ -85,8 +75,7 @@ final readonly class ThemeManager
             $theme->isFallback = true;
             $theme->requestedIdentifier = $identifier;
             $theme->fallbackReason = 'not_found';
-        }
-        elseif (!$theme->isCompatible) {
+        } elseif (!$theme->isCompatible) {
             $incompatibleTheme = $theme;
             $theme = $this->createFallbackTheme('default');
             $theme->isFallback = true;
@@ -101,23 +90,18 @@ final readonly class ThemeManager
         return $theme;
     }
 
-	/**
-	 * Returns the result of testing if the theme specified by the identifier is installed
-	 *
-	 * @param string $identifier
-	 * @return boolean
-	 */
+    /**
+     * Returns the result of testing if the theme specified by the identifier is installed.
+     */
     public function isThemeInstalled(string $identifier): bool
     {
         return null !== $this->themeScanner->getTheme($identifier);
     }
 
-	/**
-	 * Gets the folder path for the currently active theme to use in the
-	 * Twig YAML configuration for paths
-	 *
-	 * @return string
-	 */
+    /**
+     * Gets the folder path for the currently active theme to use in the
+     * Twig YAML configuration for paths.
+     */
     public function getActiveThemePath(): string
     {
         $identifier = $this->getActiveThemeIdentifier();
@@ -135,53 +119,43 @@ final readonly class ThemeManager
         return $themePaths[0];
     }
 
-	/**
-	 * Returns the path to the default theme
-	 *
-	 * @return string
-	 */
+    /**
+     * Returns the path to the default theme.
+     */
     public function getDefaultThemePath(): string
     {
         return sprintf('%s/templates/themes/default', $this->projectDir);
     }
 
-	/**
-	 * Returns the front-end Twig templates path for the currently active theme
-	 *
-	 * @return string
-	 */
+    /**
+     * Returns the front-end Twig templates path for the currently active theme.
+     */
     public function getActiveThemeWebPath(): string
     {
-        return $this->getActiveThemePath() . '/web';
+        return $this->getActiveThemePath().'/web';
     }
 
-	/**
-	 * Returns the path for the assets of the currently active theme
-	 *
-	 * @param string $relativePath
-	 * @return string
-	 */
+    /**
+     * Returns the path for the assets of the currently active theme.
+     */
     public function getAssetPath(string $relativePath): string
     {
         return sprintf(
             '/themes/%s/assets/%s',
             $this->getActiveThemeIdentifier(),
-            ltrim($relativePath, '/')
+            ltrim($relativePath, '/'),
         );
     }
 
-	/**
-	 * Returns a model of a fallback theme for when active theme fails
-	 * to load.
-	 *
-	 * @param string $identifier
-	 * @return ThemeDto
-	 */
+    /**
+     * Returns a model of a fallback theme for when active theme fails
+     * to load.
+     */
     private function createFallbackTheme(string $identifier): ThemeDto
     {
         $theme = new ThemeDto();
         $theme->identifier = $identifier;
-        $theme->name = ucfirst($identifier) . ' Theme';
+        $theme->name = ucfirst($identifier).' Theme';
         $theme->version = '1.0.0';
         $theme->author = '';
         $theme->description = '';

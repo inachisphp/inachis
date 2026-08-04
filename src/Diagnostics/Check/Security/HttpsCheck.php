@@ -13,16 +13,27 @@ use Inachis\Diagnostics\CheckResult;
 
 final class HttpsCheck implements CheckInterface
 {
-    public function getId(): string { return 'https'; }
-    public function getLabel(): string { return 'HTTPS Enforcement'; }
-    public function getSection(): string { return 'Security'; }
+    public function getId(): string
+    {
+        return 'https';
+    }
+
+    public function getLabel(): string
+    {
+        return 'HTTPS Enforcement';
+    }
+
+    public function getSection(): string
+    {
+        return 'Security';
+    }
 
     public function run(): CheckResult
     {
         $https = $_SERVER['HTTPS'] ?? '';
-        $status = $https === 'on' || $_SERVER['SERVER_PORT'] === 443 ? 'ok' : 'warning';
-        $details = $status === 'ok' ? 'HTTPS is enabled.' : 'HTTPS is not detected.';
-        $recommendation = $status === 'ok' ? null : 'Enable HTTPS for secure connections.';
+        $status = 'on' === $https || 443 === $_SERVER['SERVER_PORT'] ? 'ok' : 'warning';
+        $details = 'ok' === $status ? 'HTTPS is enabled.' : 'HTTPS is not detected.';
+        $recommendation = 'ok' === $status ? null : 'Enable HTTPS for secure connections.';
 
         return new CheckResult(
             $this->getId(),
@@ -32,7 +43,7 @@ final class HttpsCheck implements CheckInterface
             $details,
             $recommendation,
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }

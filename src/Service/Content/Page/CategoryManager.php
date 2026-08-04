@@ -13,24 +13,20 @@ use Inachis\Repository\Content\CategoryRepository;
 use Ramsey\Uuid\Uuid;
 
 /**
- * Manager class for applying category to a Page
+ * Manager class for applying category to a Page.
  */
 class CategoryManager
 {
     /**
-     * Constructor for CategoryManager
-     *
-     * @param CategoryRepository $categoryRepository
+     * Constructor for CategoryManager.
      */
     public function __construct(
-        private CategoryRepository $categoryRepository
-    ) {}
+        private CategoryRepository $categoryRepository,
+    ) {
+    }
 
     /**
-     * Apply specified categoryId as a {@link Category} to the provided {@link Page}
-     *
-     * @param Page $page
-     * @param string $categoryId
+     * Apply specified categoryId as a {@link Category} to the provided {@link Page}.
      */
     public function apply(Page $page, string $categoryId): void
     {

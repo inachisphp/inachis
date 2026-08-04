@@ -12,7 +12,6 @@ use Inachis\Controller\Page\Series\SeriesWebController;
 use Inachis\Entity\Content\Series;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
-use ReflectionClass;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -35,7 +34,7 @@ class SeriesWebControllerTest extends InachisControllerTestCase
             $this->translator,
         );
 
-        $ref = new ReflectionClass($this->controller);
+        $ref = new \ReflectionClass($this->controller);
         foreach (['entityManager', 'security'] as $prop) {
             $property = $ref->getProperty($prop);
             $property->setValue($this->controller, $this->$prop);
@@ -65,11 +64,11 @@ class SeriesWebControllerTest extends InachisControllerTestCase
                 $this->entityManager,
                 $this->params,
                 $this->security,
-                $this->translator
+                $this->translator,
             ])
             ->onlyMethods(['render'])
             ->getMock();
-        $ref = new ReflectionClass($controller);
+        $ref = new \ReflectionClass($controller);
         foreach (['entityManager', 'security'] as $prop) {
             if ($ref->hasProperty($prop)) {
                 $property = $ref->getProperty($prop);
@@ -97,7 +96,7 @@ class SeriesWebControllerTest extends InachisControllerTestCase
         $this->entityManager->expects($this->never())
             ->method('getRepository')
             ->willReturnMap([
-                [Series::class, $seriesRepository]
+                [Series::class, $seriesRepository],
             ]);
         $this->expectException(NotFoundHttpException::class);
         $this->controller->view($seriesRepository, '2025', 'test');

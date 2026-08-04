@@ -69,10 +69,10 @@ class NavigationTabTest extends TestCase
         // it doesn't set it. Let's initialize URL first by setting isSystem to false, setting url, and then setting isSystem to true.
         $this->tab->setIsSystem(false);
         $this->tab->setUrl('/admin/dashboard');
-        
+
         $this->tab->setIsSystem(true);
         $result = $this->tab->setUrl('/changed-url');
-        
+
         self::assertSame('/admin/dashboard', $this->tab->getUrl());
         self::assertSame($this->tab, $result);
     }

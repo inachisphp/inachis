@@ -21,7 +21,8 @@ class AccessDeniedSubscriber implements EventSubscriberInterface
     public function __construct(
         private Environment $twig,
         private readonly PageViewFactory $pageViewFactory,
-    ) {}
+    ) {
+    }
 
     public static function getSubscribedEvents(): array
     {
@@ -43,16 +44,16 @@ class AccessDeniedSubscriber implements EventSubscriberInterface
             return;
         }
 
-		$viewModel = str_starts_with($request->getPathInfo(), '/incp')
-			? $this->pageViewFactory->createAdmin()
-			: $this->pageViewFactory->create();
+        $viewModel = str_starts_with($request->getPathInfo(), '/incp')
+            ? $this->pageViewFactory->createAdmin()
+            : $this->pageViewFactory->create();
 
         $response = new Response(
             $this->twig->render('inadmin/errors/access_denied.html.twig', [
-            	'viewModel' => $viewModel,
+                'viewModel' => $viewModel,
                 'message' => $exception->getMessage(),
             ]),
-            Response::HTTP_FORBIDDEN
+            Response::HTTP_FORBIDDEN,
         );
 
         $event->setResponse($response);

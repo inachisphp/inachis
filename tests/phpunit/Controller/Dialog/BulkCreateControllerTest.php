@@ -23,7 +23,7 @@ class BulkCreateControllerTest extends WebTestCase
     public function testContentList(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incp/ax/bulkCreate/get'
+            'REQUEST_URI' => '/incp/ax/bulkCreate/get',
         ]);
 
         $this->controller = $this->getMockBuilder(BulkCreateController::class)
@@ -35,7 +35,7 @@ class BulkCreateControllerTest extends WebTestCase
         $this->controller->expects($this->once())
             ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $result = $this->controller->contentList($request);
         $this->assertEquals('rendered:inadmin/dialog/bulk-create.html.twig', $result->getContent());
@@ -50,7 +50,7 @@ class BulkCreateControllerTest extends WebTestCase
             'categories' => ['test-category'],
             'seriesId' => Uuid::uuid1()->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => '/incp/ax/bulkCreate/get'
+            'REQUEST_URI' => '/incp/ax/bulkCreate/get',
         ]);
         $bulkCreatePost = $this->createStub(PageBulkCreateService::class);
         $this->controller = $this->getMockBuilder(BulkCreateController::class)
@@ -62,7 +62,7 @@ class BulkCreateControllerTest extends WebTestCase
         $this->controller->expects($this->never())
             ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $result = $this->controller->saveContent($request, $bulkCreatePost);
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $result->getStatusCode());
@@ -79,7 +79,7 @@ class BulkCreateControllerTest extends WebTestCase
             'categories' => ['test-category'],
             'seriesId' => Uuid::uuid1()->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => '/incp/ax/bulkCreate/get'
+            'REQUEST_URI' => '/incp/ax/bulkCreate/get',
         ]);
         $this->assertArrayHasKey('title', $request->request->all());
         $bulkCreatePost = $this->createMock(PageBulkCreateService::class);
@@ -96,7 +96,7 @@ class BulkCreateControllerTest extends WebTestCase
         $this->controller->expects($this->never())
             ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $result = $this->controller->saveContent($request, $bulkCreatePost);
         $this->assertEquals('No change', $result->getContent());
@@ -112,7 +112,7 @@ class BulkCreateControllerTest extends WebTestCase
             'categories' => ['test-category'],
             'seriesId' => Uuid::uuid1()->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => '/incp/ax/bulkCreate/get'
+            'REQUEST_URI' => '/incp/ax/bulkCreate/get',
         ]);
         $bulkCreatePost = $this->createMock(PageBulkCreateService::class);
         $bulkCreatePost->expects($this->once())->method('create')->willReturn(7);
@@ -126,7 +126,7 @@ class BulkCreateControllerTest extends WebTestCase
         $this->controller->expects($this->never())
             ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $result = $this->controller->saveContent($request, $bulkCreatePost);
         $this->assertEquals('Saved', $result->getContent());

@@ -11,9 +11,12 @@ namespace Inachis\Service\Discovery\Generator;
 use Inachis\Entity\Content\Category;
 use Inachis\Entity\Content\Series;
 use Inachis\Entity\Content\Tag;
-use Inachis\Repository\Content\{CategoryRepository, SeriesRepository, TagRepository, UrlRepository};
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Content\SeriesRepository;
+use Inachis\Repository\Content\TagRepository;
+use Inachis\Repository\Content\UrlRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Generates an XML sitemap for the site, including posts, categories, tags, and series.
@@ -27,12 +30,6 @@ class SitemapGenerator
 
     /**
      * SitemapGenerator constructor.
-     *
-     * @param UrlRepository $urlRepository
-     * @param CategoryRepository $categoryRepository
-     * @param TagRepository $tagRepository
-     * @param SeriesRepository $seriesRepository
-     * @param UrlGeneratorInterface $router
      */
     public function __construct(
         private readonly UrlRepository $urlRepository,
@@ -52,10 +49,10 @@ class SitemapGenerator
     {
         $publicDir = rtrim(
             $this->projectDir,
-            '/'
-        ) . '/public';
+            '/',
+        ).'/public';
 
-        $sitemapDir = $publicDir . '/sitemaps';
+        $sitemapDir = $publicDir.'/sitemaps';
 
         if (!is_dir($sitemapDir)) {
             mkdir($sitemapDir, 0755, true);
@@ -65,34 +62,33 @@ class SitemapGenerator
 
         $files = array_merge(
             $files,
-            $this->generatePosts($sitemapDir)
+            $this->generatePosts($sitemapDir),
         );
 
         $files = array_merge(
             $files,
-            $this->generateSeries($sitemapDir)
+            $this->generateSeries($sitemapDir),
         );
 
         $files = array_merge(
             $files,
-            $this->generateCategories($sitemapDir)
+            $this->generateCategories($sitemapDir),
         );
 
         $files = array_merge(
             $files,
-            $this->generateTags($sitemapDir)
+            $this->generateTags($sitemapDir),
         );
 
         $this->generateIndex(
-            $publicDir . '/sitemap.xml',
-            $files
+            $publicDir.'/sitemap.xml',
+            $files,
         );
     }
 
     /**
      * Generates sitemap files for posts, splitting into multiple files if necessary.
      *
-     * @param string $dir
      * @return array<string>
      */
     private function generatePosts(string $dir): array
@@ -109,12 +105,12 @@ class SitemapGenerator
             $filename = "sitemap-posts-{$fileNumber}.xml";
 
             $writer = $this->createWriter(
-                "{$dir}/{$filename}"
+                "{$dir}/{$filename}",
             );
 
             $urlBatch = $this->urlRepository->findSitemapUrlsBatch(
                 $offset,
-                self::MAX_URLS_PER_FILE
+                self::MAX_URLS_PER_FILE,
             );
             foreach ($urlBatch as $url) {
                 /** @var \Inachis\Entity\Content\Url $url */
@@ -123,11 +119,11 @@ class SitemapGenerator
                 $writer->startElement('url');
                 $writer->writeElement(
                     'loc',
-                    $this->absoluteUrl('/' . ltrim($url->getLink(), '/'))
+                    $this->absoluteUrl('/'.ltrim($url->getLink(), '/')),
                 );
                 $writer->writeElement(
                     'lastmod',
-                    $content->getUpdatedAt()->format('Y-m-d')
+                    $content->getUpdatedAt()->format('Y-m-d'),
                 );
                 $writer->endElement();
             }
@@ -136,7 +132,7 @@ class SitemapGenerator
 
             $files[] = $filename;
 
-            $fileNumber++;
+            ++$fileNumber;
         }
 
         return $files;
@@ -145,7 +141,6 @@ class SitemapGenerator
     /**
      * Generate series sitemap files, splitting into multiple files if necessary.
      *
-     * @param string $dir
      * @return array<string>
      */
     private function generateSeries(string $dir): array
@@ -154,27 +149,24 @@ class SitemapGenerator
             $dir,
             'series',
             $this->seriesRepository->countPublicSeries(),
-            fn(int $limit, int $offset,)
-                => $this->seriesRepository->findPublicSeriesBatch(
-                    $limit,
-                    $offset,
-                ),
+            fn (int $limit, int $offset) => $this->seriesRepository->findPublicSeriesBatch(
+                $limit,
+                $offset,
+            ),
             function (Series $series): string {
                 return sprintf(
                     '/%s-%s',
                     $series->getLastDate()?->format('Y'),
-                    $series->getUrl()
+                    $series->getUrl(),
                 );
             },
-            fn(Series $series)
-                => $series->getUpdatedAt()
+            fn (Series $series) => $series->getUpdatedAt(),
         );
     }
 
     /**
      * Generate category sitemap files, splitting into multiple files if necessary.
      *
-     * @param string $dir
      * @return array<string>
      */
     private function generateCategories(string $dir): array
@@ -183,18 +175,15 @@ class SitemapGenerator
             $dir,
             'categories',
             $this->categoryRepository->countVisibleCategories(),
-            fn(int $o, int $l)
-                => $this->categoryRepository->findBatch($o, $l),
-            fn(Category $c)
-                => '/category/' . rawurlencode($c->getTitle()),
-            fn() => null
+            fn (int $o, int $l) => $this->categoryRepository->findBatch($o, $l),
+            fn (Category $c) => '/category/'.rawurlencode($c->getTitle()),
+            fn () => null,
         );
     }
 
     /**
      * Generate tag sitemap files, splitting into multiple files if necessary.
      *
-     * @param string $dir
      * @return array<string>
      */
     private function generateTags(string $dir): array
@@ -203,11 +192,9 @@ class SitemapGenerator
             $dir,
             'tags',
             $this->tagRepository->countTags(),
-            fn(int $o, int $l)
-                => $this->tagRepository->findBatch($o, $l),
-            fn(Tag $t)
-                => '/tag/' . rawurlencode($t->getTitle()),
-            fn() => null
+            fn (int $o, int $l) => $this->tagRepository->findBatch($o, $l),
+            fn (Tag $t) => '/tag/'.rawurlencode($t->getTitle()),
+            fn () => null,
         );
     }
 
@@ -215,12 +202,11 @@ class SitemapGenerator
      * Helper method to generate sitemap files for a given entity type, handling pagination and file splitting.
      *
      * @template T
-     * @param string $dir
-     * @param string $prefix
-     * @param integer $total
-     * @param callable(int, int): iterable<T> $loader
-     * @param callable(T): string $urlBuilder
+     *
+     * @param callable(int, int): iterable<T>        $loader
+     * @param callable(T): string                    $urlBuilder
      * @param callable(T): (\DateTimeInterface|null) $lastMod
+     *
      * @return array<string>
      */
     private function generateEntitySitemapFiles(
@@ -229,7 +215,7 @@ class SitemapGenerator
         int $total,
         callable $loader,
         callable $urlBuilder,
-        callable $lastMod
+        callable $lastMod,
     ): array {
         $files = [];
         $fileNumber = 1;
@@ -242,7 +228,7 @@ class SitemapGenerator
             $filename = "sitemap-{$prefix}-{$fileNumber}.xml";
 
             $writer = $this->createWriter(
-                "{$dir}/{$filename}"
+                "{$dir}/{$filename}",
             );
 
             /** @var iterable<T> $items */
@@ -253,8 +239,8 @@ class SitemapGenerator
                 $writer->writeElement(
                     'loc',
                     $this->absoluteUrl(
-                        $urlBuilder($item)
-                    )
+                        $urlBuilder($item),
+                    ),
                 );
 
                 $date = $lastMod($item);
@@ -262,7 +248,7 @@ class SitemapGenerator
                 if ($date instanceof \DateTimeInterface) {
                     $writer->writeElement(
                         'lastmod',
-                        $date->format('Y-m-d')
+                        $date->format('Y-m-d'),
                     );
                 }
 
@@ -273,7 +259,7 @@ class SitemapGenerator
 
             $files[] = $filename;
 
-            $fileNumber++;
+            ++$fileNumber;
         }
 
         return $files;
@@ -282,26 +268,25 @@ class SitemapGenerator
     /**
      * Generate the sitemap index file that references all the individual sitemap files.
      *
-     * @param string $filename
      * @param array<string> $files
      */
     private function generateIndex(
         string $filename,
-        array $files
+        array $files,
     ): void {
         $writer = new \XMLWriter();
 
         $writer->openURI($filename);
         $writer->startDocument(
             '1.0',
-            'UTF-8'
+            'UTF-8',
         );
 
         $writer->startElement('sitemapindex');
 
         $writer->writeAttribute(
             'xmlns',
-            'http://www.sitemaps.org/schemas/sitemap/0.9'
+            'http://www.sitemaps.org/schemas/sitemap/0.9',
         );
 
         foreach ($files as $file) {
@@ -309,11 +294,11 @@ class SitemapGenerator
 
             $writer->writeElement(
                 'loc',
-                $this->absoluteUrl('/sitemaps/' . $file)
+                $this->absoluteUrl('/sitemaps/'.$file),
             );
             $writer->writeElement(
                 'lastmod',
-                date('Y-m-d')
+                date('Y-m-d'),
             );
 
             $writer->endElement();
@@ -326,12 +311,9 @@ class SitemapGenerator
 
     /**
      * Create an XML writer for generating sitemap files.
-     *
-     * @param string $filename
-     * @return \XMLWriter
      */
     private function createWriter(
-        string $filename
+        string $filename,
     ): \XMLWriter {
         $writer = new \XMLWriter();
 
@@ -339,14 +321,14 @@ class SitemapGenerator
 
         $writer->startDocument(
             '1.0',
-            'UTF-8'
+            'UTF-8',
         );
 
         $writer->startElement('urlset');
 
         $writer->writeAttribute(
             'xmlns',
-            'http://www.sitemaps.org/schemas/sitemap/0.9'
+            'http://www.sitemaps.org/schemas/sitemap/0.9',
         );
 
         return $writer;
@@ -354,11 +336,9 @@ class SitemapGenerator
 
     /**
      * Close the XML writer and flush the output.
-     *
-     * @param \XMLWriter $writer
      */
     private function closeWriter(
-        \XMLWriter $writer
+        \XMLWriter $writer,
     ): void {
         $writer->endElement();
         $writer->endDocument();
@@ -367,21 +347,18 @@ class SitemapGenerator
 
     /**
      * Convert a relative URL path to an absolute URL using the router's base URL.
-     *
-     * @param string $path
-     * @return string
      */
     private function absoluteUrl(
-        string $path
+        string $path,
     ): string {
         $base = $this->router->generate(
             'inachis_default_homepage',
             [],
-            UrlGeneratorInterface::ABSOLUTE_URL
+            UrlGeneratorInterface::ABSOLUTE_URL,
         );
 
         return rtrim($base, '/')
-            . '/'
-            . ltrim($path, '/');
+            .'/'
+            .ltrim($path, '/');
     }
 }

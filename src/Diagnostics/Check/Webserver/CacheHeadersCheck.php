@@ -13,21 +13,33 @@ use Inachis\Diagnostics\CheckResult;
 
 final class CacheHeadersCheck implements CheckInterface
 {
-    public function getId(): string { return 'cache_headers'; }
-    public function getLabel(): string { return 'Cache / Expires Headers'; }
-    public function getSection(): string { return 'Webserver'; }
+    public function getId(): string
+    {
+        return 'cache_headers';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Cache / Expires Headers';
+    }
+
+    public function getSection(): string
+    {
+        return 'Webserver';
+    }
 
     public function run(): CheckResult
     {
         $found = false;
         foreach (headers_list() as $header) {
-            if (stripos($header, 'Cache-Control:') === 0 || stripos($header, 'Expires:') === 0) {
+            if (0 === stripos($header, 'Cache-Control:') || 0 === stripos($header, 'Expires:')) {
                 $found = true;
                 break;
             }
         }
 
         $status = $found ? 'ok' : 'warning';
+
         return new CheckResult(
             $this->getId(),
             $this->getLabel(),
@@ -36,7 +48,7 @@ final class CacheHeadersCheck implements CheckInterface
             $found ? 'Cache headers detected.' : 'No cache headers detected.',
             $found ? null : 'Configure caching via Cache-Control or Expires headers.',
             $this->getSection(),
-            'medium'
+            'medium',
         );
     }
 }

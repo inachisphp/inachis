@@ -11,15 +11,9 @@ namespace Inachis\Model\System;
 final class SiteSettings
 {
     /**
-     * Model used for site settings
+     * Model used for site settings.
      *
-     * @param string $siteTitle
-     * @param string $domain
      * @param list<string> $google
-     * @param string $language
-     * @param string $textDirection
-     * @param string $abstract
-     * @param bool $geotagContent
      */
     public function __construct(
         public string $siteTitle,
@@ -30,5 +24,6 @@ final class SiteSettings
         public string $abstract,
         public bool $geotagContent,
         public string $displayTimezone,
-    ) {}
+    ) {
+    }
 }

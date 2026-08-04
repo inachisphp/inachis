@@ -11,7 +11,7 @@ namespace Inachis\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * Validation message for invalid IP addresses
+ * Validation message for invalid IP addresses.
  */
 class ValidIPAddress extends Constraint
 {

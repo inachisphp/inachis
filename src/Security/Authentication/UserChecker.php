@@ -11,15 +11,16 @@ namespace Inachis\Security\Authentication;
 use Inachis\Entity\User\User;
 use Inachis\Security\Policy\SecurityPolicyManager;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;
 
 class UserChecker implements UserCheckerInterface
 {
     public function __construct(
         // private readonly SecurityPolicyManager $securityPolicyManager,
-    ) {}
+    ) {
+    }
 
     public function checkPreAuth(UserInterface $user): void
     {
@@ -38,13 +39,10 @@ class UserChecker implements UserCheckerInterface
 
     /**
      * Performs post-authentication checks.
-     *
-     * @param UserInterface $user
-     * @param TokenInterface|null $token
      */
     public function checkPostAuth(
         UserInterface $user,
-        ?TokenInterface $token = null
+        ?TokenInterface $token = null,
     ): void {
         if (!$user instanceof User) {
             return;

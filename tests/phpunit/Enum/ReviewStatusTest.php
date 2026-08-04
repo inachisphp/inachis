@@ -20,8 +20,8 @@ class ReviewStatusTest extends TestCase
     public function valuesReturnsAllPossibleValues(): void
     {
         self::assertSame(
-            ['open', 'resolved', 'closed',],
-            ReviewStatus::values()
+            ['open', 'resolved', 'closed'],
+            ReviewStatus::values(),
         );
     }
 

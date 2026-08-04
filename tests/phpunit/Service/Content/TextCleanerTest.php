@@ -137,7 +137,7 @@ MD, $result);
     {
         $result = $this->cleaner->strip(
             $this->example,
-            TextCleaner::NORMALISE_WHITESPACE | TextCleaner::REMOVE_IMAGE_ALT | TextCleaner::REMOVE_BLOCKQUOTE_CONTENT
+            TextCleaner::NORMALISE_WHITESPACE | TextCleaner::REMOVE_IMAGE_ALT | TextCleaner::REMOVE_BLOCKQUOTE_CONTENT,
         );
         $this->assertEquals(<<<MD
 example of HTML

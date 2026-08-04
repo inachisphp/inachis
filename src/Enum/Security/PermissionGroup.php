@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Inachis\Enum\Security;
 
 /**
- * Enum used to represent permission groups for {@link Role}
+ * Enum used to represent permission groups for {@link Role}.
  */
 enum PermissionGroup: string
 {
@@ -20,9 +20,7 @@ enum PermissionGroup: string
     case TOOLS = 'TOOLS';
 
     /**
-     * The user-friendly label for the group
-     *
-     * @return string
+     * The user-friendly label for the group.
      */
     public function label(): string
     {
@@ -36,9 +34,7 @@ enum PermissionGroup: string
     }
 
     /**
-     * Suitable material-icon graphic to represent the permission group
-     *
-     * @return string
+     * Suitable material-icon graphic to represent the permission group.
      */
     public function icon(): string
     {

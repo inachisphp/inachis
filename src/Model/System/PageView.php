@@ -9,22 +9,13 @@ declare(strict_types=1);
 namespace Inachis\Model\System;
 
 use Inachis\Entity\User\User;
-use Inachis\Model\System\PageMetadata;
-use Inachis\Model\System\SiteSettings;
 
 final class PageView
 {
     /**
-     * Model used for page view
+     * Model used for page view.
      *
-     * @param SiteSettings $settings
-     * @param PageMetadata $page
      * @param list<string> $notifications
-     * @param mixed $session
-     * @param int $sessionTimeout
-     * @param string $sessionTimeoutTime
-     * @param int $deletedItems
-     * @param string $timeoutTemplate
      */
     public function __construct(
         public SiteSettings $settings,
@@ -37,5 +28,6 @@ final class PageView
         public int $deletedItems = 0,
         public string $timeoutTemplate = '',
         public bool $twoFactorPending = false,
-    ) {}
+    ) {
+    }
 }

@@ -16,7 +16,8 @@ final readonly class TimezoneProvider
     public function __construct(
         #[Autowire('%env(APP_DEFAULT_TIMEZONE)%')]
         private string $defaultTimezone,
-    ) {}
+    ) {
+    }
 
     public function getDefault(): string
     {

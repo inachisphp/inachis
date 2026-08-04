@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Validator;
 
-use PHPUnit\Framework\TestCase;
-use Inachis\Validator\TlsRptValidator;
-use Inachis\Model\Domain\ValidationIssue;
 use Inachis\Model\Domain\Severity;
+use Inachis\Model\Domain\ValidationIssue;
+use Inachis\Validator\TlsRptValidator;
+use PHPUnit\Framework\TestCase;
 
 final class TlsRptValidatorTest extends TestCase
 {
@@ -31,8 +31,8 @@ final class TlsRptValidatorTest extends TestCase
             [
                 'target' => 'example.com',
                 'priority' => 10,
-                'txt' => 'invalid record'
-            ]
+                'txt' => 'invalid record',
+            ],
         ]);
 
         $this->assertCount(1, $issues);
@@ -40,7 +40,7 @@ final class TlsRptValidatorTest extends TestCase
         $this->assertSame('tls-rpt', $issues[0]->type);
         $this->assertStringContainsString(
             'Invalid TLS-RPT record format:',
-            $issues[0]->message
+            $issues[0]->message,
         );
         $this->assertSame(Severity::Error, $issues[0]->severity);
     }
@@ -53,8 +53,8 @@ final class TlsRptValidatorTest extends TestCase
             [
                 'target' => 'example.com',
                 'priority' => 10,
-                'txt' => 'v=TLSRPTv1; rua=mailto:[EMAIL_ADDRESS]'
-            ]
+                'txt' => 'v=TLSRPTv1; rua=mailto:[EMAIL_ADDRESS]',
+            ],
         ];
 
         $issues = $validator->validate($records);

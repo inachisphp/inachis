@@ -24,6 +24,7 @@ final class PageImportValidator
      * Validate an array of PageExportDto objects.
      *
      * @param array<PageExportDto> $pages
+     *
      * @return array<int, array<string>> Warnings per page (by index)
      */
     public function validateAll(array $pages): array
@@ -40,7 +41,6 @@ final class PageImportValidator
     /**
      * Validate a single PageExportDto.
      *
-     * @param PageExportDto $pageDto
      * @param int $index Index in the import list (for warnings)
      */
     public function validate(PageExportDto $pageDto, int $index): void

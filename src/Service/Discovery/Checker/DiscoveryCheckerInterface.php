@@ -12,7 +12,7 @@ use Inachis\Model\System\DiscoveryStatus;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Interface used by Discovery status checks
+ * Interface used by Discovery status checks.
  */
 #[AutoconfigureTag('inachis.discovery_checker')]
 interface DiscoveryCheckerInterface

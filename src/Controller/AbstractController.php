@@ -13,9 +13,6 @@ use Inachis\Model\System\PageView;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as SymfonyController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-/**
- *
- */
 abstract class AbstractController extends SymfonyController
 {
     protected PageView $viewModel;

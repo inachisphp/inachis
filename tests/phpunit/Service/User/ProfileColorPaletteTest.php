@@ -17,7 +17,7 @@ class ProfileColorPaletteTest extends TestCase
 
     public function setUp(): void
     {
-        $this->colorPicker  = new ProfileColorPalette();
+        $this->colorPicker = new ProfileColorPalette();
         parent::setUp();
     }
 

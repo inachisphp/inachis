@@ -8,20 +8,33 @@ declare(strict_types=1);
 
 namespace Inachis\Diagnostics\Check\Database;
 
+use Doctrine\DBAL\Connection;
 use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
 use Inachis\Doctrine\DatabasePlatformTrait;
-use Doctrine\DBAL\Connection;
 
 final class SSLCheck implements CheckInterface
 {
     use DatabasePlatformTrait;
 
-    public function __construct(private readonly Connection $connection) {}
+    public function __construct(private readonly Connection $connection)
+    {
+    }
 
-    public function getId(): string { return 'db_ssl'; }
-    public function getLabel(): string { return 'Database SSL/TLS'; }
-    public function getSection(): string { return 'Database'; }
+    public function getId(): string
+    {
+        return 'db_ssl';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Database SSL/TLS';
+    }
+
+    public function getSection(): string
+    {
+        return 'Database';
+    }
 
     public function run(): CheckResult
     {
@@ -37,7 +50,7 @@ final class SSLCheck implements CheckInterface
                 'SSL/TLS check only applies to MySQL/MariaDB.',
                 null,
                 $this->getSection(),
-                'low'
+                'low',
             );
         }
 
@@ -45,19 +58,19 @@ final class SSLCheck implements CheckInterface
             /** @var array{Variable_name: string, Value: string}|false */
             $row = $this->connection->fetchAssociative("SHOW VARIABLES LIKE 'have_ssl'");
             $value = strtoupper($row['Value'] ?? 'NO');
-            $status = $value === 'YES' ? 'ok' : 'warning';
-            $severity = $status === 'ok' ? 'low' : 'high';
-            $recommendation = $status === 'ok' ? null : 'Enable SSL/TLS for database connections to secure data in transit.';
+            $status = 'YES' === $value ? 'ok' : 'warning';
+            $severity = 'ok' === $status ? 'low' : 'high';
+            $recommendation = 'ok' === $status ? null : 'Enable SSL/TLS for database connections to secure data in transit.';
         } catch (\Throwable $e) {
             return new CheckResult(
                 $this->getId(),
                 $this->getLabel(),
                 'error',
                 null,
-                'Could not retrieve SSL status: ' . $e->getMessage(),
+                'Could not retrieve SSL status: '.$e->getMessage(),
                 'Ensure database is running and credentials are correct.',
                 $this->getSection(),
-                'high'
+                'high',
             );
         }
 
@@ -69,7 +82,7 @@ final class SSLCheck implements CheckInterface
             $value,
             $recommendation,
             $this->getSection(),
-            $severity
+            $severity,
         );
     }
 }

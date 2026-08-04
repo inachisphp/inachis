@@ -15,18 +15,15 @@ class QrCodeService
 {
     /**
      * Generate a QR code image data URI.
-     *
-     * @param string $data
-     * @return string
      */
     public function generate(
-        string $data
+        string $data,
     ): string {
         return (new Builder(
             writer: new PngWriter(),
             data: $data,
             size: 200,
-            margin: 10
+            margin: 10,
         ))
             ->build()
             ->getDataUri();

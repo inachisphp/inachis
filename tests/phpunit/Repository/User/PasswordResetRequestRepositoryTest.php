@@ -8,15 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Repository\User;
 
-use Inachis\Entity\User\PasswordResetRequest;
-use Inachis\Entity\User\User;
-use Inachis\Repository\User\PasswordResetRequestRepository;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Entity\User\PasswordResetRequest;
+use Inachis\Entity\User\User;
+use Inachis\Repository\User\PasswordResetRequestRepository;
 use PHPUnit\Framework\TestCase;
 
 class PasswordResetRequestRepositoryTest extends TestCase
@@ -30,7 +29,7 @@ class PasswordResetRequestRepositoryTest extends TestCase
         $this->entityManager = $this->createStub(EntityManagerInterface::class);
         $this->repository = $this->getMockBuilder(PasswordResetRequestRepository::class)
             ->setConstructorArgs([$registry])
-            ->onlyMethods([ 'createQueryBuilder' ])
+            ->onlyMethods(['createQueryBuilder'])
             ->getMock();
     }
 
@@ -42,7 +41,7 @@ class PasswordResetRequestRepositoryTest extends TestCase
         $qb->expects($this->atLeast(1))->method('setParameter')->willReturnSelf();
 
         $user = new User();
-        $date = new DateTimeImmutable('now');
+        $date = new \DateTimeImmutable('now');
         $passwordHash = new PasswordResetRequest($user, 'token-hash', $date);
         $query = $this->createMock(Query::class);
         $query->expects($this->once())->method('getResult')->willReturn([$passwordHash]);
@@ -63,7 +62,7 @@ class PasswordResetRequestRepositoryTest extends TestCase
         $qb->expects($this->once())->method('setMaxResults')->willReturnSelf();
 
         $user = new User();
-        $date = new DateTimeImmutable('now');
+        $date = new \DateTimeImmutable('now');
         $passwordHash = new PasswordResetRequest($user, 'token-hash', $date);
         $query = $this->createMock(Query::class);
         $query->expects($this->once())->method('getOneOrNullResult')->willReturn($passwordHash);
@@ -84,7 +83,7 @@ class PasswordResetRequestRepositoryTest extends TestCase
         $qb->expects($this->once())->method('setMaxResults')->willReturnSelf();
 
         $user = new User();
-        $date = new DateTimeImmutable('now');
+        $date = new \DateTimeImmutable('now');
         $passwordHash = new PasswordResetRequest($user, 'token-hash', $date);
         $query = $this->createMock(Query::class);
         $query->expects($this->once())->method('getOneOrNullResult')->willReturn($passwordHash);

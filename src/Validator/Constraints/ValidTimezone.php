@@ -11,7 +11,7 @@ namespace Inachis\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * Validation message for unrecognised timezones
+ * Validation message for unrecognised timezones.
  */
 class ValidTimezone extends Constraint
 {

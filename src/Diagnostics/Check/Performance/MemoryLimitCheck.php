@@ -13,9 +13,20 @@ use Inachis\Diagnostics\CheckResult;
 
 final class MemoryLimitCheck implements CheckInterface
 {
-    public function getId(): string { return 'memory_limit'; }
-    public function getLabel(): string { return 'Memory Limit'; }
-    public function getSection(): string { return 'Performance'; }
+    public function getId(): string
+    {
+        return 'memory_limit';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Memory Limit';
+    }
+
+    public function getSection(): string
+    {
+        return 'Performance';
+    }
 
     public function run(): CheckResult
     {
@@ -30,20 +41,22 @@ final class MemoryLimitCheck implements CheckInterface
             $status,
             $limit,
             $details,
-            $status === 'ok' ? null : 'Increase memory_limit in php.ini to at least 128M.',
+            'ok' === $status ? null : 'Increase memory_limit in php.ini to at least 128M.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 
     private function parsePhpSize(string $size): int
     {
         $unit = strtolower(substr($size, -1));
-        $bytes = (int)$size;
+        $bytes = (int) $size;
 
         switch ($unit) {
             case 'g': $bytes *= 1024;
+                // no break
             case 'm': $bytes *= 1024;
+                // no break
             case 'k': $bytes *= 1024;
         }
 

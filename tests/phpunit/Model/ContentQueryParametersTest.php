@@ -62,7 +62,7 @@ class ContentQueryParametersTest extends TestCase
             [
                 'limit' => 25,
                 'offset' => 75,
-            ]
+            ],
         );
 
         $repository = $this->createMock(CategoryRepository::class);
@@ -93,7 +93,7 @@ class ContentQueryParametersTest extends TestCase
                 'filter' => [
                     'categories' => '',
                 ],
-            ]
+            ],
         );
 
         $repository = $this->createMock(CategoryRepository::class);
@@ -123,7 +123,7 @@ class ContentQueryParametersTest extends TestCase
                 'filter' => [
                     'categories' => [$id->toString()],
                 ],
-            ]
+            ],
         );
 
         $repository = $this->createMock(CategoryRepository::class);
@@ -160,7 +160,7 @@ class ContentQueryParametersTest extends TestCase
                     'author' => '',
                     'status' => 'published',
                 ],
-            ]
+            ],
         );
 
         $repository = $this->createMock(CategoryRepository::class);

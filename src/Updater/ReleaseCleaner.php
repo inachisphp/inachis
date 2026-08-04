@@ -8,19 +8,19 @@ declare(strict_types=1);
 
 namespace Inachis\Updater;
 
-use RuntimeException;
-
 final class ReleaseCleaner
 {
     public function __construct(
         private ReleaseLocator $locator,
-    ) {}
+    ) {
+    }
 
     /**
      * Clean up old release directories.
      *
      * @param int $keep Number of releases to keep (including current). Minimum is 2 (current + 1 rollback).
-     * @return array<string> List of pruned directory paths.
+     *
+     * @return array<string> list of pruned directory paths
      */
     public function prune(int $keep = 3): array
     {
@@ -53,14 +53,14 @@ final class ReleaseCleaner
 
         foreach ($releases as $timestamp => $path) {
             // ALWAYS keep the active 'current' release, regardless of index
-            if ($currentPath !== null && realpath($path) === $currentPath) {
-                $keptCount++;
+            if (null !== $currentPath && realpath($path) === $currentPath) {
+                ++$keptCount;
                 continue;
             }
 
             // Keep top N recent releases (for rollback capability)
             if ($keptCount < $keep) {
-                $keptCount++;
+                ++$keptCount;
                 continue;
             }
 
@@ -73,7 +73,7 @@ final class ReleaseCleaner
     }
 
     /**
-     * Resolves the actual physical path pointed to by /var/www/inachis/current
+     * Resolves the actual physical path pointed to by /var/www/inachis/current.
      */
     private function resolveCurrentPath(): ?string
     {
@@ -85,7 +85,7 @@ final class ReleaseCleaner
 
         $realPath = realpath($currentLink);
 
-        return $realPath !== false ? $realPath : null;
+        return false !== $realPath ? $realPath : null;
     }
 
     /**
@@ -96,17 +96,17 @@ final class ReleaseCleaner
     private function scanReleases(string $releasesDir): array
     {
         $entries = scandir($releasesDir);
-        if ($entries === false) {
-            throw new RuntimeException(sprintf('Unable to read directory "%s".', $releasesDir));
+        if (false === $entries) {
+            throw new \RuntimeException(sprintf('Unable to read directory "%s".', $releasesDir));
         }
 
         $releases = [];
         foreach ($entries as $entry) {
-            if ($entry === '.' || $entry === '..') {
+            if ('.' === $entry || '..' === $entry) {
                 continue;
             }
 
-            $path = $releasesDir . DIRECTORY_SEPARATOR . $entry;
+            $path = $releasesDir.DIRECTORY_SEPARATOR.$entry;
 
             // Only inspect directories (ignore stray files)
             if (is_dir($path) && !is_link($path)) {
@@ -126,14 +126,14 @@ final class ReleaseCleaner
         $releasesDir = realpath($this->locator->releasesDirectory());
         $targetDir = realpath($dir);
 
-        if ($targetDir === false || $releasesDir === false || !str_starts_with($targetDir, $releasesDir)) {
-            throw new RuntimeException(sprintf('Refusing to delete target path outside releases directory: "%s"', $dir));
+        if (false === $targetDir || false === $releasesDir || !str_starts_with($targetDir, $releasesDir)) {
+            throw new \RuntimeException(sprintf('Refusing to delete target path outside releases directory: "%s"', $dir));
         }
 
         $files = array_diff(scandir($targetDir) ?: [], ['.', '..']);
 
         foreach ($files as $file) {
-            $filePath = $targetDir . DIRECTORY_SEPARATOR . $file;
+            $filePath = $targetDir.DIRECTORY_SEPARATOR.$file;
 
             if (is_link($filePath)) {
                 // If it's a symlink (e.g. shared storage link), unlink the link only—do NOT follow it!

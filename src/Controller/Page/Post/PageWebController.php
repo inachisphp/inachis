@@ -8,9 +8,12 @@ declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Post;
 
-use Exception;
 use Inachis\Controller\AbstractWebController;
-use Inachis\Entity\Content\{Category,Page,Series,Tag,Url};
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
+use Inachis\Entity\Content\Tag;
+use Inachis\Entity\Content\Url;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
@@ -26,30 +29,25 @@ use Symfony\Component\Routing\Attribute\Route;
 class PageWebController extends AbstractWebController
 {
     /**
-     * @param string $year
-     * @param string $month
-     * @param string $day
-     * @param string $title
-     * @return Response
-     * @throws NotFoundHttpException|Exception
+     * @throws NotFoundHttpException|\Exception
      */
     #[Route(
-        "/{year}/{month}/{day}/{title}",
+        '/{year}/{month}/{day}/{title}',
         requirements: [
-            "year" => "\d{4}",
-            "month" => "\d{2}",
-            "day" => "\d{2}"
+            'year' => "\d{4}",
+            'month' => "\d{2}",
+            'day' => "\d{2}",
         ],
-        methods: ["GET" ]
+        methods: ['GET'],
     )]
     #[Route(
-        "/incp/preview/{year}/{month}/{day}/{title}",
+        '/incp/preview/{year}/{month}/{day}/{title}',
         requirements: [
-            "year" => "\d{4}",
-            "month" => "\d{2}",
-            "day" => "\d{2}"
+            'year' => "\d{4}",
+            'month' => "\d{2}",
+            'day' => "\d{2}",
         ],
-        methods: ["GET" ]
+        methods: ['GET'],
     )]
     public function getPost(
         string $year,
@@ -57,24 +55,20 @@ class PageWebController extends AbstractWebController
         string $day,
         string $title,
         SeriesRepository $seriesRepository,
-        UrlRepository $urlRepository
+        UrlRepository $urlRepository,
     ): Response {
         $link = sprintf('%d/%02d/%02d/%s', $year, $month, $day, $title);
 
         return $this->renderPostOrPage($link, $seriesRepository, $urlRepository);
     }
 
-    /**
-     * @param Request $request
-     * @return Response
-     */
     #[Route(
-        "/{page}",
+        '/{page}',
         requirements: [
-            'page' => '^(?!setup$)(?!\d{4}-[a-zA-Z\-]+$)[^/]+$'
+            'page' => '^(?!setup$)(?!\d{4}-[a-zA-Z\-]+$)[^/]+$',
         ],
-        methods: [ "GET" ],
-        priority: -100
+        methods: ['GET'],
+        priority: -100,
     )]
     public function getPage(
         Request $request,
@@ -87,12 +81,9 @@ class PageWebController extends AbstractWebController
     }
 
     /**
-     * Outputs a page of all pages/posts with the specific tag
-     * @param string $tagName
-     * @param PageRepository $pageRepository
-     * @return Response
+     * Outputs a page of all pages/posts with the specific tag.
      */
-    #[Route("/tag/{tagName}", methods: [ "GET" ])]
+    #[Route('/tag/{tagName}', methods: ['GET'])]
     public function getPostsByTag(
         string $tagName,
         PageRepository $pageRepository,
@@ -101,12 +92,7 @@ class PageWebController extends AbstractWebController
         $tag = $this->entityManager->getRepository(Tag::class)->findOneBy(['title' => $tagName]);
 
         if (!$tag instanceof Tag) {
-            throw new NotFoundHttpException(
-                sprintf(
-                    '%s does not exist',
-                    $tagName
-                )
-            );
+            throw new NotFoundHttpException(sprintf('%s does not exist', $tagName));
         }
 
         return $this->render('web/pages/homepage.html.twig', [
@@ -118,29 +104,20 @@ class PageWebController extends AbstractWebController
     }
 
     /**
-     * Outputs a page of all pages/posts with the specific category
-     *
-     * @param string $categoryName
-     * @param CategoryRepository $categoryRepository
-     * @param PageRepository $pageRepository
-     * @return Response
+     * Outputs a page of all pages/posts with the specific category.
      */
-    #[Route("/category/{categoryName}", methods: [ "GET" ])]
+    #[Route('/category/{categoryName}', methods: ['GET'])]
     public function getPostsByCategory(
         string $categoryName,
         CategoryRepository $categoryRepository,
-        PageRepository $pageRepository
+        PageRepository $pageRepository,
     ): Response {
         // TODO change this to use slug
         $category = $categoryRepository->findOneBy(['title' => $categoryName]);
         if (!$category instanceof Category) {
-            throw new NotFoundHttpException(
-                sprintf(
-                    '%s does not exist',
-                    $categoryName
-                )
-            );
+            throw new NotFoundHttpException(sprintf('%s does not exist', $categoryName));
         }
+
         return $this->render('web/pages/homepage.html.twig', [
             'viewModel' => $this->viewModel,
             'filterName' => 'category',
@@ -150,20 +127,15 @@ class PageWebController extends AbstractWebController
     }
 
     /**
-     * Helper function for rendering posts and pages to avoid code repitition
-     *
-     * @param string $link
-     * @param SeriesRepository $seriesRepository
-     * @param UrlRepository $urlRepository
-     * @return Response
+     * Helper function for rendering posts and pages to avoid code repitition.
      */
     protected function renderPostOrPage(
         string $link,
         SeriesRepository $seriesRepository,
-        UrlRepository $urlRepository
+        UrlRepository $urlRepository,
     ): Response {
         /** @var Url|null */
-        $url = $urlRepository->findOneBy([ 'link' => $link ]);
+        $url = $urlRepository->findOneBy(['link' => $link]);
         if (!$url instanceof Url || (
             !$url->isContentLive() && !$this->security->isGranted('IS_AUTHENTICATED_REMEMBERED')
         )) {
@@ -174,7 +146,7 @@ class PageWebController extends AbstractWebController
             /** @var Url|null */
             $url = $urlRepository->getDefaultUrl($url->getContent());
             if ($url instanceof Url) {
-                return new RedirectResponse('/' . $url->getLink(), Response::HTTP_PERMANENTLY_REDIRECT);
+                return new RedirectResponse('/'.$url->getLink(), Response::HTTP_PERMANENTLY_REDIRECT);
             }
             throw new NotFoundHttpException(sprintf('%s does not exist', $link));
         }
@@ -187,7 +159,7 @@ class PageWebController extends AbstractWebController
             $postIndex = $series->getItems()->indexOf($url->getContent());
             $seriesNav = [
                 'title' => $series->getTitle(),
-                'subTitle' => $series->getSubTitle()
+                'subTitle' => $series->getSubTitle(),
             ];
             if ($postIndex - 1 >= 0) {
                 $seriesNav['previous'] = $series->getItems()->get($postIndex - 1);

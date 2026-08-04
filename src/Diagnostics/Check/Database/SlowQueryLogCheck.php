@@ -8,20 +8,33 @@ declare(strict_types=1);
 
 namespace Inachis\Diagnostics\Check\Database;
 
+use Doctrine\DBAL\Connection;
 use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
 use Inachis\Doctrine\DatabasePlatformTrait;
-use Doctrine\DBAL\Connection;
 
 final class SlowQueryLogCheck implements CheckInterface
 {
     use DatabasePlatformTrait;
 
-    public function __construct(private readonly Connection $connection) {}
+    public function __construct(private readonly Connection $connection)
+    {
+    }
 
-    public function getId(): string { return 'slow_query_log'; }
-    public function getLabel(): string { return 'slow_query_log'; }
-    public function getSection(): string { return 'Database'; }
+    public function getId(): string
+    {
+        return 'slow_query_log';
+    }
+
+    public function getLabel(): string
+    {
+        return 'slow_query_log';
+    }
+
+    public function getSection(): string
+    {
+        return 'Database';
+    }
 
     public function run(): CheckResult
     {
@@ -38,7 +51,7 @@ final class SlowQueryLogCheck implements CheckInterface
                     'Slow query log check only applies to MySQL/MariaDB.',
                     null,
                     $this->getSection(),
-                    'low'
+                    'low',
                 );
             }
 
@@ -50,14 +63,14 @@ final class SlowQueryLogCheck implements CheckInterface
                 $this->getLabel(),
                 'error',
                 null,
-                'Could not retrieve slow_query_log: ' . $e->getMessage(),
+                'Could not retrieve slow_query_log: '.$e->getMessage(),
                 'Ensure database is running and credentials are correct.',
                 $this->getSection(),
-                'high'
+                'high',
             );
         }
 
-        $status = $value === 'enabled' ? 'ok' : 'info';
+        $status = 'enabled' === $value ? 'ok' : 'info';
         $severity = 'low';
 
         return new CheckResult(
@@ -65,14 +78,14 @@ final class SlowQueryLogCheck implements CheckInterface
             $this->getLabel(),
             $status,
             $value,
-            $status === 'ok'
+            'ok' === $status
                 ? 'Slow query log is enabled.'
                 : 'Slow query log is disabled; enable for monitoring.',
-            $status !== 'ok'
+            'ok' !== $status
                 ? 'Enable slow_query_log to detect slow queries and optimize them.'
                 : null,
             $this->getSection(),
-            $severity
+            $severity,
         );
     }
 }

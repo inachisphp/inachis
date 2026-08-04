@@ -12,9 +12,6 @@ final class NumberFormatter
 {
     /**
      * Convert bytes to human-readable format.
-     * 
-     * @param int|float $bytes
-     * @return string
      */
     public static function formatBytes(int|float $bytes): string
     {
@@ -22,24 +19,23 @@ final class NumberFormatter
         $i = 0;
         while ($bytes >= 1024 && $i < count($units) - 1) {
             $bytes /= 1024;
-            $i++;
+            ++$i;
         }
-        return round($bytes, 2) . ' ' . $units[$i];
+
+        return round($bytes, 2).' '.$units[$i];
     }
 
     /**
      * Convert seconds to human-readable format (seconds or minutes if >= 60s).
-     * 
-     * @param int $seconds
-     * @return string
      */
     public static function formatSeconds(int $seconds): string
     {
         if ($seconds < 60) {
-            return $seconds . 's';
+            return $seconds.'s';
         }
         $minutes = floor($seconds / 60);
         $remaining = $seconds % 60;
+
         return $remaining > 0 ? "{$minutes} mins {$remaining} secs" : "{$minutes} mins";
     }
 }

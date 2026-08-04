@@ -17,16 +17,14 @@ use Symfony\Component\Routing\Attribute\Route;
 class ToolsIndexController extends AbstractInachisController
 {
     /**
-     * Index page for tools
-     *
-     * @return Response
+     * Index page for tools.
      */
-    #[Route("/incp/tools", name: 'incp_tools_index')]
+    #[Route('/incp/tools', name: 'incp_tools_index')]
     public function index(): Response
     {
-
         $this->viewModel->page->title = 'Tools';
         $this->viewModel->page->tab = 'tools';
+
         return $this->render('inadmin/page/tools/list.html.twig', [
             'viewModel' => $this->viewModel,
             'environment' => $this->getParameter('kernel.environment'),
@@ -34,17 +32,14 @@ class ToolsIndexController extends AbstractInachisController
     }
 
     /**
-     * Storage usage page
-     *
-     * @param ImageRepository $imageRepository
-     * @param PageRepository $pageRepository
-     * @return Response
+     * Storage usage page.
      */
-    #[Route("/incp/tools/storage", name: 'incp_tools_storage')]
+    #[Route('/incp/tools/storage', name: 'incp_tools_storage')]
     public function storage(ImageRepository $imageRepository, PageRepository $pageRepository): Response
     {
         $this->viewModel->page->title = 'Storage';
         $this->viewModel->page->tab = 'tools';
+
         return $this->render('inadmin/page/tools/storage.html.twig', [
             'viewModel' => $this->viewModel,
             'environment' => $this->getParameter('kernel.environment'),

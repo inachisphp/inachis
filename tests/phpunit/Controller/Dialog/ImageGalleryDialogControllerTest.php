@@ -8,9 +8,9 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Controller\Dialog;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Inachis\Controller\Dialog\ImageGalleryDialogController;
 use Inachis\Repository\Media\ImageRepository;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +25,7 @@ class ImageGalleryDialogControllerTest extends WebTestCase
             ->getMock();
         $controller->expects($this->once())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $result = $controller->getImageManagerList();
         $this->assertEquals('rendered:inadmin/dialog/image-manager.html.twig', $result->getContent());
@@ -39,10 +39,10 @@ class ImageGalleryDialogControllerTest extends WebTestCase
             ->getMock();
         $controller->expects($this->once())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incp/ax/imageManager/getImages/50/25'
+            'REQUEST_URI' => '/incp/ax/imageManager/getImages/50/25',
         ]);
         $paginator = $this->createStub(Paginator::class);
         $imageRepository = $this->getMockBuilder(ImageRepository::class)

@@ -13,21 +13,33 @@ use Inachis\Diagnostics\CheckResult;
 
 final class XFrameOptionsCheck implements CheckInterface
 {
-    public function getId(): string { return 'x_frame_options'; }
-    public function getLabel(): string { return 'X-Frame-Options'; }
-    public function getSection(): string { return 'Security'; }
+    public function getId(): string
+    {
+        return 'x_frame_options';
+    }
+
+    public function getLabel(): string
+    {
+        return 'X-Frame-Options';
+    }
+
+    public function getSection(): string
+    {
+        return 'Security';
+    }
 
     public function run(): CheckResult
     {
         $found = false;
         foreach (headers_list() as $header) {
-            if (stripos($header, 'X-Frame-Options:') === 0) {
+            if (0 === stripos($header, 'X-Frame-Options:')) {
                 $found = true;
                 break;
             }
         }
 
         $status = $found ? 'ok' : 'warning';
+
         return new CheckResult(
             $this->getId(),
             $this->getLabel(),
@@ -36,7 +48,7 @@ final class XFrameOptionsCheck implements CheckInterface
             $found ? 'X-Frame-Options header is present.' : 'X-Frame-Options header is missing.',
             $found ? null : 'Add X-Frame-Options header to prevent clickjacking.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }

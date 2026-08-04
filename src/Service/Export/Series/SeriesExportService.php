@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Inachis\Service\Export\Series;
 
 use Inachis\Repository\Content\SeriesRepository;
-use Inachis\Service\Export\Series\SeriesExportNormaliser;
 use Inachis\Service\Export\AbstractExportService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
@@ -21,9 +20,9 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 final class SeriesExportService extends AbstractExportService
 {
     /**
-     * @param SeriesRepository $repository The repository to use for series operations.
-     * @param SeriesExportNormaliser $normaliser The normaliser to use.
-     * @param iterable<SeriesExportWriter> $writers The writers to use.
+     * @param SeriesRepository             $repository the repository to use for series operations
+     * @param SeriesExportNormaliser       $normaliser the normaliser to use
+     * @param iterable<SeriesExportWriter> $writers    the writers to use
      */
     public function __construct(
         private SeriesRepository $repository,
@@ -36,21 +35,24 @@ final class SeriesExportService extends AbstractExportService
     /**
      * Export series to a file of a given type (JSON/MD/XML).
      *
-     * @param iterable<Series> $series The series to export.
-     * @param string $format The format to export to (json/md/xml).
-     * @return string The exported series.
+     * @param iterable<Series> $series the series to export
+     * @param string           $format the format to export to (json/md/xml)
+     *
+     * @return string the exported series
      */
     public function export(?iterable $series = null, string $format = 'json'): string
     {
         $series ??= $this->repository->findAll();
+
         return $this->exportCollection($series, $format, 'series');
     }
 
     /**
      * Normalise a series.
      *
-     * @param object $series The series to normalise.
-     * @return object The normalised series.
+     * @param object $series the series to normalise
+     *
+     * @return object the normalised series
      */
     protected function normalise(object $series): object
     {
@@ -60,8 +62,9 @@ final class SeriesExportService extends AbstractExportService
     /**
      * Get series by IDs via the repository.
      *
-     * @param array $ids The IDs of the series to retrieve.
-     * @return iterable<Series> The series.
+     * @param array $ids the IDs of the series to retrieve
+     *
+     * @return iterable<Series> the series
      */
     public function getSeriesByIds(array $ids): iterable
     {
@@ -71,7 +74,7 @@ final class SeriesExportService extends AbstractExportService
     /**
      * Get all series via the repository.
      *
-     * @return iterable<Series> The series.
+     * @return iterable<Series> the series
      */
     public function getAllSeries(): iterable
     {

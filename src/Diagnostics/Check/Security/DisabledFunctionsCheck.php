@@ -13,9 +13,20 @@ use Inachis\Diagnostics\CheckResult;
 
 final class DisabledFunctionsCheck implements CheckInterface
 {
-    public function getId(): string { return 'disabled_functions'; }
-    public function getLabel(): string { return 'Disabled Functions'; }
-    public function getSection(): string { return 'Security'; }
+    public function getId(): string
+    {
+        return 'disabled_functions';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Disabled Functions';
+    }
+
+    public function getSection(): string
+    {
+        return 'Security';
+    }
 
     public function run(): CheckResult
     {
@@ -31,7 +42,7 @@ final class DisabledFunctionsCheck implements CheckInterface
             }
         }
 
-        $details = $missing ? 'Missing disables: ' . implode(', ', $missing) : 'All dangerous functions disabled ✅';
+        $details = $missing ? 'Missing disables: '.implode(', ', $missing) : 'All dangerous functions disabled ✅';
 
         return new CheckResult(
             $this->getId(),
@@ -39,9 +50,9 @@ final class DisabledFunctionsCheck implements CheckInterface
             $status,
             $disabled,
             $details,
-            $status === 'ok' ? null : 'Consider disabling dangerous functions for security.',
+            'ok' === $status ? null : 'Consider disabling dangerous functions for security.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }

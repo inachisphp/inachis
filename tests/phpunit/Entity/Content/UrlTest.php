@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Entity\Content;
 
-use DateTimeImmutable;
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Url;
 use PHPUnit\Framework\TestCase;
@@ -65,14 +64,14 @@ class UrlTest extends TestCase
     public function testSetUpdatedAtToNow(): void
     {
         $this->url->setUpdatedAt(
-            new DateTimeImmutable('2000-01-01')
+            new \DateTimeImmutable('2000-01-01'),
         );
 
         $this->url->setUpdatedAtToNow();
 
         $this->assertSame(
-            (new DateTimeImmutable())->format('Ymd'),
-            $this->url->getUpdatedAt()->format('Ymd')
+            (new \DateTimeImmutable())->format('Ymd'),
+            $this->url->getUpdatedAt()->format('Ymd'),
         );
     }
 
@@ -92,19 +91,19 @@ class UrlTest extends TestCase
         $this->url->onPrePersist();
 
         $this->assertInstanceOf(
-            DateTimeImmutable::class,
-            $this->url->getCreatedAt()
+            \DateTimeImmutable::class,
+            $this->url->getCreatedAt(),
         );
 
         $this->assertInstanceOf(
-            DateTimeImmutable::class,
-            $this->url->getUpdatedAt()
+            \DateTimeImmutable::class,
+            $this->url->getUpdatedAt(),
         );
     }
 
     public function testSetAndGetCreatedAt(): void
     {
-        $date = new DateTimeImmutable('2025-01-01');
+        $date = new \DateTimeImmutable('2025-01-01');
 
         $this->url->setCreatedAt($date);
 
@@ -113,7 +112,7 @@ class UrlTest extends TestCase
 
     public function testSetAndGetUpdatedAt(): void
     {
-        $date = new DateTimeImmutable('2025-02-01');
+        $date = new \DateTimeImmutable('2025-02-01');
 
         $this->url->setUpdatedAt($date);
 
@@ -153,20 +152,20 @@ class UrlTest extends TestCase
     public function testAssociateContentAddsUrlToPage(): void
     {
         $this->assertTrue(
-            $this->page->getUrls()->contains($this->url)
+            $this->page->getUrls()->contains($this->url),
         );
     }
 
     public function testOnPreUpdateUpdatesTimestamp(): void
     {
-        $old = new DateTimeImmutable('2000-01-01');
+        $old = new \DateTimeImmutable('2000-01-01');
 
         $this->url->setUpdatedAt($old);
         $this->url->onPreUpdate();
 
         $this->assertGreaterThan(
             $old->getTimestamp(),
-            $this->url->getUpdatedAt()->getTimestamp()
+            $this->url->getUpdatedAt()->getTimestamp(),
         );
     }
 }

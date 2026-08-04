@@ -22,21 +22,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Login activity controller
+ * Login activity controller.
  */
 class LoginActivityController extends AbstractInachisController
 {
     /**
-     * Login activity index
-     *
-     * @param LoginActivityRepository $repository
-     * @param Request $request
-     * @return Response
+     * Login activity index.
      */
     #[Route('/incp/admin/login-activity', name: 'incp_admin_login_activity_index')]
     #[RequiresPermission(
         resource: PermissionResource::AUDIT_LOG,
-        action: PermissionAction::VIEW
+        action: PermissionAction::VIEW,
     )]
     public function index(
         CategoryRepository $categoryRepository,
@@ -59,6 +55,7 @@ class LoginActivityController extends AbstractInachisController
 
         $this->viewModel->page->title = 'Login Activity';
         $this->viewModel->page->tab = 'audit-logs';
+
         return $this->render('inadmin/page/admin/login-activity.html.twig', [
             'viewModel' => $this->viewModel,
             'activities' => $repository->getFiltered($params),
@@ -72,17 +69,12 @@ class LoginActivityController extends AbstractInachisController
     }
 
     /**
-     * Login activity by user
-     *
-     * @param Request $request
-     * @param UserRepository $userRepository
-     * @param LoginActivityRepository $repository
-     * @return Response
+     * Login activity by user.
      */
     #[Route('/incp/admin/{id}/login-activity', name: 'incp_admin_login_activity')]
     #[RequiresPermission(
         resource: PermissionResource::USER,
-        action: PermissionAction::VIEW
+        action: PermissionAction::VIEW,
     )]
     public function loginActivity(Request $request, UserRepository $userRepository, LoginActivityRepository $repository): Response
     {
@@ -92,6 +84,7 @@ class LoginActivityController extends AbstractInachisController
         }
         $this->viewModel->page->title = 'Login Activity';
         $this->viewModel->page->tab = 'audit-logs';
+
         return $this->render('inadmin/page/admin/login-activity.html.twig', [
             'viewModel' => $this->viewModel,
             'activities' => $repository->findByUser($user, 100),
@@ -100,22 +93,19 @@ class LoginActivityController extends AbstractInachisController
     }
 
     /**
-     * Login activity view
-     *
-     * @param Request $request
-     * @param LoginActivityRepository $repository
-     * @return Response
+     * Login activity view.
      */
     #[Route('/incp/admin/login-activity/{id}', name: 'incp_admin_all_login_activity_view')]
     #[Route('/incp/admin/{username}/login-activity/{id}', name: 'incp_admin_login_activity_view')]
     #[RequiresPermission(
         resource: PermissionResource::AUDIT_LOG,
-        action: PermissionAction::VIEW
+        action: PermissionAction::VIEW,
     )]
     public function view(Request $request, LoginActivityRepository $repository): Response
     {
         $this->viewModel->page->title = 'Login Activity';
         $this->viewModel->page->tab = 'audit-logs';
+
         return $this->render('inadmin/page/admin/login-activity-view.html.twig', [
             'viewModel' => $this->viewModel,
             'activity' => $repository->find($request->attributes->getString('id')),

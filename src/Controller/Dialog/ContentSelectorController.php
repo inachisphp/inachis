@@ -8,27 +8,22 @@ declare(strict_types=1);
 
 namespace Inachis\Controller\Dialog;
 
-use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Repository\Content\{PageRepository, SeriesRepository};
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\SeriesRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Controller for content selector dialog
+ * Controller for content selector dialog.
  */
 class ContentSelectorController extends AbstractInachisController
 {
     /**
-     * Get content list
-     *
-     * @param Request $request
-     * @param SeriesRepository $seriesRepository
-     * @param PageRepository $pageRepository
-     * @return Response
+     * Get content list.
      */
-    #[Route("/incp/ax/contentSelector/get", methods: [ "POST" ])]
+    #[Route('/incp/ax/contentSelector/get', methods: ['POST'])]
     public function contentList(
         Request $request,
         SeriesRepository $seriesRepository,
@@ -50,9 +45,9 @@ class ContentSelectorController extends AbstractInachisController
 
         /** @var string $seriesId */
         $seriesId = $request->request->getString('seriesId', '');
-        if ($seriesId !== '') {
+        if ('' !== $seriesId) {
             $series = $seriesRepository->find($seriesId);
-            if ($series !== null) {
+            if (null !== $series) {
                 $items = $series->getItems();
                 if (!$items->isEmpty()) {
                     $filters['excludeIds'] = [];
@@ -72,7 +67,7 @@ class ContentSelectorController extends AbstractInachisController
                 '*',
                 $limit,
                 $offset,
-                'title asc'
+                'title asc',
             ),
             'query' => [
                 'filters' => $filters,
@@ -82,13 +77,7 @@ class ContentSelectorController extends AbstractInachisController
         ]);
     }
 
-    /**
-     * @param Request $request
-     * @param SeriesRepository $seriesRepository
-     * @param PageRepository $pageRepository
-     * @return Response
-     */
-    #[Route("/incp/ax/contentSelector/save", methods: [ "POST" ])]
+    #[Route('/incp/ax/contentSelector/save', methods: ['POST'])]
     public function saveContent(
         Request $request,
         SeriesRepository $seriesRepository,
@@ -97,7 +86,7 @@ class ContentSelectorController extends AbstractInachisController
         $ids = $request->request->all('ids');
         $seriesId = $request->request->getString('seriesId', '');
         $series = $seriesRepository->find($seriesId);
-        if (empty($ids) || $series === null) {
+        if (empty($ids) || null === $series) {
             return new Response('No change', Response::HTTP_NO_CONTENT);
         }
 
@@ -113,14 +102,14 @@ class ContentSelectorController extends AbstractInachisController
             $firstDate = $series->getFirstDate();
             $lastDate = $series->getLastDate();
 
-            if ($firstDate === null || $pageDate < $firstDate) {
+            if (null === $firstDate || $pageDate < $firstDate) {
                 $series->setFirstDate($pageDate);
             }
-            if ($lastDate === null || $pageDate > $lastDate) {
+            if (null === $lastDate || $pageDate > $lastDate) {
                 $series->setLastDate($pageDate);
             }
         }
-        $series->setUpdatedAt(new DateTimeImmutable());
+        $series->setUpdatedAt(new \DateTimeImmutable());
 
         $this->entityManager->persist($series);
         $this->entityManager->flush();

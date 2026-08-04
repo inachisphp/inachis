@@ -17,9 +17,20 @@ use Inachis\Diagnostics\CheckResult;
  */
 final class IISModulesCheck implements CheckInterface
 {
-    public function getId(): string { return 'iis_modules'; }
-    public function getLabel(): string { return 'IIS Modules & Performance Guidance'; }
-    public function getSection(): string { return 'Webserver'; }
+    public function getId(): string
+    {
+        return 'iis_modules';
+    }
+
+    public function getLabel(): string
+    {
+        return 'IIS Modules & Performance Guidance';
+    }
+
+    public function getSection(): string
+    {
+        return 'Webserver';
+    }
 
     public function run(): CheckResult
     {
@@ -36,7 +47,7 @@ final class IISModulesCheck implements CheckInterface
                 'Not running on IIS. No IIS-specific guidance required.',
                 null,
                 $this->getSection(),
-                'medium'
+                'medium',
             );
         }
 
@@ -84,7 +95,7 @@ final class IISModulesCheck implements CheckInterface
             implode("\n", $details),
             'IIS settings cannot be verified automatically. Follow the checklist above for performance optimization.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }

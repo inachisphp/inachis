@@ -42,7 +42,7 @@ enum SensitiveAction: string
 
             self::DATA_IMPORT_EXPORT => 'Import/Export Data',
             self::BACKUP_RESTORE => 'Backup/Restore Data',
-            
+
             // self::API_CREDENTIAL_MANAGEMENT => 'Manage API Credentials',
             // self::USER_IMPERSONATE => 'Impersonate User',
             // self::SESSION_REVOCATION => 'Revoke User Sessions',

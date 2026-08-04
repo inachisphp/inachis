@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Tools;
 
-use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Diagnostics\DiagnosticsCollector;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,29 +17,29 @@ use Symfony\Component\Routing\Attribute\Route;
 class DiagnosticsController extends AbstractInachisController
 {
     /**
-     * Server settings page
-     *
-     * @param DiagnosticsCollector $collector
-     * @return Response
+     * Server settings page.
      */
     #[Route('/incp/tools/server', name: 'incp_tools_diagnostics')]
-    public function index(DiagnosticsCollector $collector): Response {
+    public function index(DiagnosticsCollector $collector): Response
+    {
         $results = $collector->collect();
 
         $this->viewModel->page->title = 'Server settings';
         $this->viewModel->page->tab = 'tools';
-		return $this->render('inadmin/page/tools/server.html.twig', [
+
+        return $this->render('inadmin/page/tools/server.html.twig', [
             'viewModel' => $this->viewModel,
             'environment' => $this->getParameter('kernel.environment'),
             'sections' => $collector->grouped(),
             'summary' => $this->buildSummary($results),
         ]);
-	}
+    }
 
     /**
-     * Build a summary array for the summary cards in Twig
+     * Build a summary array for the summary cards in Twig.
      *
      * @param list<\Inachis\Diagnostics\CheckResult> $results Array of {@link CheckResult} objects
+     *
      * @return array{
      *     database: array{ok: int, warning: int, error: int, info: int},
      *     environment: array{ok: int, warning: int, error: int, info: int},
@@ -77,25 +76,24 @@ class DiagnosticsController extends AbstractInachisController
                     'info' => 'info',
                     default => null,
                 };
-                if ($status !== null) {
-                    $summary[$sectionKey][$status]++;
+                if (null !== $status) {
+                    ++$summary[$sectionKey][$status];
                 }
             }
         }
+
         return $summary;
     }
 
     /**
-     * Output server settings to JSON file
-     *
-     * @param DiagnosticsCollector $collector
-     * @return JsonResponse
+     * Output server settings to JSON file.
      */
     #[Route('/incp/tools/server.json', name: 'incp_tools_diagnostics_json')]
-    public function serverJson(DiagnosticsCollector $collector): JsonResponse {
+    public function serverJson(DiagnosticsCollector $collector): JsonResponse
+    {
         return $this->json([
-            'generated_at' => (new DateTimeImmutable())->format(DATE_ATOM),
+            'generated_at' => (new \DateTimeImmutable())->format(DATE_ATOM),
             'results' => $collector->collect(),
         ]);
-	}
+    }
 }

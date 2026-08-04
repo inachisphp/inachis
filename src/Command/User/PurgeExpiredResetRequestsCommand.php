@@ -24,9 +24,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class PurgeExpiredResetRequestsCommand extends Command
 {
-    /**
-     * @param PasswordResetRequestRepository $passwordResetRequestRepository
-     */
     public function __construct(protected PasswordResetRequestRepository $passwordResetRequestRepository)
     {
         parent::__construct();
@@ -34,16 +31,13 @@ class PurgeExpiredResetRequestsCommand extends Command
 
     /**
      * Executes the command.
-     * 
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $count = $this->passwordResetRequestRepository->purgeExpiredHashes();
         $io = new SymfonyStyle($input, $output);
         $io->success(sprintf('Deleted %d expired password reset requests.', $count));
+
         return Command::SUCCESS;
     }
 }

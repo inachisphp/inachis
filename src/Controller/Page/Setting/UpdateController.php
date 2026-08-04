@@ -24,13 +24,11 @@ use Inachis\Updater\ReleaseLocator;
 use Inachis\Updater\ReleaseRollback;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Throwable;
 
 final class UpdateController extends AbstractInachisController
 {
@@ -72,7 +70,7 @@ final class UpdateController extends AbstractInachisController
             // System is up to date
         } catch (IncompatibleVersionException $e) {
             $error = $e->getMessage();
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             $error = sprintf('Unable to check for updates: %s', $e->getMessage());
         }
 
@@ -89,7 +87,7 @@ final class UpdateController extends AbstractInachisController
             'rollbackCandidate' => $rollbackCandidate,
             'olderRollbacks' => array_slice($availableRollbacks, 1),
             'error' => $error,
-            'isUpToDate' => $updatePlan === null && $error === null,
+            'isUpToDate' => null === $updatePlan && null === $error,
         ]);
     }
 
@@ -101,6 +99,7 @@ final class UpdateController extends AbstractInachisController
     {
         if (!$this->isCsrfTokenValid('system_update', (string) $request->request->get('_token'))) {
             $this->addFlash('danger', 'Invalid security token. Please try again.');
+
             return $this->redirectToRoute('incp_settings_update');
         }
 
@@ -110,16 +109,16 @@ final class UpdateController extends AbstractInachisController
             $manifest = $this->releaseProvider->latest();
             $plan = $this->updatePlanner->plan($currentVersion, $manifest);
 
-            $tempArchive = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $plan->package;
+            $tempArchive = sys_get_temp_dir().DIRECTORY_SEPARATOR.$plan->package;
             $this->releaseProvider->download($manifest, $tempArchive);
 
             $sharedDir = $this->releaseLocator->sharedDirectory();
             $sharedMappings = [
-                '.env'                   => $sharedDir . '/.env',
-                '.env.local.php'         => $sharedDir . '/.env.local.php',
-                'public/imgs'            => $sharedDir . '/public/imgs',
-                'var'                    => $sharedDir . '/var',
-                'public/maintenance.html' => $sharedDir . '/public/maintenance.html',
+                '.env' => $sharedDir.'/.env',
+                '.env.local.php' => $sharedDir.'/.env.local.php',
+                'public/imgs' => $sharedDir.'/public/imgs',
+                'var' => $sharedDir.'/var',
+                'public/maintenance.html' => $sharedDir.'/public/maintenance.html',
             ];
 
             $this->releaseInstaller->install($manifest, $tempArchive, $sharedMappings);
@@ -130,8 +129,7 @@ final class UpdateController extends AbstractInachisController
             }
 
             $this->addFlash('success', sprintf('Successfully updated Inachis to v%s!', $plan->targetVersion));
-
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             $this->addFlash('danger', sprintf('Update failed: %s', $exception->getMessage()));
         }
 
@@ -146,13 +144,14 @@ final class UpdateController extends AbstractInachisController
     {
         if (!$this->isCsrfTokenValid('system_rollback', (string) $request->request->get('_token'))) {
             $this->addFlash('danger', 'Invalid security token. Please try again.');
+
             return $this->redirectToRoute('incp_settings_update');
         }
 
         try {
             $revertedRelease = $this->releaseRollback->rollback();
             $this->addFlash('success', sprintf('Successfully rolled back to v%s!', $revertedRelease->version));
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             $this->addFlash('danger', sprintf('Rollback failed: %s', $exception->getMessage()));
         }
 

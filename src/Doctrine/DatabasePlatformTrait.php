@@ -12,15 +12,12 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
  * Trait for obtaining the database platform name. This used to be obtainable prior to DBAL 4.x using
- * ->getName
+ * ->getName.
  */
 trait DatabasePlatformTrait
 {
     /**
-     * Returns a friendly platform name for database
-     *
-     * @param AbstractPlatform $platform
-     * @return string
+     * Returns a friendly platform name for database.
      */
     public function getDatabasePlatformName(AbstractPlatform $platform): string
     {

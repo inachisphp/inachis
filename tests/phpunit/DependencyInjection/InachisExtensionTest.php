@@ -21,7 +21,7 @@ class InachisExtensionTest extends TestCase
         $extension->load([], $container);
         $container->compile();
         $this->assertTrue(
-            $container->hasDefinition('service_container')
+            $container->hasDefinition('service_container'),
         );
     }
 }

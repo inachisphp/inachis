@@ -10,7 +10,6 @@ namespace Inachis\Service\Export\Series;
 
 use Inachis\Model\Series\SeriesExportDto;
 use Inachis\Service\Export\AbstractXmlExportWriter;
-use \SimpleXMLElement;
 
 /**
  * XML writer for series.
@@ -22,7 +21,7 @@ final class SeriesXmlWriter extends AbstractXmlExportWriter
      */
     public function supports(string $format): bool
     {
-        return $format === 'xml';
+        return 'xml' === $format;
     }
 
     /**
@@ -30,13 +29,11 @@ final class SeriesXmlWriter extends AbstractXmlExportWriter
      */
     public function supportsDomain(?string $domain): bool
     {
-        return $domain === 'series';
+        return 'series' === $domain;
     }
 
     /**
      * The root node for the XML document.
-     *
-     * @return string
      */
     protected function rootNodeName(): string
     {
@@ -45,8 +42,6 @@ final class SeriesXmlWriter extends AbstractXmlExportWriter
 
     /**
      * The item node for the XML document.
-     *
-     * @return string
      */
     protected function itemNodeName(): string
     {
@@ -56,10 +51,9 @@ final class SeriesXmlWriter extends AbstractXmlExportWriter
     /**
      * Writes the given series to XML format.
      *
-     * @param SimpleXMLElement $xml
      * @param SeriesExportDto $item
      */
-    protected function writeItem(SimpleXMLElement $xml, object $item): void
+    protected function writeItem(\SimpleXMLElement $xml, object $item): void
     {
         $this->optional($xml, 'title', $item->title);
         $this->optional($xml, 'subTitle', $item->subTitle);

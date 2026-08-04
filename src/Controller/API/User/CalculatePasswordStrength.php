@@ -15,19 +15,18 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Constraints\PasswordStrengthValidator;
 
 /**
- * Controller used for changing password for an administrator {@link User}
+ * Controller used for changing password for an administrator {@link User}.
  */
 class CalculatePasswordStrength extends AbstractInachisController
 {
     /**
-     * Returns a JSON object containing the result of calculating the password strength entropy
-     * @param Request $request
-     * @return JsonResponse
+     * Returns a JSON object containing the result of calculating the password strength entropy.
      */
-    #[Route("/incp/api/calculate-password-strength", name:"incp_api_calculate-password-strength", methods: [ "POST" ])]
+    #[Route('/incp/api/calculate-password-strength', name: 'incp_api_calculate-password-strength', methods: ['POST'])]
     public function calculatePasswordStrength(Request $request): JsonResponse
     {
         $password = $request->request->getString('password', '');
+
         return new JsonResponse(PasswordStrengthValidator::estimateStrength($password));
     }
 }

@@ -19,10 +19,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class AnalyticsController extends AbstractInachisController
 {
     /**
-     * Analytics dashboard for showing general site traffic, popular pages, and 404 errors
-     *
-     * @param AnalyticsProviderInterface $analytics
-     * @return Response
+     * Analytics dashboard for showing general site traffic, popular pages, and 404 errors.
      */
     #[Route('/incp/tools/analytics', name: 'incp_tools_analytics')]
     public function index(
@@ -33,7 +30,7 @@ class AnalyticsController extends AbstractInachisController
         try {
             $period = $periodResolver->resolve(
                 $request,
-                'analytics'
+                'analytics',
             );
         } catch (InvalidAnalyticsPeriodException $e) {
             $this->addFlash('warning', $e->getMessage());
@@ -42,7 +39,7 @@ class AnalyticsController extends AbstractInachisController
                 'incp_tools_analytics',
                 [
                     'range' => '30d',
-                ]
+                ],
             );
         }
         $previous = $period->previous();
@@ -57,15 +54,15 @@ class AnalyticsController extends AbstractInachisController
 
         $prevViews = $analytics->getTotalViews($previous->from, $previous->to);
 
-		$change = $prevViews > 0
-			? (($totalViews - $prevViews) / $prevViews) * 100
-			: null;
-		$trending = $analytics->getTrendingPages(
+        $change = $prevViews > 0
+            ? (($totalViews - $prevViews) / $prevViews) * 100
+            : null;
+        $trending = $analytics->getTrendingPages(
             $period->from,
             $period->to,
             $previous->from,
             $previous->to,
-            10
+            10,
         );
         $topReferrers = $analytics->getTopReferrers($period->from, $period->to, 10);
 
@@ -77,6 +74,7 @@ class AnalyticsController extends AbstractInachisController
 
         $this->viewModel->page->title = 'Analytics';
         $this->viewModel->page->tab = 'analytics';
+
         return $this->render('inadmin/page/tools/analytics.html.twig', [
             'viewModel' => $this->viewModel,
             'analytics' => [
@@ -87,17 +85,17 @@ class AnalyticsController extends AbstractInachisController
                 'averageViewsPerDay' => round(
                     $totalViews / max(
                         1,
-                        $period->from->diff($period->to)->days + 1
+                        $period->from->diff($period->to)->days + 1,
                     ),
-                    1
+                    1,
                 ),
                 'peakViews' => array_reduce(
                     $viewsPerDay,
                     static function ($carry, $row) {
-                        return ($carry === null || $row['total'] > $carry['total'])
+                        return (null === $carry || $row['total'] > $carry['total'])
                             ? $row
                             : $carry;
-                    }
+                    },
                 ),
                 'uniqueVisitors' => $uniqueVisitors,
                 'viewsPerVisitor' => $uniqueVisitors > 0

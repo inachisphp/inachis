@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'inachis:migrate-uuid-storage',
-    description: 'UUID CHAR(36) to BINARY(16) migration with verification and reporting'
+    description: 'UUID CHAR(36) to BINARY(16) migration with verification and reporting',
 )]
 final class MigrateUuidStorageCommand extends Command
 {
@@ -35,52 +35,51 @@ final class MigrateUuidStorageCommand extends Command
                 'execute',
                 null,
                 InputOption::VALUE_NONE,
-                'Actually execute migration'
+                'Actually execute migration',
             )
             ->addOption(
                 'resume',
                 null,
                 InputOption::VALUE_NONE,
-                'Resume a previous migration'
+                'Resume a previous migration',
             )
             ->addOption(
                 'table',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Process a single table'
+                'Process a single table',
             )
             ->addOption(
                 'phase',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Stop after a phase (0-5)',
-                '5'
+                '5',
             )
             ->addOption(
                 'verify-only',
                 null,
                 InputOption::VALUE_NONE,
-                'Run verification only'
+                'Run verification only',
             )
             ->addOption(
                 'force-snapshot',
                 null,
                 InputOption::VALUE_NONE,
-                'Recreate schema snapshot'
+                'Recreate schema snapshot',
             )
             ->addOption(
                 'cleanup-old',
                 null,
                 InputOption::VALUE_NONE,
-                'Drop *_old UUID columns created during migration'
+                'Drop *_old UUID columns created during migration',
             );
     }
 
     protected function execute(
         InputInterface $input,
-        OutputInterface $output
+        OutputInterface $output,
     ): int {
-
         $execute = (bool) $input->getOption('execute');
         $resume = (bool) $input->getOption('resume');
         $verifyOnly = (bool) $input->getOption('verify-only');
@@ -98,7 +97,7 @@ final class MigrateUuidStorageCommand extends Command
         $output->writeln(
             $dryRun
                 ? '<comment>DRY RUN</comment>'
-                : '<error>EXECUTE MODE</error>'
+                : '<error>EXECUTE MODE</error>',
         );
         $output->writeln('');
 
@@ -111,16 +110,15 @@ final class MigrateUuidStorageCommand extends Command
                 return $this->cleanupOldColumns($output);
             }
 
-            /**
+            /*
              * =====================================================
              * Phase 0
              * Snapshot schema
              * =====================================================
              */
             if ($maxPhase >= 0) {
-
                 $output->writeln(
-                    '<info>[Phase 0] Schema Snapshot</info>'
+                    '<info>[Phase 0] Schema Snapshot</info>',
                 );
 
                 if (
@@ -130,37 +128,34 @@ final class MigrateUuidStorageCommand extends Command
                     $this->snapshotSchema($output);
                 } else {
                     $output->writeln(
-                        'Existing snapshot detected.'
+                        'Existing snapshot detected.',
                     );
                 }
 
                 $output->writeln(
-                    '<fg=green>✓ Phase 0 complete</>'
+                    '<fg=green>✓ Phase 0 complete</>',
                 );
             }
 
-            /**
+            /*
              * =====================================================
              * Phase 1
              * Discover UUID columns
              * =====================================================
              */
             $output->writeln(
-                '<info>[Phase 1] UUID Discovery</info>'
+                '<info>[Phase 1] UUID Discovery</info>',
             );
 
             $uuidMap = $this->discoverUuidColumns();
 
-            if ($singleTable !== null) {
-
+            if (null !== $singleTable) {
                 if (!isset($uuidMap[$singleTable])) {
-                    throw new \RuntimeException(
-                        "Unknown table: {$singleTable}"
-                    );
+                    throw new \RuntimeException("Unknown table: {$singleTable}");
                 }
 
                 $uuidMap = [
-                    $singleTable => $uuidMap[$singleTable]
+                    $singleTable => $uuidMap[$singleTable],
                 ];
             }
 
@@ -173,25 +168,25 @@ final class MigrateUuidStorageCommand extends Command
             $output->writeln(sprintf(
                 'Discovered %d UUID columns across %d tables',
                 $columnCount,
-                count($uuidMap)
+                count($uuidMap),
             ));
 
             $output->writeln(
-                '<fg=green>✓ Phase 1 complete</>'
+                '<fg=green>✓ Phase 1 complete</>',
             );
 
-            if ($maxPhase === 1) {
+            if (1 === $maxPhase) {
                 return Command::SUCCESS;
             }
 
-            /**
+            /*
              * =====================================================
              * Phase 2
              * Create _bin columns
              * =====================================================
              */
             $output->writeln(
-                '<info>[Phase 2] Create Binary Columns</info>'
+                '<info>[Phase 2] Create Binary Columns</info>',
             );
 
             foreach ($uuidMap as $table => $columns) {
@@ -200,13 +195,13 @@ final class MigrateUuidStorageCommand extends Command
                     $this->addBinaryColumns(
                         $table,
                         $columns,
-                        $dryRun
+                        $dryRun,
                     );
                 }
                 if (!$dryRun) {
                     $this->verifyBinaryColumnsExist(
                         $table,
-                        $columns
+                        $columns,
                     );
                 } else {
                     foreach ($columns as $column) {
@@ -216,60 +211,57 @@ final class MigrateUuidStorageCommand extends Command
             }
 
             $output->writeln(
-                '<fg=green>✓ Phase 2 complete</>'
+                '<fg=green>✓ Phase 2 complete</>',
             );
 
-            if ($maxPhase === 2) {
+            if (2 === $maxPhase) {
                 return Command::SUCCESS;
             }
 
-            /**
+            /*
              * =====================================================
              * Phase 3
              * Backfill
              * =====================================================
              */
             $output->writeln(
-                '<info>[Phase 3] Backfill Binary Data</info>'
+                '<info>[Phase 3] Backfill Binary Data</info>',
             );
 
             if (!$verifyOnly && !$dryRun) {
-
                 foreach ($uuidMap as $table => $columns) {
-
                     foreach ($columns as $column) {
-
                         $rows = $this->backfillColumn(
                             $table,
-                            $column
+                            $column,
                         );
 
                         $output->writeln(sprintf(
                             '  %s.%s => %d rows',
                             $table,
                             $column,
-                            $rows
+                            $rows,
                         ));
                     }
                 }
             }
 
             $output->writeln(
-                '<fg=green>✓ Phase 3 complete</>'
+                '<fg=green>✓ Phase 3 complete</>',
             );
 
-            if ($maxPhase === 3) {
+            if (3 === $maxPhase) {
                 return Command::SUCCESS;
             }
 
-            /**
+            /*
              * =====================================================
              * Phase 4
              * Conversion Verification
              * =====================================================
              */
             $output->writeln(
-                '<info>[Phase 4] Verify Conversion</info>'
+                '<info>[Phase 4] Verify Conversion</info>',
             );
 
             foreach ($uuidMap as $table => $columns) {
@@ -277,47 +269,47 @@ final class MigrateUuidStorageCommand extends Command
                     if (!$dryRun) {
                         $this->verifyNoNullBinaryValues(
                             $table,
-                            $column
+                            $column,
                         );
                         $this->verifyBinaryMatchesUuid(
                             $table,
-                            $column
+                            $column,
                         );
                         $this->verifyBinaryLength(
                             $table,
-                            $column
+                            $column,
                         );
                         $output->writeln(sprintf(
                             '  ✓ %s.%s',
                             $table,
-                            $column
+                            $column,
                         ));
                     } else {
                         $output->writeln(sprintf(
                             'Skipped verifying %s.%s',
                             $table,
-                            $column
+                            $column,
                         ));
                     }
                 }
             }
 
             $output->writeln(
-                '<fg=green>✓ Phase 4 complete</>'
+                '<fg=green>✓ Phase 4 complete</>',
             );
 
-            if ($maxPhase === 4) {
+            if (4 === $maxPhase) {
                 return Command::SUCCESS;
             }
 
-            /**
+            /*
              * =====================================================
              * Phase 5
              * Shadow FK Validation
              * =====================================================
              */
             $output->writeln(
-                '<info>[Phase 5] Shadow FK Validation</info>'
+                '<info>[Phase 5] Shadow FK Validation</info>',
             );
             $foreignKeys = $this->discoverForeignKeys();
             foreach ($foreignKeys as $fk) {
@@ -326,66 +318,64 @@ final class MigrateUuidStorageCommand extends Command
                     $output->writeln(sprintf(
                         '  ✓ %s (%s)',
                         $fk['TABLE_NAME'],
-                        implode(', ', $fk['columns']) // Changed to read the array of columns
+                        implode(', ', $fk['columns']), // Changed to read the array of columns
                     ));
                 }
             }
 
             $output->writeln(
-                '<fg=green>✓ Phase 5 complete</>'
+                '<fg=green>✓ Phase 5 complete</>',
             );
 
             $output->writeln('');
             $output->writeln(
-                '<fg=green>All verification phases completed successfully.</>'
+                '<fg=green>All verification phases completed successfully.</>',
             );
             $output->writeln(
-                '<comment>Safe to continue with FK drop/swap phases.</comment>'
+                '<comment>Safe to continue with FK drop/swap phases.</comment>',
             );
             $output->writeln('');
 
             if ($maxPhase >= 5) {
                 $foreignKeys = $this->discoverForeignKeys();
                 $this->dropForeignKeys($foreignKeys, $output);
-                if ($maxPhase === 6) {
+                if (6 === $maxPhase) {
                     return Command::SUCCESS;
                 }
 
                 $this->swap($uuidMap, $output);
-                if ($maxPhase === 7) {
+                if (7 === $maxPhase) {
                     return Command::SUCCESS;
                 }
 
                 $this->rebuildPrimaryKeys($uuidMap, $output);
-                if ($maxPhase === 8) {
+                if (8 === $maxPhase) {
                     return Command::SUCCESS;
                 }
 
                 $this->rebuildIndexes($uuidMap, $output);
-                if ($maxPhase === 9) {
+                if (9 === $maxPhase) {
                     return Command::SUCCESS;
                 }
 
                 $this->rebuildForeignKeys($foreignKeys, $output);
-                if ($maxPhase === 10) {
+                if (10 === $maxPhase) {
                     return Command::SUCCESS;
                 }
             }
 
             return Command::SUCCESS;
-
         } catch (\Throwable $e) {
-
             $output->writeln('');
             $output->writeln(
-                '<error>MIGRATION ABORTED</error>'
+                '<error>MIGRATION ABORTED</error>',
             );
 
             $output->writeln(
                 sprintf(
                     '<error>%s</error>',
-                    $e->getMessage()
-                )
+                    $e->getMessage(),
+                ),
             );
 
             return Command::FAILURE;
@@ -411,7 +401,7 @@ final class MigrateUuidStorageCommand extends Command
      */
     private function discoverForeignKeys(): array
     {
-        $rows = $this->db->fetchAllAssociative("
+        $rows = $this->db->fetchAllAssociative('
             SELECT
                 TABLE_NAME,
                 COLUMN_NAME,
@@ -422,7 +412,7 @@ final class MigrateUuidStorageCommand extends Command
             WHERE TABLE_SCHEMA = DATABASE()
             AND REFERENCED_TABLE_NAME IS NOT NULL
             ORDER BY CONSTRAINT_NAME, ORDINAL_POSITION
-        ");
+        ');
 
         $fks = [];
         foreach ($rows as $row) {
@@ -434,7 +424,7 @@ final class MigrateUuidStorageCommand extends Command
                     'TABLE_NAME' => $row['TABLE_NAME'],
                     'REFERENCED_TABLE_NAME' => $row['REFERENCED_TABLE_NAME'],
                     'columns' => [],
-                    'referenced_columns' => []
+                    'referenced_columns' => [],
                 ];
             }
 
@@ -450,7 +440,7 @@ final class MigrateUuidStorageCommand extends Command
      */
     private function discoverColumns(string $table): array
     {
-        $rows = $this->db->fetchAllAssociative("
+        $rows = $this->db->fetchAllAssociative('
             SELECT
                 COLUMN_NAME,
                 COLUMN_TYPE,
@@ -462,7 +452,7 @@ final class MigrateUuidStorageCommand extends Command
             WHERE TABLE_SCHEMA = DATABASE()
             AND TABLE_NAME = ?
             ORDER BY ORDINAL_POSITION
-        ", [$table]);
+        ', [$table]);
 
         $columns = [];
 
@@ -470,7 +460,7 @@ final class MigrateUuidStorageCommand extends Command
             $columns[] = [
                 'name' => $row['COLUMN_NAME'],
                 'type' => $row['COLUMN_TYPE'],
-                'nullable' => $row['IS_NULLABLE'] === 'YES',
+                'nullable' => 'YES' === $row['IS_NULLABLE'],
                 'default' => $row['COLUMN_DEFAULT'],
                 'extra' => $row['EXTRA'],
                 'key' => $row['COLUMN_KEY'], // PRI / MUL / UNI
@@ -498,7 +488,7 @@ final class MigrateUuidStorageCommand extends Command
      */
     private function discoverForeignKeysForTable(string $table): array
     {
-        $rows = $this->db->fetchAllAssociative("
+        $rows = $this->db->fetchAllAssociative('
             SELECT
                 COLUMN_NAME,
                 REFERENCED_TABLE_NAME,
@@ -509,7 +499,7 @@ final class MigrateUuidStorageCommand extends Command
             AND TABLE_NAME = ?
             AND REFERENCED_TABLE_NAME IS NOT NULL
             ORDER BY CONSTRAINT_NAME, ORDINAL_POSITION
-        ", [$table]);
+        ', [$table]);
 
         $fks = [];
 
@@ -543,15 +533,15 @@ final class MigrateUuidStorageCommand extends Command
      */
     private function isNullable(string $table, string $column): bool
     {
-        $value = $this->db->fetchOne("
+        $value = $this->db->fetchOne('
             SELECT IS_NULLABLE
             FROM information_schema.COLUMNS
             WHERE TABLE_SCHEMA = DATABASE()
             AND TABLE_NAME = ?
             AND COLUMN_NAME = ?
-        ", [$table, $column]);
+        ', [$table, $column]);
 
-        return $value === 'YES';
+        return 'YES' === $value;
     }
 
     /**
@@ -561,15 +551,15 @@ final class MigrateUuidStorageCommand extends Command
         string $table,
         string $column,
         string $sql,
-        bool $dryRun
+        bool $dryRun,
     ): void {
-        $exists = (int) $this->db->fetchOne("
+        $exists = (int) $this->db->fetchOne('
             SELECT COUNT(*)
             FROM information_schema.COLUMNS
             WHERE TABLE_SCHEMA = DATABASE()
             AND TABLE_NAME = ?
             AND COLUMN_NAME = ?
-        ", [$table, $column]);
+        ', [$table, $column]);
 
         if ($exists > 0) {
             return;
@@ -594,10 +584,10 @@ final class MigrateUuidStorageCommand extends Command
         array $columns,
         string $refTable,
         array $refColumns,
-        string $constraint
+        string $constraint,
     ): void {
-        $localCols = implode(', ', array_map(fn($c) => "`{$c}`", $columns));
-        $foreignCols = implode(', ', array_map(fn($c) => "`{$c}`", $refColumns));
+        $localCols = implode(', ', array_map(fn ($c) => "`{$c}`", $columns));
+        $foreignCols = implode(', ', array_map(fn ($c) => "`{$c}`", $refColumns));
 
         $sql = "
             ALTER TABLE `$table`
@@ -619,14 +609,14 @@ final class MigrateUuidStorageCommand extends Command
     private function createPrimaryKey(string $table, array $columns): void
     {
         $binCols = array_map(
-            fn($c) => "`{$c}`",
-            $columns
+            fn ($c) => "`{$c}`",
+            $columns,
         );
 
         $sql = sprintf(
-            "ALTER TABLE `%s` ADD PRIMARY KEY (%s)",
+            'ALTER TABLE `%s` ADD PRIMARY KEY (%s)',
             $table,
-            implode(',', $binCols)
+            implode(',', $binCols),
         );
 
         $this->db->executeStatement($sql);
@@ -634,7 +624,7 @@ final class MigrateUuidStorageCommand extends Command
 
     private function dropIndex(string $table, string $index): void
     {
-        if ($index === 'PRIMARY') {
+        if ('PRIMARY' === $index) {
             return;
         }
 
@@ -649,24 +639,24 @@ final class MigrateUuidStorageCommand extends Command
         $columns = $index['columns'];
 
         $binCols = array_map(
-            fn($c) => "`{$c}`",
-            $columns
+            fn ($c) => "`{$c}`",
+            $columns,
         );
 
         // Determine the correct index modifier type
         $typeModifier = '';
-        if ($index['type'] === 'FULLTEXT') {
+        if ('FULLTEXT' === $index['type']) {
             $typeModifier = 'FULLTEXT';
         } elseif ($index['unique']) {
             $typeModifier = 'UNIQUE';
         }
 
         $sql = sprintf(
-            "ALTER TABLE `%s` ADD %s INDEX `%s` (%s)",
+            'ALTER TABLE `%s` ADD %s INDEX `%s` (%s)',
             $table,
             $typeModifier,
             $name,
-            implode(',', $binCols)
+            implode(',', $binCols),
         );
 
         $this->db->executeStatement($sql);
@@ -688,7 +678,7 @@ final class MigrateUuidStorageCommand extends Command
 
     private function resolveConstraintName(array $fk): string
     {
-        return $this->db->fetchOne("
+        return $this->db->fetchOne('
             SELECT CONSTRAINT_NAME
             FROM information_schema.KEY_COLUMN_USAGE
             WHERE TABLE_SCHEMA = DATABASE()
@@ -696,35 +686,31 @@ final class MigrateUuidStorageCommand extends Command
             AND COLUMN_NAME = ?
             AND REFERENCED_TABLE_NAME IS NOT NULL
             LIMIT 1
-        ", [
+        ', [
             $fk['TABLE_NAME'],
-            $fk['COLUMN_NAME']
+            $fk['COLUMN_NAME'],
         ]);
     }
 
     //
     // Functions for performing migration below
     // =========================================
-    ///
-
+    // /
 
     /**
-     * Step 0: Snapshot the current schema
-     *
-     * @param OutputInterface $output
+     * Step 0: Snapshot the current schema.
      */
     private function snapshotSchema(OutputInterface $output): void
     {
         $output->writeln('Creating schema snapshot...');
 
-        $tables = $this->db->fetchFirstColumn("
+        $tables = $this->db->fetchFirstColumn('
             SELECT TABLE_NAME
             FROM information_schema.TABLES
             WHERE TABLE_SCHEMA = DATABASE()
-        ");
+        ');
 
         foreach ($tables as $table) {
-
             $snapshot = [
                 'columns' => $this->discoverColumns($table),
                 'primaryKey' => $this->discoverPrimaryKey($table),
@@ -758,7 +744,7 @@ final class MigrateUuidStorageCommand extends Command
     }
 
     /**
-     * Step 1: Discover UUID columns
+     * Step 1: Discover UUID columns.
      */
     private function discoverUuidColumns(): array
     {
@@ -789,7 +775,7 @@ final class MigrateUuidStorageCommand extends Command
         // Pass 2: Grab EVERY SINGLE foreign key relationship in the database.
         // If it references a table we know is transforming, we MUST include the local column
         // NO MATTER WHAT ITS CURRENT TYPE IS (char(36), varchar(255), text, etc.)
-        $fkRows = $this->db->fetchAllAssociative("
+        $fkRows = $this->db->fetchAllAssociative('
             SELECT
                 TABLE_NAME,
                 COLUMN_NAME,
@@ -797,14 +783,14 @@ final class MigrateUuidStorageCommand extends Command
             FROM information_schema.KEY_COLUMN_USAGE
             WHERE TABLE_SCHEMA = DATABASE()
             AND REFERENCED_TABLE_NAME IS NOT NULL
-        ");
+        ');
 
         foreach ($fkRows as $fk) {
             $refTable = $fk['REFERENCED_TABLE_NAME'] ?? $fk['referenced_table_name'] ?? null;
             $tableName = $fk['TABLE_NAME'] ?? $fk['table_name'] ?? null;
             $columnName = $fk['COLUMN_NAME'] ?? $fk['column_name'] ?? null;
 
-            if ($refTable !== null && $tableName !== null && $columnName !== null) {
+            if (null !== $refTable && null !== $tableName && null !== $columnName) {
                 // Case-insensitive check to see if the target table is undergoing a migration
                 if (isset($baseTables[strtolower($refTable)])) {
                     $map[$tableName][] = $columnName;
@@ -825,28 +811,25 @@ final class MigrateUuidStorageCommand extends Command
     }
 
     /**
-     * Step 2.1: Add _bin columns for each column being replaced
+     * Step 2.1: Add _bin columns for each column being replaced.
      *
-     * @param string $table
      * @param array<> $uuidColumns
-     * @param bool $dryRun
      */
     private function addBinaryColumns(
         string $table,
         array $uuidColumns,
-        bool $dryRun
+        bool $dryRun,
     ): void {
         foreach ($uuidColumns as $column) {
-
             $nullable = $this->isNullable($table, $column);
 
             $sql = sprintf(
-                "ALTER TABLE `%s`
-             ADD COLUMN IF NOT EXISTS `%s_bin` BINARY(16) %s AFTER %s",
+                'ALTER TABLE `%s`
+             ADD COLUMN IF NOT EXISTS `%s_bin` BINARY(16) %s AFTER %s',
                 $table,
                 $column,
                 $nullable ? 'NULL' : 'NOT NULL',
-                $column
+                $column,
             );
 
             $this->execIfMissing($table, "{$column}_bin", $sql, $dryRun);
@@ -854,39 +837,33 @@ final class MigrateUuidStorageCommand extends Command
     }
 
     /**
-     * Step 2.2: Verify _bin columns exist
+     * Step 2.2: Verify _bin columns exist.
      */
     private function verifyBinaryColumnsExist(
         string $table,
-        array $columns
+        array $columns,
     ): void {
         foreach ($columns as $column) {
-            $exists = (int)$this->db->fetchOne("
+            $exists = (int) $this->db->fetchOne('
             SELECT COUNT(*)
             FROM information_schema.COLUMNS
             WHERE TABLE_SCHEMA = DATABASE()
             AND TABLE_NAME = ?
             AND COLUMN_NAME = ?
-        ", [$table, "{$column}_bin"]);
+        ', [$table, "{$column}_bin"]);
 
-            if ($exists === 0) {
-                throw new \RuntimeException(
-                    "$table.{$column}_bin missing"
-                );
+            if (0 === $exists) {
+                throw new \RuntimeException("$table.{$column}_bin missing");
             }
         }
     }
 
     /**
-     * Step 3: Backfill _bin columns from ID columns
-     *
-     * @param string $table
-     * @param string $column
-     * @return int
+     * Step 3: Backfill _bin columns from ID columns.
      */
     private function backfillColumn(
         string $table,
-        string $column
+        string $column,
     ): int {
         $bin = "{$column}_bin";
         $total = 0;
@@ -897,7 +874,7 @@ final class MigrateUuidStorageCommand extends Command
             SET `$bin` = UNHEX(REPLACE(`$column`, '-', ''))
             WHERE `$column` IS NOT NULL
             AND (`$bin` IS NULL OR `$bin` = 0x00000000000000000000000000000000)
-            LIMIT " . self::CHUNK_SIZE
+            LIMIT ".self::CHUNK_SIZE,
             );
             $total += $affected;
         } while ($affected > 0);
@@ -906,16 +883,13 @@ final class MigrateUuidStorageCommand extends Command
     }
 
     /**
-     * Step 4.1: Verify there are no empty _bin fields
-     *
-     * @param string $table
-     * @param string $column
+     * Step 4.1: Verify there are no empty _bin fields.
      */
     private function verifyNoNullBinaryValues(
         string $table,
-        string $column
+        string $column,
     ): void {
-        $count = (int)$this->db->fetchOne("
+        $count = (int) $this->db->fetchOne("
         SELECT COUNT(*)
         FROM `$table`
         WHERE `$column` IS NOT NULL
@@ -923,23 +897,18 @@ final class MigrateUuidStorageCommand extends Command
     ");
 
         if ($count > 0) {
-            throw new \RuntimeException(
-                "$table.$column has $count NULL binary values"
-            );
+            throw new \RuntimeException("$table.$column has $count NULL binary values");
         }
     }
 
     /**
-     * Step 4.2: Verify UUID_BINARY values relate to UUIDs
-     *
-     * @param string $table
-     * @param string $column
+     * Step 4.2: Verify UUID_BINARY values relate to UUIDs.
      */
     private function verifyBinaryMatchesUuid(
         string $table,
-        string $column
+        string $column,
     ): void {
-        $count = (int)$this->db->fetchOne("
+        $count = (int) $this->db->fetchOne("
             SELECT COUNT(*)
             FROM `$table`
             WHERE `$column` IS NOT NULL
@@ -947,38 +916,30 @@ final class MigrateUuidStorageCommand extends Command
                 <> UNHEX(REPLACE(`$column`, '-', ''))
         ");
         if ($count > 0) {
-            throw new \RuntimeException(
-                "$table.$column has $count mismatches"
-            );
+            throw new \RuntimeException("$table.$column has $count mismatches");
         }
     }
 
     /**
-     * Step 4.3: Check binary length is correct
-     *
-     * @param string $table
-     * @param string $column
+     * Step 4.3: Check binary length is correct.
      */
     private function verifyBinaryLength(
         string $table,
-        string $column
+        string $column,
     ): void {
-        $count = (int)$this->db->fetchOne("
+        $count = (int) $this->db->fetchOne("
         SELECT COUNT(*)
         FROM `$table`
         WHERE `$column` IS NOT NULL
         AND LENGTH(`{$column}_bin`) <> 16
     ");
         if ($count > 0) {
-            throw new \RuntimeException(
-                "$table.$column contains invalid binary lengths"
-            );
+            throw new \RuntimeException("$table.$column contains invalid binary lengths");
         }
     }
 
     /**
-     * Step 4.4: Verify FK Shadow
-     * * @param array $fk
+     * Step 4.4: Verify FK Shadow.
      */
     private function verifyForeignKeyShadow(array $fk): void
     {
@@ -994,15 +955,15 @@ final class MigrateUuidStorageCommand extends Command
 
             // GUARD CLAUSE: If the shadow column doesn't exist, this table/column
             // wasn't part of this migration run (e.g., already migrated). Skip validation.
-            $columnExists = (int) $this->db->fetchOne("
+            $columnExists = (int) $this->db->fetchOne('
                 SELECT COUNT(*)
                 FROM information_schema.COLUMNS
                 WHERE TABLE_SCHEMA = DATABASE()
                 AND TABLE_NAME = ?
                 AND COLUMN_NAME = ?
-            ", [$table, $shadowColumn]);
+            ', [$table, $shadowColumn]);
 
-            if ($columnExists === 0) {
+            if (0 === $columnExists) {
                 return;
             }
 
@@ -1014,7 +975,7 @@ final class MigrateUuidStorageCommand extends Command
         $joinSql = implode(' AND ', $joinConditions);
         $whereSql = implode(' AND ', $whereConditions);
 
-        $count = (int)$this->db->fetchOne("
+        $count = (int) $this->db->fetchOne("
             SELECT COUNT(*)
             FROM `$table` t
             LEFT JOIN `$refTable` r ON $joinSql
@@ -1023,14 +984,12 @@ final class MigrateUuidStorageCommand extends Command
         ");
 
         if ($count > 0) {
-            throw new \RuntimeException(
-                "{$table} shadow FK validation failed for constraint: {$fk['constraint']}"
-            );
+            throw new \RuntimeException("{$table} shadow FK validation failed for constraint: {$fk['constraint']}");
         }
     }
 
     /**
-     * Step 5: Drop FKs
+     * Step 5: Drop FKs.
      */
     private function dropForeignKeys(array $foreignKeys, OutputInterface $output): void
     {
@@ -1051,17 +1010,13 @@ final class MigrateUuidStorageCommand extends Command
     }
 
     /**
-     * Step 6: Swap UUID and UUID_BINARY columns over
-     *
-     * @param array $uuidMap
-     * @param OutputInterface $output
+     * Step 6: Swap UUID and UUID_BINARY columns over.
      */
     private function swap(array $uuidMap, OutputInterface $output): void
     {
         $output->writeln('<info>[Phase 7] Swap CHAR → BINARY</info>');
 
         foreach ($uuidMap as $table => $columns) {
-
             foreach ($columns as $column) {
                 // Fetch the nullability of the original column before swapping it
                 $nullable = $this->isNullable($table, $column);
@@ -1076,10 +1031,7 @@ final class MigrateUuidStorageCommand extends Command
     }
 
     /**
-     * Step: 7: Rebuild Primary Keys
-     *
-     * @param array $uuidMap
-     * @param OutputInterface $output
+     * Step: 7: Rebuild Primary Keys.
      */
     private function rebuildPrimaryKeys(array $uuidMap, OutputInterface $output): void
     {
@@ -1105,17 +1057,14 @@ final class MigrateUuidStorageCommand extends Command
             }
 
             $this->createPrimaryKey($table, $pk);
-            $output->writeln("  rebuilt PK {$table} on (" . implode(', ', $pk) . ")");
+            $output->writeln("  rebuilt PK {$table} on (".implode(', ', $pk).')');
         }
 
         $output->writeln('<fg=green>✓ Phase 8 complete</>');
     }
 
     /**
-     * Step 8: Rebuild Indexes
-     *
-     * @param array $uuidMap
-     * @param OutputInterface $output
+     * Step 8: Rebuild Indexes.
      */
     private function rebuildIndexes(array $uuidMap, OutputInterface $output): void
     {
@@ -1126,7 +1075,7 @@ final class MigrateUuidStorageCommand extends Command
             $indexes = $this->discoverIndexes($table);
 
             foreach ($indexes as $index) {
-                if (strtoupper($index['name']) === 'PRIMARY') {
+                if ('PRIMARY' === strtoupper($index['name'])) {
                     continue;
                 }
 
@@ -1136,15 +1085,15 @@ final class MigrateUuidStorageCommand extends Command
                     // Suppress if already missing
                 }
 
-                $typeModifier = (isset($index['type']) && $index['type'] === 'FULLTEXT') ? 'FULLTEXT' : ($index['unique'] ? 'UNIQUE' : '');
-                $binCols = array_map(fn($c) => "`{$c}`", $index['columns']);
+                $typeModifier = (isset($index['type']) && 'FULLTEXT' === $index['type']) ? 'FULLTEXT' : ($index['unique'] ? 'UNIQUE' : '');
+                $binCols = array_map(fn ($c) => "`{$c}`", $index['columns']);
 
                 $sql = sprintf(
-                    "ALTER TABLE `%s` ADD %s INDEX `%s` (%s)",
+                    'ALTER TABLE `%s` ADD %s INDEX `%s` (%s)',
                     $table,
                     $typeModifier,
                     $index['name'],
-                    implode(',', $binCols)
+                    implode(',', $binCols),
                 );
 
                 try {
@@ -1161,7 +1110,7 @@ final class MigrateUuidStorageCommand extends Command
         $output->writeln('  <comment>Injecting fallback indexes for all migrated columns...</comment>');
         foreach ($uuidMap as $table => $columns) {
             foreach ($columns as $column) {
-                $forcedIndexName = "idx_migrated_safety_" . strtolower($column);
+                $forcedIndexName = 'idx_migrated_safety_'.strtolower($column);
                 $sql = "ALTER TABLE `$table` ADD INDEX IF NOT EXISTS `$forcedIndexName` (`$column`)";
 
                 try {
@@ -1176,18 +1125,15 @@ final class MigrateUuidStorageCommand extends Command
     }
 
     /**
-     * Step 9: Rebuild FKs
-     *
-     * @param array $foreignKeys
-     * @param OutputInterface $output
+     * Step 9: Rebuild FKs.
      */
     private function rebuildForeignKeys(array $foreignKeys, OutputInterface $output): void
     {
         $output->writeln('<info>[Phase 10] Rebuild Foreign Keys</info>');
 
-        $liveTables = $this->db->fetchFirstColumn("
+        $liveTables = $this->db->fetchFirstColumn('
             SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()
-        ");
+        ');
         $casedTableMap = [];
         foreach ($liveTables as $lt) {
             $casedTableMap[strtolower($lt)] = $lt;
@@ -1209,7 +1155,7 @@ final class MigrateUuidStorageCommand extends Command
                     $fk['columns'],
                     $refTable,
                     $fk['referenced_columns'],
-                    $fk['constraint']
+                    $fk['constraint'],
                 );
 
                 $output->writeln(sprintf('  recreated FK constraint %s on %s', $fk['constraint'], $table));
@@ -1243,7 +1189,6 @@ final class MigrateUuidStorageCommand extends Command
             }
 
             foreach ($tablesToProcess as $table => $columns) {
-
                 // 2. Check if this table has a multi-column key issue involving '_old' columns
                 $hasLockedConstraints = (int) $this->db->fetchOne("
                     SELECT COUNT(*)
@@ -1257,15 +1202,18 @@ final class MigrateUuidStorageCommand extends Command
                     // Drop the active keys to unlock the columns
                     try {
                         $this->db->executeStatement("ALTER TABLE `$table` DROP PRIMARY KEY");
-                    } catch (\Throwable $e) { /* Already gone */ }
+                    } catch (\Throwable $e) { /* Already gone */
+                    }
 
                     try {
                         $this->db->executeStatement("ALTER TABLE `$table` DROP INDEX `uniq_page_tag_pair`");
-                    } catch (\Throwable $e) { /* Already gone */ }
+                    } catch (\Throwable $e) { /* Already gone */
+                    }
 
                     try {
                         $this->db->executeStatement("ALTER TABLE `$table` DROP INDEX `UNIQ_FA0E76BFA76ED395`");
-                    } catch (\Throwable $e) { /* Already gone */ }
+                    } catch (\Throwable $e) { /* Already gone */
+                    }
                 }
 
                 // 3. Drop all the _old columns for this table
@@ -1281,34 +1229,33 @@ final class MigrateUuidStorageCommand extends Command
                 // 4. RESTORATION STEP: Put the clean binary constraints back in place
                 if ($hasLockedConstraints) {
                     try {
-                        if (strtolower($table) === 'page_series') {
-                            $this->db->executeStatement("ALTER TABLE `page_series` ADD PRIMARY KEY (`page_id`, `series_id`)");
-                            $output->writeln("  ⚡ Restored clean PRIMARY KEY on page_series");
-                        } elseif (strtolower($table) === 'series_pages') {
-                            $this->db->executeStatement("ALTER TABLE `Series_pages` ADD PRIMARY KEY (`series_id`, `page_id`)");
-                            $output->writeln("  ⚡ Restored clean PRIMARY KEY on Series_pages");
-                        } elseif (strtolower($table) === 'page_categories') {
-                            $this->db->executeStatement("ALTER TABLE `Page_categories` ADD PRIMARY KEY (`page_id`, `category_id`)");
-                            $output->writeln("  ⚡ Restored clean PRIMARY KEY on Page_categories");
-                        } elseif (strtolower($table) === 'page_tags') {
-                            $this->db->executeStatement("ALTER TABLE `Page_tags` ADD PRIMARY KEY (`page_id`, `tag_id`)");
-                            $this->db->executeStatement("ALTER TABLE `Page_tags` ADD UNIQUE INDEX `uniq_page_tag_pair` (`page_id`, `tag_id`)");
-                            $output->writeln("  ⚡ Restored clean keys on Page_tags");
-                        } elseif (strtolower($table) === 'user_preference') {
-                            $this->db->executeStatement("ALTER TABLE `user_preference` ADD UNIQUE INDEX `UNIQ_FA0E76BFA76ED395` (`user_id`)");
-                            $output->writeln("  ⚡ Restored clean unique index on user_preference");
+                        if ('page_series' === strtolower($table)) {
+                            $this->db->executeStatement('ALTER TABLE `page_series` ADD PRIMARY KEY (`page_id`, `series_id`)');
+                            $output->writeln('  ⚡ Restored clean PRIMARY KEY on page_series');
+                        } elseif ('series_pages' === strtolower($table)) {
+                            $this->db->executeStatement('ALTER TABLE `Series_pages` ADD PRIMARY KEY (`series_id`, `page_id`)');
+                            $output->writeln('  ⚡ Restored clean PRIMARY KEY on Series_pages');
+                        } elseif ('page_categories' === strtolower($table)) {
+                            $this->db->executeStatement('ALTER TABLE `Page_categories` ADD PRIMARY KEY (`page_id`, `category_id`)');
+                            $output->writeln('  ⚡ Restored clean PRIMARY KEY on Page_categories');
+                        } elseif ('page_tags' === strtolower($table)) {
+                            $this->db->executeStatement('ALTER TABLE `Page_tags` ADD PRIMARY KEY (`page_id`, `tag_id`)');
+                            $this->db->executeStatement('ALTER TABLE `Page_tags` ADD UNIQUE INDEX `uniq_page_tag_pair` (`page_id`, `tag_id`)');
+                            $output->writeln('  ⚡ Restored clean keys on Page_tags');
+                        } elseif ('user_preference' === strtolower($table)) {
+                            $this->db->executeStatement('ALTER TABLE `user_preference` ADD UNIQUE INDEX `UNIQ_FA0E76BFA76ED395` (`user_id`)');
+                            $output->writeln('  ⚡ Restored clean unique index on user_preference');
                         }
                     } catch (\Throwable $e) {
                         $output->writeln("  <error>Failed to restore key on {$table}: {$e->getMessage()}</error>");
                     }
                 }
             }
-
         } finally {
             $this->db->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
         }
 
-        $output->writeln("<fg=green>✓ Cleanup complete</>");
+        $output->writeln('<fg=green>✓ Cleanup complete</>');
 
         return Command::SUCCESS;
     }

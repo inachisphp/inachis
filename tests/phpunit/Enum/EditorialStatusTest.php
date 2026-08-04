@@ -20,8 +20,8 @@ class EditorialStatusTest extends TestCase
     public function valuesReturnsAllPossibleValues(): void
     {
         self::assertSame(
-            ['draft', 'review', 'published',],
-            EditorialStatus::values()
+            ['draft', 'review', 'published'],
+            EditorialStatus::values(),
         );
     }
 

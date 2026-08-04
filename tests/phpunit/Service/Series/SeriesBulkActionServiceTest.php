@@ -42,7 +42,7 @@ class SeriesBulkActionServiceTest extends TestCase
         $this->seriesBulkActionService = new SeriesBulkActionService(
             $this->seriesRepository,
             $this->entityManager,
-            $this->createStub(WasteManagerService::class)
+            $this->createStub(WasteManagerService::class),
         );
     }
 
@@ -57,7 +57,7 @@ class SeriesBulkActionServiceTest extends TestCase
         $this->seriesBulkActionService = new SeriesBulkActionService(
             $this->seriesRepository,
             $this->entityManager,
-            $this->createStub(WasteManagerService::class)
+            $this->createStub(WasteManagerService::class),
         );
         $result = $this->seriesBulkActionService->apply('', [Uuid::uuid1()->toString()]);
         $this->assertEquals(0, $result);

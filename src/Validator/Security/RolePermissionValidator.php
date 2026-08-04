@@ -17,6 +17,7 @@ final class RolePermissionValidator
      * Validate a permission matrix.
      *
      * @param array<string, array<string, numeric-string>> $permissions
+     *
      * @return string[]
      */
     public function validate(array $permissions): array
@@ -25,19 +26,19 @@ final class RolePermissionValidator
 
         foreach ($permissions as $resource => $actions) {
             $resourceEnum = PermissionResource::tryFrom($resource);
-            if ($resourceEnum === null) {
+            if (null === $resourceEnum) {
                 continue;
             }
 
             $granted = array_map(
-                static fn(string $action): ?PermissionAction => PermissionAction::tryFrom($action),
-                array_keys(array_filter($actions))
+                static fn (string $action): ?PermissionAction => PermissionAction::tryFrom($action),
+                array_keys(array_filter($actions)),
             );
 
             // Remove invalid actions
             $granted = array_filter(
                 $granted,
-                static fn(?PermissionAction $action): bool => $action !== null
+                static fn (?PermissionAction $action): bool => null !== $action,
             );
 
             foreach ($granted as $action) {
@@ -47,7 +48,7 @@ final class RolePermissionValidator
                             '%s has %s permission but not %s.',
                             $resourceEnum->label(),
                             $action->label(),
-                            $required->label()
+                            $required->label(),
                         );
                     }
                 }
@@ -59,7 +60,7 @@ final class RolePermissionValidator
 
     /**
      * Recursively expands all requirements for an action.
-     * 
+     *
      * @return PermissionAction[]
      */
     private function expandRequirements(PermissionAction $action): array
@@ -71,12 +72,12 @@ final class RolePermissionValidator
 
             $requirements = array_merge(
                 $requirements,
-                $this->expandRequirements($required)
+                $this->expandRequirements($required),
             );
         }
 
         return array_values(
-            array_unique($requirements, SORT_REGULAR)
+            array_unique($requirements, SORT_REGULAR),
         );
     }
 }

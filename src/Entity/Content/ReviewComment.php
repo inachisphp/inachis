@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Entity\Content;
 
-use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Inachis\Entity\User\User;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
@@ -23,8 +22,8 @@ class ReviewComment
 {
     #[ORM\Id]
     #[ORM\Column(type: 'uuid_binary')]
-	#[ORM\GeneratedValue(strategy: 'CUSTOM')]
-	#[ORM\CustomIdGenerator(class: UuidGenerator::class)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     private ?UuidInterface $id = null;
 
     #[ORM\ManyToOne(targetEntity: ReviewThread::class, inversedBy: 'comments')]
@@ -39,15 +38,15 @@ class ReviewComment
     private string $message;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private DateTimeImmutable $created;
+    private \DateTimeImmutable $created;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private DateTimeImmutable $updated;
+    private \DateTimeImmutable $updated;
 
     public function __construct(
         ReviewThread $thread,
         User $author,
-        string $message
+        string $message,
     ) {
         $this->thread = $thread;
         $this->author = $author;
@@ -57,7 +56,7 @@ class ReviewComment
     #[ORM\PrePersist]
     public function prePersist(): void
     {
-        $now = new DateTimeImmutable();
+        $now = new \DateTimeImmutable();
 
         $this->created = $now;
         $this->updated = $now;
@@ -66,7 +65,7 @@ class ReviewComment
     #[ORM\PreUpdate]
     public function preUpdate(): void
     {
-        $this->updated = new DateTimeImmutable();
+        $this->updated = new \DateTimeImmutable();
     }
 
     public function getId(): ?UuidInterface
@@ -110,24 +109,24 @@ class ReviewComment
         return $this;
     }
 
-    public function getCreated(): DateTimeImmutable
+    public function getCreated(): \DateTimeImmutable
     {
         return $this->created;
     }
 
-    public function setCreated(DateTimeImmutable $created): self
+    public function setCreated(\DateTimeImmutable $created): self
     {
         $this->created = $created;
 
         return $this;
     }
 
-    public function getUpdated(): DateTimeImmutable
+    public function getUpdated(): \DateTimeImmutable
     {
         return $this->updated;
     }
 
-    public function setUpdated(DateTimeImmutable $updated): self
+    public function setUpdated(\DateTimeImmutable $updated): self
     {
         $this->updated = $updated;
 

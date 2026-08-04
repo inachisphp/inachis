@@ -32,7 +32,7 @@ final class CheckResultTest extends TestCase
             $details,
             $recommendation,
             $section,
-            $confidence
+            $confidence,
         );
 
         $this->assertSame($id, $result->id);

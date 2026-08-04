@@ -13,16 +13,12 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
- * ValidTimezoneValidator class
+ * ValidTimezoneValidator class.
  */
 class ValidTimezoneValidator extends ConstraintValidator
 {
     /**
-     * Validate the timezone
-     *
-     * @param mixed $value
-     * @param Constraint $constraint
-     * @return void
+     * Validate the timezone.
      */
     public function validate(mixed $value, Constraint $constraint): void
     {

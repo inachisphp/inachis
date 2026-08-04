@@ -17,15 +17,14 @@ use Inachis\Entity\Content\Category;
 final class CategoryImportService
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
-    ) {}
+        private EntityManagerInterface $entityManager,
+    ) {
+    }
 
     /**
      * Find a category by its full path, or optionally create missing categories.
      *
      * @param string $fullPath e.g. "Trips/Europe/France"
-     * @param bool $createIfMissing
-     * @return Category|null
      */
     public function findOrCreateByPath(string $fullPath, bool $createIfMissing = false): ?Category
     {

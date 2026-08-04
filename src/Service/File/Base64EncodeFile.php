@@ -9,32 +9,30 @@ declare(strict_types=1);
 namespace Inachis\Service\File;
 
 /**
- * Base64 encode file
+ * Base64 encode file.
  */
 class Base64EncodeFile
 {
     /**
-     * Encode file
-     *
-     * @param string $filename
-     * @return string
+     * Encode file.
      */
     public static function encode(string $filename): string
     {
-        $projectDir = realpath(__DIR__ . '/../../');
-        if ($projectDir === false) {
+        $projectDir = realpath(__DIR__.'/../../');
+        if (false === $projectDir) {
             return '';
         }
 
-        $fullPath = realpath($projectDir . '/' . ltrim('/' . $filename));
-        if ($fullPath === false || !str_starts_with($fullPath, $projectDir)) {
+        $fullPath = realpath($projectDir.'/'.ltrim('/'.$filename));
+        if (false === $fullPath || !str_starts_with($fullPath, $projectDir)) {
             return '';
         }
         $type = pathinfo($filename, PATHINFO_EXTENSION);
         $contents = file_get_contents($fullPath);
-        if ($contents === false) {
+        if (false === $contents) {
             return '';
         }
-        return 'data:image/' . $type . ';base64,' . base64_encode($contents);
+
+        return 'data:image/'.$type.';base64,'.base64_encode($contents);
     }
 }

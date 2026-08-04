@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
- * Writes all page visits to a file which is then processed by the inachis:analytics:aggregate command
+ * Writes all page visits to a file which is then processed by the inachis:analytics:aggregate command.
  */
 class AnalyticsSubscriber implements EventSubscriberInterface
 {
@@ -27,9 +27,7 @@ class AnalyticsSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Captures page views and writes them to a file
-     *
-     * @param ResponseEvent $event
+     * Captures page views and writes them to a file.
      */
     public function onResponse(ResponseEvent $event): void
     {
@@ -45,30 +43,48 @@ class AnalyticsSubscriber implements EventSubscriberInterface
         $path = $path ? rtrim($path, '/') : '';
 
         // if ($request->getMethod() !== 'GET') return;
-        if (str_starts_with($path, '/incp')) return;
-        if (str_starts_with($path, '/_profiler')) return;
-        if (str_starts_with($path, '/_wdt')) return;
-        if (str_starts_with($path, '/assets')) return;
-        if (str_starts_with($path, '/api/csp/report')) return;
+        if (str_starts_with($path, '/incp')) {
+            return;
+        }
+        if (str_starts_with($path, '/_profiler')) {
+            return;
+        }
+        if (str_starts_with($path, '/_wdt')) {
+            return;
+        }
+        if (str_starts_with($path, '/assets')) {
+            return;
+        }
+        if (str_starts_with($path, '/api/csp/report')) {
+            return;
+        }
         // if (str_starts_with($path, '/cgi-bin/')) return;
-        if (str_starts_with($path, '/.well-known/')) return;
+        if (str_starts_with($path, '/.well-known/')) {
+            return;
+        }
         // if (str_starts_with($path, '/.git/')) return;
         // if (str_starts_with($path, '/wp-content/')) return;
         // if (str_starts_with($path, '/wp-admin/')) return;
-        if (str_starts_with($path, '/llms.txt')) return;
-        if (str_starts_with($path, '/robots.txt')) return;
-        if (str_ends_with($path, '.xml')) return;
+        if (str_starts_with($path, '/llms.txt')) {
+            return;
+        }
+        if (str_starts_with($path, '/robots.txt')) {
+            return;
+        }
+        if (str_ends_with($path, '.xml')) {
+            return;
+        }
 
-        $dir = __DIR__ . '/../../var/analytics';
+        $dir = __DIR__.'/../../var/analytics';
         $this->createAnalyticsDir($dir);
         $date = date('Y-m-d');
 
         $userAgent = $request->headers->get('User-Agent', '');
         $ip = $request->getClientIp();
-        $visitorId = hash('sha256', $ip . '|' . $userAgent);
+        $visitorId = hash('sha256', $ip.'|'.$userAgent);
         $securityEvent = $this->detectSecurityEvent($path, $userAgent);
 
-        if ($securityEvent !== null) {
+        if (null !== $securityEvent) {
             $this->appendLog(sprintf('%s/security-%s.log', $dir, $date), [
                 'date' => $date,
                 'ip' => $ip,
@@ -78,15 +94,17 @@ class AnalyticsSubscriber implements EventSubscriberInterface
                 'ua' => mb_substr($userAgent, 0, 255),
                 'ts' => time(),
             ]);
+
             return;
         }
         if (preg_match('/bot|crawl|spider|slurp|wget|curl/i', $userAgent)) {
             $this->appendLog(sprintf('%s/bot-%s.log', $dir, $date), [
                 'path' => $path,
-                'ua'   => mb_substr($userAgent, 0, 255),
+                'ua' => mb_substr($userAgent, 0, 255),
                 'date' => $date,
-                'ts'   => time(),
+                'ts' => time(),
             ]);
+
             return;
         }
 
@@ -96,7 +114,7 @@ class AnalyticsSubscriber implements EventSubscriberInterface
                 'date' => $date,
                 'code' => $status,
                 // 'ref' => $request->headers->get('referer') ?? '',
-                'ts'   => time(),
+                'ts' => time(),
             ]);
 
             return;
@@ -127,7 +145,7 @@ class AnalyticsSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Creates the analytics directory
+     * Creates the analytics directory.
      *
      * @param string $dir The directory to create
      */
@@ -139,16 +157,13 @@ class AnalyticsSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Append data to specified log file
-     *
-     * @param string $filename
-     * @param array $data
+     * Append data to specified log file.
      */
     private function appendLog(string $filename, array $data): void
     {
         file_put_contents(
             $filename,
-            json_encode($data, JSON_UNESCAPED_SLASHES) . PHP_EOL,
+            json_encode($data, JSON_UNESCAPED_SLASHES).PHP_EOL,
             FILE_APPEND | LOCK_EX,
         );
     }
@@ -156,15 +171,12 @@ class AnalyticsSubscriber implements EventSubscriberInterface
     /**
      * Detect suspicious request patterns.
      *
-     * @param string $path
-     * @param string $userAgent
      * @return array{type:string,severity:int}|null
      */
     private function detectSecurityEvent(
         string $path,
-        string $userAgent
+        string $userAgent,
     ): ?array {
-
         $patterns = [
             '#(?:^|/)wp-admin(?:/|$)#i' => [
                 'type' => 'wp_probe',

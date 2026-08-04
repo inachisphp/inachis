@@ -10,42 +10,40 @@ namespace Inachis\Enum;
 
 enum EditorialStatus: string
 {
-	/**
-	 * @const string Indicates a Page is currently a draft
-	 */
-	case DRAFT = 'draft';
+    /**
+     * @var string Indicates a Page is currently a draft
+     */
+    case DRAFT = 'draft';
 
-	/**
-	 * @const string Indicates a Page is current in review
-	 */
-	case REVIEW = 'review';
+    /**
+     * @var string Indicates a Page is current in review
+     */
+    case REVIEW = 'review';
 
-	/**
-	 * @const string Indicates a Page has been published
-	 */
-	case PUBLISHED = 'published';
+    /**
+     * @var string Indicates a Page has been published
+     */
+    case PUBLISHED = 'published';
 
-	/**
-	 * Returns an array of all possible values for this enum.
-	 *
-	 * @return string[] An array of all possible values for this enum
-	 */
-	public static function values(): array
-	{
-		return array_map(fn($case) => $case->value, self::cases());
-	}
+    /**
+     * Returns an array of all possible values for this enum.
+     *
+     * @return string[] An array of all possible values for this enum
+     */
+    public static function values(): array
+    {
+        return array_map(fn ($case) => $case->value, self::cases());
+    }
 
-	/**
-	 * Returns the label for this enum value.
-	 *
-	 * @return string
-	 */
-	public function label(): string
-	{
-		return match ($this) {
-			self::DRAFT => 'Draft',
-			self::REVIEW => 'In Review',
-			self::PUBLISHED => 'Published',
-		};
-	}
+    /**
+     * Returns the label for this enum value.
+     */
+    public function label(): string
+    {
+        return match ($this) {
+            self::DRAFT => 'Draft',
+            self::REVIEW => 'In Review',
+            self::PUBLISHED => 'Published',
+        };
+    }
 }

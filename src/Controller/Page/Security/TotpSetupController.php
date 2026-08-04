@@ -28,9 +28,6 @@ class TotpSetupController extends AbstractInachisController
      *
      * Generates a temporary secret which is only persisted
      * after successful verification.
-     *
-     * @param SessionInterface $session
-     * @return Response
      */
     #[Route('/incp/security/totp/setup', name: 'incp_admin_totp_setup', methods: ['GET'])]
     public function setup(
@@ -39,7 +36,7 @@ class TotpSetupController extends AbstractInachisController
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
-        if ($user === null) {
+        if (null === $user) {
             throw $this->createAccessDeniedException();
         }
 
@@ -48,10 +45,10 @@ class TotpSetupController extends AbstractInachisController
          * the page during setup.
          */
         $existingSecret = $session->get(
-            'totp.setup.secret'
+            'totp.setup.secret',
         );
 
-        if ($existingSecret === null) {
+        if (null === $existingSecret) {
             $setup = $totpManager->beginSetup($user);
             $session->set('totp.setup.secret', $setup['secret']);
             $session->set('totp.setup.uri', $setup['uri']);
@@ -68,17 +65,12 @@ class TotpSetupController extends AbstractInachisController
 
                 'qrCode' => $session->get('totp.setup.qr'),
                 'secret' => $session->get('totp.setup.secret'),
-            ]
+            ],
         );
     }
 
     /**
      * Confirm TOTP setup.
-     *
-     * @param Request $request
-     * @param SessionInterface $session
-     * @param TrustedDeviceManager $trustedDeviceManager
-     * @return Response
      */
     #[Route('/incp/security/totp/setup', name: 'incp_admin_totp_confirm', methods: ['POST'])]
     public function confirm(
@@ -89,14 +81,14 @@ class TotpSetupController extends AbstractInachisController
         TrustedDeviceManager $trustedDeviceManager,
     ): Response {
         $user = $this->getCurrentUser();
-        if ($user === null) {
+        if (null === $user) {
             throw $this->createAccessDeniedException();
         }
 
         $secret = $session->get('totp.setup.secret');
-        if ($secret === null) {
+        if (null === $secret) {
             return $this->redirectToRoute(
-                'incp_admin_totp_confirm'
+                'incp_admin_totp_confirm',
             );
         }
 
@@ -105,12 +97,12 @@ class TotpSetupController extends AbstractInachisController
         if (!$totpManager->confirmSetup(
             $user,
             $secret,
-            $code
+            $code,
         )) {
             $this->addFlash('error', 'The authentication code was invalid.');
 
             return $this->redirectToRoute(
-                'incp_admin_totp_confirm'
+                'incp_admin_totp_confirm',
             );
         }
 
@@ -126,7 +118,7 @@ class TotpSetupController extends AbstractInachisController
 
         $this->addFlash(
             'success',
-            'Two-factor authentication has been enabled.'
+            'Two-factor authentication has been enabled.',
         );
         $codes = $recoveryCodeManager->generate($this->getCurrentUser());
         $request->getSession()->set('recovery_codes', $codes);
@@ -136,9 +128,6 @@ class TotpSetupController extends AbstractInachisController
 
     /**
      * Cancel TOTP setup.
-     *
-     * @param SessionInterface $session
-     * @return Response
      */
     #[Route('/incp/security/totp/setup/cancel', name: 'incp_admin_totp_cancel', methods: ['GET'])]
     public function cancel(

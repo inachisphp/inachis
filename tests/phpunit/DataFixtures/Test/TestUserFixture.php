@@ -8,9 +8,9 @@ declare(strict_types=1);
 
 namespace Inachis\DataFixtures\Test;
 
-use Inachis\Entity\User\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Inachis\Entity\User\User;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class TestUserFixture extends Fixture

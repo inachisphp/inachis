@@ -8,19 +8,19 @@ declare(strict_types=1);
 
 namespace Inachis\Validator;
 
-use Inachis\Model\Domain\ValidationIssue;
 use Inachis\Model\Domain\Severity;
+use Inachis\Model\Domain\ValidationIssue;
 
 /**
- * Validates DKIM records
+ * Validates DKIM records.
  */
 final class DkimValidator
 {
     /**
-     * Validates DKIM records
-     * 
+     * Validates DKIM records.
+     *
      * @param list<string> $records
-     * @param string $selector
+     *
      * @return list<ValidationIssue>
      */
     public function validate(array $records, string $selector): array
@@ -29,6 +29,7 @@ final class DkimValidator
 
         if (empty($records)) {
             $issues[] = new ValidationIssue('dkim', "No DKIM record found for selector '{$selector}'", Severity::Warning);
+
             return $issues;
         }
 
@@ -42,7 +43,7 @@ final class DkimValidator
                 $issues[] = new ValidationIssue(
                     'dkim',
                     "DKIM record for selector '{$selector}' missing or invalid version",
-                    Severity::Error
+                    Severity::Error,
                 );
                 continue;
             }
@@ -51,17 +52,17 @@ final class DkimValidator
                 $issues[] = new ValidationIssue(
                     'dkim',
                     "DKIM record for selector '{$selector}' missing public key (p=)",
-                    Severity::Error
+                    Severity::Error,
                 );
             } else {
                 $pubKey = $this->extractPublicKey($txt);
-                if ($pubKey !== null) {
+                if (null !== $pubKey) {
                     $keyLength = $this->getDkimKeyLength($pubKey);
                     if ($keyLength < 1024) {
                         $issues[] = new ValidationIssue(
                             'dkim',
                             "DKIM key for selector '{$selector}' is too short ({$keyLength} bits)",
-                            Severity::Warning
+                            Severity::Warning,
                         );
                     }
                 }
@@ -71,7 +72,7 @@ final class DkimValidator
                 $issues[] = new ValidationIssue(
                     'dkim',
                     "DKIM record for selector '{$selector}' missing key type (k=)",
-                    Severity::Warning
+                    Severity::Warning,
                 );
             }
 
@@ -81,7 +82,7 @@ final class DkimValidator
                     $issues[] = new ValidationIssue(
                         'dkim',
                         "DKIM public key contains invalid characters for selector '{$selector}'",
-                        Severity::Error
+                        Severity::Error,
                     );
                 }
             }
@@ -90,7 +91,7 @@ final class DkimValidator
                 $issues[] = new ValidationIssue(
                     'dkim',
                     "Duplicate DKIM selector '{$selector}' detected",
-                    Severity::Warning
+                    Severity::Warning,
                 );
             }
             $seenSelectors[] = $selector;
@@ -100,32 +101,30 @@ final class DkimValidator
     }
 
     /**
-     * Extract public key from DKIM record
-     * 
-     * @param string $txt
-     * @return string|null
+     * Extract public key from DKIM record.
      */
     private function extractPublicKey(string $txt): ?string
     {
         if (preg_match('/p=([A-Za-z0-9+\/=]+)/', $txt, $matches)) {
             return $matches[1];
         }
+
         return null;
     }
 
     /**
-     * Get DKIM key length
-     * 
-     * @param string $pubKey
-     * @return int
+     * Get DKIM key length.
      */
     private function getDkimKeyLength(string $pubKey): int
     {
-        $key = "-----BEGIN PUBLIC KEY-----\n" . chunk_split($pubKey, 64, "\n") . "-----END PUBLIC KEY-----";
+        $key = "-----BEGIN PUBLIC KEY-----\n".chunk_split($pubKey, 64, "\n").'-----END PUBLIC KEY-----';
         $res = openssl_pkey_get_public($key);
-        if ($res === false) return 0;
+        if (false === $res) {
+            return 0;
+        }
         /** @var array{bits?: int} $details */
         $details = openssl_pkey_get_details($res);
+
         return $details['bits'] ?? 0;
     }
 }

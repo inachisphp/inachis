@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Security\Authentication;
 
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\User\LoginActivity;
 use Inachis\Entity\User\User;
@@ -32,10 +31,6 @@ class LoginSuccessRecorder
 
     /**
      * Record a successful login.
-     *
-     * @param User $user
-     * @param Request $request
-     * @param LoginResultType $resultType
      */
     public function record(
         User $user,
@@ -45,7 +40,7 @@ class LoginSuccessRecorder
         $ip = $request->getClientIp();
         $userAgent = $request->headers->get('User-Agent');
         $sessionId = $request->getSession()->getId();
-        $fingerprint = hash('sha512', $ip . '|' . $userAgent);
+        $fingerprint = hash('sha512', $ip.'|'.$userAgent);
 
         $activity = new LoginActivity(
             $user,
@@ -57,12 +52,12 @@ class LoginSuccessRecorder
             [
                 'fingerprint' => $fingerprint,
                 'roles' => $user->getRoles(),
-            ]
+            ],
         );
 
         $isKnownDevice = $this->loginActivityRepository->deviceExists(
             $user,
-            $fingerprint
+            $fingerprint,
         );
 
         if (!$isKnownDevice && !empty($user->getEmail())) {
@@ -75,12 +70,12 @@ class LoginSuccessRecorder
                     ->context([
                         'ip' => $ip,
                         'userAgent' => $userAgent,
-                        'time' => new DateTimeImmutable(),
-                    ])
+                        'time' => new \DateTimeImmutable(),
+                    ]),
             );
         }
 
-        $user->setLastLoginAt(new DateTimeImmutable());
+        $user->setLastLoginAt(new \DateTimeImmutable());
 
         $this->entityManager->persist($activity);
         $this->entityManager->flush();

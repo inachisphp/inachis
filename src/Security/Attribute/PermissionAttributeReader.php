@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Security\Attribute;
 
-use ReflectionMethod;
-
 final class PermissionAttributeReader
 {
     /**
@@ -17,11 +15,11 @@ final class PermissionAttributeReader
      */
     public function getPermissions(object $controller, string $method): array
     {
-        $reflection = new ReflectionMethod($controller, $method);
+        $reflection = new \ReflectionMethod($controller, $method);
 
         return array_map(
             static fn ($attribute) => $attribute->newInstance(),
-            $reflection->getAttributes(RequiresPermission::class)
+            $reflection->getAttributes(RequiresPermission::class),
         );
     }
 }

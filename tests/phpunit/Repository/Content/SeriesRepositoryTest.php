@@ -8,19 +8,19 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Repository\Content;
 
-use Inachis\Entity\Content\Page;
-use Inachis\Entity\Content\Series;
-use Inachis\Entity\Media\Image;
-use Inachis\Repository\Content\SeriesRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
+use Inachis\Entity\Media\Image;
+use Inachis\Repository\Content\SeriesRepository;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -178,7 +178,7 @@ class SeriesRepositoryTest extends TestCase
             ->with(
                 $offset,
                 $limit,
-                $this->callback(fn($where) => is_array($where) && strpos($where[0], 'LIKE :keyword') !== false),
+                $this->callback(fn ($where) => is_array($where) && false !== strpos($where[0], 'LIKE :keyword')),
                 [['q.updatedAt', 'ASC']],
             )
             ->willReturn($paginator);
@@ -271,7 +271,7 @@ class SeriesRepositoryTest extends TestCase
     }
 
     /**
-     * Helper to create a mocked QueryBuilder returning a given query
+     * Helper to create a mocked QueryBuilder returning a given query.
      */
     private function mockQueryBuilder(AbstractQuery $query): QueryBuilder
     {

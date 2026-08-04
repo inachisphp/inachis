@@ -22,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'inachis:security:setup-policies',
-    description: 'Creates or updates the default security policies.'
+    description: 'Creates or updates the default security policies.',
 )]
 class SetupSecurityPoliciesCommand extends Command
 {
@@ -39,7 +39,7 @@ class SetupSecurityPoliciesCommand extends Command
             'reset',
             null,
             InputOption::VALUE_NONE,
-            'Delete all existing security policies before recreating them.'
+            'Delete all existing security policies before recreating them.',
         );
     }
 

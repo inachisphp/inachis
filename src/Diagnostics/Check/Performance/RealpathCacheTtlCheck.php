@@ -14,9 +14,20 @@ use Inachis\Service\Formatting\NumberFormatter;
 
 final class RealpathCacheTtlCheck implements CheckInterface
 {
-    public function getId(): string { return 'realpath_cache_ttl'; }
-    public function getLabel(): string { return 'Realpath Cache TTL'; }
-    public function getSection(): string { return 'Performance'; }
+    public function getId(): string
+    {
+        return 'realpath_cache_ttl';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Realpath Cache TTL';
+    }
+
+    public function getSection(): string
+    {
+        return 'Performance';
+    }
 
     public function run(): CheckResult
     {
@@ -31,10 +42,10 @@ final class RealpathCacheTtlCheck implements CheckInterface
             $this->getLabel(),
             $status,
             $value,
-            $status === 'ok' ? "Realpath cache TTL: {$humanValue}" : "Realpath cache TTL: {$humanValue} (recommended = 600)",
-            $status === 'ok' ? null : 'Set realpath_cache_ttl to 600 for optimal PHP path caching.',
+            'ok' === $status ? "Realpath cache TTL: {$humanValue}" : "Realpath cache TTL: {$humanValue} (recommended = 600)",
+            'ok' === $status ? null : 'Set realpath_cache_ttl to 600 for optimal PHP path caching.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }

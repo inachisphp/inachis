@@ -19,28 +19,29 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Form type for creating and editing user preferences
- * 
+ * Form type for creating and editing user preferences.
+ *
  * @extends AbstractType<UserPreference>
  */
 class UserPreferenceType extends AbstractType
 {
     /**
-     * Creates a new instance of {@link UserPreferenceType}
-     * 
+     * Creates a new instance of {@link UserPreferenceType}.
+     *
      * @param TranslatorInterface $translator The translator service
-     * @param Security $security The security service
+     * @param Security            $security   The security service
      */
     public function __construct(
         protected TranslatorInterface $translator,
-        protected Security $security
-    ) {}
+        protected Security $security,
+    ) {
+    }
 
     /**
-     * Builds the form
-     * 
+     * Builds the form.
+     *
      * @param FormBuilderInterface<UserPreference|null> $builder The form builder
-     * @param array<string, mixed> $options The form options
+     * @param array<string, mixed>                      $options The form options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -51,13 +52,14 @@ class UserPreferenceType extends AbstractType
                     'Dark' => 'dark',
                     'Auto' => 'auto',
                 ],
-                'choice_attr' => function($choice, $key, $value) {
+                'choice_attr' => function ($choice, $key, $value) {
                     $icons = [
                         'light' => 'light_mode',
                         'dark' => 'dark_mode',
                         'auto' => 'brightness_auto',
                     ];
-                    /** @var string $value */
+
+                    /* @var string $value */
                     return [
                         'class' => 'theme-option',
                         // 'id' => 'theme-' . $value,
@@ -94,10 +96,10 @@ class UserPreferenceType extends AbstractType
                     'Larger' => 'larger',
                     'Largest' => 'largest',
                 ],
-                'choice_attr' => function($choice, $key, $value) {
-                    /** @var string $value */
+                'choice_attr' => function ($choice, $key, $value) {
+                    /* @var string $value */
                     return [
-                        'class' => 'fontSizePreview-' . $value,
+                        'class' => 'fontSizePreview-'.$value,
                         'data-icon' => 'format_size',
                     ];
                 },
@@ -114,9 +116,9 @@ class UserPreferenceType extends AbstractType
                     'Sans' => 'sans',
                     'Serif' => 'serif',
                     'Mono' => 'mono',
-                    'Dyslexic' => 'dyslexic'
+                    'Dyslexic' => 'dyslexic',
                 ],
-                'choice_attr' => function($choice, $key, $value) {
+                'choice_attr' => function ($choice, $key, $value) {
                     /** @var string $value */
                     $icons = [
                         'sans' => 'font_download',
@@ -124,8 +126,9 @@ class UserPreferenceType extends AbstractType
                         'mono' => 'font_download',
                         'dyslexic' => 'accessibility_new',
                     ];
+
                     return [
-                        'class' => 'fontFamilyPreview-' . $value,
+                        'class' => 'fontFamilyPreview-'.$value,
                         'data-icon' => $icons[$value],
                     ];
                 },
@@ -143,10 +146,10 @@ class UserPreferenceType extends AbstractType
                     'Comfort' => 'comfort',
                     'Spacious' => 'spacious',
                 ],
-                'choice_attr' => function($choice, $key, $value) {
-                    /** @var string $value */
+                'choice_attr' => function ($choice, $key, $value) {
+                    /* @var string $value */
                     return [
-                        'class' => 'lineHeightPreview-' . $value,
+                        'class' => 'lineHeightPreview-'.$value,
                         'data-icon' => 'line_weight',
                     ];
                 },
@@ -192,15 +195,15 @@ class UserPreferenceType extends AbstractType
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> %s',
                     'save',
-                    $this->translator->trans('admin.button.save', [], 'messages')
+                    $this->translator->trans('admin.button.save', [], 'messages'),
                 ),
                 'label_html' => true,
             ]);
     }
 
     /**
-     * Configures the options for the form
-     * 
+     * Configures the options for the form.
+     *
      * @param OptionsResolver $resolver The options resolver
      */
     public function configureOptions(OptionsResolver $resolver): void

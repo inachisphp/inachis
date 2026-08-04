@@ -29,7 +29,6 @@ class MenuBuilderTest extends TestCase
      * menu provider to {@see MenuBuilder}.
      *
      * @param array<MenuProviderInterface&PluginInstallerInterface> $enabledProviders
-     * @return PluginManager
      */
     private function pluginManagerFor(array $enabledProviders): PluginManager
     {
@@ -69,7 +68,9 @@ class MenuBuilderTest extends TestCase
                 return [new MenuItem('Dashboard', '/dashboard', 0)];
             }
 
-            public function install(): void {}
+            public function install(): void
+            {
+            }
         };
 
         $builder = new MenuBuilder($this->pluginManagerFor([$provider]), [$provider]);
@@ -90,7 +91,9 @@ class MenuBuilderTest extends TestCase
                 return [new MenuItem('Home', '/', 1)];
             }
 
-            public function install(): void {}
+            public function install(): void
+            {
+            }
         };
 
         $providerB = new class implements MenuProviderInterface, PluginInstallerInterface {
@@ -99,12 +102,14 @@ class MenuBuilderTest extends TestCase
                 return [new MenuItem('About', '/about', 2)];
             }
 
-            public function install(): void {}
+            public function install(): void
+            {
+            }
         };
 
         $builder = new MenuBuilder(
             $this->pluginManagerFor([$providerA, $providerB]),
-            [$providerA, $providerB]
+            [$providerA, $providerB],
         );
 
         self::assertCount(2, $builder->build());
@@ -123,7 +128,9 @@ class MenuBuilderTest extends TestCase
                 ];
             }
 
-            public function install(): void {}
+            public function install(): void
+            {
+            }
         };
 
         $builder = new MenuBuilder($this->pluginManagerFor([$provider]), [$provider]);
@@ -143,7 +150,9 @@ class MenuBuilderTest extends TestCase
                 return [new MenuItem('Contact', '/contact', 5)];
             }
 
-            public function install(): void {}
+            public function install(): void
+            {
+            }
         };
 
         $builder = new MenuBuilder($this->pluginManagerFor([$provider]), [$provider]);
@@ -164,7 +173,9 @@ class MenuBuilderTest extends TestCase
                 return [new MenuItem('Enabled', '/enabled', 0)];
             }
 
-            public function install(): void {}
+            public function install(): void
+            {
+            }
         };
 
         // This provider is NOT registered in PluginManager, so it will be skipped
@@ -177,7 +188,7 @@ class MenuBuilderTest extends TestCase
 
         $builder = new MenuBuilder(
             $this->pluginManagerFor([$enabledProvider]),
-            [$enabledProvider, $disabledProvider]
+            [$enabledProvider, $disabledProvider],
         );
         $result = $builder->build();
 
@@ -197,7 +208,9 @@ class MenuBuilderTest extends TestCase
                 ];
             }
 
-            public function install(): void {}
+            public function install(): void
+            {
+            }
         };
 
         $builder = new MenuBuilder($this->pluginManagerFor([$provider]), [$provider]);

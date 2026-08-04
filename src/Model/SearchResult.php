@@ -8,25 +8,22 @@ declare(strict_types=1);
 
 namespace Inachis\Model;
 
-use ArrayIterator;
-use IteratorAggregate;
-use Traversable;
-
 /**
- * Model for containing search result items
- * @implements IteratorAggregate<int, array<string|int, mixed>>
+ * Model for containing search result items.
+ *
+ * @implements \IteratorAggregate<int, array<string|int, mixed>>
  */
-class SearchResult implements IteratorAggregate
+class SearchResult implements \IteratorAggregate
 {
     /**
-     * Creates a new instance of {@link SearchResult}
+     * Creates a new instance of {@link SearchResult}.
      *
      * @param list<
      *     array{id: string, title: string, sub_title: string, content: string, type: string,
      *         contentDate: string, updatedAt: string, author: string, relevance: float}
      * > $results The search results
-     * @param int $total The total number of search results
-     * @param int $limit The limit of the search results
+     * @param int $total  The total number of search results
+     * @param int $limit  The limit of the search results
      * @param int $offset The offset of the search results
      */
     public function __construct(
@@ -34,20 +31,21 @@ class SearchResult implements IteratorAggregate
         private readonly int $total,
         private readonly int $limit,
         private readonly int $offset,
-    ) {}
-
-    /**
-     * Returns an iterator for the search results
-     *
-     * @return Traversable<int, array<string|int, mixed>> The iterator for the search results
-     */
-    public function getIterator(): Traversable
-    {
-        return new ArrayIterator($this->results);
+    ) {
     }
 
     /**
-     * Returns the total number of search results
+     * Returns an iterator for the search results.
+     *
+     * @return \Traversable<int, array<string|int, mixed>> The iterator for the search results
+     */
+    public function getIterator(): \Traversable
+    {
+        return new \ArrayIterator($this->results);
+    }
+
+    /**
+     * Returns the total number of search results.
      *
      * @return int The total number of search results
      */
@@ -57,7 +55,7 @@ class SearchResult implements IteratorAggregate
     }
 
     /**
-     * Returns the offset of the search results
+     * Returns the offset of the search results.
      *
      * @return int The offset of the search results
      */
@@ -67,7 +65,7 @@ class SearchResult implements IteratorAggregate
     }
 
     /**
-     * Returns the limit of the search results
+     * Returns the limit of the search results.
      *
      * @return int The limit of the search results
      */
@@ -77,7 +75,7 @@ class SearchResult implements IteratorAggregate
     }
 
     /**
-     * Returns the search results
+     * Returns the search results.
      *
      * @return list<
      *     array{
@@ -92,15 +90,13 @@ class SearchResult implements IteratorAggregate
     }
 
     /**
-     * Updates a property of a specific search result
+     * Updates a property of a specific search result.
      *
      * @param int $key The key of the search result
-     * @param string $property
-     * @param mixed $value
      */
     public function updateResultPropertyByKey(int $key, string $property, mixed $value): void
     {
-       if (!isset($this->results[$key])) {
+        if (!isset($this->results[$key])) {
             return;
         }
 
@@ -116,25 +112,17 @@ class SearchResult implements IteratorAggregate
 
             'relevance' => $this->updateRelevanceProperty($key, $value),
 
-            default => throw new \InvalidArgumentException(
-                sprintf('Unknown property "%s"', $property)
-            ),
+            default => throw new \InvalidArgumentException(sprintf('Unknown property "%s"', $property)),
         };
     }
 
     /**
-     * Updates the properties of the result known to be a string
-     *
-     * @param int $key
-     * @param string $property
-     * @param mixed $value
+     * Updates the properties of the result known to be a string.
      */
     private function updateStringProperty(int $key, string $property, mixed $value): void
     {
         if (!is_string($value)) {
-            throw new \InvalidArgumentException(
-                sprintf('%s must be a string', $property)
-            );
+            throw new \InvalidArgumentException(sprintf('%s must be a string', $property));
         }
         match ($property) {
             'title' => $this->results[$key]['title'] = $value,
@@ -146,9 +134,7 @@ class SearchResult implements IteratorAggregate
             'updatedAt' => $this->results[$key]['updatedAt'] = $value,
             'url' => $this->results[$key]['url'] = $value,
 
-            default => throw new \InvalidArgumentException(
-                sprintf('Unknown property "%s"', $property)
-            ),
+            default => throw new \InvalidArgumentException(sprintf('Unknown property "%s"', $property)),
         };
     }
 
@@ -169,26 +155,20 @@ class SearchResult implements IteratorAggregate
     // }
 
     /**
-     * Updates the relevance property of the {@link SearchResult}
-     *
-     * @param int $key
-     * @param mixed $value
+     * Updates the relevance property of the {@link SearchResult}.
      */
-    private function updateRelevanceProperty(int $key, mixed $value): void {
+    private function updateRelevanceProperty(int $key, mixed $value): void
+    {
         if (is_string($value)) {
             if (!is_numeric($value)) {
-                throw new \InvalidArgumentException(
-                    'relevance string must be numeric'
-                );
+                throw new \InvalidArgumentException('relevance string must be numeric');
             }
 
             $value = (float) $value;
         }
 
         if (!is_float($value)) {
-            throw new \InvalidArgumentException(
-                'relevance must be a float or numeric string'
-            );
+            throw new \InvalidArgumentException('relevance must be a float or numeric string');
         }
 
         $this->results[$key]['relevance'] = $value;

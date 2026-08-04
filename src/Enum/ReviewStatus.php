@@ -10,42 +10,40 @@ namespace Inachis\Enum;
 
 enum ReviewStatus: string
 {
-	/**
-	 * @const string Indicates a review is currently open
-	 */
-	case OPEN = 'open';
+    /**
+     * @var string Indicates a review is currently open
+     */
+    case OPEN = 'open';
 
-	/**
-	 * @const string Indicates a Review has been resolved
-	 */
-	case RESOLVED = 'resolved';
+    /**
+     * @var string Indicates a Review has been resolved
+     */
+    case RESOLVED = 'resolved';
 
-	/**
-	 * @const string Indicates a Review has been closed
-	 */
-	case CLOSED = 'closed';
+    /**
+     * @var string Indicates a Review has been closed
+     */
+    case CLOSED = 'closed';
 
-	/**
-	 * Returns an array of all possible values for this enum.
-	 *
-	 * @return string[] An array of all possible values for this enum
-	 */
-	public static function values(): array
-	{
-		return array_map(fn($case) => $case->value, self::cases());
-	}
+    /**
+     * Returns an array of all possible values for this enum.
+     *
+     * @return string[] An array of all possible values for this enum
+     */
+    public static function values(): array
+    {
+        return array_map(fn ($case) => $case->value, self::cases());
+    }
 
-	/**
-	 * Returns the label for this enum value.
-	 *
-	 * @return string
-	 */
-	public function label(): string
-	{
-		return match ($this) {
-			self::OPEN => 'open',
-			self::RESOLVED => 'resolved',
-			self::CLOSED => 'closed',
-		};
-	}
+    /**
+     * Returns the label for this enum value.
+     */
+    public function label(): string
+    {
+        return match ($this) {
+            self::OPEN => 'open',
+            self::RESOLVED => 'resolved',
+            self::CLOSED => 'closed',
+        };
+    }
 }

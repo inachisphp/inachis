@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Inachis\DependencyInjection;
 
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Component\Config\FileLocator;
 
 /**
  * Extension for handling Inachis configuration.
@@ -22,7 +22,7 @@ class InachisExtension extends Extension
     {
         $loader = new YamlFileLoader(
             $container,
-            new FileLocator(__DIR__ . '/../../config')
+            new FileLocator(__DIR__.'/../../config'),
         );
         $loader->load('services.yaml');
     }

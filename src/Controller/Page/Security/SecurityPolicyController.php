@@ -21,18 +21,18 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Controller for security policy management
+ * Controller for security policy management.
  */
 class SecurityPolicyController extends AbstractInachisController
 {
     #[Route(
         '/incp/admin/security-policy',
         name: 'incp_admin_security_policy',
-        priority: 100
+        priority: 100,
     )]
     #[RequiresPermission(
         resource: PermissionResource::PASSWORD_POLICY,
-        action: PermissionAction::MANAGE
+        action: PermissionAction::MANAGE,
     )]
     public function edit(
         Request $request,
@@ -41,18 +41,13 @@ class SecurityPolicyController extends AbstractInachisController
     ): Response {
         $policies = $securityPolicyRepository->findAll();
 
-        if (count($policies) !== 3) {
-            throw new \RuntimeException(
-                sprintf(
-                    'Expected exactly 3 security policies, found %d',
-                    count($policies)
-                )
-            );
+        if (3 !== count($policies)) {
+            throw new \RuntimeException(sprintf('Expected exactly 3 security policies, found %d', count($policies)));
         }
 
         $selectedIdentifier = $request->query->getString(
             'policy',
-            'custom'
+            'custom',
         );
 
         $selectedPolicy = null;
@@ -68,14 +63,12 @@ class SecurityPolicyController extends AbstractInachisController
             throw $this->createNotFoundException();
         }
 
-
         $form = $this->createForm(
-                SecurityPolicyType::class,
-                $selectedPolicy
-            );
+            SecurityPolicyType::class,
+            $selectedPolicy,
+        );
 
         if (!$selectedPolicy->isReadOnly()) {
-
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
@@ -83,27 +76,27 @@ class SecurityPolicyController extends AbstractInachisController
 
                 $this->addFlash(
                     'success',
-                    'Security policy updated.'
+                    'Security policy updated.',
                 );
 
                 return $this->redirectToRoute(
                     'incp_admin_security_policy',
                     [
                         'policy' => $selectedPolicy->getIdentifier(),
-                    ]
+                    ],
                 );
             }
         }
 
         if (
-            $request->isMethod('POST') &&
-            $request->request->has('active_policy')
+            $request->isMethod('POST')
+            && $request->request->has('active_policy')
         ) {
             $activeId = $request->request->getString('active_policy');
 
             foreach ($policies as $policy) {
                 $policy->setActive(
-                    $policy->getId()?->toString() === $activeId
+                    $policy->getId()?->toString() === $activeId,
                 );
             }
 
@@ -111,11 +104,11 @@ class SecurityPolicyController extends AbstractInachisController
 
             $this->addFlash(
                 'success',
-                'Active security policy updated.'
+                'Active security policy updated.',
             );
 
             return $this->redirectToRoute(
-                'incp_admin_security_policy'
+                'incp_admin_security_policy',
             );
         }
 
@@ -129,7 +122,7 @@ class SecurityPolicyController extends AbstractInachisController
                 'form' => $form?->createView(),
                 'policy' => $selectedPolicy,
                 'policies' => $policies,
-            ]
+            ],
         );
     }
 }

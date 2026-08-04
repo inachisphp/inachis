@@ -34,11 +34,11 @@ final class Version20260429120000 extends AbstractMigration
         $analyticsPageView->setPrimaryKey(['id']);
         $analyticsPageView->addUniqueIndex(
             ['path', 'date'],
-            'uniq_path_date'
+            'uniq_path_date',
         );
         $analyticsPageView->addIndex(
             ['date'],
-            'idx_analytics_page_view_date'
+            'idx_analytics_page_view_date',
         );
 
         $analyticsUniqueVisitor = $schema->createTable('analytics_unique_visitor');
@@ -52,11 +52,11 @@ final class Version20260429120000 extends AbstractMigration
         $analyticsUniqueVisitor->setPrimaryKey(['id']);
         $analyticsUniqueVisitor->addUniqueIndex(
             ['visitor_hash', 'date'],
-            'uniq_visitor_date'
+            'uniq_visitor_date',
         );
         $analyticsUniqueVisitor->addIndex(
             ['date'],
-            'idx_analytics_unique_visitor_date'
+            'idx_analytics_unique_visitor_date',
         );
 
         $analyticsErrors = $schema->createTable('analytics_errors');
@@ -76,15 +76,15 @@ final class Version20260429120000 extends AbstractMigration
         $analyticsErrors->setPrimaryKey(['id']);
         $analyticsErrors->addUniqueIndex(
             ['path', 'date', 'code'],
-            'uniq_path_date_code'
+            'uniq_path_date_code',
         );
         $analyticsErrors->addIndex(
             ['date'],
-            'idx_analytics_errors_date'
+            'idx_analytics_errors_date',
         );
         $analyticsErrors->addIndex(
             ['code'],
-            'idx_analytics_errors_code'
+            'idx_analytics_errors_code',
         );
 
         $analyticsReferrer = $schema->createTable('analytics_referrer');
@@ -104,11 +104,11 @@ final class Version20260429120000 extends AbstractMigration
         $analyticsReferrer->setPrimaryKey(['id']);
         $analyticsReferrer->addUniqueIndex(
             ['domain', 'path', 'date'],
-            'uniq_domain_path_date'
+            'uniq_domain_path_date',
         );
         $analyticsReferrer->addIndex(
             ['domain'],
-            'idx_analytics_referrer_domain'
+            'idx_analytics_referrer_domain',
         );
     }
 

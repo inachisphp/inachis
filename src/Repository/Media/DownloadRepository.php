@@ -8,16 +8,16 @@ declare(strict_types=1);
 
 namespace Inachis\Repository\Media;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Inachis\Entity\Media\Download;
 use Inachis\Repository\AbstractRepository;
-use Inachis\Repository\Media\ResourceRepositoryInterface;
-use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * Download repository for managing Download entities
- * 
+ * Download repository for managing Download entities.
+ *
  * @extends AbstractRepository<Download>
-  * @implements ResourceRepositoryInterface<Download>
+ *
+ * @implements ResourceRepositoryInterface<Download>
  */
 class DownloadRepository extends AbstractRepository implements ResourceRepositoryInterface
 {

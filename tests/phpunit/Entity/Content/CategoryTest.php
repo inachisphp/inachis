@@ -134,7 +134,7 @@ class CategoryTest extends TestCase
 
         $this->assertSame(
             'Darth Vader/Luke Skywalker',
-            $child->getFullPath()
+            $child->getFullPath(),
         );
     }
 

@@ -14,7 +14,6 @@ use Inachis\Entity\Security\RolePermission;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\RoleType;
-use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Security\RoleRepository;
@@ -24,7 +23,6 @@ use Inachis\Validator\Security\RolePermissionValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 
 /**
  * Controller for managing roles and role permissions.
@@ -34,20 +32,16 @@ class RolesController extends AbstractInachisController
     /**
      * Lists all roles.
      *
-     * @param RoleRepository $roleRepository
-     * @param CategoryRepository $categoryRepository
-     * @param RoleRepository $roleRepository
-     * @param ViewStateManager $viewStateManager
      * @return Response The response the controller results in
      */
     #[Route(
         '/incp/security/roles',
         name: 'incp_admin_role_index',
-        methods: ['GET', 'POST']
+        methods: ['GET', 'POST'],
     )]
     #[RequiresPermission(
         resource: PermissionResource::ROLE,
-        action: PermissionAction::MANAGE
+        action: PermissionAction::MANAGE,
     )]
     public function index(
         Request $request,
@@ -59,20 +53,20 @@ class RolesController extends AbstractInachisController
         $form->handleRequest($request);
 
         if (
-            $form->isSubmitted() &&
-            $form->isValid() &&
-            !empty($request->request->all('items')
-        )) {
+            $form->isSubmitted()
+            && $form->isValid()
+            && !empty($request->request->all('items')
+            )) {
             $items = $request->request->all('items');
             if ($request->request->has('clone')) {
                 $count = 0;
                 foreach ($items as $roleId) {
                     $source = $roleRepository->find($roleId);
-                    if ($source === null) {
+                    if (null === $source) {
                         continue;
                     }
                     $clone = new Role();
-                    $clone->setName($source->getName() . ' (Copy)')
+                    $clone->setName($source->getName().' (Copy)')
                         ->setDescription($source->getDescription())
                         ->setDisableReview($source->isDisableReview())
                         ->setSystemRole(false);
@@ -88,12 +82,11 @@ class RolesController extends AbstractInachisController
                 }
                 $this->entityManager->flush();
                 $this->addFlash('success', "Cloned $count role(s).");
-
-            } else if ($request->request->has('delete')) {
+            } elseif ($request->request->has('delete')) {
                 $count = 0;
                 foreach ($items as $roleId) {
                     $role = $roleRepository->find($roleId);
-                    if ($role === null) {
+                    if (null === $role) {
                         continue;
                     }
                     if (!$role->canBeDeleted()) {
@@ -103,14 +96,14 @@ class RolesController extends AbstractInachisController
                                 'The role "%s" is currently assigned to %d user(s) and cannot be deleted.',
                                 $role->getName(),
                                 $role->getUserCount(),
-                            )
+                            ),
                         );
 
                         return $this->redirectToRoute(
                             'incp_admin_role_edit',
                             [
                                 'roleId' => (string) $role->getId(),
-                            ]
+                            ],
                         );
                     }
                     $this->entityManager->remove($role);
@@ -141,6 +134,7 @@ class RolesController extends AbstractInachisController
         // );
         $this->viewModel->page->title = 'Roles';
         $this->viewModel->page->tab = 'roles';
+
         return $this->render('inadmin/page/security/roles/list.html.twig', [
             'viewModel' => $this->viewModel,
             'form' => $form->createView(),
@@ -159,20 +153,17 @@ class RolesController extends AbstractInachisController
      * The route parameter {role-id} is either the UUID of an existing role
      * or the literal string "new" for creating a fresh role.
      *
-     * @param Request $request
-     * @param RoleRepository $roleRepository
-     * @param string $roleId
      * @return Response The response the controller results in
      */
     #[Route(
         '/incp/security/roles/{roleId}',
         name: 'incp_admin_role_edit',
         requirements: ['roleId' => '[0-9a-f\-]{36}|new'],
-        methods: ['GET', 'POST']
+        methods: ['GET', 'POST'],
     )]
     #[RequiresPermission(
         resource: PermissionResource::ROLE,
-        action: PermissionAction::MANAGE
+        action: PermissionAction::MANAGE,
     )]
     public function edit(
         Request $request,
@@ -180,14 +171,15 @@ class RolesController extends AbstractInachisController
         RoleRepository $roleRepository,
         string $roleId,
     ): Response {
-        $isNew = ($roleId === 'new');
+        $isNew = ('new' === $roleId);
 
         if ($isNew) {
             $role = new Role();
         } else {
             $role = $roleRepository->find($roleId);
-            if ($role === null) {
+            if (null === $role) {
                 $this->addFlash('error', 'Role not found.');
+
                 return $this->redirectToRoute('incp_admin_role_index');
             }
         }
@@ -198,8 +190,8 @@ class RolesController extends AbstractInachisController
         if ($form->isSubmitted() && $form->isValid()) {
             $delete = $form->has('delete') ? $form->get('delete') : null;
             if (
-                $delete instanceof \Symfony\Component\Form\ClickableInterface &&
-                $delete->isClicked() && !$isNew
+                $delete instanceof \Symfony\Component\Form\ClickableInterface
+                && $delete->isClicked() && !$isNew
             ) {
                 if (!$role->canBeDeleted()) {
                     $this->addFlash(
@@ -208,20 +200,21 @@ class RolesController extends AbstractInachisController
                             'The role "%s" is currently assigned to %d user(s) and cannot be deleted.',
                             $role->getName(),
                             $role->getUserCount(),
-                        )
+                        ),
                     );
 
                     return $this->redirectToRoute(
                         'incp_admin_role_edit',
                         [
                             'roleId' => (string) $role->getId(),
-                        ]
+                        ],
                     );
                 }
                 $roleName = $role->getName();
                 $this->entityManager->remove($role);
                 $this->entityManager->flush();
                 $this->addFlash('success', "Role '$roleName' has been deleted.");
+
                 return $this->redirectToRoute('incp_admin_role_index');
             }
 
@@ -229,7 +222,7 @@ class RolesController extends AbstractInachisController
             $this->syncPermissions($request, $role);
 
             $warnings = $rolePermissionValidator->validate(
-                $request->request->all('permissions')
+                $request->request->all('permissions'),
             );
 
             foreach ($warnings as $warning) {
@@ -240,6 +233,7 @@ class RolesController extends AbstractInachisController
             $this->entityManager->flush();
 
             $this->addFlash('success', 'Role saved.');
+
             return $this->redirectToRoute('incp_admin_role_edit', [
                 'roleId' => (string) $role->getId(),
             ]);
@@ -251,13 +245,14 @@ class RolesController extends AbstractInachisController
         $permissionImplications = [];
         foreach (PermissionAction::cases() as $action) {
             $permissionImplications[strtolower($action->value)] = array_map(
-                fn(PermissionAction $implied) => strtolower($implied->value),
-                $action->requires()
+                fn (PermissionAction $implied) => strtolower($implied->value),
+                $action->requires(),
             );
         }
 
         $this->viewModel->page->title = $isNew ? 'New Role' : 'Edit Role';
         $this->viewModel->page->tab = 'roles';
+
         return $this->render('inadmin/page/security/roles/edit.html.twig', [
             'viewModel' => $this->viewModel,
             'actions' => PermissionAction::cases(),
@@ -277,9 +272,6 @@ class RolesController extends AbstractInachisController
      * `permissions[{resource}][{action}]`; this method reflects those
      * checkboxes back onto the Role entity using orphan-removal to handle
      * deletions automatically.
-     *
-     * @param Request $request
-     * @param Role $role
      */
     private function syncPermissions(Request $request, Role $role): void
     {
@@ -296,7 +288,7 @@ class RolesController extends AbstractInachisController
 
         foreach ($posted as $resource => $actions) {
             $resourceEnum = PermissionResource::tryFrom($resource);
-            if ($resourceEnum === null) {
+            if (null === $resourceEnum) {
                 continue;
             }
 
@@ -304,8 +296,8 @@ class RolesController extends AbstractInachisController
                 $actionEnum = PermissionAction::tryFrom($action);
 
                 if (
-                    $actionEnum === null ||
-                    !in_array($actionEnum, $resourceEnum->actions(), true)
+                    null === $actionEnum
+                    || !in_array($actionEnum, $resourceEnum->actions(), true)
                 ) {
                     continue;
                 }
@@ -320,9 +312,8 @@ class RolesController extends AbstractInachisController
     }
 
     /**
-     * Builds the permissions matrix
+     * Builds the permissions matrix.
      *
-     * @param Role $role
      * @return array<string, array<string, string>>
      */
     private function buildPermissionMatrix(Role $role): array

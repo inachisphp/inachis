@@ -13,10 +13,8 @@ namespace Inachis\Model\Import;
  */
 final class CategoryImportResult
 {
-    /** @var int */
     public int $categoriesCreated = 0;
 
-    /** @var int */
     public int $categoriesUpdated = 0;
 
     /** @var array<string> */

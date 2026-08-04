@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Inachis\Service\Theme;
 
 /**
- * Feature registry for determining what features are available to themes
+ * Feature registry for determining what features are available to themes.
  */
 final class FeatureRegistry
 {
@@ -18,11 +18,9 @@ final class FeatureRegistry
      */
     private array $features = [];
 
-	/**
-	 * Registers a feature by name
-	 *
-	 * @param string $feature
-	 */
+    /**
+     * Registers a feature by name.
+     */
     public function register(string $feature): void
     {
         $feature = trim($feature);
@@ -34,19 +32,17 @@ final class FeatureRegistry
         $this->features[$feature] = true;
     }
 
-	/**
-	 * Returns the result of testing if a named feature is available
-	 *
-	 * @param string $feature
-	 * @return bool
-	 */
+    /**
+     * Returns the result of testing if a named feature is available.
+     */
     public function has(string $feature): bool
     {
         return isset($this->features[$feature]);
     }
 
     /**
-	 * Retuns an array of all feature names
+     * Retuns an array of all feature names.
+     *
      * @return array<string>
      */
     public function all(): array

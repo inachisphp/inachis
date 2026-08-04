@@ -32,22 +32,22 @@ class UrlControllerTest extends InachisControllerTestCase
             'offset' => '50',
             'limit' => '50',
         ], [], [], [
-            'REQUEST_URI' => '/incp/url/list/50/25'
+            'REQUEST_URI' => '/incp/url/list/50/25',
         ]);
-            $controller = $this->getMockBuilder(UrlController::class)
-            ->setConstructorArgs([
-                $this->entityManager,
-                $this->params,
-                $this->security,
-                $this->translator,
-                $this->wasteRepository,
-            ])
-            ->onlyMethods(['createFormBuilder', 'render'])
-            ->getMock();
+        $controller = $this->getMockBuilder(UrlController::class)
+        ->setConstructorArgs([
+            $this->entityManager,
+            $this->params,
+            $this->security,
+            $this->translator,
+            $this->wasteRepository,
+        ])
+        ->onlyMethods(['createFormBuilder', 'render'])
+        ->getMock();
         $controller->expects($this->once())
             ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $contentQueryParameters = $this->createMock(ContentQueryParameters::class);
         $contentQueryParameters->expects($this->once())
@@ -64,7 +64,6 @@ class UrlControllerTest extends InachisControllerTestCase
         $this->assertEquals('rendered:inadmin/page/url/list.html.twig', $result->getContent());
     }
 
-
     /**
      * @throws Exception
      */
@@ -80,7 +79,7 @@ class UrlControllerTest extends InachisControllerTestCase
             'offset' => '50',
             'limit' => '50',
         ], [], [], [
-            'REQUEST_URI' => '/incp/url/list/50/25'
+            'REQUEST_URI' => '/incp/url/list/50/25',
         ]);
         $controller = $this->getMockBuilder(UrlController::class)
             ->setConstructorArgs([
@@ -88,7 +87,7 @@ class UrlControllerTest extends InachisControllerTestCase
                 $this->params,
                 $this->security,
                 $this->translator,
-                $this->wasteRepository
+                $this->wasteRepository,
             ])
             ->onlyMethods(['addFlash', 'createFormBuilder', 'redirectToRoute'])
             ->getMock();
@@ -125,13 +124,13 @@ class UrlControllerTest extends InachisControllerTestCase
             'id' => $uuid,
             'url' => 'test-url',
         ], [], [], [], [
-            'REQUEST_URI' => '/incp/ax/check-url-usage'
+            'REQUEST_URI' => '/incp/ax/check-url-usage',
         ]);
         $urlRepository = $this->createMock(UrlRepository::class);
         $urlRepository->expects($this->once())
             ->method('findSimilarUrlsExcludingId')->willReturn([
-            [ 'link' => 'test-url' ],
-        ]);
+                ['link' => 'test-url'],
+            ]);
         $controller = new UrlController($this->entityManager, $this->params, $this->security, $this->translator, $this->wasteRepository);
         $result = $controller->checkUrlUsage($request, $urlRepository);
         $this->assertEquals('test-url-1', $result->getContent());
@@ -139,8 +138,8 @@ class UrlControllerTest extends InachisControllerTestCase
         $urlRepository = $this->createMock(UrlRepository::class);
         $urlRepository->expects($this->once())
             ->method('findSimilarUrlsExcludingId')->willReturn([
-            [ 'link' => 'test-url-3' ],
-        ]);
+                ['link' => 'test-url-3'],
+            ]);
         $result = $controller->checkUrlUsage($request, $urlRepository);
         $this->assertEquals('test-url-4', $result->getContent());
     }

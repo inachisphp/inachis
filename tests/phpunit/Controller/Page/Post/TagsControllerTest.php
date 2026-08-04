@@ -8,11 +8,9 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Controller\Page\Post;
 
-use ArrayIterator;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Inachis\Controller\Page\Post\TagsController;
-use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Tag;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\TagRepository;
@@ -101,7 +99,7 @@ class TagsControllerTest extends InachisControllerTestCase
                     $tag1,
                     $tag2,
                     $tag3,
-                ])
+                ]),
             );
 
         $response = $controller->getTagManagerListContent(
@@ -204,7 +202,7 @@ class TagsControllerTest extends InachisControllerTestCase
         $paginator
             ->expects($this->once())
             ->method('getIterator')
-            ->willReturn(new ArrayIterator($items));
+            ->willReturn(new \ArrayIterator($items));
 
         return $paginator;
     }

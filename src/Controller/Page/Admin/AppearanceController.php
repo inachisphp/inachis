@@ -17,18 +17,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Appearance controller
+ * Appearance controller.
  */
 class AppearanceController extends AbstractInachisController
 {
     /**
-     * Allow a {@link User} to change their preferences (theme, accessibility settings, etc.)
-     *
-     * @param Request $request
-     * @param UserPreferenceProvider $userPreferenceProvider
-     * @return Response
+     * Allow a {@link User} to change their preferences (theme, accessibility settings, etc.).
      */
-    #[Route("/incp/admin/theme", name: "incp_admin_theme", methods: [ "GET", "POST" ])]
+    #[Route('/incp/admin/theme', name: 'incp_admin_theme', methods: ['GET', 'POST'])]
     public function edit(Request $request, UserPreferenceProvider $userPreferenceProvider): Response
     {
         /** @var UserPreference */
@@ -48,6 +44,7 @@ class AppearanceController extends AbstractInachisController
         }
 
         $this->viewModel->page->title = 'Appearance';
+
         return $this->render('inadmin/page/admin/theme.html.twig', [
             'viewModel' => $this->viewModel,
             'form' => $form->createView(),

@@ -24,6 +24,7 @@ final class SeriesImportValidator
      * Validate an array of SeriesExportDto objects.
      *
      * @param SeriesExportDto[] $seriesList
+     *
      * @return array<int, array<string>> Warnings per series (by index)
      */
     public function validateAll(array $seriesList): array
@@ -40,7 +41,6 @@ final class SeriesImportValidator
     /**
      * Validate a single SeriesExportDto.
      *
-     * @param SeriesExportDto $dto
      * @param int $index Index in the import list (for warnings)
      */
     public function validate(SeriesExportDto $dto, int $index): void

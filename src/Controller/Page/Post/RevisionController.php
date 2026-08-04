@@ -8,16 +8,15 @@ declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Post;
 
-use DateTimeImmutable;
-use Exception;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Content\Url;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
-use Inachis\Service\Parser\ArrayToMarkdown;
-use Inachis\Repository\Content\{PageRepository, RevisionRepository};
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\RevisionRepository;
 use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\Page\RevisionDiffRenderer;
+use Inachis\Service\Parser\ArrayToMarkdown;
 use Jfcherng\Diff\DiffHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,19 +27,14 @@ use Symfony\Component\Routing\Attribute\Route;
 class RevisionController extends AbstractInachisController
 {
     /**
-     * Displays the difference between current page and the revision
-     *
-     * @param Request $request
-     * @param PageRepository $pageRepository
-     * @param RevisionRepository $revisionRepository
-     * @return Response
+     * Displays the difference between current page and the revision.
      */
-    #[Route("/incp/page/diff/{id}", methods: [ "GET" ])]
+    #[Route('/incp/page/diff/{id}', methods: ['GET'])]
     public function diff(
         Request $request,
         PageRepository $pageRepository,
         RevisionDiffRenderer $renderer,
-        RevisionRepository $revisionRepository
+        RevisionRepository $revisionRepository,
     ): Response {
         [$revision, $page] = $this->loadPageWithRevision($request, $revisionRepository, $pageRepository);
 
@@ -48,8 +42,7 @@ class RevisionController extends AbstractInachisController
         $trackChangesRaw = DiffHelper::calculate(
             $revision->getContent() ?? '',
             $page->getContent() ?? '',
-            'Json'
-            ,
+            'Json',
             [],
             [
                 'detailLevel' => 'char',
@@ -77,7 +70,6 @@ class RevisionController extends AbstractInachisController
         $this->viewModel->page->title = 'Compare Revisions';
         $this->viewModel->page->tab = 'post';
 
-
         $title = json_decode(
             DiffHelper::calculate(
                 $revision->getTitle() ?? '',
@@ -87,14 +79,14 @@ class RevisionController extends AbstractInachisController
                 [
                     'detailLevel' => 'char',
                     'outputTagAsString' => true,
-                ]
-            )
+                ],
+            ),
         );
         if (empty($title)) {
             $title = $page->getTitle();
         }
         $subTitle = json_decode(
-            DiffHelper::calculate($revision->getSubTitle() ?? '', $page->getSubTitle() ?? '', 'Json')
+            DiffHelper::calculate($revision->getSubTitle() ?? '', $page->getSubTitle() ?? '', 'Json'),
         );
         if (empty($subTitle)) {
             $subTitle = $page->getSubTitle();
@@ -102,7 +94,7 @@ class RevisionController extends AbstractInachisController
 
         $content = mb_split(
             PHP_EOL,
-            $revision->getContent() ?? ''
+            $revision->getContent() ?? '',
         );
 
         foreach ($trackChanges as $changeGroup) {
@@ -129,18 +121,14 @@ class RevisionController extends AbstractInachisController
     }
 
     /**
-     * Reverts to the selected version
+     * Reverts to the selected version.
      *
-     * @param Request $request
-     * @param PageRepository $pageRepository
-     * @param RevisionRepository $revisionRepository
-     * @return Response
-     * @throws Exception
+     * @throws \Exception
      */
-    #[Route("/incp/page/diff/{id}", methods: [ "POST" ])]
+    #[Route('/incp/page/diff/{id}', methods: ['POST'])]
     #[RequiresPermission(
         resource: PermissionResource::PAGE,
-        action: PermissionAction::EDIT
+        action: PermissionAction::EDIT,
     )]
     public function doRevert(
         Request $request,
@@ -151,7 +139,7 @@ class RevisionController extends AbstractInachisController
         $page->setTitle($revision->getTitle() ?? '')
             ->setSubTitle($revision->getSubTitle())
             ->setContent($revision->getContent())
-            ->setUpdatedAt(new DateTimeImmutable())
+            ->setUpdatedAt(new \DateTimeImmutable())
             ->setAuthor($this->getCurrentUser());
 
         $newRevision = $revisionRepository->hydrateNewRevisionFromPage($page);
@@ -167,32 +155,27 @@ class RevisionController extends AbstractInachisController
         }
 
         $this->addFlash('notice', sprintf('Content reverted to version %s.', $revision->getVersionNumber()));
+
         return $this->redirect(
-            '/incp/' .
-            $page->getType() . '/' .
-            $url->getLink()
+            '/incp/'.
+            $page->getType().'/'.
+            $url->getLink(),
         );
     }
 
     /**
-     * Downloads a copy of the specified version as .md file
-     *
-     * @param Request $request
-     * @param RevisionRepository $revisionRepository
-     * @return Response
+     * Downloads a copy of the specified version as .md file.
      */
-    #[Route("/incp/page/download/{id}", name: "incp_post_download", methods: [ "GET" ])]
+    #[Route('/incp/page/download/{id}', name: 'incp_post_download', methods: ['GET'])]
     public function download(
         Request $request,
         RevisionRepository $revisionRepository,
     ): Response {
         $revision = $revisionRepository->findOneBy([
-            'id' => $request->attributes->getString('id')
+            'id' => $request->attributes->getString('id'),
         ]);
         if (empty($revision) || empty($revision->getPage())) {
-            throw new NotFoundHttpException(
-                sprintf('Version history could not be found for %s', $request->attributes->getString('id'))
-            );
+            throw new NotFoundHttpException(sprintf('Version history could not be found for %s', $request->attributes->getString('id')));
         }
         $post = [
             'title' => $revision->getTitle(),
@@ -202,24 +185,22 @@ class RevisionController extends AbstractInachisController
 
         $response = new Response();
         $response->setContent(ArrayToMarkdown::parse($post));
-        $filename = date('YmdHis') . '.md';
+        $filename = date('YmdHis').'.md';
 
         $response->headers->set(
             'Content-Disposition',
             $response->headers->makeDisposition(
                 ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-                $filename
-            )
+                $filename,
+            ),
         );
 
         return $response;
     }
 
     /**
-     * Fetches an array containing the revision and page
+     * Fetches an array containing the revision and page.
      *
-     * @param Request $request
-     * @param RevisionRepository $revisionRepository
      * @return list{0: \Inachis\Entity\Content\Revision, 1: \Inachis\Entity\Content\Page}
      */
     private function loadPageWithRevision(
@@ -227,18 +208,14 @@ class RevisionController extends AbstractInachisController
         RevisionRepository $revisionRepository,
     ): array {
         $revision = $revisionRepository->findOneBy([
-            'id' => $request->attributes->getString('id')
+            'id' => $request->attributes->getString('id'),
         ]);
         if (empty($revision) || empty($revision->getPage())) {
-            throw new NotFoundHttpException(
-                sprintf('Version history could not be found for %s', $request->attributes->getString('id'))
-            );
+            throw new NotFoundHttpException(sprintf('Version history could not be found for %s', $request->attributes->getString('id')));
         }
         $page = $revision->getPage();
         if (empty($page) || empty($page->getId())) {
-            throw new NotFoundHttpException(
-                sprintf('Page could not be found for revision %s', $request->attributes->getString('id'))
-            );
+            throw new NotFoundHttpException(sprintf('Page could not be found for revision %s', $request->attributes->getString('id')));
         }
 
         return [$revision, $page];

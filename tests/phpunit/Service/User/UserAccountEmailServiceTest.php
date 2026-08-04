@@ -8,11 +8,11 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\User;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\User\User;
+use Inachis\Factory\PageViewFactory;
 use Inachis\Service\User\PasswordResetTokenService;
 use Inachis\Service\User\UserAccountEmailService;
-use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Factory\PageViewFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
@@ -44,7 +44,7 @@ class UserAccountEmailServiceTest extends TestCase
 
         $fakeTokenData = [
             'token' => 'XYZ123',
-            'expiresAt' => new \DateTimeImmutable('2025-01-01 15:00')
+            'expiresAt' => new \DateTimeImmutable('2025-01-01 15:00'),
         ];
 
         $this->tokenService
@@ -58,7 +58,6 @@ class UserAccountEmailServiceTest extends TestCase
         $this->mailer->expects($this->once())
             ->method('send')
             ->with($this->callback(function (TemplatedEmail $email) use ($fakeTokenData) {
-
                 $this->assertEquals('john@example.com', $email->getTo()[0]->getAddress());
                 $this->assertEquals('Welcome to ExampleSite', $email->getSubject());
                 $this->assertEquals('inadmin/emails/registration.html.twig', $email->getHtmlTemplate());
@@ -66,7 +65,7 @@ class UserAccountEmailServiceTest extends TestCase
 
                 $context = $email->getContext();
                 $this->assertEquals('John Doe', $context['name']);
-                $this->assertEquals('https://site/reset/' . $fakeTokenData['token'], $context['url']);
+                $this->assertEquals('https://site/reset/'.$fakeTokenData['token'], $context['url']);
                 $this->assertStringContainsString('data:image/png;base64,', $context['logo']);
                 $this->assertEquals('ExampleSite', $context['settings']['siteTitle']);
 
@@ -79,7 +78,7 @@ class UserAccountEmailServiceTest extends TestCase
             $this->pageViewFactory,
         );
 
-        $urlGenerator = fn(string $token) => "https://site/reset/$token";
+        $urlGenerator = fn (string $token) => "https://site/reset/$token";
 
         $service->registerNewUser($user, $this->settings, $urlGenerator);
     }
@@ -91,7 +90,7 @@ class UserAccountEmailServiceTest extends TestCase
 
         $fakeTokenData = [
             'token' => 'XYZ123',
-            'expiresAt' => new \DateTimeImmutable('2025-01-01 15:00')
+            'expiresAt' => new \DateTimeImmutable('2025-01-01 15:00'),
         ];
 
         $this->entityManager = $this->createStub(EntityManagerInterface::class);
@@ -104,14 +103,13 @@ class UserAccountEmailServiceTest extends TestCase
         $this->mailer->expects($this->once())
             ->method('send')
             ->with($this->callback(function (TemplatedEmail $email) use ($fakeTokenData) {
-
                 $this->assertEquals('john@example.com', $email->getTo()[0]->getAddress());
                 $this->assertEquals('Reset your password for ExampleSite', $email->getSubject());
                 $this->assertEquals('inadmin/emails/forgot-password.html.twig', $email->getHtmlTemplate());
                 $this->assertEquals('inadmin/emails/forgot-password.txt.twig', $email->getTextTemplate());
 
                 $context = $email->getContext();
-                $this->assertEquals('/incp/new-password/' . $fakeTokenData['token'], $context['url']);
+                $this->assertEquals('/incp/new-password/'.$fakeTokenData['token'], $context['url']);
                 $this->assertStringContainsString('data:image/png;base64,', $context['logo']);
 
                 return true;
@@ -123,7 +121,7 @@ class UserAccountEmailServiceTest extends TestCase
             $this->entityManager,
         );
 
-        $urlGenerator = fn(string $token) => "/incp/new-password/$token";
+        $urlGenerator = fn (string $token) => "/incp/new-password/$token";
         $service->sendForgotPasswordEmail($user, $this->settings, $urlGenerator);
     }
 }

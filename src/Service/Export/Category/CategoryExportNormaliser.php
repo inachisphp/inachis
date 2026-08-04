@@ -19,8 +19,9 @@ final class CategoryExportNormaliser
     /**
      * Normalises a category for export.
      *
-     * @param Category $category The category to normalise.
-     * @return CategoryExportDto The normalised category.
+     * @param Category $category the category to normalise
+     *
+     * @return CategoryExportDto the normalised category
      */
     public function normalise(Category $category): CategoryExportDto
     {

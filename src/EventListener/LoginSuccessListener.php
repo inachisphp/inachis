@@ -8,10 +8,9 @@ declare(strict_types=1);
 
 namespace Inachis\EventListener;
 
-use Inachis\Entity\User\{LoginActivity, User};
+use Inachis\Entity\User\User;
 use Inachis\Enum\Security\LoginResultType;
 use Inachis\Security\Authentication\LoginSuccessRecorder;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 /**
@@ -19,17 +18,13 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
  */
 class LoginSuccessListener
 {
-    /**
-     * @param LoginSuccessRecorder $recorder
-     */
     public function __construct(
         protected readonly LoginSuccessRecorder $recorder,
-    ) {}
+    ) {
+    }
 
     /**
      * Logs a successful login attempt.
-     *
-     * @param LoginSuccessEvent $event
      */
     public function __invoke(LoginSuccessEvent $event): void
     {
@@ -48,5 +43,5 @@ class LoginSuccessListener
             $event->getRequest(),
             LoginResultType::TYPE_SUCCESS,
         );
-    }  
+    }
 }

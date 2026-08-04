@@ -8,23 +8,24 @@ declare(strict_types=1);
 
 namespace Inachis\Repository\Content;
 
-use Inachis\Entity\Content\Page;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Inachis\Entity\Content\Page;
 
 /**
- * Interface for page repositories
+ * Interface for page repositories.
  */
 interface PageRepositoryInterface
 {
     /**
-     * Get all pages
-     * 
-     * @param int $limit  The maximum number of results to return
-     * @param int $offset The offset from which to return results from
-     * @param list{0: string, 1?:array<string, string|list<string>>}|list{} $where
-     * @param list<list{0: string, 1: string}>|string|list{} $order
-     * @param list<string>|list{} $groupBy
+     * Get all pages.
+     *
+     * @param int                                                            $limit   The maximum number of results to return
+     * @param int                                                            $offset  The offset from which to return results from
+     * @param list{0: string, 1?:array<string, string|list<string>>}|list{}  $where
+     * @param list<list{0: string, 1: string}>|string|list{}                 $order
+     * @param list<string>|list{}                                            $groupBy
      * @param list<list{0: string, 1: string, 2: string, 3?: string}>|list{} $join
+     *
      * @return Paginator<Page>
      */
     public function getAll(
@@ -33,19 +34,17 @@ interface PageRepositoryInterface
         array $where = [],
         array|string $order = [],
         array $groupBy = [],
-        array $join = []
+        array $join = [],
     ): Paginator;
 
     /**
-     * Get the maximum number of items to show in the admin interface
-     *
-     * @return int
+     * Get the maximum number of items to show in the admin interface.
      */
     public function getMaxItemsToShow(): int;
 
     /**
-     * Get all pages of a certain type, ordered by post date
-     * 
+     * Get all pages of a certain type, ordered by post date.
+     *
      * @param array{
      *   categories?:array<string>,
      *   tags?:array<string>,
@@ -57,10 +56,7 @@ interface PageRepositoryInterface
      *   toDate?:\DateTimeImmutable,
      *   expired?:string
      * } $filters
-     * @param string $type
-     * @param int $limit
-     * @param int $offset
-     * @param string $sort
+     *
      * @return Paginator<Page>
      */
     public function getFilteredOfTypeByPostDate(
@@ -68,6 +64,6 @@ interface PageRepositoryInterface
         string $type,
         int $limit,
         int $offset,
-        string $sort
+        string $sort,
     ): Paginator;
 }

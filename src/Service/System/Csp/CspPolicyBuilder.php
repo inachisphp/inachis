@@ -26,7 +26,7 @@ class CspPolicyBuilder
             }
 
             $source = $this->normalizeBlockedUri($blockedUri);
-            if ($source !== null) {
+            if (null !== $source) {
                 $policy[$directive][$source] = true;
             }
         }
@@ -46,23 +46,23 @@ class CspPolicyBuilder
     private function normalizeBlockedUri(string $uri): ?string
     {
         // Handle keywords
-        if ($uri === 'inline') {
+        if ('inline' === $uri) {
             return "'unsafe-inline'";
         }
-        if ($uri === 'eval') {
+        if ('eval' === $uri) {
             return "'unsafe-eval'";
         }
         if (in_array($uri, ['self', 'about', 'blob', 'data', 'mediastream', 'filesystem'])) {
-            return "'" . $uri . "'";
+            return "'".$uri."'";
         }
 
         // Extract host or scheme from actual URIs
         $parsed = parse_url($uri);
         if (isset($parsed['scheme']) && isset($parsed['host'])) {
             // Keep the scheme + host (ignore specific file paths/query strings)
-            return $parsed['scheme'] . '://' . $parsed['host'];
+            return $parsed['scheme'].'://'.$parsed['host'];
         }
-        
+
         if (isset($parsed['host'])) {
             return $parsed['host'];
         }
@@ -78,8 +78,9 @@ class CspPolicyBuilder
     {
         $headerParts = [];
         foreach ($compiledPolicy as $directive => $sources) {
-            $headerParts[] = $directive . ' ' . implode(' ', $sources);
+            $headerParts[] = $directive.' '.implode(' ', $sources);
         }
+
         return implode('; ', $headerParts);
     }
 }

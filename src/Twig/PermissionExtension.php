@@ -24,14 +24,12 @@ final class PermissionExtension extends AbstractExtension
 {
     /**
      * Constructor.
-     *
-     * @param PermissionManager $permissionManager
-     * @param Security $security
      */
     public function __construct(
         private readonly PermissionManager $permissionManager,
         private readonly Security $security,
-    ) {}
+    ) {
+    }
 
     /**
      * Returns the Twig functions exposed by this extension.
@@ -60,10 +58,8 @@ final class PermissionExtension extends AbstractExtension
      * If $requireAll is true, the user must have every action. Otherwise, having
      * any one action is sufficient.
      *
-     * @param PermissionResource|string $resource
      * @param PermissionAction|string|list<PermissionAction|string> $actions
-     * @param bool $requireAll Whether all actions are required.
-     * @return bool
+     * @param bool                                                  $requireAll whether all actions are required
      */
     public function can(
         PermissionResource|string $resource,
@@ -72,21 +68,21 @@ final class PermissionExtension extends AbstractExtension
     ): bool {
         /** @var \Inachis\Entity\User\User|null */
         $user = $this->security->getUser();
-        if ($user === null) {
+        if (null === $user) {
             return false;
         }
 
         $resource = $this->normaliseResource($resource);
         $actions = array_map(
             fn (PermissionAction|string $action) => $this->normaliseAction($action),
-            (array) $actions
+            (array) $actions,
         );
 
         foreach ($actions as $action) {
             $allowed = $this->permissionManager->can(
                 $user,
                 $resource,
-                $action
+                $action,
             );
 
             if ($requireAll && !$allowed) {
@@ -107,8 +103,6 @@ final class PermissionExtension extends AbstractExtension
      *     0: PermissionResource|string,
      *     1: PermissionAction|string|list<PermissionAction|string>
      * }> $checks
-     *
-     * @return bool
      */
     public function canAny(array $checks): bool
     {
@@ -117,15 +111,13 @@ final class PermissionExtension extends AbstractExtension
                 return true;
             }
         }
+
         return false;
     }
 
     /**
      * Checks if the user has permissions for any {@link PermissionResource} in
      * this group.
-     *
-     * @param PermissionGroup|string $group
-     * @return bool
      */
     public function canGroup(
         PermissionGroup|string $group,
@@ -142,10 +134,7 @@ final class PermissionExtension extends AbstractExtension
     }
 
     /**
-     * Checks if the user has any permission for the given {@link PermissionResource}
-     *
-     * @param PermissionResource|string $resource
-     * @return bool
+     * Checks if the user has any permission for the given {@link PermissionResource}.
      */
     public function canResource(
         PermissionResource|string $resource,
@@ -154,15 +143,13 @@ final class PermissionExtension extends AbstractExtension
 
         return $this->can(
             $resource,
-            $resource->actions()
+            $resource->actions(),
         );
     }
 
     /**
      * Checks if the user needs access to the Waste bin based on what resources
-     * they have delete access for
-     *
-     * @return bool
+     * they have delete access for.
      */
     public function canWaste(): bool
     {
@@ -175,10 +162,7 @@ final class PermissionExtension extends AbstractExtension
     }
 
     /**
-     * Normalise string or PermissionResource into a PermissionResource
-     *
-     * @param PermissionResource|string $resource
-     * @return PermissionResource
+     * Normalise string or PermissionResource into a PermissionResource.
      */
     private function normaliseResource(
         PermissionResource|string $resource,
@@ -191,10 +175,7 @@ final class PermissionExtension extends AbstractExtension
     }
 
     /**
-     * Normalise string or PermissionAction into a PermissionAction
-     *
-     * @param PermissionAction|string $action
-     * @return PermissionAction
+     * Normalise string or PermissionAction into a PermissionAction.
      */
     private function normaliseAction(
         PermissionAction|string $action,
@@ -207,10 +188,7 @@ final class PermissionExtension extends AbstractExtension
     }
 
     /**
-     * Normalise a string or PermissionGroup into a PermissionGroup
-     *
-     * @param PermissionGroup|string $group
-     * @return PermissionGroup
+     * Normalise a string or PermissionGroup into a PermissionGroup.
      */
     private function normaliseGroup(
         PermissionGroup|string $group,

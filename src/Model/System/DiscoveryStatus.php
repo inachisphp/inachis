@@ -18,12 +18,7 @@ class DiscoveryStatus
     public const ERROR = 'error';
 
     /**
-     * @param string $title
-     * @param string $description
-     * @param string $status
-     * @param string|null $url
      * @param array<string> $messages
-     * @param string $group
      */
     public function __construct(
         public readonly string $title,
@@ -36,19 +31,15 @@ class DiscoveryStatus
     }
 
     /**
-     * Return true/false based on the status of the Discovery item
-     *
-     * @return bool
+     * Return true/false based on the status of the Discovery item.
      */
     public function isHealthy(): bool
     {
-        return $this->status === self::SUCCESS;
+        return self::SUCCESS === $this->status;
     }
 
     /**
-     * Return the Material Icon text to use for the current status
-     *
-     * @return string
+     * Return the Material Icon text to use for the current status.
      */
     public function getStatusIcon(): string
     {

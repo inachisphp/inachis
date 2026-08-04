@@ -13,13 +13,10 @@ namespace Inachis\Service\Import\Page;
  */
 final class PageImportResult
 {
-    /** @var int */
     public int $pagesImported = 0;
 
-    /** @var int */
     public int $categoriesCreated = 0;
 
-    /** @var int */
     public int $tagsCreated = 0;
 
     /** @var list<string> */

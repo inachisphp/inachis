@@ -17,8 +17,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Builds an amdin login form
- * 
+ * Builds an amdin login form.
+ *
  * @extends AbstractType<array{
  *     loginUsername?: string,
  *     loginPassword?: string,
@@ -28,14 +28,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LoginType extends AbstractType
 {
     /**
-     * Constructor for the LoginType
-     *
-     * @param TranslatorInterface $translator
+     * Constructor for the LoginType.
      */
-    public function __construct(private readonly TranslatorInterface $translator) {}
+    public function __construct(private readonly TranslatorInterface $translator)
+    {
+    }
 
     /**
-     * Builds the login form
+     * Builds the login form.
      *
      * @param FormBuilderInterface<array{
      *     loginUsername?: string,
@@ -50,13 +50,13 @@ class LoginType extends AbstractType
             ->add('loginUsername', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'form-login__username-label',
-                    'aria-required'   => 'true',
-                    'autofocus'       => 'true',
-                    'class'           => 'text',
-                    'id'              => 'form-login__username',
-                    'placeholder'     => $this->translator->trans('admin.label.username', [], 'messages'),
+                    'aria-required' => 'true',
+                    'autofocus' => 'true',
+                    'class' => 'text',
+                    'id' => 'form-login__username',
+                    'placeholder' => $this->translator->trans('admin.label.username', [], 'messages'),
                 ],
-                'label'      => $this->translator->trans('admin.label.username', [], 'messages'),
+                'label' => $this->translator->trans('admin.label.username', [], 'messages'),
                 'label_attr' => [
                     'id' => 'form-login__username-label',
                 ],
@@ -64,12 +64,12 @@ class LoginType extends AbstractType
             ->add('loginPassword', PasswordType::class, [
                 'attr' => [
                     'aria-labelledby' => 'form-login__password-label',
-                    'aria-required'    => 'true',
-                    'class'            => 'text',
-                    'id'               => 'form-login__password',
-                    'placeholder'      => $this->translator->trans('admin.label.password'),
+                    'aria-required' => 'true',
+                    'class' => 'text',
+                    'id' => 'form-login__password',
+                    'placeholder' => $this->translator->trans('admin.label.password'),
                 ],
-                'label'      => $this->translator->trans('admin.label.password'),
+                'label' => $this->translator->trans('admin.label.password'),
                 'label_attr' => [
                     'id' => 'form-login__password-label',
                 ],
@@ -86,10 +86,10 @@ class LoginType extends AbstractType
             ->add('logIn', SubmitType::class, [
                 'label' => sprintf(
                     '<span>%s</span> <i class="material-icons">arrow_forward</i>',
-                    $this->translator->trans('admin.button.login')
+                    $this->translator->trans('admin.button.login'),
                 ),
                 'label_html' => true,
-                'attr'  => [
+                'attr' => [
                     'class' => 'button button--positive',
                 ],
             ]);
@@ -99,7 +99,7 @@ class LoginType extends AbstractType
     {
         $resolver->setDefaults([
             // uncomment if you want to bind to a class
-            //'data_class' => Login::class,
+            // 'data_class' => Login::class,
             'csrf_token_id' => 'authenticate',
         ]);
     }

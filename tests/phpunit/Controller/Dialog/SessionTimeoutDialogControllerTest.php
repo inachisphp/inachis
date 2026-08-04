@@ -10,11 +10,8 @@ namespace Inachis\Tests\phpunit\Controller\Dialog;
 
 use Inachis\Controller\Dialog\SessionTimeoutDialogController;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SessionTimeoutDialogControllerTest extends InachisControllerTestCase
 {
@@ -24,13 +21,14 @@ class SessionTimeoutDialogControllerTest extends InachisControllerTestCase
     {
         parent::setUp();
         $this->controller = new SessionTimeoutDialogController(
-                $this->entityManager,
-                $this->params,
-                $this->security,
-                $this->translator,
-                $this->wasteRepository,
+            $this->entityManager,
+            $this->params,
+            $this->security,
+            $this->translator,
+            $this->wasteRepository,
         );
     }
+
     public function testKeepAlive(): void
     {
         $result = $this->controller->keepAlive();
@@ -43,7 +41,7 @@ class SessionTimeoutDialogControllerTest extends InachisControllerTestCase
     public function testShowDialog(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incp/ax/sessionTimeout/get'
+            'REQUEST_URI' => '/incp/ax/sessionTimeout/get',
         ]);
         $this->controller = $this->getMockBuilder(SessionTimeoutDialogController::class)
             ->disableOriginalConstructor()
@@ -51,11 +49,11 @@ class SessionTimeoutDialogControllerTest extends InachisControllerTestCase
             ->getMock();
         $this->controller->expects($this->once())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $this->assertEquals(
             'rendered:inadmin/dialog/session_timeout.html.twig',
-            $this->controller->showDialog($request)->getContent()
+            $this->controller->showDialog($request)->getContent(),
         );
     }
 }

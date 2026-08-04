@@ -24,6 +24,7 @@ final class CategoryImportValidator
      * Validate an array of CategoryExportDto objects.
      *
      * @param CategoryExportDto[] $categories
+     *
      * @return array<int, array<string>> Warnings per category (by index)
      */
     public function validateAll(array $categories): array
@@ -39,9 +40,6 @@ final class CategoryImportValidator
 
     /**
      * Validate a single CategoryExportDto.
-     *
-     * @param CategoryExportDto $dto
-     * @param int $index
      */
     public function validate(CategoryExportDto $dto, int $index): void
     {

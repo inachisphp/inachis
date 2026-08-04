@@ -29,7 +29,7 @@ class UserTypeTest extends TestCase
         $builder->expects($this->atLeastOnce())
             ->method('add')
             ->willReturnCallback(function (string $name, string $type, array $options = []) use ($builder, &$capturedOptions): FormBuilderInterface {
-                if ($name === 'assignedRoles') {
+                if ('assignedRoles' === $name) {
                     $capturedOptions = $options;
                 }
 

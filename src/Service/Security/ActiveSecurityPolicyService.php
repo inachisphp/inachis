@@ -13,7 +13,9 @@ use Inachis\Entity\Security\SecurityPolicy;
 
 class ActiveSecurityPolicyService
 {
-    public function __construct(private EntityManagerInterface $entityManager) {}
+    public function __construct(private EntityManagerInterface $entityManager)
+    {
+    }
 
     public function getActivePolicy(): ?SecurityPolicy
     {

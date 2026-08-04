@@ -14,8 +14,6 @@ use Inachis\Entity\User\User;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Model\Import\ImportOptionsDto;
 use Inachis\Model\Page\PageExportDto;
-use Inachis\Service\Import\Page\PageImportResult;
-use InvalidArgumentException;
 
 /**
  * Service for importing pages.
@@ -23,46 +21,43 @@ use InvalidArgumentException;
 final class PageImportService
 {
     /**
-     * Constructor for PageImportService
-     *
-     * @param EntityManagerInterface $entityManager
-     * @param CategoryImportService $categoryService
-     * @param TagImportService $tagService
+     * Constructor for PageImportService.
      */
     public function __construct(
         private EntityManagerInterface $entityManager,
         private CategoryImportService $categoryService,
         private TagImportService $tagService,
-    ) {}
+    ) {
+    }
 
     /**
      * Imports the given pages.
      *
-     * @param iterable<PageExportDto> $pageDtos The pages to import.
-     * @param User $author The author of the pages.
-     * @param ImportOptionsDto $options The import options.
-     * @return PageImportResult The result of the import.
+     * @param iterable<PageExportDto> $pageDtos the pages to import
+     * @param User                    $author   the author of the pages
+     * @param ImportOptionsDto        $options  the import options
+     *
+     * @return PageImportResult the result of the import
      */
     public function import(
         iterable $pageDtos,
         User $author,
-        ImportOptionsDto $options
+        ImportOptionsDto $options,
     ): PageImportResult {
         $result = new PageImportResult();
         $this->entityManager->beginTransaction();
 
         try {
-
             foreach ($pageDtos['pages'] as $dto) {
                 if (!$dto instanceof PageExportDto) {
-                    throw new InvalidArgumentException('All items must be PageExportDto');
+                    throw new \InvalidArgumentException('All items must be PageExportDto');
                 }
 
                 $page = new Page(
                     title: $dto->title,
                     content: $dto->content ?? '',
                     author: $author,
-                    type: $dto->type ?? Page::TYPE_POST
+                    type: $dto->type ?? Page::TYPE_POST,
                 );
 
                 $page->setStatus(EditorialStatus::from($dto->status));
@@ -78,7 +73,7 @@ final class PageImportService
                 foreach ($dto->categories ?? [] as $categoryDto) {
                     $category = $this->categoryService->findOrCreateByPath(
                         $categoryDto->path,
-                        $options->createMissingCategories
+                        $options->createMissingCategories,
                     );
 
                     if ($category) {
@@ -86,7 +81,7 @@ final class PageImportService
 
                         // Count creation if it was newly created
                         if ($options->createMissingCategories) {
-                            $result->categoriesCreated++;
+                            ++$result->categoriesCreated;
                         }
                     } else {
                         $result->warnings[] = "Category not found: {$categoryDto->path}";
@@ -96,14 +91,14 @@ final class PageImportService
                 foreach ($dto->tags ?? [] as $tagDto) {
                     $tag = $this->tagService->findOrCreateByTitle(
                         $tagDto->title,
-                        $options->createMissingTags
+                        $options->createMissingTags,
                     );
 
                     if ($tag) {
                         $page->addTag($tag);
 
                         if ($options->createMissingTags) {
-                            $result->tagsCreated++;
+                            ++$result->tagsCreated;
                         }
                     } else {
                         $result->warnings[] = "Tag not found: {$tagDto->title}";
@@ -113,14 +108,14 @@ final class PageImportService
                 // TODO: add page URL
 
                 $this->entityManager->persist($page);
-                $result->pagesImported++;
+                ++$result->pagesImported;
             }
 
             $this->entityManager->flush();
             $this->entityManager->commit();
         } catch (\Throwable $e) {
             $this->entityManager->rollback();
-            $result->warnings[] = "Import failed: " . $e->getMessage();
+            $result->warnings[] = 'Import failed: '.$e->getMessage();
         }
 
         return $result;

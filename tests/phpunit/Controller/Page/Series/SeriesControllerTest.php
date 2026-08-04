@@ -9,13 +9,14 @@ declare(strict_types=1);
 namespace Inachis\Tests\phpunit\Controller\Page\Series;
 
 use Inachis\Controller\Page\Series\SeriesController;
-use Inachis\Entity\Content\{Page, Series};
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
 use Inachis\Entity\Media\Image;
 use Inachis\Entity\User\User;
 use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\Media\ImageRepository;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
+use Inachis\Repository\Media\ImageRepository;
 use Inachis\Service\Content\Series\SeriesBulkActionService;
 use Inachis\Service\Waste\WasteManagerService;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
@@ -39,7 +40,7 @@ class SeriesControllerTest extends InachisControllerTestCase
             'offset' => '50',
             'limit' => '25',
         ], [], [], [
-            'REQUEST_URI' => '/incp/series/list/50/25'
+            'REQUEST_URI' => '/incp/series/list/50/25',
         ]);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([
@@ -47,14 +48,14 @@ class SeriesControllerTest extends InachisControllerTestCase
                 $this->params,
                 $this->security,
                 $this->translator,
-                $this->wasteRepository
+                $this->wasteRepository,
             ])
             ->onlyMethods(['createFormBuilder', 'render'])
             ->getMock();
         $controller->expects($this->once())
             ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $contentQueryParameters = $this->createMock(ContentQueryParameters::class);
         $contentQueryParameters->expects(self::once())
@@ -72,7 +73,6 @@ class SeriesControllerTest extends InachisControllerTestCase
         $this->assertEquals('rendered:inadmin/page/series/list.html.twig', $result->getContent());
     }
 
-
     /**
      * @throws Exception
      */
@@ -88,7 +88,7 @@ class SeriesControllerTest extends InachisControllerTestCase
             'offset' => '50',
             'limit' => '25',
         ], [], [], [
-            'REQUEST_URI' => '/incp/series/list/50/25'
+            'REQUEST_URI' => '/incp/series/list/50/25',
         ]);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([
@@ -96,7 +96,7 @@ class SeriesControllerTest extends InachisControllerTestCase
                 $this->params,
                 $this->security,
                 $this->translator,
-                $this->wasteRepository
+                $this->wasteRepository,
             ])
             ->onlyMethods(['addFlash', 'createFormBuilder', 'redirectToRoute'])
             ->getMock();
@@ -133,7 +133,7 @@ class SeriesControllerTest extends InachisControllerTestCase
         $request = new Request([], [], [
             'id' => $uuid->toString(),
         ], [], [], [
-            'REQUEST_URI' => '/incp/series/edit/' . $uuid->toString(),
+            'REQUEST_URI' => '/incp/series/edit/'.$uuid->toString(),
         ]);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([
@@ -141,13 +141,13 @@ class SeriesControllerTest extends InachisControllerTestCase
                 $this->params,
                 $this->security,
                 $this->translator,
-                $this->wasteRepository
+                $this->wasteRepository,
             ])
             ->onlyMethods(['createForm', 'render'])
             ->getMock();
         $controller->expects($this->once())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $series = (new Series())->setId($uuid)->setTitle('test series');
         $seriesRepository = $this->createMock(SeriesRepository::class);
@@ -183,7 +183,7 @@ class SeriesControllerTest extends InachisControllerTestCase
                 $this->params,
                 $this->security,
                 $this->translator,
-                $this->wasteRepository
+                $this->wasteRepository,
             ])
             ->onlyMethods(['addFlash', 'createForm', 'getUser', 'redirect'])
             ->getMock();
@@ -219,20 +219,20 @@ class SeriesControllerTest extends InachisControllerTestCase
                     'image' => Uuid::uuid1()->toString(),
                     'title' => 'test series',
                     'url' => '',
-                'delete' => '',
-            ],
-        ], [
-            'id' => null,
-        ], [], [], [
-            'REQUEST_URI' => '/incp/series/new',
-        ]);
+                    'delete' => '',
+                ],
+            ], [
+                'id' => null,
+            ], [], [], [
+                'REQUEST_URI' => '/incp/series/new',
+            ]);
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([
                 $this->entityManager,
                 $this->params,
                 $this->security,
                 $this->translator,
-                $this->wasteRepository
+                $this->wasteRepository,
             ])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirect'])
             ->getMock();
@@ -265,7 +265,6 @@ class SeriesControllerTest extends InachisControllerTestCase
                     'title' => 'test series',
                     'url' => '',
                     'itemList' => [
-
                     ],
                     'remove' => '',
                 ],
@@ -280,7 +279,7 @@ class SeriesControllerTest extends InachisControllerTestCase
                 $this->params,
                 $this->security,
                 $this->translator,
-                $this->wasteRepository
+                $this->wasteRepository,
             ])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirect'])
             ->getMock();
@@ -323,14 +322,14 @@ class SeriesControllerTest extends InachisControllerTestCase
                 $this->params,
                 $this->security,
                 $this->translator,
-                $this->wasteRepository
+                $this->wasteRepository,
             ])
             ->onlyMethods(['createForm', 'render'])
             ->getMock();
         $controller->expects($this->once())
             ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $controller->method('createForm')->willReturn($form);
         $result = $controller->contents($request, $seriesRepository);

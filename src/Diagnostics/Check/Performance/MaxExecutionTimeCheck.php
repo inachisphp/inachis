@@ -13,13 +13,24 @@ use Inachis\Diagnostics\CheckResult;
 
 final class MaxExecutionTimeCheck implements CheckInterface
 {
-    public function getId(): string { return 'max_execution_time'; }
-    public function getLabel(): string { return 'Max Execution Time'; }
-    public function getSection(): string { return 'Performance'; }
+    public function getId(): string
+    {
+        return 'max_execution_time';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Max Execution Time';
+    }
+
+    public function getSection(): string
+    {
+        return 'Performance';
+    }
 
     public function run(): CheckResult
     {
-        $max = (string)(ini_get('max_execution_time') ?: '0');
+        $max = (string) (ini_get('max_execution_time') ?: '0');
         $status = $max >= 30 ? 'ok' : 'warning';
         $details = "max_execution_time: $max seconds";
 
@@ -29,9 +40,9 @@ final class MaxExecutionTimeCheck implements CheckInterface
             $status,
             $max,
             $details,
-            $status === 'ok' ? null : 'Increase max_execution_time to at least 30 seconds.',
+            'ok' === $status ? null : 'Increase max_execution_time to at least 30 seconds.',
             $this->getSection(),
-            'medium'
+            'medium',
         );
     }
 }

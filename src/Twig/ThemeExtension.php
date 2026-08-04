@@ -14,24 +14,22 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 /**
- * Theme Extension for Twig
+ * Theme Extension for Twig.
  */
 final class ThemeExtension extends AbstractExtension
 {
-	/**
-	 * Constructor for ThemeExtension
-	 *
-	 * @param ThemeManager $themeManager
-	 * @param FeatureRegistry $featureRegistry
-	 */
+    /**
+     * Constructor for ThemeExtension.
+     */
     public function __construct(
         private ThemeManager $themeManager,
         private FeatureRegistry $featureRegistry,
-    ) {}
+    ) {
+    }
 
     /**
-	 * Registers functions used by this Twig Extension
-	 *
+     * Registers functions used by this Twig Extension.
+     *
      * @return list<TwigFunction>
      */
     public function getFunctions(): array
@@ -43,34 +41,25 @@ final class ThemeExtension extends AbstractExtension
         ];
     }
 
-	/**
-	 * Returns the result of testing if named feature is enabled
-	 *
-	 * @param string $feature
-	 * @return bool
-	 */
+    /**
+     * Returns the result of testing if named feature is enabled.
+     */
     public function featureEnabled(string $feature): bool
     {
         return $this->featureRegistry->has($feature);
     }
 
-	/**
-	 * Returns the result of testing if the named plugin is enabled
-	 *
-	 * @param string $plugin
-	 * @return bool
-	 */
+    /**
+     * Returns the result of testing if the named plugin is enabled.
+     */
     public function pluginEnabled(string $plugin): bool
     {
         return $this->featureRegistry->has($plugin);
     }
 
-	/**
-	 * Returns the asset path based on the relative path
-	 *
-	 * @param string $relativePath
-	 * @return string
-	 */
+    /**
+     * Returns the asset path based on the relative path.
+     */
     public function themeAsset(string $relativePath): string
     {
         return $this->themeManager->getAssetPath($relativePath);

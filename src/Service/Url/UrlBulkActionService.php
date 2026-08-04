@@ -8,32 +8,27 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Url;
 
-use DateTimeImmutable;
-use Inachis\Entity\Content\Url;
-use Inachis\Repository\Content\UrlRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
+use Inachis\Entity\Content\Url;
+use Inachis\Repository\Content\UrlRepository;
 
 /**
- * Service for applying bulk actions to URLs
+ * Service for applying bulk actions to URLs.
  */
 readonly class UrlBulkActionService
 {
-    /**
-     * @param UrlRepository $urlRepository
-     * @param EntityManagerInterface $entityManager
-     */
     public function __construct(
         private UrlRepository $urlRepository,
         private EntityManagerInterface $entityManager,
-    ) {}
+    ) {
+    }
 
     /**
-     * Apply a bulk action to a list of URLs
+     * Apply a bulk action to a list of URLs.
      *
-     * @param string $action
      * @param array<string> $ids
-     * @return int
+     *
      * @throws OptimisticLockException
      */
     public function apply(string $action, array $ids): int
@@ -49,21 +44,18 @@ readonly class UrlBulkActionService
                 continue;
             }
             match ($action) {
-                'delete'  => $this->urlRepository->remove($url),
-                'make_default'  => $this->makeDefault($url),
+                'delete' => $this->urlRepository->remove($url),
+                'make_default' => $this->makeDefault($url),
                 default => null,
             };
-            $count++;
+            ++$count;
         }
 
         return $count;
     }
 
     /**
-     * Make a URL the default URL for its content
-     *
-     * @param Url $url
-     * @return void
+     * Make a URL the default URL for its content.
      */
     protected function makeDefault(Url $url): void
     {
@@ -72,13 +64,13 @@ readonly class UrlBulkActionService
             [
                 'content' => $url->getContent(),
                 'default' => true,
-            ]
+            ],
         );
-        if ($previous_default !== null) {
-            $previous_default->setDefault(false)->setUpdatedAt(new DateTimeImmutable());
+        if (null !== $previous_default) {
+            $previous_default->setDefault(false)->setUpdatedAt(new \DateTimeImmutable());
             $this->entityManager->persist($previous_default);
         }
-        $url->setDefault(true)->setUpdatedAt(new DateTimeImmutable());
+        $url->setDefault(true)->setUpdatedAt(new \DateTimeImmutable());
         $this->entityManager->persist($url);
         $this->entityManager->flush();
     }

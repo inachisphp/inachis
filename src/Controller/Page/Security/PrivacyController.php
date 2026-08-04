@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class PrivacyController extends AbstractInachisController
 {
     /**
-     * Default key prefix for privacy settings stored in database/cache
+     * Default key prefix for privacy settings stored in database/cache.
      */
     private const SETTING_PREFIX = 'gdpr_';
 
@@ -30,7 +30,7 @@ class PrivacyController extends AbstractInachisController
     // }
 
     /**
-     * Renders the Privacy & GDPR management page
+     * Renders the Privacy & GDPR management page.
      */
     #[Route('/incp/security/privacy', name: 'incp_security_privacy', methods: ['GET'])]
     public function index(
@@ -41,9 +41,9 @@ class PrivacyController extends AbstractInachisController
 
         // Fetch all privacy-related settings into an associative array
         $privacySettings = [
-            'banner_enabled' => 0,'consent_mode' => 'opt_in',
+            'banner_enabled' => 0, 'consent_mode' => 'opt_in',
             'anonymize_ips' => 0,
-        ];//$this->getPrivacySettings();
+        ]; // $this->getPrivacySettings();
 
         $this->viewModel->page->title = 'Privacy';
         $this->viewModel->page->tab = 'security';
@@ -55,7 +55,7 @@ class PrivacyController extends AbstractInachisController
     }
 
     /**
-     * Handles saving Privacy & GDPR configuration
+     * Handles saving Privacy & GDPR configuration.
      */
     #[Route('/incp/security/privacy/save', name: 'incp_security_privacy_save', methods: ['POST'])]
     public function save(Request $request): Response
@@ -65,6 +65,7 @@ class PrivacyController extends AbstractInachisController
 
         if (!$this->isCsrfTokenValid('privacy_save', $request->request->get('_token'))) {
             $this->addFlash('error', 'Invalid CSRF token.');
+
             return $this->redirectToRoute('incp_security_privacy');
         }
 
@@ -80,7 +81,7 @@ class PrivacyController extends AbstractInachisController
         ];
 
         foreach ($allowedSettings as $key => $value) {
-            $settingName = self::SETTING_PREFIX . $key;
+            $settingName = self::SETTING_PREFIX.$key;
             $this->settingRepository->setSetting($settingName, $value);
         }
 
@@ -93,7 +94,7 @@ class PrivacyController extends AbstractInachisController
     }
 
     /**
-     * Handles Subject Access Request (SAR) Personal Data Export
+     * Handles Subject Access Request (SAR) Personal Data Export.
      */
     #[Route('/incp/security/privacy/export-user', name: 'incp_security_privacy_export_user', methods: ['POST'])]
     public function exportUserData(Request $request): Response
@@ -130,7 +131,7 @@ class PrivacyController extends AbstractInachisController
     }
 
     /**
-     * Handles Right to be Forgotten / User Anonymization
+     * Handles Right to be Forgotten / User Anonymization.
      */
     #[Route('/incp/security/privacy/anonymize-user', name: 'incp_security_privacy_anonymize_user', methods: ['POST'])]
     public function anonymizeUser(Request $request): Response
@@ -139,6 +140,7 @@ class PrivacyController extends AbstractInachisController
 
         if (!$this->isCsrfTokenValid('anonymize_user', $request->request->get('_token'))) {
             $this->addFlash('error', 'Invalid CSRF token.');
+
             return $this->redirectToRoute('incp_security_privacy');
         }
 
@@ -147,6 +149,7 @@ class PrivacyController extends AbstractInachisController
 
         if (!$user) {
             $this->addFlash('error', sprintf('User "%s" not found.', $emailOrUsername));
+
             return $this->redirectToRoute('incp_security_privacy');
         }
 
@@ -165,7 +168,7 @@ class PrivacyController extends AbstractInachisController
     }
 
     /**
-     * Helper to load privacy settings into an associative array
+     * Helper to load privacy settings into an associative array.
      */
     private function getPrivacySettings(): array
     {
@@ -179,7 +182,7 @@ class PrivacyController extends AbstractInachisController
 
         $settings = [];
         foreach ($keys as $key => $default) {
-            $settingName = self::SETTING_PREFIX . $key;
+            $settingName = self::SETTING_PREFIX.$key;
             $setting = $this->settingRepository->findOneByName($settingName);
 
             $settings[$key] = $setting?->getValue() ?? $default;

@@ -8,79 +8,70 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Content\Page;
 
-use Inachis\Entity\Content\{Page, Url};
+use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Url;
 use Inachis\Entity\User\User;
 use Inachis\Model\BulkCreateData;
-use Inachis\Repository\Content\{CategoryRepository, SeriesRepository, TagRepository};
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Content\SeriesRepository;
+use Inachis\Repository\Content\TagRepository;
 use Inachis\Service\Formatting\UrlNormaliser;
-use DateInterval;
-use DatePeriod;
-use DateTimeImmutable;
-use Doctrine\ORM\EntityManagerInterface;
-use Exception;
-use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 
 /**
- * Service for bulk creating pages
+ * Service for bulk creating pages.
  */
 class PageBulkCreateService
 {
     /**
-     * Creates a new instance of the PageBulkCreateService
-     *
-     * @param EntityManagerInterface $entityManager
-     * @param SeriesRepository $seriesRepository
-     * @param TagRepository $tagRepository
-     * @param CategoryRepository $categoryRepository
+     * Creates a new instance of the PageBulkCreateService.
      */
     public function __construct(
         private EntityManagerInterface $entityManager,
         private SeriesRepository $seriesRepository,
         private TagRepository $tagRepository,
         private CategoryRepository $categoryRepository,
-    ) {}
+    ) {
+    }
 
     /**
-     * Creates pages in bulk
+     * Creates pages in bulk.
      *
-     * @param BulkCreateData $data
-     * @param User $author
-     * @return int
-     * @throws Exception
+     * @throws \Exception
      */
     public function create(BulkCreateData $data, User $author): int
     {
         $series = $this->seriesRepository->find($data->seriesId);
         if (!$series) {
-            throw new InvalidArgumentException('Series not found');
+            throw new \InvalidArgumentException('Series not found');
         }
 
-        if ($series->getFirstDate() === null || $series->getFirstDate() > $data->startDate) {
+        if (null === $series->getFirstDate() || $series->getFirstDate() > $data->startDate) {
             $series->setFirstDate($data->startDate);
         }
-        if ($series->getLastDate() === null || $series->getLastDate() < $data->endDate) {
+        if (null === $series->getLastDate() || $series->getLastDate() < $data->endDate) {
             $series->setLastDate($data->endDate);
         }
 
-        $period = new DatePeriod(
+        $period = new \DatePeriod(
             $data->startDate,
-            new DateInterval('P1D'),
-            (clone $data->endDate)->modify('+1 day')
+            new \DateInterval('P1D'),
+            (clone $data->endDate)->modify('+1 day'),
         );
         $count = 0;
 
         foreach ($period as $i => $date) {
-            $count++;
-            $title = $data->title . ($data->addDayNumber ? ' Day ' . ($i + 1) : '');
+            ++$count;
+            $title = $data->title.($data->addDayNumber ? ' Day '.($i + 1) : '');
 
             $post = new Page($title);
             $post->setPostDate($date);
-            $post->setUpdatedAt(new DateTimeImmutable());
+            $post->setUpdatedAt(new \DateTimeImmutable());
             $post->setAuthor($author);
             $post->addUrl(new Url(
                 $post,
-                $post->getPostDateAsLink() . '/' . UrlNormaliser::toUri($title)
+                $post->getPostDateAsLink().'/'.UrlNormaliser::toUri($title),
             ));
             foreach ($data->tags as $newTag) {
                 if (Uuid::isValid($newTag)) {
@@ -89,11 +80,11 @@ class PageBulkCreateService
                     $tag = $this->tagRepository->getOrCreate($newTag);
                 }
 
-                if ($tag !== null) {
+                if (null !== $tag) {
                     $post->addTag($tag);
                 }
             }
-            foreach($data->categories as $newCategory) {
+            foreach ($data->categories as $newCategory) {
                 $category = null;
                 if (Uuid::isValid($newCategory)) {
                     $category = $this->categoryRepository->findOneBy(['id' => $newCategory]);
@@ -109,6 +100,7 @@ class PageBulkCreateService
             $this->entityManager->persist($series);
             $this->entityManager->flush();
         }
+
         return $count;
     }
 }

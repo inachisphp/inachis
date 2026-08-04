@@ -25,5 +25,6 @@ final readonly class UpdatePlan
         public array $migrations,
         public bool $requiresMigration,
         public string $type = 'core',
-    ) {}
+    ) {
+    }
 }

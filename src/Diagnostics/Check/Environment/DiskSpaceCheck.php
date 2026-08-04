@@ -14,9 +14,20 @@ use Inachis\Service\Formatting\NumberFormatter;
 
 final class DiskSpaceCheck implements CheckInterface
 {
-    public function getId(): string { return 'disk_space'; }
-    public function getLabel(): string { return 'Disk Free Space'; }
-    public function getSection(): string { return 'Environment'; }
+    public function getId(): string
+    {
+        return 'disk_space';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Disk Free Space';
+    }
+
+    public function getSection(): string
+    {
+        return 'Environment';
+    }
 
     public function run(): CheckResult
     {
@@ -31,9 +42,9 @@ final class DiskSpaceCheck implements CheckInterface
             $status,
             $freeMB,
             $details,
-            $status === 'ok' ? null : 'Disk space is low; consider cleaning logs or temp files.',
+            'ok' === $status ? null : 'Disk space is low; consider cleaning logs or temp files.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }

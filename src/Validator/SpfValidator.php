@@ -8,26 +8,28 @@ declare(strict_types=1);
 
 namespace Inachis\Validator;
 
-use Inachis\Model\Domain\ValidationIssue;
 use Inachis\Model\Domain\Severity;
+use Inachis\Model\Domain\ValidationIssue;
 
 /**
- * SPF validator
+ * SPF validator.
  */
 final class SpfValidator
 {
     /**
-     * Validate SPF records
+     * Validate SPF records.
      *
      * @param list<string> $spfRecords
+     *
      * @return list<ValidationIssue>
      */
     public function validate(array $spfRecords): array
     {
         $issues = [];
 
-        if ($spfRecords === []) {
+        if ([] === $spfRecords) {
             $issues[] = new ValidationIssue('spf', 'No SPF record found', Severity::Error);
+
             return $issues;
         }
 
@@ -64,18 +66,17 @@ final class SpfValidator
         if ($lookupCount > 10) {
             $issues[] = new ValidationIssue('spf', "SPF exceeds 10 DNS lookups ($lookupCount found)", Severity::Error);
         }
+
         return $issues;
     }
 
-	/**
-	 * Count DNS lookups in SPF record
-	 *
-	 * @param string $spf
-	 * @return int
-	 */
-	private function countLookups(string $spf): int
-	{
-		preg_match_all('/include:|a:|mx:|exists:|redirect=/', $spf, $matches);
+    /**
+     * Count DNS lookups in SPF record.
+     */
+    private function countLookups(string $spf): int
+    {
+        preg_match_all('/include:|a:|mx:|exists:|redirect=/', $spf, $matches);
+
         return count($matches[0]);
-	}
+    }
 }

@@ -18,17 +18,17 @@ class UserTotp
     /** @var UuidInterface|null The unique identifier for the {@link UserTotp} */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
-    #[ORM\GeneratedValue(strategy: "CUSTOM")]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     private ?UuidInterface $id = null;
 
     #[ORM\OneToOne(
         targetEntity: User::class,
-        inversedBy: 'totp'
+        inversedBy: 'totp',
     )]
     #[ORM\JoinColumn(
         nullable: false,
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
     )]
     private User $user;
 
@@ -66,6 +66,7 @@ class UserTotp
     public function setId(UuidInterface $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -77,6 +78,7 @@ class UserTotp
     public function setUser(User $user): self
     {
         $this->user = $user;
+
         return $this;
     }
 
@@ -100,6 +102,7 @@ class UserTotp
     public function setEncryptedSecret(?string $encryptedSecret): self
     {
         $this->encryptedSecret = $encryptedSecret;
+
         return $this;
     }
 
@@ -123,6 +126,7 @@ class UserTotp
     public function setEnabledAt(?\DateTimeImmutable $enabledAt): self
     {
         $this->enabledAt = $enabledAt;
+
         return $this;
     }
 
@@ -134,6 +138,7 @@ class UserTotp
     public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -145,12 +150,13 @@ class UserTotp
     public function setLastUsedAt(?\DateTimeImmutable $lastUsedAt): self
     {
         $this->lastUsedAt = $lastUsedAt;
+
         return $this;
     }
 
     public function hasSecret(): bool
     {
-        return $this->encryptedSecret !== null
-            && $this->encryptedKey !== null;
+        return null !== $this->encryptedSecret
+            && null !== $this->encryptedKey;
     }
 }

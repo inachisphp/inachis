@@ -18,27 +18,23 @@ class LlmsTxtGenerator
 {
     /**
      * Construct the generator.
-     *
-     * @param SettingRepository $settingRepository
-     * @param RequestStack $requestStack
      */
     public function __construct(
         private readonly SettingRepository $settingRepository,
         private readonly RequestStack $requestStack,
-    ) {}
+    ) {
+    }
 
     /**
      * Generate the llms.txt content.
-     *
-     * @return string
      */
     public function generate(): string
     {
         $content = trim(
-            $this->settingRepository->getValue('llms_txt') ?? ''
+            $this->settingRepository->getValue('llms_txt') ?? '',
         );
 
-        if ($content === '') {
+        if ('' === $content) {
             $content = $this->generateDefault();
         }
 
@@ -47,30 +43,28 @@ class LlmsTxtGenerator
 
     /**
      * Generate a default llms.txt document.
-     *
-     * @return string
      */
     private function generateDefault(): string
     {
         $title = trim(
             $this->settingRepository->getValue('site_title')
-            ?? 'Website'
+            ?? 'Website',
         );
 
         $description = trim(
             $this->settingRepository->getValue('site_description')
-            ?? ''
+            ?? '',
         );
 
         $content = sprintf(
-            "# %s",
-            $title
+            '# %s',
+            $title,
         );
 
-        if ($description !== '') {
+        if ('' !== $description) {
             $content .= sprintf(
                 "\n\n> %s",
-                $description
+                $description,
             );
         }
 
@@ -81,9 +75,6 @@ class LlmsTxtGenerator
 
     /**
      * Append standard resources if they are not already present.
-     *
-     * @param string $content
-     * @return string
      */
     private function appendResources(string $content): string
     {
@@ -104,40 +95,34 @@ class LlmsTxtGenerator
             $resources[] = sprintf('RSS: %s', $feed);
         }
 
-        if ($resources !== []) {
-            $content .= "\n\n" . implode(
+        if ([] !== $resources) {
+            $content .= "\n\n".implode(
                 "\n",
-                $resources
+                $resources,
             );
         }
 
-        return rtrim($content) . PHP_EOL;
+        return rtrim($content).PHP_EOL;
     }
 
     /**
      * Get the sitemap URL.
-     *
-     * @return string
      */
     private function getSitemapUrl(): string
     {
-        return $this->getBaseUrl() . '/sitemap.xml';
+        return $this->getBaseUrl().'/sitemap.xml';
     }
 
     /**
      * Get the RSS feed URL if available.
-     *
-     * @return string|null
      */
     private function getFeedUrl(): ?string
     {
-        return $this->getBaseUrl() . '/feed';
+        return $this->getBaseUrl().'/feed';
     }
 
     /**
      * Get the current site base URL.
-     *
-     * @return string
      */
     private function getBaseUrl(): string
     {

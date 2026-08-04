@@ -14,41 +14,41 @@ use Inachis\Enum\Security\PermissionResource;
 use Inachis\Security\Authorisation\PermissionResolver;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Form for editing a navigation tab
- * 
+ * Form for editing a navigation tab.
+ *
  * @extends AbstractType<NavigationTab>
  */
 class NavigationTabType extends AbstractType
 {
     /**
-     * Constructor for the NavigationTabType form
-     *
-     * @param TranslatorInterface $translator
+     * Constructor for the NavigationTabType form.
      */
     public function __construct(
         private PermissionResolver $permissionResolver,
         private Security $security,
         private TranslatorInterface $translator,
-    ) {}
+    ) {
+    }
 
     /**
-     * Build the form
+     * Build the form.
+     *
      * @param FormBuilderInterface<NavigationTab|null> $builder
-     * @param array<string, mixed> $options
+     * @param array<string, mixed>                     $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $user = $this->security->getUser();
-        $newItem = !$options['data'] instanceof NavigationTab || 
-            empty($options['data']->getId());
+        $newItem = !$options['data'] instanceof NavigationTab
+            || empty($options['data']->getId());
         $allowEdit = $this->permissionResolver->hasPermission(
             $user,
             PermissionResource::NAVIGATION,
@@ -109,7 +109,7 @@ class NavigationTabType extends AbstractType
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> %s',
                     'save',
-                    $this->translator->trans('admin.button.save', [], 'messages')
+                    $this->translator->trans('admin.button.save', [], 'messages'),
                 ),
                 'label_html' => true,
             ]);
@@ -117,7 +117,7 @@ class NavigationTabType extends AbstractType
     }
 
     /**
-     * Configure the options for the form
+     * Configure the options for the form.
      */
     public function configureOptions(OptionsResolver $resolver): void
     {

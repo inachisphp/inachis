@@ -8,38 +8,34 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Navigation;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\System\NavigationTab;
 use Inachis\Model\NavigationTabDto;
 use Inachis\Repository\System\NavigationTabRepository;
 use Inachis\Service\Doctrine\TransactionHelper;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
- * Service for managing navigation tabs
+ * Service for managing navigation tabs.
  */
 class NavigationTabService
 {
     private const CACHE_KEY = 'navigation_tabs';
 
     /**
-     * Constructor
-     *
-     * @param NavigationTabRepository $repository
-     * @param CacheInterface $cache
-     * @param EntityManagerInterface $entityManager
-     * @param TransactionHelper $transactionHelper
+     * Constructor.
      */
     public function __construct(
         private NavigationTabRepository $repository,
         private CacheInterface $cache,
         private EntityManagerInterface $entityManager,
         private TransactionHelper $transactionHelper,
-    ) {}
+    ) {
+    }
 
     /**
-     * Get all active navigation tabs ordered by position
+     * Get all active navigation tabs ordered by position.
      *
      * @return list<NavigationTabDto>
      */
@@ -47,12 +43,13 @@ class NavigationTabService
     {
         return $this->cache->get(self::CACHE_KEY, function (ItemInterface $item) {
             $item->expiresAfter(null);
+
             return $this->repository->findActiveOrderedModels();
         });
     }
 
     /**
-     * Clear the navigation cache
+     * Clear the navigation cache.
      */
     public function clearCache(): void
     {
@@ -60,18 +57,14 @@ class NavigationTabService
     }
 
     /**
-     * Add or update a navigation tab
-     *
-     * @param NavigationTab $tab
-     * @return void
+     * Add or update a navigation tab.
      */
     public function add(NavigationTab $tab): void
     {
         $this->transactionHelper->executeInTransaction(function () use ($tab) {
-
-            if ($tab->getId() === null) {
+            if (null === $tab->getId()) {
                 $tab->setPosition(
-                    $this->repository->getMaxPosition() + 1
+                    $this->repository->getMaxPosition() + 1,
                 );
 
                 $this->entityManager->persist($tab);
@@ -105,9 +98,8 @@ class NavigationTabService
     }
 
     /**
-     * Move a tab up or down
+     * Move a tab up or down.
      *
-     * @param NavigationTab $tab
      * @param int $direction -1 for up, 1 for down
      */
     private function move(NavigationTab $tab, int $direction): void
@@ -134,21 +126,15 @@ class NavigationTabService
     }
 
     /**
-     * Move a navigation tab up
-     *
-     * @param NavigationTab $tab
-     * @return void
+     * Move a navigation tab up.
      */
     public function moveUp(NavigationTab $tab): void
     {
-         $this->move($tab, -1);
+        $this->move($tab, -1);
     }
 
     /**
-     * Move a navigation tab down
-     *
-     * @param NavigationTab $tab
-     * @return void
+     * Move a navigation tab down.
      */
     public function moveDown(NavigationTab $tab): void
     {
@@ -156,9 +142,10 @@ class NavigationTabService
     }
 
     /**
-     * Reorder navigation tabs based on input data
+     * Reorder navigation tabs based on input data.
      *
      * @param array{id?: string, order?: list<string>} $data
+     *
      * @return bool True if any changes were made
      */
     public function reorderTabs(array $data): bool
@@ -202,9 +189,8 @@ class NavigationTabService
         return true;
     }
 
-
     /**
-     * Normalise the positions of all navigation tabs
+     * Normalise the positions of all navigation tabs.
      */
     public function normalisePositions(): void
     {
@@ -217,9 +203,7 @@ class NavigationTabService
     }
 
     /**
-     * Delete navigation tabs
-     *
-     * @param NavigationTab $tab
+     * Delete navigation tabs.
      */
     private function delete(NavigationTab $tab): void
     {
@@ -230,11 +214,9 @@ class NavigationTabService
     }
 
     /**
-     * Apply an action to navigation tabs
+     * Apply an action to navigation tabs.
      *
-     * @param string $action
      * @param array<string> $ids
-     * @return int
      */
     public function apply(string $action, array $ids): int
     {
@@ -247,12 +229,12 @@ class NavigationTabService
                     continue;
                 }
                 match ($action) {
-                    'delete'  => $this->delete($tab),
-                    'enable'  => $tab->setIsActive(true),
+                    'delete' => $this->delete($tab),
+                    'enable' => $tab->setIsActive(true),
                     'disable' => $tab->setIsActive(false),
-                    default   => null,
+                    default => null,
                 };
-                $count++;
+                ++$count;
             }
             $this->entityManager->flush();
             $this->clearCache();

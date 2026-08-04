@@ -15,15 +15,14 @@ use Symfony\Component\Routing\Attribute\Route;
 class SecurityIndexController extends AbstractInachisController
 {
     /**
-     * List of setting pages
-     *
-     * @return Response
+     * List of setting pages.
      */
-    #[Route("/incp/security", name: 'incp_security_list')]
+    #[Route('/incp/security', name: 'incp_security_list')]
     public function index(): Response
     {
         $this->viewModel->page->title = 'Security & Privacy';
         $this->viewModel->page->tab = 'security';
+
         return $this->render('inadmin/page/security/list.html.twig', [
             'viewModel' => $this->viewModel,
         ]);

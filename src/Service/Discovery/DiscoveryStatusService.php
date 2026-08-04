@@ -22,7 +22,7 @@ class DiscoveryStatusService
      */
     public function __construct(
         #[AutowireIterator('inachis.discovery_checker')]
-        private readonly iterable $checkers
+        private readonly iterable $checkers,
     ) {
     }
 
@@ -41,9 +41,7 @@ class DiscoveryStatusService
     }
 
     /**
-     * Returns site discoery status by groups
-     *
-     * @return array
+     * Returns site discoery status by groups.
      */
     public function getGroupedStatus(): array
     {

@@ -10,43 +10,43 @@ namespace Inachis\Diagnostics\Check\Security;
 
 use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
-use OpenSSLCertificate;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final class TlsCertificateExpiryCheck implements CheckInterface
 {
     /**
-     * Constructor the check
-     *
-     * @param RequestStack $requestStack
+     * Constructor the check.
      */
-    public function __construct(private readonly RequestStack $requestStack) {}
+    public function __construct(private readonly RequestStack $requestStack)
+    {
+    }
 
     /**
-     * Returns the id of the check
-     *
-     * @return string
+     * Returns the id of the check.
      */
-    public function getId(): string { return 'tls_certificate_expiry'; }
+    public function getId(): string
+    {
+        return 'tls_certificate_expiry';
+    }
 
     /**
-     * Returns a friendly name for the check
-     *
-     * @return string
+     * Returns a friendly name for the check.
      */
-    public function getLabel(): string { return 'TLS Certificate Expiry'; }
+    public function getLabel(): string
+    {
+        return 'TLS Certificate Expiry';
+    }
 
     /**
-     * Returns the section name this check appears under
-     *
-     * @return string
+     * Returns the section name this check appears under.
      */
-    public function getSection(): string { return 'Security'; }
+    public function getSection(): string
+    {
+        return 'Security';
+    }
 
     /**
-     * Runs the check
-     *
-     * @return CheckResult
+     * Runs the check.
      */
     public function run(): CheckResult
     {
@@ -61,7 +61,7 @@ final class TlsCertificateExpiryCheck implements CheckInterface
                 'No active request available.',
                 null,
                 $this->getSection(),
-                'high'
+                'high',
             );
         }
 
@@ -82,7 +82,7 @@ final class TlsCertificateExpiryCheck implements CheckInterface
                 $errstr,
                 10,
                 STREAM_CLIENT_CONNECT,
-                $context
+                $context,
             );
 
             if (!$client) {
@@ -96,7 +96,7 @@ final class TlsCertificateExpiryCheck implements CheckInterface
 
             $certificate = $ssl['peer_certificate'] ?? null;
 
-            if (!$certificate || !($certificate instanceof OpenSSLCertificate || is_string($certificate))) {
+            if (!$certificate || !($certificate instanceof \OpenSSLCertificate || is_string($certificate))) {
                 throw new \RuntimeException('Certificate not available');
             }
 
@@ -110,7 +110,7 @@ final class TlsCertificateExpiryCheck implements CheckInterface
             $expiryTimestamp = (int) $parsed['validTo_time_t'] ?: 0;
 
             $daysRemaining = (int) floor(
-                ($expiryTimestamp - time()) / 86400
+                ($expiryTimestamp - time()) / 86400,
             );
 
             $expiryDate = (new \DateTimeImmutable())
@@ -126,11 +126,11 @@ final class TlsCertificateExpiryCheck implements CheckInterface
                     sprintf(
                         'Certificate for %s expired on %s.',
                         $host,
-                        $expiryDate
+                        $expiryDate,
                     ),
                     'Renew the TLS certificate immediately.',
                     $this->getSection(),
-                    'high'
+                    'high',
                 );
             }
 
@@ -139,15 +139,15 @@ final class TlsCertificateExpiryCheck implements CheckInterface
                     $this->getId(),
                     $this->getLabel(),
                     'error',
-                    $daysRemaining . ' days',
+                    $daysRemaining.' days',
                     sprintf(
                         'Certificate for %s expires on %s.',
                         $host,
-                        $expiryDate
+                        $expiryDate,
                     ),
                     'Renew the certificate as soon as possible.',
                     $this->getSection(),
-                    'high'
+                    'high',
                 );
             }
 
@@ -156,15 +156,15 @@ final class TlsCertificateExpiryCheck implements CheckInterface
                     $this->getId(),
                     $this->getLabel(),
                     'warning',
-                    $daysRemaining . ' days',
+                    $daysRemaining.' days',
                     sprintf(
                         'Certificate for %s expires on %s.',
                         $host,
-                        $expiryDate
+                        $expiryDate,
                     ),
                     'Plan certificate renewal soon.',
                     $this->getSection(),
-                    'medium'
+                    'medium',
                 );
             }
 
@@ -172,15 +172,15 @@ final class TlsCertificateExpiryCheck implements CheckInterface
                 $this->getId(),
                 $this->getLabel(),
                 'ok',
-                $daysRemaining . ' days',
+                $daysRemaining.' days',
                 sprintf(
                     'Certificate for %s expires on %s.',
                     $host,
-                    $expiryDate
+                    $expiryDate,
                 ),
                 null,
                 $this->getSection(),
-                'low'
+                'low',
             );
         } catch (\Throwable $e) {
             return new CheckResult(
@@ -188,10 +188,10 @@ final class TlsCertificateExpiryCheck implements CheckInterface
                 $this->getLabel(),
                 'error',
                 null,
-                'Unable to check certificate: ' . $e->getMessage(),
+                'Unable to check certificate: '.$e->getMessage(),
                 'Verify TLS connectivity and certificate configuration.',
                 $this->getSection(),
-                'high'
+                'high',
             );
         }
     }

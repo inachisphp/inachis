@@ -12,42 +12,38 @@ use Inachis\Repository\System\SettingRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Service for generating the content of the robots.txt file based on stored settings
+ * Service for generating the content of the robots.txt file based on stored settings.
  */
 class RobotsTxtGenerator
 {
-	/**
-	 * Construct the generator with the required dependencies
-	 *
-	 * @param SettingRepository $settingRepository
-	 * @param RequestStack $requestStack
-	 */
-	public function __construct(
-		private readonly SettingRepository $settingRepository,
-    	private readonly RequestStack $requestStack,
-	){}
+    /**
+     * Construct the generator with the required dependencies.
+     */
+    public function __construct(
+        private readonly SettingRepository $settingRepository,
+        private readonly RequestStack $requestStack,
+    ) {
+    }
 
-	/**
-	 * Generate the content of the robots.txt file based on the stored configuration
-	 * 
-	 * @return string
-	 */
+    /**
+     * Generate the content of the robots.txt file based on the stored configuration.
+     */
     public function generate(): string
     {
         $robotsTxt = trim(
             $this->settingRepository->getValue('robots_txt')
-            ?? 'User-agent: *'
+            ?? 'User-agent: *',
         );
 
-		$request = $this->requestStack->getCurrentRequest();
-		$sitemapUrl = '/sitemap.xml';
+        $request = $this->requestStack->getCurrentRequest();
+        $sitemapUrl = '/sitemap.xml';
         if ($request) {
-    		$sitemapUrl = $request->getSchemeAndHttpHost() . '/sitemap.xml';
-		}
+            $sitemapUrl = $request->getSchemeAndHttpHost().'/sitemap.xml';
+        }
         $content = $robotsTxt;
 
         if (!str_contains($robotsTxt, 'Sitemap:')) {
-            $content .= "\n\nSitemap: " . $sitemapUrl;
+            $content .= "\n\nSitemap: ".$sitemapUrl;
         }
 
         return $content;

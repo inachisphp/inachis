@@ -8,19 +8,21 @@ declare(strict_types=1);
 
 namespace Inachis\Validator;
 
-use Inachis\Model\Domain\ValidationIssue;
 use Inachis\Model\Domain\Severity;
+use Inachis\Model\Domain\ValidationIssue;
 
 /**
- * Validates BIMI records
- * 
+ * Validates BIMI records.
+ *
  * @phpstan-import-type DnsTxtRecord from \Inachis\Service\System\Domain\DnsResolverInterface
  */
 final class BimiValidator
 {
     /**
-     * Validate BIMI records
+     * Validate BIMI records.
+     *
      * @param list<DnsTxtRecord> $records
+     *
      * @return list<ValidationIssue>
      */
     public function validate(array $records, string $dmarc): array

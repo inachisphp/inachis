@@ -8,33 +8,27 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Import\Series;
 
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Content\{Page,Series};
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
 use Inachis\Model\Series\SeriesExportDto;
 use Inachis\Repository\Content\PageRepository;
-use Inachis\Service\Import\Series\SeriesImportResult;
-use InvalidArgumentException;
 
 /**
  * Service for importing series and linking pages.
  */
 final class SeriesImportService
 {
-    /**
-     * @param EntityManagerInterface $entityManager
-     * @param PageRepository $pageRepository
-     */
     public function __construct(
         private EntityManagerInterface $entityManager,
         private PageRepository $pageRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Import series from DTOs.
      *
      * @param list<SeriesExportDto|null> $seriesDtos
-     * @return SeriesImportResult
      */
     public function import(iterable $seriesDtos): SeriesImportResult
     {
@@ -44,16 +38,16 @@ final class SeriesImportService
         try {
             foreach ($seriesDtos as $seriesDto) {
                 if (!$seriesDto instanceof SeriesExportDto) {
-                    throw new InvalidArgumentException('All items must be SeriesExportDto');
+                    throw new \InvalidArgumentException('All items must be SeriesExportDto');
                 }
 
                 $series = new Series();
                 $series->setTitle($seriesDto->title);
                 $series->setSubTitle($seriesDto->subTitle);
-                $series->setUrl($seriesDto->url); //TODO: need to check if URL is already in use and generate a new one if so
+                $series->setUrl($seriesDto->url); // TODO: need to check if URL is already in use and generate a new one if so
                 $series->setDescription($seriesDto->description);
-                $series->setFirstDate(new DateTimeImmutable($seriesDto->firstDate ?: ''));
-                $series->setLastDate(new DateTimeImmutable($seriesDto->lastDate ?: ''));
+                $series->setFirstDate(new \DateTimeImmutable($seriesDto->firstDate ?: ''));
+                $series->setLastDate(new \DateTimeImmutable($seriesDto->lastDate ?: ''));
                 $series->setVisible(false);
 
                 // Link pages by title
@@ -63,25 +57,25 @@ final class SeriesImportService
 
                     if ($page) {
                         $series->addItem($page);
-                        $result->pagesLinked++;
+                        ++$result->pagesLinked;
                     } else {
                         $result->warnings[] = sprintf(
                             'Series "%s": page "%s" not found and could not be linked.',
                             $seriesDto->title,
-                            $pageTitle
+                            $pageTitle,
                         );
                     }
                 }
 
                 $this->entityManager->persist($series);
-                $result->seriesImported++;
+                ++$result->seriesImported;
             }
 
             $this->entityManager->flush();
             $this->entityManager->commit();
         } catch (\Throwable $e) {
             $this->entityManager->rollback();
-            $result->warnings[] = 'Import failed: ' . $e->getMessage();
+            $result->warnings[] = 'Import failed: '.$e->getMessage();
         }
 
         return $result;
@@ -100,6 +94,7 @@ final class SeriesImportService
      *     visible?: bool,
      *     items?: list<string>
      * }> $data
+     *
      * @return SeriesExportDto[]
      */
     public function mapToDto(array $data): array

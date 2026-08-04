@@ -29,7 +29,7 @@ class ArrayToMarkdownTest extends TestCase
 
 This is a test
 MD,
-            $result
+            $result,
         );
     }
 
@@ -47,7 +47,7 @@ MD,
 
 Body
 MD,
-            $result
+            $result,
         );
     }
 
@@ -63,7 +63,7 @@ MD,
 # A title
 ## Sub-title
 MD,
-            $result
+            $result,
         );
     }
 
@@ -75,10 +75,10 @@ MD,
     public function testParseOnlyContent(): void
     {
         $this->assertSame(
-            PHP_EOL . PHP_EOL . 'Body',
+            PHP_EOL.PHP_EOL.'Body',
             ArrayToMarkdown::parse([
                 'content' => 'Body',
-            ])
+            ]),
         );
     }
 }

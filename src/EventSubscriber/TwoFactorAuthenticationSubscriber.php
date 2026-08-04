@@ -23,7 +23,8 @@ class TwoFactorAuthenticationSubscriber implements EventSubscriberInterface
         private readonly LoginSuccessRecorder $loginSuccessRecorder,
         private readonly TrustedDeviceManager $trustedDeviceManager,
         private readonly UrlGeneratorInterface $urlGenerator,
-    ) {}
+    ) {
+    }
 
     public static function getSubscribedEvents(): array
     {
@@ -35,8 +36,6 @@ class TwoFactorAuthenticationSubscriber implements EventSubscriberInterface
     /**
      * If the user has TOTP enabled, validate a trusted device cookie first. If
      * the device is not trusted, redirect to TOTP verification.
-     *
-     * @param LoginSuccessEvent $event
      */
     public function onLoginSuccess(LoginSuccessEvent $event): void
     {
@@ -46,18 +45,18 @@ class TwoFactorAuthenticationSubscriber implements EventSubscriberInterface
         }
         $trustedDeviceCookie = $this->trustedDeviceManager->validate(
             $user,
-            $event->getRequest()
+            $event->getRequest(),
         );
 
-        if ($trustedDeviceCookie !== null) {
+        if (null !== $trustedDeviceCookie) {
             $this->loginSuccessRecorder->record(
                 $user,
                 $event->getRequest(),
-                LoginResultType::TYPE_SUCCESS_TRUSTED
+                LoginResultType::TYPE_SUCCESS_TRUSTED,
             );
 
             $response = new RedirectResponse(
-                $this->urlGenerator->generate('incp_dashboard')
+                $this->urlGenerator->generate('incp_dashboard'),
             );
             $response->headers->setCookie($trustedDeviceCookie);
             $event->setResponse($response);
@@ -69,15 +68,15 @@ class TwoFactorAuthenticationSubscriber implements EventSubscriberInterface
         $session->set('security.totp_pending', true);
         $session->set(
             'security.pending_2fa_target',
-            $event->getRequest()->getUri()
+            $event->getRequest()->getUri(),
         );
 
         $event->setResponse(
             new RedirectResponse(
                 $this->urlGenerator->generate(
-                    'incp_totp_login'
-                )
-            )
+                    'incp_totp_login',
+                ),
+            ),
         );
     }
 }

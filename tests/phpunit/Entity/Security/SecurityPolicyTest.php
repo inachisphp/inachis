@@ -253,10 +253,10 @@ class SecurityPolicyTest extends TestCase
     public function doctrineLifecycleCallbacks(): void
     {
         $reflection = new \ReflectionClass(SecurityPolicy::class);
-        
+
         $prePersist = $reflection->getMethod('onPrePersist');
         $prePersist->invoke($this->policy);
-        
+
         $preUpdate = $reflection->getMethod('onPreUpdate');
         $preUpdate->invoke($this->policy);
 

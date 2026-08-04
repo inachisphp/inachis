@@ -12,15 +12,12 @@ use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Url;
 
 /**
- * Manager class for applying a Url to a Page
+ * Manager class for applying a Url to a Page.
  */
 class UrlManager
 {
     /**
-     * Apply specified Url to the provided {@link Page}
-     *
-     * @param Page $page
-     * @param string $newUrl
+     * Apply specified Url to the provided {@link Page}.
      */
     public function apply(Page $page, ?string $newUrl): void
     {

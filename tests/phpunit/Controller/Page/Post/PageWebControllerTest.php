@@ -8,18 +8,20 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Controller\Page\Post;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityRepository;
 use Inachis\Controller\Page\Post\PageWebController;
-use Inachis\Entity\Content\{Category, Page, Series, Tag, Url};
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
+use Inachis\Entity\Content\Tag;
+use Inachis\Entity\Content\Url;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Repository\Content\TagRepository;
 use Inachis\Repository\Content\UrlRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityRepository;
 use PHPUnit\Framework\MockObject\Exception;
-use ReflectionClass;
-use ReflectionException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +33,7 @@ class PageWebControllerTest extends InachisControllerTestCase
     private PageWebController $controller;
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      * @throws Exception
      */
     protected function setUp(): void
@@ -45,7 +47,7 @@ class PageWebControllerTest extends InachisControllerTestCase
             $this->translator,
         );
 
-        $ref = new ReflectionClass($this->controller);
+        $ref = new \ReflectionClass($this->controller);
         foreach (['entityManager', 'security'] as $prop) {
             $property = $ref->getProperty($prop);
             $property->setValue($this->controller, $this->$prop);
@@ -57,7 +59,7 @@ class PageWebControllerTest extends InachisControllerTestCase
     public function testGetPostThrowsNotFoundWhenUrlMissing(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/2025/10/10/sample-post'
+            'REQUEST_URI' => '/2025/10/10/sample-post',
         ]);
         $urlRepository = $this->getMockBuilder(EntityRepository::class)
             ->disableOriginalConstructor()
@@ -76,7 +78,7 @@ class PageWebControllerTest extends InachisControllerTestCase
     public function testGetPostRedirectsIfScheduledOrDraft(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/2025/10/10/sample-post'
+            'REQUEST_URI' => '/2025/10/10/sample-post',
         ]);
         $page = $this->createMock(Page::class);
         $page->expects($this->atLeastOnce())
@@ -102,7 +104,7 @@ class PageWebControllerTest extends InachisControllerTestCase
                 $this->entityManager,
                 $this->params,
                 $this->security,
-                $this->translator
+                $this->translator,
             ])
             ->onlyMethods(['render'])
             ->getStub();
@@ -111,14 +113,14 @@ class PageWebControllerTest extends InachisControllerTestCase
         $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->atLeastOnce())
             ->method('get')
-            ->willReturnCallback(function (string $id) use ($router)
-            {
+            ->willReturnCallback(function (string $id) use ($router) {
                 if (str_contains($id, 'router')) {
                     return $router;
                 }
+
                 return null;
-            }
-        );
+            },
+            );
         $controller->setContainer($container);
 
         $response = $controller->getPost($request, '2025', '10', '10', 'sample-post');
@@ -129,7 +131,7 @@ class PageWebControllerTest extends InachisControllerTestCase
     public function testGetPostRedirectsWhenNotDefault(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/2025/10/10/sample-post'
+            'REQUEST_URI' => '/2025/10/10/sample-post',
         ]);
         $url = $this->createMock(Url::class);
         $url->expects($this->once())->method('isDefault')->willReturn(false);
@@ -140,7 +142,7 @@ class PageWebControllerTest extends InachisControllerTestCase
             ->getMock();
         $urlRepository->expects($this->once())
             ->method('findOneBy')
-            ->with([ 'link' => '2025/10/10/sample-post' ])
+            ->with(['link' => '2025/10/10/sample-post'])
             ->willReturn($url);
         $urlRepository->expects($this->atLeastOnce())
             ->method('getDefaultUrl')->willReturn($url2);
@@ -156,7 +158,7 @@ class PageWebControllerTest extends InachisControllerTestCase
                 $this->entityManager,
                 $this->params,
                 $this->security,
-                $this->translator
+                $this->translator,
             ])
             ->onlyMethods(['render'])
             ->getStub();
@@ -167,6 +169,7 @@ class PageWebControllerTest extends InachisControllerTestCase
             if (str_contains($id, 'router')) {
                 return $router;
             }
+
             return null;
         });
         $controller->setContainer($container);
@@ -178,7 +181,7 @@ class PageWebControllerTest extends InachisControllerTestCase
     public function testGetPostRendersTemplate(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/2025/10/10/sample-post'
+            'REQUEST_URI' => '/2025/10/10/sample-post',
         ]);
         $page = $this->createStub(Page::class);
         $page2 = $this->createStub(Page::class);
@@ -189,7 +192,7 @@ class PageWebControllerTest extends InachisControllerTestCase
             ->getMock();
         $urlRepository->expects($this->once())
             ->method('findOneBy')
-            ->with([ 'link' => '2025/10/10/sample-post' ])
+            ->with(['link' => '2025/10/10/sample-post'])
             ->willReturn($url);
         $urlRepository->expects($this->atLeastOnce())->method('getDefaultUrl')->willReturn($url);
         $seriesByPostResult = $this->createMock(Series::class);
@@ -212,7 +215,7 @@ class PageWebControllerTest extends InachisControllerTestCase
                 $this->entityManager,
                 $this->params,
                 $this->security,
-                $this->translator
+                $this->translator,
             ])
             ->onlyMethods(['render'])
             ->getMock();
@@ -233,7 +236,7 @@ class PageWebControllerTest extends InachisControllerTestCase
                 $this->entityManager,
                 $this->params,
                 $this->security,
-                $this->translator
+                $this->translator,
             ])
             ->onlyMethods(['getPost'])
             ->getMock();
@@ -244,7 +247,7 @@ class PageWebControllerTest extends InachisControllerTestCase
                 0,
                 0,
                 0,
-                ''
+                '',
             )
             ->willReturn(new Response('OK'));
         $request = new Request();
@@ -262,7 +265,7 @@ class PageWebControllerTest extends InachisControllerTestCase
         $this->entityManager->expects($this->atLeastOnce())
             ->method('getRepository')
             ->willReturnMap([
-                [Tag::class, $tagRepository]
+                [Tag::class, $tagRepository],
             ]);
         $this->expectException(NotFoundHttpException::class);
         $this->controller->getPostsByTag($request, 'nonexistent-tag');
@@ -294,18 +297,18 @@ class PageWebControllerTest extends InachisControllerTestCase
             ->method('getRepository')
             ->willReturnMap([
                 [Tag::class, $tagRepository],
-                [Page::class, $pageRepository]
+                [Page::class, $pageRepository],
             ]);
         $controller = $this->getMockBuilder(PageWebController::class)
             ->setConstructorArgs([
                 $this->entityManager,
                 $this->params,
                 $this->security,
-                $this->translator
+                $this->translator,
             ])
             ->onlyMethods(['render'])
             ->getMock();
-        $ref = new ReflectionClass($controller);
+        $ref = new \ReflectionClass($controller);
         foreach (['entityManager', 'security'] as $prop) {
             if ($ref->hasProperty($prop)) {
                 $property = $ref->getProperty($prop);
@@ -329,7 +332,7 @@ class PageWebControllerTest extends InachisControllerTestCase
             ->getStub();
         $this->entityManager->expects($this->atLeastOnce())->method('getRepository')
             ->willReturnMap([
-                [Category::class, $categoryRepository]
+                [Category::class, $categoryRepository],
             ]);
         $this->expectException(NotFoundHttpException::class);
         $this->controller->getPostsByCategory($request, 'missing-category');
@@ -358,18 +361,18 @@ class PageWebControllerTest extends InachisControllerTestCase
             ->method('getRepository')
             ->willReturnMap([
                 [Category::class, $categoryRepository],
-                [Page::class, $pageRepository]
+                [Page::class, $pageRepository],
             ]);
         $controller = $this->getMockBuilder(PageWebController::class)
             ->setConstructorArgs([
                 $this->entityManager,
                 $this->params,
                 $this->security,
-                $this->translator
+                $this->translator,
             ])
             ->onlyMethods(['render'])
             ->getMock();
-        $ref = new ReflectionClass($controller);
+        $ref = new \ReflectionClass($controller);
         foreach (['entityManager', 'security'] as $prop) {
             if ($ref->hasProperty($prop)) {
                 $property = $ref->getProperty($prop);

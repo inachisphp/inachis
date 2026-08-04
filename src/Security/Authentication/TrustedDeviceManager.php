@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Security\Authentication;
 
-use DateInterval;
-use DateTimeImmutable;
 use DeviceDetector\DeviceDetector;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\User\User;
@@ -27,19 +25,16 @@ class TrustedDeviceManager
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly UserTrustedDeviceRepository $userTrustedDeviceRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Creates a trusted device and returns the cookie that should
      * be attached to the response.
-     *
-     * @param User $user
-     * @param Request $request
-     * @return Cookie
      */
     public function create(
         User $user,
-        Request $request
+        Request $request,
     ): Cookie {
         $selector = bin2hex(random_bytes(16));
         $validator = bin2hex(random_bytes(32));
@@ -50,21 +45,21 @@ class TrustedDeviceManager
             ->setUser($user)
             ->setSelector($selector)
             ->setValidatorHash(
-                hash('sha256', $validator)
+                hash('sha256', $validator),
             )
             ->setDisplayName(
-                $this->guessDisplayName($request)
+                $this->guessDisplayName($request),
             )
             ->setLastIp(
-                $request->getClientIp()
+                $request->getClientIp(),
             )
             ->setLastUserAgent(
-                $request->headers->get('User-Agent')
+                $request->headers->get('User-Agent'),
             )
             ->setExpiresAt(
-                (new DateTimeImmutable())->add(
-                    new DateInterval(self::VALIDITY_INTERVAL)
-                )
+                (new \DateTimeImmutable())->add(
+                    new \DateInterval(self::VALIDITY_INTERVAL),
+                ),
             );
 
         $this->entityManager->persist($trustedDevice);
@@ -73,30 +68,26 @@ class TrustedDeviceManager
         return $this->createCookie(
             $selector,
             $validator,
-            $trustedDevice->getExpiresAt()
+            $trustedDevice->getExpiresAt(),
         );
     }
 
     /**
-     * Returns the current trusted device
-     *
-     * @param User $user
-     * @param Request $request
-     * @return UserTrustedDevice|null
+     * Returns the current trusted device.
      */
     public function getCurrentTrustedDevice(
         User $user,
-        Request $request
+        Request $request,
     ): ?UserTrustedDevice {
         $cookie = $request->cookies->get(
-            self::COOKIE_NAME
+            self::COOKIE_NAME,
         );
-        if ($cookie === null) {
+        if (null === $cookie) {
             return null;
         }
 
         $parts = explode(':', $cookie, 2);
-        if (count($parts) !== 2) {
+        if (2 !== count($parts)) {
             return null;
         }
 
@@ -105,15 +96,15 @@ class TrustedDeviceManager
         $device = $this->userTrustedDeviceRepository
             ->findBySelector(
                 $user,
-                $selector
+                $selector,
             );
-        if ($device === null) {
+        if (null === $device) {
             return null;
         }
 
         if (!hash_equals(
             $device->getValidatorHash(),
-            hash('sha256', $validator)
+            hash('sha256', $validator),
         )) {
             return null;
         }
@@ -127,9 +118,10 @@ class TrustedDeviceManager
      * @return UserTrustedDevice[]
      */
     public function getTrustedDevices(
-        User $user
+        User $user,
     ): array {
         $this->userTrustedDeviceRepository->removeExpiredDevices($user);
+
         return $this->userTrustedDeviceRepository->getTrustedDevices($user);
     }
 
@@ -138,51 +130,46 @@ class TrustedDeviceManager
      *
      * Returns a refreshed cookie if valid,
      * otherwise null.
-     *
-     * @param User $user
-     * @param Request $request
-     *
-     * @return Cookie|null
      */
     public function validate(User $user, Request $request): ?Cookie
     {
         $this->userTrustedDeviceRepository->removeExpiredDevices($user);
 
         $cookie = $request->cookies->get(self::COOKIE_NAME);
-        if ($cookie === null) {
+        if (null === $cookie) {
             return null;
         }
 
         $parts = explode(':', $cookie, 2);
-        if (count($parts) !== 2) {
+        if (2 !== count($parts)) {
             return null;
         }
 
         [$selector, $validator] = $parts;
 
         $device = $this->userTrustedDeviceRepository
-            ->findBySelector($user,$selector);
-            if ($device === null) {
+            ->findBySelector($user, $selector);
+        if (null === $device) {
             return null;
         }
 
         if (
             !hash_equals(
                 $device->getValidatorHash(),
-                hash('sha256', $validator)
+                hash('sha256', $validator),
             )
         ) {
             return null;
         }
 
-        $expiresAt = (new DateTimeImmutable())->add(
-            new DateInterval(self::VALIDITY_INTERVAL)
+        $expiresAt = (new \DateTimeImmutable())->add(
+            new \DateInterval(self::VALIDITY_INTERVAL),
         );
 
         $device
             ->setExpiresAt($expiresAt)
             ->setLastIp($request->getClientIp())
-            ->setLastUsedAt(new DateTimeImmutable())
+            ->setLastUsedAt(new \DateTimeImmutable())
             ->setLastUserAgent($request->headers->get('User-Agent'));
 
         $this->entityManager->flush();
@@ -190,14 +177,12 @@ class TrustedDeviceManager
         return $this->createCookie(
             $selector,
             $validator,
-            $expiresAt
+            $expiresAt,
         );
     }
-    
+
     /**
      * Removes a trusted device.
-     * 
-     * @param UserTrustedDevice $device
      */
     public function remove(UserTrustedDevice $device): void
     {
@@ -207,8 +192,6 @@ class TrustedDeviceManager
 
     /**
      * Removes all trusted devices belonging to a user.
-     * 
-     * @param User $user
      */
     public function removeAll(User $user): void
     {
@@ -217,55 +200,45 @@ class TrustedDeviceManager
 
     /**
      * Returns an expired cookie that removes the browser cookie.
-     * 
-     * @return Cookie
      */
     public function clearCookie(): Cookie
     {
         return Cookie::create(
             self::COOKIE_NAME,
             '',
-            new DateTimeImmutable('-1 day'),
+            new \DateTimeImmutable('-1 day'),
             '/',
             null,
             true,
             true,
             false,
-            Cookie::SAMESITE_LAX
+            Cookie::SAMESITE_LAX,
         );
     }
 
     /**
      * Creates the trusted-device cookie.
-     * 
-     * @param string $selector
-     * @param string $validator
-     * @param DateTimeImmutable $expires
-     * @return Cookie
      */
     private function createCookie(
         string $selector,
         string $validator,
-        DateTimeImmutable $expires
+        \DateTimeImmutable $expires,
     ): Cookie {
         return Cookie::create(
             self::COOKIE_NAME,
-            $selector . ':' . $validator,
+            $selector.':'.$validator,
             $expires,
             '/',
             null,
             true,
             true,
             false,
-            Cookie::SAMESITE_LAX
+            Cookie::SAMESITE_LAX,
         );
     }
 
     /**
      * Generates a display name such as "Chrome on Windows".
-     *
-     * @param Request $request
-     * @return string
      */
     private function guessDisplayName(Request $request): string
     {
@@ -288,7 +261,7 @@ class TrustedDeviceManager
         $browser = $client['name'] ?? 'Unknown Browser';
         $platform = $os['name'] ?? 'Unknown OS';
 
-        if ($browser === 'Unknown Browser' && $platform === 'Unknown OS') {
+        if ('Unknown Browser' === $browser && 'Unknown OS' === $platform) {
             return 'Unknown Device';
         }
 

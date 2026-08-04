@@ -8,10 +8,9 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Util;
 
-use Inachis\Service\Formatting\UrlNormaliser;
+use Inachis\Exception\InvalidTimezoneException;
 use Inachis\Validator\DateValidator;
 use PHPUnit\Framework\TestCase;
-use Inachis\Exception\InvalidTimezoneException;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 class DateValidatorTest extends TestCase

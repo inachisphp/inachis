@@ -18,22 +18,19 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Controller for handling Themes
+ * Controller for handling Themes.
  */
 final class ThemeController extends AbstractInachisController
 {
     /**
-     * Themes list page
-     *
-     * @param ThemeScanner $themeScanner
-     * @param ThemeManager $themeManager
-     * @return Response
+     * Themes list page.
      */
     #[Route('/incp/settings/themes', name: 'incp_settings_themes', methods: ['GET'])]
     public function index(ThemeScanner $themeScanner, ThemeManager $themeManager): Response
     {
         $this->viewModel->page->title = 'Themes';
         $this->viewModel->page->tab = 'settings';
+
         return $this->render('inadmin/page/settings/themes.html.twig', [
             'viewModel' => $this->viewModel,
             'activeTheme' => $themeManager->getActiveTheme(),
@@ -43,10 +40,7 @@ final class ThemeController extends AbstractInachisController
     }
 
     /**
-     * Rescans the themes folder and redirects back to list
-     *
-     * @param ThemeScanner $themeScanner
-     * @return Response
+     * Rescans the themes folder and redirects back to list.
      */
     #[Route('/incp/settings/themes/rescan',
         name: 'incp_settings_themes_rescan',
@@ -60,13 +54,7 @@ final class ThemeController extends AbstractInachisController
     }
 
     /**
-     * Activates the specified theme
-     *
-     * @param string $identifier
-     * @param ThemeScanner $themeScanner
-     * @param ThemeManager $themeManager
-     * @param FeatureRegistry $featureRegistry
-     * @return Response
+     * Activates the specified theme.
      */
     #[Route('/incp/settings/themes/{identifier}/activate',
         name: 'incp_settings_theme_activate',
@@ -85,7 +73,7 @@ final class ThemeController extends AbstractInachisController
 
         $missingFeatures = array_values(array_filter(
             $theme->requiredFeatures,
-            static fn (string $feature): bool => !$featureRegistry->has($feature)
+            static fn (string $feature): bool => !$featureRegistry->has($feature),
         ));
 
         if ([] !== $missingFeatures) {
@@ -93,8 +81,8 @@ final class ThemeController extends AbstractInachisController
                 'error',
                 sprintf(
                     'Cannot activate theme. Missing: %s',
-                    implode(', ', $missingFeatures)
-                )
+                    implode(', ', $missingFeatures),
+                ),
             );
 
             return $this->redirectToRoute('incp_settings_themes');
@@ -107,10 +95,8 @@ final class ThemeController extends AbstractInachisController
     }
 
     /**
-     * Returns the screenshot for the specified theme based on the identifier provided
+     * Returns the screenshot for the specified theme based on the identifier provided.
      *
-     * @param string $identifier
-     * @param ThemeScanner $themeScanner
      * @return BinaryFileResponse
      */
     #[Route('/incp/settings/themes/{identifier}/screenshot', name: 'incp_settings_theme_screenshot', methods: ['GET'])]

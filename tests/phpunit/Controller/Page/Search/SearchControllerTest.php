@@ -46,17 +46,17 @@ class SearchControllerTest extends InachisControllerTestCase
                 $this->params,
                 $this->security,
                 $this->translator,
-                $this->wasteRepository
+                $this->wasteRepository,
             ])
             ->onlyMethods(['createFormBuilder', 'generateUrl', 'render'])
             ->getMock();
         $this->controller->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $this->controller->method('generateUrl')
             ->willReturnCallback(function (string $route, array $parameters) {
-                return 'redirected:' . $route;
+                return 'redirected:'.$route;
             });
         $this->controller->method('createFormBuilder')->willReturn($formBuilder);
     }

@@ -15,23 +15,22 @@ final readonly class AnalyticsPeriod
         public \DateTimeImmutable $to,
         public string $range,
         public string $label,
-    ) {}
+    ) {
+    }
 
     /**
-	 * Returns the previous period of the same length.
-	 *
-	 * @return self
-	 */
+     * Returns the previous period of the same length.
+     */
     public function previous(): self
-	{
-		$days = $this->from->diff($this->to)->days + 1;
-		$interval = new \DateInterval("P{$days}D");
+    {
+        $days = $this->from->diff($this->to)->days + 1;
+        $interval = new \DateInterval("P{$days}D");
 
-		return new self(
-			from: $this->from->sub($interval),
-			to: $this->from->sub(new \DateInterval('P1D')),
-			range: $this->range,
-			label: 'Previous ' . $this->label,
-		);
-	}
+        return new self(
+            from: $this->from->sub($interval),
+            to: $this->from->sub(new \DateInterval('P1D')),
+            range: $this->range,
+            label: 'Previous '.$this->label,
+        );
+    }
 }

@@ -13,21 +13,33 @@ use Inachis\Diagnostics\CheckResult;
 
 final class XContentTypeOptionsCheck implements CheckInterface
 {
-    public function getId(): string { return 'x_content_type_options'; }
-    public function getLabel(): string { return 'X-Content-Type-Options'; }
-    public function getSection(): string { return 'Security'; }
+    public function getId(): string
+    {
+        return 'x_content_type_options';
+    }
+
+    public function getLabel(): string
+    {
+        return 'X-Content-Type-Options';
+    }
+
+    public function getSection(): string
+    {
+        return 'Security';
+    }
 
     public function run(): CheckResult
     {
         $found = false;
         foreach (headers_list() as $header) {
-            if (stripos($header, 'X-Content-Type-Options:') === 0) {
+            if (0 === stripos($header, 'X-Content-Type-Options:')) {
                 $found = true;
                 break;
             }
         }
 
         $status = $found ? 'ok' : 'warning';
+
         return new CheckResult(
             $this->getId(),
             $this->getLabel(),
@@ -36,7 +48,7 @@ final class XContentTypeOptionsCheck implements CheckInterface
             $found ? 'Header is present.' : 'Header is missing.',
             $found ? null : 'Add X-Content-Type-Options: nosniff for security.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }

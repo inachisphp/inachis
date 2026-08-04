@@ -27,7 +27,8 @@ final readonly class Manifest
         public string $type = 'core',
         public ?string $releaseNotes = null,
         public ?string $publishedAt = null,
-    ) {}
+    ) {
+    }
 
     public function withArchiveUrl(string $url): self
     {

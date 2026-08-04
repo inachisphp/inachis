@@ -8,14 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Repository\Content;
 
-use Inachis\Entity\Content\{Page,Series};
-use Inachis\Entity\Media\Image;
-use Inachis\Enum\EditorialStatus;
-use Inachis\Repository\AbstractRepository;
-use Inachis\Repository\Content\SeriesRepositoryInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
+use Inachis\Entity\Media\Image;
+use Inachis\Enum\EditorialStatus;
+use Inachis\Repository\AbstractRepository;
 use Ramsey\Uuid\Uuid;
 
 /**
@@ -24,9 +24,7 @@ use Ramsey\Uuid\Uuid;
 class SeriesRepository extends AbstractRepository implements SeriesRepositoryInterface
 {
     /**
-     * Constructor for SeriesRepository
-     *
-     * @param ManagerRegistry $registry
+     * Constructor for SeriesRepository.
      */
     public function __construct(ManagerRegistry $registry)
     {
@@ -35,8 +33,6 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
 
     /**
      * Removes a Series entity from the database.
-     *
-     * @param Series $series
      */
     public function remove(Series $series): void
     {
@@ -47,16 +43,18 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      * Get a paginator of Series entities filtered by the given IDs.
      *
      * @param list<string> $ids
+     *
      * @return Paginator<Series>
      */
     public function getFilteredIds(array $ids): Paginator
     {
         $binaryIds = array_map(
-                fn($id) => $id instanceof \Ramsey\Uuid\UuidInterface 
-                    ? $id->getBytes() 
-                    : Uuid::fromString($id)->getBytes(),
-                $ids,
-            );
+            fn ($id) => $id instanceof \Ramsey\Uuid\UuidInterface
+                ? $id->getBytes()
+                : Uuid::fromString($id)->getBytes(),
+            $ids,
+        );
+
         return $this->getAll(
             0,
             0,
@@ -66,8 +64,8 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
                     'ids' => [
                         'value' => $binaryIds,
                     ],
-                ]
-            ]
+                ],
+            ],
         );
     }
 
@@ -76,13 +74,15 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      * This method returns the Series that contains the specified Page as one of its items.
      * If multiple Series contain the same Page, it will return one of them (the first found).
      *
-     * @param Page $page The Page for which to find the associated Series.
-     * @return Series|null The Series associated with the given Page, or null if no such Series exists.
+     * @param Page $page the Page for which to find the associated Series
+     *
+     * @return Series|null the Series associated with the given Page, or null if no such Series exists
+     *
      * @throws NonUniqueResultException
      */
     public function getSeriesByPost(Page $page): ?Series
     {
-        /** @var Series|null */
+        /* @var Series|null */
         return $this->createQueryBuilder('s')
             ->select('s')
             ->leftJoin('s.items', 'Series_pages')
@@ -98,14 +98,17 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      * (visible = 1).
      * If multiple Series contain the same Page, it will return one of them (the first found).
      *
-     * @param Page $page The Page for which to find the associated Series.
+     * @param Page $page the Page for which to find the associated Series
+     *
      * @return Series|null The published Series associated with the given Page, or null if no
+     *
      * @throws NonUniqueResultException
      */
     public function getPublishedSeriesByPost(Page $page)
     {
         $qb = $this->createQueryBuilder('s');
-        /** @var Series|null */
+
+        /* @var Series|null */
         return $qb
             ->select('s', 'i')
             ->join('s.items', 'i')
@@ -126,22 +129,24 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      * The year is matched against the lastDate field of the Series, and the URL is matched against the url field.
      * If no such Series exists, it returns null.
      *
-     * @param string $year The year to match against the lastDate field (format: 'YYYY').
-     * @param string $url The URL to match against the url field of the Series.
-     * @return Series|null The public Series that matches the given year and URL, or null if no such Series exists.
+     * @param string $year the year to match against the lastDate field (format: 'YYYY')
+     * @param string $url  the URL to match against the url field of the Series
+     *
+     * @return Series|null the public Series that matches the given year and URL, or null if no such Series exists
      */
     public function getPublicSeriesByYearAndUrl($year, $url): ?Series
     {
         $qb = $this->createQueryBuilder('s');
-        /** @var Series|null */
+
+        /* @var Series|null */
         return $qb
             ->select('s')
             ->where('s.lastDate >= :start')
             ->andWhere('s.lastDate < :end')
             ->andWhere($qb->expr()->eq('s.url', ':url'))
             ->andWhere('s.visible = :visible')
-            ->setParameter('start', $year . '-01-01')
-            ->setParameter('end', $year . '-12-31')
+            ->setParameter('start', $year.'-01-01')
+            ->setParameter('end', $year.'-12-31')
             ->setParameter('url', $url)
             ->setParameter('visible', true)
             ->getQuery()
@@ -152,11 +157,10 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      * Get a paginator of Series entities filtered by the given criteria.
      *
      * @param array{keyword?:string,visible?:string} $filters
-     * @param int $limit
-     * @param int $offset
+     *
      * @return Paginator<Series>
      */
-    public function getFiltered(array $filters,int $limit,  int $offset, string $sort = ''): Paginator
+    public function getFiltered(array $filters, int $limit, int $offset, string $sort = ''): Paginator
     {
         $where = [
             '1=1',
@@ -164,7 +168,7 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
         ];
         if (!empty($filters['keyword'])) {
             $where[0] .= ' AND (q.title LIKE :keyword OR q.subTitle LIKE :keyword OR q.description LIKE :keyword )';
-            $where[1]['keyword'] = '%' . $filters['keyword'] . '%';
+            $where[1]['keyword'] = '%'.$filters['keyword'].'%';
         }
         if (isset($filters['visibility'])) {
             $where[0] .= ' AND q.visible = :visibility';
@@ -179,18 +183,19 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             'lastDate asc' => [['q.lastDate', 'ASC']],
             'lastDate desc' => [
                 ['CASE WHEN q.lastDate IS NULL THEN 1 ELSE 0 END', 'DESC'],
-                ['q.lastDate', 'DESC']
+                ['q.lastDate', 'DESC'],
             ],
             default => [
                 ['q.title', 'ASC'],
                 ['q.subTitle', 'ASC'],
             ],
         };
+
         return $this->getAll(
             $limit,
             $offset,
             $where,
-            $sort
+            $sort,
         );
     }
 
@@ -200,7 +205,6 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      * i.e., the Image is set as the Series' image) or indirectly associated through the Series' description (i.e.,
      * the Image's filename is mentioned in the Series' description).
      *
-     * @param Image $image
      * @return Paginator<Series>
      */
     public function getSeriesUsingImage(Image $image): Paginator
@@ -211,17 +215,15 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             [
                 'q.description LIKE :filename OR q.image = :image',
                 [
-                    'filename' => '%' . $image->getFilename(). '%',
+                    'filename' => '%'.$image->getFilename().'%',
                     'image' => $image->getId()?->toString() ?? '',
-                ]
-            ]
+                ],
+            ],
         );
     }
 
     /**
-     * Return a count of public series
-     *
-     * @return int
+     * Return a count of public series.
      */
     public function countPublicSeries(): int
     {
@@ -236,15 +238,13 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
     /**
      * Return a batch of public series, ordered by lastDate desc, with pagination.
      *
-     * @param int $limit
-     * @param int $offset
      * @return array<Series>
      */
     public function findPublicSeriesBatch(
         int $limit,
         int $offset,
     ): array {
-        /** @var array<Series> */
+        /* @var array<Series> */
         return $this->createQueryBuilder('s')
             ->where('s.visible = :visible')
             ->setParameter('visible', true)
@@ -257,14 +257,13 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
 
     /**
      * Returns an array of {@link Series} that are recent drafts
-     * ordered by the date of the attached content
+     * ordered by the date of the attached content.
      *
-     * @param int $limit
      * @return array<Series>
      */
     public function findRecentDrafts(int $limit = 5): array
     {
-        /** @var array<Series> */
+        /* @var array<Series> */
         return $this->createQueryBuilder('s')
             ->where('s.visible = :visible')
             ->setParameter('visible', false)
@@ -276,14 +275,13 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
     }
 
     /**
-     * Returns an array of recently published {@link Series}
+     * Returns an array of recently published {@link Series}.
      *
-     * @param int $limit
      * @return array<Series>
      */
     public function findRecentPublished(int $limit = 5): array
     {
-        /** @var array<Series> */
+        /* @var array<Series> */
         return $this->createQueryBuilder('s')
             ->where('s.visible = :visible')
             ->setParameter('visible', true)

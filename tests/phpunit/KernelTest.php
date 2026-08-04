@@ -26,7 +26,7 @@ class KernelTest extends TestCase
     {
         $this->assertEquals(
             str_replace('/tests/phpunit', '/var/cache/test', __DIR__),
-            $this->kernel->getCacheDir()
+            $this->kernel->getCacheDir(),
         );
     }
 
@@ -34,7 +34,7 @@ class KernelTest extends TestCase
     {
         $this->assertEquals(
             str_replace('/tests/phpunit', '/var/log', __DIR__),
-            $this->kernel->getLogDir()
+            $this->kernel->getLogDir(),
         );
     }
 }

@@ -46,7 +46,7 @@ class DefaultControllerTest extends AbstractWebControllerTestCase
                     $this->assertSame($mockContent, $vars['content']);
 
                     return true;
-                })
+                }),
             )
             ->willReturn(new Response('OK'));
 

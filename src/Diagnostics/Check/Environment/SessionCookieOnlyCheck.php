@@ -13,9 +13,20 @@ use Inachis\Diagnostics\CheckResult;
 
 final class SessionCookieOnlyCheck implements CheckInterface
 {
-    public function getId(): string { return 'session_use_only_cookies'; }
-    public function getLabel(): string { return 'session.use_only_cookies'; }
-    public function getSection(): string { return 'Environment'; }
+    public function getId(): string
+    {
+        return 'session_use_only_cookies';
+    }
+
+    public function getLabel(): string
+    {
+        return 'session.use_only_cookies';
+    }
+
+    public function getSection(): string
+    {
+        return 'Environment';
+    }
 
     public function run(): CheckResult
     {
@@ -29,8 +40,8 @@ final class SessionCookieOnlyCheck implements CheckInterface
             $this->getLabel(),
             $status,
             $value ? 'enabled' : 'disabled',
-            $status === 'ok' ? 'Sessions are cookie-only, as recommended.' : 'session.use_only_cookies disabled; risk of session fixation.',
-            $status !== 'ok' ? 'Set session.use_only_cookies=1 in php.ini.' : null,
+            'ok' === $status ? 'Sessions are cookie-only, as recommended.' : 'session.use_only_cookies disabled; risk of session fixation.',
+            'ok' !== $status ? 'Set session.use_only_cookies=1 in php.ini.' : null,
             $this->getSection(),
             '',
         );

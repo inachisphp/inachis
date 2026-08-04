@@ -19,9 +19,7 @@ enum PermissionAction: string
     case PUBLISH = 'PUBLISH';
 
     /**
-     * Returns a friendly name for the {@link PermissionAction}
-     *
-     * @return string
+     * Returns a friendly name for the {@link PermissionAction}.
      */
     public function label(): string
     {

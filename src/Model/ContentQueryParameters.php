@@ -13,12 +13,12 @@ use Inachis\Repository\Content\CategoryRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * ContentQueryParameters class
+ * ContentQueryParameters class.
  */
 class ContentQueryParameters
 {
     /**
-     * Constructor for ContentQueryParameters class
+     * Constructor for ContentQueryParameters class.
      *
      * @param array{
      *     filters: array<string,mixed>,
@@ -26,10 +26,6 @@ class ContentQueryParameters
      *     limit: int,
      *     offset: int
      * }|array{} $filters
-     * @param string $sort
-     * @param int $limit
-     * @param int $offset
-     * @param string $view
      */
     public function __construct(
         protected array $filters = [],
@@ -37,7 +33,8 @@ class ContentQueryParameters
         protected int $limit = 10,
         protected int $offset = 0,
         protected string $view = 'list',
-    ) {}
+    ) {
+    }
 
     /**
      * Creates a new instance using the current values as defaults and
@@ -48,7 +45,6 @@ class ContentQueryParameters
         self $current,
         CategoryRepository $categoryRepository,
     ): self {
-
         $filters = $current->getFilters();
 
         /*
@@ -56,7 +52,6 @@ class ContentQueryParameters
         * This allows filters to be cleared.
         */
         if ($request->request->has('filter')) {
-
             $filters = $request->request->all('filter');
 
             /*
@@ -71,16 +66,16 @@ class ContentQueryParameters
             */
             $filters = array_filter(
                 $filters,
-                static fn (mixed $value): bool => $value !== '' && $value !== [],
+                static fn (mixed $value): bool => '' !== $value && [] !== $value,
             );
 
             /*
             * Convert category UUIDs into category labels.
             */
             if (
-                isset($filters['categories']) &&
-                is_array($filters['categories']) &&
-                array_is_list($filters['categories'])
+                isset($filters['categories'])
+                && is_array($filters['categories'])
+                && array_is_list($filters['categories'])
             ) {
                 /** @var list<Category> $categories */
                 $categories = $categoryRepository->findBy([
@@ -90,10 +85,9 @@ class ContentQueryParameters
                 $categoryFilter = [];
 
                 foreach ($categories as $category) {
-
                     $id = $category->getId()?->toString();
 
-                    if ($id !== null) {
+                    if (null !== $id) {
                         $categoryFilter[$id] = $category->getTitle();
                     }
                 }

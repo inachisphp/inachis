@@ -9,15 +9,14 @@ declare(strict_types=1);
 namespace Inachis\Tests\phpunit\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
 use Inachis\Factory\PageViewFactory;
 use Inachis\Model\System\PageMetadata;
 use Inachis\Model\System\PageView;
 use Inachis\Model\System\SiteSettings;
+use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractWebControllerTestCase extends TestCase
 {
@@ -53,6 +52,7 @@ abstract class AbstractWebControllerTestCase extends TestCase
      * @template T of object
      *
      * @param class-string<T> $class
+     *
      * @return T
      */
     protected function createController(string $class): object

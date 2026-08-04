@@ -25,28 +25,27 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * ResourceType
- * 
+ * ResourceType.
+ *
  * @extends AbstractType<AbstractFile>
  */
 class ResourceType extends AbstractType
 {
     /**
-     * Constructor for ResourceType
-     * 
-     * @param TranslatorInterface $translator
+     * Constructor for ResourceType.
      */
     public function __construct(
         private readonly PermissionResolver $permissionResolver,
         private readonly TranslatorInterface $translator,
         private readonly Security $security,
-    ) {}
+    ) {
+    }
 
     /**
-     * Builds the form
-     * 
+     * Builds the form.
+     *
      * @param FormBuilderInterface<AbstractFile|null> $builder
-     * @param array<string, mixed> $options
+     * @param array<string, mixed>                    $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -62,12 +61,12 @@ class ResourceType extends AbstractType
         $allowEdit = $this->permissionResolver->hasPermission(
             $user,
             $type,
-            PermissionAction::EDIT
+            PermissionAction::EDIT,
         );
         $allowDelete = $this->permissionResolver->hasPermission(
             $user,
             $type,
-            PermissionAction::DELETE
+            PermissionAction::DELETE,
         );
 
         $builder
@@ -79,9 +78,8 @@ class ResourceType extends AbstractType
                 'disabled' => !$allowEdit,
                 'label' => $this->translator->trans('admin.resources.title.label', [], 'messages'),
                 'label_attr' => [
-                    'id' => 'resource__title__label'
+                    'id' => 'resource__title__label',
                 ],
-
             ])
             ->add('altText', TextareaType::class, [
                 'attr' => [
@@ -92,9 +90,8 @@ class ResourceType extends AbstractType
                 'disabled' => !$allowEdit,
                 'label' => $this->translator->trans('admin.resources.altText.label', [], 'messages'),
                 'label_attr' => [
-                    'id' => 'resource__altText__label'
+                    'id' => 'resource__altText__label',
                 ],
-
             ])
             ->add('description', TextareaType::class, [
                 'attr' => [
@@ -105,9 +102,8 @@ class ResourceType extends AbstractType
                 'disabled' => !$allowEdit,
                 'label' => $this->translator->trans('admin.resources.caption.label', [], 'messages'),
                 'label_attr' => [
-                    'id' => 'resource__description__label'
+                    'id' => 'resource__description__label',
                 ],
-
             ]);
         if ($allowEdit) {
             $builder
@@ -130,7 +126,7 @@ class ResourceType extends AbstractType
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> <span>%s</span>',
                         'save',
-                        $this->translator->trans('admin.button.save', [], 'messages')
+                        $this->translator->trans('admin.button.save', [], 'messages'),
                     ),
                     'label_html' => true,
                 ]);
@@ -147,16 +143,13 @@ class ResourceType extends AbstractType
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> <span>%s</span>',
                     'delete',
-                    $this->translator->trans('admin.button.delete', [], 'messages')
+                    $this->translator->trans('admin.button.delete', [], 'messages'),
                 ),
                 'label_html' => true,
             ]);
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

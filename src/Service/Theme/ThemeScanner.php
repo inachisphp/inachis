@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Theme;
 
-use Composer\Semver\Semver;
 use Inachis\Model\System\ThemeDto;
 use Inachis\Service\ManifestLoader;
 use Inachis\Service\System\VersionService;
@@ -24,11 +23,7 @@ final readonly class ThemeScanner
     private const CACHE_KEY_SCAN_STATUS = 'themes.scan.status';
 
     /**
-     * Constructor for the ThemeScanner service
-     *
-     * @param string $projectDir
-     * @param CacheItemPoolInterface $cache
-     * @param LoggerInterface $logger
+     * Constructor for the ThemeScanner service.
      */
     public function __construct(
         #[Autowire('%kernel.project_dir%')]
@@ -37,10 +32,11 @@ final readonly class ThemeScanner
         private CacheItemPoolInterface $cache,
         private LoggerInterface $logger,
         private ManifestLoader $manifestLoader,
-    ) {}
+    ) {
+    }
 
     /**
-     * Gets an array of installed themes
+     * Gets an array of installed themes.
      *
      * @return array<ThemeDto>
      */
@@ -61,7 +57,7 @@ final readonly class ThemeScanner
     }
 
     /**
-     * Returns the results of the last theme directory scan
+     * Returns the results of the last theme directory scan.
      *
      * @return array{lastScannedAt: int|null, errorCount: int, errors: string[]}
      */
@@ -91,7 +87,7 @@ final readonly class ThemeScanner
 
     /**
      * Triggers a scan of the themes folder, caches the result, and caches
-     * the result of the scan
+     * the result of the scan.
      *
      * @return array<ThemeDto>
      */
@@ -116,9 +112,10 @@ final readonly class ThemeScanner
     }
 
     /**
-     * Scans the themes directory for a list of themes
+     * Scans the themes directory for a list of themes.
      *
      * @param list<string> &$errors
+     *
      * @return array<ThemeDto>
      */
     public function scanThemes(array &$errors = []): array
@@ -137,18 +134,18 @@ final readonly class ThemeScanner
                 }
 
                 $theme = $this->loadTheme(
-                    $themesDirectory . DIRECTORY_SEPARATOR . $directory
+                    $themesDirectory.DIRECTORY_SEPARATOR.$directory,
                 );
 
                 if (null === $theme) {
-                    $errors[] = sprintf('Skipped invalid theme at %s', $themesDirectory . DIRECTORY_SEPARATOR . $directory);
+                    $errors[] = sprintf('Skipped invalid theme at %s', $themesDirectory.DIRECTORY_SEPARATOR.$directory);
                     continue;
                 }
 
                 if (isset($seenIdentifiers[$theme->identifier])) {
                     $this->logger->warning(sprintf(
                         'Duplicate theme identifier "%s" found.',
-                        $theme->identifier
+                        $theme->identifier,
                     ));
                     $errors[] = sprintf('Duplicate theme identifier "%s" found.', $theme->identifier);
 
@@ -162,17 +159,14 @@ final readonly class ThemeScanner
 
         usort(
             $themes,
-            static fn (ThemeDto $a, ThemeDto $b): int => strcasecmp($a->name, $b->name)
+            static fn (ThemeDto $a, ThemeDto $b): int => strcasecmp($a->name, $b->name),
         );
 
         return $themes;
     }
 
     /**
-     * Gets a specific theme
-     *
-     * @param string $identifier
-     * @return ThemeDto|null
+     * Gets a specific theme.
      */
     public function getTheme(string $identifier): ?ThemeDto
     {
@@ -186,10 +180,7 @@ final readonly class ThemeScanner
     }
 
     /**
-     * Loads details of a specific theme
-     *
-     * @param string $themePath
-     * @return ThemeDto|null
+     * Loads details of a specific theme.
      */
     private function loadTheme(string $themePath): ?ThemeDto
     {
@@ -197,7 +188,7 @@ final readonly class ThemeScanner
             return null;
         }
 
-        $manifestFile = $themePath . '/theme.yaml';
+        $manifestFile = $themePath.'/theme.yaml';
         $manifest = $this->manifestLoader->load($manifestFile);
 
         if (null === $manifest) {
@@ -210,20 +201,20 @@ final readonly class ThemeScanner
 
         return $this->createThemeDto(
             $themePath,
-            $manifest
+            $manifest,
         );
     }
 
     /**
-     * Extracts a feature list for the given theme manifest
+     * Extracts a feature list for the given theme manifest.
      *
      * @param array<mixed> $manifest
-     * @param string $section
+     *
      * @return list<string>|array{}
      */
     private function extractFeatures(
         array $manifest,
-        string $section
+        string $section,
     ): array {
         $sectionData = $manifest[$section] ?? null;
         if (!is_array($sectionData)) {
@@ -238,13 +229,13 @@ final readonly class ThemeScanner
         return array_values(
             array_filter(
                 $features,
-                static fn (mixed $feature): bool => is_string($feature)
-            )
+                static fn (mixed $feature): bool => is_string($feature),
+            ),
         );
     }
 
     /**
-     * Reutns a list of folders to look for themes
+     * Reutns a list of folders to look for themes.
      *
      * @return list<string>
      */
@@ -252,40 +243,41 @@ final readonly class ThemeScanner
     {
         return [
             // $this->projectDir . '/themes',
-            $this->projectDir . '/templates/themes',
+            $this->projectDir.'/templates/themes',
         ];
     }
 
     private function isValidManifest(
         array $manifest,
-        string $themePath
+        string $themePath,
     ): bool {
         foreach (['identifier', 'name'] as $requiredField) {
             if (
-                !isset($manifest[$requiredField]) ||
-                !is_string($manifest[$requiredField]) ||
-                '' === trim($manifest[$requiredField])
+                !isset($manifest[$requiredField])
+                || !is_string($manifest[$requiredField])
+                || '' === trim($manifest[$requiredField])
             ) {
                 $this->logger->warning(sprintf(
                     'Theme "%s" is missing required field "%s".',
                     basename($themePath),
-                    $requiredField
+                    $requiredField,
                 ));
 
                 return false;
             }
         }
+
         return true;
     }
 
     private function createThemeDto(
         string $themePath,
-        array $manifest
+        array $manifest,
     ): ThemeDto {
         $screenshot = null;
         foreach (['screenshot.png', 'screenshot.jpg', 'screenshot.webp'] as $file) {
-            if (is_file($themePath . '/' . $file)) {
-                $screenshot = $themePath . '/' . $file;
+            if (is_file($themePath.'/'.$file)) {
+                $screenshot = $themePath.'/'.$file;
                 break;
             }
         }
@@ -307,11 +299,11 @@ final readonly class ThemeScanner
 
         $theme->requiredFeatures = $this->extractFeatures(
             $manifest,
-            'requires'
+            'requires',
         );
         $theme->suggestedFeatures = $this->extractFeatures(
             $manifest,
-            'suggests'
+            'suggests',
         );
 
         return $theme;

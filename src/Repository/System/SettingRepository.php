@@ -13,14 +13,12 @@ use Doctrine\Persistence\ManagerRegistry;
 use Inachis\Entity\System\Setting;
 
 /**
-  * @extends ServiceEntityRepository<Setting>
+ * @extends ServiceEntityRepository<Setting>
  */
 class SettingRepository extends ServiceEntityRepository
 {
     /**
-     * Constructor
-     *
-     * @param ManagerRegistry $registry
+     * Constructor.
      */
     public function __construct(ManagerRegistry $registry)
     {
@@ -28,10 +26,7 @@ class SettingRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns a setting by name
-     *
-     * @param string $name
-     * @return Setting|null
+     * Returns a setting by name.
      */
     public function getByName(string $name): ?Setting
     {
@@ -41,10 +36,7 @@ class SettingRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns a value for a setting based on its name
-     *
-     * @param string $name
-     * @return string|null
+     * Returns a value for a setting based on its name.
      */
     public function getValue(string $name): ?string
     {
@@ -54,26 +46,19 @@ class SettingRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns result of checking if this setting exists by name
-     *
-     * @param string $name
-     * @return boolean
+     * Returns result of checking if this setting exists by name.
      */
     public function has(string $name): bool
     {
-        return $this->getByName($name) !== null;
+        return null !== $this->getByName($name);
     }
 
     /**
-     * Sets the value for a named setting
-     *
-     * @param string $name
-     * @param string|null $value
-     * @return Setting
+     * Sets the value for a named setting.
      */
     public function setValue(
         string $name,
-        ?string $value
+        ?string $value,
     ): Setting {
         $setting = $this->getByName($name);
 
@@ -92,9 +77,7 @@ class SettingRepository extends ServiceEntityRepository
     }
 
     /**
-     * Removes a setting by name
-     *
-     * @param string $name
+     * Removes a setting by name.
      */
     public function removeByName(string $name): void
     {
@@ -111,7 +94,7 @@ class SettingRepository extends ServiceEntityRepository
 
     /**
      * Returns all settings indexed by name.
-     * 
+     *
      * @return array<string,string|null>
      */
     public function getAllValues(): array
@@ -126,11 +109,7 @@ class SettingRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns the specified setting, or creates it - does not flush
-     *
-     * @param string $name
-     * @param string $default
-     * @return Setting
+     * Returns the specified setting, or creates it - does not flush.
      */
     public function getOrCreateSetting(string $name, string $default): Setting
     {
@@ -141,6 +120,7 @@ class SettingRepository extends ServiceEntityRepository
             $setting->setValue($default);
             $this->getEntityManager()->persist($setting);
         }
+
         return $setting;
     }
 }

@@ -16,8 +16,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Builds an amdin login form for TOTP entry
- * 
+ * Builds an amdin login form for TOTP entry.
+ *
  * @extends AbstractType<array{
  *     code?: string,
  *     verify?: string,
@@ -26,14 +26,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LoginTotpType extends AbstractType
 {
     /**
-     * Constructor for the LoginType
-     *
-     * @param TranslatorInterface $translator
+     * Constructor for the LoginType.
      */
-    public function __construct(private readonly TranslatorInterface $translator) {}
+    public function __construct(private readonly TranslatorInterface $translator)
+    {
+    }
 
     /**
-     * Builds the login form
+     * Builds the login form.
      *
      * @param FormBuilderInterface<array{
      *     code?: string,
@@ -45,18 +45,18 @@ class LoginTotpType extends AbstractType
     {
         $builder
            ->add('code', TextType::class, [
-                'attr' => [
-                    'aria-required' => 'true',
-                    'autocomplete' => 'one-time-code',
-                    'class' => 'auth-code-field',
-                    'inputmode' => 'numeric',
-                    'maxlength' => 6,
-                    'pattern' => '[0-9]{6}',
-                    'placeholder' => '••••••',
-                    'required' => true,
-                ],
-                'label' => 'Authentication code',
-            ])
+               'attr' => [
+                   'aria-required' => 'true',
+                   'autocomplete' => 'one-time-code',
+                   'class' => 'auth-code-field',
+                   'inputmode' => 'numeric',
+                   'maxlength' => 6,
+                   'pattern' => '[0-9]{6}',
+                   'placeholder' => '••••••',
+                   'required' => true,
+               ],
+               'label' => 'Authentication code',
+           ])
             ->add('trustDevice', CheckboxType::class, [
                 'attr' => [
                     'class' => 'checkbox',

@@ -19,7 +19,7 @@ class ContentRevisionCompareTest extends TestCase
 
     public function setUp(): void
     {
-        $this->revisionCompare  = new ContentRevisionCompare();
+        $this->revisionCompare = new ContentRevisionCompare();
         parent::setUp();
     }
 

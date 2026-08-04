@@ -13,9 +13,20 @@ use Inachis\Diagnostics\CheckResult;
 
 final class SessionAutoStartCheck implements CheckInterface
 {
-    public function getId(): string { return 'session_auto_start'; }
-    public function getLabel(): string { return 'session.auto_start'; }
-    public function getSection(): string { return 'Environment'; }
+    public function getId(): string
+    {
+        return 'session_auto_start';
+    }
+
+    public function getLabel(): string
+    {
+        return 'session.auto_start';
+    }
+
+    public function getSection(): string
+    {
+        return 'Environment';
+    }
 
     public function run(): CheckResult
     {
@@ -29,8 +40,8 @@ final class SessionAutoStartCheck implements CheckInterface
             $this->getLabel(),
             $status,
             $value ? 'enabled' : 'disabled',
-            $status === 'ok' ? 'Session auto-start is disabled, as recommended.' : 'session.auto_start is enabled; can interfere with framework session management.',
-            $status !== 'ok' ? 'Set session.auto_start=0 in php.ini.' : null,
+            'ok' === $status ? 'Session auto-start is disabled, as recommended.' : 'session.auto_start is enabled; can interfere with framework session management.',
+            'ok' !== $status ? 'Set session.auto_start=0 in php.ini.' : null,
             $this->getSection(),
             '',
         );

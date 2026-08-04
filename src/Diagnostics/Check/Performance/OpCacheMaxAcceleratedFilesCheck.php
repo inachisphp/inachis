@@ -13,24 +13,36 @@ use Inachis\Diagnostics\CheckResult;
 
 final class OpCacheMaxAcceleratedFilesCheck implements CheckInterface
 {
-    public function getId(): string { return 'opcache_max_accelerated_files'; }
-    public function getLabel(): string { return 'PHP Opcache Max Accelerated Files'; }
-    public function getSection(): string { return 'Performance'; }
+    public function getId(): string
+    {
+        return 'opcache_max_accelerated_files';
+    }
+
+    public function getLabel(): string
+    {
+        return 'PHP Opcache Max Accelerated Files';
+    }
+
+    public function getSection(): string
+    {
+        return 'Performance';
+    }
 
     public function run(): CheckResult
     {
         $value = (string) ini_get('opcache.max_accelerated_files');
         $recommended = 20000;
         $status = $value >= $recommended ? 'ok' : 'warning';
+
         return new CheckResult(
             $this->getId(),
             $this->getLabel(),
             $status,
             $value,
-            $status === 'ok' ? "Max accelerated files: {$value}" : "Max accelerated files: {$value} (recommended >= 20000)",
-            $status === 'ok' ? null : 'Increase opcache.max_accelerated_files to at least 20000.',
+            'ok' === $status ? "Max accelerated files: {$value}" : "Max accelerated files: {$value} (recommended >= 20000)",
+            'ok' === $status ? null : 'Increase opcache.max_accelerated_files to at least 20000.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }

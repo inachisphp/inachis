@@ -12,8 +12,7 @@ use Inachis\Exception\InvalidTimezoneException;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
- * Class DateValidator
- * @package Inachis\Validator
+ * Class DateValidator.
  */
 class DateValidator
 {
@@ -22,7 +21,9 @@ class DateValidator
      * If user input is possible it should gracefully handle this exception.
      *
      * @param string|null $timezone The timezone to validate
+     *
      * @return string The validated timezone
+     *
      * @throws InvalidTimezoneException
      */
     public static function validateTimezone(?string $timezone): string
@@ -31,11 +32,9 @@ class DateValidator
             throw new InvalidArgumentException('The timezone can not be empty.');
         }
         if (!in_array($timezone, timezone_identifiers_list())) {
-            throw new InvalidTimezoneException(sprintf(
-                '"%s" is not a valid timezone',
-                $timezone
-            ));
+            throw new InvalidTimezoneException(sprintf('"%s" is not a valid timezone', $timezone));
         }
+
         return $timezone;
     }
 }

@@ -15,7 +15,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Add this to cron such as *\/5 * * * * php /path/to/bin/console inachis:analytics:aggregate
+ * Add this to cron such as *\/5 * * * * php /path/to/bin/console inachis:analytics:aggregate.
  */
 #[AsCommand(
     name: 'inachis:analytics:aggregate',
@@ -24,31 +24,26 @@ use Symfony\Component\Console\Output\OutputInterface;
 class AggregateAnalyticsCommand extends Command
 {
     /**
-     * Constructor for AggregateAnalyticsCommand
-     *
-     * @param Connection $db
+     * Constructor for AggregateAnalyticsCommand.
      */
-    public function __construct(private Connection $db) {
-		parent::__construct();
-	}
+    public function __construct(private Connection $db)
+    {
+        parent::__construct();
+    }
 
-	/**
-	 * Processes log files and aggregates analytics data
-	 *
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 * @return int
-	 */
+    /**
+     * Processes log files and aggregates analytics data.
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $dir = __DIR__ . '/../../../var/analytics';
+        $dir = __DIR__.'/../../../var/analytics';
 
         if (!is_dir($dir)) {
             return Command::SUCCESS;
         }
 
-        $files = glob($dir . '/*-*.log');
-        if (!empty($files)){
+        $files = glob($dir.'/*-*.log');
+        if (!empty($files)) {
             foreach ($files as $file) {
                 $output->writeln(sprintf('Processing <info>%s</info> ...', basename($file)));
                 if (str_contains($file, '/analytics-')) {
@@ -65,17 +60,16 @@ class AggregateAnalyticsCommand extends Command
 
                 $output->writeln(sprintf('Processed %s', basename($file)));
 
-                rename($file, $file . '.processed');
+                rename($file, $file.'.processed');
             }
         }
+
         return Command::SUCCESS;
     }
 
-	/**
-	 * Processes a single log file and aggregates analytics data
-	 *
-	 * @param string $file
-	 */
+    /**
+     * Processes a single log file and aggregates analytics data.
+     */
     private function processFile(string $file): void
     {
         $handle = fopen($file, 'r');
@@ -85,7 +79,7 @@ class AggregateAnalyticsCommand extends Command
 
         $pageViews = [];
         $uniqueVisitors = [];
-		$referrers = [];
+        $referrers = [];
         $regionHits = []; // Array of [date => [countryCode => [name => string, hits => int]]]
 
         while (($line = fgets($handle)) !== false) {
@@ -96,22 +90,22 @@ class AggregateAnalyticsCommand extends Command
                 continue;
             }
 
-			$path = $this->normalisePath($data['path']);
+            $path = $this->normalisePath($data['path']);
             $date = $data['date'];
             $visitor = $data['visitor'] ?? null;
             $ip = $data['ip'] ?? null;
 
-            $key = $path . '|' . $date;
+            $key = $path.'|'.$date;
             $pageViews[$key] = ($pageViews[$key] ?? 0) + 1;
-			if ($visitor) {
+            if ($visitor) {
                 $uniqueVisitors[$date][$visitor] = true;
             }
 
-			$ref = $data['ref'] ?? null;
-			if ($ref) {
-				$key = $ref . '|' . $path . '|' . $date;
-				$referrers[$key] = ($referrers[$key] ?? 0) + 1;
-			}
+            $ref = $data['ref'] ?? null;
+            if ($ref) {
+                $key = $ref.'|'.$path.'|'.$date;
+                $referrers[$key] = ($referrers[$key] ?? 0) + 1;
+            }
 
             // Resolve country/region for this IP
             if ($ip) {
@@ -125,7 +119,7 @@ class AggregateAnalyticsCommand extends Command
                         'hits' => 0,
                     ];
                 }
-                $regionHits[$date][$code]['hits']++;
+                ++$regionHits[$date][$code]['hits'];
             }
         }
 
@@ -144,11 +138,11 @@ class AggregateAnalyticsCommand extends Command
                     'path' => $path,
                     'date' => $date,
                     'views' => $views,
-                ]
+                ],
             );
         }
 
-		foreach ($uniqueVisitors as $date => $visitors) {
+        foreach ($uniqueVisitors as $date => $visitors) {
             foreach (array_keys($visitors) as $visitorHash) {
                 $this->db->executeStatement(
                     '
@@ -158,28 +152,28 @@ class AggregateAnalyticsCommand extends Command
                     [
                         'hash' => $visitorHash,
                         'date' => $date,
-                    ]
+                    ],
                 );
             }
         }
 
-		foreach ($referrers as $key => $hits) {
-			[$domain, $path, $date] = explode('|', $key);
+        foreach ($referrers as $key => $hits) {
+            [$domain, $path, $date] = explode('|', $key);
 
-			$this->db->executeStatement(
-				'
+            $this->db->executeStatement(
+                '
 				INSERT INTO analytics_referrer (domain, path, date, hits)
 				VALUES (:domain, :path, :date, :hits)
 				ON DUPLICATE KEY UPDATE hits = hits + :hits
 				',
-				[
-					'domain' => $domain,
-					'path' => $path,
-					'date' => $date,
-					'hits' => $hits,
-				]
-			);
-		}
+                [
+                    'domain' => $domain,
+                    'path' => $path,
+                    'date' => $date,
+                    'hits' => $hits,
+                ],
+            );
+        }
 
         // Save region/country stats
         foreach ($regionHits as $date => $countries) {
@@ -195,67 +189,63 @@ class AggregateAnalyticsCommand extends Command
                         'name' => $countryData['name'],
                         'date' => $date,
                         'hits' => $countryData['hits'],
-                    ]
+                    ],
                 );
             }
         }
     }
 
-	/**
-	 * Processes 404 files and aggregates 404 data
-	 *
-	 * @param string $file
-	 */
-	private function processErrorFile(string $file): void
-	{
-		$handle = fopen($file, 'r');
+    /**
+     * Processes 404 files and aggregates 404 data.
+     */
+    private function processErrorFile(string $file): void
+    {
+        $handle = fopen($file, 'r');
 
-		if (!$handle) {
-			return;
-		}
+        if (!$handle) {
+            return;
+        }
 
-		$counts = [];
+        $counts = [];
 
-		while (($line = fgets($handle)) !== false) {
+        while (($line = fgets($handle)) !== false) {
             /** @var array{path?: string, date?: string, code?: string, ts?:int} $data */
-			$data = json_decode($line, true);
+            $data = json_decode($line, true);
 
-			if (!$data || !isset($data['path'], $data['date'], $data['code'])) {
-				continue;
-			}
+            if (!$data || !isset($data['path'], $data['date'], $data['code'])) {
+                continue;
+            }
             if ($this->shouldIgnoreError($data['path'])) {
                 continue;
             }
 
-            $key = $this->normalisePath($data['path']) . '|' . $data['date'] . '|' . $data['code'];
-			$counts[$key] = ($counts[$key] ?? 0) + 1;
-		}
+            $key = $this->normalisePath($data['path']).'|'.$data['date'].'|'.$data['code'];
+            $counts[$key] = ($counts[$key] ?? 0) + 1;
+        }
 
-		fclose($handle);
+        fclose($handle);
 
-		foreach ($counts as $key => $hits) {
-			[$path, $date, $code] = explode('|', $key);
+        foreach ($counts as $key => $hits) {
+            [$path, $date, $code] = explode('|', $key);
 
-			$this->db->executeStatement(
-				'
+            $this->db->executeStatement(
+                '
 				INSERT INTO analytics_errors (path, date, code, hits)
 				VALUES (:path, :date, :code, :hits)
 				ON DUPLICATE KEY UPDATE hits = hits + :hits
 				',
-				[
-					'path' => $path,
-					'date' => $date,
-					'code' => $code,
-					'hits' => $hits,
-				]
-			);
-		}
-	}
+                [
+                    'path' => $path,
+                    'date' => $date,
+                    'code' => $code,
+                    'hits' => $hits,
+                ],
+            );
+        }
+    }
 
     /**
-     * Processes RSS subscriber log files
-     *
-     * @param string $file
+     * Processes RSS subscriber log files.
      */
     private function processSubscriberFile(string $file): void
     {
@@ -282,14 +272,23 @@ class AggregateAnalyticsCommand extends Command
 
             // Detect feed aggregators
             $aggName = null;
-            if (stripos($ua, 'Feedly') !== false) { $aggName = 'Feedly'; }
-            elseif (stripos($ua, 'Feedbin') !== false) { $aggName = 'Feedbin'; }
-            elseif (stripos($ua, 'NewsBlur') !== false) { $aggName = 'NewsBlur'; }
-            elseif (stripos($ua, 'Bloglovin') !== false) { $aggName = 'Bloglovin'; }
-            elseif (stripos($ua, 'Blogtrottr') !== false) { $aggName = 'Blogtrottr'; }
-            elseif (stripos($ua, 'Superfeedr') !== false) { $aggName = 'Superfeedr'; }
-            elseif (stripos($ua, 'WordPress') !== false) { $aggName = 'WordPress'; }
-            elseif (stripos($ua, 'FeedFetcher') !== false) { $aggName = 'FeedFetcher'; }
+            if (false !== stripos($ua, 'Feedly')) {
+                $aggName = 'Feedly';
+            } elseif (false !== stripos($ua, 'Feedbin')) {
+                $aggName = 'Feedbin';
+            } elseif (false !== stripos($ua, 'NewsBlur')) {
+                $aggName = 'NewsBlur';
+            } elseif (false !== stripos($ua, 'Bloglovin')) {
+                $aggName = 'Bloglovin';
+            } elseif (false !== stripos($ua, 'Blogtrottr')) {
+                $aggName = 'Blogtrottr';
+            } elseif (false !== stripos($ua, 'Superfeedr')) {
+                $aggName = 'Superfeedr';
+            } elseif (false !== stripos($ua, 'WordPress')) {
+                $aggName = 'WordPress';
+            } elseif (false !== stripos($ua, 'FeedFetcher')) {
+                $aggName = 'FeedFetcher';
+            }
 
             if ($aggName) {
                 $count = 1;
@@ -323,15 +322,13 @@ class AggregateAnalyticsCommand extends Command
                     'path' => $path,
                     'date' => $date,
                     'subscribers' => $totalSubscribers,
-                ]
+                ],
             );
         }
     }
 
     /**
-     * Processes bot log files and aggregates bot traffic by user-agent per day
-     *
-     * @param string $file
+     * Processes bot log files and aggregates bot traffic by user-agent per day.
      */
     private function processBotFile(string $file): void
     {
@@ -352,7 +349,7 @@ class AggregateAnalyticsCommand extends Command
 
             $ua = mb_substr(trim($data['ua']), 0, 255);
             $date = $data['date'];
-            $key = $ua . '|' . $date;
+            $key = $ua.'|'.$date;
             $counts[$key] = ($counts[$key] ?? 0) + 1;
         }
 
@@ -368,29 +365,28 @@ class AggregateAnalyticsCommand extends Command
                 ON DUPLICATE KEY UPDATE hits = hits + :hits
                 ',
                 [
-                    'ua'   => $ua,
+                    'ua' => $ua,
                     'date' => $date,
                     'hits' => $hits,
-                ]
+                ],
             );
         }
     }
 
     /**
-     * Resolves an IP to its Country Code and Country Name using a cache-backed GeoIP lookup
+     * Resolves an IP to its Country Code and Country Name using a cache-backed GeoIP lookup.
      *
-     * @param string $ip
      * @return array{code: string, name: string}
      */
     private function resolveIpToCountry(string $ip): array
     {
         // 1. Identify local/private/empty IPs
         if (
-            $ip === '127.0.0.1' ||
-            $ip === '::1' ||
-            str_starts_with($ip, '192.168.') ||
-            str_starts_with($ip, '10.') ||
-            filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false
+            '127.0.0.1' === $ip
+            || '::1' === $ip
+            || str_starts_with($ip, '192.168.')
+            || str_starts_with($ip, '10.')
+            || false === filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)
         ) {
             return ['code' => 'Local', 'name' => 'Local Network'];
         }
@@ -400,13 +396,13 @@ class AggregateAnalyticsCommand extends Command
             /** @var array{country_code: string, country_name: string}|array{} $cached */
             $cached = $this->db->fetchAssociative(
                 'SELECT country_code, country_name FROM analytics_ip_cache WHERE ip = :ip LIMIT 1',
-                ['ip' => $ip]
+                ['ip' => $ip],
             );
 
             if ($cached) {
                 return [
                     'code' => $cached['country_code'],
-                    'name' => $cached['country_name']
+                    'name' => $cached['country_name'],
                 ];
             }
         } catch (\Exception $e) {
@@ -421,14 +417,14 @@ class AggregateAnalyticsCommand extends Command
             $ctx = stream_context_create([
                 'http' => [
                     'timeout' => 2.0,
-                    'user_agent' => 'InachisAnalytics/1.0'
-                ]
+                    'user_agent' => 'InachisAnalytics/1.0',
+                ],
             ]);
-            $response = @file_get_contents('http://ip-api.com/json/' . urlencode($ip) . '?fields=status,country,countryCode', false, $ctx);
+            $response = @file_get_contents('http://ip-api.com/json/'.urlencode($ip).'?fields=status,country,countryCode', false, $ctx);
             if ($response) {
                 /** @var array{status?:string, countryCode?:string, country?:string}|array{} */
                 $res = json_decode($response, true);
-                if ($res && isset($res['status']) && $res['status'] === 'success') {
+                if ($res && isset($res['status']) && 'success' === $res['status']) {
                     $code = $res['countryCode'] ?? 'Unknown';
                     $name = $res['country'] ?? 'Unknown';
                 }
@@ -447,8 +443,8 @@ class AggregateAnalyticsCommand extends Command
                 [
                     'ip' => $ip,
                     'code' => $code,
-                    'name' => $name
-                ]
+                    'name' => $name,
+                ],
             );
         } catch (\Exception $e) {
             // Ignore DB errors
@@ -458,9 +454,10 @@ class AggregateAnalyticsCommand extends Command
     }
 
     /**
-     * Ensures no path is stored with more than 255 characters
+     * Ensures no path is stored with more than 255 characters.
      *
      * @param string $path The path to normalise
+     *
      * @return string The normalised path
      */
     private function normalisePath(string $path): string
@@ -470,9 +467,10 @@ class AggregateAnalyticsCommand extends Command
 
     /**
      * Exclude obvious vulnerability scans from statistics - they should
-     * be dealt with through other means
+     * be dealt with through other means.
      *
      * @param string $path The path to check for ignoring
+     *
      * @return bool Should the current path be ignored
      */
     private function shouldIgnoreError(string $path): bool
@@ -487,7 +485,7 @@ class AggregateAnalyticsCommand extends Command
         ];
 
         foreach ($patterns as $pattern) {
-            if (stripos($path, $pattern) !== false) {
+            if (false !== stripos($path, $pattern)) {
                 return true;
             }
         }
@@ -497,8 +495,6 @@ class AggregateAnalyticsCommand extends Command
 
     /**
      * Processes security event logs.
-     *
-     * @param string $file
      */
     private function processSecurityFile(string $file): void
     {
@@ -514,7 +510,6 @@ class AggregateAnalyticsCommand extends Command
         $events = [];
 
         while (($line = fgets($handle)) !== false) {
-
             /**
              * @var array{
              *     date?:string,
@@ -528,18 +523,17 @@ class AggregateAnalyticsCommand extends Command
             $data = json_decode($line, true);
 
             if (
-                !$data ||
-                !isset(
+                !$data
+                || !isset(
                     $data['date'],
                     $data['ip'],
                     $data['path'],
                     $data['type'],
-                    $data['severity']
+                    $data['severity'],
                 )
             ) {
                 continue;
             }
-
 
             $path = $this->normalisePath($data['path']);
 
@@ -556,9 +550,7 @@ class AggregateAnalyticsCommand extends Command
 
         fclose($handle);
 
-
         foreach ($events as $key => $hits) {
-
             [
                 $date,
                 $type,
@@ -566,7 +558,6 @@ class AggregateAnalyticsCommand extends Command
                 $path,
                 $ip
             ] = explode('|', $key);
-
 
             $this->db->executeStatement(
                 '
@@ -601,7 +592,7 @@ class AggregateAnalyticsCommand extends Command
                     'ip' => $ip,
                     'ip_hash' => hash('sha256', $ip),
                     'hits' => $hits,
-                ]
+                ],
             );
         }
     }

@@ -21,10 +21,25 @@ final class SensitiveFilesCheck implements CheckInterface
         'public/vendor',
     ];
 
-    public function getId(): string { return 'sensitive_files'; }
-    public function getLabel(): string { return 'Sensitive Files Exposure'; }
-    public function getSection(): string { return 'Security'; }
-    public function getSeverity(): string { return 'high'; }
+    public function getId(): string
+    {
+        return 'sensitive_files';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Sensitive Files Exposure';
+    }
+
+    public function getSection(): string
+    {
+        return 'Security';
+    }
+
+    public function getSeverity(): string
+    {
+        return 'high';
+    }
 
     public function run(): CheckResult
     {
@@ -43,10 +58,10 @@ final class SensitiveFilesCheck implements CheckInterface
             $this->getLabel(),
             $status,
             $value,
-            $status === 'ok' ? 'No sensitive files found in public directory.' : 'Sensitive files detected in public directory!',
-            $status === 'ok' ? null : 'Move sensitive files out of the webroot.',
+            'ok' === $status ? 'No sensitive files found in public directory.' : 'Sensitive files detected in public directory!',
+            'ok' === $status ? null : 'Move sensitive files out of the webroot.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }

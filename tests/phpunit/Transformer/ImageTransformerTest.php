@@ -8,12 +8,10 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Transformer;
 
-use Inachis\Transformer\ImageTransformer;
 use Imagick;
-use ImagickException;
+use Inachis\Transformer\ImageTransformer;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 class ImageTransformerTest extends TestCase
 {
@@ -34,18 +32,18 @@ class ImageTransformerTest extends TestCase
 
     public function testCreateImagick(): void
     {
-        $reflection = new ReflectionClass($this->imageTransformer);
+        $reflection = new \ReflectionClass($this->imageTransformer);
         $method = $reflection->getMethod('createImagick');
-        $this->assertEquals(new Imagick(), $method->invoke($this->imageTransformer));
+        $this->assertEquals(new \Imagick(), $method->invoke($this->imageTransformer));
     }
 
     /**
-     * @throws ImagickException
+     * @throws \ImagickException
      * @throws Exception
      */
     public function testConvertHeicToJpegWithAutoOrient(): void
     {
-        $mock = $this->createMock(Imagick::class);
+        $mock = $this->createMock(\Imagick::class);
 
         $mock->expects($this->once())->method('readImage')->with('/src.heic');
         $mock->expects($this->once())->method('setImageFormat')->with('jpeg');
@@ -61,13 +59,25 @@ class ImageTransformerTest extends TestCase
 
         $service = new class($mock) extends ImageTransformer {
             private $m;
-            public function __construct($m) { $this->m = $m; }
 
-            protected function isHeicAvailable(): bool { return true; }
-            protected function createImagick(): Imagick { return $this->m; }
+            public function __construct($m)
+            {
+                $this->m = $m;
+            }
 
-            protected function imagickSupportsMethod(Imagick $i, string $method): bool {
-                return $method === 'autoOrient';
+            protected function isHeicAvailable(): bool
+            {
+                return true;
+            }
+
+            protected function createImagick(): \Imagick
+            {
+                return $this->m;
+            }
+
+            protected function imagickSupportsMethod(\Imagick $i, string $method): bool
+            {
+                return 'autoOrient' === $method;
             }
         };
 
@@ -75,12 +85,12 @@ class ImageTransformerTest extends TestCase
     }
 
     /**
-     * @throws ImagickException
+     * @throws \ImagickException
      * @throws Exception
      */
     public function testConvertHeicToJpegWithAutoRotateImageAndResize(): void
     {
-        $mock = $this->createMock(Imagick::class);
+        $mock = $this->createMock(\Imagick::class);
 
         $mock->expects($this->once())->method('readImage')->with('/input.heic');
 
@@ -99,17 +109,29 @@ class ImageTransformerTest extends TestCase
 
         $service = new class($mock) extends ImageTransformer {
             private $m;
-            public function __construct($m) { $this->m = $m; }
 
-            protected function isHeicAvailable(): bool { return true; }
-            protected function createImagick(): Imagick { return $this->m; }
-
-            protected function imagickSupportsMethod(Imagick $i, string $method): bool {
-                // Simulate autoRotateImage exists, autoOrient does not
-                return $method === 'autoRotateImage';
+            public function __construct($m)
+            {
+                $this->m = $m;
             }
 
-            protected function applyOrientation(Imagick $imagick): void
+            protected function isHeicAvailable(): bool
+            {
+                return true;
+            }
+
+            protected function createImagick(): \Imagick
+            {
+                return $this->m;
+            }
+
+            protected function imagickSupportsMethod(\Imagick $i, string $method): bool
+            {
+                // Simulate autoRotateImage exists, autoOrient does not
+                return 'autoRotateImage' === $method;
+            }
+
+            protected function applyOrientation(\Imagick $imagick): void
             {
                 // stand-in for autoRotateImage() that definitely exists
                 $imagick->getImageBlob();
@@ -120,18 +142,22 @@ class ImageTransformerTest extends TestCase
     }
 
     /**
-     * @throws ImagickException
+     * @throws \ImagickException
      * @throws Exception
      */
     public function testConvertHeicToJpegWhenHeicIsNotSupported(): void
     {
         // Imagick should NOT be created or called.
-        $imagick = $this->createStub(Imagick::class);
+        $imagick = $this->createStub(\Imagick::class);
 
         // Anonymous subclass overrides isHEICSupported() to force false
         $service = new class($imagick) extends ImageTransformer {
             private $mock;
-            public function __construct($mock) { $this->mock = $mock; }
+
+            public function __construct($mock)
+            {
+                $this->mock = $mock;
+            }
 
             public function isHEICSupported(): bool
             {
@@ -139,7 +165,7 @@ class ImageTransformerTest extends TestCase
             }
 
             // ensure Imagick is never actually requested
-            protected function createImagick(): Imagick
+            protected function createImagick(): \Imagick
             {
                 $this->fail('createImagick() should not be called when HEIC is unsupported.');
             }
@@ -151,6 +177,4 @@ class ImageTransformerTest extends TestCase
         // Expect: NO interactions with Imagick
         $this->assertTrue(true, 'convertHeicToJpeg should exit early when HEIC unsupported.');
     }
-
-
 }

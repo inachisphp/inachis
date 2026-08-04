@@ -32,8 +32,9 @@ class LlmsTxtType extends AbstractType
     public function __construct(
         private PermissionResolver $permissionResolver,
         private Security $security,
-        private readonly TranslatorInterface $translator
-    ) {}
+        private readonly TranslatorInterface $translator,
+    ) {
+    }
 
     /**
      * @param FormBuilderInterface<array{
@@ -44,15 +45,15 @@ class LlmsTxtType extends AbstractType
      */
     public function buildForm(
         FormBuilderInterface $builder,
-        array $options
+        array $options,
     ): void {
         $user = $this->security->getUser();
         $allowEdit = $this->permissionResolver->hasPermission(
             $user,
             PermissionResource::CRAWLER,
-            PermissionAction::EDIT
+            PermissionAction::EDIT,
         );
-        
+
         $builder->add('llms_txt', TextareaType::class, [
             'attr' => [
                 'aria-labelledby' => 'title_label',
@@ -78,8 +79,8 @@ class LlmsTxtType extends AbstractType
                     $this->translator->trans(
                         'admin.button.save',
                         [],
-                        'messages'
-                    )
+                        'messages',
+                    ),
                 ),
                 'label_html' => true,
             ]);
@@ -87,13 +88,10 @@ class LlmsTxtType extends AbstractType
     }
 
     /**
-     * Configure options for the form
-     *
-     * @param OptionsResolver $resolver
-     * @return void
+     * Configure options for the form.
      */
     public function configureOptions(
-        OptionsResolver $resolver
+        OptionsResolver $resolver,
     ): void {
         $resolver->setDefaults([
             'attr' => [

@@ -11,7 +11,9 @@ namespace Inachis\Diagnostics;
 interface CheckInterface
 {
     public function getId(): string;
+
     public function getLabel(): string;
+
     public function getSection(): string;
 
     public function run(): CheckResult;

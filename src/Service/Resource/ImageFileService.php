@@ -12,36 +12,33 @@ use Inachis\Entity\Media\Image;
 use Inachis\Transformer\ImageTransformer;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-/**
- *
- */
 readonly class ImageFileService
 {
     public function __construct(
-        private ImageTransformer $transformer
-    ) {}
+        private ImageTransformer $transformer,
+    ) {
+    }
 
     /**
-     * Create a hash of the uploaded image
-     * @param UploadedFile $file
-     * @return string
+     * Create a hash of the uploaded image.
      */
     public function createChecksum(UploadedFile $file): string
     {
         $path = $file->getRealPath();
-        if ($path === false) {
+        if (false === $path) {
             throw new \RuntimeException('Unable to determine file path.');
         }
         $hash = hash_file('sha256', $path);
-        if ($hash === false) {
+        if (false === $hash) {
             throw new \RuntimeException('Unable to generate checksum.');
         }
+
         return $hash;
     }
 
     /**
-     * Uses PHP function getimagesize to get the dimensions of the uploaded image
-     * @param UploadedFile $file
+     * Uses PHP function getimagesize to get the dimensions of the uploaded image.
+     *
      * @return array<int|string, int|string>|false
      */
     public function getImageDimensions(UploadedFile $file): array|false
@@ -50,8 +47,7 @@ readonly class ImageFileService
     }
 
     /**
-     * Optimise image: resize, compress, convert to WebP/AVIF
-     *
+     * Optimise image: resize, compress, convert to WebP/AVIF.
      */
     public function optimise(UploadedFile $file): UploadedFile
     {
@@ -62,12 +58,12 @@ readonly class ImageFileService
         $file = $this->convertHEICToJPEG($file);
 
         $sourcePath = $file->getRealPath();
-        if ($sourcePath === false) {
+        if (false === $sourcePath) {
             throw new \RuntimeException('Unable to determine file path.');
         }
 
         $destinationPath = tempnam(sys_get_temp_dir(), 'opt_');
-        if ($destinationPath === false) {
+        if (false === $destinationPath) {
             throw new \RuntimeException('Unable to create temp file.');
         }
 
@@ -76,30 +72,27 @@ readonly class ImageFileService
             $sourcePath,
             $destinationPath,
             $maxWidth,
-            $maxHeight
+            $maxHeight,
         );
 
         $extension = strtolower(pathinfo($destinationPath, PATHINFO_EXTENSION));
         if (!in_array($extension, ['webp', 'avif'], true)) {
             $extension = '.webp';
-            rename($destinationPath, $destinationPath . $extension);
+            rename($destinationPath, $destinationPath.$extension);
             $destinationPath .= $extension;
         }
 
         return new UploadedFile(
             $destinationPath,
-            pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . $extension,
+            pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME).$extension,
             mime_content_type($destinationPath) ?: null,
             null,
-            true
+            true,
         );
     }
 
     /**
-     * Convert HEIC to JPEG if needed
-     *
-     * @param UploadedFile $file
-     * @return UploadedFile
+     * Convert HEIC to JPEG if needed.
      */
     public function convertHEICToJPEG(UploadedFile $file): UploadedFile
     {
@@ -116,17 +109,17 @@ readonly class ImageFileService
         }
 
         $sourcePath = $file->getRealPath();
-        if ($sourcePath === false) {
+        if (false === $sourcePath) {
             throw new \RuntimeException('Unable to determine file path.');
         }
 
-        $destinationPath = tempnam(sys_get_temp_dir(), 'heic_') . '.jpg';
+        $destinationPath = tempnam(sys_get_temp_dir(), 'heic_').'.jpg';
 
         try {
             $this->transformer->convertHeicToJpeg(
                 $sourcePath,
                 $destinationPath,
-                85
+                85,
             );
         } catch (\ImagickException $e) {
             unlink($destinationPath);
@@ -135,7 +128,7 @@ readonly class ImageFileService
 
         return new UploadedFile(
             $destinationPath,
-            pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '.jpg',
+            pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME).'.jpg',
             'image/jpeg',
             null,
             true,

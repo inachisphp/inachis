@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Entity\Media;
 
-use DateTimeImmutable;
 use Inachis\Entity\Media\Image;
 use Inachis\Entity\User\User;
 use PHPUnit\Framework\TestCase;
@@ -91,15 +90,15 @@ class ImageTest extends TestCase
         $this->assertEquals('test', $this->image->getAuthor()->getUsername());
     }
 
-        public function testSetAndGetCreatedAt(): void
+    public function testSetAndGetCreatedAt(): void
     {
-        $this->image->setCreatedAt(new DateTimeImmutable('1970-01-02 01:34:56'));
+        $this->image->setCreatedAt(new \DateTimeImmutable('1970-01-02 01:34:56'));
         $this->assertEquals('1970-01-02 01:34:56', $this->image->getCreatedAt()->format('Y-m-d H:i:s'));
     }
 
     public function testSetAndGetUpdatedAt(): void
     {
-        $this->image->setUpdatedAt(new DateTimeImmutable('1970-01-02 01:34:56'));
+        $this->image->setUpdatedAt(new \DateTimeImmutable('1970-01-02 01:34:56'));
         $this->assertEquals('1970-01-02 01:34:56', $this->image->getUpdatedAt()->format('Y-m-d H:i:s'));
     }
 

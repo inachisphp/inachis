@@ -11,10 +11,10 @@ namespace Inachis\Tests\phpunit\Security;
 use Inachis\Exception\InvalidContentSecurityPolicyException;
 use Inachis\Security\ContentSecurityPolicy;
 use PHPUnit\Framework\TestCase;
-use Exception;
 
 /**
  * @Entity
+ *
  * @group unit
  */
 class ContentSecurityPolicyTest extends TestCase
@@ -25,7 +25,7 @@ class ContentSecurityPolicyTest extends TestCase
     protected $csp;
 
     /**
-     * Set-up CSP defaults
+     * Set-up CSP defaults.
      */
     public function setUp(): void
     {
@@ -51,51 +51,59 @@ class ContentSecurityPolicyTest extends TestCase
                     }
                 }
             }',
-            true
+            true,
         );
 
         parent::setUp();
     }
+
     /**
-     * Test the enforce header
+     * Test the enforce header.
+     *
      * @throws InvalidContentSecurityPolicyException
      */
     public function testGenerateCSPEnforceHeader(): void
     {
         $this->assertEquals(
             'default-src \'self\'; script-src \'unsafe-eval\' \'self\' analytics.google.com; upgrade-insecure-requests',
-            ContentSecurityPolicy::getCSPEnforceHeader($this->csp)
+            ContentSecurityPolicy::getCSPEnforceHeader($this->csp),
         );
     }
+
     /**
-     * Test the report header
+     * Test the report header.
+     *
      * @throws InvalidContentSecurityPolicyException
      */
     public function testGenerateCSPReportHeader(): void
     {
         $this->assertEquals(
             'style-src \'self\' data:',
-            ContentSecurityPolicy::getCSPReportHeader($this->csp)
+            ContentSecurityPolicy::getCSPReportHeader($this->csp),
         );
     }
+
     /**
-     * Test the enforce header default is not an empty string
+     * Test the enforce header default is not an empty string.
+     *
      * @throws InvalidContentSecurityPolicyException
      */
     public function testGenerateCSPEnforceHeaderDefault(): void
     {
         $this->assertEmpty(
-            ContentSecurityPolicy::getCSPEnforceHeader()
+            ContentSecurityPolicy::getCSPEnforceHeader(),
         );
     }
+
     /**
-     * Test the report header default is not an empty string
+     * Test the report header default is not an empty string.
+     *
      * @throws InvalidContentSecurityPolicyException
      */
     public function testGenerateCSPReportHeaderDefault(): void
     {
         $this->assertEmpty(
-            ContentSecurityPolicy::getCSPReportHeader()
+            ContentSecurityPolicy::getCSPReportHeader(),
         );
     }
 
@@ -108,10 +116,10 @@ class ContentSecurityPolicyTest extends TestCase
                         "bar": true
                     }
                 }',
-                true
+                true,
             );
             ContentSecurityPolicy::generateCSP($csp);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->assertStringContainsString('policy is not supported', $exception->getMessage());
         }
     }
@@ -125,10 +133,10 @@ class ContentSecurityPolicyTest extends TestCase
                         "bar": true
                     }
                 }',
-                true
+                true,
             );
             ContentSecurityPolicy::generateCSP($csp);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $this->assertStringContainsString('Could not understand', $exception->getMessage());
         }
     }

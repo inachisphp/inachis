@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Updater\Downloader;
 
-use RuntimeException;
-
 final class Downloader
 {
     public function download(
@@ -27,61 +25,40 @@ final class Downloader
             $url,
             'rb',
             false,
-            $context
+            $context,
         );
 
-        if ($source === false) {
-            throw new RuntimeException(
-                sprintf(
-                    'Unable to download "%s".',
-                    $url
-                )
-            );
+        if (false === $source) {
+            throw new \RuntimeException(sprintf('Unable to download "%s".', $url));
         }
 
-        $temporary = $destination . '.download';
+        $temporary = $destination.'.download';
 
         try {
             $target = fopen(
                 $temporary,
-                'wb'
+                'wb',
             );
 
-            if ($target === false) {
-                throw new RuntimeException(
-                    sprintf(
-                        'Unable to create "%s".',
-                        $temporary
-                    )
-                );
+            if (false === $target) {
+                throw new \RuntimeException(sprintf('Unable to create "%s".', $temporary));
             }
 
             $bytes = stream_copy_to_stream(
                 $source,
-                $target
+                $target,
             );
 
             fclose($target);
             fclose($source);
 
-            if ($bytes === false) {
-                throw new RuntimeException(
-                    sprintf(
-                        'Failed downloading "%s".',
-                        $url
-                    )
-                );
+            if (false === $bytes) {
+                throw new \RuntimeException(sprintf('Failed downloading "%s".', $url));
             }
 
             if (!rename($temporary, $destination)) {
-                throw new RuntimeException(
-                    sprintf(
-                        'Unable to move download to "%s".',
-                        $destination
-                    )
-                );
+                throw new \RuntimeException(sprintf('Unable to move download to "%s".', $destination));
             }
-
         } catch (\Throwable $exception) {
             fclose($source);
 

@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Exception;
 
-use Exception;
-
-class InvalidTimezoneException extends Exception
+class InvalidTimezoneException extends \Exception
 {
 }

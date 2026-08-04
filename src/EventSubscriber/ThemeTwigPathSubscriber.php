@@ -11,31 +11,28 @@ namespace Inachis\EventSubscriber;
 use Inachis\Service\Theme\ThemeManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Twig\Loader\FilesystemLoader;
 
 /**
- * Subscriber for retrieving current theme path
+ * Subscriber for retrieving current theme path.
  */
 final readonly class ThemeTwigPathSubscriber implements EventSubscriberInterface
 {
     /**
-     * Constructor for ThemeTwigPathSubscriber
-     *
-     * @param ThemeManager $themeManager
-     * @param FilesystemLoader $twigLoader
-     * @param string $projectDir
+     * Constructor for ThemeTwigPathSubscriber.
      */
     public function __construct(
         private ThemeManager $themeManager,
         private FilesystemLoader $twigLoader,
         #[Autowire('%kernel.project_dir%')]
         private string $projectDir,
-    ) {}
+    ) {
+    }
 
     /**
-     * Returns the events this subscriber listens for
+     * Returns the events this subscriber listens for.
      *
      * @return array<string, string>
      */
@@ -47,13 +44,11 @@ final readonly class ThemeTwigPathSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Prepends the current theme path to Twig's YAML config
-     *
-     * @param RequestEvent $event
+     * Prepends the current theme path to Twig's YAML config.
      */
     public function onKernelRequest(RequestEvent $event): void
     {
-        $defaultThemePath = $this->projectDir . '/templates/themes/default';
+        $defaultThemePath = $this->projectDir.'/templates/themes/default';
         if (is_dir($defaultThemePath) && !in_array($defaultThemePath, $this->twigLoader->getPaths(), true)) {
             $this->twigLoader->prependPath($defaultThemePath);
         }

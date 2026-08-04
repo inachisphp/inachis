@@ -11,19 +11,19 @@ namespace Inachis\Tests\phpunit\Form;
 use Inachis\Entity\Media\Image;
 use Inachis\Form\ImageType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
 class ImageTypeTest extends TypeTestCase
 {
-
     protected function getExtensions(): array
     {
         $translator = $this->createStub(TranslatorInterface::class);
+
         return [
-            new PreloadedExtension([new ImageType($translator)], [])
+            new PreloadedExtension([new ImageType($translator)], []),
         ];
     }
 
@@ -32,7 +32,7 @@ class ImageTypeTest extends TypeTestCase
         $form = $this->factory->create(ImageType::class, new Image());
         $view = $form->createView();
 
-        $expectedFields = [ 'filename', 'optimiseImage', 'title', 'altText', 'description', ];
+        $expectedFields = ['filename', 'optimiseImage', 'title', 'altText', 'description'];
         $this->assertSame($expectedFields, array_keys($view->children));
     }
 }

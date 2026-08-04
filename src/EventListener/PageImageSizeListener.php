@@ -58,7 +58,7 @@ class PageImageSizeListener implements EventSubscriber
         // Find all markdown /imgs/ references, e.g. ![alt](/imgs/filename.ext)
         if (preg_match_all('/\/imgs\/([a-zA-Z0-9_\-\.]+)/', $content, $matches)) {
             $filenames = array_unique($matches[1]);
-            
+
             if (!empty($filenames)) {
                 $images = $this->imageRepository->findBy(['filename' => $filenames]);
                 foreach ($images as $image) {
@@ -68,7 +68,7 @@ class PageImageSizeListener implements EventSubscriber
         }
 
         // Also include the feature image size if there is one
-        if ($entity->getFeatureImage() !== null) {
+        if (null !== $entity->getFeatureImage()) {
             $totalSize += $entity->getFeatureImage()->getFilesize();
         }
 

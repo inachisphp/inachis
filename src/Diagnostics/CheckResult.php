@@ -19,5 +19,6 @@ final class CheckResult
         public readonly ?string $recommendation,
         public readonly string $section, // environment|performance|security|webserver|etc
         public readonly string $confidence, // high|medium|low
-    ) {}
+    ) {
+    }
 }

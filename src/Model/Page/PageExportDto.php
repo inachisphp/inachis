@@ -9,49 +9,19 @@ declare(strict_types=1);
 namespace Inachis\Model\Page;
 
 /**
- * Data Transfer Object for page export
+ * Data Transfer Object for page export.
  */
 final class PageExportDto
 {
-    /**
-     * @var string
-     */
     public string $title;
-    /**
-     * @var string|null
-     */
     public ?string $subTitle = null;
-    /**
-     * @var string|null
-     */
     public ?string $content = null;
-    /**
-     * @var string
-     */
     public string $type;
-    /**
-     * @var string
-     */
     public string $status;
-    /**
-     * @var bool
-     */
     public bool $visible;
-    /**
-     * @var bool
-     */
     public bool $allowComments;
-    /**
-     * @var string|null
-     */
     public ?string $language = null;
-    /**
-     * @var string|null
-     */
     public ?string $timezone = null;
-    /**
-     * @var string|null
-     */
     public ?string $postDate = null;
 
     /**

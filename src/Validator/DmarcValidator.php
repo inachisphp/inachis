@@ -8,16 +8,17 @@ declare(strict_types=1);
 
 namespace Inachis\Validator;
 
-use Inachis\Model\Domain\ValidationIssue;
 use Inachis\Model\Domain\Severity;
+use Inachis\Model\Domain\ValidationIssue;
 
 /**
- * Validates DMARC records
+ * Validates DMARC records.
  */
 final class DmarcValidator
 {
     /**
      * @param list<string> $records
+     *
      * @return list<ValidationIssue>
      */
     public function validate(array $records): array
@@ -25,9 +26,9 @@ final class DmarcValidator
         /** @var list<ValidationIssue> $issues */
         $issues = [];
 
-        if ($records === []) {
+        if ([] === $records) {
             return [
-                new ValidationIssue('dmarc', 'No DMARC record found', Severity::Error)
+                new ValidationIssue('dmarc', 'No DMARC record found', Severity::Error),
             ];
         }
 
@@ -49,15 +50,15 @@ final class DmarcValidator
             $issues[] = new ValidationIssue('dmarc', 'DMARC sp not set: subdomains may inherit none', Severity::Warning);
         }
 
-        if (isset($parsed['pct']) && (!ctype_digit($parsed['pct']) || (int)$parsed['pct'] > 100)) {
+        if (isset($parsed['pct']) && (!ctype_digit($parsed['pct']) || (int) $parsed['pct'] > 100)) {
             $issues[] = new ValidationIssue('dmarc', 'pct must be between 0 and 100', Severity::Error);
         }
 
         foreach (['adkim', 'aspf'] as $tag) {
             if (isset($parsed[$tag])) {
-                if (!in_array($parsed[$tag], ['r','s'], true)) {
+                if (!in_array($parsed[$tag], ['r', 's'], true)) {
                     $issues[] = new ValidationIssue('dmarc', "$tag must be r or s", Severity::Error);
-                } elseif ($parsed[$tag] === 'r') {
+                } elseif ('r' === $parsed[$tag]) {
                     $issues[] = new ValidationIssue('dmarc', "$tag is relaxed (r), consider strict (s)", Severity::Warning);
                 }
             }
@@ -77,8 +78,8 @@ final class DmarcValidator
     }
 
     /**
-     * Parse DMARC record
-     * @param string $record
+     * Parse DMARC record.
+     *
      * @return array<string, string>
      */
     private function parse(string $record): array
@@ -91,15 +92,14 @@ final class DmarcValidator
                 $result[strtolower(trim($k))] = trim($v);
             }
         }
+
         return $result;
     }
 
     /**
-     * Validate RUA/RUF records
-     * @param string $rua
-     * @param string $type
+     * Validate RUA/RUF records.
+     *
      * @param list<ValidationIssue> $issues
-     * @return void
      */
     private function validateRuaRuf(string $rua, string $type, array &$issues): void
     {

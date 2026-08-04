@@ -8,19 +8,16 @@ declare(strict_types=1);
 
 namespace Inachis\Service\System\Csp;
 
-use Inachis\Model\System\CspReportDto;
 use Inachis\Enum\System\CspSeverity;
+use Inachis\Model\System\CspReportDto;
 
 /**
- * Determines the overall severity of the reported item
+ * Determines the overall severity of the reported item.
  */
 final class CspSeverityResolver
 {
     /**
-     * Resolves the DTO severity to the enum
-     *
-     * @param CspReportDto $dto
-     * @return CspSeverity
+     * Resolves the DTO severity to the enum.
      */
     public function resolve(
         CspReportDto $dto,

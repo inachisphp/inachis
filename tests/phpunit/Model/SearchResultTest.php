@@ -112,7 +112,7 @@ class SearchResultTest extends TestCase
         $this->searchResult->updateResultPropertyByKey(
             99,
             'title',
-            'ignored'
+            'ignored',
         );
 
         $this->assertSame($before, $this->searchResult->getResults());
@@ -126,7 +126,7 @@ class SearchResultTest extends TestCase
         $this->searchResult->updateResultPropertyByKey(
             0,
             'title',
-            123
+            123,
         );
     }
 
@@ -138,7 +138,7 @@ class SearchResultTest extends TestCase
         $this->searchResult->updateResultPropertyByKey(
             0,
             'unknown',
-            'value'
+            'value',
         );
     }
 
@@ -150,7 +150,7 @@ class SearchResultTest extends TestCase
         $this->searchResult->updateResultPropertyByKey(
             0,
             'relevance',
-            'abc'
+            'abc',
         );
     }
 
@@ -158,13 +158,13 @@ class SearchResultTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'relevance must be a float or numeric string'
+            'relevance must be a float or numeric string',
         );
 
         $this->searchResult->updateResultPropertyByKey(
             0,
             'relevance',
-            1
+            1,
         );
     }
 
@@ -173,12 +173,12 @@ class SearchResultTest extends TestCase
         $this->searchResult->updateResultPropertyByKey(
             0,
             'relevance',
-            0.99
+            0.99,
         );
 
         $this->assertSame(
             0.99,
-            $this->searchResult->getResults()[0]['relevance']
+            $this->searchResult->getResults()[0]['relevance'],
         );
     }
 }

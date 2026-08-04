@@ -17,18 +17,17 @@ class SecurityTxtWebController extends AbstractController
 {
     #[Route(
         '/.well-known/security.txt',
-        name: 'web_security_txt'
+        name: 'web_security_txt',
     )]
     public function index(
-        SecurityTxtGenerator $generator
+        SecurityTxtGenerator $generator,
     ): Response {
         return new Response(
             $generator->generate(),
             Response::HTTP_OK,
             [
-                'Content-Type' =>
-                    'text/plain; charset=UTF-8',
-            ]
+                'Content-Type' => 'text/plain; charset=UTF-8',
+            ],
         );
     }
 }

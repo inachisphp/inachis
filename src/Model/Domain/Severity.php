@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Inachis\Model\Domain;
 
 /**
- * Severity of validation issue
+ * Severity of validation issue.
  */
 enum Severity: string
 {

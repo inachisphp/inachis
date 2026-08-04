@@ -18,7 +18,7 @@ use Symfony\Component\Finder\Finder;
 
 /**
  * Command to remove old analytics data and delete processed files
- * after 7 days
+ * after 7 days.
  *
  * Add this to cron such as:
  * * * * * php /path/to/bin/console inachis:analytics:cleanup
@@ -30,10 +30,7 @@ use Symfony\Component\Finder\Finder;
 class CleanupAnalyticsCommand extends Command
 {
     /**
-     * Constructor for CleanupAnalyticsCommand
-     *
-     * @param string $projectDir
-     * @param Connection $db
+     * Constructor for CleanupAnalyticsCommand.
      */
     public function __construct(
         #[Autowire('%kernel.project_dir%')]
@@ -44,29 +41,25 @@ class CleanupAnalyticsCommand extends Command
     }
 
     /**
-     * Keep last 90 days of analytics data
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
+     * Keep last 90 days of analytics data.
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $days = 90;
-        $output->writeln('Removing analytics data older than ' . $days . ' days');
+        $output->writeln('Removing analytics data older than '.$days.' days');
         $this->db->executeStatement(
             'DELETE FROM analytics_page_view
              WHERE date < DATE_SUB(CURDATE(), INTERVAL :days DAY)',
-             [
-                'days' => $days
-             ]
+            [
+                'days' => $days,
+            ],
         );
         $this->db->executeStatement(
             'DELETE FROM analytics_unique_visitor
              WHERE date < DATE_SUB(CURDATE(), INTERVAL :days DAY)',
-             [
-                'days' => $days
-             ]
+            [
+                'days' => $days,
+            ],
         );
         $securityDays = 180;
         $this->db->executeStatement(
@@ -75,12 +68,12 @@ class CleanupAnalyticsCommand extends Command
             WHERE date < DATE_SUB(CURDATE(), INTERVAL :days DAY)
             ',
             [
-                'days' => $securityDays
-            ]
+                'days' => $securityDays,
+            ],
         );
 
         $output->writeln('Removing processed log files older than 7 days');
-        $directory = $this->projectDir . '/var/analytics';
+        $directory = $this->projectDir.'/var/analytics';
         $finder = new Finder();
         $finder
             ->files()

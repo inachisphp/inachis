@@ -113,317 +113,212 @@ class CspReport
     #[ORM\Column(type: 'json')]
     private array $payload = [];
 
-    /**
-     * @return UuidInterface|null
-     */
     public function getId(): ?UuidInterface
     {
         return $this->id;
     }
 
-    /**
-     * @return string|null
-     */
     public function getDocumentUri(): ?string
     {
         return $this->documentUri;
     }
 
-    /**
-     * @param string|null $documentUri
-     * @return CspReport
-     */
     public function setDocumentUri(?string $documentUri): CspReport
     {
         $this->documentUri = $documentUri;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getBlockedUri(): ?string
     {
         return $this->blockedUri;
     }
 
-    /**
-     * @param string|null $blockedUri
-     * @return CspReport
-     */
     public function setBlockedUri(?string $blockedUri): CspReport
     {
         $this->blockedUri = $blockedUri;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getEffectiveDirective(): ?string
     {
         return $this->effectiveDirective;
     }
 
-    /**
-     * @param string|null $effectiveDirective
-     * @return CspReport
-     */
     public function setEffectiveDirective(?string $effectiveDirective): CspReport
     {
         $this->effectiveDirective = $effectiveDirective;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getViolatedDirective(): ?string
     {
         return $this->violatedDirective;
     }
 
-    /**
-     * @param string|null $violatedDirective
-     * @return CspReport
-     */
     public function setViolatedDirective(?string $violatedDirective): CspReport
     {
         $this->violatedDirective = $violatedDirective;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getDisposition(): ?string
     {
         return $this->disposition;
     }
 
-    /**
-     * @param string|null $disposition
-     * @return CspReport
-     */
     public function setDisposition(?string $disposition): CspReport
     {
         $this->disposition = $disposition;
+
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
     public function getStatusCode(): ?int
     {
         return $this->statusCode;
     }
 
-    /**
-     * @param int|null $statusCode
-     * @return CspReport
-     */
     public function setStatusCode(?int $statusCode): CspReport
     {
         $this->statusCode = $statusCode;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getOriginalPolicy(): ?string
     {
         return $this->originalPolicy;
     }
 
-    /**
-     * @param string|null $originalPolicy
-     * @return CspReport
-     */
     public function setOriginalPolicy(?string $originalPolicy): CspReport
     {
         $this->originalPolicy = $originalPolicy;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSourceFile(): ?string
     {
         return $this->sourceFile;
     }
 
-    /**
-     * @param string|null $sourceFile
-     * @return CspReport
-     */
     public function setSourceFile(?string $sourceFile): CspReport
     {
         $this->sourceFile = $sourceFile;
+
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
     public function getLineNumber(): ?int
     {
         return $this->lineNumber;
     }
 
-    /**
-     * @param int|null $lineNumber
-     * @return CspReport
-     */
     public function setLineNumber(?int $lineNumber): CspReport
     {
         $this->lineNumber = $lineNumber;
+
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
     public function getColumnNumber(): ?int
     {
         return $this->columnNumber;
     }
 
-    /**
-     * @param int|null $columnNumber
-     * @return CspReport
-     */
     public function setColumnNumber(?int $columnNumber): CspReport
     {
         $this->columnNumber = $columnNumber;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getUserAgent(): ?string
     {
         return $this->userAgent;
     }
 
-    /**
-     * @param string|null $userAgent
-     * @return CspReport
-     */
     public function setUserAgent(?string $userAgent): CspReport
     {
         $this->userAgent = $userAgent;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getHost(): ?string
     {
         return $this->host;
     }
 
-    /**
-     * @param string|null $host
-     * @return CspReport
-     */
     public function setHost(?string $host): CspReport
     {
         $this->host = $host;
+
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getFingerprint(): string
     {
         return $this->fingerprint;
     }
 
-    /**
-     * @param string $fingerprint
-     * @return CspReport
-     */
     public function setFingerprint(string $fingerprint): CspReport
     {
         $this->fingerprint = $fingerprint;
+
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getOccurrences(): int
     {
         return $this->occurrences;
     }
 
-    /**
-     * @param int $occurrences
-     * @return CspReport
-     */
     public function setOccurrences(int $occurrences): CspReport
     {
         $this->occurrences = $occurrences;
+
         return $this;
     }
 
-    /**
-     * @return \DateTimeImmutable|null
-     */
     public function getLastSeenAt(): ?\DateTimeImmutable
     {
         return $this->lastSeenAt;
     }
 
-    /**
-     * @param \DateTimeImmutable|null $lastSeenAt
-     * @return CspReport
-     */
     public function setLastSeenAt(?\DateTimeImmutable $lastSeenAt): CspReport
     {
         $this->lastSeenAt = $lastSeenAt;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getReferrer(): ?string
     {
         return $this->referrer;
     }
 
-    /**
-     * @param string|null $referrer
-     * @return CspReport
-     */
     public function setReferrer(?string $referrer): CspReport
     {
         $this->referrer = $referrer;
+
         return $this;
     }
 
-    /**
-     * @return \DateTimeImmutable
-     */
     public function getFirstSeenAt(): \DateTimeImmutable
     {
         return $this->firstSeenAt;
     }
 
-    /**
-     * @param \DateTimeImmutable $firstSeenAt
-     * @return CspReport
-     */
     public function setFirstSeenAt(\DateTimeImmutable $firstSeenAt): CspReport
     {
         $this->firstSeenAt = $firstSeenAt;
+
         return $this;
     }
 
@@ -437,18 +332,16 @@ class CspReport
 
     /**
      * @param PayloadShape $payload
-     * @return CspReport
      */
     public function setPayload(array $payload): CspReport
     {
         $this->payload = $payload;
+
         return $this;
     }
 
     /**
-     * Gets the severity of the {@link CspReport}
-     *
-     * @return CspSeverity
+     * Gets the severity of the {@link CspReport}.
      */
     public function getSeverity(): CspSeverity
     {
@@ -456,10 +349,7 @@ class CspReport
     }
 
     /**
-     * Sets the severity of the {@link CspReport}
-     *
-     * @param CspSeverity $severity
-     * @return self
+     * Sets the severity of the {@link CspReport}.
      */
     public function setSeverity(CspSeverity $severity): self
     {
@@ -469,9 +359,7 @@ class CspReport
     }
 
     /**
-     * Gets the processing status of the {@link CspReport} - has it been reviewed
-     *
-     * @return bool
+     * Gets the processing status of the {@link CspReport} - has it been reviewed.
      */
     public function isProcessed(): bool
     {
@@ -479,14 +367,12 @@ class CspReport
     }
 
     /**
-     * Sets the processing status of the {@link CspReport}
-     *
-     * @param boolean $processed
-     * @return self
+     * Sets the processing status of the {@link CspReport}.
      */
     public function setProcessed(bool $processed): self
     {
         $this->processed = $processed;
+
         return $this;
     }
 }

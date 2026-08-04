@@ -8,12 +8,12 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\User;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\User\User;
 use Inachis\Repository\User\UserRepository;
 use Inachis\Service\User\UserBulkActionService;
 use Inachis\Service\User\UserProtectionServiceInterface;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -63,7 +63,7 @@ class UserBulkActionServiceTest extends TestCase
         $this->userBulkActionService = new UserBulkActionService(
             $this->userProtectionService,
             $this->userRepository,
-            $this->entityManager
+            $this->entityManager,
         );
 
         $result = $this->userBulkActionService->apply('', [$uuid]);

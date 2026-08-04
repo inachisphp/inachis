@@ -8,47 +8,38 @@ declare(strict_types=1);
 
 namespace Inachis\EntityListener;
 
-use Inachis\Entity\System\Setting;
-use Inachis\Service\Crypto\EncryptionService;
 use Doctrine\ORM\Event\PostLoadEventArgs;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Inachis\Entity\System\Setting;
+use Inachis\Service\Crypto\EncryptionService;
 
 class SettingListener
 {
     /**
-     * Construct the listener with the encryption service
-     *
-     * @param EncryptionService $crypto
+     * Construct the listener with the encryption service.
      */
     public function __construct(
-        private readonly EncryptionService $crypto
+        private readonly EncryptionService $crypto,
     ) {
     }
 
     /**
-     * Encrypt the setting's value before saving to the database
-     *
-     * @param Setting $setting
-     * @param PrePersistEventArgs $event
-     * @return void
+     * Encrypt the setting's value before saving to the database.
      */
     public function prePersist(
         Setting $setting,
-        PrePersistEventArgs $event
+        PrePersistEventArgs $event,
     ): void {
         $this->encryptSetting($setting);
     }
 
     /**
-     * Encrypt the setting's value before updating
-     *
-     * @param Setting $setting
-     * @param PreUpdateEventArgs $event
+     * Encrypt the setting's value before updating.
      */
     public function preUpdate(
         Setting $setting,
-        PreUpdateEventArgs $event
+        PreUpdateEventArgs $event,
     ): void {
         $this->encryptSetting($setting);
 
@@ -57,50 +48,45 @@ class SettingListener
 
         $uow->recomputeSingleEntityChangeSet(
             $em->getClassMetadata(Setting::class),
-            $setting
+            $setting,
         );
     }
 
     /**
-     * Decrypt the setting's value after loading from the database
-     *
-     * @param Setting $setting
-     * @param PostLoadEventArgs $event
+     * Decrypt the setting's value after loading from the database.
      */
     public function postLoad(
         Setting $setting,
-        PostLoadEventArgs $event
+        PostLoadEventArgs $event,
     ): void {
         if (
-            empty($setting->getEncryptedValue()) ||
-            empty($setting->getEncryptedKey())
+            empty($setting->getEncryptedValue())
+            || empty($setting->getEncryptedKey())
         ) {
             return;
         }
 
         $rowKey = $this->crypto->unwrapKey(
-            $setting->getEncryptedKey()
+            $setting->getEncryptedKey(),
         );
 
         $setting->setValue(
             $this->crypto->decryptValue(
                 $setting->getEncryptedValue(),
-                $rowKey
-            )
+                $rowKey,
+            ),
         );
     }
 
     /**
-     * Encrypt the setting's value
-     *
-     * @param Setting $setting
+     * Encrypt the setting's value.
      */
     private function encryptSetting(
-        Setting $setting
+        Setting $setting,
     ): void {
         $value = $setting->getValue();
 
-        if ($value === null) {
+        if (null === $value) {
             return;
         }
 
@@ -112,14 +98,14 @@ class SettingListener
         $rowKey = $this->crypto->generateRowKey();
 
         $setting->setEncryptedKey(
-            $this->crypto->wrapKey($rowKey)
+            $this->crypto->wrapKey($rowKey),
         );
 
         $setting->setEncryptedValue(
             $this->crypto->encryptValue(
                 $value,
-                $rowKey
-            )
+                $rowKey,
+            ),
         );
     }
 }

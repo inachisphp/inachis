@@ -33,7 +33,7 @@ class SetupControllerTest extends InachisControllerTestCase
                 $this->params,
                 $this->security,
                 $this->translator,
-                $this->wasteRepository
+                $this->wasteRepository,
             ])
             ->onlyMethods(['redirectToRoute'])
             ->getMock();
@@ -62,14 +62,14 @@ class SetupControllerTest extends InachisControllerTestCase
                 $this->params,
                 $this->security,
                 $this->translator,
-                $this->wasteRepository
+                $this->wasteRepository,
             ])
             ->onlyMethods(['createFormBuilder', 'render'])
             ->getMock();
         $controller->expects($this->once())
             ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $result = $controller->stage1($userRepository);
         $this->assertEquals('rendered:setup/stage-1.html.twig', $result->getContent());
@@ -82,7 +82,7 @@ class SetupControllerTest extends InachisControllerTestCase
             $this->params,
             $this->security,
             $this->translator,
-            $this->wasteRepository
+            $this->wasteRepository,
         );
         $this->assertEmpty($controller->getErrors());
     }
@@ -94,7 +94,7 @@ class SetupControllerTest extends InachisControllerTestCase
             $this->params,
             $this->security,
             $this->translator,
-            $this->wasteRepository
+            $this->wasteRepository,
         );
         $controller->addError('test', 'Something went wrong');
         $this->assertEquals('Something went wrong', $controller->getError('test'));

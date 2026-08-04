@@ -26,9 +26,9 @@ final class PermissionManager
     public function can(
         ?User $user,
         PermissionResource $resource,
-        PermissionAction $action
+        PermissionAction $action,
     ): bool {
-        if ($user === null) {
+        if (null === $user) {
             return false;
         }
 
@@ -44,7 +44,7 @@ final class PermissionManager
      */
     public function all(?User $user): array
     {
-        if ($user === null) {
+        if (null === $user) {
             return [];
         }
 
@@ -54,9 +54,7 @@ final class PermissionManager
     }
 
     /**
-     * Loads permissions for the user
-     *
-     * @param User $user
+     * Loads permissions for the user.
      */
     private function loadPermissions(User $user): void
     {
@@ -69,9 +67,7 @@ final class PermissionManager
 
         foreach ($user->getAssignedRoles() as $role) {
             foreach ($role->getRolePermissions() as $permission) {
-                $this->permissions
-                    [$permission->getResource()->value]
-                    [$permission->getAction()->value] = true;
+                $this->permissions[$permission->getResource()->value][$permission->getAction()->value] = true;
             }
         }
 

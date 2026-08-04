@@ -8,37 +8,35 @@ declare(strict_types=1);
 
 namespace Inachis\Form\Provider;
 
-use DateInvalidTimeZoneException;
-use DateTimeZone;
-
 /**
- * TimezoneChoices class
+ * TimezoneChoices class.
  */
 class TimezoneChoices
 {
     /**
-     * Get timezone choices
+     * Get timezone choices.
      *
      * @return array<string, string>
-     * @throws DateInvalidTimeZoneException
+     *
+     * @throws \DateInvalidTimeZoneException
      */
     public function getTimezones(): array
     {
-        $timezones = DateTimeZone::listIdentifiers();
+        $timezones = \DateTimeZone::listIdentifiers();
         $now = new \DateTimeImmutable('now');
 
         $choices = [];
 
         foreach ($timezones as $tz) {
-            $offset = new DateTimeZone($tz)->getOffset($now);
-            $hours  = intdiv($offset, 3600);
+            $offset = new \DateTimeZone($tz)->getOffset($now);
+            $hours = intdiv($offset, 3600);
             $minutes = abs(($offset % 3600) / 60);
 
             $label = sprintf(
                 '(GMT%+03d:%02d) %s',
                 $hours,
                 $minutes,
-                str_replace('_', ' ', $tz)
+                str_replace('_', ' ', $tz),
             );
 
             $choices[$label] = $tz;

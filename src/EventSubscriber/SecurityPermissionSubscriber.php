@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Subscriber to enforce permissions across routes starting with /incp
+ * Subscriber to enforce permissions across routes starting with /incp.
  */
 class SecurityPermissionSubscriber implements EventSubscriberInterface
 {
@@ -28,7 +28,8 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
         private Security $security,
         private PermissionAttributeReader $attributeReader,
         private PermissionResolver $permissionResolver,
-    ) {}
+    ) {
+    }
 
     public static function getSubscribedEvents(): array
     {
@@ -78,10 +79,10 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
 
         $permissions = $this->attributeReader->getPermissions(
             $controller[0],
-            $method
+            $method,
         );
 
-        if ($permissions !== []) {
+        if ([] !== $permissions) {
             foreach ($permissions as $permission) {
                 $allowed = false;
                 foreach ($permission->resources() as $resource) {
@@ -89,7 +90,7 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
                         $this->permissionResolver->hasPermission(
                             $user,
                             $resource,
-                            $permission->action
+                            $permission->action,
                         )
                     ) {
                         $allowed = true;
@@ -98,11 +99,7 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
                 }
 
                 if (!$allowed) {
-                    throw new AccessDeniedHttpException(sprintf(
-                        'Access denied. %s permission required for %s.',
-                        $permission->action->label(),
-                        $permission->resource->label(),
-                    ));
+                    throw new AccessDeniedHttpException(sprintf('Access denied. %s permission required for %s.', $permission->action->label(), $permission->resource->label()));
                 }
             }
 
@@ -111,7 +108,7 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Determines whether a controller action is whitelisted for all authenticated users
+     * Determines whether a controller action is whitelisted for all authenticated users.
      */
     private function isWhitelisted(string $controllerClass, string $method, $request, User $user): bool
     {
@@ -139,7 +136,7 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
         }
 
         // 5. Editing/viewing own profile
-        if (str_contains($controllerClass, 'AdminProfileController') && $method === 'edit') {
+        if (str_contains($controllerClass, 'AdminProfileController') && 'edit' === $method) {
             $targetUserUsername = $request->attributes->get('id');
             if ($user->getUsername() === $targetUserUsername) {
                 // Prevent editing of own roles if the request contains role updates,
@@ -158,7 +155,7 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Maps controller class and method to [PermissionResource, PermissionAction]
+     * Maps controller class and method to [PermissionResource, PermissionAction].
      *
      * @return array{0: PermissionResource, 1: PermissionAction}|null
      */
@@ -166,10 +163,10 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
     {
         // 1. Pages and Posts
         if (str_contains($controllerClass, 'PageController') || str_contains($controllerClass, 'RevisionController') || str_contains($controllerClass, 'PostType')) {
-            if ($method === 'list' || $method === 'getRevisions') {
+            if ('list' === $method || 'getRevisions' === $method) {
                 return [PermissionResource::PAGE, PermissionAction::VIEW];
             }
-            if ($method === 'edit' || $method === 'save' || $method === 'compare') {
+            if ('edit' === $method || 'save' === $method || 'compare' === $method) {
                 if ($request->isMethod('POST')) {
                     $postData = $request->request->all('post');
                     if (isset($postData['delete'])) {
@@ -180,9 +177,10 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
                     }
                 }
                 $title = $request->attributes->get('title');
-                if ($title === 'new' || $title === null) {
+                if ('new' === $title || null === $title) {
                     return [PermissionResource::PAGE, PermissionAction::CREATE];
                 }
+
                 return [PermissionResource::PAGE, PermissionAction::EDIT];
             }
         }
@@ -208,10 +206,10 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
 
         // 4. Series
         if (str_contains($controllerClass, 'SeriesController')) {
-            if ($method === 'list') {
+            if ('list' === $method) {
                 return [PermissionResource::SERIES, PermissionAction::VIEW];
             }
-            if ($method === 'edit') {
+            if ('edit' === $method) {
                 if ($request->isMethod('POST')) {
                     $seriesData = $request->request->all('series');
                     if (isset($seriesData['delete'])) {
@@ -219,9 +217,10 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
                     }
                 }
                 $seriesId = $request->attributes->get('id');
-                if ($seriesId === 'new' || $seriesId === null) {
+                if ('new' === $seriesId || null === $seriesId) {
                     return [PermissionResource::SERIES, PermissionAction::CREATE];
                 }
+
                 return [PermissionResource::SERIES, PermissionAction::EDIT];
             }
         }
@@ -238,10 +237,10 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
 
         // 6. User Management (other users)
         if (str_contains($controllerClass, 'AdminProfileController') || str_contains($controllerClass, 'ChangePasswordController')) {
-            if ($method === 'list') {
+            if ('list' === $method) {
                 return [PermissionResource::USER, PermissionAction::VIEW];
             }
-            if ($method === 'edit' || $method === 'changePasswordTab') {
+            if ('edit' === $method || 'changePasswordTab' === $method) {
                 if ($request->isMethod('POST')) {
                     $userData = $request->request->all('user');
                     if (isset($userData['delete'])) {
@@ -249,9 +248,10 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
                     }
                 }
                 $id = $request->attributes->get('id');
-                if ($id === 'new') {
+                if ('new' === $id) {
                     return [PermissionResource::USER, PermissionAction::CREATE];
                 }
+
                 return [PermissionResource::USER, PermissionAction::EDIT];
             }
         }
@@ -281,6 +281,7 @@ class SecurityPermissionSubscriber implements EventSubscriberInterface
             if ($request->isMethod('POST')) {
                 return [PermissionResource::MAINTENANCE, PermissionAction::EDIT];
             }
+
             return [PermissionResource::MAINTENANCE, PermissionAction::VIEW];
         }
 

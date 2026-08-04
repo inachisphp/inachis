@@ -8,14 +8,13 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Repository\Content;
 
-use Inachis\Model\SearchResult;
-use Inachis\Repository\Content\SearchRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Model\SearchResult;
+use Inachis\Repository\Content\SearchRepository;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 class SearchRepositoryTest extends TestCase
 {
@@ -50,7 +49,7 @@ class SearchRepositoryTest extends TestCase
         $totalResults = 42;
         $fetchedRows = [
             ['id' => 1, 'title' => 'First result'],
-            ['id' => 2, 'title' => 'Second result']
+            ['id' => 2, 'title' => 'Second result'],
         ];
 
         $mainStmt = $this->createMock(Result::class);
@@ -69,11 +68,11 @@ class SearchRepositoryTest extends TestCase
             ->method('prepare')
             ->willReturnOnConsecutiveCalls(
                 $this->createConfiguredStub(Statement::class, [
-                    'executeQuery' => $mainStmt
+                    'executeQuery' => $mainStmt,
                 ]),
                 $this->createConfiguredStub(Statement::class, [
-                    'executeQuery' => $countStmt
-                ])
+                    'executeQuery' => $countStmt,
+                ]),
             );
         $result = $this->repository->search($keyword, $offset, $limit);
 
@@ -83,7 +82,6 @@ class SearchRepositoryTest extends TestCase
         $this->assertSame($offset, $result->getOffset());
         $this->assertSame($limit, $result->getLimit());
     }
-
 
     public function testSearchPublicReturnsSearchResultWithoutImages(): void
     {
@@ -116,7 +114,7 @@ class SearchRepositoryTest extends TestCase
                 ]),
                 $this->createConfiguredStub(Statement::class, [
                     'executeQuery' => $countStmt,
-                ])
+                ]),
             );
 
         $result = $this->repository->searchPublic($keyword, $offset, $limit);
@@ -167,9 +165,9 @@ class SearchRepositoryTest extends TestCase
             'type asc' => 'type ASC',
             'default' => 'relevance DESC, contentDate DESC',
         ];
-        $reflection = new ReflectionClass($this->repository);
+        $reflection = new \ReflectionClass($this->repository);
         $method = $reflection->getMethod('determineOrderBy');
-        foreach($orders as $key => $order) {
+        foreach ($orders as $key => $order) {
             $this->assertEquals($order, $method->invokeArgs($this->repository, [$key]));
         }
     }

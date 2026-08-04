@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Inachis\Form\Provider;
 
 /**
- * Language codes
+ * Language codes.
  */
 class LanguageCodes
 {
@@ -42,7 +42,7 @@ class LanguageCodes
         'English' => [
             'codes' => [
                 'en_GB' => 'English (United Kingdom)',
-                /**
+                /*
                  *en_AS: "English (American Samoa)",
                  * en_AU: "English (Australia)",
                  * en_BE: "English (Belgium)",

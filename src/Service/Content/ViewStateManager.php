@@ -23,27 +23,22 @@ final readonly class ViewStateManager
     public function __construct(
         private Security $security,
         private UserViewStateRepository $repository,
-    ) {}
+    ) {
+    }
 
     /**
      * Loads content view settings. It will load the defaults for this view,
      * apply session-stored values over the top if set, and if not set, will
      * check the database for stored values and apply those instead over the
      * top if set.
-     * 
-     * Priority: POST > Session > DB > Defaults
      *
-     * @param Request $request
-     * @param string $context
-     * @param ViewStateDefaults $defaults
-     * @return ContentQueryParameters
+     * Priority: POST > Session > DB > Defaults
      */
     public function load(
         Request $request,
         string $context,
         ViewStateDefaults $defaults,
     ): ContentQueryParameters {
-
         $state = [
             'filters' => $defaults->getFilters(),
             'sort' => $defaults->getSort(),
@@ -55,7 +50,6 @@ final readonly class ViewStateManager
         if (is_array($sessionState)) {
             $state = array_replace_recursive($state, $sessionState);
         } else {
-
             /*
             * Database
             */
@@ -63,14 +57,12 @@ final readonly class ViewStateManager
             $user = $this->security->getUser();
 
             if ($user instanceof User) {
-
                 $saved = $this->repository->findFor(
                     $user,
                     $context,
                 );
 
-                if ($saved !== null) {
-
+                if (null !== $saved) {
                     $state = array_replace_recursive(
                         $state,
                         $saved->getState(),
@@ -100,10 +92,10 @@ final readonly class ViewStateManager
 
         $requestState = array_filter(
             $requestState,
-            static fn (mixed $value): bool => $value !== '' && $value !== [],
+            static fn (mixed $value): bool => '' !== $value && [] !== $value,
         );
 
-        if ($requestState !== []) {
+        if ([] !== $requestState) {
             $state = array_replace_recursive(
                 $state,
                 $requestState,
@@ -120,11 +112,7 @@ final readonly class ViewStateManager
     }
 
     /**
-     * Update the session and database with the current View settings
-     *
-     * @param SessionInterface $session
-     * @param string $context
-     * @param ContentQueryParameters $parameters
+     * Update the session and database with the current View settings.
      */
     public function save(
         SessionInterface $session,
@@ -154,7 +142,7 @@ final readonly class ViewStateManager
             $context,
         );
 
-        if ($saved === null) {
+        if (null === $saved) {
             $saved = new UserViewState($user, $context);
         }
         $saved->setState($state);
@@ -163,10 +151,7 @@ final readonly class ViewStateManager
     }
 
     /**
-     * Clears the Session and DB for the specified context for this user
-     *
-     * @param SessionInterface $session
-     * @param string $context
+     * Clears the Session and DB for the specified context for this user.
      */
     public function clear(
         SessionInterface $session,
@@ -185,20 +170,14 @@ final readonly class ViewStateManager
             $context,
         );
 
-        if ($saved !== null) {
+        if (null !== $saved) {
             $this->repository->remove($saved);
         }
     }
 
     /**
-     * Loads and returns {@link ContentQueryParameters} for the current 
-     * request context
-     *
-     * @param Request $request
-     * @param string $context
-     * @param ViewStateDefaults $defaults
-     * @param CategoryRepository $categoryRepository
-     * @return ContentQueryParameters
+     * Loads and returns {@link ContentQueryParameters} for the current
+     * request context.
      */
     public function build(
         Request $request,
@@ -212,14 +191,8 @@ final readonly class ViewStateManager
     }
 
     /**
-     * Creates a DTO from the Request parameters and updates the 
+     * Creates a DTO from the Request parameters and updates the
      * session and DB values for this context.
-     *
-     * @param Request $request
-     * @param string $context
-     * @param ContentQueryParameters $current
-     * @param CategoryRepository $categoryRepository
-     * @return ContentQueryParameters
      */
     public function update(
         Request $request,

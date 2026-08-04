@@ -10,24 +10,20 @@ namespace Inachis\MessageHandler;
 
 use Inachis\Message\CleanupLoginActivityMessage;
 use Inachis\Repository\User\LoginActivityRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 /**
- * Handler for CleanupLoginActivityMessage
+ * Handler for CleanupLoginActivityMessage.
  */
 #[AsMessageHandler]
 class CleanupLoginActivityHandler
 {
-    /**
-     * @param LoginActivityRepository $repo
-     */
     public function __construct(
         private readonly LoginActivityRepository $repo,
-    ) {}
+    ) {
+    }
 
     /**
-     * @param CleanupLoginActivityMessage $message
      * @return void
      */
     public function __invoke(CleanupLoginActivityMessage $message)
@@ -37,8 +33,8 @@ class CleanupLoginActivityHandler
         $failureRetention = $now->modify('-90 days');
 
         $callback = $message->dryRun
-            ? fn(int $batchDeleted, int $totalDeleted) => null
-            : fn(int $batchDeleted, int $totalDeleted) => print("Deleted batch $batchDeleted (total $totalDeleted)\n");
+            ? fn (int $batchDeleted, int $totalDeleted) => null
+            : fn (int $batchDeleted, int $totalDeleted) => print "Deleted batch $batchDeleted (total $totalDeleted)\n";
 
         $successDeleted = $this->repo->deleteOlderThan('success', $successRetention, $message->batchSize, $callback);
         $failureDeleted = $this->repo->deleteOlderThan('failure', $failureRetention, $message->batchSize, $callback);
@@ -47,9 +43,9 @@ class CleanupLoginActivityHandler
             $successCount = $this->repo->countOlderThan('success', $successRetention);
             $failureCount = $this->repo->countOlderThan('failure', $failureRetention);
 
-            print("Dry run: $successCount successful, $failureCount failed would be deleted\n");
+            echo "Dry run: $successCount successful, $failureCount failed would be deleted\n";
         } else {
-            print("Cleanup finished: $successDeleted successful, $failureDeleted failed records deleted\n");
+            echo "Cleanup finished: $successDeleted successful, $failureDeleted failed records deleted\n";
         }
     }
 }

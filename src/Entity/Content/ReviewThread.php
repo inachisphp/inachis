@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Entity\Content;
 
-use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,9 +23,9 @@ class ReviewThread
     /** @var UuidInterface The unqiue identifier for the review thread */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid_binary')]
-	#[ORM\GeneratedValue(strategy: 'CUSTOM')]
-	#[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-	private ?UuidInterface $id = null;
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
+    private ?UuidInterface $id = null;
 
     /** @var Page The page the review thread is for */
     #[ORM\ManyToOne(targetEntity: Page::class)]
@@ -37,7 +36,7 @@ class ReviewThread
         mappedBy: 'thread',
         targetEntity: ReviewComment::class,
         cascade: ['persist', 'remove'],
-        orphanRemoval: true
+        orphanRemoval: true,
     )]
     #[ORM\OrderBy(['created' => 'ASC'])]
     protected Collection $comments;
@@ -86,21 +85,21 @@ class ReviewThread
     #[ORM\ManyToOne(targetEntity: User::class)]
     protected ?User $assignedTo = null;
 
-    /** @var DateTimeImmutable The datetime this review was started  */
+    /** @var \DateTimeImmutable The datetime this review was started */
     #[ORM\Column(type: 'datetime_immutable')]
-    protected DateTimeImmutable $created;
+    protected \DateTimeImmutable $created;
 
-    /** @var DateTimeImmutable The datetime this review was last updated  */
+    /** @var \DateTimeImmutable The datetime this review was last updated */
     #[ORM\Column(type: 'datetime_immutable')]
-    protected DateTimeImmutable $updated;
+    protected \DateTimeImmutable $updated;
 
-    /** @var User The user who resolved this review thread  */
+    /** @var User The user who resolved this review thread */
     #[ORM\ManyToOne(targetEntity: User::class)]
     protected ?User $resolvedBy = null;
 
-    /** @var DateTimeImmutable The datetime this review thread was resolved  */
+    /** @var \DateTimeImmutable The datetime this review thread was resolved */
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    protected ?DateTimeImmutable $resolvedAt = null;
+    protected ?\DateTimeImmutable $resolvedAt = null;
 
     public function __construct()
     {
@@ -110,7 +109,7 @@ class ReviewThread
     #[ORM\PrePersist]
     public function prePersist(): void
     {
-        $now = new DateTimeImmutable();
+        $now = new \DateTimeImmutable();
 
         $this->created = $now;
         $this->updated = $now;
@@ -119,7 +118,7 @@ class ReviewThread
     #[ORM\PreUpdate]
     public function preUpdate(): void
     {
-        $this->updated = new DateTimeImmutable();
+        $this->updated = new \DateTimeImmutable();
     }
 
     public function getId(): ?UuidInterface
@@ -147,7 +146,7 @@ class ReviewThread
     }
 
     /**
-     * Returns the collection of comments for this review
+     * Returns the collection of comments for this review.
      *
      * @return Collection<int, ReviewComment>
      */
@@ -229,9 +228,7 @@ class ReviewThread
     public function setEndOffset(int $endOffset): self
     {
         if ($endOffset < $this->startOffset) {
-            throw new \InvalidArgumentException(
-                'End offset cannot be before start offset'
-            );
+            throw new \InvalidArgumentException('End offset cannot be before start offset');
         }
 
         $this->endOffset = $endOffset;
@@ -313,14 +310,14 @@ class ReviewThread
 
     public function isResolved(): bool
     {
-        return $this->status === ReviewStatus::RESOLVED;
+        return ReviewStatus::RESOLVED === $this->status;
     }
 
     public function resolve(User $user): self
     {
         $this->status = ReviewStatus::RESOLVED;
         $this->resolvedBy = $user;
-        $this->resolvedAt = new DateTimeImmutable();
+        $this->resolvedAt = new \DateTimeImmutable();
 
         return $this;
     }
@@ -341,24 +338,24 @@ class ReviewThread
         return $this;
     }
 
-    public function getCreated(): DateTimeImmutable
+    public function getCreated(): \DateTimeImmutable
     {
         return $this->created;
     }
 
-    public function setCreated(DateTimeImmutable $created): self
+    public function setCreated(\DateTimeImmutable $created): self
     {
         $this->created = $created;
 
         return $this;
     }
 
-    public function getUpdated(): DateTimeImmutable
+    public function getUpdated(): \DateTimeImmutable
     {
         return $this->updated;
     }
 
-    public function setUpdated(DateTimeImmutable $updated): self
+    public function setUpdated(\DateTimeImmutable $updated): self
     {
         $this->updated = $updated;
 
@@ -377,12 +374,12 @@ class ReviewThread
         return $this;
     }
 
-    public function getResolvedAt(): ?DateTimeImmutable
+    public function getResolvedAt(): ?\DateTimeImmutable
     {
         return $this->resolvedAt;
     }
 
-    public function setResolvedAt(?DateTimeImmutable $resolvedAt): self
+    public function setResolvedAt(?\DateTimeImmutable $resolvedAt): self
     {
         $this->resolvedAt = $resolvedAt;
 

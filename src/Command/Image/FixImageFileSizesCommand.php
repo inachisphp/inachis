@@ -18,15 +18,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'inachis:images:fix-filesizes',
-    description: 'Fixes missing image file sizes by reading from disk'
+    description: 'Fixes missing image file sizes by reading from disk',
 )]
 class FixImageFileSizesCommand extends Command
 {
     /**
-     * Constructor for FixImageFileSizesCommand
-     *
-     * @param EntityManagerInterface $entityManager
-     * @param ImageRepository $imageRepository
+     * Constructor for FixImageFileSizesCommand.
      */
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -36,11 +33,7 @@ class FixImageFileSizesCommand extends Command
     }
 
     /**
-     * Executes the command
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
+     * Executes the command.
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -48,7 +41,7 @@ class FixImageFileSizesCommand extends Command
 
         $images = $this->imageRepository->findAll();
 
-        $basePath = getcwd() . '/public/imgs/';
+        $basePath = getcwd().'/public/imgs/';
 
         $updated = 0;
         $missing = 0;
@@ -57,24 +50,24 @@ class FixImageFileSizesCommand extends Command
         $io->title('Fixing Image Filesizes');
 
         foreach ($images as $image) {
-            $checked++;
+            ++$checked;
             // if ($image->getFilesize() > 0) {
             //     continue;
             // }
 
             $filename = $image->getFilename();
-            $path = $basePath . $filename;
+            $path = $basePath.$filename;
 
             if (!file_exists($path) || !is_file($path)) {
-                $missing++;
+                ++$missing;
                 $io->warning("Missing file: {$filename}");
                 continue;
             }
 
             $size = filesize($path);
 
-            if ($size === false) {
-                $missing++;
+            if (false === $size) {
+                ++$missing;
                 $io->warning("Could not read size: {$filename}");
                 continue;
             }
@@ -82,7 +75,7 @@ class FixImageFileSizesCommand extends Command
             // adjust setter name if needed
             $image->setFilesize($size);
 
-            $updated++;
+            ++$updated;
 
             $io->text("Updated: {$filename} → {$size} bytes");
         }

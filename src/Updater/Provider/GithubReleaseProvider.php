@@ -11,10 +11,8 @@ namespace Inachis\Updater\Provider;
 use Inachis\Updater\Downloader\Downloader;
 use Inachis\Updater\Release\Manifest;
 use Inachis\Updater\Release\ManifestFactory;
-use JsonException;
-use RuntimeException;
-use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 final readonly class GithubReleaseProvider implements ReleaseProviderInterface
@@ -33,16 +31,18 @@ final readonly class GithubReleaseProvider implements ReleaseProviderInterface
         private CacheInterface $cache,
         private ManifestFactory $manifestFactory = new ManifestFactory(),
         private int $cacheTtl = 3600,
-    ) {}
+    ) {
+    }
 
     public function latest(): Manifest
     {
         $cacheKey = sprintf('inachis_updater_latest_%s_%s', $this->owner, $this->repository);
+
         return $this->cache->get($cacheKey, function (ItemInterface $item): Manifest {
             $item->expiresAfter($this->cacheTtl);
 
             return $this->fetchRelease(
-                sprintf(self::API . '/latest', $this->owner, $this->repository)
+                sprintf(self::API.'/latest', $this->owner, $this->repository),
             );
         });
     }
@@ -53,14 +53,14 @@ final readonly class GithubReleaseProvider implements ReleaseProviderInterface
             'inachis_updater_version_%s_%s_%s',
             $this->owner,
             $this->repository,
-            md5($version)
+            md5($version),
         );
 
         return $this->cache->get($cacheKey, function (ItemInterface $item) use ($version): Manifest {
             $item->expiresAfter($this->cacheTtl);
 
             return $this->fetchRelease(
-                sprintf(self::API . '/tags/%s', $this->owner, $this->repository, rawurlencode($version))
+                sprintf(self::API.'/tags/%s', $this->owner, $this->repository, rawurlencode($version)),
             );
         });
     }
@@ -68,7 +68,7 @@ final readonly class GithubReleaseProvider implements ReleaseProviderInterface
     public function download(Manifest $manifest, string $destination): void
     {
         if (empty($manifest->archiveUrl)) {
-            throw new RuntimeException('Manifest does not contain a valid archive download URL.');
+            throw new \RuntimeException('Manifest does not contain a valid archive download URL.');
         }
 
         $this->downloader->download($manifest->archiveUrl, $destination);
@@ -79,7 +79,7 @@ final readonly class GithubReleaseProvider implements ReleaseProviderInterface
         $release = $this->requestJson($url);
 
         if (!isset($release['assets']) || !is_array($release['assets'])) {
-            throw new RuntimeException('GitHub release does not contain any assets.');
+            throw new \RuntimeException('GitHub release does not contain any assets.');
         }
 
         $manifestAsset = null;
@@ -94,8 +94,8 @@ final readonly class GithubReleaseProvider implements ReleaseProviderInterface
             }
         }
 
-        if ($manifestAsset === null) {
-            throw new RuntimeException('No release manifest JSON asset found.');
+        if (null === $manifestAsset) {
+            throw new \RuntimeException('No release manifest JSON asset found.');
         }
 
         $manifestData = $this->requestJson($manifestAsset['browser_download_url']);
@@ -119,9 +119,7 @@ final readonly class GithubReleaseProvider implements ReleaseProviderInterface
             );
         }
 
-        throw new RuntimeException(
-            sprintf('Release package "%s" listed in manifest was not found in release assets.', $manifest->package)
-        );
+        throw new \RuntimeException(sprintf('Release package "%s" listed in manifest was not found in release assets.', $manifest->package));
     }
 
     /**
@@ -142,18 +140,18 @@ final readonly class GithubReleaseProvider implements ReleaseProviderInterface
 
         $contents = @file_get_contents($url, false, $context);
 
-        if ($contents === false) {
-            throw new RuntimeException(sprintf('Unable to fetch data from "%s".', $url));
+        if (false === $contents) {
+            throw new \RuntimeException(sprintf('Unable to fetch data from "%s".', $url));
         }
 
         try {
             $data = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $exception) {
-            throw new RuntimeException(sprintf('Invalid JSON received from "%s".', $url), previous: $exception);
+        } catch (\JsonException $exception) {
+            throw new \RuntimeException(sprintf('Invalid JSON received from "%s".', $url), previous: $exception);
         }
 
         if (!is_array($data)) {
-            throw new RuntimeException(sprintf('Unexpected JSON structure from "%s".', $url));
+            throw new \RuntimeException(sprintf('Unexpected JSON structure from "%s".', $url));
         }
 
         return $data;

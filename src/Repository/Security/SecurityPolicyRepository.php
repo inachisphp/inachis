@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace Inachis\Repository\Security;
 
-use Inachis\Entity\Security\SecurityPolicy;
 use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Entity\Security\SecurityPolicy;
 use Inachis\Repository\AbstractRepository;
 
 /**
@@ -24,8 +24,6 @@ class SecurityPolicyRepository extends AbstractRepository
 
     /**
      * Finds the active security policy.
-     *
-     * @return SecurityPolicy|null
      */
     public function findActive(): ?SecurityPolicy
     {

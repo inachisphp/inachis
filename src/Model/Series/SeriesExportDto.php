@@ -9,36 +9,36 @@ declare(strict_types=1);
 namespace Inachis\Model\Series;
 
 /**
- * Data transfer object for exporting a series
+ * Data transfer object for exporting a series.
  */
 final class SeriesExportDto
 {
     /**
-     * The string title of the series
+     * The string title of the series.
      */
     public string $title;
     /**
-     * The string subtitle of the series
+     * The string subtitle of the series.
      */
     public ?string $subTitle = null;
     /**
-     * The string URL of the series
+     * The string URL of the series.
      */
     public string $url;
     /**
-     * The string description of the series
+     * The string description of the series.
      */
     public ?string $description = null;
     /**
-     * The string first date of the series
+     * The string first date of the series.
      */
     public ?string $firstDate = null;
     /**
-     * The string last date of the series
+     * The string last date of the series.
      */
     public ?string $lastDate = null;
     /**
-     * The boolean visibility of the series
+     * The boolean visibility of the series.
      */
     public bool $visible;
 

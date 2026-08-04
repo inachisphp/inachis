@@ -8,21 +8,34 @@ declare(strict_types=1);
 
 namespace Inachis\Diagnostics\Check\Database;
 
+use Doctrine\DBAL\Connection;
 use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
 use Inachis\Doctrine\DatabasePlatformTrait;
-use Doctrine\DBAL\Connection;
 use Inachis\Service\Formatting\NumberFormatter;
 
 final class InnoDBBufferPoolCheck implements CheckInterface
 {
     use DatabasePlatformTrait;
 
-    public function __construct(private readonly Connection $connection) {}
+    public function __construct(private readonly Connection $connection)
+    {
+    }
 
-    public function getId(): string { return 'innodb_buffer_pool_size'; }
-    public function getLabel(): string { return 'innodb_buffer_pool_size'; }
-    public function getSection(): string { return 'Database'; }
+    public function getId(): string
+    {
+        return 'innodb_buffer_pool_size';
+    }
+
+    public function getLabel(): string
+    {
+        return 'innodb_buffer_pool_size';
+    }
+
+    public function getSection(): string
+    {
+        return 'Database';
+    }
 
     public function run(): CheckResult
     {
@@ -39,7 +52,7 @@ final class InnoDBBufferPoolCheck implements CheckInterface
                     'Buffer pool check only applies to MySQL/MariaDB.',
                     null,
                     $this->getSection(),
-                    'low'
+                    'low',
                 );
             }
 
@@ -53,10 +66,10 @@ final class InnoDBBufferPoolCheck implements CheckInterface
                 $this->getLabel(),
                 'error',
                 null,
-                'Could not retrieve innodb_buffer_pool_size: ' . $e->getMessage(),
+                'Could not retrieve innodb_buffer_pool_size: '.$e->getMessage(),
                 'Ensure database is running and credentials are correct.',
                 $this->getSection(),
-                'high'
+                'high',
             );
         }
 
@@ -68,14 +81,14 @@ final class InnoDBBufferPoolCheck implements CheckInterface
             $this->getLabel(),
             $status,
             NumberFormatter::formatBytes($value),
-            $status === 'ok'
+            'ok' === $status
                 ? 'InnoDB buffer pool size is sufficient.'
                 : 'InnoDB buffer pool is smaller than recommended; may affect performance.',
-            $status !== 'ok'
-                ? "Consider increasing innodb_buffer_pool_size to 50–70% of available RAM for dedicated DB servers, and 20-40% for shared servers."
+            'ok' !== $status
+                ? 'Consider increasing innodb_buffer_pool_size to 50–70% of available RAM for dedicated DB servers, and 20-40% for shared servers.'
                 : null,
             $this->getSection(),
-            $severity
+            $severity,
         );
     }
 }

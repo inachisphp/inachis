@@ -14,29 +14,29 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\Version\Version;
 use Doctrine\ORM\EntityManagerInterface;
-use RuntimeException;
-use Throwable;
 
 final class MigrationRunner
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-    ) {}
+    ) {
+    }
 
     /**
      * Executes pending migrations found in the newly extracted release directory.
      *
-     * @param string $releasePath Path to the extracted release
-     * @param string $migrationsNamespace Namespace of the release migrations (e.g., 'Inachis\Migrations')
+     * @param string $releasePath           Path to the extracted release
+     * @param string $migrationsNamespace   Namespace of the release migrations (e.g., 'Inachis\Migrations')
      * @param string $relativeMigrationsDir Directory containing migration files relative to release root
+     *
      * @return string|null The target migration version executed up to (used for rollback target if needed)
      */
     public function migrate(
         string $releasePath,
         string $migrationsNamespace = 'Inachis\Migrations',
-        string $relativeMigrationsDir = 'src/Migrations'
+        string $relativeMigrationsDir = 'src/Migrations',
     ): ?string {
-        $migrationsDir = $releasePath . DIRECTORY_SEPARATOR . ltrim($relativeMigrationsDir, '/\\');
+        $migrationsDir = $releasePath.DIRECTORY_SEPARATOR.ltrim($relativeMigrationsDir, '/\\');
 
         if (!is_dir($migrationsDir)) {
             // No migrations directory in this release
@@ -53,7 +53,7 @@ final class MigrationRunner
         // Calculate the plan up to 'latest'
         $plan = $planCalculator->getPlanUntilVersion($latestVersion);
 
-        if (count($plan) === 0) {
+        if (0 === count($plan)) {
             // Database is already up to date
             return (string) $latestVersion;
         }
@@ -65,12 +65,8 @@ final class MigrationRunner
         try {
             $migrator = $dependencyFactory->getMigrator();
             $migrator->migrate($plan, $configuration);
-        } catch (Throwable $exception) {
-            throw new RuntimeException(
-                sprintf('Doctrine Migration failed: %s', $exception->getMessage()),
-                0,
-                $exception
-            );
+        } catch (\Throwable $exception) {
+            throw new \RuntimeException(sprintf('Doctrine Migration failed: %s', $exception->getMessage()), 0, $exception);
         }
 
         return (string) $latestVersion;
@@ -83,9 +79,9 @@ final class MigrationRunner
         string $targetVersion,
         string $releasePath,
         string $migrationsNamespace = 'Inachis\Migrations',
-        string $relativeMigrationsDir = 'src/Migrations'
+        string $relativeMigrationsDir = 'src/Migrations',
     ): void {
-        $migrationsDir = $releasePath . DIRECTORY_SEPARATOR . ltrim($relativeMigrationsDir, '/\\');
+        $migrationsDir = $releasePath.DIRECTORY_SEPARATOR.ltrim($relativeMigrationsDir, '/\\');
 
         if (!is_dir($migrationsDir)) {
             return;
@@ -101,7 +97,7 @@ final class MigrationRunner
 
             $migrator = $dependencyFactory->getMigrator();
             $migrator->migrate($plan, $configuration);
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             error_log(sprintf('Failed to rollback Doctrine migrations to version %s: %s', $targetVersion, $exception->getMessage()));
         }
     }
@@ -124,7 +120,7 @@ final class MigrationRunner
 
         return DependencyFactory::fromEntityManager(
             $config,
-            new ExistingEntityManager($this->entityManager)
+            new ExistingEntityManager($this->entityManager),
         );
     }
 }

@@ -17,7 +17,7 @@ final readonly class UpdatePlanner
     /**
      * Inspects a release Manifest against the current version and plans the update.
      *
-     * @throws NoUpdateAvailableException If target version <= current version
+     * @throws NoUpdateAvailableException   If target version <= current version
      * @throws IncompatibleVersionException If current version < manifest minimumVersion
      */
     public function plan(string $currentVersion, Manifest $manifest): UpdatePlan
@@ -29,7 +29,7 @@ final readonly class UpdatePlanner
         // 1. Check if target version is newer than current
         $comparison = version_compare($normalizedTarget, $normalizedCurrent);
 
-        if ($comparison === 0) {
+        if (0 === $comparison) {
             throw NoUpdateAvailableException::alreadyUpToDate($currentVersion);
         }
 
@@ -39,11 +39,7 @@ final readonly class UpdatePlanner
 
         // 2. Enforce minimum version requirement for step updates
         if (version_compare($normalizedCurrent, $normalizedMinimum, '<')) {
-            throw IncompatibleVersionException::minimumVersionNotMet(
-                $currentVersion,
-                $manifest->version,
-                $manifest->minimumVersion
-            );
+            throw IncompatibleVersionException::minimumVersionNotMet($currentVersion, $manifest->version, $manifest->minimumVersion);
         }
 
         // 3. Build executable UpdatePlan

@@ -15,14 +15,11 @@ final class TagImportService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-    ) {}
+    ) {
+    }
 
     /**
      * Find a tag by title, or optionally create it.
-     *
-     * @param string $title
-     * @param bool $createIfMissing
-     * @return Tag|null
      */
     public function findOrCreateByTitle(string $title, bool $createIfMissing = false): ?Tag
     {

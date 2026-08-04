@@ -22,45 +22,36 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[AsCommand(
     name: 'inachis:images:migrate',
-    description: 'Full image migration: rename, deduplicate, WebP optimise, and update references'
+    description: 'Full image migration: rename, deduplicate, WebP optimise, and update references',
 )]
 class ImageMigrationCommand extends Command
 {
     /** @var int */
     private const MAX_DIMENSION = 1024;
-    
-    /** @var string */
+
     private string $checkpointFile;
 
-    /** @var string */
     private string $imageDir;
 
-    /** @var string */
     private string $planFile;
 
-    /** @var string */
     private string $projectDir;
 
     /**
-     * Undocumented function
-     *
-     * @param ImageRepository $imageRepository
-     * @param PageRepository $pageRepository
-     * @param SeriesRepository $seriesRepository
-     * @param SluggerInterface $slugger
+     * Undocumented function.
      */
     public function __construct(
         private ImageRepository $imageRepository,
         private PageRepository $pageRepository,
         private SeriesRepository $seriesRepository,
-        private SluggerInterface $slugger
+        private SluggerInterface $slugger,
     ) {
         parent::__construct();
 
         $this->projectDir = getcwd() ?: '';
-        $this->imageDir = $this->projectDir . '/public/imgs/';
-        $this->planFile = $this->projectDir . '/var/image_migration_plan.json';
-        $this->checkpointFile = $this->projectDir . '/var/image_migration_checkpoint.json';
+        $this->imageDir = $this->projectDir.'/public/imgs/';
+        $this->planFile = $this->projectDir.'/var/image_migration_plan.json';
+        $this->checkpointFile = $this->projectDir.'/var/image_migration_checkpoint.json';
     }
 
     /**
@@ -73,10 +64,6 @@ class ImageMigrationCommand extends Command
 
     /**
      * Execute the command.
-     * 
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -90,9 +77,6 @@ class ImageMigrationCommand extends Command
 
     /**
      * Scan the image directory for unused and broken images.
-     * 
-     * @param OutputInterface $output
-     * @return int
      */
     private function scan(OutputInterface $output): int
     {
@@ -107,8 +91,8 @@ class ImageMigrationCommand extends Command
             'broken' => [],
             'dedup' => [
                 'map' => [],
-                'duplicates' => []
-            ]
+                'duplicates' => [],
+            ],
         ];
 
         $used = [];
@@ -169,14 +153,16 @@ class ImageMigrationCommand extends Command
         // -----------------------------
         foreach ($images as $image) {
             $old = $image->getFilename();
-            if (!$old) continue;
+            if (!$old) {
+                continue;
+            }
 
             $ext = strtolower(pathinfo($old, PATHINFO_EXTENSION));
-            $safe = strtolower($this->slugger->slug($image->getTitle() . '-' . uniqid()));
+            $safe = strtolower($this->slugger->slug($image->getTitle().'-'.uniqid()));
 
-            $new = $safe . '.' . $ext;
+            $new = $safe.'.'.$ext;
 
-            $path = $this->imageDir . $old;
+            $path = $this->imageDir.$old;
             $checksum = (file_exists($path)) ? hash_file('sha256', $path) : null;
 
             $plan['images'][] = [
@@ -186,7 +172,7 @@ class ImageMigrationCommand extends Command
                 'ext' => $ext,
                 'convertToWebp' => in_array($ext, ['jpg', 'jpeg', 'png']),
                 'oldChecksum' => $checksum,
-                'newChecksum' => null
+                'newChecksum' => null,
             ];
 
             $plan['contentReplacements'][$old] = $new;
@@ -203,37 +189,35 @@ class ImageMigrationCommand extends Command
         foreach ($pages as $page) {
             $broken = $this->findBroken($page->getContent());
             if ($broken) {
-                $plan['broken']['page:' . $page->getId()] = $broken;
+                $plan['broken']['page:'.$page->getId()] = $broken;
             }
         }
 
         foreach ($seriesList as $series) {
             $broken = $this->findBroken($series->getDescription());
             if ($broken) {
-                $plan['broken']['series:' . $series->getId()] = $broken;
+                $plan['broken']['series:'.$series->getId()] = $broken;
             }
         }
 
         file_put_contents($this->planFile, json_encode($plan, JSON_PRETTY_PRINT));
 
         $output->writeln('<info>Scan complete</info>');
-        $output->writeln('Unused: ' . count($plan['unused']));
-        $output->writeln('Duplicates: ' . count($plan['dedup']['duplicates']));
-        $output->writeln('Broken refs: ' . count($plan['broken']));
+        $output->writeln('Unused: '.count($plan['unused']));
+        $output->writeln('Duplicates: '.count($plan['dedup']['duplicates']));
+        $output->writeln('Broken refs: '.count($plan['broken']));
 
         return Command::SUCCESS;
     }
 
     /**
      * Apply the plan to the image directory.
-     * 
-     * @param OutputInterface $output
-     * @return int
      */
     private function apply(OutputInterface $output): int
     {
         if (!file_exists($this->planFile)) {
             $output->writeln('<error>No plan file found</error>');
+
             return Command::FAILURE;
         }
 
@@ -277,16 +261,16 @@ class ImageMigrationCommand extends Command
         $imageProgress = new ProgressBar($output, count($images));
         $imageProgress->advance($checkpoint['imageIndex']);
 
-        for ($i = $checkpoint['imageIndex']; $i < count($images); $i++) {
+        for ($i = $checkpoint['imageIndex']; $i < count($images); ++$i) {
             $img = &$images[$i];
 
-            $oldPath = $this->imageDir . $img['old'];
+            $oldPath = $this->imageDir.$img['old'];
             if (!file_exists($oldPath)) {
                 $imageProgress->advance();
                 continue;
             }
 
-            $newPath = $this->imageDir . $img['new'];
+            $newPath = $this->imageDir.$img['new'];
 
             if ($img['convertToWebp']) {
                 $webpPath = preg_replace('/\.\w+$/', '.webp', $newPath);
@@ -298,7 +282,9 @@ class ImageMigrationCommand extends Command
                     $newPath = $webpPath;
                     $img['new'] = basename($webpPath);
                 } else {
-                    if (file_exists($webpPath)) unlink($webpPath);
+                    if (file_exists($webpPath)) {
+                        unlink($webpPath);
+                    }
                     rename($oldPath, $newPath);
                 }
             } else {
@@ -318,27 +304,26 @@ class ImageMigrationCommand extends Command
         $imageProgress->finish();
         $output->writeln('');
 
-
         // -----------------------------
         // Update content
         // -----------------------------
         $pages = $this->pageRepository->findAll();
-        
+
         $output->writeln('<info>Updating pages...</info>');
 
         $pageProgress = new ProgressBar($output, count($pages));
         $pageProgress->advance($checkpoint['pageIndex']);
 
-        for ($i = $checkpoint['pageIndex']; $i < count($pages); $i++) {
+        for ($i = $checkpoint['pageIndex']; $i < count($pages); ++$i) {
             $page = $pages[$i];
             $content = $page->getContent();
 
             foreach ($plan['contentReplacements'] as $old => $new) {
-                $content = str_replace('/imgs/' . $old, '/imgs/' . $new, $content);
+                $content = str_replace('/imgs/'.$old, '/imgs/'.$new, $content);
             }
 
             foreach ($plan['dedup']['duplicates'] as $dup) {
-                $content = str_replace('/imgs/' . $dup['duplicate'], '/imgs/' . $dup['kept'], $content);
+                $content = str_replace('/imgs/'.$dup['duplicate'], '/imgs/'.$dup['kept'], $content);
             }
 
             $page->setContent($content);
@@ -358,16 +343,16 @@ class ImageMigrationCommand extends Command
         $seriesProgress = new ProgressBar($output, count($seriesList));
         $seriesProgress->advance($checkpoint['seriesIndex']);
 
-        for ($i = $checkpoint['seriesIndex']; $i < count($seriesList); $i++) {
+        for ($i = $checkpoint['seriesIndex']; $i < count($seriesList); ++$i) {
             $series = $seriesList[$i];
             $desc = $series->getDescription();
 
             foreach ($plan['contentReplacements'] as $old => $new) {
-                $desc = str_replace('/imgs/' . $old, '/imgs/' . $new, $desc);
+                $desc = str_replace('/imgs/'.$old, '/imgs/'.$new, $desc);
             }
 
             foreach ($plan['dedup']['duplicates'] as $dup) {
-                $desc = str_replace('/imgs/' . $dup['duplicate'], '/imgs/' . $dup['kept'], $desc);
+                $desc = str_replace('/imgs/'.$dup['duplicate'], '/imgs/'.$dup['kept'], $desc);
             }
 
             $series->setDescription($desc);
@@ -393,22 +378,20 @@ class ImageMigrationCommand extends Command
 
     /**
      * Rollback the plan to the image directory.
-     * 
-     * @param OutputInterface $output
-     * @return int
      */
     private function rollback(OutputInterface $output): int
     {
         if (!file_exists($this->planFile)) {
             $output->writeln('<error>No plan</error>');
+
             return Command::FAILURE;
         }
 
         $plan = json_decode(file_get_contents($this->planFile), true);
 
         foreach ($plan['images'] as $img) {
-            $oldPath = $this->imageDir . $img['old'];
-            $newPath = $this->imageDir . $img['new'];
+            $oldPath = $this->imageDir.$img['old'];
+            $newPath = $this->imageDir.$img['new'];
 
             if (file_exists($newPath)) {
                 rename($newPath, $oldPath);
@@ -426,7 +409,7 @@ class ImageMigrationCommand extends Command
             $content = $page->getContent();
 
             foreach ($reverse as $new => $old) {
-                $content = str_replace('/imgs/' . $new, '/imgs/' . $old, $content);
+                $content = str_replace('/imgs/'.$new, '/imgs/'.$old, $content);
             }
 
             $page->setContent($content);
@@ -441,14 +424,12 @@ class ImageMigrationCommand extends Command
 
     /**
      * Extract references to images from the content.
-     * 
-     * @param string|null $content
-     * @param array $used
-     * @return void
      */
     private function extractRefs(?string $content, array &$used): void
     {
-        if (!$content) return;
+        if (!$content) {
+            return;
+        }
 
         preg_match_all('/\/imgs\/([^)]+)/', $content, $m);
         foreach ($m[1] as $f) {
@@ -458,20 +439,19 @@ class ImageMigrationCommand extends Command
 
     /**
      * Find broken references to images in the content.
-     * 
-     * @param string|null $content
-     * @return array
      */
     private function findBroken(?string $content): array
     {
-        if (!$content) return [];
+        if (!$content) {
+            return [];
+        }
 
         $broken = [];
 
         preg_match_all('/\/imgs\/([^)]+)/', $content, $m);
 
         foreach ($m[1] as $f) {
-            if (!file_exists($this->imageDir . $f)) {
+            if (!file_exists($this->imageDir.$f)) {
                 $broken[] = $f;
             }
         }
@@ -481,20 +461,19 @@ class ImageMigrationCommand extends Command
 
     /**
      * Compute the total size of images in the content.
-     * 
-     * @param string|null $content
-     * @return int
      */
     private function computeSize(?string $content): int
     {
-        if (!$content) return 0;
+        if (!$content) {
+            return 0;
+        }
 
         $total = 0;
 
         preg_match_all('/\/imgs\/([^)]+)/', $content, $m);
 
         foreach ($m[1] as $f) {
-            $p = $this->imageDir . $f;
+            $p = $this->imageDir.$f;
             if (file_exists($p)) {
                 $total += filesize($p);
             }
@@ -505,10 +484,6 @@ class ImageMigrationCommand extends Command
 
     /**
      * Convert an image to WebP.
-     * 
-     * @param string $src
-     * @param string $dst
-     * @return void
      */
     private function convertWebp(string $src, string $dst): void
     {
@@ -523,7 +498,8 @@ class ImageMigrationCommand extends Command
                 $img->destroy();
 
                 return;
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) {
+            }
         }
 
         if (!function_exists('imagewebp')) {
@@ -531,29 +507,37 @@ class ImageMigrationCommand extends Command
         }
 
         $info = getimagesize($src);
-        if (!$info) return;
+        if (!$info) {
+            return;
+        }
 
         [$w, $h] = $info;
 
         switch ($info['mime']) {
             case 'image/jpeg':
-                if (!function_exists('imagecreatefromjpeg')) return;
+                if (!function_exists('imagecreatefromjpeg')) {
+                    return;
+                }
                 $img = imagecreatefromjpeg($src);
                 break;
             case 'image/png':
-                if (!function_exists('imagecreatefrompng')) return;
+                if (!function_exists('imagecreatefrompng')) {
+                    return;
+                }
                 $img = imagecreatefrompng($src);
                 break;
             default:
                 return;
         }
 
-        if (!$img) return;
+        if (!$img) {
+            return;
+        }
 
         $ratio = min(self::MAX_DIMENSION / $w, self::MAX_DIMENSION / $h, 1);
 
-        $nw = (int)($w * $ratio);
-        $nh = (int)($h * $ratio);
+        $nw = (int) ($w * $ratio);
+        $nh = (int) ($h * $ratio);
 
         $tmp = imagecreatetruecolor($nw, $nh);
         imagecopyresampled($tmp, $img, 0, 0, 0, 0, $nw, $nh, $w, $h);
@@ -566,16 +550,11 @@ class ImageMigrationCommand extends Command
 
     /**
      * Save the current state to a checkpoint file.
-     * 
-     * @param int $imageIndex
-     * @param int $pageIndex
-     * @param int $seriesIndex
-     * @return void
      */
     private function saveCheckpoint(
         int $imageIndex,
         int $pageIndex,
-        int $seriesIndex
+        int $seriesIndex,
     ): void {
         file_put_contents($this->checkpointFile, json_encode([
             'imageIndex' => $imageIndex,

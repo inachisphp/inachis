@@ -22,7 +22,7 @@ class RolePermission
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
-    #[ORM\GeneratedValue(strategy: "CUSTOM")]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected ?UuidInterface $id = null;
 
@@ -51,6 +51,7 @@ class RolePermission
     public function setAction(PermissionAction $action): self
     {
         $this->action = $action;
+
         return $this;
     }
 
@@ -62,6 +63,7 @@ class RolePermission
     public function setResource(PermissionResource $resource): self
     {
         $this->resource = $resource;
+
         return $this;
     }
 
@@ -73,6 +75,7 @@ class RolePermission
     public function setRole(Role $role): self
     {
         $this->role = $role;
+
         return $this;
     }
 }

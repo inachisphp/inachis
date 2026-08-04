@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Controller\Dialog;
 
-use Exception;
-use InvalidArgumentException;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\User\User;
 use Inachis\Model\BulkCreateData;
@@ -19,16 +17,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Bulk Create Controller
+ * Bulk Create Controller.
  */
 class BulkCreateController extends AbstractInachisController
 {
     /**
-     * Get the bulk create dialog
-     *
-     * @return Response
+     * Get the bulk create dialog.
      */
-    #[Route("/incp/ax/bulkCreate/get", methods: [ "POST" ])]
+    #[Route('/incp/ax/bulkCreate/get', methods: ['POST'])]
     public function contentList(Request $request): Response
     {
         return $this->render('inadmin/dialog/bulk-create.html.twig', [
@@ -37,29 +33,28 @@ class BulkCreateController extends AbstractInachisController
     }
 
     /**
-     * Save the bulk create data
+     * Save the bulk create data.
      *
-     * @param Request $request
-     * @param PageBulkCreateService $bulkCreatePost
-     * @return Response
-     * @throws Exception
+     * @throws \Exception
      */
-    #[Route("/incp/ax/bulkCreate/save", methods: [ "POST" ])]
-    public function saveContent(Request $request, PageBulkCreateService $bulkCreatePost): Response {
+    #[Route('/incp/ax/bulkCreate/save', methods: ['POST'])]
+    public function saveContent(Request $request, PageBulkCreateService $bulkCreatePost): Response
+    {
         /** @var User|null $user */
         $user = $this->getUser();
-        if ($user === null) {
+        if (null === $user) {
             return new Response('Unauthorized', Response::HTTP_UNAUTHORIZED);
         }
         try {
             $data = BulkCreateData::fromRequest($request);
             $count = $bulkCreatePost->create($data, $user);
 
-            if ($count === 0) {
+            if (0 === $count) {
                 return new Response('No change', Response::HTTP_NO_CONTENT);
             }
+
             return new Response('Saved', Response::HTTP_CREATED);
-        } catch (InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             return new Response($e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
     }

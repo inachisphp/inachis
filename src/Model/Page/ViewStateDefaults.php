@@ -15,7 +15,8 @@ final class ViewStateDefaults
         public readonly array $filters = [],
         public readonly string $sort = '',
         public readonly string $view = 'list',
-    ) {}
+    ) {
+    }
 
     /**
      * @return array<string,mixed>

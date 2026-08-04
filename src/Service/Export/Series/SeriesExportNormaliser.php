@@ -19,8 +19,9 @@ final class SeriesExportNormaliser
     /**
      * Normalises a series for export.
      *
-     * @param Series $series The series to normalise.
-     * @return SeriesExportDto The normalised series.
+     * @param Series $series the series to normalise
+     *
+     * @return SeriesExportDto the normalised series
      */
     public function normalise(Series $series): SeriesExportDto
     {
@@ -32,7 +33,7 @@ final class SeriesExportNormaliser
         $dto->description = $series->getDescription();
 
         $dto->firstDate = $series->getFirstDate()?->format('Y-m-d');
-        $dto->lastDate  = $series->getLastDate()?->format('Y-m-d');
+        $dto->lastDate = $series->getLastDate()?->format('Y-m-d');
 
         $dto->visible = $series->isVisible();
 

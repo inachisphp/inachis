@@ -10,17 +10,13 @@ namespace Inachis\Service\System\Csp;
 
 use Inachis\Model\System\CspReportDto;
 
-
 /**
- * Used to filter out noise from CSP report submissions
+ * Used to filter out noise from CSP report submissions.
  */
 final class CspNoiseFilter
 {
     /**
-     * Determines if the request is likely noise, and returns true|false
-     *
-     * @param CspReportDto $dto
-     * @return bool
+     * Determines if the request is likely noise, and returns true|false.
      */
     public function isNoise(CspReportDto $dto): bool
     {

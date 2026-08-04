@@ -13,16 +13,15 @@ use Doctrine\Common\Collections\Collection;
 trait BidirectionalCollectionTrait
 {
     /**
-     * Add items to both sides of Many-to-Many relationship
+     * Add items to both sides of Many-to-Many relationship.
      *
      * @param Collection<int,\Inachis\Entity\Content\Page>|Collection<int,\Inachis\Entity\Content\Series> $collection
-     * @param \Inachis\Entity\Content\Page|\Inachis\Entity\Content\Series $item
-     * @param string $owningMethod
+     * @param \Inachis\Entity\Content\Page|\Inachis\Entity\Content\Series                                 $item
      */
     private function addBidirectional(
         Collection $collection,
         object $item,
-        string $owningMethod
+        string $owningMethod,
     ): void {
         if (!$collection->contains($item)) {
             $collection->add($item);
@@ -34,17 +33,15 @@ trait BidirectionalCollectionTrait
     }
 
     /**
-     * Removes items from both sides of Many-to-Many relationship
+     * Removes items from both sides of Many-to-Many relationship.
      *
      * @param Collection<int,\Inachis\Entity\Content\Page>|Collection<int,\Inachis\Entity\Content\Series> $collection
-     * @param \Inachis\Entity\Content\Page|\Inachis\Entity\Content\Series $item
-     * @param string $owningMethod
-     * @return void
+     * @param \Inachis\Entity\Content\Page|\Inachis\Entity\Content\Series                                 $item
      */
     private function removeBidirectional(
         Collection $collection,
         object $item,
-        string $owningMethod
+        string $owningMethod,
     ): void {
         if ($collection->removeElement($item)) {
             if (method_exists($item, $owningMethod)) {

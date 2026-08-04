@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Entity\Content;
 
-use DateTimeImmutable;
-use Exception;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
@@ -23,7 +21,7 @@ use Ramsey\Uuid\UuidInterface;
 class Url
 {
     /**
-     * @const The maximum size allowed for SEO-friendly short URLs
+     * @var The maximum size allowed for SEO-friendly short URLs
      */
     public const DEFAULT_URL_SIZE_LIMIT = 255;
 
@@ -62,26 +60,26 @@ class Url
     protected bool $default;
 
     /**
-     * @var DateTimeImmutable The date the Url was added
+     * @var \DateTimeImmutable The date the Url was added
      */
     #[ORM\Column(type: 'datetime_immutable', nullable: false)]
-    protected DateTimeImmutable $createdAt;
+    protected \DateTimeImmutable $createdAt;
 
     /**
-     * @var DateTimeImmutable The date the Url was last modified
+     * @var \DateTimeImmutable The date the Url was last modified
      */
     #[ORM\Column(type: 'datetime_immutable', nullable: false)]
-    protected DateTimeImmutable $updatedAt;
+    protected \DateTimeImmutable $updatedAt;
 
     /**
      * Default constructor for entity - by default the
      * URL will be specified as canonical. This can be overridden using
      * {@link Url::setDefault}.
      *
-     * @param Page $content The {@link Page} object the link is for
-     * @param string $link The short link for the content
-     * @param bool $default
-     * @throws Exception
+     * @param Page   $content The {@link Page} object the link is for
+     * @param string $link    The short link for the content
+     *
+     * @throws \Exception
      */
     public function __construct(Page $content, string $link = '', bool $default = true)
     {
@@ -94,7 +92,7 @@ class Url
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
-        $now = new DateTimeImmutable();
+        $now = new \DateTimeImmutable();
 
         $this->createdAt = $now;
         $this->updatedAt = $now;
@@ -103,7 +101,7 @@ class Url
     #[ORM\PreUpdate]
     public function onPreUpdate(): void
     {
-        $this->updatedAt = new DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     /**
@@ -131,7 +129,7 @@ class Url
      */
     public function getPath(): string
     {
-        return '/' . ltrim($this->link, '/');
+        return '/'.ltrim($this->link, '/');
     }
 
     /**
@@ -167,9 +165,9 @@ class Url
     /**
      * Returns the value of {@link createdAt}.
      *
-     * @return DateTimeImmutable The value of {@link createdAt}
+     * @return \DateTimeImmutable The value of {@link createdAt}
      */
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -177,9 +175,9 @@ class Url
     /**
      * Returns the value of {@link updatedAt}.
      *
-     * @return DateTimeImmutable The value of {@link updatedAt}
+     * @return \DateTimeImmutable The value of {@link updatedAt}
      */
-    public function getUpdatedAt(): DateTimeImmutable
+    public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
     }
@@ -188,11 +186,11 @@ class Url
      * Sets the value of {@link id}.
      *
      * @param UuidInterface $value The value to set
-     * @return self
      */
     public function setId(UuidInterface $value): self
     {
         $this->id = $value;
+
         return $this;
     }
 
@@ -200,12 +198,12 @@ class Url
      * Sets the value of {@link link}.
      *
      * @param string $value The value to set
-     * @return self
      */
     public function setLink(string $value): self
     {
         $this->link = $value;
         $this->linkCanonical = md5($value);
+
         return $this;
     }
 
@@ -213,11 +211,11 @@ class Url
      * Sets the value of {@link content}.
      *
      * @param Page $value The value to set
-     * @return self
      */
     public function setContent(Page $value): self
     {
         $this->content = $value;
+
         return $this;
     }
 
@@ -225,46 +223,45 @@ class Url
      * Sets the value of {@link default}.
      *
      * @param bool $value The value to set
-     * @return self
      */
     public function setDefault(bool $value): self
     {
         $this->default = $value;
+
         return $this;
     }
 
     /**
      * Sets the value of {@link createdAt}.
      *
-     * @param DateTimeImmutable $value The value to set
-     * @return self
+     * @param \DateTimeImmutable $value The value to set
      */
-    public function setCreatedAt(DateTimeImmutable $value): self
+    public function setCreatedAt(\DateTimeImmutable $value): self
     {
         $this->createdAt = $value;
+
         return $this;
     }
 
     /**
      * Sets the value of {@link updatedAt}.
      *
-     * @param DateTimeImmutable $value The value to set
-     * @return self
+     * @param \DateTimeImmutable $value The value to set
      */
-    public function setUpdatedAt(DateTimeImmutable $value): self
+    public function setUpdatedAt(\DateTimeImmutable $value): self
     {
         $this->updatedAt = $value;
+
         return $this;
     }
 
     /**
      * Sets the mod date for the {@link Url} to the current date.
-     *
-     * @return self
      */
     public function setUpdatedAtToNow(): self
     {
-        $this->setUpdatedAt(new DateTimeImmutable());
+        $this->setUpdatedAt(new \DateTimeImmutable());
+
         return $this;
     }
 
@@ -276,13 +273,11 @@ class Url
      */
     public function validateURL(): bool
     {
-        return preg_match('/^[a-z0-9\-]+$/i', $this->link) === 1;
+        return 1 === preg_match('/^[a-z0-9\-]+$/i', $this->link);
     }
 
     /**
      * Associates the {@link Url} with the {@link Page}.
-     *
-     * @return void
      */
     public function associateContent(): void
     {
@@ -290,7 +285,7 @@ class Url
     }
 
     /**
-     * Checks if the linked content is live - i.e. not draft, expired, or scheduled
+     * Checks if the linked content is live - i.e. not draft, expired, or scheduled.
      */
     public function isContentLive(): bool
     {

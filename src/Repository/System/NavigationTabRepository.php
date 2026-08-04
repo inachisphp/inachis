@@ -8,23 +8,21 @@ declare(strict_types=1);
 
 namespace Inachis\Repository\System;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
 use Inachis\Entity\System\NavigationTab;
 use Inachis\Model\NavigationTabDto;
 use Inachis\Repository\AbstractRepository;
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * Repository for navigation tabs
- * 
+ * Repository for navigation tabs.
+ *
  * @extends AbstractRepository<NavigationTab>
  */
 class NavigationTabRepository extends AbstractRepository
 {
     /**
-     * Constructor
-     *
-     * @param ManagerRegistry $registry
+     * Constructor.
      */
     public function __construct(ManagerRegistry $registry)
     {
@@ -32,9 +30,7 @@ class NavigationTabRepository extends AbstractRepository
     }
 
     /**
-     * Returns the maximum position
-     *
-     * @return int
+     * Returns the maximum position.
      */
     public function getMaxPosition(): int
     {
@@ -45,26 +41,24 @@ class NavigationTabRepository extends AbstractRepository
     }
 
     /**
-     * Returns paginated tabs ordered by position
+     * Returns paginated tabs ordered by position.
      *
-     * @param int $limit
-     * @param int $offset
      * @return Paginator<NavigationTab>
      */
-    public function getFiltered(int $limit,  int $offset): Paginator
+    public function getFiltered(int $limit, int $offset): Paginator
     {
         return $this->getAll(
             $limit,
             $offset,
             [],
             [
-                [ 'q.position', 'ASC' ],
-            ]
+                ['q.position', 'ASC'],
+            ],
         );
     }
 
     /**
-     * Returns tabs ordered by position
+     * Returns tabs ordered by position.
      *
      * @return array<int,NavigationTab>
      */
@@ -75,11 +69,12 @@ class NavigationTabRepository extends AbstractRepository
             ->orderBy('t.position', 'ASC')
             ->getQuery()
             ->getResult();
+
         return $result;
     }
 
     /**
-     * Returns all tabs indexed by UUID string for easy lookup
+     * Returns all tabs indexed by UUID string for easy lookup.
      *
      * @return array<string,NavigationTab>
      */
@@ -89,16 +84,17 @@ class NavigationTabRepository extends AbstractRepository
         $result = [];
         foreach ($tabs as $tab) {
             $id = $tab->getId();
-            if ($id === null) {
+            if (null === $id) {
                 continue;
             }
             $result[$id->toString()] = $tab;
         }
+
         return $result;
     }
 
     /**
-     * Returns active tabs ordered by position
+     * Returns active tabs ordered by position.
      *
      * @return array<int,NavigationTab>
      */
@@ -111,11 +107,12 @@ class NavigationTabRepository extends AbstractRepository
             ->orderBy('t.position', 'ASC')
             ->getQuery()
             ->getResult();
+
         return $result;
     }
 
     /**
-     * Returns active tabs models ordered by position
+     * Returns active tabs models ordered by position.
      *
      * @return list<NavigationTabDto>
      */
@@ -138,12 +135,12 @@ class NavigationTabRepository extends AbstractRepository
 
         return array_map(
             [NavigationTabDto::class, 'fromArray'],
-            $rows
+            $rows,
         );
     }
 
     /**
-     * Returns active tabs ordered by position
+     * Returns active tabs ordered by position.
      *
      * @return array<string,array{url:string}>
      */
@@ -159,7 +156,7 @@ class NavigationTabRepository extends AbstractRepository
 
         $result = [];
         foreach ($tabs as $tab) {
-            $result[$tab->getTitle()] = [ 'url' => $tab->getUrl(), ];
+            $result[$tab->getTitle()] = ['url' => $tab->getUrl()];
         }
 
         return $result;

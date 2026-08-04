@@ -19,10 +19,10 @@ class DiffBlockTypeTest extends TestCase
     #[Test]
     public function enumContainsExpectedCases(): void
     {
-        $cases = array_map(fn($case) => $case->value, DiffBlockType::cases());
+        $cases = array_map(fn ($case) => $case->value, DiffBlockType::cases());
         self::assertSame(
             ['unchanged', 'inserted', 'deleted', 'replaced'],
-            $cases
+            $cases,
         );
     }
 }

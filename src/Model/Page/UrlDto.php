@@ -9,16 +9,10 @@ declare(strict_types=1);
 namespace Inachis\Model\Page;
 
 /**
- * Data Transfer Object for URL
+ * Data Transfer Object for URL.
  */
 final class UrlDto
 {
-    /**
-     * @var string
-     */
     public string $path;
-    /**
-     * @var bool
-     */
     public bool $default = false;
 }

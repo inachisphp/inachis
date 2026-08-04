@@ -28,10 +28,6 @@ class TwoFactorAuthenticationController extends AbstractInachisController
 
     /**
      * Display the TOTP challenge form.
-     *
-     * @param Request $request
-     * @param TwoFactorLoginCompleter $completer
-     * @return Response
      */
     #[Route('/incp/login/totp', name: 'incp_totp_login', methods: ['GET'])]
     public function totpForm(
@@ -50,11 +46,6 @@ class TwoFactorAuthenticationController extends AbstractInachisController
 
     /**
      * Verify the submitted TOTP code.
-     *
-     * @param Request $request
-     * @param TotpManager $totpManager
-     * @param TwoFactorLoginCompleter $completer
-     * @return Response
      */
     #[Route('/incp/login/totp', name: 'incp_totp_login_verify', methods: ['POST'])]
     public function totpVerify(
@@ -74,10 +65,11 @@ class TwoFactorAuthenticationController extends AbstractInachisController
                 return $completer->complete(
                     $request,
                     LoginResultType::TYPE_SUCCESS_TOTP,
-                    (bool) $form->get('trustDevice')->getData()
+                    (bool) $form->get('trustDevice')->getData(),
                 );
             }
             $this->addFlash('error', 'Invalid authentication code.');
+
             return $this->redirectToRoute('incp_totp_login');
         }
 
@@ -89,16 +81,12 @@ class TwoFactorAuthenticationController extends AbstractInachisController
 
     /**
      * Display the Recovery Code form.
-     *
-     * @param Request $request
-     * @param TwoFactorLoginCompleter $completer
-     * @return Response
      */
     #[Route('/incp/login/recovery', name: 'incp_recovery_code_login', methods: ['GET'])]
     public function recoveryForm(
         Request $request,
         TwoFactorLoginCompleter $completer,
-    ): Response  {
+    ): Response {
         if (!$completer->isValid($request)) {
             return $this->redirectToRoute(self::LOGIN_ROUTE);
         }
@@ -113,11 +101,6 @@ class TwoFactorAuthenticationController extends AbstractInachisController
 
     /**
      * Verify the submitted recovery code.
-     *
-     * @param Request $request
-     * @param RecoveryCodeManager $recoveryCodeManager
-     * @param TwoFactorLoginCompleter $completer
-     * @return Response
      */
     #[Route('/incp/login/recovery', name: 'incp_recovery_code_verify', methods: ['POST'])]
     public function recoveryVerify(
@@ -137,10 +120,11 @@ class TwoFactorAuthenticationController extends AbstractInachisController
                 return $completer->complete(
                     $request,
                     LoginResultType::TYPE_SUCCESS_RECOVERY,
-                    false
+                    false,
                 );
             }
             $this->addFlash('error', 'Invalid recovery code.');
+
             return $this->redirectToRoute('incp_recovery_code_login');
         }
 

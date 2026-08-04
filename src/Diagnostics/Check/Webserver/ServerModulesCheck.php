@@ -13,9 +13,20 @@ use Inachis\Diagnostics\CheckResult;
 
 final class ServerModulesCheck implements CheckInterface
 {
-    public function getId(): string { return 'server_modules'; }
-    public function getLabel(): string { return 'Server Modules'; }
-    public function getSection(): string { return 'Webserver'; }
+    public function getId(): string
+    {
+        return 'server_modules';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Server Modules';
+    }
+
+    public function getSection(): string
+    {
+        return 'Webserver';
+    }
 
     public function run(): CheckResult
     {
@@ -47,9 +58,9 @@ final class ServerModulesCheck implements CheckInterface
             $status,
             null,
             implode("\n", $details),
-            $status === 'ok' ? null : 'Verify server modules for performance and compression.',
+            'ok' === $status ? null : 'Verify server modules for performance and compression.',
             $this->getSection(),
-            'medium'
+            'medium',
         );
     }
 }

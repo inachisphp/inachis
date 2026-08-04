@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Crypto;
 
-use RuntimeException;
-
 /**
  * Service for handling encryption and decryption operations.
  */
@@ -19,9 +17,7 @@ class EncryptionService
     private readonly string $masterKey;
 
     /**
-     * Construct the encryption service with the master key
-     *
-     * @param string $masterKey
+     * Construct the encryption service with the master key.
      */
     public function __construct(string $masterKey)
     {
@@ -29,17 +25,12 @@ class EncryptionService
             $masterKey = base64_decode(substr($masterKey, 7), true);
         }
 
-        if ($masterKey === false) {
-            throw new RuntimeException('Unable to decode master key.');
+        if (false === $masterKey) {
+            throw new \RuntimeException('Unable to decode master key.');
         }
 
-        if (strlen($masterKey) !== 32) {
-            throw new RuntimeException(
-                sprintf(
-                    'Master key must be 32 bytes, got %d bytes.',
-                    strlen($masterKey)
-                )
-            );
+        if (32 !== strlen($masterKey)) {
+            throw new \RuntimeException(sprintf('Master key must be 32 bytes, got %d bytes.', strlen($masterKey)));
         }
 
         $this->masterKey = $masterKey;
@@ -59,6 +50,7 @@ class EncryptionService
      * Encrypt a row key using the master key.
      *
      * @param string $rowKey The plaintext row key to encrypt
+     *
      * @return string The base64-encoded wrapped key
      */
     public function wrapKey(string $rowKey): string
@@ -72,28 +64,29 @@ class EncryptionService
             $this->masterKey,
             OPENSSL_RAW_DATA,
             $iv,
-            $tag
+            $tag,
         );
 
-        if ($ciphertext === false) {
-            throw new RuntimeException('Failed to wrap row key.');
+        if (false === $ciphertext) {
+            throw new \RuntimeException('Failed to wrap row key.');
         }
 
-        return base64_encode($iv . $tag . $ciphertext);
+        return base64_encode($iv.$tag.$ciphertext);
     }
 
     /**
      * Decrypt a wrapped row key.
      *
      * @param string $wrapped The base64-encoded wrapped key
+     *
      * @return string The decrypted row key
      */
     public function unwrapKey(string $wrapped): string
     {
         $data = base64_decode($wrapped, true);
 
-        if ($data === false) {
-            throw new RuntimeException('Invalid wrapped key.');
+        if (false === $data) {
+            throw new \RuntimeException('Invalid wrapped key.');
         }
 
         $iv = substr($data, 0, 12);
@@ -106,11 +99,11 @@ class EncryptionService
             $this->masterKey,
             OPENSSL_RAW_DATA,
             $iv,
-            $tag
+            $tag,
         );
 
-        if ($rowKey === false) {
-            throw new RuntimeException('Failed to unwrap row key.');
+        if (false === $rowKey) {
+            throw new \RuntimeException('Failed to unwrap row key.');
         }
 
         return $rowKey;
@@ -120,7 +113,8 @@ class EncryptionService
      * Encrypt a value using a row key.
      *
      * @param string $plaintext The plaintext value to encrypt
-     * @param string $rowKey The decrypted row key to use for encryption
+     * @param string $rowKey    The decrypted row key to use for encryption
+     *
      * @return string The base64-encoded encrypted value
      */
     public function encryptValue(string $plaintext, string $rowKey): string
@@ -134,29 +128,30 @@ class EncryptionService
             $rowKey,
             OPENSSL_RAW_DATA,
             $iv,
-            $tag
+            $tag,
         );
 
-        if ($ciphertext === false) {
-            throw new RuntimeException('Failed to encrypt value.');
+        if (false === $ciphertext) {
+            throw new \RuntimeException('Failed to encrypt value.');
         }
 
-        return base64_encode($iv . $tag . $ciphertext);
+        return base64_encode($iv.$tag.$ciphertext);
     }
 
     /**
-     * Decrypt a value using a row key
+     * Decrypt a value using a row key.
      *
      * @param string $encryptedValue The base64-encoded encrypted value
-     * @param string $rowKey The decrypted row key to use for decryption
+     * @param string $rowKey         The decrypted row key to use for decryption
+     *
      * @return string The decrypted plaintext value
      */
     public function decryptValue(string $encryptedValue, string $rowKey): string
     {
         $data = base64_decode($encryptedValue, true);
 
-        if ($data === false) {
-            throw new RuntimeException('Invalid encrypted value.');
+        if (false === $data) {
+            throw new \RuntimeException('Invalid encrypted value.');
         }
 
         $iv = substr($data, 0, 12);
@@ -169,11 +164,11 @@ class EncryptionService
             $rowKey,
             OPENSSL_RAW_DATA,
             $iv,
-            $tag
+            $tag,
         );
 
-        if ($plaintext === false) {
-            throw new RuntimeException('Failed to decrypt value.');
+        if (false === $plaintext) {
+            throw new \RuntimeException('Failed to decrypt value.');
         }
 
         return $plaintext;

@@ -19,9 +19,20 @@ final class FileCountCheck implements CheckInterface
         'templates',
     ];
 
-    public function getId(): string { return 'file_count'; }
-    public function getLabel(): string { return 'File Count / Path Thrashing'; }
-    public function getSection(): string { return 'Performance'; }
+    public function getId(): string
+    {
+        return 'file_count';
+    }
+
+    public function getLabel(): string
+    {
+        return 'File Count / Path Thrashing';
+    }
+
+    public function getSection(): string
+    {
+        return 'Performance';
+    }
 
     public function run(): CheckResult
     {
@@ -40,18 +51,15 @@ final class FileCountCheck implements CheckInterface
             $this->getLabel(),
             $status,
             (string) $totalFiles,
-            $status === 'ok' ? "Total files: $totalFiles" : "Total files: $totalFiles (may stress OpCache / realpath cache)",
-            $status === 'ok' ? null : "Consider increasing opcache.max_accelerated_files or realpath_cache_size.",
+            'ok' === $status ? "Total files: $totalFiles" : "Total files: $totalFiles (may stress OpCache / realpath cache)",
+            'ok' === $status ? null : 'Consider increasing opcache.max_accelerated_files or realpath_cache_size.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 
     /**
-     * Counts the number of fiels in the folder
-     *
-     * @param string $dir
-     * @return int
+     * Counts the number of fiels in the folder.
      */
     private function countFiles(string $dir): int
     {
@@ -62,9 +70,10 @@ final class FileCountCheck implements CheckInterface
                 continue;
             }
             if ($file->isFile()) {
-                $count++;
+                ++$count;
             }
         }
+
         return $count;
     }
 }

@@ -8,21 +8,19 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Repository\Content;
 
-use Inachis\Entity\Content\Category;
-use Inachis\Entity\Content\Page;
-use Inachis\Entity\Content\Tag;
-use Inachis\Entity\Media\Image;
-use Inachis\Repository\Content\PageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
-use Exception;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Tag;
+use Inachis\Entity\Media\Image;
+use Inachis\Repository\Content\PageRepository;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
-use ReflectionClass;
 
 class PageRepositoryTest extends TestCase
 {
@@ -52,7 +50,7 @@ class PageRepositoryTest extends TestCase
 
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
-     * @throws Exception
+     * @throws \Exception
      */
     public function testRemove(): void
     {
@@ -90,7 +88,7 @@ class PageRepositoryTest extends TestCase
             ->method('createQueryBuilder')->willReturn($qb);
         $this->assertEquals(
             [$page],
-            $this->repository->getPagesWithCategory($category, 10, 20)
+            $this->repository->getPagesWithCategory($category, 10, 20),
         );
     }
 
@@ -137,7 +135,7 @@ class PageRepositoryTest extends TestCase
         $this->repository->expects($this->once())->method('createQueryBuilder')->willReturn($qb);
         $this->assertEquals(
             [$page],
-            $this->repository->getPagesWithTag($tag, 10, 20)
+            $this->repository->getPagesWithTag($tag, 10, 20),
         );
     }
 
@@ -156,12 +154,12 @@ class PageRepositoryTest extends TestCase
                         'type' => 'post',
                     ],
                 ],
-                [['q.postDate', 'DESC']]
+                [['q.postDate', 'DESC']],
             )
             ->willReturn($paginator);
         $this->assertEquals(
             $paginator,
-            $this->repository->getAllOfTypeByPostDate('post', 10, 5)
+            $this->repository->getAllOfTypeByPostDate('post', 10, 5),
         );
     }
 
@@ -182,9 +180,9 @@ class PageRepositoryTest extends TestCase
             'postDate asc' => [['q.postDate', 'ASC']],
             'default' => [['q.postDate', 'DESC']],
         ];
-        $reflection = new ReflectionClass($this->repository);
+        $reflection = new \ReflectionClass($this->repository);
         $method = $reflection->getMethod('determineOrderBy');
-        foreach($orders as $key => $order) {
+        foreach ($orders as $key => $order) {
             $this->assertEquals($order, $method->invokeArgs($this->repository, [$key]));
         }
     }
@@ -214,12 +212,12 @@ class PageRepositoryTest extends TestCase
                         'excludeIds' => 42,
                     ],
                 ],
-                [['q.postDate', 'DESC']]
+                [['q.postDate', 'DESC']],
             )
             ->willReturn($paginator);
         $this->assertEquals(
             $paginator,
-            $this->repository->getFilteredOfTypeByPostDate($filters, 'post', 10, 5)
+            $this->repository->getFilteredOfTypeByPostDate($filters, 'post', 10, 5),
         );
     }
 
@@ -232,16 +230,16 @@ class PageRepositoryTest extends TestCase
             ->with(
                 0,
                 0,
-            [
-                'q.id IN (:ids)',
                 [
-                    'ids' => ['1','2','3'],
-                ]
-            ])
+                    'q.id IN (:ids)',
+                    [
+                        'ids' => ['1', '2', '3'],
+                    ],
+                ])
             ->willReturn($paginator);
         $this->assertEquals(
             $paginator,
-            $this->repository->getFilteredIds(['1','2','3'])
+            $this->repository->getFilteredIds(['1', '2', '3']),
         );
     }
 
@@ -260,15 +258,15 @@ class PageRepositoryTest extends TestCase
                 [
                     'q.content LIKE :filename OR q.featureImage = :image',
                     [
-                        'filename' => '%' . $image->getFilename() . '%',
+                        'filename' => '%'.$image->getFilename().'%',
                         'image' => $image->getId(),
                     ],
-                ]
+                ],
             )
             ->willReturn($paginator);
         $this->assertEquals(
             $paginator,
-            $this->repository->getPostsUsingImage($image)
+            $this->repository->getPostsUsingImage($image),
         );
     }
 }

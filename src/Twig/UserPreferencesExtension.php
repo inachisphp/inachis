@@ -14,17 +14,18 @@ use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
 
 /**
- * Adds userPreference to the Twig globals for easy access to the signed-in user's preferences
+ * Adds userPreference to the Twig globals for easy access to the signed-in user's preferences.
  */
 class UserPreferencesExtension extends AbstractExtension implements GlobalsInterface
 {
     public function __construct(
         private UserPreferenceProvider $preferenceProvider,
-        private Security $security
-    ) {}
+        private Security $security,
+    ) {
+    }
 
     /**
-     * Will return userPreferences if the user is signed in
+     * Will return userPreferences if the user is signed in.
      *
      * @return array<string, mixed>
      */
@@ -35,6 +36,7 @@ class UserPreferencesExtension extends AbstractExtension implements GlobalsInter
                 'userPreference' => $this->preferenceProvider->get(),
             ];
         }
+
         return [];
     }
 }

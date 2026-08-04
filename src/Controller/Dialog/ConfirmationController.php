@@ -16,12 +16,9 @@ use Symfony\Component\Routing\Attribute\Route;
 class ConfirmationController extends AbstractInachisController
 {
     /**
-     * Renders a confirmation dialog
-     *
-     * @param Request $request
-     * @return Response
+     * Renders a confirmation dialog.
      */
-    #[Route("/incp/ax/confirmation/get", methods: [ "POST" ])]
+    #[Route('/incp/ax/confirmation/get', methods: ['POST'])]
     public function contentList(Request $request): Response
     {
         $data = [
@@ -36,6 +33,7 @@ class ConfirmationController extends AbstractInachisController
         if ($request->request->getBoolean('hideHelp', false)) {
             $data['hideHelp'] = $request->request->getBoolean('hideHelp', false);
         }
+
         return $this->render('inadmin/dialog/confirmation.html.twig', $data);
     }
 }

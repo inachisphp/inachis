@@ -12,51 +12,46 @@ use Inachis\Model\System\DiscoveryStatus;
 use Inachis\Repository\System\SettingRepository;
 
 /**
- * Checks the status of security.txt
+ * Checks the status of security.txt.
  */
 class SecurityTxtChecker implements DiscoveryCheckerInterface
 {
     /**
-     * Constructor
-     *
-     * @param SettingRepository $settingRepository
+     * Constructor.
      */
     public function __construct(
         private readonly SettingRepository $settingRepository,
-    ) {}
+    ) {
+    }
 
     /**
-     * Checks the status of security.txt
-     *
-     * @return DiscoveryStatus
+     * Checks the status of security.txt.
      */
     public function check(): DiscoveryStatus
     {
         $content = trim(
-            $this->settingRepository ->getValue('security_txt') ?? ''
+            $this->settingRepository->getValue('security_txt') ?? '',
         );
         $messages = [];
         $status = 'success';
 
-        if ($content === '') {
+        if ('' === $content) {
             return new DiscoveryStatus(
                 'security.txt',
                 'Security contact information.',
                 'warning',
                 '/.well-known/security.txt',
                 [
-                    'security.txt has not been configured.'
+                    'security.txt has not been configured.',
                 ],
-                'documents'
+                'documents',
             );
         }
-
 
         if (!preg_match('/^Contact:/mi', $content)) {
             $status = 'warning';
             $messages[] = 'No Contact field found.';
         }
-
 
         if (!preg_match('/^Expires:\s*(.+)$/mi', $content, $match)) {
             $status = 'warning';
@@ -64,7 +59,7 @@ class SecurityTxtChecker implements DiscoveryCheckerInterface
         } else {
             $expires = \DateTimeImmutable::createFromFormat(
                 'Y-m-d\TH:i:s\Z',
-                trim($match[1])
+                trim($match[1]),
             );
 
             if (!$expires) {
@@ -82,7 +77,7 @@ class SecurityTxtChecker implements DiscoveryCheckerInterface
             $status,
             '/.well-known/security.txt',
             $messages,
-            'documents'
+            'documents',
         );
     }
 }

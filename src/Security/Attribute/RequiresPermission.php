@@ -8,23 +8,22 @@ declare(strict_types=1);
 
 namespace Inachis\Security\Attribute;
 
-use Attribute;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 
-#[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 final readonly class RequiresPermission
 {
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param PermissionResource|array<PermissionResource> $resource
-     * @param PermissionAction $action
      */
     public function __construct(
         public PermissionResource|array $resource,
         public PermissionAction $action,
-    ) {}
+    ) {
+    }
 
     /**
      * @return list<PermissionResource>

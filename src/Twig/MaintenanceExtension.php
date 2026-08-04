@@ -13,19 +13,17 @@ use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
 
 /**
- * Allows the templates to know if maintenance mode is enabled
+ * Allows the templates to know if maintenance mode is enabled.
  */
 class MaintenanceExtension extends AbstractExtension implements GlobalsInterface
 {
-    /**
-     * @param MaintenanceManager $maintenance
-     */
     public function __construct(
-        private MaintenanceManager $maintenance
-    ) {}
+        private MaintenanceManager $maintenance,
+    ) {
+    }
 
     /**
-     * Allow Twig templates to see if maintenance mode is enabled
+     * Allow Twig templates to see if maintenance mode is enabled.
      *
      * @return array<string,bool>
      */

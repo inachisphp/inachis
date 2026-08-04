@@ -8,23 +8,20 @@ declare(strict_types=1);
 
 namespace Inachis\Repository\Content;
 
-use Inachis\Repository\AbstractRepository;
-use Inachis\Repository\Content\CategoryRepositoryInterface;
-use Inachis\Entity\Content\Category;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Entity\Content\Category;
+use Inachis\Repository\AbstractRepository;
 
 /**
- * Repository for handling {@link Category} entities
- * 
+ * Repository for handling {@link Category} entities.
+ *
  * @extends AbstractRepository<Category>
  */
 class CategoryRepository extends AbstractRepository implements CategoryRepositoryInterface
 {
     /**
-     * Constructor for CategoryRepository
-     *
-     * @param ManagerRegistry $registry
+     * Constructor for CategoryRepository.
      */
     public function __construct(ManagerRegistry $registry)
     {
@@ -33,8 +30,6 @@ class CategoryRepository extends AbstractRepository implements CategoryRepositor
 
     /**
      * Removes a Category entity from the database.
-     *
-     * @param Category $category
      */
     public function remove(Category $category): void
     {
@@ -49,7 +44,7 @@ class CategoryRepository extends AbstractRepository implements CategoryRepositor
      */
     public function getRootCategories(): array
     {
-        /** @var array<int,Category> */
+        /* @var array<int,Category> */
         return $this->createQueryBuilder('q')
             ->where('q.parent is null')
             ->getQuery()
@@ -57,9 +52,8 @@ class CategoryRepository extends AbstractRepository implements CategoryRepositor
     }
 
     /**
-     * Find categories by title
+     * Find categories by title.
      *
-     * @param string $title
      * @return Paginator<Category>
      */
     public function findByTitleLike(string $title): Paginator
@@ -70,17 +64,15 @@ class CategoryRepository extends AbstractRepository implements CategoryRepositor
             [
                 'q.title LIKE :title',
                 [
-                    'title' => '%' . $title . '%',
+                    'title' => '%'.$title.'%',
                 ],
             ],
-            'q.title'
+            'q.title',
         );
     }
 
     /**
-     * Return a count of visible categories
-     *
-     * @return integer
+     * Return a count of visible categories.
      */
     public function countVisibleCategories(): int
     {
@@ -93,15 +85,13 @@ class CategoryRepository extends AbstractRepository implements CategoryRepositor
     /**
      * Return a batch of categories, ordered by title, with pagination.
      *
-     * @param integer $limit
-     * @param integer $offset
      * @return array<int,Category>
      */
     public function findBatch(
         int $limit,
         int $offset,
     ): array {
-        /** @var array<int,Category> */
+        /* @var array<int,Category> */
         return $this->createQueryBuilder('c')
             ->orderBy('c.title', 'ASC')
             ->setMaxResults($limit)

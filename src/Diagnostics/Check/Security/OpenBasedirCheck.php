@@ -13,9 +13,20 @@ use Inachis\Diagnostics\CheckResult;
 
 final class OpenBasedirCheck implements CheckInterface
 {
-    public function getId(): string { return 'open_basedir'; }
-    public function getLabel(): string { return 'open_basedir Restriction'; }
-    public function getSection(): string { return 'Security'; }
+    public function getId(): string
+    {
+        return 'open_basedir';
+    }
+
+    public function getLabel(): string
+    {
+        return 'open_basedir Restriction';
+    }
+
+    public function getSection(): string
+    {
+        return 'Security';
+    }
 
     public function run(): CheckResult
     {
@@ -27,10 +38,10 @@ final class OpenBasedirCheck implements CheckInterface
             $this->getLabel(),
             $status,
             $value ?: '(none)',
-            $status === 'ok' ? 'open_basedir restriction is set.' : 'No open_basedir restriction, PHP can access all paths.',
-            $status === 'ok' ? null : 'Consider restricting PHP access to only required directories for security.',
+            'ok' === $status ? 'open_basedir restriction is set.' : 'No open_basedir restriction, PHP can access all paths.',
+            'ok' === $status ? null : 'Consider restricting PHP access to only required directories for security.',
             $this->getSection(),
-            'medium'
+            'medium',
         );
     }
 }

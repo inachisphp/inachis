@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Entity\Content;
 
-use DateTimeImmutable;
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Revision;
 use Inachis\Entity\User\User;
@@ -66,7 +65,7 @@ class RevisionTest extends TestCase
 
     public function testGetAndSetCreatedAt(): void
     {
-        $date = new DateTimeImmutable('2025-01-01 12:34:56');
+        $date = new \DateTimeImmutable('2025-01-01 12:34:56');
 
         $this->revision->setCreatedAt($date);
 
@@ -78,8 +77,8 @@ class RevisionTest extends TestCase
         $this->revision->onPrePersist();
 
         $this->assertInstanceOf(
-            DateTimeImmutable::class,
-            $this->revision->getCreatedAt()
+            \DateTimeImmutable::class,
+            $this->revision->getCreatedAt(),
         );
     }
 
@@ -105,7 +104,7 @@ class RevisionTest extends TestCase
 
         $this->assertSame(
             'Updated content',
-            $this->revision->getAction()
+            $this->revision->getAction(),
         );
     }
 
@@ -115,7 +114,7 @@ class RevisionTest extends TestCase
 
         $this->assertSame(
             'Test title',
-            $this->revision->getTitle()
+            $this->revision->getTitle(),
         );
     }
 
@@ -125,7 +124,7 @@ class RevisionTest extends TestCase
 
         $this->assertSame(
             'Test subtitle',
-            $this->revision->getSubTitle()
+            $this->revision->getSubTitle(),
         );
     }
 
@@ -142,7 +141,7 @@ class RevisionTest extends TestCase
 
         $this->assertSame(
             'Test content',
-            $this->revision->getContent()
+            $this->revision->getContent(),
         );
     }
 

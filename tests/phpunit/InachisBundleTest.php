@@ -13,7 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class InachisBundleTest extends TestCase
 {
-
     public function testGetPath()
     {
         $bundle = new InachisBundle();

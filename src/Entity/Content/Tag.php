@@ -17,7 +17,7 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
  * Object for handling tags that are mapped to content.
  */
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\Content\TagRepository', readOnly: false)]
-#[ORM\Index(name: "search_idx", columns: [ "title" ])]
+#[ORM\Index(name: 'search_idx', columns: ['title'])]
 class Tag
 {
     /**
@@ -25,20 +25,20 @@ class Tag
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
-    #[ORM\GeneratedValue(strategy: "CUSTOM")]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected ?UuidInterface $id = null;
 
     /**
      * @var string The text for the tag
      */
-    #[ORM\Column(type: "string", length: 50, unique: true)]
+    #[ORM\Column(type: 'string', length: 50, unique: true)]
     protected string $title;
 
     /**
      * @var string The slug for the tag
      */
-    #[ORM\Column(type: "string", length: 60, unique: true)]
+    #[ORM\Column(type: 'string', length: 60, unique: true)]
     protected string $slug;
 
     /**
@@ -55,18 +55,16 @@ class Tag
      * Sets the value of {@link id}.
      *
      * @param UuidInterface $value The UUID of the {@link Revision}
-     * @return self
      */
     public function setId(UuidInterface $value): self
     {
         $this->id = $value;
+
         return $this;
     }
 
     /**
      * Gets the unique identifier of the tag.
-     *
-     * @return UuidInterface|null
      */
     public function getId(): ?UuidInterface
     {
@@ -75,8 +73,6 @@ class Tag
 
     /**
      * Gets the title of the tag.
-     *
-     * @return string
      */
     public function getTitle(): string
     {
@@ -85,8 +81,6 @@ class Tag
 
     /**
      * Gets the slug for the tag.
-     *
-     * @return string
      */
     public function getSlug(): string
     {
@@ -97,17 +91,17 @@ class Tag
      * Sets the title of the tag and generates a slug.
      *
      * @param string $value The value of the tag
-     * @return self
      */
     public function setTitle(string $value): self
     {
         $value = trim($value);
-        if ($value === '') {
+        if ('' === $value) {
             throw new \InvalidArgumentException('Tag title cannot be empty');
         }
 
         $this->title = mb_strtolower($value);
         $this->slug = $this->slugify($value);
+
         return $this;
     }
 
@@ -115,6 +109,7 @@ class Tag
      * Generates a slug for a string.
      *
      * @param string $value The value to slugify
+     *
      * @return string The slug
      */
     private function slugify(string $value): string
@@ -124,13 +119,12 @@ class Tag
             ->slug($value)
             ->lower()
             ->toString();
+
         return trim($slug, '-');
     }
 
     /**
-     * Provides simple Tag to string conversion
-     *
-     * @return string
+     * Provides simple Tag to string conversion.
      */
     public function __toString(): string
     {

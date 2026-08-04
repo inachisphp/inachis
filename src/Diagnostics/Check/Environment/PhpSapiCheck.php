@@ -13,9 +13,20 @@ use Inachis\Diagnostics\CheckResult;
 
 final class PhpSapiCheck implements CheckInterface
 {
-    public function getId(): string { return 'php_sapi'; }
-    public function getLabel(): string { return 'PHP SAPI'; }
-    public function getSection(): string { return 'Environment'; }
+    public function getId(): string
+    {
+        return 'php_sapi';
+    }
+
+    public function getLabel(): string
+    {
+        return 'PHP SAPI';
+    }
+
+    public function getSection(): string
+    {
+        return 'Environment';
+    }
 
     public function run(): CheckResult
     {
@@ -29,9 +40,9 @@ final class PhpSapiCheck implements CheckInterface
             $status,
             $sapi,
             $details,
-            $status === 'ok' ? null : "Recommended SAPI is FPM or Apache2handler for optimal performance.",
+            'ok' === $status ? null : 'Recommended SAPI is FPM or Apache2handler for optimal performance.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }
