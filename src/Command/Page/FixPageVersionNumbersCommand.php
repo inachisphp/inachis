@@ -1,9 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * This file is part of the inachis framework.
+ */
+
 namespace Inachis\Command\Page;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Content\{Page, Revision};
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Revision;
 use Inachis\Repository\Content\PageRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -12,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'inachis:page:fix-versions',
-    description: 'Corrects page version numbers based on revision history'
+    description: 'Corrects page version numbers based on revision history',
 )]
 class FixPageVersionNumbersCommand extends Command
 {
@@ -25,7 +32,7 @@ class FixPageVersionNumbersCommand extends Command
 
     protected function execute(
         InputInterface $input,
-        OutputInterface $output
+        OutputInterface $output,
     ): int {
         /** @var Page[] $pages */
         $pages = $this->pageRepository->findAll();
@@ -49,7 +56,7 @@ class FixPageVersionNumbersCommand extends Command
                     'Updating "%s" from %d to %d',
                     $page->getTitle(),
                     $page->getVersionNumber(),
-                    $correctVersion
+                    $correctVersion,
                 ));
 
                 $page->setVersionNumber($correctVersion);
@@ -61,7 +68,7 @@ class FixPageVersionNumbersCommand extends Command
 
         $output->writeln(sprintf(
             'Updated %d page version numbers.',
-            $updated
+            $updated,
         ));
 
         return Command::SUCCESS;

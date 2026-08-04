@@ -1,16 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Post;
 
-use DateTimeImmutable;
-use Exception;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Url;
@@ -20,51 +17,51 @@ use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\PostType;
 use Inachis\Model\Page\ViewStateDefaults;
-use Inachis\Repository\Content\{CategoryRepository, PageRepository, ReviewThreadRepository, RevisionRepository};
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\ReviewThreadRepository;
+use Inachis\Repository\Content\RevisionRepository;
 use Inachis\Repository\Media\ImageRepository;
 use Inachis\Security\Attribute\RequiresPermission;
+use Inachis\Service\Content\ContentRevisionCompare;
 use Inachis\Service\Content\Page\CategoryManager;
 use Inachis\Service\Content\Page\PageBulkActionService;
 use Inachis\Service\Content\Page\ReviewRebaseService;
 use Inachis\Service\Content\Page\TagManager;
 use Inachis\Service\Content\Page\UrlManager;
-use Inachis\Service\Content\{ContentRevisionCompare, ReadingTime, ViewStateManager};
+use Inachis\Service\Content\ReadingTime;
+use Inachis\Service\Content\ViewStateManager;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Page controller
+ * Page controller.
  */
 class PageController extends AbstractInachisController
 {
     public const ITEMS_TO_SHOW = 20;
 
     /**
-     * List posts
-
-     * @param Request $request
-     * @param PageBulkActionService $pageBulkActionService
-     * @param PageRepository $pageRepository
-     * @param string $type
-     * @return Response
-     * @throws Exception
+     * List posts.
+     *
+     * @throws \Exception
      */
     #[Route(
-        "/incp/{type}/list/{limit}/{offset}",
-        name: "incp_post_list",
+        '/incp/{type}/list/{limit}/{offset}',
+        name: 'incp_post_list',
         requirements: [
-            "type" => "post|page",
-            "limit" => "\d+",
-            "offset" => "\d+",
+            'type' => 'post|page',
+            'limit' => "\d+",
+            'offset' => "\d+",
         ],
-        defaults: [ "limit" => 10, "offset" => 0, ],
-        methods: [ "GET", "POST" ]
+        defaults: ['limit' => 10, 'offset' => 0],
+        methods: ['GET', 'POST'],
     )]
     #[RequiresPermission(
         resource: PermissionResource::PAGE,
-        action: PermissionAction::VIEW
+        action: PermissionAction::VIEW,
     )]
     public function list(
         Request $request,
@@ -73,7 +70,6 @@ class PageController extends AbstractInachisController
         PageRepository $pageRepository,
         ViewStateManager $viewStateManager,
         string $type = 'post',
-
     ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
@@ -81,17 +77,18 @@ class PageController extends AbstractInachisController
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
             /** @var array<string,string>|array{} */
             $items = $request->request->all('items');
-            $action = $request->request->has('delete')  ? 'delete' :
+            $action = $request->request->has('delete') ? 'delete' :
                 ($request->request->has('private') ? 'private' :
                 ($request->request->has('public') ? 'public' : null));
 
-            if ($action !== null) {
+            if (null !== $action) {
                 $count = $pageBulkActionService->apply($action, $items);
                 $this->addFlash('success', "Action '$action' applied to $count $type.");
             }
+
             return $this->redirectToRoute(
                 'incp_post_list',
-                [ 'type' => $type ]
+                ['type' => $type],
             );
         }
 
@@ -133,8 +130,9 @@ class PageController extends AbstractInachisController
             $params->getSort(),
         );
 
-        $this->viewModel->page->title = ucfirst($type) . 's';
+        $this->viewModel->page->title = ucfirst($type).'s';
         $this->viewModel->page->tab = $type;
+
         return $this->render('inadmin/page/post/list.html.twig', [
             'viewModel' => $this->viewModel,
             'form' => $form->createView(),
@@ -145,37 +143,32 @@ class PageController extends AbstractInachisController
     }
 
     /**
-     * Edit post
+     * Edit post.
      *
-     * @param Request $request
-     * @param ContentRevisionCompare $contentRevisionCompare
-     * @param string $type
-     * @param string|null $title
-     * @return Response
-     * @throws Exception
+     * @throws \Exception
      */
     #[Route(
-        "/incp/{type}/{title}",
-        name: "incp_post_edit",
-        requirements: [ "type" => "page|post"],
-        defaults: [ "type" => "post" ],
-        methods: [ "GET", "POST" ],
+        '/incp/{type}/{title}',
+        name: 'incp_post_edit',
+        requirements: ['type' => 'page|post'],
+        defaults: ['type' => 'post'],
+        methods: ['GET', 'POST'],
         priority: -10,
     )]
     #[Route(
-        "/incp/{type}/{year}/{month}/{day}/{title}",
-        name: "incp_post_edit_1",
+        '/incp/{type}/{year}/{month}/{day}/{title}',
+        name: 'incp_post_edit_1',
         requirements: [
-            "type" => "post",
-            "year" => "\d+",
-            "month" => "\d+",
-            "day" => "\d+"
+            'type' => 'post',
+            'year' => "\d+",
+            'month' => "\d+",
+            'day' => "\d+",
         ],
-        methods: [ "GET", "POST" ]
+        methods: ['GET', 'POST'],
     )]
     #[RequiresPermission(
         resource: PermissionResource::PAGE,
-        action: PermissionAction::VIEW
+        action: PermissionAction::VIEW,
     )]
     public function edit(
         Request $request,
@@ -190,22 +183,22 @@ class PageController extends AbstractInachisController
         TagManager $tagManager,
         UrlManager $urlManager,
         string $type = 'post',
-        ?string $title = null
+        ?string $title = null,
     ): Response {
         $url = preg_replace('/\/?incp\/(page|post)\/?/', '', $request->getRequestUri());
         $url = $this->entityManager->getRepository(Url::class)->findBy(['link' => $url]);
-        $title = $title === 'new' ? null : $title;
+        $title = 'new' === $title ? null : $title;
         // If content with this URL doesn't exist, then redirect
         if (empty($url) && null !== $title) {
             return $this->redirectToRoute(
                 'incp_post_list',
-                ['type' => $type]
+                ['type' => $type],
             );
         }
         $post = null !== $title ?
             ($pageRepository->findOneBy(['id' => $url[0]->getContent()->getId()]) ?: new Page()) :
             $post = new Page();
-        if ($post->getId() === null) {
+        if (null === $post->getId()) {
             $post->setType($type);
         }
         if (!empty($post->getId())) {
@@ -218,7 +211,7 @@ class PageController extends AbstractInachisController
             $threads = $reviewThreadRepository->findOpenForPage($post);
         }
 
-        if($form->isSubmitted() && !$form->isValid()) {
+        if ($form->isSubmitted() && !$form->isValid()) {
             foreach ($form->getErrors(true) as $error) {
                 dump($error->getOrigin()->getName(), $error->getMessage());
             }
@@ -231,9 +224,10 @@ class PageController extends AbstractInachisController
             // Handle delete action
             if ($delete instanceof ClickableInterface && $delete->isClicked()) {
                 $pageBulkActionService->delete($post);
+
                 return $this->redirectToRoute(
                     'incp_post_list',
-                    [ 'type' => $type ]
+                    ['type' => $type],
                 );
             }
 
@@ -245,7 +239,7 @@ class PageController extends AbstractInachisController
 
             // Update post
             $post->setAuthor($this->getCurrentUser());
-            $post->setUpdatedAt(new DateTimeImmutable());
+            $post->setUpdatedAt(new \DateTimeImmutable());
             $data = $request->request->all('post');
             $urlManager->apply($post, is_string($data['url']) ? $data['url'] : '');
             $categoryManager->apply($post, is_string($data['categories']) ? $data['categories'] : '');
@@ -274,7 +268,7 @@ class PageController extends AbstractInachisController
                 if ($contentRevisionCompare->doesPageMatchRevision($post, $revision)) {
                     $revision->setContent('');
                 }
-                if ($post->getStatus() === EditorialStatus::PUBLISHED) {
+                if (EditorialStatus::PUBLISHED === $post->getStatus()) {
                     $revision->setAction(RevisionRepository::PUBLISHED);
                 }
             }
@@ -292,16 +286,17 @@ class PageController extends AbstractInachisController
 
             $this->addFlash('success', 'Content saved.');
             $firstLink = $post->getUrls()[0];
+
             return $this->redirect(
-                '/incp/' .
-                $post->getType() . '/' .
-                $firstLink?->getLink()
+                '/incp/'.
+                $post->getType().'/'.
+                $firstLink?->getLink(),
             );
         }
 
-        $this->viewModel->page->title = $post->getId() !== null ?
-            'Editing "' . $post->getTitle() . '"' :
-            'New ' . $post->getType();
+        $this->viewModel->page->title = null !== $post->getId() ?
+            'Editing "'.$post->getTitle().'"' :
+            'New '.$post->getType();
         $this->viewModel->page->tab = $post->getType();
 
         return $this->render('inadmin/page/post/edit.html.twig', [
@@ -312,7 +307,7 @@ class PageController extends AbstractInachisController
             'includeEditorId' => $post->getId()?->toString() ?: '',
             'post' => $post,
             'revisions' => $revisionRepository->getRevisionsForPage($post),
-            'textStats' => $post->getId() !== null ? ReadingTime::getWordCountAndReadingTime($post->getContent()) : [],
+            'textStats' => null !== $post->getId() ? ReadingTime::getWordCountAndReadingTime($post->getContent()) : [],
         ]);
     }
 }

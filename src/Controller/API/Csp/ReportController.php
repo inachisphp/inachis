@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\API\Csp;
@@ -17,17 +16,16 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class ReportController extends AbstractController
 {
-    
     #[Route('/api/csp/report', name: 'csp_report', methods: ['POST'])]
     public function __invoke(
         Request $request,
-        CspReportProcessor $processor
+        CspReportProcessor $processor,
     ): JsonResponse {
         $contentLength = $request->headers->get('Content-Length');
-        if ($contentLength === null || (int)$contentLength > 10240) {
+        if (null === $contentLength || (int) $contentLength > 10240) {
             return new Response('', Response::HTTP_REQUEST_ENTITY_TOO_LARGE);
         }
-        
+
         $content = $request->getContent();
         if (!$content) {
             return new JsonResponse(status: 204);
@@ -38,13 +36,14 @@ final class ReportController extends AbstractController
                 $content,
                 true,
                 512,
-                JSON_THROW_ON_ERROR
+                JSON_THROW_ON_ERROR,
             );
             $processor->process(
                 $payload,
-                $request->headers->get('User-Agent')
+                $request->headers->get('User-Agent'),
             );
-        } catch (\Throwable $e) { }
+        } catch (\Throwable $e) {
+        }
 
         return new JsonResponse(status: 204);
     }

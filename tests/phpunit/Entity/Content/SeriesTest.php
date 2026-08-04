@@ -1,17 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Entity\Content;
 
-use DateTimeImmutable;
-use Doctrine\Common\Collections\ArrayCollection;
-use Inachis\Entity\Content\{Page, Series};
+use Inachis\Entity\Content\Series;
 use Inachis\Entity\Media\Image;
 use Inachis\Entity\User\User;
 use PHPUnit\Framework\TestCase;
@@ -61,14 +58,14 @@ class SeriesTest extends TestCase
 
     public function testGetAndSetFirstDate(): void
     {
-        $testDate = new DateTimeImmutable();
+        $testDate = new \DateTimeImmutable();
         $this->series->setFirstDate($testDate);
         $this->assertEquals($testDate, $this->series->getFirstDate());
     }
 
     public function testGetAndSetLastDate(): void
     {
-        $testDate = new DateTimeImmutable();
+        $testDate = new \DateTimeImmutable();
         $this->series->setLastDate($testDate);
         $this->assertEquals($testDate, $this->series->getLastDate());
     }
@@ -82,14 +79,14 @@ class SeriesTest extends TestCase
 
     public function testSetAndGetCreatedAt(): void
     {
-        $date = new DateTimeImmutable('now');
+        $date = new \DateTimeImmutable('now');
         $this->series->setCreatedAt($date);
         $this->assertEquals($date, $this->series->getCreatedAt());
     }
 
     public function testSetAndGetUpdatedAt(): void
     {
-        $date = new DateTimeImmutable('now');
+        $date = new \DateTimeImmutable('now');
         $this->series->setUpdatedAt($date);
         $this->assertEquals($date, $this->series->getUpdatedAt());
     }

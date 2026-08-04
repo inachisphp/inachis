@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Security\Authentication;
@@ -13,21 +12,18 @@ use Inachis\Entity\User\User;
 use Inachis\Enum\Security\AuthenticationPolicy;
 
 /**
- * Checks TOTP requirements for {@link Role} and {@link User}
+ * Checks TOTP requirements for {@link Role} and {@link User}.
  */
 class TotpRequirementChecker
 {
     /**
-     * Check if user's {@link Role} requires TOTP
-     *
-     * @param User $user
-     * @return bool
+     * Check if user's {@link Role} requires TOTP.
      */
     public function requiresTotp(User $user): bool
     {
         foreach ($user->getAssignedRoles() as $role) {
-            if ($role->getAuthenticationPolicy() == AuthenticationPolicy::TOTP_REQUIRED ||
-                $role->getAuthenticationPolicy() == AuthenticationPolicy::MFA_REQUIRED) {
+            if (AuthenticationPolicy::TOTP_REQUIRED == $role->getAuthenticationPolicy()
+                || AuthenticationPolicy::MFA_REQUIRED == $role->getAuthenticationPolicy()) {
                 return true;
             }
         }
@@ -36,24 +32,18 @@ class TotpRequirementChecker
     }
 
     /**
-     * Check if User has TOTP enabled
-     *
-     * @param User $user
-     * @return bool
+     * Check if User has TOTP enabled.
      */
     public function hasEnabledTotp(User $user): bool
     {
         $totp = $user->getTotp();
 
-        return $totp !== null
-            && $totp->getEnabledAt() !== null;
+        return null !== $totp
+            && null !== $totp->getEnabledAt();
     }
 
     /**
-     * Check if user requires TOTP setting up
-     *
-     * @param User $user
-     * @return bool
+     * Check if user requires TOTP setting up.
      */
     public function needsSetup(User $user): bool
     {

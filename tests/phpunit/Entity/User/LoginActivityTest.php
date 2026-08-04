@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Entity\User;
 
 use Inachis\Entity\User\LoginActivity;
 use Inachis\Entity\User\User;
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -39,14 +37,12 @@ class LoginActivityTest extends TestCase
         $this->assertEquals('username', $this->loginActivity->getUsername());
     }
 
-
     public function testSetAndGetIpAddress(): void
     {
         $this->assertEmpty($this->loginActivity->getIpAddress());
         $this->loginActivity->setIpAddress('ip');
         $this->assertEquals('ip', $this->loginActivity->getIpAddress());
     }
-
 
     public function testSetAndGetUserAgent(): void
     {
@@ -57,7 +53,7 @@ class LoginActivityTest extends TestCase
 
     public function testSetAndGetLoggedAt(): void
     {
-        $date = new DateTimeImmutable();
+        $date = new \DateTimeImmutable();
         $this->loginActivity->setLoggedAt($date);
         $this->assertEquals($date, $this->loginActivity->getLoggedAt());
     }

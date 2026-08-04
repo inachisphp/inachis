@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form;
@@ -21,8 +20,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Form for editing a navigation tab
- * 
+ * Form for editing a navigation tab.
+ *
  * @extends AbstractType<array{
  *     robots_txt?: string,
  *     submit?: string,
@@ -31,18 +30,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class RobotsTxtType extends AbstractType
 {
     /**
-     * Constructor for RobotsTxtType
-     *
-     * @param TranslatorInterface $translator
+     * Constructor for RobotsTxtType.
      */
     public function __construct(
         private PermissionResolver $permissionResolver,
         private Security $security,
         private readonly TranslatorInterface $translator,
-    ) {}
+    ) {
+    }
 
     /**
-     * Build the form
+     * Build the form.
      *
      * @param FormBuilderInterface<array{
      *     robots_txt?: string,
@@ -56,7 +54,7 @@ class RobotsTxtType extends AbstractType
         $allowEdit = $this->permissionResolver->hasPermission(
             $user,
             PermissionResource::CRAWLER,
-            PermissionAction::EDIT
+            PermissionAction::EDIT,
         );
 
         $builder->add('robots_txt', TextareaType::class, [
@@ -81,18 +79,15 @@ class RobotsTxtType extends AbstractType
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> %s',
                     'save',
-                    $this->translator->trans('admin.button.save', [], 'messages')
+                    $this->translator->trans('admin.button.save', [], 'messages'),
                 ),
                 'label_html' => true,
             ]);
         }
-            
     }
 
     /**
-     * Configure the options for the form
-     * 
-     * @param OptionsResolver $resolver
+     * Configure the options for the form.
      */
     public function configureOptions(OptionsResolver $resolver): void
     {

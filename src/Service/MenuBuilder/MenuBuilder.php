@@ -1,28 +1,29 @@
 <?php
+
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
+
 namespace Inachis\Service\MenuBuilder;
 
 use Inachis\Entity\System\MenuItem;
 use Inachis\Service\Plugin\PluginManager;
 
 /**
- * Builds the navigation menu by combining menu items from all enabled menu providers
+ * Builds the navigation menu by combining menu items from all enabled menu providers.
  */
 final class MenuBuilder
 {
     /**
-     * @param PluginManager $pluginManager
      * @param iterable<MenuProviderInterface> $menuProviders
      */
     public function __construct(
         private PluginManager $pluginManager,
-        private iterable $menuProviders
-    ) {}
+        private iterable $menuProviders,
+    ) {
+    }
 
     /**
      * Builds the navigation menu by combining menu items from all enabled menu providers.
@@ -42,15 +43,15 @@ final class MenuBuilder
             }
         }
 
-        usort($items, static fn(MenuItem $a, MenuItem $b): int => $a->getPriority() <=> $b->getPriority());
+        usort($items, static fn (MenuItem $a, MenuItem $b): int => $a->getPriority() <=> $b->getPriority());
 
         return array_map(
-            static fn(MenuItem $item): array => [
-                'label'    => $item->getLabel(),
-                'url'      => $item->getUrl(),
+            static fn (MenuItem $item): array => [
+                'label' => $item->getLabel(),
+                'url' => $item->getUrl(),
                 'priority' => $item->getPriority(),
             ],
-            $items
+            $items,
         );
     }
 }

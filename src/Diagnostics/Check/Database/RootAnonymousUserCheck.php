@@ -1,28 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics\Check\Database;
 
+use Doctrine\DBAL\Connection;
 use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
 use Inachis\Doctrine\DatabasePlatformTrait;
-use Doctrine\DBAL\Connection;
 
 final class RootAnonymousUserCheck implements CheckInterface
 {
     use DatabasePlatformTrait;
-    
-    public function __construct(private readonly Connection $connection) {}
 
-    public function getId(): string { return 'db_root_anonymous_users'; }
-    public function getLabel(): string { return 'Root / anonymous users'; }
-    public function getSection(): string { return 'Database'; }
+    public function __construct(private readonly Connection $connection)
+    {
+    }
+
+    public function getId(): string
+    {
+        return 'db_root_anonymous_users';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Root / anonymous users';
+    }
+
+    public function getSection(): string
+    {
+        return 'Database';
+    }
 
     public function run(): CheckResult
     {
@@ -38,39 +50,39 @@ final class RootAnonymousUserCheck implements CheckInterface
                 'User checks only apply to MySQL/MariaDB.',
                 null,
                 $this->getSection(),
-                'low'
+                'low',
             );
         }
 
         try {
             /** @var list<array{User: string, Host: string}> */
             $users = $this->connection->fetchAllAssociative(
-                "SELECT User, Host FROM mysql.user WHERE User = '' OR User = 'root'"
+                "SELECT User, Host FROM mysql.user WHERE User = '' OR User = 'root'",
             );
 
             $warnings = [];
             foreach ($users as $user) {
-                if ($user['User'] === '') {
+                if ('' === $user['User']) {
                     $warnings[] = "Anonymous user at host {$user['Host']}";
-                } elseif ($user['User'] === 'root' && $user['Host'] !== 'localhost') {
+                } elseif ('root' === $user['User'] && 'localhost' !== $user['Host']) {
                     $warnings[] = "Root user with remote access ({$user['Host']})";
                 }
             }
 
-            $status = count($warnings) === 0 ? 'ok' : 'warning';
-            $severity = count($warnings) === 0 ? 'low' : 'high';
-            $value = count($warnings) === 0 ? 'No insecure users found' : implode('; ', $warnings);
-            $recommendation = $status === 'ok' ? null : 'Remove anonymous users and restrict root access to localhost only.';
+            $status = 0 === count($warnings) ? 'ok' : 'warning';
+            $severity = 0 === count($warnings) ? 'low' : 'high';
+            $value = 0 === count($warnings) ? 'No insecure users found' : implode('; ', $warnings);
+            $recommendation = 'ok' === $status ? null : 'Remove anonymous users and restrict root access to localhost only.';
         } catch (\Throwable $e) {
             return new CheckResult(
                 $this->getId(),
                 $this->getLabel(),
                 'error',
                 null,
-                'Could not retrieve MySQL users: ' . $e->getMessage(),
+                'Could not retrieve MySQL users: '.$e->getMessage(),
                 'Ensure database is running and credentials are correct.',
                 $this->getSection(),
-                'high'
+                'high',
             );
         }
 
@@ -82,7 +94,7 @@ final class RootAnonymousUserCheck implements CheckInterface
             $value,
             $recommendation,
             $this->getSection(),
-            $severity
+            $severity,
         );
     }
 }

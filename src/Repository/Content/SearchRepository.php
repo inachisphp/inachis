@@ -1,33 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Repository\Content;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Inachis\Model\SearchResult;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Model\SearchResult;
 
 /**
  * @extends ServiceEntityRepository<SearchResult>
  */
 class SearchRepository extends ServiceEntityRepository
 {
-    /** @var Connection */
     private Connection $connection;
 
     /**
-     * Constructor for Search Repository
-     *
-     * @param ManagerRegistry $registry
-     * @param Connection $connection
+     * Constructor for Search Repository.
      */
     public function __construct(ManagerRegistry $registry, Connection $connection)
     {
@@ -36,10 +31,7 @@ class SearchRepository extends ServiceEntityRepository
     }
 
     /**
-     * Return an orderBy value based on a provided string
-     *
-     * @param string $orderBy
-     * @return string
+     * Return an orderBy value based on a provided string.
      */
     protected function determineOrderBy(string $orderBy): string
     {
@@ -56,28 +48,16 @@ class SearchRepository extends ServiceEntityRepository
     }
 
     /**
-     * Perform search across all available types
-     * 
-     * @param string $keyword
-     * @param int $limit
-     * @param int $offset
-     * @param string $orderBy
-     * @return SearchResult
+     * Perform search across all available types.
      */
-    public function search(?string $keyword, int $limit = 25, int $offset = 0, string  $orderBy = 'relevance DESC, contentDate DESC'): SearchResult
+    public function search(?string $keyword, int $limit = 25, int $offset = 0, string $orderBy = 'relevance DESC, contentDate DESC'): SearchResult
     {
         return $this->searchWithScope($keyword, $limit, $offset, $orderBy, true);
     }
 
     /**
      * Perform a front-end search excluding results front-end users would not be interested in, such
-     * as {@link Image} resukts
-     * 
-     * @param string $keyword
-     * @param int $limit
-     * @param int $offset
-     * @param string $orderBy
-     * @return SearchResult
+     * as {@link Image} resukts.
      */
     public function searchPublic(?string $keyword, int $limit = 25, int $offset = 0, string $orderBy = 'relevance DESC, contentDate DESC'): SearchResult
     {
@@ -85,14 +65,7 @@ class SearchRepository extends ServiceEntityRepository
     }
 
     /**
-     * Performs the actual search
-     * 
-     * @param string|null $keyword
-     * @param int $limit
-     * @param int $offset
-     * @param string $orderBy
-     * @param bool $includeImages
-     * @return SearchResult
+     * Performs the actual search.
      */
     private function searchWithScope(?string $keyword, int $limit, int $offset, string $orderBy, bool $includeImages): SearchResult
     {
@@ -116,7 +89,7 @@ class SearchRepository extends ServiceEntityRepository
         $statement = $this->connection->prepare($sql);
         $statement->bindValue('kw', strtolower((string) $keyword), 'string');
         $statement->bindValue('limit', $limit, 'integer');
-        $statement->bindValue('offset', $offset,  'integer');
+        $statement->bindValue('offset', $offset, 'integer');
 
         /** @var list<array{
          *     id: string,
@@ -151,11 +124,8 @@ class SearchRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns the total search results
+     * Returns the total search results.
      *
-     * @param string|null $keyword
-     * @param bool $includeImages
-     * @return int
      * @throws Exception
      */
     private function getSearchTotalResults(?string $keyword, bool $includeImages = true): int
@@ -164,7 +134,7 @@ class SearchRepository extends ServiceEntityRepository
             return 0;
         }
         $sql = sprintf('SELECT COUNT(*) AS total FROM (%s) AS all_results;',
-            $this->getSQLUnion([ 'id', 'id', 'id' ], $includeImages)
+            $this->getSQLUnion(['id', 'id', 'id'], $includeImages),
         );
         $statement = $this->connection->prepare($sql);
         $statement->bindValue('kw', strtolower((string) $keyword), 'string');
@@ -194,7 +164,7 @@ class SearchRepository extends ServiceEntityRepository
             $fieldLists[0],
             $this->getWhereConditions('page'),
             $fieldLists[1],
-            $this->getWhereConditions('series')
+            $this->getWhereConditions('series'),
         );
 
         if ($includeImages) {
@@ -202,7 +172,7 @@ class SearchRepository extends ServiceEntityRepository
             UNION ALL
             (SELECT %s FROM image i WHERE %s)',
                 $fieldLists[2],
-                $this->getWhereConditions('image')
+                $this->getWhereConditions('image'),
             );
         }
 
@@ -210,14 +180,11 @@ class SearchRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns the where conditions for the search based on the search type
-     *
-     * @param string $type
-     * @return string
+     * Returns the where conditions for the search based on the search type.
      */
     protected function getWhereConditions(string $type): string
     {
-        return match($type) {
+        return match ($type) {
             'image' => 'MATCH(i.title, i.alt_text, i.description) AGAINST(:kw IN NATURAL LANGUAGE MODE)',
             'page' => 'MATCH(p.title, p.sub_title, p.content) AGAINST(:kw IN NATURAL LANGUAGE MODE)',
             'series' => 'MATCH(s.title, s.sub_title, s.description) AGAINST(:kw IN NATURAL LANGUAGE MODE)',

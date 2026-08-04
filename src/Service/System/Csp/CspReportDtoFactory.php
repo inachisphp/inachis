@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\System\Csp;
@@ -12,12 +11,12 @@ namespace Inachis\Service\System\Csp;
 use Inachis\Model\System\CspReportDto;
 
 /**
- * Normalises the report into a DTO for portability
+ * Normalises the report into a DTO for portability.
  */
 final class CspReportDtoFactory
 {
     /**
-     * Turns CSP 1.0 reports into a DTO
+     * Turns CSP 1.0 reports into a DTO.
      *
      * @param array{
      *     document-uri?: string,
@@ -34,9 +33,6 @@ final class CspReportDtoFactory
      *     userAgent: string,
      *     rawPayload: array<string,int|string|array<string, int|string>>
      * } $report
-     * @param string|null $userAgent
-     * @param string|null $referrer
-     * @return CspReportDto
      */
     public function fromLegacyReport(
         array $report,
@@ -61,7 +57,7 @@ final class CspReportDtoFactory
     }
 
     /**
-     * Turns CSP 2.0 reports into a DTO
+     * Turns CSP 2.0 reports into a DTO.
      *
      * @param array{
      *     documentURL?: string,
@@ -78,9 +74,6 @@ final class CspReportDtoFactory
      *     userAgent: string,
      *     rawPayload: array<string,int|string|array<string, int|string>>
      * } $report
-     * @param string|null $userAgent
-     * @param string|null $referrer
-     * @return CspReportDto
      */
     public function fromReportingApi(
         array $report,

@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Model\System;
@@ -19,12 +18,7 @@ class DiscoveryStatus
     public const ERROR = 'error';
 
     /**
-     * @param string $title
-     * @param string $description
-     * @param string $status
-     * @param string|null $url
      * @param array<string> $messages
-     * @param string $group
      */
     public function __construct(
         public readonly string $title,
@@ -37,19 +31,15 @@ class DiscoveryStatus
     }
 
     /**
-     * Return true/false based on the status of the Discovery item
-     *
-     * @return bool
+     * Return true/false based on the status of the Discovery item.
      */
     public function isHealthy(): bool
     {
-        return $this->status === self::SUCCESS;
+        return self::SUCCESS === $this->status;
     }
 
     /**
-     * Return the Material Icon text to use for the current status
-     *
-     * @return string
+     * Return the Material Icon text to use for the current status.
      */
     public function getStatusIcon(): string
     {

@@ -1,19 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Repository\User;
 
-use Inachis\Repository\User\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Repository\User\UserRepository;
 use PHPUnit\Framework\TestCase;
 
 class UserRepositoryTest extends TestCase
@@ -28,7 +27,7 @@ class UserRepositoryTest extends TestCase
 
         $this->repository = $this->getMockBuilder(UserRepository::class)
             ->setConstructorArgs([$registry])
-            ->onlyMethods([ 'getEntityManager', 'getAll' ])
+            ->onlyMethods(['getEntityManager', 'getAll'])
             ->getMock();
 
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);
@@ -47,7 +46,7 @@ class UserRepositoryTest extends TestCase
                     'q.isRemoved = \'0\'',
                     [],
                 ],
-                [['q.displayName', 'ASC']]
+                [['q.displayName', 'ASC']],
             )
             ->willReturn($paginator);
         $result = $this->repository->getFiltered([], 0, 25);
@@ -68,7 +67,7 @@ class UserRepositoryTest extends TestCase
                         'keyword' => '%test%',
                     ],
                 ],
-                [['q.displayName', 'ASC']]
+                [['q.displayName', 'ASC']],
             )
             ->willReturn($paginator);
         $result = $this->repository->getFiltered(['keyword' => 'test'], 0, 25);

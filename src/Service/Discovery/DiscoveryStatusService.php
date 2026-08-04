@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Discovery;
@@ -23,7 +22,7 @@ class DiscoveryStatusService
      */
     public function __construct(
         #[AutowireIterator('inachis.discovery_checker')]
-        private readonly iterable $checkers
+        private readonly iterable $checkers,
     ) {
     }
 
@@ -42,9 +41,7 @@ class DiscoveryStatusService
     }
 
     /**
-     * Returns site discoery status by groups
-     *
-     * @return array
+     * Returns site discoery status by groups.
      */
     public function getGroupedStatus(): array
     {

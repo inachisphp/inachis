@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Service\Content;
@@ -138,7 +137,7 @@ MD, $result);
     {
         $result = $this->cleaner->strip(
             $this->example,
-            TextCleaner::NORMALISE_WHITESPACE | TextCleaner::REMOVE_IMAGE_ALT | TextCleaner::REMOVE_BLOCKQUOTE_CONTENT
+            TextCleaner::NORMALISE_WHITESPACE | TextCleaner::REMOVE_IMAGE_ALT | TextCleaner::REMOVE_BLOCKQUOTE_CONTENT,
         );
         $this->assertEquals(<<<MD
 example of HTML

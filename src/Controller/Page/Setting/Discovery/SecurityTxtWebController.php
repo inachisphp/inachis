@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Setting\Discovery;
@@ -18,18 +17,17 @@ class SecurityTxtWebController extends AbstractController
 {
     #[Route(
         '/.well-known/security.txt',
-        name: 'web_security_txt'
+        name: 'web_security_txt',
     )]
     public function index(
-        SecurityTxtGenerator $generator
+        SecurityTxtGenerator $generator,
     ): Response {
         return new Response(
             $generator->generate(),
             Response::HTTP_OK,
             [
-                'Content-Type' =>
-                    'text/plain; charset=UTF-8',
-            ]
+                'Content-Type' => 'text/plain; charset=UTF-8',
+            ],
         );
     }
 }

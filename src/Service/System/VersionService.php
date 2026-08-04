@@ -1,14 +1,15 @@
 <?php
+
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
+
 namespace Inachis\Service\System;
 
 /**
- * Returns version information about the framework
+ * Returns version information about the framework.
  */
 final class VersionService
 {
@@ -18,13 +19,28 @@ final class VersionService
     private array $version;
 
     /**
-     * @param string $versionFile Path to the version file
+     * @param string $versionFile Path to the generated version file
      */
     public function __construct(string $versionFile)
     {
+        if (!is_file($versionFile)) {
+            $this->version = [
+                'version' => 'dev',
+                'commit' => 'unknown',
+                'build_date' => '',
+            ];
+
+            return;
+        }
+
         /** @var array<string, string> $version */
         $version = require $versionFile;
-        $this->version = $version;
+
+        $this->version = [
+            'version' => $version['version'] ?? 'dev',
+            'commit' => $version['commit'] ?? 'unknown',
+            'build_date' => $version['build_date'] ?? '',
+        ];
     }
 
     /**
@@ -67,11 +83,15 @@ final class VersionService
         $version = $this->getVersion();
         $constraint = trim($constraint);
 
+        if ('dev' === $version) {
+            return false;
+        }
+
         if (str_starts_with($constraint, '^')) {
             $min = substr($constraint, 1);
             $parts = explode('.', $min);
             $nextMajor = ((int) ($parts[0] ?? 0)) + 1;
-            $max = $nextMajor . '.0.0';
+            $max = $nextMajor.'.0.0';
 
             return version_compare($version, $min, '>=')
                 && version_compare($version, $max, '<');
@@ -81,7 +101,7 @@ final class VersionService
             $min = substr($constraint, 1);
             $parts = explode('.', $min);
             $nextMinor = ((int) ($parts[1] ?? 0)) + 1;
-            $max = ($parts[0] ?? 0) . '.' . $nextMinor . '.0';
+            $max = ($parts[0] ?? 0).'.'.$nextMinor.'.0';
 
             return version_compare($version, $min, '>=')
                 && version_compare($version, $max, '<');

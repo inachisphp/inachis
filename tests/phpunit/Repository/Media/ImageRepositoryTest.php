@@ -1,22 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Repository\Media;
 
-use Inachis\Entity\Media\Image;
-use Inachis\Repository\Media\ImageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Entity\Media\Image;
+use Inachis\Repository\Media\ImageRepository;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 class ImageRepositoryTest extends TestCase
 {
@@ -30,7 +28,7 @@ class ImageRepositoryTest extends TestCase
 
         $this->repository = $this->getMockBuilder(ImageRepository::class)
             ->setConstructorArgs([$registry])
-            ->onlyMethods([ 'getEntityManager', 'getAll' ])
+            ->onlyMethods(['getEntityManager', 'getAll'])
             ->getMock();
 
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);
@@ -60,7 +58,7 @@ class ImageRepositoryTest extends TestCase
                 0,
                 25,
                 [],
-                [['q.title', 'ASC']]
+                [['q.title', 'ASC']],
             )
             ->willReturn($paginator);
         $result = $this->repository->getFiltered([], 0, 25);
@@ -82,7 +80,7 @@ class ImageRepositoryTest extends TestCase
                         'keyword' => '%test%',
                     ],
                 ],
-                [['q.title', 'ASC']]
+                [['q.title', 'ASC']],
             )
             ->willReturn($paginator);
         $result = $this->repository->getFiltered(['keyword' => 'test'], 0, 25);
@@ -102,9 +100,9 @@ class ImageRepositoryTest extends TestCase
             'updatedAt desc' => ['q.updatedAt', 'DESC'],
             'default' => ['q.title', 'ASC'],
         ];
-        $reflection = new ReflectionClass($this->repository);
+        $reflection = new \ReflectionClass($this->repository);
         $method = $reflection->getMethod('determineOrderBy');
-        foreach($orders as $key => $order) {
+        foreach ($orders as $key => $order) {
             $this->assertEquals($order, $method->invokeArgs($this->repository, [$key]));
         }
     }

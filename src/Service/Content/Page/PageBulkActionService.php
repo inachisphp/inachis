@@ -1,30 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Content\Page;
 
-use Inachis\Entity\Content\{Page, Url};
-use Inachis\Repository\Content\{PageRepository, RevisionRepository, UrlRepository};
-use Inachis\Service\Formatting\UrlNormaliser;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
-use Inachis\Service\Waste\WasteManagerService;
-use DateTimeImmutable;
 use Exception;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Url;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\RevisionRepository;
+use Inachis\Repository\Content\UrlRepository;
+use Inachis\Service\Formatting\UrlNormaliser;
+use Inachis\Service\Waste\WasteManagerService;
+use Symfony\Bundle\SecurityBundle\Security;
 
 readonly class PageBulkActionService
 {
-    /**
-     * @param PageRepository $pageRepository
-     * @param RevisionRepository $revisionRepository
-     * @param EntityManagerInterface $entityManager
-     */
     public function __construct(
         private PageRepository $pageRepository,
         private RevisionRepository $revisionRepository,
@@ -32,15 +28,15 @@ readonly class PageBulkActionService
         private EntityManagerInterface $entityManager,
         private Security $security,
         private WasteManagerService $wasteManagerService,
-    ) {}
+    ) {
+    }
 
     /**
-     * Applies a bulk action to pages
+     * Applies a bulk action to pages.
      *
-     * @param string $action
      * @param array<string> $ids
-     * @return int
-     * @throws Exception
+     *
+     * @throws \Exception
      */
     public function apply(string $action, array $ids): int
     {
@@ -52,35 +48,35 @@ readonly class PageBulkActionService
                 continue;
             }
             match ($action) {
-                'delete'  => $this->delete($post),
-                'private'  => $post->setVisible(false),
+                'delete' => $this->delete($post),
+                'private' => $post->setVisible(false),
                 'public' => $post->setVisible(true),
                 'rebuild' => $post = $this->rebuild($post),
-                default   => null,
+                default => null,
             };
-            if ($action !== 'delete') {
-                $post->setUpdatedAt(new DateTimeImmutable());
+            if ('delete' !== $action) {
+                $post->setUpdatedAt(new \DateTimeImmutable());
                 $this->entityManager->persist($post);
-                if ($action === 'private' || $action === 'public') {
+                if ('private' === $action || 'public' === $action) {
                     $revision = $this->revisionRepository->hydrateNewRevisionFromPage($post);
                     $revision = $revision
                         ->setContent('')
                         ->setAction(sprintf(
                             RevisionRepository::VISIBILITY_CHANGE,
-                            $post->isVisible()
+                            $post->isVisible(),
                         ));
                     $this->entityManager->persist($revision);
                 }
             }
-            $count++;
+            ++$count;
         }
         $this->entityManager->flush();
+
         return $count;
     }
 
     /**
-     * @param Page $post
-     * @throws Exception
+     * @throws \Exception
      */
     public function delete(Page $post): void
     {
@@ -92,9 +88,7 @@ readonly class PageBulkActionService
     }
 
     /**
-     * @param Page $post
-     * @return Page
-     * @throws Exception
+     * @throws \Exception
      */
     public function rebuild(Page $post): Page
     {
@@ -107,14 +101,14 @@ readonly class PageBulkActionService
         // if ($title === null) {
         //     throw new Exception('Page title cannot be null');
         // }
-        $link = $post->getPostDateAsLink() . '/' . UrlNormaliser::toUri($title);
+        $link = $post->getPostDateAsLink().'/'.UrlNormaliser::toUri($title);
         $subTitle = $post->getSubTitle();
-        if ($subTitle !== null) {
-            $link .= '-' . UrlNormaliser::toUri($subTitle);
+        if (null !== $subTitle) {
+            $link .= '-'.UrlNormaliser::toUri($subTitle);
         }
         $url = new Url($post, $link);
         $this->entityManager->persist($url);
-        $post->setUpdatedAt(new DateTimeImmutable('now'));
+        $post->setUpdatedAt(new \DateTimeImmutable('now'));
 
         return $post;
     }

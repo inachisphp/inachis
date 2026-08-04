@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\EventListener;
@@ -15,18 +14,20 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Event listener for admin responses
+ * Event listener for admin responses.
  */
 final class AdminResponseEvent implements EventSubscriberInterface
 {
     /**
      * AdminResponseEvent constructor.
      */
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     /**
-     * Handles kernel requests
-     * 
+     * Handles kernel requests.
+     *
      * @param RequestEvent $event The request event
      */
     public function onKernelRequest(RequestEvent $event): void
@@ -34,12 +35,12 @@ final class AdminResponseEvent implements EventSubscriberInterface
         // Redirect to /setup if no admins
         // Redirect if not signed in
         // Redirect if password has expired
-        //$request = $event->getRequest();
+        // $request = $event->getRequest();
     }
 
     /**
-     * Handles kernel responses
-     * 
+     * Handles kernel responses.
+     *
      * @param ResponseEvent $event The response event
      */
     public function onKernelResponse(ResponseEvent $event): void
@@ -48,8 +49,8 @@ final class AdminResponseEvent implements EventSubscriberInterface
     }
 
     /**
-     * Returns the events this listener is subscribed to
-     * 
+     * Returns the events this listener is subscribed to.
+     *
      * @return array<string, string> The events this listener is subscribed to
      */
     public static function getSubscribedEvents(): array
@@ -61,8 +62,8 @@ final class AdminResponseEvent implements EventSubscriberInterface
     }
 
     /**
-     * Sends security headers to the response
-     * 
+     * Sends security headers to the response.
+     *
      * @param ResponseEvent $event The response event
      */
     public function sendSecurityHeaders(ResponseEvent $event): void
@@ -71,17 +72,17 @@ final class AdminResponseEvent implements EventSubscriberInterface
         $event->getResponse()->headers->set('X-XSS-Protection', '1; mode=block');
         $event->getResponse()->headers->set('X-Content-Type-Options', 'nosniff');
         // default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' ajax.googleapis.com,cdn.jsdelivr.net,cdnjs.cloudflare.com,unpkg.com,www.google-analytics.com; style-src 'self' data: cdn.jsdelivr.net,cdnjs.cloudflare.com,fonts.googleapis.com,maxcdn.bootstrapcdn.com,unpkg.com; img-src 'self' data: maps.googleapis.com,staticflickr.com; font-src 'self' fonts.gstatic.com,maxcdn.bootstrapcdn.com; connect-src 'self' cdn.jsdelivr.net,maps.googleapis.com; form-action 'self'; upgrade-insecure-requests; block-all-mixed-content
-//        $cspHeader = ContentSecurityPolicy::getInstance()->getCSPEnforceHeader(
-//            $this->csp
-//        );
-//        if (!empty($cspHeader)) {
-//            $event->getResponse()->headers->set('Content-Security-Policy', $cspHeader);
-//        }
-//        $cspReportHeader = ContentSecurityPolicy::getInstance()->getCSPReportHeader(
-//            $this->csp
-//        );
-//        if (!empty($cspReportHeader)) {
-//            $event->getResponse()->headers->set('Content-Security-Policy-Report-Only', $cspReportHeader);
-//        }
+        //        $cspHeader = ContentSecurityPolicy::getInstance()->getCSPEnforceHeader(
+        //            $this->csp
+        //        );
+        //        if (!empty($cspHeader)) {
+        //            $event->getResponse()->headers->set('Content-Security-Policy', $cspHeader);
+        //        }
+        //        $cspReportHeader = ContentSecurityPolicy::getInstance()->getCSPReportHeader(
+        //            $this->csp
+        //        );
+        //        if (!empty($cspReportHeader)) {
+        //            $event->getResponse()->headers->set('Content-Security-Policy-Report-Only', $cspReportHeader);
+        //        }
     }
 }

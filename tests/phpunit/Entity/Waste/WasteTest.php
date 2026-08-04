@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Entity\Waste;
 
-use DateTimeImmutable;
 use Inachis\Entity\User\User;
 use Inachis\Entity\Waste\Waste;
 use PHPUnit\Framework\TestCase;
@@ -62,7 +60,7 @@ class WasteTest extends TestCase
 
     public function testSetAndGetUpdatedAt(): void
     {
-        $date =  new DateTimeImmutable();
+        $date = new \DateTimeImmutable();
         $this->waste->setUpdatedAt($date);
         $this->assertEquals($date, $this->waste->getUpdatedAt());
     }

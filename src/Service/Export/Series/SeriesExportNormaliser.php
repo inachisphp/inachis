@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Export\Series;
@@ -20,8 +19,9 @@ final class SeriesExportNormaliser
     /**
      * Normalises a series for export.
      *
-     * @param Series $series The series to normalise.
-     * @return SeriesExportDto The normalised series.
+     * @param Series $series the series to normalise
+     *
+     * @return SeriesExportDto the normalised series
      */
     public function normalise(Series $series): SeriesExportDto
     {
@@ -33,7 +33,7 @@ final class SeriesExportNormaliser
         $dto->description = $series->getDescription();
 
         $dto->firstDate = $series->getFirstDate()?->format('Y-m-d');
-        $dto->lastDate  = $series->getLastDate()?->format('Y-m-d');
+        $dto->lastDate = $series->getLastDate()?->format('Y-m-d');
 
         $dto->visible = $series->isVisible();
 

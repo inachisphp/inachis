@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Security\Authentication;
 
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\User\User;
 use Inachis\Entity\User\UserRecoveryCode;
@@ -43,7 +41,8 @@ class RecoveryCodeManager
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher,
-    ) {}
+    ) {
+    }
 
     /**
      * Generates a fresh set of recovery codes.
@@ -52,8 +51,6 @@ class RecoveryCodeManager
      *
      * Returns the plaintext codes so they can
      * be displayed once to the user.
-     *
-     * @param User $user
      *
      * @return string[]
      */
@@ -65,7 +62,7 @@ class RecoveryCodeManager
 
         $codes = [];
 
-        for ($i = 0; $i < self::CODE_COUNT; $i++) {
+        for ($i = 0; $i < self::CODE_COUNT; ++$i) {
             $plainCode = $this->generateCode();
 
             $recoveryCode = new UserRecoveryCode();
@@ -73,8 +70,8 @@ class RecoveryCodeManager
             $recoveryCode->setCodeHash(
                 password_hash(
                     $plainCode,
-                    PASSWORD_ARGON2ID
-                )
+                    PASSWORD_ARGON2ID,
+                ),
             );
 
             $this->entityManager->persist($recoveryCode);
@@ -90,15 +87,10 @@ class RecoveryCodeManager
      * Verifies and consumes a recovery code.
      *
      * Returns true if the code was valid.
-     *
-     * @param User $user
-     * @param string $code
-     *
-     * @return bool
      */
     public function verify(
         User $user,
-        string $code
+        string $code,
     ): bool {
         $code = strtoupper(trim($code));
 
@@ -109,7 +101,7 @@ class RecoveryCodeManager
 
             if (password_verify($code, $recoveryCode->getCodeHash())) {
                 $recoveryCode->setUsedAt(
-                    new DateTimeImmutable()
+                    new \DateTimeImmutable(),
                 );
                 $this->entityManager->flush();
 
@@ -122,19 +114,15 @@ class RecoveryCodeManager
 
     /**
      * Returns the number of unused recovery codes.
-     *
-     * @param User $user
-     *
-     * @return int
      */
     public function getRemainingCount(
-        User $user
+        User $user,
     ): int {
         $count = 0;
 
         foreach ($user->getRecoveryCodes() as $code) {
             if (!$code->isUsed()) {
-                $count++;
+                ++$count;
             }
         }
 
@@ -147,29 +135,25 @@ class RecoveryCodeManager
      * Example:
      *
      * ABCD-EFGH
-     *
-     * @return string
      */
     private function generateCode(): string
     {
         return sprintf(
             '%s-%s',
             $this->randomPart(),
-            $this->randomPart()
+            $this->randomPart(),
         );
     }
 
     /**
      * Generates one 4-character segment.
-     *
-     * @return string
      */
     private function randomPart(): string
     {
         $result = '';
         $max = strlen(self::ALPHABET) - 1;
 
-        for ($i = 0; $i < self::CODE_PART_LENGTH; $i++) {
+        for ($i = 0; $i < self::CODE_PART_LENGTH; ++$i) {
             $result .= self::ALPHABET[random_int(0, $max)];
         }
 

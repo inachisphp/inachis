@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Import\Page;
@@ -16,14 +15,11 @@ final class TagImportService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-    ) {}
+    ) {
+    }
 
     /**
      * Find a tag by title, or optionally create it.
-     *
-     * @param string $title
-     * @param bool $createIfMissing
-     * @return Tag|null
      */
     public function findOrCreateByTitle(string $title, bool $createIfMissing = false): ?Tag
     {

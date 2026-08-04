@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Enum\Security;
 
-use Inachis\Enum\Security\PermissionAction;
-
 /**
- * Enum used to identify {@link Role} items
+ * Enum used to identify {@link Role} items.
  */
 enum PermissionResource: string
 {
@@ -110,9 +107,7 @@ enum PermissionResource: string
     }
 
     /**
-     * Returns a human-friendly label for the permission resource
-     *
-     * @return string
+     * Returns a human-friendly label for the permission resource.
      */
     public function label(): string
     {
@@ -149,7 +144,7 @@ enum PermissionResource: string
     }
 
     /**
-     * Return the contents of the permission groups
+     * Return the contents of the permission groups.
      *
      * @return list<array{group: PermissionGroup, resources:list<PermissionResource>}>
      */

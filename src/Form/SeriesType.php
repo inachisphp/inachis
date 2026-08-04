@@ -1,16 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form;
 
 use Inachis\Entity\Content\Series;
-use Inachis\Entity\User\User;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Provider\TimezoneProvider;
@@ -29,38 +27,36 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Form for creating and editing a series
+ * Form for creating and editing a series.
  *
  * @extends AbstractType<Series>
  */
 class SeriesType extends AbstractType
 {
     /**
-     * Constructor
-
-     * @param Security $security
-     * @param TranslatorInterface $translator
+     * Constructor.
      */
     public function __construct(
         private PermissionResolver $permissionResolver,
         private Security $security,
         private readonly TimezoneProvider $timezoneProvider,
         private readonly TranslatorInterface $translator,
-    ) {}
+    ) {
+    }
 
     /**
-     * Build the form
+     * Build the form.
      *
      * @param FormBuilderInterface<Series|null> $builder
-     * @param array<string, mixed> $options The form options
+     * @param array<string, mixed>              $options The form options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $user = $this->security->getUser();
         $userTimezone = $this->timezoneProvider->getForUser($user);
 
-        $newItem = !$options['data'] instanceof Series ||
-            empty($options['data']->getId());
+        $newItem = !$options['data'] instanceof Series
+            || empty($options['data']->getId());
         $allowEdit = $this->permissionResolver->hasPermission(
             $user,
             PermissionResource::SERIES,
@@ -69,12 +65,12 @@ class SeriesType extends AbstractType
         $allowBulkCreate = $allowEdit && $this->permissionResolver->hasPermission(
             $user,
             PermissionResource::PAGE,
-            PermissionAction::CREATE
+            PermissionAction::CREATE,
         );
         $allowDelete = $this->permissionResolver->hasPermission(
             $user,
             PermissionResource::SERIES,
-            PermissionAction::DELETE
+            PermissionAction::DELETE,
         );
 
         $builder
@@ -87,7 +83,7 @@ class SeriesType extends AbstractType
                     'placeholder' => $this->translator->trans('admin.series.title.placeholder', [], 'messages'),
                 ],
                 'disabled' => !$allowEdit,
-                'label'      => $this->translator->trans('admin.series.title.label', [], 'messages'),
+                'label' => $this->translator->trans('admin.series.title.label', [], 'messages'),
                 'label_attr' => [
                     'class' => 'inline_label',
                     'id' => 'title_label',
@@ -111,13 +107,13 @@ class SeriesType extends AbstractType
             ->add('url', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'url_label',
-                    'aria-required'   => 'false',
+                    'aria-required' => 'false',
                     'class' => 'editor__url text',
                     'pattern' => '[0-9a-zA-ZÀ-ž\-]{4,}',
-                    'placeholder'     => $this->translator->trans('admin.series.url.placeholder', [], 'messages'),
+                    'placeholder' => $this->translator->trans('admin.series.url.placeholder', [], 'messages'),
                 ],
                 'disabled' => !$allowEdit,
-                'label'      => $this->translator->trans('admin.series.url.label', [], 'messages'),
+                'label' => $this->translator->trans('admin.series.url.label', [], 'messages'),
                 'label_attr' => [
                     'id' => 'url_label',
                 ],
@@ -181,7 +177,7 @@ class SeriesType extends AbstractType
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> %s',
                         'create',
-                        $this->translator->trans('admin.series.bulk.label', [], 'messages')
+                        $this->translator->trans('admin.series.bulk.label', [], 'messages'),
                     ),
                     'label_html' => true,
                 ]);
@@ -194,7 +190,7 @@ class SeriesType extends AbstractType
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> %s',
                         'playlist_add',
-                        $this->translator->trans('admin.series.add.label', [], 'messages')
+                        $this->translator->trans('admin.series.add.label', [], 'messages'),
                     ),
                     'label_html' => true,
                 ]);
@@ -225,7 +221,7 @@ class SeriesType extends AbstractType
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> %s',
                         'save',
-                        $this->translator->trans('admin.button.save', [], 'messages')
+                        $this->translator->trans('admin.button.save', [], 'messages'),
                     ),
                     'label_html' => true,
                 ])
@@ -250,7 +246,7 @@ class SeriesType extends AbstractType
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> %s',
                         'delete_forever',
-                        $this->translator->trans('admin.button.delete', [], 'messages')
+                        $this->translator->trans('admin.button.delete', [], 'messages'),
                     ),
                     'label_html' => true,
                 ]);
@@ -263,19 +259,16 @@ class SeriesType extends AbstractType
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> %s',
                         'playlist_remove',
-                        $this->translator->trans('admin.button.remove', [], 'messages')
+                        $this->translator->trans('admin.button.remove', [], 'messages'),
                     ),
                     'label_html' => true,
                 ]);
             }
-
         }
     }
 
     /**
-     * Configure the options for the form
-     *
-     * @param OptionsResolver $resolver
+     * Configure the options for the form.
      */
     public function configureOptions(OptionsResolver $resolver): void
     {

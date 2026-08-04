@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Repository\User;
@@ -15,15 +14,15 @@ use Inachis\Entity\User\UserTrustedDevice;
 use Inachis\Repository\AbstractRepository;
 
 /**
- * Repository for {@link UserTrustedDevice} entities
- * 
+ * Repository for {@link UserTrustedDevice} entities.
+ *
  * @extends AbstractRepository<UserTrustedDevice>
  */
 class UserTrustedDeviceRepository extends AbstractRepository
 {
     /**
-     * Creates a new instance of the UserTrustedDeviceRepository
-     * 
+     * Creates a new instance of the UserTrustedDeviceRepository.
+     *
      * @param ManagerRegistry $registry The registry
      */
     public function __construct(ManagerRegistry $registry)
@@ -34,12 +33,11 @@ class UserTrustedDeviceRepository extends AbstractRepository
     /**
      * Returns all active trusted devices for a user.
      *
-     * @param User $user
      * @return list<UserTrustedDevice>
      */
     public function getTrustedDevices(User $user): array
     {
-        /** @var list<UserTrustedDevice> */
+        /* @var list<UserTrustedDevice> */
         return $this->createQueryBuilder('d')
             ->where('d.user = :user')
             ->andWhere('d.expiresAt > :now')
@@ -52,18 +50,13 @@ class UserTrustedDeviceRepository extends AbstractRepository
     }
 
     /**
-     * Returns trusted devices for a user by selector
-     *
-     * @param User $user
-     * @param string $selector
-     * @return UserTrustedDevice|null
+     * Returns trusted devices for a user by selector.
      */
     public function findBySelector(
         User $user,
-        string $selector
-    ): ?UserTrustedDevice
-    {
-        /** @var UserTrustedDevice|null */
+        string $selector,
+    ): ?UserTrustedDevice {
+        /* @var UserTrustedDevice|null */
         return $this->createQueryBuilder('d')
             ->where('d.user = :user')
             ->andWhere('d.selector = :selector')
@@ -75,8 +68,6 @@ class UserTrustedDeviceRepository extends AbstractRepository
 
     /**
      * Removes all expired trusted devices for the given user.
-     *
-     * @param User $user
      */
     public function removeExpiredDevices(User $user): void
     {
@@ -91,9 +82,7 @@ class UserTrustedDeviceRepository extends AbstractRepository
     }
 
     /**
-     * Removes all trusted devices for a user
-     *
-     * @param User $user
+     * Removes all trusted devices for a user.
      */
     public function removeAll(User $user): void
     {

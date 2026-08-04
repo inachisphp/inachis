@@ -1,17 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Repository\Content;
 
-use Inachis\Entity\Content\Page;
-use Inachis\Entity\Content\Url;
-use Inachis\Repository\Content\UrlRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -20,10 +16,11 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
-use Exception;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Url;
+use Inachis\Repository\Content\UrlRepository;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
-use ReflectionClass;
 
 class UrlRepositoryTest extends TestCase
 {
@@ -44,7 +41,7 @@ class UrlRepositoryTest extends TestCase
             ->willReturn($metadata);
         $this->repository = $this->getMockBuilder(UrlRepository::class)
             ->setConstructorArgs([$registry])
-            ->onlyMethods([ 'getClassName', 'getEntityManager', 'getAll', 'findOneBy' ])
+            ->onlyMethods(['getClassName', 'getEntityManager', 'getAll', 'findOneBy'])
             ->getMock();
         $this->repository->method('getClassName')
             ->willReturn(Url::class);
@@ -70,7 +67,7 @@ class UrlRepositoryTest extends TestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testGetDefaultUrl(): void
     {
@@ -79,14 +76,14 @@ class UrlRepositoryTest extends TestCase
         $this->entityManager->expects($this->never())->method('createQueryBuilder');
         $this->repository->expects($this->once())
             ->method('findOneBy')
-            ->with([ 'content' => $page, 'default' => true, ])
+            ->with(['content' => $page, 'default' => true])
             ->willReturn($url);
         $result = $this->repository->getDefaultUrl($page);
         $this->assertEquals($url, $result);
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testFindSimilarUrlsExcludingId(): void
     {
@@ -125,10 +122,10 @@ class UrlRepositoryTest extends TestCase
                 25,
                 [],
                 [
-                    [ 'substring(q.link, 1, 10)', 'asc' ],
-                    [ 'q.default', 'desc' ],
-                    [ 'q.createdAt', 'desc' ],
-                ]
+                    ['substring(q.link, 1, 10)', 'asc'],
+                    ['q.default', 'desc'],
+                    ['q.createdAt', 'desc'],
+                ],
             )
             ->willReturn($paginator);
         $result = $this->repository->getFiltered([], 0, 25);
@@ -148,16 +145,16 @@ class UrlRepositoryTest extends TestCase
                     '(p.title LIKE :keyword OR q.link LIKE :keyword)',
                     [
                         'keyword' => '%test%',
-                    ]
+                    ],
                 ],
                 [
-                    [ 'substring(q.link, 1, 10)', 'asc' ],
-                    [ 'q.default', 'desc' ],
-                    [ 'q.createdAt', 'desc' ],
-                ]
+                    ['substring(q.link, 1, 10)', 'asc'],
+                    ['q.default', 'desc'],
+                    ['q.createdAt', 'desc'],
+                ],
             )
             ->willReturn($paginator);
-        $result = $this->repository->getFiltered([ 'keyword' => 'test' ], 0, 25);
+        $result = $this->repository->getFiltered(['keyword' => 'test'], 0, 25);
         $this->assertEquals($paginator, $result);
     }
 
@@ -167,23 +164,23 @@ class UrlRepositoryTest extends TestCase
         $this->repository->expects($this->never())->method('findOneBy');
         $orders = [
             'contentDate desc' => [
-                [ 'substring(q.link, 1, 10)', 'desc' ],
-                [ 'q.default', 'desc' ],
-                [ 'q.createdAt', 'desc' ],
+                ['substring(q.link, 1, 10)', 'desc'],
+                ['q.default', 'desc'],
+                ['q.createdAt', 'desc'],
             ],
             'link asc' => [['q.link', 'ASC']],
             'link desc' => [['q.link', 'DESC']],
             'content asc' => [['p.title', 'ASC']],
             'content desc' => [['p.title', 'DESC']],
             'default' => [
-                [ 'substring(q.link, 1, 10)', 'asc' ],
-                [ 'q.default', 'desc' ],
-                [ 'q.createdAt', 'desc' ],
-            ]
+                ['substring(q.link, 1, 10)', 'asc'],
+                ['q.default', 'desc'],
+                ['q.createdAt', 'desc'],
+            ],
         ];
-        $reflection = new ReflectionClass($this->repository);
+        $reflection = new \ReflectionClass($this->repository);
         $method = $reflection->getMethod('determineOrderBy');
-        foreach($orders as $key => $order) {
+        foreach ($orders as $key => $order) {
             $this->assertEquals($order, $method->invokeArgs($this->repository, [$key]));
         }
     }

@@ -1,16 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Admin;
 
-use DateTimeImmutable;
-use Exception;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Form\ChangePasswordType;
 use Inachis\Repository\User\UserRepository;
@@ -22,20 +19,14 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Controller used for changing password for an administrator {@link User}
+ * Controller used for changing password for an administrator {@link User}.
  */
 class ChangePasswordController extends AbstractInachisController
 {
     /**
-     * Controller for the change-password tab in the admin interface
-     *
-     * @param Request $request
-     * @param TrustedDeviceManager $trustedDeviceManager
-     * @param UserPasswordHasherInterface $passwordHasher
-     * @param UserRepository $userRepository
-     * @return Response
+     * Controller for the change-password tab in the admin interface.
      */
-    #[Route("/incp/admin/{id}/change-password", name: "incp_admin_change_password", methods: [ "GET", "POST" ])]
+    #[Route('/incp/admin/{id}/change-password', name: 'incp_admin_change_password', methods: ['GET', 'POST'])]
     public function changePasswordTab(
         Request $request,
         TrustedDeviceManager $trustedDeviceManager,
@@ -55,18 +46,18 @@ class ChangePasswordController extends AbstractInachisController
             null,
             [
                 'last_modified' => $currentUser->getPasswordChangedAt()?->format('d F Y'),
-            ]
+            ],
         );
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid() && $user->getId() === $currentUser->getId()) {
             /** @var string */
             $plaintextPassword = $request->request->all('change_password')['new_password'];
             if (str_contains(strtolower($plaintextPassword), strtolower($user->getUsername() ?: ''))) {
-                throw new Exception('Your password cannot contain username.');
+                throw new \Exception('Your password cannot contain username.');
             }
             $hashedPassword = $passwordHasher->hashPassword($user, $plaintextPassword);
             $user->setPassword($hashedPassword);
-            $user->setPasswordChangedAt(new DateTimeImmutable());
+            $user->setPasswordChangedAt(new \DateTimeImmutable());
             if (!$passwordHasher->isPasswordValid($user, $plaintextPassword)) {
                 throw new AccessDeniedHttpException();
             }
@@ -77,6 +68,7 @@ class ChangePasswordController extends AbstractInachisController
 
         $this->viewModel->page->title = 'Change Password';
         $this->viewModel->page->tab = 'change-password';
+
         return $this->render('inadmin/page/admin/change-password.html.twig', [
             'viewModel' => $this->viewModel,
             'form' => $form->createView(),

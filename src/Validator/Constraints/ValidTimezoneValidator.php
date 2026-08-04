@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Validator\Constraints;
@@ -14,16 +13,12 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
- * ValidTimezoneValidator class
+ * ValidTimezoneValidator class.
  */
 class ValidTimezoneValidator extends ConstraintValidator
 {
     /**
-     * Validate the timezone
-     *
-     * @param mixed $value
-     * @param Constraint $constraint
-     * @return void
+     * Validate the timezone.
      */
     public function validate(mixed $value, Constraint $constraint): void
     {

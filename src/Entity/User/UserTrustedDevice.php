@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Entity\User;
 
-use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
@@ -25,11 +23,11 @@ class UserTrustedDevice
 
     #[ORM\ManyToOne(
         targetEntity: User::class,
-        inversedBy: 'trustedDevices'
+        inversedBy: 'trustedDevices',
     )]
     #[ORM\JoinColumn(
         nullable: false,
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
     )]
     private User $user;
 
@@ -58,17 +56,17 @@ class UserTrustedDevice
     private ?string $lastUserAgent = null;
 
     #[ORM\Column]
-    private DateTimeImmutable $createdAt;
+    private \DateTimeImmutable $createdAt;
 
     #[ORM\Column]
-    private DateTimeImmutable $expiresAt;
+    private \DateTimeImmutable $expiresAt;
 
     #[ORM\Column(nullable: true)]
-    private ?DateTimeImmutable $lastUsedAt = null;
+    private ?\DateTimeImmutable $lastUsedAt = null;
 
     public function __construct()
     {
-        $this->createdAt = new DateTimeImmutable();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?UuidInterface
@@ -148,29 +146,29 @@ class UserTrustedDevice
         return $this;
     }
 
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getExpiresAt(): DateTimeImmutable
+    public function getExpiresAt(): \DateTimeImmutable
     {
         return $this->expiresAt;
     }
 
-    public function setExpiresAt(DateTimeImmutable $expiresAt): self
+    public function setExpiresAt(\DateTimeImmutable $expiresAt): self
     {
         $this->expiresAt = $expiresAt;
 
         return $this;
     }
 
-    public function getLastUsedAt(): ?DateTimeImmutable
+    public function getLastUsedAt(): ?\DateTimeImmutable
     {
         return $this->lastUsedAt;
     }
 
-    public function setLastUsedAt(?DateTimeImmutable $lastUsedAt): self
+    public function setLastUsedAt(?\DateTimeImmutable $lastUsedAt): self
     {
         $this->lastUsedAt = $lastUsedAt;
 
@@ -179,6 +177,6 @@ class UserTrustedDevice
 
     public function isExpired(): bool
     {
-        return $this->expiresAt <= new DateTimeImmutable();
+        return $this->expiresAt <= new \DateTimeImmutable();
     }
 }

@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Service\User;
@@ -18,7 +17,7 @@ class ProfileColorPaletteTest extends TestCase
 
     public function setUp(): void
     {
-        $this->colorPicker  = new ProfileColorPalette();
+        $this->colorPicker = new ProfileColorPalette();
         parent::setUp();
     }
 

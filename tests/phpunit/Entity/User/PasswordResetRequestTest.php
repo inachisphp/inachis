@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Entity\User;
 
 use Inachis\Entity\User\PasswordResetRequest;
 use Inachis\Entity\User\User;
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class PasswordResetRequestTest extends TestCase
@@ -20,12 +18,12 @@ class PasswordResetRequestTest extends TestCase
 
     protected ?User $user;
 
-    protected DateTimeImmutable $expiresAt;
+    protected \DateTimeImmutable $expiresAt;
 
     public function setUp(): void
     {
         $this->user = new User();
-        $this->expiresAt = new DateTimeImmutable();
+        $this->expiresAt = new \DateTimeImmutable();
         $this->passwordResetRequest = new PasswordResetRequest($this->user, 'abc123', $this->expiresAt);
         parent::setUp();
     }

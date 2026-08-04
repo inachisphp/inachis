@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\API\Search;
@@ -21,12 +20,6 @@ class SearchAPIController extends AbstractController
 {
     /**
      * JSON search endpoint for front-end clients.
-     * 
-     * @param Request $request
-     * @param SearchRepository $searchRepository
-     * @param UrlRepository $urlRepository
-     * @param SeriesRepository $seriesRepository
-     * @return JsonResponse
      */
     #[Route('/api/search', name: 'api_search', methods: ['GET'])]
     public function search(
@@ -37,7 +30,7 @@ class SearchAPIController extends AbstractController
     ): JsonResponse {
         $keyword = trim((string) $request->query->get('q', ''));
 
-        if ($keyword === '') {
+        if ('' === $keyword) {
             return $this->json([
                 'query' => $keyword,
                 'results' => [],
@@ -55,10 +48,10 @@ class SearchAPIController extends AbstractController
             $title = is_scalar($result['title'] ?? null) ? (string) $result['title'] : '';
             $excerpt = is_scalar($result['content'] ?? null) ? (string) $result['content'] : '';
 
-            if ($type === 'series') {
+            if ('series' === $type) {
                 $entity = $seriesRepository->find($id);
-                $path = $entity !== null && is_scalar($entity->getUrl())
-                    ? '/series/' . ltrim((string) $entity->getUrl(), '/')
+                $path = null !== $entity && is_scalar($entity->getUrl())
+                    ? '/series/'.ltrim((string) $entity->getUrl(), '/')
                     : null;
             } else {
                 /** @var \Inachis\Entity\Content\Url|null $url */
@@ -67,14 +60,14 @@ class SearchAPIController extends AbstractController
                     'default' => true,
                 ]);
                 $path = $url instanceof \Inachis\Entity\Content\Url
-                    ? '/' . ltrim((string) $url->getLink(), '/')
+                    ? '/'.ltrim((string) $url->getLink(), '/')
                     : null;
             }
 
             $items[] = [
                 'id' => $id,
-                'entity' => $type === 'series' ? 'series' : 'page',
-                'type' => $type === 'series' ? 'series' : $type,
+                'entity' => 'series' === $type ? 'series' : 'page',
+                'type' => 'series' === $type ? 'series' : $type,
                 'title' => $title,
                 'excerpt' => $excerpt,
                 'url' => $path,

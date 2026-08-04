@@ -1,16 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form\Provider;
 
 /**
- * Language codes
+ * Language codes.
  */
 class LanguageCodes
 {
@@ -43,7 +42,7 @@ class LanguageCodes
         'English' => [
             'codes' => [
                 'en_GB' => 'English (United Kingdom)',
-                /**
+                /*
                  *en_AS: "English (American Samoa)",
                  * en_AU: "English (Australia)",
                  * en_BE: "English (Belgium)",

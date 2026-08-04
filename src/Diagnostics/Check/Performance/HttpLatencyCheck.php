@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics\Check\Performance;
@@ -14,23 +13,23 @@ use Inachis\Diagnostics\CheckResult;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * Checks the HTTP latency
+ * Checks the HTTP latency.
  */
 final class HttpLatencyCheck implements CheckInterface
 {
-	/** @var string The internal URL to measure */
+    /** @var string The internal URL to measure */
     private string $internalUrl;
 
-	/** @var string The public URL to measure */
+    /** @var string The public URL to measure */
     private string $publicUrl;
 
-	/**
-	 * Constructor
-	 *
-	 * @param HttpClientInterface $client The HTTP client
-	 * @param int $samples The number of samples to take
-	 * @param float $timeout The timeout in seconds
-	 */
+    /**
+     * Constructor.
+     *
+     * @param HttpClientInterface $client  The HTTP client
+     * @param int                 $samples The number of samples to take
+     * @param float               $timeout The timeout in seconds
+     */
     public function __construct(
         private readonly HttpClientInterface $client,
         private readonly int $samples = 3,
@@ -45,37 +44,38 @@ final class HttpLatencyCheck implements CheckInterface
             : 'https://localhost/health';
     }
 
-	/**
-	 * Get the ID of the check
-	 *
-	 * @return string
-	 */
-    public function getId(): string { return 'http_latency'; }
+    /**
+     * Get the ID of the check.
+     */
+    public function getId(): string
+    {
+        return 'http_latency';
+    }
 
-	/**
-	 * Get the label of the check
-	 *
-	 * @return string
-	 */
-    public function getLabel(): string { return 'HTTP Latency'; }
+    /**
+     * Get the label of the check.
+     */
+    public function getLabel(): string
+    {
+        return 'HTTP Latency';
+    }
 
-	/**
-	 * Get the section of the check
-	 *
-	 * @return string
-	 */
-    public function getSection(): string { return 'Environment'; }
+    /**
+     * Get the section of the check.
+     */
+    public function getSection(): string
+    {
+        return 'Environment';
+    }
 
-	/**
-	 * Run the check
-	 *
-	 * @return CheckResult
-	 */
+    /**
+     * Run the check.
+     */
     public function run(): CheckResult
     {
         try {
             $internal = $this->measure($this->internalUrl);
-            $public   = $this->measure($this->publicUrl);
+            $public = $this->measure($this->publicUrl);
 
             $issues = [];
             $severity = 'ok';
@@ -114,24 +114,23 @@ final class HttpLatencyCheck implements CheckInterface
                 $internal['dns'],
                 $internal['connect'],
                 $internal['tls'],
-                $internal['ttfb']
+                $internal['ttfb'],
             );
 
             if ($issues) {
-                $summary .= ' | ' . implode('; ', $issues);
+                $summary .= ' | '.implode('; ', $issues);
             }
 
             return new CheckResult(
                 $this->getId(),
                 $this->getLabel(),
                 $severity,
-                $public['average'] . ' ms',
+                $public['average'].' ms',
                 $summary,
-                $severity === 'ok' ? null : 'Investigate network, proxy, or container performance.',
+                'ok' === $severity ? null : 'Investigate network, proxy, or container performance.',
                 $this->getSection(),
-                'high'
+                'high',
             );
-
         } catch (\Throwable $e) {
             return new CheckResult(
                 $this->getId(),
@@ -141,16 +140,17 @@ final class HttpLatencyCheck implements CheckInterface
                 $e->getMessage(),
                 'Verify application availability.',
                 $this->getSection(),
-                'high'
+                'high',
             );
         }
     }
 
-	/**
-	 * Measure the HTTP latency
-	 *
-	 * @param string $url The URL to measure
-	 * @return array{
+    /**
+     * Measure the HTTP latency.
+     *
+     * @param string $url The URL to measure
+     *
+     * @return array{
      *     samples: array<array{total: int|float}>,
      *     average: int|float,
      *     dns: int|float,
@@ -158,7 +158,7 @@ final class HttpLatencyCheck implements CheckInterface
      *     tls: int|float,
      *     ttfb: int|float
      * } The measurement results
-	 */
+     */
     private function measure(string $url): array
     {
         $samples = [];
@@ -167,7 +167,7 @@ final class HttpLatencyCheck implements CheckInterface
         $tlsTimes = [];
         $ttfbTimes = [];
 
-        for ($i = 0; $i < $this->samples; $i++) {
+        for ($i = 0; $i < $this->samples; ++$i) {
             $start = hrtime(true);
             $response = $this->client->request('HEAD', $url, [
                 'timeout' => $this->timeout,
@@ -194,19 +194,16 @@ final class HttpLatencyCheck implements CheckInterface
         return [
             'samples' => $samples,
             'average' => round(array_sum(array_column($samples, 'total')) / count($samples), 1),
-            'dns' => round(array_sum($dnsTimes)/count($dnsTimes),1),
-            'connect' => round(array_sum($connectTimes)/count($connectTimes),1),
-            'tls' => round(array_sum($tlsTimes)/count($tlsTimes),1),
-            'ttfb' => round(array_sum($ttfbTimes)/count($ttfbTimes),1),
+            'dns' => round(array_sum($dnsTimes) / count($dnsTimes), 1),
+            'connect' => round(array_sum($connectTimes) / count($connectTimes), 1),
+            'tls' => round(array_sum($tlsTimes) / count($tlsTimes), 1),
+            'ttfb' => round(array_sum($ttfbTimes) / count($ttfbTimes), 1),
         ];
     }
 
-	/**
-	 *
-	 */
     private function isContainer(): bool
     {
-        return file_exists('/.dockerenv') ||
-            (file_exists('/proc/1/cgroup') && str_contains(file_get_contents('/proc/1/cgroup') ?: '', 'docker'));
+        return file_exists('/.dockerenv')
+            || (file_exists('/proc/1/cgroup') && str_contains(file_get_contents('/proc/1/cgroup') ?: '', 'docker'));
     }
 }

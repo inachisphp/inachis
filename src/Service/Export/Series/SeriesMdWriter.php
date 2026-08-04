@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Export\Series;
@@ -20,30 +19,33 @@ final class SeriesMdWriter implements ExportWriterInterface
     /**
      * Checks if the writer supports the given format.
      *
-     * @param string $format The format to check.
-     * @return bool True if the writer supports the format, false otherwise.
+     * @param string $format the format to check
+     *
+     * @return bool true if the writer supports the format, false otherwise
      */
     public function supports(string $format): bool
     {
-        return $format === 'md';
+        return 'md' === $format;
     }
 
     /**
      * Checks if the writer supports the given content domain.
      *
-     * @param string|null $domain The content domain to check.
-     * @return bool True if the writer supports the domain, false otherwise.
+     * @param string|null $domain the content domain to check
+     *
+     * @return bool true if the writer supports the domain, false otherwise
      */
     public function supportsDomain(?string $domain): bool
     {
-        return $domain === 'series';
+        return 'series' === $domain;
     }
 
     /**
      * Writes the given series to the specified format.
      *
-     * @param iterable<SeriesExportDto> $items The series to write.
-     * @return string The written series.
+     * @param iterable<SeriesExportDto> $items the series to write
+     *
+     * @return string the written series
      */
     public function write(iterable $items): string
     {
@@ -51,16 +53,17 @@ final class SeriesMdWriter implements ExportWriterInterface
 
         foreach ($items as $item) {
             $output .= "---\n";
-            $output .= "title: " . $item->title . "\n";
-            $output .= "subtitle: " . $item->subTitle . "\n";
-            $output .= "url: " . $item->url . "\n";
-            $output .= "description: " . $item->description . "\n";
-            $output .= "firstDate: " . $item->firstDate . "\n";
-            $output .= "lastDate: " . $item->lastDate . "\n";
-            $output .= "visible: " . $item->visible . "\n";
-            $output .= "items: " . implode(", ", $item->items) . "\n";
+            $output .= 'title: '.$item->title."\n";
+            $output .= 'subtitle: '.$item->subTitle."\n";
+            $output .= 'url: '.$item->url."\n";
+            $output .= 'description: '.$item->description."\n";
+            $output .= 'firstDate: '.$item->firstDate."\n";
+            $output .= 'lastDate: '.$item->lastDate."\n";
+            $output .= 'visible: '.$item->visible."\n";
+            $output .= 'items: '.implode(', ', $item->items)."\n";
             $output .= "---\n";
         }
+
         return $output;
     }
 }

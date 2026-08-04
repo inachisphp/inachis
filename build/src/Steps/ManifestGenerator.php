@@ -115,20 +115,19 @@ final class ManifestGenerator implements BuildStepInterface
     private function getVersion(
         ReleaseWorkspace $workspace
     ): string {
-        $composer = $workspace->path
+        $versionFile = $workspace->path
             . DIRECTORY_SEPARATOR
-            . 'composer.json';
+            . 'config'
+            . DIRECTORY_SEPARATOR
+            . 'version.php';
 
-        if (!file_exists($composer)) {
-            return 'unknown';
+        if (!is_file($versionFile)) {
+            return 'dev';
         }
 
-        $data = json_decode(
-            file_get_contents($composer),
-            true,
-            flags: JSON_THROW_ON_ERROR
-        );
+        /** @var array<string, string> $version */
+        $version = require $versionFile;
 
-        return $data['version'] ?? 'unknown';
+        return $version['version'] ?? 'dev';
     }
 }

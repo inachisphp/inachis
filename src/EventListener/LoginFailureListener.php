@@ -1,16 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\EventListener;
 
-use Inachis\Entity\User\LoginActivity;
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Entity\User\LoginActivity;
 use Inachis\Enum\Security\LoginResultType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
@@ -20,19 +19,14 @@ use Symfony\Component\Security\Http\Event\LoginFailureEvent;
  */
 class LoginFailureListener
 {
-    /**
-     * @param EntityManagerInterface $entityManager
-     * @param RequestStack $requestStack
-     */
     public function __construct(
         protected EntityManagerInterface $entityManager,
         protected RequestStack $requestStack,
-    ) {}
+    ) {
+    }
 
     /**
      * Logs a failed login attempt.
-     * 
-     * @param LoginFailureEvent $event
      */
     public function __invoke(LoginFailureEvent $event): void
     {
@@ -58,7 +52,7 @@ class LoginFailureListener
             $submittedUsername,
             [
                 'error' => $exception->getMessageKey(),
-            ]
+            ],
         );
 
         $this->entityManager->persist($activity);

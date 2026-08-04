@@ -1,16 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Waste;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Waste\WasteRepository;
@@ -22,24 +20,18 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class WasteController extends AbstractInachisController
 {
-    /**
-     * @param Request $request
-     * @param ContentQueryParameters $contentQueryParameters
-     * @param WasteRepository $wasteRepository
-     * @return Response
-     */
     #[Route(
-        "/incp/waste/{limit}/{offset}",
+        '/incp/waste/{limit}/{offset}',
         requirements: [
-          "limit" => "\d+",
-          "offset" => "\d+",
+            'limit' => "\d+",
+            'offset' => "\d+",
         ],
         defaults: [
-            "limit" => 10,
-            "offset" => 0,
+            'limit' => 10,
+            'offset' => 0,
         ],
-        methods: [ 'GET', 'POST' ],
-        name: "incp_waste_list"
+        methods: ['GET', 'POST'],
+        name: 'incp_waste_list',
     )]
     public function list(
         Request $request,
@@ -55,10 +47,10 @@ class WasteController extends AbstractInachisController
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
             foreach ($request->request->all('items') as $item) {
                 $processItem = $wasteRepository->findOneBy(['id' => $item]);
-                if ($processItem !== null) {
-                    if ($request->request->getString('delete', '') !== '') {
+                if (null !== $processItem) {
+                    if ('' !== $request->request->getString('delete', '')) {
                         $wasteManagerService->deleteWaste($processItem);
-                    } elseif ($request->request->getString('recover', '') !== '') {
+                    } elseif ('' !== $request->request->getString('recover', '')) {
                         $wasteManagerService->restore($processItem);
                     }
                 }
@@ -66,8 +58,9 @@ class WasteController extends AbstractInachisController
             $this->addFlash('success', sprintf(
                 '%d item(s) have been %s',
                 count($request->request->all('items')),
-                $request->request->getString('recover', '') !== '' ? 'recovered' : 'deleted',
+                '' !== $request->request->getString('recover', '') ? 'recovered' : 'deleted',
             ));
+
             return $this->redirectToRoute(
                 'incp_waste_list',
                 [],
@@ -85,6 +78,7 @@ class WasteController extends AbstractInachisController
         );
 
         $this->viewModel->page->tab = 'waste';
+
         return $this->render('inadmin/page/waste/list.html.twig', [
             'viewModel' => $this->viewModel,
             'dataset' => $wasteRepository->getFiltered(
@@ -98,18 +92,13 @@ class WasteController extends AbstractInachisController
         ]);
     }
 
-    /**
-     * @param string $id
-     * @param WasteRepository $wasteRepository
-     * @return Response
-     */
     #[Route(
-        "/incp/waste/{id}",
+        '/incp/waste/{id}',
         requirements: [
-            "id" => "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+            'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}',
         ],
-        methods: [ 'GET' ],
-        name: "incp_waste_view"
+        methods: ['GET'],
+        name: 'incp_waste_view',
     )]
     public function view(
         string $id,
@@ -118,17 +107,18 @@ class WasteController extends AbstractInachisController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $processItem = $wasteRepository->findOneBy(['id' => $id]);
-        if ($processItem === null) {
+        if (null === $processItem) {
             throw $this->createNotFoundException('The item does not exist or has been permanently deleted');
         }
         $form = $this->createFormBuilder()->getForm();
 
         $this->viewModel->page->tab = 'waste';
+
         return $this->render('inadmin/page/waste/view.html.twig', [
             'viewModel' => $this->viewModel,
             'form' => $form->createView(),
             'waste' => $processItem,
-            'wasteContent' =>json_decode($processItem->getContent() ?? '', true),
+            'wasteContent' => json_decode($processItem->getContent() ?? '', true),
         ]);
     }
 }

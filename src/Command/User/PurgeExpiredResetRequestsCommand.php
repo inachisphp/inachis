@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Command\User;
@@ -25,9 +24,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class PurgeExpiredResetRequestsCommand extends Command
 {
-    /**
-     * @param PasswordResetRequestRepository $passwordResetRequestRepository
-     */
     public function __construct(protected PasswordResetRequestRepository $passwordResetRequestRepository)
     {
         parent::__construct();
@@ -35,16 +31,13 @@ class PurgeExpiredResetRequestsCommand extends Command
 
     /**
      * Executes the command.
-     * 
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $count = $this->passwordResetRequestRepository->purgeExpiredHashes();
         $io = new SymfonyStyle($input, $output);
         $io->success(sprintf('Deleted %d expired password reset requests.', $count));
+
         return Command::SUCCESS;
     }
 }

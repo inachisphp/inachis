@@ -1,16 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Repository\Content;
 
-use Inachis\Entity\Content\Tag;
-use Inachis\Repository\Content\TagRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -18,6 +15,8 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Entity\Content\Tag;
+use Inachis\Repository\Content\TagRepository;
 use PHPUnit\Framework\TestCase;
 
 class TagRepositoryTest extends TestCase
@@ -39,7 +38,7 @@ class TagRepositoryTest extends TestCase
 
         $this->repository = $this->getMockBuilder(TagRepository::class)
             ->setConstructorArgs([$registry])
-            ->onlyMethods([ 'getEntityManager', 'getAll', 'getClassName', 'createQueryBuilder', ])
+            ->onlyMethods(['getEntityManager', 'getAll', 'getClassName', 'createQueryBuilder'])
             ->getMock();
         $this->repository->method('getEntityManager')
             ->willReturn($this->entityManager);
@@ -61,7 +60,7 @@ class TagRepositoryTest extends TestCase
         $this->entityManager->expects($this->never())->method('createQueryBuilder');
         $this->assertEquals(
             ['title' => 'test-tag'],
-            $this->repository->hydrate(['title' => 'test-tag'], ['title' => 'new-tag'])
+            $this->repository->hydrate(['title' => 'test-tag'], ['title' => 'new-tag']),
         );
     }
 
@@ -84,7 +83,7 @@ class TagRepositoryTest extends TestCase
 
         $result = $this->repository->getAllCount([
             'q.title = :title',
-            ['title' => 'test-tag']
+            ['title' => 'test-tag'],
         ]);
         $this->assertIsInt($result);
         $this->assertEquals(3, $result);
@@ -111,7 +110,7 @@ class TagRepositoryTest extends TestCase
             ->willReturn($this->entityManager);
         $this->repository = $this->getMockBuilder(TagRepository::class)
             ->setConstructorArgs([$registry])
-            ->onlyMethods([ 'getEntityManager', 'getClassName', 'createQueryBuilder', ])
+            ->onlyMethods(['getEntityManager', 'getClassName', 'createQueryBuilder'])
             ->getMock();
 
         $this->repository->expects($this->once())
@@ -127,13 +126,13 @@ class TagRepositoryTest extends TestCase
             25,
             [
                 'q.title = :title',
-                ['title' => 'test-tag']
+                ['title' => 'test-tag'],
             ],
             [
-                [ 'title', 'asc' ],
+                ['title', 'asc'],
             ],
-            [ 'id' ],
-            [ 'table', 'fields' ],
+            ['id'],
+            ['table', 'fields'],
         );
         $this->assertInstanceOf(Paginator::class, $result);
     }
@@ -155,7 +154,7 @@ class TagRepositoryTest extends TestCase
             ->willReturn($this->entityManager);
         $this->repository = $this->getMockBuilder(TagRepository::class)
             ->setConstructorArgs([$registry])
-            ->onlyMethods([ 'getEntityManager', 'getClassName', 'createQueryBuilder', ])
+            ->onlyMethods(['getEntityManager', 'getClassName', 'createQueryBuilder'])
             ->getMock();
 
         $this->repository->expects($this->once())
@@ -197,7 +196,7 @@ class TagRepositoryTest extends TestCase
                     'q.title LIKE :title',
                     ['title' => '%test%'],
                 ],
-                'q.title'
+                'q.title',
             )
             ->willReturn($paginator);
 

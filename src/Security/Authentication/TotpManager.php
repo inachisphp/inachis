@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Security\Authentication;
 
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\User\User;
 use Inachis\Entity\User\UserTotp;
@@ -23,9 +21,9 @@ class TotpManager
     public function __construct(
         private readonly TotpService $totpService,
         private readonly QrCodeService $qrCodeService,
-        private readonly EntityManagerInterface $entityManager
-    ) {}
-
+        private readonly EntityManagerInterface $entityManager,
+    ) {
+    }
 
     /**
      * Begin TOTP setup.
@@ -37,12 +35,12 @@ class TotpManager
      * }
      */
     public function beginSetup(
-        User $user
+        User $user,
     ): array {
         $secret = $this->totpService->generateSecret();
         $uri = $this->totpService->getProvisioningUri(
             $user->getUsername(),
-            $secret
+            $secret,
         );
 
         return [
@@ -54,20 +52,15 @@ class TotpManager
 
     /**
      * Confirm and enable TOTP.
-     *
-     * @param User $user
-     * @param string $secret
-     * @param string $code
-     * @return bool
      */
     public function confirmSetup(
         User $user,
         string $secret,
-        string $code
+        string $code,
     ): bool {
         if (!$this->totpService->verifyCode(
             $secret,
-            $code
+            $code,
         )) {
             return false;
         }
@@ -75,13 +68,13 @@ class TotpManager
         $totp = new UserTotp();
         $totp->setUser($user);
 
-        /**
+        /*
          * Stored as plaintext only in memory.
          * UserTotpListener encrypts this before persistence.
          */
         $totp->setSecret($secret);
         $totp->setEnabledAt(
-            new DateTimeImmutable()
+            new \DateTimeImmutable(),
         );
 
         $this->entityManager->persist($totp);
@@ -92,33 +85,29 @@ class TotpManager
 
     /**
      * Verify a TOTP code.
-     *
-     * @param User $user
-     * @param string $code
-     * @return bool
      */
     public function verify(User $user, string $code): bool
     {
         $totp = $user->getTotp();
-        if ($totp === null) {
+        if (null === $totp) {
             return false;
         }
-        if ($totp->getEnabledAt() === null) {
+        if (null === $totp->getEnabledAt()) {
             return false;
         }
 
         $secret = $totp->getSecret();
-        if ($secret === null) {
+        if (null === $secret) {
             return false;
         }
 
         $valid = $this->totpService->verifyCode(
             $secret,
-            $code
+            $code,
         );
 
         if ($valid) {
-            $totp->setLastUsedAt(new DateTimeImmutable());
+            $totp->setLastUsedAt(new \DateTimeImmutable());
 
             $this->entityManager->flush();
         }
@@ -128,14 +117,12 @@ class TotpManager
 
     /**
      * Disable TOTP.
-     *
-     * @param User $user
      */
     public function disable(
-        User $user
+        User $user,
     ): void {
         $totp = $user->getTotp();
-        if ($totp === null) {
+        if (null === $totp) {
             return;
         }
 

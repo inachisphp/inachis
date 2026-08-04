@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Analytics;
@@ -16,9 +15,6 @@ final class AnalyticsPeriodFactory
 {
     /**
      * Creates an analytics period from the current request.
-     *
-     * @param Request $request
-     * @return AnalyticsPeriod
      */
     public static function fromRequest(Request $request): AnalyticsPeriod
     {
@@ -90,9 +86,6 @@ final class AnalyticsPeriodFactory
 
     /**
      * Creates a custom analytics period.
-     *
-     * @param Request $request
-     * @return AnalyticsPeriod
      */
     private static function createCustom(Request $request): AnalyticsPeriod
     {
@@ -100,18 +93,14 @@ final class AnalyticsPeriodFactory
         $to = $request->query->get('to');
 
         if (!$from || !$to) {
-            throw new InvalidAnalyticsPeriodException(
-                'Both a start and end date are required.'
-            );
+            throw new InvalidAnalyticsPeriodException('Both a start and end date are required.');
         }
 
         try {
             $fromDate = new \DateTimeImmutable($from);
             $toDate = new \DateTimeImmutable($to);
         } catch (\Throwable) {
-            throw new InvalidAnalyticsPeriodException(
-                'The selected dates are invalid.'
-            );
+            throw new InvalidAnalyticsPeriodException('The selected dates are invalid.');
         }
 
         if ($fromDate > $toDate) {
@@ -125,9 +114,7 @@ final class AnalyticsPeriodFactory
 
         $maxDays = 365;
         if ($fromDate->diff($toDate)->days > $maxDays) {
-            throw new InvalidAnalyticsPeriodException(
-                'Custom date ranges cannot exceed one year.'
-            );
+            throw new InvalidAnalyticsPeriodException('Custom date ranges cannot exceed one year.');
         }
 
         return new AnalyticsPeriod(
@@ -144,8 +131,6 @@ final class AnalyticsPeriodFactory
 
     /**
      * Returns the default reporting period.
-     *
-     * @return AnalyticsPeriod
      */
     private static function fallback(): AnalyticsPeriod
     {

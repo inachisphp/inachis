@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Url;
@@ -13,7 +12,6 @@ use Doctrine\ORM\OptimisticLockException;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
-use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\UrlRepository;
@@ -27,23 +25,18 @@ use Symfony\Component\Routing\Attribute\Route;
 class UrlController extends AbstractInachisController
 {
     /**
-     * @param Request $request
-     * @param ContentQueryParameters $contentQueryParameters
-     * @param UrlBulkActionService $urlBulkActionService
-     * @param UrlRepository $urlRepository
-     * @return Response
      * @throws OptimisticLockException
      */
     #[Route(
-        "/incp/url/list/{limit}/{offset}",
-        name: "incp_url_list",
-        requirements: [ "limit" => "\d+", "offset" => "\d+", ],
-        defaults: [ "limit" => 20, "offset" => 0, ],
-        methods: [ "GET", "POST" ]
+        '/incp/url/list/{limit}/{offset}',
+        name: 'incp_url_list',
+        requirements: ['limit' => "\d+", 'offset' => "\d+"],
+        defaults: ['limit' => 20, 'offset' => 0],
+        methods: ['GET', 'POST'],
     )]
     #[RequiresPermission(
         resource: PermissionResource::PAGE,
-        action: PermissionAction::VIEW
+        action: PermissionAction::VIEW,
     )]
     public function list(
         Request $request,
@@ -58,13 +51,14 @@ class UrlController extends AbstractInachisController
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
             /** @var list<string> */
             $items = $request->request->all('items');
-            $action = $request->request->has('delete')  ? 'delete' :
+            $action = $request->request->has('delete') ? 'delete' :
                 ($request->request->has('make_default') ? 'make_default' : null);
 
-            if ($action !== null) {
+            if (null !== $action) {
                 $count = $urlBulkActionService->apply($action, $items);
                 $this->addFlash('success', "Action '$action' applied to $count urls.");
             }
+
             return $this->redirectToRoute('incp_url_list');
         }
 
@@ -93,6 +87,7 @@ class UrlController extends AbstractInachisController
 
         $this->viewModel->page->title = 'URLs';
         $this->viewModel->page->tab = 'url';
+
         return $this->render('inadmin/page/url/list.html.twig', [
             'viewModel' => $this->viewModel,
             'dataset' => $urlRepository->getFiltered(
@@ -106,14 +101,9 @@ class UrlController extends AbstractInachisController
         ]);
     }
 
-    /**
-     * @param Request $request
-     * @param UrlRepository $urlRepository
-     * @return Response
-     */
     #[Route(
-        "/incp/ax/check-url-usage",
-        methods: [ "POST" ]
+        '/incp/ax/check-url-usage',
+        methods: ['POST'],
     )]
     public function checkUrlUsage(
         Request $request,
@@ -122,20 +112,21 @@ class UrlController extends AbstractInachisController
         $url = $request->request->getString('url');
         $urls = $urlRepository->findSimilarUrlsExcludingId(
             $url,
-            $request->request->getString('id')
+            $request->request->getString('id'),
         );
 
         if (isset($urls[0])) {
             preg_match('/\-([0-9]+)$/', $urls[0]['link'], $matches);
             if (!isset($matches[1])) {
                 $matches = [
-                  '-0',
-                  '0',
+                    '-0',
+                    '0',
                 ];
                 $urls[0]['link'] .= '-0';
             }
-            $url = str_replace($matches[0], '-' . ++$matches[1], $urls[0]['link']);
+            $url = str_replace($matches[0], '-'.++$matches[1], $urls[0]['link']);
         }
+
         return new Response($url);
     }
 }

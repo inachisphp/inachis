@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Post;
@@ -14,9 +13,10 @@ use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Content\Tag;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
-use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
-use Inachis\Repository\Content\{CategoryRepository, PageRepository,TagRepository};
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\TagRepository;
 use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\Page\TagBulkActionService;
 use Inachis\Service\Content\ViewStateManager;
@@ -28,13 +28,9 @@ use Symfony\Component\Routing\Attribute\Route;
 class TagsController extends AbstractInachisController
 {
     /**
-     * Get tag list content for ajax requests
-     *
-     * @param Request $request
-     * @param TagRepository $tagRepository
-     * @return Response
+     * Get tag list content for ajax requests.
      */
-    #[Route("incp/ax/tagList/get", methods: [ "POST" ], name: 'api_tags_list')]
+    #[Route('incp/ax/tagList/get', methods: ['POST'], name: 'api_tags_list')]
     public function getTagManagerListContent(Request $request, TagRepository $tagRepository): Response
     {
         /** @var \Doctrine\ORM\Tools\Pagination\Paginator<Tag> */
@@ -44,7 +40,7 @@ class TagsController extends AbstractInachisController
         foreach ($tags as $tag) {
             $title = $tag->getTitle();
             $items[$title] = (object) [
-                'id'   => $tag->getId(),
+                'id' => $tag->getId(),
                 'text' => $title,
             ];
         }
@@ -53,34 +49,25 @@ class TagsController extends AbstractInachisController
 
         return new JsonResponse(
             [
-                'items'      => $result,
+                'items' => $result,
                 'totalCount' => count($result),
             ],
-            Response::HTTP_OK
+            Response::HTTP_OK,
         );
     }
 
     /**
-     * List all tags and provide ability to delete or merge
-     *
-     * @param Request $request
-     * @param CategoryRepository $categoryRepository
-     * @param ContentQueryParameters $contentQueryParameters
-     * @param TagBulkActionService $tagBulkActionService
-     * @param TagRepository $tagRepository
-     * @param int $limit
-     * @param int $offset
-     * @return Response
+     * List all tags and provide ability to delete or merge.
      */
     #[Route(
         '/incp/tags/{limit}/{offset}',
         name: 'incp_tags_list',
-        requirements: [ "limit" => "\d+", "offset" => "\d+", ],
-        defaults: [ "limit" => 20, "offset" => 0, ]
+        requirements: ['limit' => "\d+", 'offset' => "\d+"],
+        defaults: ['limit' => 20, 'offset' => 0],
     )]
     #[RequiresPermission(
         resource: PermissionResource::TAG,
-        action: PermissionAction::VIEW
+        action: PermissionAction::VIEW,
     )]
     public function index(
         Request $request,
@@ -99,12 +86,11 @@ class TagsController extends AbstractInachisController
             $items = $request->request->all('items');
             $action = $request->request->has('delete') ? 'delete' : null;
 
-            if ($action !== null) {
+            if (null !== $action) {
                 try {
                     $count = $tagBulkActionService->apply($action, $items);
                     $this->addFlash('success', "Action '$action' applied to $count tags.");
-                }
-                catch(\Exception $e) {
+                } catch (\Exception $e) {
                     $this->addFlash('error', $e->getMessage());
                 }
             }
@@ -125,16 +111,17 @@ class TagsController extends AbstractInachisController
 
         $this->viewModel->page->title = 'Tags';
         $this->viewModel->page->tab = 'tag';
+
         return $this->render('inadmin/page/tag/list.html.twig', [
             'viewModel' => $this->viewModel,
             'dataset' => array_map(
-                fn($row) => (object) [
+                fn ($row) => (object) [
                     'id' => $row[0]->getId(),
                     'title' => $row[0]->getTitle(),
-                    'url' => '/incp/tags/' . $row[0]->getSlug(),
+                    'url' => '/incp/tags/'.$row[0]->getSlug(),
                     'usageCount' => $row['usageCount'],
                 ],
-                $tagRepository->findAllWithUsageCount($limit, $offset)
+                $tagRepository->findAllWithUsageCount($limit, $offset),
             ),
             'form' => $form->createView(),
             'query' => $params,
@@ -143,20 +130,14 @@ class TagsController extends AbstractInachisController
     }
 
     /**
-     * Merge two tags, deleting the source tag and updating the target tag with any pages associated with the source tag
-     *
-     * @param Request $request
-     * @param PageRepository $pageRepository
-     * @param TagRepository $tagRepository
-     * @param EntityManagerInterface $entityManager
-     * @return Response
+     * Merge two tags, deleting the source tag and updating the target tag with any pages associated with the source tag.
      */
     #[Route('/incp/tags/merge', name: 'incp_tags_merge', methods: ['POST'])]
     public function mergeTags(
         Request $request,
         PageRepository $pageRepository,
         TagRepository $tagRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
     ): Response {
         $targetId = $request->request->getString('target');
         $sourceIds = $request->request->all('sources');
@@ -178,7 +159,7 @@ class TagsController extends AbstractInachisController
             }
 
             // Move pages across
-            $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [ $source->getId() ]], '*', 0, 0);
+            $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$source->getId()]], '*', 0, 0);
             foreach ($pages as $page) {
                 $page->removeTag($source);
                 $page->addTag($target);
@@ -192,17 +173,13 @@ class TagsController extends AbstractInachisController
     }
 
     /**
-     * Show tag and its pages
-     *
-     * @param string $slug
-     * @param PageRepository $pageRepository
-     * @return Response
+     * Show tag and its pages.
      */
     #[Route(
         '/incp/tags/{slug}/{limit}/{offset}',
         name: 'incp_tag_show',
-        requirements: [ "limit" => "\d+", "offset" => "\d+", ],
-        defaults: [  "limit" => 25, "offset" => 0, ]
+        requirements: ['limit' => "\d+", 'offset' => "\d+"],
+        defaults: ['limit' => 25, 'offset' => 0],
     )]
     public function show(
         string $slug,
@@ -215,7 +192,7 @@ class TagsController extends AbstractInachisController
         int $limit = 25,
         int $offset = 0,
     ): Response {
-        $tag = $tagRepository->findOneBy([ 'slug' => $slug]);
+        $tag = $tagRepository->findOneBy(['slug' => $slug]);
         if (empty($tag)) {
             return $this->redirectToRoute('incp_tags_list');
         }
@@ -224,12 +201,12 @@ class TagsController extends AbstractInachisController
 
         if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
             $items = $request->request->all('items');
-            $action = $request->request->has('delete')  ? 'delete' : null;
+            $action = $request->request->has('delete') ? 'delete' : null;
 
             // TODO: move the following foreach loop into a TagsBulkActionService and pass it $request
-            foreach($items as $item) {
+            foreach ($items as $item) {
                 $page = $pageRepository->findOneBy(['id' => $item]);
-                if ($page === null) {
+                if (null === $page) {
                     continue;
                 }
                 $page->removeTag($tag);
@@ -239,7 +216,7 @@ class TagsController extends AbstractInachisController
             return $this->redirectToRoute('incp_tag_show', ['id' => $tag->getId()]);
         }
 
-        $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [ $tag->getId() ]], '*', $limit, $offset);
+        $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$tag->getId()]], '*', $limit, $offset);
 
         $params = $viewStateManager->build(
             $request,
@@ -253,6 +230,7 @@ class TagsController extends AbstractInachisController
 
         $this->viewModel->page->title = 'Tags';
         $this->viewModel->page->tab = 'tag';
+
         return $this->render('inadmin/page/tag/view.html.twig', [
             'viewModel' => $this->viewModel,
             'dataset' => $pages,

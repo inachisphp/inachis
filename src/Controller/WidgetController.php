@@ -1,16 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller;
 
-use Inachis\Entity\Content\{Category, Page, Series};
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -28,10 +29,6 @@ class WidgetController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * @param int $maxDisplayCount
-     * @return Response
-     */
     public function getRecentTrips(int $maxDisplayCount = self::DEFAULT_MAX_DISPLAY_COUNT): Response
     {
         return $this->render('web/partials/recent_trips.html.twig', [
@@ -39,10 +36,6 @@ class WidgetController extends AbstractController
         ]);
     }
 
-    /**
-     * @param int $maxDisplayCount
-     * @return Response
-     */
     public function getRecentRunning(int $maxDisplayCount = self::DEFAULT_MAX_DISPLAY_COUNT): Response
     {
         return $this->render('web/partials/recent_running.html.twig', [
@@ -50,10 +43,6 @@ class WidgetController extends AbstractController
         ]);
     }
 
-    /**
-     * @param int $maxDisplayCount
-     * @return Response
-     */
     public function getRecentArticles(int $maxDisplayCount = self::DEFAULT_MAX_DISPLAY_COUNT): Response
     {
         return $this->render('web/partials/recent_articles.html.twig', [
@@ -62,8 +51,6 @@ class WidgetController extends AbstractController
     }
 
     /**
-     * @param string $categoryName
-     * @param int $maxDisplayCount
      * @return Page[]
      */
     private function getPagesWithCategoryName(string $categoryName, int $maxDisplayCount = 0): array
@@ -74,14 +61,14 @@ class WidgetController extends AbstractController
         if ($category instanceof Category) {
             return $this->entityManager->getRepository(Page::class)->getPagesWithCategory(
                 $category,
-                $maxDisplayCount
+                $maxDisplayCount,
             );
         }
+
         return [];
     }
 
     /**
-     * @param int $maxDisplayCount
      * @return Series[]
      */
     private function getRecentSeries(int $maxDisplayCount = 0): array

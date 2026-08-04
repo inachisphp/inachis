@@ -1,28 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Controller\Page\Post;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Exception;
 use Inachis\Controller\Page\Post\PageController;
-use Inachis\Entity\Content\{Revision, Url};
+use Inachis\Entity\Content\Revision;
+use Inachis\Entity\Content\Url;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\ReviewThreadRepository;
 use Inachis\Repository\Content\RevisionRepository;
 use Inachis\Repository\Content\TagRepository;
 use Inachis\Repository\Content\UrlRepository;
+use Inachis\Service\Content\ContentRevisionCompare;
 use Inachis\Service\Content\Page\PageBulkActionService;
 use Inachis\Service\Content\Page\ReviewRebaseService;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
-use Inachis\Service\Content\ContentRevisionCompare;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,7 +37,7 @@ class PageControllerTest extends InachisControllerTestCase
     public function testGetPostAdminRedirectsWhenUrlMissing(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incp/post/some-post'
+            'REQUEST_URI' => '/incp/post/some-post',
         ]);
         $request->setSession(new Session(new MockArraySessionStorage()));
         $pageRepository = $this->createStub(PageRepository::class);
@@ -80,20 +79,20 @@ class PageControllerTest extends InachisControllerTestCase
             $this->createStub(ReviewRebaseService::class),
             $this->createStub(TagRepository::class),
             'post',
-            'ome-post'
+            'ome-post',
         );
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertEquals('/redirected', $response->getTargetUrl());
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     public function testGetPostAdminWithNewPostRendersForm(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incp/post/new'
+            'REQUEST_URI' => '/incp/post/new',
         ]);
         $request->setSession(new Session(new MockArraySessionStorage()));
 
@@ -150,7 +149,7 @@ class PageControllerTest extends InachisControllerTestCase
             $this->createStub(ReviewRebaseService::class),
             $this->createStub(TagRepository::class),
             'post',
-            'new'
+            'new',
         );
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals('Rendered form', $response->getContent());

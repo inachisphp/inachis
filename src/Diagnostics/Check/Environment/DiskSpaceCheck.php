@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics\Check\Environment;
@@ -15,9 +14,20 @@ use Inachis\Service\Formatting\NumberFormatter;
 
 final class DiskSpaceCheck implements CheckInterface
 {
-    public function getId(): string { return 'disk_space'; }
-    public function getLabel(): string { return 'Disk Free Space'; }
-    public function getSection(): string { return 'Environment'; }
+    public function getId(): string
+    {
+        return 'disk_space';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Disk Free Space';
+    }
+
+    public function getSection(): string
+    {
+        return 'Environment';
+    }
 
     public function run(): CheckResult
     {
@@ -32,9 +42,9 @@ final class DiskSpaceCheck implements CheckInterface
             $status,
             $freeMB,
             $details,
-            $status === 'ok' ? null : 'Disk space is low; consider cleaning logs or temp files.',
+            'ok' === $status ? null : 'Disk space is low; consider cleaning logs or temp files.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }

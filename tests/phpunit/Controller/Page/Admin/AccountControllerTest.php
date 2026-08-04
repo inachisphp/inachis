@@ -1,37 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Controller\Page\Admin;
 
-
 use Inachis\Controller\Page\Admin\AccountController;
-use Inachis\Entity\User\{PasswordResetRequest, User};
+use Inachis\Entity\User\PasswordResetRequest;
+use Inachis\Entity\User\User;
 use Inachis\Repository\User\PasswordResetRequestRepository;
-use Inachis\Repository\User\UserRepository;
 use Inachis\Repository\User\UserPasskeyRepository;
-use Inachis\Security\Authentication\TotpService;
+use Inachis\Repository\User\UserRepository;
 use Inachis\Security\Authentication\PasskeyService;
+use Inachis\Security\Authentication\TotpService;
 use Inachis\Security\Authentication\TwoFactorAuthenticationListener;
 use Inachis\Service\User\PasswordResetTokenService;
 use Inachis\Service\User\UserAccountEmailService;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Random\RandomException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
@@ -58,27 +57,26 @@ class AccountControllerTest extends InachisControllerTestCase
             ])
             ->onlyMethods([
                 'addFlash', 'createForm', 'createFormBuilder', 'redirectIfAuthenticatedOrNoAdmins',
-                'redirectToRoute', 'render', 'generateUrl'
+                'redirectToRoute', 'render', 'generateUrl',
             ])
             ->getMock();
         $this->controller->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
     }
 
     public function testLogin(): void
     {
         $request = new Request([], [], [], [], [], [
-                'REQUEST_URI' => '/incc/login',
-            ]);
+            'REQUEST_URI' => '/incc/login',
+        ]);
         $this->controller->expects($this->once())
             ->method('redirectIfAuthenticatedOrNoAdmins')
             ->willReturn('');
         $authenticationUtils = $this->createStub(AuthenticationUtils::class);
         $result = $this->controller->login($request, $authenticationUtils);
         $this->assertEquals('rendered:inadmin/page/admin/signin.html.twig', $result->getContent());
-
     }
 
     public function testLoginRedirect(): void
@@ -142,7 +140,7 @@ class AccountControllerTest extends InachisControllerTestCase
 
         $result = $this->controller->forgotPassword(
             $request, $passwordResetRequestRepository, $forgotPasswordIpLimiter,
-            $forgotPasswordAccountLimiter, $userAccountEmailService, $userRepository
+            $forgotPasswordAccountLimiter, $userAccountEmailService, $userRepository,
         );
         $this->assertEquals('rendered:inadmin/page/admin/forgot-password.html.twig', $result->getContent());
     }
@@ -190,7 +188,7 @@ class AccountControllerTest extends InachisControllerTestCase
 
         $result = $this->controller->forgotPassword(
             $request, $passwordResetRequestRepository, $forgotPasswordIpLimiter,
-            $forgotPasswordAccountLimiter, $userAccountEmailService, $userRepository
+            $forgotPasswordAccountLimiter, $userAccountEmailService, $userRepository,
         );
         $this->assertEquals('rendered:inadmin/page/admin/forgot-password-sent.html.twig', $result->getContent());
     }
@@ -223,7 +221,7 @@ class AccountControllerTest extends InachisControllerTestCase
 
         $result = $this->controller->forgotPassword(
             $request, $passwordResetRequestRepository, $forgotPasswordIpLimiter,
-            $forgotPasswordAccountLimiter, $userAccountEmailService, $userRepository
+            $forgotPasswordAccountLimiter, $userAccountEmailService, $userRepository,
         );
         $this->assertEquals('Too many attempts from this IP. Try again later.', $result->getContent());
     }
@@ -273,7 +271,7 @@ class AccountControllerTest extends InachisControllerTestCase
 
         $result = $this->controller->forgotPassword(
             $request, $passwordResetRequestRepository, $forgotPasswordIpLimiter,
-            $forgotPasswordAccountLimiter, $userAccountEmailService, $userRepository
+            $forgotPasswordAccountLimiter, $userAccountEmailService, $userRepository,
         );
         $this->assertEquals('Too many reset attempts for this account. Try again later.', $result->getContent());
     }
@@ -304,7 +302,7 @@ class AccountControllerTest extends InachisControllerTestCase
 
         $result = $this->controller->forgotPassword(
             $request, $passwordResetRequestRepository, $forgotPasswordIpLimiter,
-            $forgotPasswordAccountLimiter, $userAccountEmailService, $userRepository
+            $forgotPasswordAccountLimiter, $userAccountEmailService, $userRepository,
         );
 
         $this->assertInstanceOf(RedirectResponse::class, $result);
@@ -355,11 +353,11 @@ class AccountControllerTest extends InachisControllerTestCase
 
         $result = $this->controller->forgotPassword(
             $request, $passwordResetRequestRepository, $forgotPasswordIpLimiter,
-            $forgotPasswordAccountLimiter, $userAccountEmailService, $userRepository
+            $forgotPasswordAccountLimiter, $userAccountEmailService, $userRepository,
         );
         $this->assertEquals(
             'rendered:inadmin/page/admin/forgot-password-sent.html.twig',
-            $result->getContent()
+            $result->getContent(),
         );
     }
 
@@ -380,7 +378,7 @@ class AccountControllerTest extends InachisControllerTestCase
 
         $result = $this->controller->newPassword(
             $request, $tokenService, $forgotPasswordIpLimiter, $passwordHasher,
-            $userRepository, random_bytes(64)
+            $userRepository, random_bytes(64),
         );
         $this->assertEquals('rendered:inadmin/page/admin/new-password.html.twig', $result->getContent());
     }
@@ -409,7 +407,7 @@ class AccountControllerTest extends InachisControllerTestCase
 
         $result = $this->controller->newPassword(
             $request, $tokenService, $forgotPasswordIpLimiter, $passwordHasher,
-            $userRepository, random_bytes(64)
+            $userRepository, random_bytes(64),
         );
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/incc/', $result->getTargetUrl());
@@ -436,7 +434,7 @@ class AccountControllerTest extends InachisControllerTestCase
 
         $result = $this->controller->newPassword(
             $request, $tokenService, $forgotPasswordIpLimiter, $passwordHasher,
-            $userRepository, random_bytes(30)
+            $userRepository, random_bytes(30),
         );
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/incc/forgot-password', $result->getTargetUrl());
@@ -460,7 +458,7 @@ class AccountControllerTest extends InachisControllerTestCase
 
         $result = $this->controller->newPassword(
             $request, $tokenService, $forgotPasswordIpLimiter, $passwordHasher,
-            $userRepository, random_bytes(64)
+            $userRepository, random_bytes(64),
         );
         $this->assertEquals('Too many password reset attempts from this IP. Try again later.', $result->getContent());
     }
@@ -505,7 +503,7 @@ class AccountControllerTest extends InachisControllerTestCase
 
         $result = $this->controller->newPassword(
             $request, $tokenService, $forgotPasswordIpLimiter, $passwordHasher,
-            $userRepository, random_bytes(64)
+            $userRepository, random_bytes(64),
         );
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/incc/forgot-password', $result->getTargetUrl());
@@ -547,7 +545,7 @@ class AccountControllerTest extends InachisControllerTestCase
 
         $result = $this->controller->newPassword(
             $request, $tokenService, $forgotPasswordIpLimiter, $passwordHasher,
-            $userRepository, random_bytes(64)
+            $userRepository, random_bytes(64),
         );
 
         $this->assertInstanceOf(RedirectResponse::class, $result);
@@ -596,7 +594,7 @@ class AccountControllerTest extends InachisControllerTestCase
 
         $result = $this->controller->newPassword(
             $request, $tokenService, $forgotPasswordIpLimiter, $passwordHasher,
-            $userRepository, random_bytes(64)
+            $userRepository, random_bytes(64),
         );
 
         $this->assertInstanceOf(RedirectResponse::class, $result);
@@ -853,4 +851,3 @@ class AccountControllerTest extends InachisControllerTestCase
         self::assertTrue($session->get(TwoFactorAuthenticationListener::SESSION_TOTP_VERIFIED_KEY));
     }
 }
-

@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\EntityListener;
@@ -37,42 +36,41 @@ use Inachis\Service\Crypto\EncryptionService;
 #[AsEntityListener(
     event: Events::prePersist,
     method: 'prePersist',
-    entity: UserTotp::class
+    entity: UserTotp::class,
 )]
 #[AsEntityListener(
     event: Events::preUpdate,
     method: 'preUpdate',
-    entity: UserTotp::class
+    entity: UserTotp::class,
 )]
 #[AsEntityListener(
     event: Events::postLoad,
     method: 'postLoad',
-    entity: UserTotp::class
+    entity: UserTotp::class,
 )]
 class UserTotpListener
 {
     public function __construct(
-        private readonly EncryptionService $crypto
-    ) {}
-
+        private readonly EncryptionService $crypto,
+    ) {
+    }
 
     /**
      * Encrypt the TOTP secret before inserting.
      */
     public function prePersist(
         UserTotp $totp,
-        PrePersistEventArgs $event
+        PrePersistEventArgs $event,
     ): void {
         $this->encryptTotpSecret($totp);
     }
-
 
     /**
      * Encrypt the TOTP secret before updating.
      */
     public function preUpdate(
         UserTotp $totp,
-        PreUpdateEventArgs $event
+        PreUpdateEventArgs $event,
     ): void {
         if (!$event->hasChangedField('secret')) {
             return;
@@ -89,56 +87,50 @@ class UserTotpListener
 
         $uow->recomputeSingleEntityChangeSet(
             $em->getClassMetadata(UserTotp::class),
-            $totp
+            $totp,
         );
     }
-
 
     /**
      * Decrypt the TOTP secret after loading.
      */
     public function postLoad(
         UserTotp $totp,
-        PostLoadEventArgs $event
+        PostLoadEventArgs $event,
     ): void {
         if (!$totp->hasSecret()) {
             return;
         }
 
-
         $rowKey = $this->crypto->unwrapKey(
-            $totp->getEncryptedKey()
+            $totp->getEncryptedKey(),
         );
-
 
         $totp->setSecret(
             $this->crypto->decryptValue(
                 $totp->getEncryptedSecret(),
-                $rowKey
-            )
+                $rowKey,
+            ),
         );
     }
-
 
     /**
      * Encrypt the current secret.
      */
     private function encryptTotpSecret(
-        UserTotp $totp
+        UserTotp $totp,
     ): void {
         $secret = $totp->getSecret();
 
-
-        /**
+        /*
          * Nothing to encrypt.
          *
          * This can happen when Doctrine hydrates an existing
          * entity and only encrypted fields are present.
          */
-        if ($secret === null) {
+        if (null === $secret) {
             return;
         }
-
 
         /**
          * Generate a fresh row key every time.
@@ -148,17 +140,15 @@ class UserTotpListener
          */
         $rowKey = $this->crypto->generateRowKey();
 
-
         $totp->setEncryptedKey(
-            $this->crypto->wrapKey($rowKey)
+            $this->crypto->wrapKey($rowKey),
         );
-
 
         $totp->setEncryptedSecret(
             $this->crypto->encryptValue(
                 $secret,
-                $rowKey
-            )
+                $rowKey,
+            ),
         );
     }
 }

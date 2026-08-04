@@ -1,23 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Entity\User;
 
-use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Exception;
 use Doctrine\ORM\Mapping as ORM;
 use Inachis\Entity\Security\Role;
-use Inachis\Entity\User\UserPreference;
-use Inachis\Entity\User\UserRecoveryCode;
-use Inachis\Entity\User\UserTotp;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -29,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Object for handling User entity.
  */
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\User\UserRepository')]
-#[ORM\Index(columns: [ 'usernameCanonical', 'emailCanonical' ], name: 'search_idx')]
+#[ORM\Index(columns: ['usernameCanonical', 'emailCanonical'], name: 'search_idx')]
 #[UniqueEntity(fields: ['email'], message: 'This email address is already used.')]
 #[UniqueEntity(fields: ['username'], message: 'This username is already taken.')]
 #[ORM\HasLifecycleCallbacks]
@@ -38,31 +32,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /** @var UuidInterface|null The unique identifier for the {@link User} */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
-    #[ORM\GeneratedValue(strategy: "CUSTOM")]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected ?UuidInterface $id = null;
 
     /** @var string Username of the user */
-    #[ORM\Column(type: "string", length: 255, nullable: false)]
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
     #[Assert\NotBlank]
     #[Assert\Regex(
         pattern: '/^[A-Za-z0-9]{3,}$/',
-        message: 'Username may only contain letters and digits, and must be 3 characters or more.'
+        message: 'Username may only contain letters and digits, and must be 3 characters or more.',
     )]
     protected string $username;
 
     /** @var string|null Username of the user */
-    #[ORM\Column(name: 'usernameCanonical', type: "string", length: 255, unique: true, nullable: false)]
+    #[ORM\Column(name: 'usernameCanonical', type: 'string', length: 255, unique: true, nullable: false)]
     protected ?string $usernameCanonical;
 
     /** @var string|null Password for the user */
-    #[ORM\Column(type: "string", length: 512, nullable: false)]
+    #[ORM\Column(type: 'string', length: 512, nullable: false)]
     protected ?string $password;
 
     /**
      * @var string|null Plaintext version of password - used for validation only and is not stored
      */
-    #[Assert\NotBlank(groups: [ 'Default' ])]
+    #[Assert\NotBlank(groups: ['Default'])]
     #[Assert\Length(max: 4096)]
     #[Assert\NotCompromisedPassword]
     #[Assert\PasswordStrength(
@@ -71,47 +65,47 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected ?string $plainPassword;
 
     /** @var string|null The email address of the user */
-    #[ORM\Column(type: "string", length: 512, nullable: false)]
+    #[ORM\Column(type: 'string', length: 512, nullable: false)]
     #[Assert\Email]
     #[Assert\NotBlank]
     protected ?string $email;
 
     /** @var string|null The canonical email address of the user */
-    #[ORM\Column(name: 'emailCanonical', type: "string", length: 255, unique: true, nullable: false)]
+    #[ORM\Column(name: 'emailCanonical', type: 'string', length: 255, unique: true, nullable: false)]
     protected ?string $emailCanonical;
 
     /** @var string The display name for the user */
-    #[ORM\Column(type: "string", length: 512)]
+    #[ORM\Column(type: 'string', length: 512)]
     #[Assert\NotBlank]
     protected string $displayName = '';
 
     /** @var string|null An image to use for the {@link User} */
-    #[ORM\Column(name: 'avatar', type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'avatar', type: 'string', length: 255, nullable: true)]
     protected ?string $avatar = '';
 
     /** @var bool Flag indicating if the {@link User} can sign in */
-    #[ORM\Column(type: "boolean")]
+    #[ORM\Column(type: 'boolean')]
     protected bool $isActive = true;
 
     /** @var bool Flag indicating if the {@link User} has been "deleted" */
-    #[ORM\Column(type: "boolean")]
+    #[ORM\Column(type: 'boolean')]
     protected bool $isRemoved = false;
 
-    /** @var DateTimeImmutable The date the {@link User} was added */
-    #[ORM\Column(type: "datetime_immutable")]
-    protected DateTimeImmutable $createdAt;
+    /** @var \DateTimeImmutable The date the {@link User} was added */
+    #[ORM\Column(type: 'datetime_immutable')]
+    protected \DateTimeImmutable $createdAt;
 
-    /** @var DateTimeImmutable The date the {@link User} was last modified */
-    #[ORM\Column(type: "datetime_immutable")]
-    protected DateTimeImmutable $updatedAt;
+    /** @var \DateTimeImmutable The date the {@link User} was last modified */
+    #[ORM\Column(type: 'datetime_immutable')]
+    protected \DateTimeImmutable $updatedAt;
 
-    /** @var DateTimeImmutable|null The date the password was last modified */
-    #[ORM\Column(type: "datetime_immutable")]
-    protected ?DateTimeImmutable $passwordChangedAt = null;
+    /** @var \DateTimeImmutable|null The date the password was last modified */
+    #[ORM\Column(type: 'datetime_immutable')]
+    protected ?\DateTimeImmutable $passwordChangedAt = null;
 
-    /** @var DateTimeImmutable|null The date the user last logged in */
+    /** @var \DateTimeImmutable|null The date the user last logged in */
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?DateTimeImmutable $lastLoginAt = null;
+    private ?\DateTimeImmutable $lastLoginAt = null;
 
     /** @var Collection<int, Role> The admin roles assigned to this user */
     #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: 'users')]
@@ -133,7 +127,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         mappedBy: 'user',
         targetEntity: UserRecoveryCode::class,
         cascade: ['persist', 'remove'],
-        orphanRemoval: true
+        orphanRemoval: true,
     )]
     private Collection $recoveryCodes;
 
@@ -142,7 +136,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         mappedBy: 'user',
         targetEntity: UserTrustedDevice::class,
         cascade: ['persist', 'remove'],
-        orphanRemoval: true
+        orphanRemoval: true,
     )]
     private Collection $trustedDevices;
 
@@ -152,10 +146,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * version of the password instead. This entity should never hold
      * the password in plain-text.
      *
-     * @param string $username The username for the {@link User}
+     * @param string      $username The username for the {@link User}
      * @param string|null $password The password for the {@link User}
-     * @param string|null $email The email for the {@link User}
-     * @throws Exception
+     * @param string|null $email    The email for the {@link User}
+     *
+     * @throws \Exception
      */
     public function __construct(string $username = '', ?string $password = '', ?string $email = '')
     {
@@ -171,7 +166,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
-        $now = new DateTimeImmutable();
+        $now = new \DateTimeImmutable();
 
         $this->createdAt = $now;
         $this->updatedAt = $now;
@@ -180,7 +175,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\PreUpdate]
     public function onPreUpdate(): void
     {
-        $this->updatedAt = new DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     /**
@@ -213,9 +208,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    /**
-     * @return string|null
-     */
     public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
@@ -242,7 +234,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Gets the roles assigned to this user
+     * Gets the roles assigned to this user.
      *
      * @return Collection<int,Role>
      */
@@ -252,10 +244,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Adds a specific Role to the User
-     *
-     * @param Role $role
-     * @return self
+     * Adds a specific Role to the User.
      */
     public function addAssignedRole(Role $role): self
     {
@@ -267,10 +256,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Removes a specific role from the user
-     *
-     * @param Role $role
-     * @return self
+     * Removes a specific role from the user.
      */
     public function removeAssignedRole(Role $role): self
     {
@@ -280,7 +266,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Returns the role(s) for the current {@link User}
+     * Returns the role(s) for the current {@link User}.
      *
      * @return array<string>
      */
@@ -289,8 +275,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $roles = [];
         foreach ($this->assignedRoles as $role) {
             $slug = strtoupper($role->getIdentifier());
-            $roles[] = 'ROLE_' . $slug;
-            if ($slug === 'ADMIN' || $slug === 'ADMINISTRATOR') {
+            $roles[] = 'ROLE_'.$slug;
+            if ('ADMIN' === $slug || 'ADMINISTRATOR' === $slug) {
                 $roles[] = 'ROLE_ADMIN';
             }
         }
@@ -302,8 +288,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Determines if this user is an administrator.
-     *
-     * @return bool
      */
     public function isAdministrator(): bool
     {
@@ -315,7 +299,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return false;
     }
-    
+
     /**
      * Returns the {@link avatar} for the {@link User}.
      *
@@ -349,9 +333,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link createdAt} for the {@link User}.
      *
-     * @return DateTimeImmutable The creation date for the user
+     * @return \DateTimeImmutable The creation date for the user
      */
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -359,9 +343,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link updatedAt} for the {@link User}.
      *
-     * @return DateTimeImmutable The modification for the user
+     * @return \DateTimeImmutable The modification for the user
      */
-    public function getUpdatedAt(): DateTimeImmutable
+    public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
     }
@@ -369,9 +353,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link passwordChangedAt} for the {@link User}.
      *
-     * @return DateTimeImmutable|null The password last modification date for the user
+     * @return \DateTimeImmutable|null The password last modification date for the user
      */
-    public function getPasswordChangedAt(): ?DateTimeImmutable
+    public function getPasswordChangedAt(): ?\DateTimeImmutable
     {
         return $this->passwordChangedAt;
     }
@@ -379,17 +363,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Returns the {@link lastLoginAt} for the {@link User}.
      *
-     * @return DateTimeImmutable|null The last login date for the user
+     * @return \DateTimeImmutable|null The last login date for the user
      */
-    public function getLastLoginAt(): ?DateTimeImmutable
+    public function getLastLoginAt(): ?\DateTimeImmutable
     {
         return $this->lastLoginAt;
     }
 
     /**
-     * Gets the preferences for the current {@link User}
-     *
-     * @return UserPreference|null
+     * Gets the preferences for the current {@link User}.
      */
     public function getPreferences(): ?UserPreference
     {
@@ -397,9 +379,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Returns the identifier (in this case, username) for the  {@link User}
-     *
-     * @return string
+     * Returns the identifier (in this case, username) for the  {@link User}.
      */
     public function getUserIdentifier(): string
     {
@@ -407,9 +387,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Returns the initials for the {@link User} based on their {@link User.displayName}
-     *
-     * @return string|null
+     * Returns the initials for the {@link User} based on their {@link User.displayName}.
      */
     public function getInitials(): ?string
     {
@@ -421,6 +399,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $initials .= ucfirst($nameWord[0]);
             }
         }
+
         return $initials;
     }
 
@@ -428,7 +407,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the unique id for the {@link User}.
      *
      * @param UuidInterface|null $value The value to set
-     * @return self
      */
     public function setId(?UuidInterface $value): self
     {
@@ -441,7 +419,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the value of {@link username}.
      *
      * @param string $value The value to set
-     * @return self
      */
     public function setUsername(string $value): self
     {
@@ -455,20 +432,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the value of {@link password}.
      *
      * @param string|null $value The value to set
-     * @return self
      */
-    public function setPassword(?string $value, ?DateTimeImmutable $now = null): self
+    public function setPassword(?string $value, ?\DateTimeImmutable $now = null): self
     {
         $this->password = $value;
-        if ($value !== null) {
-            $this->passwordChangedAt = $now ?? new DateTimeImmutable();
+        if (null !== $value) {
+            $this->passwordChangedAt = $now ?? new \DateTimeImmutable();
         }
+
         return $this;
     }
 
     /**
      * @param string|null $value New password to use
-     * @return self
      */
     public function setPlainPassword(?string $value): self
     {
@@ -482,7 +458,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the value of {@link email}.
      *
      * @param string|null $value The value to set
-     * @return self
      */
     public function setEmail(?string $value): self
     {
@@ -496,7 +471,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the value of {@link displayName}.
      *
      * @param string $value The value to set
-     * @return self
      */
     public function setDisplayName(string $value): self
     {
@@ -509,7 +483,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the value of {@link avatar}.
      *
      * @param string|null $value The value to set
-     * @return self
      */
     public function setAvatar(?string $value): self
     {
@@ -522,7 +495,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the value of {@link isActive}.
      *
      * @param bool $value The value to set
-     * @return self
      */
     public function setActive(bool $value): self
     {
@@ -535,7 +507,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Sets the value of {@link isRemoved}.
      *
      * @param bool $value The value to set
-     * @return self
      */
     public function setRemoved(bool $value): self
     {
@@ -547,10 +518,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the {@link passwordChangedAt} from a DateTime object.
      *
-     * @param DateTimeImmutable $value The date to set
-     * @return self
+     * @param \DateTimeImmutable $value The date to set
      */
-    public function setPasswordChangedAt(DateTimeImmutable $value): self
+    public function setPasswordChangedAt(\DateTimeImmutable $value): self
     {
         $this->passwordChangedAt = $value;
 
@@ -560,10 +530,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Sets the {@link lastLoginAt} from a DateTime object.
      *
-     * @param DateTimeImmutable $value The date to set
-     * @return self
+     * @param \DateTimeImmutable $value The date to set
      */
-    public function setLastLoginAt(DateTimeImmutable $value): self
+    public function setLastLoginAt(\DateTimeImmutable $value): self
     {
         $this->lastLoginAt = $value;
 
@@ -571,10 +540,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Applies preference settings to the {@link User}
-     *
-     * @param UserPreference $preferences
-     * @return self
+     * Applies preference settings to the {@link User}.
      */
     public function setPreferences(UserPreference $preferences): self
     {
@@ -587,9 +553,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Returns the User's {@link UserTotp}
-     *
-     * @return UserTotp
+     * Returns the User's {@link UserTotp}.
      */
     public function getTotp(): ?UserTotp
     {
@@ -597,10 +561,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Sets the TOTP for the User
-     *
-     * @param UserTotp|null $totp
-     * @return self
+     * Sets the TOTP for the User.
      */
     public function setTotp(?UserTotp $totp): self
     {
@@ -610,8 +571,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Get the recovery codes for the user
-     * 
+     * Get the recovery codes for the user.
+     *
      * @return Collection<int, UserRecoveryCode>
      */
     public function getRecoveryCodes(): Collection
@@ -620,10 +581,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Add a recovery code
-     *
-     * @param UserRecoveryCode $recoveryCode
-     * @return self
+     * Add a recovery code.
      */
     public function addRecoveryCode(UserRecoveryCode $recoveryCode): self
     {
@@ -636,10 +594,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Remove a recovery code
-     *
-     * @param UserRecoveryCode $recoveryCode
-     * @return self
+     * Remove a recovery code.
      */
     public function removeRecoveryCode(UserRecoveryCode $recoveryCode): self
     {
@@ -662,13 +617,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Add a trusted device
-     *
-     * @param UserTrustedDevice $device
-     * @return self
+     * Add a trusted device.
      */
     public function addTrustedDevice(
-        UserTrustedDevice $device
+        UserTrustedDevice $device,
     ): self {
         if (!$this->trustedDevices->contains($device)) {
             $this->trustedDevices->add($device);
@@ -679,13 +631,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Remove a trusted device
-     *
-     * @param UserTrustedDevice $device
-     * @return self
+     * Remove a trusted device.
      */
     public function removeTrustedDevice(
-        UserTrustedDevice $device
+        UserTrustedDevice $device,
     ): self {
         $this->trustedDevices->removeElement($device);
 
@@ -693,14 +642,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Checks if TOTP is configured
-     *
-     * @return boolean
+     * Checks if TOTP is configured.
      */
     public function isTotpEnabled(): bool
     {
-        return $this->getTotp() !== null &&
-            $this->getTotp()->getEnabledAt() !== null;
+        return null !== $this->getTotp()
+            && null !== $this->getTotp()->getEnabledAt();
     }
 
     /**
@@ -725,18 +672,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function validateEmail(): bool
     {
         return (bool) preg_match(
-            '/[a-z0-9!#\$%&\'*+\/=?^_`{|}~-]+' .
-            '(?:\.[a-z0-9!#\$%&\'*+\/=?^_`{|}~-]+)' .
-            '*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+' .
+            '/[a-z0-9!#\$%&\'*+\/=?^_`{|}~-]+'.
+            '(?:\.[a-z0-9!#\$%&\'*+\/=?^_`{|}~-]+)'.
+            '*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+'.
             '[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/',
-            $this->email ?? ''
+            $this->email ?? '',
         );
     }
 
     /**
-     * Removes the password for this {@link User}
-     *
-     * @return void
+     * Removes the password for this {@link User}.
      */
     public function eraseCredentials(): void
     {

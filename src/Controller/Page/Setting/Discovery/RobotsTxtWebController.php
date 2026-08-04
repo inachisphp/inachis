@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Setting\Discovery;
@@ -16,21 +15,18 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class RobotsTxtWebController extends AbstractController
 {
-	/**
-	 * Serve the robots.txt content
-	 *
-	 * @param RobotsTxtGenerator $generator
-	 * @return Response
-	 */
+    /**
+     * Serve the robots.txt content.
+     */
     #[Route('/robots.txt', name: 'web_robots_txt')]
     public function index(RobotsTxtGenerator $generator): Response
     {
-		return new Response(
-			$generator->generate(),
-			Response::HTTP_OK,
-			[
-				'Content-Type' => 'text/plain; charset=UTF-8',
-			]
-		);
+        return new Response(
+            $generator->generate(),
+            Response::HTTP_OK,
+            [
+                'Content-Type' => 'text/plain; charset=UTF-8',
+            ],
+        );
     }
 }

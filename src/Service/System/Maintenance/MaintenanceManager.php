@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\System\Maintenance;
@@ -13,26 +12,25 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Twig\Environment;
 
 /**
- * Manages the maintenance mode
+ * Manages the maintenance mode.
  */
 class MaintenanceManager
 {
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param string $projectDir The project directory
-     * @param Environment $twig The twig environment
+     * @param string      $projectDir The project directory
+     * @param Environment $twig       The twig environment
      */
     public function __construct(
         #[Autowire('%kernel.project_dir%')]
         private string $projectDir,
-        private Environment $twig
-    ) {}
+        private Environment $twig,
+    ) {
+    }
 
     /**
-     * Check if maintenance mode is enabled
-     *
-     * @return bool
+     * Check if maintenance mode is enabled.
      */
     public function isEnabled(): bool
     {
@@ -40,7 +38,7 @@ class MaintenanceManager
     }
 
     /**
-     * Enable maintenance mode
+     * Enable maintenance mode.
      */
     public function enable(): void
     {
@@ -49,7 +47,7 @@ class MaintenanceManager
     }
 
     /**
-     * Disable maintenance mode
+     * Disable maintenance mode.
      */
     public function disable(): void
     {
@@ -58,9 +56,9 @@ class MaintenanceManager
     }
 
     /**
-     * Get the maintenance configuration
+     * Get the maintenance configuration.
      *
-     * @return array{message: string, estimated_downtime: string, allowed_ips:list<string>, retry_after: int}| array{}
+     * @return array{message: string, estimated_downtime: string, allowed_ips:list<string>, retry_after: int}|array{}
      */
     public function getConfig(): array
     {
@@ -74,10 +72,11 @@ class MaintenanceManager
             ];
         }
         $json = file_get_contents($file);
-        if ($json === false) {
+        if (false === $json) {
             return [];
         }
         $data = json_decode($json, true);
+
         return is_array($data) ? $data : [];
     }
 
@@ -89,12 +88,12 @@ class MaintenanceManager
     public function saveConfig(array $config): void
     {
         $content = json_encode($config, JSON_PRETTY_PRINT);
-        if ($content === false) {
+        if (false === $content) {
             throw new \RuntimeException('Failed to encode maintenance config to JSON.');
         }
         $this->atomicWrite(
             'maintenance.json',
-            $this->projectDir . '/var',
+            $this->projectDir.'/var',
             $content,
             0600,
             LOCK_EX,
@@ -118,24 +117,24 @@ class MaintenanceManager
      * Write a file using an atomic write operation to avoid concurrency and security
      * issues.
      *
-     * @param string $filename The name of the file to write
-     * @param string $location The location to write the file to
-     * @param string $content The content to write to the file
-     * @param int $permissions The permissions to set on the file
-     * @param int $flags The flags to use with file_put_contents
+     * @param string $filename    The name of the file to write
+     * @param string $location    The location to write the file to
+     * @param string $content     The content to write to the file
+     * @param int    $permissions The permissions to set on the file
+     * @param int    $flags       The flags to use with file_put_contents
      */
     private function atomicWrite(
         string $filename,
         string $location,
         string $content,
         int $permissions = 0600,
-        int $flags = 0
+        int $flags = 0,
     ): void {
-        $tmpFile = $this->projectDir . '/var/' . $filename . '.tmp';
+        $tmpFile = $this->projectDir.'/var/'.$filename.'.tmp';
         touch($tmpFile);
         chmod($tmpFile, $permissions);
         file_put_contents($tmpFile, $content, $flags);
-        copy($tmpFile, $location . '/' . $filename);
+        copy($tmpFile, $location.'/'.$filename);
         unlink($tmpFile);
     }
 }

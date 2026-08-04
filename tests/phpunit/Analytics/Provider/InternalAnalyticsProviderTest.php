@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Analytics\Provider;
 
-use DateTimeImmutable;
 use Inachis\Analytics\Provider\InternalAnalyticsProvider;
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Series;
@@ -48,10 +46,10 @@ class InternalAnalyticsProviderTest extends TestCase
             ->willReturnCallback(
                 static function (
                     string $key,
-                    callable $callback
+                    callable $callback,
                 ) use ($item) {
                     return $callback($item);
-                }
+                },
             );
 
         return $cache;
@@ -79,8 +77,8 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $provider = $this->createProvider();
 
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $result = $provider->getTopPages($from, $to, 2);
 
@@ -92,8 +90,8 @@ class InternalAnalyticsProviderTest extends TestCase
 
     public function testGetPageViewsPerDay(): void
     {
-        $from = new DateTimeImmutable('2026-04-29');
-        $to = new DateTimeImmutable('2026-04-30');
+        $from = new \DateTimeImmutable('2026-04-29');
+        $to = new \DateTimeImmutable('2026-04-30');
 
         $expected = [
             ['date' => '2026-04-29', 'total' => 123],
@@ -114,8 +112,8 @@ class InternalAnalyticsProviderTest extends TestCase
 
     public function testGetTotalViews(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $this->analyticsRepository
             ->expects($this->once())
@@ -131,8 +129,8 @@ class InternalAnalyticsProviderTest extends TestCase
 
     public function testGetMonthlyUniqueVisitors(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $this->analyticsRepository
             ->expects($this->once())
@@ -148,8 +146,8 @@ class InternalAnalyticsProviderTest extends TestCase
 
     public function testGetTopErrors(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $expected = [
             ['path' => '/', 'code' => 404, 'hits' => 5],
@@ -170,11 +168,11 @@ class InternalAnalyticsProviderTest extends TestCase
 
     public function testGetTrendingPages(): void
     {
-        $from = new DateTimeImmutable('2026-05-01');
-        $to = new DateTimeImmutable('2026-05-31');
+        $from = new \DateTimeImmutable('2026-05-01');
+        $to = new \DateTimeImmutable('2026-05-31');
 
-        $previousFrom = new DateTimeImmutable('2026-04-01');
-        $previousTo = new DateTimeImmutable('2026-04-30');
+        $previousFrom = new \DateTimeImmutable('2026-04-01');
+        $previousTo = new \DateTimeImmutable('2026-04-30');
 
         $this->analyticsRepository
             ->expects($this->once())
@@ -213,7 +211,7 @@ class InternalAnalyticsProviderTest extends TestCase
             $to,
             $previousFrom,
             $previousTo,
-            10
+            10,
         );
 
         $this->assertSame([
@@ -227,10 +225,10 @@ class InternalAnalyticsProviderTest extends TestCase
         ], $result);
     }
 
-        public function testGetTopReferrers(): void
+    public function testGetTopReferrers(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $expected = [
             ['domain' => 'Direct', 'total' => 10],
@@ -251,8 +249,8 @@ class InternalAnalyticsProviderTest extends TestCase
 
     public function testGetTopReferrersForPage(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $expected = [
             ['domain' => 'Direct', 'total' => 10],
@@ -273,8 +271,8 @@ class InternalAnalyticsProviderTest extends TestCase
 
     public function testGetPageViewsPerDayForPaths(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $expected = [
             ['date' => '2026-01-01', 'views' => 5],
@@ -299,8 +297,8 @@ class InternalAnalyticsProviderTest extends TestCase
     {
         $page = new Page('Test Page');
 
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $expected = [
             ['date' => '2026-01-01', 'views' => 10],
@@ -323,8 +321,8 @@ class InternalAnalyticsProviderTest extends TestCase
     {
         $series = new Series();
 
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $expected = [
             ['date' => '2026-01-01', 'views' => 20],
@@ -345,8 +343,8 @@ class InternalAnalyticsProviderTest extends TestCase
 
     public function testGetTopRegions(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $expected = [
             [
@@ -375,8 +373,8 @@ class InternalAnalyticsProviderTest extends TestCase
 
     public function testGetSubscriberStatsOverTime(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $expected = [
             ['date' => '2026-01-01', 'subscribers' => 100],
@@ -417,8 +415,8 @@ class InternalAnalyticsProviderTest extends TestCase
 
     public function testGetTopBots(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $expected = [
             [
@@ -443,7 +441,7 @@ class InternalAnalyticsProviderTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-        public function testGetDashboardSummary(): void
+    public function testGetDashboardSummary(): void
     {
         $expected = [
             'viewsToday' => 123,
@@ -461,14 +459,14 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $this->assertSame(
             $expected,
-            $this->createProvider()->getDashboardSummary()
+            $this->createProvider()->getDashboardSummary(),
         );
     }
 
     public function testGetTotalErrors(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $this->analyticsRepository
             ->expects($this->once())
@@ -478,14 +476,14 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $this->assertSame(
             42,
-            $this->createProvider()->getTotalErrors($from, $to)
+            $this->createProvider()->getTotalErrors($from, $to),
         );
     }
 
     public function testGetSecuritySummary(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $expected = [
             'total' => 100,
@@ -502,14 +500,14 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $this->assertSame(
             $expected,
-            $this->createProvider()->getSecuritySummary($from, $to)
+            $this->createProvider()->getSecuritySummary($from, $to),
         );
     }
 
     public function testGetTopSecurityPaths(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $expected = [
             ['path' => '/wp-login.php', 'total' => '45'],
@@ -524,14 +522,14 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $this->assertSame(
             $expected,
-            $this->createProvider()->getTopSecurityPaths($from, $to)
+            $this->createProvider()->getTopSecurityPaths($from, $to),
         );
     }
 
     public function testGetTopSecurityTypes(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $expected = [
             ['type' => 'sql_injection', 'total' => '18'],
@@ -546,14 +544,14 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $this->assertSame(
             $expected,
-            $this->createProvider()->getTopSecurityTypes($from, $to)
+            $this->createProvider()->getTopSecurityTypes($from, $to),
         );
     }
 
     public function testGetTopSecurityIps(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $expected = [
             ['ip' => '192.0.2.1', 'total' => '20'],
@@ -568,14 +566,14 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $this->assertSame(
             $expected,
-            $this->createProvider()->getTopSecurityIps($from, $to)
+            $this->createProvider()->getTopSecurityIps($from, $to),
         );
     }
 
     public function testGetSecurityEventsPerDay(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $expected = [
             ['date' => '2026-01-01', 'total' => '8'],
@@ -590,7 +588,7 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $this->assertSame(
             $expected,
-            $this->createProvider()->getSecurityEventsPerDay($from, $to)
+            $this->createProvider()->getSecurityEventsPerDay($from, $to),
         );
     }
 
@@ -615,7 +613,7 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $this->assertSame(
             $expected,
-            $this->createProvider()->getRecentSecurityEvents()
+            $this->createProvider()->getRecentSecurityEvents(),
         );
     }
 
@@ -640,14 +638,14 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $this->assertSame(
             $expected,
-            $this->createProvider()->getCriticalSecurityEvents()
+            $this->createProvider()->getCriticalSecurityEvents(),
         );
     }
 
     public function testGetSecurityMethods(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $expected = [
             ['method' => 'GET', 'total' => '120'],
@@ -662,14 +660,14 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $this->assertSame(
             $expected,
-            $this->createProvider()->getSecurityMethods($from, $to)
+            $this->createProvider()->getSecurityMethods($from, $to),
         );
     }
 
     public function testGetSecurityEventsByType(): void
     {
-        $from = new DateTimeImmutable('2026-01-01');
-        $to = new DateTimeImmutable('2026-01-31');
+        $from = new \DateTimeImmutable('2026-01-01');
+        $to = new \DateTimeImmutable('2026-01-31');
 
         $expected = [
             ['type' => 'sql_injection', 'total' => '15'],
@@ -684,7 +682,7 @@ class InternalAnalyticsProviderTest extends TestCase
 
         $this->assertSame(
             $expected,
-            $this->createProvider()->getSecurityEventsByType($from, $to)
+            $this->createProvider()->getSecurityEventsByType($from, $to),
         );
     }
 }

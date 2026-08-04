@@ -1,14 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Service\User;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\User\User;
 use Inachis\Factory\PageViewFactory;
 use Inachis\Model\System\PageMetadata;
@@ -67,6 +67,7 @@ class UserAccountEmailServiceTest extends TestCase
 
         $tokenData = [
             'token' => 'XYZ123',
+            'expiresAt' => new \DateTimeImmutable('2025-01-01 15:00'),
             'expiresAt' => new \DateTimeImmutable('2025-01-01 15:00'),
         ];
 
@@ -175,6 +176,7 @@ class UserAccountEmailServiceTest extends TestCase
         $tokenData = [
             'token' => 'XYZ123',
             'expiresAt' => new \DateTimeImmutable('2025-01-01 15:00'),
+            'expiresAt' => new \DateTimeImmutable('2025-01-01 15:00'),
         ];
 
         $this->tokenService
@@ -272,3 +274,4 @@ class UserAccountEmailServiceTest extends TestCase
         );
     }
 }
+

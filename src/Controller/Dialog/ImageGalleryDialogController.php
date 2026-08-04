@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Dialog;
@@ -19,10 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ImageGalleryDialogController extends AbstractInachisController
 {
-    /**
-     * @return Response
-     */
-    #[Route('/incp/ax/imageManager/get', methods: [ 'POST' ])]
+    #[Route('/incp/ax/imageManager/get', methods: ['POST'])]
     public function getImageManagerList(): Response
     {
         return $this->render('inadmin/dialog/image-manager.html.twig', [
@@ -32,17 +28,13 @@ class ImageGalleryDialogController extends AbstractInachisController
         ]);
     }
 
-    /**
-     * @param Request $request
-     * @return Response
-     */
     #[Route('/incp/ax/imageManager/getImages/{limit}/{offset}',
         requirements: [
-            "limit" => "\d+",
-            "offset" => "\d+",
+            'limit' => "\d+",
+            'offset' => "\d+",
         ],
-        defaults: [ "limit" => 25, "offset" => 0, ],
-        methods: [ "POST" ],
+        defaults: ['limit' => 25, 'offset' => 0],
+        methods: ['POST'],
     )]
     public function getImageList(
         Request $request,

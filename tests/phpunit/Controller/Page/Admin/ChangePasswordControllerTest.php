@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Controller\Page\Admin;
@@ -38,7 +37,7 @@ class ChangePasswordControllerTest extends InachisControllerTestCase
         ], [
             'id' => Uuid::uuid1(),
         ], [], [], [
-            'REQUEST_URI' => '/incp/admin/{id}/change-password'
+            'REQUEST_URI' => '/incp/admin/{id}/change-password',
         ]);
         $user = (new User('test-user'))->setId(Uuid::uuid1());
         $security = $this->createMock(Security::class);
@@ -58,7 +57,7 @@ class ChangePasswordControllerTest extends InachisControllerTestCase
         $controller->expects($this->once())
             ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $form = $this->createMock(Form::class);
         $form->expects($this->once())->method('isSubmitted')->willReturn(true);
@@ -83,7 +82,7 @@ class ChangePasswordControllerTest extends InachisControllerTestCase
         ], [
             'id' => Uuid::uuid1(),
         ], [], [], [
-            'REQUEST_URI' => '/incp/admin/{id}/change-password'
+            'REQUEST_URI' => '/incp/admin/{id}/change-password',
         ]);
         $user = (new User('test-user'))->setId(Uuid::uuid1());
         $security = $this->createMock(Security::class);
@@ -102,7 +101,7 @@ class ChangePasswordControllerTest extends InachisControllerTestCase
             ->getMock();
         $controller->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $form = $this->createMock(Form::class);
         $form->expects($this->once())->method('isSubmitted')->willReturn(true);
@@ -123,14 +122,14 @@ class ChangePasswordControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'password' => 'Testpa$$word123',
         ], [], [], [], [
-            'REQUEST_URI' => '/incp/api/calculate-password-strength'
+            'REQUEST_URI' => '/incp/api/calculate-password-strength',
         ]);
         $controller = new ChangePasswordController(
             $this->entityManager,
             $this->params,
             $this->security,
             $this->translator,
-            $this->wasteRepository
+            $this->wasteRepository,
         );
 
         $result = $controller->calculatePasswordStrength($request);

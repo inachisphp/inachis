@@ -1,16 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Controller\Page\Post;
 
 use Inachis\Controller\Page\Post\RevisionController;
-use Inachis\Entity\Content\{Page, Revision, Url};
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Revision;
+use Inachis\Entity\Content\Url;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\RevisionRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
@@ -45,7 +46,7 @@ class RevisionControllerTest extends InachisControllerTestCase
     public function testDiffEmptyRevision()
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incp/page/diff/{id}'
+            'REQUEST_URI' => '/incp/page/diff/{id}',
         ]);
         $pageRepository = $this->createStub(PageRepository::class);
         $revisionRepository = $this->createMock(RevisionRepository::class);
@@ -59,7 +60,7 @@ class RevisionControllerTest extends InachisControllerTestCase
     public function testDiffPageNotFound()
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incp/page/diff/{id}'
+            'REQUEST_URI' => '/incp/page/diff/{id}',
         ]);
         $pageRepository = $this->createStub(PageRepository::class);
         $revisionRepository = $this->createMock(RevisionRepository::class);
@@ -78,7 +79,7 @@ class RevisionControllerTest extends InachisControllerTestCase
     public function testDiff()
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incp/page/diff/{id}'
+            'REQUEST_URI' => '/incp/page/diff/{id}',
         ]);
         $pageRepository = $this->createMock(PageRepository::class);
         $page = (new Page('test-page'))->setId(Uuid::uuid1())
@@ -91,7 +92,7 @@ class RevisionControllerTest extends InachisControllerTestCase
         $this->controller->expects($this->once())
             ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $this->controller->diff($request, $pageRepository, $revisionRepository);
     }
@@ -102,7 +103,7 @@ class RevisionControllerTest extends InachisControllerTestCase
     public function testDoRevert()
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incp/page/diff/{id}'
+            'REQUEST_URI' => '/incp/page/diff/{id}',
         ]);
         $pageRepository = $this->createMock(PageRepository::class);
         $page = (new Page('test-page'))->setId(Uuid::uuid1())
@@ -124,7 +125,7 @@ class RevisionControllerTest extends InachisControllerTestCase
     public function testDownload()
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incp/page/download/{id}'
+            'REQUEST_URI' => '/incp/page/download/{id}',
         ]);
         $revisionRepository = $this->createMock(RevisionRepository::class);
         $revision = (new Revision())->setPageId(Uuid::uuid1())->setTitle('')->setContent('test');
@@ -135,7 +136,7 @@ class RevisionControllerTest extends InachisControllerTestCase
         $result = $this->controller->download($request, $revisionRepository, $serializer);
         $this->assertStringContainsString(
             'attachment; filename=',
-            $result->headers->get('content-disposition')
+            $result->headers->get('content-disposition'),
         );
     }
 
@@ -145,7 +146,7 @@ class RevisionControllerTest extends InachisControllerTestCase
     public function testDownloadRevisionNotFound()
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incp/page/download/{id}'
+            'REQUEST_URI' => '/incp/page/download/{id}',
         ]);
         $revisionRepository = $this->createMock(RevisionRepository::class);
         $revisionRepository->expects($this->once())->method('findOneBy')->willReturn(null);
@@ -156,7 +157,7 @@ class RevisionControllerTest extends InachisControllerTestCase
         $result = $this->controller->download($request, $revisionRepository, $serializer);
         $this->assertStringContainsString(
             'attachment; filename=',
-            $result->headers->get('content-disposition')
+            $result->headers->get('content-disposition'),
         );
     }
 }

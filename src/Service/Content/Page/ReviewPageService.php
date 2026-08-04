@@ -1,45 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Content\Page;
 
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Content\{Page, ReviewComment, ReviewThread};
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\ReviewComment;
+use Inachis\Entity\Content\ReviewThread;
 use Inachis\Entity\User\User;
 use Inachis\Repository\Content\ReviewThreadRepository;
 
 class ReviewPageService
 {
     /**
-     * Constructor for the review page service
-     *
-     * @param EntityManagerInterface $entityManager
-     * @param ReviewThreadRepository $reviewThreadRepository
+     * Constructor for the review page service.
      */
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly ReviewThreadRepository $reviewThreadRepository
-    ) {}
+        private readonly ReviewThreadRepository $reviewThreadRepository,
+    ) {
+    }
 
     /**
      * Creates a new review thread and initial comment.
-     *
-     * @param Page $page
-     * @param User $author
-     * @param string $message
-     * @param int $startOffset
-     * @param int $endOffset
-     * @param string $selectedText
-     * @param string $contextBefore
-     * @param string $contextAfter
-     * @return ReviewThread
      */
     public function createThread(
         Page $page,
@@ -61,8 +49,8 @@ class ReviewPageService
             ->setSelectedText($selectedText)
             ->setContextBefore($contextBefore)
             ->setContextAfter($contextAfter)
-            ->setCreated(new DateTimeImmutable())
-            ->setUpdated(new DateTimeImmutable());
+            ->setCreated(new \DateTimeImmutable())
+            ->setUpdated(new \DateTimeImmutable());
 
         $comment = new ReviewComment($thread, $author, $message);
 
@@ -70,7 +58,7 @@ class ReviewPageService
             ->setThread($thread)
             ->setAuthor($author)
             ->setMessage($message)
-            ->setCreated(new DateTimeImmutable());
+            ->setCreated(new \DateTimeImmutable());
 
         $this->entityManager->persist($thread);
         $this->entityManager->persist($comment);
@@ -85,7 +73,7 @@ class ReviewPageService
     public function addReply(
         ReviewThread $thread,
         User $author,
-        string $message
+        string $message,
     ): ReviewComment {
         $comment = new ReviewComment($thread, $author, $message);
 
@@ -93,9 +81,9 @@ class ReviewPageService
             ->setThread($thread)
             ->setAuthor($author)
             ->setMessage($message)
-            ->setCreated(new DateTimeImmutable());
+            ->setCreated(new \DateTimeImmutable());
 
-        $thread->setUpdated(new DateTimeImmutable());
+        $thread->setUpdated(new \DateTimeImmutable());
 
         $this->entityManager->persist($comment);
         $this->entityManager->flush();
@@ -108,9 +96,9 @@ class ReviewPageService
      */
     public function resolveThread(
         ReviewThread $thread,
-        User $resolvedBy
+        User $resolvedBy,
     ): ReviewThread {
-        $thread->resolve($resolvedBy)->setUpdated(new DateTimeImmutable());
+        $thread->resolve($resolvedBy)->setUpdated(new \DateTimeImmutable());
         $this->entityManager->flush();
 
         return $thread;
@@ -120,9 +108,9 @@ class ReviewPageService
      * Reopens a resolved review thread.
      */
     public function reopenThread(
-        ReviewThread $thread
+        ReviewThread $thread,
     ): ReviewThread {
-        $thread->reopen()->setUpdated(new DateTimeImmutable());
+        $thread->reopen()->setUpdated(new \DateTimeImmutable());
         $this->entityManager->flush();
 
         return $thread;
@@ -138,11 +126,11 @@ class ReviewPageService
         return $this->reviewThreadRepository->findBy(
             [
                 'page' => $page,
-                'resolved' => false
+                'resolved' => false,
             ],
             [
-                'updated' => 'DESC'
-            ]
+                'updated' => 'DESC',
+            ],
         );
     }
 
@@ -155,7 +143,7 @@ class ReviewPageService
     {
         return $this->reviewThreadRepository->findBy(
             ['page' => $page],
-            ['updated' => 'DESC']
+            ['updated' => 'DESC'],
         );
     }
 }

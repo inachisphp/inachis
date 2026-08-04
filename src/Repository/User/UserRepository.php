@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Repository\User;
@@ -16,15 +15,15 @@ use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\AbstractRepository;
 
 /**
- * Repository for {@link User} entities
- * 
+ * Repository for {@link User} entities.
+ *
  * @extends AbstractRepository<User>
  */
 class UserRepository extends AbstractRepository
 {
     /**
-     * Creates a new instance of the UserRepository
-     * 
+     * Creates a new instance of the UserRepository.
+     *
      * @param ManagerRegistry $registry The registry
      */
     public function __construct(ManagerRegistry $registry)
@@ -33,9 +32,10 @@ class UserRepository extends AbstractRepository
     }
 
     /**
-     * Finds a user by username
-     * 
+     * Finds a user by username.
+     *
      * @param string $username The username to search for
+     *
      * @return User|null The user if found
      */
     public function findByUsername(string $username): ?User
@@ -44,9 +44,8 @@ class UserRepository extends AbstractRepository
     }
 
     /**
-     * Gets filtered users
-     * 
-     * @param ContentQueryParameters $params
+     * Gets filtered users.
+     *
      * @return Paginator<User> The paginator
      */
     public function getFiltered(ContentQueryParameters $params): Paginator
@@ -55,16 +54,16 @@ class UserRepository extends AbstractRepository
         $joins = [];
         $where = [
             'q.isRemoved = \'0\'',
-            []
+            [],
         ];
 
         if (!empty($filters['keyword']) && is_string($filters['keyword'])) {
             $where[0] .= ' AND (q.displayName LIKE :keyword OR q.username LIKE :keyword OR q.email LIKE :keyword )';
-            $where[1]['keyword'] = '%' . $filters['keyword']  . '%';
+            $where[1]['keyword'] = '%'.$filters['keyword'].'%';
         }
         if (!empty($filters['status'])) {
             $where[0] .= ' AND q.isActive = :active';
-            $where[1]['active'] = $filters['status'] === 'enabled';
+            $where[1]['active'] = 'enabled' === $filters['status'];
         }
         if (!empty($filters['role'])) {
             $joins[] = ['join', 'q.assignedRoles', 'r'];
@@ -73,17 +72,17 @@ class UserRepository extends AbstractRepository
         }
         if (!empty($filters['last sign-in']) && is_numeric($filters['last sign-in'])) {
             $where[0] .= ' AND q.lastLoginAt <= :lastLoginAt';
-            $where[1]['lastLoginAt'] = new \DateTime('-' . $filters['last sign-in'] . ' days');
+            $where[1]['lastLoginAt'] = new \DateTime('-'.$filters['last sign-in'].' days');
         }
         if (!empty($filters['password modified']) && is_numeric($filters['password modified'])) {
             $where[0] .= ' AND q.passwordChangedAt <= :passwordModified';
-            $where[1]['passwordModified'] = new \DateTime('-' . $filters['password modified'] . ' days');
+            $where[1]['passwordModified'] = new \DateTime('-'.$filters['password modified'].' days');
         }
         if (!empty($filters['2fa status'])) {
             $where[0] .= ' AND q.totpEnabled = :totpEnabled';
             $where[1]['totpEnabled'] = $filters['2fa status'];
         }
-        
+
         $sort = match ($params->getSort()) {
             'createdAt asc' => [['q.createdAt', 'ASC']],
             'createdAt desc' => [['q.createdAt', 'DESC']],
@@ -100,15 +99,13 @@ class UserRepository extends AbstractRepository
             $params->getOffset(),
             $where,
             $sort,
-            [ 'q.id' ],
+            ['q.id'],
             $joins,
         );
     }
 
     /**
-     * Returns a count of {@link User}s with Administrator role
-     *
-     * @return int
+     * Returns a count of {@link User}s with Administrator role.
      */
     public function countActiveAdministrators(): int
     {

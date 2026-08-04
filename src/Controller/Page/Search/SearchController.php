@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Search;
 
-use Exception;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Repository\Content\SearchRepository;
 use Inachis\Repository\Content\UrlRepository;
@@ -22,18 +20,16 @@ use Symfony\Component\Routing\Attribute\Route;
 class SearchController extends AbstractInachisController
 {
     /**
-     * @param Request $request
-     * @return Response
-     * @throws Exception|\Doctrine\DBAL\Exception
+     * @throws \Exception|\Doctrine\DBAL\Exception
      */
-    #[Route("/incp/search/results/{keyword}/{limit}/{offset}",
-        name: "incp_search_results",
+    #[Route('/incp/search/results/{keyword}/{limit}/{offset}',
+        name: 'incp_search_results',
         requirements: [
-            "limit" => "\d+",
-            "offset" => "\d+",
+            'limit' => "\d+",
+            'offset' => "\d+",
         ],
-        defaults: [ "keyword" => null, "limit" => 25, "offset" => 0, ],
-        methods: [ "GET", "POST" ],
+        defaults: ['keyword' => null, 'limit' => 25, 'offset' => 0],
+        methods: ['GET', 'POST'],
     )]
     public function results(
         Request $request,
@@ -41,9 +37,10 @@ class SearchController extends AbstractInachisController
         UrlRepository $urlRepository,
         UserRepository $userRepository,
     ): Response {
-        if ($request->attributes->getString('keyword') === ' ' && !empty($request->request->getString('keyword', ''))) {
+        if (' ' === $request->attributes->getString('keyword') && !empty($request->request->getString('keyword', ''))) {
             $keyword = str_replace('/', '', $request->request->getString('keyword', ''));
             $keyword = preg_replace('/(?:%25)*2[fF]/', '', $keyword);
+
             return $this->redirectToRoute('incp_search_results', ['keyword' => $keyword]);
         }
 
@@ -67,7 +64,6 @@ class SearchController extends AbstractInachisController
 
         $this->viewModel->page->title = sprintf('\'%s\' results', $request->attributes->getString('keyword'));
 
-
         foreach ($results->getResults() as $key => $result) {
             $uuidString = Uuid::fromBytes($result['id'])->toString();
             // $results->updateResultPropertyByKey($key, 'id', $uuidString);
@@ -75,10 +71,10 @@ class SearchController extends AbstractInachisController
             $results->updateResultPropertyByKey(
                 $key,
                 'relevance',
-                number_format($result['relevance'], 2)
+                number_format($result['relevance'], 2),
             );
             $author = $userRepository->findOneBy([
-                'id' => $result['author'] !== null ? Uuid::fromBytes($result['author'])->toString() : '',
+                'id' => null !== $result['author'] ? Uuid::fromBytes($result['author'])->toString() : '',
             ]);
             $results->updateResultPropertyByKey(
                 $key,
@@ -92,8 +88,8 @@ class SearchController extends AbstractInachisController
                         'url',
                         $this->generateUrl('incp_resource_edit', [
                             'type' => 'images',
-                            'filename' => $uuidString]
-                        )
+                            'filename' => $uuidString],
+                        ),
                     );
                     break;
 
@@ -101,7 +97,7 @@ class SearchController extends AbstractInachisController
                     $results->updateResultPropertyByKey(
                         $key,
                         'url',
-                        $this->generateUrl('incp_series_edit', ['id' => $uuidString])
+                        $this->generateUrl('incp_series_edit', ['id' => $uuidString]),
                     );
                     break;
 
@@ -117,7 +113,7 @@ class SearchController extends AbstractInachisController
                         sprintf(
                             '/incp/%s/%s',
                             strtolower($result['type']),
-                            !empty($link) ? $link->getLink() : ''
+                            !empty($link) ? $link->getLink() : '',
                         ),
                     );
             }

@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Model;
 
-use DateTimeImmutable;
 use Inachis\Model\BulkCreateData;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -23,19 +21,19 @@ class BulkCreateDataTest extends TestCase
     {
         $this->bulkCreateData = new BulkCreateData(
             'some title',
-            DateTimeImmutable::createFromFormat('d/m/Y', '01/11/2025'),
-            DateTimeImmutable::createFromFormat('d/m/Y', '07/11/2025'),
+            \DateTimeImmutable::createFromFormat('d/m/Y', '01/11/2025'),
+            \DateTimeImmutable::createFromFormat('d/m/Y', '07/11/2025'),
             false,
             Uuid::uuid1()->toString(),
-            [ 'test-tag' ],
-            [ 'test-category' ],
+            ['test-tag'],
+            ['test-category'],
         );
     }
 
     public function testFromRequestNoFormData(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incp/series/some-post'
+            'REQUEST_URI' => '/incp/series/some-post',
         ]);
         $this->expectExceptionMessage('Form data is missing.');
         BulkCreateData::fromRequest($request);

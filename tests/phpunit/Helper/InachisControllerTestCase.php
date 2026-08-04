@@ -1,25 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Factory\PageViewFactory;
+use Inachis\Model\System\PageMetadata;
+use Inachis\Model\System\PageView;
+use Inachis\Model\System\SiteSettings;
 use Inachis\Repository\Waste\WasteRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-
-use Inachis\Factory\PageViewFactory;
-use Inachis\Model\System\PageMetadata;
-use Inachis\Model\System\PageView;
-use Inachis\Model\System\SiteSettings;
 
 abstract class InachisControllerTestCase extends TestCase
 {

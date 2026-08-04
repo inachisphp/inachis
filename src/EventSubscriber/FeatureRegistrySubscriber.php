@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\EventSubscriber;
@@ -15,22 +14,22 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * FeatureRegistrySubscriber
+ * FeatureRegistrySubscriber.
  */
 final readonly class FeatureRegistrySubscriber implements EventSubscriberInterface
 {
-	/**
-	 * Constructor for the FeatureRegistrySubscriber
-	 *
-	 * @param FeatureRegistry $featureRegistry
-	 */
-    public function __construct(private FeatureRegistry $featureRegistry) {}
+    /**
+     * Constructor for the FeatureRegistrySubscriber.
+     */
+    public function __construct(private FeatureRegistry $featureRegistry)
+    {
+    }
 
-	/**
-	 * Gets the function name to use for subscribed events
-	 *
-	 * @return array<string,string>
-	 */
+    /**
+     * Gets the function name to use for subscribed events.
+     *
+     * @return array<string,string>
+     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -38,12 +37,9 @@ final readonly class FeatureRegistrySubscriber implements EventSubscriberInterfa
         ];
     }
 
-	/**
-	 * Registers the available features
-	 *
-	 * @param RequestEvent $event
-	 * @return void
-	 */
+    /**
+     * Registers the available features.
+     */
     public function onKernelRequest(RequestEvent $event): void
     {
         // $this->featureRegistry->register('trips');

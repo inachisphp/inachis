@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Analytics;
@@ -21,7 +20,7 @@ final class AnalyticsPeriodFactoryTest extends TestCase
         $today = new \DateTimeImmutable('today');
 
         $period = AnalyticsPeriodFactory::fromRequest(
-            new Request(['range' => 'today'])
+            new Request(['range' => 'today']),
         );
 
         $this->assertEquals($today, $period->from);
@@ -35,7 +34,7 @@ final class AnalyticsPeriodFactoryTest extends TestCase
         $today = new \DateTimeImmutable('today');
 
         $period = AnalyticsPeriodFactory::fromRequest(
-            new Request(['range' => 'yesterday'])
+            new Request(['range' => 'yesterday']),
         );
 
         $expected = $today->modify('-1 day');
@@ -51,7 +50,7 @@ final class AnalyticsPeriodFactoryTest extends TestCase
         $today = new \DateTimeImmutable('today');
 
         $period = AnalyticsPeriodFactory::fromRequest(
-            new Request(['range' => '7d'])
+            new Request(['range' => '7d']),
         );
 
         $this->assertEquals($today->modify('-6 days'), $period->from);
@@ -65,7 +64,7 @@ final class AnalyticsPeriodFactoryTest extends TestCase
         $today = new \DateTimeImmutable('today');
 
         $period = AnalyticsPeriodFactory::fromRequest(
-            new Request(['range' => '30d'])
+            new Request(['range' => '30d']),
         );
 
         $this->assertEquals($today->modify('-29 days'), $period->from);
@@ -79,7 +78,7 @@ final class AnalyticsPeriodFactoryTest extends TestCase
         $today = new \DateTimeImmutable('today');
 
         $period = AnalyticsPeriodFactory::fromRequest(
-            new Request(['range' => '90d'])
+            new Request(['range' => '90d']),
         );
 
         $this->assertEquals($today->modify('-89 days'), $period->from);
@@ -93,12 +92,12 @@ final class AnalyticsPeriodFactoryTest extends TestCase
         $today = new \DateTimeImmutable('today');
 
         $period = AnalyticsPeriodFactory::fromRequest(
-            new Request(['range' => 'this-month'])
+            new Request(['range' => 'this-month']),
         );
 
         $this->assertEquals(
             $today->modify('first day of this month'),
-            $period->from
+            $period->from,
         );
         $this->assertEquals($today, $period->to);
         $this->assertSame('this-month', $period->range);
@@ -110,16 +109,16 @@ final class AnalyticsPeriodFactoryTest extends TestCase
         $today = new \DateTimeImmutable('today');
 
         $period = AnalyticsPeriodFactory::fromRequest(
-            new Request(['range' => 'last-month'])
+            new Request(['range' => 'last-month']),
         );
 
         $this->assertEquals(
             $today->modify('first day of last month'),
-            $period->from
+            $period->from,
         );
         $this->assertEquals(
             $today->modify('last day of last month'),
-            $period->to
+            $period->to,
         );
         $this->assertSame('last-month', $period->range);
         $this->assertSame('Last Month', $period->label);
@@ -130,12 +129,12 @@ final class AnalyticsPeriodFactoryTest extends TestCase
         $today = new \DateTimeImmutable('today');
 
         $period = AnalyticsPeriodFactory::fromRequest(
-            new Request(['range' => 'this-year'])
+            new Request(['range' => 'this-year']),
         );
 
         $this->assertEquals(
             $today->setDate((int) $today->format('Y'), 1, 1),
-            $period->from
+            $period->from,
         );
         $this->assertEquals($today, $period->to);
         $this->assertSame('this-year', $period->range);
@@ -147,7 +146,7 @@ final class AnalyticsPeriodFactoryTest extends TestCase
         $today = new \DateTimeImmutable('today');
 
         $period = AnalyticsPeriodFactory::fromRequest(
-            new Request(['range' => 'invalid'])
+            new Request(['range' => 'invalid']),
         );
 
         $this->assertEquals($today->modify('-29 days'), $period->from);
@@ -158,26 +157,26 @@ final class AnalyticsPeriodFactoryTest extends TestCase
 
     public function testCustomRange(): void
     {
-		$today = new \DateTimeImmutable('today');
+        $today = new \DateTimeImmutable('today');
         $lastMonth = $today->modify('-1 month');
         $period = AnalyticsPeriodFactory::fromRequest(
             new Request([
                 'range' => 'custom',
                 'from' => $lastMonth->format('Y-m-d'),
                 'to' => $today->modify('+1 month')->format('Y-m-d'),
-            ])
+            ]),
         );
 
         $this->assertEquals(
             $lastMonth,
-            $period->from
+            $period->from,
         );
         $this->assertEquals(
             $today,
-            $period->to
+            $period->to,
         );
         $this->assertSame('custom', $period->range);
-        $this->assertSame($lastMonth->format('j M Y') . ' – ' . $today->format('j M Y'), $period->label);
+        $this->assertSame($lastMonth->format('j M Y').' – '.$today->format('j M Y'), $period->label);
     }
 
     public function testCustomDatesAreSwappedWhenReversed(): void
@@ -187,16 +186,16 @@ final class AnalyticsPeriodFactoryTest extends TestCase
                 'range' => 'custom',
                 'from' => '2025-02-01',
                 'to' => '2025-01-01',
-            ])
+            ]),
         );
 
         $this->assertEquals(
             new \DateTimeImmutable('2025-01-01'),
-            $period->from
+            $period->from,
         );
         $this->assertEquals(
             new \DateTimeImmutable('2025-02-01'),
-            $period->to
+            $period->to,
         );
     }
 
@@ -207,7 +206,7 @@ final class AnalyticsPeriodFactoryTest extends TestCase
         AnalyticsPeriodFactory::fromRequest(
             new Request([
                 'range' => 'custom',
-            ])
+            ]),
         );
     }
 
@@ -220,7 +219,7 @@ final class AnalyticsPeriodFactoryTest extends TestCase
                 'range' => 'custom',
                 'from' => 'invalid',
                 'to' => '2025-01-01',
-            ])
+            ]),
         );
     }
 
@@ -233,7 +232,7 @@ final class AnalyticsPeriodFactoryTest extends TestCase
                 'range' => 'custom',
                 'from' => '2024-01-01',
                 'to' => '2025-12-31',
-            ])
+            ]),
         );
     }
 }

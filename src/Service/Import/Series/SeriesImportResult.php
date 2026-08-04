@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Import\Series;
@@ -14,10 +13,8 @@ namespace Inachis\Service\Import\Series;
  */
 final class SeriesImportResult
 {
-    /** @var int */
     public int $seriesImported = 0;
-    
-    /** @var int */
+
     public int $pagesLinked = 0;
 
     /** @var list<string> */

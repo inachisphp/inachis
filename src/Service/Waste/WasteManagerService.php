@@ -1,29 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Waste;
 
-use DateTimeImmutable;
-use Inachis\Entity\Content\{Category, Page, Series, Tag, Url};
-use Inachis\Entity\Media\{Download,Image};
+use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
+use Inachis\Entity\Content\Tag;
+use Inachis\Entity\Content\Url;
+use Inachis\Entity\Media\Download;
+use Inachis\Entity\Media\Image;
 use Inachis\Entity\User\User;
 use Inachis\Entity\Waste\Waste;
-use Inachis\Repository\Content\PageRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Enum\EditorialStatus;
+use Inachis\Repository\Content\PageRepository;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Manages the waste bin for the application
+ * Manages the waste bin for the application.
  *
  * @phpstan-import-type ImageShape from \Inachis\Entity\Media\Image
  * @phpstan-import-type PageShape from \Inachis\Entity\Content\Page
@@ -32,12 +35,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 class WasteManagerService
 {
     /**
-     * Inject the dependencies
-
-     * @param EntityManagerInterface $entityManager
-     * @param Security $security
-     * @param Filesystem $filesystem
-     * @param string $imageDirectory
+     * Inject the dependencies.
      */
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -45,11 +43,12 @@ class WasteManagerService
         private Security $security,
         private Filesystem $filesystem,
         #[Autowire('%kernel.project_dir%/public/imgs/')]
-        private string $imageDirectory
-    ) {}
+        private string $imageDirectory,
+    ) {
+    }
 
     /**
-     * Send an entity to the waste bin
+     * Send an entity to the waste bin.
      *
      * @param Download|Image|Page|Series $entity
      */
@@ -59,7 +58,7 @@ class WasteManagerService
         /** @var User */
         $deletedBy = $this->security->getUser();
         $waste->setUser($deletedBy);
-        $waste->setUpdatedAt(new DateTimeImmutable());
+        $waste->setUpdatedAt(new \DateTimeImmutable());
 
         $data = [
             'id' => $entity->getId(),
@@ -96,7 +95,6 @@ class WasteManagerService
             foreach ($entity->getUrls() as $url) {
                 $data['urls'][] = ['link' => $url->getLink(), 'default' => $url->isDefault()];
             }
-
         } elseif ($entity instanceof Series) {
             $waste->setSourceType('Series');
             $waste->setSourceName($entity->getTitle());
@@ -114,7 +112,6 @@ class WasteManagerService
             foreach ($entity->getItems() as $item) {
                 $data['items'][] = $item->getId();
             }
-
         } elseif ($entity instanceof Image) {
             $waste->setSourceType('Image');
             $waste->setSourceName($entity->getFilename());
@@ -130,11 +127,11 @@ class WasteManagerService
             $data['dimensionY'] = $entity->getDimensionY();
             $data['author'] = $entity->getAuthor()?->getId();
 
-            $sourcePath = $this->imageDirectory . $entity->getFilename();
-            $wastePath = $this->imageDirectory . '.waste/' . $entity->getFilename();
+            $sourcePath = $this->imageDirectory.$entity->getFilename();
+            $wastePath = $this->imageDirectory.'.waste/'.$entity->getFilename();
             if ($this->filesystem->exists($sourcePath)) {
-                if (!$this->filesystem->exists($this->imageDirectory . '.waste/')) {
-                    $this->filesystem->mkdir($this->imageDirectory . '.waste/');
+                if (!$this->filesystem->exists($this->imageDirectory.'.waste/')) {
+                    $this->filesystem->mkdir($this->imageDirectory.'.waste/');
                 }
                 $this->filesystem->rename($sourcePath, $wastePath);
             }
@@ -149,9 +146,7 @@ class WasteManagerService
     }
 
     /**
-     * Restore an entity from the waste bin
-     *
-     * @param Waste $waste
+     * Restore an entity from the waste bin.
      */
     public function restore(Waste $waste): void
     {
@@ -169,14 +164,14 @@ class WasteManagerService
                     $page = new Page();
                     $page->setId(Uuid::fromString($data['id']));
                 }
-                /** @var PageShape $data */
+                /* @var PageShape $data */
                 $page->setTitle($data['title']);
                 $page->setSubTitle($data['subTitle'] ?? null);
                 $page->setContent($data['content'] ?? null);
                 $page->setStatus(EditorialStatus::from($data['status']));
                 $page->setVisible($data['visible']);
                 if (!empty($data['postDate'])) {
-                    $page->setPostDate(new DateTimeImmutable($data['postDate']));
+                    $page->setPostDate(new \DateTimeImmutable($data['postDate']));
                 }
                 $page->setTimezone($data['timezone']);
                 $page->setPassword($data['password']);
@@ -184,7 +179,7 @@ class WasteManagerService
                 $page->setType($data['type']);
                 $page->setFeatureSnippet($data['featureSnippet'] ?? '');
 
-                if(isset($data['author'])) {
+                if (isset($data['author'])) {
                     /** @var User|null */
                     $author = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $data['author']]);
                     if ($author) {
@@ -192,7 +187,7 @@ class WasteManagerService
                     }
                 }
 
-                if(isset($data['featureImage'])) {
+                if (isset($data['featureImage'])) {
                     /** @var Image|null */
                     $image = $this->entityManager->getRepository(Image::class)->findOneBy(['id' => $data['featureImage']]);
                     if ($image) {
@@ -200,16 +195,19 @@ class WasteManagerService
                     }
                 }
 
-
                 foreach ($data['categories'] as $catId) {
                     $cat = $this->entityManager->getRepository(Category::class)->findOneBy(['id' => $catId]);
-                    if ($cat) $page->getCategories()->add($cat);
+                    if ($cat) {
+                        $page->getCategories()->add($cat);
+                    }
                 }
 
                 foreach ($data['tags'] as $tagId) {
                     /** @var Tag|null */
                     $tag = $this->entityManager->getRepository(Tag::class)->findOneBy(['id' => $tagId]);
-                    if ($tag) $page->getTags()->add($tag);
+                    if ($tag) {
+                        $page->getTags()->add($tag);
+                    }
                 }
 
                 if (!empty($data['urls'])) {
@@ -232,7 +230,7 @@ class WasteManagerService
                 if (!$series) {
                     $series = new Series();
                 }
-                /** @var SeriesShape $data */
+                /* @var SeriesShape $data */
                 $series->setTitle($data['title'] ?? '');
                 $series->setSubTitle($data['subTitle'] ?? '');
                 $series->setDescription($data['description'] ?? '');
@@ -257,7 +255,9 @@ class WasteManagerService
                     foreach ($data['items'] as $itemId) {
                         /** @var Page|null */
                         $item = $this->entityManager->getRepository(Page::class)->findOneBy(['id' => $itemId]);
-                        if ($item) $series->getItems()->add($item);
+                        if ($item) {
+                            $series->getItems()->add($item);
+                        }
                     }
                 }
                 $this->entityManager->persist($series);
@@ -270,7 +270,7 @@ class WasteManagerService
                     $image = new Image();
                     $image->setId(Uuid::fromString($data['id']));
                 }
-                /** @var ImageShape $data */
+                /* @var ImageShape $data */
                 $image->setTitle($data['title'] ?? '');
                 $image->setDescription($data['description'] ?? '');
                 $image->setAltText($data['altText'] ?? '');
@@ -288,8 +288,8 @@ class WasteManagerService
                     }
                 }
 
-                $wastePath = $this->imageDirectory . '.waste/' . $image->getFilename();
-                $targetPath = $this->imageDirectory . $image->getFilename();
+                $wastePath = $this->imageDirectory.'.waste/'.$image->getFilename();
+                $targetPath = $this->imageDirectory.$image->getFilename();
                 if ($this->filesystem->exists($wastePath)) {
                     $this->filesystem->rename($wastePath, $targetPath);
                 }
@@ -306,17 +306,15 @@ class WasteManagerService
     }
 
     /**
-     * Delete an entity from the waste bin
-     *
-     * @param Waste $waste
+     * Delete an entity from the waste bin.
      */
     public function deleteWaste(Waste $waste): void
     {
-        if ($waste->getSourceType() === 'Image') {
+        if ('Image' === $waste->getSourceType()) {
             /** @var ImageShape|null */
             $data = json_decode($waste->getContent() ?: '', true);
             if ($data && !empty($data['filename'])) {
-                $wastePath = $this->imageDirectory . '.waste/' . $data['filename'];
+                $wastePath = $this->imageDirectory.'.waste/'.$data['filename'];
                 if ($this->filesystem->exists($wastePath)) {
                     $this->filesystem->remove($wastePath);
                 }

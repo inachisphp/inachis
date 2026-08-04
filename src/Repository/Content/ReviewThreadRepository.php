@@ -1,32 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Repository\Content;
 
-use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Inachis\Entity\Content\{Page, ReviewThread};
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\ReviewThread;
 use Inachis\Entity\User\User;
 use Inachis\Enum\ReviewStatus;
 
 /**
- * Repository for handling {@link ReviewThread} entities
+ * Repository for handling {@link ReviewThread} entities.
  *
  * @extends ServiceEntityRepository<ReviewThread>
  */
 class ReviewThreadRepository extends ServiceEntityRepository
 {
     /**
-     * Constructor
-     *
-     * @param ManagerRegistry $registry
+     * Constructor.
      */
     public function __construct(ManagerRegistry $registry)
     {
@@ -34,13 +31,13 @@ class ReviewThreadRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns an array of open {@link ReviewThread} objects for the give {@link Page}
+     * Returns an array of open {@link ReviewThread} objects for the give {@link Page}.
      *
      * @return array<ReviewThread>
      */
     public function findOpenForPage(Page $page): array
     {
-        /** @var array<ReviewThread> */
+        /* @var array<ReviewThread> */
         return $this->createQueryBuilder('t')
             ->where('t.page = :page')
             ->andWhere('t.status = :status')
@@ -59,7 +56,7 @@ class ReviewThreadRepository extends ServiceEntityRepository
      */
     public function findAllForPage(Page $page): array
     {
-        /** @var array<ReviewThread> */
+        /* @var array<ReviewThread> */
         return $this->createQueryBuilder('t')
             ->where('t.page = :page')
             ->setParameter('page', $page)
@@ -74,25 +71,25 @@ class ReviewThreadRepository extends ServiceEntityRepository
     private function countByResolutionStatus(
         bool $resolved,
         ?User $user,
-        ?DateTimeImmutable $from,
-        ?DateTimeImmutable $to
+        ?\DateTimeImmutable $from,
+        ?\DateTimeImmutable $to,
     ): int {
         $qb = $this->createQueryBuilder('t')
             ->select('COUNT(t.id)')
             ->andWhere('t.resolved = :resolved')
             ->setParameter('resolved', $resolved);
 
-        if ($user !== null) {
+        if (null !== $user) {
             $qb->andWhere('t.resolvedBy = :user')
                 ->setParameter('user', $user);
         }
 
-        if ($from !== null) {
+        if (null !== $from) {
             $qb->andWhere('t.resolvedAt >= :from')
                 ->setParameter('from', $from);
         }
 
-        if ($to !== null) {
+        if (null !== $to) {
             $qb->andWhere('t.resolvedAt <= :to')
                 ->setParameter('to', $to);
         }
@@ -102,35 +99,23 @@ class ReviewThreadRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns a count of open reviews
-     *
-     * @param User|null $user
-     * @param DateTimeImmutable|null $from
-     * @param DateTimeImmutable|null $to
-     * @return int
+     * Returns a count of open reviews.
      */
-    public function countOpen(?User $user, ?DateTimeImmutable $from, ?DateTimeImmutable $to): int
+    public function countOpen(?User $user, ?\DateTimeImmutable $from, ?\DateTimeImmutable $to): int
     {
         return $this->countByResolutionStatus(false, $user, $from, $to);
     }
 
     /**
-     * Returns a count of resolved reviews
-     *
-     * @param User|null $user
-     * @param DateTimeImmutable|null $from
-     * @param DateTimeImmutable|null $to
-     * @return int
+     * Returns a count of resolved reviews.
      */
-    public function countResolved(?User $user, ?DateTimeImmutable $from, ?DateTimeImmutable $to): int
+    public function countResolved(?User $user, ?\DateTimeImmutable $from, ?\DateTimeImmutable $to): int
     {
         return $this->countByResolutionStatus(true, $user, $from, $to);
     }
 
     /**
-     * Returns a count of assigned reviews
-     *
-     * @return int
+     * Returns a count of assigned reviews.
      */
     public function countAssignedReviews(): int
     {
@@ -140,11 +125,9 @@ class ReviewThreadRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
- 
+
     /**
-     * Returns a count of assigned reviews
-     *
-     * @return int
+     * Returns a count of assigned reviews.
      */
     public function countUnassignedReviews(): int
     {
@@ -156,10 +139,7 @@ class ReviewThreadRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns the number of reviews assigned to a specific user
-     *
-     * @param User $user
-     * @return int
+     * Returns the number of reviews assigned to a specific user.
      */
     public function countAssignedReviewsForUser(User $user): int
     {

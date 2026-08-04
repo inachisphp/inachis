@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit;
@@ -27,7 +26,7 @@ class KernelTest extends TestCase
     {
         $this->assertEquals(
             str_replace('/tests/phpunit', '/var/cache/test', __DIR__),
-            $this->kernel->getCacheDir()
+            $this->kernel->getCacheDir(),
         );
     }
 
@@ -35,7 +34,7 @@ class KernelTest extends TestCase
     {
         $this->assertEquals(
             str_replace('/tests/phpunit', '/var/log', __DIR__),
-            $this->kernel->getLogDir()
+            $this->kernel->getLogDir(),
         );
     }
 }

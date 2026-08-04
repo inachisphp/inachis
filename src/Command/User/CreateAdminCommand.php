@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Command\User;
 
-use Inachis\Entity\User\User;
 use Doctrine\ORM\EntityManagerInterface;
-use InvalidArgumentException;
+use Inachis\Entity\User\User;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,7 +19,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
- * Create an admin user
+ * Create an admin user.
  */
 #[AsCommand(
     name: 'inachis:user:create',
@@ -30,20 +28,17 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class CreateAdminCommand extends Command
 {
     /**
-     * Entity manager
+     * Entity manager.
      */
     protected EntityManagerInterface $entityManager;
 
     /**
-     * Password hasher
+     * Password hasher.
      */
     protected UserPasswordHasherInterface $passwordHasher;
 
     /**
-     * Constructor
-     *
-     * @param EntityManagerInterface $entityManager
-     * @param UserPasswordHasherInterface $passwordHasher
+     * Constructor.
      */
     public function __construct(EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher)
     {
@@ -53,18 +48,15 @@ class CreateAdminCommand extends Command
     }
 
     /**
-     * Configure the command
+     * Configure the command.
      */
     protected function configure(): void
     {
     }
 
     /**
-     * Execute the command
+     * Execute the command.
      *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
      * @throws \InvalidArgumentException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -75,15 +67,15 @@ class CreateAdminCommand extends Command
         $helper = $this->getHelper('question');
 
         $normalizeToString = function (mixed $value = null): string {
-            if ($value === null) {
-                throw new InvalidArgumentException('This value cannot be empty');
+            if (null === $value) {
+                throw new \InvalidArgumentException('This value cannot be empty');
             }
             if (!is_string($value)) {
-                throw new InvalidArgumentException('Value must be a string.');
+                throw new \InvalidArgumentException('Value must be a string.');
             }
             $trimmed = trim($value);
-            if ($trimmed === '') {
-                throw new InvalidArgumentException('This value cannot be empty');
+            if ('' === $trimmed) {
+                throw new \InvalidArgumentException('This value cannot be empty');
             }
 
             return $trimmed;
@@ -109,11 +101,11 @@ class CreateAdminCommand extends Command
         $user = new User(
             $username,
             $plaintextPassword,
-            $emailAddress
+            $emailAddress,
         );
         $hashedPassword = $this->passwordHasher->hashPassword(
             $user,
-            $plaintextPassword
+            $plaintextPassword,
         );
         $user->setPassword($hashedPassword);
         $user->setDisplayName($username);
@@ -121,7 +113,7 @@ class CreateAdminCommand extends Command
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        $io->success(sprintf('User %s created', ($user->getUsername())));
+        $io->success(sprintf('User %s created', $user->getUsername()));
 
         return Command::SUCCESS;
     }

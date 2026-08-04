@@ -1,31 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Security\Attribute;
 
-use Attribute;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 
-#[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 final readonly class RequiresPermission
 {
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param PermissionResource|array<PermissionResource> $resource
-     * @param PermissionAction $action
      */
     public function __construct(
         public PermissionResource|array $resource,
         public PermissionAction $action,
-    ) {}
+    ) {
+    }
 
     /**
      * @return list<PermissionResource>

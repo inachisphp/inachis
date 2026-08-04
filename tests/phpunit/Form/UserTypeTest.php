@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Form;
@@ -30,7 +29,7 @@ class UserTypeTest extends TestCase
         $builder->expects($this->atLeastOnce())
             ->method('add')
             ->willReturnCallback(function (string $name, string $type, array $options = []) use ($builder, &$capturedOptions): FormBuilderInterface {
-                if ($name === 'assignedRoles') {
+                if ('assignedRoles' === $name) {
                     $capturedOptions = $options;
                 }
 

@@ -1,40 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form\Extension;
 
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-
 /**
- * Class for implementing a toggle password component
+ * Class for implementing a toggle password component.
  */
 class TogglePasswordTypeExtension extends AbstractTypeExtension
 {
     /**
-     * Returns the form component type that this class extends
+     * Returns the form component type that this class extends.
      *
      * @return iterable<class-string>
      */
     public static function getExtendedTypes(): iterable
     {
-        return [ PasswordType::class ];
+        return [PasswordType::class];
     }
 
     /**
-     * Sets the default options
-     *
-     * @param OptionsResolver $resolver
+     * Sets the default options.
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -42,9 +38,8 @@ class TogglePasswordTypeExtension extends AbstractTypeExtension
     }
 
     /**
-     * Configures the view for the component
+     * Configures the view for the component.
      *
-     * @param FormView $view
      * @param FormInterface<mixed> $form
      * @param array<string, mixed> $options
      */
@@ -56,14 +51,14 @@ class TogglePasswordTypeExtension extends AbstractTypeExtension
         }
         /** @var array<string, mixed> $attr */
         $attr = is_array($view->vars['attr'] ?? null) ? $view->vars['attr'] : [];
-        
+
         /** @var string $controller */
         $controller = $attr['data-controller'] ?? '';
-        $attr['data-controller'] = trim($controller . ' toggle-password');
+        $attr['data-controller'] = trim($controller.' toggle-password');
 
         /** @var string $action */
         $action = $attr['data-action'] ?? '';
-        $attr['data-action'] = trim($action . ' toggle-password#toggle');
+        $attr['data-action'] = trim($action.' toggle-password#toggle');
 
         $view->vars['attr'] = $attr;
     }

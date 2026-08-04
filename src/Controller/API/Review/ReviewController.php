@@ -1,16 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\API\Review;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Content\{Page, ReviewThread};
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\ReviewThread;
 use Inachis\Service\Content\Page\ReviewNormaliser;
 use Inachis\Service\Content\Page\ReviewPageService;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,21 +18,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Review controller
+ * Review controller.
  */
 class ReviewController extends AbstractInachisController
 {
-	/**
-	 * Returns a JSON list of review threads for a page, including all comments and author information.
-	 * The threads are ordered by last updated date, with the most recently updated threads first.
-	 * Only open threads are returned by this endpoint.
-	 * The response format is as follows:
-	 *
-	 * @param Page $page The page for which to list review threads
-     * @param ReviewPageService $reviewService
-     * @param ReviewNormaliser $normaliser
-	 * @return JsonResponse A JSON response containing an array of review threads, each with its comments and author information
-	 */
+    /**
+     * Returns a JSON list of review threads for a page, including all comments and author information.
+     * The threads are ordered by last updated date, with the most recently updated threads first.
+     * Only open threads are returned by this endpoint.
+     * The response format is as follows:
+     *
+     * @param Page $page The page for which to list review threads
+     *
+     * @return JsonResponse A JSON response containing an array of review threads, each with its comments and author information
+     */
     #[Route('/incp/api/review/page/{id}', methods: ['GET'])]
     public function list(
         Page $page,
@@ -44,20 +43,14 @@ class ReviewController extends AbstractInachisController
         return $this->json(
             array_map(
                 fn ($thread) => $normaliser->normaliseThread($thread),
-                $threads
-            )
+                $threads,
+            ),
         );
     }
 
-	/**
-	 * Creates a new review thread for a page with an initial comment, and returns the created thread as JSON.
-	 *
-	 * @param Request $request
-	 * @param Page $page
-     * @param ReviewPageService $reviewService
-     * @param ReviewNormaliser $normaliser
-	 * @return JsonResponse
-	 */
+    /**
+     * Creates a new review thread for a page with an initial comment, and returns the created thread as JSON.
+     */
     #[Route('/incp/api/review/page/{id}', methods: ['POST'])]
     public function create(
         Request $request,
@@ -78,7 +71,7 @@ class ReviewController extends AbstractInachisController
             $request->getContent(),
             true,
             512,
-            JSON_THROW_ON_ERROR
+            JSON_THROW_ON_ERROR,
         );
 
         $thread = $reviewService->createThread(
@@ -89,54 +82,45 @@ class ReviewController extends AbstractInachisController
             endOffset: $payload['endOffset'],
             selectedText: $payload['selectedText'],
             contextBefore: $payload['contextBefore'] ?? '',
-            contextAfter: $payload['contextAfter'] ?? ''
+            contextAfter: $payload['contextAfter'] ?? '',
         );
 
         return $this->json(
-            $normaliser->normaliseThread($thread)
+            $normaliser->normaliseThread($thread),
         );
     }
 
-	/**
-	 * Adds a reply to a thread, and returns the UUID of the added comment
-	 *
-	 * @param Request $request
-     * @param ReviewPageService $reviewService
-	 * @param ReviewThread $thread
-	 * @return JsonResponse
-	 */
+    /**
+     * Adds a reply to a thread, and returns the UUID of the added comment.
+     */
     #[Route('/incp/api/review/thread/{id}/reply', methods: ['POST'])]
     public function reply(
         Request $request,
         ReviewPageService $reviewService,
         ReviewThread $thread,
     ): JsonResponse {
-		/** @var array{message: string} $payload */
+        /** @var array{message: string} $payload */
         $payload = json_decode(
             $request->getContent(),
             true,
             512,
-            JSON_THROW_ON_ERROR
+            JSON_THROW_ON_ERROR,
         );
 
         $comment = $reviewService->addReply(
             $thread,
             $this->getCurrentUser(),
-            $payload['message']
+            $payload['message'],
         );
 
         return $this->json([
-            'id' => (string)$comment->getId()
+            'id' => (string) $comment->getId(),
         ]);
     }
 
-	/**
-	 * Resolves the specified review thread and returns success
-	 *
-     * @param ReviewPageService $reviewService
-	 * @param ReviewThread $thread
-	 * @return JsonResponse
-	 */
+    /**
+     * Resolves the specified review thread and returns success.
+     */
     #[Route('/incp/api/review/thread/{id}/resolve', methods: ['POST'])]
     public function resolve(
         ReviewPageService $reviewService,
@@ -144,30 +128,26 @@ class ReviewController extends AbstractInachisController
     ): JsonResponse {
         $reviewService->resolveThread(
             $thread,
-            $this->getCurrentUser()
+            $this->getCurrentUser(),
         );
 
         return $this->json([
-            'success' => true
+            'success' => true,
         ]);
     }
 
     /**
-     * Reopens the specified thread
-     *
-     * @param ReviewPageService $reviewService
-     * @param ReviewThread $thread
-     * @return JsonResponse
+     * Reopens the specified thread.
      */
-	#[Route('/incp/api/review/thread/{id}/reopen', methods: ['POST'])]
-	public function reopen(
+    #[Route('/incp/api/review/thread/{id}/reopen', methods: ['POST'])]
+    public function reopen(
         ReviewPageService $reviewService,
         ReviewThread $thread,
     ): JsonResponse {
-		$reviewService->reopenThread($thread);
+        $reviewService->reopenThread($thread);
 
-		return $this->json([
-			'success' => true
-		]);
-	}
+        return $this->json([
+            'success' => true,
+        ]);
+    }
 }

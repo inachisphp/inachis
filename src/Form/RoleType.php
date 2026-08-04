@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form;
@@ -20,45 +19,46 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Form type for creating and editing roles
+ * Form type for creating and editing roles.
  *
  * @extends AbstractType<Role>
  */
 class RoleType extends AbstractType
 {
     /**
-     * Creates a new instance of {@link RoleType}
+     * Creates a new instance of {@link RoleType}.
      *
      * @param TranslatorInterface $translator The translator service
      */
     public function __construct(
         private TranslatorInterface $translator,
-    ) {}
+    ) {
+    }
 
     /**
-     * Builds the form
+     * Builds the form.
      *
      * @param FormBuilderInterface<Role|null> $builder The form builder
-     * @param array<string, mixed> $options The form options
+     * @param array<string, mixed>            $options The form options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $isNew = !isset($options['data'])
             || !($options['data'] instanceof Role)
-            || $options['data']->getId() === null;
+            || null === $options['data']->getId();
 
         $builder
             ->add('name', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'role__name__label',
-                    'autofocus'       => $isNew,
-                    'class'           => 'text inline_label',
-                    'placeholder'     => 'Enter a unique role name',
+                    'autofocus' => $isNew,
+                    'class' => 'text inline_label',
+                    'placeholder' => 'Enter a unique role name',
                 ],
-                'label'      => 'Role Name',
+                'label' => 'Role Name',
                 'label_attr' => [
                     'class' => 'inline_label',
-                    'id'    => 'role__name__label',
+                    'id' => 'role__name__label',
                 ],
                 'required' => true,
             ])
@@ -66,13 +66,13 @@ class RoleType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'role__description__label',
                     'class' => 'full-width',
-                    'placeholder'     => 'Optional description for this role',
-                    'rows'            => 3,
+                    'placeholder' => 'Optional description for this role',
+                    'rows' => 3,
                 ],
-                'label'      => 'Description',
+                'label' => 'Description',
                 'label_attr' => [
                     'class' => 'inline_label',
-                    'id'    => 'role__description__label',
+                    'id' => 'role__description__label',
                 ],
                 'required' => false,
             ])
@@ -96,7 +96,7 @@ class RoleType extends AbstractType
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> %s',
                     'save',
-                    $this->translator->trans('admin.button.save', [], 'messages')
+                    $this->translator->trans('admin.button.save', [], 'messages'),
                 ),
                 'label_html' => true,
             ])
@@ -105,17 +105,17 @@ class RoleType extends AbstractType
         if (!$isNew) {
             $builder->add('delete', SubmitType::class, [
                 'attr' => [
-                    'class'            => 'button button--negative button--confirm',
-                    'data-confirm'     => 'delete',
+                    'class' => 'button button--negative button--confirm',
+                    'data-confirm' => 'delete',
                     'data-confirm-text' => 'Yes, delete',
-                    'data-entity'      => 'role',
-                    'data-title'       => $options['data']->getName(),
-                    'data-warning'     => 'This action cannot be undone. All users assigned to this role will lose the associated permissions.',
+                    'data-entity' => 'role',
+                    'data-title' => $options['data']->getName(),
+                    'data-warning' => 'This action cannot be undone. All users assigned to this role will lose the associated permissions.',
                 ],
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> %s',
                     'delete',
-                    $this->translator->trans('admin.button.delete', [], 'messages')
+                    $this->translator->trans('admin.button.delete', [], 'messages'),
                 ),
                 'label_html' => true,
             ]);
@@ -123,7 +123,7 @@ class RoleType extends AbstractType
     }
 
     /**
-     * Configures the options for the form
+     * Configures the options for the form.
      *
      * @param OptionsResolver $resolver The options resolver
      */

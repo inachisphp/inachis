@@ -1,23 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Controller\Page\Admin;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Controller\Page\Admin\AdminProfileController;
 use Inachis\Entity\User\User;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\User\UserRepository;
-use Inachis\Service\User\UserBulkActionService;
 use Inachis\Service\User\UserAccountEmailService;
-use Inachis\Transformer\ImageTransformer;
-use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Service\User\UserBulkActionService;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
+use Inachis\Transformer\ImageTransformer;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Ramsey\Uuid\Uuid;
@@ -34,7 +33,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AdminProfileControllerTest extends InachisControllerTestCase
 {
     /**
-     * @var AdminProfileController&MockObject $controller
+     * @var AdminProfileController&MockObject
      */
     protected AdminProfileController $controller;
 
@@ -44,7 +43,7 @@ class AdminProfileControllerTest extends InachisControllerTestCase
     public function setUp(): void
     {
         parent::setUp();
-        
+
         $this->controller = $this->getMockBuilder(AdminProfileController::class)
             ->setConstructorArgs([
                 $this->entityManager,
@@ -66,7 +65,7 @@ class AdminProfileControllerTest extends InachisControllerTestCase
             ->getMock();
         $this->controller->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $formBuilder = $this->createStub(FormBuilder::class);
         $this->controller->method('createFormBuilder')->willReturn($formBuilder);
@@ -83,7 +82,7 @@ class AdminProfileControllerTest extends InachisControllerTestCase
             'offset' => 50,
             'limit' => 25,
         ], [], [], [
-            'REQUEST_URI' => '/incc/admin/list/50/25'
+            'REQUEST_URI' => '/incc/admin/list/50/25',
         ]);
         $userBulkActionService = $this->createStub(UserBulkActionService::class);
         $userRepository = $this->createStub(UserRepository::class);
@@ -111,7 +110,7 @@ class AdminProfileControllerTest extends InachisControllerTestCase
             'offset' => 50,
             'limit' => 25,
         ], [], [], [
-            'REQUEST_URI' => '/incc/admin/list/50/25'
+            'REQUEST_URI' => '/incc/admin/list/50/25',
         ]);
         $entityManager = $this->createStub(EntityManagerInterface::class);
         $security = $this->createStub(Security::class);
@@ -162,7 +161,7 @@ class AdminProfileControllerTest extends InachisControllerTestCase
         $request = new Request([], [], [
             'id' => 'test-user',
         ], [], [], [
-            'REQUEST_URI' => '/incc/admin/test-user'
+            'REQUEST_URI' => '/incc/admin/test-user',
         ]);
         $imageTransformer = $this->createStub(ImageTransformer::class);
         $userRegistrationService = $this->createStub(UserAccountEmailService::class);
@@ -177,7 +176,7 @@ class AdminProfileControllerTest extends InachisControllerTestCase
             $request,
             $imageTransformer,
             $userRegistrationService,
-            $userRepository
+            $userRepository,
         );
         $this->assertEquals('rendered:inadmin/page/admin/profile.html.twig', $result->getContent());
     }
@@ -196,10 +195,10 @@ class AdminProfileControllerTest extends InachisControllerTestCase
                 'timezone' => 'UTC',
             ],
         ];
-        $request = new Request([], [ $formData, ], [
+        $request = new Request([], [$formData], [
             'id' => 'new',
         ], [], [], [
-            'REQUEST_URI' => '/incc/admin/test-user'
+            'REQUEST_URI' => '/incc/admin/test-user',
         ]);
         $request->setMethod(Request::METHOD_POST);
 
@@ -222,7 +221,7 @@ class AdminProfileControllerTest extends InachisControllerTestCase
             $request,
             $imageTransformer,
             $userRegistrationService,
-            $userRepository
+            $userRepository,
         );
         $this->assertInstanceOf(RedirectResponse::class, $result);
     }
@@ -241,8 +240,8 @@ class AdminProfileControllerTest extends InachisControllerTestCase
                 'timezone' => 'UTC',
             ],
         ];
-        $request = new Request([], [ $formData, ], [], [], [], [
-            'REQUEST_URI' => '/incc/admin/test-user'
+        $request = new Request([], [$formData], [], [], [], [
+            'REQUEST_URI' => '/incc/admin/test-user',
         ]);
         $request->setMethod(Request::METHOD_POST);
 
@@ -265,7 +264,7 @@ class AdminProfileControllerTest extends InachisControllerTestCase
             $request,
             $imageTransformer,
             $userRegistrationService,
-            $userRepository
+            $userRepository,
         );
         $this->assertInstanceOf(RedirectResponse::class, $result);
     }

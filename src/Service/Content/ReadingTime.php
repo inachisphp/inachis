@@ -1,33 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Content;
 
-use Inachis\Service\Content\TextCleaner;
-
 /**
- * ReadingTime class
+ * ReadingTime class.
  */
 class ReadingTime
 {
     /**
-     * Words per minute
+     * Words per minute.
      */
     private const WORDS_PER_MINUTE = 238;
 
     /**
-     * Get reading time
-     *
-     * @param string|null  $text
-     * @param int|null $wordCount
-     * @param int|null $wpm
-     * @return float
+     * Get reading time.
      */
     public static function getReadingTime(?string $text, ?int $wordCount = 0, ?int $wpm = self::WORDS_PER_MINUTE): float
     {
@@ -35,27 +27,24 @@ class ReadingTime
     }
 
     /**
-     * Get word count
-     *
-     * @param string|null $text
-     * @return int
+     * Get word count.
      */
     public static function getWordCount(?string $text): int
     {
         $text = TextCleaner::strip($text, TextCleaner::REMOVE_IMAGE_ALT | TextCleaner::NORMALISE_WHITESPACE);
+
         return str_word_count($text);
     }
 
     /**
-     * Get word count and reading time
+     * Get word count and reading time.
      *
-     * @param string|null  $text
-     * @param int|null $wpm
      * @return array<string, int|float>
      */
     public static function getWordCountAndReadingTime(?string $text, ?int $wpm = self::WORDS_PER_MINUTE): array
     {
         $wordCount = self::getWordCount($text);
+
         return [
             'readingTime' => self::getReadingTime($text, $wordCount, $wpm),
             'wordCount' => $wordCount,

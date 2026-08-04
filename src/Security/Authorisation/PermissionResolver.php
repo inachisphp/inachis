@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Security\Authorisation;
@@ -21,13 +20,13 @@ final class PermissionResolver
     public function hasPermission(
         User $user,
         PermissionResource $resource,
-        PermissionAction $action
+        PermissionAction $action,
     ): bool {
         foreach ($user->getAssignedRoles() as $role) {
             foreach ($role->getRolePermissions() as $permission) {
                 if (
-                    $permission->getResource() === $resource &&
-                    $permission->getAction() === $action
+                    $permission->getResource() === $resource
+                    && $permission->getAction() === $action
                 ) {
                     return true;
                 }
@@ -47,18 +46,18 @@ final class PermissionResolver
      */
     public function isGranted(
         User $user,
-        string $permission
+        string $permission,
     ): bool {
         [$resource, $action] = $this->parsePermission($permission);
 
-        if ($resource === null || $action === null) {
+        if (null === $resource || null === $action) {
             return false;
         }
 
         return $this->hasPermission(
             $user,
             $resource,
-            $action
+            $action,
         );
     }
 
@@ -74,24 +73,24 @@ final class PermissionResolver
      * }
      */
     private function parsePermission(string $permission): array
-	{
-		foreach (PermissionAction::cases() as $action) {
-			$suffix = '_' . $action->value;
+    {
+        foreach (PermissionAction::cases() as $action) {
+            $suffix = '_'.$action->value;
 
-			if (str_ends_with($permission, $suffix)) {
-				$resourceName = substr(
-					$permission,
-					0,
-					-strlen($suffix)
-				);
+            if (str_ends_with($permission, $suffix)) {
+                $resourceName = substr(
+                    $permission,
+                    0,
+                    -strlen($suffix),
+                );
 
-				return [
-					PermissionResource::tryFrom($resourceName),
-					$action,
-				];
-			}
-		}
+                return [
+                    PermissionResource::tryFrom($resourceName),
+                    $action,
+                ];
+            }
+        }
 
-		return [null, null];
-	}
+        return [null, null];
+    }
 }

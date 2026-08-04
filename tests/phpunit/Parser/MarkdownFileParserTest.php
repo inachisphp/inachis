@@ -1,23 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Parser;
 
-use DateTimeImmutable;
-use Exception;
-use ReflectionClass;
-use ReflectionException;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use Inachis\Entity\Content\Category;
 use Inachis\Entity\Content\Page;
 use Inachis\Service\Parser\MarkdownFileParser;
-use Doctrine\Persistence\ObjectManager;
-use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 
 class MarkdownFileParserTest extends TestCase
@@ -32,13 +27,13 @@ class MarkdownFileParserTest extends TestCase
         $this->repository = $this->createStub(ObjectRepository::class);
         $this->entityManager->method('getRepository')
             ->willReturn($this->repository);
-        $this->parser  = new MarkdownFileParser($this->entityManager);
+        $this->parser = new MarkdownFileParser($this->entityManager);
 
         parent::setUp();
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testParsesMarkdownWithTitleSubtitleDateCategoryAndContent(): void
     {
@@ -60,7 +55,7 @@ MD;
             ->willReturnCallback(function ($criteria) use ($category1, $category2, $category3) {
                 return match ($criteria['title']) {
                     'Trips' => $category1,
-                    'Europe' => ($criteria['parent'] === $category1) ? $category2: null,
+                    'Europe' => ($criteria['parent'] === $category1) ? $category2 : null,
                     'Wales' => ($criteria['parent'] === $category2) ? $category3 : null,
                     default => null,
                 };
@@ -71,14 +66,14 @@ MD;
         $this->assertInstanceOf(Page::class, $page);
         $this->assertSame('A title', $page->getTitle());
         $this->assertSame('Sub-title', $page->getSubTitle());
-        $this->assertInstanceOf(DateTimeImmutable::class, $page->getPostDate());
+        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getPostDate());
         $this->assertEquals('2025-01-01', $page->getPostDate()->format('Y-m-d'));
         $this->assertSame('This is a test', $page->getContent());
         $this->assertTrue($page->getCategories()->contains($category3));
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testParsesWithoutSubtitle(): void
     {
@@ -100,7 +95,7 @@ MD;
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testParsesWithoutDate(): void
     {
@@ -119,7 +114,7 @@ MD;
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testHandlesMissingCategoryGracefully(): void
     {
@@ -140,12 +135,12 @@ MD;
 
     public function testHandlesInvalidMarkdown(): void
     {
-        $this->expectException(Exception::class);
-        $this->parser->parse("Invalid line");
+        $this->expectException(\Exception::class);
+        $this->parser->parse('Invalid line');
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testPartialCategoryPathStopsAtValidParent(): void
     {
@@ -175,7 +170,7 @@ MD;
 
     public function testParssMarkdownWithoutTitleThrowsException(): void
     {
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
         $markdown = <<<MD
 This is some content
 split over two lines without a title.
@@ -185,7 +180,7 @@ MD;
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testParsesWithNoCategories(): void
     {
@@ -202,11 +197,11 @@ MD;
     }
 
     /**
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public function testResolveCategoryPathReturnsNullForEmptyPath(): void
     {
-        $reflection = new ReflectionClass($this->parser);
+        $reflection = new \ReflectionClass($this->parser);
         $method = $reflection->getMethod('resolveCategoryPath');
         $result = $method->invoke($this->parser, []);
 

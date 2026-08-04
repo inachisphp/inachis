@@ -1,10 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * This file is part of the inachis framework.
+ */
+
 namespace Inachis\Tests\phpunit\Diagnostics;
 
+use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
 use Inachis\Diagnostics\DiagnosticsCollector;
-use Inachis\Diagnostics\CheckInterface;
 use PHPUnit\Framework\TestCase;
 
 final class DiagnosticsCollectorTest extends TestCase

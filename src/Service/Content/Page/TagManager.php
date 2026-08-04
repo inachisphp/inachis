@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Content\Page;
@@ -14,24 +13,20 @@ use Inachis\Repository\Content\TagRepository;
 use Ramsey\Uuid\Uuid;
 
 /**
- * Manager class for applying tags to a Page
+ * Manager class for applying tags to a Page.
  */
 class TagManager
 {
     /**
-     * Constructor for TagManager
-     *
-     * @param TagRepository $tagRepository
+     * Constructor for TagManager.
      */
     public function __construct(
-        private TagRepository $tagRepository
-    ) {}
+        private TagRepository $tagRepository,
+    ) {
+    }
 
     /**
-     * Apply specified tags to the provided {@link Page}
-     *
-     * @param Page $page
-     * @param string $rawTags
+     * Apply specified tags to the provided {@link Page}.
      */
     public function apply(Page $page, string $rawTags): void
     {
@@ -39,7 +34,7 @@ class TagManager
 
         $tags = array_filter(array_map(
             'trim',
-            explode(',', $rawTags)
+            explode(',', $rawTags),
         ));
 
         foreach ($tags as $tagValue) {

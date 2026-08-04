@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Import\Category;
@@ -25,6 +24,7 @@ final class CategoryImportValidator
      * Validate an array of CategoryExportDto objects.
      *
      * @param CategoryExportDto[] $categories
+     *
      * @return array<int, array<string>> Warnings per category (by index)
      */
     public function validateAll(array $categories): array
@@ -40,9 +40,6 @@ final class CategoryImportValidator
 
     /**
      * Validate a single CategoryExportDto.
-     *
-     * @param CategoryExportDto $dto
-     * @param int $index
      */
     public function validate(CategoryExportDto $dto, int $index): void
     {

@@ -1,18 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Entity\Security;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Inachis\Entity\Security\RolePermission;
+use Doctrine\ORM\Mapping as ORM;
 use Inachis\Entity\User\User;
 use Inachis\Enum\Security\AuthenticationPolicy;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
@@ -27,7 +25,7 @@ class Role
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
-    #[ORM\GeneratedValue(strategy: "CUSTOM")]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected ?UuidInterface $id = null;
 
@@ -80,6 +78,7 @@ class Role
     public function setIdentifier(string $identifier): self
     {
         $this->identifier = $identifier;
+
         return $this;
     }
 
@@ -92,7 +91,7 @@ class Role
     {
         $this->name = trim($name);
 
-        if ($this->identifier === '') {
+        if ('' === $this->identifier) {
             $this->identifier = $this->slugify($this->name);
         }
 
@@ -107,13 +106,12 @@ class Role
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
     /**
-     * Returns the MFA requirement for this role
-     *
-     * @return AuthenticationPolicy
+     * Returns the MFA requirement for this role.
      */
     public function getAuthenticationPolicy(): AuthenticationPolicy
     {
@@ -121,13 +119,10 @@ class Role
     }
 
     /**
-     * Sets the MFA requirement for this role
-     *
-     * @param AuthenticationPolicy $requirement
-     * @return self
+     * Sets the MFA requirement for this role.
      */
     public function setAuthenticationPolicy(
-        AuthenticationPolicy $requirement
+        AuthenticationPolicy $requirement,
     ): self {
         $this->authenticationPolicy = $requirement;
 
@@ -142,6 +137,7 @@ class Role
     public function setDisableReview(bool $disableReview): self
     {
         $this->disableReview = $disableReview;
+
         return $this;
     }
 
@@ -159,19 +155,19 @@ class Role
             $this->rolePermissions[] = $permission;
             $permission->setRole($this);
         }
+
         return $this;
     }
 
     public function removeRolePermission(RolePermission $permission): self
     {
         $this->rolePermissions->removeElement($permission);
+
         return $this;
     }
 
     /**
-     * Returns the result of testing if this is a system-defined role
-     *
-     * @return bool
+     * Returns the result of testing if this is a system-defined role.
      */
     public function isSystemRole(): bool
     {
@@ -179,19 +175,17 @@ class Role
     }
 
     /**
-     * Sets the flag of whether this is a system-defined role
-     *
-     * @param bool $systemRole
-     * @return self
+     * Sets the flag of whether this is a system-defined role.
      */
     public function setSystemRole(bool $systemRole): self
     {
         $this->systemRole = $systemRole;
+
         return $this;
     }
 
     /**
-     * Returns a Collection of the {@link User} entities assigned this role
+     * Returns a Collection of the {@link User} entities assigned this role.
      *
      * @return Collection<int,User>
      */
@@ -213,8 +207,6 @@ class Role
 
     /**
      * Determines if this is an administrator role.
-     *
-     * @return bool
      */
     public function isAdministrator(): bool
     {
@@ -227,8 +219,6 @@ class Role
 
     /**
      * Returns the number of users currently assigned this role.
-     * 
-     * @return int
      */
     public function getUserCount(): int
     {
@@ -237,12 +227,10 @@ class Role
 
     /**
      * Determines whether the role can safely be deleted.
-     * 
-     * @return bool
      */
     public function canBeDeleted(): bool
     {
         return !$this->systemRole
-            && $this->getUserCount() === 0;
+            && 0 === $this->getUserCount();
     }
 }

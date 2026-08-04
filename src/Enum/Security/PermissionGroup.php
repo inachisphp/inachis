@@ -1,16 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Enum\Security;
 
 /**
- * Enum used to represent permission groups for {@link Role}
+ * Enum used to represent permission groups for {@link Role}.
  */
 enum PermissionGroup: string
 {
@@ -21,9 +20,7 @@ enum PermissionGroup: string
     case TOOLS = 'TOOLS';
 
     /**
-     * The user-friendly label for the group
-     *
-     * @return string
+     * The user-friendly label for the group.
      */
     public function label(): string
     {
@@ -37,9 +34,7 @@ enum PermissionGroup: string
     }
 
     /**
-     * Suitable material-icon graphic to represent the permission group
-     *
-     * @return string
+     * Suitable material-icon graphic to represent the permission group.
      */
     public function icon(): string
     {

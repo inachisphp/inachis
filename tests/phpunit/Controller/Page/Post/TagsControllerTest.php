@@ -1,31 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
-namespace Inachis\Tests\phpunit\Controller;
+namespace Inachis\Tests\phpunit\Controller\Page\Post;
 
-use ArrayIterator;
-use Inachis\Controller\TagsController;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Inachis\Controller\Page\Post\TagsController;
 use Inachis\Entity\Content\Tag;
+use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\TagRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class TagsControllerTest extends InachisControllerTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     private function makeController(): TagsController
     {
         return new TagsController(
@@ -40,62 +36,173 @@ class TagsControllerTest extends InachisControllerTestCase
     public function testGetTagManagerListContentReturnsEmptyList(): void
     {
         $controller = $this->makeController();
-        $request = new Request([], ['q' => 'test']);
 
-        $tagRepository = $this->createMock(TagRepository::class);
-        $tagRepository->expects($this->once())
-            ->method('findByTitleLike')->willReturn($this->createMockPaginator([]));
+        $request = new Request([], [
+            'q' => 'test',
+        ]);
 
-        $response = $controller->getTagManagerListContent($request, $tagRepository);
-        $data = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $repository = $this->createMock(TagRepository::class);
+
+        $repository
+            ->expects($this->once())
+            ->method('findByTitleLike')
+            ->with('test')
+            ->willReturn($this->createMockPaginator([]));
+
+        $response = $controller->getTagManagerListContent(
+            $request,
+            $repository,
+        );
+
+        $data = json_decode(
+            $response->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertSame([], $data['items']);
         $this->assertSame(0, $data['totalCount']);
     }
 
-    public function testGetTagManagerListContentReturnsDeduplicatedTags(): void
+    public function testGetTagManagerListContentDeduplicatesTags(): void
     {
         $controller = $this->makeController();
-        $request = new Request([], ['q' => 'abc']);
 
-        $tag1 = $this->createConfiguredStub(Tag::class, [
-            'getId' => Uuid::uuid1(),
-            'getTitle' => 'Foo'
-        ]);
-        $tag2 = $this->createConfiguredStub(Tag::class, [
-            'getId' => Uuid::uuid1(),
-            'getTitle' => 'Foo' // duplicate title
-        ]);
-        $tag3 = $this->createConfiguredStub(Tag::class, [
-            'getId' => Uuid::uuid1(),
-            'getTitle' => 'Bar'
+        $request = new Request([], [
+            'q' => 'foo',
         ]);
 
-        $tagRepository = $this->createMock(TagRepository::class);
-        $tagRepository->expects($this->once())
+        $tag1 = $this->createConfiguredMock(Tag::class, [
+            'getId' => Uuid::uuid4(),
+            'getTitle' => 'Foo',
+        ]);
+
+        $tag2 = $this->createConfiguredMock(Tag::class, [
+            'getId' => Uuid::uuid4(),
+            'getTitle' => 'Foo',
+        ]);
+
+        $tag3 = $this->createConfiguredMock(Tag::class, [
+            'getId' => Uuid::uuid4(),
+            'getTitle' => 'Bar',
+        ]);
+
+        $repository = $this->createMock(TagRepository::class);
+
+        $repository
+            ->expects($this->once())
             ->method('findByTitleLike')
-            ->willReturn($this->createMockPaginator([$tag1, $tag2, $tag3]));
+            ->willReturn(
+                $this->createMockPaginator([
+                    $tag1,
+                    $tag2,
+                    $tag3,
+                ]),
+            );
 
-        $response = $controller->getTagManagerListContent($request, $tagRepository);
-        $data = json_decode($response->getContent(), true, JSON_THROW_ON_ERROR);
+        $response = $controller->getTagManagerListContent(
+            $request,
+            $repository,
+        );
+
+        $data = json_decode(
+            $response->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
+
         $titles = array_column($data['items'], 'text');
         sort($titles);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertCount(2, $data['items']);
         $this->assertSame(['Bar', 'Foo'], $titles);
         $this->assertSame(2, $data['totalCount']);
+    }
+
+    public function testMergeTagsReturnsBadRequestWhenTargetMissing(): void
+    {
+        $controller = $this->makeController();
+
+        $request = new Request([], []);
+
+        $response = $controller->mergeTags(
+            $request,
+            $this->createMock(PageRepository::class),
+            $this->createMock(TagRepository::class),
+            $this->createMock(EntityManagerInterface::class),
+        );
+
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+    }
+
+    public function testMergeTagsReturnsNotFoundWhenTargetDoesNotExist(): void
+    {
+        $controller = $this->makeController();
+
+        $request = new Request([], [
+            'target' => Uuid::uuid4()->toString(),
+            'sources' => [
+                Uuid::uuid4()->toString(),
+            ],
+        ]);
+
+        $repository = $this->createMock(TagRepository::class);
+
+        $repository
+            ->expects($this->once())
+            ->method('find')
+            ->willReturn(null);
+
+        $response = $controller->mergeTags(
+            $request,
+            $this->createMock(PageRepository::class),
+            $repository,
+            $this->createMock(EntityManagerInterface::class),
+        );
+
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+    }
+
+    public function testMergeTagsReturnsOkWhenNothingNeedsMoving(): void
+    {
+        $controller = $this->makeController();
+
+        $target = $this->createConfiguredMock(Tag::class, [
+            'getId' => Uuid::uuid4(),
+        ]);
+
+        $request = new Request([], [
+            'target' => 'target',
+            'sources' => [],
+        ]);
+
+        $response = $controller->mergeTags(
+            $request,
+            $this->createMock(PageRepository::class),
+            $this->createMock(TagRepository::class),
+            $this->createMock(EntityManagerInterface::class),
+        );
+
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
 
     private function createMockPaginator(array $items): Paginator
     {
         $paginator = $this->getMockBuilder(Paginator::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getIterator', 'count'])
+            ->onlyMethods([
+                'getIterator',
+                'count',
+            ])
             ->getMock();
-        $paginator->expects($this->once())->method('getIterator')
-            ->willReturn(new ArrayIterator($items));
+
+        $paginator
+            ->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new \ArrayIterator($items));
 
         return $paginator;
     }

@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Model;
@@ -17,54 +16,54 @@ use Inachis\Entity\Content\Category;
 final class CategoryExportDto
 {
     /**
-     * The UUID as a string
+     * The UUID as a string.
      */
     public ?string $id = null;
 
     /**
-     * The title of the category
+     * The title of the category.
      */
     public string $title = '';
 
     /**
-     * The description of the category
+     * The description of the category.
      */
     public ?string $description = null;
 
     /**
-     * The image URL/UUID
+     * The image URL/UUID.
      */
     public ?string $image = null;
 
     /**
-     * The icon URL/UUID
+     * The icon URL/UUID.
      */
     public ?string $icon = null;
 
     /**
-     * Visibility flag
+     * Visibility flag.
      */
     public bool $visible = true;
 
     /**
-     * Parent category ID (nullable)
+     * Parent category ID (nullable).
      */
     public ?string $parentId = null;
 
     /**
-     * List of child categories IDs
+     * List of child categories IDs.
      *
      * @var array<int,string|null>
      */
     public array $childrenIds = [];
 
     /**
-     * Optional: full path string
+     * Optional: full path string.
      */
     public ?string $fullPath = null;
 
     /**
-     * Constructor from entity
+     * Constructor from entity.
      */
     public static function fromEntity(Category $category): self
     {
@@ -77,8 +76,8 @@ final class CategoryExportDto
         $dto->visible = $category->isVisible();
         $dto->parentId = $category->getParent()?->getId()?->toString();
         $dto->childrenIds = array_map(
-            fn($child) => $child->getId()?->toString(),
-            $category->getChildren()->toArray()
+            fn ($child) => $child->getId()?->toString(),
+            $category->getChildren()->toArray(),
         );
         $dto->fullPath = $category->getFullPath();
 

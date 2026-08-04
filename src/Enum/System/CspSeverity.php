@@ -1,16 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Enum\System;
 
 /**
- * The severity of the CSP report
+ * The severity of the CSP report.
  */
 enum CspSeverity: string
 {
@@ -21,9 +20,7 @@ enum CspSeverity: string
     case Info = 'info';
 
     /**
-     * Returns a label for the enum
-     *
-     * @return string
+     * Returns a label for the enum.
      */
     public function label(): string
     {
@@ -37,9 +34,7 @@ enum CspSeverity: string
     }
 
     /**
-     * Returns a CSS class-friendly name for the severity
-     *
-     * @return string
+     * Returns a CSS class-friendly name for the severity.
      */
     public function badgeClass(): string
     {
@@ -53,9 +48,7 @@ enum CspSeverity: string
     }
 
     /**
-     * The weighting for the severity
-     *
-     * @return int
+     * The weighting for the severity.
      */
     public function weight(): int
     {
@@ -70,8 +63,6 @@ enum CspSeverity: string
 
     /**
      * Does the CSP report need actioning?
-     *
-     * @return bool
      */
     public function isActionable(): bool
     {

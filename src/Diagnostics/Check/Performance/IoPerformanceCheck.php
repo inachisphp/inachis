@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics\Check\Performance;
@@ -14,58 +13,60 @@ use Inachis\Diagnostics\CheckResult;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * Checks the disk I/O performance
+ * Checks the disk I/O performance.
  */
 final class IoPerformanceCheck implements CheckInterface
 {
-	/**
-	 * The cache directory
-	 */
+    /**
+     * The cache directory.
+     */
     private string $cacheDir;
 
-	/**
-	 * The test size in MB
-	 */
+    /**
+     * The test size in MB.
+     */
     private int $testSizeMb = 5;
 
-	/**
-	 * Constructor
-	 *
-	 * @param KernelInterface $kernel The kernel
-	 */
-    public function __construct(KernelInterface $kernel) {
+    /**
+     * Constructor.
+     *
+     * @param KernelInterface $kernel The kernel
+     */
+    public function __construct(KernelInterface $kernel)
+    {
         $this->cacheDir = $kernel->getCacheDir();
     }
 
-	/**
-	 * Get the ID of the check
-	 *
-	 * @return string
-	 */
-    public function getId(): string { return 'io_performance'; }
+    /**
+     * Get the ID of the check.
+     */
+    public function getId(): string
+    {
+        return 'io_performance';
+    }
 
-	/**
-	 * Get the label of the check
-	 *
-	 * @return string
-	 */
-    public function getLabel(): string { return 'Disk I/O Performance'; }
+    /**
+     * Get the label of the check.
+     */
+    public function getLabel(): string
+    {
+        return 'Disk I/O Performance';
+    }
 
-	/**
-	 * Get the section of the check
-	 *
-	 * @return string
-	 */
-    public function getSection(): string { return 'Performance'; }
+    /**
+     * Get the section of the check.
+     */
+    public function getSection(): string
+    {
+        return 'Performance';
+    }
 
-	/**
-	 * Run the check
-	 *
-	 * @return CheckResult
-	 */
+    /**
+     * Run the check.
+     */
     public function run(): CheckResult
     {
-        $file = $this->cacheDir . '/io_test.tmp';
+        $file = $this->cacheDir.'/io_test.tmp';
         $bytes = $this->testSizeMb * 1024 * 1024;
 
         try {
@@ -79,14 +80,14 @@ final class IoPerformanceCheck implements CheckInterface
 
             $handle = fopen($file, 'wb');
             if (!$handle) {
-                throw new \Exception('Could not write to ' . $file);
+                throw new \Exception('Could not write to '.$file);
             }
-            for ($i = 0; $i < $this->testSizeMb; $i++) {
+            for ($i = 0; $i < $this->testSizeMb; ++$i) {
                 fwrite($handle, $data);
             }
             fflush($handle);
             fclose($handle);
-            
+
             $writeDuration = (hrtime(true) - $start) / 1e9;
             $writeSpeed = round(($bytes / 1024 / 1024) / $writeDuration, 1);
 
@@ -97,7 +98,7 @@ final class IoPerformanceCheck implements CheckInterface
 
             $handle = fopen($file, 'rb');
             if (!$handle) {
-                throw new \Exception('Could not read from ' . $file);
+                throw new \Exception('Could not read from '.$file);
             }
             while (!feof($handle)) {
                 fread($handle, 8192);
@@ -123,20 +124,19 @@ final class IoPerformanceCheck implements CheckInterface
             $summary = sprintf(
                 'Write: %s MB/s | Read: %s MB/s',
                 $writeSpeed,
-                $readSpeed
+                $readSpeed,
             );
 
             return new CheckResult(
                 $this->getId(),
                 $this->getLabel(),
                 $severity,
-                $writeSpeed . ' MB/s',
+                $writeSpeed.' MB/s',
                 $summary,
-                $severity === 'ok' ? null : 'Disk I/O performance is degraded.',
+                'ok' === $severity ? null : 'Disk I/O performance is degraded.',
                 $this->getSection(),
-                'high'
+                'high',
             );
-
         } catch (\Throwable $e) {
             return new CheckResult(
                 $this->getId(),
@@ -146,7 +146,7 @@ final class IoPerformanceCheck implements CheckInterface
                 $e->getMessage(),
                 'Verify filesystem permissions and disk health.',
                 $this->getSection(),
-                'high'
+                'high',
             );
         }
     }

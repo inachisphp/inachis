@@ -1,17 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Repository\Security;
 
-use Inachis\Entity\Security\Role;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Entity\Security\Role;
 use Inachis\Repository\AbstractRepository;
 
 /**
@@ -20,9 +19,7 @@ use Inachis\Repository\AbstractRepository;
 class RoleRepository extends AbstractRepository
 {
     /**
-     * Constructor
-     *
-     * @param ManagerRegistry $registry
+     * Constructor.
      */
     public function __construct(ManagerRegistry $registry)
     {
@@ -30,9 +27,10 @@ class RoleRepository extends AbstractRepository
     }
 
     /**
-     * Gets an associative array of role names as 'identifier' => 'name'
+     * Gets an associative array of role names as 'identifier' => 'name'.
      *
-     * @param integer $limit
+     * @param int $limit
+     *
      * @return array<string, string>
      */
     public function getRoleNames($limit = 25)
@@ -48,14 +46,13 @@ class RoleRepository extends AbstractRepository
     }
 
     /**
-     * Returns a {@link Role} by the provided identifier
+     * Returns a {@link Role} by the provided identifier.
      *
-     * @param string $identifier
      * @return Role
      */
     public function getRoleByIdentifier(string $identifier)
     {
-        /** @var Role */
+        /* @var Role */
         return $this->createQueryBuilder('r')
             ->select('r.identifier, r.name')
             ->where('identifier = :identifier')
@@ -65,11 +62,12 @@ class RoleRepository extends AbstractRepository
     }
 
     /**
-     * Gets filtered users
-     * 
+     * Gets filtered users.
+     *
      * @param array{keyword?: string} $filters The filters
-     * @param int $limit The limit
-     * @param int $offset The offset
+     * @param int                     $limit   The limit
+     * @param int                     $offset  The offset
+     *
      * @return Paginator<Role> The paginator
      */
     public function getFiltered(array $filters, int $limit, int $offset): Paginator
@@ -80,15 +78,16 @@ class RoleRepository extends AbstractRepository
         ];
         if (!empty($filters['keyword'])) {
             $where[0] .= ' AND (q.name LIKE :keyword)';
-            $where[1]['keyword'] = '%' . $filters['keyword']  . '%';
+            $where[1]['keyword'] = '%'.$filters['keyword'].'%';
         }
+
         return $this->getAll(
             $limit,
             $offset,
             $where,
             [
-                [ 'q.name', 'ASC' ],
-            ]
+                ['q.name', 'ASC'],
+            ],
         );
     }
 }

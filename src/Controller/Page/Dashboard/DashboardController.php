@@ -1,18 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Dashboard;
 
-use DateTimeImmutable;
 use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Repository\Content\{PageRepository, SeriesRepository};
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Repository\Media\ImageRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -20,23 +19,21 @@ use Symfony\Component\Routing\Attribute\Route;
 class DashboardController extends AbstractInachisController
 {
     /**
-     * Provides the main dashboard
-     *
-     * @return Response
+     * Provides the main dashboard.
      */
-    #[Route('/incp', name: "incp_dashboard", methods: [ 'GET' ])]
+    #[Route('/incp', name: 'incp_dashboard', methods: ['GET'])]
     public function default(
         AnalyticsProviderInterface $analytics,
         ImageRepository $imageRepository,
         PageRepository $pageRepository,
-        SeriesRepository $seriesRepository
+        SeriesRepository $seriesRepository,
     ): Response {
         $this->viewModel->page->title = 'Dashboard';
         $this->viewModel->page->tab = 'dashboard';
 
         $recentDraft = $pageRepository->findMostRecentlyEditedDraft();
         if ($recentDraft) {
-            $now = new DateTimeImmutable();
+            $now = new \DateTimeImmutable();
             $recentDraftTimeAgo = $now->diff($recentDraft->getUpdatedAt());
         }
 
@@ -55,7 +52,6 @@ class DashboardController extends AbstractInachisController
             $from = $from->modify('-1 week');
         }
         $to = new \DateTimeImmutable();
-
 
         return $this->render('inadmin/page/dashboard/dashboard.html.twig', [
             'viewModel' => $this->viewModel,

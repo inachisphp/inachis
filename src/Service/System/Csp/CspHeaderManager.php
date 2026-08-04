@@ -1,5 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * This file is part of the inachis framework.
+ */
+
 namespace Inachis\Service\System\Csp;
 
 use Inachis\Entity\System\CspReport;
@@ -11,11 +17,12 @@ class CspHeaderManager
 {
     public function __construct(
         private readonly SettingRepository $settingRepository,
-        private readonly CacheInterface $cspCache
-    ) {}
+        private readonly CacheInterface $cspCache,
+    ) {
+    }
 
     /**
-     * Get the compiled CSP string for the front-end
+     * Get the compiled CSP string for the front-end.
      *
      * @return array{}
      */
@@ -26,31 +33,31 @@ class CspHeaderManager
 
             $modeSetting = $this->settingRepository->findOneBy(['name' => 'csp_mode']);
             $mode = $modeSetting ? $modeSetting->getValue() : 'off';
-            if ($mode === 'off') {
+            if ('off' === $mode) {
                 return null;
             }
 
-            $headerName = ($mode === 'report-only')
+            $headerName = ('report-only' === $mode)
                 ? 'Content-Security-Policy-Report-Only'
                 : 'Content-Security-Policy';
 
             $policySetting = $this->settingRepository->findOneBy(['name' => 'csp_policy_frontend']);
             $upgradeSetting = $this->settingRepository->findOneBy(['name' => 'csp_upgrade_insecure']);
 
-            $upgradeInsecure = ($upgradeSetting && $upgradeSetting->getValue() === '1');
+            $upgradeInsecure = ($upgradeSetting && '1' === $upgradeSetting->getValue());
             $headerValue = ($policySetting && $policySetting->getValue())
                 ? $this->compileJsonToCspString($policySetting->getValue(), $upgradeInsecure)
                 : "default-src 'self'; report-uri /api/csp/report;";
 
             return [
                 'name' => $headerName,
-                'value' => $headerValue
+                'value' => $headerValue,
             ];
         });
     }
 
     /**
-     * Clear the cache when an admin changes settings
+     * Clear the cache when an admin changes settings.
      */
     public function invalidateCache(): void
     {
@@ -58,10 +65,11 @@ class CspHeaderManager
     }
 
     /**
-     * Compiles a JSON policy schema into a raw CSP header value
+     * Compiles a JSON policy schema into a raw CSP header value.
      *
-     * @param string $jsonConfig The JSON string to convert into a header
-     * @param bool $upgradeInsecure Whether or not HTTP requests should be upgraded to HTTPS automatically
+     * @param string $jsonConfig      The JSON string to convert into a header
+     * @param bool   $upgradeInsecure Whether or not HTTP requests should be upgraded to HTTPS automatically
+     *
      * @return string The compiled CSP header value
      */
     private function compileJsonToCspString(string $jsonConfig, bool $upgradeInsecure = false): string
@@ -87,22 +95,23 @@ class CspHeaderManager
                 if (in_array($source, ['self', 'none', 'unsafe-inline', 'unsafe-eval', 'strict-dynamic'])) {
                     return "'$source'";
                 }
-                if ($source === 'data-uri' || $source === 'data') {
+                if ('data-uri' === $source || 'data' === $source) {
                     return 'data:';
                 }
+
                 return $source;
             }, $sources);
 
-            $directives[] = $directive . ' ' . implode(' ', $cleanedSources);
+            $directives[] = $directive.' '.implode(' ', $cleanedSources);
         }
 
         $directives[] = 'report-uri /api/csp/report';
 
-        return implode('; ', $directives) . ';';
+        return implode('; ', $directives).';';
     }
 
     /**
-     * Adds a reported item to the existing CSP policy
+     * Adds a reported item to the existing CSP policy.
      *
      * @param CspReport $report
      */
@@ -113,12 +122,12 @@ class CspHeaderManager
             'default-src' => ['self'],
             'script-src' => ['self'],
             'style-src' => ['self'],
-            'img-src' => ['self', 'data-uri']
+            'img-src' => ['self', 'data-uri'],
         ]);
 
         $policySetting = $this->settingRepository->getOrCreateSetting(
             'csp_policy_frontend',
-            $defaultPolicyJson
+            $defaultPolicyJson,
         );
         $policy = json_decode($policySetting->getValue(), true) ?? [];
 
@@ -142,7 +151,7 @@ class CspHeaderManager
             $cleanSource = 'unsafe-eval';
         } elseif (filter_var($blockedUri, FILTER_VALIDATE_URL)) {
             $parsed = parse_url($blockedUri);
-            $cleanSource = ($parsed['scheme'] ?? 'https') . '://' . ($parsed['host'] ?? '');
+            $cleanSource = ($parsed['scheme'] ?? 'https').'://'.($parsed['host'] ?? '');
         }
 
         // Initialize the specific directive array block if missing

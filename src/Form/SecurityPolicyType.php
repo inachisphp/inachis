@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form;
@@ -31,7 +30,7 @@ class SecurityPolicyType extends AbstractType
 {
     /**
      * @param FormBuilderInterface<SecurityPolicy|null> $builder
-     * @param array<string, mixed> $options
+     * @param array<string, mixed>                      $options
      */
     public function buildForm(
         FormBuilderInterface $builder,
@@ -105,9 +104,6 @@ class SecurityPolicyType extends AbstractType
             ]);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(
         OptionsResolver $resolver,
     ): void {

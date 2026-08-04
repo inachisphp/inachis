@@ -1,17 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Entity\Media;
 
-use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
-use Inachis\Entity\Media\AbstractFile;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
@@ -35,7 +32,7 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
  */
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\Media\ImageRepository', readOnly: false)]
 #[ORM\Index(columns: ['title', 'filename', 'filetype'], name: 'search_idx')]
-#[ORM\Index(columns: ['title', 'alt_text', 'description'], name: "fulltext_title_content", flags: ["fulltext"])]
+#[ORM\Index(columns: ['title', 'alt_text', 'description'], name: 'fulltext_title_content', flags: ['fulltext'])]
 #[ORM\HasLifecycleCallbacks]
 class Image extends AbstractFile
 {
@@ -46,7 +43,7 @@ class Image extends AbstractFile
     public const ALLOWED_TYPES = ['.jpg', '.jpeg', '.png', '.heic', '.heif', '.webp', '.svg'];
 
     public const WARNING_DIMENSIONS = 2048;
-    public const WARNING_FILESIZE = 2048; //kb
+    public const WARNING_FILESIZE = 2048; // kb
 
     /** @var int The width of the image */
     #[ORM\Column(type: 'integer')]
@@ -63,7 +60,7 @@ class Image extends AbstractFile
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
-        $now = new DateTimeImmutable();
+        $now = new \DateTimeImmutable();
 
         $this->createdAt ??= $now;
         $this->updatedAt ??= $now;
@@ -72,13 +69,11 @@ class Image extends AbstractFile
     #[ORM\PreUpdate]
     public function onPreUpdate(): void
     {
-        $this->updatedAt = new DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     /**
-     * Returns the width of the image
-     *
-     * @return int
+     * Returns the width of the image.
      */
     public function getDimensionX(): int
     {
@@ -86,9 +81,7 @@ class Image extends AbstractFile
     }
 
     /**
-     * Returns the height of the image
-     *
-     * @return int
+     * Returns the height of the image.
      */
     public function getDimensionY(): int
     {
@@ -96,9 +89,7 @@ class Image extends AbstractFile
     }
 
     /**
-     * Returns alt text for the image
-     *
-     * @return string|null
+     * Returns alt text for the image.
      */
     public function getAltText(): ?string
     {
@@ -106,10 +97,7 @@ class Image extends AbstractFile
     }
 
     /**
-     * Sets the width of the image
-     *
-     * @param int $value
-     * @return self
+     * Sets the width of the image.
      */
     public function setDimensionX(int $value): self
     {
@@ -119,10 +107,7 @@ class Image extends AbstractFile
     }
 
     /**
-     * Sets the height of the image
-     *
-     * @param int $value
-     * @return self
+     * Sets the height of the image.
      */
     public function setDimensionY(int $value): self
     {
@@ -132,10 +117,7 @@ class Image extends AbstractFile
     }
 
     /**
-     * Sets the alt text for the image
-     *
-     * @param string|null $value
-     * @return self
+     * Sets the alt text for the image.
      */
     public function setAltText(?string $value): self
     {
@@ -145,30 +127,28 @@ class Image extends AbstractFile
     }
 
     /**
-     * Gets the properties of the image file using PHP's getimagesize function
+     * Gets the properties of the image file using PHP's getimagesize function.
      *
-     * @param string $imageDirectory
      * @return array<int|string, int|string>|false
      */
     public function getImageProperties(string $imageDirectory): array|false
     {
         $fullImagePath = self::getFilename();
         if (!empty($imageDirectory) && !str_starts_with($fullImagePath, 'http')) {
-            $fullImagePath = $imageDirectory . $fullImagePath;
+            $fullImagePath = $imageDirectory.$fullImagePath;
         }
         if (!file_exists($fullImagePath) || !is_file($fullImagePath)) {
             throw new FileNotFoundException();
         }
+
         return getimagesize($fullImagePath);
     }
 
     /**
-     * Returns the dimensions fo the image as a string (w x h)
-     *
-     * @return string
+     * Returns the dimensions fo the image as a string (w x h).
      */
     public function getDimensionsString(): string
     {
-        return $this->dimensionX . ' x ' . $this->dimensionY;
+        return $this->dimensionX.' x '.$this->dimensionY;
     }
 }

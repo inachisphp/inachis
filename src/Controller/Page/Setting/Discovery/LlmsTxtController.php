@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Setting\Discovery;
@@ -23,54 +22,38 @@ class LlmsTxtController extends AbstractTextFileController
 {
     /**
      * Admin interface to edit the llms.txt content.
-     *
-     * @param Request $request
-     * @param SettingRepository $settingRepository
-     * @return Response
      */
     #[Route('/incp/settings/llms', name: 'incp_settings_llms')]
     public function edit(
         Request $request,
-        SettingRepository $settingRepository
+        SettingRepository $settingRepository,
     ): Response {
         return $this->editTextFile($request, $settingRepository);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function createTextFileForm(
-        SettingRepository $settingRepository
+        SettingRepository $settingRepository,
     ): FormInterface {
         return $this->createForm(
             LlmsTxtType::class,
             [
                 $this->getFormField() => $settingRepository->getValue(
-                    $this->getSettingKey()
+                    $this->getSettingKey(),
                 ) ?? '',
-            ]
+            ],
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getFormField(): string
     {
         return 'llms_txt';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getSettingKey(): string
     {
         return 'llms_txt';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTemplate(): string
     {
         return '/inadmin/page/settings/llms.html.twig';
@@ -81,23 +64,17 @@ class LlmsTxtController extends AbstractTextFileController
         return 'llms.txt';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTab(): string
     {
         return 'llms';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function validateContent(string $content): void
     {
-        if ($content === '') {
+        if ('' === $content) {
             $this->addFlash(
                 'warning',
-                'Your llms.txt file is empty. We will generate a default document.'
+                'Your llms.txt file is empty. We will generate a default document.',
             );
 
             return;
@@ -106,28 +83,28 @@ class LlmsTxtController extends AbstractTextFileController
         if (!preg_match('/^#\s+.+$/m', $content)) {
             $this->addFlash(
                 'info',
-                'Consider adding a Markdown heading as the document title.'
+                'Consider adding a Markdown heading as the document title.',
             );
         }
 
         if (!preg_match('/^>\s*.+$/m', $content)) {
             $this->addFlash(
                 'info',
-                'Consider adding a short description after the title.'
+                'Consider adding a short description after the title.',
             );
         }
 
         if (!preg_match('/^##\s+.+$/m', $content)) {
             $this->addFlash(
                 'info',
-                'Consider adding sections to help AI systems discover your content.'
+                'Consider adding sections to help AI systems discover your content.',
             );
         }
 
         if (!preg_match('/^Sitemap:/mi', $content)) {
             $this->addFlash(
                 'info',
-                'Consider including a sitemap URL.'
+                'Consider including a sitemap URL.',
             );
         }
     }

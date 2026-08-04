@@ -1,18 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Repository\Content;
 
-use Inachis\Entity\Content\Page;
-use Inachis\Entity\Content\Revision;
-use Inachis\Repository\Content\RevisionRepository;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
@@ -20,6 +15,9 @@ use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Revision;
+use Inachis\Repository\Content\RevisionRepository;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -42,13 +40,13 @@ class RevisionRepositoryTest extends TestCase
     {
         $this->repository = $this->getMockBuilder(RevisionRepository::class)
             ->setConstructorArgs([$this->registry])
-            ->onlyMethods([ 'getEntityManager', 'createQueryBuilder', 'getNextVersionNumberForPageId' ])
+            ->onlyMethods(['getEntityManager', 'createQueryBuilder', 'getNextVersionNumberForPageId'])
             ->getMock();
         $this->repository->expects($this->atMost(1))
             ->method('getEntityManager')->willReturn($this->entityManager);
 
         $uuid = Uuid::uuid1();
-        $date = new DateTimeImmutable('now');
+        $date = new \DateTimeImmutable('now');
         $page = new Page('test page', 'some content');
         $page->setId($uuid)->setSubTitle('sub-title')->setUpdatedAt($date);
         $revision = new Revision();
@@ -64,7 +62,6 @@ class RevisionRepositoryTest extends TestCase
             ->willReturn(2);
         $result = $this->repository->hydrateNewRevisionFromPage($page);
         $this->assertEquals($revision, $result);
-
     }
 
     /**
@@ -76,7 +73,7 @@ class RevisionRepositoryTest extends TestCase
         $uuid = Uuid::uuid1();
         $this->repository = $this->getMockBuilder(RevisionRepository::class)
             ->setConstructorArgs([$this->registry])
-            ->onlyMethods([ 'getEntityManager', 'createQueryBuilder' ])
+            ->onlyMethods(['getEntityManager', 'createQueryBuilder'])
             ->getMock();
         $this->repository->expects($this->atMost(1))
             ->method('getEntityManager')->willReturn($this->entityManager);
@@ -101,13 +98,13 @@ class RevisionRepositoryTest extends TestCase
     public function testDeleteAndRecordByPage(): void
     {
         $uuid = Uuid::uuid1();
-        $date = new DateTimeImmutable('now');
+        $date = new \DateTimeImmutable('now');
         $page = new Page('test page', 'some content');
         $page->setId($uuid)->setSubTitle('sub-title')->setUpdatedAt($date);
 
         $this->repository = $this->getMockBuilder(RevisionRepository::class)
             ->setConstructorArgs([$this->registry])
-            ->onlyMethods([ 'getEntityManager', 'createQueryBuilder' ])
+            ->onlyMethods(['getEntityManager', 'createQueryBuilder'])
             ->getMock();
         $this->repository->expects($this->exactly(2))
             ->method('getEntityManager')->willReturn($this->entityManager);

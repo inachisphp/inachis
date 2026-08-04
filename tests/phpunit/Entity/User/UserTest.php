@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Entity\User;
 
-use DateTimeImmutable;
 use Inachis\Entity\User\User;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -95,19 +93,19 @@ class UserTest extends TestCase
 
     public function testSGetCreatedAt(): void
     {
-        $currentDateTime = new DateTimeImmutable('now');
+        $currentDateTime = new \DateTimeImmutable('now');
         $this->assertEquals($currentDateTime, $this->user->getCreatedAt());
     }
 
     public function testSetAndGetUpdatedAt(): void
     {
-        $currentDateTime = new DateTimeImmutable('now');
+        $currentDateTime = new \DateTimeImmutable('now');
         $this->assertEquals($currentDateTime, $this->user->getUpdatedAt());
     }
 
     public function testSetAndGetPasswordChangedAt(): void
     {
-        $currentDateTime = new DateTimeImmutable('now');
+        $currentDateTime = new \DateTimeImmutable('now');
         $this->user->setPasswordChangedAt($currentDateTime);
         $this->assertEquals($currentDateTime, $this->user->getPasswordChangedAt());
     }
@@ -115,7 +113,7 @@ class UserTest extends TestCase
     public function testHasCredentialsExpired(): void
     {
         $this->assertFalse($this->user->hasCredentialsExpired());
-        $this->user->setPasswordChangedAt(new DateTimeImmutable('-20 days'));
+        $this->user->setPasswordChangedAt(new \DateTimeImmutable('-20 days'));
         $this->assertTrue($this->user->hasCredentialsExpired(10));
     }
 
@@ -135,8 +133,8 @@ class UserTest extends TestCase
 
     public function testGetRoles(): void
     {
-        $this->user->setRoles([ 'ROLE_ADMIN', 'ROLE_USER' ]);
-        $this->assertEquals([ 'ROLE_ADMIN', 'ROLE_USER' ], $this->user->getRoles());
+        $this->user->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
+        $this->assertEquals(['ROLE_ADMIN', 'ROLE_USER'], $this->user->getRoles());
     }
 
     public function testGetUserIdentifier(): void

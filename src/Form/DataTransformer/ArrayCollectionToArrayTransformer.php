@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form\DataTransformer;
@@ -14,7 +13,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 /**
  * Class ArrayCollectionToArrayTransformer.
- * 
+ *
  * @implements DataTransformerInterface<
  *     ArrayCollection<int, mixed>,
  *     array<int, mixed>
@@ -23,9 +22,10 @@ use Symfony\Component\Form\DataTransformerInterface;
 class ArrayCollectionToArrayTransformer implements DataTransformerInterface
 {
     /**
-     * Transform the value from an ArrayCollection into an array
-     * 
+     * Transform the value from an ArrayCollection into an array.
+     *
      * @param ArrayCollection<int, mixed>|null $value
+     *
      * @return array<int, mixed>
      */
     public function transform(mixed $value): array
@@ -36,9 +36,10 @@ class ArrayCollectionToArrayTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transform the array of values into an ArrayCollection
-     * 
+     * Transform the array of values into an ArrayCollection.
+     *
      * @param array<int, mixed> $value
+     *
      * @return ArrayCollection<int, mixed>
      */
     public function reverseTransform(mixed $value): ArrayCollection

@@ -1,27 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\System\Csp;
 
-use Inachis\Model\System\CspReportDto;
 use Inachis\Enum\System\CspSeverity;
+use Inachis\Model\System\CspReportDto;
 
 /**
- * Determines the overall severity of the reported item
+ * Determines the overall severity of the reported item.
  */
 final class CspSeverityResolver
 {
     /**
-     * Resolves the DTO severity to the enum
-     *
-     * @param CspReportDto $dto
-     * @return CspSeverity
+     * Resolves the DTO severity to the enum.
      */
     public function resolve(
         CspReportDto $dto,

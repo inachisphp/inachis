@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Setting\Discovery;
@@ -23,54 +22,38 @@ class RobotsTxtController extends AbstractTextFileController
 {
     /**
      * Admin interface to edit the robots.txt content.
-     *
-     * @param Request $request
-     * @param SettingRepository $settingRepository
-     * @return Response
      */
     #[Route('/incp/settings/robots', name: 'incp_settings_robots')]
     public function edit(
         Request $request,
-        SettingRepository $settingRepository
+        SettingRepository $settingRepository,
     ): Response {
         return $this->editTextFile($request, $settingRepository);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function createTextFileForm(
-        SettingRepository $settingRepository
+        SettingRepository $settingRepository,
     ): FormInterface {
         return $this->createForm(
             RobotsTxtType::class,
             [
                 $this->getFormField() => $settingRepository->getValue(
-                    $this->getSettingKey()
+                    $this->getSettingKey(),
                 ) ?? '',
-            ]
+            ],
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getFormField(): string
     {
         return 'robots_txt';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getSettingKey(): string
     {
         return 'robots_txt';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTemplate(): string
     {
         return '/inadmin/page/settings/robots.html.twig';
@@ -81,23 +64,17 @@ class RobotsTxtController extends AbstractTextFileController
         return 'robots.txt';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getTab(): string
     {
         return 'robots';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function validateContent(string $content): void
     {
         if (preg_match('/^Disallow:\s*\/\s*$/mi', $content)) {
             $this->addFlash(
                 'warning',
-                'Your robots.txt blocks the entire site from indexing.'
+                'Your robots.txt blocks the entire site from indexing.',
             );
         }
     }

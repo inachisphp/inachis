@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Content\Page;
@@ -23,6 +22,7 @@ final readonly class RevisionDiffRenderer
      *     old: array{offset: int, lines:list<string>},
      *     new: array{offset: int, lines:list<string>}
      * }|array{}|string> $content
+     *
      * @return list<DiffBlock>
      */
     public function render(array $content): array
@@ -55,7 +55,7 @@ final readonly class RevisionDiffRenderer
                 case 'del':
                     $oldLines = $this->extractLines(
                         $contentBlock,
-                        'old'
+                        'old',
                     );
 
                     $skipLines = max(0, count($oldLines) - 1);
@@ -90,6 +90,7 @@ final readonly class RevisionDiffRenderer
 
     /**
      * @param array<string, mixed> $change
+     *
      * @return list<string>
      */
     private function extractLines(
@@ -108,8 +109,8 @@ final readonly class RevisionDiffRenderer
         return array_values(
             array_filter(
                 $change[$side]['lines'],
-                static fn (mixed $line): bool => is_string($line)
-            )
+                static fn (mixed $line): bool => is_string($line),
+            ),
         );
     }
 
@@ -130,11 +131,11 @@ final readonly class RevisionDiffRenderer
 
             switch ($type) {
                 case 'insert':
-                    $html .= '<ins class="diff diff--inserted">' . $safe . '</ins>';
+                    $html .= '<ins class="diff diff--inserted">'.$safe.'</ins>';
                     break;
 
                 case 'delete':
-                    $html .= '<del class="diff diff--deleted">' . $safe . '</del>';
+                    $html .= '<del class="diff diff--deleted">'.$safe.'</del>';
                     break;
 
                 default:
@@ -169,26 +170,27 @@ final readonly class RevisionDiffRenderer
      *
      * @param list<string> $a
      * @param list<string> $b
+     *
      * @return list<array{0:string,1:string}>
      */
     private function diff(array $a, array $b): array
     {
         $n = count($a);
         $m = count($b);
-        
+
         // Shortcut for empty sides
-        if ($n === 0) {
-            return array_map(static fn($token) => ['insert', $token], $b);
+        if (0 === $n) {
+            return array_map(static fn ($token) => ['insert', $token], $b);
         }
-        if ($m === 0) {
-            return array_map(static fn($token) => ['delete', $token], $a);
+        if (0 === $m) {
+            return array_map(static fn ($token) => ['delete', $token], $a);
         }
 
         $max = $n + $m;
         $v = [1 => 0];
         $trace = [];
 
-        for ($d = 0; $d <= $max; $d++) {
+        for ($d = 0; $d <= $max; ++$d) {
             for ($k = -$d; $k <= $d; $k += 2) {
                 if ($k === -$d || ($k !== $d && ($v[$k - 1] ?? -1) < ($v[$k + 1] ?? -1))) {
                     $x = $v[$k + 1] ?? 0;
@@ -199,8 +201,8 @@ final readonly class RevisionDiffRenderer
                 $y = $x - $k;
 
                 while ($x < $n && $y < $m && $a[$x] === $b[$y]) {
-                    $x++;
-                    $y++;
+                    ++$x;
+                    ++$y;
                 }
 
                 $v[$k] = $x;
@@ -218,7 +220,7 @@ final readonly class RevisionDiffRenderer
         $x = $n;
         $y = $m;
 
-        for ($d = count($trace) - 1; $d >= 0; $d--) {
+        for ($d = count($trace) - 1; $d >= 0; --$d) {
             $v = $trace[$d];
             $k = $x - $y;
 
@@ -233,17 +235,17 @@ final readonly class RevisionDiffRenderer
 
             while ($x > $prevX && $y > $prevY) {
                 $ops[] = ['equal', $a[$x - 1]];
-                $x--;
-                $y--;
+                --$x;
+                --$y;
             }
 
             if ($d > 0) {
                 if ($x > $prevX) {
                     $ops[] = ['delete', $a[$x - 1]];
-                    $x--;
+                    --$x;
                 } elseif ($y > $prevY) {
                     $ops[] = ['insert', $b[$y - 1]];
-                    $y--;
+                    --$y;
                 }
             }
         }
@@ -256,7 +258,7 @@ final readonly class RevisionDiffRenderer
         return html_entity_decode(
             strip_tags($text),
             ENT_QUOTES | ENT_HTML5,
-            'UTF-8'
+            'UTF-8',
         );
     }
 }

@@ -1,18 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form;
 
-use DateTimeImmutable;
-use IntlException;
-use Inachis\Entity\Content\{Category,Page,Tag};
-use Inachis\Entity\User\User;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Tag;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
@@ -34,7 +32,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Form for creating and editing a post
+ * Form for creating and editing a post.
  *
  * @extends AbstractType<Page>
  */
@@ -43,12 +41,9 @@ class PostType extends AbstractType
     private EmojiTransliterator $emojisTransliterator;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param TranslatorInterface $translator
-     * @param RouterInterface $router
-     * @param Security $security
-     * @throws IntlException
+     * @throws \IntlException
      */
     public function __construct(
         private PermissionResolver $permissionResolver,
@@ -61,10 +56,10 @@ class PostType extends AbstractType
     }
 
     /**
-     * Build the form
+     * Build the form.
      *
      * @param FormBuilderInterface<Page|null> $builder
-     * @param array<string, mixed> $options
+     * @param array<string, mixed>            $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -80,25 +75,25 @@ class PostType extends AbstractType
             !$newItem ? PermissionAction::EDIT : PermissionAction::CREATE,
         );
         $showReview = $this->permissionResolver->hasPermission(
-                $user,
-                PermissionResource::PAGE,
-                PermissionAction::REVIEW
-            ) &&
-            $options['data'] instanceof Page &&
-            $options['data']->getStatus() == EditorialStatus::DRAFT
+            $user,
+            PermissionResource::PAGE,
+            PermissionAction::REVIEW,
+        )
+            && $options['data'] instanceof Page
+            && EditorialStatus::DRAFT == $options['data']->getStatus()
         ;
         $showPublish = $this->permissionResolver->hasPermission(
-                $user,
-                PermissionResource::PAGE,
-                PermissionAction::PUBLISH
-            ) &&
-            $options['data'] instanceof Page &&
-            $options['data']->getStatus() == EditorialStatus::REVIEW
+            $user,
+            PermissionResource::PAGE,
+            PermissionAction::PUBLISH,
+        )
+            && $options['data'] instanceof Page
+            && EditorialStatus::REVIEW == $options['data']->getStatus()
         ;
         $showDelete = $this->permissionResolver->hasPermission(
             $user,
             PermissionResource::PAGE,
-            PermissionAction::DELETE
+            PermissionAction::DELETE,
         );
         $builder
             ->add('title', TextType::class, [
@@ -119,7 +114,7 @@ class PostType extends AbstractType
             ->add('subTitle', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'subTitle_label',
-                    'aria-required'   => 'false',
+                    'aria-required' => 'false',
                     'class' => 'editor__sub-title text inline_label',
                     'placeholder' => 'admin.post.subTitle.placeholder',
                 ],
@@ -142,13 +137,13 @@ class PostType extends AbstractType
                 'label_attr' => [
                     'id' => 'url_label',
                 ],
-                'mapped'   => false,
+                'mapped' => false,
                 'required' => false,
             ])
             ->add('content', TextareaType::class, [
                 'attr' => [
                     'aria-labelledby' => 'content_label',
-                    'aria-required'   => 'false',
+                    'aria-required' => 'false',
                     'class' => 'mde_editor',
                 ],
                 'disabled' => !$allowEdit,
@@ -200,12 +195,12 @@ class PostType extends AbstractType
                     'data-on-change' => 'updatePostUrl',
                 ],
                 'disabled' => !$allowEdit,
-                'format'=> 'dd/MM/yyyy HH:mm',
+                'format' => 'dd/MM/yyyy HH:mm',
                 'html5' => false,
                 'input' => 'datetime_immutable',
                 'label' => isset($options['data'])
                     && $options['data'] instanceof Page
-                    && $options['data']->getPostDate() < new DateTimeImmutable() ?
+                    && $options['data']->getPostDate() < new \DateTimeImmutable() ?
                         'admin.post.properties.postDate-past.label' :
                         'admin.post.properties.postDate-future.label',
                 'label_attr' => [
@@ -230,8 +225,8 @@ class PostType extends AbstractType
                 'input' => 'datetime_immutable',
                 'label' => isset($options['data'])
                     && $options['data'] instanceof Page
-                    && $options['data']->getExpireDate() != ''
-                    && $options['data']->getExpireDate() < new DateTimeImmutable() ?
+                    && '' != $options['data']->getExpireDate()
+                    && $options['data']->getExpireDate() < new \DateTimeImmutable() ?
                         'admin.post.properties.expireDate-past.label' :
                         'admin.post.properties.expireDate-future.label',
                 'label_attr' => [
@@ -255,39 +250,39 @@ class PostType extends AbstractType
                         array_map(
                             static fn (Category $category) => [
                                 'value' => (string) $category->getId(),
-                                'text'  => $category->getTitle(),
+                                'text' => $category->getTitle(),
                             ],
                             $options['data'] instanceof Page
                                 ? $options['data']->getCategories()->toArray()
-                                : []
+                                : [],
                         ),
-                        JSON_THROW_ON_ERROR
+                        JSON_THROW_ON_ERROR,
                     ),
                 ],
                 'disabled' => !$allowEdit,
-                'label'      => 'admin.post.properties.categories.label',
+                'label' => 'admin.post.properties.categories.label',
                 'label_attr' => [
                     'id' => 'categories_label',
                 ],
-                'mapped'   => false,
+                'mapped' => false,
                 'required' => false,
             ])
             ->add('tags', TextType::class, [
                 'attr' => [
-                    'aria-labelledby'  => 'tags_label',
+                    'aria-labelledby' => 'tags_label',
                     'aria-required' => 'false',
                     'class' => 'js-select halfwidth',
                     'data-selected-options' => json_encode(
                         array_map(
                             static fn (Tag $tag) => [
                                 'value' => (string) $tag->getId(),
-                                'text'  => $tag->getTitle(),
+                                'text' => $tag->getTitle(),
                             ],
                             $options['data'] instanceof Page
                                 ? $options['data']->getTags()->toArray()
-                                : []
+                                : [],
                         ),
-                        JSON_THROW_ON_ERROR
+                        JSON_THROW_ON_ERROR,
                     ),
                     'data-tags' => 'true',
                     'data-url' => $this->router->generate('api_tags_list'),
@@ -309,7 +304,7 @@ class PostType extends AbstractType
                 'disabled' => !$allowEdit,
                 'duplicate_preferred_choices' => false,
                 'empty_data' => 'en_GB',
-                'preferred_choices' => [ 'en_GB' ],
+                'preferred_choices' => ['en_GB'],
             ])
             ->add('latlong', TextType::class, [
                 'attr' => [
@@ -321,7 +316,7 @@ class PostType extends AbstractType
                 'disabled' => !$allowEdit,
                 'label' => 'admin.post.properties.location.label',
                 'label_attr' => [
-                    'id' => 'latlong_label'
+                    'id' => 'latlong_label',
                 ],
                 'required' => false,
             ])
@@ -458,9 +453,7 @@ class PostType extends AbstractType
     }
 
     /**
-     * Configure the options
-     *
-     * @param OptionsResolver $resolver
+     * Configure the options.
      */
     public function configureOptions(OptionsResolver $resolver): void
     {

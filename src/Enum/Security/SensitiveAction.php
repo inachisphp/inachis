@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Enum\Security;
@@ -43,7 +42,7 @@ enum SensitiveAction: string
 
             self::DATA_IMPORT_EXPORT => 'Import/Export Data',
             self::BACKUP_RESTORE => 'Backup/Restore Data',
-            
+
             // self::API_CREDENTIAL_MANAGEMENT => 'Manage API Credentials',
             // self::USER_IMPERSONATE => 'Impersonate User',
             // self::SESSION_REVOCATION => 'Revoke User Sessions',

@@ -1,39 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Content\Page;
 
-use Inachis\Entity\Content\{Tag};
-use Inachis\Repository\Content\{PageRepository,TagRepository};
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
+use Inachis\Entity\Content\Tag;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\TagRepository;
 
 readonly class TagBulkActionService
 {
-    /**
-     * @param PageRepository $pageRepository
-     * @param TagRepository $tagRepository
-     * @param EntityManagerInterface $entityManager
-     */
     public function __construct(
         private PageRepository $pageRepository,
         private TagRepository $tagRepository,
         private EntityManagerInterface $entityManager,
-    ) {}
+    ) {
+    }
 
     /**
-     * Applies a bulk action to pages
-     * 
-     * @param string $action
+     * Applies a bulk action to pages.
+     *
      * @param array<string> $ids
-     * @return int
-     * @throws Exception
+     *
+     * @throws \Exception
      */
     public function apply(string $action, array $ids): int
     {
@@ -45,18 +39,18 @@ readonly class TagBulkActionService
                 continue;
             }
             match ($action) {
-                'delete'  => $this->delete($tag),
-                default   => null,
+                'delete' => $this->delete($tag),
+                default => null,
             };
-            $count++;
+            ++$count;
         }
         $this->entityManager->flush();
+
         return $count;
     }
 
     /**
-     * @param Tag $tag
-     * @throws Exception
+     * @throws \Exception
      */
     public function delete(Tag $tag): void
     {

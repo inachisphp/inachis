@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Tools;
@@ -15,14 +14,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Controller for displaying application logs
+ * Controller for displaying application logs.
  */
 class LogController extends AbstractInachisController
 {
     /**
-     * Show the logs page
+     * Show the logs page.
      *
      * @param Request $request The request
+     *
      * @return Response The response
      */
     #[Route('/incp/tools/logs', name: 'incp_tools_logs')]
@@ -30,7 +30,7 @@ class LogController extends AbstractInachisController
     {
         /** @var string */
         $projectDir = $this->getParameter('kernel.project_dir');
-        $logPath = $projectDir . '/var/log/dev.log';
+        $logPath = $projectDir.'/var/log/dev.log';
         if (!file_exists($logPath) || !is_readable($logPath)) {
             throw $this->createNotFoundException('Log file not readable or does not exist');
         }
@@ -44,7 +44,7 @@ class LogController extends AbstractInachisController
         $parsedLines = [];
         foreach ($allLines as $line) {
             if (isset($filter['keyword'])) {
-                if (strpos($line, $filter['keyword']) === false) {
+                if (false === strpos($line, $filter['keyword'])) {
                     continue;
                 }
             }
@@ -59,6 +59,7 @@ class LogController extends AbstractInachisController
 
         $this->viewModel->page->title = 'Logs';
         $this->viewModel->page->tab = 'logs';
+
         return $this->render('inadmin/page/tools/log.html.twig', [
             'viewModel' => $this->viewModel,
             'entries' => $parsedLines,
@@ -69,16 +70,19 @@ class LogController extends AbstractInachisController
 
     /**
      * Get the last N lines from a file
-     * TODO: move this into a service
+     * TODO: move this into a service.
      *
-     * @param string $file The file to read
-     * @param int $maxLines The maximum number of lines to read
+     * @param string $file     The file to read
+     * @param int    $maxLines The maximum number of lines to read
+     *
      * @return array<string> The last N lines from the file
      */
     private function getLastLines(string $file, int $maxLines): array
     {
         $handle = fopen($file, 'rb');
-        if (!$handle) return [];
+        if (!$handle) {
+            return [];
+        }
 
         $buffer = '';
         $pos = -2;
@@ -86,11 +90,13 @@ class LogController extends AbstractInachisController
 
         fseek($handle, 0, SEEK_END);
 
-        while ($lineCount < $maxLines && fseek($handle, $pos, SEEK_END) !== -1) {
+        while ($lineCount < $maxLines && -1 !== fseek($handle, $pos, SEEK_END)) {
             $char = fgetc($handle);
-            if ($char === "\n") $lineCount++;
-            $buffer = $char . $buffer;
-            $pos--;
+            if ("\n" === $char) {
+                ++$lineCount;
+            }
+            $buffer = $char.$buffer;
+            --$pos;
         }
         fclose($handle);
 
@@ -99,9 +105,10 @@ class LogController extends AbstractInachisController
 
     /**
      * Parse a monolog log line
-     * TODO: move this into a service
+     * TODO: move this into a service.
      *
      * @param string $line The log line to parse
+     *
      * @return array{timestamp: string, channel: string, level: string, message: string, raw: string}|null The parsed log line
      */
     private function parseMonologLine(string $line): ?array
@@ -109,6 +116,7 @@ class LogController extends AbstractInachisController
         if (!preg_match('/^\[(.*?)\]\s+([^.]+)\.([A-Z]+):\s+(.*)$/', $line, $matches)) {
             return null;
         }
+
         return [
             'timestamp' => $matches[1],
             'channel' => $matches[2],

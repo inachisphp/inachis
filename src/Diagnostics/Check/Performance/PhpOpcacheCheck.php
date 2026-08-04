@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics\Check\Performance;
@@ -14,9 +13,20 @@ use Inachis\Diagnostics\CheckResult;
 
 final class PhpOpcacheCheck implements CheckInterface
 {
-    public function getId(): string { return 'php_opcache'; }
-    public function getLabel(): string { return 'PHP OPcache'; }
-    public function getSection(): string { return 'Performance'; }
+    public function getId(): string
+    {
+        return 'php_opcache';
+    }
+
+    public function getLabel(): string
+    {
+        return 'PHP OPcache';
+    }
+
+    public function getSection(): string
+    {
+        return 'Performance';
+    }
 
     public function run(): CheckResult
     {
@@ -29,7 +39,7 @@ final class PhpOpcacheCheck implements CheckInterface
                 'OPcache extension is not available in this PHP build.',
                 null,
                 $this->getSection(),
-                'high'
+                'high',
             );
         }
 
@@ -44,7 +54,7 @@ final class PhpOpcacheCheck implements CheckInterface
                 'OPcache is active and improving PHP performance.',
                 null,
                 $this->getSection(),
-                'high'
+                'high',
             );
         }
 
@@ -56,7 +66,7 @@ final class PhpOpcacheCheck implements CheckInterface
             'OPcache is installed but currently disabled.',
             'Enable OPcache in php.ini for better performance.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }

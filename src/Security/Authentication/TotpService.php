@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Security\Authentication;
@@ -33,19 +32,15 @@ final class TotpService
      * 64 Base32 characters = 320 bits of entropy.
      *
      * @param int $length Base32 character length
-     *
-     * @return string
      */
     public function generateSecret(int $length = 64): string
     {
-        if ($length % 8 !== 0) {
-            throw new \InvalidArgumentException(
-                'TOTP secret length must be a multiple of 8.'
-            );
+        if (0 !== $length % 8) {
+            throw new \InvalidArgumentException('TOTP secret length must be a multiple of 8.');
         }
 
         return $this->base32Encode(
-            random_bytes((int) ($length * 5 / 8))
+            random_bytes((int) ($length * 5 / 8)),
         );
     }
 
@@ -54,40 +49,39 @@ final class TotpService
      *
      * @param string $secret Base32 encoded secret
      * @param string $code   User supplied code
-     * @return bool
      */
     public function verifyCode(string $secret, string $code): bool
     {
         $code = preg_replace('/\s+/', '', $code);
 
         if (
-            $code === null ||
-            strlen($code) !== self::CODE_LENGTH ||
-            !ctype_digit($code)
+            null === $code
+            || self::CODE_LENGTH !== strlen($code)
+            || !ctype_digit($code)
         ) {
             return false;
         }
 
         $key = $this->base32Decode($secret);
-        if ($key === '') {
+        if ('' === $key) {
             return false;
         }
 
         $currentStep = (int) floor(
-            time() / self::TIME_STEP
+            time() / self::TIME_STEP,
         );
 
         for (
             $offset = -self::WINDOW;
             $offset <= self::WINDOW;
-            $offset++
+            ++$offset
         ) {
             if (hash_equals(
                 $this->generateCode(
                     $key,
-                    $currentStep + $offset
+                    $currentStep + $offset,
                 ),
-                $code
+                $code,
             )) {
                 return true;
             }
@@ -98,17 +92,11 @@ final class TotpService
 
     /**
      * Generate the authenticator application provisioning URI.
-     *
-     * @param string $username
-     * @param string $secret
-     * @param string $issuer
-     *
-     * @return string
      */
     public function getProvisioningUri(
         string $username,
         string $secret,
-        string $issuer = 'Inachis'
+        string $issuer = 'Inachis',
     ): string {
         return sprintf(
             'otpauth://totp/%s:%s?secret=%s&issuer=%s&algorithm=SHA1&digits=%d&period=%d',
@@ -117,34 +105,29 @@ final class TotpService
             $secret,
             rawurlencode($issuer),
             self::CODE_LENGTH,
-            self::TIME_STEP
+            self::TIME_STEP,
         );
     }
 
     /**
      * Generate a HOTP code for a counter.
-     *
-     * @param string $key
-     * @param int $counter
-     *
-     * @return string
      */
     private function generateCode(
         string $key,
-        int $counter
+        int $counter,
     ): string {
         $time = pack('N*', 0)
-            . pack('N*', $counter);
+            .pack('N*', $counter);
 
         $hash = hash_hmac(
             self::ALGORITHM,
             $time,
             $key,
-            true
+            true,
         );
 
         $offset = ord(
-            $hash[strlen($hash) - 1]
+            $hash[strlen($hash) - 1],
         ) & 0x0F;
 
         $binary =
@@ -157,19 +140,15 @@ final class TotpService
             (string) ($binary % (10 ** self::CODE_LENGTH)),
             self::CODE_LENGTH,
             '0',
-            STR_PAD_LEFT
+            STR_PAD_LEFT,
         );
     }
 
     /**
      * Encode binary data as Base32.
-     *
-     * @param string $data
-     *
-     * @return string
      */
     private function base32Encode(
-        string $data
+        string $data,
     ): string {
         $encoded = '';
         $buffer = 0;
@@ -199,16 +178,12 @@ final class TotpService
 
     /**
      * Decode Base32 data.
-     *
-     * @param string $encoded
-     *
-     * @return string
      */
     private function base32Decode(
-        string $encoded
+        string $encoded,
     ): string {
         $encoded = strtoupper(
-            preg_replace('/\s+/', '', $encoded) ?? ''
+            preg_replace('/\s+/', '', $encoded) ?? '',
         );
 
         $decoded = '';
@@ -218,13 +193,11 @@ final class TotpService
         foreach (str_split($encoded) as $char) {
             $position = strpos(
                 self::BASE32_CHARS,
-                $char
+                $char,
             );
 
-            if ($position === false) {
-                throw new \InvalidArgumentException(
-                    'Invalid Base32 TOTP secret.'
-                );
+            if (false === $position) {
+                throw new \InvalidArgumentException('Invalid Base32 TOTP secret.');
             }
 
             $buffer = ($buffer << 5) | $position;
@@ -234,7 +207,7 @@ final class TotpService
                 $bitsLeft -= 8;
 
                 $decoded .= chr(
-                    ($buffer >> $bitsLeft) & 0xFF
+                    ($buffer >> $bitsLeft) & 0xFF,
                 );
             }
         }

@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Command\Security;
@@ -24,7 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'inachis:security:setup-roles',
-    description: 'Creates or updates the default system roles.'
+    description: 'Creates or updates the default system roles.',
 )]
 class SetupRolesCommand extends Command
 {
@@ -41,7 +40,7 @@ class SetupRolesCommand extends Command
             'reset',
             null,
             InputOption::VALUE_NONE,
-            'Delete all roles before recreating them'
+            'Delete all roles before recreating them',
         );
     }
 
@@ -114,7 +113,7 @@ class SetupRolesCommand extends Command
     }
 
     /**
-     * Returns an array of the default roles
+     * Returns an array of the default roles.
      *
      * @return array<int, array{
      *     slug:string,
@@ -228,7 +227,7 @@ class SetupRolesCommand extends Command
      * @return array<int,array{PermissionResource,PermissionAction}>
      */
     private function resourcePermissions(
-        PermissionResource ...$resources
+        PermissionResource ...$resources,
     ): array {
         $permissions = [];
 

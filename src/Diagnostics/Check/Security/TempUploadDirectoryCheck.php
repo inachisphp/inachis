@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics\Check\Security;
@@ -20,10 +19,25 @@ final class TempUploadDirectoryCheck implements CheckInterface
         'var/tmp',
     ];
 
-    public function getId(): string { return 'temp_upload_dirs'; }
-    public function getLabel(): string { return 'Temporary / Upload Directories'; }
-    public function getSection(): string { return 'Security'; }
-    public function getSeverity(): string { return 'medium'; }
+    public function getId(): string
+    {
+        return 'temp_upload_dirs';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Temporary / Upload Directories';
+    }
+
+    public function getSection(): string
+    {
+        return 'Security';
+    }
+
+    public function getSeverity(): string
+    {
+        return 'medium';
+    }
 
     public function run(): CheckResult
     {
@@ -48,10 +62,10 @@ final class TempUploadDirectoryCheck implements CheckInterface
             $this->getLabel(),
             $status,
             $value,
-            $status === 'ok' ? 'Temporary and upload directories are correctly secured.' : 'Some temp/upload directories have insecure permissions.',
-            $status === 'ok' ? null : 'Restrict permissions to PHP user; avoid world-executable/writable.',
+            'ok' === $status ? 'Temporary and upload directories are correctly secured.' : 'Some temp/upload directories have insecure permissions.',
+            'ok' === $status ? null : 'Restrict permissions to PHP user; avoid world-executable/writable.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }

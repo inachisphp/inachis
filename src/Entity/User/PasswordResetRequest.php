@@ -1,26 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Entity\User;
 
 use Doctrine\ORM\Mapping as ORM;
-use Inachis\Entity\User\User;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
-use DateTimeImmutable;
 
 /**
- * Entity for storing password reset requests
+ * Entity for storing password reset requests.
  */
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\User\PasswordResetRequestRepository')]
-#[ORM\Table(name: "password_reset_requests")]
-#[ORM\Index(columns: [ "user_id", "token_hash" ], name: "search_idx")]
+#[ORM\Table(name: 'password_reset_requests')]
+#[ORM\Index(columns: ['user_id', 'token_hash'], name: 'search_idx')]
 class PasswordResetRequest
 {
     /**
@@ -28,7 +25,7 @@ class PasswordResetRequest
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
-    #[ORM\GeneratedValue(strategy: "CUSTOM")]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected ?UuidInterface $id = null;
 
@@ -42,46 +39,44 @@ class PasswordResetRequest
     /**
      * @var string Store HMAC hash of token, not raw token
      */
-    #[ORM\Column(type: "string", length: 128)]
+    #[ORM\Column(type: 'string', length: 128)]
     private string $tokenHash;
 
     /**
-     * @var DateTimeImmutable DateTime the token was created
+     * @var \DateTimeImmutable DateTime the token was created
      */
-    #[ORM\Column(type: "datetime_immutable")]
-    private DateTimeImmutable $createdAt;
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $createdAt;
 
     /**
-     * @var DateTimeImmutable Expiry DateTime for the token
+     * @var \DateTimeImmutable Expiry DateTime for the token
      */
-    #[ORM\Column(type: "datetime_immutable")]
-    private DateTimeImmutable $expiresAt;
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $expiresAt;
 
     /**
      * @var bool Has this reset token been used already
      */
-    #[ORM\Column(type: "boolean")]
+    #[ORM\Column(type: 'boolean')]
     private bool $used = false;
 
     /**
-     * Creates a new instance of {@link PasswordResetRequest}
+     * Creates a new instance of {@link PasswordResetRequest}.
      *
-     * @param User $user The user this token relates to
-     * @param string $tokenHash The HMAC hash of the token
-     * @param DateTimeImmutable $expiresAt The expiry date and time for the token
+     * @param User               $user      The user this token relates to
+     * @param string             $tokenHash The HMAC hash of the token
+     * @param \DateTimeImmutable $expiresAt The expiry date and time for the token
      */
-    public function __construct(User $user, string $tokenHash, DateTimeImmutable $expiresAt)
+    public function __construct(User $user, string $tokenHash, \DateTimeImmutable $expiresAt)
     {
         $this->user = $user;
         $this->tokenHash = $tokenHash;
-        $this->createdAt = new DateTimeImmutable();
+        $this->createdAt = new \DateTimeImmutable();
         $this->expiresAt = $expiresAt;
     }
 
     /**
-     * Get the value of id
-     *
-     * @return UuidInterface|null
+     * Get the value of id.
      */
     public function getId(): ?UuidInterface
     {
@@ -89,9 +84,7 @@ class PasswordResetRequest
     }
 
     /**
-     * Get the value of user
-     *
-     * @return User
+     * Get the value of user.
      */
     public function getUser(): User
     {
@@ -99,9 +92,7 @@ class PasswordResetRequest
     }
 
     /**
-     * Get the value of tokenHash
-     *
-     * @return string
+     * Get the value of tokenHash.
      */
     public function getTokenHash(): string
     {
@@ -109,29 +100,23 @@ class PasswordResetRequest
     }
 
     /**
-     * Get the value of createdAt
-     *
-     * @return DateTimeImmutable
+     * Get the value of createdAt.
      */
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
 
     /**
-     * Get the value of expiresAt
-     *
-     * @return DateTimeImmutable
+     * Get the value of expiresAt.
      */
-    public function getExpiresAt(): DateTimeImmutable
+    public function getExpiresAt(): \DateTimeImmutable
     {
         return $this->expiresAt;
     }
 
     /**
-     * Get the value of used
-     *
-     * @return bool
+     * Get the value of used.
      */
     public function isUsed(): bool
     {
@@ -139,9 +124,7 @@ class PasswordResetRequest
     }
 
     /**
-     * Mark the token as used
-     *
-     * @return void
+     * Mark the token as used.
      */
     public function markUsed(): void
     {

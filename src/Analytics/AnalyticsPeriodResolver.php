@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Analytics;
@@ -16,26 +15,24 @@ use Inachis\Service\Content\ViewStateManager;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Determine the analytics period to show
+ * Determine the analytics period to show.
  */
 class AnalyticsPeriodResolver
 {
     public function __construct(
-        private ViewStateManager $viewStateManager
-    ) {}
+        private ViewStateManager $viewStateManager,
+    ) {
+    }
 
     /**
      * Returns an {@link AnalyticsPeriod} for the current view based
      * on stored preferences and requested tab.
      *
-     * @param Request $request
-     * @param string $stateKey
-     * @return AnalyticsPeriod
      * @throws InvalidAnalyticsPeriodException
      */
     public function resolve(
         Request $request,
-        string $stateKey
+        string $stateKey,
     ): AnalyticsPeriod {
         $state = $this->viewStateManager->load(
             $request,

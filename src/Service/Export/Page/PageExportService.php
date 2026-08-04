@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Export\Page;
 
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Service\Export\AbstractExportService;
-use Inachis\Service\Export\Page\PageExportNormaliser;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
@@ -22,9 +20,9 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 final class PageExportService extends AbstractExportService
 {
     /**
-     * @param PageRepository $pageRepository The repository to use for page operations.
-     * @param PageExportNormaliser $normaliser The normaliser to use.
-     * @param iterable $writers The writers to use.
+     * @param PageRepository       $pageRepository the repository to use for page operations
+     * @param PageExportNormaliser $normaliser     the normaliser to use
+     * @param iterable             $writers        the writers to use
      */
     public function __construct(
         private PageRepository $pageRepository,
@@ -37,21 +35,24 @@ final class PageExportService extends AbstractExportService
     /**
      * Export pages to a file of a given type (JSON/MD/XML).
      *
-     * @param iterable|null $pages The pages to export.
-     * @param string $format The format to export to (json/md/xml).
-     * @return string The exported pages.
+     * @param iterable|null $pages  the pages to export
+     * @param string        $format the format to export to (json/md/xml)
+     *
+     * @return string the exported pages
      */
     public function export(?iterable $pages = null, string $format = 'json'): string
     {
         $pages ??= $this->getAllPages();
+
         return $this->exportCollection($pages, $format);
     }
 
     /**
      * Normalise a page.
      *
-     * @param object $page The page to normalise.
-     * @return object The normalised page.
+     * @param object $page the page to normalise
+     *
+     * @return object the normalised page
      */
     protected function normalise(object $page): object
     {
@@ -61,8 +62,9 @@ final class PageExportService extends AbstractExportService
     /**
      * Get pages by IDs via the repository.
      *
-     * @param array $ids The IDs of the pages to retrieve.
-     * @return iterable<Page> The pages.
+     * @param array $ids the IDs of the pages to retrieve
+     *
+     * @return iterable<Page> the pages
      */
     public function getPagesByIds(array $ids): iterable
     {
@@ -72,7 +74,7 @@ final class PageExportService extends AbstractExportService
     /**
      * Get all pages via the repository.
      *
-     * @return iterable<Page> The pages.
+     * @return iterable<Page> the pages
      */
     public function getAllPages(): iterable
     {
@@ -82,13 +84,15 @@ final class PageExportService extends AbstractExportService
     /**
      * Get filtered pages via the repository.
      *
-     * @param array $filter The filter to use.
-     * @return iterable<Page> The pages.
+     * @param array $filter the filter to use
+     *
+     * @return iterable<Page> the pages
      */
     public function getFilteredPages(array $filter): iterable
     {
         $filter_type = $filter['type'] ?? '*';
         unset($filter['type']);
+
         return $this->pageRepository->getFilteredOfTypeByPostDate(
             array_filter($filter),
             $filter_type,
@@ -100,7 +104,7 @@ final class PageExportService extends AbstractExportService
     /**
      * Get the count of all pages via the repository.
      *
-     * @return int The count of pages.
+     * @return int the count of pages
      */
     public function getAllCount(): int
     {

@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Entity\System;
@@ -17,9 +16,6 @@ use Ramsey\Uuid\UuidInterface;
 #[ORM\Index(columns: ['name'], name: 'search_idx')]
 class Setting
 {
-    /**
-     * @var UuidInterface
-     */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -51,28 +47,20 @@ class Setting
     #[ORM\Column(type: 'datetime_immutable')]
     private \DateTimeImmutable $updatedAt;
 
-    /**
-     * @return UuidInterface
-     */
     public function getId(): ?UuidInterface
     {
         return isset($this->id) ? $this->id : null;
     }
 
-    /**
-     * @param UuidInterface $id
-     * @return Setting
-     */
     public function setId(UuidInterface $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
     /**
-     * Get the setting name
-     *
-     * @return string
+     * Get the setting name.
      */
     public function getName(): string
     {
@@ -80,10 +68,7 @@ class Setting
     }
 
     /**
-     * Set the setting name
-     *
-     * @param string $name
-     * @return Setting
+     * Set the setting name.
      */
     public function setName(string $name): self
     {
@@ -93,9 +78,7 @@ class Setting
     }
 
     /**
-     * Get the decrypted value of the setting
-     *
-     * @return string|null
+     * Get the decrypted value of the setting.
      */
     public function getValue(): ?string
     {
@@ -103,10 +86,7 @@ class Setting
     }
 
     /**
-     * Set the decrypted value of the setting
-     *
-     * @param string|null $value
-     * @return self
+     * Set the decrypted value of the setting.
      */
     public function setValue(?string $value): self
     {
@@ -117,9 +97,7 @@ class Setting
     }
 
     /**
-     * Get the encrypted value of the setting
-     *
-     * @return string|null
+     * Get the encrypted value of the setting.
      */
     public function getEncryptedValue(): ?string
     {
@@ -127,10 +105,7 @@ class Setting
     }
 
     /**
-     * Set the encrypted value of the setting
-     *
-     * @param string|null $encryptedValue
-     * @return self
+     * Set the encrypted value of the setting.
      */
     public function setEncryptedValue(?string $encryptedValue): self
     {
@@ -140,9 +115,7 @@ class Setting
     }
 
     /**
-     * Get the encryption key version for the setting
-     *
-     * @return integer
+     * Get the encryption key version for the setting.
      */
     public function getKeyVersion(): int
     {
@@ -150,10 +123,7 @@ class Setting
     }
 
     /**
-     * Set the encryption key version for the setting
-     *
-     * @param integer $keyVersion
-     * @return self
+     * Set the encryption key version for the setting.
      */
     public function setKeyVersion(int $keyVersion): self
     {
@@ -163,9 +133,7 @@ class Setting
     }
 
     /**
-     * Get the encrypted key for the setting
-     *
-     * @return string|null
+     * Get the encrypted key for the setting.
      */
     public function getEncryptedKey(): ?string
     {
@@ -173,10 +141,7 @@ class Setting
     }
 
     /**
-     * Set the encrypted key for the setting
-     *
-     * @param string|null $encryptedKey
-     * @return self
+     * Set the encrypted key for the setting.
      */
     public function setEncryptedKey(?string $encryptedKey): self
     {
@@ -186,9 +151,7 @@ class Setting
     }
 
     /**
-     * Get the last updated date for the setting
-     *
-     * @return \DateTimeImmutable
+     * Get the last updated date for the setting.
      */
     public function getUpdatedAt(): \DateTimeImmutable
     {
@@ -196,9 +159,7 @@ class Setting
     }
 
     /**
-     * Set the last updated date
-     * 
-     * @param \DateTimeImmutable $updatedAt
+     * Set the last updated date.
      */
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): self
     {

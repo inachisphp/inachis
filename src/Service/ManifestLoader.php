@@ -1,9 +1,9 @@
 <?php
+
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service;
@@ -16,12 +16,11 @@ final readonly class ManifestLoader
 {
     /**
      * Constructor.
-     *
-     * @param LoggerInterface $logger
      */
     public function __construct(
         private LoggerInterface $logger,
-    ) {}
+    ) {
+    }
 
     /**
      * Loads and parses a YAML manifest.
@@ -29,7 +28,6 @@ final readonly class ManifestLoader
      * Returns null if the file does not exist, cannot be parsed, or does
      * not contain a valid YAML object.
      *
-     * @param string $filename
      * @return array<mixed>|null
      */
     public function load(string $filename): ?array
@@ -41,13 +39,13 @@ final readonly class ManifestLoader
         try {
             $manifest = Yaml::parseFile(
                 $filename,
-                Yaml::PARSE_EXCEPTION_ON_ALIAS
+                Yaml::PARSE_EXCEPTION_ON_ALIAS,
             );
         } catch (ParseException $exception) {
             $this->logger->warning(sprintf(
                 'Failed to parse manifest "%s": %s',
                 $filename,
-                $exception->getMessage()
+                $exception->getMessage(),
             ));
 
             return null;

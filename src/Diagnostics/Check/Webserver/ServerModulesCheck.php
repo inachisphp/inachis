@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics\Check\Webserver;
@@ -14,9 +13,20 @@ use Inachis\Diagnostics\CheckResult;
 
 final class ServerModulesCheck implements CheckInterface
 {
-    public function getId(): string { return 'server_modules'; }
-    public function getLabel(): string { return 'Server Modules'; }
-    public function getSection(): string { return 'Webserver'; }
+    public function getId(): string
+    {
+        return 'server_modules';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Server Modules';
+    }
+
+    public function getSection(): string
+    {
+        return 'Webserver';
+    }
 
     public function run(): CheckResult
     {
@@ -48,9 +58,9 @@ final class ServerModulesCheck implements CheckInterface
             $status,
             null,
             implode("\n", $details),
-            $status === 'ok' ? null : 'Verify server modules for performance and compression.',
+            'ok' === $status ? null : 'Verify server modules for performance and compression.',
             $this->getSection(),
-            'medium'
+            'medium',
         );
     }
 }

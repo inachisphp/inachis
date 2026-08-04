@@ -1,19 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Controller\Page\Dashboard;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Controller\Page\Dashboard\DashboardController;
-use Inachis\Repository\Content\{PageRepository, SeriesRepository};
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Repository\Media\ImageRepository;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,7 +27,7 @@ class DashboardControllerTest extends InachisControllerTestCase
     public function testDefault(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incp/'
+            'REQUEST_URI' => '/incp/',
         ]);
         $controller = $this->getMockBuilder(DashboardController::class)
             ->setConstructorArgs([
@@ -41,7 +41,7 @@ class DashboardControllerTest extends InachisControllerTestCase
             ->getMock();
         $controller->expects($this->once())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $paginator = $this->createStub(Paginator::class);
         $pageRepository = $this->createMock(PageRepository::class);
@@ -61,7 +61,7 @@ class DashboardControllerTest extends InachisControllerTestCase
         );
         $this->assertEquals(
             'rendered:inadmin/page/dashboard/dashboard.html.twig',
-            $result->getContent()
+            $result->getContent(),
         );
     }
 }

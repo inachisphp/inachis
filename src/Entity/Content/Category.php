@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Entity\Content;
@@ -70,11 +69,12 @@ class Category
 
     /**
      * @todo consier adding orphanRemoval: true in future
+     *
      * @var Collection<int, Category> The array of child categories if applicable
      */
     #[ORM\OneToMany(
         targetEntity: 'Inachis\Entity\Content\Category',
-        mappedBy: 'parent'
+        mappedBy: 'parent',
     )]
     #[ORM\OrderBy(['title' => 'ASC'])]
     protected Collection $children;
@@ -142,9 +142,6 @@ class Category
     //     return $this->icon;
     // }
 
-    /**
-     * @return bool
-     */
     public function isVisible(): bool
     {
         return $this->visible;
@@ -175,7 +172,6 @@ class Category
      * Sets the value of {@link id}.
      *
      * @param UuidInterface|null $value The UUID of the {@link Category}
-     * @return self
      */
     public function setId(?UuidInterface $value): self
     {
@@ -188,7 +184,6 @@ class Category
      * Sets the value of {@link title}.
      *
      * @param string $value The title of the {@link Category}
-     * @return self
      */
     public function setTitle(string $value): self
     {
@@ -201,7 +196,6 @@ class Category
      * Sets the value of {@link description}.
      *
      * @param string|null $value The description of the {@link Category}
-     * @return self
      */
     public function setDescription(?string $value): self
     {
@@ -236,10 +230,6 @@ class Category
     //     return $this;
     // }
 
-    /**
-     * @param bool $value
-     * @return self
-     */
     public function setVisible(bool $value): self
     {
         $this->visible = $value;
@@ -251,14 +241,11 @@ class Category
      * Sets the value of {@link parent}.
      *
      * @param Category|null $parent The parent of the current category
-     * @return self
      */
     public function setParent(?Category $parent = null): self
     {
         if ($parent === $this) {
-            throw new \InvalidArgumentException(
-                'Category cannot be its own parent'
-            );
+            throw new \InvalidArgumentException('Category cannot be its own parent');
         }
 
         $this->parent = $parent;
@@ -270,7 +257,6 @@ class Category
      * Adds a child category to the current {@link Category}.
      *
      * @param Category $category The {@link Category} to add
-     * @return self
      */
     public function addChild(Category $category): self
     {
@@ -284,9 +270,6 @@ class Category
 
     /**
      * Removes a child category to the current {@link Category}.
-     *
-     * @param Category $category
-     * @return self
      */
     public function removeChild(Category $category): self
     {
@@ -306,7 +289,7 @@ class Category
      */
     public function isRootCategory(): bool
     {
-        return $this->parent === null;
+        return null === $this->parent;
     }
 
     /**
@@ -316,7 +299,7 @@ class Category
      */
     public function isChildCategory(): bool
     {
-        return $this->parent !== null;
+        return null !== $this->parent;
     }
 
     // /**
@@ -348,7 +331,7 @@ class Category
     {
         $parent = $this->getParent();
         if (!empty($parent)) {
-            return $parent->getFullPath() . '/' . $this->getTitle();
+            return $parent->getFullPath().'/'.$this->getTitle();
         }
 
         return $this->getTitle();

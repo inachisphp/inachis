@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics;
@@ -12,14 +11,17 @@ namespace Inachis\Diagnostics;
 final class DiagnosticsCollector
 {
     /**
-     * Constructor for DiagnosticsCollector
+     * Constructor for DiagnosticsCollector.
      *
      * @param iterable<CheckInterface> $checks
      */
-    public function __construct(private iterable $checks) {}
+    public function __construct(private iterable $checks)
+    {
+    }
 
     /**
-     * Returns the result of checks
+     * Returns the result of checks.
+     *
      * @return list<CheckResult>
      */
     public function collect(): array
@@ -34,7 +36,7 @@ final class DiagnosticsCollector
     }
 
     /**
-     * Groups checks by category
+     * Groups checks by category.
      *
      * @return array<string,array<string,string|array<CheckResult>>>
      */

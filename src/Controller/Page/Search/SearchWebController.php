@@ -1,18 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Search;
 
+use Inachis\Controller\AbstractWebController;
 use Inachis\Repository\Content\SearchRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Repository\Content\UrlRepository;
-use Inachis\Controller\AbstractWebController;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,7 +36,7 @@ class SearchWebController extends AbstractWebController
 
         $results = [];
         $total = 0;
-        if ($keyword !== '') {
+        if ('' !== $keyword) {
             $searchResults = $searchRepository->searchPublic($keyword, $limit, $offset);
             $total = $searchResults->getTotal();
 
@@ -48,10 +47,10 @@ class SearchWebController extends AbstractWebController
                 $title = is_scalar($result['title'] ?? null) ? (string) $result['title'] : '';
                 $excerpt = is_scalar($result['content'] ?? null) ? (string) $result['content'] : '';
 
-                if ($type === 'series') {
+                if ('series' === $type) {
                     $entity = $seriesRepository->find($uuidString);
-                    $url = $entity !== null && is_scalar($entity->getUrl())
-                        ? '/series/' . ltrim((string) $entity->getUrl(), '/')
+                    $url = null !== $entity && is_scalar($entity->getUrl())
+                        ? '/series/'.ltrim((string) $entity->getUrl(), '/')
                         : null;
                 } else {
                     /** @var \Inachis\Entity\Content\Url|null $contentUrl */
@@ -60,21 +59,22 @@ class SearchWebController extends AbstractWebController
                         'default' => true,
                     ]);
                     $url = $contentUrl instanceof \Inachis\Entity\Content\Url
-                        ? '/' . ltrim((string) $contentUrl->getLink(), '/')
+                        ? '/'.ltrim((string) $contentUrl->getLink(), '/')
                         : null;
                 }
 
                 $results[] = [
                     'id' => $uuidString,
                     'title' => $title,
-                    'type' => $type === 'series' ? 'series' : $type,
+                    'type' => 'series' === $type ? 'series' : $type,
                     'excerpt' => $excerpt,
                     'url' => $url,
                 ];
             }
         }
 
-        $this->viewModel->page->title = $keyword === '' ? 'Search' : sprintf('Search results for “%s”', $keyword);
+        $this->viewModel->page->title = '' === $keyword ? 'Search' : sprintf('Search results for “%s”', $keyword);
+
         return $this->render('web/pages/search.html.twig', [
             'viewModel' => $this->viewModel,
             'keyword' => $keyword,

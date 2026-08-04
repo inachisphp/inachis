@@ -1,16 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Controller\Dialog;
 
 use Inachis\Controller\Dialog\ContentSelectorController;
-use Inachis\Entity\Content\{Page, Series};
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
@@ -30,7 +30,7 @@ class ContentSelectorControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'seriesId' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => '/incp/ax/contentSelector/get'
+            'REQUEST_URI' => '/incp/ax/contentSelector/get',
         ]);
         $controller = $this->getMockBuilder(ContentSelectorController::class)
             ->setConstructorArgs([
@@ -44,7 +44,7 @@ class ContentSelectorControllerTest extends InachisControllerTestCase
             ->getMock();
         $controller->expects($this->once())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $series = (new Series())->setId(Uuid::uuid1());
         $series->addItem(new Page());
@@ -65,7 +65,7 @@ class ContentSelectorControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'seriesId' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => '/incp/ax/contentSelector/save'
+            'REQUEST_URI' => '/incp/ax/contentSelector/save',
         ]);
         $controller = $this->getMockBuilder(ContentSelectorController::class)
             ->setConstructorArgs([
@@ -79,7 +79,7 @@ class ContentSelectorControllerTest extends InachisControllerTestCase
             ->getMock();
         $controller->expects($this->never())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $seriesRepository = $this->createStub(SeriesRepository::class);
         $pageRepository = $this->createStub(PageRepository::class);
@@ -100,7 +100,7 @@ class ContentSelectorControllerTest extends InachisControllerTestCase
             ],
             'seriesId' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => '/incp/ax/contentSelector/save'
+            'REQUEST_URI' => '/incp/ax/contentSelector/save',
         ]);
         $controller = $this->getMockBuilder(ContentSelectorController::class)
             ->setConstructorArgs([
@@ -114,7 +114,7 @@ class ContentSelectorControllerTest extends InachisControllerTestCase
             ->getMock();
         $controller->expects($this->never())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $series = (new Series())->setId(Uuid::uuid1());
         $series->addItem(new Page());
@@ -139,7 +139,7 @@ class ContentSelectorControllerTest extends InachisControllerTestCase
             ],
             'seriesId' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => '/incp/ax/contentSelector/save'
+            'REQUEST_URI' => '/incp/ax/contentSelector/save',
         ]);
         $controller = $this->getMockBuilder(ContentSelectorController::class)
             ->setConstructorArgs([
@@ -154,7 +154,7 @@ class ContentSelectorControllerTest extends InachisControllerTestCase
         $controller->expects($this->never())
             ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $page = (new Page('test-page'))->setId($uuid2);
         $series = (new Series())->setId(Uuid::uuid1());

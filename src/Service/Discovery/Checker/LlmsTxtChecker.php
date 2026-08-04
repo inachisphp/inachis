@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Discovery\Checker;
@@ -13,38 +12,35 @@ use Inachis\Model\System\DiscoveryStatus;
 use Inachis\Repository\System\SettingRepository;
 
 /**
- * Check status of llms.txt
+ * Check status of llms.txt.
  */
 class LlmsTxtChecker implements DiscoveryCheckerInterface
 {
     /**
-     * Constructor
-     *
-     * @param SettingRepository $settingRepository
+     * Constructor.
      */
     public function __construct(
         private readonly SettingRepository $settingRepository,
-    ) {}
+    ) {
+    }
 
     /**
-     * Check the status of llms.txt
-     *
-     * @return DiscoveryStatus
+     * Check the status of llms.txt.
      */
     public function check(): DiscoveryStatus
     {
         $content = trim(
-            $this->settingRepository->getValue('llms_txt') ?? ''
+            $this->settingRepository->getValue('llms_txt') ?? '',
         );
         $messages = [];
         $status = 'success';
 
-        if ($content === '') {
+        if ('' === $content) {
             $status = 'warning';
             $messages[] = 'No llms.txt content has been configured.';
         }
 
-        if ($content !== ''
+        if ('' !== $content
             && !preg_match('/^#\s+.+$/m', $content)
         ) {
             $messages[] =
@@ -57,7 +53,7 @@ class LlmsTxtChecker implements DiscoveryCheckerInterface
             $status,
             '/llms.txt',
             $messages,
-            'documents'
+            'documents',
         );
     }
 }

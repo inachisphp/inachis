@@ -1,24 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\File;
 
 /**
- * Base64 encode file
+ * Base64 encode file.
  */
 class Base64EncodeFile
 {
     /**
-     * Encode file
-     *
-     * @param string $filename
-     * @return string
+     * Encode file.
      */
     public static function encode(string $filename): string
     {
@@ -33,9 +29,10 @@ class Base64EncodeFile
         }
         $type = pathinfo($filename, PATHINFO_EXTENSION);
         $contents = file_get_contents($fullPath);
-        if ($contents === false) {
+        if (false === $contents) {
             return '';
         }
-        return 'data:image/' . $type . ';base64,' . base64_encode($contents);
+
+        return 'data:image/'.$type.';base64,'.base64_encode($contents);
     }
 }

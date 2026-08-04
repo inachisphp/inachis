@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Twig;
@@ -14,19 +13,17 @@ use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
 
 /**
- * Allows the templates to know if maintenance mode is enabled
+ * Allows the templates to know if maintenance mode is enabled.
  */
 class MaintenanceExtension extends AbstractExtension implements GlobalsInterface
 {
-    /**
-     * @param MaintenanceManager $maintenance
-     */
     public function __construct(
-        private MaintenanceManager $maintenance
-    ) {}
+        private MaintenanceManager $maintenance,
+    ) {
+    }
 
     /**
-     * Allow Twig templates to see if maintenance mode is enabled
+     * Allow Twig templates to see if maintenance mode is enabled.
      *
      * @return array<string,bool>
      */

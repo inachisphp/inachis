@@ -1,18 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Validator;
 
-use PHPUnit\Framework\TestCase;
-use Inachis\Validator\BimiValidator;
-use Inachis\Model\Domain\ValidationIssue;
 use Inachis\Model\Domain\Severity;
+use Inachis\Model\Domain\ValidationIssue;
+use Inachis\Validator\BimiValidator;
+use PHPUnit\Framework\TestCase;
 
 final class BimiValidatorTest extends TestCase
 {
@@ -27,7 +26,7 @@ final class BimiValidatorTest extends TestCase
         $this->assertSame('bimi', $issues[0]->type);
         $this->assertSame(
             'No BIMI record found (required when DMARC is reject)',
-            $issues[0]->message
+            $issues[0]->message,
         );
         $this->assertSame(Severity::Warning, $issues[0]->severity);
     }
@@ -40,8 +39,8 @@ final class BimiValidatorTest extends TestCase
             [
                 'target' => 'example.com',
                 'priority' => 10,
-                'txt' => 'v=BIMI1; l=https://example.com/logo.svg;'
-            ]
+                'txt' => 'v=BIMI1; l=https://example.com/logo.svg;',
+            ],
         ];
 
         $issues = $validator->validate($records, 'v=DMARC1; p=reject;');
@@ -57,8 +56,8 @@ final class BimiValidatorTest extends TestCase
             [
                 'target' => 'example.com',
                 'priority' => 10,
-                'txt' => 'invalid-bimi-record'
-            ]
+                'txt' => 'invalid-bimi-record',
+            ],
         ];
 
         $issues = $validator->validate($records, 'v=DMARC1; p=reject;');
@@ -77,8 +76,8 @@ final class BimiValidatorTest extends TestCase
             [
                 'target' => 'example.com',
                 'priority' => 10,
-                'txt' => 'invalid-bimi-record'
-            ]
+                'txt' => 'invalid-bimi-record',
+            ],
         ];
 
         $issues = $validator->validate($records, 'v=DMARC1; p=none;');
@@ -93,9 +92,9 @@ final class BimiValidatorTest extends TestCase
         $records = [
             [
                 'target' => 'example.com',
-                'priority' => 10
+                'priority' => 10,
                 // no 'txt'
-            ]
+            ],
         ];
 
         $issues = $validator->validate($records, 'v=DMARC1; p=reject;');

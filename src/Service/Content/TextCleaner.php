@@ -1,39 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Content;
 
 /**
- * TextCleaner class
+ * TextCleaner class.
  */
 class TextCleaner
 {
     /**
-     * Remove blockquote content
+     * Remove blockquote content.
      */
     public const REMOVE_BLOCKQUOTE_CONTENT = 1;
 
     /**
-     * Remove image alt text
+     * Remove image alt text.
      */
     public const REMOVE_IMAGE_ALT = 2;
 
     /**
-     * Normalise whitespace
+     * Normalise whitespace.
      */
     public const NORMALISE_WHITESPACE = 4;
 
     /**
-     * Strip text of HTML and Markdown
+     * Strip text of HTML and Markdown.
      *
-     * @param string|null $text The text to strip
-     * @param int $options Bitmask of options to apply
+     * @param string|null $text    The text to strip
+     * @param int         $options Bitmask of options to apply
+     *
      * @return string The stripped text
      */
     public static function strip(?string $text, int $options = 0): string

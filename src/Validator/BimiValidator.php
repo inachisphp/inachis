@@ -1,27 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Validator;
 
-use Inachis\Model\Domain\ValidationIssue;
 use Inachis\Model\Domain\Severity;
+use Inachis\Model\Domain\ValidationIssue;
 
 /**
- * Validates BIMI records
- * 
+ * Validates BIMI records.
+ *
  * @phpstan-import-type DnsTxtRecord from \Inachis\Service\System\Domain\DnsResolverInterface
  */
 final class BimiValidator
 {
     /**
-     * Validate BIMI records
+     * Validate BIMI records.
+     *
      * @param list<DnsTxtRecord> $records
+     *
      * @return list<ValidationIssue>
      */
     public function validate(array $records, string $dmarc): array

@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Security;
@@ -28,30 +27,27 @@ class RecoveryCodeController extends AbstractInachisController
      *
      * The flash bag automatically removes the codes after they have
      * been retrieved once.
-     *
-     * @param SessionInterface $session
-     * @return Response
      */
     #[Route(
         '/incp/security/recovery-codes',
         name: 'incp_security_recovery_codes_generate',
-        methods: ['GET']
+        methods: ['GET'],
     )]
     public function show(SessionInterface $session): Response
     {
         $codes = $session->get('recovery_codes');
         $session->set('recovery_codes', '');
 
-        if ($codes === []) {
+        if ([] === $codes) {
             $this->addFlash(
                 'warning',
-                'Recovery codes are only shown immediately after they are generated.'
+                'Recovery codes are only shown immediately after they are generated.',
             );
 
             return $this->redirectToRoute(
                 'incp_admin_list', [
                     'id' => $this->getCurrentUser()->getUsername(),
-                ]
+                ],
             );
         }
 
@@ -62,7 +58,7 @@ class RecoveryCodeController extends AbstractInachisController
             [
                 'viewModel' => $this->viewModel,
                 'codes' => $codes,
-            ]
+            ],
         );
     }
 }

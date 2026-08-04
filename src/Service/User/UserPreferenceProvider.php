@@ -1,21 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\User;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\User\{User,UserPreference};
+use Inachis\Entity\User\User;
+use Inachis\Entity\User\UserPreference;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class used for retrieving the user's preferences
+ * Class used for retrieving the user's preferences.
  */
 class UserPreferenceProvider
 {
@@ -23,14 +23,13 @@ class UserPreferenceProvider
         private Security $security,
         private RequestStack $requestStack,
         private EntityManagerInterface $entityManager,
-    ) {}
+    ) {
+    }
 
     /**
      * Returns the currently signed-in {@link User}'s preferences from the session
      * if available, or from the entity otherwise (and will then store in session to reduce lookups).
      * Unauthenticated users will return null.
-     *
-     * @return UserPreference|null
      */
     public function get(): ?UserPreference
     {
@@ -42,7 +41,7 @@ class UserPreferenceProvider
 
         /** @var UserPreference|null $preferences */
         $preferences = $user->getPreferences();
-        if ($preferences === null) {
+        if (null === $preferences) {
             $preferences = new UserPreference($user);
             $user->setPreferences($preferences);
             $this->entityManager->persist($preferences);
@@ -55,9 +54,7 @@ class UserPreferenceProvider
     }
 
     /**
-     * Save changes to the user's preferences and refresh session cache
-     * 
-     * @param UserPreference $preferences
+     * Save changes to the user's preferences and refresh session cache.
      */
     public function save(UserPreference $preferences): void
     {

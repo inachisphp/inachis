@@ -1,5 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * This file is part of the inachis framework.
+ */
+
 namespace Inachis\EventListener;
 
 use Inachis\Service\System\Csp\CspHeaderManager;
@@ -11,8 +17,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class CspHeaderListener
 {
     public function __construct(
-        private readonly CspHeaderManager $cspHeaderManager
-    ) {}
+        private readonly CspHeaderManager $cspHeaderManager,
+    ) {
+    }
 
     public function onKernelResponse(ResponseEvent $event): void
     {
@@ -33,7 +40,7 @@ class CspHeaderListener
 
         // 2. Frontend Policy: Pulled from fast Cache
         $frontendCsp = $this->cspHeaderManager->getFrontendHeaderConfig();
-        if ($frontendCsp !== null) {
+        if (null !== $frontendCsp) {
             $response->headers->set($frontendCsp['name'], $frontendCsp['value']);
         }
     }

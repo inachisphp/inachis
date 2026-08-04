@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Repository;
@@ -14,6 +13,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * @template T of object
+ *
  * @extends ServiceEntityRepository<T>
  */
 abstract class AbstractRepository extends ServiceEntityRepository
@@ -23,7 +23,6 @@ abstract class AbstractRepository extends ServiceEntityRepository
 
     /**
      * @param array<string,mixed> $values
-     * @return mixed
      */
     public function create(array $values = []): mixed
     {
@@ -36,8 +35,9 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * Uses the objects setters to populate the object
      * based on the provided values.
      *
-     * @param mixed $object The object to hydrate
+     * @param mixed               $object The object to hydrate
      * @param array<string,mixed> $values The values to apply to the object
+     *
      * @return mixed The hydrated object
      */
     public function hydrate(mixed $object, array $values): mixed
@@ -46,8 +46,8 @@ abstract class AbstractRepository extends ServiceEntityRepository
             return $object;
         }
         foreach ($values as $key => $value) {
-            $methodName = 'set' . ucfirst($key);
-            if (method_exists($object, $methodName) && !($key === 'id' && $value === '-1')) {
+            $methodName = 'set'.ucfirst($key);
+            if (method_exists($object, $methodName) && !('id' === $key && '-1' === $value)) {
                 $object->$methodName($value);
             }
         }
@@ -60,7 +60,9 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * provided constraints.
      *
      * @param array{0:string, 1?:array<string,string|list<string>>}|array{} $where Array of elements and string replacements
+     *
      * @return int The number of entities located
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -87,12 +89,13 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * Returns all entries for the current repository using Paginator; if you don't need pagination,
      * do NOT use this function - use a findAll instead.
      *
-     * @param int $limit  The maximum number of results to return
-     * @param int $offset The offset from which to return results from
-     * @param list{0: string, 1?:array<string, mixed>}|list{} $where
-     * @param list<list{0: string, 1: string}>|string|list{} $order
-     * @param list<string>|list{} $groupBy
+     * @param int                                                            $limit   The maximum number of results to return
+     * @param int                                                            $offset  The offset from which to return results from
+     * @param list{0: string, 1?:array<string, mixed>}|list{}                $where
+     * @param list<list{0: string, 1: string}>|string|list{}                 $order
+     * @param list<string>|list{}                                            $groupBy
      * @param list<list{0: string, 1: string, 2: string, 3?: string}>|list{} $join
+     *
      * @return Paginator<T> The result of fetching the objects
      */
     public function getAll(
@@ -101,7 +104,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
         array $where = [],
         array|string $order = [],
         array $groupBy = [],
-        array $join = []
+        array $join = [],
     ): Paginator {
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('q')
@@ -113,10 +116,10 @@ abstract class AbstractRepository extends ServiceEntityRepository
                 $alias = $j[2]; // e.g., 'i'
                 $condition = $j[3] ?? null;
 
-                if ($type === 'join') {
+                if ('join' === $type) {
                     $condition ? $qb->join($path, $alias, 'WITH', $condition)
                             : $qb->join($path, $alias);
-                } elseif ($type === 'leftJoin') {
+                } elseif ('leftJoin' === $type) {
                     $condition ? $qb->leftJoin($path, $alias, 'WITH', $condition)
                             : $qb->leftJoin($path, $alias);
                 }
@@ -143,11 +146,11 @@ abstract class AbstractRepository extends ServiceEntityRepository
                 // support typed parameters: [value, type]
                 if (is_array($value)) {
                     $paramValue = $value['value'];
-                    $paramType  = !empty($value['type']) && is_string($value['type']) ?
+                    $paramType = !empty($value['type']) && is_string($value['type']) ?
                         $value['type'] :
                         null;
                 }
-                if ($paramType !== null) {
+                if (null !== $paramType) {
                     $qb = $qb->setParameter($key, $paramValue, $paramType);
                 } else {
                     $qb = $qb->setParameter($key, $paramValue);
@@ -168,14 +171,12 @@ abstract class AbstractRepository extends ServiceEntityRepository
             $query = $query->setFirstResult($offset);
         }
 
-        /** @var Paginator<T> */
+        /* @var Paginator<T> */
         return new Paginator($query, false);
     }
 
     /**
-     * Returns the maximum number of items to show
-     *
-     * @return int
+     * Returns the maximum number of items to show.
      */
     public function getMaxItemsToShow(): int
     {

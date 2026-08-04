@@ -1,33 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Form;
 
 use Inachis\Entity\Content\Page;
-use Inachis\Form\PostType;
 use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use Inachis\Form\PostType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
 final class PostTypeTest extends TestCase
@@ -36,6 +35,7 @@ final class PostTypeTest extends TestCase
     {
         $m = $this->createStub(TranslatorInterface::class);
         $m->method('trans')->willReturnCallback(fn ($s) => (string) $s);
+
         return $m;
     }
 
@@ -43,6 +43,7 @@ final class PostTypeTest extends TestCase
     {
         $m = $this->createStub(RouterInterface::class);
         $m->method('generate')->willReturn('/fake/url');
+
         return $m;
     }
 
@@ -60,7 +61,7 @@ final class PostTypeTest extends TestCase
         $postType = new PostType(
             $this->translator(),
             $this->router(),
-            $this->createStub(Security::class)
+            $this->createStub(Security::class),
         );
 
         $page = new Page();
@@ -101,7 +102,7 @@ final class PostTypeTest extends TestCase
             $this->translator(),
             $this->router(),
             $this->createStub(Security::class),
-            $this->transformer()
+            $this->transformer(),
         );
 
         $page = (new Page())->setId(Uuid::uuid1());
@@ -138,7 +139,7 @@ final class PostTypeTest extends TestCase
         $postType = new PostType(
             $this->translator(),
             $this->router(),
-            $this->createStub(Security::class)
+            $this->createStub(Security::class),
         );
 
         $resolver = new OptionsResolver();
@@ -151,7 +152,7 @@ final class PostTypeTest extends TestCase
     }
 
     /**
-     * Helper to assert add() calls in exact order
+     * Helper to assert add() calls in exact order.
      */
     private function expectAddCallsInOrder(FormBuilderInterface $builder, array $expectedCalls): void
     {
@@ -169,7 +170,8 @@ final class PostTypeTest extends TestCase
                     $this->assertSame(['selected' => 'selected'], $result);
                 }
 
-                $callIndex++;
+                ++$callIndex;
+
                 return $builder;
             });
     }

@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Import\Page;
@@ -25,6 +24,7 @@ final class PageImportValidator
      * Validate an array of PageExportDto objects.
      *
      * @param array<PageExportDto> $pages
+     *
      * @return array<int, array<string>> Warnings per page (by index)
      */
     public function validateAll(array $pages): array
@@ -41,7 +41,6 @@ final class PageImportValidator
     /**
      * Validate a single PageExportDto.
      *
-     * @param PageExportDto $pageDto
      * @param int $index Index in the import list (for warnings)
      */
     public function validate(PageExportDto $pageDto, int $index): void

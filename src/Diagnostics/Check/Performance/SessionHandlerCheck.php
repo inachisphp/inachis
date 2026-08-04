@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics\Check\Performance;
@@ -14,9 +13,20 @@ use Inachis\Diagnostics\CheckResult;
 
 final class SessionHandlerCheck implements CheckInterface
 {
-    public function getId(): string { return 'session_handler'; }
-    public function getLabel(): string { return 'Session Handler'; }
-    public function getSection(): string { return 'Performance'; }
+    public function getId(): string
+    {
+        return 'session_handler';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Session Handler';
+    }
+
+    public function getSection(): string
+    {
+        return 'Performance';
+    }
 
     public function run(): CheckResult
     {
@@ -30,9 +40,9 @@ final class SessionHandlerCheck implements CheckInterface
             $status,
             $handler,
             $details,
-            $status === 'ok' ? null : 'Use files, Redis, or Memcached for session storage.',
+            'ok' === $status ? null : 'Use files, Redis, or Memcached for session storage.',
             $this->getSection(),
-            'medium'
+            'medium',
         );
     }
 }

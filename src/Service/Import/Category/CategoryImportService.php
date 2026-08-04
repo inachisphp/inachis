@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Import\Category;
@@ -21,21 +20,18 @@ use Inachis\Repository\Content\CategoryRepository;
 final class CategoryImportService
 {
     /**
-     * Constructor for CategoryImportService
-     *
-     * @param CategoryRepository $categoryRepository
-     * @param EntityManagerInterface $entityManager
+     * Constructor for CategoryImportService.
      */
     public function __construct(
         private CategoryRepository $categoryRepository,
-        private EntityManagerInterface $entityManager
-    ) {}
+        private EntityManagerInterface $entityManager,
+    ) {
+    }
 
     /**
      * Build or update category tree from DTOs.
      *
      * @param iterable<CategoryExportDto> $categoryDtos
-     * @return CategoryImportResult
      */
     public function import(iterable $categoryDtos): CategoryImportResult
     {
@@ -64,7 +60,7 @@ final class CategoryImportService
                 $pathSoFar = '';
 
                 foreach ($segments as $title) {
-                    $pathSoFar = $pathSoFar ? $pathSoFar . '/' . $title : $title;
+                    $pathSoFar = $pathSoFar ? $pathSoFar.'/'.$title : $title;
 
                     if (isset($existingCategories[$pathSoFar])) {
                         $cat = $existingCategories[$pathSoFar];
@@ -72,7 +68,7 @@ final class CategoryImportService
                         $cat = new Category($title);
                         $cat->setParent($parent);
                         $this->entityManager->persist($cat);
-                        $result->categoriesCreated++;
+                        ++$result->categoriesCreated;
                         $existingCategories[$pathSoFar] = $cat;
                     }
 
@@ -87,14 +83,14 @@ final class CategoryImportService
             $uow = $this->entityManager->getUnitOfWork();
             foreach ($existingCategories as $category) {
                 if (!empty($uow->getEntityChangeSet($category))) {
-                    $result->categoriesUpdated++;
+                    ++$result->categoriesUpdated;
                 }
             }
             $this->entityManager->flush();
             $this->entityManager->commit();
         } catch (\Throwable $e) {
             $this->entityManager->rollback();
-            $result->warnings[] = 'Import failed: ' . $e->getMessage();
+            $result->warnings[] = 'Import failed: '.$e->getMessage();
         }
 
         return $result;
@@ -103,7 +99,6 @@ final class CategoryImportService
     /**
      * Maps the imported data to DTOs.
      *
-     * @param array $data
      * @return CategoryExportDto[]
      */
     public function mapToDto(array $data): array

@@ -1,30 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Repository\Waste;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
 use Inachis\Entity\User\User;
 use Inachis\Entity\Waste\Waste;
 use Inachis\Repository\AbstractRepository;
-use Inachis\Repository\Waste\WasteRepositoryInterface;
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * Repository for {@link Waste} entities
+ * Repository for {@link Waste} entities.
  *
  * @extends AbstractRepository<Waste>
  */
 class WasteRepository extends AbstractRepository implements WasteRepositoryInterface
 {
     /**
-     * Creates a new instance of the WasteRepository
+     * Creates a new instance of the WasteRepository.
      *
      * @param ManagerRegistry $registry The registry
      */
@@ -34,9 +32,10 @@ class WasteRepository extends AbstractRepository implements WasteRepositoryInter
     }
 
     /**
-     * Deletes all waste for a user
+     * Deletes all waste for a user.
      *
      * @param User $user The user
+     *
      * @return int The number of waste items deleted
      */
     public function deleteWasteByUser(User $user): int
@@ -51,11 +50,12 @@ class WasteRepository extends AbstractRepository implements WasteRepositoryInter
         if (!is_int($result)) {
             throw new \RuntimeException('Failed to delete waste');
         }
+
         return $result;
     }
 
     /**
-     * Returns a count of the number of deleted items
+     * Returns a count of the number of deleted items.
      *
      * @return int The number of waste items
      */
@@ -65,12 +65,13 @@ class WasteRepository extends AbstractRepository implements WasteRepositoryInter
     }
 
     /**
-     * Gets filtered waste
+     * Gets filtered waste.
      *
      * @param array{keyword?: string} $filters Only keyword(s) should be passed in as the filter
-     * @param int $limit The limit
-     * @param int $offset The offset
-     * @param string $sort The sort
+     * @param int                     $limit   The limit
+     * @param int                     $offset  The offset
+     * @param string                  $sort    The sort
+     *
      * @return Paginator<Waste> The paginator
      */
     public function getFiltered(array $filters, int $limit, int $offset, string $sort): Paginator
@@ -80,7 +81,7 @@ class WasteRepository extends AbstractRepository implements WasteRepositoryInter
             $where = [
                 '(q.title LIKE :keyword OR q.content LIKE :keyword )',
                 [
-                    'keyword' => '%' . $filters['keyword']  . '%',
+                    'keyword' => '%'.$filters['keyword'].'%',
                 ],
             ];
         }
@@ -94,11 +95,12 @@ class WasteRepository extends AbstractRepository implements WasteRepositoryInter
                 ['q.title', 'ASC'],
             ],
         };
+
         return $this->getAll(
             $limit,
             $offset,
             $where,
-            $sort
+            $sort,
         );
     }
 }

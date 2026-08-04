@@ -1,22 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Command\User;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Command\User\CreateAdminCommand;
 use Inachis\Entity\User\User;
-use Doctrine\ORM\EntityManagerInterface;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class CreateAdminCommandTest extends TestCase
@@ -29,6 +27,7 @@ class CreateAdminCommandTest extends TestCase
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
     }
+
     public function testExecuteCreatesAdminUserSuccessfully(): void
     {
         $hashedPassword = 'hashed_secret';
@@ -45,6 +44,7 @@ class CreateAdminCommandTest extends TestCase
                 $this->assertEquals('test@example.com', $user->getEmail());
                 $this->assertEquals($hashedPassword, $user->getPassword());
                 $this->assertEquals('testuser', $user->getDisplayName());
+
                 return true;
             }));
         $this->entityManager->expects($this->once())->method('flush');
@@ -73,9 +73,9 @@ class CreateAdminCommandTest extends TestCase
         $command = new CreateAdminCommand($this->entityManager, $this->passwordHasher);
         $command->setHelperSet(new HelperSet(['question' => new QuestionHelper()]));
         $tester = new CommandTester($command);
-        $tester->setInputs(['test-user', 'test@example.com', '' ,'']);
+        $tester->setInputs(['test-user', 'test@example.com', '', '']);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('This value cannot be empty');
         $tester->execute([]);
     }
@@ -106,5 +106,4 @@ class CreateAdminCommandTest extends TestCase
         $this->assertSame(0, $tester->getStatusCode());
         $this->assertStringContainsString('User testuser created', $tester->getDisplay());
     }
-
 }

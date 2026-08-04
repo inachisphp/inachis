@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Model\Page;
@@ -16,7 +15,8 @@ final class ViewStateDefaults
         public readonly array $filters = [],
         public readonly string $sort = '',
         public readonly string $view = 'list',
-    ) {}
+    ) {
+    }
 
     /**
      * @return array<string,mixed>

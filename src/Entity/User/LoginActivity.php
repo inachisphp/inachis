@@ -1,17 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Entity\User;
 
-use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
-use Inachis\Entity\User\User;
 use Inachis\Enum\Security\LoginResultType;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
@@ -20,9 +17,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\User\LoginActivityRepository', readOnly: false)]
 class LoginActivity
 {
-    /**
-     * @var UuidInterface|null
-     */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -43,10 +37,10 @@ class LoginActivity
     private LoginResultType $type;
 
     /**
-     * @var DateTimeImmutable|null The date and time of the attempt
+     * @var \DateTimeImmutable|null The date and time of the attempt
      */
     #[ORM\Column]
-    private ?DateTimeImmutable $loggedAt;
+    private ?\DateTimeImmutable $loggedAt;
 
     /**
      * @var string|null The source IP of the login-in attempt
@@ -60,10 +54,7 @@ class LoginActivity
     #[ORM\Column(type: 'string', length: 256)]
     private ?string $userAgent = '';
 
-    /**
-     * @var string|null
-     */
-     #[ORM\Column(type: 'string', length: 64, nullable: true)]
+    #[ORM\Column(type: 'string', length: 64, nullable: true)]
     private ?string $sessionHash = null;
 
     /**
@@ -83,12 +74,6 @@ class LoginActivity
      * {@link LoginActivity} requires success|failure status as a minimum to
      * record login attempts.
      *
-     * @param User|null $user
-     * @param LoginResultType $type
-     * @param string|null $ip
-     * @param string|null $userAgent
-     * @param string|null $sessionId
-     * @param string|null $username
      * @param array<string,array<string>|string>|null $extraData
      */
     public function __construct(
@@ -98,11 +83,11 @@ class LoginActivity
         ?string $userAgent = null,
         ?string $sessionId = null,
         ?string $username = null,
-        ?array $extraData = null
+        ?array $extraData = null,
     ) {
         $this->user = $user;
         $this->type = $type;
-        $this->loggedAt = new DateTimeImmutable();
+        $this->loggedAt = new \DateTimeImmutable();
         $this->ipAddress = $ip;
         $this->userAgent = $userAgent;
         $this->sessionHash = $sessionId ? hash('sha256', $sessionId) : null;
@@ -110,155 +95,107 @@ class LoginActivity
         $this->extraData = $extraData;
     }
 
-    /**
-     * @return UuidInterface|null
-     */
     public function getId(): ?UuidInterface
     {
         return $this->id;
     }
 
-    /**
-     * @return User|null
-     */
     public function getUser(): ?User
     {
         return $this->user;
     }
 
-    /**
-     * @return LoginResultType
-     */
     public function getType(): LoginResultType
     {
         return $this->type;
     }
 
-    /**
-     * @return DateTimeImmutable|null
-     */
-    public function getLoggedAt(): ?DateTimeImmutable
+    public function getLoggedAt(): ?\DateTimeImmutable
     {
         return $this->loggedAt;
     }
 
-    /**
-     * @return string|null
-     */
     public function getIpAddress(): ?string
     {
         return $this->ipAddress;
     }
 
-    /**
-     * @return string|null
-     */
     public function getUserAgent(): ?string
     {
         return $this->userAgent;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSessionHash(): ?string
     {
         return $this->sessionHash;
     }
 
-    /**
-     * @return string|null
-     */
     public function getUsername(): ?string
     {
         return $this->username;
     }
 
     /**
-     * @return array<string,array<string>|string>|null 
+     * @return array<string,array<string>|string>|null
      */
     public function getExtraData(): ?array
     {
         return $this->extraData;
     }
 
-    /**
-     * @param UuidInterface|null $id
-     * @return self
-     */
     public function setId(?UuidInterface $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
-    /**
-     * @param User|null $user
-     * @return self
-     */
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
         return $this;
     }
 
-    /**
-     * @param LoginResultType $type
-     * @return self
-     */
     public function setType(LoginResultType $type): self
     {
         $this->type = $type;
+
         return $this;
     }
 
-    /**
-     * @param DateTimeImmutable|null $loggedAt
-     * @return self
-     */
-    public function setLoggedAt(?DateTimeImmutable $loggedAt): self
+    public function setLoggedAt(?\DateTimeImmutable $loggedAt): self
     {
         $this->loggedAt = $loggedAt;
+
         return $this;
     }
 
-    /**
-     * @param string|null $ipAddress
-     * @return self
-     */
     public function setIpAddress(?string $ipAddress): self
     {
         $this->ipAddress = $ipAddress;
+
         return $this;
     }
 
-    /**
-     * @param string|null $userAgent
-     * @return self
-     */
     public function setUserAgent(?string $userAgent): self
     {
         $this->userAgent = $userAgent;
+
         return $this;
     }
 
-    /**
-     * @param string|null $sessionHash
-     * @return self
-     */
     public function setSessionHash(?string $sessionHash): self
     {
         $this->sessionHash = $sessionHash;
+
         return $this;
     }
 
-    /**
-     * @param string|null $username
-     * @return self
-     */
     public function setUsername(?string $username): self
     {
         $this->username = $username;
+
         return $this;
     }
 
@@ -267,11 +204,11 @@ class LoginActivity
      *     string,
      *     array<string>|string
      * >|null $extraData
-     * @return self
      */
     public function setExtraData(?array $extraData): self
     {
         $this->extraData = $extraData;
+
         return $this;
     }
 }

@@ -1,23 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Service\Content\Page;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Series;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Service\Content\Page\ContentAggregator;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -36,7 +35,7 @@ class ContentAggregatorTest extends TestCase
         $entityManager = $this->createStub(EntityManagerInterface::class);
         $entityManager->method('getRepository')
             ->willReturnCallback(function ($class) use ($seriesRepository, $pageRepository) {
-                return $class === Series::class ? $seriesRepository : $pageRepository;
+                return Series::class === $class ? $seriesRepository : $pageRepository;
             });
         $seriesItemPage = $this->createConfiguredStub(Page::class, [
             'getId' => Uuid::uuid1(),

@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Enum;
@@ -21,8 +20,8 @@ class EditorialStatusTest extends TestCase
     public function valuesReturnsAllPossibleValues(): void
     {
         self::assertSame(
-            ['draft', 'review', 'published', 'archived'],
-            EditorialStatus::values()
+            ['draft', 'review', 'published'],
+            EditorialStatus::values(),
         );
     }
 
@@ -32,6 +31,5 @@ class EditorialStatusTest extends TestCase
         self::assertSame('Draft', EditorialStatus::DRAFT->label());
         self::assertSame('In Review', EditorialStatus::REVIEW->label());
         self::assertSame('Published', EditorialStatus::PUBLISHED->label());
-        self::assertSame('Archived', EditorialStatus::ARCHIVED->label());
     }
 }

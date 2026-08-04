@@ -1,50 +1,45 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Repository\Media;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
 use Inachis\Entity\Media\Image;
 use Inachis\Repository\AbstractRepository;
-use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
- * Image repository
- * 
+ * Image repository.
+ *
  * @extends AbstractRepository<Image>
+ *
  * @implements ResourceRepositoryInterface<Image>
  */
 class ImageRepository extends AbstractRepository implements ResourceRepositoryInterface
 {
     /** @use DefaultResourceRepository<Image> */
     use DefaultResourceRepository;
-    
+
     /** @var int */
     public const MAX_ITEMS_TO_SHOW_ADMIN = 25;
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function __construct(
         private CacheInterface $cache,
-        ManagerRegistry $registry
+        ManagerRegistry $registry,
     ) {
         parent::__construct($registry, Image::class);
     }
 
     /**
-     * Get all images that do not have alt text
+     * Get all images that do not have alt text.
      *
-     * @param int $limit
-     * @param int $offset
      * @return Paginator<Image>
      */
     public function getImagesWithoutAltText(int $limit = 0, int $offset = 0): Paginator
@@ -55,19 +50,17 @@ class ImageRepository extends AbstractRepository implements ResourceRepositoryIn
             where: [
                 'q.altText IS NULL OR q.altText = :emptyString',
                 [
-                    'emptyString' => ''
-                ]
+                    'emptyString' => '',
+                ],
             ],
             order: [
-                ['q.id', 'ASC']
-            ]
+                ['q.id', 'ASC'],
+            ],
         );
     }
 
     /**
-     * Get the number of images that do not have alt text
-     *
-     * @return int
+     * Get the number of images that do not have alt text.
      */
     public function getImagesWithoutAltTextCount(): int
     {
@@ -86,7 +79,7 @@ class ImageRepository extends AbstractRepository implements ResourceRepositoryIn
 
     /**
      * Get a list of the IDs for Image not used in {@link Page} or
-     * {@link Series} objects
+     * {@link Series} objects.
      *
      * @return list<string>
      */
@@ -122,7 +115,7 @@ class ImageRepository extends AbstractRepository implements ResourceRepositoryIn
                 ->getConnection()
                 ->executeQuery($sql)
                 ->fetchAllAssociative(),
-            'id'
+            'id',
         );
     }
 }

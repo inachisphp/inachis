@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Tools;
@@ -20,15 +19,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Controller for exporting pages and posts
+ * Controller for exporting pages and posts.
  */
 class ExportController extends AbstractInachisController
 {
-    /**
-     * @param Request $request
-     * @param PageExportService $pageExportService
-     * @return Response
-     */
     #[Route('incp/tools/export', name: 'incp_tools_export', methods: ['GET', 'POST'])]
     public function export(
         Request $request,
@@ -41,7 +35,7 @@ class ExportController extends AbstractInachisController
         $scope = $request->request->getString('scope') ?? 'all';
         $format = $request->request->getString('format') ?? 'json';
         $selectedIds = array_filter(
-            explode(',', $request->request->get('selectedIds') ?? '')
+            explode(',', $request->request->get('selectedIds') ?? ''),
         );
         $filter = $request->request->all('filter');
         $filterType = $filter['type'] ?? null;
@@ -62,30 +56,32 @@ class ExportController extends AbstractInachisController
                     break;
 
                 case 'post':
-                    if ($scope === 'all') {
+                    if ('all' === $scope) {
                         $items = $pageExportService->getAllPages();
-                    } elseif ($scope === 'manual') {
+                    } elseif ('manual' === $scope) {
                         if (empty($selectedIds)) {
                             $this->addFlash('error', 'No pages selected for export.');
+
                             return $this->redirectToRoute('incp_tools_export');
                         }
                         $items = $pageExportService->getPagesByIds($selectedIds);
-                    }  elseif ($scope === 'filtered') {
+                    } elseif ('filtered' === $scope) {
                         $items = $pageExportService->getFilteredPages($filter);
                     }
                     $exportService = $pageExportService;
                     break;
 
                 case 'series':
-                    if ($scope === 'all') {
+                    if ('all' === $scope) {
                         $items = $seriesExportService->getAllSeries();
-                    } elseif ($scope === 'manual') {
+                    } elseif ('manual' === $scope) {
                         if (empty($selectedIds)) {
                             $this->addFlash('error', 'No series selected for export.');
+
                             return $this->redirectToRoute('incp_tools_export');
                         }
                         $items = $seriesExportService->getSeriesByIds($selectedIds);
-                    }  elseif ($scope === 'filtered') {
+                    } elseif ('filtered' === $scope) {
                         $items = $pageRepository->getFilteredOfTypeByPostDate(
                             array_filter($filter),
                             '*',
@@ -101,28 +97,28 @@ class ExportController extends AbstractInachisController
                 $exportedData = $exportService->export($items, $format);
             } catch (\InvalidArgumentException $e) {
                 $this->addFlash('error', $e->getMessage());
+
                 return $this->redirectToRoute('incp_tools_export');
             }
 
-            $filename = $contentType . '-export-' . date('Y-m-d-His') . '.' . $format;
-            if ($format === 'md') {
+            $filename = $contentType.'-export-'.date('Y-m-d-His').'.'.$format;
+            if ('md' === $format) {
                 return new Response($exportedData, 200, [
                     'Content-Type' => 'text/markdown',
-                    'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                    'Content-Disposition' => 'attachment; filename="'.$filename.'"',
                 ]);
             }
 
-            $contentType = $format === 'json' ? 'application/json' : 'application/xml';
+            $contentType = 'json' === $format ? 'application/json' : 'application/xml';
+
             return new Response($exportedData, 200, [
                 'Content-Type' => $contentType,
-                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             ]);
         }
 
         $this->viewModel->page->title = 'Export';
         $this->viewModel->page->tab = 'export';
-
-
 
         return $this->render('inadmin/page/tools/export.html.twig', [
             'viewModel' => $this->viewModel,
@@ -170,7 +166,7 @@ class ExportController extends AbstractInachisController
                     $offset,
                     'parent_id',
                 );
-                //$total = get count - make sure results limited to 50
+                // $total = get count - make sure results limited to 50
                 break;
 
             case 'series':
@@ -179,7 +175,7 @@ class ExportController extends AbstractInachisController
                     $limit,
                     $offset,
                 );
-                //$total = get count - make sure results limited to 50
+                // $total = get count - make sure results limited to 50
                 break;
 
             default:

@@ -1,91 +1,88 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Repository\Analytics;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
-use Inachis\Entity\Content\{Page, Series};
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
 
 /**
- * Analytics repository
+ * Analytics repository.
  *
  * This repository is used to store and retrieve analytics data.
  */
 class AnalyticsRepository
 {
-    public function __construct(private Connection $db) {}
-
-	/**
-	 * Increment page views
-	 *
-	 * @param string $path The path of the page
-	 * @param string $date The date
-	 * @param int $views The number of views
-	 */
-    public function increment(string $path, string $date, int $views): void
+    public function __construct(private Connection $db)
     {
-		// $this->db->executeStatement(
-		// 	'
-		// 	INSERT INTO analytics_page_view (path, date, views)
-		// 	VALUES (:path, :date, :views)
-		// 	ON DUPLICATE KEY UPDATE views = views + :views
-		// 	',
-		// 	[
-		// 		'path' => $path,
-		// 		'date' => $date,
-		// 		'views' => $views,
-		// 	]
-		// );
     }
 
-	/**
-	 * Get top pages
-	 *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-	 * @param int $limit
-	 * @return list<array{path: string, total: numeric-string}>
-	 */
-	public function getTopPages(
+    /**
+     * Increment page views.
+     *
+     * @param string $path  The path of the page
+     * @param string $date  The date
+     * @param int    $views The number of views
+     */
+    public function increment(string $path, string $date, int $views): void
+    {
+        // $this->db->executeStatement(
+        // 	'
+        // 	INSERT INTO analytics_page_view (path, date, views)
+        // 	VALUES (:path, :date, :views)
+        // 	ON DUPLICATE KEY UPDATE views = views + :views
+        // 	',
+        // 	[
+        // 		'path' => $path,
+        // 		'date' => $date,
+        // 		'views' => $views,
+        // 	]
+        // );
+    }
+
+    /**
+     * Get top pages.
+     *
+     * @return list<array{path: string, total: numeric-string}>
+     */
+    public function getTopPages(
         \DateTimeInterface $from,
         \DateTimeInterface $to,
-        int $limit = 10
+        int $limit = 10,
     ): array {
-        /** @var list<array{path: string, total: numeric-string}> */
-		return $this->db->executeQuery(
-			'
+        /* @var list<array{path: string, total: numeric-string}> */
+        return $this->db->executeQuery(
+            '
 			SELECT path, SUM(views) as total
 			FROM analytics_page_view
             WHERE date BETWEEN :from AND :to
 			GROUP BY path
 			ORDER BY total DESC
-			LIMIT ' . $limit,
+			LIMIT '.$limit,
             [
                 'from' => $from->format('Y-m-d'),
-                'to'   => $to->format('Y-m-d'),
-            ]
-		)->fetchAllAssociative();
-	}
+                'to' => $to->format('Y-m-d'),
+            ],
+        )->fetchAllAssociative();
+    }
 
-	/**
-	 * Get page views per day
-	 *
-	 * @param \DateTimeInterface $from
-	 * @param \DateTimeInterface $to
-	 * @return list<array{date: string, total: numeric-string}>
-	 */
-	public function getPageViewsPerDay(
+    /**
+     * Get page views per day.
+     *
+     * @return list<array{date: string, total: numeric-string}>
+     */
+    public function getPageViewsPerDay(
         \DateTimeInterface $from,
-        \DateTimeInterface $to
+        \DateTimeInterface $to,
     ): array {
-        /** @var list<array{date: string, total: numeric-string}> */
+        /* @var list<array{date: string, total: numeric-string}> */
         return $this->db->fetchAllAssociative(
             '
             SELECT date, SUM(views) as total
@@ -97,18 +94,14 @@ class AnalyticsRepository
             [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
-            ]
+            ],
         );
     }
 
-	/**
-	 * Get total views
-	 *
-	 * @param \DateTimeInterface $from
-	 * @param \DateTimeInterface $to
-	 * @return int
-	 */
-	public function getTotalViews(\DateTimeInterface $from, \DateTimeInterface $to): int
+    /**
+     * Get total views.
+     */
+    public function getTotalViews(\DateTimeInterface $from, \DateTimeInterface $to): int
     {
         /** @var int $result */
         $result = $this->db->fetchOne(
@@ -120,18 +113,14 @@ class AnalyticsRepository
             [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
-            ]
+            ],
         );
 
         return (int) $result;
     }
 
     /**
-     * Get monthly unique visitors
-     *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @return int
+     * Get monthly unique visitors.
      */
     public function getMonthlyUniqueVisitors(\DateTimeInterface $from, \DateTimeInterface $to): int
     {
@@ -145,48 +134,40 @@ class AnalyticsRepository
             [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
-            ]
+            ],
         );
 
         return (int) $result;
     }
 
-	/**
+    /**
      * Get the most common paths that result in a 4xx or 5xx error.
      *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @param int $limit
      * @return list<array{path: string, code: string, hits: numeric-string}>
      */
     public function getTopErrors(
         \DateTimeInterface $from,
         \DateTimeInterface $to,
-        int $limit = 10
+        int $limit = 10,
     ): array {
-        /** @var list<array{path: string, code: string, hits: numeric-string}> */
+        /* @var list<array{path: string, code: string, hits: numeric-string}> */
         return $this->db->fetchAllAssociative('
             SELECT path, code, SUM(hits) AS hits
             FROM analytics_errors
             WHERE date BETWEEN :from AND :to
             GROUP BY path
             ORDER BY hits DESC
-            LIMIT ' . (int) $limit,
+            LIMIT '.(int) $limit,
             [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
-            ]
+            ],
         );
     }
 
     /**
      * Get trending pages by comparing two date ranges.
      *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @param \DateTimeInterface $previousFrom
-     * @param \DateTimeInterface $previousTo
-     * @param int $limit
      * @return list<array{path: string, current: int, previous: int, change: float|int|null}>
      */
     public function getTrendingPages(
@@ -194,7 +175,7 @@ class AnalyticsRepository
         \DateTimeInterface $to,
         \DateTimeInterface $previousFrom,
         \DateTimeInterface $previousTo,
-        int $limit = 10
+        int $limit = 10,
     ): array {
         /** @var list<array{path: string, total: numeric-string}> $current */
         $current = $this->db->fetchAllAssociative(
@@ -206,8 +187,8 @@ class AnalyticsRepository
             ',
             [
                 'from' => $from->format('Y-m-d'),
-                'to'   => $to->format('Y-m-d'),
-            ]
+                'to' => $to->format('Y-m-d'),
+            ],
         );
 
         /** @var list<array{path: string, total: numeric-string}> $previous */
@@ -220,8 +201,8 @@ class AnalyticsRepository
             ',
             [
                 'from' => $previousFrom->format('Y-m-d'),
-                'to'   => $previousTo->format('Y-m-d'),
-            ]
+                'to' => $previousTo->format('Y-m-d'),
+            ],
         );
 
         $previousMap = [];
@@ -250,7 +231,7 @@ class AnalyticsRepository
 
         usort(
             $results,
-            static fn(array $a, array $b): int => $b['current'] <=> $a['current']
+            static fn (array $a, array $b): int => $b['current'] <=> $a['current'],
         );
 
         return array_slice($results, 0, $limit);
@@ -259,17 +240,14 @@ class AnalyticsRepository
     /**
      * Get the most common referring domains.
      *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @param int $limit
      * @return list<array{domain: string, total: numeric-string}>
      */
     public function getTopReferrers(
         \DateTimeInterface $from,
         \DateTimeInterface $to,
-        int $limit = 10
+        int $limit = 10,
     ): array {
-        /** @var list<array{domain: string, total: numeric-string}> */
+        /* @var list<array{domain: string, total: numeric-string}> */
         return $this->db->fetchAllAssociative(
             '
             SELECT domain, SUM(hits) AS total
@@ -277,30 +255,26 @@ class AnalyticsRepository
             WHERE date BETWEEN :from AND :to
             GROUP BY domain
             ORDER BY total DESC
-            LIMIT ' . (int) $limit,
+            LIMIT '.(int) $limit,
             [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
-            ]
+            ],
         );
     }
 
     /**
      * Get the most common referring domains for a specific page.
      *
-     * @param string $path
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @param int $limit
      * @return list<array{domain: string, total: numeric-string}>
      */
     public function getTopReferrersForPage(
         string $path,
         \DateTimeInterface $from,
         \DateTimeInterface $to,
-        int $limit = 10
+        int $limit = 10,
     ): array {
-        /** @var list<array{domain: string, total: numeric-string}> */
+        /* @var list<array{domain: string, total: numeric-string}> */
         return $this->db->fetchAllAssociative(
             '
             SELECT domain, SUM(hits) AS total
@@ -309,27 +283,26 @@ class AnalyticsRepository
             AND date BETWEEN :from AND :to
             GROUP BY domain
             ORDER BY total DESC
-            LIMIT ' . (int) $limit,
+            LIMIT '.(int) $limit,
             [
                 'path' => $path,
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
-            ]
+            ],
         );
     }
 
     /**
-     * Get page views per day for paths
+     * Get page views per day for paths.
      *
      * @param string[] $paths
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
+     *
      * @return list<array{date: string, views: int}>
      */
     public function getPageViewsPerDayForPaths(
         array $paths,
         \DateTimeInterface $from,
-        \DateTimeInterface $to
+        \DateTimeInterface $to,
     ): array {
         if (empty($paths)) {
             return [];
@@ -352,39 +325,33 @@ class AnalyticsRepository
             ],
             [
                 'paths' => ArrayParameterType::STRING,
-            ]
+            ],
         )->fetchAllAssociative();
 
         return $this->fillMissingSeries($data, $from, $to, 'views');
     }
 
     /**
-     * Get page views per day for a page
+     * Get page views per day for a page.
      *
-     * @param Page $page
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
      * @return list<array{date: string, views: int}>
      */
-	public function getPageStatsOverTime(Page $page, \DateTimeInterface $from, \DateTimeInterface $to): array
-	{
-		$paths = $page->getUrls()->map(fn($url) => '/' . $url->getLink());
+    public function getPageStatsOverTime(Page $page, \DateTimeInterface $from, \DateTimeInterface $to): array
+    {
+        $paths = $page->getUrls()->map(fn ($url) => '/'.$url->getLink());
 
-		return $this->getPageViewsPerDayForPaths($paths->toArray(), $from, $to);
-	}
+        return $this->getPageViewsPerDayForPaths($paths->toArray(), $from, $to);
+    }
 
     /**
-     * Get page views per day for a series
+     * Get page views per day for a series.
      *
-     * @param Series $series
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
      * @return list<array{date: string, views: int}>
      */
     public function getSeriesStatsOverTime(Series $series, \DateTimeInterface $from, \DateTimeInterface $to): array
     {
         if (!empty($series->getLastDate()) && !empty($series->getUrl())) {
-            $paths = ['/' . $series->getLastDate()->format('Y') . '-' . $series->getUrl()];
+            $paths = ['/'.$series->getLastDate()->format('Y').'-'.$series->getUrl()];
         } else {
             $paths = [];
         }
@@ -395,14 +362,11 @@ class AnalyticsRepository
     /**
      * Get top visitor countries/regions.
      *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @param int $limit
      * @return list<array{country_code: string, country_name: string, total: numeric-string}>
      */
     public function getTopRegions(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array
     {
-        /** @var list<array{country_code: string, country_name: string, total: numeric-string}> */
+        /* @var list<array{country_code: string, country_name: string, total: numeric-string}> */
         return $this->db->fetchAllAssociative(
             '
             SELECT country_code, country_name, SUM(hits) AS total
@@ -410,24 +374,22 @@ class AnalyticsRepository
             WHERE date BETWEEN :from AND :to
             GROUP BY country_code, country_name
             ORDER BY total DESC
-            LIMIT ' . (int) $limit,
+            LIMIT '.(int) $limit,
             [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
-            ]
+            ],
         );
     }
 
     /**
      * Get RSS subscriber stats over time.
      *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
      * @return list<array{date: string, subscribers: int}>
      */
     public function getSubscriberStatsOverTime(
         \DateTimeInterface $from,
-        \DateTimeInterface $to
+        \DateTimeInterface $to,
     ): array {
         /** @var list<array{date:string,total:int|string|null}> $data */
         $data = $this->db->fetchAllAssociative(
@@ -441,15 +403,15 @@ class AnalyticsRepository
             [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
-            ]
+            ],
         );
 
-        /** @var list<array{date:string,subscribers:int}> */
+        /* @var list<array{date:string,subscribers:int}> */
         return $this->fillMissingSeries(
             $data,
             $from,
             $to,
-            'subscribers'
+            'subscribers',
         );
     }
 
@@ -460,7 +422,7 @@ class AnalyticsRepository
      */
     public function getCurrentSubscribersPerFeed(): array
     {
-        /** @var list<array{path: string, subscribers: numeric-string}> */
+        /* @var list<array{path: string, subscribers: numeric-string}> */
         return $this->db->fetchAllAssociative(
             '
             SELECT s.path, s.subscribers
@@ -472,21 +434,18 @@ class AnalyticsRepository
             ) latest ON s.path = latest.path AND s.date = latest.max_date
             ORDER BY s.subscribers DESC
             LIMIT 10
-            '
+            ',
         );
     }
 
     /**
      * Get top bot user-agents ordered by total hits in the given date range.
      *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @param int $limit
      * @return list<array{user_agent: string, total: numeric-string}>
      */
     public function getTopBots(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 15): array
     {
-        /** @var list<array{user_agent: string, total: numeric-string}> */
+        /* @var list<array{user_agent: string, total: numeric-string}> */
         return $this->db->fetchAllAssociative(
             '
             SELECT user_agent, SUM(hits) AS total
@@ -494,11 +453,11 @@ class AnalyticsRepository
             WHERE date BETWEEN :from AND :to
             GROUP BY user_agent
             ORDER BY total DESC
-            LIMIT ' . (int) $limit,
+            LIMIT '.(int) $limit,
             [
                 'from' => $from->format('Y-m-d'),
-                'to'   => $to->format('Y-m-d'),
-            ]
+                'to' => $to->format('Y-m-d'),
+            ],
         );
     }
 
@@ -565,7 +524,7 @@ class AnalyticsRepository
                 'yesterday' => $yesterday->format('Y-m-d'),
                 'thisMonth' => $thisMonth->format('Y-m-d'),
                 'lastMonth' => $lastMonth->format('Y-m-d'),
-            ]
+            ],
         );
 
         /** @var array{
@@ -594,7 +553,7 @@ class AnalyticsRepository
             [
                 'thisMonth' => $thisMonth->format('Y-m-d'),
                 'lastMonth' => $lastMonth->format('Y-m-d'),
-            ]
+            ],
         );
 
         return [
@@ -614,16 +573,15 @@ class AnalyticsRepository
      * The query should return rows with a "date" column and a "total" column.
      *
      * @param list<array{date:string,total:int|string|null}> $data
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @param string $valueKey The key to use in the returned array (e.g. "views", "subscribers")
+     * @param string                                         $valueKey The key to use in the returned array (e.g. "views", "subscribers")
+     *
      * @return list<array{date:string}>
      */
     private function fillMissingSeries(
         array $data,
         \DateTimeInterface $from,
         \DateTimeInterface $to,
-        string $valueKey
+        string $valueKey,
     ): array {
         $indexed = [];
 
@@ -652,10 +610,6 @@ class AnalyticsRepository
 
     /**
      * Total number of 4xx/5xx responses.
-     *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @return integer
      */
     public function getTotalErrors(
         \DateTimeInterface $from,
@@ -669,16 +623,13 @@ class AnalyticsRepository
             ',
             [
                 'from' => $from->format('Y-m-d'),
-                'to'   => $to->format('Y-m-d'),
-            ]
+                'to' => $to->format('Y-m-d'),
+            ],
         );
     }
 
     /**
      * Get security dashboard summary.
-     *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
      *
      * @return array{
      *     total:int,
@@ -689,7 +640,7 @@ class AnalyticsRepository
      */
     public function getSecuritySummary(
         \DateTimeInterface $from,
-        \DateTimeInterface $to
+        \DateTimeInterface $to,
     ): array {
         $result = $this->db->fetchAssociative(
             '
@@ -704,7 +655,7 @@ class AnalyticsRepository
             [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
-            ]
+            ],
         );
 
         return [
@@ -718,16 +669,12 @@ class AnalyticsRepository
     /**
      * Get most targeted paths.
      *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @param int $limit
-     *
      * @return list<array{path:string,total:numeric-string}>
      */
     public function getTopSecurityPaths(
         \DateTimeInterface $from,
         \DateTimeInterface $to,
-        int $limit = 10
+        int $limit = 10,
     ): array {
         return $this->db->fetchAllAssociative(
             '
@@ -738,27 +685,23 @@ class AnalyticsRepository
             WHERE date BETWEEN :from AND :to
             GROUP BY path
             ORDER BY total DESC
-            LIMIT ' . (int) $limit,
+            LIMIT '.(int) $limit,
             [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
-            ]
+            ],
         );
     }
 
     /**
      * Get most common security event types.
      *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @param int $limit
-     *
      * @return list<array{type:string,total:numeric-string}>
      */
     public function getTopSecurityTypes(
         \DateTimeInterface $from,
         \DateTimeInterface $to,
-        int $limit = 10
+        int $limit = 10,
     ): array {
         return $this->db->fetchAllAssociative(
             '
@@ -769,27 +712,23 @@ class AnalyticsRepository
             WHERE date BETWEEN :from AND :to
             GROUP BY type
             ORDER BY total DESC
-            LIMIT ' . (int) $limit,
+            LIMIT '.(int) $limit,
             [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
-            ]
+            ],
         );
     }
 
     /**
      * Get IP addresses generating the most security events.
      *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @param int $limit
-     *
      * @return list<array{ip:string,total:numeric-string}>
      */
     public function getTopSecurityIps(
         \DateTimeInterface $from,
         \DateTimeInterface $to,
-        int $limit = 10
+        int $limit = 10,
     ): array {
         return $this->db->fetchAllAssociative(
             '
@@ -800,25 +739,22 @@ class AnalyticsRepository
             WHERE date BETWEEN :from AND :to
             GROUP BY ip
             ORDER BY total DESC
-            LIMIT ' . (int) $limit,
+            LIMIT '.(int) $limit,
             [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
-            ]
+            ],
         );
     }
 
     /**
      * Get security events over time.
      *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     *
      * @return list<array{date:string,total:numeric-string}>
      */
     public function getSecurityEventsPerDay(
         \DateTimeInterface $from,
-        \DateTimeInterface $to
+        \DateTimeInterface $to,
     ): array {
         return $this->db->fetchAllAssociative(
             '
@@ -833,14 +769,12 @@ class AnalyticsRepository
             [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
-            ]
+            ],
         );
     }
 
     /**
      * Get recent security events.
-     *
-     * @param int $limit
      *
      * @return list<array{
      *     date:string,
@@ -852,7 +786,7 @@ class AnalyticsRepository
      * }>
      */
     public function getRecentSecurityEvents(
-        int $limit = 20
+        int $limit = 20,
     ): array {
         return $this->db->fetchAllAssociative(
             '
@@ -865,7 +799,7 @@ class AnalyticsRepository
                 hits
             FROM analytics_security_event
             ORDER BY id DESC
-            LIMIT ' . (int) $limit
+            LIMIT '.(int) $limit,
         );
     }
 
@@ -873,8 +807,6 @@ class AnalyticsRepository
      * Get highest severity events.
      *
      * Useful for an "active threats" panel.
-     *
-     * @param int $limit
      *
      * @return list<array{
      *     date:string,
@@ -886,7 +818,7 @@ class AnalyticsRepository
      * }>
      */
     public function getCriticalSecurityEvents(
-        int $limit = 10
+        int $limit = 10,
     ): array {
         return $this->db->fetchAllAssociative(
             '
@@ -900,21 +832,18 @@ class AnalyticsRepository
             FROM analytics_security_event
             WHERE severity >= 9
             ORDER BY severity DESC, hits DESC
-            LIMIT ' . (int) $limit
+            LIMIT '.(int) $limit,
         );
     }
 
     /**
      * Get security activity by HTTP method.
      *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     *
      * @return list<array{method:string,total:numeric-string}>
      */
     public function getSecurityMethods(
         \DateTimeInterface $from,
-        \DateTimeInterface $to
+        \DateTimeInterface $to,
     ): array {
         return $this->db->fetchAllAssociative(
             '
@@ -929,7 +858,7 @@ class AnalyticsRepository
             [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
-            ]
+            ],
         );
     }
 
@@ -941,7 +870,7 @@ class AnalyticsRepository
     public function getSecurityEventsByType(
         \DateTimeInterface $from,
         \DateTimeInterface $to,
-        int $limit = 10
+        int $limit = 10,
     ): array {
         return $this->db->fetchAllAssociative(
             '
@@ -952,11 +881,11 @@ class AnalyticsRepository
             WHERE date BETWEEN :from AND :to
             GROUP BY type
             ORDER BY total DESC
-            LIMIT ' . (int) $limit,
+            LIMIT '.(int) $limit,
             [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
-            ]
+            ],
         );
     }
 }

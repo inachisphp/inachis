@@ -1,17 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Entity\User;
 
 use Doctrine\DBAL\Types\Types;
-use Inachis\Repository\User\UserViewStateRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Inachis\Repository\User\UserViewStateRepository;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 
@@ -42,10 +41,7 @@ class UserViewState
     private array $state = [];
 
     /**
-     * Constructor for {@link UserViewState}
-     *
-     * @param User $user
-     * @param string $context
+     * Constructor for {@link UserViewState}.
      */
     public function __construct(User $user, string $context)
     {
@@ -54,7 +50,7 @@ class UserViewState
     }
 
     /**
-     * Returns the current view state
+     * Returns the current view state.
      *
      * @return array<string,mixed>
      */
@@ -64,10 +60,9 @@ class UserViewState
     }
 
     /**
-     * Sets the current view state
+     * Sets the current view state.
      *
      * @param array<string,mixed> $state
-     * @return self
      */
     public function setState(array $state): self
     {
@@ -77,9 +72,7 @@ class UserViewState
     }
 
     /**
-     * Gets the current context
-     *
-     * @return string
+     * Gets the current context.
      */
     public function getContext(): string
     {
@@ -87,9 +80,7 @@ class UserViewState
     }
 
     /**
-     * Gets the current user
-     *
-     * @return User
+     * Gets the current user.
      */
     public function getUser(): User
     {

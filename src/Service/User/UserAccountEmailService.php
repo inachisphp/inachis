@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\User;
@@ -20,16 +19,12 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 
 /**
- * Service for sending user account emails
+ * Service for sending user account emails.
  */
 readonly class UserAccountEmailService
 {
     protected PageView $viewModel;
 
-    /**
-     * @param MailerInterface $mailer
-     * @param PasswordResetTokenService $tokenService
-     */
     public function __construct(
         private MailerInterface $mailer,
         private PasswordResetTokenService $tokenService,
@@ -39,12 +34,9 @@ readonly class UserAccountEmailService
     }
 
     /**
-     * Send a forgot password email to a user
+     * Send a forgot password email to a user.
      *
-     * @param User $user
      * @param array<string, mixed> $data
-     * @param callable $urlGenerator
-     * @return void
      */
     public function sendForgotPasswordEmail(User $user, array $data, callable $urlGenerator): void
     {
@@ -62,7 +54,7 @@ readonly class UserAccountEmailService
         $siteTitle = $data['siteTitle'] ?? 'Inachis Admin Panel';
         $email = (new TemplatedEmail())
             ->to(new Address($emailAddress))
-            ->subject('Reset your password for ' . $siteTitle)
+            ->subject('Reset your password for '.$siteTitle)
             ->htmlTemplate('inadmin/emails/forgot-password.html.twig')
             ->textTemplate('inadmin/emails/forgot-password.txt.twig')
             ->context([
@@ -77,19 +69,17 @@ readonly class UserAccountEmailService
     }
 
     /**
-     * Register a new user and send them an email
+     * Register a new user and send them an email.
      *
-     * @param User $user
      * @param array<string, mixed> $settings
-     * @param callable $urlGenerator
-     * @return void
+     *
      * @throws RandomException
      * @throws TransportExceptionInterface
      */
     public function registerNewUser(
         User $user,
         array $settings,
-        callable $urlGenerator
+        callable $urlGenerator,
     ): void {
         $emailAddress = $user->getEmail();
         if (empty($emailAddress)) {
@@ -98,10 +88,10 @@ readonly class UserAccountEmailService
 
         $tokenData = $this->tokenService->createResetRequestForEmail($emailAddress);
         if (
-            empty($tokenData) ||
-            empty($tokenData['token']) ||
-            empty($tokenData['expiresAt']) ||
-            !($tokenData['expiresAt'] instanceof \DateTimeImmutable)
+            empty($tokenData)
+            || empty($tokenData['token'])
+            || empty($tokenData['expiresAt'])
+            || !($tokenData['expiresAt'] instanceof \DateTimeImmutable)
         ) {
             return;
         }
@@ -110,7 +100,7 @@ readonly class UserAccountEmailService
         $siteTitle = $settings['siteTitle'] ?? 'Inachis Admin Panel';
         $email = (new TemplatedEmail())
             ->to(new Address($emailAddress))
-            ->subject('Welcome to ' . $siteTitle)
+            ->subject('Welcome to '.$siteTitle)
             ->htmlTemplate('inadmin/emails/registration.html.twig')
             ->textTemplate('inadmin/emails/registration.txt.twig')
             ->context([

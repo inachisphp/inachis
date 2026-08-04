@@ -1,15 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Security\Attribute;
-
-use ReflectionMethod;
 
 final class PermissionAttributeReader
 {
@@ -18,11 +15,11 @@ final class PermissionAttributeReader
      */
     public function getPermissions(object $controller, string $method): array
     {
-        $reflection = new ReflectionMethod($controller, $method);
+        $reflection = new \ReflectionMethod($controller, $method);
 
         return array_map(
             static fn ($attribute) => $attribute->newInstance(),
-            $reflection->getAttributes(RequiresPermission::class)
+            $reflection->getAttributes(RequiresPermission::class),
         );
     }
 }

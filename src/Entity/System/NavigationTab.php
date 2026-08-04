@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Entity\System;
@@ -15,15 +14,12 @@ use Ramsey\Uuid\UuidInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
- * Entity for storing navigation tabs for the website
+ * Entity for storing navigation tabs for the website.
  */
 #[ORM\Entity]
 #[UniqueEntity('position')]
 class NavigationTab
 {
-    /**
-     * @var UuidInterface|null
-     */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -31,19 +27,19 @@ class NavigationTab
     private ?UuidInterface $id = null;
 
     /**
-     * The title for the tab
+     * The title for the tab.
      */
     #[ORM\Column(length: 100)]
     private string $title;
 
     /**
-     * The URL for the tab
+     * The URL for the tab.
      */
     #[ORM\Column(length: 255)]
     private string $url;
 
     /**
-     * The position of the tab
+     * The position of the tab.
      */
     #[ORM\Column(unique: true)]
     private int $position = 0;
@@ -57,29 +53,25 @@ class NavigationTab
     private bool $isSystem = false;
 
     /**
-     * Set the value of id
-     *
-     * @param UuidInterface|null $id
-     * @return self
+     * Set the value of id.
      */
-    public function setId(?UuidInterface $id): self {
+    public function setId(?UuidInterface $id): self
+    {
         $this->id = $id;
+
         return $this;
     }
 
     /**
-     * Get the value of id
-     *
-     * @return UuidInterface|null
+     * Get the value of id.
      */
-    public function getId(): ?UuidInterface {
+    public function getId(): ?UuidInterface
+    {
         return $this->id;
     }
 
     /**
-     * Get the value of title
-     *
-     * @return string
+     * Get the value of title.
      */
     public function getTitle(): string
     {
@@ -87,21 +79,17 @@ class NavigationTab
     }
 
     /**
-     * Set the value of title
-     *
-     * @param string $title
-     * @return self
+     * Set the value of title.
      */
     public function setTitle(string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
     /**
-     * Get the value of url
-     *
-     * @return string
+     * Get the value of url.
      */
     public function getUrl(): string
     {
@@ -109,10 +97,7 @@ class NavigationTab
     }
 
     /**
-     * Set the value of url
-     *
-     * @param string $url
-     * @return self
+     * Set the value of url.
      */
     public function setUrl(string $url): self
     {
@@ -121,13 +106,12 @@ class NavigationTab
         }
 
         $this->url = $url;
+
         return $this;
     }
 
     /**
-     * Get the value of position
-     *
-     * @return int
+     * Get the value of position.
      */
     public function getPosition(): int
     {
@@ -135,21 +119,17 @@ class NavigationTab
     }
 
     /**
-     * Set the value of position
-     *
-     * @param int $position
-     * @return self
+     * Set the value of position.
      */
     public function setPosition(int $position): self
     {
         $this->position = $position;
+
         return $this;
     }
 
     /**
-     * Get the value of isActive
-     *
-     * @return bool
+     * Get the value of isActive.
      */
     public function isActive(): bool
     {
@@ -157,21 +137,17 @@ class NavigationTab
     }
 
     /**
-     * Set the value of isActive
-     *
-     * @param bool $isActive
-     * @return self
+     * Set the value of isActive.
      */
     public function setIsActive(bool $isActive): self
     {
         $this->isActive = $isActive;
+
         return $this;
     }
 
     /**
-     * Get the value of isSystem
-     *
-     * @return bool
+     * Get the value of isSystem.
      */
     public function isSystem(): bool
     {
@@ -179,14 +155,12 @@ class NavigationTab
     }
 
     /**
-     * Set the value of isSystem
-     *
-     * @param bool $isSystem
-     * @return self
+     * Set the value of isSystem.
      */
     public function setIsSystem(bool $isSystem): self
     {
         $this->isSystem = $isSystem;
+
         return $this;
     }
 }

@@ -1,23 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Resource;
 
-use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Media\{Download, Image};
+use Inachis\Entity\Media\Download;
+use Inachis\Entity\Media\Image;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\ResourceType;
 use Inachis\Model\Page\ViewStateDefaults;
-use Inachis\Repository\Content\{CategoryRepository, PageRepository, SeriesRepository};
-use Inachis\Repository\Media\{DownloadRepository, ImageRepository};
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\SeriesRepository;
+use Inachis\Repository\Media\DownloadRepository;
+use Inachis\Repository\Media\ImageRepository;
 use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\ViewStateManager;
 use Inachis\Service\Resource\ImageFileService;
@@ -35,26 +37,24 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class ResourceController extends AbstractInachisController
 {
     /**
-     * @param Request $request
-     * @return Response
      * @throws \Exception
      */
-    #[Route("/incp/resources/{type}/{limit}/{offset}",
-        name: "incp_resource_list",
+    #[Route('/incp/resources/{type}/{limit}/{offset}',
+        name: 'incp_resource_list',
         requirements: [
-            "type" => "(images|downloads)",
-            "limit" => "\d+",
-            "offset" => "\d+",
+            'type' => '(images|downloads)',
+            'limit' => "\d+",
+            'offset' => "\d+",
         ],
-        defaults: [ "limit" => 25, "offset" => 0, ],
-        methods: [ "GET", "POST" ],
+        defaults: ['limit' => 25, 'offset' => 0],
+        methods: ['GET', 'POST'],
     )]
     #[RequiresPermission(
         resource: [
             PermissionResource::IMAGE,
             PermissionResource::DOWNLOAD,
         ],
-        action: PermissionAction::VIEW
+        action: PermissionAction::VIEW,
     )]
     public function list(
         Request $request,
@@ -63,18 +63,18 @@ class ResourceController extends AbstractInachisController
         ImageRepository $imageRepository,
         ViewStateManager $viewStateManager,
     ): Response {
-        $typeClass = match($request->attributes->getString('type')) {
+        $typeClass = match ($request->attributes->getString('type')) {
             'downloads' => Download::class,
             default => Image::class,
         };
         $type = substr(strrchr($typeClass, '\\') ?: '', 1);
-        $repository = match($type) {
+        $repository = match ($type) {
             'Download' => $downloadRepository,
             default => $imageRepository,
         };
         $form = $this->createFormBuilder()
             ->setAction($this->generateUrl('incp_resource_list', [
-                'type' => strtolower($type) . 's',
+                'type' => strtolower($type).'s',
             ]))
             ->getForm();
         $form->handleRequest($request);
@@ -103,7 +103,7 @@ class ResourceController extends AbstractInachisController
             ]);
         }
 
-        if ($repository instanceof ImageRepository && $request->query->getString('altText', '') === 'null') {
+        if ($repository instanceof ImageRepository && 'null' === $request->query->getString('altText', '')) {
             $dataset = $repository->getImagesWithoutAltText(
                 $params->getLimit(),
                 $params->getOffset(),
@@ -117,9 +117,10 @@ class ResourceController extends AbstractInachisController
             );
         }
 
-        $this->viewModel->page->title = $type . 's';
-        $this->viewModel->page->type = strtolower($type) . 's';
+        $this->viewModel->page->title = $type.'s';
+        $this->viewModel->page->type = strtolower($type).'s';
         $this->viewModel->page->tab = strtolower($type);
+
         return $this->render('inadmin/page/resource/list.html.twig', [
             'viewModel' => $this->viewModel,
             'allowedTypes' => Image::ALLOWED_MIME_TYPES,
@@ -128,22 +129,16 @@ class ResourceController extends AbstractInachisController
             'limitKByte' => Image::WARNING_FILESIZE,
             'limitSize' => Image::WARNING_DIMENSIONS,
             'query' => $params,
-            'showUploadDialog' => $request->query->has('upload') && $request->query->getString('upload') === 'true',
+            'showUploadDialog' => $request->query->has('upload') && 'true' === $request->query->getString('upload'),
         ]);
     }
 
-    /**
-     * @param Request $request
-     * @param Filesystem $filesystem
-     * @param string $imageDirectory
-     * @return Response
-     */
     #[Route('/incp/resources/{type}/{filename}',
-        name: "incp_resource_edit",
+        name: 'incp_resource_edit',
         requirements: [
-            "type" => "(images|downloads)",
+            'type' => '(images|downloads)',
         ],
-        methods: [ "GET", "POST" ],
+        methods: ['GET', 'POST'],
     )]
     public function edit(
         Request $request,
@@ -153,15 +148,15 @@ class ResourceController extends AbstractInachisController
         PageRepository $pageRepository,
         SeriesRepository $seriesRepository,
         WasteManagerService $wasteManagerService,
-        #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory
+        #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory,
     ): Response {
-//            "filename" => "[a-zA-Z0-9\-\_]\.(jpe?g|heic|png)",
+        //            "filename" => "[a-zA-Z0-9\-\_]\.(jpe?g|heic|png)",
         $typeClass = match ($request->attributes->getString('type')) {
             'downloads' => Download::class,
             default => Image::class,
         };
         $type = substr(strrchr($typeClass, '\\') ?: '', 1);
-        $repository = match($type) {
+        $repository = match ($type) {
             'Download' => $downloadRepository,
             default => $imageRepository,
         };
@@ -173,9 +168,8 @@ class ResourceController extends AbstractInachisController
                 'incp_resource_list',
                 [
                     'type' => $request->attributes->getString('type'),
-
                 ],
-                Response::HTTP_PERMANENTLY_REDIRECT
+                Response::HTTP_PERMANENTLY_REDIRECT,
             );
         }
         $form = $this->createForm(ResourceType::class, $resource);
@@ -191,11 +185,11 @@ class ResourceController extends AbstractInachisController
         if ($form->isSubmitted() && $form->isValid()) {
             $resource = $form->getData();
             if (isset($request->request->all('resource')['delete'])) {
-                $filename = $imageDirectory . $resource->getFilename();
-                if ($resource instanceof Image &&
-                    isset($usages['posts']) &&
-                    empty($usages['posts']) &&
-                    $usages['series']->count() === 0) {
+                $filename = $imageDirectory.$resource->getFilename();
+                if ($resource instanceof Image
+                    && isset($usages['posts'])
+                    && empty($usages['posts'])
+                    && 0 === $usages['series']->count()) {
                     try {
                         if (!$filesystem->exists($filename)) {
                             $this->addFlash('error', 'The file for this resource does not exist and so will not be recoverable.');
@@ -204,21 +198,22 @@ class ResourceController extends AbstractInachisController
                         }
                         $repository->remove($resource);
                         $this->addFlash('success', 'Resource deleted.');
+
                         return $this->redirectToRoute(
                             'incp_resource_list',
                             [
                                 'type' => $request->attributes->getString('type'),
-
                             ],
-                            Response::HTTP_PERMANENTLY_REDIRECT
+                            Response::HTTP_PERMANENTLY_REDIRECT,
                         );
                     } catch (\Exception $e) {
                         $this->addFlash('error', 'Failed to remove file.');
+
                         return $this->redirectToRoute(
                             'incp_resource_edit', [
                                 'type' => $request->attributes->getString('type'),
                                 'filename' => $resource->getId(),
-                            ]
+                            ],
                         );
                     }
                 } else {
@@ -226,16 +221,17 @@ class ResourceController extends AbstractInachisController
                 }
             }
             $resource->setAuthor($this->getCurrentUser());
-            $resource->setUpdatedAt(new DateTimeImmutable());
+            $resource->setUpdatedAt(new \DateTimeImmutable());
             $this->entityManager->persist($resource);
             $this->entityManager->flush();
 
             $this->addFlash('success', 'Content saved.');
+
             return $this->redirectToRoute(
                 'incp_resource_edit', [
                     'type' => $request->attributes->getString('type'),
                     'filename' => $resource->getId(),
-                ]
+                ],
             );
         }
 
@@ -255,6 +251,7 @@ class ResourceController extends AbstractInachisController
         $this->viewModel->page->type = $request->attributes->getString('type');
         $this->viewModel->page->title = sprintf('%s: %s', $type, $resource->getTitle());
         $this->viewModel->page->tab = $type;
+
         return $this->render('inadmin/page/resource/edit.html.twig', [
             'viewModel' => $this->viewModel,
             'additional' => $additional,
@@ -264,13 +261,7 @@ class ResourceController extends AbstractInachisController
         ]);
     }
 
-    /**
-     * @param Request $request
-     * @param SluggerInterface $slugger
-     * @param string $imageDirectory
-     * @return JsonResponse
-     */
-    #[Route("/incp/resource/image/upload", name: "incp_resource_upload_image", methods: [ "POST", "PUT" ])]
+    #[Route('/incp/resource/image/upload', name: 'incp_resource_upload_image', methods: ['POST', 'PUT'])]
     public function uploadImage(
         Request $request,
         ImageFileService $imageFileService,
@@ -312,7 +303,7 @@ class ResourceController extends AbstractInachisController
 
             // Step 3: Extract dimensions
             $dimensions = $imageFileService->getImageDimensions($uploadedFile);
-            if ($dimensions === false) {
+            if (false === $dimensions) {
                 throw new \RuntimeException('Unable to read image dimensions.');
             }
 
@@ -329,14 +320,14 @@ class ResourceController extends AbstractInachisController
 
             // Step 5: Create safe filename
             $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-            $title = trim($imageData['title']) !== ''
+            $title = '' !== trim($imageData['title'])
                 ? $imageData['title']
                 : $originalFilename;
 
             $safeFilename = strtolower(
-                (string) $slugger->slug($title . '-' . uniqid())
+                (string) $slugger->slug($title.'-'.uniqid()),
             );
-            $newFilename = $safeFilename . '.' . $uploadedFile->guessExtension();
+            $newFilename = $safeFilename.'.'.$uploadedFile->guessExtension();
 
             $imageSize = $uploadedFile->getSize();
             $imageMimeType = $uploadedFile->getMimeType();
@@ -370,7 +361,7 @@ class ResourceController extends AbstractInachisController
                 ],
             ]);
         } catch (FileException $e) {
-            return new JsonResponse(['error' => 'File upload failed: ' . $e->getMessage()], 400);
+            return new JsonResponse(['error' => 'File upload failed: '.$e->getMessage()], 400);
         } catch (\RuntimeException $e) {
             return new JsonResponse(['error' => $e->getMessage()], 400);
         }

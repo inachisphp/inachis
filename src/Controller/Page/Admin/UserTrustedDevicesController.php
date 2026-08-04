@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Admin;
@@ -21,7 +20,7 @@ class UserTrustedDevicesController extends AbstractInachisController
     #[Route(
         '/incp/trusted-devices/{deviceId}/rename',
         name: 'incp_security_trusted_device_rename',
-        methods: ['POST']
+        methods: ['POST'],
     )]
     public function renameTrustedDevice(
         Request $request,
@@ -34,13 +33,14 @@ class UserTrustedDevicesController extends AbstractInachisController
         }
 
         $displayName = trim(
-            (string) $request->request->get('display_name')
+            (string) $request->request->get('display_name'),
         );
 
-        if ($displayName === '') {
+        if ('' === $displayName) {
             $this->addFlash('error', 'Device name cannot be empty.');
+
             return $this->redirectToRoute('incp_admin_edit', [
-                'id' => $this->getCurrentUser()->getUsername()
+                'id' => $this->getCurrentUser()->getUsername(),
             ]);
         }
 
@@ -48,7 +48,7 @@ class UserTrustedDevicesController extends AbstractInachisController
             $displayName = mb_substr(
                 $displayName,
                 0,
-                100
+                100,
             );
         }
 
@@ -59,14 +59,14 @@ class UserTrustedDevicesController extends AbstractInachisController
         $this->addFlash('success', 'Trusted device renamed.');
 
         return $this->redirectToRoute('incp_admin_edit', [
-            'id' => $this->getCurrentUser()->getUsername()
+            'id' => $this->getCurrentUser()->getUsername(),
         ]);
     }
 
     #[Route(
         '/incp/admin/trusted-devices/{id}/remove',
         name: 'incp_security_trusted_device_remove',
-        methods: ['POST']
+        methods: ['POST'],
     )]
     public function removeTrustedDevice(
         Request $request,
@@ -81,21 +81,21 @@ class UserTrustedDevicesController extends AbstractInachisController
         $currentDevice = $trustedDeviceManager
             ->getCurrentTrustedDevice(
                 $user,
-                $request
+                $request,
             );
 
         $trustedDeviceManager->remove($device);
 
         $response = $this->redirectToRoute('incp_admin_edit', [
-            'id' => $this->getCurrentUser()->getUsername()
+            'id' => $this->getCurrentUser()->getUsername(),
         ]);
 
         if (
-            $currentDevice !== null &&
-            $currentDevice->getId()->equals($device->getId())
+            null !== $currentDevice
+            && $currentDevice->getId()->equals($device->getId())
         ) {
             $response->headers->setCookie(
-                $trustedDeviceManager->clearCookie()
+                $trustedDeviceManager->clearCookie(),
             );
         }
 
@@ -107,21 +107,21 @@ class UserTrustedDevicesController extends AbstractInachisController
     #[Route(
         '/incp/admin/trusted-devices/remove-all',
         name: 'incp_security_trusted_device_remove_all',
-        methods: ['POST']
+        methods: ['POST'],
     )]
     public function removeAllTrustedDevices(
         TrustedDeviceManager $trustedDeviceManager,
     ): Response {
         $trustedDeviceManager->removeAll(
-            $this->getCurrentUser()
+            $this->getCurrentUser(),
         );
 
         $response = $this->redirectToRoute('incp_admin_edit', [
-            'id' => $this->getCurrentUser()->getUsername()
+            'id' => $this->getCurrentUser()->getUsername(),
         ]);
 
         $response->headers->setCookie(
-            $trustedDeviceManager->clearCookie()
+            $trustedDeviceManager->clearCookie(),
         );
 
         $this->addFlash('success', 'All trusted devices have been removed.');

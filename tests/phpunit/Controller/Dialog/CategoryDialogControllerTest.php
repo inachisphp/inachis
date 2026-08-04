@@ -1,21 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Controller\Dialog;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Inachis\Controller\Dialog\CategoryDialogController;
 use Inachis\Entity\Content\Category;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
-use ArrayIterator;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,7 +43,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
             ->getMock();
         $this->controller->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $this->categoryRepository = $this->createMock(CategoryRepository::class);
         parent::setUp();
@@ -68,7 +66,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
     public function testGetCategoryManagerListContentRootCategory(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incp/ax/categoryList/get'
+            'REQUEST_URI' => '/incp/ax/categoryList/get',
         ]);
         $category = (new Category('test-category'))->setId(Uuid::uuid1());
         $this->categoryRepository->expects($this->once())
@@ -86,7 +84,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'q' => 'test-category',
         ], [], [], [], [
-            'REQUEST_URI' => '/incp/ax/categoryList/get'
+            'REQUEST_URI' => '/incp/ax/categoryList/get',
         ]);
         $category = (new Category('test-category'))->setId(Uuid::uuid1());
         $paginator = $this->getMockBuilder(Paginator::class)
@@ -95,7 +93,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
             ->getMock();
         $paginator->expects($this->once())
             ->method('getIterator')
-            ->willReturn(new ArrayIterator([$category, $category]));
+            ->willReturn(new \ArrayIterator([$category, $category]));
 
         $this->categoryRepository->expects($this->once())
             ->method('findByTitleLike')
@@ -113,7 +111,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'id' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => 'incp/ax/categoryManager/save'
+            'REQUEST_URI' => 'incp/ax/categoryManager/save',
         ]);
         $category = (new Category('test-category'))->setId($uuid);
         $this->categoryRepository->expects($this->atLeastOnce())
@@ -130,7 +128,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
             'id' => '-1',
             'parentID' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => 'incp/ax/categoryManager/save'
+            'REQUEST_URI' => 'incp/ax/categoryManager/save',
         ]);
         $this->categoryRepository->expects($this->once())
             ->method('findOneBy')
@@ -148,7 +146,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'id' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => 'incp/ax/categoryManager/usage'
+            'REQUEST_URI' => 'incp/ax/categoryManager/usage',
         ]);
         $category = (new Category('test-category'))->setId($uuid);
         $category->addChild(new Category('test-sub-category'));
@@ -172,7 +170,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'id' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => 'incp/ax/categoryManager/delete'
+            'REQUEST_URI' => 'incp/ax/categoryManager/delete',
         ]);
         $category = (new Category('test-category'))->setId($uuid);
         $category->addChild(new Category('test-sub-category'));
@@ -197,7 +195,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
         $request = new Request([], [
             'id' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => 'incp/ax/categoryManager/delete'
+            'REQUEST_URI' => 'incp/ax/categoryManager/delete',
         ]);
         $category = (new Category('test-category'))->setId($uuid);
         $category->addChild(new Category('test-sub-category'));

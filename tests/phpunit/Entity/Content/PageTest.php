@@ -1,23 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Entity\Content;
 
-use DateTimeImmutable;
-use Exception;
-use InvalidArgumentException;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Tag;
+use Inachis\Entity\Content\Url;
 use Inachis\Entity\Media\Image;
-use Inachis\Entity\Content\{Category, Page, Series, Tag, Url};
 use Inachis\Entity\User\User;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Exception\InvalidTimezoneException;
-use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -86,21 +84,21 @@ class PageTest extends TestCase
 
     public function testSetAndGetCreatedAt(): void
     {
-        $currentTime = new DateTimeImmutable('now');
+        $currentTime = new \DateTimeImmutable('now');
         $this->page->setCreatedAt($currentTime);
         $this->assertEquals($currentTime, $this->page->getCreatedAt());
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testIsScheduledPage(): void
     {
-        $currentTime = new DateTimeImmutable('yesterday');
+        $currentTime = new \DateTimeImmutable('yesterday');
         $this->page->setPostDate($currentTime);
         $this->page->setStatus(EditorialStatus::PUBLISHED);
         $this->assertFalse($this->page->isScheduledPage());
-        $currentTime = new DateTimeImmutable('tomorrow');
+        $currentTime = new \DateTimeImmutable('tomorrow');
         $this->page->setPostDate($currentTime);
         $this->assertTrue($this->page->isScheduledPage());
     }
@@ -115,7 +113,7 @@ class PageTest extends TestCase
 
     public function testSetAndGetUpdatedAt(): void
     {
-        $currentTime = new DateTimeImmutable('now');
+        $currentTime = new \DateTimeImmutable('now');
         $this->page->setUpdatedAt($currentTime);
         $this->assertEquals($currentTime, $this->page->getUpdatedAt());
     }
@@ -127,7 +125,7 @@ class PageTest extends TestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testSetAndGetType(): void
     {
@@ -135,7 +133,7 @@ class PageTest extends TestCase
         $this->assertEquals(Page::TYPE_PAGE, $this->page->getType());
         $this->page->setType(Page::TYPE_POST);
         $this->assertEquals(Page::TYPE_POST, $this->page->getType());
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
         $this->page->setType('test');
     }
 
@@ -174,7 +172,7 @@ class PageTest extends TestCase
 
     public function testSetAndGetPostDate(): void
     {
-        $currentTime = new DateTimeImmutable('now');
+        $currentTime = new \DateTimeImmutable('now');
         $this->page->setPostDate($currentTime);
         $this->assertEquals($currentTime, $this->page->getPostDate());
     }
@@ -187,7 +185,7 @@ class PageTest extends TestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testAddAndGetUrls(): void
     {
@@ -195,7 +193,7 @@ class PageTest extends TestCase
         $this->page->addUrl(new Url($this->page, 'test', true));
         $this->assertNotEmpty($this->page->getUrls());
         $this->assertInstanceOf('\Inachis\Entity\Content\Url', $this->page->getUrl());
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->page->getUrl(100);
     }
 
@@ -217,7 +215,7 @@ class PageTest extends TestCase
 
     public function testGetPostDateAsLink(): void
     {
-        $this->page->setPostDate(new DateTimeImmutable('1970-01-01'));
+        $this->page->setPostDate(new \DateTimeImmutable('1970-01-01'));
         $this->assertEquals('1970/01/01', $this->page->getPostDateAsLink());
     }
 

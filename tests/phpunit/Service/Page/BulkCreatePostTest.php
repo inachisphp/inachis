@@ -1,14 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Service\Content\Page;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Content\Category;
 use Inachis\Entity\Content\Series;
 use Inachis\Entity\User\User;
@@ -17,9 +17,6 @@ use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Repository\Content\TagRepository;
 use Inachis\Service\Content\Page\PageBulkCreateService;
-use DateTimeImmutable;
-use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -42,17 +39,17 @@ class BulkCreatePostTest extends TestCase
         $this->categoryRepository = $this->createStub(CategoryRepository::class);
         $this->bulkCreateData = new BulkCreateData(
             'some title',
-            DateTimeImmutable::createFromFormat('d/m/Y', '01/11/2025'),
-            DateTimeImmutable::createFromFormat('d/m/Y', '07/11/2025'),
+            \DateTimeImmutable::createFromFormat('d/m/Y', '01/11/2025'),
+            \DateTimeImmutable::createFromFormat('d/m/Y', '07/11/2025'),
             false,
             Uuid::uuid1()->toString(),
-            [ Uuid::uuid1() ],
-            [ Uuid::uuid1() ],
+            [Uuid::uuid1()],
+            [Uuid::uuid1()],
         );
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testCreateInvalidSeries(): void
     {
@@ -67,7 +64,7 @@ class BulkCreatePostTest extends TestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testCreate(): void
     {

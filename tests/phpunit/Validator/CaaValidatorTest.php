@@ -1,18 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Validator;
 
-use PHPUnit\Framework\TestCase;
-use Inachis\Validator\CaaValidator;
-use Inachis\Model\Domain\ValidationIssue;
 use Inachis\Model\Domain\Severity;
+use Inachis\Model\Domain\ValidationIssue;
+use Inachis\Validator\CaaValidator;
+use PHPUnit\Framework\TestCase;
 
 final class CaaValidatorTest extends TestCase
 {
@@ -34,7 +33,7 @@ final class CaaValidatorTest extends TestCase
                 'target' => 'example.com',
                 'priority' => 10,
                 // 'value' is missing
-            ]
+            ],
         ]);
 
         $this->assertCount(1, $issues);
@@ -42,7 +41,7 @@ final class CaaValidatorTest extends TestCase
         $this->assertSame('caa', $issues[0]->type);
         $this->assertSame(
             'Malformed CAA record',
-            $issues[0]->message
+            $issues[0]->message,
         );
         $this->assertSame(Severity::Error, $issues[0]->severity);
     }
@@ -55,8 +54,8 @@ final class CaaValidatorTest extends TestCase
             [
                 'target' => 'example.com',
                 'priority' => 10,
-                'value' => 'caa record 1'
-            ]
+                'value' => 'caa record 1',
+            ],
         ];
 
         $issues = $validator->validate($records);

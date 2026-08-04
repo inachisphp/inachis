@@ -1,22 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Controller\Dialog;
 
 use Inachis\Controller\Dialog\ConfirmationController;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Exception;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfirmationControllerTest extends InachisControllerTestCase
 {
@@ -26,7 +22,7 @@ class ConfirmationControllerTest extends InachisControllerTestCase
     public function testContentList(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incp/ax/confirmation/get'
+            'REQUEST_URI' => '/incp/ax/confirmation/get',
         ]);
         $controller = $this->getMockBuilder(ConfirmationController::class)
             ->setConstructorArgs([
@@ -40,7 +36,7 @@ class ConfirmationControllerTest extends InachisControllerTestCase
             ->getMock();
         $controller->expects($this->once())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
 
         $result = $controller->contentList($request);

@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form;
@@ -13,9 +12,9 @@ use Inachis\Entity\Security\Role;
 use Inachis\Entity\User\User;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
-use Inachis\Service\User\ProfileColorPalette;
 use Inachis\Form\Provider\TimezoneChoices;
 use Inachis\Security\Authorisation\PermissionResolver;
+use Inachis\Service\User\ProfileColorPalette;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
@@ -28,35 +27,36 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Form type for creating and editing users
+ * Form type for creating and editing users.
  *
  * @extends AbstractType<User>
  */
 class UserType extends AbstractType
 {
     /**
-     * Creates a new instance of {@link UserType}
+     * Creates a new instance of {@link UserType}.
      *
      * @param TranslatorInterface $translator The translator service
-     * @param Security $security The security service
+     * @param Security            $security   The security service
      */
     public function __construct(
         private PermissionResolver $permissionResolver,
         private TranslatorInterface $translator,
-        private Security $security
-    ) {}
+        private Security $security,
+    ) {
+    }
 
     /**
-     * Builds the form
+     * Builds the form.
      *
      * @param FormBuilderInterface<User|null> $builder The form builder
-     * @param array<string, mixed> $options The form options
+     * @param array<string, mixed>            $options The form options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $newUser = !isset($options['data']) 
-            || !($options['data'] instanceof User) 
-            || $options['data']->getId() === null;
+        $newUser = !isset($options['data'])
+            || !($options['data'] instanceof User)
+            || null === $options['data']->getId();
         $currentUser = $this->security->getUser();
         if (!$currentUser instanceof User) {
             throw new \LogicException();
@@ -87,7 +87,7 @@ class UserType extends AbstractType
                 'label' => 'Username',
                 'label_attr' => [
                     'class' => 'inline_label',
-                    'id' => 'user__username__label'
+                    'id' => 'user__username__label',
                 ],
                 'required' => true,
             ])
@@ -99,7 +99,7 @@ class UserType extends AbstractType
                 'label' => 'Display Name',
                 'label_attr' => [
                     'class' => 'inline_label',
-                    'id' => 'user__displayName__label'
+                    'id' => 'user__displayName__label',
                 ],
             ])
             ->add('email', TextType::class, [
@@ -111,7 +111,7 @@ class UserType extends AbstractType
                 'label' => 'Email Address',
                 'label_attr' => [
                     'class' => 'inline_label',
-                    'id' => 'user__email__label'
+                    'id' => 'user__email__label',
                 ],
                 'required' => true,
             ])
@@ -120,7 +120,7 @@ class UserType extends AbstractType
                     'aria-labelledby' => 'user__timezone__label',
                     'class' => 'text inline_label',
                 ],
-                'choices' => (new TimezoneChoices)->getTimezones(),
+                'choices' => (new TimezoneChoices())->getTimezones(),
                 'label' => 'Timezone',
                 'label_attr' => [
                     'class' => 'inline_label',
@@ -130,7 +130,7 @@ class UserType extends AbstractType
             ]);
 
         if (
-            $this->security->isGranted('ROLE_ADMIN') 
+            $this->security->isGranted('ROLE_ADMIN')
             || $this->security->isGranted('ROLE_EDIT')
         ) {
             $builder->add('assignedRoles', EntityType::class, [
@@ -162,7 +162,7 @@ class UserType extends AbstractType
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> %s',
                     'save',
-                    $this->translator->trans('admin.button.save', [], 'messages')
+                    $this->translator->trans('admin.button.save', [], 'messages'),
                 ),
                 'label_html' => true,
             ])
@@ -186,7 +186,7 @@ class UserType extends AbstractType
                         'label' => sprintf(
                             '<span class="material-icons">%s</span> %s',
                             'delete',
-                            $this->translator->trans('admin.button.delete', [], 'messages')
+                            $this->translator->trans('admin.button.delete', [], 'messages'),
                         ),
                         'label_html' => true,
                     ])
@@ -197,12 +197,11 @@ class UserType extends AbstractType
                         'label' => sprintf(
                             '<span class="material-icons">%s</span> %s',
                             $options['data']->isEnabled() ? 'person_off' : 'person_outline',
-                            $this->translator->trans($options['data']->isEnabled() ? 'admin.button.disable' : 'admin.button.enable', [], 'messages')
+                            $this->translator->trans($options['data']->isEnabled() ? 'admin.button.disable' : 'admin.button.enable', [], 'messages'),
                         ),
                         'label_html' => true,
                     ]);
-            }
-            else {
+            } else {
                 $builder->add('color', ChoiceType::class, [
                     'attr' => [
                         'aria-labelledby' => 'user__color__label',
@@ -214,7 +213,7 @@ class UserType extends AbstractType
                     'expanded' => true,
                     'label' => 'Color',
                     'label_attr' => [
-                        'id' => 'user__color__label'
+                        'id' => 'user__color__label',
                     ],
                     'multiple' => false,
                     'property_path' => 'preferences.color',
@@ -227,7 +226,7 @@ class UserType extends AbstractType
                         'label' => sprintf(
                             '<span class="material-icons">%s</span> %s',
                             'gpp_bad',
-                            'Disable Two-Factor Authentication'
+                            'Disable Two-Factor Authentication',
                         ),
                         'label_html' => true,
                     ]);
@@ -238,7 +237,7 @@ class UserType extends AbstractType
                         'label' => sprintf(
                             '<span class="material-icons">%s</span> %s',
                             'loop',
-                            'Generate New Recovery Codes'
+                            'Generate New Recovery Codes',
                         ),
                         'label_html' => true,
                     ]);
@@ -250,7 +249,7 @@ class UserType extends AbstractType
                         'label' => sprintf(
                             '<span class="material-icons">%s</span> %s',
                             'verified_user',
-                            'Enable Two-Factor Authentication'
+                            'Enable Two-Factor Authentication',
                         ),
                         'label_html' => true,
                     ]);
@@ -260,7 +259,7 @@ class UserType extends AbstractType
     }
 
     /**
-     * Configures the options for the form
+     * Configures the options for the form.
      *
      * @param OptionsResolver $resolver The options resolver
      */

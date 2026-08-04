@@ -1,15 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Updater\Release;
-
-use JsonException;
-use RuntimeException;
 
 final class ManifestFactory
 {
@@ -18,13 +15,11 @@ final class ManifestFactory
         // Support aliases between build process keys and Manifest keys
         $version = $data['version'] ?? null;
         $package = $data['package'] ?? $data['archive'] ?? null;
-        $sha256  = $data['packageSha256'] ?? $data['sha256'] ?? null;
+        $sha256 = $data['packageSha256'] ?? $data['sha256'] ?? null;
         $minimum = $data['minimumVersion'] ?? '0.0.0';
 
-        if ($version === null || $package === null || $sha256 === null) {
-            throw new RuntimeException(
-                'Release manifest is missing required version, package/archive, or sha256 properties.'
-            );
+        if (null === $version || null === $package || null === $sha256) {
+            throw new \RuntimeException('Release manifest is missing required version, package/archive, or sha256 properties.');
         }
 
         return new Manifest(
@@ -45,12 +40,12 @@ final class ManifestFactory
     {
         try {
             $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $exception) {
-            throw new RuntimeException('Invalid release manifest JSON.', previous: $exception);
+        } catch (\JsonException $exception) {
+            throw new \RuntimeException('Invalid release manifest JSON.', previous: $exception);
         }
 
         if (!is_array($data)) {
-            throw new RuntimeException('Release manifest must contain a JSON object.');
+            throw new \RuntimeException('Release manifest must contain a JSON object.');
         }
 
         return $this->create($data);

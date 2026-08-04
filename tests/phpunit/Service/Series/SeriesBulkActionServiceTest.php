@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Service\Content\Series;
@@ -43,7 +42,7 @@ class SeriesBulkActionServiceTest extends TestCase
         $this->seriesBulkActionService = new SeriesBulkActionService(
             $this->seriesRepository,
             $this->entityManager,
-            $this->createStub(WasteManagerService::class)
+            $this->createStub(WasteManagerService::class),
         );
     }
 
@@ -58,7 +57,7 @@ class SeriesBulkActionServiceTest extends TestCase
         $this->seriesBulkActionService = new SeriesBulkActionService(
             $this->seriesRepository,
             $this->entityManager,
-            $this->createStub(WasteManagerService::class)
+            $this->createStub(WasteManagerService::class),
         );
         $result = $this->seriesBulkActionService->apply('', [Uuid::uuid1()->toString()]);
         $this->assertEquals(0, $result);

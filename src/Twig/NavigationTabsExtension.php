@@ -1,31 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Twig;
 
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
 use Inachis\Model\NavigationTabDto;
 use Inachis\Service\Navigation\NavigationTabService;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
- * Twig extension for navigation tabs
+ * Twig extension for navigation tabs.
  */
 class NavigationTabsExtension extends AbstractExtension
 {
-    /**
-     * @param NavigationTabService $navigation
-     */
-    public function __construct(private NavigationTabService $navigation) {}
+    public function __construct(private NavigationTabService $navigation)
+    {
+    }
 
     /**
-     * Returns the list of functions provided by this extension
+     * Returns the list of functions provided by this extension.
+     *
      * @return list<TwigFunction>
      */
     public function getFunctions(): array
@@ -36,8 +35,8 @@ class NavigationTabsExtension extends AbstractExtension
     }
 
     /**
-     * Returns the list of active navigation tabs
-     * 
+     * Returns the list of active navigation tabs.
+     *
      * @return list<NavigationTabDto>
      */
     public function getTabs(): array

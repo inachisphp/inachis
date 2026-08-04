@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Entity\System;
@@ -70,10 +69,10 @@ class NavigationTabTest extends TestCase
         // it doesn't set it. Let's initialize URL first by setting isSystem to false, setting url, and then setting isSystem to true.
         $this->tab->setIsSystem(false);
         $this->tab->setUrl('/admin/dashboard');
-        
+
         $this->tab->setIsSystem(true);
         $result = $this->tab->setUrl('/changed-url');
-        
+
         self::assertSame('/admin/dashboard', $this->tab->getUrl());
         self::assertSame($this->tab, $result);
     }

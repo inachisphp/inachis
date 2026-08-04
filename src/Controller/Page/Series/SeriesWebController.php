@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Series;
@@ -16,29 +15,23 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class SeriesWebController extends AbstractWebController
 {
-    /**
-     * @param SeriesRepository $seriesRepository
-     * @param int $year
-     * @param string $title
-     * @return Response
-     */
-    #[Route("/{year}-{title}", name: "web_series_view", methods: [ "GET" ], requirements: ["year" => "\d{4}"])]
+    #[Route('/{year}-{title}', name: 'web_series_view', methods: ['GET'], requirements: ['year' => "\d{4}"])]
     public function view(
         SeriesRepository $seriesRepository,
         int $year,
-        string $title
+        string $title,
     ): Response {
         $series = $seriesRepository->getPublicSeriesByYearAndUrl(
             (string) $year,
-            $title
+            $title,
         );
         if (empty($series)) {
             throw $this->createNotFoundException('This page does not exist');
         }
+
         return $this->render('web/pages/series.html.twig', [
             'viewModel' => $this->viewModel,
             'series' => $series,
         ]);
     }
-
 }

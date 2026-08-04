@@ -1,13 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
+
 namespace Inachis\Entity\Security;
 
-use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Inachis\Enum\Security\AuthenticationPolicy;
 use Inachis\Enum\Security\PasswordStrengthLevel;
@@ -29,7 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 #[Assert\Expression(
     expression: 'this.maximumPasswordLength === null or this.minimumPasswordLength <= this.maximumPasswordLength',
-    message: 'Maximum password length cannot be smaller than minimum password length.'
+    message: 'Maximum password length cannot be smaller than minimum password length.',
 )]
 #[ORM\Entity(repositoryClass: SecurityPolicyRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -68,7 +68,7 @@ class SecurityPolicy
     #[Assert\Length(max: 50)]
     #[Assert\Regex(
         pattern: '/^[a-z0-9][a-z0-9_-]*$/',
-        message: 'The identifier may only contain lowercase letters, numbers, underscores and hyphens.'
+        message: 'The identifier may only contain lowercase letters, numbers, underscores and hyphens.',
     )]
     #[ORM\Column(length: 50, unique: true)]
     private string $identifier = '';
@@ -183,7 +183,7 @@ class SecurityPolicy
     /**
      * Sensitive actions that require step-up authentication.
      * Values are stored as the string values of {@see SensitiveAction}.
-     * 
+     *
      * @var list<string>
      */
     #[ORM\Column(type: 'json')]
@@ -216,20 +216,20 @@ class SecurityPolicy
      * Date and time the policy was created.
      */
     #[ORM\Column(type: 'datetime_immutable')]
-    private DateTimeImmutable $createdAt;
+    private \DateTimeImmutable $createdAt;
 
     /**
      * Date and time the policy was last modified.
      */
     #[ORM\Column(type: 'datetime_immutable')]
-    private DateTimeImmutable $updatedAt;
+    private \DateTimeImmutable $updatedAt;
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        $now = new DateTimeImmutable();
+        $now = new \DateTimeImmutable();
 
         $this->createdAt = $now;
         $this->updatedAt = $now;
@@ -238,19 +238,19 @@ class SecurityPolicy
     #[ORM\PreUpdate]
     public function updateTimestamp(): void
     {
-        $this->updatedAt = new DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     #[ORM\PrePersist]
     public function initialiseTimestamp(): void
     {
-        $now = new DateTimeImmutable();
+        $now = new \DateTimeImmutable();
 
         $this->createdAt = $now;
         $this->updatedAt = $now;
     }
 
-        /**
+    /**
      * Get the unique identifier.
      */
     public function getId(): ?UuidInterface
@@ -277,9 +277,7 @@ class SecurityPolicy
     }
 
     /**
-     * Get the identifier
-     *
-     * @return string
+     * Get the identifier.
      */
     public function getIdentifier(): string
     {
@@ -287,10 +285,7 @@ class SecurityPolicy
     }
 
     /**
-     * Sets the identifier
-     *
-     * @param string $identifier
-     * @return self
+     * Sets the identifier.
      */
     public function setIdentifier(string $identifier): self
     {
@@ -312,7 +307,7 @@ class SecurityPolicy
      */
     public function setDescription(?string $description): self
     {
-        $this->description = $description !== null
+        $this->description = null !== $description
             ? trim($description)
             : null;
 
@@ -332,7 +327,7 @@ class SecurityPolicy
      */
     public function incrementVersion(): self
     {
-        $this->version++;
+        ++$this->version;
 
         return $this;
     }
@@ -351,18 +346,14 @@ class SecurityPolicy
     public function setMinimumPasswordLength(int $length): self
     {
         if ($length < 1) {
-            throw new \InvalidArgumentException(
-                'Minimum password length must be positive.'
-            );
+            throw new \InvalidArgumentException('Minimum password length must be positive.');
         }
 
         if (
-            $this->maximumPasswordLength !== null &&
-            $length > $this->maximumPasswordLength
+            null !== $this->maximumPasswordLength
+            && $length > $this->maximumPasswordLength
         ) {
-            throw new \InvalidArgumentException(
-                'Minimum password length cannot exceed maximum password length.'
-            );
+            throw new \InvalidArgumentException('Minimum password length cannot exceed maximum password length.');
         }
 
         $this->minimumPasswordLength = $length;
@@ -384,12 +375,10 @@ class SecurityPolicy
     public function setMaximumPasswordLength(?int $length): self
     {
         if (
-            $length !== null &&
-            $length < $this->minimumPasswordLength
+            null !== $length
+            && $length < $this->minimumPasswordLength
         ) {
-            throw new \InvalidArgumentException(
-                'Maximum password length cannot be smaller than minimum password length.'
-            );
+            throw new \InvalidArgumentException('Maximum password length cannot be smaller than minimum password length.');
         }
 
         $this->maximumPasswordLength = $length;
@@ -409,7 +398,7 @@ class SecurityPolicy
      * Set the required password strength level.
      */
     public function setPasswordStrength(
-        PasswordStrengthLevel $strength
+        PasswordStrengthLevel $strength,
     ): self {
         $this->passwordStrength = $strength;
 
@@ -428,7 +417,7 @@ class SecurityPolicy
      * Set whether compromised passwords should be rejected.
      */
     public function setRejectCompromisedPasswords(
-        bool $reject
+        bool $reject,
     ): self {
         $this->rejectCompromisedPasswords = $reject;
 
@@ -449,9 +438,7 @@ class SecurityPolicy
     public function setPasswordReuseLimit(int $limit): self
     {
         if ($limit < 0) {
-            throw new \InvalidArgumentException(
-                'Password reuse limit cannot be negative.'
-            );
+            throw new \InvalidArgumentException('Password reuse limit cannot be negative.');
         }
 
         $this->passwordReuseLimit = $limit;
@@ -472,10 +459,8 @@ class SecurityPolicy
      */
     public function setMinimumPasswordAgeDays(?int $days): self
     {
-        if ($days !== null && $days < 1) {
-            throw new \InvalidArgumentException(
-                'Minimum password age must be positive.'
-            );
+        if (null !== $days && $days < 1) {
+            throw new \InvalidArgumentException('Minimum password age must be positive.');
         }
 
         $this->minimumPasswordAgeDays = $days;
@@ -496,10 +481,8 @@ class SecurityPolicy
      */
     public function setPasswordLifetimeDays(?int $days): self
     {
-        if ($days !== null && $days < 1) {
-            throw new \InvalidArgumentException(
-                'Password lifetime must be positive.'
-            );
+        if (null !== $days && $days < 1) {
+            throw new \InvalidArgumentException('Password lifetime must be positive.');
         }
 
         $this->passwordLifetimeDays = $days;
@@ -512,7 +495,7 @@ class SecurityPolicy
      */
     public function hasPasswordExpiry(): bool
     {
-        return $this->passwordLifetimeDays !== null;
+        return null !== $this->passwordLifetimeDays;
     }
 
     /**
@@ -528,7 +511,7 @@ class SecurityPolicy
      */
     public function hasMaximumPasswordLength(): bool
     {
-        return $this->maximumPasswordLength !== null;
+        return null !== $this->maximumPasswordLength;
     }
 
     /**
@@ -543,7 +526,7 @@ class SecurityPolicy
      * Set administrator authentication requirements.
      */
     public function setAdministratorPolicy(
-        AuthenticationPolicy $policy
+        AuthenticationPolicy $policy,
     ): self {
         $this->administratorPolicy = $policy;
 
@@ -562,7 +545,7 @@ class SecurityPolicy
      * Set super administrator authentication requirements.
      */
     public function setSuperAdministratorPolicy(
-        AuthenticationPolicy $policy
+        AuthenticationPolicy $policy,
     ): self {
         $this->superAdministratorPolicy = $policy;
 
@@ -581,7 +564,7 @@ class SecurityPolicy
      * Set whether step-up authentication is required.
      */
     public function setRequireStepUpAuthentication(
-        bool $required
+        bool $required,
     ): self {
         $this->requireStepUpAuthentication = $required;
 
@@ -597,7 +580,7 @@ class SecurityPolicy
     {
         return array_map(
             static fn (string $action): SensitiveAction => SensitiveAction::from($action),
-            $this->stepUpRequiredActions
+            $this->stepUpRequiredActions,
         );
     }
 
@@ -607,11 +590,11 @@ class SecurityPolicy
      * @param list<SensitiveAction> $actions
      */
     public function setStepUpRequiredActions(
-        array $actions
+        array $actions,
     ): self {
         $this->stepUpRequiredActions = array_map(
             static fn (SensitiveAction $action): string => $action->value,
-            $actions
+            $actions,
         );
 
         return $this;
@@ -621,7 +604,7 @@ class SecurityPolicy
      * Add an action requiring step-up authentication.
      */
     public function addStepUpRequiredAction(
-        SensitiveAction $action
+        SensitiveAction $action,
     ): self {
         if (!in_array($action->value, $this->stepUpRequiredActions, true)) {
             $this->stepUpRequiredActions[] = $action->value;
@@ -634,13 +617,13 @@ class SecurityPolicy
      * Remove an action requiring step-up authentication.
      */
     public function removeStepUpRequiredAction(
-        SensitiveAction $action
+        SensitiveAction $action,
     ): self {
         $this->stepUpRequiredActions = array_values(
             array_filter(
                 $this->stepUpRequiredActions,
-                static fn (string $value): bool => $value !== $action->value
-            )
+                static fn (string $value): bool => $value !== $action->value,
+            ),
         );
 
         return $this;
@@ -660,7 +643,7 @@ class SecurityPolicy
      * Determines whether an action requires step-up authentication.
      */
     public function requiresStepUpFor(
-        SensitiveAction $action
+        SensitiveAction $action,
     ): bool {
         if (!$this->requireStepUpAuthentication) {
             return false;
@@ -669,7 +652,7 @@ class SecurityPolicy
         return in_array(
             $action->value,
             $this->stepUpRequiredActions,
-            true
+            true,
         );
     }
 
@@ -712,7 +695,7 @@ class SecurityPolicy
     /**
      * Get creation timestamp.
      */
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -720,7 +703,7 @@ class SecurityPolicy
     /**
      * Get last update timestamp.
      */
-    public function getUpdatedAt(): DateTimeImmutable
+    public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
     }

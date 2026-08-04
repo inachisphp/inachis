@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\API\Url;
@@ -16,45 +15,41 @@ use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * Link Validation Controller
+ * Link Validation Controller.
  */
 final class LinkValidationController
 {
-	private string $baseUrl;
+    private string $baseUrl;
 
-	/**
-	 * Constructor
-	 *
-	 * @param HttpClientInterface $httpClient
-	 */
+    /**
+     * Constructor.
+     */
     public function __construct(
         private readonly HttpClientInterface $httpClient,
-    ) {}
+    ) {
+    }
 
-	/**
-	 * Validate links
-	 *
-	 * @param Request $request
-	 * @return JsonResponse
-	 */
+    /**
+     * Validate links.
+     */
     #[Route('/incp/api/validate-links', name: 'api_validate_links', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {
-		// Referrer protection
-		$referer = $request->headers->get('referer');
-		if (!is_string($referer)) {
-			return new JsonResponse(['error' => 'Missing referer'], 403);
-		}
-		$refererHost = parse_url($referer, PHP_URL_HOST);
-		$currentHost = $request->getHost();
-		if (!is_string($refererHost) || $refererHost !== $currentHost) {
-			return new JsonResponse(['error' => 'Invalid referer'], 403);
-		}
+        // Referrer protection
+        $referer = $request->headers->get('referer');
+        if (!is_string($referer)) {
+            return new JsonResponse(['error' => 'Missing referer'], 403);
+        }
+        $refererHost = parse_url($referer, PHP_URL_HOST);
+        $currentHost = $request->getHost();
+        if (!is_string($refererHost) || $refererHost !== $currentHost) {
+            return new JsonResponse(['error' => 'Invalid referer'], 403);
+        }
 
-		// Set base URL in case of relative links
-		$this->baseUrl = $request->getSchemeAndHttpHost();
+        // Set base URL in case of relative links
+        $this->baseUrl = $request->getSchemeAndHttpHost();
 
-		$origin = $request->headers->get('origin');
+        $origin = $request->headers->get('origin');
         if (is_string($origin)) {
             $originHost = parse_url($origin, PHP_URL_HOST);
             if (!is_string($originHost) || $originHost !== $currentHost) {
@@ -62,13 +57,12 @@ final class LinkValidationController
             }
         }
 
-        /** @var mixed $decoded */
         $decoded = json_decode($request->getContent(), true);
 
         if (!is_array($decoded) || !isset($decoded['links']) || !is_array($decoded['links'])) {
             return new JsonResponse(
                 ['error' => 'Invalid payload'],
-                JsonResponse::HTTP_BAD_REQUEST
+                JsonResponse::HTTP_BAD_REQUEST,
             );
         }
 
@@ -77,7 +71,7 @@ final class LinkValidationController
 
         $links = array_values(array_filter(
             $rawLinks,
-            static fn ($l): bool => is_string($l) && $l !== ''
+            static fn ($l): bool => is_string($l) && '' !== $l,
         ));
 
         $results = [];
@@ -90,8 +84,8 @@ final class LinkValidationController
     }
 
     /**
-	 * Validate a single link
-	 *
+     * Validate a single link.
+     *
      * @return array{
      *     url: string,
      *     ok: bool,
@@ -102,36 +96,36 @@ final class LinkValidationController
      */
     private function validateSingleLink(string $url): array
     {
-		if (!preg_match('#^https?://#i', $url)) {
+        if (!preg_match('#^https?://#i', $url)) {
             if (!str_starts_with($url, '/')) {
-                $url = '/' . $url;
+                $url = '/'.$url;
             }
 
-            $url = rtrim($this->baseUrl, '/') . $url;
+            $url = rtrim($this->baseUrl, '/').$url;
         }
-		if (!filter_var($url, FILTER_VALIDATE_URL)) {
-			return [
-				'url' => $url,
-				'ok' => false,
-				'status' => null,
-				'error' => 'Invalid URL',
-			];
-		}
-		$scheme = parse_url($url, PHP_URL_SCHEME);
-		if (!is_string($scheme) || !in_array(strtolower($scheme), ['http', 'https'], true)) {
-			return [
-				'url' => $url,
-				'ok' => false,
-				'status' => null,
-				'error' => 'Invalid protocol',
-			];
-		}
-		$host = parse_url($url, PHP_URL_HOST);
-		if (is_string($host) && $host !== $this->baseUrl) {
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            return [
+                'url' => $url,
+                'ok' => false,
+                'status' => null,
+                'error' => 'Invalid URL',
+            ];
+        }
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+        if (!is_string($scheme) || !in_array(strtolower($scheme), ['http', 'https'], true)) {
+            return [
+                'url' => $url,
+                'ok' => false,
+                'status' => null,
+                'error' => 'Invalid protocol',
+            ];
+        }
+        $host = parse_url($url, PHP_URL_HOST);
+        if (is_string($host) && $host !== $this->baseUrl) {
             // SSRF protection
             $records = dns_get_record($host, DNS_A + DNS_AAAA);
 
-            if ($records === false) {
+            if (false === $records) {
                 return [
                     'url' => $url,
                     'ok' => false,
@@ -150,7 +144,7 @@ final class LinkValidationController
                 if (($_ENV['APP_ENV'] ?? 'dev') === 'prod' && !filter_var(
                     $ip,
                     FILTER_VALIDATE_IP,
-                    FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+                    FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE,
                 )) {
                     return [
                         'url' => $url,
@@ -179,18 +173,18 @@ final class LinkValidationController
                 $statusCode = $response->getStatusCode();
             }
 
-			$timeMs = (int)((microtime(true) - $start) * 1000);
+            $timeMs = (int) ((microtime(true) - $start) * 1000);
             /** @var array{redirect_count?:int, ...} */
-			$info = $response->getInfo();
-			$redirectCount = $info['redirect_count'] ?? 0;
+            $info = $response->getInfo();
+            $redirectCount = $info['redirect_count'] ?? 0;
 
             return [
                 'url' => $url,
                 'ok' => $statusCode >= 200 && $statusCode < 400,
                 'status' => $statusCode,
                 'headers' => $this->normalizeHeaders($response->getHeaders(false)),
-				'time_ms' => $timeMs,
-				'redirects' => $redirectCount,
+                'time_ms' => $timeMs,
+                'redirects' => $redirectCount,
             ];
         } catch (ExceptionInterface $e) {
             return [
@@ -203,9 +197,10 @@ final class LinkValidationController
     }
 
     /**
-     * Normalize headers
-	 *
+     * Normalize headers.
+     *
      * @param array<string, array<int, string>> $headers
+     *
      * @return array<string, string>
      */
     private function normalizeHeaders(array $headers): array

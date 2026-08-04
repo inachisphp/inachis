@@ -1,23 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Entity\User;
 
+use Doctrine\ORM\Mapping as ORM;
 use Inachis\Exception\InvalidTimezoneException;
 use Inachis\Validator\DateValidator;
-use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\UuidInterface;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: 'Inachis\Repository\User\UserPreferenceRepository', readOnly: false)]
-#[ORM\Index(columns: [ 'user_id' ], name: 'search_idx')]
+#[ORM\Index(columns: ['user_id'], name: 'search_idx')]
 class UserPreference
 {
     /**
@@ -25,7 +24,7 @@ class UserPreference
      */
     #[ORM\Id]
     #[ORM\Column(type: 'uuid_binary', unique: true, nullable: false)]
-    #[ORM\GeneratedValue(strategy: "CUSTOM")]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected UuidInterface $id;
 
@@ -43,9 +42,9 @@ class UserPreference
     private string $theme = 'light';
 
     /**
-     * @var boolean Flag indicating if high contrast colours should be used
+     * @var bool Flag indicating if high contrast colours should be used
      */
-    #[ORM\Column(type: "boolean")]
+    #[ORM\Column(type: 'boolean')]
     private bool $highContrast = false;
 
     /**
@@ -74,23 +73,22 @@ class UserPreference
 
     /**
      * @InachisAssert\ValidTimezone()
+     *
      * @var string The local timezone for the user
      */
-    #[ORM\Column(type: "string", length: 32, options: ["default" => "UTC" ])]
+    #[ORM\Column(type: 'string', length: 32, options: ['default' => 'UTC'])]
     #[Assert\NotBlank]
     protected string $timezone = 'UTC';
 
     /**
      * @var string Background colour for the {@link User}'s letter avatar
      */
-    #[ORM\Column(type: "string", length: 10, nullable: false)]
+    #[ORM\Column(type: 'string', length: 10, nullable: false)]
     #[Assert\NotBlank]
     protected string $color = '#099bdd';
 
     /**
-     * Constructor for {@link UserPreference} requires the linked {@link User}
-     *
-     * @param User $user
+     * Constructor for {@link UserPreference} requires the linked {@link User}.
      */
     public function __construct(User $user)
     {
@@ -98,128 +96,109 @@ class UserPreference
     }
 
     /**
-     * Sets the id for the {@link UserPreference}
-     *
-     * @param UuidInterface $id
-     * @return self
+     * Sets the id for the {@link UserPreference}.
      */
     public function setId(UuidInterface $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
     /**
-     * Sets the {@link User} for the {@link UserPreference}
-     *
-     * @param User $user
-     * @return self
+     * Sets the {@link User} for the {@link UserPreference}.
      */
     public function setUser(User $user): self
     {
         $this->user = $user;
+
         return $this;
     }
 
     /**
-     * Sets the theme for the {@link UserPreference}
-     *
-     * @param string $theme
-     * @return self
+     * Sets the theme for the {@link UserPreference}.
      */
     public function setTheme(string $theme): self
     {
         $this->theme = $theme;
+
         return $this;
     }
 
     /**
-     * Sets the highContrast flag for the {@link UserPreference}
-     *
-     * @return self
+     * Sets the highContrast flag for the {@link UserPreference}.
      */
     public function setHighContrast(bool $highContrast): self
     {
         $this->highContrast = $highContrast;
+
         return $this;
     }
 
     /**
-     * Sets the font-size descriptor for the {@link UserPreference}
-     *
-     * @param string $fontSize
-     * @return self
+     * Sets the font-size descriptor for the {@link UserPreference}.
      */
     public function setFontSize(string $fontSize): self
     {
         $this->fontSize = $fontSize;
+
         return $this;
     }
 
     /**
-     * Sets the fontFamily descriptor for the {@link UserPreference}
-     *
-     * @param string $fontFamily
-     * @return self
+     * Sets the fontFamily descriptor for the {@link UserPreference}.
      */
     public function setFontFamily(string $fontFamily): self
     {
         $this->fontFamily = $fontFamily;
+
         return $this;
     }
 
     /**
-     * Sets the line height descriptor for the {@link UserPreference}
-     *
-     * @param string $lineHeight
-     * @return self
+     * Sets the line height descriptor for the {@link UserPreference}.
      */
     public function setLineHeight(string $lineHeight): self
     {
         $this->lineHeight = $lineHeight;
+
         return $this;
     }
 
     /**
-     * sets the language code for the {@link UserPreference}
-     *
-     * @param string $locale
-     * @return self
+     * sets the language code for the {@link UserPreference}.
      */
     public function setLocale(string $locale): self
     {
         $this->locale = $locale;
+
         return $this;
     }
 
     /**
-     * Sets the timezone for the {@link UserPreference}
-     * 
-     * @param string|null $value
-     * @return self
+     * Sets the timezone for the {@link UserPreference}.
+     *
      * @throws InvalidTimezoneException
      */
     public function setTimezone(?string $value): self
     {
         $this->timezone = DateValidator::validateTimezone($value);
+
         return $this;
     }
 
     /**
-     * Sets the background colour for the {@link User}'s lettered avatar
-     * @param string $color
-     * @return self
+     * Sets the background colour for the {@link User}'s lettered avatar.
      */
     public function setColor(string $color): self
     {
         $this->color = $color;
+
         return $this;
     }
 
     /**
-     * Returns the id for the {@link UserPreference}
-     *
-     * @return UuidInterface
+     * Returns the id for the {@link UserPreference}.
      */
     public function getId(): UuidInterface
     {
@@ -227,9 +206,7 @@ class UserPreference
     }
 
     /**
-     * Returns the {@link User} for the {@link UserPreference}
-     *
-     * @return User
+     * Returns the {@link User} for the {@link UserPreference}.
      */
     public function getUser(): User
     {
@@ -237,9 +214,7 @@ class UserPreference
     }
 
     /**
-     * Returns the theme for the {@link UserPreference}
-     *
-     * @return string
+     * Returns the theme for the {@link UserPreference}.
      */
     public function getTheme(): string
     {
@@ -247,9 +222,7 @@ class UserPreference
     }
 
     /**
-     * Returns the highContrast flag for the {@link UserPreference}
-     *
-     * @return bool
+     * Returns the highContrast flag for the {@link UserPreference}.
      */
     public function getHighContrast(): bool
     {
@@ -257,9 +230,7 @@ class UserPreference
     }
 
     /**
-     * Returns the font size descriptor for the {@link UserPreference}
-     *
-     * @return string
+     * Returns the font size descriptor for the {@link UserPreference}.
      */
     public function getFontSize(): string
     {
@@ -267,9 +238,7 @@ class UserPreference
     }
 
     /**
-     * Returns the font family descriptor for the {@link UserPreference}
-     *
-     * @return string
+     * Returns the font family descriptor for the {@link UserPreference}.
      */
     public function getFontFamily(): string
     {
@@ -277,9 +246,7 @@ class UserPreference
     }
 
     /**
-     * Returns the line height descriptor  for the {@link UserPreference}
-     *
-     * @return string
+     * Returns the line height descriptor  for the {@link UserPreference}.
      */
     public function getLineHeight(): string
     {
@@ -287,9 +254,7 @@ class UserPreference
     }
 
     /**
-     * Returns the language code for the {@link UserPreference}
-     *
-     * @return string
+     * Returns the language code for the {@link UserPreference}.
      */
     public function getLocale(): string
     {
@@ -307,8 +272,7 @@ class UserPreference
     }
 
     /**
-     * Returns the background colour for the {@link UserPreference}. Used by the lettered avatar
-     * @return string
+     * Returns the background colour for the {@link UserPreference}. Used by the lettered avatar.
      */
     public function getColor(): string
     {

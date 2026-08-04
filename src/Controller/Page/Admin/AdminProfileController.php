@@ -1,16 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Admin;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\User\{User,UserPreference};
+use Inachis\Entity\User\User;
+use Inachis\Entity\User\UserPreference;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Exception\User\CannotRemoveLastAdministratorException;
@@ -24,11 +24,11 @@ use Inachis\Security\Authentication\RecoveryCodeManager;
 use Inachis\Security\Authentication\TotpManager;
 use Inachis\Security\Authentication\TrustedDeviceManager;
 use Inachis\Service\Content\ViewStateManager;
-use Inachis\Service\User\UserBulkActionService;
-use Inachis\Service\User\UserAccountEmailService;
-use Inachis\Transformer\ImageTransformer;
 use Inachis\Service\User\ProfileColorPalette;
+use Inachis\Service\User\UserAccountEmailService;
+use Inachis\Service\User\UserBulkActionService;
 use Inachis\Service\User\UserProtectionService;
+use Inachis\Transformer\ImageTransformer;
 use Random\RandomException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,27 +39,21 @@ use Symfony\Component\Routing\Attribute\Route;
 class AdminProfileController extends AbstractInachisController
 {
     /**
-     * List administrators
-     *
-     * @param Request $request
-     * @param UserBulkActionService $userBulkActionService
-     * @param UserRepository $userRepository
-     * @param ViewStateManager $viewStateManager
-     * @return Response
+     * List administrators.
      */
     #[Route(
-        "/incp/admin/list/{limit}/{offset}",
+        '/incp/admin/list/{limit}/{offset}',
         name: 'incp_admin_list',
         requirements: [
-            "limit" => "\d+",
-            "offset" => "\d+",
+            'limit' => "\d+",
+            'offset' => "\d+",
         ],
-        defaults: [ "limit" => 25, "offset" => 0, ],
-        methods: [ "GET", "POST" ]
+        defaults: ['limit' => 25, 'offset' => 0],
+        methods: ['GET', 'POST'],
     )]
     #[RequiresPermission(
         resource: PermissionResource::USER,
-        action: PermissionAction::VIEW
+        action: PermissionAction::VIEW,
     )]
     public function list(
         Request $request,
@@ -75,11 +69,11 @@ class AdminProfileController extends AbstractInachisController
         if ($form->isSubmitted() && !empty($request->request->all('items'))) {
             /** @var list<string> */
             $items = $request->request->all('items');
-            $action = $request->request->has('delete')  ? 'delete' :
+            $action = $request->request->has('delete') ? 'delete' :
                 ($request->request->has('enable') ? 'enable' :
                 ($request->request->has('disable') ? 'disable' : null));
 
-            if ($action !== null) {
+            if (null !== $action) {
                 try {
                     $count = $userBulkActionService->apply($action, $items);
                     $this->addFlash('success', "Action '$action' applied to $count users.");
@@ -103,6 +97,7 @@ class AdminProfileController extends AbstractInachisController
 
         $this->viewModel->page->title = 'Users';
         $this->viewModel->page->tab = 'users';
+
         return $this->render('inadmin/page/admin/list.html.twig', [
             'viewModel' => $this->viewModel,
             'dataset' => $userRepository->getFiltered($params),
@@ -113,19 +108,14 @@ class AdminProfileController extends AbstractInachisController
     }
 
     /**
-     * @param Request $request
-     * @param ImageTransformer $imageTransformer
-     * @param UserAccountEmailService $userAccountEmailService
-     * @param UserRepository $userRepository
-     * @return Response
      * @throws RandomException
      * @throws TransportExceptionInterface
      */
     #[Route(
-        "/incp/admin/{id}",
-        name: "incp_admin_edit",
-        methods: [ "GET", "POST" ],
-        priority: -100
+        '/incp/admin/{id}',
+        name: 'incp_admin_edit',
+        methods: ['GET', 'POST'],
+        priority: -100,
     )]
     public function edit(
         Request $request,
@@ -138,14 +128,14 @@ class AdminProfileController extends AbstractInachisController
         UserRepository $userRepository,
     ): Response {
         $id = $request->attributes->getString('id');
-        $isNew = ($id === 'new');
+        $isNew = ('new' === $id);
 
-        $user = $isNew ? new User():
+        $user = $isNew ? new User() :
             $userRepository->findOneBy(
-                [ 'username' => $request->attributes->getString('id') ]
+                ['username' => $request->attributes->getString('id')],
             ) ?? new User();
         $preferences = $user->getPreferences();
-        if ($preferences === null) {
+        if (null === $preferences) {
             $preferences = new UserPreference($user);
             $user->setPreferences($preferences);
             $this->entityManager->persist($preferences);
@@ -154,21 +144,21 @@ class AdminProfileController extends AbstractInachisController
 
         /** @var Form $form */
         $form = $this->createForm(UserType::class, $user, [
-            'validation_groups' => [ '' ],
+            'validation_groups' => [''],
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
             foreach ($originalRoles as $role) {
                 if (
-                    $role->isAdministrator() &&
-                    !$user->getAssignedRoles()->contains($role)
+                    $role->isAdministrator()
+                    && !$user->getAssignedRoles()->contains($role)
                 ) {
                     try {
                         $userProtectionService->assertAdministratorCanBeRemoved();
                     } catch (CannotRemoveLastAdministratorException $e) {
                         $form->get('assignedRoles')->addError(
-                            new \Symfony\Component\Form\FormError($e->getMessage())
+                            new \Symfony\Component\Form\FormError($e->getMessage()),
                         );
                     }
 
@@ -229,6 +219,7 @@ class AdminProfileController extends AbstractInachisController
                 if ($regenerateCodes instanceof \Symfony\Component\Form\ClickableInterface && $regenerateCodes->isClicked()) {
                     $codes = $recoveryCodeManager->generate($this->getCurrentUser());
                     $request->getSession()->set('recovery_codes', $codes);
+
                     return $this->redirectToRoute('incp_security_recovery_codes_generate');
                 }
 
@@ -237,26 +228,27 @@ class AdminProfileController extends AbstractInachisController
                     $this->entityManager->persist($user);
                     $userAccountEmailService->registerNewUser(
                         $user,
-                        [ 'viewModel' => $this->viewModel, ],
+                        ['viewModel' => $this->viewModel],
                         fn (string $token) => $this->generateUrl(
                             'incp_account_new-password',
-                            [ 'token' => $token ]
-                        )
+                            ['token' => $token],
+                        ),
                     );
                 }
                 $preferences->setTimezone(
-                    $request->request->all('user')['timezone'] ?? $preferences->getTimezone()
+                    $request->request->all('user')['timezone'] ?? $preferences->getTimezone(),
                 );
                 $preferences->setLocale(
-                    $request->request->all('user')['locale'] ?? $preferences->getLocale()
+                    $request->request->all('user')['locale'] ?? $preferences->getLocale(),
                 );
                 $preferences->setColor(
-                    $request->request->all('user')['color'] ?? $preferences->getColor()
+                    $request->request->all('user')['color'] ?? $preferences->getColor(),
                 );
 
                 $this->entityManager->flush();
 
                 $this->addFlash('success', 'User details saved.');
+
                 return $this->redirect($this->generateUrl('incp_admin_edit', [
                     'id' => $user->getUsername(),
                 ]));
@@ -265,16 +257,17 @@ class AdminProfileController extends AbstractInachisController
 
         $this->viewModel->page->title = 'Profile';
         $this->viewModel->page->tab = 'users';
+
         return $this->render('inadmin/page/admin/profile.html.twig', [
             'viewModel' => $this->viewModel,
             'form' => $form->createView(),
             'heicSupported' => $imageTransformer->isHEICSupported(),
             'remainingRecoveryCodes' => $recoveryCodeManager->getRemainingCount(
-                $this->getCurrentUser()
+                $this->getCurrentUser(),
             ),
             'currentTrustedDevice' => $trustedDeviceManager->getCurrentTrustedDevice(
                 $user,
-                $request
+                $request,
             ),
             'trustedDevices' => $trustedDeviceManager->getTrustedDevices($user),
             'user' => $user,

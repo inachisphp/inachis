@@ -1,20 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Repository\Waste;
 
-use Inachis\Entity\User\User;
-use Inachis\Repository\Waste\WasteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Entity\User\User;
+use Inachis\Repository\Waste\WasteRepository;
 use PHPUnit\Framework\TestCase;
 
 class WasteRepositoryTest extends TestCase
@@ -32,7 +31,7 @@ class WasteRepositoryTest extends TestCase
     {
         $repository = $this->getStubBuilder(WasteRepository::class)
             ->setConstructorArgs([$this->registry])
-            ->onlyMethods([ 'createQueryBuilder' ])
+            ->onlyMethods(['createQueryBuilder'])
             ->getStub();
         $qb = $this->createStub(QueryBuilder::class);
         $qb->method('delete')->willReturnSelf();

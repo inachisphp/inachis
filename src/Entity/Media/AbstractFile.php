@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Entity\Media;
 
-use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Inachis\Entity\User\User;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
@@ -43,54 +41,33 @@ abstract class AbstractFile
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
     protected string $title = '';
 
-    /**
-     * @var ?string
-     */
     #[ORM\Column(type: 'string', nullable: true)]
     protected ?string $description = '';
 
-    /**
-     * @var string
-     */
     #[ORM\Column(type: 'string', nullable: false)]
     protected string $filename = '';
 
-    /**
-     * @var string
-     */
     #[ORM\Column(type: 'string', nullable: false)]
     protected string $filetype = '';
 
-    /**
-     * @var int
-     */
     #[ORM\Column(type: 'integer')]
     protected int $filesize = 0;
 
-    /**
-     * @var string
-     */
     #[ORM\Column(type: 'string')]
     protected string $checksum;
 
     /**
      * @var User|null The UUID of the {@link User} that uploaded the file
      */
-    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User\User', cascade: [ 'detach' ])]
+    #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User\User', cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id')]
     protected ?User $author = null;
 
-    /**
-     * @var DateTimeImmutable
-     */
     #[ORM\Column(type: 'datetime_immutable')]
-    protected DateTimeImmutable $createdAt;
+    protected \DateTimeImmutable $createdAt;
 
-    /**
-     * @var DateTimeImmutable
-     */
     #[ORM\Column(type: 'datetime_immutable')]
-    protected DateTimeImmutable $updatedAt;
+    protected \DateTimeImmutable $updatedAt;
 
     /**
      * Returns the value of {@link id}.
@@ -175,9 +152,9 @@ abstract class AbstractFile
     /**
      * Returns the value of {@link createdAt}.
      *
-     * @return DateTimeImmutable The creation date of the file
+     * @return \DateTimeImmutable The creation date of the file
      */
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -185,9 +162,9 @@ abstract class AbstractFile
     /**
      * Returns the value of {@link updatedAt}.
      *
-     * @return DateTimeImmutable The date the file was last modified
+     * @return \DateTimeImmutable The date the file was last modified
      */
-    public function getUpdatedAt(): DateTimeImmutable
+    public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
     }
@@ -196,7 +173,6 @@ abstract class AbstractFile
      * Sets the value of {@link id}.
      *
      * @param ?UuidInterface $value The id to set
-     * @return static
      */
     public function setId(?UuidInterface $value): static
     {
@@ -209,7 +185,6 @@ abstract class AbstractFile
      * Sets the value of {@link title}.
      *
      * @param string $value The title to set
-     * @return static
      */
     public function setTitle(string $value): static
     {
@@ -222,7 +197,6 @@ abstract class AbstractFile
      * Sets the value of {@link description}.
      *
      * @param string|null $value The description to set
-     * @return static
      */
     public function setDescription(?string $value): static
     {
@@ -235,7 +209,6 @@ abstract class AbstractFile
      * Sets the value of {@link filename}.
      *
      * @param string $value The filename to set
-     * @return static
      */
     public function setFilename(string $value): static
     {
@@ -248,7 +221,6 @@ abstract class AbstractFile
      * Sets the value of {@link filetype}.
      *
      * @param string $value The filetype to set
-     * @return static
      */
     public function setFiletype(string $value): static
     {
@@ -260,10 +232,6 @@ abstract class AbstractFile
         return $this;
     }
 
-    /**
-     * @param string $value
-     * @return bool
-     */
     public function isValidFiletype(string $value): bool
     {
         return empty(static::ALLOWED_MIME_TYPES) || in_array($value, static::ALLOWED_MIME_TYPES, true);
@@ -273,7 +241,6 @@ abstract class AbstractFile
      * Sets the value of {@link filesize}.
      *
      * @param int $value The filesize to set
-     * @return static
      */
     public function setFilesize(int $value): static
     {
@@ -289,7 +256,6 @@ abstract class AbstractFile
      * Sets the value of {@link checksum}.
      *
      * @param string $value The checksum to set
-     * @return static
      */
     public function setChecksum(string $value): static
     {
@@ -302,21 +268,20 @@ abstract class AbstractFile
      * Sets the value of {@link author}.
      *
      * @param User|null $value The {@link User} to set as the author
-     * @return static
      */
     public function setAuthor(?User $value = null): static
     {
         $this->author = $value;
+
         return $this;
     }
 
     /**
      * Sets the value of {@link createdAt}.
      *
-     * @param DateTimeImmutable $value The date to be set
-     * @return static
+     * @param \DateTimeImmutable $value The date to be set
      */
-    public function setCreatedAt(DateTimeImmutable $value): static
+    public function setCreatedAt(\DateTimeImmutable $value): static
     {
         $this->createdAt = $value;
 
@@ -326,10 +291,9 @@ abstract class AbstractFile
     /**
      * Sets the value of {@link updatedAt}.
      *
-     * @param DateTimeImmutable $value Specifies the mod date for the {@link Page}
-     * @return static
+     * @param \DateTimeImmutable $value Specifies the mod date for the {@link Page}
      */
-    public function setUpdatedAt(DateTimeImmutable $value): static
+    public function setUpdatedAt(\DateTimeImmutable $value): static
     {
         $this->updatedAt = $value;
 
@@ -340,6 +304,7 @@ abstract class AbstractFile
      * Verifies the checksum of the file matches the provided one.
      *
      * @param string $checksum The checksum to verify against
+     *
      * @return bool The result of testing the checksum
      */
     public function verifyChecksum(string $checksum): bool

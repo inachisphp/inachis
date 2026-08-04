@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form;
@@ -23,15 +22,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class SecurityTxtType extends AbstractType
 {
     /**
-     * Constructor
-     *
-     * @param TranslatorInterface $translator
+     * Constructor.
      */
     public function __construct(
         private PermissionResolver $permissionResolver,
         private Security $security,
         private readonly TranslatorInterface $translator,
-    ) {}
+    ) {
+    }
 
     /**
      * @param FormBuilderInterface<array{
@@ -42,13 +40,13 @@ class SecurityTxtType extends AbstractType
      */
     public function buildForm(
         FormBuilderInterface $builder,
-        array $options
+        array $options,
     ): void {
         $user = $this->security->getUser();
         $allowEdit = $this->permissionResolver->hasPermission(
             $user,
             PermissionResource::CRAWLER,
-            PermissionAction::EDIT
+            PermissionAction::EDIT,
         );
 
         $builder->add('security_txt', TextareaType::class, [
@@ -75,8 +73,8 @@ class SecurityTxtType extends AbstractType
                     $this->translator->trans(
                         'admin.button.save',
                         [],
-                        'messages'
-                    )
+                        'messages',
+                    ),
                 ),
                 'label_html' => true,
             ]);
@@ -84,13 +82,10 @@ class SecurityTxtType extends AbstractType
     }
 
     /**
-     * Configure the options
-     *
-     * @param OptionsResolver $resolver
-     * @return void
+     * Configure the options.
      */
     public function configureOptions(
-        OptionsResolver $resolver
+        OptionsResolver $resolver,
     ): void {
         $resolver->setDefaults([
             'attr' => [

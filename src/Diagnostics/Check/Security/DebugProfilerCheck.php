@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics\Check\Security;
@@ -14,10 +13,25 @@ use Inachis\Diagnostics\CheckResult;
 
 final class DebugProfilerCheck implements CheckInterface
 {
-    public function getId(): string { return 'debug_profiler'; }
-    public function getLabel(): string { return 'Debug / Profiler Exposure'; }
-    public function getSection(): string { return 'Security'; }
-    public function getSeverity(): string { return 'high'; }
+    public function getId(): string
+    {
+        return 'debug_profiler';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Debug / Profiler Exposure';
+    }
+
+    public function getSection(): string
+    {
+        return 'Security';
+    }
+
+    public function getSeverity(): string
+    {
+        return 'high';
+    }
 
     public function run(): CheckResult
     {
@@ -29,9 +43,9 @@ final class DebugProfilerCheck implements CheckInterface
             $schema = $_SERVER['REQUEST_SCHEME'] ?? 'http';
             /** @var string */
             $host = $_SERVER['HTTP_HOST'];
-            $url = $schema . '://' . $host . '/' . $endpoint;
+            $url = $schema.'://'.$host.'/'.$endpoint;
             $headers = @get_headers($url);
-            if ($headers && strpos($headers[0], '200') !== false) {
+            if ($headers && false !== strpos($headers[0], '200')) {
                 $accessible[] = $endpoint;
             }
         }
@@ -44,10 +58,10 @@ final class DebugProfilerCheck implements CheckInterface
             $this->getLabel(),
             $status,
             $value,
-            $status === 'ok' ? 'Debug/profiler endpoints are not accessible.' : 'Debug endpoints accessible!',
-            $status === 'ok' ? null : 'Restrict access to _profiler and /config in production.',
+            'ok' === $status ? 'Debug/profiler endpoints are not accessible.' : 'Debug endpoints accessible!',
+            'ok' === $status ? null : 'Restrict access to _profiler and /config in production.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }

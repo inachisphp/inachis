@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Setting\Discovery;
@@ -22,54 +21,38 @@ abstract class AbstractTextFileController extends AbstractInachisController
 {
     /**
      * Create the form used to edit the document.
-     *
-     * @param SettingRepository $settingRepository
-     * @return FormInterface
      */
     abstract protected function createTextFileForm(
-        SettingRepository $settingRepository
+        SettingRepository $settingRepository,
     ): FormInterface;
 
     /**
      * Return the name of the form field containing the document content.
-     *
-     * @return string
      */
     abstract protected function getFormField(): string;
 
     /**
      * Return the settings key used to persist the document.
-     *
-     * @return string
      */
     abstract protected function getSettingKey(): string;
 
     /**
      * Return the template used to render the page.
-     *
-     * @return string
      */
     abstract protected function getTemplate(): string;
 
     /**
      * Return the human-readable document name.
-     *
-     * @return string
      */
     abstract protected function getDocumentName(): string;
 
     /**
      * Return the active tab identifier.
-     *
-     * @return string
      */
     abstract protected function getTab(): string;
 
     /**
      * Hook for subclasses to perform validation and add advisory warnings.
-     *
-     * @param string $content
-     * @return void
      */
     protected function validateContent(string $content): void
     {
@@ -78,14 +61,10 @@ abstract class AbstractTextFileController extends AbstractInachisController
 
     /**
      * Render and process the text file editor.
-     *
-     * @param Request $request
-     * @param SettingRepository $settingRepository
-     * @return Response
      */
     protected function editTextFile(
         Request $request,
-        SettingRepository $settingRepository
+        SettingRepository $settingRepository,
     ): Response {
         $form = $this->createTextFileForm($settingRepository);
 
@@ -96,23 +75,23 @@ abstract class AbstractTextFileController extends AbstractInachisController
             $data = $form->getData();
 
             $content = trim(
-                (string) ($data[$this->getFormField()] ?? '')
+                (string) ($data[$this->getFormField()] ?? ''),
             );
 
             $this->validateContent($content);
 
             $settingRepository->setValue(
                 $this->getSettingKey(),
-                $content
+                $content,
             );
 
             $this->addFlash(
                 'success',
-                $this->getSuccessMessage()
+                $this->getSuccessMessage(),
             );
 
             return $this->redirect(
-                $request->getUri()
+                $request->getUri(),
             );
         }
 
@@ -125,35 +104,31 @@ abstract class AbstractTextFileController extends AbstractInachisController
                 'viewModel' => $this->viewModel,
                 'form' => $form->createView(),
                 $this->getFormField() => $settingRepository->getValue(
-                    $this->getSettingKey()
+                    $this->getSettingKey(),
                 ) ?? '',
-            ]
+            ],
         );
     }
 
     /**
      * Return the page title.
-     *
-     * @return string
      */
     protected function getPageTitle(): string
     {
         return sprintf(
             '%s Configuration',
-            $this->getDocumentName()
+            $this->getDocumentName(),
         );
     }
 
     /**
      * Return the success flash message.
-     *
-     * @return string
      */
     protected function getSuccessMessage(): string
     {
         return sprintf(
             '%s configuration updated.',
-            $this->getDocumentName()
+            $this->getDocumentName(),
         );
     }
 }

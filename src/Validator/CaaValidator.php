@@ -1,27 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Validator;
 
-use Inachis\Model\Domain\ValidationIssue;
 use Inachis\Model\Domain\Severity;
+use Inachis\Model\Domain\ValidationIssue;
 
 /**
- * Validates CAA records
- * 
+ * Validates CAA records.
+ *
  * @phpstan-import-type DnsCaaRecord from \Inachis\Service\System\Domain\DnsResolverInterface
  */
 final class CaaValidator
 {
     /**
-     * Validate CAA records
+     * Validate CAA records.
+     *
      * @param list<DnsCaaRecord> $records
+     *
      * @return list<ValidationIssue>
      */
     public function validate(array $records): array

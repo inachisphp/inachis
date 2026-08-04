@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Enum\Security;
@@ -20,9 +19,7 @@ enum PermissionAction: string
     case PUBLISH = 'PUBLISH';
 
     /**
-     * Returns a friendly name for the {@link PermissionAction}
-     *
-     * @return string
+     * Returns a friendly name for the {@link PermissionAction}.
      */
     public function label(): string
     {

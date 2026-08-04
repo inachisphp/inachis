@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Validator\Constraints;
@@ -16,7 +15,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
-use stdClass;
 
 #[AllowMockObjectsWithoutExpectations]
 class ValidTimezoneValidatorTest extends ConstraintValidatorTestCase
@@ -44,7 +42,7 @@ class ValidTimezoneValidatorTest extends ConstraintValidatorTestCase
     public function testValidateNotString(): void
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new stdClass(), new ValidTimezone());
+        $this->validator->validate(new \stdClass(), new ValidTimezone());
     }
 
     public function testTimezoneNotInArray(): void

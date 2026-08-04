@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Setting\Discovery;
@@ -17,17 +16,14 @@ use Symfony\Component\Routing\Attribute\Route;
 class DiscoveryController extends AbstractInachisController
 {
     /**
-     * Main Crawlers and Discovery dashboard for viewing status
-     *
-     * @param DiscoveryStatusService $discoveryStatusService
-     * @return Response
+     * Main Crawlers and Discovery dashboard for viewing status.
      */
     #[Route(
         '/incp/settings/discovery',
-        name: 'incp_settings_discovery'
+        name: 'incp_settings_discovery',
     )]
     public function index(
-        DiscoveryStatusService $discoveryStatusService
+        DiscoveryStatusService $discoveryStatusService,
     ): Response {
         $this->viewModel->page->title = 'Crawlers & Discovery';
         $this->viewModel->page->tab = 'discovery';
@@ -37,7 +33,7 @@ class DiscoveryController extends AbstractInachisController
             [
                 'viewModel' => $this->viewModel,
                 'status' => $discoveryStatusService->getGroupedStatus(),
-            ]
+            ],
         );
     }
 }

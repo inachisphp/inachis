@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Factory;
@@ -58,12 +57,12 @@ class PageViewFactory
 
         $sessionTimeout = new \DateTimeImmutable();
         $sessionTimeout = $sessionTimeout->add(
-            new \DateInterval('PT' . ini_get('session.gc_maxlifetime') . 'S')
+            new \DateInterval('PT'.ini_get('session.gc_maxlifetime').'S'),
         );
 
         $view->twoFactorPending = $this->requestStack?->getSession()->get(
             'security.totp_pending',
-            false
+            false,
         ) ?? false;
         $view->session = $this->security->getUser();
         $view->sessionTimeout = (int) ini_get('session.gc_maxlifetime');
@@ -80,14 +79,14 @@ class PageViewFactory
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if ($request !== null) {
+        if (null !== $request) {
             return $request->getSchemeAndHttpHost();
         }
 
         // Fallback for CLI, workers, etc.
         $domain = $_ENV['APP_DOMAIN'] ?? '';
 
-        if (!is_string($domain) || $domain === '') {
+        if (!is_string($domain) || '' === $domain) {
             return '';
         }
 
@@ -96,7 +95,7 @@ class PageViewFactory
         return sprintf(
             '%s://%s',
             $https ? 'https' : 'http',
-            $domain
+            $domain,
         );
     }
 

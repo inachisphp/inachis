@@ -1,33 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Content;
 
-use Inachis\Entity\Content\{Page, Revision};
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Revision;
 
 /**
- * Compare page content to revision
+ * Compare page content to revision.
  */
 class ContentRevisionCompare
 {
     /**
-     * Check if page matches revision
-     *
-     * @param Page $page
-     * @param Revision $revision
-     * @return bool
+     * Check if page matches revision.
      */
     public static function doesPageMatchRevision(Page $page, Revision $revision): bool
     {
         return
-            $revision->getContent() === $page->getContent() &&
-            $revision->getTitle() === $page->getTitle() &&
-            $revision->getSubTitle() === $page->getSubTitle();
+            $revision->getContent() === $page->getContent()
+            && $revision->getTitle() === $page->getTitle()
+            && $revision->getSubTitle() === $page->getSubTitle();
     }
 }

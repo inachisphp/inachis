@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Security\Authentication;
 
 use Inachis\Entity\User\User;
 use Inachis\Enum\Security\LoginResultType;
-use Inachis\Security\Authentication\LoginSuccessRecorder;
-use Inachis\Security\Authentication\TrustedDeviceManager;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,7 +25,8 @@ class TwoFactorLoginCompleter
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly Security $security,
         private readonly TrustedDeviceManager $trustedDeviceManager,
-    ) {}
+    ) {
+    }
 
     /**
      * Validates that the user is logged in and has a pending 2FA challenge state.
@@ -41,6 +39,7 @@ class TwoFactorLoginCompleter
 
         if (!$user instanceof User) {
             $session->remove('security.totp_pending');
+
             return false;
         }
 
@@ -51,25 +50,22 @@ class TwoFactorLoginCompleter
      * Complete a pending two-factor authentication.
      * Responsible for:
      * - clearing the pending 2FA session state
-     * - redirecting the user to their destination
+     * - redirecting the user to their destination.
      *
      * Used by both 2FA codes, and recovery code routes
      *
-     * @param Request $request
-     * @param LoginResultType $loginType
      * @param bool $trustDevice Whether to issue a trusted device cookie
-     * @return RedirectResponse
      */
     public function complete(
         Request $request,
         LoginResultType $loginType,
-        bool $trustDevice = false
+        bool $trustDevice = false,
     ): RedirectResponse {
         $session = $request->getSession();
 
         $target = $session->get(
             'security.pending_2fa_target',
-            $this->urlGenerator->generate('incp_dashboard')
+            $this->urlGenerator->generate('incp_dashboard'),
         );
 
         $session->remove('security.totp_pending');
@@ -82,7 +78,7 @@ class TwoFactorLoginCompleter
 
         if ($trustDevice && $user instanceof User) {
             $response->headers->setCookie(
-                $this->trustedDeviceManager->create($user, $request)
+                $this->trustedDeviceManager->create($user, $request),
             );
         }
 
@@ -90,7 +86,7 @@ class TwoFactorLoginCompleter
             $this->loginSuccessRecorder->record(
                 $user,
                 $request,
-                $loginType
+                $loginType,
             );
         }
 

@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Discovery\Checker;
@@ -13,23 +12,20 @@ use Inachis\Model\System\DiscoveryStatus;
 use Inachis\Service\Discovery\Generator\RobotsTxtGenerator;
 
 /**
- * Checks the status of robots.txt
+ * Checks the status of robots.txt.
  */
 class RobotsTxtChecker implements DiscoveryCheckerInterface
 {
     /**
-     * Constructor
-     *
-     * @param RobotsTxtGenerator $generator
+     * Constructor.
      */
     public function __construct(
-        private readonly RobotsTxtGenerator $generator
-    ) {}
+        private readonly RobotsTxtGenerator $generator,
+    ) {
+    }
 
     /**
-     * Check the status of robots.txt
-     *
-     * @return DiscoveryStatus
+     * Check the status of robots.txt.
      */
     public function check(): DiscoveryStatus
     {
@@ -39,7 +35,7 @@ class RobotsTxtChecker implements DiscoveryCheckerInterface
 
         if (preg_match(
             '/^Disallow:\s*\/\s*$/mi',
-            $content
+            $content,
         )) {
             $status = 'warning';
 
@@ -51,7 +47,7 @@ class RobotsTxtChecker implements DiscoveryCheckerInterface
             'Controls crawler access rules.',
             $status,
             '/robots.txt',
-            $messages
+            $messages,
         );
     }
 }

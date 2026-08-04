@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Export\Category;
@@ -20,29 +19,31 @@ final class CategoryXmlWriter extends AbstractXmlExportWriter
     /**
      * Checks if the writer supports the given format.
      *
-     * @param string $format The format to check.
-     * @return bool True if the writer supports the format, false otherwise.
+     * @param string $format the format to check
+     *
+     * @return bool true if the writer supports the format, false otherwise
      */
     public function supports(string $format): bool
     {
-        return $format === 'xml';
+        return 'xml' === $format;
     }
 
     /**
      * Checks if the writer supports the given content domain.
      *
-     * @param string|null $domain The domain to check.
-     * @return bool True if the writer supports the domain, false otherwise.
+     * @param string|null $domain the domain to check
+     *
+     * @return bool true if the writer supports the domain, false otherwise
      */
     public function supportsDomain(?string $domain): bool
     {
-        return $domain === 'category';
+        return 'category' === $domain;
     }
 
     /**
      * The root node for the XML document.
      *
-     * @return string The root node name.
+     * @return string the root node name
      */
     protected function rootNodeName(): string
     {
@@ -52,7 +53,7 @@ final class CategoryXmlWriter extends AbstractXmlExportWriter
     /**
      * The item node for the XML document.
      *
-     * @return string The item node name.
+     * @return string the item node name
      */
     protected function itemNodeName(): string
     {
@@ -62,12 +63,12 @@ final class CategoryXmlWriter extends AbstractXmlExportWriter
     /**
      * Writes a single category DTO to XML.
      *
-     * @param \SimpleXMLElement $xml The XML element to write to.
-     * @param CategoryExportDto $item The category DTO to write.
+     * @param \SimpleXMLElement $xml  the XML element to write to
+     * @param CategoryExportDto $item the category DTO to write
      */
     protected function writeItem(\SimpleXMLElement $xml, object $item): void
     {
-        /** @var CategoryExportDto $item */
+        /* @var CategoryExportDto $item */
         $this->optional($xml, 'id', $item->id);
         $this->optional($xml, 'title', $item->title);
         $this->optional($xml, 'description', $item->description);

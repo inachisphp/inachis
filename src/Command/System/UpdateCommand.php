@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Command\System;
@@ -23,11 +22,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Throwable;
 
 #[AsCommand(
     name: 'inachis:system:update',
-    description: 'Checks for, downloads, and applies core Inachis framework updates.'
+    description: 'Checks for, downloads, and applies core Inachis framework updates.',
 )]
 final class UpdateCommand extends Command
 {
@@ -49,13 +47,13 @@ final class UpdateCommand extends Command
                 'check-only',
                 'c',
                 InputOption::VALUE_NONE,
-                'Check for available updates without downloading or installing them.'
+                'Check for available updates without downloading or installing them.',
             )
             ->addOption(
                 'force',
                 'f',
                 InputOption::VALUE_NONE,
-                'Bypass interactive confirmation prompt (useful for automated cron jobs).'
+                'Bypass interactive confirmation prompt (useful for automated cron jobs).',
             );
     }
 
@@ -74,12 +72,15 @@ final class UpdateCommand extends Command
             $plan = $this->updatePlanner->plan($currentVersion, $manifest);
         } catch (NoUpdateAvailableException $e) {
             $io->success($e->getMessage());
+
             return Command::SUCCESS;
         } catch (IncompatibleVersionException $e) {
             $io->error($e->getMessage());
+
             return Command::FAILURE;
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             $io->error(sprintf('Failed checking for updates: %s', $e->getMessage()));
+
             return Command::FAILURE;
         }
 
@@ -87,16 +88,17 @@ final class UpdateCommand extends Command
         $io->table(
             ['Property', 'Value'],
             [
-                ['Target Version', 'v' . $plan->targetVersion],
+                ['Target Version', 'v'.$plan->targetVersion],
                 ['Package Archive', $plan->package],
                 ['Migrations Required', $plan->requiresMigration ? 'Yes' : 'No'],
                 ['Release Date', $manifest->publishedAt ? date('F j, Y H:i', strtotime($manifest->publishedAt)) : 'N/A'],
-            ]
+            ],
         );
 
         // If user only wanted to check, stop here
         if ($input->getOption('check-only')) {
             $io->info(sprintf('New release v%s is available! Run without --check-only to install.', $plan->targetVersion));
+
             return Command::SUCCESS;
         }
 
@@ -104,11 +106,12 @@ final class UpdateCommand extends Command
         if (!$input->getOption('force')) {
             $confirmed = $io->confirm(
                 sprintf('Are you sure you want to update from v%s to v%s?', $currentVersion, $plan->targetVersion),
-                true
+                true,
             );
 
             if (!$confirmed) {
                 $io->warning('Update cancelled by user.');
+
                 return Command::SUCCESS;
             }
         }
@@ -119,17 +122,17 @@ final class UpdateCommand extends Command
 
             // Download
             $io->text('1/4 Downloading release package...');
-            $tempArchive = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $plan->package;
+            $tempArchive = sys_get_temp_dir().DIRECTORY_SEPARATOR.$plan->package;
             $this->releaseProvider->download($manifest, $tempArchive);
 
             // Shared paths
             $sharedDir = $this->releaseLocator->sharedDirectory();
             $sharedMappings = [
-                '.env'                   => $sharedDir . '/.env',
-                '.env.local.php'         => $sharedDir . '/.env.local.php',
-                'public/imgs'            => $sharedDir . '/public/imgs',
-                'var'                    => $sharedDir . '/var',
-                'public/maintenance.html' => $sharedDir . '/public/maintenance.html',
+                '.env' => $sharedDir.'/.env',
+                '.env.local.php' => $sharedDir.'/.env.local.php',
+                'public/imgs' => $sharedDir.'/public/imgs',
+                'var' => $sharedDir.'/var',
+                'public/maintenance.html' => $sharedDir.'/public/maintenance.html',
             ];
 
             // Extract, migrate DB, swap symlink
@@ -153,10 +156,10 @@ final class UpdateCommand extends Command
             $io->success(sprintf('Inachis successfully updated to v%s!', $plan->targetVersion));
 
             return Command::SUCCESS;
-
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             $io->newLine();
             $io->error(sprintf('Update process failed: %s', $e->getMessage()));
+
             return Command::FAILURE;
         }
     }

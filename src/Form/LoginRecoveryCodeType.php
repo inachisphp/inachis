@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form;
@@ -18,7 +17,7 @@ class LoginRecoveryCodeType extends AbstractType
 {
     public function buildForm(
         FormBuilderInterface $builder,
-        array $options
+        array $options,
     ): void {
         $builder->add(
             'code',
@@ -36,7 +35,7 @@ class LoginRecoveryCodeType extends AbstractType
                     'required' => true,
                     'spellcheck' => 'false',
                 ],
-            ]
+            ],
         )
         ->add('verify', SubmitType::class, [
             'attr' => [

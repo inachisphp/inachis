@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Entity\Media;
 
-use DateTimeImmutable;
 use Inachis\Entity\Media\Download;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -79,13 +77,13 @@ class DownloadTest extends TestCase
 
     public function testSetAndGetCreatedAt(): void
     {
-        $this->download->setCreatedAt(new DateTimeImmutable('1970-01-02 01:34:56'));
+        $this->download->setCreatedAt(new \DateTimeImmutable('1970-01-02 01:34:56'));
         $this->assertEquals('1970-01-02 01:34:56', $this->download->getCreatedAt()->format('Y-m-d H:i:s'));
     }
 
     public function testSetAndGetUpdatedAt(): void
     {
-        $this->download->setUpdatedAt(new DateTimeImmutable('1970-01-02 01:34:56'));
+        $this->download->setUpdatedAt(new \DateTimeImmutable('1970-01-02 01:34:56'));
         $this->assertEquals('1970-01-02 01:34:56', $this->download->getUpdatedAt()->format('Y-m-d H:i:s'));
     }
 }

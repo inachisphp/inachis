@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Entity\User;
 
-use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
@@ -31,11 +29,11 @@ class UserRecoveryCode
      */
     #[ORM\ManyToOne(
         targetEntity: User::class,
-        inversedBy: 'recoveryCodes'
+        inversedBy: 'recoveryCodes',
     )]
     #[ORM\JoinColumn(
         nullable: false,
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
     )]
     private User $user;
 
@@ -51,7 +49,7 @@ class UserRecoveryCode
      * When this recovery code was created.
      */
     #[ORM\Column]
-    private DateTimeImmutable $createdAt;
+    private \DateTimeImmutable $createdAt;
 
     /**
      * When this recovery code was used.
@@ -59,14 +57,14 @@ class UserRecoveryCode
      * Null indicates the code is still valid.
      */
     #[ORM\Column(nullable: true)]
-    private ?DateTimeImmutable $usedAt = null;
+    private ?\DateTimeImmutable $usedAt = null;
 
     /**
      * UserRecoveryCode constructor.
      */
     public function __construct()
     {
-        $this->createdAt = new DateTimeImmutable();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     /**
@@ -126,7 +124,7 @@ class UserRecoveryCode
     /**
      * Get when the recovery code was created.
      */
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -134,7 +132,7 @@ class UserRecoveryCode
     /**
      * Set when the recovery code was created.
      */
-    public function setCreatedAt(DateTimeImmutable $createdAt): self
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
 
@@ -144,7 +142,7 @@ class UserRecoveryCode
     /**
      * Get when the recovery code was used.
      */
-    public function getUsedAt(): ?DateTimeImmutable
+    public function getUsedAt(): ?\DateTimeImmutable
     {
         return $this->usedAt;
     }
@@ -152,7 +150,7 @@ class UserRecoveryCode
     /**
      * Set when the recovery code was used.
      */
-    public function setUsedAt(?DateTimeImmutable $usedAt): self
+    public function setUsedAt(?\DateTimeImmutable $usedAt): self
     {
         $this->usedAt = $usedAt;
 
@@ -164,6 +162,6 @@ class UserRecoveryCode
      */
     public function isUsed(): bool
     {
-        return $this->usedAt !== null;
+        return null !== $this->usedAt;
     }
 }

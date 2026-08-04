@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Validator\Constraints;
@@ -12,7 +11,6 @@ namespace Inachis\Tests\phpunit\Validator\Constraints;
 use Inachis\Validator\Constraints\ValidIPAddress;
 use Inachis\Validator\Constraints\ValidIPAddressValidator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -34,12 +32,12 @@ class ValidIPAddressValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
         $this->validator->validate(
             '2001:0db8:85a3:0000:0000:8a2e:0370:7334', // full-format
-            new ValidIPAddress()
+            new ValidIPAddress(),
         );
         $this->assertNoViolation();
         $this->validator->validate(
             '2001:db8:3333:4444:5555:6666:7777:8888', // omit leading zeroes
-            new ValidIPAddress()
+            new ValidIPAddress(),
         );
         $this->assertNoViolation();
     }

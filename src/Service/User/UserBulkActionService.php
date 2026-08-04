@@ -1,40 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\User;
 
-use Inachis\Repository\User\UserRepository;
-use Inachis\Service\User\UserProtectionServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Repository\User\UserRepository;
 
 /**
- * Service for applying bulk actions to users
+ * Service for applying bulk actions to users.
  */
 readonly class UserBulkActionService
 {
-    /**
-     * @param UserProtectionServiceInterface $userProtectionService
-     * @param UserRepository $userRepository
-     * @param EntityManagerInterface $entityManager
-     */
     public function __construct(
         private UserProtectionServiceInterface $userProtectionService,
         private UserRepository $userRepository,
         private EntityManagerInterface $entityManager,
-    ) {}
+    ) {
+    }
 
     /**
-     * Apply a bulk action to users
+     * Apply a bulk action to users.
      *
-     * @param string $action
      * @param list<string> $ids
-     * @return int
      */
     public function apply(string $action, array $ids): int
     {
@@ -57,8 +49,8 @@ readonly class UserBulkActionService
 
         foreach ($users as $user) {
             match ($action) {
-                'delete'  => $user->setRemoved(true),
-                'enable'  => $user->setActive(true),
+                'delete' => $user->setRemoved(true),
+                'enable' => $user->setActive(true),
                 'disable' => $user->setActive(false),
                 default => null,
             };
@@ -67,6 +59,7 @@ readonly class UserBulkActionService
         }
 
         $this->entityManager->flush();
+
         return $count;
     }
 }

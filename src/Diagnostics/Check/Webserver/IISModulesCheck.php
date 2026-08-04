@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics\Check\Webserver;
@@ -18,9 +17,20 @@ use Inachis\Diagnostics\CheckResult;
  */
 final class IISModulesCheck implements CheckInterface
 {
-    public function getId(): string { return 'iis_modules'; }
-    public function getLabel(): string { return 'IIS Modules & Performance Guidance'; }
-    public function getSection(): string { return 'Webserver'; }
+    public function getId(): string
+    {
+        return 'iis_modules';
+    }
+
+    public function getLabel(): string
+    {
+        return 'IIS Modules & Performance Guidance';
+    }
+
+    public function getSection(): string
+    {
+        return 'Webserver';
+    }
 
     public function run(): CheckResult
     {
@@ -37,7 +47,7 @@ final class IISModulesCheck implements CheckInterface
                 'Not running on IIS. No IIS-specific guidance required.',
                 null,
                 $this->getSection(),
-                'medium'
+                'medium',
             );
         }
 
@@ -85,7 +95,7 @@ final class IISModulesCheck implements CheckInterface
             implode("\n", $details),
             'IIS settings cannot be verified automatically. Follow the checklist above for performance optimization.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }
