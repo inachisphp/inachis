@@ -9,46 +9,76 @@
 
 {% if canResource('SYSTEM_STATUS') %}
 <section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">health_and_safety</span></p>
-    <h2>System Health &amp; Diagnostics</h2>
-    <p><span>Inspect server configuration, memory, security headers, and environmental health.</span></p>
-    <p><a href="{{ viewModel.settings.domain ~ path('incp_tools_diagnostics') }}" class="btn btn--secondary">View Status</a></p>
+    <a href="{{ viewModel.settings.domain ~ path('incp_tools_diagnostics') }}" class="widget-settings__link">
+        <div class="widget-settings__icon">
+            <span class="material-icons" aria-hidden="true">health_and_safety</span>
+        </div>
+        <h2>System Health &amp; Diagnostics</h2>
+        <p class="widget-settings__desc">Inspect server configuration, memory, security headers, and environmental health.</p>
+        <div class="widget-settings__action">
+            <span class="btn btn--secondary">View Status</span>
+        </div>
+    </a>
 </section>
 {% endif %}
 
 {% if canResource('EMAIL_DNS') %}
 <section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">mark_email_read</span></p>
-    <h2>Email &amp; DNS Authentication</h2>
-    <p><span>Verify SPF, DKIM, DMARC, and domain security compliance.</span></p>
-    <p><a href="{{ viewModel.settings.domain ~ path('incp_tools_email') }}" class="btn btn--secondary">Check Mail Security</a></p>
+    <a href="{{ viewModel.settings.domain ~ path('incp_tools_email') }}" class="widget-settings__link">
+        <div class="widget-settings__icon">
+            <span class="material-icons" aria-hidden="true">mark_email_read</span>
+        </div>
+        <h2>Email &amp; DNS Authentication</h2>
+        <p class="widget-settings__desc">Verify SPF, DKIM, DMARC, and domain security compliance.</p>
+        <div class="widget-settings__action">
+            <span class="btn btn--secondary">Check Mail Security</span>
+        </div>
+    </a>
 </section>
 {% endif %}
 
 {% if canResource('PRIVACY_GDPR') %}
 <section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">verified_user</span></p>
-    <h2>Privacy &amp; GDPR</h2>
-    <p><span>Manage cookie consent banners, user data exports, and IP anonymization settings.</span></p>
-    <p><a href="{{ viewModel.settings.domain ~ path('incp_security_privacy')  }}" class="btn btn--secondary">Manage Privacy</a></p>
+    <a href="{{ viewModel.settings.domain ~ path('incp_security_privacy') }}" class="widget-settings__link">
+        <div class="widget-settings__icon">
+            <span class="material-icons" aria-hidden="true">verified_user</span>
+        </div>
+        <h2>Privacy &amp; GDPR</h2>
+        <p class="widget-settings__desc">Manage cookie consent banners, user data exports, and IP anonymization settings.</p>
+        <div class="widget-settings__action">
+            <span class="btn btn--secondary">Manage Privacy</span>
+        </div>
+    </a>
 </section>
 {% endif %}
 
 {% if canResource('CSP_POLICY') %}
 <section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">policy</span></p>
-    <h2>Content Security Policy</h2>
-    <p><span>Configure CSP directives and monitor real-time violation reports.</span></p>
-    <p><a href="{{ viewModel.settings.domain ~ path('incp_tools_csp_dashboard') }}" class="btn btn--secondary">Manage CSP</a></p>
+    <a href="{{ viewModel.settings.domain ~ path('incp_tools_csp_dashboard') }}" class="widget-settings__link">
+        <div class="widget-settings__icon">
+            <span class="material-icons" aria-hidden="true">policy</span>
+        </div>
+        <h2>Content Security Policy</h2>
+        <p class="widget-settings__desc">Configure CSP directives and monitor real-time violation reports.</p>
+        <div class="widget-settings__action">
+            <span class="btn btn--secondary">Manage CSP</span>
+        </div>
+    </a>
 </section>
 {% endif %}
 
 {% if canResource('PASSWORD_POLICY') %}
 <section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">password</span></p>
-    <h2>Password Policy</h2>
-    <p><span>Define password complexity, expiration, and session security rules.</span></p>
-    <p><a href="{{ viewModel.settings.domain ~ path('incp_admin_security_policy') }}" class="btn btn--secondary">Manage Policy</a></p>
+    <a href="{{ viewModel.settings.domain ~ path('incp_admin_security_policy') }}" class="widget-settings__link">
+        <div class="widget-settings__icon">
+            <span class="material-icons" aria-hidden="true">password</span>
+        </div>
+        <h2>Password Policy</h2>
+        <p class="widget-settings__desc">Define password complexity, expiration, and session security rules.</p>
+        <div class="widget-settings__action">
+            <span class="btn btn--secondary">Manage Policy</span>
+        </div>
+    </a>
 </section>
 {% endif %}
 

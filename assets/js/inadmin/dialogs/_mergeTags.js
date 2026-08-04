@@ -33,18 +33,18 @@ window.Inachis.MergeTags = {
 			`,
 			buttons: [
 				{
+					text: 'Cancel',
+					class: 'btn btn--outline',
+					click() {
+						this.close();
+					}
+				},
+				{
 					text: 'Merge',
 					class: 'btn btn--primary',
 					disabled: true,
 					click: () => this.submitMerge(this, this.selectedTagIds)
 				},
-				{
-					text: 'Cancel',
-					class: 'btn btn--info',
-					click() {
-						this.close();
-					}
-				}
 			],
 			onOpen: dialog => {
 				document.querySelector('.fixed-bottom-bar')?.classList.toggle('hidden');

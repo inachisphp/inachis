@@ -104,33 +104,59 @@ div.EasyMDEContainer {
 
 /* ---------------- Autosave Notification Toast ---------------- */
 
-.autosave-notification {
-  align-items: center;
-  animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  background-color: $flash-autosave-bg;
-  border-radius: $radius-standard;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  bottom: 4.5rem;
-  color: $flash-autosave-text;
+p.autosave-notification {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  padding: 0.625rem 1rem;
-  width: auto;
-  z-index: 60;
+  gap: 1rem;
 
-  button.button {
+  position: fixed;
+  bottom: 5.25rem;
+  left: 1.25rem;
+  right: 1.25rem;
+  z-index: 49;
+
+  @media (min-width: $breakpoint-medium) {
+    left: calc(#{$sidebar-collapsed} + 1.25rem);
+    transition: left $transition-base, right $transition-base;
+
+    .layout.expanded & {
+      left: calc(#{$sidebar-expanded} + 1.25rem);
+    }
+  }
+
+  background-color: $flash-autosave-bg;
+  border: 1px solid $flash-autosave-border;
+  border-radius: $radius-standard;
+  padding: 0.625rem 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  & > span:first-child {
+    color: $flash-autosave-text;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: none;
+  }
+
+  // Icons
+  .material-icons,
+  &::before {
+    color: $flash-autosave-text;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+
+  // Discard/Action Button
+  button.btn {
     background-color: transparent;
     border: none;
     color: $flash-autosave-discard;
     cursor: pointer;
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
 
     &:hover {
-      background-color: transparent;
+      color: $flash-autosave-discard-hover;
       text-decoration: underline;
     }
   }

@@ -18,10 +18,10 @@
   padding: 0.5rem 1rem;
   text-decoration: none;
   text-wrap-mode: nowrap;
-  transition: 
-    background-color $transition-base, 
-    border-color $transition-base, 
-    box-shadow $transition-base, 
+  transition:
+    background-color $transition-base,
+    border-color $transition-base,
+    box-shadow $transition-base,
     transform $transition-base,
     filter $transition-base;
   user-select: none;
@@ -190,12 +190,23 @@
     text-align: center;
   }
 
+  &.btn--full {
+    display: flex;
+    width: 100%;
+    text-align: center;
+  }
+
+  &.btn--caps {
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+
   &.btn--icon-only {
     padding: 0.5rem;
     border-radius: $radius-round;
 
-    span:not(.material-icons) { 
-      display: none; 
+    span:not(.material-icons) {
+      display: none;
     }
 
     .material-icons {

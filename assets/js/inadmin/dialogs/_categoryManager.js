@@ -31,11 +31,11 @@ window.Inachis.CategoryManager = {
           buttons: [
             {
               text: 'Close',
-              class: 'btn btn--info',
+              class: 'btn btn--outline',
               click() {
                 this.close();
               }
-            }
+            },
           ],
           onOpen: dialog => {
             document.querySelector('.fixed-bottom-bar')?.classList.toggle('hidden');

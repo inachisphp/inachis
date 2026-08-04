@@ -40,7 +40,7 @@ window.Inachis.FileUpload = {
         ]);
         await this.loadScript('/assets/js/incp/filepond.min.js');
         await Promise.all([
-            this.loadScript('/assets/js/inc/filepond-plugin-image-preview.min.js'),
+            this.loadScript('/assets/js/incp/filepond-plugin-image-preview.min.js'),
             this.loadScript('/assets/js/incp/filepond-plugin-file-validate-size.min.js'),
             this.loadScript('/assets/js/incp/filepond-plugin-file-validate-type.min.js')
         ]);

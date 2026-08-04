@@ -6,6 +6,13 @@ window.Inachis.ImageManager = {
     allowedTypes: [],
     buttons: [
         {
+            text: 'Close',
+            class: 'btn btn--outline',
+            click() {
+                this.close();
+            }
+        },
+        {
             class: 'btn btn--primary',
             disabled: true,
             text: 'Choose Image',
@@ -13,13 +20,6 @@ window.Inachis.ImageManager = {
                 window.Inachis.ImageManager.chooseImageAction();
             }
         },
-        {
-            text: 'Close',
-            class: 'btn btn--info',
-            click() {
-                this.close();
-            }
-        }
     ],
 
     offset: 0,

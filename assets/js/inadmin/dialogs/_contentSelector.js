@@ -30,18 +30,18 @@ window.Inachis.ContentSelectorDialog = {
       `,
       buttons: [
         {
+          text: 'Close',
+          class: 'btn btn--outline',
+          click() {
+            this.close();
+          }
+        },
+        {
           text: 'Attach to series',
           class: 'btn btn--primary',
           disabled: true,
           click: () => this.addContentToSeries()
         },
-        {
-          text: 'Close',
-          class: 'btn btn--info',
-          click() {
-            this.close();
-          }
-        }
       ],
       onOpen: dialog => {
         document.querySelector('.fixed-bottom-bar')?.classList.toggle('hidden');

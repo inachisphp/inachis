@@ -9,50 +9,79 @@
 
 {% if can('NAVIGATION', 'VIEW') %}
 <section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">tab</span></p>
-    <h2>Tabs &amp; Navigation</h2>
-    <p><span>Manage site navigation and main menu links</span></p>
-    <p><a href="{{ viewModel.settings.domain ~ path('incp_settings_navigation_list') }}" class="btn btn--secondary">Manage Tabs</a></p>
+    <a href="{{ viewModel.settings.domain ~ path('incp_settings_navigation_list') }}" class="widget-settings__link">
+        <div class="widget-settings__icon">
+            <span class="material-icons" aria-hidden="true">tab</span>
+        </div>
+        <h2>Tabs &amp; Navigation</h2>
+        <p class="widget-settings__desc">Manage site navigation and main menu links</p>
+        <div class="widget-settings__action">
+            <span class="btn btn--secondary">Manage Tabs</span>
+        </div>
+    </a>
 </section>
 {% endif %}
 
-{# path('incp_settings_plugins')  #}
 {% if can('PLUGIN', 'VIEW') %}
 <section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">extension</span></p>
-    <h2>Plugins &amp; Add-ons</h2>
-    <p><span>Manage installed plugins, extensions, and integrations</span></p>
-    <p><a href="{{ viewModel.settings.domain }}" class="btn btn--secondary">Manage Plugins</a></p>
+    <a href="{{ viewModel.settings.domain }}" class="widget-settings__link">
+        <div class="widget-settings__icon">
+            <span class="material-icons" aria-hidden="true">extension</span>
+        </div>
+        <h2>Plugins &amp; Add-ons</h2>
+        <p class="widget-settings__desc">Manage installed plugins, extensions, and integrations</p>
+        <div class="widget-settings__action">
+            <span class="btn btn--secondary">Manage Plugins</span>
+        </div>
+    </a>
 </section>
 {% endif %}
 
 {% if can('THEME', 'MANAGE') %}
 <section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">format_paint</span></p>
-    <h2>Themes &amp; Styling</h2>
-    <p><span>Manage and apply visual presentation themes</span></p>
-    <p><a href="{{ viewModel.settings.domain ~ path('incp_settings_themes') }}" class="btn btn--secondary">Manage Themes</a></p>
+    <a href="{{ viewModel.settings.domain ~ path('incp_settings_themes') }}" class="widget-settings__link">
+        <div class="widget-settings__icon">
+            <span class="material-icons" aria-hidden="true">format_paint</span>
+        </div>
+        <h2>Themes &amp; Styling</h2>
+        <p class="widget-settings__desc">Manage and apply visual presentation themes</p>
+        <div class="widget-settings__action">
+            <span class="btn btn--secondary">Manage Themes</span>
+        </div>
+    </a>
 </section>
 {% endif %}
 
 {% if can('CRAWLER', 'VIEW') %}
 <section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">android</span></p>
-    <h2>Crawlers &amp; Discovery</h2>
-    <p><span>Manage robots.txt, llms.txt, and AI engine discovery</span></p>
-    <p><a href="{{ viewModel.settings.domain ~ path('incp_settings_discovery') }}" class="btn btn--secondary">Manage Discovery</a></p>
+    <a href="{{ viewModel.settings.domain ~ path('incp_settings_discovery') }}" class="widget-settings__link">
+        <div class="widget-settings__icon">
+            <span class="material-icons" aria-hidden="true">android</span>
+        </div>
+        <h2>Crawlers &amp; Discovery</h2>
+        <p class="widget-settings__desc">Manage robots.txt, llms.txt, and AI engine discovery</p>
+        <div class="widget-settings__action">
+            <span class="btn btn--secondary">Manage Discovery</span>
+        </div>
+    </a>
 </section>
 {% endif %}
 
 {# System Information Widget #}
 <section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">info</span></p>
-    <h2>System Information</h2>
-    <p>
-        <span>Version: {{ version.version }}</span><br>
-        <small class="text-muted">Build date: {{ version.build_date }}</small>
-    </p>
-    <p><a href="{{ viewModel.settings.domain ~ path('incp_settings_update') }}" class="btn btn--secondary">Update / Rollback</a></p>
+    <a href="{{ viewModel.settings.domain ~ path('incp_settings_update') }}" class="widget-settings__link">
+        <div class="widget-settings__icon">
+            <span class="material-icons" aria-hidden="true">info</span>
+        </div>
+        <h2>System Information</h2>
+        <p class="widget-settings__desc">
+            Version: {{ version.version }}<br>
+            <small class="text-muted">Build date: {{ version.build_date }}</small>
+        </p>
+        <div class="widget-settings__action">
+            <span class="btn btn--secondary">Update / Rollback</span>
+        </div>
+    </a>
 </section>
 
 </div>

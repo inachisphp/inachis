@@ -100,10 +100,10 @@
 
                         <div>
                             {% if activeTheme.identifier == theme.identifier %}
-                                <button type="button" class="btn btn--primary" disabled>Active</button>
+                                <button type="button" class="btn btn--primary btn--full btn--caps" disabled>Active</button>
                             {% else %}
                                 <form method="post" action="{{ path('incp_settings_theme_activate', { identifier: theme.identifier }) }}">
-                                    <button type="submit" class="btn btn--primary">Activate</button>
+                                    <button type="submit" class="btn btn--primary btn--full btn--caps">Activate</button>
                                 </form>
                             {% endif %}
                         </div>

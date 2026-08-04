@@ -34,7 +34,7 @@ window.Inachis.ConfirmationPrompt = {
         return [
             {
                 text: 'Cancel',
-                class: 'btn btn--info',
+                class: 'btn btn--outline',
                 click: () => this.dialog.close(),
             },
             {

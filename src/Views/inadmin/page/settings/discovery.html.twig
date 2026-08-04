@@ -4,9 +4,8 @@
     <a href="{{ path('incp_settings_index') }}">
         Settings
     </a>
-    <span>Crawlers & Discovery</span>
+    <span>Crawlers &amp; Discovery</span>
 {% endblock pagetitle %}
-
 
 {% block content %}
 <div class="col-12">
@@ -15,34 +14,47 @@
 <div class="widget-container">
 
 {% for item in status.documents|merge(status.generated) %}
-<section class="widget widget-settings">
-    <span class="material-icons" aria-hidden="true">
-        {{ item.statusIcon }}
-    </span>
-    <h2>{{ item.title }}</h2>
-    <p><span>{{ item.description }}</span></p>
-    {% if item.messages %}
-    <div class="widget__alert">
-        <p><strong>Status: Issues identified</strong></p>
-        <ul>
-        {% for message in item.messages %}
-            <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-    </div>
-    {% else %}
-    <div class="widget__ok">
-        <p><strong>Status: OK</strong></p>
-    </div>
-    {% endif %}
+<section class="widget widget-settings {% if item.messages %}widget-settings--warning{% endif %}">
     {% if item.url %}
-        <p>
-            <a href="{{ viewModel.settings.domain ~ item.url }}"
-            class="btn btn--secondary"
-            target="_blank">
-                View live
-            </a>
-        </p>
+    <a href="{{ viewModel.settings.domain ~ item.url }}" class="widget-settings__link" target="_blank" rel="noopener">
+    {% else %}
+    <div class="widget-settings__link">
+    {% endif %}
+
+        <div class="widget-settings__icon">
+            <span class="material-icons" aria-hidden="true">
+                {{ item.statusIcon }}
+            </span>
+        </div>
+
+        <h2>{{ item.title }}</h2>
+        <p class="widget-settings__desc">{{ item.description }}</p>
+
+        {% if item.messages %}
+        <div class="widget__alert">
+            <p><strong>Status: Issues identified</strong></p>
+            <ul>
+            {% for message in item.messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+        {% else %}
+        <div class="widget__ok">
+            <p><strong>Status: OK</strong></p>
+        </div>
+        {% endif %}
+
+        {% if item.url %}
+        <div class="widget-settings__action">
+            <span class="btn btn--secondary">View live</span>
+        </div>
+        {% endif %}
+
+    {% if item.url %}
+    </a>
+    {% else %}
+    </div>
     {% endif %}
 </section>
 {% endfor %}

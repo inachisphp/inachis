@@ -261,11 +261,13 @@
         {% if post.id is not empty %}
             {% if form.review is defined %}{{ form_widget(form.review) }}{% endif %}
             {% if form.publish is defined %}{{ form_widget(form.publish) }}{% endif %}
-            {% if form.delete is defined %}{{ form_widget(form.delete) }}{% endif %}
             {%  if not post.isDraft %}
-                <a class="btn btn--secondary" href="{% if previewMode %}/incp/preview{% endif %}/{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons" aria-hidden="true">exit_to_app</span>
-                    {% trans %}admin.button.viewLive{% endtrans %}</a>
+                <a class="btn btn--secondary" href="{% if previewMode %}/incp/preview{% endif %}/{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}">
+                    <span class="material-icons" aria-hidden="true">exit_to_app</span>
+                    <span class="btn-text">{% trans %}admin.button.viewLive{% endtrans %}</span></a>
             {%  endif %}
+
+            {% if form.delete is defined %}{{ form_widget(form.delete) }}{% endif %}
         {% endif %}
         </p>
     </div>

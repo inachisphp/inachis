@@ -16,7 +16,7 @@
                 {% if action.icon is defined and action.icon is not empty %}
                     <span class="material-icons" aria-hidden="true">{{ action.icon }}</span>
                 {% endif %}
-                {{ action.title|default(null) }}
+                <span class="btn-txt">{{ action.title|default(null) }}</span>
             </{{ elementType }}>
         {% endfor %}
     </p>

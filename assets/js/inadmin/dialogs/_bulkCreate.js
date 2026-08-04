@@ -30,18 +30,18 @@ window.Inachis.BulkCreateDialog = {
       `,
       buttons: [
         {
+          text: 'Close',
+          class: 'btn btn--outline',
+          click() {
+            this.close();
+          }
+        },
+        {
           text: 'Create',
           class: 'btn btn--primary',
           disabled: true,
           click: () => this.createPosts()
         },
-        {
-          text: 'Close',
-          class: 'btn btn--info',
-          click() {
-            this.close();
-          }
-        }
       ],
       onOpen: dialog => {
         document.querySelector('.fixed-bottom-bar')?.classList.toggle('hidden');

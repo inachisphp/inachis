@@ -95,14 +95,6 @@
                 icon: 'visibility',
                 title: 'Make public',
             } : null,
-            rebuild: can('PAGE', 'EDIT') ? {
-                button_class: 'btn--secondary',
-                data: {
-                    'form-action': ''
-                },
-                'icon': 'hub',
-                title: 'Recreate Link'
-            } : null,
             export: {
                 button_class: 'btn--secondary btn--export',
                 button_type: 'button',
@@ -115,7 +107,7 @@
                 'title': 'Export',
             },
             delete: can('PAGE', 'DELETE') ? {
-                button_class: 'btn--danger btn--delete btn--confirm',
+                button_class: 'btn--danger btn--delete btn--icon-only btn--confirm',
                 data: {
                     confirm: 'delete',
                     'confirm-text': 'Yes, delete',

@@ -37,11 +37,35 @@
     gap: 0.625rem;
     margin: 0;
     flex-wrap: wrap;
+    width: 100%;
   }
 
   .btn,
   button {
     margin: 0;
+    text-transform: capitalize;
+  }
+
+  // Automatically pushes delete/destructive actions to the far right
+  .btn--danger,
+  button[id*="delete"],
+  button[name*="delete"] {
+    margin-left: auto;
+  }
+
+  // Square layout and sizing for icon-only buttons
+  .btn--icon-only {
+    padding: 0.5rem;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-standard;
+
+    .material-icons {
+      margin: 0;
+    }
   }
 
   @media (min-width: $breakpoint-medium) {

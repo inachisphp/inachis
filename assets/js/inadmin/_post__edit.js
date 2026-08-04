@@ -108,8 +108,14 @@ window.Inachis.PostEdit = {
 		p.className = 'fixed-bottom-bar autosave-notification';
 		p.ariaLive = 'polite';
 
+		const icon = document.createElement('i');
+		icon.className = 'material-icons';
+		icon.ariaHidden = true;
+		icon.innerHTML = 'auto_awesome';
+		p.appendChild(icon);
+
 		const span = document.createElement('span');
-		span.textContent = "✨ We've restored your unsaved changes. Save now to keep them.";
+		span.textContent = "We've restored your unsaved changes. Save now to keep them.";
 		p.appendChild(span);
 
 		const button = document.createElement('button');
