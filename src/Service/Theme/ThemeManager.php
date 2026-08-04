@@ -8,12 +8,7 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Theme;
 
-<<<<<<< HEAD
 use Inachis\Model\System\Theme;
-use Psr\Cache\CacheItemPoolInterface;
-=======
-use Inachis\Model\System\ThemeDto;
->>>>>>> 96859bbbc17425f9876d07df76cc70799756bee3
 use Inachis\Repository\System\SettingRepository;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -57,19 +52,12 @@ final readonly class ThemeManager
         $this->cache->deleteItem('theme.twig.paths');
     }
 
-<<<<<<< HEAD
 	/**
 	 * Returns a DTO (model) of the currently active theme
 	 *
 	 * @return Theme
 	 */
     public function getActiveTheme(): Theme
-=======
-    /**
-     * Returns a DTO (model) of the currently active theme.
-     */
-    public function getActiveTheme(): ThemeDto
->>>>>>> 96859bbbc17425f9876d07df76cc70799756bee3
     {
         $cacheItem = $this->cache->getItem(self::CACHE_KEY_ACTIVE_THEME);
 

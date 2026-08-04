@@ -11,6 +11,7 @@ namespace Inachis\Security\Authorisation;
 use Inachis\Entity\User\User;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
+use Ramsey\Uuid\UuidInterface;
 
 final class PermissionManager
 {
@@ -21,7 +22,7 @@ final class PermissionManager
      */
     private array $permissions = [];
 
-    private ?string $loadedUserIdentifier = null;
+    private ?UuidInterface $loadedUserIdentifier = null;
 
     public function can(
         ?User $user,
@@ -59,7 +60,7 @@ final class PermissionManager
     private function loadPermissions(User $user): void
     {
         // Already built for this user during this request
-        if ($this->loadedUserIdentifier === $user->getId()) {
+        if ($this->loadedUserIdentifier?->equals($user->getId())) {
             return;
         }
 

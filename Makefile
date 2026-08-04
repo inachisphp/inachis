@@ -14,10 +14,10 @@ help: ## Display available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-18s$(RESET) %s\n", $$1, $$2}'
 
 headers:
-	php bin/console inachis:build:file-headers
+	php bin/console inachis:build:check-headers
 
 fix-headers:
-	php bin/console inachis:build:file-headers --fix
+	php bin/console inachis:build:check-headers --fix
 
 release: ## Bump version, update CHANGELOG.md, commit, and tag (TYPE=patch|minor|major)
 	@echo "$(CYAN)Checking git status...$(RESET)"
