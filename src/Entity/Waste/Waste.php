@@ -60,7 +60,7 @@ class Waste
     /**
      * Gets the value of {@link id}.
      */
-    public function getId(): ?string
+    public function getId(): ?UuidInterface
     {
         return $this->id;
     }
