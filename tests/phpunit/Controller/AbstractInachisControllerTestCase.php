@@ -9,10 +9,15 @@ declare(strict_types=1);
 namespace Inachis\Tests\phpunit\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Factory\PageViewFactory;
+use Inachis\Model\System\PageMetadata;
+use Inachis\Model\System\PageView;
+use Inachis\Model\System\SiteSettings;
 use Inachis\Repository\Waste\WasteRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractInachisControllerTestCase extends TestCase
@@ -22,6 +27,8 @@ abstract class AbstractInachisControllerTestCase extends TestCase
     protected Security $security;
     protected TranslatorInterface $translator;
     protected WasteRepository $wasteRepository;
+    protected PageViewFactory $pageViewFactory;
+    protected RequestStack $requestStack;
 
     protected function setUp(): void
     {
@@ -39,5 +46,13 @@ abstract class AbstractInachisControllerTestCase extends TestCase
 
         $this->wasteRepository = $this->createStub(WasteRepository::class);
         $this->wasteRepository->method('getWasteCount')->willReturn(0);
+
+        $this->requestStack = $this->createStub(RequestStack::class);
+        $this->pageViewFactory = new PageViewFactory(
+            $this->params,
+            $this->requestStack,
+            $this->security,
+            $this->wasteRepository,
+        );
     }
 }

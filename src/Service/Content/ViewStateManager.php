@@ -18,7 +18,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-final readonly class ViewStateManager
+final readonly class ViewStateManager implements ViewStateManagerInterface
 {
     public function __construct(
         private Security $security,

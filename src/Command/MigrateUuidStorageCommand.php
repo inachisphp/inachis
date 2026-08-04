@@ -15,6 +15,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @deprecated 1.2.0 This will only be available in 1.2.0 for UUID_BINARY migration
+ */
 #[AsCommand(
     name: 'inachis:migrate-uuid-storage',
     description: 'UUID CHAR(36) to BINARY(16) migration with verification and reporting',

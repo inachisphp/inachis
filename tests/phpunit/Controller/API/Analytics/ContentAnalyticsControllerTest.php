@@ -38,6 +38,8 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
             $this->security,
             $this->translator,
             $this->wasteRepository,
+            $this->pageViewFactory,
+            $this->requestStack,
         );
 
         $response = $controller->postStats(
@@ -75,12 +77,7 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
 
         $analytics->expects($this->once())
             ->method('getTopReferrersForPage')
-            ->with(
-                '/my-post',
-                $this->isInstanceOf(\DateTimeImmutable::class),
-                $this->isInstanceOf(\DateTimeImmutable::class),
-                10,
-            )
+            ->with('/my-post')
             ->willReturn([]);
 
         $controller = $this->getMockBuilder(ContentAnalyticsController::class)
@@ -90,6 +87,8 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['render'])
             ->getMock();
@@ -173,6 +172,8 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['render'])
             ->getMock();
@@ -242,6 +243,8 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['render'])
             ->getMock();
@@ -319,6 +322,8 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['render'])
             ->getMock();
@@ -355,6 +360,8 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
             $this->security,
             $this->translator,
             $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
         );
 
         $response = $controller->seriesStats(

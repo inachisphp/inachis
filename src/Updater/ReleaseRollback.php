@@ -14,7 +14,7 @@ final class ReleaseRollback
 {
     public function __construct(
         private ReleaseLocator $locator,
-        private SymlinkManager $symlinkManager,
+        private SymlinkManagerInterface $symlinkManager,
         private MaintenanceManager $maintenanceManager,
     ) {
     }

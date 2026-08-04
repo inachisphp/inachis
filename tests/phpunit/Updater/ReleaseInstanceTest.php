@@ -13,11 +13,40 @@ use PHPUnit\Framework\TestCase;
 
 final class ReleaseInstanceTest extends TestCase
 {
-
-    public function testPlaceholder(): void
+    public function testCreatesReleaseInstance(): void
     {
-        $this->markTestIncomplete(
-            'Test not implemented.'
+        $release = new ReleaseInstance(
+            identifier: '20260804073000-1.2.0',
+            version: '1.2.0',
+            path: '/var/www/inachis/releases/20260804073000-1.2.0',
         );
+
+        self::assertSame(
+            '20260804073000-1.2.0',
+            $release->identifier
+        );
+
+        self::assertSame(
+            '1.2.0',
+            $release->version
+        );
+
+        self::assertSame(
+            '/var/www/inachis/releases/20260804073000-1.2.0',
+            $release->path
+        );
+    }
+
+    public function testPropertiesAreReadonly(): void
+    {
+        $release = new ReleaseInstance(
+            identifier: '20260804073000-1.2.0',
+            version: '1.2.0',
+            path: '/var/www/inachis/releases/20260804073000-1.2.0',
+        );
+
+        $this->expectException(\Error::class);
+
+        $release->version = '2.0.0';
     }
 }

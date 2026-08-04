@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Inachis\Updater;
 
-final class SymlinkManager
+final class SymlinkManager implements SymlinkManagerInterface
 {
     /**
      * Atomically switches the 'current' symlink to point to targetPath.

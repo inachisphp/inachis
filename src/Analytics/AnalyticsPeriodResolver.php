@@ -11,7 +11,7 @@ namespace Inachis\Analytics;
 use Inachis\Exception\InvalidAnalyticsPeriodException;
 use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
-use Inachis\Service\Content\ViewStateManager;
+use Inachis\Service\Content\ViewStateManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 class AnalyticsPeriodResolver
 {
     public function __construct(
-        private ViewStateManager $viewStateManager,
+        private ViewStateManagerInterface $viewStateManager,
     ) {
     }
 
