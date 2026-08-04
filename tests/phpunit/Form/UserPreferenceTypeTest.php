@@ -1,0 +1,23 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * This file is part of the inachis framework.
+ */
+
+namespace Inachis\Tests\phpunit\Form;
+
+use Inachis\Form\UserPreferenceType;
+use PHPUnit\Framework\TestCase;
+
+final class UserPreferenceTypeTest extends TestCase
+{
+
+    public function testPlaceholder(): void
+    {
+        $this->markTestIncomplete(
+            'Test not implemented.'
+        );
+    }
+}

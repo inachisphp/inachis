@@ -1,0 +1,23 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * This file is part of the inachis framework.
+ */
+
+namespace Inachis\Tests\phpunit\Service\Import\Series;
+
+use Inachis\Service\Import\Series\SeriesImportService;
+use PHPUnit\Framework\TestCase;
+
+final class SeriesImportServiceTest extends TestCase
+{
+
+    public function testPlaceholder(): void
+    {
+        $this->markTestIncomplete(
+            'Test not implemented.'
+        );
+    }
+}
