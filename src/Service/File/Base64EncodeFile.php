@@ -22,12 +22,12 @@ class Base64EncodeFile
      */
     public static function encode(string $filename): string
     {
-        $projectDir = realpath(__DIR__ . '/../../');
+        $projectDir = realpath(__DIR__ . '/../../../');
         if ($projectDir === false) {
             return '';
         }
 
-        $fullPath = realpath($projectDir . '/' . ltrim('/' . $filename));
+        $fullPath = realpath($projectDir . '/' . ltrim($filename, '/'));
         if ($fullPath === false || !str_starts_with($fullPath, $projectDir)) {
             return '';
         }

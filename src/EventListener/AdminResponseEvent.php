@@ -9,10 +9,7 @@
 
 namespace Inachis\EventListener;
 
-use Inachis\Controller\AbstractInachisController;
-use Inachis\Controller\AbstractWebController;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
