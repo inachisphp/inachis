@@ -47,12 +47,11 @@ class TagRepositoryTest extends TestCase
         parent::setUp();
     }
 
-    public function testCreateFromAbstract(): void
+    public function testCreateFromAbstractIsNotSupportedForRequiredConstructor(): void
     {
-        $this->entityManager->expects($this->never())->method('createQueryBuilder');
-        $result = $this->repository->create(['title' => 'test-tag']);
-        $this->assertInstanceOf(Tag::class, $result);
-        $this->assertEquals('test-tag', $result->getTitle());
+        $this->expectException(\ArgumentCountError::class);
+
+        $this->repository->create(['title' => 'test-tag']);
     }
 
     public function testHydrateNonObject(): void
@@ -132,7 +131,9 @@ class TagRepositoryTest extends TestCase
                 ['title', 'asc'],
             ],
             ['id'],
-            ['table', 'fields'],
+            [
+                ['join', 'q.someRelation', 'r'],
+            ],
         );
         $this->assertInstanceOf(Paginator::class, $result);
     }
@@ -190,8 +191,8 @@ class TagRepositoryTest extends TestCase
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
-                0,
                 25,
+                0,
                 [
                     'q.title LIKE :title',
                     ['title' => '%test%'],

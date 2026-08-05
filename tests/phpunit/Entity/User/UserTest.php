@@ -8,150 +8,218 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Entity\User;
 
+use Inachis\Entity\Security\Role;
 use Inachis\Entity\User\User;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
-class UserTest extends TestCase
+final class UserTest extends TestCase
 {
-    protected ?User $user;
+    private User $user;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->user = new User();
-        parent::setUp();
     }
 
     public function testSetAndGetId(): void
     {
-        $uuid = Uuid::uuid1();
+        $uuid = Uuid::uuid4();
+
         $this->user->setId($uuid);
-        $this->assertEquals($uuid, $this->user->getId());
+
+        $this->assertSame($uuid, $this->user->getId());
     }
 
     public function testSetAndGetUsername(): void
     {
-        $this->user->setUsername('test');
-        $this->assertEquals('test', $this->user->getUsername());
+        $this->user->setUsername('testuser');
+
+        $this->assertSame('testuser', $this->user->getUsername());
+        $this->assertSame('testuser', $this->user->getUserIdentifier());
     }
 
     public function testSetAndGetPassword(): void
     {
-        $this->user->setPassword('test');
-        $this->assertEquals('test', $this->user->getPassword());
+        $now = new \DateTimeImmutable();
+
+        $this->user->setPassword('password', $now);
+
+        $this->assertSame('password', $this->user->getPassword());
+        $this->assertSame($now, $this->user->getPasswordChangedAt());
     }
 
     public function testSetAndGetPlainPassword(): void
     {
-        $this->user->setPlainPassword('test');
-        $this->assertEquals('test', $this->user->getPlainPassword());
+        $this->user->setPlainPassword('password');
+
+        $this->assertSame('password', $this->user->getPlainPassword());
+        $this->assertNull($this->user->getPassword());
     }
 
     public function testSetAndGetEmail(): void
     {
-        $this->user->setEmail('test');
-        $this->assertEquals('test', $this->user->getEmail());
+        $this->user->setEmail('test@example.com');
+
+        $this->assertSame('test@example.com', $this->user->getEmail());
     }
 
     public function testSetAndGetDisplayName(): void
     {
-        $this->user->setDisplayName('test user');
-        $this->assertEquals('test user', $this->user->getDisplayName());
+        $this->user->setDisplayName('Test User');
+
+        $this->assertSame('Test User', $this->user->getDisplayName());
     }
 
-    public function testSetAndGetInitials(): void
+    public function testGetInitials(): void
     {
-        $this->user->setDisplayName('test');
-        $this->assertEquals('T', $this->user->getInitials());
-        $this->user->setDisplayName('test user');
-        $this->assertEquals('TU', $this->user->getInitials());
-        $this->user->setDisplayName('test user-hyphenated');
-        $this->assertEquals('TU', $this->user->getInitials());
-        $this->user->setDisplayName('forename middle-name surname');
-        $this->assertEquals('FMS', $this->user->getInitials());
+        $this->user->setDisplayName('Test User');
+
+        $this->assertSame('TU', $this->user->getInitials());
+
+        $this->user->setDisplayName('Forename Middle Surname');
+
+        $this->assertSame('FMS', $this->user->getInitials());
+
+        $this->user->setDisplayName('');
+
+        $this->assertSame('', $this->user->getInitials());
     }
 
     public function testSetAndGetAvatar(): void
     {
-        $this->user->setAvatar('test.jpg');
-        $this->assertEquals('test.jpg', $this->user->getAvatar());
+        $this->user->setAvatar('avatar.jpg');
+
+        $this->assertSame('avatar.jpg', $this->user->getAvatar());
+
+        $this->user->setAvatar(null);
+
+        $this->assertNull($this->user->getAvatar());
     }
 
     public function testIsEnabled(): void
     {
         $this->assertTrue($this->user->isEnabled());
+
         $this->user->setActive(false);
+
         $this->assertFalse($this->user->isEnabled());
     }
 
     public function testHasBeenRemoved(): void
     {
         $this->assertFalse($this->user->hasBeenRemoved());
+
         $this->user->setRemoved(true);
+
         $this->assertTrue($this->user->hasBeenRemoved());
     }
 
-    public function testSGetCreatedAt(): void
+    public function testLifecycleCallbacksPopulateDates(): void
     {
-        $currentDateTime = new \DateTimeImmutable('now');
-        $this->assertEquals($currentDateTime, $this->user->getCreatedAt());
+        $this->user->onPrePersist();
+
+        $this->assertInstanceOf(
+            \DateTimeImmutable::class,
+            $this->user->getCreatedAt()
+        );
+
+        $this->assertInstanceOf(
+            \DateTimeImmutable::class,
+            $this->user->getUpdatedAt()
+        );
+
+        $updated = $this->user->getUpdatedAt();
+
+        usleep(1000);
+
+        $this->user->onPreUpdate();
+
+        $this->assertGreaterThan(
+            $updated,
+            $this->user->getUpdatedAt()
+        );
     }
 
-    public function testSetAndGetUpdatedAt(): void
+    public function testPasswordChangedAt(): void
     {
-        $currentDateTime = new \DateTimeImmutable('now');
-        $this->assertEquals($currentDateTime, $this->user->getUpdatedAt());
+        $date = new \DateTimeImmutable('-1 day');
+
+        $this->user->setPasswordChangedAt($date);
+
+        $this->assertSame($date, $this->user->getPasswordChangedAt());
     }
 
-    public function testSetAndGetPasswordChangedAt(): void
+    public function testLastLoginAt(): void
     {
-        $currentDateTime = new \DateTimeImmutable('now');
-        $this->user->setPasswordChangedAt($currentDateTime);
-        $this->assertEquals($currentDateTime, $this->user->getPasswordChangedAt());
-    }
+        $date = new \DateTimeImmutable();
 
-    public function testHasCredentialsExpired(): void
-    {
-        $this->assertFalse($this->user->hasCredentialsExpired());
-        $this->user->setPasswordChangedAt(new \DateTimeImmutable('-20 days'));
-        $this->assertTrue($this->user->hasCredentialsExpired(10));
+        $this->user->setLastLoginAt($date);
+
+        $this->assertSame($date, $this->user->getLastLoginAt());
     }
 
     public function testValidateEmail(): void
     {
         $this->user->setEmail('test@test.com');
         $this->assertTrue($this->user->validateEmail());
+
         $this->user->setEmail('test@test.co.uk');
         $this->assertTrue($this->user->validateEmail());
-        $this->user->setEmail('test.o\'test@test.com');
+
+        $this->user->setEmail("test.o'test@test.com");
         $this->assertTrue($this->user->validateEmail());
+
         $this->user->setEmail('test+something@test.com');
         $this->assertTrue($this->user->validateEmail());
-        $this->user->setEmail('test_at_test.com');
+
+        $this->user->setEmail('invalid-email');
         $this->assertFalse($this->user->validateEmail());
     }
 
-    public function testGetRoles(): void
+    public function testAssignedRoles(): void
     {
-        $this->user->setRoles(['ROLE_ADMIN', 'ROLE_USER']);
-        $this->assertEquals(['ROLE_ADMIN', 'ROLE_USER'], $this->user->getRoles());
-    }
+        $role = new Role();
+        $role->setIdentifier('administrator');
 
-    public function testGetUserIdentifier(): void
-    {
-        $this->assertEquals($this->user->getUsername(), $this->user->getUserIdentifier());
+        $this->user->addAssignedRole($role);
+
+        $this->assertCount(1, $this->user->getAssignedRoles());
+
+        $this->assertContains('ROLE_ADMINISTRATOR', $this->user->getRoles());
+        $this->assertContains('ROLE_ADMIN', $this->user->getRoles());
+        $this->assertContains('ROLE_USER', $this->user->getRoles());
+
+        $this->user->removeAssignedRole($role);
+
+        $this->assertCount(0, $this->user->getAssignedRoles());
+        $this->assertSame(['ROLE_USER'], $this->user->getRoles());
     }
 
     public function testEraseCredentials(): void
     {
-        $this->user->setPlainPassword('test');
-        $this->assertEquals('test', $this->user->getPlainPassword());
+        $this->user->setPlainPassword('password');
+
         $this->user->eraseCredentials();
-        $this->assertEquals('', $this->user->getPlainPassword());
+
+        $this->assertNull($this->user->getPlainPassword());
     }
 
     public function testErase(): void
     {
-        $this->assertNull($this->user->erase());
+        $this->user
+            ->setPassword('password')
+            ->setEmail('test@example.com')
+            ->setAvatar('avatar.jpg')
+            ->setActive(true)
+            ->setRemoved(false);
+
+        $this->user->erase();
+
+        $this->assertNull($this->user->getPassword());
+        $this->assertNull($this->user->getEmail());
+        $this->assertNull($this->user->getAvatar());
+        $this->assertFalse($this->user->isEnabled());
+        $this->assertTrue($this->user->hasBeenRemoved());
     }
 }

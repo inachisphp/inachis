@@ -9,19 +9,23 @@ declare(strict_types=1);
 namespace Inachis\Tests\phpunit\Entity\Security;
 
 use Inachis\Entity\Security\SecurityPolicy;
+use Inachis\Enum\Security\AuthenticationPolicy;
+use Inachis\Enum\Security\PasswordStrengthLevel;
+use Inachis\Enum\Security\SensitiveAction;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
 #[CoversClass(SecurityPolicy::class)]
-class SecurityPolicyTest extends TestCase
+final class SecurityPolicyTest extends TestCase
 {
     private SecurityPolicy $policy;
 
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->policy = new SecurityPolicy();
     }
 
@@ -29,238 +33,333 @@ class SecurityPolicyTest extends TestCase
     public function defaultConstructorProducesExpectedValues(): void
     {
         self::assertNull($this->policy->getId());
+
         self::assertSame('', $this->policy->getName());
-        self::assertSame(12, $this->policy->getMinLength());
-        self::assertTrue($this->policy->getRequireUppercase());
-        self::assertTrue($this->policy->getRequireLowercase());
-        self::assertTrue($this->policy->getRequireNumber());
-        self::assertTrue($this->policy->getRequireSpecial());
-        self::assertNull($this->policy->getPasswordRegex());
-        self::assertNull($this->policy->getPasswordExpiryDays());
-        self::assertSame(5, $this->policy->getPasswordHistory());
-        self::assertSame(5, $this->policy->getMaxFailedLoginAttempts());
-        self::assertSame(15, $this->policy->getLockoutDurationMinutes());
-        self::assertFalse($this->policy->getAdminRequire2FA());
-        self::assertFalse($this->policy->getSuperAdminRequire2FA());
-        self::assertFalse($this->policy->getSuperAdminRequiresWebAuthn());
-        self::assertTrue($this->policy->getStepUpForSensitiveActions());
-        self::assertFalse($this->policy->getIsReadOnly());
-        self::assertFalse($this->policy->getIsActive());
-        self::assertInstanceOf(\DateTimeImmutable::class, $this->policy->getCreatedAt());
-        self::assertInstanceOf(\DateTimeImmutable::class, $this->policy->getUpdatedAt());
+        self::assertSame('', $this->policy->getIdentifier());
+        self::assertNull($this->policy->getDescription());
+
+        self::assertSame(1, $this->policy->getVersion());
+
+        self::assertSame(14, $this->policy->getMinimumPasswordLength());
+        self::assertNull($this->policy->getMaximumPasswordLength());
+        self::assertFalse($this->policy->hasMaximumPasswordLength());
+
+        self::assertSame(
+            PasswordStrengthLevel::STANDARD,
+            $this->policy->getPasswordStrength(),
+        );
+
+        self::assertTrue($this->policy->getRejectCompromisedPasswords());
+
+        self::assertSame(5, $this->policy->getPasswordReuseLimit());
+        self::assertTrue($this->policy->hasPasswordHistory());
+
+        self::assertNull($this->policy->getMinimumPasswordAgeDays());
+
+        self::assertNull($this->policy->getPasswordLifetimeDays());
+        self::assertFalse($this->policy->hasPasswordExpiry());
+
+        self::assertSame(
+            AuthenticationPolicy::MFA_REQUIRED,
+            $this->policy->getAdministratorPolicy(),
+        );
+
+        self::assertSame(
+            AuthenticationPolicy::WEBAUTHN_REQUIRED,
+            $this->policy->getSuperAdministratorPolicy(),
+        );
+
+        self::assertTrue($this->policy->getRequireStepUpAuthentication());
+
+        self::assertCount(3, $this->policy->getStepUpRequiredActions());
+
+        self::assertFalse($this->policy->isReadOnly());
+        self::assertFalse($this->policy->isActive());
+
+        self::assertInstanceOf(
+            \DateTimeImmutable::class,
+            $this->policy->getCreatedAt(),
+        );
+
+        self::assertInstanceOf(
+            \DateTimeImmutable::class,
+            $this->policy->getUpdatedAt(),
+        );
     }
 
     #[Test]
-    public function setAndGetId(): void
+    public function identifierCanBeSet(): void
     {
-        $uuid = Uuid::uuid4();
-        $result = $this->policy->setId($uuid);
-        self::assertSame($uuid, $this->policy->getId());
+        $result = $this->policy->setIdentifier('  My_Policy  ');
+
+        self::assertSame('my_policy', $this->policy->getIdentifier());
         self::assertSame($this->policy, $result);
     }
 
     #[Test]
-    public function setAndGetName(): void
+    public function nameCanBeSet(): void
     {
-        $result = $this->policy->setName('Strict Policy');
+        $result = $this->policy->setName('  Strict Policy  ');
+
         self::assertSame('Strict Policy', $this->policy->getName());
         self::assertSame($this->policy, $result);
     }
 
     #[Test]
-    public function setAndGetMinLengthValid(): void
+    public function descriptionCanBeSet(): void
     {
-        $result = $this->policy->setMinLength(8);
-        self::assertSame(8, $this->policy->getMinLength());
+        $this->policy->setDescription('  Description  ');
+        self::assertSame('Description', $this->policy->getDescription());
+
+        $this->policy->setDescription(null);
+        self::assertNull($this->policy->getDescription());
+    }
+
+    #[Test]
+    public function versionCanBeIncremented(): void
+    {
+        self::assertSame(1, $this->policy->getVersion());
+
+        $result = $this->policy->incrementVersion();
+
+        self::assertSame(2, $this->policy->getVersion());
         self::assertSame($this->policy, $result);
     }
 
     #[Test]
-    public function setMinLengthThrowsExceptionOnInvalidValue(): void
+    public function minimumPasswordLengthCanBeChanged(): void
+    {
+        $result = $this->policy->setMinimumPasswordLength(20);
+
+        self::assertSame(20, $this->policy->getMinimumPasswordLength());
+        self::assertSame($this->policy, $result);
+    }
+
+    #[Test]
+    public function minimumPasswordLengthMustBePositive(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Password minimum length must be at least 1.');
-        $this->policy->setMinLength(0);
+
+        $this->policy->setMinimumPasswordLength(0);
     }
 
     #[Test]
-    public function setAndGetRequireUppercase(): void
+    public function maximumPasswordLengthCanBeChanged(): void
     {
-        $result = $this->policy->setRequireUppercase(false);
-        self::assertFalse($this->policy->getRequireUppercase());
-        self::assertSame($this->policy, $result);
-    }
+        $result = $this->policy->setMaximumPasswordLength(128);
 
-    #[Test]
-    public function setAndGetRequireLowercase(): void
-    {
-        $result = $this->policy->setRequireLowercase(false);
-        self::assertFalse($this->policy->getRequireLowercase());
-        self::assertSame($this->policy, $result);
-    }
-
-    #[Test]
-    public function setAndGetRequireNumber(): void
-    {
-        $result = $this->policy->setRequireNumber(false);
-        self::assertFalse($this->policy->getRequireNumber());
-        self::assertSame($this->policy, $result);
-    }
-
-    #[Test]
-    public function setAndGetRequireSpecial(): void
-    {
-        $result = $this->policy->setRequireSpecial(false);
-        self::assertFalse($this->policy->getRequireSpecial());
-        self::assertSame($this->policy, $result);
-    }
-
-    #[Test]
-    public function setAndGetPasswordRegexValid(): void
-    {
-        $result = $this->policy->setPasswordRegex('/^[a-zA-Z0-9]+$/');
-        self::assertSame('/^[a-zA-Z0-9]+$/', $this->policy->getPasswordRegex());
+        self::assertSame(128, $this->policy->getMaximumPasswordLength());
+        self::assertTrue($this->policy->hasMaximumPasswordLength());
         self::assertSame($this->policy, $result);
 
-        $this->policy->setPasswordRegex(null);
-        self::assertNull($this->policy->getPasswordRegex());
+        $this->policy->setMaximumPasswordLength(null);
+
+        self::assertNull($this->policy->getMaximumPasswordLength());
+        self::assertFalse($this->policy->hasMaximumPasswordLength());
     }
 
     #[Test]
-    public function setPasswordRegexThrowsExceptionOnInvalidRegex(): void
+    public function maximumPasswordLengthCannotBeLessThanMinimum(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid regex pattern provided.');
-        $this->policy->setPasswordRegex('invalid_regex_pattern');
+
+        $this->policy->setMaximumPasswordLength(10);
     }
 
     #[Test]
-    public function setAndGetPasswordExpiryDaysValid(): void
+    public function passwordStrengthCanBeChanged(): void
     {
-        $result = $this->policy->setPasswordExpiryDays(90);
-        self::assertSame(90, $this->policy->getPasswordExpiryDays());
-        self::assertSame($this->policy, $result);
+        $result = $this->policy->setPasswordStrength(
+            PasswordStrengthLevel::VERY_STRONG,
+        );
 
-        $this->policy->setPasswordExpiryDays(null);
-        self::assertNull($this->policy->getPasswordExpiryDays());
+        self::assertSame(
+            PasswordStrengthLevel::VERY_STRONG,
+            $this->policy->getPasswordStrength(),
+        );
+
+        self::assertSame($this->policy, $result);
     }
 
     #[Test]
-    public function setPasswordExpiryDaysThrowsExceptionOnInvalidValue(): void
+    public function compromisedPasswordCheckingCanBeChanged(): void
+    {
+        $result = $this->policy->setRejectCompromisedPasswords(false);
+
+        self::assertFalse($this->policy->getRejectCompromisedPasswords());
+        self::assertSame($this->policy, $result);
+    }
+
+    #[Test]
+    public function passwordReuseLimitCanBeChanged(): void
+    {
+        $result = $this->policy->setPasswordReuseLimit(0);
+
+        self::assertSame(0, $this->policy->getPasswordReuseLimit());
+        self::assertFalse($this->policy->hasPasswordHistory());
+        self::assertSame($this->policy, $result);
+    }
+
+    #[Test]
+    public function passwordReuseLimitCannotBeNegative(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Password expiry must be positive or null.');
-        $this->policy->setPasswordExpiryDays(0);
+
+        $this->policy->setPasswordReuseLimit(-1);
     }
 
     #[Test]
-    public function setAndGetPasswordHistoryValid(): void
+    public function minimumPasswordAgeCanBeChanged(): void
     {
-        $result = $this->policy->setPasswordHistory(0);
-        self::assertSame(0, $this->policy->getPasswordHistory());
+        $result = $this->policy->setMinimumPasswordAgeDays(7);
+
+        self::assertSame(7, $this->policy->getMinimumPasswordAgeDays());
+        self::assertSame($this->policy, $result);
+
+        $this->policy->setMinimumPasswordAgeDays(null);
+
+        self::assertNull($this->policy->getMinimumPasswordAgeDays());
+    }
+
+    #[Test]
+    public function passwordLifetimeCanBeChanged(): void
+    {
+        $result = $this->policy->setPasswordLifetimeDays(90);
+
+        self::assertSame(90, $this->policy->getPasswordLifetimeDays());
+        self::assertTrue($this->policy->hasPasswordExpiry());
+        self::assertSame($this->policy, $result);
+
+        $this->policy->setPasswordLifetimeDays(null);
+
+        self::assertNull($this->policy->getPasswordLifetimeDays());
+        self::assertFalse($this->policy->hasPasswordExpiry());
+    }
+
+    #[Test]
+    public function administratorPolicyCanBeChanged(): void
+    {
+        $result = $this->policy->setAdministratorPolicy(
+            AuthenticationPolicy::TOTP_REQUIRED,
+        );
+
+        self::assertSame(
+            AuthenticationPolicy::TOTP_REQUIRED,
+            $this->policy->getAdministratorPolicy(),
+        );
+
         self::assertSame($this->policy, $result);
     }
 
     #[Test]
-    public function setPasswordHistoryThrowsExceptionOnInvalidValue(): void
+    public function superAdministratorPolicyCanBeChanged(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Password history must be zero or positive.');
-        $this->policy->setPasswordHistory(-1);
-    }
+        $result = $this->policy->setSuperAdministratorPolicy(
+            AuthenticationPolicy::MFA_REQUIRED,
+        );
 
-    #[Test]
-    public function setAndGetMaxFailedLoginAttemptsValid(): void
-    {
-        $result = $this->policy->setMaxFailedLoginAttempts(3);
-        self::assertSame(3, $this->policy->getMaxFailedLoginAttempts());
+        self::assertSame(
+            AuthenticationPolicy::MFA_REQUIRED,
+            $this->policy->getSuperAdministratorPolicy(),
+        );
+
         self::assertSame($this->policy, $result);
     }
 
     #[Test]
-    public function setMaxFailedLoginAttemptsThrowsExceptionOnInvalidValue(): void
+    public function requireStepUpAuthenticationCanBeChanged(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Max failed login attempts must be at least 1.');
-        $this->policy->setMaxFailedLoginAttempts(0);
-    }
+        $result = $this->policy->setRequireStepUpAuthentication(false);
 
-    #[Test]
-    public function setAndGetLockoutDurationMinutesValid(): void
-    {
-        $result = $this->policy->setLockoutDurationMinutes(30);
-        self::assertSame(30, $this->policy->getLockoutDurationMinutes());
+        self::assertFalse($this->policy->getRequireStepUpAuthentication());
         self::assertSame($this->policy, $result);
     }
 
     #[Test]
-    public function setLockoutDurationMinutesThrowsExceptionOnInvalidValue(): void
+    public function stepUpActionsCanBeManaged(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Lockout duration must be at least 1 minute.');
-        $this->policy->setLockoutDurationMinutes(0);
+        $this->policy->clearStepUpRequiredActions();
+        self::assertCount(0, $this->policy->getStepUpRequiredActions());
+
+        $this->policy->addStepUpRequiredAction(
+            SensitiveAction::ROLE_MANAGEMENT,
+        );
+
+        self::assertTrue(
+            $this->policy->requiresStepUpFor(
+                SensitiveAction::ROLE_MANAGEMENT,
+            ),
+        );
+
+        $this->policy->removeStepUpRequiredAction(
+            SensitiveAction::ROLE_MANAGEMENT,
+        );
+
+        self::assertFalse(
+            $this->policy->requiresStepUpFor(
+                SensitiveAction::ROLE_MANAGEMENT,
+            ),
+        );
+
+        $this->policy->setStepUpRequiredActions([
+            SensitiveAction::MFA_RESET,
+        ]);
+
+        self::assertSame(
+            [SensitiveAction::MFA_RESET],
+            $this->policy->getStepUpRequiredActions(),
+        );
     }
 
     #[Test]
-    public function setAndGetAdminRequire2FA(): void
+    public function readOnlyCanBeChanged(): void
     {
-        $result = $this->policy->setAdminRequire2FA(true);
-        self::assertTrue($this->policy->getAdminRequire2FA());
+        $result = $this->policy->setReadOnly(true);
+
+        self::assertTrue($this->policy->isReadOnly());
         self::assertSame($this->policy, $result);
     }
 
     #[Test]
-    public function setAndGetSuperAdminRequire2FA(): void
+    public function activeCanBeChanged(): void
     {
-        $result = $this->policy->setSuperAdminRequire2FA(true);
-        self::assertTrue($this->policy->getSuperAdminRequire2FA());
+        $result = $this->policy->setActive(true);
+
+        self::assertTrue($this->policy->isActive());
         self::assertSame($this->policy, $result);
     }
 
     #[Test]
-    public function setAndGetSuperAdminRequiresWebAuthn(): void
-    {
-        $result = $this->policy->setSuperAdminRequiresWebAuthn(true);
-        self::assertTrue($this->policy->getSuperAdminRequiresWebAuthn());
-        self::assertSame($this->policy, $result);
-    }
-
-    #[Test]
-    public function setAndGetStepUpForSensitiveActions(): void
-    {
-        $result = $this->policy->setStepUpForSensitiveActions(false);
-        self::assertFalse($this->policy->getStepUpForSensitiveActions());
-        self::assertSame($this->policy, $result);
-    }
-
-    #[Test]
-    public function setAndGetIsReadOnly(): void
-    {
-        $result = $this->policy->setIsReadOnly(true);
-        self::assertTrue($this->policy->getIsReadOnly());
-        self::assertSame($this->policy, $result);
-    }
-
-    #[Test]
-    public function setAndGetIsActive(): void
-    {
-        $result = $this->policy->setIsActive(true);
-        self::assertTrue($this->policy->getIsActive());
-        self::assertSame($this->policy, $result);
-    }
-
-    #[Test]
-    public function doctrineLifecycleCallbacks(): void
+    public function lifecycleCallbacksUpdateTimestamps(): void
     {
         $reflection = new \ReflectionClass(SecurityPolicy::class);
 
-        $prePersist = $reflection->getMethod('onPrePersist');
-        $prePersist->invoke($this->policy);
+        $persist = $reflection->getMethod('initialiseTimestamp');
+        $persist->invoke($this->policy);
 
-        $preUpdate = $reflection->getMethod('onPreUpdate');
-        $preUpdate->invoke($this->policy);
+        $update = $reflection->getMethod('updateTimestamp');
+        $update->invoke($this->policy);
 
-        self::assertInstanceOf(\DateTimeImmutable::class, $this->policy->getCreatedAt());
-        self::assertInstanceOf(\DateTimeImmutable::class, $this->policy->getUpdatedAt());
+        self::assertInstanceOf(
+            \DateTimeImmutable::class,
+            $this->policy->getCreatedAt(),
+        );
+
+        self::assertInstanceOf(
+            \DateTimeImmutable::class,
+            $this->policy->getUpdatedAt(),
+        );
+    }
+
+    #[Test]
+    public function identifierCanBeAssignedViaReflection(): void
+    {
+        $uuid = Uuid::uuid4();
+
+        $reflection = new \ReflectionClass(SecurityPolicy::class);
+        $property = $reflection->getProperty('id');
+        $property->setValue($this->policy, $uuid);
+
+        self::assertSame($uuid, $this->policy->getId());
     }
 }

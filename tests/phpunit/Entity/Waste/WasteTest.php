@@ -10,9 +10,11 @@ namespace Inachis\Tests\phpunit\Entity\Waste;
 
 use Inachis\Entity\User\User;
 use Inachis\Entity\Waste\Waste;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
+#[CoversClass(Waste::class)]
 class WasteTest extends TestCase
 {
     protected ?Waste $waste;

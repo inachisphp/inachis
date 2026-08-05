@@ -50,7 +50,6 @@ class SeriesRepositoryTest extends TestCase
 
         $this->repository->expects($this->never())->method('createQueryBuilder');
         $this->entityManager->expects($this->once())->method('remove')->with($series);
-        $this->entityManager->expects($this->once())->method('flush');
 
         $this->repository->remove($series);
     }

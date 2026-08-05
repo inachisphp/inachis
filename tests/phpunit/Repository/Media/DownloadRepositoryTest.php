@@ -32,6 +32,7 @@ class DownloadRepositoryTest extends TestCase
             ->getMock();
 
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);
+
         parent::setUp();
     }
 
@@ -42,6 +43,7 @@ class DownloadRepositoryTest extends TestCase
         $this->entityManager->expects($this->once())
             ->method('remove')
             ->with($download);
+
         $this->entityManager->expects($this->once())
             ->method('flush');
 
@@ -50,125 +52,181 @@ class DownloadRepositoryTest extends TestCase
 
     public function testGetFilteredWithoutKeyword(): void
     {
-        $this->entityManager->expects($this->never())->method('getRepository');
-        $paginator = $this->createStub(Paginator::class);
-        $this->repository->expects($this->once())
-            ->method('getAll')
-            ->with(
-                0,
-                25,
-                [],
-                [['q.title', 'ASC']],
-            )
-            ->willReturn($paginator);
-        $result = $this->repository->getFiltered([], 0, 25);
-        $this->assertEquals($paginator, $result);
-    }
+        $this->entityManager->expects($this->never())
+            ->method('getRepository');
 
-    public function testGetFilteredWithKeyword(): void
-    {
-        $this->entityManager->expects($this->never())->method('getRepository');
         $paginator = $this->createStub(Paginator::class);
+
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
                 0,
                 25,
                 [
-                    '(q.altText LIKE :keyword OR q.title LIKE :keyword OR q.description LIKE :keyword )',
+                    '1=1',
+                    [],
+                ],
+                [
+                    ['q.title', 'ASC'],
+                ],
+            )
+            ->willReturn($paginator);
+
+        $result = $this->repository->getFiltered([], 0, 25);
+
+        $this->assertSame($paginator, $result);
+    }
+
+    public function testGetFilteredWithKeyword(): void
+    {
+        $this->entityManager->expects($this->never())
+            ->method('getRepository');
+
+        $paginator = $this->createStub(Paginator::class);
+
+        $this->repository->expects($this->once())
+            ->method('getAll')
+            ->with(
+                0,
+                25,
+                [
+                    '1=1 AND (q.altText LIKE :keyword OR q.title LIKE :keyword OR q.description LIKE :keyword )',
                     [
                         'keyword' => '%test%',
                     ],
                 ],
-                [['q.title', 'ASC']],
+                [
+                    ['q.title', 'ASC'],
+                ],
             )
             ->willReturn($paginator);
-        $result = $this->repository->getFiltered(['keyword' => 'test'], 0, 25);
-        $this->assertEquals($paginator, $result);
+
+        $result = $this->repository->getFiltered(
+            ['keyword' => 'test'],
+            0,
+            25,
+        );
+
+        $this->assertSame($paginator, $result);
     }
 
     public function testSortByTitleDesc(): void
     {
-        $this->entityManager->expects($this->never())->method('getRepository');
         $paginator = $this->createStub(Paginator::class);
+
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
                 0,
                 25,
-                [],
-                [['q.title', 'DESC']],
+                [
+                    '1=1',
+                    [],
+                ],
+                [
+                    ['q.title', 'DESC'],
+                ],
             )
             ->willReturn($paginator);
+
         $result = $this->repository->getFiltered([], 0, 25, 'title desc');
-        $this->assertEquals($paginator, $result);
+
+        $this->assertSame($paginator, $result);
     }
 
     public function testSortByCreatedAtAsc(): void
     {
-        $this->entityManager->expects($this->never())->method('getRepository');
         $paginator = $this->createStub(Paginator::class);
+
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
                 0,
                 25,
-                [],
-                [['q.createdAt', 'ASC']],
+                [
+                    '1=1',
+                    [],
+                ],
+                [
+                    ['q.createdAt', 'ASC'],
+                ],
             )
             ->willReturn($paginator);
+
         $result = $this->repository->getFiltered([], 0, 25, 'createdAt asc');
-        $this->assertEquals($paginator, $result);
+
+        $this->assertSame($paginator, $result);
     }
 
     public function testSortByCreatedAtDesc(): void
     {
-        $this->entityManager->expects($this->never())->method('getRepository');
         $paginator = $this->createStub(Paginator::class);
+
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
                 0,
                 25,
-                [],
-                [['q.createdAt', 'DESC']],
+                [
+                    '1=1',
+                    [],
+                ],
+                [
+                    ['q.createdAt', 'DESC'],
+                ],
             )
             ->willReturn($paginator);
+
         $result = $this->repository->getFiltered([], 0, 25, 'createdAt desc');
-        $this->assertEquals($paginator, $result);
+
+        $this->assertSame($paginator, $result);
     }
 
     public function testSortByUpdatedAtDesc(): void
     {
-        $this->entityManager->expects($this->never())->method('getRepository');
         $paginator = $this->createStub(Paginator::class);
+
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
                 0,
                 25,
-                [],
-                [['q.updatedAt', 'DESC']],
+                [
+                    '1=1',
+                    [],
+                ],
+                [
+                    ['q.updatedAt', 'DESC'],
+                ],
             )
             ->willReturn($paginator);
+
         $result = $this->repository->getFiltered([], 0, 25, 'updatedAt desc');
-        $this->assertEquals($paginator, $result);
+
+        $this->assertSame($paginator, $result);
     }
 
     public function testSortByUpdatedAtAsc(): void
     {
-        $this->entityManager->expects($this->never())->method('getRepository');
         $paginator = $this->createStub(Paginator::class);
+
         $this->repository->expects($this->once())
             ->method('getAll')
             ->with(
                 0,
                 25,
-                [],
-                [['q.updatedAt', 'ASC']],
+                [
+                    '1=1',
+                    [],
+                ],
+                [
+                    ['q.updatedAt', 'ASC'],
+                ],
             )
             ->willReturn($paginator);
+
         $result = $this->repository->getFiltered([], 0, 25, 'updatedAt asc');
-        $this->assertEquals($paginator, $result);
+
+        $this->assertSame($paginator, $result);
     }
 }

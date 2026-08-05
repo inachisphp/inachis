@@ -15,23 +15,29 @@ use Doctrine\Persistence\ManagerRegistry;
 use Inachis\Entity\Media\Image;
 use Inachis\Repository\Media\ImageRepository;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class ImageRepositoryTest extends TestCase
 {
     private EntityManagerInterface $entityManager;
     private EntityRepository $repository;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $registry = $this->createStub(ManagerRegistry::class);
+        $cache = $this->createStub(CacheInterface::class);
+
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
 
         $this->repository = $this->getMockBuilder(ImageRepository::class)
-            ->setConstructorArgs([$registry])
+            ->setConstructorArgs([$cache, $registry])
             ->onlyMethods(['getEntityManager', 'getAll'])
             ->getMock();
 
-        $this->repository->method('getEntityManager')->willReturn($this->entityManager);
+        $this->repository
+            ->method('getEntityManager')
+            ->willReturn($this->entityManager);
+
         parent::setUp();
     }
 
@@ -39,10 +45,13 @@ class ImageRepositoryTest extends TestCase
     {
         $image = new Image();
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager
+            ->expects($this->once())
             ->method('remove')
             ->with($image);
-        $this->entityManager->expects($this->once())
+
+        $this->entityManager
+            ->expects($this->once())
             ->method('flush');
 
         $this->repository->remove($image);
@@ -50,60 +59,89 @@ class ImageRepositoryTest extends TestCase
 
     public function testGetFilteredWithoutKeyword(): void
     {
-        $this->entityManager->expects($this->never())->method('getRepository');
-        $paginator = $this->createStub(Paginator::class);
-        $this->repository->expects($this->once())
-            ->method('getAll')
-            ->with(
-                0,
-                25,
-                [],
-                [['q.title', 'ASC']],
-            )
-            ->willReturn($paginator);
-        $result = $this->repository->getFiltered([], 0, 25);
-        $this->assertEquals($paginator, $result);
-    }
+        $this->entityManager
+            ->expects($this->never())
+            ->method('getRepository');
 
-    public function testGetFilteredWithKeyword(): void
-    {
-        $this->entityManager->expects($this->never())->method('getRepository');
         $paginator = $this->createStub(Paginator::class);
-        $this->repository->expects($this->once())
+
+        $this->repository
+            ->expects($this->once())
             ->method('getAll')
             ->with(
                 0,
                 25,
                 [
-                    '(q.altText LIKE :keyword OR q.title LIKE :keyword OR q.description LIKE :keyword )',
+                    '1=1',
+                    [],
+                ],
+                [
+                    ['q.title', 'ASC'],
+                ],
+            )
+            ->willReturn($paginator);
+
+        $result = $this->repository->getFiltered([], 0, 25);
+
+        $this->assertSame($paginator, $result);
+    }
+
+    public function testGetFilteredWithKeyword(): void
+    {
+        $this->entityManager
+            ->expects($this->never())
+            ->method('getRepository');
+
+        $paginator = $this->createStub(Paginator::class);
+
+        $this->repository
+            ->expects($this->once())
+            ->method('getAll')
+            ->with(
+                0,
+                25,
+                [
+                    '1=1 AND (q.altText LIKE :keyword OR q.title LIKE :keyword OR q.description LIKE :keyword )',
                     [
                         'keyword' => '%test%',
                     ],
                 ],
-                [['q.title', 'ASC']],
+                [
+                    ['q.title', 'ASC'],
+                ],
             )
             ->willReturn($paginator);
-        $result = $this->repository->getFiltered(['keyword' => 'test'], 0, 25);
-        $this->assertEquals($paginator, $result);
+
+        $result = $this->repository->getFiltered(
+            ['keyword' => 'test'],
+            0,
+            25
+        );
+
+        $this->assertSame($paginator, $result);
     }
 
     public function testDetermineOrderBy(): void
     {
-        $this->entityManager->expects($this->never())->method('getRepository');
         $orders = [
-            'title desc' => ['q.title', 'DESC'],
-            'createdAt asc' => ['q.createdAt', 'ASC'],
+            'title desc'     => ['q.title', 'DESC'],
+            'createdAt asc'  => ['q.createdAt', 'ASC'],
             'createdAt desc' => ['q.createdAt', 'DESC'],
-            'filesize asc' => ['q.filesize', 'ASC'],
-            'filesize desc' => ['q.filesize', 'DESC'],
-            'updatedAt asc' => ['q.updatedAt', 'ASC'],
+            'filesize asc'   => ['q.filesize', 'ASC'],
+            'filesize desc'  => ['q.filesize', 'DESC'],
+            'updatedAt asc'  => ['q.updatedAt', 'ASC'],
             'updatedAt desc' => ['q.updatedAt', 'DESC'],
-            'default' => ['q.title', 'ASC'],
+            'default'        => ['q.title', 'ASC'],
         ];
+
         $reflection = new \ReflectionClass($this->repository);
         $method = $reflection->getMethod('determineOrderBy');
-        foreach ($orders as $key => $order) {
-            $this->assertEquals($order, $method->invokeArgs($this->repository, [$key]));
+
+        foreach ($orders as $sort => $expected) {
+            $this->assertEquals(
+                $expected,
+                $method->invoke($this->repository, $sort)
+            );
         }
     }
 }

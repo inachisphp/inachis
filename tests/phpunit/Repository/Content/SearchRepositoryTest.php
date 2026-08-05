@@ -47,34 +47,49 @@ class SearchRepositoryTest extends TestCase
         $offset = 5;
         $limit = 10;
         $totalResults = 42;
+
         $fetchedRows = [
             ['id' => 1, 'title' => 'First result'],
             ['id' => 2, 'title' => 'Second result'],
         ];
 
-        $mainStmt = $this->createMock(Result::class);
-        $mainStmt->expects($this->once())
+        $mainResult = $this->createMock(Result::class);
+        $mainResult
+            ->expects($this->once())
             ->method('fetchAllAssociative')
             ->willReturn($fetchedRows);
-        $countStmt = $this->createMock(Result::class);
-        $countStmt->expects($this->once())
+
+        $countResult = $this->createMock(Result::class);
+        $countResult
+            ->expects($this->once())
             ->method('fetchOne')
             ->willReturn($totalResults);
 
-        $connection = $this->createMock(Connection::class);
-        $this->connection = $connection;
+        $mainStatement = $this->createMock(\Doctrine\DBAL\Statement::class);
+        $mainStatement
+            ->method('bindValue')
+            ->willReturnSelf();
+        $mainStatement
+            ->method('executeQuery')
+            ->willReturn($mainResult);
 
-        $connection
+        $countStatement = $this->createMock(\Doctrine\DBAL\Statement::class);
+        $countStatement
+            ->method('bindValue')
+            ->willReturnSelf();
+        $countStatement
+            ->method('executeQuery')
+            ->willReturn($countResult);
+
+        $this->connection
+            ->expects($this->exactly(2))
             ->method('prepare')
             ->willReturnOnConsecutiveCalls(
-                $this->createConfiguredStub(Statement::class, [
-                    'executeQuery' => $mainStmt,
-                ]),
-                $this->createConfiguredStub(Statement::class, [
-                    'executeQuery' => $countStmt,
-                ]),
+                $mainStatement,
+                $countStatement,
             );
-        $result = $this->repository->search($keyword, $offset, $limit);
+
+        $result = $this->repository->search($keyword, $limit, $offset);
 
         $this->assertInstanceOf(SearchResult::class, $result);
         $this->assertSame($fetchedRows, $result->getResults());
@@ -103,10 +118,7 @@ class SearchRepositoryTest extends TestCase
             ->method('fetchOne')
             ->willReturn($totalResults);
 
-        $connection = $this->createMock(Connection::class);
-        $this->connection = $connection;
-
-        $connection
+        $this->connection
             ->method('prepare')
             ->willReturnOnConsecutiveCalls(
                 $this->createConfiguredStub(Statement::class, [
