@@ -10,6 +10,7 @@ namespace Inachis\Tests\phpunit\Entity\Security;
 
 use Inachis\Entity\Security\Role;
 use Inachis\Entity\Security\RolePermission;
+use Inachis\Enum\Security\AuthenticationPolicy;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -70,15 +71,25 @@ class RoleTest extends TestCase
     }
 
     #[Test]
-    public function nameChangesDoNotReplaceTheInitialSlug(): void
+    public function nameChangesDoNotReplaceTheInitialIdentifier(): void
     {
         $this->role->setName('Administrator');
 
-        self::assertSame('administrator', $this->role->getSlug());
+        self::assertSame('administrator', $this->role->getIdentifier());
 
         $this->role->setName('Super Administrator');
 
-        self::assertSame('administrator', $this->role->getSlug());
+        self::assertSame('administrator', $this->role->getIdentifier());
+    }
+
+    #[Test]
+    public function setNameDoesNotOverwriteExplicitIdentifier(): void
+    {
+        $this->role
+            ->setIdentifier('custom-role')
+            ->setName('Administrator');
+
+        self::assertSame('custom-role', $this->role->getIdentifier());
     }
 
     #[Test]
@@ -98,5 +109,57 @@ class RoleTest extends TestCase
 
         $this->role->removeRolePermission($permission);
         self::assertEmpty($this->role->getRolePermissions());
+    }
+
+    #[Test]
+    public function authenticationPolicyCanBeChanged(): void
+    {
+        foreach (AuthenticationPolicy::cases() as $policy) {
+            $this->role->setAuthenticationPolicy($policy);
+
+            self::assertSame(
+                $policy,
+                $this->role->getAuthenticationPolicy(),
+            );
+        }
+    }
+
+    #[Test]
+    public function systemRoleFlagCanBeChanged(): void
+    {
+        self::assertFalse($this->role->isSystemRole());
+
+        $this->role->setSystemRole(true);
+
+        self::assertTrue($this->role->isSystemRole());
+    }
+
+    #[Test]
+    public function administratorIsDetectedFromIdentifier(): void
+    {
+        $this->role->setIdentifier('administrator');
+        self::assertTrue($this->role->isAdministrator());
+
+        $this->role->setIdentifier('admin');
+        self::assertTrue($this->role->isAdministrator());
+
+        $this->role->setIdentifier('editor');
+        self::assertFalse($this->role->isAdministrator());
+    }
+
+    #[Test]
+    public function userCountDefaultsToZero(): void
+    {
+        self::assertSame(0, $this->role->getUserCount());
+    }
+
+    #[Test]
+    public function canBeDeletedDependsOnSystemRoleAndAssignedUsers(): void
+    {
+        self::assertTrue($this->role->canBeDeleted());
+
+        $this->role->setSystemRole(true);
+
+        self::assertFalse($this->role->canBeDeleted());
     }
 }

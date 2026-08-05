@@ -29,19 +29,22 @@ class LocaleSubscriberTest extends TestCase
     public function testSetsLocaleFromRequestAttribute(): void
     {
         $session = new Session(new MockArraySessionStorage());
-        $request = $this
-            ->getMockBuilder(Request::class)
-            ->onlyMethods(['hasPreviousSession'])
-            ->getMock();
+
+        $request = new class extends Request {
+            public function hasPreviousSession(): bool
+            {
+                return true;
+            }
+        };
+
         $request->setSession($session);
         $request->attributes->set('_locale', 'fr');
-        $request->expects($this->once())
-            ->method('hasPreviousSession')->willReturn(true);
-        $subscriber = new LocaleSubscriber('en');
-        $event = $this->createEvent($request);
-        $subscriber->onKernelRequest($event);
 
-        $this->assertSame('fr', $session->get('_locale'));
+        $subscriber = new LocaleSubscriber('en');
+
+        $subscriber->onKernelRequest($this->createEvent($request));
+
+        $this->assertSame('fr', $request->getSession()->get('_locale'));
     }
 
     public function testNoPreviousSession(): void
