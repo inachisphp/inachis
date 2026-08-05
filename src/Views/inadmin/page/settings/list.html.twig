@@ -38,6 +38,15 @@
 {% endif %}
 
 {% if can('CRAWLER', 'VIEW') %}
+    {% include 'inadmin/partials/components/card.html.twig' with {
+        title: 'Crawlers & Discovery',
+        icon: 'android',
+        description: 'Manage robots.txt, llms.txt, and AI engine discovery',
+        button_text: 'Manage Discovery',
+        link: viewModel.settings.domain ~ path('incp_settings_discovery'),
+    } %}
+{% endif %}
+
     {% embed 'inadmin/partials/components/card.html.twig' with {
         title: 'System Information',
         icon: 'info',
@@ -49,7 +58,6 @@
             <small class="text-muted">Build date: {{ version.build_date }}</small>
         {% endblock description %}
     {% endembed %}
-{% endif %}
 
 </div>
 {% endblock content %}

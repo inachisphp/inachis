@@ -18,78 +18,57 @@
 {% endif %}
 
 {% if canResource('STORAGE') %}
-<section class="widget widget-settings">
-    <a href="{{ viewModel.settings.domain ~ path('incp_tools_storage') }}" class="widget-settings__link">
-        <div class="widget-settings__icon">
-            <span class="material-icons" aria-hidden="true">sd_storage</span>
-        </div>
-        <h2>Storage</h2>
-        <p class="widget-settings__desc">Inspect disk usage, media upload limits, and temporary assets.</p>
-        <div class="widget-settings__action">
-            <span class="btn btn--secondary">Check Storage</span>
-        </div>
-    </a>
-</section>
+    {% include 'inadmin/partials/components/card.html.twig' with {
+        title: 'Storage',
+        icon: 'sd_storage',
+        description: 'Inspect disk usage, media upload limits, and temporary assets.',
+        button_text: 'Check Storage',
+        link: viewModel.settings.domain ~ path('incp_tools_storage'),
+    } %}
 {% endif %}
 
 {% if environment !== 'prod' and canResource('ERROR_LOG') %}
-<section class="widget widget-settings">
-    <a href="{{ viewModel.settings.domain ~ path('incp_tools_logs') }}" class="widget-settings__link">
-        <div class="widget-settings__icon">
-            <span class="material-icons" aria-hidden="true">article</span>
-        </div>
-        <h2>Logs</h2>
-        <p class="widget-settings__desc">Review recent application, environment, and system error logs.</p>
-        <div class="widget-settings__action">
-            <span class="btn btn--secondary">View Logs</span>
-        </div>
-    </a>
-</section>
+    {% include 'inadmin/partials/components/card.html.twig' with {
+        title: 'Logs',
+        icon: 'article',
+        description: 'Review recent application, environment, and system error logs.',
+        button_text: 'View Logs',
+        link: viewModel.settings.domain ~ path('incp_tools_logs'),
+    } %}
 {% endif %}
 
 {% if canResource('IMPORT_EXPORT') %}
-<section class="widget widget-settings">
-    <a href="{{ viewModel.settings.domain ~ path('incp_tools_import') }}" class="widget-settings__link">
-        <div class="widget-settings__icon">
-            <span class="material-icons" aria-hidden="true">import_export</span>
-        </div>
-        <h2>Import &amp; Export</h2>
-        <p class="widget-settings__desc">Export site content or import backup packages and media.</p>
-        <div class="widget-settings__action">
-            <span class="btn btn--secondary">Import / Export</span>
-        </div>
-    </a>
-</section>
+    {% include 'inadmin/partials/components/card.html.twig' with {
+        title: 'Import & Export',
+        icon: 'import_export',
+        description: 'Export site content or import backup packages and media.',
+        button_text: 'Import / Export',
+        link: viewModel.settings.domain ~ path('incp_tools_import'),
+    } %}
 {% endif %}
 
 {% if canResource('MAINTENANCE') %}
-<section class="widget widget-settings">
-    <a href="{{ viewModel.settings.domain ~ path('incp_tools_maintenance') }}" class="widget-settings__link">
-        <div class="widget-settings__icon">
-            <span class="material-icons" aria-hidden="true">construction</span>
-        </div>
-        <h2>Maintenance Mode</h2>
-        <p class="widget-settings__desc">Toggle maintenance mode and manage public access notices.</p>
-        <div class="widget-settings__action">
-            <span class="btn btn--secondary">Manage Mode</span>
-        </div>
-    </a>
-</section>
+    {% include 'inadmin/partials/components/card.html.twig' with {
+        title: 'Maintenance Mode',
+        icon: 'construction',
+        description: 'Toggle maintenance mode and manage public access notices.',
+        button_text: 'Manage Mode',
+        link: viewModel.settings.domain ~ path('incp_tools_maintenance'),
+    } %}
 {% endif %}
 
 {% if true %}
-<section class="widget widget-settings widget-settings--danger">
-    <a href="{{ viewModel.settings.domain }}" class="widget-settings__link">
-        <div class="widget-settings__icon">
-            <span class="material-icons" aria-hidden="true">delete_forever</span>
-        </div>
-        <h2>Data Purge</h2>
-        <p class="widget-settings__desc"><strong>Danger:</strong> Permanently wipe content and reset site data.</p>
-        <div class="widget-settings__action">
-            <span class="btn btn--danger">Purge Data</span>
-        </div>
-    </a>
-</section>
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: 'Data Purge',
+        icon: 'delete_forever',
+        button_text: 'Purge Data',
+        link: viewModel.settings.domain,
+        className: 'widget-settings--danger',
+    } %}
+    {% block description %}
+    <strong>Danger:</strong> Permanently wipe content and reset site data.
+    {% endblock description %}
+    {% endembed %}
 {% endif %}
 
 </div>
