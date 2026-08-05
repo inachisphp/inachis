@@ -1,5 +1,10 @@
 <section class="widget widget-settings {{ className|default(null) }}">
-    <a href="{{ link }}" class="widget-settings__link">
+    {% if link|default(null) is not empty %}
+    <a href="{{ link }}" class="widget-settings__link"{% if link_external is defined and link_external %} target="_blank" rel="noopener"{% endif %}>
+    {% else %}
+    <div class="widget-settings__link">
+    {% endif %}
+
         <div class="widget-settings__icon">
             <span class="material-icons" aria-hidden="true">{{ icon }}</span>
         </div>
@@ -7,8 +12,14 @@
         <p class="widget-settings__desc">
 			{% block description %}{{ description }}{% endblock description %}
 		</p>
+        {% block extra_content %}{% endblock extra_content %}
         <div class="widget-settings__action">
             <span class="btn btn--secondary">{{ button_text }}</span>
         </div>
+
+    {% if link|default(null) is not empty %}
     </a>
+    {% else %}
+    </div>
+    {% endif %}
 </section>

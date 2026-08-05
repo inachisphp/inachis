@@ -14,23 +14,17 @@
 <div class="widget-container">
 
 {% for item in status.documents|merge(status.generated) %}
-<section class="widget widget-settings {% if item.messages %}widget-settings--warning{% endif %}">
-    {% if item.url %}
-    <a href="{{ viewModel.settings.domain ~ item.url }}" class="widget-settings__link" target="_blank" rel="noopener">
-    {% else %}
-    <div class="widget-settings__link">
-    {% endif %}
-
-        <div class="widget-settings__icon">
-            <span class="material-icons" aria-hidden="true">
-                {{ item.statusIcon }}
-            </span>
-        </div>
-
-        <h2>{{ item.title }}</h2>
-        <p class="widget-settings__desc">{{ item.description }}</p>
-
-        {% if item.messages %}
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: item.title,
+        icon: item.statusIcon,
+        description: item.description,
+        button_text: 'View live',
+        link: item.url,
+        link_external: true,
+        className: item.messages ? 'widget-settings--warning' : '',
+    } %}
+        {% block extra_content %}
+            {% if item.messages %}
         <div class="widget__alert">
             <p><strong>Status: Issues identified</strong></p>
             <ul>
@@ -43,20 +37,9 @@
         <div class="widget__ok">
             <p><strong>Status: OK</strong></p>
         </div>
-        {% endif %}
-
-        {% if item.url %}
-        <div class="widget-settings__action">
-            <span class="btn btn--secondary">View live</span>
-        </div>
-        {% endif %}
-
-    {% if item.url %}
-    </a>
-    {% else %}
-    </div>
-    {% endif %}
-</section>
+            {% endif %}
+        {% endblock extra_content %}
+    {% endembed %}
 {% endfor %}
 
 </div>
