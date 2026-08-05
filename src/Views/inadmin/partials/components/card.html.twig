@@ -1,0 +1,14 @@
+<section class="widget widget-settings">
+    <a href="{{ link }}" class="widget-settings__link">
+        <div class="widget-settings__icon">
+            <span class="material-icons" aria-hidden="true">{{ icon }}</span>
+        </div>
+        <h2>{{ title }}</h2>
+        <p class="widget-settings__desc">
+			{% block description %}{{ description }}{% endblock description %}
+		</p>
+        <div class="widget-settings__action">
+            <span class="btn btn--secondary">{{ button_text }}</span>
+        </div>
+    </a>
+</section>

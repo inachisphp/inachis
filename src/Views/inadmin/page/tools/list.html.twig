@@ -8,18 +8,13 @@
 <div class="col-12 widget-container">
 
 {% if canResource('ANALYTICS') %}
-<section class="widget widget-settings">
-    <a href="{{ viewModel.settings.domain ~ path('incp_tools_analytics') }}" class="widget-settings__link">
-        <div class="widget-settings__icon">
-            <span class="material-icons" aria-hidden="true">analytics</span>
-        </div>
-        <h2>Analytics</h2>
-        <p class="widget-settings__desc">Review traffic trends, popular content, and visitor metrics.</p>
-        <div class="widget-settings__action">
-            <span class="btn btn--secondary">View Analytics</span>
-        </div>
-    </a>
-</section>
+    {% include 'inadmin/partials/components/card.html.twig' with {
+        title: 'Analytics',
+        icon: 'analytics',
+        description: 'Review traffic trends, popular content, and visitor metrics.',
+        button_text: 'View Analytics',
+        link: viewModel.settings.domain ~ path('incp_tools_analytics'),
+    } %}
 {% endif %}
 
 {% if canResource('STORAGE') %}

@@ -7,8 +7,6 @@
 
 
 {% block content %}
-{% block server_check_pre %}{% endblock server_check_pre %}
-{% block server_check %}
 <div class="col-12">
 {% if environment != 'prod' %}
     {% include 'inadmin/partials/flashes.html.twig' with {
@@ -20,7 +18,15 @@
     } %}
 {% endif %}
 
-<p><a href="{{ viewModel.settings.domain ~ path('incp_tools_diagnostics_json') }}" class="btn btn--secondary"><span class="material-icons" aria-hidden="true">download</span> Download Report</a></p>
+<div class="diagnostics-toolbar mb-4">
+    <a href="{{ viewModel.settings.domain ~ path('incp_tools_diagnostics_json') }}" class="btn btn--secondary">
+        <span class="material-icons" aria-hidden="true">download</span>
+        <span class="btn-text">Download Report</span></a>
+        <button type="button" id="toggle-errors-btn" class="btn btn--outline">
+            <span class="material-icons" aria-hidden="true">filter_alt</span>
+            <span class="btn-txt">Show Issues Only</span>
+        </button>
+</div>
 
 {% include 'inadmin/partials/diagnostics/summary.html.twig' with { summary: summary } %}
 
@@ -70,6 +76,67 @@
     </section>
 {% endfor %}
 </div>
-{% endblock server_check %}
-{% block server_check_post %}{% endblock server_check_post %}
+<script>
+// todo: move this to js file
+document.addEventListener('DOMContentLoaded', () => {
+  // 1. Make Diagnostics Summary Cards Clickable Scroll Targets
+  const summaryCards = document.querySelectorAll('.diagnostics-summary .card');
+
+  summaryCards.forEach(card => {
+    const titleEl = card.querySelector('.card-title');
+    if (!titleEl) return;
+
+    const sectionName = titleEl.textContent.trim().toLowerCase();
+
+    // Find matching section heading
+    const targetHeading = Array.from(document.querySelectorAll('.content section h2'))
+      .find(h2 => h2.textContent.trim().toLowerCase() === sectionName);
+
+    if (targetHeading) {
+      card.style.cursor = 'pointer';
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('title', `Jump to ${titleEl.textContent.trim()} section`);
+
+      const scrollToSection = () => {
+        // Scroll the parent section or heading taking scroll-margin-top into account
+        const targetSection = targetHeading.closest('section') || targetHeading;
+        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // Visual highlight ring/flash
+        targetHeading.classList.add('highlight-section');
+        setTimeout(() => targetHeading.classList.remove('highlight-section'), 1500);
+      };
+
+      card.addEventListener('click', scrollToSection);
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          scrollToSection();
+        }
+      });
+    }
+  });
+
+  // 2. "Show Issues Only" Filter Toggle
+  const filterBtn = document.getElementById('toggle-errors-btn');
+  let issuesOnly = false;
+
+  if (filterBtn) {
+    filterBtn.addEventListener('click', () => {
+      issuesOnly = !issuesOnly;
+      const okRows = document.querySelectorAll('.table--responsive tbody tr.status-ok, .table--responsive tbody tr.status-info');
+
+      okRows.forEach(row => {
+        row.style.display = issuesOnly ? 'none' : '';
+      });
+
+      filterBtn.classList.toggle('btn--primary', issuesOnly);
+      filterBtn.classList.toggle('btn--outline', !issuesOnly);
+      filterBtn.querySelector('.material-icons').textContent = issuesOnly ? 'filter_alt_off' : 'filter_alt';
+      filterBtn.childNodes[2].textContent = issuesOnly ? ' Show All Checks' : ' Show Issues Only';
+    });
+  }
+});
+</script>
 {% endblock content %}
