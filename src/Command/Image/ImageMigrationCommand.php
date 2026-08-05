@@ -89,7 +89,7 @@ class ImageMigrationCommand extends Command
             'apply' => $this->apply($output, $dryRun, $force, $resume, $noWebp, $noDedup, $noResize),
             'rollback' => $this->rollback($output, $dryRun),
             'report' => $this->report($output),
-            'verify' => $this->verify($output),
+            'verify' => $this->verify($input, $output),
             default => $this->invalidMode($output, $mode)
         };
     }
