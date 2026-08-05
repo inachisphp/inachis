@@ -86,7 +86,7 @@ class ResourceController extends AbstractInachisController
             strtolower($type),
             new ViewStateDefaults(
                 sort: 'title asc',
-                view: 'grid',
+                view: $typeClass === Download::class ? 'table' : 'grid',
             ),
         );
 
@@ -169,7 +169,7 @@ class ResourceController extends AbstractInachisController
             $resource = new $typeClass();
         } else {
             $resource = $repository->findOneBy([
-                'filename' => $request->attributes->getString('filename'),
+                'id' => $request->attributes->getString('filename'),
             ]);
             if (empty($resource)) {
                 return $this->redirectToRoute(
@@ -198,8 +198,8 @@ class ResourceController extends AbstractInachisController
 
             if (isset($request->request->all('resource')['delete'])) {
                 $storageDir = $resource instanceof Download ? 
-                    $projectDirectory . 'var/uploads/' : 
-                    $projectDirectory . 'public/imgs/';
+                    $projectDirectory . '/var/uploads/' : 
+                    $projectDirectory . '/public/imgs/';
                 $filePath = $storageDir . $resource->getFilename();
 
                 if (($resource instanceof Image
@@ -247,7 +247,7 @@ class ResourceController extends AbstractInachisController
                 if ($uploadedFile) {
                     $fileMeta = $downloadFileService->storeFile(
                         $uploadedFile,
-                        $projectDirectory . 'var/uploads/',
+                        $projectDirectory . '/var/uploads/',
                         $resource->getTitle()
                     );
 
@@ -275,7 +275,7 @@ class ResourceController extends AbstractInachisController
         $additional = [];
         if ($resource instanceof Image) {
             try {
-                $sizes = $resource->getImageProperties($projectDirectory . 'public/imgs/');
+                $sizes = $resource->getImageProperties($projectDirectory . '/public/imgs/');
             } catch (FileNotFoundException $exception) {
                 $this->addFlash('error', 'Associated image file could not be found');
             }

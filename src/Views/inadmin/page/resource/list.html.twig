@@ -21,19 +21,13 @@
 } : null %}
 
 {% set downloadAddButton = can('DOWNLOAD', 'CREATE') ? {
-    class: 'dialog__link',
     data: {
-        'class-name': 'dialog__uploadManager',
-        dialog: 'uploadManager',
-        'template-name': 'upload-manager',
         title: 'admin.dialog.upload.title'|trans,
-        view: 'upload',
-        'allowed-types': allowedTypes|default([])|join(','),
     },
     text: 'Upload a new Download file',
     image: 'cloud_upload',
-    type: 'button',
-    url: '#',
+    type: 'a',
+    url: path('incp_resource_edit', { type: 'downloads', filename: 'new' }),
 } : null %}
 
 {% set columns = [
@@ -48,7 +42,11 @@
         source: 'filename',
     }
 ] %}
+{% set viewModes = [ 'table' ] %}
+{% set viewDefault = 'table' %}
 {% if viewModel.page.tab == 'image' %}
+    {% set viewDefault = 'grid' %}
+    {% set viewModes = [ 'grid' ]|merge(viewModes) %}
     {% set columns = columns|merge([{
         title: 'admin.resources.properties.dimensions'|trans,
         source: 'dimensionsString',
@@ -111,8 +109,8 @@
             'title asc': 'Title: A-Z',
             'title desc': 'Title: Z-A',
         },
-        view_modes: [ 'grid', 'table' ],
-        view_setting: query.view|default('grid'),
+        view_modes: viewModes,
+        view_setting: query.view|default(viewDefault),
         zebra: true,
     }) }}
 

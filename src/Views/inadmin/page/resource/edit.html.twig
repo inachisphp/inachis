@@ -6,10 +6,8 @@
 {% endblock pagetitle %}
 
 {% block content %}
-{% block resources_pre %}{% endblock resources_pre %}
 
-{% block resources %}
-{{ form_start(form, {'attr': { 'class': 'col-12 form form__post form__resource' }}) }}
+{{ form_start(form, {'attr': { 'class': 'col-12 form form__post form__resource filepond' }}) }}
 <div class="content__edit edit-grid">
         <fieldset class="edit-details" id="post__edit">
             <h3>{{ 'admin.resources.details.title'|trans }}</h3>
@@ -50,11 +48,20 @@
                        value="{% if not (resource.filename starts with 'http')  %}/imgs/{% endif %}{{ resource.filename }}" />
             {% elseif viewModel.page.type == 'downloads' %}
                 {% if resource.id is empty %}
-                    <p>
-                        {{ form_label(form.file) }}
-                        {{ form_errors(form.file) }}
-                        {{ form_widget(form.file) }}
-                    </p>
+                    {% include 'inadmin/partials/components/file-upload.html.twig' with {
+                        paramName: 'resource[file]',
+                        required: true,
+                        autoUpload: false,
+                        uploadMultiple: false,
+                        acceptedFiles: [
+                            'application/pdf',
+                            'application/zip',
+                            'application/msword',
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            'text/csv',
+                            'text/plain'
+                        ]
+                    } %}
                 {% else %}
                     <div class="card margin-bottom">
                         <h3><span class="material-icons">attach_file</span> Currently Attached File</h3>
@@ -63,28 +70,6 @@
                         <p><strong>Size:</strong> {{ (resource.filesize / 1024 / 1024)|round(2) }} MB</p>
                     </div>
                 {% endif %}
-                <script>
-                    document.addEventListener('DOMContentLoaded', () => {
-                        const downloadInput = document.querySelector('form.form__resource input.filepond');
-                        if (downloadInput && window.Inachis?.FileUpload) {
-                            window.Inachis.FileUpload.init('form.form__resource input.filepond', {
-                                name: 'resource[file]',
-                                allowMultiple: false,
-                                instantUpload: false, // Prevents immediate AJAX upload
-                                storeAsFile: true,    // Submits the raw file via standard form multipart/form-data
-                                required: true,
-                                acceptedFileTypes: [
-                                    'application/pdf',
-                                    'application/zip',
-                                    'application/msword',
-                                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                                    'text/csv',
-                                    'text/plain'
-                                ]
-                            });
-                        }
-                    });
-                </script>
             {% endif %}
         </fieldset>
 
@@ -173,6 +158,53 @@
 
 {{ form_row(form._token) }}
 {{ form_end(form, {render_rest: false}) }}
-{% endblock resources %}
-{% block resources_post %}{% endblock resources_post %}
+
+
+{% if viewModel.page.type == 'downloads' and resource.id is empty %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const filePondInput = document.querySelector('input.filepond');
+    if (!filePondInput) return;
+
+    // Direct initialization via global FilePond to bypass dialog button logic
+    if (typeof FilePond !== 'undefined') {
+        FilePond.create(filePondInput, {
+            storeAsFile: true,
+            instantUpload: false,
+            allowMultiple: false,
+            required: true,
+            acceptedFileTypes: [
+                'application/pdf',
+                'application/zip',
+                'application/x-tar',
+                'application/gzip',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'text/plain',
+                'text/csv'
+            ]
+        });
+    } else if (window.Inachis?.FileUpload) {
+        // Fallback using Inachis wrapper if FilePond global isn't exposed directly
+        window.Inachis.FileUpload.init('input.filepond', {
+            name: 'resource[file]',
+            allowMultiple: false,
+            instantUpload: false,
+            storeAsFile: true,
+            required: true,
+            acceptedFileTypes: [
+                'application/pdf',
+                'application/zip',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'text/csv',
+                'text/plain'
+            ]
+        });
+    }
+});
+</script>
+{% endif %}
 {% endblock content %}
