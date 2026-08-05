@@ -17,11 +17,13 @@ use Inachis\Security\Authorisation\PermissionResolver;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -80,19 +82,41 @@ class ResourceType extends AbstractType
                 'label_attr' => [
                     'id' => 'resource__title__label',
                 ],
-            ])
-            ->add('altText', TextareaType::class, [
-                'attr' => [
-                    'aria-labelledby' => 'resource__altText__label',
-                    'class' => 'full-width',
-                    'rows' => 2,
+            ]);
+        if ($type === PermissionResource::IMAGE) {
+            $builder
+                ->add('altText', TextareaType::class, [
+                    'attr' => [
+                        'aria-labelledby' => 'resource__altText__label',
+                        'class' => 'full-width',
+                        'rows' => 2,
                 ],
                 'disabled' => !$allowEdit,
                 'label' => $this->translator->trans('admin.resources.altText.label', [], 'messages'),
                 'label_attr' => [
                     'id' => 'resource__altText__label',
                 ],
-            ])
+            ]);
+        }
+        elseif ($options['data'] instanceof Download && null === $options['data']->getId()) {
+            $builder->add('file', FileType::class, [
+                'label' => 'Upload File',
+                'mapped' => false,
+                'required' => true,
+                'attr' => [
+                    'class' => 'filepond',
+                    'data-max-file-size' => '50MB',
+                ],
+                'constraints' => [
+                    new File(
+                        maxSize: Download::MAX_FILESIZE . 'M',
+                        mimeTypes: Download::ALLOWED_MIME_TYPES,
+                        mimeTypesMessage: 'Please upload a valid file type (PDF, ZIP, DOCX, CSV, etc.).',
+                    ),
+                ],
+            ]);
+        }
+        $builder
             ->add('description', TextareaType::class, [
                 'attr' => [
                     'aria-labelledby' => 'resource__description__label',

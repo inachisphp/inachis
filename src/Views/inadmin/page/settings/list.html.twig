@@ -8,13 +8,21 @@
 <div class="col-12 widget-container">
 
 {% if can('NAVIGATION', 'VIEW') %}
-    {% include 'inadmin/partials/components/card.html.twig' with {
+    {% embed 'inadmin/partials/components/card.html.twig' with {
         title: 'Tabs & Navigation',
         icon: 'tab',
         description: 'Manage site navigation and main menu links',
         button_text: 'Manage Tabs',
         link: viewModel.settings.domain ~ path('incp_settings_navigation_list'),
     } %}
+        {% block extra_content %}
+            <div class="text-muted">
+                <p>
+                    <strong>{{ tabs|length }}</strong> Active Tabs
+                </p>
+            </div>
+        {% endblock extra_content %}
+    {% endembed %}
 {% endif %}
 
 {% if can('PLUGIN', 'VIEW') %}
@@ -28,35 +36,61 @@
 {% endif %}
 
 {% if can('THEME', 'MANAGE') %}
-    {% include 'inadmin/partials/components/card.html.twig' with {
+    {% embed 'inadmin/partials/components/card.html.twig' with {
         title: 'Themes & Styling',
         icon: 'format_paint',
         description: 'Manage and apply visual presentation themes',
         button_text: 'Manage Themes',
         link: viewModel.settings.domain ~ path('incp_settings_themes'),
     } %}
+        {% block extra_content %}
+        <div class="text-muted">
+            <p>
+                Active Theme: {{ activeTheme.name }}<br />
+                <small class="text-muted">Version: {{ activeTheme.version }}</small>
+            </p>
+        </div>
+        {% endblock extra_content %}
+    {% endembed %}
 {% endif %}
 
 {% if can('CRAWLER', 'VIEW') %}
-    {% include 'inadmin/partials/components/card.html.twig' with {
+    {% embed 'inadmin/partials/components/card.html.twig' with {
         title: 'Crawlers & Discovery',
         icon: 'android',
         description: 'Manage robots.txt, llms.txt, and AI engine discovery',
         button_text: 'Manage Discovery',
         link: viewModel.settings.domain ~ path('incp_settings_discovery'),
     } %}
+        {% block extra_content %}
+            {% if discoverySummary.hasIssues %}
+                <div class="widget__alert">
+                    <span class="material-icons">warning</span> Status: Issues identified
+                </div>
+            {% else %}
+                <div class="widget__ok">
+                    <span class="material-icons">check_circle</span> Status: OK
+                </div>
+            {% endif %}
+        {% endblock extra_content %}
+    {% endembed %}
 {% endif %}
 
     {% embed 'inadmin/partials/components/card.html.twig' with {
-        title: 'System Information',
-        icon: 'info',
-        button_text: 'Update / Rollback',
+        title: 'Updates',
+        icon: 'system_update_alt',
+        description: 'Perform updates, or rollback releases.',
+        button_text: 'Update or Rollback',
         link: viewModel.settings.domain ~ path('incp_settings_discovery'),
     } %}
-        {% block description %}
-            Version: {{ version.version }}<br>
-            <small class="text-muted">Build date: {{ version.build_date }}</small>
-        {% endblock description %}
+        {% block extra_content %}
+        <div class="text-muted">
+            <p>
+                Version: {{ version.version }}<br />
+                <small class="text-muted">Build date: {{ version.build_date }}</small>
+            </p>
+        </div>
+        {% endblock extra_content %}
     {% endembed %}
 
 </div>

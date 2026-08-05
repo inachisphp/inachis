@@ -13,6 +13,7 @@ use Inachis\Entity\Media\Download;
 use Inachis\Entity\Media\Image;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
+use Inachis\Form\ImageType;
 use Inachis\Form\ResourceType;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
@@ -22,6 +23,7 @@ use Inachis\Repository\Media\DownloadRepository;
 use Inachis\Repository\Media\ImageRepository;
 use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\ViewStateManager;
+use Inachis\Service\File\DownloadFileService;
 use Inachis\Service\Resource\ImageFileService;
 use Inachis\Service\Waste\WasteManagerService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -143,12 +145,13 @@ class ResourceController extends AbstractInachisController
     public function edit(
         Request $request,
         Filesystem $filesystem,
+        DownloadFileService $downloadFileService,
         DownloadRepository $downloadRepository,
         ImageRepository $imageRepository,
         PageRepository $pageRepository,
         SeriesRepository $seriesRepository,
         WasteManagerService $wasteManagerService,
-        #[Autowire('%kernel.project_dir%/public/imgs/')] string $imageDirectory,
+        #[Autowire('%kernel.project_dir%')] string $projectDirectory,
     ): Response {
         //            "filename" => "[a-zA-Z0-9\-\_]\.(jpe?g|heic|png)",
         $typeClass = match ($request->attributes->getString('type')) {
@@ -160,20 +163,28 @@ class ResourceController extends AbstractInachisController
             'Download' => $downloadRepository,
             default => $imageRepository,
         };
-        $resource = $repository->findOneBy([
-            'id' => $request->attributes->getString('filename'),
-        ]);
-        if (empty($resource)) {
-            return $this->redirectToRoute(
-                'incp_resource_list',
-                [
-                    'type' => $request->attributes->getString('type'),
-                ],
-                Response::HTTP_PERMANENTLY_REDIRECT,
-            );
+        
+        $filenameParam = $request->attributes->getString('filename');
+        if ('new' === $filenameParam) {
+            $resource = new $typeClass();
+        } else {
+            $resource = $repository->findOneBy([
+                'filename' => $request->attributes->getString('filename'),
+            ]);
+            if (empty($resource)) {
+                return $this->redirectToRoute(
+                    'incp_resource_list',
+                    [
+                        'type' => $request->attributes->getString('type'),
+                    ],
+                    Response::HTTP_PERMANENTLY_REDIRECT,
+                );
+            }
         }
+
         $form = $this->createForm(ResourceType::class, $resource);
         $form->handleRequest($request);
+
         $usages = [];
         if ($resource instanceof Image) {
             $usages = [
@@ -184,14 +195,21 @@ class ResourceController extends AbstractInachisController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $resource = $form->getData();
+
             if (isset($request->request->all('resource')['delete'])) {
-                $filename = $imageDirectory.$resource->getFilename();
-                if ($resource instanceof Image
+                $storageDir = $resource instanceof Download ? 
+                    $projectDirectory . 'var/uploads/' : 
+                    $projectDirectory . 'public/imgs/';
+                $filePath = $storageDir . $resource->getFilename();
+
+                if (($resource instanceof Image
                     && isset($usages['posts'])
                     && empty($usages['posts'])
-                    && 0 === $usages['series']->count()) {
+                    && 0 === $usages['series']->count()) ||
+                    $resource instanceof Download
+                ) {
                     try {
-                        if (!$filesystem->exists($filename)) {
+                        if (!$filesystem->exists($filePath)) {
                             $this->addFlash('error', 'The file for this resource does not exist and so will not be recoverable.');
                         } else {
                             $wasteManagerService->sendToWaste($resource);
@@ -220,25 +238,44 @@ class ResourceController extends AbstractInachisController
                     $this->addFlash('error', 'Can\'t remove file as it is in use');
                 }
             }
+
+            // Handle File Processing for NEW Download items on Submit
+            if ($resource instanceof Download && null === $resource->getId()) {
+                /** @var \Symfony\Component\HttpFoundation\File\UploadedFile|null $uploadedFile */
+                $uploadedFile = $form->get('file')->getData();
+
+                if ($uploadedFile) {
+                    $fileMeta = $downloadFileService->storeFile(
+                        $uploadedFile,
+                        $projectDirectory . 'var/uploads/',
+                        $resource->getTitle()
+                    );
+
+                    $resource
+                        ->setFilename($fileMeta['filename'])
+                        ->setFilesize($fileMeta['filesize'])
+                        ->setFiletype($fileMeta['filetype'])
+                        ->setChecksum($fileMeta['checksum']);
+                }
+            }
+
             $resource->setAuthor($this->getCurrentUser());
             $resource->setUpdatedAt(new \DateTimeImmutable());
             $this->entityManager->persist($resource);
             $this->entityManager->flush();
 
-            $this->addFlash('success', 'Content saved.');
+            $this->addFlash('success', 'Content saved successfully.');
 
-            return $this->redirectToRoute(
-                'incp_resource_edit', [
-                    'type' => $request->attributes->getString('type'),
-                    'filename' => $resource->getId(),
-                ],
-            );
+            return $this->redirectToRoute('incp_resource_edit', [
+                'type' => $request->attributes->getString('type'),
+                'filename' => $resource->getId(),
+            ]);
         }
 
         $additional = [];
         if ($resource instanceof Image) {
             try {
-                $sizes = $resource->getImageProperties($imageDirectory);
+                $sizes = $resource->getImageProperties($projectDirectory . 'public/imgs/');
             } catch (FileNotFoundException $exception) {
                 $this->addFlash('error', 'Associated image file could not be found');
             }
@@ -259,6 +296,67 @@ class ResourceController extends AbstractInachisController
             'resource' => $resource,
             'usages' => $usages,
         ]);
+    }
+
+    #[Route('/incp/resource/download/upload', name: 'incp_resource_upload_download', methods: ['POST', 'PUT'])]
+    public function uploadDownload(
+        Request $request,
+        DownloadFileService $downloadFileService,
+        DownloadRepository $downloadRepository,
+        #[Autowire('%kernel.project_dir%/var/uploads/')] string $uploadDirectory
+    ): JsonResponse {
+        $downloadData = $request->request->all('download');
+        $uploadedFileInput = null;
+
+        if ($request->files->has('download')) {
+            $fileBag = $request->files->get('download');
+            if (is_array($fileBag)) {
+                $uploadedFileInput = $fileBag['file'] ?? null;
+            }
+        }
+
+        if (!$uploadedFileInput) {
+            return new JsonResponse(['error' => 'No file provided'], 400);
+        }
+        if (empty($downloadData['title'])) {
+            return new JsonResponse(['error' => 'No title provided'], 400);
+        }
+
+        try {
+            $checksum = $downloadFileService->createChecksum($uploadedFileInput);
+            
+            // Prevent duplicate file uploads
+            if ($downloadRepository->findOneBy(['checksum' => $checksum])) {
+                return new JsonResponse(['error' => 'Duplicate file found'], 400);
+            }
+
+            $fileMeta = $downloadFileService->storeFile(
+                $uploadedFileInput,
+                $uploadDirectory,
+                $downloadData['title']
+            );
+
+            $download = new Download();
+            $download
+                ->setTitle($downloadData['title'])
+                ->setDescription($downloadData['description'] ?? null)
+                ->setFilesize($fileMeta['filesize'])
+                ->setFiletype($fileMeta['filetype'])
+                ->setFilename($fileMeta['filename'])
+                ->setChecksum($fileMeta['checksum'])
+                ->setAuthor($this->getCurrentUser());
+
+            $this->entityManager->persist($download);
+            $this->entityManager->flush();
+
+            return new JsonResponse([
+                'success' => true,
+                'id' => $download->getId()->toString(),
+                'filename' => $fileMeta['filename'],
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 400);
+        }
     }
 
     #[Route('/incp/resource/image/upload', name: 'incp_resource_upload_image', methods: ['POST', 'PUT'])]

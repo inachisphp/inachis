@@ -18,11 +18,13 @@
                 {{ form_errors(form.title) }}
                 {{ form_widget(form.title) }}
             </p>
+            {% if viewModel.page.type == 'images' %}
             <p>
                 {{ form_label(form.altText) }}
                 {{ form_errors(form.altText) }}
                 {{ form_widget(form.altText) }}
             </p>
+            {% endif %}
             <p>
                 {{ form_label(form.description) }}
                 {{ form_errors(form.description) }}
@@ -46,9 +48,47 @@
                        id="image_link"
                        type="text"
                        value="{% if not (resource.filename starts with 'http')  %}/imgs/{% endif %}{{ resource.filename }}" />
+            {% elseif viewModel.page.type == 'downloads' %}
+                {% if resource.id is empty %}
+                    <p>
+                        {{ form_label(form.file) }}
+                        {{ form_errors(form.file) }}
+                        {{ form_widget(form.file) }}
+                    </p>
+                {% else %}
+                    <div class="card margin-bottom">
+                        <h3><span class="material-icons">attach_file</span> Currently Attached File</h3>
+                        <p><strong>Filename:</strong> {{ resource.filename }}</p>
+                        <p><strong>Type:</strong> <code>{{ resource.filetype }}</code></p>
+                        <p><strong>Size:</strong> {{ (resource.filesize / 1024 / 1024)|round(2) }} MB</p>
+                    </div>
+                {% endif %}
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const downloadInput = document.querySelector('form.form__resource input.filepond');
+                        if (downloadInput && window.Inachis?.FileUpload) {
+                            window.Inachis.FileUpload.init('form.form__resource input.filepond', {
+                                name: 'resource[file]',
+                                allowMultiple: false,
+                                instantUpload: false, // Prevents immediate AJAX upload
+                                storeAsFile: true,    // Submits the raw file via standard form multipart/form-data
+                                required: true,
+                                acceptedFileTypes: [
+                                    'application/pdf',
+                                    'application/zip',
+                                    'application/msword',
+                                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                    'text/csv',
+                                    'text/plain'
+                                ]
+                            });
+                        }
+                    });
+                </script>
             {% endif %}
         </fieldset>
 
+        {% if resource.id is not null %}
         <fieldset class="edit-properties" id="post__properties">
             <h3>{{ 'admin.resources.properties.title'|trans }}</h3>
             {% if viewModel.page.type == 'images' %}
@@ -62,10 +102,15 @@
             {% if not (resource.filename starts with 'http')  %}
             <p><strong>{{ 'admin.resources.properties.filesize'|trans }}:</strong> {{ resource.filesize }} bytes ({{ (resource.filesize / 1024 / 1024)|round(2) }} Mb)</p>
             {% endif %}
+            {% if viewModel.page.tab == 'download' %}
+            <p><strong>SHA-256 Checksum:</strong> <code>{{ resource.checksum }}</code></p>
+            {% endif %}
             <p><strong>{{ 'admin.resources.properties.updatedAt'|trans }}:</strong> {{ resource.updatedAt|date('d F Y', viewModel.session.preferences.timezone) }}</p>
             <p>&nbsp;</p>
         </fieldset>
+        {% endif %}
 
+        {% if viewModel.page.tab == 'images' %}
         <fieldset class="edit-usages" id="post_usages">
             <details open="open">
             <summary>{{ 'admin.resources.usages.title'|trans }}</summary>
@@ -90,6 +135,7 @@
             {% endif %}
             </details>
         </fieldset>
+        {% endif %}
 </div>
 
 <div class="fixed-bottom-bar">
@@ -102,6 +148,11 @@
             {{ form_widget(form.generate_alt_text) }}
         {% endif %}
 
+        {% if viewModel.page.tab == 'download' %}
+            <a href="{{ path('app_file_download', { id: resource.id }) }}" class="btn btn--outline" target="_blank">
+                <span class="material-icons">download</span> Download / Preview File
+            </a>
+        {% elseif viewModel.page.tab == 'images' %}
         <button aria-label="{{ 'admin.resources.images.copyMarkdown.help'|trans }}"
                 data-target="image_markdown"
                 class="btn btn--secondary btn--copy"
@@ -112,6 +163,7 @@
                 class="btn btn--secondary btn--copy"
                 type="button"
         ><span class="material-icons" aria-hidden="true">content_paste</span> {{ 'admin.resources.images.copyLink.label'|trans }}</button>
+    {% endif %}
 
     {% if resource.id is not null and usages.posts|default(null) is empty and usages.series|default(null) is empty and form.delete is defined %}
         {{ form_widget(form.delete) }}

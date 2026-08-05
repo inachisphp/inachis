@@ -11,6 +11,7 @@ namespace Inachis\Controller\Page\Tools;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Media\ImageRepository;
+use Inachis\Service\System\Maintenance\MaintenanceManager;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -20,14 +21,18 @@ class ToolsIndexController extends AbstractInachisController
      * Index page for tools.
      */
     #[Route('/incp/tools', name: 'incp_tools_index')]
-    public function index(): Response
-    {
+    public function index(
+        ImageRepository $imageRepository,
+        MaintenanceManager $manager
+    ): Response {
         $this->viewModel->page->title = 'Tools';
         $this->viewModel->page->tab = 'tools';
 
         return $this->render('inadmin/page/tools/list.html.twig', [
             'viewModel' => $this->viewModel,
+            'diskUsage' => $imageRepository->getDiskUsage(),
             'environment' => $this->getParameter('kernel.environment'),
+            'maintenanceEnabled' => $manager->isEnabled(),
         ]);
     }
 

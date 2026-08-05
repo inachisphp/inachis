@@ -9,48 +9,37 @@ declare(strict_types=1);
 namespace Inachis\Controller\Page\Security;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Repository\System\SettingRepository;
-use Inachis\Repository\User\UserRepository;
+use Inachis\Entity\System\Setting;
+use Inachis\Entity\User\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class PrivacyController extends AbstractInachisController
 {
     /**
-     * Default key prefix for privacy settings stored in database/cache.
+     * Key prefix for privacy settings stored in database.
      */
     private const SETTING_PREFIX = 'gdpr_';
-
-    // public function __construct(
-    //     private readonly SettingRepository $settingRepository,
-    //     private readonly UserRepository $userRepository
-    // ) {
-    // }
 
     /**
      * Renders the Privacy & GDPR management page.
      */
     #[Route('/incp/security/privacy', name: 'incp_security_privacy', methods: ['GET'])]
-    public function index(
-        SettingRepository $settingRepository,
-    ): Response {
-        // Enforce VIEW permission
-        // $this->denyAccessUnlessGranted('PRIVACY_GDPR', 'VIEW');
+    public function index(): Response
+    {
+        // if (!$this->security->isGranted('PRIVACY_GDPR', 'VIEW')) {
+        //     throw new AccessDeniedException('Access denied.');
+        // }
 
-        // Fetch all privacy-related settings into an associative array
-        $privacySettings = [
-            'banner_enabled' => 0, 'consent_mode' => 'opt_in',
-            'anonymize_ips' => 0,
-        ]; // $this->getPrivacySettings();
-
-        $this->viewModel->page->title = 'Privacy';
+        $this->viewModel->page->title = 'Privacy & GDPR Management';
         $this->viewModel->page->tab = 'security';
 
         return $this->render('inadmin/page/security/gdpr.html.twig', [
             'viewModel' => $this->viewModel,
-            'privacy' => $privacySettings,
+            'privacy' => $this->getPrivacySettings(),
         ]);
     }
 
@@ -60,34 +49,40 @@ class PrivacyController extends AbstractInachisController
     #[Route('/incp/security/privacy/save', name: 'incp_security_privacy_save', methods: ['POST'])]
     public function save(Request $request): Response
     {
-        // Enforce EDIT permission
-        $this->denyAccessUnlessGranted('PRIVACY_GDPR', 'EDIT');
+        if (!$this->security->isGranted('PRIVACY_GDPR', 'EDIT')) {
+            throw new AccessDeniedException('Access denied.');
+        }
 
-        if (!$this->isCsrfTokenValid('privacy_save', $request->request->get('_token'))) {
+        if (!$this->isCsrfTokenValid('privacy_save', (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'Invalid CSRF token.');
 
             return $this->redirectToRoute('incp_security_privacy');
         }
 
         $gdprData = $request->request->all('gdpr');
+        $settingRepo = $this->entityManager->getRepository(Setting::class);
 
-        // Map submitted fields to setting entries
         $allowedSettings = [
-            'banner_enabled' => $gdprData['banner_enabled'] ?? '0',
-            'consent_mode' => $gdprData['consent_mode'] ?? 'opt_in',
-            'banner_message' => $gdprData['banner_message'] ?? '',
-            'anonymize_ips' => $gdprData['anonymize_ips'] ?? '1',
+            'banner_enabled' => isset($gdprData['banner_enabled']) ? '1' : '0',
+            'consent_mode'   => $gdprData['consent_mode'] ?? 'opt_in',
+            'banner_message' => trim((string) ($gdprData['banner_message'] ?? '')),
+            'anonymize_ips'  => $gdprData['anonymize_ips'] ?? '1',
             'log_retention_days' => (string) max(7, (int) ($gdprData['log_retention_days'] ?? 90)),
         ];
 
         foreach ($allowedSettings as $key => $value) {
-            $settingName = self::SETTING_PREFIX.$key;
-            $this->settingRepository->setSetting($settingName, $value);
+            $settingName = self::SETTING_PREFIX . $key;
+            
+            $setting = $settingRepo->findOneBy(['name' => $settingName]);
+            if (!$setting) {
+                $setting = new Setting();
+                $setting->setName($settingName);
+            }
+            $setting->setValue($value);
+            $this->entityManager->persist($setting);
         }
 
-        // Flush entity manager updates
-        $this->settingRepository->save();
-
+        $this->entityManager->flush();
         $this->addFlash('success', 'Privacy and GDPR settings updated successfully.');
 
         return $this->redirectToRoute('incp_security_privacy');
@@ -99,29 +94,42 @@ class PrivacyController extends AbstractInachisController
     #[Route('/incp/security/privacy/export-user', name: 'incp_security_privacy_export_user', methods: ['POST'])]
     public function exportUserData(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('PRIVACY_GDPR', 'VIEW');
+        if (!$this->security->isGranted('PRIVACY_GDPR', 'VIEW')) {
+            throw new AccessDeniedException('Access denied.');
+        }
+
+        if (!$this->isCsrfTokenValid('sar_export', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Invalid CSRF token.');
+
+            return $this->redirectToRoute('incp_security_privacy');
+        }
 
         $emailOrUsername = trim((string) $request->request->get('user_identifier'));
         if (empty($emailOrUsername)) {
-            return new JsonResponse(['error' => 'User identifier is required.'], Response::HTTP_BAD_REQUEST);
+            $this->addFlash('error', 'User identifier is required for export.');
+
+            return $this->redirectToRoute('incp_security_privacy');
         }
 
-        $user = $this->userRepository->findOneByEmailOrUsername($emailOrUsername);
-        if (!$user) {
-            return new JsonResponse(['error' => 'User not found.'], Response::HTTP_NOT_FOUND);
+        $userRepo = $this->entityManager->getRepository(User::class);
+        $user = $userRepo->findOneBy(['email' => $emailOrUsername]) 
+             ?? $userRepo->findOneBy(['username' => $emailOrUsername]);
+
+        if (!$user instanceof User) {
+            $this->addFlash('error', sprintf('User "%s" not found.', $emailOrUsername));
+
+            return $this->redirectToRoute('incp_security_privacy');
         }
 
-        // Aggregate user personal data (Profile, Comments, Activity, Logins)
         $userData = [
             'export_date' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
             'user' => [
-                'id' => $user->getId()?->toString(),
-                'username' => $user->getUsername(),
-                'email' => $user->getEmail(),
+                'id'          => $user->getId(),
+                'username'    => $user->getUsername(),
+                'email'       => $user->getEmail(),
                 'displayName' => $user->getDisplayName(),
-                'createdAt' => $user->getCreatedAt()?->format(\DateTimeInterface::ATOM),
+                'createdAt'   => $user->getPostDate()?->format(\DateTimeInterface::ATOM),
             ],
-            // Add other associated entity data here (e.g. comments, posts, sessions)
         ];
 
         $response = new JsonResponse($userData);
@@ -136,56 +144,63 @@ class PrivacyController extends AbstractInachisController
     #[Route('/incp/security/privacy/anonymize-user', name: 'incp_security_privacy_anonymize_user', methods: ['POST'])]
     public function anonymizeUser(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('PRIVACY_GDPR', 'DELETE');
+        if (!$this->security->isGranted('PRIVACY_GDPR', 'DELETE')) {
+            throw new AccessDeniedException('Access denied.');
+        }
 
-        if (!$this->isCsrfTokenValid('anonymize_user', $request->request->get('_token'))) {
+        if (!$this->isCsrfTokenValid('anonymize_user', (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'Invalid CSRF token.');
 
             return $this->redirectToRoute('incp_security_privacy');
         }
 
         $emailOrUsername = trim((string) $request->request->get('user_identifier'));
-        $user = $this->userRepository->findOneByEmailOrUsername($emailOrUsername);
+        $userRepo = $this->entityManager->getRepository(User::class);
+        $user = $userRepo->findOneBy(['email' => $emailOrUsername]) 
+             ?? $userRepo->findOneBy(['username' => $emailOrUsername]);
 
-        if (!$user) {
+        if (!$user instanceof User) {
             $this->addFlash('error', sprintf('User "%s" not found.', $emailOrUsername));
 
             return $this->redirectToRoute('incp_security_privacy');
         }
 
-        // Perform anonymization (Scramble email, username, display name)
         $anonymizedHash = substr(md5(uniqid((string) rand(), true)), 0, 10);
         $user->setEmail(sprintf('deleted_%s@anonymized.invalid', $anonymizedHash));
         $user->setUsername(sprintf('deleted_user_%s', $anonymizedHash));
         $user->setDisplayName('Anonymized User');
         $user->setDisabled(true);
 
-        $this->userRepository->save($user);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
 
-        $this->addFlash('success', sprintf('User "%s" has been anonymized.', $emailOrUsername));
+        $this->addFlash('success', sprintf('User "%s" has been anonymized successfully.', $emailOrUsername));
 
         return $this->redirectToRoute('incp_security_privacy');
     }
 
     /**
-     * Helper to load privacy settings into an associative array.
+     * Fetches all privacy settings into an associative array with fallback defaults.
+     *
+     * @return array<string, string>
      */
     private function getPrivacySettings(): array
     {
-        $keys = [
+        $defaults = [
             'banner_enabled' => '1',
-            'consent_mode' => 'opt_in',
+            'consent_mode'   => 'opt_in',
             'banner_message' => 'We use cookies to improve your browsing experience and analyze site traffic.',
-            'anonymize_ips' => '1',
+            'anonymize_ips'  => '1',
             'log_retention_days' => '90',
         ];
 
+        $settingRepo = $this->entityManager->getRepository(Setting::class);
         $settings = [];
-        foreach ($keys as $key => $default) {
-            $settingName = self::SETTING_PREFIX.$key;
-            $setting = $this->settingRepository->findOneByName($settingName);
 
-            $settings[$key] = $setting?->getValue() ?? $default;
+        foreach ($defaults as $key => $defaultValue) {
+            $settingName = self::SETTING_PREFIX . $key;
+            $setting = $settingRepo->findOneBy(['name' => $settingName]);
+            $settings[$key] = $setting ? $setting->getValue() : $defaultValue;
         }
 
         return $settings;

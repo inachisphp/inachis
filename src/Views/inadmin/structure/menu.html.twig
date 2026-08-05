@@ -49,7 +49,7 @@
             <a href="{{ viewModel.settings.domain ~ path('incp_post_list', {'type': 'post'}) }}"
                 data-tooltip="{% trans %}admin.posts.help{% endtrans %}"
                 title="{% trans %}admin.posts.help{% endtrans %}">
-                <i class="material-icons" aria-hidden="true">library_books</i>
+                <i class="material-icons" aria-hidden="true">article</i>
                 <span>{% trans %}admin.posts.title{% endtrans %}</span></a>
         </li>
 {% endif %}
@@ -58,7 +58,7 @@
             <a href="{{ viewModel.settings.domain ~ path('incp_series_list') }}"
                 data-tooltip="{% trans %}admin.series.help{% endtrans %}"
                 title="{% trans %}admin.series.help{% endtrans %}">
-                <i class="material-icons" aria-hidden="true">chrome_reader_mode</i>
+                <i class="material-icons" aria-hidden="true">library_books</i>
                 <span>{% trans %}admin.series.title{% endtrans %}</span>
             </a>
         </li>
@@ -68,7 +68,7 @@
             <a href="{{ viewModel.settings.domain ~ path('incp_resource_list', { type: 'images' }) }}"
                 data-tooltip="{% trans %}admin.resources.help{% endtrans %}"
                 title="{% trans %}admin.resources.help{% endtrans %}">
-                <i class="material-icons" aria-hidden="true">wallpaper</i>
+                <i class="material-icons" aria-hidden="true">perm_media</i>
                 <span>{% trans %}admin.resources.title{% endtrans %}</span>
             </a>
         </li>
@@ -92,7 +92,7 @@
 {% if canGroup('SECURITY') %}
                 <li class="{{ viewModel.page.tab|activeMenu('security') ~ viewModel.page.tab|activeMenu('policies') }}">
                     <a href="{{ viewModel.settings.domain ~ path('incp_security_list') }}"
-                        data-tooltop="{% trans %}admin.security.help{% endtrans %}"
+                        data-tooltip="{% trans %}admin.security.help{% endtrans %}"
                         title="{% trans %}admin.security.help{% endtrans %}">
                         <i class="material-icons" aria-hidden="true">security</i>
                         <span>{% trans %}admin.security.title{% endtrans %}</span></a>

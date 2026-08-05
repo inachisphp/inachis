@@ -26,7 +26,10 @@
         {% block extra_content %}
             {% if item.messages %}
         <div class="widget__alert">
-            <p><strong>Status: Issues identified</strong></p>
+            <p>
+                <span class="material-icons">warning</span> 
+                <strong>Status: Issues identified</strong>
+            </p>
             <ul>
             {% for message in item.messages %}
                 <li>{{ message }}</li>
@@ -35,7 +38,10 @@
         </div>
         {% else %}
         <div class="widget__ok">
-            <p><strong>Status: OK</strong></p>
+            <p>
+                <span class="material-icons">check_circle</span> 
+                <strong>Status: OK</strong>
+            </p>
         </div>
             {% endif %}
         {% endblock extra_content %}

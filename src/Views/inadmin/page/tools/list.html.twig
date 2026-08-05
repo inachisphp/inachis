@@ -18,23 +18,21 @@
 {% endif %}
 
 {% if canResource('STORAGE') %}
-    {% include 'inadmin/partials/components/card.html.twig' with {
+    {% embed 'inadmin/partials/components/card.html.twig' with {
         title: 'Storage',
         icon: 'sd_storage',
         description: 'Inspect disk usage, media upload limits, and temporary assets.',
         button_text: 'Check Storage',
         link: viewModel.settings.domain ~ path('incp_tools_storage'),
     } %}
-{% endif %}
-
-{% if environment !== 'prod' and canResource('ERROR_LOG') %}
-    {% include 'inadmin/partials/components/card.html.twig' with {
-        title: 'Logs',
-        icon: 'article',
-        description: 'Review recent application, environment, and system error logs.',
-        button_text: 'View Logs',
-        link: viewModel.settings.domain ~ path('incp_tools_logs'),
-    } %}
+    {% block extra_content %}
+        <div class="text-muted">
+            <small>
+                <strong>Disk Usage:</strong> {{ (diskUsage/1024/1024)|round(2) }} MB
+            </small>
+        </div>
+    {% endblock extra_content %}
+    {% endembed %}
 {% endif %}
 
 {% if canResource('IMPORT_EXPORT') %}
@@ -48,12 +46,34 @@
 {% endif %}
 
 {% if canResource('MAINTENANCE') %}
-    {% include 'inadmin/partials/components/card.html.twig' with {
+    {% embed 'inadmin/partials/components/card.html.twig' with {
         title: 'Maintenance Mode',
         icon: 'construction',
         description: 'Toggle maintenance mode and manage public access notices.',
         button_text: 'Manage Mode',
         link: viewModel.settings.domain ~ path('incp_tools_maintenance'),
+    } %}
+    {% block extra_content %}
+        {% if maintenanceEnabled %}
+        <div class="widget__alert">
+            <strong>Maintenance mode is currently enabled.</strong><br /> Visitors will see a maintenance notice.
+        </div>
+        {% else %}
+        <div class="widget__ok">
+            <strong>Maintenance mode is currently disabled.</strong><br /> Visitors can access the site normally.
+        </div>
+        {% endif %}
+    {% endblock extra_content %}
+    {% endembed %}
+{% endif %}
+
+{% if environment !== 'prod' and canResource('ERROR_LOG') %}
+    {% include 'inadmin/partials/components/card.html.twig' with {
+        title: 'Logs',
+        icon: 'article',
+        description: 'Review recent application, environment, and system error logs.',
+        button_text: 'View Logs',
+        link: viewModel.settings.domain ~ path('incp_tools_logs'),
     } %}
 {% endif %}
 
@@ -64,9 +84,10 @@
         button_text: 'Purge Data',
         link: viewModel.settings.domain,
         className: 'widget-settings--danger',
+        buttonClassName: 'btn--danger',
     } %}
     {% block description %}
-    <strong>Danger:</strong> Permanently wipe content and reset site data.
+    <strong>Danger</strong><br /> Permanently wipe content and reset site data.
     {% endblock description %}
     {% endembed %}
 {% endif %}

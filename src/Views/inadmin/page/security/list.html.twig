@@ -8,78 +8,121 @@
 <div class="col-12 widget-container">
 
 {% if canResource('SYSTEM_STATUS') %}
-<section class="widget widget-settings">
-    <a href="{{ viewModel.settings.domain ~ path('incp_tools_diagnostics') }}" class="widget-settings__link">
-        <div class="widget-settings__icon">
-            <span class="material-icons" aria-hidden="true">health_and_safety</span>
-        </div>
-        <h2>System Health &amp; Diagnostics</h2>
-        <p class="widget-settings__desc">Inspect server configuration, memory, security headers, and environmental health.</p>
-        <div class="widget-settings__action">
-            <span class="btn btn--secondary">View Status</span>
-        </div>
-    </a>
-</section>
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: 'System Health & Diagnostics',
+        icon: 'health_and_safety',
+        description: 'Inspect server configuration, memory, security headers, and environmental health.',
+        button_text: 'View Status',
+        link: viewModel.settings.domain ~ path('incp_tools_diagnostics'),
+    } %}
+    {% block extra_content %}
+        {% if systemIssues.warning is not empty or systemIssues.error is not empty %}
+            <div class="widget__alert">
+                <p>There are issues detected in the system diagnostics.</p>
+                <ul>
+                {% if systemIssues.warning is not empty %}
+                    <li><strong>Warning:</strong> {{ systemIssues.warning|length }} issue(s)</li>
+                {% endif %}
+                {% if systemIssues.error is not empty %}
+                    <li><strong>Error:</strong> {{ systemIssues.error|length }} issue(s)</li>
+                {% endif %}
+                </ul>
+            </div>
+        {% else %}
+            <div class="widget__ok">
+                <p>All system diagnostics checks passed successfully.</p>
+            </div>
+        {% endif %}
+    {% endblock extra_content %}
+    {% endembed %}
 {% endif %}
 
 {% if canResource('EMAIL_DNS') %}
-<section class="widget widget-settings">
-    <a href="{{ viewModel.settings.domain ~ path('incp_tools_email') }}" class="widget-settings__link">
-        <div class="widget-settings__icon">
-            <span class="material-icons" aria-hidden="true">mark_email_read</span>
-        </div>
-        <h2>Email &amp; DNS Authentication</h2>
-        <p class="widget-settings__desc">Verify SPF, DKIM, DMARC, and domain security compliance.</p>
-        <div class="widget-settings__action">
-            <span class="btn btn--secondary">Check Mail Security</span>
-        </div>
-    </a>
-</section>
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: 'Email & DNS Authentication',
+        icon: 'mark_email_read',
+        description: 'Verify SPF, DKIM, DMARC, for email deliverability, and domain security compliance.',
+        button_text: 'Check Mail Security',
+        link: viewModel.settings.domain ~ path('incp_tools_email'),
+    } %}
+    {% block extra_content %}
+        {% if domainEmailReport.issues is empty %}
+            <div class="widget__ok">
+                <p>All email authentication records are valid.</p>
+            </div>
+        {% else %}
+            <div class="widget__alert">
+                <ul>
+                {% for issue in domainEmailReport.issues %}
+                    <li>{{ issue.message }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endblock extra_content %}
+    {% endembed %}
 {% endif %}
 
 {% if canResource('PRIVACY_GDPR') %}
-<section class="widget widget-settings">
-    <a href="{{ viewModel.settings.domain ~ path('incp_security_privacy') }}" class="widget-settings__link">
-        <div class="widget-settings__icon">
-            <span class="material-icons" aria-hidden="true">verified_user</span>
-        </div>
-        <h2>Privacy &amp; GDPR</h2>
-        <p class="widget-settings__desc">Manage cookie consent banners, user data exports, and IP anonymization settings.</p>
-        <div class="widget-settings__action">
-            <span class="btn btn--secondary">Manage Privacy</span>
-        </div>
-    </a>
-</section>
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: 'Privacy & GDPR Compliance',
+        icon: 'verified_user',
+        description: 'Manage cookie consent banners, user data exports, and IP anonymization settings.',
+        button_text: 'Manage Privacy',
+        link: viewModel.settings.domain ~ path('incp_security_privacy'),
+    } %}
+    {% block extra_content %}
+    Cookie Banner: Active • IP Anonymization: On
+    {% endblock extra_content %}
+    {% endembed %}
 {% endif %}
 
 {% if canResource('CSP_POLICY') %}
-<section class="widget widget-settings">
-    <a href="{{ viewModel.settings.domain ~ path('incp_tools_csp_dashboard') }}" class="widget-settings__link">
-        <div class="widget-settings__icon">
-            <span class="material-icons" aria-hidden="true">policy</span>
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: 'Content Security Policy & Reports',
+        icon: 'policy',
+        description: 'Configure CSP directives and monitor real-time violation reports.',
+        button_text: 'Manage CSP',
+        link: viewModel.settings.domain ~ path('incp_tools_csp_dashboard'),
+    } %}
+    {% block extra_content %}
+    {% if cspMode.value == 'off' %}
+        <div class="widget__alert">
+            <p>CSP is currently disabled.</p>
         </div>
-        <h2>Content Security Policy</h2>
-        <p class="widget-settings__desc">Configure CSP directives and monitor real-time violation reports.</p>
-        <div class="widget-settings__action">
-            <span class="btn btn--secondary">Manage CSP</span>
+        {% elseif cspMode.value == 'report-only' %}
+        <div class="widget__alert">
+            <p>CSP is in report-only mode.</p>
         </div>
-    </a>
-</section>
+    {% elseif cspMode.value == 'enforce' %}
+        <div class="widget__ok">
+            <p>CSP is fully enforced.</p>
+        </div>
+    {% endif %}
+    {% endblock extra_content %}
+    {% endembed %}
 {% endif %}
 
 {% if canResource('PASSWORD_POLICY') %}
-<section class="widget widget-settings">
-    <a href="{{ viewModel.settings.domain ~ path('incp_admin_security_policy') }}" class="widget-settings__link">
-        <div class="widget-settings__icon">
-            <span class="material-icons" aria-hidden="true">password</span>
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: 'Security Policy & Authentication',
+        icon: 'password',
+        description: 'Manage password requirements, multi-factor authentication, and step-up action controls.',
+        button_text: 'Manage Security Policy',
+        link: viewModel.settings.domain ~ path('incp_admin_security_policy'),
+    } %}
+    {% block extra_content %}
+        <div class="text-muted">
+            <p>
+                <strong>Active Policy:</strong>
+                {{ securityPolicy.name }} <br />
+                <small><strong>Password Strength:</strong>
+                    {{ securityPolicy.passwordStrength.label }}
+                </small>
+            </p>
         </div>
-        <h2>Password Policy</h2>
-        <p class="widget-settings__desc">Define password complexity, expiration, and session security rules.</p>
-        <div class="widget-settings__action">
-            <span class="btn btn--secondary">Manage Policy</span>
-        </div>
-    </a>
-</section>
+    {% endblock extra_content %}
+    {% endembed %}
 {% endif %}
 
 </div>

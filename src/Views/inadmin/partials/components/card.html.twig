@@ -14,7 +14,7 @@
 		</p>
         {% block extra_content %}{% endblock extra_content %}
         <div class="widget-settings__action">
-            <span class="btn btn--secondary">{{ button_text }}</span>
+            <span class="btn {{ buttonClassName|default('btn--secondary') }}">{{ button_text }}</span>
         </div>
 
     {% if link|default(null) is not empty %}
