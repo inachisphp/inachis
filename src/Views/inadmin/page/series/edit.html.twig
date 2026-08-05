@@ -87,18 +87,18 @@
         {% if form.submit is defined %}
         {{ form_widget(form.submit) }}
         {% endif %}
+        {%  if series.id is not empty and series.items|length > 0 %}
+            <a class="btn btn--secondary" href="{{ path('web_series_view', { 'year': series.lastDate|date('Y'), 'title': series.url}) }}" target="_blank" title="View Live"><span class="material-icons" aria-hidden="true">exit_to_app</span> View Live</a>
+        {% endif %}
+        {%  if series.id is not empty and series.items|length > 0 and form.remove is defined %}
+            <span class="series__controls visually-hidden">
+            with selected:
+            {{ form_widget(form.remove) }}
+            </span>
+        {%  endif %}
         {%  if series.id is not empty and form.delete is defined %}
         {{ form_widget(form.delete) }}
         {% endif %}
-        {%  if series.id is not empty and series.items|length > 0 %}
-            <a class="btn btn--secondary" href="{{ path('web_series_view', { 'year': series.lastDate|date('Y'), 'title': series.url}) }}" target="_blank" title="View Live"><span class="material-icons" aria-hidden="true">exit_to_app</span> View Live</a>
-            <span class="series__controls visually-hidden">
-            with selected:
-            {% if form.remove is defined %}
-            {{ form_widget(form.remove) }}
-            {% endif %}
-        {%  endif %}
-        </span>
     </p>
 </div>
 
