@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Command\Image;
@@ -63,6 +65,7 @@ class ImageMigrationCommand extends Command
     {
         $this
             ->addArgument('mode', InputArgument::REQUIRED, 'scan | apply | rollback | report | verify')
+            ->addOption('clean', null, InputOption::VALUE_NONE, 'Remove var/image-migration directory upon successful verification')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Preview migration without making changes')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force operation without prompts or bypassing stale plan checks')
             ->addOption('resume', null, InputOption::VALUE_NONE, 'Resume apply mode from last checkpoint')
@@ -155,7 +158,9 @@ class ImageMigrationCommand extends Command
             $saveCheckpointCallback
         );
 
-        @unlink($this->checkpointFile);
+        if (file_exists($this->checkpointFile)) {
+            @unlink($this->checkpointFile);
+        }
         $this->reporter->writeReports($plan, $appliedStats, $this->reportMdFile, $this->reportJsonFile);
 
         $output->writeln('<info>Migration successfully applied!</info>');
@@ -189,11 +194,41 @@ class ImageMigrationCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function verify(OutputInterface $output): int
+    private function verify(InputInterface $input, OutputInterface $output): int
     {
         $result = $this->verifier->verify($this->imageDir, $output);
+        $shouldClean = (bool) $input->getOption('clean');
 
-        return $result ? Command::SUCCESS : Command::FAILURE;
+        if ($result) {
+            if ($shouldClean) {
+                $output->writeln('<info>Verification successful. Cleaning up temporary migration artifacts...</info>');
+                $this->removeDirectory($this->varDir);
+                $output->writeln('<info>✓ Removed var/image-migration/</info>');
+            } else {
+                $output->writeln('<comment>Tip: Run verify with --clean to purge backup files and migration logs (var/image-migration/).</comment>');
+            }
+            return Command::SUCCESS;
+        }
+
+        return Command::FAILURE;
+    }
+    
+    /**
+     * Recursively remove a directory and its contents safely.
+     */
+    private function removeDirectory(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        $files = array_diff(scandir($dir) ?: [], ['.', '..']);
+        foreach ($files as $file) {
+            $path = $dir . '/' . $file;
+            is_dir($path) ? $this->removeDirectory($path) : @unlink($path);
+        }
+
+        @rmdir($dir);
     }
 
     private function report(OutputInterface $output): int
