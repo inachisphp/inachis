@@ -6,7 +6,7 @@ declare(strict_types=1);
  * This file is part of the inachis framework.
  */
 
-namespace Inachis\Service\File;
+namespace Inachis\Service\Resource;
 
 /**
  * Base64 encode file.
@@ -18,13 +18,13 @@ class Base64EncodeFile
      */
     public static function encode(string $filename): string
     {
-        $projectDir = realpath(__DIR__ . '/../../../');
-        if ($projectDir === false) {
+        $projectDir = realpath(__DIR__.'/../../../');
+        if (false === $projectDir) {
             return '';
         }
 
-        $fullPath = realpath($projectDir . '/' . ltrim($filename, '/'));
-        if ($fullPath === false || !str_starts_with($fullPath, $projectDir)) {
+        $fullPath = realpath($projectDir.'/'.ltrim($filename, '/'));
+        if (false === $fullPath || !str_starts_with($fullPath, $projectDir)) {
             return '';
         }
         $type = pathinfo($filename, PATHINFO_EXTENSION);

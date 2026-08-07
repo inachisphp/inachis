@@ -59,6 +59,7 @@ class ResourceType extends AbstractType
         } else {
             throw new \InvalidArgumentException('Unrecognised content type');
         }
+        $isNew = null === $options['data']->getId();
 
         $allowEdit = $this->permissionResolver->hasPermission(
             $user,
@@ -83,35 +84,49 @@ class ResourceType extends AbstractType
                     'id' => 'resource__title__label',
                 ],
             ]);
-        if ($type === PermissionResource::IMAGE) {
+        if (PermissionResource::IMAGE === $type) {
             $builder
                 ->add('altText', TextareaType::class, [
                     'attr' => [
                         'aria-labelledby' => 'resource__altText__label',
                         'class' => 'full-width',
                         'rows' => 2,
-                ],
-                'disabled' => !$allowEdit,
-                'label' => $this->translator->trans('admin.resources.altText.label', [], 'messages'),
-                'label_attr' => [
-                    'id' => 'resource__altText__label',
-                ],
-            ]);
-        }
-        elseif ($options['data'] instanceof Download && null === $options['data']->getId()) {
+                    ],
+                    'disabled' => !$allowEdit,
+                    'label' => $this->translator->trans('admin.resources.altText.label', [], 'messages'),
+                    'label_attr' => [
+                        'id' => 'resource__altText__label',
+                    ],
+                ]);
+        } elseif ($options['data'] instanceof Download) {
+            // Build dynamic human-readable string: "PDF, ZIP, TAR, GZ, DOC, etc."
+            $allowedExts = array_map(
+                static fn (string $ext): string => strtoupper(ltrim($ext, '.')),
+                Download::ALLOWED_TYPES,
+            );
+
+            $limit = 5;
+            $typesPreview = implode(', ', array_slice($allowedExts, 0, $limit));
+            if (count($allowedExts) > $limit) {
+                $typesPreview .= ', etc.';
+            }
+
             $builder->add('file', FileType::class, [
-                'label' => 'Upload File',
+                'label' => $isNew ? 'Upload File' : 'Replace File',
                 'mapped' => false,
-                'required' => true,
+                'required' => $isNew,
                 'attr' => [
                     'class' => 'filepond',
                     'data-max-file-size' => '50MB',
                 ],
                 'constraints' => [
                     new File(
-                        maxSize: Download::MAX_FILESIZE . 'M',
+                        maxSize: Download::MAX_FILESIZE.'M',
                         mimeTypes: Download::ALLOWED_MIME_TYPES,
-                        mimeTypesMessage: 'Please upload a valid file type (PDF, ZIP, DOCX, CSV, etc.).',
+                        mimeTypesMessage: sprintf(
+                            'Please upload a valid file type (%s).',
+                            $typesPreview,
+                        ),
                     ),
                 ],
             ]);

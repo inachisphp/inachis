@@ -8,8 +8,16 @@
 {% block content %}
 
 {{ form_start(form, {'attr': { 'class': 'col-12 form form__post form__resource filepond' }}) }}
-<div class="content__edit edit-grid">
-        <fieldset class="edit-details" id="post__edit">
+    {% include 'inadmin/partials/tabs.html.twig' with { tabs: [
+        { id: 'details', title: 'Details', url: '#resource__details' },
+        viewModel.page.tab == 'image' ? { id: 'usages', title: 'Usages', url: '#resource__usages' } : null,
+        viewModel.page.type == 'downloads' and resource.id is not empty and resource.versions is not empty ? { id: 'history', title: 'History', url: '#resource__history' } : null,
+    ]|filter(v => v is not null) } %}
+
+<div class="content__edit">
+    <section id="resource__details" class="ui-section">
+    <div class="edit-grid">
+        <fieldset class="edit-details">
             <h3>{{ 'admin.resources.details.title'|trans }}</h3>
             <p>
                 {{ form_label(form.title) }}
@@ -22,6 +30,9 @@
                 {{ form_errors(form.altText) }}
                 {{ form_widget(form.altText) }}
             </p>
+            <p><small>Helps visually impaired users and search engines understand the content of the image.</small></p>
+            {% endif %}
+            {% if viewModel.page.type == 'downloads' %}
             {% endif %}
             <p>
                 {{ form_label(form.description) }}
@@ -46,81 +57,135 @@
                        id="image_link"
                        type="text"
                        value="{% if not (resource.filename starts with 'http')  %}/imgs/{% endif %}{{ resource.filename }}" />
-            {% elseif viewModel.page.type == 'downloads' %}
-                {% if resource.id is empty %}
-                    {% include 'inadmin/partials/components/file-upload.html.twig' with {
-                        paramName: 'resource[file]',
-                        required: true,
-                        autoUpload: false,
-                        uploadMultiple: false,
-                        acceptedFiles: [
-                            'application/pdf',
-                            'application/zip',
-                            'application/msword',
-                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                            'text/csv',
-                            'text/plain'
-                        ]
-                    } %}
-                {% else %}
-                    <div class="card margin-bottom">
-                        <h3><span class="material-icons">attach_file</span> Currently Attached File</h3>
-                        <p><strong>Filename:</strong> {{ resource.filename }}</p>
-                        <p><strong>Type:</strong> <code>{{ resource.filetype }}</code></p>
-                        <p><strong>Size:</strong> {{ (resource.filesize / 1024 / 1024)|round(2) }} MB</p>
-                    </div>
-                {% endif %}
             {% endif %}
-        </fieldset>
-
-        {% if resource.id is not null %}
-        <fieldset class="edit-properties" id="post__properties">
-            <h3>{{ 'admin.resources.properties.title'|trans }}</h3>
-            {% if viewModel.page.type == 'images' %}
-            <p><strong>{{ 'admin.resources.properties.dimensions'|trans }}:</strong> {{ resource.dimensionX ~ ' (w) x ' ~ resource.dimensionY ~ ' (h)' }}</p>
-                {% if additional.channels is not empty or additional.bits is not empty %}
-            <p><strong>{{ 'admin.resources.properties.colourDepth'|trans }}:</strong> {% if additional.bits is not empty %}{{ additional.bits }}-bit{% endif %} {% if additional.channels == 3 %}RGB{% elseif additional.channels == 4 %}CMYK{% endif %}</p>
+            {% if resource.id is not empty %}
+                <div class="edit-properties" id="post__properties">
+                    <h3><span class="material-icons">attach_file</span> {{ 'admin.resources.properties.title'|trans }}</h3>
+                    <p><strong>{{ 'admin.resources.properties.filename'|trans }}:</strong> {{ resource.filename }}</p>
+                    <p><strong>{{ 'admin.resources.properties.filetype'|trans }}:</strong> <code>{{ resource.filetype }}</code></p>
+                    {% if not (resource.filename starts with 'http')  %}
+                    <p><strong>{{ 'admin.resources.properties.filesize'|trans }}:</strong> {{ resource.filesize }} bytes ({{ (resource.filesize / 1024 / 1024)|round(2) }} Mb)</p>
                     {% endif %}
-            {% endif %}
-            <p><strong>{{ 'admin.resources.properties.filename'|trans }}:</strong> {{ resource.filename }}</p>
-            <p><strong>{{ 'admin.resources.properties.filetype'|trans }}:</strong> {{ resource.filetype }}</p>
-            {% if not (resource.filename starts with 'http')  %}
-            <p><strong>{{ 'admin.resources.properties.filesize'|trans }}:</strong> {{ resource.filesize }} bytes ({{ (resource.filesize / 1024 / 1024)|round(2) }} Mb)</p>
-            {% endif %}
-            {% if viewModel.page.tab == 'download' %}
-            <p><strong>SHA-256 Checksum:</strong> <code>{{ resource.checksum }}</code></p>
-            {% endif %}
-            <p><strong>{{ 'admin.resources.properties.updatedAt'|trans }}:</strong> {{ resource.updatedAt|date('d F Y', viewModel.session.preferences.timezone) }}</p>
-            <p>&nbsp;</p>
-        </fieldset>
-        {% endif %}
+                    {% if viewModel.page.type == 'images' %}
+                    <p><strong>{{ 'admin.resources.properties.dimensions'|trans }}:</strong> {{ resource.dimensionX ~ ' (w) x ' ~ resource.dimensionY ~ ' (h)' }}</p>
+                        {% if additional.channels is not empty or additional.bits is not empty %}
+                    <p><strong>{{ 'admin.resources.properties.colourDepth'|trans }}:</strong> {% if additional.bits is not empty %}{{ additional.bits }}-bit{% endif %} {% if additional.channels == 3 %}RGB{% elseif additional.channels == 4 %}CMYK{% endif %}</p>
+                        {% endif %}
+                    {% elseif viewModel.page.tab == 'download' %}
+                    <p><strong>{{ 'admin.resources.properties.checksum'|trans }}:</strong> <code>{{ resource.checksum }}</code></p>
+                    {% endif %}
+                    <p><strong>{{ 'admin.resources.properties.updatedAt'|trans }}:</strong> {{ resource.updatedAt|date('d F Y', viewModel.session.preferences.timezone) }}</p>
+                </div>
 
-        {% if viewModel.page.tab == 'images' %}
-        <fieldset class="edit-usages" id="post_usages">
-            <details open="open">
-            <summary>{{ 'admin.resources.usages.title'|trans }}</summary>
-            {% if usages.posts|default(null) is not empty or usages.series|default(null) is not empty %}
-                <ol>
-                    {% for content_type,content_uses in usages %}
-                        {% for image_use in content_uses %}
-                            {% set link = '' %}
-                            {% if content_type == 'series' %}
-                                {% set link = path('incp_series_edit', {id: image_use.id}) %}
-                            {% elseif content_type == 'posts' %}
-                                {% set link = '/incp/' ~ image_use.type ~ '/' ~ image_use.urls[0].link %}
-                            {% endif %}
-                            <li>
-                                {{ content_type|title }}: <a href="{{ link }}">{{ image_use.title }} {% if image_use.subTitle is not empty %} &mdash; {{ image_use.subTitle }}{% endif %}</a>
-                            </li>
-                        {% endfor %}
-                    {% endfor %}
-                </ol>
-            {% else %}
-                <p>{{ 'admin.resources.usages.notInUse'|trans }}</p>
+                <p>
+                </p>
+                
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const btn = document.getElementById('btn-toggle-replace-file');
+                        const wrapper = document.getElementById('replace-file-wrapper');
+
+                        btn?.addEventListener('click', () => {
+                            wrapper?.classList.toggle('visually-hidden');
+                            btn.classList.toggle('active');
+                        });
+                    });
+                </script>
             {% endif %}
-            </details>
+
+            <div id="replace-file-wrapper" class="{% if resource.id is not empty %}visually-hidden{% endif %}">
+                {% include 'inadmin/partials/components/file-upload.html.twig' with {
+                    paramName: 'resource[file]',
+                    required: resource.id is empty,
+                    autoUpload: false,
+                    uploadMultiple: false,
+                    acceptedFiles: [
+                        'application/pdf',
+                        'application/zip',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'text/csv',
+                        'text/plain'
+                    ]
+                } %}
+            </div>
         </fieldset>
+    </div>
+    </section>
+
+    {% if viewModel.page.tab == 'image' %}
+    <div id="resource__usages" class="ui-section">
+    <fieldset class="edit-usages" id="post_usages">
+        <details open="open">
+        <summary class="visually-hidden">{{ 'admin.resources.usages.title'|trans }}</summary>
+        {% if usages.posts|default(null) is not empty or usages.series|default(null) is not empty %}
+            <ol>
+                {% for content_type,content_uses in usages %}
+                    {% for image_use in content_uses %}
+                        {% set link = '' %}
+                        {% if content_type == 'series' %}
+                            {% set link = path('incp_series_edit', {id: image_use.id}) %}
+                        {% elseif content_type == 'posts' %}
+                            {% set link = '/incp/' ~ image_use.type ~ '/' ~ image_use.urls[0].link %}
+                        {% endif %}
+                        <li>
+                            {{ content_type|title }}: <a href="{{ link }}">{{ image_use.title }} {% if image_use.subTitle is not empty %} &mdash; {{ image_use.subTitle }}{% endif %}</a>
+                        </li>
+                    {% endfor %}
+                {% endfor %}
+            </ol>
+        {% else %}
+            <p>{{ 'admin.resources.usages.notInUse'|trans }}</p>
         {% endif %}
+        </details>
+    </fieldset>
+    </div>
+    {% endif %}
+
+    {% if viewModel.page.type == 'downloads' and resource.id is not empty and resource.versions is not empty %}
+    <div id="resource__history" class="ui-section">
+        <fieldset class="edit-versions col-12" id="post_versions">
+            <h3>File Version History</h3>
+            <table class="table full-width zebra">
+                <thead>
+                    <tr>
+                        <th>Version</th>
+                        <th>Filename</th>
+                        <th>Size</th>
+                        <th>Uploaded Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>v{{ resource.versions.first.versionNumber + 1 }} (Active)</strong></td>
+                        <td>{{ resource.filename }}</td>
+                        <td>{{ (resource.filesize / 1024 / 1024)|round(2) }} MB</td>
+                        <td>{{ resource.updatedAt|date('d F Y H:i', viewModel.session.preferences.timezone) }}</td>
+                        <td>
+                            <a href="{{ path('web_file_download', { id: resource.id }) }}" class="btn btn--xs btn--outline" target="_blank">
+                                Download
+                            </a>
+                        </td>
+                    </tr>
+                    {% for ver in resource.versions %}
+                        <tr>
+                            <td>v{{ ver.versionNumber }}</td>
+                            <td>{{ ver.filename }}</td>
+                            <td>{{ (ver.filesize / 1024 / 1024)|round(2) }} MB</td>
+                            <td>{{ ver.createdAt|date('d F Y H:i', viewModel.session.preferences.timezone) }}</td>
+                            <td>
+                                <a href="{{ path('web_file_download', { id: resource.id, version: ver.versionNumber }) }}" class="btn btn--xs btn--outline" target="_blank">
+                                    Download v{{ ver.versionNumber }}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </fieldset>
+    </div>
+    {% endif %}
 </div>
 
 <div class="fixed-bottom-bar">
@@ -133,11 +198,15 @@
             {{ form_widget(form.generate_alt_text) }}
         {% endif %}
 
-        {% if viewModel.page.tab == 'download' %}
-            <a href="{{ path('app_file_download', { id: resource.id }) }}" class="btn btn--outline" target="_blank">
-                <span class="material-icons">download</span> Download / Preview File
+        {% if viewModel.page.tab == 'download' and resource.id is not null %}
+            <button type="button" class="btn btn--secondary" id="btn-toggle-replace-file">
+                <span class="material-icons">swap_horiz</span>
+                <span class="btn--text">Replace {{ viewModel.page.tab|title }}</span>
+            </button>
+            <a href="{{ path('web_file_download', { id: resource.id }) }}" class="btn btn--info" target="_blank">
+                <span class="material-icons">download</span> Download File
             </a>
-        {% elseif viewModel.page.tab == 'images' %}
+        {% elseif viewModel.page.tab == 'image' %}
         <button aria-label="{{ 'admin.resources.images.copyMarkdown.help'|trans }}"
                 data-target="image_markdown"
                 class="btn btn--secondary btn--copy"
@@ -158,53 +227,4 @@
 
 {{ form_row(form._token) }}
 {{ form_end(form, {render_rest: false}) }}
-
-
-{% if viewModel.page.type == 'downloads' and resource.id is empty %}
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const filePondInput = document.querySelector('input.filepond');
-    if (!filePondInput) return;
-
-    // Direct initialization via global FilePond to bypass dialog button logic
-    if (typeof FilePond !== 'undefined') {
-        FilePond.create(filePondInput, {
-            storeAsFile: true,
-            instantUpload: false,
-            allowMultiple: false,
-            required: true,
-            acceptedFileTypes: [
-                'application/pdf',
-                'application/zip',
-                'application/x-tar',
-                'application/gzip',
-                'application/msword',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                'application/vnd.ms-excel',
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'text/plain',
-                'text/csv'
-            ]
-        });
-    } else if (window.Inachis?.FileUpload) {
-        // Fallback using Inachis wrapper if FilePond global isn't exposed directly
-        window.Inachis.FileUpload.init('input.filepond', {
-            name: 'resource[file]',
-            allowMultiple: false,
-            instantUpload: false,
-            storeAsFile: true,
-            required: true,
-            acceptedFileTypes: [
-                'application/pdf',
-                'application/zip',
-                'application/msword',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                'text/csv',
-                'text/plain'
-            ]
-        });
-    }
-});
-</script>
-{% endif %}
 {% endblock content %}

@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Inachis\Entity\Media;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -31,13 +33,23 @@ class Download extends AbstractFile
         'text/plain',
         'text/csv',
     ];
-    
+
     /** @var list<string> */
     public const ALLOWED_TYPES = [
-        '.pdf', '.zip', '.tar', '.gz', '.doc', '.docx', '.xls', '.xlsx', '.txt', '.csv'
+        '.pdf', '.zip', '.tar', '.gz', '.doc', '.docx', '.xls', '.xlsx', '.txt', '.csv',
     ];
-    
+
     public const MAX_FILESIZE = 50;
+
+    /** @var Collection<int, DownloadVersion> */
+    #[ORM\OneToMany(mappedBy: 'download', targetEntity: DownloadVersion::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['versionNumber' => 'DESC'])]
+    private Collection $versions;
+
+    public function __construct()
+    {
+        $this->versions = new ArrayCollection();
+    }
 
     #[ORM\PrePersist]
     public function onPrePersist(): void
@@ -51,5 +63,44 @@ class Download extends AbstractFile
     public function onPreUpdate(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    /**
+     * @return Collection<int, DownloadVersion>
+     */
+    public function getVersions(): Collection
+    {
+        return $this->versions;
+    }
+
+    public function getNextVersionNumber(): int
+    {
+        if ($this->versions->isEmpty()) {
+            return 1;
+        }
+
+        return $this->versions->first()->getVersionNumber() + 1;
+    }
+
+    /**
+     * Archives the current file metadata into a DownloadVersion snapshot.
+     */
+    public function archiveCurrentPayload(): void
+    {
+        if (empty($this->getFilename())) {
+            return;
+        }
+
+        $version = new DownloadVersion();
+        $version
+            ->setDownload($this)
+            ->setVersionNumber($this->getNextVersionNumber())
+            ->setFilename($this->getFilename())
+            ->setFiletype($this->getFiletype() ?? '')
+            ->setFilesize($this->getFilesize())
+            ->setChecksum($this->getChecksum() ?? '')
+            ->setAuthor($this->getAuthor());
+
+        $this->versions->add($version);
     }
 }
