@@ -194,7 +194,7 @@
         {{ form_widget(form.submit) }}
         {% endif %}
 
-        {% if openai_api is defined and open_ai|default(false) and form.generate_alt_text is defined %}
+        {% if aiVisionEnabled and form.generate_alt_text is defined %}
             {{ form_widget(form.generate_alt_text) }}
         {% endif %}
 
@@ -227,4 +227,51 @@
 
 {{ form_row(form._token) }}
 {{ form_end(form, {render_rest: false}) }}
+
+{% if viewModel.page.type == 'images' and resource.id is not empty and aiVisionEnabled %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const aiBtn = document.getElementById('resource_generate_alt_text');
+    if (!aiBtn) return;
+
+    aiBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        const originalText = aiBtn.innerHTML;
+        aiBtn.disabled = true;
+        aiBtn.innerHTML = '<span class="material-icons spin">autorenew</span> <span>Generating...</span>';
+
+        try {
+            const response = await fetch('{{ path('incp_resource_image_ai_metadata', { id: resource.id }) }}', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.error || 'Failed to generate metadata');
+            }
+
+            // Populate form inputs
+            const titleInput = document.querySelector('#resource_title');
+            const altTextInput = document.querySelector('#resource_altText');
+            const descInput = document.querySelector('#resource_description');
+
+            if (titleInput && result.data.title) titleInput.value = result.data.title;
+            if (altTextInput && result.data.altText) altTextInput.value = result.data.altText;
+            if (descInput && result.data.description) descInput.value = result.data.description;
+
+        } catch (error) {
+            alert('AI Generation Error: ' + error.message);
+        } finally {
+            aiBtn.disabled = false;
+            aiBtn.innerHTML = originalText;
+        }
+    });
+});
+</script>
+{% endif %}
 {% endblock content %}

@@ -10,8 +10,9 @@ parameters:
     app.public_img_path: '%env(APP_PUBLIC_IMG_PATH)%'
 
     app.config.twitter: 'jedi58'
-
-    csp: ''
+    env(AI_PROVIDER): ''
+    env(GEMINI_API_KEY): '' #https://aistudio.google.com/prompts/new_chat
+    env(OPENAI_API_KEY): ''
 
 services:
     # default configuration for services in *this* file
