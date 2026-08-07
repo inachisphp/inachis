@@ -13,12 +13,12 @@ use Inachis\Build\ReleaseWorkspace;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 
-#[AsTaggedItem(priority: 0)]
+#[AsTaggedItem(priority: 130)]
 final class CleanupRelease implements BuildStepInterface
 {
     public static function priority(): int
     {
-        return 0;
+        return 130;
     }
 
     public function execute(
@@ -36,6 +36,7 @@ final class CleanupRelease implements BuildStepInterface
             'assets',
             'node_modules',
             'package.json',
+            'package-lock.json',
             'var/cache',
             'var/log',
         ];
