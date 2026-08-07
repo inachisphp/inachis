@@ -9,10 +9,9 @@ declare(strict_types=1);
 namespace Inachis\Model\System;
 
 use Inachis\Enum\System\PackageType;
-use Inachis\Model\System\Package;
 
 /**
- * Model for detailing what constitutes a theme file
+ * Model for detailing what constitutes a theme file.
  */
 final class Theme extends Package
 {
@@ -39,10 +38,10 @@ final class Theme extends Package
         );
     }
 
-	/** @var string|null Absolute path to the screenshot */
+    /** @var string|null Absolute path to the screenshot */
     public ?string $screenshot = null;
 
-	/** @var bool Flag indicating if this instance is a fallback due to an issue */
+    /** @var bool Flag indicating if this instance is a fallback due to an issue */
     public bool $isFallback = false;
 
     /** @var string|null If fallback, stores the requested identifier that failed */

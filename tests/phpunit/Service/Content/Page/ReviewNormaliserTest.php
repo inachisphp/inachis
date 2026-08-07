@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ReviewNormaliserTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ReviewNormaliser();
 
         self::assertInstanceOf(
             ReviewNormaliser::class,
-            $instance
+            $instance,
         );
     }
 }

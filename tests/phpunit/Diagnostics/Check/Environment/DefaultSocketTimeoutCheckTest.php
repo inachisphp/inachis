@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class DefaultSocketTimeoutCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new DefaultSocketTimeoutCheck();
 
         self::assertInstanceOf(
             DefaultSocketTimeoutCheck::class,
-            $instance
+            $instance,
         );
     }
 }

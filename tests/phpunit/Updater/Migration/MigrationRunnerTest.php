@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Updater\Migration;
 
-use Inachis\Updater\Migration\MigrationRunner;
 use PHPUnit\Framework\TestCase;
 
 final class MigrationRunnerTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

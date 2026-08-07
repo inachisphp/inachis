@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ImportOptionsDtoTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ImportOptionsDto();
 
         self::assertInstanceOf(
             ImportOptionsDto::class,
-            $instance
+            $instance,
         );
     }
 }

@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ImageMigrationReporterTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ImageMigrationReporter();
 
         self::assertInstanceOf(
             ImageMigrationReporter::class,
-            $instance
+            $instance,
         );
     }
 }

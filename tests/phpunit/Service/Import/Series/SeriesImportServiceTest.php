@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\Import\Series;
 
-use Inachis\Service\Import\Series\SeriesImportService;
 use PHPUnit\Framework\TestCase;
 
 final class SeriesImportServiceTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

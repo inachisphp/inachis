@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class PreloadJitCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new PreloadJitCheck();
 
         self::assertInstanceOf(
             PreloadJitCheck::class,
-            $instance
+            $instance,
         );
     }
 }

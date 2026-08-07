@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Twig;
 
-use Inachis\Twig\NavigationTabsExtension;
 use PHPUnit\Framework\TestCase;
 
 final class NavigationTabsExtensionTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

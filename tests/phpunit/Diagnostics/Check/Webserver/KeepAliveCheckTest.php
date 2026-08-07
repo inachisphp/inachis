@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class KeepAliveCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new KeepAliveCheck();
 
         self::assertInstanceOf(
             KeepAliveCheck::class,
-            $instance
+            $instance,
         );
     }
 }

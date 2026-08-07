@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class CannotRemoveLastAdministratorExceptionTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new CannotRemoveLastAdministratorException();
 
         self::assertInstanceOf(
             CannotRemoveLastAdministratorException::class,
-            $instance
+            $instance,
         );
     }
 }

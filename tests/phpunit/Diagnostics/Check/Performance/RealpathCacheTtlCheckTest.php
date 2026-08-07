@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class RealpathCacheTtlCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new RealpathCacheTtlCheck();
 
         self::assertInstanceOf(
             RealpathCacheTtlCheck::class,
-            $instance
+            $instance,
         );
     }
 }

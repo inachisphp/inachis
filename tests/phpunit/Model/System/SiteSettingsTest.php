@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Model\System;
 
-use Inachis\Model\System\SiteSettings;
 use PHPUnit\Framework\TestCase;
 
 final class SiteSettingsTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

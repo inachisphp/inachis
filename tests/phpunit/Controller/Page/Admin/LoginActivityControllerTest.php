@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class LoginActivityControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new LoginActivityController();
 
         self::assertInstanceOf(
             LoginActivityController::class,
-            $instance
+            $instance,
         );
     }
 }

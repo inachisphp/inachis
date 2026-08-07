@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class CategoryExportNormaliserTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new CategoryExportNormaliser();
 
         self::assertInstanceOf(
             CategoryExportNormaliser::class,
-            $instance
+            $instance,
         );
     }
 }

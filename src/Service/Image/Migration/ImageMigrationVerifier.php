@@ -19,8 +19,9 @@ class ImageMigrationVerifier
         private ImageRepository $imageRepository,
         private PageRepository $pageRepository,
         private SeriesRepository $seriesRepository,
-        private MarkdownImageRewriter $markdownRewriter
-    ) {}
+        private MarkdownImageRewriter $markdownRewriter,
+    ) {
+    }
 
     /**
      * Run full verification pass.
@@ -39,7 +40,7 @@ class ImageMigrationVerifier
         $validImages = 0;
         foreach ($images as $img) {
             $filename = $img->getFilename();
-            $path = $imageDir . $filename;
+            $path = $imageDir.$filename;
 
             if (!file_exists($path)) {
                 $failures[] = sprintf('Image entity %s: missing file %s', $img->getId(), $filename);
@@ -52,7 +53,7 @@ class ImageMigrationVerifier
             }
 
             $dims = @getimagesize($path);
-            if ($dims !== false) {
+            if (false !== $dims) {
                 if ($dims[0] !== $img->getDimensionX() || $dims[1] !== $img->getDimensionY()) {
                     $failures[] = sprintf(
                         'Image entity %s (%s): dimension mismatch (DB: %dx%d vs Disk: %dx%d)',
@@ -61,12 +62,12 @@ class ImageMigrationVerifier
                         $img->getDimensionX(),
                         $img->getDimensionY(),
                         $dims[0],
-                        $dims[1]
+                        $dims[1],
                     );
                 }
             }
 
-            $validImages++;
+            ++$validImages;
         }
 
         // 2. Verify Pages
@@ -74,11 +75,11 @@ class ImageMigrationVerifier
         foreach ($pages as $page) {
             $refs = $this->markdownRewriter->extractImageReferences($page->getContent());
             foreach ($refs as $ref) {
-                if (!file_exists($imageDir . $ref)) {
+                if (!file_exists($imageDir.$ref)) {
                     $failures[] = sprintf('Page %s (%s): broken image reference /imgs/%s', $page->getId(), $page->getTitle(), $ref);
                 }
             }
-            $validPages++;
+            ++$validPages;
         }
 
         // 3. Verify Series
@@ -86,11 +87,11 @@ class ImageMigrationVerifier
         foreach ($seriesList as $series) {
             $refs = $this->markdownRewriter->extractImageReferences($series->getDescription());
             foreach ($refs as $ref) {
-                if (!file_exists($imageDir . $ref)) {
+                if (!file_exists($imageDir.$ref)) {
                     $failures[] = sprintf('Series %s (%s): broken image reference /imgs/%s', $series->getId(), $series->getTitle(), $ref);
                 }
             }
-            $validSeries++;
+            ++$validSeries;
         }
 
         if (empty($failures)) {

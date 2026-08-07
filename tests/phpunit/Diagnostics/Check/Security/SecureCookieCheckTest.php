@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class SecureCookieCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new SecureCookieCheck();
 
         self::assertInstanceOf(
             SecureCookieCheck::class,
-            $instance
+            $instance,
         );
     }
 }

@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Repository\Security;
 
-use Inachis\Repository\Security\RoleRepository;
 use PHPUnit\Framework\TestCase;
 
 final class RoleRepositoryTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

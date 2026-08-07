@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class PageImportResultTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new PageImportResult();
 
         self::assertInstanceOf(
             PageImportResult::class,
-            $instance
+            $instance,
         );
     }
 }

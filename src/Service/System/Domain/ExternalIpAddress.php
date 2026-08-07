@@ -11,7 +11,7 @@ namespace Inachis\Service\System\Domain;
 /**
  * Service to retrieve the external IP address of the server.
  */
-class ExternalIpAddress 
+class ExternalIpAddress
 {
     /**
      * Returns the external IP address of the server.

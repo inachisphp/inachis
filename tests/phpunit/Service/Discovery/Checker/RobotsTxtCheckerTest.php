@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\Discovery\Checker;
 
-use Inachis\Service\Discovery\Checker\RobotsTxtChecker;
 use PHPUnit\Framework\TestCase;
 
 final class RobotsTxtCheckerTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Package;
 
-use Inachis\Enum\System\PackageType;
 use Inachis\Model\System\Package;
 use Inachis\Service\ManifestLoader;
 use Psr\Cache\CacheItemPoolInterface;
@@ -42,15 +41,14 @@ abstract readonly class AbstractPackageScanner
     public function getPackages(): array
     {
         $cache = $this->cache->getItem(
-            $this->packagesCacheKey()
+            $this->packagesCacheKey(),
         );
 
         if ($cache->isHit()) {
-
             $packages = $cache->get();
 
             if (is_array($packages)) {
-                /** @var list<T> */
+                /* @var list<T> */
                 return $packages;
             }
         }
@@ -66,9 +64,7 @@ abstract readonly class AbstractPackageScanner
     public function getPackage(
         string $identifier,
     ): ?Package {
-
         foreach ($this->getPackages() as $package) {
-
             if ($package->identifier === $identifier) {
                 return $package;
             }
@@ -89,11 +85,10 @@ abstract readonly class AbstractPackageScanner
     public function getScanStatus(): array
     {
         $cache = $this->cache->getItem(
-            $this->statusCacheKey()
+            $this->statusCacheKey(),
         );
 
         if ($cache->isHit()) {
-
             $status = $cache->get();
 
             if (is_array($status)) {
@@ -112,7 +107,7 @@ abstract readonly class AbstractPackageScanner
         ];
     }
 
-        /**
+    /**
      * Scans package directories and refreshes the cache.
      *
      * @return list<T>
@@ -123,20 +118,20 @@ abstract readonly class AbstractPackageScanner
         $packages = $this->scanPackages($errors);
 
         $packagesCache = $this->cache->getItem(
-            $this->packagesCacheKey()
+            $this->packagesCacheKey(),
         );
 
         $packagesCache->set($packages);
         $this->cache->save($packagesCache);
 
         $statusCache = $this->cache->getItem(
-            $this->statusCacheKey()
+            $this->statusCacheKey(),
         );
 
         $statusCache->set([
             'lastScannedAt' => time(),
-            'errorCount'    => count($errors),
-            'errors'        => $errors,
+            'errorCount' => count($errors),
+            'errors' => $errors,
         ]);
 
         $this->cache->save($statusCache);
@@ -158,28 +153,25 @@ abstract readonly class AbstractPackageScanner
         $packages = [];
 
         foreach ($this->packageRoots() as $root) {
-
             if (!is_dir($root)) {
                 continue;
             }
 
             foreach (scandir($root) ?: [] as $directory) {
-
-                if ($directory === '.' || $directory === '..') {
+                if ('.' === $directory || '..' === $directory) {
                     continue;
                 }
 
                 $package = $this->loadPackage(
-                    $root . DIRECTORY_SEPARATOR . $directory,
+                    $root.DIRECTORY_SEPARATOR.$directory,
                     $errors,
                 );
 
-                if ($package === null) {
+                if (null === $package) {
                     continue;
                 }
 
                 if (isset($packages[$package->identifier])) {
-
                     $message = sprintf(
                         'Duplicate package identifier "%s".',
                         $package->identifier,
@@ -207,11 +199,11 @@ abstract readonly class AbstractPackageScanner
             ),
         );
 
-        /** @var list<T> */
+        /* @var list<T> */
         return array_values($packages);
     }
 
-        /**
+    /**
      * Loads a package from a directory.
      *
      * @param list<string> $errors
@@ -227,12 +219,12 @@ abstract readonly class AbstractPackageScanner
         }
 
         $manifestFile = $directory
-            . DIRECTORY_SEPARATOR
-            . $this->manifestFilename();
+            .DIRECTORY_SEPARATOR
+            .$this->manifestFilename();
 
         $manifest = $this->manifestLoader->load($manifestFile);
 
-        if ($manifest === null) {
+        if (null === $manifest) {
             $errors[] = sprintf(
                 'Skipped invalid package at %s',
                 $directory,
@@ -282,11 +274,10 @@ abstract readonly class AbstractPackageScanner
         string $directory,
     ): bool {
         foreach (['identifier', 'name'] as $requiredField) {
-
             if (
-                !isset($manifest[$requiredField]) ||
-                !is_string($manifest[$requiredField]) ||
-                trim($manifest[$requiredField]) === ''
+                !isset($manifest[$requiredField])
+                || !is_string($manifest[$requiredField])
+                || '' === trim($manifest[$requiredField])
             ) {
                 $this->logger->warning(sprintf(
                     'Package "%s" is missing required field "%s".',

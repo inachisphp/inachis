@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class HttpsCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new HttpsCheck();
 
         self::assertInstanceOf(
             HttpsCheck::class,
-            $instance
+            $instance,
         );
     }
 }

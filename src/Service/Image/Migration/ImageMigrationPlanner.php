@@ -23,8 +23,9 @@ class ImageMigrationPlanner
         private SeriesRepository $seriesRepository,
         private SluggerInterface $slugger,
         private ImageProcessor $imageProcessor,
-        private MarkdownImageRewriter $markdownRewriter
-    ) {}
+        private MarkdownImageRewriter $markdownRewriter,
+    ) {
+    }
 
     /**
      * Generate complete image migration plan.
@@ -35,7 +36,7 @@ class ImageMigrationPlanner
         string $imageDir,
         bool $noWebp,
         bool $noDedup,
-        bool $noResize
+        bool $noResize,
     ): array {
         $images = $this->imageRepository->findBy([], ['id' => 'ASC']);
         $pages = $this->pageRepository->findBy([], ['id' => 'ASC']);
@@ -68,7 +69,7 @@ class ImageMigrationPlanner
             $extracted = $this->markdownRewriter->extractImageReferences($page->getContent());
             foreach ($extracted as $file) {
                 $referencedFiles[$file] = true;
-                if (!file_exists($imageDir . $file)) {
+                if (!file_exists($imageDir.$file)) {
                     $brokenRefs[] = [
                         'entity' => 'Page',
                         'id' => $pageId,
@@ -102,7 +103,7 @@ class ImageMigrationPlanner
             $extracted = $this->markdownRewriter->extractImageReferences($series->getDescription());
             foreach ($extracted as $file) {
                 $referencedFiles[$file] = true;
-                if (!file_exists($imageDir . $file)) {
+                if (!file_exists($imageDir.$file)) {
                     $brokenRefs[] = [
                         'entity' => 'Series',
                         'id' => $seriesId,
@@ -125,7 +126,7 @@ class ImageMigrationPlanner
                 continue;
             }
 
-            $filePath = $imageDir . $filename;
+            $filePath = $imageDir.$filename;
             if (!file_exists($filePath)) {
                 continue;
             }
@@ -172,7 +173,7 @@ class ImageMigrationPlanner
                 continue;
             }
 
-            $filePath = $imageDir . $oldFilename;
+            $filePath = $imageDir.$oldFilename;
             $fileExists = file_exists($filePath);
             $filesize = $fileExists ? (filesize($filePath) ?: 0) : 0;
             $checksum = $image->getChecksum() ?? ($fileExists ? (hash_file('sha256', $filePath) ?: '') : '');
@@ -222,8 +223,8 @@ class ImageMigrationPlanner
             $estimatedFilesize = $filesize;
             $finalExt = $origExt;
 
-            if (!$noWebp && in_array($origExt, ['jpg', 'jpeg', 'png', 'heic', 'heif', 'webp'], true) && $origExt !== 'svg' && $fileExists) {
-                $tempWebpPath = tempnam(sys_get_temp_dir(), 'scan_webp_') . '.webp';
+            if (!$noWebp && in_array($origExt, ['jpg', 'jpeg', 'png', 'heic', 'heif', 'webp'], true) && 'svg' !== $origExt && $fileExists) {
+                $tempWebpPath = tempnam(sys_get_temp_dir(), 'scan_webp_').'.webp';
                 try {
                     if ($this->imageProcessor->convertToWebp($filePath, $tempWebpPath)) {
                         $webpSize = filesize($tempWebpPath) ?: 0;
@@ -252,11 +253,11 @@ class ImageMigrationPlanner
                 }
             }
 
-            $candidateFilename = $baseSlug . '.' . $finalExt;
+            $candidateFilename = $baseSlug.'.'.$finalExt;
             $counter = 2;
             while (isset($usedTargetFilenames[$candidateFilename])) {
-                $candidateFilename = $baseSlug . '-' . $counter . '.' . $finalExt;
-                $counter++;
+                $candidateFilename = $baseSlug.'-'.$counter.'.'.$finalExt;
+                ++$counter;
             }
             $usedTargetFilenames[$candidateFilename] = true;
 
@@ -299,9 +300,9 @@ class ImageMigrationPlanner
         }
 
         // Scan physical orphan files
-        $diskFiles = glob($imageDir . '*');
-        if ($diskFiles !== false) {
-            $dbFiles = array_filter(array_map(fn($img) => $img->getFilename(), $images));
+        $diskFiles = glob($imageDir.'*');
+        if (false !== $diskFiles) {
+            $dbFiles = array_filter(array_map(fn ($img) => $img->getFilename(), $images));
             $dbFilesSet = array_flip($dbFiles);
 
             foreach ($diskFiles as $diskFilePath) {

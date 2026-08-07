@@ -40,7 +40,7 @@ final readonly class PluginScanner extends AbstractPackageScanner
     protected function packageRoots(): array
     {
         return [
-            $this->projectDir . '/plugins',
+            $this->projectDir.'/plugins',
         ];
     }
 
@@ -57,7 +57,7 @@ final readonly class PluginScanner extends AbstractPackageScanner
             ...$this->createBasePackage(
                 $path,
                 $manifest,
-            )
+            ),
         );
 
         $plugin->features = $this->extractFeatures(
@@ -79,7 +79,7 @@ final readonly class PluginScanner extends AbstractPackageScanner
     }
 
     /**
-     * Retrieves a list of plugins
+     * Retrieves a list of plugins.
      *
      * @return list<Plugin>
      */
@@ -94,7 +94,7 @@ final readonly class PluginScanner extends AbstractPackageScanner
     }
 
     /**
-     * Rescan the plugin folder
+     * Rescan the plugin folder.
      *
      * @return list<Plugin>
      */

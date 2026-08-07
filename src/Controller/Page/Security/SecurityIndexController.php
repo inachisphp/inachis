@@ -36,18 +36,18 @@ class SecurityIndexController extends AbstractInachisController
             'error' => [],
         ];
         foreach ($results as $result) {
-            if ($result->status === 'warning' || $result->status === 'error') {
+            if ('warning' === $result->status || 'error' === $result->status) {
                 $systemIssues[$result->status][] = $result;
             }
         }
         $domain = isset($_ENV['APP_DOMAIN']) && is_string($_ENV['APP_DOMAIN']) ?
-            $_ENV['APP_DOMAIN'] : 
+            $_ENV['APP_DOMAIN'] :
             'example.com';
         $serverIp = !empty($_ENV['SERVER_IP']) && is_string($_ENV['SERVER_IP']) ?
             $_ENV['SERVER_IP'] :
             $externalIpAddress->getExternalIp();
         $selector = isset($_ENV['DKIM_SELECTOR']) && is_string($_ENV['DKIM_SELECTOR']) ?
-            $_ENV['DKIM_SELECTOR'] : 
+            $_ENV['DKIM_SELECTOR'] :
             'default';
         $report = $domainEmailAnalyser->analyse($domain, $serverIp, $selector);
 

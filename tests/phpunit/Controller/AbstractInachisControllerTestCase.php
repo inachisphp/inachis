@@ -10,9 +10,6 @@ namespace Inachis\Tests\phpunit\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Factory\PageViewFactory;
-use Inachis\Model\System\PageMetadata;
-use Inachis\Model\System\PageView;
-use Inachis\Model\System\SiteSettings;
 use Inachis\Repository\Waste\WasteRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;

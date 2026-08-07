@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class PhpOpcacheCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new PhpOpcacheCheck();
 
         self::assertInstanceOf(
             PhpOpcacheCheck::class,
-            $instance
+            $instance,
         );
     }
 }

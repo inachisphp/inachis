@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class TagDtoTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new TagDto();
 
         self::assertInstanceOf(
             TagDto::class,
-            $instance
+            $instance,
         );
     }
 }

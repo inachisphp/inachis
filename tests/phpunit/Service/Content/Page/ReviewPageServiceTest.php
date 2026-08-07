@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\Content\Page;
 
-use Inachis\Service\Content\Page\ReviewPageService;
 use PHPUnit\Framework\TestCase;
 
 final class ReviewPageServiceTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

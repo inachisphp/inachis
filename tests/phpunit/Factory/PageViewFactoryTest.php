@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Factory;
 
-use Inachis\Factory\PageViewFactory;
 use PHPUnit\Framework\TestCase;
 
 final class PageViewFactoryTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class RolesControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new RolesController();
 
         self::assertInstanceOf(
             RolesController::class,
-            $instance
+            $instance,
         );
     }
 }

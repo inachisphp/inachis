@@ -59,7 +59,7 @@ final class PermissionExtension extends AbstractExtension
      * any one action is sufficient.
      *
      * @param PermissionAction|string|list<PermissionAction|string> $actions
-     * @param bool $requireAll whether all actions are required
+     * @param bool                                                  $requireAll whether all actions are required
      */
     public function can(
         PermissionResource|string $resource,

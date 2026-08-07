@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\Import\Page;
 
-use Inachis\Service\Import\Page\PageImportMapper;
 use PHPUnit\Framework\TestCase;
 
 final class PageImportMapperTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

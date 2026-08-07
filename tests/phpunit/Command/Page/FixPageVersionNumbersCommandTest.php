@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Command\Page;
 
-use Inachis\Command\Page\FixPageVersionNumbersCommand;
 use PHPUnit\Framework\TestCase;
 
 final class FixPageVersionNumbersCommandTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

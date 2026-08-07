@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class SessionCookieOnlyCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new SessionCookieOnlyCheck();
 
         self::assertInstanceOf(
             SessionCookieOnlyCheck::class,
-            $instance
+            $instance,
         );
     }
 }

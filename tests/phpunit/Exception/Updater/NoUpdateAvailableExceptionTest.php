@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class NoUpdateAvailableExceptionTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new NoUpdateAvailableException();
 
         self::assertInstanceOf(
             NoUpdateAvailableException::class,
-            $instance
+            $instance,
         );
     }
 }

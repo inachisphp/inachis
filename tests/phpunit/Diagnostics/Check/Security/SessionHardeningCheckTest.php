@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class SessionHardeningCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new SessionHardeningCheck();
 
         self::assertInstanceOf(
             SessionHardeningCheck::class,
-            $instance
+            $instance,
         );
     }
 }

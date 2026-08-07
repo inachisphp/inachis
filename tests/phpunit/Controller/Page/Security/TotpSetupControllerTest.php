@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class TotpSetupControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new TotpSetupController();
 
         self::assertInstanceOf(
             TotpSetupController::class,
-            $instance
+            $instance,
         );
     }
 }

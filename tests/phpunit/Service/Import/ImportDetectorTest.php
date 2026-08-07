@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ImportDetectorTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ImportDetector();
 
         self::assertInstanceOf(
             ImportDetector::class,
-            $instance
+            $instance,
         );
     }
 }

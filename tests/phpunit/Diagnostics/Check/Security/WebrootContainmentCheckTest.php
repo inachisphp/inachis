@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class WebrootContainmentCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new WebrootContainmentCheck();
 
         self::assertInstanceOf(
             WebrootContainmentCheck::class,
-            $instance
+            $instance,
         );
     }
 }

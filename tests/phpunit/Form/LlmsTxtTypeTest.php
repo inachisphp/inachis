@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Form;
 
-use Inachis\Form\LlmsTxtType;
 use PHPUnit\Framework\TestCase;
 
 final class LlmsTxtTypeTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

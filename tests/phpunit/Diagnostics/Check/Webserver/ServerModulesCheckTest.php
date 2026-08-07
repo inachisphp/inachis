@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ServerModulesCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ServerModulesCheck();
 
         self::assertInstanceOf(
             ServerModulesCheck::class,
-            $instance
+            $instance,
         );
     }
 }

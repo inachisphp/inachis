@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class PermissionManagerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new PermissionManager();
 
         self::assertInstanceOf(
             PermissionManager::class,
-            $instance
+            $instance,
         );
     }
 }

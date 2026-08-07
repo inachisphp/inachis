@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class PageImportValidatorTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new PageImportValidator();
 
         self::assertInstanceOf(
             PageImportValidator::class,
-            $instance
+            $instance,
         );
     }
 }

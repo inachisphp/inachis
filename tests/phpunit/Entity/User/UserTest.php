@@ -121,12 +121,12 @@ final class UserTest extends TestCase
 
         $this->assertInstanceOf(
             \DateTimeImmutable::class,
-            $this->user->getCreatedAt()
+            $this->user->getCreatedAt(),
         );
 
         $this->assertInstanceOf(
             \DateTimeImmutable::class,
-            $this->user->getUpdatedAt()
+            $this->user->getUpdatedAt(),
         );
 
         $updated = $this->user->getUpdatedAt();
@@ -137,7 +137,7 @@ final class UserTest extends TestCase
 
         $this->assertGreaterThan(
             $updated,
-            $this->user->getUpdatedAt()
+            $this->user->getUpdatedAt(),
         );
     }
 

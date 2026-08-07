@@ -31,7 +31,7 @@ class SettingsIndexController extends AbstractInachisController
         $discoveryStatus = $discoveryStatusService->getGroupedStatus();
         $allItems = array_merge(
             $discoveryStatus['documents'] ?? [],
-            $discoveryStatus['generated'] ?? []
+            $discoveryStatus['generated'] ?? [],
         );
 
         // Check if any item contains error/warning messages
@@ -45,10 +45,9 @@ class SettingsIndexController extends AbstractInachisController
 
         $discoverySummary = [
             'hasIssues' => $hasIssues,
-            'label'     => $hasIssues ? 'Issues identified' : 'OK',
-            'badgeClass'=> $hasIssues ? 'badge--warning' : 'badge--success',
+            'label' => $hasIssues ? 'Issues identified' : 'OK',
+            'badgeClass' => $hasIssues ? 'badge--warning' : 'badge--success',
         ];
-
 
         $this->viewModel->page->title = 'Settings';
         $this->viewModel->page->tab = 'settings';

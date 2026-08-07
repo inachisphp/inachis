@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class OpCacheJitBufferSizeCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new OpCacheJitBufferSizeCheck();
 
         self::assertInstanceOf(
             OpCacheJitBufferSizeCheck::class,
-            $instance
+            $instance,
         );
     }
 }

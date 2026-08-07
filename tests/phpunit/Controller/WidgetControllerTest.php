@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Controller;
 
-use Inachis\Controller\WidgetController;
 use PHPUnit\Framework\TestCase;
 
 final class WidgetControllerTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

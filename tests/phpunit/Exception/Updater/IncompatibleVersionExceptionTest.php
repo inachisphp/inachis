@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class IncompatibleVersionExceptionTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new IncompatibleVersionException();
 
         self::assertInstanceOf(
             IncompatibleVersionException::class,
-            $instance
+            $instance,
         );
     }
 }

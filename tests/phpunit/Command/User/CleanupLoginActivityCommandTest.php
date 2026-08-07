@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Command\User;
 
-use Inachis\Command\User\CleanupLoginActivityCommand;
 use PHPUnit\Framework\TestCase;
 
 final class CleanupLoginActivityCommandTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

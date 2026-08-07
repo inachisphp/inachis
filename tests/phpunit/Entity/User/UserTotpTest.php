@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class UserTotpTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new UserTotp();
 
         self::assertInstanceOf(
             UserTotp::class,
-            $instance
+            $instance,
         );
     }
 }

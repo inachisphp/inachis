@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class PhpExtensionsCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new PhpExtensionsCheck();
 
         self::assertInstanceOf(
             PhpExtensionsCheck::class,
-            $instance
+            $instance,
         );
     }
 }

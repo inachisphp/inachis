@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Twig;
 
-use Inachis\Twig\PropertyExtension;
 use PHPUnit\Framework\TestCase;
 
 final class PropertyExtensionTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

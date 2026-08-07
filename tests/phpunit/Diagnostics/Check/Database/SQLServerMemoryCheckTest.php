@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Diagnostics\Check\Database;
 
-use Inachis\Diagnostics\Check\Database\SQLServerMemoryCheck;
 use PHPUnit\Framework\TestCase;
 
 final class SQLServerMemoryCheckTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

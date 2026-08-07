@@ -64,15 +64,15 @@ class PrivacyController extends AbstractInachisController
 
         $allowedSettings = [
             'banner_enabled' => isset($gdprData['banner_enabled']) ? '1' : '0',
-            'consent_mode'   => $gdprData['consent_mode'] ?? 'opt_in',
+            'consent_mode' => $gdprData['consent_mode'] ?? 'opt_in',
             'banner_message' => trim((string) ($gdprData['banner_message'] ?? '')),
-            'anonymize_ips'  => $gdprData['anonymize_ips'] ?? '1',
+            'anonymize_ips' => $gdprData['anonymize_ips'] ?? '1',
             'log_retention_days' => (string) max(7, (int) ($gdprData['log_retention_days'] ?? 90)),
         ];
 
         foreach ($allowedSettings as $key => $value) {
-            $settingName = self::SETTING_PREFIX . $key;
-            
+            $settingName = self::SETTING_PREFIX.$key;
+
             $setting = $settingRepo->findOneBy(['name' => $settingName]);
             if (!$setting) {
                 $setting = new Setting();
@@ -112,7 +112,7 @@ class PrivacyController extends AbstractInachisController
         }
 
         $userRepo = $this->entityManager->getRepository(User::class);
-        $user = $userRepo->findOneBy(['email' => $emailOrUsername]) 
+        $user = $userRepo->findOneBy(['email' => $emailOrUsername])
              ?? $userRepo->findOneBy(['username' => $emailOrUsername]);
 
         if (!$user instanceof User) {
@@ -124,11 +124,11 @@ class PrivacyController extends AbstractInachisController
         $userData = [
             'export_date' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
             'user' => [
-                'id'          => $user->getId(),
-                'username'    => $user->getUsername(),
-                'email'       => $user->getEmail(),
+                'id' => $user->getId(),
+                'username' => $user->getUsername(),
+                'email' => $user->getEmail(),
                 'displayName' => $user->getDisplayName(),
-                'createdAt'   => $user->getPostDate()?->format(\DateTimeInterface::ATOM),
+                'createdAt' => $user->getPostDate()?->format(\DateTimeInterface::ATOM),
             ],
         ];
 
@@ -156,7 +156,7 @@ class PrivacyController extends AbstractInachisController
 
         $emailOrUsername = trim((string) $request->request->get('user_identifier'));
         $userRepo = $this->entityManager->getRepository(User::class);
-        $user = $userRepo->findOneBy(['email' => $emailOrUsername]) 
+        $user = $userRepo->findOneBy(['email' => $emailOrUsername])
              ?? $userRepo->findOneBy(['username' => $emailOrUsername]);
 
         if (!$user instanceof User) {
@@ -188,9 +188,9 @@ class PrivacyController extends AbstractInachisController
     {
         $defaults = [
             'banner_enabled' => '1',
-            'consent_mode'   => 'opt_in',
+            'consent_mode' => 'opt_in',
             'banner_message' => 'We use cookies to improve your browsing experience and analyze site traffic.',
-            'anonymize_ips'  => '1',
+            'anonymize_ips' => '1',
             'log_retention_days' => '90',
         ];
 
@@ -198,7 +198,7 @@ class PrivacyController extends AbstractInachisController
         $settings = [];
 
         foreach ($defaults as $key => $defaultValue) {
-            $settingName = self::SETTING_PREFIX . $key;
+            $settingName = self::SETTING_PREFIX.$key;
             $setting = $settingRepo->findOneBy(['name' => $settingName]);
             $settings[$key] = $setting ? $setting->getValue() : $defaultValue;
         }

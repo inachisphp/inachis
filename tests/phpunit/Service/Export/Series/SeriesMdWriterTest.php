@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class SeriesMdWriterTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new SeriesMdWriter();
 
         self::assertInstanceOf(
             SeriesMdWriter::class,
-            $instance
+            $instance,
         );
     }
 }

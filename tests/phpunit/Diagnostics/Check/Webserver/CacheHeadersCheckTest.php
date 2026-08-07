@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class CacheHeadersCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new CacheHeadersCheck();
 
         self::assertInstanceOf(
             CacheHeadersCheck::class,
-            $instance
+            $instance,
         );
     }
 }

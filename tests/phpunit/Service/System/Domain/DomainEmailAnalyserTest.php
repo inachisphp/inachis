@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\System\Domain;
 
-use Inachis\Service\System\Domain\DomainEmailAnalyser;
 use PHPUnit\Framework\TestCase;
 
 final class DomainEmailAnalyserTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

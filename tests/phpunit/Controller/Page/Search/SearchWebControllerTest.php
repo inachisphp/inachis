@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class SearchWebControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new SearchWebController();
 
         self::assertInstanceOf(
             SearchWebController::class,
-            $instance
+            $instance,
         );
     }
 }

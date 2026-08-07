@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class NavigationTabControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new NavigationTabController();
 
         self::assertInstanceOf(
             NavigationTabController::class,
-            $instance
+            $instance,
         );
     }
 }

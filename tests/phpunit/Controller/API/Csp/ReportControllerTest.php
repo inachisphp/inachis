@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ReportControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ReportController();
 
         self::assertInstanceOf(
             ReportController::class,
-            $instance
+            $instance,
         );
     }
 }

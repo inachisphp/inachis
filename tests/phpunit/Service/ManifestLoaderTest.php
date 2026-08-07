@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service;
 
-use Inachis\Service\ManifestLoader;
 use PHPUnit\Framework\TestCase;
 
 final class ManifestLoaderTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

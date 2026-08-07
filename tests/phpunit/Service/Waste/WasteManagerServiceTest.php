@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\Waste;
 
-use Inachis\Service\Waste\WasteManagerService;
 use PHPUnit\Framework\TestCase;
 
 final class WasteManagerServiceTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class RolePermissionValidatorTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new RolePermissionValidator();
 
         self::assertInstanceOf(
             RolePermissionValidator::class,
-            $instance
+            $instance,
         );
     }
 }

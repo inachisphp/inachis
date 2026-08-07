@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class TimezoneCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new TimezoneCheck();
 
         self::assertInstanceOf(
             TimezoneCheck::class,
-            $instance
+            $instance,
         );
     }
 }

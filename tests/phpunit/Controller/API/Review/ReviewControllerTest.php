@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ReviewControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ReviewController();
 
         self::assertInstanceOf(
             ReviewController::class,
-            $instance
+            $instance,
         );
     }
 }

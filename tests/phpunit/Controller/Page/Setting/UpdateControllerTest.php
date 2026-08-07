@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Controller\Page\Setting;
 
-use Inachis\Controller\Page\Setting\UpdateController;
 use PHPUnit\Framework\TestCase;
 
 final class UpdateControllerTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

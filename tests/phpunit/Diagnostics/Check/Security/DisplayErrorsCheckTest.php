@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class DisplayErrorsCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new DisplayErrorsCheck();
 
         self::assertInstanceOf(
             DisplayErrorsCheck::class,
-            $instance
+            $instance,
         );
     }
 }

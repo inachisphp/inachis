@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class UrlManagerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new UrlManager();
 
         self::assertInstanceOf(
             UrlManager::class,
-            $instance
+            $instance,
         );
     }
 }

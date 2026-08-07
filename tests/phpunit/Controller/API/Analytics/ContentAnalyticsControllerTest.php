@@ -360,8 +360,8 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
             $this->security,
             $this->translator,
             $this->wasteRepository,
-                $this->pageViewFactory,
-                $this->requestStack,
+            $this->pageViewFactory,
+            $this->requestStack,
         );
 
         $response = $controller->seriesStats(

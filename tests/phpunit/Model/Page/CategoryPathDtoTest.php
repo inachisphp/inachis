@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class CategoryPathDtoTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new CategoryPathDto();
 
         self::assertInstanceOf(
             CategoryPathDto::class,
-            $instance
+            $instance,
         );
     }
 }

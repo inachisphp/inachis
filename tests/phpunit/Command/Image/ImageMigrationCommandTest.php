@@ -60,7 +60,7 @@ class ImageMigrationCommandTest extends TestCase
             $this->seriesRepository,
             new AsciiSlugger(),
             $this->imageProcessor,
-            $this->markdownRewriter
+            $this->markdownRewriter,
         );
         $this->applier = new ImageMigrationApplier(
             $this->entityManager,
@@ -68,20 +68,20 @@ class ImageMigrationCommandTest extends TestCase
             $this->pageRepository,
             $this->seriesRepository,
             $this->imageProcessor,
-            $this->markdownRewriter
+            $this->markdownRewriter,
         );
         $this->rollbackService = new ImageMigrationRollback(
             $this->entityManager,
             $this->imageRepository,
             $this->pageRepository,
             $this->seriesRepository,
-            $this->markdownRewriter
+            $this->markdownRewriter,
         );
         $this->verifier = new ImageMigrationVerifier(
             $this->imageRepository,
             $this->pageRepository,
             $this->seriesRepository,
-            $this->markdownRewriter
+            $this->markdownRewriter,
         );
         $this->reporter = new ImageMigrationReporter();
     }
@@ -97,7 +97,7 @@ class ImageMigrationCommandTest extends TestCase
             $this->applier,
             $this->rollbackService,
             $this->verifier,
-            $this->reporter
+            $this->reporter,
         );
     }
 
@@ -131,9 +131,9 @@ class ImageMigrationCommandTest extends TestCase
 
         $this->assertSame(Command::SUCCESS, $statusCode);
         $this->assertStringContainsString('Scan complete', $tester->getDisplay());
-        $this->assertFileExists(getcwd() . '/var/image-migration/plan.json');
-        $this->assertFileExists(getcwd() . '/var/image-migration/report.md');
-        $this->assertFileExists(getcwd() . '/var/image-migration/report.json');
+        $this->assertFileExists(getcwd().'/var/image-migration/plan.json');
+        $this->assertFileExists(getcwd().'/var/image-migration/report.md');
+        $this->assertFileExists(getcwd().'/var/image-migration/report.json');
     }
 
     public function testApplyDryRunPrintsPreviewWithoutModifying(): void

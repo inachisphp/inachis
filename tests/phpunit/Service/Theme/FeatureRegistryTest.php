@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class FeatureRegistryTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new FeatureRegistry();
 
         self::assertInstanceOf(
             FeatureRegistry::class,
-            $instance
+            $instance,
         );
     }
 }

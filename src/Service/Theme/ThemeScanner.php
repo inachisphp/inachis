@@ -29,19 +29,19 @@ final readonly class ThemeScanner extends AbstractPackageScanner
     protected function packageRoots(): array
     {
         return [
-            $this->projectDir . '/templates/themes',
+            $this->projectDir.'/templates/themes',
         ];
     }
 
     protected function createPackage(
         string $path,
-        array $manifest
+        array $manifest,
     ): Theme {
         $theme = new Theme(
             ...$this->createBasePackage(
                 $path,
-                $manifest
-            )
+                $manifest,
+            ),
         );
 
         $theme->screenshot = $this->findScreenshot($path);

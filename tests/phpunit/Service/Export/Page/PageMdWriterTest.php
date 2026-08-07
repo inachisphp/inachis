@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class PageMdWriterTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new PageMdWriter();
 
         self::assertInstanceOf(
             PageMdWriter::class,
-            $instance
+            $instance,
         );
     }
 }

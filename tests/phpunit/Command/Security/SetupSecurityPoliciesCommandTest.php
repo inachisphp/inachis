@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Command\Security;
 
-use Inachis\Command\Security\SetupSecurityPoliciesCommand;
 use PHPUnit\Framework\TestCase;
 
 final class SetupSecurityPoliciesCommandTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

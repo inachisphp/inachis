@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ReferrerPolicyCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ReferrerPolicyCheck();
 
         self::assertInstanceOf(
             ReferrerPolicyCheck::class,
-            $instance
+            $instance,
         );
     }
 }

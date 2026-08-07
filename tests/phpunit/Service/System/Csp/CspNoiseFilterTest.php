@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class CspNoiseFilterTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new CspNoiseFilter();
 
         self::assertInstanceOf(
             CspNoiseFilter::class,
-            $instance
+            $instance,
         );
     }
 }

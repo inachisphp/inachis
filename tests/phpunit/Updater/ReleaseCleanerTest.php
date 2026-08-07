@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Updater;
 
-use Inachis\Updater\ReleaseCleaner;
 use PHPUnit\Framework\TestCase;
 
 final class ReleaseCleanerTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

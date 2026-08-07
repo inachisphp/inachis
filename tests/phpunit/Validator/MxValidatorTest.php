@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class MxValidatorTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new MxValidator();
 
         self::assertInstanceOf(
             MxValidator::class,
-            $instance
+            $instance,
         );
     }
 }

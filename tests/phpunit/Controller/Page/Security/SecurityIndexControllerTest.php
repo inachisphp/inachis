@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class SecurityIndexControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new SecurityIndexController();
 
         self::assertInstanceOf(
             SecurityIndexController::class,
-            $instance
+            $instance,
         );
     }
 }

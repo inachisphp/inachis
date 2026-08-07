@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class XContentTypeOptionsCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new XContentTypeOptionsCheck();
 
         self::assertInstanceOf(
             XContentTypeOptionsCheck::class,
-            $instance
+            $instance,
         );
     }
 }

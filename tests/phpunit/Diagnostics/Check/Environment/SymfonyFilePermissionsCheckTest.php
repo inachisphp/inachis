@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class SymfonyFilePermissionsCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new SymfonyFilePermissionsCheck();
 
         self::assertInstanceOf(
             SymfonyFilePermissionsCheck::class,
-            $instance
+            $instance,
         );
     }
 }

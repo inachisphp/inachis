@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class OpCacheJitCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new OpCacheJitCheck();
 
         self::assertInstanceOf(
             OpCacheJitCheck::class,
-            $instance
+            $instance,
         );
     }
 }

@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ReviewThreadTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ReviewThread();
 
         self::assertInstanceOf(
             ReviewThread::class,
-            $instance
+            $instance,
         );
     }
 }

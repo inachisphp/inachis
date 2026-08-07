@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class NumberFormatterTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new NumberFormatter();
 
         self::assertInstanceOf(
             NumberFormatter::class,
-            $instance
+            $instance,
         );
     }
 }

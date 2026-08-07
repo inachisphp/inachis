@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class InvalidAnalyticsPeriodExceptionTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new InvalidAnalyticsPeriodException();
 
         self::assertInstanceOf(
             InvalidAnalyticsPeriodException::class,
-            $instance
+            $instance,
         );
     }
 }

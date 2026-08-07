@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class AllowUrlFopenCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new AllowUrlFopenCheck();
 
         self::assertInstanceOf(
             AllowUrlFopenCheck::class,
-            $instance
+            $instance,
         );
     }
 }

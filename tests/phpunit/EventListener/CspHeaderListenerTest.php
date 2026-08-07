@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\EventListener;
 
-use Inachis\EventListener\CspHeaderListener;
 use PHPUnit\Framework\TestCase;
 
 final class CspHeaderListenerTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ImageProcessorTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ImageProcessor();
 
         self::assertInstanceOf(
             ImageProcessor::class,
-            $instance
+            $instance,
         );
     }
 }

@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class SettingsIndexControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new SettingsIndexController();
 
         self::assertInstanceOf(
             SettingsIndexController::class,
-            $instance
+            $instance,
         );
     }
 }

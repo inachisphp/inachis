@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\EventSubscriber;
 
-use Inachis\EventSubscriber\AccessDeniedSubscriber;
 use PHPUnit\Framework\TestCase;
 
 final class AccessDeniedSubscriberTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

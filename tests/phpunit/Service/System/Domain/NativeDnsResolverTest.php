@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class NativeDnsResolverTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new NativeDnsResolver();
 
         self::assertInstanceOf(
             NativeDnsResolver::class,
-            $instance
+            $instance,
         );
     }
 }

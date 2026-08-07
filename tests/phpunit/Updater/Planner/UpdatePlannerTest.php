@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class UpdatePlannerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new UpdatePlanner();
 
         self::assertInstanceOf(
             UpdatePlanner::class,
-            $instance
+            $instance,
         );
     }
 }

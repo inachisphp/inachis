@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class UserTrustedDevicesControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new UserTrustedDevicesController();
 
         self::assertInstanceOf(
             UserTrustedDevicesController::class,
-            $instance
+            $instance,
         );
     }
 }

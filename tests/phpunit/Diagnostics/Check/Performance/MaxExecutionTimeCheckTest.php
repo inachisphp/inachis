@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class MaxExecutionTimeCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new MaxExecutionTimeCheck();
 
         self::assertInstanceOf(
             MaxExecutionTimeCheck::class,
-            $instance
+            $instance,
         );
     }
 }

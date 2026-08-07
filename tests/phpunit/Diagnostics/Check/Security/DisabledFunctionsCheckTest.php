@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class DisabledFunctionsCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new DisabledFunctionsCheck();
 
         self::assertInstanceOf(
             DisabledFunctionsCheck::class,
-            $instance
+            $instance,
         );
     }
 }

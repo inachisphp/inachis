@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class XFrameOptionsCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new XFrameOptionsCheck();
 
         self::assertInstanceOf(
             XFrameOptionsCheck::class,
-            $instance
+            $instance,
         );
     }
 }

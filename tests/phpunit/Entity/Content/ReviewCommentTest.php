@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Entity\Content;
 
-use Inachis\Entity\Content\ReviewComment;
 use PHPUnit\Framework\TestCase;
 
 final class ReviewCommentTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

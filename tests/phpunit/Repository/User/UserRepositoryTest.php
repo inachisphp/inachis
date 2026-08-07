@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Inachis\Tests\phpunit\Repository\User;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use Inachis\Model\ContentQueryParameters;

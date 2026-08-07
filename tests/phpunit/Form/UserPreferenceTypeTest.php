@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Form;
 
-use Inachis\Form\UserPreferenceType;
 use PHPUnit\Framework\TestCase;
 
 final class UserPreferenceTypeTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

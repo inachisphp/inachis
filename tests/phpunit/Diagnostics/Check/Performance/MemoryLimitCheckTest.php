@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class MemoryLimitCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new MemoryLimitCheck();
 
         self::assertInstanceOf(
             MemoryLimitCheck::class,
-            $instance
+            $instance,
         );
     }
 }

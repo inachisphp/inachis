@@ -10,7 +10,6 @@ namespace Inachis\Tests\phpunit\Updater;
 
 use Inachis\Updater\ReleaseExtractor;
 use PHPUnit\Framework\TestCase;
-use ZipArchive;
 
 final class ReleaseExtractorTest extends TestCase
 {
@@ -45,16 +44,16 @@ final class ReleaseExtractorTest extends TestCase
         );
 
         self::assertFileExists(
-            $destination.'/index.php'
+            $destination.'/index.php',
         );
 
         self::assertFileExists(
-            $destination.'/config/app.yaml'
+            $destination.'/config/app.yaml',
         );
 
         self::assertSame(
             '<?php echo "hello";',
-            file_get_contents($destination.'/index.php')
+            file_get_contents($destination.'/index.php'),
         );
     }
 
@@ -76,7 +75,7 @@ final class ReleaseExtractorTest extends TestCase
         );
 
         self::assertFileExists(
-            $destination.'/test.txt'
+            $destination.'/test.txt',
         );
     }
 
@@ -86,7 +85,7 @@ final class ReleaseExtractorTest extends TestCase
 
         file_put_contents(
             $archive,
-            'not a zip file'
+            'not a zip file',
         );
 
         $extractor = new ReleaseExtractor();
@@ -117,7 +116,7 @@ final class ReleaseExtractorTest extends TestCase
         );
 
         self::assertFileDoesNotExist(
-            $this->testDirectory.'/../outside.txt'
+            $this->testDirectory.'/../outside.txt',
         );
     }
 
@@ -125,10 +124,10 @@ final class ReleaseExtractorTest extends TestCase
     {
         $archive = $this->testDirectory.'/archive-'.uniqid().'.zip';
 
-        $zip = new ZipArchive();
+        $zip = new \ZipArchive();
 
         self::assertTrue(
-            $zip->open($archive, ZipArchive::CREATE)
+            $zip->open($archive, \ZipArchive::CREATE),
         );
 
         foreach ($files as $filename => $contents) {
@@ -152,7 +151,7 @@ final class ReleaseExtractorTest extends TestCase
         foreach (
             array_diff(
                 scandir($directory) ?: [],
-                ['.', '..']
+                ['.', '..'],
             ) as $file
         ) {
             $path = $directory.'/'.$file;

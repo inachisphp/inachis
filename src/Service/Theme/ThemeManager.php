@@ -52,11 +52,9 @@ final readonly class ThemeManager
         $this->cache->deleteItem('theme.twig.paths');
     }
 
-	/**
-	 * Returns a DTO (model) of the currently active theme
-	 *
-	 * @return Theme
-	 */
+    /**
+     * Returns a DTO (model) of the currently active theme.
+     */
     public function getActiveTheme(): Theme
     {
         $cacheItem = $this->cache->getItem(self::CACHE_KEY_ACTIVE_THEME);
@@ -149,13 +147,10 @@ final readonly class ThemeManager
         );
     }
 
-	/**
-	 * Returns a model of a fallback theme for when active theme fails
-	 * to load.
-	 *
-	 * @param string $identifier
-	 * @return Theme
-	 */
+    /**
+     * Returns a model of a fallback theme for when active theme fails
+     * to load.
+     */
     private function createFallbackTheme(string $identifier): Theme
     {
         $theme = new Theme(

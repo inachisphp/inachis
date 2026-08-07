@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\EventListener;
 
-use Inachis\EventListener\DashboardCacheListener;
 use PHPUnit\Framework\TestCase;
 
 final class DashboardCacheListenerTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

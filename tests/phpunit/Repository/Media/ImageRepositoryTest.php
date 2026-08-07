@@ -115,7 +115,7 @@ class ImageRepositoryTest extends TestCase
         $result = $this->repository->getFiltered(
             ['keyword' => 'test'],
             0,
-            25
+            25,
         );
 
         $this->assertSame($paginator, $result);
@@ -124,14 +124,14 @@ class ImageRepositoryTest extends TestCase
     public function testDetermineOrderBy(): void
     {
         $orders = [
-            'title desc'     => ['q.title', 'DESC'],
-            'createdAt asc'  => ['q.createdAt', 'ASC'],
+            'title desc' => ['q.title', 'DESC'],
+            'createdAt asc' => ['q.createdAt', 'ASC'],
             'createdAt desc' => ['q.createdAt', 'DESC'],
-            'filesize asc'   => ['q.filesize', 'ASC'],
-            'filesize desc'  => ['q.filesize', 'DESC'],
-            'updatedAt asc'  => ['q.updatedAt', 'ASC'],
+            'filesize asc' => ['q.filesize', 'ASC'],
+            'filesize desc' => ['q.filesize', 'DESC'],
+            'updatedAt asc' => ['q.updatedAt', 'ASC'],
             'updatedAt desc' => ['q.updatedAt', 'DESC'],
-            'default'        => ['q.title', 'ASC'],
+            'default' => ['q.title', 'ASC'],
         ];
 
         $reflection = new \ReflectionClass($this->repository);
@@ -140,7 +140,7 @@ class ImageRepositoryTest extends TestCase
         foreach ($orders as $sort => $expected) {
             $this->assertEquals(
                 $expected,
-                $method->invoke($this->repository, $sort)
+                $method->invoke($this->repository, $sort),
             );
         }
     }

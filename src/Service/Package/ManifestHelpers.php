@@ -25,7 +25,6 @@ trait ManifestHelpers
             : $default;
     }
 
-
     /**
      * Extracts a feature list from a manifest section.
      *
@@ -58,11 +57,10 @@ trait ManifestHelpers
         return array_values(
             array_filter(
                 $features,
-                static fn (mixed $feature): bool => is_string($feature)
-            )
+                static fn (mixed $feature): bool => is_string($feature),
+            ),
         );
     }
-
 
     /**
      * Returns a manifest string if it exists.
@@ -94,8 +92,7 @@ trait ManifestHelpers
             'screenshot.jpg',
             'screenshot.jpeg',
         ] as $filename) {
-
-            $path = $directory . DIRECTORY_SEPARATOR . $filename;
+            $path = $directory.DIRECTORY_SEPARATOR.$filename;
 
             if (is_file($path)) {
                 return $path;

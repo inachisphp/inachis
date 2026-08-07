@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class DebugProfilerCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new DebugProfilerCheck();
 
         self::assertInstanceOf(
             DebugProfilerCheck::class,
-            $instance
+            $instance,
         );
     }
 }

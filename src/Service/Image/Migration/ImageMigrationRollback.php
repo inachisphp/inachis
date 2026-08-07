@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Image\Migration;
 
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Series;
@@ -27,8 +26,9 @@ class ImageMigrationRollback
         private ImageRepository $imageRepository,
         private PageRepository $pageRepository,
         private SeriesRepository $seriesRepository,
-        private MarkdownImageRewriter $markdownRewriter
-    ) {}
+        private MarkdownImageRewriter $markdownRewriter,
+    ) {
+    }
 
     /**
      * Execute full file and database rollback.
@@ -39,7 +39,7 @@ class ImageMigrationRollback
         array $plan,
         string $imageDir,
         string $backupDir,
-        OutputInterface $output
+        OutputInterface $output,
     ): void {
         $images = $plan['images'] ?? [];
         $contentReplacements = $plan['contentReplacements'] ?? [];
@@ -50,12 +50,12 @@ class ImageMigrationRollback
         $seriesEntityBackups = $entityBackups['series'] ?? [];
 
         // 1. Verify Backup Integrity
-        $manifestPath = $backupDir . 'backup_manifest.json';
+        $manifestPath = $backupDir.'backup_manifest.json';
         if (file_exists($manifestPath)) {
             /** @var array<string, array{sha256: string, size: int}> $manifest */
             $manifest = json_decode((string) file_get_contents($manifestPath), true);
             foreach ($manifest as $file => $meta) {
-                $bakPath = $backupDir . $file;
+                $bakPath = $backupDir.$file;
                 if (file_exists($bakPath)) {
                     $chk = hash_file('sha256', $bakPath);
                     if ($chk !== $meta['sha256']) {
@@ -74,9 +74,9 @@ class ImageMigrationRollback
                 $oldFilename = $img['oldFilename'];
                 $newFilename = $img['newFilename'];
 
-                $bakPath = $backupDir . $oldFilename;
-                $targetPath = $imageDir . $oldFilename;
-                $currentNewPath = $imageDir . $newFilename;
+                $bakPath = $backupDir.$oldFilename;
+                $targetPath = $imageDir.$oldFilename;
+                $currentNewPath = $imageDir.$newFilename;
 
                 if (file_exists($currentNewPath) && $currentNewPath !== $targetPath) {
                     @unlink($currentNewPath);
@@ -89,7 +89,7 @@ class ImageMigrationRollback
                 $imageEntity = $this->imageRepository->find($imageId);
                 $backupData = $imageEntityBackups[$imageId] ?? null;
 
-                if ($imageEntity === null && $backupData !== null) {
+                if (null === $imageEntity && null !== $backupData) {
                     $imageEntity = new Image();
                     $imageEntity->setId(Uuid::fromString($imageId));
                     $imageEntity->setTitle($backupData['title'] ?? 'Image');
@@ -98,20 +98,20 @@ class ImageMigrationRollback
                     }
                     if (!empty($backupData['authorId'])) {
                         $author = $this->entityManager->find(User::class, $backupData['authorId']);
-                        if ($author !== null) {
+                        if (null !== $author) {
                             $imageEntity->setAuthor($author);
                         }
                     }
                     if (!empty($backupData['createdAt'])) {
-                        $imageEntity->setCreatedAt(new DateTimeImmutable($backupData['createdAt']));
+                        $imageEntity->setCreatedAt(new \DateTimeImmutable($backupData['createdAt']));
                     }
                     if (!empty($backupData['updatedAt'])) {
-                        $imageEntity->setUpdatedAt(new DateTimeImmutable($backupData['updatedAt']));
+                        $imageEntity->setUpdatedAt(new \DateTimeImmutable($backupData['updatedAt']));
                     }
                     $this->entityManager->persist($imageEntity);
                 }
 
-                if ($imageEntity !== null && $backupData !== null) {
+                if (null !== $imageEntity && null !== $backupData) {
                     $imageEntity->setFilename($backupData['filename']);
                     $imageEntity->setFilesize($backupData['filesize']);
                     $imageEntity->setChecksum($backupData['checksum']);
@@ -131,10 +131,10 @@ class ImageMigrationRollback
                 $pageId = (string) $page->getId();
                 $backupData = $pageEntityBackups[$pageId] ?? null;
 
-                if ($backupData !== null) {
+                if (null !== $backupData) {
                     if (!empty($backupData['featureImageId'])) {
                         $origFeatImage = $this->imageRepository->find($backupData['featureImageId']);
-                        if ($origFeatImage !== null) {
+                        if (null !== $origFeatImage) {
                             $page->setFeatureImage($origFeatImage);
                         }
                     } else {
@@ -156,10 +156,10 @@ class ImageMigrationRollback
                 $seriesId = (string) $series->getId();
                 $backupData = $seriesEntityBackups[$seriesId] ?? null;
 
-                if ($backupData !== null) {
+                if (null !== $backupData) {
                     if (!empty($backupData['imageId'])) {
                         $origSeriesImage = $this->imageRepository->find($backupData['imageId']);
-                        if ($origSeriesImage !== null) {
+                        if (null !== $origSeriesImage) {
                             $series->setImage($origSeriesImage);
                         }
                     } else {
@@ -191,7 +191,7 @@ class ImageMigrationRollback
         $total = 0;
 
         foreach ($files as $file) {
-            $path = $imageDir . $file;
+            $path = $imageDir.$file;
             if (file_exists($path)) {
                 $total += (filesize($path) ?: 0);
             }

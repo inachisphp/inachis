@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class CspReportDtoFactoryTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new CspReportDtoFactory();
 
         self::assertInstanceOf(
             CspReportDtoFactory::class,
-            $instance
+            $instance,
         );
     }
 }

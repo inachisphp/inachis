@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ArrayToMarkdownTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ArrayToMarkdown();
 
         self::assertInstanceOf(
             ArrayToMarkdown::class,
-            $instance
+            $instance,
         );
     }
 }

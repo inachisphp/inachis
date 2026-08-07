@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class PageXmlWriterTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new PageXmlWriter();
 
         self::assertInstanceOf(
             PageXmlWriter::class,
-            $instance
+            $instance,
         );
     }
 }

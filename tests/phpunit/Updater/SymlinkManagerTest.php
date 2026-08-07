@@ -41,16 +41,16 @@ final class SymlinkManagerTest extends TestCase
 
         $manager->switchCurrent(
             $current,
-            $release
+            $release,
         );
 
         self::assertTrue(
-            is_link($current)
+            is_link($current),
         );
 
         self::assertSame(
             $release,
-            readlink($current)
+            readlink($current),
         );
     }
 
@@ -67,7 +67,7 @@ final class SymlinkManagerTest extends TestCase
 
         $manager->switchCurrent(
             $current,
-            $target
+            $target,
         );
     }
 
@@ -83,25 +83,25 @@ final class SymlinkManagerTest extends TestCase
 
         file_put_contents(
             $shared.'/config.yaml',
-            'test'
+            'test',
         );
 
         $manager->linkSharedResources(
             $release,
             [
                 'config/config.yaml' => $shared.'/config.yaml',
-            ]
+            ],
         );
 
         $link = $release.'/config/config.yaml';
 
         self::assertTrue(
-            is_link($link)
+            is_link($link),
         );
 
         self::assertSame(
             $shared.'/config.yaml',
-            readlink($link)
+            readlink($link),
         );
     }
 
@@ -117,28 +117,28 @@ final class SymlinkManagerTest extends TestCase
 
         file_put_contents(
             $release.'/config/config.yaml',
-            'placeholder'
+            'placeholder',
         );
 
         file_put_contents(
             $shared.'/config.yaml',
-            'shared'
+            'shared',
         );
 
         $manager->linkSharedResources(
             $release,
             [
                 'config/config.yaml' => $shared.'/config.yaml',
-            ]
+            ],
         );
 
         self::assertTrue(
-            is_link($release.'/config/config.yaml')
+            is_link($release.'/config/config.yaml'),
         );
 
         self::assertSame(
             $shared.'/config.yaml',
-            readlink($release.'/config/config.yaml')
+            readlink($release.'/config/config.yaml'),
         );
     }
 
@@ -153,25 +153,25 @@ final class SymlinkManagerTest extends TestCase
 
         file_put_contents(
             $this->tempDirectory.'/source.png',
-            'image'
+            'image',
         );
 
         $manager->linkSharedResources(
             $release,
             [
                 'uploads/image.png' => $shared,
-            ]
+            ],
         );
 
         self::assertTrue(
-            is_link($release.'/uploads/image.png')
+            is_link($release.'/uploads/image.png'),
         );
     }
 
     private function removeDirectory(string $directory): void
     {
         foreach (scandir($directory) ?: [] as $item) {
-            if ($item === '.' || $item === '..') {
+            if ('.' === $item || '..' === $item) {
                 continue;
             }
 

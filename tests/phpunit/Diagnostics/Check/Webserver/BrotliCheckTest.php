@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class BrotliCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new BrotliCheck();
 
         self::assertInstanceOf(
             BrotliCheck::class,
-            $instance
+            $instance,
         );
     }
 }

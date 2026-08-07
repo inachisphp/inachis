@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class FileCountCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new FileCountCheck();
 
         self::assertInstanceOf(
             FileCountCheck::class,
-            $instance
+            $instance,
         );
     }
 }

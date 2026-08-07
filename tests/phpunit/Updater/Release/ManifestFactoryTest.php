@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ManifestFactoryTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ManifestFactory();
 
         self::assertInstanceOf(
             ManifestFactory::class,
-            $instance
+            $instance,
         );
     }
 }

@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class SeriesExportNormaliserTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new SeriesExportNormaliser();
 
         self::assertInstanceOf(
             SeriesExportNormaliser::class,
-            $instance
+            $instance,
         );
     }
 }

@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ValidIPAddressTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ValidIPAddress();
 
         self::assertInstanceOf(
             ValidIPAddress::class,
-            $instance
+            $instance,
         );
     }
 }

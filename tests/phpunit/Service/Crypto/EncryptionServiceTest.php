@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\Crypto;
 
-use Inachis\Service\Crypto\EncryptionService;
 use PHPUnit\Framework\TestCase;
 
 final class EncryptionServiceTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

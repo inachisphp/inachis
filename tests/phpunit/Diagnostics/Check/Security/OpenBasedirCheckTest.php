@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class OpenBasedirCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new OpenBasedirCheck();
 
         self::assertInstanceOf(
             OpenBasedirCheck::class,
-            $instance
+            $instance,
         );
     }
 }

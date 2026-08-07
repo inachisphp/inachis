@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class QrCodeServiceTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new QrCodeService();
 
         self::assertInstanceOf(
             QrCodeService::class,
-            $instance
+            $instance,
         );
     }
 }

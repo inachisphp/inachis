@@ -29,8 +29,9 @@ class ImageMigrationApplier
         private PageRepository $pageRepository,
         private SeriesRepository $seriesRepository,
         private ImageProcessor $imageProcessor,
-        private MarkdownImageRewriter $markdownRewriter
-    ) {}
+        private MarkdownImageRewriter $markdownRewriter,
+    ) {
+    }
 
     /**
      * Validate plan freshness against current database state.
@@ -58,6 +59,7 @@ class ImageMigrationApplier
      *
      * @param array<string, mixed> $plan
      * @param array<string, mixed> $checkpoint
+     *
      * @return array<string, mixed>
      */
     public function applyPlan(
@@ -69,7 +71,7 @@ class ImageMigrationApplier
         bool $noWebp,
         bool $noDedup,
         bool $noResize,
-        callable $saveCheckpointCallback
+        callable $saveCheckpointCallback,
     ): array {
         $errors = [];
 
@@ -82,8 +84,8 @@ class ImageMigrationApplier
         $backupManifest = [];
 
         foreach ($images as $img) {
-            $srcFile = $imageDir . $img['oldFilename'];
-            $bakFile = $backupDir . $img['oldFilename'];
+            $srcFile = $imageDir.$img['oldFilename'];
+            $bakFile = $backupDir.$img['oldFilename'];
 
             if (file_exists($srcFile)) {
                 if (!file_exists($bakFile)) {
@@ -96,7 +98,7 @@ class ImageMigrationApplier
                 ];
             }
         }
-        file_put_contents($backupDir . 'backup_manifest.json', (string) json_encode($backupManifest, JSON_PRETTY_PRINT));
+        file_put_contents($backupDir.'backup_manifest.json', (string) json_encode($backupManifest, JSON_PRETTY_PRINT));
 
         // Build deduplication maps
         $dedupFilenameMap = [];
@@ -109,7 +111,7 @@ class ImageMigrationApplier
             foreach ($duplicates as $dup) {
                 $duplicateIdMap[$dup['duplicateId']] = $dup['canonicalId'];
                 $canonicalPlan = $imagePlanById[$dup['canonicalId']] ?? null;
-                if ($canonicalPlan !== null) {
+                if (null !== $canonicalPlan) {
                     $dedupFilenameMap[$dup['duplicateFilename']] = $canonicalPlan['newFilename'];
                 }
             }
@@ -130,7 +132,7 @@ class ImageMigrationApplier
         $resizedCount = 0;
         $webpCount = 0;
 
-        for ($i = $checkpoint['imageIndex']; $i < count($images); $i++) {
+        for ($i = $checkpoint['imageIndex']; $i < count($images); ++$i) {
             $imgPlan = &$images[$i];
             $imageId = $imgPlan['id'];
 
@@ -141,8 +143,8 @@ class ImageMigrationApplier
 
             $oldFilename = $imgPlan['oldFilename'];
             $targetFilename = $imgPlan['newFilename'];
-            $oldPath = $imageDir . $oldFilename;
-            $newPath = $imageDir . $targetFilename;
+            $oldPath = $imageDir.$oldFilename;
+            $newPath = $imageDir.$targetFilename;
 
             $origSize = $imgPlan['oldFilesize'];
             $totalOriginalBytes += $origSize;
@@ -159,7 +161,7 @@ class ImageMigrationApplier
             try {
                 /** @var Image|null $imageEntity */
                 $imageEntity = $this->imageRepository->find($imageId);
-                if ($imageEntity === null) {
+                if (null === $imageEntity) {
                     $errors[] = sprintf('Image entity %s not found in database.', $imageId);
                     $this->entityManager->rollback();
                     $checkpoint['completedImageIds'][] = $imageId;
@@ -174,11 +176,11 @@ class ImageMigrationApplier
 
                     // Resize if needed
                     if ($imgPlan['needsResize'] && !$noResize) {
-                        $resizedPath = tempnam(sys_get_temp_dir(), 'img_rsz_') ?: ($newPath . '.tmp');
+                        $resizedPath = tempnam(sys_get_temp_dir(), 'img_rsz_') ?: ($newPath.'.tmp');
                         try {
                             if ($this->imageProcessor->resizeImage($oldPath, $resizedPath, self::MAX_DIMENSION)) {
                                 $processedPath = $resizedPath;
-                                $resizedCount++;
+                                ++$resizedCount;
                             }
                         } catch (\Throwable $e) {
                             if (file_exists($resizedPath) && $resizedPath !== $oldPath) {
@@ -190,8 +192,8 @@ class ImageMigrationApplier
 
                     // WebP Conversion
                     if ($imgPlan['convertToWebp'] && !$noWebp) {
-                        $webpCandidatePath = preg_replace('/\.\w+$/', '.webp', $newPath) ?: ($newPath . '.webp');
-                        $webpTempPath = tempnam(sys_get_temp_dir(), 'img_webp_') ?: ($webpCandidatePath . '.tmp');
+                        $webpCandidatePath = preg_replace('/\.\w+$/', '.webp', $newPath) ?: ($newPath.'.webp');
+                        $webpTempPath = tempnam(sys_get_temp_dir(), 'img_webp_') ?: ($webpCandidatePath.'.tmp');
 
                         try {
                             if ($this->imageProcessor->convertToWebp($processedPath, $webpTempPath)) {
@@ -205,7 +207,7 @@ class ImageMigrationApplier
                                         @unlink($processedPath);
                                     }
                                     $processedPath = $webpTempPath;
-                                    $webpCount++;
+                                    ++$webpCount;
                                     $imgPlan['newFilename'] = $targetFilename;
                                     $contentReplacements[$oldFilename] = $targetFilename;
                                 } else {
@@ -237,7 +239,7 @@ class ImageMigrationApplier
                         rename($oldPath, $targetPath);
                     }
 
-                    $renamedCount++;
+                    ++$renamedCount;
                     $finalSize = file_exists($targetPath) ? (filesize($targetPath) ?: 0) : 0;
                     $totalFinalBytes += $finalSize;
                     $finalChecksum = file_exists($targetPath) ? (hash_file('sha256', $targetPath) ?: '') : '';
@@ -278,7 +280,7 @@ class ImageMigrationApplier
         $output->writeln('');
 
         // 3. Update Pages safely by fetching IDs upfront
-        $pageIds = array_map(fn($p) => (string) $p->getId(), $this->pageRepository->findBy([], ['id' => 'ASC']));
+        $pageIds = array_map(fn ($p) => (string) $p->getId(), $this->pageRepository->findBy([], ['id' => 'ASC']));
         $output->writeln('<info>Updating page content and feature images...</info>');
         $pageProgress = new ProgressBar($output, count($pageIds));
         $pageProgress->setFormat("%label%\n%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%eta:-6s% %memory:6s%");
@@ -287,7 +289,7 @@ class ImageMigrationApplier
         $pageProgress->start();
         $pageProgress->setProgress($checkpoint['pageIndex']);
 
-        for ($i = $checkpoint['pageIndex']; $i < count($pageIds); $i++) {
+        for ($i = $checkpoint['pageIndex']; $i < count($pageIds); ++$i) {
             $pageId = $pageIds[$i];
 
             if (in_array($pageId, $checkpoint['completedPageIds'], true)) {
@@ -299,12 +301,12 @@ class ImageMigrationApplier
             try {
                 /** @var Page|null $page */
                 $page = $this->pageRepository->find($pageId);
-                if ($page !== null) {
-                    if ($page->getFeatureImage() !== null && $page->getFeatureImage()->getId() !== null) {
+                if (null !== $page) {
+                    if (null !== $page->getFeatureImage() && null !== $page->getFeatureImage()->getId()) {
                         $featId = (string) $page->getFeatureImage()->getId();
                         if (isset($duplicateIdMap[$featId])) {
                             $canonicalEntity = $this->imageRepository->find($duplicateIdMap[$featId]);
-                            if ($canonicalEntity !== null) {
+                            if (null !== $canonicalEntity) {
                                 $page->setFeatureImage($canonicalEntity);
                             }
                         }
@@ -339,7 +341,7 @@ class ImageMigrationApplier
         $output->writeln('');
 
         // 4. Update Series safely by fetching IDs upfront
-        $seriesIds = array_map(fn($s) => (string) $s->getId(), $this->seriesRepository->findBy([], ['id' => 'ASC']));
+        $seriesIds = array_map(fn ($s) => (string) $s->getId(), $this->seriesRepository->findBy([], ['id' => 'ASC']));
         $output->writeln('<info>Updating series description and images...</info>');
         $seriesProgress = new ProgressBar($output, count($seriesIds));
         $seriesProgress->setFormat("%label%\n%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%eta:-6s% %memory:6s%");
@@ -348,7 +350,7 @@ class ImageMigrationApplier
         $seriesProgress->start();
         $seriesProgress->setProgress($checkpoint['seriesIndex']);
 
-        for ($i = $checkpoint['seriesIndex']; $i < count($seriesIds); $i++) {
+        for ($i = $checkpoint['seriesIndex']; $i < count($seriesIds); ++$i) {
             $seriesId = $seriesIds[$i];
 
             if (in_array($seriesId, $checkpoint['completedSeriesIds'], true)) {
@@ -360,12 +362,12 @@ class ImageMigrationApplier
             try {
                 /** @var Series|null $series */
                 $series = $this->seriesRepository->find($seriesId);
-                if ($series !== null) {
-                    if ($series->getImage() !== null && $series->getImage()->getId() !== null) {
+                if (null !== $series) {
+                    if (null !== $series->getImage() && null !== $series->getImage()->getId()) {
                         $sImgId = (string) $series->getImage()->getId();
                         if (isset($duplicateIdMap[$sImgId])) {
                             $canonicalEntity = $this->imageRepository->find($duplicateIdMap[$sImgId]);
-                            if ($canonicalEntity !== null) {
+                            if (null !== $canonicalEntity) {
                                 $series->setImage($canonicalEntity);
                             }
                         }
@@ -404,10 +406,10 @@ class ImageMigrationApplier
             try {
                 foreach ($duplicates as $dup) {
                     $dupEntity = $this->imageRepository->find($dup['duplicateId']);
-                    if ($dupEntity !== null) {
+                    if (null !== $dupEntity) {
                         $this->entityManager->remove($dupEntity);
                     }
-                    $dupPath = $imageDir . $dup['duplicateFilename'];
+                    $dupPath = $imageDir.$dup['duplicateFilename'];
                     if (file_exists($dupPath)) {
                         @unlink($dupPath);
                     }
@@ -439,7 +441,7 @@ class ImageMigrationApplier
         $total = 0;
 
         foreach ($files as $file) {
-            $path = $imageDir . $file;
+            $path = $imageDir.$file;
             if (file_exists($path)) {
                 $total += (filesize($path) ?: 0);
             }

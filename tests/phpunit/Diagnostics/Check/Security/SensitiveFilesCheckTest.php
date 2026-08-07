@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class SensitiveFilesCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new SensitiveFilesCheck();
 
         self::assertInstanceOf(
             SensitiveFilesCheck::class,
-            $instance
+            $instance,
         );
     }
 }

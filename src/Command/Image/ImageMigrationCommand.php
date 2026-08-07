@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[AsCommand(
     name: 'inachis:images:migrate',
-    description: 'Full image migration: rename, deduplicate, WebP optimise, update references, and verify'
+    description: 'Full image migration: rename, deduplicate, WebP optimise, update references, and verify',
 )]
 class ImageMigrationCommand extends Command
 {
@@ -48,17 +48,17 @@ class ImageMigrationCommand extends Command
         private ImageMigrationApplier $applier,
         private ImageMigrationRollback $rollbackService,
         private ImageMigrationVerifier $verifier,
-        private ImageMigrationReporter $reporter
+        private ImageMigrationReporter $reporter,
     ) {
         parent::__construct();
 
-        $this->imageDir = rtrim($this->projectDir, '/') . '/public/imgs/';
-        $this->varDir = rtrim($this->projectDir, '/') . '/var/image-migration/';
-        $this->backupDir = $this->varDir . 'backups/';
-        $this->planFile = $this->varDir . 'plan.json';
-        $this->checkpointFile = $this->varDir . 'checkpoint.json';
-        $this->reportMdFile = $this->varDir . 'report.md';
-        $this->reportJsonFile = $this->varDir . 'report.json';
+        $this->imageDir = rtrim($this->projectDir, '/').'/public/imgs/';
+        $this->varDir = rtrim($this->projectDir, '/').'/var/image-migration/';
+        $this->backupDir = $this->varDir.'backups/';
+        $this->planFile = $this->varDir.'plan.json';
+        $this->checkpointFile = $this->varDir.'checkpoint.json';
+        $this->reportMdFile = $this->varDir.'report.md';
+        $this->reportJsonFile = $this->varDir.'report.json';
     }
 
     protected function configure(): void
@@ -118,10 +118,11 @@ class ImageMigrationCommand extends Command
         bool $resume,
         bool $noWebp,
         bool $noDedup,
-        bool $noResize
+        bool $noResize,
     ): int {
         if (!file_exists($this->planFile)) {
             $output->writeln('<error>No migration plan found. Run scan first.</error>');
+
             return Command::FAILURE;
         }
 
@@ -130,6 +131,7 @@ class ImageMigrationCommand extends Command
 
         if (!$force && $this->applier->isPlanStale($plan)) {
             $output->writeln('<error>Migration plan is stale! Repository entity counts have changed since scan. Re-run scan or pass --force.</error>');
+
             return Command::FAILURE;
         }
 
@@ -144,7 +146,7 @@ class ImageMigrationCommand extends Command
         $checkpoint = $this->loadCheckpoint($resume);
         $this->ensureDirectoriesExist();
 
-        $saveCheckpointCallback = fn(array $cp) => file_put_contents($this->checkpointFile, (string) json_encode($cp, JSON_PRETTY_PRINT));
+        $saveCheckpointCallback = fn (array $cp) => file_put_contents($this->checkpointFile, (string) json_encode($cp, JSON_PRETTY_PRINT));
 
         $appliedStats = $this->applier->applyPlan(
             $plan,
@@ -155,7 +157,7 @@ class ImageMigrationCommand extends Command
             $noWebp,
             $noDedup,
             $noResize,
-            $saveCheckpointCallback
+            $saveCheckpointCallback,
         );
 
         if (file_exists($this->checkpointFile)) {
@@ -172,6 +174,7 @@ class ImageMigrationCommand extends Command
     {
         if (!file_exists($this->planFile)) {
             $output->writeln('<error>No plan file found to rollback from.</error>');
+
             return Command::FAILURE;
         }
 
@@ -183,6 +186,7 @@ class ImageMigrationCommand extends Command
             foreach ($plan['images'] ?? [] as $img) {
                 $output->writeln(sprintf('RESTORE %s → %s', $img['newFilename'], $img['oldFilename']));
             }
+
             return Command::SUCCESS;
         }
 
@@ -207,12 +211,13 @@ class ImageMigrationCommand extends Command
             } else {
                 $output->writeln('<comment>Tip: Run verify with --clean to purge backup files and migration logs (var/image-migration/).</comment>');
             }
+
             return Command::SUCCESS;
         }
 
         return Command::FAILURE;
     }
-    
+
     /**
      * Recursively remove a directory and its contents safely.
      */
@@ -224,7 +229,7 @@ class ImageMigrationCommand extends Command
 
         $files = array_diff(scandir($dir) ?: [], ['.', '..']);
         foreach ($files as $file) {
-            $path = $dir . '/' . $file;
+            $path = $dir.'/'.$file;
             is_dir($path) ? $this->removeDirectory($path) : @unlink($path);
         }
 
@@ -235,6 +240,7 @@ class ImageMigrationCommand extends Command
     {
         if (file_exists($this->reportMdFile)) {
             $output->writeln(file_get_contents($this->reportMdFile) ?: 'Empty report.');
+
             return Command::SUCCESS;
         }
 
@@ -242,6 +248,7 @@ class ImageMigrationCommand extends Command
             /** @var array<string, mixed> $plan */
             $plan = json_decode((string) file_get_contents($this->planFile), true);
             $output->writeln($this->reporter->generateReportMarkdown($plan, []));
+
             return Command::SUCCESS;
         }
 
@@ -255,6 +262,7 @@ class ImageMigrationCommand extends Command
         if ($resume && file_exists($this->checkpointFile)) {
             /** @var array<string, mixed> $data */
             $data = json_decode((string) file_get_contents($this->checkpointFile), true);
+
             return [
                 'imageIndex' => (int) ($data['imageIndex'] ?? 0),
                 'pageIndex' => (int) ($data['pageIndex'] ?? 0),
@@ -288,6 +296,7 @@ class ImageMigrationCommand extends Command
     private function invalidMode(OutputInterface $output, string $mode): int
     {
         $output->writeln(sprintf('<error>Invalid mode "%s". Supported modes: scan, apply, rollback, report, verify</error>', $mode));
+
         return Command::FAILURE;
     }
 }

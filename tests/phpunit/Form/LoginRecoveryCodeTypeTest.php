@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class LoginRecoveryCodeTypeTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new LoginRecoveryCodeType();
 
         self::assertInstanceOf(
             LoginRecoveryCodeType::class,
-            $instance
+            $instance,
         );
     }
 }

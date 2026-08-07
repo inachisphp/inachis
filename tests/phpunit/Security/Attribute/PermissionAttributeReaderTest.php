@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class PermissionAttributeReaderTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new PermissionAttributeReader();
 
         self::assertInstanceOf(
             PermissionAttributeReader::class,
-            $instance
+            $instance,
         );
     }
 }

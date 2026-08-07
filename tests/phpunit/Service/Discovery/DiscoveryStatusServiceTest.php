@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\Discovery;
 
-use Inachis\Service\Discovery\DiscoveryStatusService;
 use PHPUnit\Framework\TestCase;
 
 final class DiscoveryStatusServiceTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

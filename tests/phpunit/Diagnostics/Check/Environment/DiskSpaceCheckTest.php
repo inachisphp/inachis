@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class DiskSpaceCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new DiskSpaceCheck();
 
         self::assertInstanceOf(
             DiskSpaceCheck::class,
-            $instance
+            $instance,
         );
     }
 }

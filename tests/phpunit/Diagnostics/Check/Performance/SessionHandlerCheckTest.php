@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class SessionHandlerCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new SessionHandlerCheck();
 
         self::assertInstanceOf(
             SessionHandlerCheck::class,
-            $instance
+            $instance,
         );
     }
 }

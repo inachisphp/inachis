@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class SessionHashBitsCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new SessionHashBitsCheck();
 
         self::assertInstanceOf(
             SessionHashBitsCheck::class,
-            $instance
+            $instance,
         );
     }
 }

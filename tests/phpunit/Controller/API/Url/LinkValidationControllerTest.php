@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Controller\API\Url;
 
-use Inachis\Controller\API\Url\LinkValidationController;
 use PHPUnit\Framework\TestCase;
 
 final class LinkValidationControllerTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

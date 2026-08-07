@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class EmailSettingControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new EmailSettingController();
 
         self::assertInstanceOf(
             EmailSettingController::class,
-            $instance
+            $instance,
         );
     }
 }

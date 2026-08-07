@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class CalculatePasswordStrengthTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new CalculatePasswordStrength();
 
         self::assertInstanceOf(
             CalculatePasswordStrength::class,
-            $instance
+            $instance,
         );
     }
 }

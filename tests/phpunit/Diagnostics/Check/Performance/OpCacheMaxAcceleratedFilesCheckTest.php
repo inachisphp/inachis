@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class OpCacheMaxAcceleratedFilesCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new OpCacheMaxAcceleratedFilesCheck();
 
         self::assertInstanceOf(
             OpCacheMaxAcceleratedFilesCheck::class,
-            $instance
+            $instance,
         );
     }
 }

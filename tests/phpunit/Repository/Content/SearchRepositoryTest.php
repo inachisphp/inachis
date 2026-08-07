@@ -65,7 +65,7 @@ class SearchRepositoryTest extends TestCase
             ->method('fetchOne')
             ->willReturn($totalResults);
 
-        $mainStatement = $this->createMock(\Doctrine\DBAL\Statement::class);
+        $mainStatement = $this->createMock(Statement::class);
         $mainStatement
             ->method('bindValue')
             ->willReturnSelf();
@@ -73,7 +73,7 @@ class SearchRepositoryTest extends TestCase
             ->method('executeQuery')
             ->willReturn($mainResult);
 
-        $countStatement = $this->createMock(\Doctrine\DBAL\Statement::class);
+        $countStatement = $this->createMock(Statement::class);
         $countStatement
             ->method('bindValue')
             ->willReturnSelf();

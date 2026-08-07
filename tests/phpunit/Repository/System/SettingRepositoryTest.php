@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Repository\System;
 
-use Inachis\Repository\System\SettingRepository;
 use PHPUnit\Framework\TestCase;
 
 final class SettingRepositoryTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class SessionCacheExpireCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new SessionCacheExpireCheck();
 
         self::assertInstanceOf(
             SessionCacheExpireCheck::class,
-            $instance
+            $instance,
         );
     }
 }

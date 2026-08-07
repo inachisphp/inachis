@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ReviewRebaseServiceTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ReviewRebaseService();
 
         self::assertInstanceOf(
             ReviewRebaseService::class,
-            $instance
+            $instance,
         );
     }
 }

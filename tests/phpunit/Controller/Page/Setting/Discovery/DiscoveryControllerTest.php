@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class DiscoveryControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new DiscoveryController();
 
         self::assertInstanceOf(
             DiscoveryController::class,
-            $instance
+            $instance,
         );
     }
 }

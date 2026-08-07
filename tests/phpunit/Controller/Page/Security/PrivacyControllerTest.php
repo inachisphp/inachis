@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class PrivacyControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new PrivacyController();
 
         self::assertInstanceOf(
             PrivacyController::class,
-            $instance
+            $instance,
         );
     }
 }

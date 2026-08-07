@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class WasteControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new WasteController();
 
         self::assertInstanceOf(
             WasteController::class,
-            $instance
+            $instance,
         );
     }
 }

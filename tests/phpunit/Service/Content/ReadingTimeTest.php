@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ReadingTimeTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ReadingTime();
 
         self::assertInstanceOf(
             ReadingTime::class,
-            $instance
+            $instance,
         );
     }
 }

@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Command\System;
 
-use Inachis\Command\System\UpdateCommand;
 use PHPUnit\Framework\TestCase;
 
 final class UpdateCommandTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

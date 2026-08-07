@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\User;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\User\User;
 use Inachis\Factory\PageViewFactory;
 use Inachis\Model\System\PageMetadata;
@@ -91,7 +90,7 @@ class UserAccountEmailServiceTest extends TestCase
                 self::assertInstanceOf(PageView::class, $context['viewModel']);
                 self::assertSame(
                     'Wednesday 1st January 2025 at 15:00',
-                    $context['expiresAt']
+                    $context['expiresAt'],
                 );
                 self::assertSame('John Doe', $context['name']);
                 self::assertSame($this->settings, $context['settings']);
@@ -111,7 +110,7 @@ class UserAccountEmailServiceTest extends TestCase
         $service->registerNewUser(
             $user,
             $this->settings,
-            static fn(string $token): string => "https://site/reset/$token"
+            static fn (string $token): string => "https://site/reset/$token",
         );
     }
 
@@ -136,7 +135,7 @@ class UserAccountEmailServiceTest extends TestCase
         $service->registerNewUser(
             $user,
             [],
-            static fn(): string => ''
+            static fn (): string => '',
         );
     }
 
@@ -163,7 +162,7 @@ class UserAccountEmailServiceTest extends TestCase
         $service->registerNewUser(
             $user,
             [],
-            static fn(): string => ''
+            static fn (): string => '',
         );
     }
 
@@ -199,7 +198,7 @@ class UserAccountEmailServiceTest extends TestCase
                 self::assertInstanceOf(PageView::class, $context['viewModel']);
                 self::assertSame(
                     'Wednesday 1st January 2025 at 15:00',
-                    $context['expiresAt']
+                    $context['expiresAt'],
                 );
                 self::assertSame('127.0.0.1', $context['ipAddress']);
                 self::assertSame('/incp/new-password/XYZ123', $context['url']);
@@ -218,7 +217,7 @@ class UserAccountEmailServiceTest extends TestCase
         $service->sendForgotPasswordEmail(
             $user,
             $this->settings,
-            static fn(string $token): string => "/incp/new-password/$token"
+            static fn (string $token): string => "/incp/new-password/$token",
         );
     }
 
@@ -243,7 +242,7 @@ class UserAccountEmailServiceTest extends TestCase
         $service->sendForgotPasswordEmail(
             $user,
             [],
-            static fn(): string => ''
+            static fn (): string => '',
         );
     }
 
@@ -270,8 +269,7 @@ class UserAccountEmailServiceTest extends TestCase
         $service->sendForgotPasswordEmail(
             $user,
             [],
-            static fn(): string => ''
+            static fn (): string => '',
         );
     }
 }
-

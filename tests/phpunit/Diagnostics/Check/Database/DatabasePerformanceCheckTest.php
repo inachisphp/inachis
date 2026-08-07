@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Diagnostics\Check\Database;
 
-use Inachis\Diagnostics\Check\Database\DatabasePerformanceCheck;
 use PHPUnit\Framework\TestCase;
 
 final class DatabasePerformanceCheckTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

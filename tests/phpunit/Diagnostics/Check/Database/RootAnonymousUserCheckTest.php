@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Diagnostics\Check\Database;
 
-use Inachis\Diagnostics\Check\Database\RootAnonymousUserCheck;
 use PHPUnit\Framework\TestCase;
 
 final class RootAnonymousUserCheckTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

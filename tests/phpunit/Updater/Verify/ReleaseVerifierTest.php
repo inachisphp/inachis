@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ReleaseVerifierTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ReleaseVerifier();
 
         self::assertInstanceOf(
             ReleaseVerifier::class,
-            $instance
+            $instance,
         );
     }
 }

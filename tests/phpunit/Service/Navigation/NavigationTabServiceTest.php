@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\Navigation;
 
-use Inachis\Service\Navigation\NavigationTabService;
 use PHPUnit\Framework\TestCase;
 
 final class NavigationTabServiceTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

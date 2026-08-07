@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class InvalidTimezoneExceptionTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new InvalidTimezoneException();
 
         self::assertInstanceOf(
             InvalidTimezoneException::class,
-            $instance
+            $instance,
         );
     }
 }

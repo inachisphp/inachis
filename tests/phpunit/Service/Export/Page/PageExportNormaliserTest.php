@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class PageExportNormaliserTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new PageExportNormaliser();
 
         self::assertInstanceOf(
             PageExportNormaliser::class,
-            $instance
+            $instance,
         );
     }
 }

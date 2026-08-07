@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class SessionAutoStartCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new SessionAutoStartCheck();
 
         self::assertInstanceOf(
             SessionAutoStartCheck::class,
-            $instance
+            $instance,
         );
     }
 }

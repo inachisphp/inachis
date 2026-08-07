@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class RealpathCacheSizeCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new RealpathCacheSizeCheck();
 
         self::assertInstanceOf(
             RealpathCacheSizeCheck::class,
-            $instance
+            $instance,
         );
     }
 }

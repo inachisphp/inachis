@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class RobotsTxtWebControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new RobotsTxtWebController();
 
         self::assertInstanceOf(
             RobotsTxtWebController::class,
-            $instance
+            $instance,
         );
     }
 }

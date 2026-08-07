@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ToolsIndexControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ToolsIndexController();
 
         self::assertInstanceOf(
             ToolsIndexController::class,
-            $instance
+            $instance,
         );
     }
 }

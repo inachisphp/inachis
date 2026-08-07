@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\Content\Page;
 
-use Inachis\Service\Content\Page\TagBulkActionService;
 use PHPUnit\Framework\TestCase;
 
 final class TagBulkActionServiceTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

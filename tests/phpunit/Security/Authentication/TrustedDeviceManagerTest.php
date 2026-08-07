@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Security\Authentication;
 
-use Inachis\Security\Authentication\TrustedDeviceManager;
 use PHPUnit\Framework\TestCase;
 
 final class TrustedDeviceManagerTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

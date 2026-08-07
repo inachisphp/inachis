@@ -14,7 +14,6 @@ use Inachis\Updater\ReleaseLocator;
 use Inachis\Updater\ReleaseRollback;
 use Inachis\Updater\SymlinkManagerInterface;
 use PHPUnit\Framework\TestCase;
-use Twig\Environment;
 
 final class ReleaseRollbackTest extends TestCase
 {
@@ -40,7 +39,7 @@ final class ReleaseRollbackTest extends TestCase
 
         symlink(
             $this->tempDirectory.'/releases/20260201000000-1.1.0',
-            $this->tempDirectory.'/current'
+            $this->tempDirectory.'/current',
         );
 
         $rollback = new ReleaseRollback(
@@ -55,7 +54,7 @@ final class ReleaseRollbackTest extends TestCase
 
         self::assertSame(
             '1.0.0',
-            $releases[0]->version
+            $releases[0]->version,
         );
     }
 
@@ -73,7 +72,7 @@ final class ReleaseRollbackTest extends TestCase
 
         self::assertSame(
             [],
-            $rollback->availableRollbacks()
+            $rollback->availableRollbacks(),
         );
     }
 
@@ -84,7 +83,7 @@ final class ReleaseRollbackTest extends TestCase
         mkdir($target, 0775, true);
 
         $symlinkManager = $this->createMock(
-            SymlinkManagerInterface::class
+            SymlinkManagerInterface::class,
         );
 
         $symlinkManager
@@ -96,7 +95,7 @@ final class ReleaseRollbackTest extends TestCase
             );
 
         $maintenance = $this->createMock(
-            MaintenanceManager::class
+            MaintenanceManager::class,
         );
 
         $maintenance
@@ -123,7 +122,7 @@ final class ReleaseRollbackTest extends TestCase
 
         self::assertSame(
             $release,
-            $result
+            $result,
         );
     }
 
@@ -142,7 +141,7 @@ final class ReleaseRollbackTest extends TestCase
                 identifier: 'missing',
                 version: '1.0.0',
                 path: $this->tempDirectory.'/missing',
-            )
+            ),
         );
     }
 

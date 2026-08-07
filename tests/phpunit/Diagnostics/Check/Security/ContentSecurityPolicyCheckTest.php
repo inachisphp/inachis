@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ContentSecurityPolicyCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ContentSecurityPolicyCheck();
 
         self::assertInstanceOf(
             ContentSecurityPolicyCheck::class,
-            $instance
+            $instance,
         );
     }
 }

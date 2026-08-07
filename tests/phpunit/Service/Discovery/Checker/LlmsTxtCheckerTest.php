@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\Discovery\Checker;
 
-use Inachis\Service\Discovery\Checker\LlmsTxtChecker;
 use PHPUnit\Framework\TestCase;
 
 final class LlmsTxtCheckerTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

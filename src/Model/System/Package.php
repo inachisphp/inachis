@@ -19,30 +19,31 @@ abstract class Package
         /** @var PackageType The type of package (core/theme/plugin) */
         public readonly PackageType $type,
 
-	    /** @var string */
+        /** @var string */
         public string $identifier,
-        
-	    /** @var string */
+
+        /** @var string */
         public string $name,
-        
-	    /** @var string */
+
+        /** @var string */
         public string $version,
-        
-	    /** @var string */
+
+        /** @var string */
         public ?string $author,
-        
-	    /** @var string */
+
+        /** @var string */
         public ?string $description,
-        
-	    /** @var string */
+
+        /** @var string */
         public ?string $homepage,
-        
-	    /** @var string */
+
+        /** @var string */
         public ?string $license,
-        
-	    /** @var string Absolute path to the package. */
+
+        /** @var string Absolute path to the package. */
         public string $path,
-    ) {}
+    ) {
+    }
 
     /**
      * Minimal framework version required.

@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class TwoFactorRequestSubscriberTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new TwoFactorRequestSubscriber();
 
         self::assertInstanceOf(
             TwoFactorRequestSubscriber::class,
-            $instance
+            $instance,
         );
     }
 }

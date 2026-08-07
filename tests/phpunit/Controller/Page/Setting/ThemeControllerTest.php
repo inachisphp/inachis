@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ThemeControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ThemeController();
 
         self::assertInstanceOf(
             ThemeController::class,
-            $instance
+            $instance,
         );
     }
 }

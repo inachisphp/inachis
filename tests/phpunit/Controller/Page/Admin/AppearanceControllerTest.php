@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class AppearanceControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new AppearanceController();
 
         self::assertInstanceOf(
             AppearanceController::class,
-            $instance
+            $instance,
         );
     }
 }

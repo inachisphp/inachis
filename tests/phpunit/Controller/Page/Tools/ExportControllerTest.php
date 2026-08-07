@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class ExportControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new ExportController();
 
         self::assertInstanceOf(
             ExportController::class,
-            $instance
+            $instance,
         );
     }
 }

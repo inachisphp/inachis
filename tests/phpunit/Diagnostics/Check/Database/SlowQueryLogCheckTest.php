@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Diagnostics\Check\Database;
 
-use Inachis\Diagnostics\Check\Database\SlowQueryLogCheck;
 use PHPUnit\Framework\TestCase;
 
 final class SlowQueryLogCheckTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class SearchAPIControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new SearchAPIController();
 
         self::assertInstanceOf(
             SearchAPIController::class,
-            $instance
+            $instance,
         );
     }
 }

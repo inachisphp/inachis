@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Repository\User;
 
-use Inachis\Repository\User\UserPreferenceRepository;
 use PHPUnit\Framework\TestCase;
 
 final class UserPreferenceRepositoryTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

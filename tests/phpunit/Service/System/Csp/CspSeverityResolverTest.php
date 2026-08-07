@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class CspSeverityResolverTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new CspSeverityResolver();
 
         self::assertInstanceOf(
             CspSeverityResolver::class,
-            $instance
+            $instance,
         );
     }
 }

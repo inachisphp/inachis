@@ -23,7 +23,7 @@ final class ReleaseLocatorTest extends TestCase
         $this->installRoot = '/tmp/inachis';
 
         $this->locator = new ReleaseLocator(
-            $this->installRoot
+            $this->installRoot,
         );
     }
 
@@ -31,7 +31,7 @@ final class ReleaseLocatorTest extends TestCase
     {
         self::assertSame(
             '/tmp/inachis/releases',
-            $this->locator->releasesDirectory()
+            $this->locator->releasesDirectory(),
         );
     }
 
@@ -39,7 +39,7 @@ final class ReleaseLocatorTest extends TestCase
     {
         self::assertSame(
             '/tmp/inachis/shared',
-            $this->locator->sharedDirectory()
+            $this->locator->sharedDirectory(),
         );
     }
 
@@ -47,7 +47,7 @@ final class ReleaseLocatorTest extends TestCase
     {
         self::assertSame(
             '/tmp/inachis/current',
-            $this->locator->currentLink()
+            $this->locator->currentLink(),
         );
     }
 
@@ -57,22 +57,22 @@ final class ReleaseLocatorTest extends TestCase
 
         self::assertInstanceOf(
             ReleaseInstance::class,
-            $release
+            $release,
         );
 
         self::assertSame(
             '1.2.0',
-            $release->version
+            $release->version,
         );
 
         self::assertMatchesRegularExpression(
             '/^\d{14}-1\.2\.0$/',
-            $release->identifier
+            $release->identifier,
         );
 
         self::assertSame(
             '/tmp/inachis/releases/'.$release->identifier,
-            $release->path
+            $release->path,
         );
     }
 
@@ -82,12 +82,12 @@ final class ReleaseLocatorTest extends TestCase
 
         self::assertSame(
             '2.0.0',
-            $release->version
+            $release->version,
         );
 
         self::assertStringContainsString(
             '-2.0.0',
-            $release->identifier
+            $release->identifier,
         );
     }
 }

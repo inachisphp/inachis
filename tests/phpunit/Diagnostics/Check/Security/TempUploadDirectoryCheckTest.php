@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class TempUploadDirectoryCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new TempUploadDirectoryCheck();
 
         self::assertInstanceOf(
             TempUploadDirectoryCheck::class,
-            $instance
+            $instance,
         );
     }
 }

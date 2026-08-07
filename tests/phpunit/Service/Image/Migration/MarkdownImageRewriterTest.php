@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class MarkdownImageRewriterTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new MarkdownImageRewriter();
 
         self::assertInstanceOf(
             MarkdownImageRewriter::class,
-            $instance
+            $instance,
         );
     }
 }

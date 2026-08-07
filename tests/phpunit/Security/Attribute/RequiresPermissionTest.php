@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Security\Attribute;
 
-use Inachis\Security\Attribute\RequiresPermission;
 use PHPUnit\Framework\TestCase;
 
 final class RequiresPermissionTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

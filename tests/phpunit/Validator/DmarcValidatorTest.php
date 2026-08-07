@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class DmarcValidatorTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new DmarcValidator();
 
         self::assertInstanceOf(
             DmarcValidator::class,
-            $instance
+            $instance,
         );
     }
 }

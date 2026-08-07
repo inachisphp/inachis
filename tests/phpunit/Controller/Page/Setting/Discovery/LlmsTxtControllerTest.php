@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class LlmsTxtControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new LlmsTxtController();
 
         self::assertInstanceOf(
             LlmsTxtController::class,
-            $instance
+            $instance,
         );
     }
 }

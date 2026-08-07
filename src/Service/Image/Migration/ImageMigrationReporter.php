@@ -22,7 +22,7 @@ class ImageMigrationReporter
         array $plan,
         array $appliedStats,
         string $reportMdFile,
-        string $reportJsonFile
+        string $reportJsonFile,
     ): void {
         $markdown = $this->generateReportMarkdown($plan, $appliedStats);
         file_put_contents($reportMdFile, $markdown);
@@ -76,7 +76,7 @@ class ImageMigrationReporter
                     $img['targetWidth'],
                     $img['targetHeight'],
                     $img['targetMegapixels'],
-                    $img['pixelReductionPercent']
+                    $img['pixelReductionPercent'],
                 ));
             }
         }
@@ -144,8 +144,8 @@ class ImageMigrationReporter
         $md .= sprintf("- **Total Megapixels Removed**: %.2f MP\n\n", $savedMP);
 
         // Top 20 Resized Images
-        $resizedImages = array_filter($images, fn($i) => !empty($i['needsResize']));
-        usort($resizedImages, fn($a, $b) => ($b['origMegapixels'] <=> $a['origMegapixels']));
+        $resizedImages = array_filter($images, fn ($i) => !empty($i['needsResize']));
+        usort($resizedImages, fn ($a, $b) => ($b['origMegapixels'] <=> $a['origMegapixels']));
         $topResized = array_slice($resizedImages, 0, 20);
 
         if (!empty($topResized)) {
@@ -162,15 +162,15 @@ class ImageMigrationReporter
                     $r['targetWidth'],
                     $r['targetHeight'],
                     $r['targetMegapixels'],
-                    $r['pixelReductionPercent']
+                    $r['pixelReductionPercent'],
                 );
             }
             $md .= "\n";
         }
 
         // Top 20 WebP Conversions
-        $webpImages = array_filter($images, fn($i) => !empty($i['convertToWebp']));
-        usort($webpImages, fn($a, $b) => (($b['oldFilesize'] - $b['estimatedFilesize']) <=> ($a['oldFilesize'] - $a['estimatedFilesize'])));
+        $webpImages = array_filter($images, fn ($i) => !empty($i['convertToWebp']));
+        usort($webpImages, fn ($a, $b) => (($b['oldFilesize'] - $b['estimatedFilesize']) <=> ($a['oldFilesize'] - $a['estimatedFilesize'])));
         $topWebp = array_slice($webpImages, 0, 20);
 
         if (!empty($topWebp)) {
@@ -185,7 +185,7 @@ class ImageMigrationReporter
                     $w['newFilename'],
                     $this->formatBytes($w['oldFilesize']),
                     $this->formatBytes($w['estimatedFilesize']),
-                    $this->formatBytes($saving)
+                    $this->formatBytes($saving),
                 );
             }
             $md .= "\n";
@@ -196,7 +196,7 @@ class ImageMigrationReporter
             $md .= "| Duplicate | Canonical | Pixel Hash |\n";
             $md .= "| --- | --- | --- |\n";
             foreach ($duplicates as $dup) {
-                $md .= sprintf("| `%s` | `%s` | `%s` |\n", $dup['duplicateFilename'], $dup['canonicalFilename'], substr($dup['pixelHash'] ?? '', 0, 16) . '...');
+                $md .= sprintf("| `%s` | `%s` | `%s` |\n", $dup['duplicateFilename'], $dup['canonicalFilename'], substr($dup['pixelHash'] ?? '', 0, 16).'...');
             }
             $md .= "\n";
         }

@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class PermissionsPolicyCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new PermissionsPolicyCheck();
 
         self::assertInstanceOf(
             PermissionsPolicyCheck::class,
-            $instance
+            $instance,
         );
     }
 }

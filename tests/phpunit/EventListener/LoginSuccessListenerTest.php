@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\EventListener;
 
-use Inachis\EventListener\LoginSuccessListener;
 use PHPUnit\Framework\TestCase;
 
 final class LoginSuccessListenerTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

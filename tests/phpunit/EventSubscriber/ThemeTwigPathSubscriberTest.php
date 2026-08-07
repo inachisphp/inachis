@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\EventSubscriber;
 
-use Inachis\EventSubscriber\ThemeTwigPathSubscriber;
 use PHPUnit\Framework\TestCase;
 
 final class ThemeTwigPathSubscriberTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

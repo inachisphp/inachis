@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class RssCheckerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new RssChecker();
 
         self::assertInstanceOf(
             RssChecker::class,
-            $instance
+            $instance,
         );
     }
 }

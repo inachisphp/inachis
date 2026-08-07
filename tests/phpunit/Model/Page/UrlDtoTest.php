@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class UrlDtoTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new UrlDto();
 
         self::assertInstanceOf(
             UrlDto::class,
-            $instance
+            $instance,
         );
     }
 }

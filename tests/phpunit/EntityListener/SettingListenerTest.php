@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\EntityListener;
 
-use Inachis\EntityListener\SettingListener;
 use PHPUnit\Framework\TestCase;
 
 final class SettingListenerTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

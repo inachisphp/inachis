@@ -6,9 +6,9 @@ declare(strict_types=1);
  * This file is part of the inachis framework.
  */
 
-namespace Inachis\Tests\phpunit\Service\File;
+namespace Inachis\Tests\phpunit\Service\Resource;
 
-use Inachis\Service\File\Base64EncodeFile;
+use Inachis\Service\Resource\Base64EncodeFile;
 use PHPUnit\Framework\TestCase;
 
 final class Base64EncodeFileTest extends TestCase

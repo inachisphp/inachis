@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Security\Authentication;
 
-use Inachis\Security\Authentication\TotpManager;
 use PHPUnit\Framework\TestCase;
 
 final class TotpManagerTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

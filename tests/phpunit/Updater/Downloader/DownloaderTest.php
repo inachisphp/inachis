@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class DownloaderTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new Downloader();
 
         self::assertInstanceOf(
             Downloader::class,
-            $instance
+            $instance,
         );
     }
 }

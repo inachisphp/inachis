@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class XXSSProtectionCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new XXSSProtectionCheck();
 
         self::assertInstanceOf(
             XXSSProtectionCheck::class,
-            $instance
+            $instance,
         );
     }
 }

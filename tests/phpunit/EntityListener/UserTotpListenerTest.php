@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\EntityListener;
 
-use Inachis\EntityListener\UserTotpListener;
 use PHPUnit\Framework\TestCase;
 
 final class UserTotpListenerTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

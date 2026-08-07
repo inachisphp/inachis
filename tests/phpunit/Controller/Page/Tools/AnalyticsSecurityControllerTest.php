@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class AnalyticsSecurityControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new AnalyticsSecurityController();
 
         self::assertInstanceOf(
             AnalyticsSecurityController::class,
-            $instance
+            $instance,
         );
     }
 }

@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class PageMetadataTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new PageMetadata();
 
         self::assertInstanceOf(
             PageMetadata::class,
-            $instance
+            $instance,
         );
     }
 }

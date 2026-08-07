@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class PageJsonWriterTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new PageJsonWriter();
 
         self::assertInstanceOf(
             PageJsonWriter::class,
-            $instance
+            $instance,
         );
     }
 }

@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class CleanupLoginActivityMessageTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new CleanupLoginActivityMessage();
 
         self::assertInstanceOf(
             CleanupLoginActivityMessage::class,
-            $instance
+            $instance,
         );
     }
 }

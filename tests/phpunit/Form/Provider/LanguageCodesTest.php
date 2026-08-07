@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class LanguageCodesTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new LanguageCodes();
 
         self::assertInstanceOf(
             LanguageCodes::class,
-            $instance
+            $instance,
         );
     }
 }

@@ -23,7 +23,7 @@ class ToolsIndexController extends AbstractInachisController
     #[Route('/incp/tools', name: 'incp_tools_index')]
     public function index(
         ImageRepository $imageRepository,
-        MaintenanceManager $manager
+        MaintenanceManager $manager,
     ): Response {
         $this->viewModel->page->title = 'Tools';
         $this->viewModel->page->tab = 'tools';

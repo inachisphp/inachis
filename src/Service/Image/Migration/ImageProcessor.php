@@ -24,7 +24,7 @@ class ImageProcessor
         }
 
         $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
-        if ($ext === 'svg') {
+        if ('svg' === $ext) {
             return hash_file('sha256', $filePath) ?: '';
         }
 
@@ -61,7 +61,7 @@ class ImageProcessor
     private function computePixelChecksumGd(string $filePath): string
     {
         $info = @getimagesize($filePath);
-        if ($info === false) {
+        if (false === $info) {
             return hash_file('sha256', $filePath) ?: '';
         }
 
@@ -74,7 +74,7 @@ class ImageProcessor
             default => false
         };
 
-        if ($srcImage === false) {
+        if (false === $srcImage) {
             return hash_file('sha256', $filePath) ?: '';
         }
 
@@ -88,7 +88,7 @@ class ImageProcessor
         for ($y = 0; $y < $h; $y += $stepY) {
             for ($x = 0; $x < $w; $x += $stepX) {
                 $rgb = imagecolorat($srcImage, $x, $y);
-                if ($rgb !== false) {
+                if (false !== $rgb) {
                     $r = ($rgb >> 16) & 0xFF;
                     $g = ($rgb >> 8) & 0xFF;
                     $b = $rgb & 0xFF;
@@ -112,7 +112,7 @@ class ImageProcessor
         }
 
         $ext = strtolower(pathinfo($srcPath, PATHINFO_EXTENSION));
-        if ($ext === 'svg') {
+        if ('svg' === $ext) {
             return copy($srcPath, $dstPath);
         }
 
@@ -156,7 +156,7 @@ class ImageProcessor
     private function resizeImageGd(string $srcPath, string $dstPath, int $maxDimension): bool
     {
         $info = @getimagesize($srcPath);
-        if ($info === false) {
+        if (false === $info) {
             return false;
         }
 
@@ -182,13 +182,14 @@ class ImageProcessor
             default => false
         };
 
-        if ($srcImage === false) {
+        if (false === $srcImage) {
             return false;
         }
 
         $dstImage = imagecreatetruecolor($newWidth, $newHeight);
-        if ($dstImage === false) {
+        if (false === $dstImage) {
             imagedestroy($srcImage);
+
             return false;
         }
 
@@ -196,7 +197,7 @@ class ImageProcessor
             imagealphablending($dstImage, false);
             imagesavealpha($dstImage, true);
             $transparent = imagecolorallocatealpha($dstImage, 255, 255, 255, 127);
-            if ($transparent !== false) {
+            if (false !== $transparent) {
                 imagefilledrectangle($dstImage, 0, 0, $newWidth, $newHeight, $transparent);
             }
         }
@@ -227,7 +228,7 @@ class ImageProcessor
         }
 
         $ext = strtolower(pathinfo($srcPath, PATHINFO_EXTENSION));
-        if ($ext === 'svg') {
+        if ('svg' === $ext) {
             return false;
         }
 
@@ -258,7 +259,7 @@ class ImageProcessor
         }
 
         $info = @getimagesize($srcPath);
-        if ($info === false) {
+        if (false === $info) {
             return false;
         }
 
@@ -270,7 +271,7 @@ class ImageProcessor
             default => false
         };
 
-        if ($srcImage === false) {
+        if (false === $srcImage) {
             return false;
         }
 
@@ -302,7 +303,7 @@ class ImageProcessor
 
         if (function_exists('finfo_open')) {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            if ($finfo !== false) {
+            if (false !== $finfo) {
                 $mime = finfo_file($finfo, $filePath);
                 finfo_close($finfo);
                 if (!empty($mime) && is_string($mime)) {

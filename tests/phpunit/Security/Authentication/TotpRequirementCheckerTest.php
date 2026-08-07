@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class TotpRequirementCheckerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new TotpRequirementChecker();
 
         self::assertInstanceOf(
             TotpRequirementChecker::class,
-            $instance
+            $instance,
         );
     }
 }

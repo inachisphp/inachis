@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class IISModulesCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new IISModulesCheck();
 
         self::assertInstanceOf(
             IISModulesCheck::class,
-            $instance
+            $instance,
         );
     }
 }

@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class RecoveryCodeControllerTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new RecoveryCodeController();
 
         self::assertInstanceOf(
             RecoveryCodeController::class,
-            $instance
+            $instance,
         );
     }
 }

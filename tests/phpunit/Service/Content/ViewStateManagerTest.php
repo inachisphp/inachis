@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\Content;
 
-use Inachis\Service\Content\ViewStateManager;
 use PHPUnit\Framework\TestCase;
 
 final class ViewStateManagerTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

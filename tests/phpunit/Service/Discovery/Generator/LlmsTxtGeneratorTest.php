@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\Discovery\Generator;
 
-use Inachis\Service\Discovery\Generator\LlmsTxtGenerator;
 use PHPUnit\Framework\TestCase;
 
 final class LlmsTxtGeneratorTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

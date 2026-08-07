@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class SpfValidatorTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new SpfValidator();
 
         self::assertInstanceOf(
             SpfValidator::class,
-            $instance
+            $instance,
         );
     }
 }

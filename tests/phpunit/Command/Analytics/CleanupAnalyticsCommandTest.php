@@ -28,14 +28,12 @@ final class CleanupAnalyticsCommandTest extends TestCase
             ->expects($this->exactly(3))
             ->method('executeStatement')
             ->with(
-                $this->callback(static fn (string $sql): bool =>
-                    str_contains($sql, 'DELETE FROM analytics_page_view')
+                $this->callback(static fn (string $sql): bool => str_contains($sql, 'DELETE FROM analytics_page_view')
                     || str_contains($sql, 'DELETE FROM analytics_unique_visitor')
-                    || str_contains($sql, 'DELETE FROM analytics_security_event')
+                    || str_contains($sql, 'DELETE FROM analytics_security_event'),
                 ),
-                $this->callback(static fn (array $params): bool =>
-                    isset($params['days'])
-                )
+                $this->callback(static fn (array $params): bool => isset($params['days']),
+                ),
             );
 
         $command = new CleanupAnalyticsCommand(
@@ -49,19 +47,19 @@ final class CleanupAnalyticsCommandTest extends TestCase
 
         self::assertSame(
             Command::SUCCESS,
-            $exitCode
+            $exitCode,
         );
 
         $display = $tester->getDisplay();
 
         self::assertStringContainsString(
             'Removing analytics data older than 90 days',
-            $display
+            $display,
         );
 
         self::assertStringContainsString(
             'Removing processed log files older than 7 days',
-            $display
+            $display,
         );
 
         $this->removeDirectory($projectDir);
@@ -88,7 +86,7 @@ final class CleanupAnalyticsCommandTest extends TestCase
 
         self::assertSame(
             Command::SUCCESS,
-            $tester->execute([])
+            $tester->execute([]),
         );
 
         $this->removeDirectory($projectDir);
@@ -101,7 +99,7 @@ final class CleanupAnalyticsCommandTest extends TestCase
         }
 
         foreach (scandir($directory) ?: [] as $file) {
-            if ($file === '.' || $file === '..') {
+            if ('.' === $file || '..' === $file) {
                 continue;
             }
 

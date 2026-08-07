@@ -23,17 +23,17 @@ final class ReleaseInstanceTest extends TestCase
 
         self::assertSame(
             '20260804073000-1.2.0',
-            $release->identifier
+            $release->identifier,
         );
 
         self::assertSame(
             '1.2.0',
-            $release->version
+            $release->version,
         );
 
         self::assertSame(
             '/var/www/inachis/releases/20260804073000-1.2.0',
-            $release->path
+            $release->path,
         );
     }
 

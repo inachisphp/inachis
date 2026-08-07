@@ -19,7 +19,7 @@ class MarkdownImageRewriter
     public function rewriteContent(
         string $content,
         array $primaryMap,
-        array $secondaryMap = []
+        array $secondaryMap = [],
     ): string {
         $combinedMap = array_merge($secondaryMap, $primaryMap);
 
@@ -27,8 +27,8 @@ class MarkdownImageRewriter
             if ($oldFile === $newFile) {
                 continue;
             }
-            $pattern = '~(?<=^|[\s"\'()<>\[\]])\/imgs\/' . preg_quote($oldFile, '~') . '(?=[\s"\'()<>\[\]\?#]|$)~';
-            $content = (string) preg_replace($pattern, '/imgs/' . $newFile, $content);
+            $pattern = '~(?<=^|[\s"\'()<>\[\]])\/imgs\/'.preg_quote($oldFile, '~').'(?=[\s"\'()<>\[\]\?#]|$)~';
+            $content = (string) preg_replace($pattern, '/imgs/'.$newFile, $content);
         }
 
         return $content;

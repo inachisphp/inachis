@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Service\Image\Migration;
 
-use Inachis\Service\Image\Migration\ImageMigrationPlanner;
 use PHPUnit\Framework\TestCase;
 
 final class ImageMigrationPlannerTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

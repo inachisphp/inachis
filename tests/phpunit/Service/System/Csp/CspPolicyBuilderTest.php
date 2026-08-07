@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class CspPolicyBuilderTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new CspPolicyBuilder();
 
         self::assertInstanceOf(
             CspPolicyBuilder::class,
-            $instance
+            $instance,
         );
     }
 }

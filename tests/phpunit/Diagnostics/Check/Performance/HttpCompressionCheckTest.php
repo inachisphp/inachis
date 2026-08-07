@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class HttpCompressionCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new HttpCompressionCheck();
 
         self::assertInstanceOf(
             HttpCompressionCheck::class,
-            $instance
+            $instance,
         );
     }
 }

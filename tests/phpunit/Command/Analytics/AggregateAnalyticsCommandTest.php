@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+/**
+ * This file is part of the inachis framework.
+ */
+
 namespace Inachis\Tests\phpunit\Command\Analytics;
 
 use Doctrine\DBAL\Connection;
@@ -22,7 +26,7 @@ final class AggregateAnalyticsCommandTest extends TestCase
 
         self::assertSame(
             Command::SUCCESS,
-            $tester->execute([])
+            $tester->execute([]),
         );
     }
 }

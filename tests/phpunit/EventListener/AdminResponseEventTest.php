@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class AdminResponseEventTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new AdminResponseEvent();
 
         self::assertInstanceOf(
             AdminResponseEvent::class,
-            $instance
+            $instance,
         );
     }
 }

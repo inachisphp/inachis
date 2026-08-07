@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Repository\Security;
 
-use Inachis\Repository\Security\SecurityPolicyRepository;
 use PHPUnit\Framework\TestCase;
 
 final class SecurityPolicyRepositoryTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

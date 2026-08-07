@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Inachis\Model\System;
 
 use Inachis\Enum\System\PackageType;
-use Inachis\Model\System\Package;
 
 final class Plugin extends Package
 {

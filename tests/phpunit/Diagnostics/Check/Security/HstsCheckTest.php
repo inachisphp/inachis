@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class HstsCheckTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new HstsCheck();
 
         self::assertInstanceOf(
             HstsCheck::class,
-            $instance
+            $instance,
         );
     }
 }

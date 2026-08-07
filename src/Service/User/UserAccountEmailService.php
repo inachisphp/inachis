@@ -11,7 +11,7 @@ namespace Inachis\Service\User;
 use Inachis\Entity\User\User;
 use Inachis\Factory\PageViewFactory;
 use Inachis\Model\System\PageView;
-use Inachis\Service\File\Base64EncodeFile;
+use Inachis\Service\Resource\Base64EncodeFile;
 use Random\RandomException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;

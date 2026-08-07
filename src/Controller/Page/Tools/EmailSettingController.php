@@ -11,7 +11,6 @@ namespace Inachis\Controller\Page\Tools;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Service\System\Domain\DomainEmailAnalyser;
 use Inachis\Service\System\Domain\ExternalIpAddress;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -29,13 +28,13 @@ class EmailSettingController extends AbstractInachisController
         ExternalIpAddress $externalIpAddress,
     ): Response {
         $domain = isset($_ENV['APP_DOMAIN']) && is_string($_ENV['APP_DOMAIN']) ?
-            $_ENV['APP_DOMAIN'] : 
+            $_ENV['APP_DOMAIN'] :
             'example.com';
         $serverIp = !empty($_ENV['SERVER_IP']) && is_string($_ENV['SERVER_IP']) ?
             $_ENV['SERVER_IP'] :
             $externalIpAddress->getExternalIp();
         $selector = isset($_ENV['DKIM_SELECTOR']) && is_string($_ENV['DKIM_SELECTOR']) ?
-            $_ENV['DKIM_SELECTOR'] : 
+            $_ENV['DKIM_SELECTOR'] :
             'default';
         $report = $domainEmailAnalyser->analyse($domain, $serverIp, $selector);
 

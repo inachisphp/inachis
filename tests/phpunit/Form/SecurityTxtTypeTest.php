@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Form;
 
-use Inachis\Form\SecurityTxtType;
 use PHPUnit\Framework\TestCase;
 
 final class SecurityTxtTypeTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

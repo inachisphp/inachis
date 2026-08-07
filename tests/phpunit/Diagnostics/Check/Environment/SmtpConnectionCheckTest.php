@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Diagnostics\Check\Environment;
 
-use Inachis\Diagnostics\Check\Environment\SmtpConnectionCheck;
 use PHPUnit\Framework\TestCase;
 
 final class SmtpConnectionCheckTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }

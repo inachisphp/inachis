@@ -24,7 +24,7 @@ final class AnalyticsPeriodResolverTest extends TestCase
     protected function setUp(): void
     {
         $this->viewStateManager = $this->createMock(
-            ViewStateManagerInterface::class
+            ViewStateManagerInterface::class,
         );
     }
 
@@ -38,7 +38,7 @@ final class AnalyticsPeriodResolverTest extends TestCase
             ->with(
                 $request,
                 'analytics',
-                $this->isInstanceOf(ViewStateDefaults::class)
+                $this->isInstanceOf(ViewStateDefaults::class),
             )
             ->willReturn(
                 new ContentQueryParameters(
@@ -53,7 +53,7 @@ final class AnalyticsPeriodResolverTest extends TestCase
                     limit: 0,
                     offset: 0,
                     view: '',
-                )
+                ),
             );
 
         $this->viewStateManager
@@ -61,27 +61,27 @@ final class AnalyticsPeriodResolverTest extends TestCase
             ->method('save');
 
         $resolver = new AnalyticsPeriodResolver(
-            $this->viewStateManager
+            $this->viewStateManager,
         );
 
         $period = $resolver->resolve(
             $request,
-            'analytics'
+            'analytics',
         );
 
         self::assertInstanceOf(
             AnalyticsPeriod::class,
-            $period
+            $period,
         );
 
         self::assertSame(
             '30d',
-            $period->range
+            $period->range,
         );
 
         self::assertSame(
             'Last 30 Days',
-            $period->label
+            $period->label,
         );
     }
 
@@ -104,7 +104,7 @@ final class AnalyticsPeriodResolverTest extends TestCase
                     limit: 0,
                     offset: 0,
                     view: '',
-                )
+                ),
             );
 
         $this->viewStateManager
@@ -112,27 +112,27 @@ final class AnalyticsPeriodResolverTest extends TestCase
             ->method('save');
 
         $resolver = new AnalyticsPeriodResolver(
-            $this->viewStateManager
+            $this->viewStateManager,
         );
 
         $period = $resolver->resolve(
             $request,
-            'analytics'
+            'analytics',
         );
 
         self::assertSame(
             '7d',
-            $period->range
+            $period->range,
         );
 
         self::assertSame(
             'Last 7 Days',
-            $period->label
+            $period->label,
         );
 
         self::assertSame(
             '7d',
-            $request->query->get('range')
+            $request->query->get('range'),
         );
     }
 
@@ -157,7 +157,7 @@ final class AnalyticsPeriodResolverTest extends TestCase
                     limit: 0,
                     offset: 0,
                     view: '',
-                )
+                ),
             );
 
         $this->viewStateManager
@@ -165,22 +165,22 @@ final class AnalyticsPeriodResolverTest extends TestCase
             ->method('save');
 
         $resolver = new AnalyticsPeriodResolver(
-            $this->viewStateManager
+            $this->viewStateManager,
         );
 
         $period = $resolver->resolve(
             $request,
-            'analytics'
+            'analytics',
         );
 
         self::assertSame(
             'today',
-            $period->range
+            $period->range,
         );
 
         self::assertSame(
             'Today',
-            $period->label
+            $period->label,
         );
     }
 
@@ -207,7 +207,7 @@ final class AnalyticsPeriodResolverTest extends TestCase
                     limit: 0,
                     offset: 0,
                     view: '',
-                )
+                ),
             );
 
         $this->viewStateManager
@@ -215,22 +215,22 @@ final class AnalyticsPeriodResolverTest extends TestCase
             ->method('save');
 
         $resolver = new AnalyticsPeriodResolver(
-            $this->viewStateManager
+            $this->viewStateManager,
         );
 
         $period = $resolver->resolve(
             $request,
-            'analytics'
+            'analytics',
         );
 
         self::assertSame(
             'custom',
-            $period->range
+            $period->range,
         );
 
         self::assertSame(
             '1 Jan 2026 – 31 Jan 2026',
-            $period->label
+            $period->label,
         );
     }
 
@@ -240,11 +240,11 @@ final class AnalyticsPeriodResolverTest extends TestCase
         $request = Request::create(
             '/',
             'GET',
-            $query
+            $query,
         );
 
         $request->setSession(
-            new Session()
+            new Session(),
         );
 
         return $request;

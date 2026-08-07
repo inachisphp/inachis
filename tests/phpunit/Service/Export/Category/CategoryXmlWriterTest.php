@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class CategoryXmlWriterTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new CategoryXmlWriter();
 
         self::assertInstanceOf(
             CategoryXmlWriter::class,
-            $instance
+            $instance,
         );
     }
 }

@@ -49,9 +49,7 @@ final class ReleaseExtractor
                     }
                     if ('..' === $part) {
                         if ([] === $p) {
-                            throw new \RuntimeException(
-                                sprintf('Zip slip attempt detected with path: %s', $filename)
-                            );
+                            throw new \RuntimeException(sprintf('Zip slip attempt detected with path: %s', $filename));
                         }
 
                         array_pop($p);

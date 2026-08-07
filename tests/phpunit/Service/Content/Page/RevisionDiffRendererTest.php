@@ -13,14 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 final class RevisionDiffRendererTest extends TestCase
 {
-
     public function testCanBeInstantiated(): void
     {
         $instance = new RevisionDiffRenderer();
 
         self::assertInstanceOf(
             RevisionDiffRenderer::class,
-            $instance
+            $instance,
         );
     }
 }

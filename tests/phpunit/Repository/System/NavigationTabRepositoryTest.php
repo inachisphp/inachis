@@ -8,16 +8,14 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Repository\System;
 
-use Inachis\Repository\System\NavigationTabRepository;
 use PHPUnit\Framework\TestCase;
 
 final class NavigationTabRepositoryTest extends TestCase
 {
-
     public function testPlaceholder(): void
     {
         $this->markTestIncomplete(
-            'Test not implemented.'
+            'Test not implemented.',
         );
     }
 }
