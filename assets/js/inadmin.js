@@ -16,6 +16,7 @@ import './inadmin/dialogs/_imageManager.js';
 import './inadmin/dialogs/_mergeTags.js';
 import './inadmin/dialogs/_sessionTimeout.js';
 
+import './inadmin/aiGenerate.js';
 import './inadmin/_changePassword.js';
 import './inadmin/_components.js';
 import './inadmin/_dashboard.js';

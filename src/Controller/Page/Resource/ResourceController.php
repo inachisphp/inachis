@@ -181,7 +181,6 @@ class ResourceController extends AbstractInachisController
         $form->handleRequest($request);
 
         $usages = $usageService->getUsages($resource);
-
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var AbstractFile $resource */
             $resource = $form->getData();

@@ -76,9 +76,6 @@
                     {% endif %}
                     <p><strong>{{ 'admin.resources.properties.updatedAt'|trans }}:</strong> {{ resource.updatedAt|date('d F Y', viewModel.session.preferences.timezone) }}</p>
                 </div>
-
-                <p>
-                </p>
                 
                 <script>
                     document.addEventListener('DOMContentLoaded', () => {
@@ -93,6 +90,7 @@
                 </script>
             {% endif %}
 
+            {% if viewModel.page.type == 'downloads' %}
             <div id="replace-file-wrapper" class="{% if resource.id is not empty %}visually-hidden{% endif %}">
                 {% include 'inadmin/partials/components/file-upload.html.twig' with {
                     paramName: 'resource[file]',
@@ -109,6 +107,7 @@
                     ]
                 } %}
             </div>
+            {% endif %}
         </fieldset>
     </div>
     </section>
@@ -194,8 +193,13 @@
         {{ form_widget(form.submit) }}
         {% endif %}
 
-        {% if aiVisionEnabled and form.generate_alt_text is defined %}
-            {{ form_widget(form.generate_alt_text) }}
+        {% if viewModel.page.tab == 'image' and aiVisionEnabled and form.generate_alt_text is defined %}
+            {{ form_widget(form.generate_alt_text, {
+                'attr': {
+                    'data-image-id': resource.id,
+                    'data-endpoint': path('incp_resource_image_ai_metadata', { 'id': resource.id })
+                }
+            }) }}
         {% endif %}
 
         {% if viewModel.page.tab == 'download' and resource.id is not null %}
@@ -227,51 +231,4 @@
 
 {{ form_row(form._token) }}
 {{ form_end(form, {render_rest: false}) }}
-
-{% if viewModel.page.type == 'images' and resource.id is not empty and aiVisionEnabled %}
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const aiBtn = document.getElementById('resource_generate_alt_text');
-    if (!aiBtn) return;
-
-    aiBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-
-        const originalText = aiBtn.innerHTML;
-        aiBtn.disabled = true;
-        aiBtn.innerHTML = '<span class="material-icons spin">autorenew</span> <span>Generating...</span>';
-
-        try {
-            const response = await fetch('{{ path('incp_resource_image_ai_metadata', { id: resource.id }) }}', {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                }
-            });
-
-            const result = await response.json();
-
-            if (!response.ok || !result.success) {
-                throw new Error(result.error || 'Failed to generate metadata');
-            }
-
-            // Populate form inputs
-            const titleInput = document.querySelector('#resource_title');
-            const altTextInput = document.querySelector('#resource_altText');
-            const descInput = document.querySelector('#resource_description');
-
-            if (titleInput && result.data.title) titleInput.value = result.data.title;
-            if (altTextInput && result.data.altText) altTextInput.value = result.data.altText;
-            if (descInput && result.data.description) descInput.value = result.data.description;
-
-        } catch (error) {
-            alert('AI Generation Error: ' + error.message);
-        } finally {
-            aiBtn.disabled = false;
-            aiBtn.innerHTML = originalText;
-        }
-    });
-});
-</script>
-{% endif %}
 {% endblock content %}

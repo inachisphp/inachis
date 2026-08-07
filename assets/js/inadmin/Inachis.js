@@ -9,6 +9,7 @@ window.Inachis = {
 	},
 
 	bootstrap() {
+		window.Inachis.AiGenerate.init();
 		window.Inachis.BulkCreateDialog.init();
 		window.Inachis.CategoryManager.init();
 		window.Inachis.Components.init();

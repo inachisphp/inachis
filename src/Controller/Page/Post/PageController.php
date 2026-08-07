@@ -23,6 +23,7 @@ use Inachis\Repository\Content\ReviewThreadRepository;
 use Inachis\Repository\Content\RevisionRepository;
 use Inachis\Repository\Media\ImageRepository;
 use Inachis\Security\Attribute\RequiresPermission;
+use Inachis\Service\Ai\AiTextManager;
 use Inachis\Service\Content\ContentRevisionCompare;
 use Inachis\Service\Content\Page\CategoryManager;
 use Inachis\Service\Content\Page\PageBulkActionService;
@@ -172,6 +173,7 @@ class PageController extends AbstractInachisController
     )]
     public function edit(
         Request $request,
+        AiTextManager $aiTextManager,
         CategoryManager $categoryManager,
         ContentRevisionCompare $contentRevisionCompare,
         ImageRepository $imageRepository,
@@ -301,6 +303,7 @@ class PageController extends AbstractInachisController
 
         return $this->render('inadmin/page/post/edit.html.twig', [
             'viewModel' => $this->viewModel,
+            'aiTextEnabled' => $aiTextManager->isConfigured(),
             'allowedTypes' => Image::ALLOWED_MIME_TYPES,
             'form' => $form->createView(),
             'includeEditor' => true,

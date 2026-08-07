@@ -19,6 +19,7 @@ use Inachis\Security\Authorisation\PermissionResolver;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -26,6 +27,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Flow\Type\ButtonFlowType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
@@ -405,6 +407,19 @@ class PostType extends AbstractType
                     'view_timezone' => $userTimezone,
                     'widget' => 'single_text',
                 ]);
+            if ($allowEdit) {
+                $builder->add('generate_seo', ButtonType::class, [
+                    'attr' => [
+                        'class' => 'btn btn--ai',
+                    ],
+                    'label' => sprintf(
+                        '<span class="material-icons">%s</span> <span>%s</span>',
+                        'auto_awesome',
+                        'Generate SEO Excerpt',
+                    ),
+                    'label_html' => true,
+                ]);
+            }
             if ($showReview) {
                 $builder->add('review', SubmitType::class, [
                     'attr' => [
