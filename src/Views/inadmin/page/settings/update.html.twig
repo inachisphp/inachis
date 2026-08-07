@@ -1,5 +1,12 @@
 {% extends 'inadmin/structure/main.html.twig' %}
 
+{% block pagetitle %}
+    <a href="{{ path('incp_settings_index') }}">
+        Settings
+    </a>
+    <span>System Updates</span>
+{% endblock pagetitle %}
+
 {% block content %}
 
 {% if isUpToDate %}
@@ -27,45 +34,27 @@
 <section class="ui-section col-12">
     {% embed 'inadmin/partials/components/admonition.html.twig' with {
         type: 'info',
+        title: 'System Update Available',
         icon: 'update',
     } %}
         {% block text %}
-            <strong>Update Available: v{{ latestManifest.version }}</strong> — A new version is available for deployment.
-            {% if latestManifest.publishedAt %}
+            <p>
+                <strong>Update Available: v{{ latestManifest.version }}</strong>
+                {% if latestManifest.publishedAt %}
                 <span class="text-muted">(Released {{ latestManifest.publishedAt|date('F j, Y') }})</span>
-            {% endif %}
+                {% endif %}
+            </p>
+            <p>
+                <strong>Database Migrations</strong>
+                {% if updatePlan.requiresMigration %}
+                    Yes (Backup Required)
+                {% else %}
+                    No
+                {% endif %}
+            </p>
+            <p>Click the button below to download and apply the update from v{{ currentVersion }} to v{{ latestManifest.version }}. The system will briefly enter maintenance mode during the update process.</p>
         {% endblock text %}
     {% endembed %}
-
-    <div class="update-summary-grid">
-        <p class="version-flow font-mono">
-            <span class="version-step">
-                <span class="version-label">Installed</span>
-                <span class="badge">v{{ currentVersion }}</span>
-            </span>
-            <span class="version-arrow">➔</span>
-            <span class="version-step">
-                <span class="version-label">Target</span>
-                <span class="badge badge--highlight">v{{ latestManifest.version }}</span>
-            </span>
-        </p>
-
-        <div class="update-meta-chips">
-            <div class="meta-chip">
-                <span class="meta-label">Database Migrations</span>
-                {% if updatePlan.requiresMigration %}
-                    <span class="badge badge__critical">Yes (Backup Required)</span>
-                {% else %}
-                    <span class="badge">No</span>
-                {% endif %}
-            </div>
-
-            <div class="meta-chip">
-                <span class="meta-label">Package</span>
-                <code class="badge">{{ latestManifest.package }}</code>
-            </div>
-        </div>
-    </div>
 
     {% if latestManifest.releaseNotes %}
     <div class="changelog-card">

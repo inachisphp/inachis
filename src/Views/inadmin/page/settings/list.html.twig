@@ -25,7 +25,7 @@
     {% endembed %}
 {% endif %}
 
-{% if can('PLUGIN', 'VIEW') %}
+{% if can('PLUGIN', 'MANAGE') %}
     {% include 'inadmin/partials/components/card.html.twig' with {
         title: 'Plugins & Add-ons',
         icon: 'extension',
