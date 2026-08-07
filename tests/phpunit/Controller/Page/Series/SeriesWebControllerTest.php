@@ -29,6 +29,7 @@ class SeriesWebControllerTest extends InachisControllerTestCase
 
         $this->controller = new SeriesWebController(
             $this->entityManager,
+            $this->pageViewFactory,
             $this->params,
             $this->security,
             $this->translator,
@@ -62,6 +63,7 @@ class SeriesWebControllerTest extends InachisControllerTestCase
         $controller = $this->getMockBuilder(SeriesWebController::class)
             ->setConstructorArgs([
                 $this->entityManager,
+                $this->pageViewFactory,
                 $this->params,
                 $this->security,
                 $this->translator,

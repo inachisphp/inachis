@@ -13,6 +13,7 @@ use Inachis\Form\UserType;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\SecurityBundle\Security;
+use Inachis\Security\Authorisation\PermissionResolver;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -36,7 +37,12 @@ class UserTypeTest extends TestCase
                 return $builder;
             });
 
-        $formType = new UserType($translator, $security);
+        $permissionResolver = new PermissionResolver();
+
+        $currentUser = new \Inachis\Entity\User\User('current');
+        $security->method('getUser')->willReturn($currentUser);
+
+        $formType = new UserType($permissionResolver, $translator, $security);
         $formType->buildForm($builder, []);
 
         $this->assertArrayHasKey('choice_value', $capturedOptions);

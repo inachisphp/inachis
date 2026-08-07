@@ -24,7 +24,7 @@ class UserBulkActionServiceTest extends TestCase
     private User $user;
     private UserRepository $userRepository;
     private UserBulkActionService $userBulkActionService;
-    private UserProtectionService $userProtectionService;
+    private UserProtectionServiceInterface $userProtectionService;
 
     /**
      * @throws Exception
@@ -72,11 +72,11 @@ class UserBulkActionServiceTest extends TestCase
 
     public function testApplyDelete(): void
     {
-        $result = $this->userBulkActionService->apply('delete', [$this->user->getId()]);
         $this->userProtectionService
             ->expects($this->once())
             ->method('assertAdministratorsCanBeRemoved')
             ->with([$this->user]);
+        $result = $this->userBulkActionService->apply('delete', [$this->user->getId()]);
         $this->assertEquals(1, $result);
         $this->assertTrue($this->user->hasBeenRemoved());
     }
@@ -93,11 +93,11 @@ class UserBulkActionServiceTest extends TestCase
 
     public function testApplyDisable(): void
     {
-        $result = $this->userBulkActionService->apply('disable', [$this->user->getId()]);
         $this->userProtectionService
             ->expects($this->once())
             ->method('assertAdministratorsCanBeRemoved')
             ->with([$this->user]);
+        $result = $this->userBulkActionService->apply('disable', [$this->user->getId()]);
         $this->assertEquals(1, $result);
         $this->assertFalse($this->user->isEnabled());
     }

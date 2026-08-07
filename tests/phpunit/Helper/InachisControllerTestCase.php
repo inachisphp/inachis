@@ -27,6 +27,7 @@ abstract class InachisControllerTestCase extends TestCase
     protected TranslatorInterface $translator;
     protected WasteRepository $wasteRepository;
     protected PageViewFactory $pageViewFactory;
+    protected \Symfony\Component\HttpFoundation\RequestStack $requestStack;
 
     protected function setUp(): void
     {
@@ -38,12 +39,13 @@ abstract class InachisControllerTestCase extends TestCase
         $this->translator = $this->createStub(TranslatorInterface::class);
         $this->wasteRepository = $this->createMock(WasteRepository::class);
 
-        $siteSettings = new SiteSettings('Wandering the World', 'http://localhost', [], 'en', 'ltr', '', false);
+        $siteSettings = new SiteSettings('Wandering the World', 'http://localhost', [], 'en', 'ltr', '', false, 'UTC');
         $pageMetadata = new PageMetadata();
         $pageView = new PageView($siteSettings, $pageMetadata);
 
         $this->pageViewFactory = $this->createMock(PageViewFactory::class);
         $this->pageViewFactory->method('create')->willReturn($pageView);
         $this->pageViewFactory->method('createAdmin')->willReturn($pageView);
+        $this->requestStack = new \Symfony\Component\HttpFoundation\RequestStack();
     }
 }

@@ -41,6 +41,8 @@ class UrlControllerTest extends InachisControllerTestCase
             $this->security,
             $this->translator,
             $this->wasteRepository,
+            $this->pageViewFactory,
+            $this->requestStack,
         ])
         ->onlyMethods(['createFormBuilder', 'render'])
         ->getMock();
@@ -49,18 +51,16 @@ class UrlControllerTest extends InachisControllerTestCase
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:'.$template);
             });
-        $contentQueryParameters = $this->createMock(ContentQueryParameters::class);
-        $contentQueryParameters->expects($this->once())
-            ->method('process')
-            ->willReturn([
-                'filters' => [],
-                'offset' => '50',
-                'limit' => '25',
-                'sort' => 'contentDate asc',
-            ]);
+        $categoryRepository = $this->createStub(\Inachis\Repository\Content\CategoryRepository::class);
+        $session = $this->createStub(\Symfony\Component\HttpFoundation\Session\SessionInterface::class);
+        $request->setSession($session);
+        $viewStateManager = new \Inachis\Service\Content\ViewStateManager(
+            $this->security,
+            $this->createStub(\Inachis\Repository\User\UserViewStateRepository::class),
+        );
         $urlBulkActionService = $this->createStub(UrlBulkActionService::class);
         $urlRepository = $this->createStub(UrlRepository::class);
-        $result = $controller->list($request, $contentQueryParameters, $urlBulkActionService, $urlRepository);
+        $result = $controller->list($request, $categoryRepository, $urlBulkActionService, $urlRepository, $viewStateManager);
         $this->assertEquals('rendered:inadmin/page/url/list.html.twig', $result->getContent());
     }
 
@@ -88,6 +88,8 @@ class UrlControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['addFlash', 'createFormBuilder', 'redirectToRoute'])
             ->getMock();
@@ -103,12 +105,18 @@ class UrlControllerTest extends InachisControllerTestCase
             ->method('redirectToRoute')
             ->with('incp_url_list')
             ->willReturn(new RedirectResponse('/incp/url/list/50/25'));
-        $contentQueryParameters = $this->createStub(ContentQueryParameters::class);
+        $categoryRepository = $this->createStub(\Inachis\Repository\Content\CategoryRepository::class);
+        $session = $this->createStub(\Symfony\Component\HttpFoundation\Session\SessionInterface::class);
+        $request->setSession($session);
+        $viewStateManager = new \Inachis\Service\Content\ViewStateManager(
+            $this->security,
+            $this->createStub(\Inachis\Repository\User\UserViewStateRepository::class),
+        );
         $urlBulkActionService = $this->createStub(UrlBulkActionService::class);
         $urlBulkActionService->method('apply')->willReturn(2);
         $urlRepository = $this->createStub(UrlRepository::class);
 
-        $result = $controller->list($request, $contentQueryParameters, $urlBulkActionService, $urlRepository);
+        $result = $controller->list($request, $categoryRepository, $urlBulkActionService, $urlRepository, $viewStateManager);
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertSame('/incp/url/list/50/25', $result->headers->get('Location'));
     }
@@ -131,7 +139,7 @@ class UrlControllerTest extends InachisControllerTestCase
             ->method('findSimilarUrlsExcludingId')->willReturn([
                 ['link' => 'test-url'],
             ]);
-        $controller = new UrlController($this->entityManager, $this->params, $this->security, $this->translator, $this->wasteRepository);
+        $controller = new UrlController($this->entityManager, $this->params, $this->security, $this->translator, $this->wasteRepository, $this->pageViewFactory, $this->requestStack);
         $result = $controller->checkUrlUsage($request, $urlRepository);
         $this->assertEquals('test-url-1', $result->getContent());
 

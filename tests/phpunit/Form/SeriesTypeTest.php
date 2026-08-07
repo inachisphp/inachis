@@ -10,6 +10,8 @@ namespace Inachis\Tests\phpunit\Form;
 
 use Inachis\Entity\Content\Series;
 use Inachis\Form\SeriesType;
+use Inachis\Security\Authorisation\PermissionResolver;
+use Inachis\Provider\TimezoneProvider;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -43,16 +45,27 @@ class SeriesTypeTest extends TypeTestCase
     {
         $translator = $this->createStub(TranslatorInterface::class);
         $security = $this->createStub(Security::class);
+        $permissionResolver = $this->createStub(PermissionResolver::class);
+        $permissionResolver->method('hasPermission')->willReturn(true);
+        $timezoneProvider = $this->createStub(TimezoneProvider::class);
+        $timezoneProvider->method('getForUser')->willReturn('UTC');
 
         return [
-            new PreloadedExtension([new SeriesType($security, $translator)], []),
+            new PreloadedExtension([new SeriesType($permissionResolver, $security, $timezoneProvider, $translator)], []),
         ];
     }
 
     public function testConfigureOptionsSetsDataClass(): void
     {
+        $permissionResolver = $this->createStub(PermissionResolver::class);
+        $permissionResolver->method('hasPermission')->willReturn(true);
+        $timezoneProvider = $this->createStub(TimezoneProvider::class);
+        $timezoneProvider->method('getForUser')->willReturn('UTC');
+
         $seriesType = new SeriesType(
+            $permissionResolver,
             $this->createStub(Security::class),
+            $timezoneProvider,
             $this->translator(),
         );
         $resolver = new OptionsResolver();
@@ -66,8 +79,15 @@ class SeriesTypeTest extends TypeTestCase
 
     public function testBuildFormForNewSeries(): void
     {
+        $permissionResolver = $this->createStub(PermissionResolver::class);
+        $permissionResolver->method('hasPermission')->willReturn(true);
+        $timezoneProvider = $this->createStub(TimezoneProvider::class);
+        $timezoneProvider->method('getForUser')->willReturn('UTC');
+
         $seriesType = new SeriesType(
+            $permissionResolver,
             $this->createStub(Security::class),
+            $timezoneProvider,
             $this->translator(),
         );
         $series = new Series();

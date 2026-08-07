@@ -9,17 +9,37 @@ declare(strict_types=1);
 namespace Inachis\Tests\phpunit\Controller\Page\Tools;
 
 use Inachis\Controller\Page\Tools\ToolsIndexController;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Inachis\Repository\Waste\WasteRepository;
+use Inachis\Factory\PageViewFactory;
+use Symfony\Component\HttpFoundation\RequestStack;
 use PHPUnit\Framework\TestCase;
 
 final class ToolsIndexControllerTest extends TestCase
 {
     public function testCanBeInstantiated(): void
     {
-        $instance = new ToolsIndexController();
+        $siteSettings = new \Inachis\Model\System\SiteSettings('Wandering the World', 'http://localhost', [], 'en', 'ltr', '', false, 'UTC');
+        $pageMetadata = new \Inachis\Model\System\PageMetadata();
+        $pageView = new \Inachis\Model\System\PageView($siteSettings, $pageMetadata);
 
-        self::assertInstanceOf(
-            ToolsIndexController::class,
-            $instance,
+        $pvf = $this->createStub(PageViewFactory::class);
+        $pvf->method('create')->willReturn($pageView);
+        $pvf->method('createAdmin')->willReturn($pageView);
+
+        $instance = new ToolsIndexController(
+            $this->createMock(EntityManagerInterface::class),
+            $this->createMock(ParameterBagInterface::class),
+            $this->createStub(Security::class),
+            $this->createStub(TranslatorInterface::class),
+            $this->createMock(WasteRepository::class),
+            $pvf,
+            new RequestStack(),
         );
+
+        self::assertInstanceOf(ToolsIndexController::class, $instance);
     }
 }
