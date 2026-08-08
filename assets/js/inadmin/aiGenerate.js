@@ -44,7 +44,7 @@ window.Inachis.AiGenerate = {
             const contentVal = this.getContentValue(this.options.seoContentSelector);
 
             if (!contentVal.trim()) {
-                alert('Please enter some article content before generating SEO metadata.');
+                this.showError('Please enter some article content before generating SEO metadata.');
                 return;
             }
 
@@ -76,7 +76,13 @@ window.Inachis.AiGenerate = {
                     throw new Error(result.error || 'Failed to generate SEO metadata.');
                 }
             } catch (err) {
-                alert('AI Error: ' + err.message);
+                if (err.status === 429) {
+                    this.showError(
+                        'AI generation is temporarily unavailable. Please try again in a moment.'
+                    );
+                } else {
+                    this.showError('AI Error: ' + err.message);
+                }
             } finally {
                 this.setButtonLoading(seoBtn, false);
             }
@@ -95,7 +101,7 @@ window.Inachis.AiGenerate = {
 
             const imageId = imageBtn.dataset.imageId || imageBtn.dataset.id;
             if (!imageId) {
-                alert('Missing image ID attribute for AI metadata generation.');
+                this.showError('AI Error: Missing image ID attribute for AI metadata generation.');
                 return;
             }
 
@@ -126,7 +132,13 @@ window.Inachis.AiGenerate = {
                     throw new Error(result.error || 'Failed to generate image metadata.');
                 }
             } catch (err) {
-                alert('AI Error: ' + err.message);
+                if (err.status === 429) {
+                    this.showError(
+                        'AI generation is temporarily unavailable. Please try again in a moment.'
+                    );
+                } else {
+                    this.showError('AI Error: ' + err.message);
+                }
             } finally {
                 this.setButtonLoading(imageBtn, false);
             }
@@ -167,9 +179,22 @@ window.Inachis.AiGenerate = {
             body: JSON.stringify(payload)
         });
 
-        const data = await response.json();
+        let data;
+
+        try {
+            data = await response.json();
+        } catch {
+            throw new Error(`HTTP ${response.status}: Generation failed.`);
+        }
+
         if (!response.ok) {
-            throw new Error(data.error || `HTTP ${response.status}: Generation failed.`);
+            const error = new Error(
+                data.error || `HTTP ${response.status}: Generation failed.`
+            );
+
+            error.status = response.status;
+
+            throw error;
         }
 
         return data;
@@ -192,5 +217,34 @@ window.Inachis.AiGenerate = {
             button.disabled = false;
             button.setAttribute('aria-disabled', 'false');
         }
-    }
+    },
+
+    /**
+     * Displays an AI generation error message.
+     *
+     * @param {string} message - The message to display.
+     */
+    showError: function (message) {
+        const mainContent = document.querySelector('main.content');
+        if (!mainContent) {
+            return;
+        }
+
+        // Remove an existing AI error message.
+        mainContent.querySelector('.ai-generation-error')?.remove();
+
+        const messageElement = document.createElement('div');
+        messageElement.className = 'col-12 flash-error ai-generation-error';
+        messageElement.setAttribute('aria-live', 'polite');
+
+        const icon = document.createElement('span');
+        icon.className = 'material-icons';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.textContent = 'error';
+
+        messageElement.appendChild(icon);
+        messageElement.append(` ${message}`);
+
+        mainContent.prepend(messageElement);
+    },
 };
