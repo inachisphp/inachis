@@ -10,7 +10,9 @@ namespace Inachis\Tests\phpunit\Form;
 
 use Inachis\Entity\Media\Image;
 use Inachis\Form\ResourceType;
+use Inachis\Security\Authorisation\PermissionResolver;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -21,9 +23,11 @@ class ResourceTypeTest extends TypeTestCase
     protected function getExtensions(): array
     {
         $translator = $this->createStub(TranslatorInterface::class);
+        $security = $this->createStub(Security::class);
+        $security->method('getUser')->willReturn(new \Inachis\Entity\User\User());
 
         return [
-            new PreloadedExtension([new ResourceType($translator)], []),
+            new PreloadedExtension([new ResourceType(new PermissionResolver(), $translator, $security)], []),
         ];
     }
 
@@ -41,7 +45,7 @@ class ResourceTypeTest extends TypeTestCase
         $form = $this->factory->create(ResourceType::class, new Image());
         $view = $form->createView();
 
-        $expectedFields = ['title', 'altText', 'description', 'generate_alt_text', 'submit', 'delete'];
+        $expectedFields = ['title', 'altText', 'description'];
         $this->assertSame($expectedFields, array_keys($view->children));
     }
 }

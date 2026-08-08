@@ -81,7 +81,7 @@ class SeriesWebControllerTest extends InachisControllerTestCase
             ->method('render')
             ->with('web/pages/series.html.twig')
             ->willReturn(new Response('Rendered OK', 200));
-        $response = $controller->view($seriesRepository, '2025', 'test');
+        $response = $controller->view($seriesRepository, 2025, 'test');
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }
@@ -101,6 +101,6 @@ class SeriesWebControllerTest extends InachisControllerTestCase
                 [Series::class, $seriesRepository],
             ]);
         $this->expectException(NotFoundHttpException::class);
-        $this->controller->view($seriesRepository, '2025', 'test');
+        $this->controller->view($seriesRepository, 2025, 'test');
     }
 }

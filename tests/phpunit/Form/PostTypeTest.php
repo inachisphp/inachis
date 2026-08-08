@@ -11,6 +11,8 @@ namespace Inachis\Tests\phpunit\Form;
 use Inachis\Entity\Content\Page;
 use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
 use Inachis\Form\PostType;
+use Inachis\Provider\TimezoneProvider;
+use Inachis\Security\Authorisation\PermissionResolver;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
@@ -20,6 +22,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -47,6 +50,14 @@ final class PostTypeTest extends TestCase
         return $m;
     }
 
+    private function security(): Security
+    {
+        $security = $this->createStub(Security::class);
+        $security->method('getUser')->willReturn(new \Inachis\Entity\User\User());
+
+        return $security;
+    }
+
     private function transformer(): ArrayCollectionToArrayTransformer
     {
         return $this->createStub(ArrayCollectionToArrayTransformer::class);
@@ -59,9 +70,11 @@ final class PostTypeTest extends TestCase
     public function testBuildFormForNewItem(): void
     {
         $postType = new PostType(
+            new PermissionResolver(),
+            new TimezoneProvider('UTC'),
             $this->translator(),
             $this->router(),
-            $this->createStub(Security::class),
+            $this->security(),
         );
 
         $page = new Page();
@@ -72,18 +85,18 @@ final class PostTypeTest extends TestCase
             ['subTitle', TextType::class, $this->anything()],
             ['url', TextType::class, $this->anything()],
             ['content', TextareaType::class, $this->anything()],
-            ['visibility', CheckboxType::class, $this->anything()],
+            ['visible', CheckboxType::class, $this->anything()],
             ['showTableOfContents', CheckboxType::class, $this->anything()],
             ['postDate', DateTimeType::class, $this->anything()],
             ['expireDate', DateTimeType::class, $this->anything()],
-            ['categories', EntityType::class, $this->anything()],
-            ['tags', EntityType::class, $this->anything()],
+            ['categories', TextType::class, $this->anything()],
+            ['tags', TextType::class, $this->anything()],
             ['language', ChoiceType::class, $this->anything()],
             ['latlong', TextType::class, $this->anything()],
+            ['featureImage', HiddenType::class, $this->anything()],
             ['featureSnippet', TextareaType::class, $this->anything()],
             ['noindex', CheckboxType::class, $this->anything()],
             ['nofollow', CheckboxType::class, $this->anything()],
-            ['submit', SubmitType::class, $this->anything()],
         ];
 
         $this->expectAddCallsInOrder($builder, $expected);
@@ -99,10 +112,11 @@ final class PostTypeTest extends TestCase
     public function testBuildFormForExistingItem(): void
     {
         $postType = new PostType(
+            new PermissionResolver(),
+            new TimezoneProvider('UTC'),
             $this->translator(),
             $this->router(),
-            $this->createStub(Security::class),
-            $this->transformer(),
+            $this->security(),
         );
 
         $page = (new Page())->setId(Uuid::uuid1());
@@ -112,22 +126,19 @@ final class PostTypeTest extends TestCase
             ['subTitle', TextType::class, $this->anything()],
             ['url', TextType::class, $this->anything()],
             ['content', TextareaType::class, $this->anything()],
-            ['visibility', CheckboxType::class, $this->anything()],
+            ['visible', CheckboxType::class, $this->anything()],
             ['showTableOfContents', CheckboxType::class, $this->anything()],
             ['postDate', DateTimeType::class, $this->anything()],
             ['expireDate', DateTimeType::class, $this->anything()],
-            ['categories', EntityType::class, $this->anything()],
-            ['tags', EntityType::class, $this->anything()],
+            ['categories', TextType::class, $this->anything()],
+            ['tags', TextType::class, $this->anything()],
             ['language', ChoiceType::class, $this->anything()],
             ['latlong', TextType::class, $this->anything()],
+            ['featureImage', HiddenType::class, $this->anything()],
             ['featureSnippet', TextareaType::class, $this->anything()],
             ['noindex', CheckboxType::class, $this->anything()],
             ['nofollow', CheckboxType::class, $this->anything()],
-            ['submit', SubmitType::class, $this->anything()],
-            // Extra fields added only for existing item:
             ['updatedAt', DateTimeType::class, $this->anything()],
-            ['publish', SubmitType::class, $this->anything()],
-            ['delete', SubmitType::class, $this->anything()],
         ];
 
         $this->expectAddCallsInOrder($builder, $expected);
@@ -137,9 +148,11 @@ final class PostTypeTest extends TestCase
     public function testConfigureOptions(): void
     {
         $postType = new PostType(
+            new PermissionResolver(),
+            new TimezoneProvider('UTC'),
             $this->translator(),
             $this->router(),
-            $this->createStub(Security::class),
+            $this->security(),
         );
 
         $resolver = new OptionsResolver();

@@ -77,7 +77,12 @@ class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
 
         $analytics->expects($this->once())
             ->method('getTopReferrersForPage')
-            ->with('/my-post')
+            ->with(
+                '/my-post',
+                $this->callback(fn (\DateTimeInterface $d) => true),
+                $this->callback(fn (\DateTimeInterface $d) => true),
+                10,
+            )
             ->willReturn([]);
 
         $controller = $this->getMockBuilder(ContentAnalyticsController::class)

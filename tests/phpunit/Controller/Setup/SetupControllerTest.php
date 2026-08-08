@@ -34,6 +34,8 @@ class SetupControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['redirectToRoute'])
             ->getMock();
@@ -63,6 +65,8 @@ class SetupControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['createFormBuilder', 'render'])
             ->getMock();
@@ -83,6 +87,8 @@ class SetupControllerTest extends InachisControllerTestCase
             $this->security,
             $this->translator,
             $this->wasteRepository,
+            $this->pageViewFactory,
+            $this->requestStack,
         );
         $this->assertEmpty($controller->getErrors());
     }
@@ -95,6 +101,8 @@ class SetupControllerTest extends InachisControllerTestCase
             $this->security,
             $this->translator,
             $this->wasteRepository,
+            $this->pageViewFactory,
+            $this->requestStack,
         );
         $controller->addError('test', 'Something went wrong');
         $this->assertEquals('Something went wrong', $controller->getError('test'));
