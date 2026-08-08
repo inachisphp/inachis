@@ -18,11 +18,6 @@ use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 #[AsTaggedItem(priority: 250)]
 final readonly class GenerateVersionFile implements BuildStepInterface
 {
-	public static function priority(): int
-	{
-		return 250;
-	}
-
 	public function __construct(
 		private VersionGenerator $generator,
 	) {}

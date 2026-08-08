@@ -16,11 +16,6 @@ use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 #[AsTaggedItem(priority: 130)]
 final class CleanupRelease implements BuildStepInterface
 {
-    public static function priority(): int
-    {
-        return 130;
-    }
-
     public function execute(
         ReleaseWorkspace $workspace,
         SymfonyStyle $io,

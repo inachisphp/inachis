@@ -17,11 +17,6 @@ use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 #[AsTaggedItem(priority: 125)]
 final class ValidateRelease implements BuildStepInterface
 {
-    public static function priority(): int
-    {
-        return 125;
-    }
-
     public function execute(
         ReleaseWorkspace $workspace,
         SymfonyStyle $io,
