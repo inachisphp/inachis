@@ -135,7 +135,7 @@ class CspHeaderManager
 
         // 4. Normalize the directive from the incoming report
         $rawDirective = $report->getEffectiveDirective();
-        if (empty($rawDirective)) {
+        if (!is_string($rawDirective) || $rawDirective === '') {
             return;
         }
         $directive = str_replace(['-elem', '-attr'], '', $rawDirective);
