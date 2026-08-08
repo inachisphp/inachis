@@ -136,7 +136,7 @@ body.type_login {
 
 	a,
 	a:visited {
-		&.button {
+		&.btn {
 			display: inline;
 		}
 
@@ -152,7 +152,7 @@ body.type_login {
 	}
 
 	a:hover {
-		&.button {
+		&.btn {
 			color: $text-inverse;
 			text-decoration: none;
 		}
