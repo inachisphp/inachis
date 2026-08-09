@@ -8,14 +8,42 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Controller\Page\Setting\Discovery;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Controller\Page\Setting\Discovery\LlmsTxtController;
+use Inachis\Factory\PageViewFactory;
+use Inachis\Model\System\PageMetadata;
+use Inachis\Model\System\PageView;
+use Inachis\Model\System\SiteSettings;
+use Inachis\Repository\Waste\WasteRepository;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class LlmsTxtControllerTest extends TestCase
 {
     public function testCanBeInstantiated(): void
     {
-        $instance = new LlmsTxtController();
+        $params = $this->createMock(ParameterBagInterface::class);
+        $pageViewFactory = $this->createMock(PageViewFactory::class);
+        $pageViewFactory->method('create')->willReturn(new PageView(
+            new SiteSettings('Title', 'http://localhost', [], 'en', 'ltr', '', false, 'UTC'),
+            new PageMetadata(),
+        ));
+        $pageViewFactory->method('createAdmin')->willReturn(new PageView(
+            new SiteSettings('Title', 'http://localhost', [], 'en', 'ltr', '', false, 'UTC'),
+            new PageMetadata(),
+        ));
+
+        $instance = new LlmsTxtController(
+            $this->createMock(EntityManagerInterface::class),
+            $params,
+            $this->createMock(Security::class),
+            $this->createMock(TranslatorInterface::class),
+            $this->createMock(WasteRepository::class),
+            $pageViewFactory,
+            new \Symfony\Component\HttpFoundation\RequestStack(),
+        );
 
         self::assertInstanceOf(
             LlmsTxtController::class,
