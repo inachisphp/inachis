@@ -14,14 +14,18 @@ use Inachis\Entity\Content\Series;
 use Inachis\Entity\Media\Image;
 use Inachis\Entity\User\User;
 use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Repository\Media\ImageRepository;
+use Inachis\Repository\User\UserViewStateRepository;
 use Inachis\Service\Content\Series\SeriesBulkActionService;
+use Inachis\Service\Content\ViewStateManager;
 use Inachis\Service\Waste\WasteManagerService;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Uuid;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Button;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
@@ -49,6 +53,8 @@ class SeriesControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['createFormBuilder', 'render'])
             ->getMock();
@@ -57,19 +63,19 @@ class SeriesControllerTest extends InachisControllerTestCase
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:'.$template);
             });
-        $contentQueryParameters = $this->createMock(ContentQueryParameters::class);
-        $contentQueryParameters->expects(self::once())
-            ->method('process')
-            ->willReturn([
-                'filters' => [],
-                'offset' => '50',
-                'limit' => '25',
-                'sort' => 'lastDate desc',
-            ]);
         $seriesBulkActionService = $this->createStub(SeriesBulkActionService::class);
         $seriesRepository = $this->createStub(SeriesRepository::class);
 
-        $result = $controller->list($request, $contentQueryParameters, $seriesBulkActionService, $seriesRepository);
+        $result = $controller->list(
+            $request,
+            $this->createStub(CategoryRepository::class),
+            $seriesBulkActionService,
+            $seriesRepository,
+            new ViewStateManager(
+                $this->createStub(Security::class),
+                $this->createStub(UserViewStateRepository::class),
+            ),
+        );
         $this->assertEquals('rendered:inadmin/page/series/list.html.twig', $result->getContent());
     }
 
@@ -97,6 +103,8 @@ class SeriesControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['addFlash', 'createFormBuilder', 'redirectToRoute'])
             ->getMock();
@@ -119,7 +127,16 @@ class SeriesControllerTest extends InachisControllerTestCase
             ->method('apply')->willReturn(1);
         $seriesRepository = $this->createStub(SeriesRepository::class);
 
-        $result = $controller->list($request, $contentQueryParameters, $seriesBulkActionService, $seriesRepository);
+        $result = $controller->list(
+            $request,
+            $this->createStub(CategoryRepository::class),
+            $seriesBulkActionService,
+            $seriesRepository,
+            new ViewStateManager(
+                $this->createStub(Security::class),
+                $this->createStub(UserViewStateRepository::class),
+            ),
+        );
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertSame('/incp/series/list/50/25', $result->headers->get('Location'));
     }
@@ -142,6 +159,8 @@ class SeriesControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['createForm', 'render'])
             ->getMock();
@@ -156,7 +175,12 @@ class SeriesControllerTest extends InachisControllerTestCase
         $imageRepository = $this->createStub(ImageRepository::class);
         $pageRepository = $this->createStub(PageRepository::class);
 
-        $result = $controller->edit($request, $seriesRepository, $imageRepository, $pageRepository, $this->createStub(WasteManagerService::class));
+        $result = $controller->edit(
+            $request,
+            $seriesRepository,
+            $pageRepository,
+            $this->createStub(WasteManagerService::class)
+        );
         $this->assertEquals('rendered:inadmin/page/series/edit.html.twig', $result->getContent());
     }
 
@@ -168,7 +192,7 @@ class SeriesControllerTest extends InachisControllerTestCase
     {
         $request = new Request([], [
             'series' => [
-                'image' => Uuid::uuid1()->toString(),
+                'image' => Uuid::uuid1()->getBytes(),
                 'title' => 'test series',
                 'url' => '',
             ],
@@ -184,6 +208,8 @@ class SeriesControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['addFlash', 'createForm', 'getUser', 'redirect'])
             ->getMock();
@@ -203,7 +229,12 @@ class SeriesControllerTest extends InachisControllerTestCase
         $imageRepository->method('findOneBy')->willReturn(new Image());
         $pageRepository = $this->createStub(PageRepository::class);
 
-        $result = $controller->edit($request, $seriesRepository, $imageRepository, $pageRepository, $this->createStub(WasteManagerService::class));
+        $result = $controller->edit(
+            $request,
+            $seriesRepository,
+            $pageRepository,
+            $this->createStub(WasteManagerService::class)
+        );
         $this->assertInstanceOf(RedirectResponse::class, $result);
     }
 
@@ -233,6 +264,8 @@ class SeriesControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirect'])
             ->getMock();
@@ -245,10 +278,14 @@ class SeriesControllerTest extends InachisControllerTestCase
 
         $controller->expects($this->once())->method('createForm')->willReturn($form);
         $seriesRepository = $this->createStub(SeriesRepository::class);
-        $imageRepository = $this->createStub(ImageRepository::class);
         $pageRepository = $this->createStub(PageRepository::class);
 
-        $result = $controller->edit($request, $seriesRepository, $imageRepository, $pageRepository, $this->createStub(WasteManagerService::class));
+        $result = $controller->edit(
+            $request,
+            $seriesRepository,
+            $pageRepository,
+            $this->createStub(WasteManagerService::class)
+        );
         $this->assertInstanceOf(RedirectResponse::class, $result);
     }
 
@@ -261,7 +298,7 @@ class SeriesControllerTest extends InachisControllerTestCase
         $request = new Request([],
             [
                 'series' => [
-                    'image' => Uuid::uuid1()->toString(),
+                    'image' => Uuid::uuid1()->getBytes(),
                     'title' => 'test series',
                     'url' => '',
                     'itemList' => [
@@ -280,6 +317,8 @@ class SeriesControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirect'])
             ->getMock();
@@ -303,7 +342,12 @@ class SeriesControllerTest extends InachisControllerTestCase
         $pageRepository = $this->createMock(PageRepository::class);
         $pageRepository->expects($this->once())->method('findBy')->willReturn([$page]);
 
-        $result = $controller->edit($request, $seriesRepository, $imageRepository, $pageRepository, $this->createStub(WasteManagerService::class));
+        $result = $controller->edit(
+            $request,
+            $seriesRepository,
+            $pageRepository,
+            $this->createStub(WasteManagerService::class)
+        );
         $this->assertInstanceOf(RedirectResponse::class, $result);
     }
 
@@ -323,6 +367,8 @@ class SeriesControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['createForm', 'render'])
             ->getMock();

@@ -18,8 +18,12 @@ use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Repository\Media\DownloadRepository;
 use Inachis\Repository\Media\ImageRepository;
 use Inachis\Repository\User\UserViewStateRepository;
+use Inachis\Service\Ai\AiVisionManager;
 use Inachis\Service\Content\ViewStateManager;
+use Inachis\Service\Resource\DownloadFileService;
 use Inachis\Service\Resource\ImageFileService;
+use Inachis\Service\Resource\ResourceStorageProvider;
+use Inachis\Service\Resource\ResourceUsageService;
 use Inachis\Service\Waste\WasteManagerService;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
@@ -123,10 +127,18 @@ class ResourceControllerTest extends InachisControllerTestCase
         $pageRepository->expects($this->once())->method('getPostsUsingImage')->willReturn($paginator);
         $seriesRepository = $this->createMock(SeriesRepository::class);
         $seriesRepository->expects($this->once())->method('getSeriesUsingImage')->willReturn($paginator);
-        $imageDirectory = '/tmp/';
         $wasteManagerService = $this->createStub(WasteManagerService::class);
-        $result = $this->controller->edit($request, $filesystem, $downloadRepository, $imageRepository,
-            $pageRepository, $seriesRepository, $wasteManagerService, $imageDirectory);
+        $result = $this->controller->edit(
+            $request,
+            $filesystem,
+            $this->createStub(DownloadFileService::class),
+            $downloadRepository,
+            $imageRepository,
+            $this->createStub(AiVisionManager::class),
+            $this->createStub(ResourceStorageProvider::class),
+            $this->createStub(ResourceUsageService::class),
+            $wasteManagerService,
+        );
         $this->assertEquals('rendered:inadmin/page/resource/edit.html.twig', $result->getContent());
     }
 
@@ -166,10 +178,18 @@ class ResourceControllerTest extends InachisControllerTestCase
         $pageRepository->expects($this->never())->method('getPostsUsingImage');
         $seriesRepository = $this->createMock(SeriesRepository::class);
         $seriesRepository->expects($this->never())->method('getSeriesUsingImage');
-        $imageDirectory = '/tmp/';
         $wasteManagerService = $this->createStub(WasteManagerService::class);
-        $result = $this->controller->edit($request, $filesystem, $downloadRepository, $imageRepository,
-            $pageRepository, $seriesRepository, $wasteManagerService, $imageDirectory);
+        $result = $this->controller->edit(
+            $request,
+            $filesystem,
+            $this->createStub(DownloadFileService::class),
+            $downloadRepository,
+            $imageRepository,
+            $this->createStub(AiVisionManager::class),
+            $this->createStub(ResourceStorageProvider::class),
+            $this->createStub(ResourceUsageService::class),
+            $wasteManagerService,
+        );
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/resources/images', $result->getTargetUrl());
     }
@@ -225,8 +245,17 @@ class ResourceControllerTest extends InachisControllerTestCase
         $seriesRepository->expects($this->once())->method('getSeriesUsingImage')->willReturn($paginator);
         $imageDirectory = '/tmp/';
         $wasteManagerService = $this->createStub(WasteManagerService::class);
-        $result = $this->controller->edit($request, $filesystem, $downloadRepository, $imageRepository,
-            $pageRepository, $seriesRepository, $wasteManagerService, $imageDirectory);
+        $result = $this->controller->edit(
+            $request,
+            $filesystem,
+            $this->createStub(DownloadFileService::class),
+            $downloadRepository,
+            $imageRepository,
+            $this->createStub(AiVisionManager::class),
+            $this->createStub(ResourceStorageProvider::class),
+            $this->createStub(ResourceUsageService::class),
+            $wasteManagerService,
+        );
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/resources/images', $result->getTargetUrl());
     }
@@ -286,8 +315,17 @@ class ResourceControllerTest extends InachisControllerTestCase
         $seriesRepository->expects($this->once())->method('getSeriesUsingImage')->willReturn($paginator);
         $imageDirectory = '/tmp/';
 
-        $result = $this->controller->edit($request, $filesystem, $downloadRepository, $imageRepository,
-            $pageRepository, $seriesRepository, $wasteManagerService, $imageDirectory);
+        $result = $this->controller->edit(
+            $request,
+            $filesystem,
+            $this->createStub(DownloadFileService::class),
+            $downloadRepository,
+            $imageRepository,
+            $this->createStub(AiVisionManager::class),
+            $this->createStub(ResourceStorageProvider::class),
+            $this->createStub(ResourceUsageService::class),
+            $wasteManagerService,
+        );
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/resources/images', $result->getTargetUrl());
     }
@@ -338,8 +376,17 @@ class ResourceControllerTest extends InachisControllerTestCase
         $seriesRepository->expects($this->once())->method('getSeriesUsingImage')->willReturn($paginator);
         $imageDirectory = '/tmp/';
         $wasteManagerService = $this->createStub(WasteManagerService::class);
-        $result = $this->controller->edit($request, $filesystem, $downloadRepository, $imageRepository,
-            $pageRepository, $seriesRepository, $wasteManagerService, $imageDirectory);
+        $result = $this->controller->edit(
+            $request,
+            $filesystem,
+            $this->createStub(DownloadFileService::class),
+            $downloadRepository,
+            $imageRepository,
+            $this->createStub(AiVisionManager::class),
+            $this->createStub(ResourceStorageProvider::class),
+            $this->createStub(ResourceUsageService::class),
+            $wasteManagerService,
+        );
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/resources/images', $result->getTargetUrl());
     }

@@ -12,12 +12,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Inachis\Controller\Page\RssController;
 use Inachis\Entity\Page;
+use Inachis\Factory\PageViewFactory;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Waste\WasteRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -25,7 +27,7 @@ class RssControllerTest extends TestCase
 {
     public function testFeedActionRendersXml(): void
     {
-        $em = $this->createMock(EntityManagerInterface::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $params = $this->createMock(ParameterBagInterface::class);
         $security = $this->createMock(Security::class);
         $translator = $this->createMock(TranslatorInterface::class);
@@ -43,23 +45,33 @@ class RssControllerTest extends TestCase
             ->method('getFilteredOfTypeByPostDate')
             ->willReturn($paginator);
 
-        $em->method('getRepository')
+        $entityManager->method('getRepository')
             ->with(Page::class)
             ->willReturn($pageRepository);
 
         $controller = $this->getMockBuilder(RssController::class)
-            ->setConstructorArgs([$em, $params, $security, $translator, $wasteRepository])
+            ->setConstructorArgs([
+                $entityManager,
+                new PageViewFactory(
+                    $params,
+                    $this->createStub(RequestStack::class),
+                    $this->createStub(Security::class),
+                    $wasteRepository,
+                ),
+                $params,
+                $security,
+                $translator,
+                $wasteRepository,
+            ])
             ->onlyMethods(['render'])
             ->getMock();
-
-        $controller->setDefaults();
 
         $controller->expects($this->once())
             ->method('render')
             ->willReturn(new Response('<rss></rss>', 200, ['Content-Type' => 'application/rss+xml']));
 
         $request = new Request();
-        $response = $controller->feed($request);
+        $response = $controller->feed($request, $pageRepository);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame('<rss></rss>', $response->getContent());

@@ -83,31 +83,31 @@ class SearchControllerTest extends InachisControllerTestCase
         $results = $this->createMock(SearchResult::class);
         $results->method('getResults')->willReturn([
             0 => [
-                'id' => Uuid::uuid1(),
+                'id' => Uuid::uuid1()->getBytes(),
                 'type' => 'Image',
                 'title' => 'Test image',
                 'sub_title' => 'image.jpeg',
-                'relevance' => '0.345678',
+                'relevance' => 0.345678,
                 'url' => '',
-                'author' => '',
+                'author' => null,
             ],
             1 => [
                 'type' => 'Series',
                 'title' => 'Test Series',
                 'sub_title' => '',
-                'id' => Uuid::uuid1(),
-                'relevance' => '0.3',
+                'id' => Uuid::uuid1()->getBytes(),
+                'relevance' => 0.3,
                 'url' => '',
-                'author' => '',
+                'author' => null,
             ],
             2 => [
                 'type' => 'Post',
                 'title' => 'Test Series',
                 'sub_title' => '',
-                'id' => Uuid::uuid1(),
-                'relevance' => '0.3',
+                'id' => Uuid::uuid1()->getBytes(),
+                'relevance' => 0.3,
                 'url' => '',
-                'author' => '',
+                'author' => null,
             ],
         ]);
         $results->expects($this->once())->method('getOffset')->willReturn(50);
@@ -167,13 +167,13 @@ class SearchControllerTest extends InachisControllerTestCase
         $results = $this->createMock(SearchResult::class);
         $results->expects($this->once())->method('getResults')->willReturn([
             0 => [
-                'id' => Uuid::uuid1(),
+                'id' => Uuid::uuid1()->getBytes(),
                 'type' => 'Image',
                 'title' => 'Test image',
                 'sub_title' => 'image.jpeg',
-                'relevance' => '0.345678',
+                'relevance' => 0.345678,
                 'url' => '',
-                'author' => '',
+                'author' => null,
             ],
         ]);
         $results->expects($this->once())->method('getOffset')->willReturn(50);

@@ -36,6 +36,8 @@ class DashboardControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['render'])
             ->getMock();
@@ -53,7 +55,6 @@ class DashboardControllerTest extends InachisControllerTestCase
         $analytics->expects($this->atLeastOnce())->method('getMonthlyUniqueVisitors')->willReturn(3);
 
         $result = $controller->default(
-            $request,
             $analytics,
             $this->createStub(ImageRepository::class),
             $pageRepository,
