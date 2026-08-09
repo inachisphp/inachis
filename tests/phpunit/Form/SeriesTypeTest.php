@@ -8,19 +8,21 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Form;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Inachis\Entity\Content\Series;
+use Inachis\Entity\User\User;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\SeriesType;
-use Inachis\Security\Authorisation\PermissionResolver;
 use Inachis\Provider\TimezoneProvider;
+use Inachis\Security\Authorisation\PermissionResolver;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Ramsey\Uuid\Uuid;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\SecurityBundle\Security;
-// use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
-// use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -41,14 +43,44 @@ class SeriesTypeTest extends TypeTestCase
         return $m;
     }
 
+    private function createGrantedUser(): User
+    {
+        $permissions = [];
+        foreach (PermissionResource::cases() as $resource) {
+            foreach (PermissionAction::cases() as $action) {
+                $permissions[] = new class($resource, $action) {
+                    public function __construct(
+                        private readonly PermissionResource $r,
+                        private readonly PermissionAction $a,
+                    ) {}
+
+                    public function getResource(): PermissionResource { return $this->r; }
+                    public function getAction(): PermissionAction { return $this->a; }
+                };
+            }
+        }
+
+        $role = new class($permissions) {
+            public function __construct(private readonly array $permissions) {}
+
+            public function getRolePermissions(): array { return $this->permissions; }
+        };
+
+        $user = $this->createStub(User::class);
+        $user->method('getAssignedRoles')->willReturn(new ArrayCollection([$role]));
+
+        return $user;
+    }
+
     protected function getExtensions(): array
     {
         $translator = $this->createStub(TranslatorInterface::class);
         $security = $this->createStub(Security::class);
-        $permissionResolver = $this->createStub(PermissionResolver::class);
-        $permissionResolver->method('hasPermission')->willReturn(true);
-        $timezoneProvider = $this->createStub(TimezoneProvider::class);
-        $timezoneProvider->method('getForUser')->willReturn('UTC');
+        $security->method('getUser')->willReturn($this->createGrantedUser());
+        $permissionResolver = new PermissionResolver();
+
+        // Instantiate directly instead of stubbing:
+        $timezoneProvider = new TimezoneProvider('UTC');
 
         return [
             new PreloadedExtension([new SeriesType($permissionResolver, $security, $timezoneProvider, $translator)], []),
@@ -57,14 +89,14 @@ class SeriesTypeTest extends TypeTestCase
 
     public function testConfigureOptionsSetsDataClass(): void
     {
-        $permissionResolver = $this->createStub(PermissionResolver::class);
-        $permissionResolver->method('hasPermission')->willReturn(true);
-        $timezoneProvider = $this->createStub(TimezoneProvider::class);
-        $timezoneProvider->method('getForUser')->willReturn('UTC');
+        $security = $this->createStub(Security::class);
+        $security->method('getUser')->willReturn($this->createGrantedUser());
+        $permissionResolver = new PermissionResolver();
+        $timezoneProvider = new TimezoneProvider('UTC');
 
         $seriesType = new SeriesType(
             $permissionResolver,
-            $this->createStub(Security::class),
+            $security,
             $timezoneProvider,
             $this->translator(),
         );
@@ -79,14 +111,14 @@ class SeriesTypeTest extends TypeTestCase
 
     public function testBuildFormForNewSeries(): void
     {
-        $permissionResolver = $this->createStub(PermissionResolver::class);
-        $permissionResolver->method('hasPermission')->willReturn(true);
-        $timezoneProvider = $this->createStub(TimezoneProvider::class);
-        $timezoneProvider->method('getForUser')->willReturn('UTC');
+        $security = $this->createStub(Security::class);
+        $security->method('getUser')->willReturn($this->createGrantedUser());
+        $permissionResolver = new PermissionResolver();
+        $timezoneProvider = new TimezoneProvider('UTC');
 
         $seriesType = new SeriesType(
             $permissionResolver,
-            $this->createStub(Security::class),
+            $security,
             $timezoneProvider,
             $this->translator(),
         );
@@ -94,14 +126,12 @@ class SeriesTypeTest extends TypeTestCase
         $builder = $this->createMock(FormBuilderInterface::class);
 
         $expected = [
-            ['title', TextType::class, $this->anything()],
-            ['subTitle', TextType::class, $this->anything()],
-            ['url', TextType::class, $this->anything()],
-            ['description', TextareaType::class, $this->anything()],
-            ['image', EntityType::class, $this->anything()],
-            ['visibility', CheckboxType::class, $this->anything()],
-            ['submit', SubmitType::class, $this->anything()],
-            ['delete', SubmitType::class, $this->anything()],
+            ['title', TextType::class],
+            ['subTitle', TextType::class],
+            ['url', TextType::class],
+            ['description', TextareaType::class],
+            ['image', HiddenType::class],
+            ['submit', SubmitType::class],
         ];
 
         $this->expectAddCallsInOrder($builder, $expected);
@@ -110,27 +140,34 @@ class SeriesTypeTest extends TypeTestCase
 
     public function testBuildFormForExistingSeries(): void
     {
+        $security = $this->createStub(Security::class);
+        $security->method('getUser')->willReturn($this->createGrantedUser());
+        $permissionResolver = new PermissionResolver();
+        $timezoneProvider = new TimezoneProvider('UTC');
+
         $seriesType = new SeriesType(
-            $this->createStub(Security::class),
+            $permissionResolver,
+            $security,
+            $timezoneProvider,
             $this->translator(),
         );
         $series = (new Series())->setId(Uuid::uuid1());
         $builder = $this->createMock(FormBuilderInterface::class);
 
         $expected = [
-            ['title', TextType::class, $this->anything()],
-            ['subTitle', TextType::class, $this->anything()],
-            ['url', TextType::class, $this->anything()],
-            ['description', TextareaType::class, $this->anything()],
-            ['image', EntityType::class, $this->anything()],
-            ['firstDate', DateType::class, $this->anything()],
-            ['lastDate', DateType::class, $this->anything()],
-            ['bulkCreate', ButtonType::class, $this->anything()],
-            ['addItem', ButtonType::class, $this->anything()],
-            ['visibility', CheckboxType::class, $this->anything()],
-            ['submit', SubmitType::class, $this->anything()],
-            ['delete', SubmitType::class, $this->anything()],
-            ['remove', SubmitType::class, $this->anything()],
+            ['title', TextType::class],
+            ['subTitle', TextType::class],
+            ['url', TextType::class],
+            ['description', TextareaType::class],
+            ['image', HiddenType::class],
+            ['firstDate', DateType::class],
+            ['lastDate', DateType::class],
+            ['bulkCreate', ButtonType::class],
+            ['addItem', ButtonType::class],
+            ['visible', CheckboxType::class],
+            ['submit', SubmitType::class],
+            ['delete', SubmitType::class],
+            ['remove', SubmitType::class],
         ];
 
         $this->expectAddCallsInOrder($builder, $expected);
