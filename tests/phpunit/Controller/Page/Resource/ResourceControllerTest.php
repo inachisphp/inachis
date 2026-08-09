@@ -11,7 +11,8 @@ namespace Inachis\Tests\phpunit\Controller\Page\Resource;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Inachis\Controller\Page\Resource\ResourceController;
 use Inachis\Entity\Media\Image;
-use Inachis\Model\ContentQueryParameters;
+use Inachis\Entity\User\User;
+use Inachis\Form\ResourceType;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
@@ -37,8 +38,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\String\UnicodeString;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 class ResourceControllerTest extends InachisControllerTestCase
 {
@@ -54,10 +55,16 @@ class ResourceControllerTest extends InachisControllerTestCase
         ], [], [], [
             'REQUEST_URI' => '/incp/resources/{type}/{offset}/{limit}',
         ]);
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
         $downloadRepository = $this->createStub(DownloadRepository::class);
         $paginator = $this->createStub(Paginator::class);
+
         $imageRepository = $this->createMock(ImageRepository::class);
-        $imageRepository->expects($this->once())->method('getFiltered')->willReturn($paginator);
+        $imageRepository->expects($this->once())
+            ->method('getFiltered')
+            ->willReturn($paginator);
+
         $this->controller = $this->getMockBuilder(ResourceController::class)
             ->setConstructorArgs([
                 $this->entityManager,
@@ -70,6 +77,7 @@ class ResourceControllerTest extends InachisControllerTestCase
             ])
             ->onlyMethods(['createFormBuilder', 'generateUrl', 'render'])
             ->getMock();
+
         $this->controller->expects($this->once())
             ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
@@ -83,10 +91,14 @@ class ResourceControllerTest extends InachisControllerTestCase
             $imageRepository,
             new ViewStateManager(
                 $this->createStub(Security::class),
-                $this->createStub(UserViewStateRepository::class)
+                $this->createStub(UserViewStateRepository::class),
             ),
         );
-        $this->assertEquals('rendered:inadmin/page/resource/list.html.twig', $result->getContent());
+
+        $this->assertEquals(
+            'rendered:inadmin/page/resource/list.html.twig',
+            $result->getContent()
+        );
     }
 
     /**
@@ -100,6 +112,7 @@ class ResourceControllerTest extends InachisControllerTestCase
         ], [], [], [
             'REQUEST_URI' => '/incp/resources/{type}/{filename}',
         ]);
+
         $this->controller = $this->getMockBuilder(ResourceController::class)
             ->setConstructorArgs([
                 $this->entityManager,
@@ -112,22 +125,43 @@ class ResourceControllerTest extends InachisControllerTestCase
             ])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'render'])
             ->getMock();
+
         $this->controller->expects($this->once())
             ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:'.$template);
             });
+
+        $image = new Image();
+
         $filesystem = $this->createStub(Filesystem::class);
         $downloadRepository = $this->createStub(DownloadRepository::class);
-        $image = new Image();
+
         $imageRepository = $this->createMock(ImageRepository::class);
-        $imageRepository->expects($this->once())->method('findOneBy')->willReturn($image);
-        $paginator = $this->createStub(Paginator::class);
-        $pageRepository = $this->createMock(PageRepository::class);
-        $pageRepository->expects($this->once())->method('getPostsUsingImage')->willReturn($paginator);
-        $seriesRepository = $this->createMock(SeriesRepository::class);
-        $seriesRepository->expects($this->once())->method('getSeriesUsingImage')->willReturn($paginator);
-        $wasteManagerService = $this->createStub(WasteManagerService::class);
+        $imageRepository->expects($this->once())
+            ->method('findOneBy')
+            ->willReturn($image);
+
+        $usageService = $this->createMock(ResourceUsageService::class);
+        $usageService->expects($this->once())
+            ->method('getUsages')
+            ->with($image)
+            ->willReturn([]);
+
+        $form = $this->createMock(Form::class);
+        $form->expects($this->once())
+            ->method('handleRequest')
+            ->with($request);
+
+        $form->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(false);
+
+        $this->controller->expects($this->once())
+            ->method('createForm')
+            ->with(ResourceType::class, $image)
+            ->willReturn($form);
+
         $result = $this->controller->edit(
             $request,
             $filesystem,
@@ -136,10 +170,14 @@ class ResourceControllerTest extends InachisControllerTestCase
             $imageRepository,
             $this->createStub(AiVisionManager::class),
             $this->createStub(ResourceStorageProvider::class),
-            $this->createStub(ResourceUsageService::class),
-            $wasteManagerService,
+            $usageService,
+            $this->createStub(WasteManagerService::class),
         );
-        $this->assertEquals('rendered:inadmin/page/resource/edit.html.twig', $result->getContent());
+
+        $this->assertEquals(
+            'rendered:inadmin/page/resource/edit.html.twig',
+            $result->getContent()
+        );
     }
 
     /**
@@ -153,6 +191,7 @@ class ResourceControllerTest extends InachisControllerTestCase
         ], [], [], [
             'REQUEST_URI' => '/incp/resources/{type}/{filename}',
         ]);
+
         $this->controller = $this->getMockBuilder(ResourceController::class)
             ->setConstructorArgs([
                 $this->entityManager,
@@ -165,31 +204,37 @@ class ResourceControllerTest extends InachisControllerTestCase
             ])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'redirectToRoute'])
             ->getMock();
+
         $this->controller->expects($this->once())
             ->method('redirectToRoute')
             ->with('incp_resource_list', ['type' => 'images'])
             ->willReturn(new RedirectResponse('/resources/images'));
-        $filesystem = $this->createStub(Filesystem::class);
-        $downloadRepository = $this->createStub(DownloadRepository::class);
-        $image = null;
+
         $imageRepository = $this->createMock(ImageRepository::class);
-        $imageRepository->expects($this->once())->method('findOneBy')->willReturn($image);
+        $imageRepository->expects($this->once())
+            ->method('findOneBy')
+            ->willReturn(null);
+
         $pageRepository = $this->createMock(PageRepository::class);
-        $pageRepository->expects($this->never())->method('getPostsUsingImage');
+        $pageRepository->expects($this->never())
+            ->method('getPostsUsingImage');
+
         $seriesRepository = $this->createMock(SeriesRepository::class);
-        $seriesRepository->expects($this->never())->method('getSeriesUsingImage');
-        $wasteManagerService = $this->createStub(WasteManagerService::class);
+        $seriesRepository->expects($this->never())
+            ->method('getSeriesUsingImage');
+
         $result = $this->controller->edit(
             $request,
-            $filesystem,
+            $this->createStub(Filesystem::class),
             $this->createStub(DownloadFileService::class),
-            $downloadRepository,
+            $this->createStub(DownloadRepository::class),
             $imageRepository,
             $this->createStub(AiVisionManager::class),
             $this->createStub(ResourceStorageProvider::class),
             $this->createStub(ResourceUsageService::class),
-            $wasteManagerService,
+            $this->createStub(WasteManagerService::class),
         );
+
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/resources/images', $result->getTargetUrl());
     }
@@ -209,7 +254,9 @@ class ResourceControllerTest extends InachisControllerTestCase
         ], [], [], [
             'REQUEST_URI' => '/incp/resources/{type}/{filename}',
         ]);
+
         $image = (new Image())->setId(Uuid::uuid1());
+
         $this->controller = $this->getMockBuilder(ResourceController::class)
             ->setConstructorArgs([
                 $this->entityManager,
@@ -220,42 +267,77 @@ class ResourceControllerTest extends InachisControllerTestCase
                 $this->pageViewFactory,
                 $this->requestStack,
             ])
-            ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirectToRoute'])
+            ->onlyMethods([
+                'addFlash',
+                'createForm',
+                'generateUrl',
+                'getCurrentUser',
+                'redirectToRoute',
+            ])
             ->getMock();
+
+        $this->controller->method('getCurrentUser')
+            ->willReturn(new User());
+
         $this->controller->expects($this->once())
             ->method('redirectToRoute')
             ->with('incp_resource_list', ['type' => 'images'])
             ->willReturn(new RedirectResponse('/resources/images'));
-        $form = $this->createMock(Form::class);
-        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
-        $form->expects($this->once())->method('isValid')->willReturn(true);
-        $form->expects($this->once())->method('getData')->willReturn($image);
+
+        $form = $this->createMock(\Symfony\Component\Form\Form::class);
+        $form->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+        $form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+        $form->expects($this->once())
+            ->method('getData')
+            ->willReturn($image);
+
         $this->controller->expects($this->once())
             ->method('createForm')
             ->willReturn($form);
+
         $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects($this->once())->method('exists')->willReturn(true);
-        $downloadRepository = $this->createStub(DownloadRepository::class);
+        $filesystem->expects($this->once())
+            ->method('exists')
+            ->willReturn(true);
+
         $imageRepository = $this->createMock(ImageRepository::class);
-        $imageRepository->expects($this->once())->method('findOneBy')->willReturn($image);
-        $paginator = $this->createStub(Paginator::class);
-        $pageRepository = $this->createMock(PageRepository::class);
-        $pageRepository->expects($this->once())->method('getPostsUsingImage')->willReturn($paginator);
-        $seriesRepository = $this->createMock(SeriesRepository::class);
-        $seriesRepository->expects($this->once())->method('getSeriesUsingImage')->willReturn($paginator);
-        $imageDirectory = '/tmp/';
-        $wasteManagerService = $this->createStub(WasteManagerService::class);
+        $imageRepository->expects($this->once())
+            ->method('findOneBy')
+            ->willReturn($image);
+
+        $usageService = $this->createMock(ResourceUsageService::class);
+        $usageService->expects($this->once())
+            ->method('getUsages')
+            ->willReturn([]);
+        $usageService->expects($this->once())
+            ->method('isFileInUse')
+            ->willReturn(false);
+
+        $storageProvider = $this->createMock(ResourceStorageProvider::class);
+        $storageProvider->expects($this->once())
+            ->method('getFullPath')
+            ->willReturn('/tmp/test.jpg');
+
+        $wasteManagerService = $this->createMock(WasteManagerService::class);
+        $wasteManagerService->expects($this->once())
+            ->method('sendToWaste');
+
         $result = $this->controller->edit(
             $request,
             $filesystem,
             $this->createStub(DownloadFileService::class),
-            $downloadRepository,
+            $this->createStub(DownloadRepository::class),
             $imageRepository,
             $this->createStub(AiVisionManager::class),
-            $this->createStub(ResourceStorageProvider::class),
-            $this->createStub(ResourceUsageService::class),
+            $storageProvider,
+            $usageService,
             $wasteManagerService,
         );
+
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/resources/images', $result->getTargetUrl());
     }
@@ -275,7 +357,9 @@ class ResourceControllerTest extends InachisControllerTestCase
         ], [], [], [
             'REQUEST_URI' => '/incp/resources/{type}/{filename}',
         ]);
+
         $image = (new Image())->setId(Uuid::uuid1());
+
         $this->controller = $this->getMockBuilder(ResourceController::class)
             ->setConstructorArgs([
                 $this->entityManager,
@@ -286,46 +370,80 @@ class ResourceControllerTest extends InachisControllerTestCase
                 $this->pageViewFactory,
                 $this->requestStack,
             ])
-            ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirectToRoute'])
+            ->onlyMethods([
+                'addFlash',
+                'createForm',
+                'getCurrentUser',
+                'redirectToRoute',
+            ])
             ->getMock();
+
+        $this->controller->method('getCurrentUser')
+            ->willReturn(new User());
+
         $this->controller->expects($this->once())
             ->method('redirectToRoute')
-            ->with('incp_resource_edit', ['type' => 'images', 'filename' => $image->getId()])
+            ->with('incp_resource_edit', [
+                'type' => 'images',
+                'filename' => $image->getId(),
+            ])
             ->willReturn(new RedirectResponse('/resources/images'));
-        $form = $this->createMock(Form::class);
-        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
-        $form->expects($this->once())->method('isValid')->willReturn(true);
-        $form->expects($this->once())->method('getData')->willReturn($image);
+
+        $form = $this->createMock(\Symfony\Component\Form\Form::class);
+        $form->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+        $form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+        $form->expects($this->once())
+            ->method('getData')
+            ->willReturn($image);
+
         $this->controller->expects($this->once())
             ->method('createForm')
             ->willReturn($form);
+
         $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects($this->once())->method('exists')->willReturn(true);
+        $filesystem->expects($this->once())
+            ->method('exists')
+            ->willReturn(true);
+
+        $imageRepository = $this->createMock(ImageRepository::class);
+        $imageRepository->expects($this->once())
+            ->method('findOneBy')
+            ->willReturn($image);
+
+        $usageService = $this->createMock(ResourceUsageService::class);
+        $usageService->expects($this->once())
+            ->method('getUsages')
+            ->willReturn([]);
+        $usageService->expects($this->once())
+            ->method('isFileInUse')
+            ->willReturn(false);
+
+        $storageProvider = $this->createMock(ResourceStorageProvider::class);
+        $storageProvider->expects($this->once())
+            ->method('getFullPath')
+            ->willReturn('/tmp/test.jpg');
+
         $wasteManagerService = $this->createMock(WasteManagerService::class);
         $wasteManagerService->expects($this->once())
             ->method('sendToWaste')
             ->willThrowException(new \Exception('Failed to remove file.'));
-        $downloadRepository = $this->createStub(DownloadRepository::class);
-        $imageRepository = $this->createMock(ImageRepository::class);
-        $imageRepository->expects($this->once())->method('findOneBy')->willReturn($image);
-        $paginator = $this->createStub(Paginator::class);
-        $pageRepository = $this->createMock(PageRepository::class);
-        $pageRepository->expects($this->once())->method('getPostsUsingImage')->willReturn($paginator);
-        $seriesRepository = $this->createMock(SeriesRepository::class);
-        $seriesRepository->expects($this->once())->method('getSeriesUsingImage')->willReturn($paginator);
-        $imageDirectory = '/tmp/';
 
         $result = $this->controller->edit(
             $request,
             $filesystem,
             $this->createStub(DownloadFileService::class),
-            $downloadRepository,
+            $this->createStub(DownloadRepository::class),
             $imageRepository,
             $this->createStub(AiVisionManager::class),
-            $this->createStub(ResourceStorageProvider::class),
-            $this->createStub(ResourceUsageService::class),
+            $storageProvider,
+            $usageService,
             $wasteManagerService,
         );
+
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/resources/images', $result->getTargetUrl());
     }
@@ -341,7 +459,9 @@ class ResourceControllerTest extends InachisControllerTestCase
         ], [], [], [
             'REQUEST_URI' => '/incp/resources/{type}/{filename}',
         ]);
+
         $image = (new Image())->setId(Uuid::uuid1());
+
         $this->controller = $this->getMockBuilder(ResourceController::class)
             ->setConstructorArgs([
                 $this->entityManager,
@@ -352,41 +472,62 @@ class ResourceControllerTest extends InachisControllerTestCase
                 $this->pageViewFactory,
                 $this->requestStack,
             ])
-            ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirectToRoute'])
+            ->onlyMethods([
+                'addFlash',
+                'createForm',
+                'getCurrentUser',
+                'redirectToRoute',
+            ])
             ->getMock();
+
+        $this->controller->method('getCurrentUser')
+            ->willReturn(new User());
+
         $this->controller->expects($this->once())
             ->method('redirectToRoute')
-            ->with('incp_resource_edit', ['type' => 'images', 'filename' => $image->getId()])
+            ->with('incp_resource_edit', [
+                'type' => 'images',
+                'filename' => $image->getId(),
+            ])
             ->willReturn(new RedirectResponse('/resources/images'));
-        $form = $this->createMock(Form::class);
-        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
-        $form->expects($this->once())->method('isValid')->willReturn(true);
-        $form->expects($this->once())->method('getData')->willReturn($image);
+
+        $form = $this->createMock(\Symfony\Component\Form\Form::class);
+        $form->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+        $form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+        $form->expects($this->once())
+            ->method('getData')
+            ->willReturn($image);
+
         $this->controller->expects($this->once())
             ->method('createForm')
             ->willReturn($form);
-        $filesystem = $this->createStub(Filesystem::class);
-        $downloadRepository = $this->createStub(DownloadRepository::class);
+
         $imageRepository = $this->createMock(ImageRepository::class);
-        $imageRepository->expects($this->once())->method('findOneBy')->willReturn($image);
-        $paginator = $this->createStub(Paginator::class);
-        $pageRepository = $this->createMock(PageRepository::class);
-        $pageRepository->expects($this->once())->method('getPostsUsingImage')->willReturn($paginator);
-        $seriesRepository = $this->createMock(SeriesRepository::class);
-        $seriesRepository->expects($this->once())->method('getSeriesUsingImage')->willReturn($paginator);
-        $imageDirectory = '/tmp/';
-        $wasteManagerService = $this->createStub(WasteManagerService::class);
+        $imageRepository->expects($this->once())
+            ->method('findOneBy')
+            ->willReturn($image);
+
+        $usageService = $this->createMock(ResourceUsageService::class);
+        $usageService->expects($this->once())
+            ->method('getUsages')
+            ->willReturn([]);
+
         $result = $this->controller->edit(
             $request,
-            $filesystem,
+            $this->createStub(Filesystem::class),
             $this->createStub(DownloadFileService::class),
-            $downloadRepository,
+            $this->createStub(DownloadRepository::class),
             $imageRepository,
             $this->createStub(AiVisionManager::class),
             $this->createStub(ResourceStorageProvider::class),
-            $this->createStub(ResourceUsageService::class),
-            $wasteManagerService,
+            $usageService,
+            $this->createStub(WasteManagerService::class),
         );
+
         $this->assertInstanceOf(RedirectResponse::class, $result);
         $this->assertEquals('/resources/images', $result->getTargetUrl());
     }
@@ -399,6 +540,7 @@ class ResourceControllerTest extends InachisControllerTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incp/resource/image/upload',
         ]);
+
         $this->controller = $this->getMockBuilder(ResourceController::class)
             ->setConstructorArgs([
                 $this->entityManager,
@@ -411,13 +553,21 @@ class ResourceControllerTest extends InachisControllerTestCase
             ])
             ->onlyMethods(['redirectToRoute'])
             ->getMock();
-        $this->controller->expects($this->never())->method('redirectToRoute');
-        $imageFileService = $this->createStub(ImageFileService::class);
-        $slugger = $this->createStub(SluggerInterface::class);
-        $result = $this->controller->uploadImage($request, $imageFileService, $slugger, '/tmp');
+
+        $this->controller->expects($this->never())
+            ->method('redirectToRoute');
+
+        $result = $this->controller->uploadImage(
+            $request,
+            $this->createStub(ImageFileService::class),
+        );
+
         $this->assertInstanceOf(JsonResponse::class, $result);
         $this->assertEquals(400, $result->getStatusCode());
-        $this->assertEquals('{"error":"No file provided"}', $result->getContent());
+        $this->assertEquals(
+            '{"error":"No file provided"}',
+            $result->getContent()
+        );
     }
 
     /**
@@ -432,6 +582,7 @@ class ResourceControllerTest extends InachisControllerTestCase
         ], [
             'REQUEST_URI' => '/incp/resource/image/upload',
         ]);
+
         $this->controller = $this->getMockBuilder(ResourceController::class)
             ->setConstructorArgs([
                 $this->entityManager,
@@ -444,13 +595,21 @@ class ResourceControllerTest extends InachisControllerTestCase
             ])
             ->onlyMethods(['redirectToRoute'])
             ->getMock();
-        $this->controller->expects($this->never())->method('redirectToRoute');
-        $imageFileService = $this->createStub(ImageFileService::class);
-        $slugger = $this->createStub(SluggerInterface::class);
-        $result = $this->controller->uploadImage($request, $imageFileService, $slugger, '/tmp');
+
+        $this->controller->expects($this->never())
+            ->method('redirectToRoute');
+
+        $result = $this->controller->uploadImage(
+            $request,
+            $this->createStub(ImageFileService::class),
+        );
+
         $this->assertInstanceOf(JsonResponse::class, $result);
         $this->assertEquals(400, $result->getStatusCode());
-        $this->assertEquals('{"error":"No title provided"}', $result->getContent());
+        $this->assertEquals(
+            '{"error":"No title provided"}',
+            $result->getContent()
+        );
     }
 
     /**
@@ -459,10 +618,7 @@ class ResourceControllerTest extends InachisControllerTestCase
     public function testUploadImage(): void
     {
         $file = $this->createMock(UploadedFile::class);
-        $file->expects($this->once())->method('getClientOriginalName')->willReturn('test');
-        $file->expects($this->once())->method('guessExtension')->willReturn('jpg');
-        $file->expects($this->once())->method('getSize')->willReturn(1024);
-        $file->expects($this->once())->method('getMimeType')->willReturn('image/jpeg');
+
         $request = new Request([], [
             'image' => [
                 'title' => 'test-image',
@@ -477,6 +633,13 @@ class ResourceControllerTest extends InachisControllerTestCase
         ], [
             'REQUEST_URI' => '/incp/resource/image/upload',
         ]);
+
+        $image = (new Image())
+            ->setFilename('test.jpg')
+            ->setChecksum('test')
+            ->setDimensionX(10)
+            ->setDimensionY(10);
+
         $this->controller = $this->getMockBuilder(ResourceController::class)
             ->setConstructorArgs([
                 $this->entityManager,
@@ -487,23 +650,41 @@ class ResourceControllerTest extends InachisControllerTestCase
                 $this->pageViewFactory,
                 $this->requestStack,
             ])
-            ->onlyMethods(['redirectToRoute'])
+            ->onlyMethods(['getCurrentUser'])
             ->getMock();
-        $this->controller->expects($this->never())->method('redirectToRoute');
+
+        $this->controller->method('getCurrentUser')
+            ->willReturn(new User());
+
         $imageFileService = $this->createMock(ImageFileService::class);
-        $imageFileService->expects($this->once())->method('convertHEICToJPEG')->willReturn($file);
-        $imageFileService->expects($this->once())->method('createChecksum')->willReturn('test');
-        $imageFileService->expects($this->once())->method('getImageDimensions')->willReturn([
-            10,
-            10,
-        ]);
-        $imageFileService->expects($this->once())->method('optimise')->willReturn($file);
-        $slugger = $this->createMock(SluggerInterface::class);
-        $slugger->expects($this->once())->method('slug')->willReturn(new UnicodeString('test'));
-        $result = $this->controller->uploadImage($request, $imageFileService, $slugger, '/tmp');
+        $imageFileService->expects($this->once())
+            ->method('createFromUpload')
+            ->with(
+                $file,
+                'test-image',
+                '',
+                '',
+                true,
+                $this->isInstanceOf(User::class),
+            )
+            ->willReturn($image);
+
+        $result = $this->controller->uploadImage(
+            $request,
+            $imageFileService,
+        );
+
         $this->assertInstanceOf(JsonResponse::class, $result);
         $this->assertEquals(200, $result->getStatusCode());
-        $this->assertStringContainsString('success', $result->getContent());
+
+        $data = json_decode($result->getContent(), true);
+
+        $this->assertIsArray($data);
+        $this->assertTrue($data['success']);
+        $this->assertSame('test.jpg', $data['filename']);
+        $this->assertSame('test', $data['checksum']);
+        $this->assertSame(10, $data['dimensions']['width']);
+        $this->assertSame(10, $data['dimensions']['height']);
     }
 
     /**
@@ -512,11 +693,7 @@ class ResourceControllerTest extends InachisControllerTestCase
     public function testUploadImageFailed(): void
     {
         $file = $this->createMock(UploadedFile::class);
-        $file->expects($this->once())->method('getClientOriginalName')->willReturn('test');
-        $file->expects($this->once())->method('guessExtension')->willReturn('jpg');
-        $file->expects($this->once())->method('getSize')->willReturn(1024);
-        $file->expects($this->once())->method('getMimeType')->willReturn('image/jpeg');
-        $file->expects($this->once())->method('move')->willThrowException(new FileException());
+
         $request = new Request([], [
             'image' => [
                 'title' => 'test-image',
@@ -531,6 +708,7 @@ class ResourceControllerTest extends InachisControllerTestCase
         ], [
             'REQUEST_URI' => '/incp/resource/image/upload',
         ]);
+
         $this->controller = $this->getMockBuilder(ResourceController::class)
             ->setConstructorArgs([
                 $this->entityManager,
@@ -541,22 +719,29 @@ class ResourceControllerTest extends InachisControllerTestCase
                 $this->pageViewFactory,
                 $this->requestStack,
             ])
-            ->onlyMethods(['redirectToRoute'])
+            ->onlyMethods(['getCurrentUser'])
             ->getMock();
-        $this->controller->expects($this->never())->method('redirectToRoute');
+
+        $this->controller->method('getCurrentUser')
+            ->willReturn(new User());
+
         $imageFileService = $this->createMock(ImageFileService::class);
-        $imageFileService->expects($this->once())->method('convertHEICToJPEG')->willReturn($file);
-        $imageFileService->expects($this->once())->method('createChecksum')->willReturn('test');
-        $imageFileService->expects($this->once())->method('getImageDimensions')->willReturn([
-            10,
-            10,
-        ]);
-        $imageFileService->expects($this->once())->method('optimise')->willReturn($file);
-        $slugger = $this->createMock(SluggerInterface::class);
-        $slugger->expects($this->once())->method('slug')->willReturn(new UnicodeString('test'));
-        $result = $this->controller->uploadImage($request, $imageFileService, $slugger, '/tmp');
+        $imageFileService->expects($this->once())
+            ->method('createFromUpload')
+            ->willThrowException(new FileException('Upload failed.'));
+
+        $result = $this->controller->uploadImage(
+            $request,
+            $imageFileService,
+        );
+
         $this->assertInstanceOf(JsonResponse::class, $result);
         $this->assertEquals(400, $result->getStatusCode());
-        $this->assertStringContainsString('error', $result->getContent());
+
+        $data = json_decode($result->getContent(), true);
+
+        $this->assertIsArray($data);
+        $this->assertArrayHasKey('error', $data);
+        $this->assertStringContainsString('File upload failed', $data['error']);
     }
 }

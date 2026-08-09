@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Controller\Page\Dashboard;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Controller\Page\Dashboard\DashboardController;
 use Inachis\Repository\Content\PageRepository;
@@ -29,6 +28,7 @@ class DashboardControllerTest extends InachisControllerTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incp/',
         ]);
+
         $controller = $this->getMockBuilder(DashboardController::class)
             ->setConstructorArgs([
                 $this->entityManager,
@@ -41,26 +41,101 @@ class DashboardControllerTest extends InachisControllerTestCase
             ])
             ->onlyMethods(['render'])
             ->getMock();
-        $controller->expects($this->once())->method('render')
-            ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:'.$template);
-            });
-        $paginator = $this->createStub(Paginator::class);
+
+        $controller->expects($this->once())
+            ->method('render')
+            ->willReturnCallback(
+                static function (string $template, array $data): Response {
+                    return new Response('rendered:'.$template);
+                },
+            );
+
         $pageRepository = $this->createMock(PageRepository::class);
-        $pageRepository->expects($this->atLeastOnce())->method('getAll')->willReturn($paginator);
+
+        $pageRepository->expects($this->once())
+            ->method('findMostRecentlyEditedDraft')
+            ->willReturn(null);
+
+        $pageRepository->expects($this->once())
+            ->method('findRecentDrafts')
+            ->with(5)
+            ->willReturn([]);
+
+        $pageRepository->expects($this->once())
+            ->method('findUpcoming')
+            ->with(5)
+            ->willReturn([]);
+
+        $pageRepository->expects($this->once())
+            ->method('findRecentPublished')
+            ->with(5)
+            ->willReturn([]);
+
+        $pageRepository->expects($this->once())
+            ->method('getDashboardCounts')
+            ->willReturn([
+                'drafts' => 0,
+                'published' => 0,
+                'upcoming' => 0,
+            ]);
+
+        $pageRepository->expects($this->once())
+            ->method('getPagesWithoutTagsCount')
+            ->willReturn(0);
+
+        $pageRepository->expects($this->once())
+            ->method('getPagesWithoutCategoriesCount')
+            ->willReturn(0);
+
+        $pageRepository->expects($this->once())
+            ->method('getPagesWithoutFeatureImageCount')
+            ->willReturn(0);
+
+        $pageRepository->expects($this->once())
+            ->method('getPagesWithoutSharingMessageCount')
+            ->willReturn(0);
+
+        $imageRepository = $this->createMock(ImageRepository::class);
+
+        $imageRepository->expects($this->once())
+            ->method('getImagesWithoutAltTextCount')
+            ->willReturn(0);
+
+        $seriesRepository = $this->createMock(SeriesRepository::class);
+
+        $seriesRepository->expects($this->once())
+            ->method('findRecentDrafts')
+            ->with(5)
+            ->willReturn([]);
+
+        $seriesRepository->expects($this->once())
+            ->method('findRecentPublished')
+            ->with(5)
+            ->willReturn([]);
 
         $analytics = $this->createMock(AnalyticsProviderInterface::class);
-        $analytics->expects($this->once())->method('getTopPages')->willReturn([]);
-        $analytics->expects($this->atLeastOnce())->method('getTotalViews')->willReturn(2);
-        $analytics->expects($this->atLeastOnce())->method('getMonthlyUniqueVisitors')->willReturn(3);
+
+        $analytics->expects($this->once())
+            ->method('getDashboardSummary')
+            ->willReturn([]);
+
+        $analytics->expects($this->once())
+            ->method('getTopPages')
+            ->with(
+                $this->isInstanceOf(\DateTimeImmutable::class),
+                $this->isInstanceOf(\DateTimeImmutable::class),
+                5,
+            )
+            ->willReturn([]);
 
         $result = $controller->default(
             $analytics,
-            $this->createStub(ImageRepository::class),
+            $imageRepository,
             $pageRepository,
-            $this->createStub(SeriesRepository::class),
+            $seriesRepository,
         );
-        $this->assertEquals(
+
+        $this->assertSame(
             'rendered:inadmin/page/dashboard/dashboard.html.twig',
             $result->getContent(),
         );

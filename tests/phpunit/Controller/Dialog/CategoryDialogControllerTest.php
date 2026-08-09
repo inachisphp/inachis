@@ -112,6 +112,7 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
         $uuid = Uuid::uuid1();
         $request = new Request([], [
             'id' => $uuid->toString(),
+            'parentID' => '-1',
         ], [], [], [], [
             'REQUEST_URI' => 'incp/ax/categoryManager/save',
         ]);

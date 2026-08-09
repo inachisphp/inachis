@@ -27,11 +27,15 @@ use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Button;
+use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 class SeriesControllerTest extends InachisControllerTestCase
 {
@@ -46,6 +50,7 @@ class SeriesControllerTest extends InachisControllerTestCase
         ], [], [], [
             'REQUEST_URI' => '/incp/series/list/50/25',
         ]);
+        $request->setSession(new Session(new MockArraySessionStorage()));
         $controller = $this->getMockBuilder(SeriesController::class)
             ->setConstructorArgs([
                 $this->entityManager,
@@ -148,7 +153,7 @@ class SeriesControllerTest extends InachisControllerTestCase
     {
         $uuid = Uuid::uuid1();
         $request = new Request([], [], [
-            'id' => $uuid->toString(),
+            'id' => $uuid->getBytes(),
         ], [], [], [
             'REQUEST_URI' => '/incp/series/edit/'.$uuid->toString(),
         ]);
@@ -196,9 +201,7 @@ class SeriesControllerTest extends InachisControllerTestCase
                 'title' => 'test series',
                 'url' => '',
             ],
-        ], [
-            'id' => null,
-        ], [], [], [
+        ], [], [], [], [
             'REQUEST_URI' => '/incp/series/new',
         ]);
         $controller = $this->getMockBuilder(SeriesController::class)
@@ -211,17 +214,18 @@ class SeriesControllerTest extends InachisControllerTestCase
                 $this->pageViewFactory,
                 $this->requestStack,
             ])
-            ->onlyMethods(['addFlash', 'createForm', 'getUser', 'redirect'])
+            ->onlyMethods(['addFlash', 'createForm', 'getCurrentUser', 'redirect'])
             ->getMock();
         $form = $this->createMock(Form::class);
         $form->expects($this->once())->method('isSubmitted')->willReturn(true);
-        $form->method('isValid')->willReturn(true);
-        $button = $this->createMock(Button::class);
-        $button->expects($this->atLeastOnce())->method('getName')->willReturn('submit');
-        $form->expects($this->atLeastOnce())->method('getClickedButton')->willReturn($button);
+        $form->expects($this->once())->method('isValid')->willReturn(true);
 
         $controller->expects($this->once())->method('createForm')->willReturn($form);
-        $controller->expects($this->once())->method('getUser')->willReturn(new User());
+        $controller->expects($this->once())->method('getCurrentUser')->willReturn(new User());
+        $controller->expects($this->once())
+            ->method('redirect')
+            ->with($this->stringStartsWith('/incp/series/edit/'))
+            ->willReturn(new RedirectResponse('/incp/series/edit/'));
 
         $seriesRepository = $this->createMock(SeriesRepository::class);
         $seriesRepository->method('findOneBy')->willReturn(null);
@@ -247,14 +251,12 @@ class SeriesControllerTest extends InachisControllerTestCase
         $request = new Request([],
             [
                 'series' => [
-                    'image' => Uuid::uuid1()->toString(),
+                    'image' => Uuid::uuid1()->getBytes(),
                     'title' => 'test series',
                     'url' => '',
                     'delete' => '',
                 ],
-            ], [
-                'id' => null,
-            ], [], [], [
+            ], [], [], [], [
                 'REQUEST_URI' => '/incp/series/new',
             ]);
         $controller = $this->getMockBuilder(SeriesController::class)
@@ -267,16 +269,18 @@ class SeriesControllerTest extends InachisControllerTestCase
                 $this->pageViewFactory,
                 $this->requestStack,
             ])
-            ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirect'])
+            ->onlyMethods(['addFlash', 'createForm', 'getCurrentUser', 'redirect'])
             ->getMock();
         $form = $this->createMock(Form::class);
         $form->expects($this->once())->method('isSubmitted')->willReturn(true);
         $form->method('isValid')->willReturn(true);
-        $button = $this->createMock(Button::class);
-        $button->expects($this->atLeastOnce())->method('getName')->willReturn('delete');
-        $form->method('getClickedButton')->willReturn($button);
 
         $controller->expects($this->once())->method('createForm')->willReturn($form);
+
+        $controller->expects($this->once())
+            ->method('redirect')
+            ->with('/incp/series/edit//')
+            ->willReturn(new RedirectResponse('/incp/series/edit/'));
         $seriesRepository = $this->createStub(SeriesRepository::class);
         $pageRepository = $this->createStub(PageRepository::class);
 
@@ -305,9 +309,7 @@ class SeriesControllerTest extends InachisControllerTestCase
                     ],
                     'remove' => '',
                 ],
-            ], [
-                'id' => null,
-            ], [], [], [
+            ], [], [], [], [
                 'REQUEST_URI' => '/incp/series/new',
             ]);
         $controller = $this->getMockBuilder(SeriesController::class)
@@ -320,25 +322,35 @@ class SeriesControllerTest extends InachisControllerTestCase
                 $this->pageViewFactory,
                 $this->requestStack,
             ])
-            ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirect'])
+            ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getCurrentUser', 'redirect'])
             ->getMock();
         $form = $this->createMock(Form::class);
         $form->expects($this->once())->method('isSubmitted')->willReturn(true);
         $form->method('isValid')->willReturn(true);
-        $button = $this->createMock(Button::class);
-        $button->expects($this->atLeastOnce())->method('getName')->willReturn('remove');
-        $form->expects($this->atLeastOnce())->method('getClickedButton')->willReturn($button);
+        $button = $this->createMockForIntersectionOfInterfaces([
+            FormInterface::class,
+            ClickableInterface::class,
+        ]);
+        $button->expects($this->once())
+            ->method('isClicked')
+            ->willReturn(true);
+        $form->method('has')
+            ->willReturnCallback(
+                static fn (string $name): bool => 'remove' === $name,
+            );
+        $form->expects($this->once())
+            ->method('get')
+            ->with('remove')
+            ->willReturn($button);
 
         $controller->expects($this->once())->method('createForm')->willReturn($form);
-        $controller->expects($this->once())->method('getUser')->willReturn(new User());
+        $controller->expects($this->once())->method('getCurrentUser')->willReturn(new User());
 
         $page = new Page();
         $series = new Series();
 
         $seriesRepository = $this->createMock(SeriesRepository::class);
-        $seriesRepository->method('findOneBy')->willReturn($series);
-        $imageRepository = $this->createMock(ImageRepository::class);
-        $imageRepository->method('findOneBy')->willReturn(new Image());
+        $seriesRepository->method('findBy')->willReturn([$series]);
         $pageRepository = $this->createMock(PageRepository::class);
         $pageRepository->expects($this->once())->method('findBy')->willReturn([$page]);
 
