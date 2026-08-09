@@ -9,9 +9,6 @@ declare(strict_types=1);
 namespace Inachis\Tests\phpunit\Repository\Content;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -21,104 +18,243 @@ use Inachis\Repository\Content\RevisionRepository;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
-class RevisionRepositoryTest extends TestCase
+final class RevisionRepositoryTest extends TestCase
 {
-    private EntityManagerInterface $entityManager;
     private ManagerRegistry $registry;
-    private EntityRepository $repository;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->registry = $this->createStub(ManagerRegistry::class);
-        $this->entityManager = $this->createStub(EntityManagerInterface::class);
     }
 
-    /**
-     * @throws NonUniqueResultException
-     */
-    public function testHydrateNewRevisionFromPage()
+    public function testHydrateNewRevisionFromPage(): void
     {
-        $this->repository = $this->getMockBuilder(RevisionRepository::class)
-            ->setConstructorArgs([$this->registry])
-            ->onlyMethods(['getEntityManager', 'createQueryBuilder', 'getNextVersionNumberForPageId'])
-            ->getMock();
-        $this->repository->expects($this->atMost(1))
-            ->method('getEntityManager')->willReturn($this->entityManager);
+        $page = new Page('Test page', 'Some content');
+        $page->setSubTitle('Sub-title');
 
-        $uuid = Uuid::uuid1();
-        $date = new \DateTimeImmutable('now');
-        $page = new Page('test page', 'some content');
-        $page->setId($uuid)->setSubTitle('sub-title')->setUpdatedAt($date);
-        $revision = new Revision();
-        $revision->setVersionNumber(2)
-            ->setTitle('test page')
-            ->setSubTitle('sub-title')
-            ->setContent('some content')
-            ->setUser(null)
-            ->setPageId($uuid);
-        $this->repository->expects($this->once())
-            ->method('getNextVersionNumberForPageId')
-            ->with($uuid)
+        $repository = $this->getMockBuilder(RevisionRepository::class)
+            ->setConstructorArgs([$this->registry])
+            ->onlyMethods(['getNextVersionNumberForPage'])
+            ->getMock();
+
+        $repository->expects($this->once())
+            ->method('getNextVersionNumberForPage')
+            ->with($page)
             ->willReturn(2);
-        $result = $this->repository->hydrateNewRevisionFromPage($page);
-        $this->assertEquals($revision, $result);
+
+        $revision = $repository->hydrateNewRevisionFromPage($page);
+
+        $this->assertInstanceOf(Revision::class, $revision);
+        $this->assertSame($page, $revision->getPage());
+        $this->assertSame(2, $revision->getVersionNumber());
+        $this->assertSame('Test page', $revision->getTitle());
+        $this->assertSame('Sub-title', $revision->getSubTitle());
+        $this->assertSame('Some content', $revision->getContent());
+        $this->assertSame($page->getAuthor(), $revision->getUser());
     }
 
-    /**
-     * @throws NonUniqueResultException
-     * @throws NoResultException
-     */
-    public function testGetNextVersionNumberForPageId(): void
+    public function testGetNextVersionNumberForPage(): void
     {
-        $uuid = Uuid::uuid1();
-        $this->repository = $this->getMockBuilder(RevisionRepository::class)
-            ->setConstructorArgs([$this->registry])
-            ->onlyMethods(['getEntityManager', 'createQueryBuilder'])
-            ->getMock();
-        $this->repository->expects($this->atMost(1))
-            ->method('getEntityManager')->willReturn($this->entityManager);
+        $page = new Page('Test page', 'Some content');
 
         $query = $this->createMock(Query::class);
-        $query->expects($this->once())->method('getSingleScalarResult')->willReturn(1);
-        $qb = $this->createMock(QueryBuilder::class);
-        $qb->expects($this->once())->method('select')->willReturnSelf();
-        $qb->expects($this->once())->method('where')->willReturnSelf();
-        $qb->expects($this->once())->method('setParameter')->willReturnSelf();
-        $qb->expects($this->once())->method('getQuery')->willReturn($query);
+        $query->expects($this->once())
+            ->method('getSingleScalarResult')
+            ->willReturn(1);
 
-        $this->repository->expects($this->once())->method('createQueryBuilder')->willReturn($qb);
+        $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $result = $this->repository->getNextVersionNumberForPageId($uuid);
-        $this->assertEquals(2, $result);
+        $queryBuilder->expects($this->once())
+            ->method('select')
+            ->with('MAX(r.versionNumber) as max_version')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('r.page = :page')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('page', $page)
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $repository = $this->getMockBuilder(RevisionRepository::class)
+            ->setConstructorArgs([$this->registry])
+            ->onlyMethods(['createQueryBuilder'])
+            ->getMock();
+
+        $repository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('r')
+            ->willReturn($queryBuilder);
+
+        $this->assertSame(2, $repository->getNextVersionNumberForPage($page));
     }
 
-    /**
-     * @throws \Exception
-     */
+    public function testGetNextVersionNumberForPageReturnsOneWhenNoPreviousRevisionExists(): void
+    {
+        $page = new Page('Test page', 'Some content');
+
+        $query = $this->createMock(Query::class);
+        $query->expects($this->once())
+            ->method('getSingleScalarResult')
+            ->willReturn(null);
+
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+
+        $queryBuilder->expects($this->once())
+            ->method('select')
+            ->with('MAX(r.versionNumber) as max_version')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('r.page = :page')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('page', $page)
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $repository = $this->getMockBuilder(RevisionRepository::class)
+            ->setConstructorArgs([$this->registry])
+            ->onlyMethods(['createQueryBuilder'])
+            ->getMock();
+
+        $repository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('r')
+            ->willReturn($queryBuilder);
+
+        $this->assertSame(1, $repository->getNextVersionNumberForPage($page));
+    }
+
+    public function testGetRevisionsForPage(): void
+    {
+        $page = new Page('Test page', 'Some content');
+
+        $revisionOne = new Revision();
+        $revisionTwo = new Revision();
+
+        $results = [$revisionOne, $revisionTwo];
+
+        $query = $this->createMock(Query::class);
+        $query->expects($this->once())
+            ->method('getResult')
+            ->willReturn($results);
+
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('r.page = :pageId')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('pageId', $page->getId(), 'uuid_binary')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('orderBy')
+            ->with('r.versionNumber', 'DESC')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('setMaxResults')
+            ->with(25)
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $repository = $this->getMockBuilder(RevisionRepository::class)
+            ->setConstructorArgs([$this->registry])
+            ->onlyMethods(['createQueryBuilder'])
+            ->getMock();
+
+        $repository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('r')
+            ->willReturn($queryBuilder);
+
+        $this->assertSame(
+            $results,
+            $repository->getRevisionsForPage($page)
+        );
+    }
+
     public function testDeleteAndRecordByPage(): void
     {
-        $uuid = Uuid::uuid1();
-        $date = new \DateTimeImmutable('now');
-        $page = new Page('test page', 'some content');
-        $page->setId($uuid)->setSubTitle('sub-title')->setUpdatedAt($date);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
 
-        $this->repository = $this->getMockBuilder(RevisionRepository::class)
+        $page = new Page('Test page', 'Some content');
+        $page->setSubTitle('Sub-title');
+
+        $query = $this->createMock(Query::class);
+        $query->expects($this->once())
+            ->method('execute')
+            ->willReturn(1);
+
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+
+        $queryBuilder->expects($this->once())
+            ->method('delete')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('r.page = :page')
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('page', $page)
+            ->willReturnSelf();
+
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $repository = $this->getMockBuilder(RevisionRepository::class)
             ->setConstructorArgs([$this->registry])
-            ->onlyMethods(['getEntityManager', 'createQueryBuilder'])
+            ->onlyMethods(['createQueryBuilder', 'getEntityManager'])
             ->getMock();
-        $this->repository->expects($this->exactly(2))
-            ->method('getEntityManager')->willReturn($this->entityManager);
 
-        $qb = $this->createMock(QueryBuilder::class);
-        $qb->expects($this->atLeast(1))->method('delete')->willReturnSelf();
-        $qb->expects($this->atLeast(1))->method('where')->willReturnSelf();
-        $qb->expects($this->atLeast(1))->method('setParameter')->willReturnSelf();
+        $repository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('r')
+            ->willReturn($queryBuilder);
 
-        $this->repository->expects($this->once())->method('createQueryBuilder')->willReturn($qb);
+        $repository->expects($this->exactly(2))
+            ->method('getEntityManager')
+            ->willReturn($entityManager);
 
-        $result = $this->repository->deleteAndRecordByPage($page, null);
-        $this->assertEquals(RevisionRepository::DELETED, $result->getAction());
-        $this->assertEquals('test page', $result->getTitle());
-        $this->assertEquals('sub-title', $result->getSubTitle());
+        $entityManager->expects($this->once())
+            ->method('persist')
+            ->with($this->isInstanceOf(Revision::class));
+
+        $entityManager->expects($this->once())
+            ->method('flush');
+
+        $revision = $repository->deleteAndRecordByPage($page, null);
+
+        $this->assertInstanceOf(Revision::class, $revision);
+        $this->assertNull($revision->getPage());
+        $this->assertSame('Test page', $revision->getTitle());
+        $this->assertSame('Sub-title', $revision->getSubTitle());
+        $this->assertNull($revision->getUser());
+        $this->assertSame(RevisionRepository::DELETED, $revision->getAction());
     }
 }

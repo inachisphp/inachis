@@ -54,8 +54,9 @@ final class DownloadTest extends TestCase
 
     public function testSetDescriptionAllowsNull(): void
     {
-        $this->download->setDescription(null);
+        $result = $this->download->setDescription(null);
 
+        $this->assertSame($this->download, $result);
         $this->assertNull($this->download->getDescription());
     }
 
@@ -83,21 +84,21 @@ final class DownloadTest extends TestCase
         $this->download->setFiletype('image/jpeg');
     }
 
-    public function testValidFiletypeReturnsTrueForAllowedMimeType(): void
+    public function testIsValidFiletypeReturnsTrueForAllowedMimeType(): void
     {
         $this->assertTrue(
             $this->download->isValidFiletype('application/pdf'),
         );
     }
 
-    public function testValidFiletypeReturnsFalseForDisallowedMimeType(): void
+    public function testIsValidFiletypeReturnsFalseForDisallowedMimeType(): void
     {
         $this->assertFalse(
             $this->download->isValidFiletype('image/jpeg'),
         );
     }
 
-    public function testSetAndGetFilesize(): void
+    public function testGetAndSetFilesize(): void
     {
         $result = $this->download->setFilesize(100);
 
@@ -107,20 +108,23 @@ final class DownloadTest extends TestCase
 
     public function testSetFilesizeAllowsZero(): void
     {
-        $this->download->setFilesize(0);
+        $result = $this->download->setFilesize(0);
 
+        $this->assertSame($this->download, $result);
         $this->assertSame(0, $this->download->getFilesize());
     }
 
     public function testSetFilesizeRejectsNegativeValue(): void
     {
         $this->expectException(FileException::class);
-        $this->expectExceptionMessage('File size must be a positive integer');
+        $this->expectExceptionMessage(
+            'File size must be a positive integer',
+        );
 
         $this->download->setFilesize(-1);
     }
 
-    public function testSetAndGetChecksum(): void
+    public function testGetAndSetChecksum(): void
     {
         $result = $this->download->setChecksum('abc123');
 
@@ -158,8 +162,9 @@ final class DownloadTest extends TestCase
 
     public function testSetAuthorAllowsNull(): void
     {
-        $this->download->setAuthor();
+        $result = $this->download->setAuthor();
 
+        $this->assertSame($this->download, $result);
         $this->assertNull($this->download->getAuthor());
     }
 
@@ -197,7 +202,11 @@ final class DownloadTest extends TestCase
     {
         $version = (new DownloadVersion())
             ->setDownload($this->download)
-            ->setVersionNumber(3);
+            ->setVersionNumber(3)
+            ->setFilename('document.pdf')
+            ->setFiletype('application/pdf')
+            ->setFilesize(100)
+            ->setChecksum('abc123');
 
         $this->download->getVersions()->add($version);
 
@@ -288,6 +297,7 @@ final class DownloadTest extends TestCase
         $version = $this->download->getVersions()->first();
 
         $this->assertSame('', $version->getChecksum());
+        $this->assertNull($version->getAuthor());
     }
 
     public function testOnPrePersistSetsCreatedAndUpdatedAt(): void
@@ -298,6 +308,9 @@ final class DownloadTest extends TestCase
 
         $after = new \DateTimeImmutable();
 
+        $this->assertNotNull($this->download->getCreatedAt());
+        $this->assertNotNull($this->download->getUpdatedAt());
+
         $this->assertGreaterThanOrEqual(
             $before,
             $this->download->getCreatedAt(),
@@ -306,6 +319,7 @@ final class DownloadTest extends TestCase
             $after,
             $this->download->getCreatedAt(),
         );
+
         $this->assertGreaterThanOrEqual(
             $before,
             $this->download->getUpdatedAt(),

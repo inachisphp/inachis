@@ -54,7 +54,7 @@ abstract class AbstractFile
     protected int $filesize = 0;
 
     #[ORM\Column(type: 'string')]
-    protected string $checksum;
+    protected string $checksum = '';
 
     /**
      * @var User|null The UUID of the {@link User} that uploaded the file
