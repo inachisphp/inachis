@@ -32,11 +32,10 @@ class RevisionController extends AbstractInachisController
     #[Route('/incp/page/diff/{id}', methods: ['GET'])]
     public function diff(
         Request $request,
-        PageRepository $pageRepository,
         RevisionDiffRenderer $renderer,
         RevisionRepository $revisionRepository,
     ): Response {
-        [$revision, $page] = $this->loadPageWithRevision($request, $revisionRepository, $pageRepository);
+        [$revision, $page] = $this->loadPageWithRevision($request, $revisionRepository);
 
         /** @var string */
         $trackChangesRaw = DiffHelper::calculate(

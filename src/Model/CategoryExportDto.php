@@ -71,8 +71,6 @@ final class CategoryExportDto
         $dto->id = $category->getId()?->toString();
         $dto->title = $category->getTitle();
         $dto->description = $category->getDescription();
-        $dto->image = $category->getImage()?->getId()?->toString() ?? null;
-        $dto->icon = $category->getIcon()?->getId()?->toString() ?? null;
         $dto->visible = $category->isVisible();
         $dto->parentId = $category->getParent()?->getId()?->toString();
         $dto->childrenIds = array_map(

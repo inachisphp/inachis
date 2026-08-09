@@ -12,15 +12,19 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Inachis\Controller\Page\Resource\ResourceController;
 use Inachis\Entity\Media\Image;
 use Inachis\Model\ContentQueryParameters;
+use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Repository\Media\DownloadRepository;
 use Inachis\Repository\Media\ImageRepository;
+use Inachis\Repository\User\UserViewStateRepository;
+use Inachis\Service\Content\ViewStateManager;
 use Inachis\Service\Resource\ImageFileService;
 use Inachis\Service\Waste\WasteManagerService;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Uuid;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -57,6 +61,8 @@ class ResourceControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['createFormBuilder', 'generateUrl', 'render'])
             ->getMock();
@@ -65,17 +71,17 @@ class ResourceControllerTest extends InachisControllerTestCase
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:'.$template);
             });
-        $contentQueryParameters = $this->createMock(ContentQueryParameters::class);
-        $contentQueryParameters->expects($this->once())
-            ->method('process')
-            ->willReturn([
-                'filters' => '',
-                'offset' => '',
-                'limit' => '',
-                'sort' => '',
-            ]);
 
-        $result = $this->controller->list($request, $contentQueryParameters, $downloadRepository, $imageRepository);
+        $result = $this->controller->list(
+            $request,
+            $this->createStub(CategoryRepository::class),
+            $downloadRepository,
+            $imageRepository,
+            new ViewStateManager(
+                $this->createStub(Security::class),
+                $this->createStub(UserViewStateRepository::class)
+            ),
+        );
         $this->assertEquals('rendered:inadmin/page/resource/list.html.twig', $result->getContent());
     }
 
@@ -97,6 +103,8 @@ class ResourceControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'render'])
             ->getMock();
@@ -140,6 +148,8 @@ class ResourceControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'redirectToRoute'])
             ->getMock();
@@ -187,6 +197,8 @@ class ResourceControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirectToRoute'])
             ->getMock();
@@ -242,6 +254,8 @@ class ResourceControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirectToRoute'])
             ->getMock();
@@ -297,6 +311,8 @@ class ResourceControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['addFlash', 'createForm', 'generateUrl', 'getUser', 'redirectToRoute'])
             ->getMock();
@@ -343,6 +359,8 @@ class ResourceControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['redirectToRoute'])
             ->getMock();
@@ -374,6 +392,8 @@ class ResourceControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['redirectToRoute'])
             ->getMock();
@@ -417,6 +437,8 @@ class ResourceControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['redirectToRoute'])
             ->getMock();
@@ -469,6 +491,8 @@ class ResourceControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['redirectToRoute'])
             ->getMock();

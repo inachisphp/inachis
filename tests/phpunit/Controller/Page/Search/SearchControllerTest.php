@@ -47,6 +47,8 @@ class SearchControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['createFormBuilder', 'generateUrl', 'render'])
             ->getMock();

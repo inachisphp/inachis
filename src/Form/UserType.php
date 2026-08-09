@@ -54,20 +54,24 @@ class UserType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $newUser = !isset($options['data'])
-            || !($options['data'] instanceof User)
-            || null === $options['data']->getId();
+        $targetUser = $options['data'] ?? null;
+        $targetUser = $targetUser instanceof User ? $targetUser : null;
+
+        $newUser = null === $targetUser || null === $targetUser->getId();
+
         $currentUser = $this->security->getUser();
         if (!$currentUser instanceof User) {
-            throw new \LogicException();
+            throw new \LogicException('Current user must be authenticated to build UserType form.');
         }
-        $isCurrentUser = $currentUser->getId() === $options['data']->getId();
+
+        $isCurrentUser = $targetUser !== null && $currentUser->getId() === $targetUser->getId();
 
         $allowEdit = $this->permissionResolver->hasPermission(
             $currentUser,
             PermissionResource::USER,
             $newUser ? PermissionAction::CREATE : PermissionAction::EDIT,
         );
+        $canEditUserOrOwn = $allowEdit || $isCurrentUser;
 
         $allowDelete = $this->permissionResolver->hasPermission(
             $currentUser,
@@ -84,6 +88,7 @@ class UserType extends AbstractType
                     'placeholder' => 'Enter a unique username',
                     'readOnly' => !$newUser,
                 ],
+                'disabled' => !$newUser,
                 'label' => 'Username',
                 'label_attr' => [
                     'class' => 'inline_label',
@@ -96,6 +101,7 @@ class UserType extends AbstractType
                     'aria-labelledby' => 'user__displayName__label',
                     'class' => 'text inline_label',
                 ],
+                'disabled' => !$canEditUserOrOwn,
                 'label' => 'Display Name',
                 'label_attr' => [
                     'class' => 'inline_label',
@@ -108,6 +114,7 @@ class UserType extends AbstractType
                     'class' => 'text inline_label',
                     'readOnly' => !$newUser,
                 ],
+                'disabled' => !$canEditUserOrOwn,
                 'label' => 'Email Address',
                 'label_attr' => [
                     'class' => 'inline_label',
@@ -121,6 +128,7 @@ class UserType extends AbstractType
                     'class' => 'text inline_label',
                 ],
                 'choices' => (new TimezoneChoices())->getTimezones(),
+                'disabled' => !$canEditUserOrOwn,
                 'label' => 'Timezone',
                 'label_attr' => [
                     'class' => 'inline_label',
@@ -129,10 +137,7 @@ class UserType extends AbstractType
                 'property_path' => 'preferences.timezone',
             ]);
 
-        if (
-            $this->security->isGranted('ROLE_ADMIN')
-            || $this->security->isGranted('ROLE_EDIT')
-        ) {
+        if ($allowEdit) {
             $builder->add('assignedRoles', EntityType::class, [
                 'class' => Role::class,
                 'choice_label' => 'name',
@@ -153,9 +158,9 @@ class UserType extends AbstractType
             ]);
         }
 
-        $builder
-            ->add('avatar', HiddenType::class)
-            ->add('submit', SubmitType::class, [
+        $builder->add('avatar', HiddenType::class);
+        if ($canEditUserOrOwn) {
+            $builder->add('submit', SubmitType::class, [
                 'attr' => [
                     'class' => 'btn btn--primary',
                 ],
@@ -165,12 +170,12 @@ class UserType extends AbstractType
                     $this->translator->trans('admin.button.save', [], 'messages'),
                 ),
                 'label_html' => true,
-            ])
-        ;
+            ]);
+        }
         if (!$newUser) {
             if (!$isCurrentUser) {
-                $builder
-                    ->add('delete', SubmitType::class, [
+                if ($allowDelete) {
+                    $builder->add('delete', SubmitType::class, [
                         'attr' => [
                             'data-confirm' => 'delete',
                             'data-confirm-text' => 'Yes, delete',
@@ -178,8 +183,8 @@ class UserType extends AbstractType
                             'data-entity' => 'user',
                             'data-title' => sprintf(
                                 '%s (%s)',
-                                $options['data']->getDisplayName(),
-                                $options['data']->getUsername(),
+                                $targetUser->getDisplayName(),
+                                $targetUser->getUsername(),
                             ),
                             'data-warning' => 'This action cannot be undone, and will result in the user no longer being able to access this system.',
                         ],
@@ -189,8 +194,10 @@ class UserType extends AbstractType
                             $this->translator->trans('admin.button.delete', [], 'messages'),
                         ),
                         'label_html' => true,
-                    ])
-                    ->add('enableDisable', SubmitType::class, [
+                    ]);
+                }
+                if ($allowEdit) {
+                    $builder->add('enableDisable', SubmitType::class, [
                         'attr' => [
                             'class' => 'btn btn--secondary',
                         ],
@@ -201,6 +208,7 @@ class UserType extends AbstractType
                         ),
                         'label_html' => true,
                     ]);
+                }
             } else {
                 $builder->add('color', ChoiceType::class, [
                     'attr' => [

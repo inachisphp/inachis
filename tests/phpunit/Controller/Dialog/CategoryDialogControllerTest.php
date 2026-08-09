@@ -38,6 +38,8 @@ class CategoryDialogControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['render'])
             ->getMock();

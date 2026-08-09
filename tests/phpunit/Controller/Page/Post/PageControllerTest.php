@@ -18,9 +18,14 @@ use Inachis\Repository\Content\ReviewThreadRepository;
 use Inachis\Repository\Content\RevisionRepository;
 use Inachis\Repository\Content\TagRepository;
 use Inachis\Repository\Content\UrlRepository;
+use Inachis\Repository\Media\ImageRepository;
+use Inachis\Service\Ai\AiTextManager;
 use Inachis\Service\Content\ContentRevisionCompare;
+use Inachis\Service\Content\Page\CategoryManager;
 use Inachis\Service\Content\Page\PageBulkActionService;
 use Inachis\Service\Content\Page\ReviewRebaseService;
+use Inachis\Service\Content\Page\TagManager;
+use Inachis\Service\Content\Page\UrlManager;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -60,6 +65,8 @@ class PageControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['denyAccessUnlessGranted', 'redirectToRoute'])
             ->getMock();
@@ -71,13 +78,17 @@ class PageControllerTest extends InachisControllerTestCase
 
         $response = $controller->edit(
             $request,
+            $this->createStub(AiTextManager::class),
+            $this->createStub(CategoryManager::class),
             $this->createStub(ContentRevisionCompare::class),
+            $this->createStub(ImageRepository::class),
             $this->createStub(PageBulkActionService::class),
             $pageRepository,
             $revisionRepository,
             $this->createStub(ReviewThreadRepository::class),
             $this->createStub(ReviewRebaseService::class),
-            $this->createStub(TagRepository::class),
+            $this->createStub(TagManager::class),
+            $this->createStub(UrlManager::class),
             'post',
             'ome-post',
         );
@@ -128,6 +139,8 @@ class PageControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['denyAccessUnlessGranted', 'createForm', 'render'])
             ->getMock();
@@ -141,13 +154,17 @@ class PageControllerTest extends InachisControllerTestCase
 
         $response = $controller->edit(
             $request,
+            $this->createStub(AiTextManager::class),
+            $this->createStub(CategoryManager::class),
             $this->createStub(ContentRevisionCompare::class),
+            $this->createStub(ImageRepository::class),
             $this->createStub(PageBulkActionService::class),
             $pageRepository,
             $revisionRepository,
             $this->createStub(ReviewThreadRepository::class),
             $this->createStub(ReviewRebaseService::class),
-            $this->createStub(TagRepository::class),
+            $this->createStub(TagManager::class),
+            $this->createStub(UrlManager::class),
             'post',
             'new',
         );

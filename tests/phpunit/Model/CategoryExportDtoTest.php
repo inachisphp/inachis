@@ -8,18 +8,18 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Model;
 
+use Inachis\Entity\Content\Category;
 use Inachis\Model\CategoryExportDto;
 use PHPUnit\Framework\TestCase;
 
 final class CategoryExportDtoTest extends TestCase
 {
-    public function testCanBeInstantiated(): void
+    public function testFromEntity()
     {
-        $instance = new CategoryExportDto();
+        $category = new Category('test category', 'description');
 
-        self::assertInstanceOf(
-            CategoryExportDto::class,
-            $instance,
-        );
+        $categoryDto = CategoryExportDto::fromEntity($category);
+        $this->assertEquals($category->getTitle(), $categoryDto->title);
+        $this->assertEquals($category->getDescription(), $categoryDto->description);
     }
 }

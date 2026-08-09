@@ -14,14 +14,15 @@ use Inachis\Entity\Content\Revision;
 use Inachis\Entity\Content\Url;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\RevisionRepository;
+use Inachis\Service\Content\Page\RevisionDiffRenderer;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Uuid;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class RevisionControllerTest extends InachisControllerTestCase
 {
@@ -38,6 +39,8 @@ class RevisionControllerTest extends InachisControllerTestCase
                 $this->security,
                 $this->translator,
                 $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
             ])
             ->onlyMethods(['addFlash', 'getUser', 'redirect', 'render'])
             ->getMock();
@@ -48,13 +51,13 @@ class RevisionControllerTest extends InachisControllerTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incp/page/diff/{id}',
         ]);
-        $pageRepository = $this->createStub(PageRepository::class);
+        $revisionDiff = $this->createStub(RevisionDiffRenderer::class);
         $revisionRepository = $this->createMock(RevisionRepository::class);
         $revisionRepository->expects($this->once())->method('findOneBy')->willReturn(null);
         $this->controller->expects($this->never())->method('render');
         $this->expectException(NotFoundHttpException::class);
 
-        $this->controller->diff($request, $pageRepository, $revisionRepository);
+        $this->controller->diff($request, $revisionDiff, $revisionRepository);
     }
 
     public function testDiffPageNotFound()
@@ -62,15 +65,17 @@ class RevisionControllerTest extends InachisControllerTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incp/page/diff/{id}',
         ]);
-        $pageRepository = $this->createStub(PageRepository::class);
+        $revisionDiff = $this->createStub(RevisionDiffRenderer::class);
         $revisionRepository = $this->createMock(RevisionRepository::class);
         $revision = new Revision();
-        $revision->setPageId(Uuid::uuid1());
+        $page = new Page();
+        $page->setId(Uuid::uuid1());
+        $revision->setPage($page);
         $revisionRepository->expects($this->once())->method('findOneBy')->willReturn($revision);
         $this->controller->expects($this->never())->method('render');
-        $this->expectException(NotFoundHttpException::class);
+        $this->expectException(RuntimeException::class);
 
-        $this->controller->diff($request, $pageRepository, $revisionRepository);
+        $this->controller->diff($request, $revisionDiff, $revisionRepository);
     }
 
     /**
@@ -81,20 +86,22 @@ class RevisionControllerTest extends InachisControllerTestCase
         $request = new Request([], [], [], [], [], [
             'REQUEST_URI' => '/incp/page/diff/{id}',
         ]);
-        $pageRepository = $this->createMock(PageRepository::class);
         $page = (new Page('test-page'))->setId(Uuid::uuid1())
             ->setTitle('')->setContent('teast edited');
         $url = new Url($page, 'test-link');
-        $pageRepository->expects($this->once())->method('findOneBy')->willReturn($page);
+        $revisionDiff = $this->createStub(RevisionDiffRenderer::class);
         $revisionRepository = $this->createMock(RevisionRepository::class);
-        $revision = (new Revision())->setPageId(Uuid::uuid1())->setTitle('')->setContent('test');
+        $page = new Page('', 'test');
+        $page->setId(Uuid::uuid1());
+        $page->addUrl($url);
+        $revision = (new Revision())->setPage($page)->setTitle('');
         $revisionRepository->expects($this->once())->method('findOneBy')->willReturn($revision);
         $this->controller->expects($this->once())
             ->method('render')
             ->willReturnCallback(function (string $template, array $data) {
                 return new Response('rendered:'.$template);
             });
-        $this->controller->diff($request, $pageRepository, $revisionRepository);
+        $this->controller->diff($request, $revisionDiff, $revisionRepository);
     }
 
     /**
@@ -111,7 +118,10 @@ class RevisionControllerTest extends InachisControllerTestCase
         $url = new Url($page, 'test-link');
         $pageRepository->expects($this->once())->method('findOneBy')->willReturn($page);
         $revisionRepository = $this->createMock(RevisionRepository::class);
-        $revision = (new Revision())->setPageId(Uuid::uuid1())->setTitle('')->setContent('test');
+        $page = new Page('', 'test');
+        $page->setId(Uuid::uuid1());
+        $page->addUrl($url);
+        $revision = (new Revision())->setPage($page)->setTitle('');
         $revisionRepository->expects($this->once())->method('findOneBy')->willReturn($revision);
         $this->controller->expects($this->once())
             ->method('redirect')
@@ -128,12 +138,13 @@ class RevisionControllerTest extends InachisControllerTestCase
             'REQUEST_URI' => '/incp/page/download/{id}',
         ]);
         $revisionRepository = $this->createMock(RevisionRepository::class);
-        $revision = (new Revision())->setPageId(Uuid::uuid1())->setTitle('')->setContent('test');
+        $page = new Page('', 'test');
+        $page->setId(Uuid::uuid1());
+        $revision = (new Revision())->setPage($page)->setTitle('')->setContent('test');
         $revisionRepository->expects($this->once())->method('findOneBy')->willReturn($revision);
-        $serializer = $this->createStub(SerializerInterface::class);
         $this->controller->expects($this->never())->method('redirect');
 
-        $result = $this->controller->download($request, $revisionRepository, $serializer);
+        $result = $this->controller->download($request, $revisionRepository);
         $this->assertStringContainsString(
             'attachment; filename=',
             $result->headers->get('content-disposition'),
@@ -150,11 +161,10 @@ class RevisionControllerTest extends InachisControllerTestCase
         ]);
         $revisionRepository = $this->createMock(RevisionRepository::class);
         $revisionRepository->expects($this->once())->method('findOneBy')->willReturn(null);
-        $serializer = $this->createStub(SerializerInterface::class);
         $this->expectException(NotFoundHttpException::class);
         $this->controller->expects($this->never())->method('redirect');
 
-        $result = $this->controller->download($request, $revisionRepository, $serializer);
+        $result = $this->controller->download($request, $revisionRepository);
         $this->assertStringContainsString(
             'attachment; filename=',
             $result->headers->get('content-disposition'),

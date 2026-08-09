@@ -11,7 +11,7 @@ namespace Inachis\Service\Content\Page;
 use Inachis\Enum\DiffBlockType;
 use Inachis\Model\Page\DiffBlock;
 
-final readonly class RevisionDiffRenderer
+class RevisionDiffRenderer
 {
     /**
      * Converts the content array currently produced by RevisionController

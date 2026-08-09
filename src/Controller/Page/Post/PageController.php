@@ -213,11 +213,11 @@ class PageController extends AbstractInachisController
             $threads = $reviewThreadRepository->findOpenForPage($post);
         }
 
-        if ($form->isSubmitted() && !$form->isValid()) {
-            foreach ($form->getErrors(true) as $error) {
-                dump($error->getOrigin()->getName(), $error->getMessage());
-            }
-        }
+        // if ($form->isSubmitted() && !$form->isValid()) {
+        //     foreach ($form->getErrors(true) as $error) {
+        //         dump($error->getOrigin()->getName(), $error->getMessage());
+        //     }
+        // }
         if ($form->isSubmitted() && $form->isValid()) {
             $delete = $form->has('delete') ? $form->get('delete') : null;
             $review = $form->has('review') ? $form->get('review') : null;

@@ -51,6 +51,9 @@ class ContentAnalyticsController extends AbstractInachisController
         if (false !== $url) {
             $topReferrers = $analyticsProvider->getTopReferrersForPage(
                 '/'.$url->getLink(),
+                $fromDate,
+                $toDate,
+                10,
             );
         }
 
@@ -102,6 +105,9 @@ class ContentAnalyticsController extends AbstractInachisController
                 'totalViews' => array_sum(array_column($data, 'views')),
                 'topReferrers' => $analyticsProvider->getTopReferrersForPage(
                     '/'.($series->getLastDate()?->format('Y') ?? '').'/'.$series->getUrl(),
+                    $fromDate,
+                    $toDate,
+                    10,
                 ),
             ],
         ]);
