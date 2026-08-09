@@ -10,6 +10,7 @@ namespace Inachis\Service\System\Csp;
 
 use Inachis\Entity\System\CspReport;
 use Inachis\Repository\System\SettingRepository;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -17,6 +18,7 @@ class CspHeaderManager
 {
     public function __construct(
         private readonly SettingRepository $settingRepository,
+         #[Target('cspCache')]
         private readonly CacheInterface $cspCache,
     ) {
     }
@@ -24,7 +26,7 @@ class CspHeaderManager
     /**
      * Get the compiled CSP string for the front-end.
      *
-     * @return array{}
+     * @return array{name: string, value: string}|null
      */
     public function getFrontendHeaderConfig(): ?array
     {
@@ -115,7 +117,7 @@ class CspHeaderManager
      *
      * @param CspReport $report
      */
-    public function addReportToPolicy($report): void
+    public function addReportToPolicy(CspReport $report): void
     {
         // 1. Establish secure default baseline template for a brand-new policy
         $defaultPolicyJson = json_encode([
@@ -133,7 +135,7 @@ class CspHeaderManager
 
         // 4. Normalize the directive from the incoming report
         $rawDirective = $report->getEffectiveDirective();
-        if (empty($rawDirective)) {
+        if (!is_string($rawDirective) || $rawDirective === '') {
             return;
         }
         $directive = str_replace(['-elem', '-attr'], '', $rawDirective);

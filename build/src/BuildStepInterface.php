@@ -14,8 +14,6 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('inachis.build_step')]
 interface BuildStepInterface
 {
-    public static function priority(): int;
-    
     public function execute(
         ReleaseWorkspace $workspace,
         SymfonyStyle $io,

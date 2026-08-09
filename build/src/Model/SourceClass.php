@@ -22,7 +22,7 @@ final readonly class SourceClass
         private bool $readonly = false,
         private bool $final = false,
         private ?string $extends = null,
-        private SourceClassType $type,
+        private SourceClassType $type = SourceClassType::ConcreteClass,
         private bool $hasConstructor = false,
         private bool $hasRequiredConstructorParameters = false,
     ) {
@@ -134,7 +134,7 @@ final readonly class SourceClass
 
     public function shouldGenerateTest(): bool
     {
-        return $this->type === SourceClassType::ConcreteClass 
+        return $this->type === SourceClassType::ConcreteClass
             && !$this->abstract;
     }
 

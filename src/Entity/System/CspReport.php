@@ -37,12 +37,10 @@ use Ramsey\Uuid\UuidInterface;
  * }|null>
  */
 #[ORM\Entity]
-#[ORM\Table(indexes: [
-    new ORM\Index(name: 'idx_csp_host', columns: ['host']),
-    new ORM\Index(name: 'idx_csp_directive', columns: ['effective_directive']),
-    new ORM\Index(name: 'idx_csp_severity', columns: ['severity']),
-    new ORM\Index(name: 'idx_csp_last_seen', columns: ['last_seen_at']),
-])]
+#[ORM\Index(name: 'idx_csp_host', columns: ['host'])]
+#[ORM\Index(name: 'idx_csp_directive', columns: ['effective_directive'])]
+#[ORM\Index(name: 'idx_csp_severity', columns: ['severity'])]
+#[ORM\Index(name: 'idx_csp_last_seen', columns: ['last_seen_at'])]
 class CspReport
 {
     /** @var UuidInterface|null Unique identifier for the CSP Report */

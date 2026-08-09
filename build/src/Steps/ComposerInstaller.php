@@ -17,11 +17,6 @@ use Symfony\Component\Process\Process;
 #[AsTaggedItem(priority: 200)]
 final class ComposerInstaller implements BuildStepInterface
 {
-    public static function priority(): int
-    {
-        return 200;
-    }
-
     public function execute(
         ReleaseWorkspace $workspace,
         SymfonyStyle $io,

@@ -18,15 +18,6 @@ use Symfony\Component\Process\Process;
 #[AsTaggedItem(priority: 150)]
 final class CommandRunner implements BuildStepInterface
 {
-    /**
-     * Priority set to 40 so it runs AFTER workspace files are copied,
-     * but BEFORE ZipBuilder / ManifestGenerator / Cleanup.
-     */
-    public static function priority(): int
-    {
-        return 150;
-    }
-
     public function execute(
         ReleaseWorkspace $workspace,
         SymfonyStyle $io,

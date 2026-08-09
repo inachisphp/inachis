@@ -18,11 +18,6 @@ use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 #[AsTaggedItem(priority: 100)]
 final class ManifestGenerator implements BuildStepInterface
 {
-    public static function priority(): int
-    {
-        return 100;
-    }
-
     public function execute(
         ReleaseWorkspace $workspace,
         SymfonyStyle $io,

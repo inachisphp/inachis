@@ -21,11 +21,6 @@ use ZipArchive;
 #[AsTaggedItem(priority: 50)]
 final class ZipBuilder implements BuildStepInterface
 {
-    public static function priority(): int
-    {
-        return 50;
-    }
-
     public function execute(
         ReleaseWorkspace $workspace,
         SymfonyStyle $io,

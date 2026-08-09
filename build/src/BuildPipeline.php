@@ -19,7 +19,6 @@ final readonly class BuildPipeline
     public function __construct(
         #[AutowireIterator(
             'inachis.build_step',
-            defaultPriorityMethod: 'priority',
         )]
         private iterable $steps,
     ) {}

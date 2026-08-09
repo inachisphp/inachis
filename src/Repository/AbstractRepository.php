@@ -117,11 +117,13 @@ abstract class AbstractRepository extends ServiceEntityRepository
                 $condition = $j[3] ?? null;
 
                 if ('join' === $type) {
-                    $condition ? $qb->join($path, $alias, 'WITH', $condition)
-                            : $qb->join($path, $alias);
+                    $condition
+                        ? $qb->join($path, $alias, 'ON', $condition)
+                        : $qb->join($path, $alias);
                 } elseif ('leftJoin' === $type) {
-                    $condition ? $qb->leftJoin($path, $alias, 'WITH', $condition)
-                            : $qb->leftJoin($path, $alias);
+                    $condition
+                        ? $qb->leftJoin($path, $alias, 'ON', $condition)
+                        : $qb->leftJoin($path, $alias);
                 }
             }
         }
