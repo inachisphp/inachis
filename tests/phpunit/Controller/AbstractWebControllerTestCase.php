@@ -30,9 +30,8 @@ abstract class AbstractWebControllerTestCase extends TestCase
     {
         parent::setUp();
 
-        $this->params = $this->createMock(ParameterBagInterface::class);
-        $this->params->expects($this->any())
-            ->method('has')
+        $this->params = $this->createStub(ParameterBagInterface::class);
+        $this->params->method('has')
             ->willReturn(false);
 
         $this->entityManager = $this->createStub(EntityManagerInterface::class);
@@ -43,7 +42,7 @@ abstract class AbstractWebControllerTestCase extends TestCase
         $pageMetadata = new PageMetadata();
         $pageView = new PageView($siteSettings, $pageMetadata);
 
-        $this->pageViewFactory = $this->createMock(PageViewFactory::class);
+        $this->pageViewFactory = $this->createStub(PageViewFactory::class);
         $this->pageViewFactory->method('create')->willReturn($pageView);
         $this->pageViewFactory->method('createAdmin')->willReturn($pageView);
     }

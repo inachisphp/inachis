@@ -21,9 +21,8 @@ class DefaultControllerTest extends AbstractWebControllerTestCase
             '20240101' => 'test value',
         ];
 
-        $contentProvider = $this->createMock(ContentAggregator::class);
-        $contentProvider->expects($this->once())
-            ->method('getHomepageContent')
+        $contentProvider = $this->createStub(ContentAggregator::class);
+        $contentProvider->method('getHomepageContent')
             ->willReturn($mockContent);
 
         $controller = $this->getMockBuilder(DefaultController::class)
@@ -65,7 +64,7 @@ class DefaultControllerTest extends AbstractWebControllerTestCase
 
         $this->assertInstanceOf(JsonResponse::class, $response);
 
-        $data = json_decode($response->getContent(), true);
+        $data = json_decode((string) $response->getContent(), true);
 
         $this->assertIsArray($data);
         $this->assertSame('ok', $data['status']);

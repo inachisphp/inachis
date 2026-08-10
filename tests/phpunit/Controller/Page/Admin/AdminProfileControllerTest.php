@@ -253,7 +253,12 @@ final class AdminProfileControllerTest extends InachisControllerTestCase
 
         $formFactory = $this->createMock(FormFactoryInterface::class);
         $form = $this->createStub(FormInterface::class);
-        $formFactory->method('create')->with(UserType::class, $user, ['validation_groups' => ['']])->willReturn($form);
+
+        $formFactory->expects(self::once())
+            ->method('create')
+            ->with(UserType::class, $user, ['validation_groups' => ['']])
+            ->willReturn($form);
+
         $form->method('isSubmitted')->willReturn(false);
         $form->method('createView')->willReturn($this->createStub(FormView::class));
 
@@ -423,7 +428,11 @@ final class AdminProfileControllerTest extends InachisControllerTestCase
             }
         );
 
-        $form->method('get')->with('assignedRoles')->willReturn($assignedRolesField);
+        $form->expects(self::once())
+            ->method('get')
+            ->with('assignedRoles')
+            ->willReturn($assignedRolesField);
+
         $assignedRolesField->expects(self::once())->method('addError');
 
         $imageTransformer = $this->createStub(ImageTransformer::class);

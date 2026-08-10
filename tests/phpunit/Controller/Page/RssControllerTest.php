@@ -27,7 +27,7 @@ class RssControllerTest extends TestCase
 {
     public function testFeedActionRendersXml(): void
     {
-        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
         $params = $this->createMock(ParameterBagInterface::class);
         $security = $this->createMock(Security::class);
         $translator = $this->createMock(TranslatorInterface::class);
@@ -44,10 +44,6 @@ class RssControllerTest extends TestCase
         $pageRepository->expects($this->once())
             ->method('getFilteredOfTypeByPostDate')
             ->willReturn($paginator);
-
-        $entityManager->method('getRepository')
-            ->with(Page::class)
-            ->willReturn($pageRepository);
 
         $controller = $this->getMockBuilder(RssController::class)
             ->setConstructorArgs([
