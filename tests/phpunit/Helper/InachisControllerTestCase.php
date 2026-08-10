@@ -34,11 +34,17 @@ abstract class InachisControllerTestCase extends TestCase
         parent::setUp();
 
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->params = $this->createMock(ParameterBagInterface::class);
-        $this->security = $this->createStub(Security::class);
-        $this->translator = $this->createStub(TranslatorInterface::class);
-        $this->wasteRepository = $this->createMock(WasteRepository::class);
+        $this->params = $this->createStub(ParameterBagInterface::class);
+        $this->params->method('has')->willReturn(false);
 
+        $this->security = $this->createStub(Security::class);
+        $this->security->method('getUser')->willReturn(null);
+
+        $this->translator = $this->createStub(TranslatorInterface::class);
+
+        $this->wasteRepository = $this->createStub(WasteRepository::class);
+        $this->wasteRepository->method('getWasteCount')->willReturn(0);
+        
         $siteSettings = new SiteSettings('Wandering the World', 'http://localhost', [], 'en', 'ltr', '', false, 'UTC');
         $pageMetadata = new PageMetadata();
         $pageView = new PageView($siteSettings, $pageMetadata);

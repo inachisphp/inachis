@@ -16,11 +16,11 @@ use Inachis\Entity\Content\Series;
 use Inachis\Entity\Content\Url;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
-use Inachis\Tests\phpunit\Controller\AbstractInachisControllerTestCase;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ContentAnalyticsControllerTest extends AbstractInachisControllerTestCase
+class ContentAnalyticsControllerTest extends InachisControllerTestCase
 {
     public function testPostStatsReturnsEmptyResponseWhenPostNotFound(): void
     {
