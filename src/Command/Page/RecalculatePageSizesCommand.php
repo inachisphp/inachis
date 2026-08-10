@@ -24,15 +24,15 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: 'inachis:pages:recalculate-sizes',
     description: 'Recalculates the imageSize property for all pages based on their active content',
 )]
-class RecalculatePageSizesCommand extends Command
+final class RecalculatePageSizesCommand extends Command
 {
     /**
      * Constructor.
      */
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private ImageRepository $imageRepository,
-        private PageRepository $pageRepository,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ImageRepository $imageRepository,
+        private readonly PageRepository $pageRepository,
     ) {
         parent::__construct();
     }
@@ -44,7 +44,7 @@ class RecalculatePageSizesCommand extends Command
     {
         $output->writeln('<info>Recalculating page image sizes…</info>');
 
-        /** @var Page[] $pages */
+        /** @var list<Page> $pages */
         $pages = $this->pageRepository->findAll();
 
         $count = 0;
