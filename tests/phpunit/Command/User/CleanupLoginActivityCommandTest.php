@@ -28,8 +28,8 @@ final class CleanupLoginActivityCommandTest extends TestCase
             ->method('dispatch')
             ->with(self::callback(
                 fn (mixed $message): bool => $message instanceof CleanupLoginActivityMessage
-                    && $this->getMessageProperty($message, 'dryRun') === false
-                    && $this->getMessageProperty($message, 'batchSize') === 1000
+                    && false === $this->getMessageProperty($message, 'dryRun')
+                    && 1000 === $this->getMessageProperty($message, 'batchSize'),
             ))
             ->willReturnCallback(fn (object $message): Envelope => new Envelope($message));
 
@@ -54,8 +54,8 @@ final class CleanupLoginActivityCommandTest extends TestCase
             ->method('dispatch')
             ->with(self::callback(
                 fn (mixed $message): bool => $message instanceof CleanupLoginActivityMessage
-                    && $this->getMessageProperty($message, 'dryRun') === true
-                    && $this->getMessageProperty($message, 'batchSize') === 1000
+                    && true === $this->getMessageProperty($message, 'dryRun')
+                    && 1000 === $this->getMessageProperty($message, 'batchSize'),
             ))
             ->willReturnCallback(fn (object $message): Envelope => new Envelope($message));
 
@@ -72,12 +72,12 @@ final class CleanupLoginActivityCommandTest extends TestCase
 
     private function getMessageProperty(CleanupLoginActivityMessage $message, string $propertyName): mixed
     {
-        $getter = 'is' . ucfirst($propertyName);
+        $getter = 'is'.ucfirst($propertyName);
         if (method_exists($message, $getter)) {
             return $message->{$getter}();
         }
 
-        $getter = 'get' . ucfirst($propertyName);
+        $getter = 'get'.ucfirst($propertyName);
         if (method_exists($message, $getter)) {
             return $message->{$getter}();
         }

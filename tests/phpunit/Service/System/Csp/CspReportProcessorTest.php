@@ -11,7 +11,6 @@ namespace Inachis\Tests\phpunit\Service\System\Csp;
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\System\CspReport;
 use Inachis\Enum\System\CspSeverity;
-use Inachis\Model\System\CspReportDto;
 use Inachis\Repository\System\CspReportRepository;
 use Inachis\Service\System\Csp\CspNoiseFilter;
 use Inachis\Service\System\Csp\CspReportDtoFactory;

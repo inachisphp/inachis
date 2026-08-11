@@ -18,7 +18,6 @@ use Inachis\Service\Content\Page\RevisionDiffRenderer;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Uuid;
-use RuntimeException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -89,7 +88,7 @@ class RevisionControllerTest extends InachisControllerTestCase
         $this->controller->expects($this->never())
             ->method('render');
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
 
         $this->controller->diff(
             $request,

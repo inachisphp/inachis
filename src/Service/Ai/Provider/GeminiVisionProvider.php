@@ -53,7 +53,7 @@ Respond ONLY with a valid JSON object matching this schema:
 }
 TEXT;
 
-        $endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=' . $this->apiKey;
+        $endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key='.$this->apiKey;
 
         $response = $this->httpClient->request('POST', $endpoint, [
             'headers' => ['Content-Type' => 'application/json'],
@@ -73,7 +73,7 @@ TEXT;
 
         $data = $response->toArray();
         $rawJson = $data['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
-        
+
         /** @var array{title?: string, altText?: string, description?: string} $result */
         $result = json_decode($rawJson, true) ?: [];
 

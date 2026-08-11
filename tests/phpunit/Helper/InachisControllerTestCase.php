@@ -44,7 +44,7 @@ abstract class InachisControllerTestCase extends TestCase
 
         $this->wasteRepository = $this->createStub(WasteRepository::class);
         $this->wasteRepository->method('getWasteCount')->willReturn(0);
-        
+
         $siteSettings = new SiteSettings('Wandering the World', 'http://localhost', [], 'en', 'ltr', '', false, 'UTC');
         $pageMetadata = new PageMetadata();
         $pageView = new PageView($siteSettings, $pageMetadata);

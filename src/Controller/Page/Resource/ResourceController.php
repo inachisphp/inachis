@@ -387,7 +387,7 @@ class ResourceController extends AbstractInachisController
                 'data' => $metadata,
             ]);
         } catch (\Throwable $e) {
-            return new JsonResponse(['error' => 'AI Generation failed: ' . $e->getMessage()], 500);
+            return new JsonResponse(['error' => 'AI Generation failed: '.$e->getMessage()], 500);
         }
     }
 }

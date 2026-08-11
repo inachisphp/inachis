@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Inachis\Tests\phpunit\Controller\Page\Url;
 
 use Inachis\Controller\Page\Url\UrlController;
-use Inachis\Model\ContentQueryParameters;
 use Inachis\Repository\Content\UrlRepository;
 use Inachis\Service\Url\UrlBulkActionService;
 use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;

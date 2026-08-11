@@ -134,6 +134,7 @@ class UserPreferenceProviderTest extends TestCase
     {
         if ($user instanceof MockObject) {
             $user->method('getPreferences')->willReturn($preferences);
+
             return;
         }
 

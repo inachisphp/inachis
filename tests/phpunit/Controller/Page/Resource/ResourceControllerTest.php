@@ -97,7 +97,7 @@ class ResourceControllerTest extends InachisControllerTestCase
 
         $this->assertEquals(
             'rendered:inadmin/page/resource/list.html.twig',
-            $result->getContent()
+            $result->getContent(),
         );
     }
 
@@ -176,7 +176,7 @@ class ResourceControllerTest extends InachisControllerTestCase
 
         $this->assertEquals(
             'rendered:inadmin/page/resource/edit.html.twig',
-            $result->getContent()
+            $result->getContent(),
         );
     }
 
@@ -284,7 +284,7 @@ class ResourceControllerTest extends InachisControllerTestCase
             ->with('incp_resource_list', ['type' => 'images'])
             ->willReturn(new RedirectResponse('/resources/images'));
 
-        $form = $this->createMock(\Symfony\Component\Form\Form::class);
+        $form = $this->createMock(Form::class);
         $form->expects($this->once())
             ->method('isSubmitted')
             ->willReturn(true);
@@ -389,7 +389,7 @@ class ResourceControllerTest extends InachisControllerTestCase
             ])
             ->willReturn(new RedirectResponse('/resources/images'));
 
-        $form = $this->createMock(\Symfony\Component\Form\Form::class);
+        $form = $this->createMock(Form::class);
         $form->expects($this->once())
             ->method('isSubmitted')
             ->willReturn(true);
@@ -491,7 +491,7 @@ class ResourceControllerTest extends InachisControllerTestCase
             ])
             ->willReturn(new RedirectResponse('/resources/images'));
 
-        $form = $this->createMock(\Symfony\Component\Form\Form::class);
+        $form = $this->createMock(Form::class);
         $form->expects($this->once())
             ->method('isSubmitted')
             ->willReturn(true);
@@ -566,7 +566,7 @@ class ResourceControllerTest extends InachisControllerTestCase
         $this->assertEquals(400, $result->getStatusCode());
         $this->assertEquals(
             '{"error":"No file provided"}',
-            $result->getContent()
+            $result->getContent(),
         );
     }
 
@@ -608,7 +608,7 @@ class ResourceControllerTest extends InachisControllerTestCase
         $this->assertEquals(400, $result->getStatusCode());
         $this->assertEquals(
             '{"error":"No title provided"}',
-            $result->getContent()
+            $result->getContent(),
         );
     }
 

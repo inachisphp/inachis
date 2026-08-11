@@ -11,7 +11,6 @@ namespace Inachis\Tests\phpunit\Controller\Page;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Inachis\Controller\Page\RssController;
-use Inachis\Entity\Page;
 use Inachis\Factory\PageViewFactory;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Waste\WasteRepository;

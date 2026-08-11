@@ -23,9 +23,9 @@ class MaintenanceManagerTest extends TestCase
     {
         parent::setUp();
 
-        $this->tempDir = sys_get_temp_dir() . '/inachis_maint_test_' . uniqid('', true);
-        mkdir($this->tempDir . '/var', 0777, true);
-        mkdir($this->tempDir . '/public', 0777, true);
+        $this->tempDir = sys_get_temp_dir().'/inachis_maint_test_'.uniqid('', true);
+        mkdir($this->tempDir.'/var', 0777, true);
+        mkdir($this->tempDir.'/public', 0777, true);
 
         $this->twig = $this->createMock(Environment::class);
         $this->manager = new MaintenanceManager($this->tempDir, $this->twig);
@@ -44,7 +44,7 @@ class MaintenanceManagerTest extends TestCase
 
     public function testIsEnabledReturnsTrueWhenLockFileExists(): void
     {
-        touch($this->tempDir . '/var/maintenance.lock');
+        touch($this->tempDir.'/var/maintenance.lock');
 
         $this->assertTrue($this->manager->isEnabled());
     }
@@ -58,20 +58,20 @@ class MaintenanceManagerTest extends TestCase
 
         $this->manager->enable();
 
-        $this->assertFileExists($this->tempDir . '/var/maintenance.lock');
-        $this->assertFileExists($this->tempDir . '/public/maintenance.html');
-        $this->assertSame('<html>Maintenance</html>', file_get_contents($this->tempDir . '/public/maintenance.html'));
+        $this->assertFileExists($this->tempDir.'/var/maintenance.lock');
+        $this->assertFileExists($this->tempDir.'/public/maintenance.html');
+        $this->assertSame('<html>Maintenance</html>', file_get_contents($this->tempDir.'/public/maintenance.html'));
     }
 
     public function testDisableRemovesLockFileAndMaintenanceHtml(): void
     {
-        touch($this->tempDir . '/var/maintenance.lock');
-        file_put_contents($this->tempDir . '/public/maintenance.html', '<html>Maintenance</html>');
+        touch($this->tempDir.'/var/maintenance.lock');
+        file_put_contents($this->tempDir.'/public/maintenance.html', '<html>Maintenance</html>');
 
         $this->manager->disable();
 
-        $this->assertFileDoesNotExist($this->tempDir . '/var/maintenance.lock');
-        $this->assertFileDoesNotExist($this->tempDir . '/public/maintenance.html');
+        $this->assertFileDoesNotExist($this->tempDir.'/var/maintenance.lock');
+        $this->assertFileDoesNotExist($this->tempDir.'/public/maintenance.html');
     }
 
     public function testGetConfigReturnsDefaultConfigWhenFileDoesNotExist(): void
@@ -95,14 +95,14 @@ class MaintenanceManagerTest extends TestCase
             'retry_after' => 7200,
         ];
 
-        file_put_contents($this->tempDir . '/var/maintenance.json', json_encode($customConfig));
+        file_put_contents($this->tempDir.'/var/maintenance.json', json_encode($customConfig));
 
         $this->assertSame($customConfig, $this->manager->getConfig());
     }
 
     public function testGetConfigReturnsEmptyArrayWhenJsonIsInvalid(): void
     {
-        file_put_contents($this->tempDir . '/var/maintenance.json', 'INVALID_JSON{');
+        file_put_contents($this->tempDir.'/var/maintenance.json', 'INVALID_JSON{');
 
         $this->assertSame([], $this->manager->getConfig());
     }
@@ -118,8 +118,8 @@ class MaintenanceManagerTest extends TestCase
 
         $this->manager->saveConfig($config);
 
-        $this->assertFileExists($this->tempDir . '/var/maintenance.json');
-        $decoded = json_decode(file_get_contents($this->tempDir . '/var/maintenance.json'), true);
+        $this->assertFileExists($this->tempDir.'/var/maintenance.json');
+        $decoded = json_decode(file_get_contents($this->tempDir.'/var/maintenance.json'), true);
         $this->assertSame($config, $decoded);
     }
 
@@ -144,8 +144,8 @@ class MaintenanceManagerTest extends TestCase
 
         $this->manager->generateStaticPage($config);
 
-        $this->assertFileExists($this->tempDir . '/public/maintenance.html');
-        $this->assertSame('<h1>Site Maintenance</h1>', file_get_contents($this->tempDir . '/public/maintenance.html'));
+        $this->assertFileExists($this->tempDir.'/public/maintenance.html');
+        $this->assertSame('<h1>Site Maintenance</h1>', file_get_contents($this->tempDir.'/public/maintenance.html'));
     }
 
     private function removeTempDirRecursive(string $dir): void
@@ -156,7 +156,7 @@ class MaintenanceManagerTest extends TestCase
 
         $files = array_diff(scandir($dir) ?: [], ['.', '..']);
         foreach ($files as $file) {
-            $path = $dir . '/' . $file;
+            $path = $dir.'/'.$file;
             if (is_link($path)) {
                 unlink($path);
             } elseif (is_dir($path)) {

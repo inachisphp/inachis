@@ -195,9 +195,9 @@ class WasteManagerServiceTest extends TestCase
         $image->method('getDimensionY')->willReturn(600);
         $image->method('getAuthor')->willReturn(null);
 
-        $sourcePath = $this->imageDir . 'photo.jpg';
-        $wasteDir = $this->imageDir . '.waste/';
-        $wastePath = $wasteDir . 'photo.jpg';
+        $sourcePath = $this->imageDir.'photo.jpg';
+        $wasteDir = $this->imageDir.'.waste/';
+        $wastePath = $wasteDir.'photo.jpg';
 
         $this->filesystem->expects($this->atLeastOnce())
             ->method('exists')
@@ -379,8 +379,8 @@ class WasteManagerServiceTest extends TestCase
             [Image::class, $imageRepo],
         ]);
 
-        $wastePath = $this->imageDir . '.waste/restored.jpg';
-        $targetPath = $this->imageDir . 'restored.jpg';
+        $wastePath = $this->imageDir.'.waste/restored.jpg';
+        $targetPath = $this->imageDir.'restored.jpg';
 
         $this->filesystem->expects($this->once())->method('exists')->with($wastePath)->willReturn(true);
         $this->filesystem->expects($this->once())->method('rename')->with($wastePath, $targetPath);
@@ -409,7 +409,7 @@ class WasteManagerServiceTest extends TestCase
         $waste->setSourceType('Image');
         $waste->setContent(json_encode(['filename' => 'to_delete.jpg']));
 
-        $wastePath = $this->imageDir . '.waste/to_delete.jpg';
+        $wastePath = $this->imageDir.'.waste/to_delete.jpg';
 
         $this->filesystem->expects($this->once())->method('exists')->with($wastePath)->willReturn(true);
         $this->filesystem->expects($this->once())->method('remove')->with($wastePath);

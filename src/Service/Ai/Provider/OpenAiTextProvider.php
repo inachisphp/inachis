@@ -50,7 +50,7 @@ readonly class OpenAiTextProvider implements AiTextProviderInterface
 
         $response = $this->httpClient->request('POST', 'https://api.openai.com/v1/chat/completions', [
             'headers' => [
-                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Authorization' => 'Bearer '.$this->apiKey,
                 'Content-Type' => 'application/json',
             ],
             'json' => $payload,

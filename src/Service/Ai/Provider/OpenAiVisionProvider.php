@@ -54,7 +54,7 @@ TEXT;
 
         $response = $this->httpClient->request('POST', 'https://api.openai.com/v1/chat/completions', [
             'headers' => [
-                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Authorization' => 'Bearer '.$this->apiKey,
                 'Content-Type' => 'application/json',
             ],
             'json' => [
@@ -76,7 +76,7 @@ TEXT;
 
         $data = $response->toArray();
         $rawJson = $data['choices'][0]['message']['content'] ?? '{}';
-        
+
         /** @var array{title?: string, altText?: string, description?: string} $result */
         $result = json_decode($rawJson, true) ?: [];
 
