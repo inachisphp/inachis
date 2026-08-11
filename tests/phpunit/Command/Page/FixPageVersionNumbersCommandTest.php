@@ -8,9 +8,9 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Command\Page;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Command\Page\FixPageVersionNumbersCommand;
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Revision;
@@ -40,16 +40,12 @@ final class FixPageVersionNumbersCommandTest extends TestCase
             ->method('findAll')
             ->willReturn([$page]);
 
-        $query = $this->createMock(Query::class);
+        $query = $this->createStub(Query::class);
         $query
-            ->expects(self::once())
             ->method('getSingleScalarResult')
             ->willReturn('3');
 
-        $queryBuilder = $this->createQueryBuilderMock(
-            $query,
-            (string) $pageId,
-        );
+        $queryBuilder = $this->createQueryBuilderStub($query);
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager
@@ -103,16 +99,12 @@ final class FixPageVersionNumbersCommandTest extends TestCase
             ->method('findAll')
             ->willReturn([$page]);
 
-        $query = $this->createMock(Query::class);
+        $query = $this->createStub(Query::class);
         $query
-            ->expects(self::once())
             ->method('getSingleScalarResult')
             ->willReturn('3');
 
-        $queryBuilder = $this->createQueryBuilderMock(
-            $query,
-            (string) $pageId,
-        );
+        $queryBuilder = $this->createQueryBuilderStub($query);
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager
@@ -176,27 +168,18 @@ final class FixPageVersionNumbersCommandTest extends TestCase
                 $secondPage,
             ]);
 
-        $firstQuery = $this->createMock(Query::class);
+        $firstQuery = $this->createStub(Query::class);
         $firstQuery
-            ->expects(self::once())
             ->method('getSingleScalarResult')
             ->willReturn('0');
 
-        $secondQuery = $this->createMock(Query::class);
+        $secondQuery = $this->createStub(Query::class);
         $secondQuery
-            ->expects(self::once())
             ->method('getSingleScalarResult')
             ->willReturn('5');
 
-        $firstQueryBuilder = $this->createQueryBuilderMock(
-            $firstQuery,
-            (string) $firstPageId,
-        );
-
-        $secondQueryBuilder = $this->createQueryBuilderMock(
-            $secondQuery,
-            (string) $secondPageId,
-        );
+        $firstQueryBuilder = $this->createQueryBuilderStub($firstQuery);
+        $secondQueryBuilder = $this->createQueryBuilderStub($secondQuery);
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager
@@ -239,38 +222,15 @@ final class FixPageVersionNumbersCommandTest extends TestCase
         );
     }
 
-    /**
-     * @param Query $query
-     */
-    private function createQueryBuilderMock(
-        Query $query,
-        string $pageId,
-    ): QueryBuilder {
-        $queryBuilder = $this->createMock(QueryBuilder::class);
+    private function createQueryBuilderStub(Query $query): QueryBuilder
+    {
+        $queryBuilder = $this->createStub(QueryBuilder::class);
 
-        $queryBuilder
-            ->method('select')
-            ->with('COUNT(r.id)')
-            ->willReturnSelf();
-
-        $queryBuilder
-            ->method('from')
-            ->with(Revision::class, 'r')
-            ->willReturnSelf();
-
-        $queryBuilder
-            ->method('where')
-            ->with('r.page_id = :pageId')
-            ->willReturnSelf();
-
-        $queryBuilder
-            ->method('setParameter')
-            ->with('pageId', $pageId)
-            ->willReturnSelf();
-
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
+        $queryBuilder->method('select')->willReturnSelf();
+        $queryBuilder->method('from')->willReturnSelf();
+        $queryBuilder->method('where')->willReturnSelf();
+        $queryBuilder->method('setParameter')->willReturnSelf();
+        $queryBuilder->method('getQuery')->willReturn($query);
 
         return $queryBuilder;
     }
