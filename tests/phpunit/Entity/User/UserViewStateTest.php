@@ -8,14 +8,40 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Entity\User;
 
+use Inachis\Entity\User\User;
+use Inachis\Entity\User\UserViewState;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 final class UserViewStateTest extends TestCase
 {
-    public function testPlaceholder(): void
+    #[Test]
+    public function itInstantiatesUserViewStateWithDefaultValues(): void
     {
-        $this->markTestIncomplete(
-            'Test not implemented.',
-        );
+        $user = $this->createMock(User::class);
+        $context = 'post';
+
+        $viewState = new UserViewState($user, $context);
+
+        self::assertSame($user, $viewState->getUser());
+        self::assertSame('post', $viewState->getContext());
+        self::assertSame([], $viewState->getState());
+    }
+
+    #[Test]
+    public function itSetsAndGetsState(): void
+    {
+        $user = $this->createMock(User::class);
+        $viewState = new UserViewState($user, 'page');
+
+        $stateData = [
+            'columns' => ['title', 'date', 'status'],
+            'sort' => 'date',
+            'order' => 'DESC',
+            'itemsPerPage' => 25,
+        ];
+
+        self::assertSame($viewState, $viewState->setState($stateData));
+        self::assertSame($stateData, $viewState->getState());
     }
 }

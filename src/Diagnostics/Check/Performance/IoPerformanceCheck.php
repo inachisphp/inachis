@@ -78,7 +78,7 @@ final class IoPerformanceCheck implements CheckInterface
             // --------------------
             $start = hrtime(true);
 
-            $handle = fopen($file, 'wb');
+            $handle = @fopen($file, 'wb');
             if (!$handle) {
                 throw new \Exception('Could not write to '.$file);
             }
@@ -96,7 +96,7 @@ final class IoPerformanceCheck implements CheckInterface
             // --------------------
             $start = hrtime(true);
 
-            $handle = fopen($file, 'rb');
+            $handle = @fopen($file, 'rb');
             if (!$handle) {
                 throw new \Exception('Could not read from '.$file);
             }
