@@ -978,7 +978,7 @@ final class PageRepositoryTest extends TestCase
         );
     }
 
-    public function testGetPagesWithoutSharingMessage(): void
+    public function testGetPagesWithoutFeatureSnippet(): void
     {
         $paginator = $this->createStub(Paginator::class);
 
@@ -989,7 +989,7 @@ final class PageRepositoryTest extends TestCase
                 limit: 10,
                 offset: 5,
                 where: [
-                    'q.sharingMessage IS NULL',
+                    'q.featureSnippet IS NULL',
                 ],
                 order: [
                     ['q.postDate', 'DESC'],
@@ -999,7 +999,7 @@ final class PageRepositoryTest extends TestCase
 
         self::assertSame(
             $paginator,
-            $this->repository->getPagesWithoutSharingMessage(10, 5),
+            $this->repository->getPagesWithoutFeatureSnippet(10, 5),
         );
     }
 
@@ -1193,7 +1193,7 @@ final class PageRepositoryTest extends TestCase
         );
     }
 
-    public function testGetPagesWithoutSharingMessageCountUsesCache(): void
+    public function testGetPagesWithoutFeatureSnippetCountUsesCache(): void
     {
         $item = $this->createMock(ItemInterface::class);
         $query = $this->createMock(Query::class);
@@ -1218,7 +1218,7 @@ final class PageRepositoryTest extends TestCase
 
         $qb->expects($this->once())
             ->method('where')
-            ->with('p.sharingMessage IS NULL')
+            ->with('p.featureSnippet IS NULL')
             ->willReturnSelf();
 
         $qb->expects($this->once())
@@ -1249,7 +1249,7 @@ final class PageRepositoryTest extends TestCase
 
         self::assertSame(
             10,
-            $this->repository->getPagesWithoutSharingMessageCount(),
+            $this->repository->getPagesWithoutFeatureSnippetCount(),
         );
     }
 
