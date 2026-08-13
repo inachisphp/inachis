@@ -17,6 +17,8 @@ use Inachis\Entity\User\User;
 use Inachis\Enum\EditorialStatus;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Object for handling {@link Series} entities.
@@ -52,12 +54,16 @@ class Series
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected ?UuidInterface $id = null;
 
+    #[Assert\Length(max: 255)]
+    #[Assert\NotBlank]
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
     protected string $title = '';
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     protected ?string $subTitle = '';
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(type: 'string', length: 255, unique: true, nullable: false)]
     protected string $url = '';
 
@@ -121,6 +127,17 @@ class Series
     public function onPreUpdate(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    #[Assert\Callback]
+    public function validateContent(ExecutionContextInterface $context): void
+    {
+        if (null !== $this->description && mb_strlen($this->description) > 65535) {
+            $context
+                ->buildViolation('admin.validation.too_large')
+                ->atPath('description')
+                ->addViolation();
+        }
     }
 
     /**

@@ -11,6 +11,7 @@ namespace Inachis\Entity\Content;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Object for handling custom URLs that are mapped to content.
@@ -44,12 +45,14 @@ class Url
     /**
      * @var string The SEO-friendly short link
      */
+    #[Assert\Length(max: 512)]
     #[ORM\Column(type: 'string', length: 512)]
     protected string $link;
 
     /**
      * @var string The canonical hash for the link
      */
+    #[Assert\Length(max: 255)]
     #[ORM\Column(name: 'linkCanonical', type: 'string', length: 255, unique: true)]
     protected string $linkCanonical;
 

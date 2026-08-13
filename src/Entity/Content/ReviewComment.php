@@ -32,9 +32,9 @@ class ReviewComment
     #[ORM\ManyToOne(targetEntity: User::class)]
     private User $author;
 
-    #[Assert\NotBlank]
     #[Assert\Length(max: 10000)]
-    #[ORM\Column(type: 'text')]
+    #[Assert\NotBlank]
+    #[ORM\Column(type: 'text', length: 10000)]
     private string $message;
 
     #[ORM\Column(type: 'datetime_immutable')]

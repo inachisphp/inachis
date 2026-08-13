@@ -156,6 +156,19 @@ final class LinkValidationController
     {
         $url = trim($url);
 
+        // Reject malformed absolute-style URLs before resolving relative URLs.
+        if (str_contains($url, '://') && !preg_match(
+            '#^[a-z][a-z0-9+.-]*://#i',
+            $url,
+        )) {
+            return [
+                'url' => $url,
+                'ok' => false,
+                'status' => null,
+                'error' => 'Invalid URL',
+            ];
+        }
+
         /*
          * Determine whether this is an absolute URL before attempting to
          * resolve it as a relative URL. This is important because an URL
@@ -219,12 +232,14 @@ final class LinkValidationController
             ];
         }
 
+
         /*
          * Protect against SSRF. Literal IP addresses can be checked
          * directly and do not require DNS resolution.
          */
-        if (filter_var($host, FILTER_VALIDATE_IP)) {
-            if (!$this->isPublicIp($host)) {
+        $ipHost = trim($host, '[]');
+        if (filter_var($ipHost, FILTER_VALIDATE_IP)) {
+            if (!$this->isPublicIp($ipHost)) {
                 return [
                     'url' => $url,
                     'ok' => false,

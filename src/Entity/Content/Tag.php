@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Object for handling tags that are mapped to content.
@@ -32,12 +33,16 @@ class Tag
     /**
      * @var string The text for the tag
      */
+    #[Assert\Length(max: 50)]
+    #[Assert\NotBlank]
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     protected string $title;
 
     /**
      * @var string The slug for the tag
      */
+    #[Assert\Length(max: 60)]
+    #[Assert\NotBlank]
     #[ORM\Column(type: 'string', length: 60, unique: true)]
     protected string $slug;
 

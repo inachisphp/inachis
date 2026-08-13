@@ -76,15 +76,15 @@ class UserPreference
      *
      * @var string The local timezone for the user
      */
-    #[ORM\Column(type: 'string', length: 32, options: ['default' => 'UTC'])]
     #[Assert\NotBlank]
+    #[ORM\Column(type: 'string', length: 32, options: ['default' => 'UTC'])]
     protected string $timezone = 'UTC';
 
     /**
      * @var string Background colour for the {@link User}'s letter avatar
      */
-    #[ORM\Column(type: 'string', length: 10, nullable: false)]
     #[Assert\NotBlank]
+    #[ORM\Column(type: 'string', length: 10, nullable: false)]
     protected string $color = '#099bdd';
 
     /**

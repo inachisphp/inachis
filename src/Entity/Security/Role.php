@@ -16,6 +16,7 @@ use Inachis\Enum\Security\AuthenticationPolicy;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 class Role
@@ -32,9 +33,11 @@ class Role
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     private string $identifier = '';
 
+    #[Assert\Length(max: 50)]
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     private string $name;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $description = null;
 

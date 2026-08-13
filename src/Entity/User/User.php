@@ -37,12 +37,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected ?UuidInterface $id = null;
 
     /** @var string Username of the user */
-    #[ORM\Column(type: 'string', length: 255, nullable: false)]
     #[Assert\NotBlank]
     #[Assert\Regex(
         pattern: '/^[A-Za-z0-9]{3,}$/',
         message: 'Username may only contain letters and digits, and must be 3 characters or more.',
     )]
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
     protected string $username;
 
     /** @var string|null Username of the user */
@@ -56,8 +56,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string|null Plaintext version of password - used for validation only and is not stored
      */
-    #[Assert\NotBlank(groups: ['Default'])]
     #[Assert\Length(max: 4096)]
+    #[Assert\NotBlank(groups: ['Default'])]
     #[Assert\NotCompromisedPassword]
     #[Assert\PasswordStrength(
         minScore: Assert\PasswordStrength::STRENGTH_WEAK,
@@ -65,9 +65,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected ?string $plainPassword;
 
     /** @var string|null The email address of the user */
-    #[ORM\Column(type: 'string', length: 512, nullable: false)]
     #[Assert\Email]
     #[Assert\NotBlank]
+    #[ORM\Column(type: 'string', length: 512, nullable: false)]
     protected ?string $email;
 
     /** @var string|null The canonical email address of the user */
@@ -75,8 +75,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected ?string $emailCanonical;
 
     /** @var string The display name for the user */
-    #[ORM\Column(type: 'string', length: 512)]
     #[Assert\NotBlank]
+    #[ORM\Column(type: 'string', length: 512)]
     protected string $displayName = '';
 
     /** @var string|null An image to use for the {@link User} */

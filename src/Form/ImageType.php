@@ -69,6 +69,7 @@ class ImageType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'image-uploader__altText__label',
                     'class' => 'full-width',
+                    'maxlength' => 255,
                     'rows' => 1,
                 ],
                 'label' => 'Alt Text',
@@ -80,6 +81,7 @@ class ImageType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'image-uploader__description__label',
                     'class' => 'full-width',
+                    'maxlength' => 2000,
                     'rows' => 2,
                 ],
                 'label' => 'Caption',

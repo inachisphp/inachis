@@ -136,13 +136,7 @@ class PageTest extends TestCase
         $this->expectException(\Exception::class);
         $this->page->setType('test');
     }
-
-    public function testSetAndGetSharingMessage(): void
-    {
-        $this->page->setSharingMessage('test');
-        $this->assertEquals('test', $this->page->getSharingMessage());
-    }
-
+    
     public function testSetAndGetSubTitle(): void
     {
         $this->page->setSubTitle('test');

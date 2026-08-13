@@ -92,7 +92,7 @@ class DashboardControllerTest extends InachisControllerTestCase
             ->willReturn(0);
 
         $pageRepository->expects($this->once())
-            ->method('getPagesWithoutSharingMessageCount')
+            ->method('getPagesWithoutFeatureSnippetCount')
             ->willReturn(0);
 
         $imageRepository = $this->createMock(ImageRepository::class);

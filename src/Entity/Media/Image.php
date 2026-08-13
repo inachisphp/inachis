@@ -10,6 +10,7 @@ namespace Inachis\Entity\Media;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Object for handling images on a site.
@@ -46,16 +47,19 @@ class Image extends AbstractFile
     public const WARNING_FILESIZE = 2048; // kb
 
     /** @var int The width of the image */
+    #[Assert\PositiveOrZero]
     #[ORM\Column(type: 'integer')]
     protected int $dimensionX = 0;
 
     /** @var int The height of the image */
+    #[Assert\PositiveOrZero]
     #[ORM\Column(type: 'integer')]
     protected int $dimensionY = 0;
 
     /** @var string|null The alt text for the image */
-    #[ORM\Column(type: 'string', nullable: true)]
-    protected ?string $altText = '';
+    #[Assert\Length(max: 255)]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    protected ?string $altText = null;
 
     #[ORM\PrePersist]
     public function onPrePersist(): void

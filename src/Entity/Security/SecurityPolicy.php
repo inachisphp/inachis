@@ -54,8 +54,8 @@ class SecurityPolicy
     /**
      * Human-readable name of the policy.
      */
-    #[Assert\NotBlank]
     #[Assert\Length(max: 100)]
+    #[Assert\NotBlank]
     #[ORM\Column(length: 100)]
     private string $name = '';
 
@@ -64,8 +64,8 @@ class SecurityPolicy
      * Built-in policies use a fixed identifier so they can always be
      * referenced regardless of their display name.
      */
-    #[Assert\NotBlank]
     #[Assert\Length(max: 50)]
+    #[Assert\NotBlank]
     #[Assert\Regex(
         pattern: '/^[a-z0-9][a-z0-9_-]*$/',
         message: 'The identifier may only contain lowercase letters, numbers, underscores and hyphens.',
