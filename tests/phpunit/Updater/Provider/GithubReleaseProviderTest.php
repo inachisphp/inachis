@@ -32,7 +32,7 @@ class GithubReleaseProviderTest extends TestCase
         $this->cache = $this->createMock(CacheInterface::class);
         $this->manifestFactory = new ManifestFactory();
 
-        $this->tempDir = sys_get_temp_dir() . '/inachis_provider_test_' . uniqid('', true);
+        $this->tempDir = sys_get_temp_dir().'/inachis_provider_test_'.uniqid('', true);
         mkdir($this->tempDir, 0777, true);
 
         // Configure mock cache to execute the callback directly
@@ -166,7 +166,7 @@ class GithubReleaseProviderTest extends TestCase
             archiveUrl: $archiveUrl,
         );
 
-        $destination = $this->tempDir . '/release.zip';
+        $destination = $this->tempDir.'/release.zip';
 
         $provider = new GithubReleaseProvider(
             owner: 'inachisphp',
@@ -203,7 +203,7 @@ class GithubReleaseProviderTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Manifest does not contain a valid archive download URL.');
 
-        $provider->download($manifest, $this->tempDir . '/release.zip');
+        $provider->download($manifest, $this->tempDir.'/release.zip');
     }
 
     public function testFetchReleaseThrowsExceptionWhenAssetsAreMissing(): void
@@ -352,7 +352,7 @@ class GithubReleaseProviderTest extends TestCase
 
         $files = array_diff(scandir($dir) ?: [], ['.', '..']);
         foreach ($files as $file) {
-            $path = $dir . '/' . $file;
+            $path = $dir.'/'.$file;
             if (is_link($path)) {
                 unlink($path);
             } elseif (is_dir($path)) {

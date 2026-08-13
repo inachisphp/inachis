@@ -184,7 +184,7 @@ class SeriesControllerTest extends InachisControllerTestCase
             $request,
             $seriesRepository,
             $pageRepository,
-            $this->createStub(WasteManagerService::class)
+            $this->createStub(WasteManagerService::class),
         );
         $this->assertEquals('rendered:inadmin/page/series/edit.html.twig', $result->getContent());
     }
@@ -237,7 +237,7 @@ class SeriesControllerTest extends InachisControllerTestCase
             $request,
             $seriesRepository,
             $pageRepository,
-            $this->createStub(WasteManagerService::class)
+            $this->createStub(WasteManagerService::class),
         );
         $this->assertInstanceOf(RedirectResponse::class, $result);
     }
@@ -288,7 +288,7 @@ class SeriesControllerTest extends InachisControllerTestCase
             $request,
             $seriesRepository,
             $pageRepository,
-            $this->createStub(WasteManagerService::class)
+            $this->createStub(WasteManagerService::class),
         );
         $this->assertInstanceOf(RedirectResponse::class, $result);
     }
@@ -358,7 +358,7 @@ class SeriesControllerTest extends InachisControllerTestCase
             $request,
             $seriesRepository,
             $pageRepository,
-            $this->createStub(WasteManagerService::class)
+            $this->createStub(WasteManagerService::class),
         );
         $this->assertInstanceOf(RedirectResponse::class, $result);
     }

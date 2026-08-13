@@ -44,7 +44,7 @@ class PostSeoMetadataController extends AbstractController
                 'data' => $seoData,
             ]);
         } catch (\Throwable $e) {
-            return new JsonResponse(['error' => 'SEO generation failed: ' . $e->getMessage()], 500);
+            return new JsonResponse(['error' => 'SEO generation failed: '.$e->getMessage()], 500);
         }
     }
 }

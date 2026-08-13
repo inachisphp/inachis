@@ -204,7 +204,7 @@ class ThemeManagerTest extends TestCase
         $manager = $this->createThemeManager();
 
         $this->assertSame(
-            $this->projectDir . '/templates/themes/default',
+            $this->projectDir.'/templates/themes/default',
             $manager->getDefaultThemePath(),
         );
     }
@@ -217,9 +217,9 @@ class ThemeManagerTest extends TestCase
 
         $manager = $this->createThemeManager();
 
-        $expectedPath = $this->projectDir . '/templates/themes/default';
+        $expectedPath = $this->projectDir.'/templates/themes/default';
         $this->assertSame($expectedPath, $manager->getActiveThemePath());
-        $this->assertSame($expectedPath . '/web', $manager->getActiveThemeWebPath());
+        $this->assertSame($expectedPath.'/web', $manager->getActiveThemeWebPath());
     }
 
     public function testGetAssetPathFormatsPathCorrectly(): void
@@ -325,7 +325,7 @@ class ThemeManagerTest extends TestCase
             description: 'Test Theme Description',
             homepage: '',
             license: '',
-            path: $this->projectDir . '/templates/themes/' . $identifier,
+            path: $this->projectDir.'/templates/themes/'.$identifier,
         );
 
         $theme->isCompatible = $isCompatible;

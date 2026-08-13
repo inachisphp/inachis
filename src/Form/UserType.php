@@ -64,7 +64,7 @@ class UserType extends AbstractType
             throw new \LogicException('Current user must be authenticated to build UserType form.');
         }
 
-        $isCurrentUser = $targetUser !== null && $currentUser->getId() === $targetUser->getId();
+        $isCurrentUser = null !== $targetUser && $currentUser->getId() === $targetUser->getId();
 
         $allowEdit = $this->permissionResolver->hasPermission(
             $currentUser,

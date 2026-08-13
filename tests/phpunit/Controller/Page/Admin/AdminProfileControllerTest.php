@@ -88,7 +88,7 @@ final class AdminProfileControllerTest extends InachisControllerTestCase
                 'request_stack',
                 'session',
                 'security.token_storage',
-            ], true)
+            ], true),
         );
 
         $container->method('get')->willReturnCallback(
@@ -101,7 +101,7 @@ final class AdminProfileControllerTest extends InachisControllerTestCase
                     'security.token_storage' => $tokenStorage,
                     default => null,
                 };
-            }
+            },
         );
 
         $this->controller->setContainer($container);
@@ -425,7 +425,7 @@ final class AdminProfileControllerTest extends InachisControllerTestCase
                 $user->removeAssignedRole($adminRole);
 
                 return $form;
-            }
+            },
         );
 
         $form->expects(self::once())

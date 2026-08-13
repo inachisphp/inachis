@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Inachis\Tests\phpunit\Command\System;
 
 use Inachis\Command\System\UpdateCommand;
-use Inachis\Exception\Updater\IncompatibleVersionException;
 use Inachis\Exception\Updater\NoUpdateAvailableException;
 use Inachis\Service\System\VersionService;
 use Inachis\Updater\Planner\UpdatePlanner;
@@ -47,18 +46,18 @@ class UpdateCommandTest extends TestCase
     {
         parent::setUp();
 
-        $this->tempDir = sys_get_temp_dir() . '/inachis_update_cmd_test_' . uniqid('', true);
-        mkdir($this->tempDir . '/releases', 0777, true);
-        mkdir($this->tempDir . '/shared', 0777, true);
+        $this->tempDir = sys_get_temp_dir().'/inachis_update_cmd_test_'.uniqid('', true);
+        mkdir($this->tempDir.'/releases', 0777, true);
+        mkdir($this->tempDir.'/shared', 0777, true);
 
-        $versionFile = $this->tempDir . '/version.php';
+        $versionFile = $this->tempDir.'/version.php';
         file_put_contents($versionFile, "<?php return ['version' => '1.0.0'];");
 
         $this->versionService = new VersionService($versionFile);
         $this->cache = $this->createMock(CacheInterface::class);
 
         // Create a real dummy zip file in tempDir
-        $this->dummyZipPath = $this->tempDir . '/dummy-release.zip';
+        $this->dummyZipPath = $this->tempDir.'/dummy-release.zip';
         $zip = new \ZipArchive();
         if (true === $zip->open($this->dummyZipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE)) {
             $zip->addFromString('version.txt', '2.0.0');
@@ -76,7 +75,7 @@ class UpdateCommandTest extends TestCase
                     } else {
                         file_put_contents($destination, 'dummy_zip_content');
                     }
-                }
+                },
             );
         }
 
@@ -201,10 +200,10 @@ class UpdateCommandTest extends TestCase
 
     public function testExecuteSuccessfulUpdateWithForceOption(): void
     {
-        mkdir($this->tempDir . '/releases/20260101000000-0.9.0', 0777, true);
-        mkdir($this->tempDir . '/releases/20260102000000-0.9.1', 0777, true);
-        mkdir($this->tempDir . '/releases/20260103000000-0.9.2', 0777, true);
-        mkdir($this->tempDir . '/releases/20260104000000-1.0.0', 0777, true);
+        mkdir($this->tempDir.'/releases/20260101000000-0.9.0', 0777, true);
+        mkdir($this->tempDir.'/releases/20260102000000-0.9.1', 0777, true);
+        mkdir($this->tempDir.'/releases/20260103000000-0.9.2', 0777, true);
+        mkdir($this->tempDir.'/releases/20260104000000-1.0.0', 0777, true);
 
         $manifest = $this->createManifest(
             version: '2.0.0',
@@ -294,7 +293,7 @@ class UpdateCommandTest extends TestCase
             'migrations' => [],
             'preserve' => [],
             'replace' => [],
-            'archiveUrl' => null !== $archiveUrl ? $archiveUrl : ('file://' . $this->dummyZipPath),
+            'archiveUrl' => null !== $archiveUrl ? $archiveUrl : ('file://'.$this->dummyZipPath),
             'type' => 'core',
             'releaseNotes' => 'Release notes for testing',
             'publishedAt' => $publishedAt,
@@ -406,7 +405,7 @@ class UpdateCommandTest extends TestCase
 
         $files = array_diff(scandir($dir) ?: [], ['.', '..']);
         foreach ($files as $file) {
-            $path = $dir . '/' . $file;
+            $path = $dir.'/'.$file;
             if (is_link($path)) {
                 unlink($path);
             } elseif (is_dir($path)) {

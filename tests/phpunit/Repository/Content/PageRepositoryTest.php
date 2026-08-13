@@ -256,12 +256,12 @@ final class PageRepositoryTest extends TestCase
                             )
                             && $where[1]['categories']['value']
                                 === $categoryId->toString()
-                            && $where[1]['categories']['type']
-                                === 'uuid_binary'
+                            && 'uuid_binary'
+                                === $where[1]['categories']['type']
                             && $where[1]['tags']['value']
                                 === $tagId->toString()
-                            && $where[1]['tags']['type']
-                                === 'uuid_binary';
+                            && 'uuid_binary'
+                                === $where[1]['tags']['type'];
                     },
                 ),
                 [['q.postDate', 'DESC']],
@@ -831,8 +831,7 @@ final class PageRepositoryTest extends TestCase
             ->method('setParameter')
             ->with(
                 self::callback(
-                    static fn (string $name): bool =>
-                        in_array($name, ['filename', 'image'], true),
+                    static fn (string $name): bool => in_array($name, ['filename', 'image'], true),
                 ),
                 self::anything(),
             )
@@ -1334,8 +1333,7 @@ final class PageRepositoryTest extends TestCase
             ->method('setParameter')
             ->with(
                 self::callback(
-                    static fn (string $name): bool =>
-                        in_array($name, ['status', 'now'], true),
+                    static fn (string $name): bool => in_array($name, ['status', 'now'], true),
                 ),
                 self::anything(),
             )
@@ -1399,8 +1397,7 @@ final class PageRepositoryTest extends TestCase
             ->method('setParameter')
             ->with(
                 self::callback(
-                    static fn (string $name): bool =>
-                        in_array($name, ['status', 'now'], true),
+                    static fn (string $name): bool => in_array($name, ['status', 'now'], true),
                 ),
                 self::anything(),
             )
@@ -1487,8 +1484,8 @@ final class PageRepositoryTest extends TestCase
                             === EditorialStatus::DRAFT->value
                             && $parameters['published']
                             === EditorialStatus::PUBLISHED->value
-                            && $parameters['type']
-                            === Page::TYPE_POST
+                            && Page::TYPE_POST
+                            === $parameters['type']
                             && is_string($parameters['now']);
                     },
                 ),

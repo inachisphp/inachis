@@ -13,17 +13,16 @@ use Inachis\Model\System\PageView;
 use Inachis\Model\System\SiteSettings;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 final class PageViewTest extends TestCase
 {
     #[Test]
     public function itCreatesAPageViewWithDefaultValues(): void
     {
-        $settings = new ReflectionClass(SiteSettings::class)
+        $settings = new \ReflectionClass(SiteSettings::class)
             ->newInstanceWithoutConstructor();
 
-        $page = new ReflectionClass(PageMetadata::class)
+        $page = new \ReflectionClass(PageMetadata::class)
             ->newInstanceWithoutConstructor();
 
         $pageView = new PageView(
@@ -45,10 +44,10 @@ final class PageViewTest extends TestCase
     #[Test]
     public function itCreatesAPageViewWithAllValues(): void
     {
-        $settings = new ReflectionClass(SiteSettings::class)
+        $settings = new \ReflectionClass(SiteSettings::class)
             ->newInstanceWithoutConstructor();
 
-        $page = new ReflectionClass(PageMetadata::class)
+        $page = new \ReflectionClass(PageMetadata::class)
             ->newInstanceWithoutConstructor();
 
         $notifications = [

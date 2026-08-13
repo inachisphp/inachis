@@ -52,18 +52,31 @@ class SeriesTypeTest extends TypeTestCase
                     public function __construct(
                         private readonly PermissionResource $r,
                         private readonly PermissionAction $a,
-                    ) {}
+                    ) {
+                    }
 
-                    public function getResource(): PermissionResource { return $this->r; }
-                    public function getAction(): PermissionAction { return $this->a; }
+                    public function getResource(): PermissionResource
+                    {
+                        return $this->r;
+                    }
+
+                    public function getAction(): PermissionAction
+                    {
+                        return $this->a;
+                    }
                 };
             }
         }
 
         $role = new class($permissions) {
-            public function __construct(private readonly array $permissions) {}
+            public function __construct(private readonly array $permissions)
+            {
+            }
 
-            public function getRolePermissions(): array { return $this->permissions; }
+            public function getRolePermissions(): array
+            {
+                return $this->permissions;
+            }
         };
 
         $user = $this->createStub(User::class);

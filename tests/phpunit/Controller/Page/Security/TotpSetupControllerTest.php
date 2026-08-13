@@ -8,15 +8,15 @@ declare(strict_types=1);
 
 namespace Inachis\Tests\phpunit\Controller\Page\Security;
 
-use Inachis\Controller\Page\Security\TotpSetupController;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Inachis\Repository\Waste\WasteRepository;
+use Inachis\Controller\Page\Security\TotpSetupController;
 use Inachis\Factory\PageViewFactory;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Inachis\Repository\Waste\WasteRepository;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class TotpSetupControllerTest extends TestCase
 {

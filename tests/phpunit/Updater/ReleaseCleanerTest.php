@@ -22,9 +22,9 @@ class ReleaseCleanerTest extends TestCase
     {
         parent::setUp();
 
-        $this->tempDir = sys_get_temp_dir() . '/inachis_cleaner_test_' . uniqid('', true);
-        $this->releasesDir = $this->tempDir . '/releases';
-        $this->currentLink = $this->tempDir . '/current';
+        $this->tempDir = sys_get_temp_dir().'/inachis_cleaner_test_'.uniqid('', true);
+        $this->releasesDir = $this->tempDir.'/releases';
+        $this->currentLink = $this->tempDir.'/current';
 
         mkdir($this->releasesDir, 0777, true);
     }
@@ -38,7 +38,7 @@ class ReleaseCleanerTest extends TestCase
     public function testPruneReturnsEmptyArrayWhenReleasesDirectoryDoesNotExist(): void
     {
         // Use a path where 'releases' directory does not exist
-        $locator = new ReleaseLocator($this->tempDir . '/non_existent');
+        $locator = new ReleaseLocator($this->tempDir.'/non_existent');
         $cleaner = new ReleaseCleaner($locator);
 
         $this->assertSame([], $cleaner->prune(3));
@@ -55,8 +55,8 @@ class ReleaseCleanerTest extends TestCase
         $pruned = $cleaner->prune(3);
 
         $this->assertSame([], $pruned);
-        $this->assertDirectoryExists($this->releasesDir . '/20260101000000-v1.0.0');
-        $this->assertDirectoryExists($this->releasesDir . '/20260102000000-v1.0.1');
+        $this->assertDirectoryExists($this->releasesDir.'/20260101000000-v1.0.0');
+        $this->assertDirectoryExists($this->releasesDir.'/20260102000000-v1.0.1');
     }
 
     public function testPruneEnforcesMinimumKeepThresholdOfTwo(): void
@@ -86,12 +86,12 @@ class ReleaseCleanerTest extends TestCase
         $rel4 = $this->createReleaseDir('20260104000000-v1.0.3');
 
         // Create nested directories, files, and symlinks inside old release
-        mkdir($rel1 . '/config/sub', 0777, true);
-        file_put_contents($rel1 . '/config/sub/app.json', '{}');
+        mkdir($rel1.'/config/sub', 0777, true);
+        file_put_contents($rel1.'/config/sub/app.json', '{}');
 
-        $externalTarget = $this->tempDir . '/external_file.txt';
+        $externalTarget = $this->tempDir.'/external_file.txt';
         file_put_contents($externalTarget, 'important data');
-        symlink($externalTarget, $rel1 . '/external_link');
+        symlink($externalTarget, $rel1.'/external_link');
 
         $locator = new ReleaseLocator($this->tempDir);
         $cleaner = new ReleaseCleaner($locator);
@@ -139,7 +139,7 @@ class ReleaseCleanerTest extends TestCase
         $this->createReleaseDir('20260101000000-v1.0.0');
         $this->createReleaseDir('20260102000000-v1.0.1');
 
-        file_put_contents($this->releasesDir . '/stray_file.txt', 'test');
+        file_put_contents($this->releasesDir.'/stray_file.txt', 'test');
 
         $locator = new ReleaseLocator($this->tempDir);
         $cleaner = new ReleaseCleaner($locator);
@@ -147,12 +147,12 @@ class ReleaseCleanerTest extends TestCase
         $pruned = $cleaner->prune(2);
 
         $this->assertSame([], $pruned);
-        $this->assertFileExists($this->releasesDir . '/stray_file.txt');
+        $this->assertFileExists($this->releasesDir.'/stray_file.txt');
     }
 
     private function createReleaseDir(string $name): string
     {
-        $path = $this->releasesDir . '/' . $name;
+        $path = $this->releasesDir.'/'.$name;
         mkdir($path, 0777, true);
 
         return $path;
@@ -166,7 +166,7 @@ class ReleaseCleanerTest extends TestCase
 
         $files = array_diff(scandir($dir) ?: [], ['.', '..']);
         foreach ($files as $file) {
-            $path = $dir . '/' . $file;
+            $path = $dir.'/'.$file;
             if (is_link($path)) {
                 unlink($path);
             } elseif (is_dir($path)) {

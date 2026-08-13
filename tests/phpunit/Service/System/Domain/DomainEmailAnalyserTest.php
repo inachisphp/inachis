@@ -97,7 +97,7 @@ class DomainEmailAnalyserTest extends TestCase
                 }
 
                 return [];
-            }
+            },
         );
 
         $report = $this->analyser->analyse('https://www.EXAMPLE.COM');
@@ -125,7 +125,7 @@ class DomainEmailAnalyserTest extends TestCase
                 }
 
                 return [];
-            }
+            },
         );
 
         $report = $this->analyser->analyse('example.com');
@@ -158,7 +158,7 @@ class DomainEmailAnalyserTest extends TestCase
                 }
 
                 return [];
-            }
+            },
         );
 
         // Authorized via included SPF subnet
@@ -191,7 +191,7 @@ class DomainEmailAnalyserTest extends TestCase
                 }
 
                 return [];
-            }
+            },
         );
 
         $report = $this->analyser->analyse('example.com', '10.0.0.1');
@@ -215,7 +215,7 @@ class DomainEmailAnalyserTest extends TestCase
                 }
 
                 return [];
-            }
+            },
         );
 
         $report = $this->analyser->analyse('example.com');
@@ -247,7 +247,7 @@ class DomainEmailAnalyserTest extends TestCase
      */
     private function getIssueProperty(ValidationIssue $issue, string $propertyName): mixed
     {
-        $getter = 'get' . ucfirst($propertyName);
+        $getter = 'get'.ucfirst($propertyName);
         if (method_exists($issue, $getter)) {
             return $issue->{$getter}();
         }
@@ -262,7 +262,7 @@ class DomainEmailAnalyserTest extends TestCase
 
         if ('category' === $propertyName) {
             foreach (['type', 'component', 'source', 'section', 'field', 'name'] as $alt) {
-                $altGetter = 'get' . ucfirst($alt);
+                $altGetter = 'get'.ucfirst($alt);
                 if (method_exists($issue, $altGetter)) {
                     return $issue->{$altGetter}();
                 }
@@ -285,7 +285,7 @@ class DomainEmailAnalyserTest extends TestCase
      */
     private function getReportProperty(DomainDnsReport $report, string $propertyName): mixed
     {
-        $getter = 'get' . ucfirst($propertyName);
+        $getter = 'get'.ucfirst($propertyName);
         if (method_exists($report, $getter)) {
             return $report->{$getter}();
         }

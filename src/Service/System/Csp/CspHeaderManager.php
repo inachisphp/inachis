@@ -18,7 +18,7 @@ class CspHeaderManager
 {
     public function __construct(
         private readonly SettingRepository $settingRepository,
-         #[Target('cspCache')]
+        #[Target('cspCache')]
         private readonly CacheInterface $cspCache,
     ) {
     }
@@ -114,8 +114,6 @@ class CspHeaderManager
 
     /**
      * Adds a reported item to the existing CSP policy.
-     *
-     * @param CspReport $report
      */
     public function addReportToPolicy(CspReport $report): void
     {
@@ -135,7 +133,7 @@ class CspHeaderManager
 
         // 4. Normalize the directive from the incoming report
         $rawDirective = $report->getEffectiveDirective();
-        if (!is_string($rawDirective) || $rawDirective === '') {
+        if (!is_string($rawDirective) || '' === $rawDirective) {
             return;
         }
         $directive = str_replace(['-elem', '-attr'], '', $rawDirective);

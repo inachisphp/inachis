@@ -16,7 +16,6 @@ use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Revision;
 use Inachis\Repository\Content\RevisionRepository;
 use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Uuid;
 
 final class RevisionRepositoryTest extends TestCase
 {
@@ -191,7 +190,7 @@ final class RevisionRepositoryTest extends TestCase
 
         $this->assertSame(
             $results,
-            $repository->getRevisionsForPage($page)
+            $repository->getRevisionsForPage($page),
         );
     }
 

@@ -485,7 +485,6 @@ final class SetupSecurityPoliciesCommandTest extends TestCase
         );
     }
 
-
     #[Test]
     public function itResetsExistingPoliciesBeforeCreatingDefaults(): void
     {
@@ -545,5 +544,4 @@ final class SetupSecurityPoliciesCommandTest extends TestCase
         self::assertSame($existingPolicies[0], $removedPolicies[0]);
         self::assertSame($existingPolicies[1], $removedPolicies[1]);
     }
-
 }

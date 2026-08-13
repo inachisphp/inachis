@@ -56,7 +56,7 @@ readonly class GeminiTextProvider implements AiTextProviderInterface
             ];
         }
 
-        $endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=' . $this->apiKey;
+        $endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key='.$this->apiKey;
 
         $response = $this->httpClient->request('POST', $endpoint, [
             'headers' => ['Content-Type' => 'application/json'],

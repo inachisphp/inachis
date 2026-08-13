@@ -75,7 +75,7 @@ TEXT;
         $prompt = sprintf("Title: %s\n\nContent:\n%s", $title ?: 'Untitled', mb_substr($cleanContent, 0, 8000));
 
         $jsonString = $this->generateText($prompt, $systemPrompt, true);
-        
+
         /** @var array{excerpt?: string, metaDescription?: string, keywords?: string[]} $result */
         $result = json_decode($jsonString, true) ?: [];
 

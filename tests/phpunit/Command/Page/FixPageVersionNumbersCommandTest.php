@@ -13,7 +13,6 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Inachis\Command\Page\FixPageVersionNumbersCommand;
 use Inachis\Entity\Content\Page;
-use Inachis\Entity\Content\Revision;
 use Inachis\Repository\Content\PageRepository;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

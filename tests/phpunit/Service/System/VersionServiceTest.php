@@ -20,7 +20,7 @@ class VersionServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->tempDir = sys_get_temp_dir() . '/inachis_version_test_' . uniqid('', true);
+        $this->tempDir = sys_get_temp_dir().'/inachis_version_test_'.uniqid('', true);
         mkdir($this->tempDir, 0777, true);
     }
 
@@ -32,7 +32,7 @@ class VersionServiceTest extends TestCase
 
     public function testDefaultsWhenVersionFileDoesNotExist(): void
     {
-        $service = new VersionService($this->tempDir . '/non_existent.php');
+        $service = new VersionService($this->tempDir.'/non_existent.php');
 
         $this->assertSame('dev', $service->getVersion());
         $this->assertSame('unknown', $service->getCommit());
@@ -46,7 +46,7 @@ class VersionServiceTest extends TestCase
 
     public function testLoadsVersionInformationFromFile(): void
     {
-        $versionFile = $this->tempDir . '/version.php';
+        $versionFile = $this->tempDir.'/version.php';
         file_put_contents($versionFile, <<<'PHP'
 <?php
 return [
@@ -71,7 +71,7 @@ PHP
 
     public function testFallbackValuesWhenKeysMissingInVersionFile(): void
     {
-        $versionFile = $this->tempDir . '/partial_version.php';
+        $versionFile = $this->tempDir.'/partial_version.php';
         file_put_contents($versionFile, <<<'PHP'
 <?php
 return [
@@ -89,7 +89,7 @@ PHP
 
     public function testSatisfiesReturnsFalseForDevVersion(): void
     {
-        $service = new VersionService($this->tempDir . '/non_existent.php');
+        $service = new VersionService($this->tempDir.'/non_existent.php');
 
         $this->assertFalse($service->satisfies('^1.0.0'));
         $this->assertFalse($service->satisfies('>= 1.0.0'));
@@ -207,7 +207,7 @@ PHP
 
     private function createVersionFile(string $version): string
     {
-        $file = $this->tempDir . '/version_' . md5($version) . '.php';
+        $file = $this->tempDir.'/version_'.md5($version).'.php';
         file_put_contents($file, sprintf('<?php return ["version" => "%s"];', $version));
 
         return $file;
@@ -221,7 +221,7 @@ PHP
 
         $files = array_diff(scandir($dir) ?: [], ['.', '..']);
         foreach ($files as $file) {
-            $path = $dir . '/' . $file;
+            $path = $dir.'/'.$file;
             if (is_link($path)) {
                 unlink($path);
             } elseif (is_dir($path)) {
