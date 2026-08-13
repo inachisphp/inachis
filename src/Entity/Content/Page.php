@@ -18,6 +18,8 @@ use Inachis\Enum\EditorialStatus;
 use Inachis\Exception\InvalidTimezoneException;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Object for handling pages of a site.
@@ -41,7 +43,6 @@ use Ramsey\Uuid\UuidInterface;
  *    allowComments: bool,
  *    type: string,
  *    latlong?: string,
- *    sharingMessage?: string,
  *    versionNumber: int,
  *    urls: array<array{link: string, default: bool}>,
  *    categories: array<array{id: string}>|array{},
@@ -82,12 +83,15 @@ class Page
     /**
      * @var string The title of the {@link Page}
      */
+    #[Assert\Length(max: 255)]
+    #[Assert\NotBlank]
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
     protected string $title = '';
 
     /**
      * @var string|null An optional subtitle for the {@link Page}
      */
+    #[Assert\Length(max: 255)]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     protected ?string $subTitle = null;
 
@@ -120,7 +124,7 @@ class Page
     /**
      * @var EditorialStatus Current status of the {@link Page}, defaults to {@link DRAFT}
      */
-    #[ORM\Column(type: 'text', enumType: EditorialStatus::class, length: 20)]
+    #[ORM\Column(type: 'string', enumType: EditorialStatus::class, length: 20)]
     protected EditorialStatus $status = EditorialStatus::DRAFT;
 
     /**
@@ -162,6 +166,7 @@ class Page
     /**
      * @var string|null A password to protect the {@link Page} with if required
      */
+    #[Assert\Length(max: 255)]
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     protected ?string $password = '';
 
@@ -182,12 +187,6 @@ class Page
      */
     #[ORM\Column(type: 'string', nullable: true)]
     protected ?string $latlong = '';
-
-    /**
-     * @var string|null A short 140-character message to use when sharing content
-     */
-    #[ORM\Column(type: 'string', length: 140, nullable: true)]
-    protected ?string $sharingMessage = '';
 
     /** @var int The current version number for this content */
     #[ORM\Column(type: 'integer')]
@@ -249,6 +248,7 @@ class Page
     #[ORM\Column(type: 'boolean')]
     protected ?bool $showTableOfContents = false;
 
+    #[Assert\PositiveOrZero]
     #[ORM\Column(type: 'integer', options: ['default' => 0])]
     protected int $imageSize = 0;
 
@@ -293,6 +293,23 @@ class Page
     public function onPreUpdate(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    #[Assert\Callback]
+    public function validateContent(ExecutionContextInterface $context): void
+    {
+        if (null !== $this->content && mb_strlen($this->content) > 65535) {
+            $context
+                ->buildViolation('admin.validation.too_large')
+                ->atPath('content')
+                ->addViolation();
+        }
+        if (null !== $this->featureSnippet && mb_strlen($this->featureSnippet) > 65535) {
+            $context
+                ->buildViolation('admin.validation.too_large')
+                ->atPath('featureSnippet')
+                ->addViolation();
+        }
     }
 
     /**
@@ -473,16 +490,6 @@ class Page
     public function getLatlong(): ?string
     {
         return $this->latlong;
-    }
-
-    /**
-     * Returns the sharingMessage for the current {@link Page} entity.
-     *
-     * @return string|null The latitude and longitude of the content
-     */
-    public function getSharingMessage(): ?string
-    {
-        return $this->sharingMessage;
     }
 
     /**
@@ -804,18 +811,6 @@ class Page
     public function setLatlong(?string $value): self
     {
         $this->latlong = $value;
-
-        return $this;
-    }
-
-    /**
-     * Sets the current sharingMessage of {@link Page} entity.
-     *
-     * @param string|null $value The sharingMessage of the content
-     */
-    public function setSharingMessage(?string $value): self
-    {
-        $this->sharingMessage = $value;
 
         return $this;
     }

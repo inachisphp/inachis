@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Inachis\Enum\System\CspSeverity;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  *  @phpstan-type PayloadShape array{csp-report: array{
@@ -50,27 +51,34 @@ class CspReport
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     private ?UuidInterface $id = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $documentUri = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $blockedUri = null;
 
+    #[Assert\Length(max: 100)]
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $effectiveDirective = null;
 
+    #[Assert\Length(max: 100)]
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $violatedDirective = null;
 
+    #[Assert\Length(max: 50)]
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $disposition = null;
 
+    #[Assert\PositiveOrZero()]
     #[ORM\Column(nullable: true)]
     private ?int $statusCode = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $originalPolicy = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $sourceFile = null;
 
@@ -80,12 +88,15 @@ class CspReport
     #[ORM\Column(nullable: true)]
     private ?int $columnNumber = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $userAgent = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $host = null;
 
+    #[Assert\Length(max: 40)]
     #[ORM\Column(length: 40, unique: true)]
     private string $fingerprint;
 
@@ -95,6 +106,7 @@ class CspReport
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $lastSeenAt = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $referrer = null;
 

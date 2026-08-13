@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Object for handling categories on a site.
@@ -34,6 +35,8 @@ class Category
     /**
      * @var string The name of the category
      */
+    #[Assert\Length(max: 255)]
+    #[Assert\NotBlank]
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
     protected string $title = '';
 

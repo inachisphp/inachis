@@ -86,9 +86,9 @@ class DashboardController extends AbstractInachisController
                         'count' => $pageRepository->getPagesWithoutFeatureImageCount(),
                         // 'pages' => $pageRepository->getPagesWithoutFeatureImage(5),
                     ],
-                    'sharingMessage' => [
-                        'count' => $pageRepository->getPagesWithoutSharingMessageCount(),
-                        // 'pages' => $pageRepository->getPagesWithoutSharingMessage(5),
+                    'featureSnippet' => [
+                        'count' => $pageRepository->getPagesWithoutFeatureSnippetCount(),
+                        // 'pages' => $pageRepository->getPagesWithoutFeatureSnippet(5),
                     ],
                 ],
                 'analytics' => [

@@ -60,8 +60,8 @@ class LoginActivity
     /**
      * @var string|null The username failed login attempt was for
      */
-    #[ORM\Column(type: 'string', length: 512, nullable: true)]
     #[Assert\NotBlank]
+    #[ORM\Column(type: 'string', length: 512, nullable: true)]
     private ?string $username = '';
 
     /**

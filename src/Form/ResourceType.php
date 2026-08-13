@@ -77,6 +77,7 @@ class ResourceType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'resource__title__label',
                     'class' => 'text full-width',
+                    'maxlength' => 255,
                 ],
                 'disabled' => !$allowEdit,
                 'label' => $this->translator->trans('admin.resources.title.label', [], 'messages'),
@@ -90,6 +91,7 @@ class ResourceType extends AbstractType
                     'attr' => [
                         'aria-labelledby' => 'resource__altText__label',
                         'class' => 'full-width',
+                        'maxlength' => 255,
                         'rows' => 2,
                     ],
                     'disabled' => !$allowEdit,
@@ -136,6 +138,7 @@ class ResourceType extends AbstractType
                 'attr' => [
                     'aria-labelledby' => 'resource__description__label',
                     'class' => 'full-width',
+                    'maxlength' => 2000,
                     'rows' => 5,
                 ],
                 'disabled' => !$allowEdit,

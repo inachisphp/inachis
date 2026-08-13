@@ -13,6 +13,8 @@ use Inachis\Entity\User\User;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * File entity properties common to different upload types
@@ -38,22 +40,31 @@ abstract class AbstractFile
     /**
      * @var string The title of the {@link Image}
      */
+    #[Assert\Length(max: 255)]
+    #[Assert\NotBlank]
     #[ORM\Column(type: 'string', length: 255, nullable: false)]
     protected string $title = '';
 
-    #[ORM\Column(type: 'string', nullable: true)]
-    protected ?string $description = '';
+    #[ORM\Column(type: 'text', nullable: true)]
+    protected ?string $description = null;
 
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[Assert\Length(max: 255)]
+    #[ORM\Column(type: 'string', length: 255, nullable: false)]
     protected string $filename = '';
 
-    #[ORM\Column(type: 'string', nullable: false)]
+    #[Assert\Length(max: 127)]
+    #[Assert\NotBlank]
+    #[ORM\Column(type: 'string', length: 127, nullable: false)]
     protected string $filetype = '';
 
+    #[Assert\PositiveOrZero]
     #[ORM\Column(type: 'integer')]
     protected int $filesize = 0;
 
-    #[ORM\Column(type: 'string')]
+    #[Assert\Length(exactly: 64)]
+    #[Assert\NotBlank]
+    #[Assert\Regex('/^[a-f0-9]{64}$/i')]
+    #[ORM\Column(type: 'string', length: 64, nullable: false)]
     protected string $checksum = '';
 
     /**
@@ -68,6 +79,17 @@ abstract class AbstractFile
 
     #[ORM\Column(type: 'datetime_immutable')]
     protected \DateTimeImmutable $updatedAt;
+
+    #[Assert\Callback]
+    public function validateContent(ExecutionContextInterface $context): void
+    {
+        if (null !== $this->description && mb_strlen($this->description) > 65535) {
+            $context
+                ->buildViolation('admin.validation.too_large')
+                ->atPath('description')
+                ->addViolation();
+        }
+    }
 
     /**
      * Returns the value of {@link id}.

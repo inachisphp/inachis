@@ -108,7 +108,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             return match ($filters['issues']) {
                 'categories' => $this->getPagesWithoutCategories($limit, $offset),
                 'image' => $this->getPagesWithoutFeatureImage($limit, $offset),
-                'snippet' => $this->getPagesWithoutSharingMessage($limit, $offset),
+                'snippet' => $this->getPagesWithoutFeatureSnippet($limit, $offset),
                 'tags' => $this->getPagesWithoutTags($limit, $offset),
             };
         }
@@ -482,13 +482,13 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      *
      * @return Paginator<Page>
      */
-    public function getPagesWithoutSharingMessage(int $limit = 0, int $offset = 0): Paginator
+    public function getPagesWithoutFeatureSnippet(int $limit = 0, int $offset = 0): Paginator
     {
         return $this->getAll(
             limit: $limit,
             offset: $offset,
             where: [
-                'q.sharingMessage IS NULL',
+                'q.featureSnippet IS NULL',
             ],
             order: [
                 ['q.postDate', 'DESC'],
@@ -499,7 +499,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
     /**
      * Get all pages that do not have a sharing message.
      */
-    public function getPagesWithoutSharingMessageCount(): int
+    public function getPagesWithoutFeatureSnippetCount(): int
     {
         return $this->cache->get(
             'pages_without_sharing_message_count',
@@ -510,7 +510,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
                 $qb = $this->createQueryBuilder('p');
                 $qb = $qb
                     ->select('COUNT(p)')
-                    ->where('p.sharingMessage IS NULL');
+                    ->where('p.featureSnippet IS NULL');
 
                 /* @var int */
                 return $qb->getQuery()->getSingleScalarResult();

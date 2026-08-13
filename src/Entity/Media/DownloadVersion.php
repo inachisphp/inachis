@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Inachis\Entity\User\User;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(readOnly: false)]
 #[ORM\Table(name: 'Download_versions')]
@@ -30,17 +31,24 @@ class DownloadVersion
     #[ORM\Column(type: 'integer')]
     private int $versionNumber = 1;
 
-    #[ORM\Column(type: 'string')]
-    private string $filename;
+    #[Assert\Length(max: 255)]
+    #[ORM\Column(type: 'string', nullable: false)]
+    protected string $filename = '';
 
-    #[ORM\Column(type: 'string')]
-    private string $filetype;
+    #[Assert\Length(max: 127)]
+    #[Assert\NotBlank]
+    #[ORM\Column(type: 'string', length: 127, nullable: false)]
+    protected string $filetype = '';
 
+    #[Assert\PositiveOrZero]
     #[ORM\Column(type: 'integer')]
-    private int $filesize;
+    protected int $filesize = 0;
 
-    #[ORM\Column(type: 'string')]
-    private string $checksum;
+    #[Assert\Length(exactly: 64)]
+    #[Assert\NotBlank]
+    #[Assert\Regex('/^[a-f0-9]{64}$/i')]
+    #[ORM\Column(type: 'string', length: 64, nullable: false)]
+    protected string $checksum = '';
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id', nullable: true)]
