@@ -6,231 +6,1228 @@ declare(strict_types=1);
  * This file is part of the inachis framework.
  */
 
-namespace Inachis\Controller\API\Url {
+namespace Inachis\Tests\phpunit\Controller\API\Url;
+
+use Inachis\Controller\API\Url\LinkValidationController;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+
+/**
+ * Link Validation Controller tests.
+ */
+final class LinkValidationControllerTest extends TestCase
+{
+    private const BASE_URL = 'https://93.184.216.34';
+
+    private const HOST = 'example.com';
+
     /**
-     * Namespace function override for dns_get_record during PHPUnit execution.
+     * Reject a request without a referer.
      */
-    function dns_get_record(string $hostname, int $type = \DNS_ANY, array &$authoritative_name_servers = [], array &$additional_records = [], bool $raw = false): array|false
+    #[Test]
+    public function itRejectsRequestWithoutReferer(): void
     {
-        if (isset($GLOBALS['mock_dns_records'][$hostname])) {
-            return $GLOBALS['mock_dns_records'][$hostname];
-        }
+        $controller = $this->createController();
 
-        return \dns_get_record($hostname, $type, $authoritative_name_servers, $additional_records, $raw);
+        $request = $this->createRequest(
+            ['links' => []],
+            [],
+        );
+
+        $response = $controller($request);
+
+        self::assertSame(
+            Response::HTTP_FORBIDDEN,
+            $response->getStatusCode(),
+        );
+
+        self::assertSame(
+            ['error' => 'Missing referer'],
+            $this->decodeResponse($response),
+        );
     }
-}
 
-namespace Inachis\Tests\phpunit\Controller\API\Url {
-
-    use Inachis\Controller\API\Url\LinkValidationController;
-    use PHPUnit\Framework\Attributes\Test;
-    use PHPUnit\Framework\MockObject\MockObject;
-    use PHPUnit\Framework\TestCase;
-    use Symfony\Component\HttpFoundation\JsonResponse;
-    use Symfony\Component\HttpFoundation\Request;
-    use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
-    use Symfony\Contracts\HttpClient\HttpClientInterface;
-    use Symfony\Contracts\HttpClient\ResponseInterface;
-
-    final class LinkValidationControllerTest extends TestCase
+    /**
+     * Reject a request with an invalid referer.
+     */
+    #[Test]
+    public function itRejectsRequestWithInvalidReferer(): void
     {
-        private HttpClientInterface&MockObject $httpClient;
-        private LinkValidationController $controller;
+        $controller = $this->createController();
 
-        protected function setUp(): void
-        {
-            parent::setUp();
+        $request = $this->createRequest(
+            ['links' => []],
+            [
+                'referer' => 'https://evil.example.com/',
+            ],
+        );
 
-            $this->httpClient = $this->createMock(HttpClientInterface::class);
-            $this->controller = new LinkValidationController($this->httpClient);
+        $response = $controller($request);
 
-            $_ENV['APP_ENV'] = 'dev';
-            $GLOBALS['mock_dns_records'] = [];
-        }
+        self::assertSame(
+            Response::HTTP_FORBIDDEN,
+            $response->getStatusCode(),
+        );
 
-        protected function tearDown(): void
-        {
-            unset($_ENV['APP_ENV'], $GLOBALS['mock_dns_records']);
-            parent::tearDown();
-        }
+        self::assertSame(
+            ['error' => 'Invalid referer'],
+            $this->decodeResponse($response),
+        );
+    }
 
-        #[Test]
-        public function itReturnsForbiddenWhenRefererHeaderIsMissing(): void
-        {
-            $request = Request::create('/incp/api/validate-links', 'POST');
+    /**
+     * Accept a request with a matching referer.
+     */
+    #[Test]
+    public function itAcceptsRequestWithMatchingReferer(): void
+    {
+        $controller = $this->createController(
+            new MockHttpClient(
+                new MockResponse('', [
+                    'http_code' => Response::HTTP_OK,
+                ]),
+            ),
+        );
 
-            $response = ($this->controller)($request);
+        $request = $this->createRequest(
+            ['links' => []],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
 
-            self::assertSame(403, $response->getStatusCode());
-            self::assertSame('{"error":"Missing referer"}', $response->getContent());
-        }
+        $response = $controller($request);
 
-        #[Test]
-        public function itReturnsForbiddenWhenRefererHostDoesNotMatchRequestHost(): void
-        {
-            $request = Request::create('http://localhost/incp/api/validate-links', 'POST');
-            $request->headers->set('referer', 'http://evil.com/some-page');
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
 
-            $response = ($this->controller)($request);
+        self::assertSame([], $this->decodeResponse($response));
+    }
 
-            self::assertSame(403, $response->getStatusCode());
-            self::assertSame('{"error":"Invalid referer"}', $response->getContent());
-        }
+    /**
+     * Reject a request with an invalid origin.
+     */
+    #[Test]
+    public function itRejectsRequestWithInvalidOrigin(): void
+    {
+        $controller = $this->createController();
 
-        #[Test]
-        public function itReturnsForbiddenWhenOriginHostDoesNotMatchRequestHost(): void
-        {
-            $request = Request::create('http://localhost/incp/api/validate-links', 'POST');
-            $request->headers->set('referer', 'http://localhost/some-page');
-            $request->headers->set('origin', 'http://evil.com');
+        $request = $this->createRequest(
+            ['links' => []],
+            [
+                'referer' => 'https://example.com/admin',
+                'origin' => 'https://evil.example.com',
+            ],
+        );
 
-            $response = ($this->controller)($request);
+        $response = $controller($request);
 
-            self::assertSame(403, $response->getStatusCode());
-            self::assertSame('{"error":"Invalid origin"}', $response->getContent());
-        }
+        self::assertSame(
+            Response::HTTP_FORBIDDEN,
+            $response->getStatusCode(),
+        );
 
-        #[Test]
-        public function itReturnsBadRequestForInvalidPayload(): void
-        {
-            $request = $this->createValidRequest('invalid-json-content');
+        self::assertSame(
+            ['error' => 'Invalid origin'],
+            $this->decodeResponse($response),
+        );
+    }
 
-            $response = ($this->controller)($request);
+    /**
+     * Accept a request with a matching origin.
+     */
+    #[Test]
+    public function itAcceptsRequestWithMatchingOrigin(): void
+    {
+        $controller = $this->createController(
+            new MockHttpClient(
+                new MockResponse('', [
+                    'http_code' => Response::HTTP_OK,
+                ]),
+            ),
+        );
 
-            self::assertSame(JsonResponse::HTTP_BAD_REQUEST, $response->getStatusCode());
-            self::assertSame('{"error":"Invalid payload"}', $response->getContent());
-        }
+        $request = $this->createRequest(
+            ['links' => []],
+            [
+                'referer' => 'https://example.com/admin',
+                'origin' => 'https://example.com',
+            ],
+        );
 
-        #[Test]
-        public function itValidatesRelativeLinkSuccessfully(): void
-        {
-            $request = $this->createValidRequest(json_encode([
-                'links' => ['about-us'],
-            ]));
+        $response = $controller($request);
 
-            $responseMock = $this->createMock(ResponseInterface::class);
-            $responseMock->method('getStatusCode')->willReturn(200);
-            $responseMock->method('getInfo')->willReturn(['redirect_count' => 0]);
-            $responseMock
-                ->expects(self::once())
-                ->method('getHeaders')
-                ->with(false)
-                ->willReturn([
-                    'Content-Type' => ['text/html; charset=UTF-8'],
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+
+        self::assertSame([], $this->decodeResponse($response));
+    }
+
+    /**
+     * Reject invalid JSON.
+     */
+    #[Test]
+    public function itRejectsInvalidJson(): void
+    {
+        $controller = $this->createController();
+
+        $request = $this->createRequest(
+            null,
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+            '{invalid json',
+        );
+
+        $response = $controller($request);
+
+        self::assertSame(
+            Response::HTTP_BAD_REQUEST,
+            $response->getStatusCode(),
+        );
+
+        self::assertSame(
+            ['error' => 'Invalid payload'],
+            $this->decodeResponse($response),
+        );
+    }
+
+    /**
+     * Reject a payload without links.
+     */
+    #[Test]
+    public function itRejectsPayloadWithoutLinks(): void
+    {
+        $controller = $this->createController();
+
+        $request = $this->createRequest(
+            ['urls' => ['https://example.org']],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        self::assertSame(
+            Response::HTTP_BAD_REQUEST,
+            $response->getStatusCode(),
+        );
+
+        self::assertSame(
+            ['error' => 'Invalid payload'],
+            $this->decodeResponse($response),
+        );
+    }
+
+    /**
+     * Reject a payload where links is not an array.
+     */
+    #[Test]
+    public function itRejectsPayloadWithNonArrayLinks(): void
+    {
+        $controller = $this->createController();
+
+        $request = $this->createRequest(
+            ['links' => 'https://example.org'],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        self::assertSame(
+            Response::HTTP_BAD_REQUEST,
+            $response->getStatusCode(),
+        );
+
+        self::assertSame(
+            ['error' => 'Invalid payload'],
+            $this->decodeResponse($response),
+        );
+    }
+
+    /**
+     * Ignore empty and non-string links.
+     */
+    #[Test]
+    public function itIgnoresEmptyAndNonStringLinks(): void
+    {
+        $controller = $this->createController();
+
+        $request = $this->createRequest(
+            [
+                'links' => [
+                    '',
+                    '   ',
+                    null,
+                    123,
+                    false,
+                    [],
+                ],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+
+        self::assertSame([], $this->decodeResponse($response));
+    }
+
+    /**
+     * Reject more than one hundred links.
+     */
+    #[Test]
+    public function itRejectsMoreThanOneHundredLinks(): void
+    {
+        $controller = $this->createController();
+
+        $links = array_fill(
+            0,
+            101,
+            self::BASE_URL,
+        );
+
+        $request = $this->createRequest(
+            ['links' => $links],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        self::assertSame(
+            Response::HTTP_BAD_REQUEST,
+            $response->getStatusCode(),
+        );
+
+        self::assertSame(
+            [
+                'error' => 'A maximum of 100 links may be validated at once.',
+            ],
+            $this->decodeResponse($response),
+        );
+    }
+
+    /**
+     * Accept exactly one hundred links.
+     */
+    #[Test]
+    public function itAcceptsExactlyOneHundredLinks(): void
+    {
+        $requests = [];
+
+        $client = new MockHttpClient(
+            function (
+                string $method,
+                string $url,
+            ) use (&$requests): MockResponse {
+                $requests[] = [$method, $url];
+
+                return new MockResponse('', [
+                    'http_code' => Response::HTTP_OK,
                 ]);
+            },
+        );
 
-            $this->httpClient
-                ->expects(self::once())
-                ->method('request')
-                ->with('HEAD', 'http://localhost/about-us', [
-                    'timeout' => 5,
-                    'max_redirects' => 5,
-                ])
-                ->willReturn($responseMock);
+        $controller = $this->createController($client);
 
-            $response = ($this->controller)($request);
+        $links = array_fill(
+            0,
+            100,
+            self::BASE_URL,
+        );
 
-            self::assertSame(200, $response->getStatusCode());
+        $request = $this->createRequest(
+            ['links' => $links],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
 
-            $data = json_decode((string) $response->getContent(), true);
-            self::assertIsArray($data);
-            self::assertCount(1, $data);
-            self::assertSame('http://localhost/about-us', $data[0]['url']);
-            self::assertTrue($data[0]['ok']);
-            self::assertSame(200, $data[0]['status']);
-            self::assertSame(['content-type' => 'text/html; charset=UTF-8'], $data[0]['headers']);
+        $response = $controller($request);
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+
+        $results = $this->decodeResponse($response);
+
+        self::assertCount(100, $results);
+        self::assertCount(100, $requests);
+    }
+
+    /**
+     * Resolve relative links.
+     */
+    #[Test]
+    public function itResolvesRelativeLinks(): void
+    {
+        $requestedUrl = null;
+
+        $client = new MockHttpClient(
+            function (
+                string $method,
+                string $url,
+            ) use (&$requestedUrl): MockResponse {
+                $requestedUrl = $url;
+
+                return new MockResponse('', [
+                    'http_code' => Response::HTTP_OK,
+                ]);
+            },
+        );
+
+        $controller = $this->createController($client);
+
+        $request = $this->createRequest(
+            [
+                'links' => ['/some/page'],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+
+        self::assertSame(
+            'https://example.com/some/page',
+            $requestedUrl,
+        );
+    }
+
+    /**
+     * Resolve relative links without a leading slash.
+     */
+    #[Test]
+    public function itResolvesRelativeLinksWithoutLeadingSlash(): void
+    {
+        $requestedUrl = null;
+
+        $client = new MockHttpClient(
+            function (
+                string $method,
+                string $url,
+            ) use (&$requestedUrl): MockResponse {
+                $requestedUrl = $url;
+
+                return new MockResponse('', [
+                    'http_code' => Response::HTTP_OK,
+                ]);
+            },
+        );
+
+        $controller = $this->createController($client);
+
+        $request = $this->createRequest(
+            [
+                'links' => ['some/page'],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+
+        self::assertSame(
+            'https://example.com/some/page',
+            $requestedUrl,
+        );
+    }
+
+    /**
+     * Trim links before validation.
+     */
+    #[Test]
+    public function itTrimsLinksBeforeValidation(): void
+    {
+        $requestedUrl = null;
+
+        $client = new MockHttpClient(
+            function (
+                string $method,
+                string $url,
+            ) use (&$requestedUrl): MockResponse {
+                $requestedUrl = $url;
+
+                return new MockResponse('', [
+                    'http_code' => Response::HTTP_OK,
+                ]);
+            },
+        );
+
+        $controller = $this->createController($client);
+
+        $request = $this->createRequest(
+            [
+                'links' => ['  /some/page  '],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+
+        self::assertSame(
+            'https://example.com/some/page',
+            $requestedUrl,
+        );
+    }
+
+    /**
+     * Reject an unsupported protocol.
+     */
+    #[Test]
+    public function itRejectsInvalidProtocol(): void
+    {
+        $controller = $this->createController();
+
+        $request = $this->createRequest(
+            [
+                'links' => ['ftp://example.org/file.txt'],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        $results = $this->decodeResponse($response);
+
+        self::assertSame(
+            [
+                'url' => 'ftp://example.org/file.txt',
+                'ok' => false,
+                'status' => null,
+                'error' => 'Invalid protocol',
+            ],
+            $results[0],
+        );
+    }
+
+    /**
+     * Reject malformed URLs.
+     */
+    #[Test]
+    public function itRejectsInvalidUrls(): void
+    {
+        $controller = $this->createController();
+
+        $request = $this->createRequest(
+            [
+                'links' => ['://not-a-valid-url'],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        $results = $this->decodeResponse($response);
+
+        self::assertFalse($results[0]['ok']);
+        self::assertSame('Invalid URL', $results[0]['error']);
+    }
+
+    /**
+     * Reject private IPv4 addresses.
+     */
+    #[Test]
+    public function itRejectsPrivateIpv4Addresses(): void
+    {
+        $controller = $this->createController();
+
+        $request = $this->createRequest(
+            [
+                'links' => ['https://192.168.1.1'],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        self::assertSame(
+            [
+                [
+                    'url' => 'https://192.168.1.1',
+                    'ok' => false,
+                    'status' => null,
+                    'error' => 'Blocked (private or reserved network)',
+                ],
+            ],
+            $this->decodeResponse($response),
+        );
+    }
+
+    /**
+     * Reject loopback IPv4 addresses.
+     */
+    #[Test]
+    public function itRejectsLoopbackIpv4Addresses(): void
+    {
+        $controller = $this->createController();
+
+        $request = $this->createRequest(
+            [
+                'links' => ['https://127.0.0.1'],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        self::assertSame(
+            [
+                [
+                    'url' => 'https://127.0.0.1',
+                    'ok' => false,
+                    'status' => null,
+                    'error' => 'Blocked (private or reserved network)',
+                ],
+            ],
+            $this->decodeResponse($response),
+        );
+    }
+
+    /**
+     * Reject link-local IPv4 addresses.
+     */
+    #[Test]
+    public function itRejectsLinkLocalIpv4Addresses(): void
+    {
+        $controller = $this->createController();
+
+        $request = $this->createRequest(
+            [
+                'links' => ['https://169.254.1.1'],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        self::assertSame(
+            [
+                [
+                    'url' => 'https://169.254.1.1',
+                    'ok' => false,
+                    'status' => null,
+                    'error' => 'Blocked (private or reserved network)',
+                ],
+            ],
+            $this->decodeResponse($response),
+        );
+    }
+
+    /**
+     * Reject loopback IPv6 addresses.
+     */
+    #[Test]
+    public function itRejectsLoopbackIpv6Addresses(): void
+    {
+        $controller = $this->createController();
+
+        $request = $this->createRequest(
+            [
+                'links' => ['https://[::1]'],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        self::assertSame(
+            [
+                [
+                    'url' => 'https://[::1]',
+                    'ok' => false,
+                    'status' => null,
+                    'error' => 'Blocked (private or reserved network)',
+                ],
+            ],
+            $this->decodeResponse($response),
+        );
+    }
+
+    /**
+     * Reject reserved IPv6 addresses.
+     */
+    #[Test]
+    public function itRejectsReservedIpv6Addresses(): void
+    {
+        $controller = $this->createController();
+
+        $request = $this->createRequest(
+            [
+                'links' => ['https://[::]'],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        self::assertSame(
+            [
+                [
+                    'url' => 'https://[::]',
+                    'ok' => false,
+                    'status' => null,
+                    'error' => 'Blocked (private or reserved network)',
+                ],
+            ],
+            $this->decodeResponse($response),
+        );
+    }
+
+    /**
+     * Use HEAD for successful requests.
+     */
+    #[Test]
+    public function itUsesHeadForSuccessfulRequests(): void
+    {
+        $requests = [];
+
+        $client = new MockHttpClient(
+            function (
+                string $method,
+                string $url,
+            ) use (&$requests): MockResponse {
+                $requests[] = [$method, $url];
+
+                return new MockResponse('', [
+                    'http_code' => Response::HTTP_OK,
+                ]);
+            },
+        );
+
+        $controller = $this->createController($client);
+
+        $request = $this->createRequest(
+            [
+                'links' => [self::BASE_URL],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+
+        self::assertSame(
+            [
+                ['HEAD', self::BASE_URL . '/'],
+            ],
+            $requests,
+        );
+    }
+
+    /**
+     * Fall back to GET when HEAD fails.
+     */
+    #[Test]
+    public function itFallsBackToGetWhenHeadFails(): void
+    {
+        $requests = [];
+
+        $client = new MockHttpClient(
+            function (
+                string $method,
+                string $url,
+            ) use (&$requests): MockResponse {
+                $requests[] = [$method, $url];
+
+                if ('HEAD' === $method) {
+                    return new MockResponse('', [
+                        'http_code' => Response::HTTP_METHOD_NOT_ALLOWED,
+                    ]);
+                }
+
+                return new MockResponse('', [
+                    'http_code' => Response::HTTP_OK,
+                ]);
+            },
+        );
+
+        $controller = $this->createController($client);
+
+        $request = $this->createRequest(
+            [
+                'links' => [self::BASE_URL],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        self::assertSame(
+            Response::HTTP_OK,
+            $response->getStatusCode(),
+        );
+
+        self::assertSame(
+            [
+                ['HEAD', self::BASE_URL . '/'],
+                ['GET', self::BASE_URL . '/'],
+            ],
+            $requests,
+        );
+    }
+
+    /**
+     * Report failed HTTP responses.
+     */
+    #[Test]
+    public function itReportsFailedHttpResponses(): void
+    {
+        $client = new MockHttpClient(
+            static function (
+                string $method,
+                string $url,
+            ): MockResponse {
+                return new MockResponse('', [
+                    'http_code' => Response::HTTP_NOT_FOUND,
+                ]);
+            },
+        );
+
+        $controller = $this->createController($client);
+
+        $request = $this->createRequest(
+            [
+                'links' => [self::BASE_URL],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        $results = $this->decodeResponse($response);
+
+        self::assertFalse($results[0]['ok']);
+        self::assertSame(
+            Response::HTTP_NOT_FOUND,
+            $results[0]['status'],
+        );
+    }
+
+    /**
+     * Return response headers.
+     */
+    #[Test]
+    public function itReturnsResponseHeaders(): void
+    {
+        $client = new MockHttpClient(
+            new MockResponse('', [
+                'http_code' => Response::HTTP_OK,
+                'response_headers' => [
+                    'Content-Type: text/html',
+                    'X-Test: value',
+                ],
+            ]),
+        );
+
+        $controller = $this->createController($client);
+
+        $request = $this->createRequest(
+            [
+                'links' => [self::BASE_URL],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        $results = $this->decodeResponse($response);
+
+        self::assertSame(
+            [
+                'content-type' => 'text/html',
+                'x-test' => 'value',
+            ],
+            $results[0]['headers'],
+        );
+    }
+
+    /**
+     * Normalize header names to lowercase.
+     */
+    #[Test]
+    public function itNormalizesHeaderNamesToLowercase(): void
+    {
+        $client = new MockHttpClient(
+            new MockResponse('', [
+                'http_code' => Response::HTTP_OK,
+                'response_headers' => [
+                    'Content-Type: text/html',
+                    'X-Custom-Header: test',
+                ],
+            ]),
+        );
+
+        $controller = $this->createController($client);
+
+        $request = $this->createRequest(
+            [
+                'links' => [self::BASE_URL],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        $results = $this->decodeResponse($response);
+
+        self::assertArrayHasKey(
+            'content-type',
+            $results[0]['headers'],
+        );
+
+        self::assertArrayHasKey(
+            'x-custom-header',
+            $results[0]['headers'],
+        );
+
+        self::assertArrayNotHasKey(
+            'Content-Type',
+            $results[0]['headers'],
+        );
+
+        self::assertArrayNotHasKey(
+            'X-Custom-Header',
+            $results[0]['headers'],
+        );
+    }
+
+    /**
+     * Return transport errors as failed results.
+     */
+    #[Test]
+    public function itReturnsTransportErrorsAsFailedResults(): void
+    {
+        $client = new MockHttpClient(
+            static function (): never {
+                throw new TransportException('Connection failed');
+            },
+        );
+
+        $controller = $this->createController($client);
+
+        $request = $this->createRequest(
+            [
+                'links' => [self::BASE_URL],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        $results = $this->decodeResponse($response);
+
+        self::assertFalse($results[0]['ok']);
+        self::assertNull($results[0]['status']);
+        self::assertSame(
+            'Connection failed',
+            $results[0]['error'],
+        );
+    }
+
+    /**
+     * Include timing information for successful requests.
+     */
+    #[Test]
+    public function itIncludesTimingInformationForSuccessfulRequests(): void
+    {
+        $client = new MockHttpClient(
+            new MockResponse('', [
+                'http_code' => Response::HTTP_OK,
+            ]),
+        );
+
+        $controller = $this->createController($client);
+
+        $request = $this->createRequest(
+            [
+                'links' => [self::BASE_URL],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        $results = $this->decodeResponse($response);
+
+        self::assertArrayHasKey('time_ms', $results[0]);
+        self::assertIsInt($results[0]['time_ms']);
+        self::assertGreaterThanOrEqual(0, $results[0]['time_ms']);
+    }
+
+    /**
+     * Report zero redirects when there are none.
+     */
+    #[Test]
+    public function itReportsZeroRedirectsWhenThereAreNone(): void
+    {
+        $client = new MockHttpClient(
+            new MockResponse('', [
+                'http_code' => Response::HTTP_OK,
+                'info' => [
+                    'redirect_count' => 0,
+                ],
+            ]),
+        );
+
+        $controller = $this->createController($client);
+
+        $request = $this->createRequest(
+            [
+                'links' => [self::BASE_URL],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        $results = $this->decodeResponse($response);
+
+        self::assertSame(0, $results[0]['redirects']);
+    }
+
+    /**
+     * Preserve the original absolute URL.
+     */
+    #[Test]
+    public function itPreservesTheOriginalAbsoluteUrl(): void
+    {
+        $url = 'https://93.184.216.34/some/path?foo=bar';
+
+        $client = new MockHttpClient(
+            new MockResponse('', [
+                'http_code' => Response::HTTP_OK,
+            ]),
+        );
+
+        $controller = $this->createController($client);
+
+        $request = $this->createRequest(
+            [
+                'links' => [$url],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        $results = $this->decodeResponse($response);
+
+        self::assertSame($url, $results[0]['url']);
+    }
+
+    /**
+     * Process multiple links independently.
+     */
+    #[Test]
+    public function itProcessesMultipleLinksIndependently(): void
+    {
+        $client = new MockHttpClient(
+            static function (
+                string $method,
+                string $url,
+            ): MockResponse {
+                if (str_contains($url, '/missing')) {
+                    return new MockResponse('', [
+                        'http_code' => Response::HTTP_NOT_FOUND,
+                    ]);
+                }
+
+                return new MockResponse('', [
+                    'http_code' => Response::HTTP_OK,
+                ]);
+            },
+        );
+
+        $controller = $this->createController($client);
+
+        $request = $this->createRequest(
+            [
+                'links' => [
+                    self::BASE_URL . '/ok',
+                    self::BASE_URL . '/missing',
+                ],
+            ],
+            [
+                'referer' => 'https://example.com/admin',
+            ],
+        );
+
+        $response = $controller($request);
+
+        $results = $this->decodeResponse($response);
+
+        self::assertCount(2, $results);
+
+        self::assertTrue($results[0]['ok']);
+        self::assertSame(
+            Response::HTTP_OK,
+            $results[0]['status'],
+        );
+
+        self::assertFalse($results[1]['ok']);
+        self::assertSame(
+            Response::HTTP_NOT_FOUND,
+            $results[1]['status'],
+        );
+    }
+
+    /**
+     * Create the controller under test.
+     */
+    private function createController(
+        ?HttpClientInterface $httpClient = null,
+    ): LinkValidationController {
+        return new LinkValidationController(
+            $httpClient ?? new MockHttpClient(
+                new MockResponse('', [
+                    'http_code' => Response::HTTP_OK,
+                ]),
+            ),
+        );
+    }
+
+    /**
+     * Create a request for the controller.
+     *
+     * @param array<string, mixed>|null $payload
+     * @param array<string, string>     $headers
+     */
+    private function createRequest(
+        ?array $payload,
+        array $headers = [],
+        ?string $rawContent = null,
+    ): Request {
+        $request = Request::create(
+            '/incp/api/validate-links',
+            Request::METHOD_POST,
+            [],
+            [],
+            [],
+            [
+                'HTTP_HOST' => self::HOST,
+                'HTTPS' => 'on',
+            ],
+            $rawContent ?? json_encode(
+                $payload,
+                JSON_THROW_ON_ERROR,
+            ),
+        );
+
+        if (isset($headers['referer'])) {
+            $request->headers->set(
+                'referer',
+                $headers['referer'],
+            );
         }
 
-        #[Test]
-        public function itRetriesWithGetWhenHeadReturnsErrorStatus(): void
-        {
-            $request = $this->createValidRequest(json_encode([
-                'links' => ['http://localhost/page'],
-            ]));
-
-            $headResponse = $this->createMock(ResponseInterface::class);
-            $headResponse->method('getStatusCode')->willReturn(405);
-
-            $getResponse = $this->createMock(ResponseInterface::class);
-            $getResponse->method('getStatusCode')->willReturn(200);
-            $getResponse->method('getInfo')->willReturn(['redirect_count' => 1]);
-            $getResponse
-                ->expects(self::once())
-                ->method('getHeaders')
-                ->with(false)
-                ->willReturn([]);
-
-            $this->httpClient
-                ->expects(self::exactly(2))
-                ->method('request')
-                ->willReturnOnConsecutiveCalls($headResponse, $getResponse);
-
-            $response = ($this->controller)($request);
-
-            self::assertSame(200, $response->getStatusCode());
-
-            $data = json_decode((string) $response->getContent(), true);
-            self::assertIsArray($data);
-            self::assertTrue($data[0]['ok']);
-            self::assertSame(200, $data[0]['status']);
-            self::assertSame(1, $data[0]['redirects']);
+        if (isset($headers['origin'])) {
+            $request->headers->set(
+                'origin',
+                $headers['origin'],
+            );
         }
 
-        #[Test]
-        public function itHandlesHttpClientExceptionsGracefully(): void
-        {
-            $request = $this->createValidRequest(json_encode([
-                'links' => ['http://localhost/failing-endpoint'],
-            ]));
+        return $request;
+    }
 
-            $exception = new class('Connection timed out') extends \RuntimeException implements ExceptionInterface {};
+    /**
+     * Decode a JSON response.
+     *
+     * @return array<mixed>
+     */
+    private function decodeResponse(JsonResponse $response): array
+    {
+        $content = $response->getContent();
 
-            $this->httpClient
-                ->expects(self::once())
-                ->method('request')
-                ->willThrowException($exception);
+        self::assertIsString($content);
 
-            $response = ($this->controller)($request);
+        /** @var array<mixed> $decoded */
+        $decoded = json_decode(
+            $content,
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
 
-            self::assertSame(200, $response->getStatusCode());
-
-            $data = json_decode((string) $response->getContent(), true);
-            self::assertIsArray($data);
-            self::assertFalse($data[0]['ok']);
-            self::assertNull($data[0]['status']);
-            self::assertSame('Connection timed out', $data[0]['error']);
-        }
-
-        #[Test]
-        public function itBlocksPrivateNetworkIpsInProductionEnvironment(): void
-        {
-            $_ENV['APP_ENV'] = 'prod';
-            $GLOBALS['mock_dns_records']['private.example.com'] = [
-                ['ip' => '127.0.0.1'],
-            ];
-
-            $request = $this->createValidRequest(json_encode([
-                'links' => ['http://private.example.com/status'],
-            ]));
-
-            $response = ($this->controller)($request);
-
-            self::assertSame(200, $response->getStatusCode());
-
-            $data = json_decode((string) $response->getContent(), true);
-            self::assertIsArray($data);
-            self::assertFalse($data[0]['ok']);
-            self::assertNull($data[0]['status']);
-            self::assertSame('Blocked (private network)', $data[0]['error']);
-        }
-
-        private function createValidRequest(string $content): Request
-        {
-            $request = Request::create('http://localhost/incp/api/validate-links', 'POST', [], [], [], [], $content);
-            $request->headers->set('referer', 'http://localhost/admin/dashboard');
-            $request->headers->set('origin', 'http://localhost');
-
-            return $request;
-        }
+        return $decoded;
     }
 }
