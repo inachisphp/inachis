@@ -25,6 +25,26 @@
     {% endembed %}
 {% endif %}
 
+{# can('AUDIO', 'MANAGE') #}
+{% if true %}
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: 'Podcast Bumpers',
+        icon: 'graphic_eq',
+        description: 'Manage stinger and trailer MP3 bumpers for AI blog audio',
+        button_text: 'Manage Audio Bumpers',
+        link: viewModel.settings.domain ~ path('incp_settings_audio'),
+    } %}
+        {% block extra_content %}
+            <div class="text-muted">
+                <p>
+                    <small>Stinger: {{ audioSummary.hasStinger ? '✓ Custom' : 'None' }}</small><br />
+                    <small>Trailer: {{ audioSummary.hasTrailer ? '✓ Custom' : 'None' }}</small>
+                </p>
+            </div>
+        {% endblock extra_content %}
+    {% endembed %}
+{% endif %}
+
 {% if can('PLUGIN', 'MANAGE') %}
     {% include 'inadmin/partials/components/card.html.twig' with {
         title: 'Plugins & Add-ons',

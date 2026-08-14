@@ -11,6 +11,11 @@ window.Inachis.AiGenerate = {
         seoSnippetSelector: '#post_featureSnippet',
         seoTagsSelector: '#post_tags',
 
+        // Generate audio version
+        audioSelector: '#post_generate_audio',
+        audioEndpointPattern: '/incp/api/post/{id}/generate-audio',
+        audioPlayerContainer: '#post_audio_player_wrapper',
+
         // Image Metadata / Alt Text Generator options
         imageSelector: '#resource_generate_alt_text, #generate_alt_text',
         imageEndpointPattern: '/incp/api/resource/image/{id}/generate-metadata',
@@ -28,6 +33,7 @@ window.Inachis.AiGenerate = {
 
         this.initSeoGenerator();
         this.initImageMetadataGenerator();
+        this.initAudioGenerator();
     },
 
     /**
@@ -133,6 +139,56 @@ window.Inachis.AiGenerate = {
         });
     },
 
+    initAudioGenerator: function () {
+        const audioBtn = document.querySelector(this.options.audioSelector);
+        if (!audioBtn) return;
+
+        audioBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            const postId = audioBtn.dataset.postId || audioBtn.dataset.id;
+            const titleVal = document.querySelector(this.options.seoTitleSelector)?.value || '';
+            const contentVal = this.getContentValue(this.options.seoContentSelector);
+
+            if (!contentVal.trim()) {
+                this.showError('Please enter post content before generating audio.');
+                return;
+            }
+
+            let endpoint = audioBtn.dataset.endpoint || this.options.audioEndpointPattern;
+            endpoint = endpoint.replace('{id}', encodeURIComponent(postId));
+
+            this.setButtonLoading(audioBtn, true, 'Synthesizing Audio...');
+
+            try {
+                const result = await this.postData(endpoint, {
+                    title: titleVal,
+                    content: contentVal,
+                });
+
+                if (result.success && result.data?.audioUrl) {
+                    // Render an HTML5 audio preview widget
+                    const container = document.querySelector(this.options.audioPlayerContainer);
+                    if (container) {
+                        container.innerHTML = `
+                            <audio controls class="w-100 mt-2">
+                                <source src="${result.data.audioUrl}" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
+                            <small class="text-muted">${result.data.cached ? 'Loaded from cache' : 'Newly generated'}</small>
+                        `;
+                    }
+                } else {
+                    throw new Error(result.error || 'Failed to generate audio.');
+                }
+            } catch (err) {
+                this.handleError(err);
+            } finally {
+                this.setButtonLoading(audioBtn, false);
+            }
+        });
+    },
+
     /**
      * Helper to extract content value from textarea or Markdown editor instance.
      */
@@ -178,7 +234,7 @@ window.Inachis.AiGenerate = {
             throw error;
         }
 
-        if (!response.ok) {
+        if (!response.ok || data.success === false) {
             const error = new Error(
                 data.error || `HTTP ${response.status}: Generation failed.`
             );
@@ -244,6 +300,16 @@ window.Inachis.AiGenerate = {
      * Displays an appropriate error for an AI generation failure.
      */
     handleError: function (error) {
+        const msg = error.message || '';
+
+        // Check for rate limit error codes OR quota error text from provider
+        if (error.code === 'ai_rate_limit' || /quota|credits|rate limit/i.test(msg)) {
+            this.showError(
+                msg || 'AI generation limit reached. Please check your credit quota or try again later.'
+            );
+            return;
+        }
+
         switch (error.code) {
             case 'ai_rate_limit':
                 this.showError(

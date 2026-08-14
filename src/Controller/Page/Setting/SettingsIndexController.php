@@ -49,12 +49,19 @@ class SettingsIndexController extends AbstractInachisController
             'badgeClass' => $hasIssues ? 'badge--warning' : 'badge--success',
         ];
 
+        $uploadsDir = $this->getParameter('kernel.project_dir') . '/var/uploads/';
+        $audioSummary = [
+            'hasStinger' => file_exists($uploadsDir . 'pod_stinger.mp3'),
+            'hasTrailer' => file_exists($uploadsDir . 'pod_trailer.mp3'),
+        ];
+
         $this->viewModel->page->title = 'Settings';
         $this->viewModel->page->tab = 'settings';
 
         return $this->render('inadmin/page/settings/list.html.twig', [
             'viewModel' => $this->viewModel,
             'activeTheme' => $themeManager->getActiveTheme(),
+            'audioSummary' => $audioSummary,
             'discoverySummary' => $discoverySummary,
             'tabs' => $tabManager->getActiveTabs(),
             'version' => $versionService->getAll(),

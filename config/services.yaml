@@ -11,8 +11,10 @@ parameters:
 
     app.config.twitter: 'jedi58'
     env(AI_PROVIDER): ''
+    env(AI_AUDIO_PROVIDER): ''
     env(GEMINI_API_KEY): '' #https://aistudio.google.com/prompts/new_chat
     env(OPENAI_API_KEY): ''
+    env(ELEVENLABS_API_KEY): ''
 
 services:
     # default configuration for services in *this* file
