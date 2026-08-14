@@ -363,31 +363,4 @@ class ResourceController extends AbstractInachisController
             return new JsonResponse(['error' => $e->getMessage()], 400);
         }
     }
-
-    #[Route('/incp/resource/image/{id}/generate-metadata', name: 'incp_resource_image_ai_metadata', methods: ['POST'])]
-    public function generateAiMetadata(
-        string $id,
-        ImageRepository $imageRepository,
-        AiVisionManager $aiVisionManager,
-    ): JsonResponse {
-        if (!$aiVisionManager->isConfigured()) {
-            return new JsonResponse(['error' => 'AI Provider is not configured.'], 400);
-        }
-
-        $image = $imageRepository->find($id);
-        if (!$image) {
-            return new JsonResponse(['error' => 'Image not found.'], 404);
-        }
-
-        try {
-            $metadata = $aiVisionManager->generateMetadata($image);
-
-            return new JsonResponse([
-                'success' => true,
-                'data' => $metadata,
-            ]);
-        } catch (\Throwable $e) {
-            return new JsonResponse(['error' => 'AI Generation failed: '.$e->getMessage()], 500);
-        }
-    }
 }

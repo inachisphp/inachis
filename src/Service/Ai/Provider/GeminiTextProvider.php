@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
+/**
+ * This file is part of the inachis framework.
+ */
+
 namespace Inachis\Service\Ai\Provider;
 
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Inachis\Exception\Ai\AiResponseException;
+use Inachis\Service\Ai\Client\GeminiClient;
 
 readonly class GeminiTextProvider implements AiTextProviderInterface
 {
     public function __construct(
-        private HttpClientInterface $httpClient,
-        #[Autowire('%env(GEMINI_API_KEY)%')]
-        private ?string $apiKey = null,
-    ) {
-    }
+        private GeminiClient $client,
+    ) {}
 
     public function getName(): string
     {
@@ -23,29 +24,32 @@ readonly class GeminiTextProvider implements AiTextProviderInterface
 
     public function isConfigured(): bool
     {
-        return !empty($this->apiKey);
+        return $this->client->isConfigured();
     }
 
-    public function generateText(string $prompt, ?string $systemPrompt = null, bool $jsonMode = false): string
-    {
-        if (!$this->isConfigured()) {
-            throw new \LogicException('Gemini API key is not configured.');
-        }
-
+    public function generateText(
+        string $prompt,
+        ?string $systemPrompt = null,
+        bool $jsonMode = false,
+    ): string {
         $payload = [
             'contents' => [
                 [
                     'parts' => [
-                        ['text' => $prompt],
+                        [
+                            'text' => $prompt,
+                        ],
                     ],
                 ],
             ],
         ];
 
-        if ($systemPrompt) {
+        if (null !== $systemPrompt && '' !== trim($systemPrompt)) {
             $payload['systemInstruction'] = [
                 'parts' => [
-                    ['text' => $systemPrompt],
+                    [
+                        'text' => $systemPrompt,
+                    ],
                 ],
             ];
         }
@@ -56,16 +60,67 @@ readonly class GeminiTextProvider implements AiTextProviderInterface
             ];
         }
 
-        $endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key='.$this->apiKey;
+        $data = $this->client->generateContent($payload);
 
-        $response = $this->httpClient->request('POST', $endpoint, [
-            'headers' => ['Content-Type' => 'application/json'],
-            'json' => $payload,
-            'timeout' => 30,
-        ]);
+        return $this->extractGeneratedText($data);
+    }
 
-        $data = $response->toArray();
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function extractGeneratedText(array $data): string
+    {
+        $candidates = $data['candidates'] ?? null;
 
-        return $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
+        if (!is_array($candidates) || [] === $candidates) {
+            throw new AiResponseException(
+                'Gemini response did not contain any candidates.',
+                provider: 'gemini',
+            );
+        }
+
+        $candidate = $candidates[0] ?? null;
+
+        if (!is_array($candidate)) {
+            throw new AiResponseException(
+                'Gemini response contained an invalid candidate.',
+                provider: 'gemini',
+            );
+        }
+
+        $content = $candidate['content'] ?? null;
+
+        if (!is_array($content)) {
+            throw new AiResponseException(
+                'Gemini response did not contain content.',
+                provider: 'gemini',
+            );
+        }
+
+        $parts = $content['parts'] ?? null;
+
+        if (!is_array($parts)) {
+            throw new AiResponseException(
+                'Gemini response did not contain content parts.',
+                provider: 'gemini',
+            );
+        }
+
+        foreach ($parts as $part) {
+            if (!is_array($part)) {
+                continue;
+            }
+
+            $text = $part['text'] ?? null;
+
+            if (is_string($text)) {
+                return $text;
+            }
+        }
+
+        throw new AiResponseException(
+            'Gemini response did not contain generated text.',
+            provider: 'gemini',
+        );
     }
 }

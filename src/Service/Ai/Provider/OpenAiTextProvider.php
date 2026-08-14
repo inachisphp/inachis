@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
+/**
+ * This file is part of the inachis framework.
+ */
+
 namespace Inachis\Service\Ai\Provider;
 
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Inachis\Exception\Ai\AiResponseException;
+use Inachis\Service\Ai\Client\OpenAiClient;
 
 readonly class OpenAiTextProvider implements AiTextProviderInterface
 {
     public function __construct(
-        private HttpClientInterface $httpClient,
-        #[Autowire('%env(OPENAI_API_KEY)%')]
-        private ?string $apiKey = null,
-    ) {
-    }
+        private OpenAiClient $client,
+    ) {}
 
     public function getName(): string
     {
@@ -23,42 +24,85 @@ readonly class OpenAiTextProvider implements AiTextProviderInterface
 
     public function isConfigured(): bool
     {
-        return !empty($this->apiKey);
+        return $this->client->isConfigured();
     }
 
-    public function generateText(string $prompt, ?string $systemPrompt = null, bool $jsonMode = false): string
-    {
-        if (!$this->isConfigured()) {
-            throw new \LogicException('OpenAI API key is not configured.');
+    public function generateText(
+        string $prompt,
+        ?string $systemPrompt = null,
+        bool $jsonMode = false,
+    ): string {
+        $messages = [];
+
+        if (null !== $systemPrompt && '' !== trim($systemPrompt)) {
+            $messages[] = [
+                'role' => 'system',
+                'content' => $systemPrompt,
+            ];
         }
 
-        $messages = [];
-        if ($systemPrompt) {
-            $messages[] = ['role' => 'system', 'content' => $systemPrompt];
-        }
-        $messages[] = ['role' => 'user', 'content' => $prompt];
+        $messages[] = [
+            'role' => 'user',
+            'content' => $prompt,
+        ];
 
         $payload = [
-            'model' => 'gpt-4o-mini',
             'messages' => $messages,
             'max_tokens' => 1000,
         ];
 
         if ($jsonMode) {
-            $payload['response_format'] = ['type' => 'json_object'];
+            $payload['response_format'] = [
+                'type' => 'json_object',
+            ];
         }
 
-        $response = $this->httpClient->request('POST', 'https://api.openai.com/v1/chat/completions', [
-            'headers' => [
-                'Authorization' => 'Bearer '.$this->apiKey,
-                'Content-Type' => 'application/json',
-            ],
-            'json' => $payload,
-            'timeout' => 30,
-        ]);
+        $data = $this->client->createChatCompletion($payload);
 
-        $data = $response->toArray();
+        return $this->extractGeneratedText($data);
+    }
 
-        return $data['choices'][0]['message']['content'] ?? '';
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function extractGeneratedText(array $data): string
+    {
+        $choices = $data['choices'] ?? null;
+
+        if (!is_array($choices) || [] === $choices) {
+            throw new AiResponseException(
+                'OpenAI response did not contain any choices.',
+                provider: 'openai',
+            );
+        }
+
+        $choice = $choices[0] ?? null;
+
+        if (!is_array($choice)) {
+            throw new AiResponseException(
+                'OpenAI response contained an invalid choice.',
+                provider: 'openai',
+            );
+        }
+
+        $message = $choice['message'] ?? null;
+
+        if (!is_array($message)) {
+            throw new AiResponseException(
+                'OpenAI response did not contain a message.',
+                provider: 'openai',
+            );
+        }
+
+        $content = $message['content'] ?? null;
+
+        if (!is_string($content)) {
+            throw new AiResponseException(
+                'OpenAI response did not contain generated text.',
+                provider: 'openai',
+            );
+        }
+
+        return $content;
     }
 }

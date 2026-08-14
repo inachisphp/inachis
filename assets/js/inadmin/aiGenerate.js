@@ -13,7 +13,7 @@ window.Inachis.AiGenerate = {
 
         // Image Metadata / Alt Text Generator options
         imageSelector: '#resource_generate_alt_text, #generate_alt_text',
-        imageEndpointPattern: '/incp/resource/image/{id}/generate-metadata',
+        imageEndpointPattern: '/incp/api/resource/image/{id}/generate-metadata',
         imageTitleSelector: '#resource_title',
         imageAltSelector: '#resource_altText',
         imageDescSelector: '#resource_description',
@@ -76,13 +76,7 @@ window.Inachis.AiGenerate = {
                     throw new Error(result.error || 'Failed to generate SEO metadata.');
                 }
             } catch (err) {
-                if (err.status === 429) {
-                    this.showError(
-                        'AI generation is temporarily unavailable. Please try again in a moment.'
-                    );
-                } else {
-                    this.showError('AI Error: ' + err.message);
-                }
+                this.handleError(err);
             } finally {
                 this.setButtonLoading(seoBtn, false);
             }
@@ -132,13 +126,7 @@ window.Inachis.AiGenerate = {
                     throw new Error(result.error || 'Failed to generate image metadata.');
                 }
             } catch (err) {
-                if (err.status === 429) {
-                    this.showError(
-                        'AI generation is temporarily unavailable. Please try again in a moment.'
-                    );
-                } else {
-                    this.showError('AI Error: ' + err.message);
-                }
+                this.handleError(err);
             } finally {
                 this.setButtonLoading(imageBtn, false);
             }
@@ -184,7 +172,10 @@ window.Inachis.AiGenerate = {
         try {
             data = await response.json();
         } catch {
-            throw new Error(`HTTP ${response.status}: Generation failed.`);
+            const error = new Error(`HTTP ${response.status}: Generation failed.`);
+            error.status = response.status;
+
+            throw error;
         }
 
         if (!response.ok) {
@@ -193,6 +184,7 @@ window.Inachis.AiGenerate = {
             );
 
             error.status = response.status;
+            error.code = data.code || null;
 
             throw error;
         }
@@ -246,5 +238,42 @@ window.Inachis.AiGenerate = {
         messageElement.append(` ${message}`);
 
         mainContent.prepend(messageElement);
+    },
+
+    /**
+     * Displays an appropriate error for an AI generation failure.
+     */
+    handleError: function (error) {
+        switch (error.code) {
+            case 'ai_rate_limit':
+                this.showError(
+                    'AI generation is temporarily unavailable because the provider rate limit has been reached. Please try again later.'
+                );
+                break;
+
+            case 'ai_temporary':
+                this.showError(
+                    'The AI service is temporarily unavailable. Please try again in a moment.'
+                );
+                break;
+
+            case 'ai_configuration':
+                this.showError(
+                    'AI generation is not currently configured.'
+                );
+                break;
+
+            case 'ai_response':
+                this.showError(
+                    'The AI service returned an unexpected response. Please try again.'
+                );
+                break;
+
+            default:
+                this.showError(
+                    'The AI service could not complete the request. Please try again.'
+                );
+                break;
+        }
     },
 };
