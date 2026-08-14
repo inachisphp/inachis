@@ -23,6 +23,7 @@ use Inachis\Repository\Content\ReviewThreadRepository;
 use Inachis\Repository\Content\RevisionRepository;
 use Inachis\Repository\Media\ImageRepository;
 use Inachis\Security\Attribute\RequiresPermission;
+use Inachis\Service\Ai\AiAudioManager;
 use Inachis\Service\Ai\AiTextManager;
 use Inachis\Service\Content\ContentRevisionCompare;
 use Inachis\Service\Content\Page\CategoryManager;
@@ -174,6 +175,7 @@ class PageController extends AbstractInachisController
     public function edit(
         Request $request,
         AiTextManager $aiTextManager,
+        AiAudioManager $audioManager,
         CategoryManager $categoryManager,
         ContentRevisionCompare $contentRevisionCompare,
         ImageRepository $imageRepository,
@@ -296,6 +298,9 @@ class PageController extends AbstractInachisController
             );
         }
 
+        $hasAudio = $audioManager->hasAudio($post);
+        $audioUrl = $hasAudio ? $this->generateUrl('api_post_audio_stream', ['id' => $post->getId()]) : null;
+
         $this->viewModel->page->title = null !== $post->getId() ?
             'Editing "'.$post->getTitle().'"' :
             'New '.$post->getType();
@@ -305,6 +310,8 @@ class PageController extends AbstractInachisController
             'viewModel' => $this->viewModel,
             'aiTextEnabled' => $aiTextManager->isConfigured(),
             'allowedTypes' => Image::ALLOWED_MIME_TYPES,
+            'audioUrl' => $audioUrl,
+            'hasAudio' => $hasAudio,
             'form' => $form->createView(),
             'includeEditor' => true,
             'includeEditorId' => $post->getId()?->toString() ?: '',

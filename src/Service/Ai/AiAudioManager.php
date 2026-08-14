@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Ai;
 
+use Inachis\Entity\Content\Page;
 use Inachis\Service\Ai\Provider\AiAudioProviderInterface;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -66,6 +67,26 @@ class AiAudioManager
         $provider = $this->getActiveProvider();
 
         return null !== $provider && $provider->isConfigured();
+    }
+
+    public function hasAudio(Page $post): bool
+    {
+        $audioPath = $this->getAudioPath($post);
+
+        return file_exists($audioPath) && filesize($audioPath) > 0;
+    }
+
+    public function getAudioPath(Page $post): string
+    {
+        $idString = (string) $post->getId();
+        $fullText = $post->getTitle() . "\n\n" . $post->getContent();
+        
+        $hasStinger = file_exists($this->uploadsDir . 'pod_stinger.mp3');
+        $hasTrailer = file_exists($this->uploadsDir . 'pod_trailer.mp3');
+
+        $contentHash = md5($fullText . ($hasStinger ? '1' : '0') . ($hasTrailer ? '1' : '0'));
+
+        return $this->storageDir . sprintf('post_%s_%s.mp3', $idString, $contentHash);
     }
 
     /**
