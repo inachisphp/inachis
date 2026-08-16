@@ -412,3 +412,13 @@ p.autosave-notification {
   color: var(--color-warning-900, #78350f);
   font-size: 0.8125rem;
 }
+
+.cm-long-paragraph {
+  background-color: rgba(59, 130, 246, 0.06);
+  border-bottom: 2px dashed rgba(59, 130, 246, 0.45);
+  border-radius: 2px;
+
+  &:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+}
