@@ -51,6 +51,12 @@
             endpoint: "/incp/api/review"
         });
         {% endif %}
+        const longParagraph = new window.Inachis.EasyMDELongParagraph(
+            easymde.codemirror, {
+                threshold: 150,
+            }
+        );
+        longParagraph.init();
     </script>
     {% endif %}
     <template id="session-timeout-template">
