@@ -1,0 +1,41 @@
+{% set page_start = query.offset + 1 %}
+{% set page_end = page_start + pages.getIterator|length - 1 %}
+
+<div id="content-selector-summary">
+    Showing
+    <strong>{{ page_start|number_format }}</strong>-<strong>{{ page_end|number_format }}</strong>
+    of <strong>{{ pages.count }}</strong> posts and pages
+</div>
+
+<div id="content-selector-list">
+    {% if pages is not empty %}
+        <ol>
+            {% for item in pages %}
+                <li>
+                    <input
+                        aria-labelledby="page_{{ item.id }}"
+                        id="page_{{ item.id }}"
+                        name="pages[]"
+                        type="checkbox"
+                        value="{{ item.id }}"
+                    />
+                    <label for="page_{{ item.id }}">
+                        {{ item.title }}{% if item.subTitle is not empty %} - {{ item.subTitle }}{% endif %}
+                    </label>
+                </li>
+            {% endfor %}
+        </ol>
+
+        {{ include('inadmin/partials/components/pagination.html.twig', {
+            offset: query.offset,
+            limit: query.limit,
+            maxResults: pages.count,
+            maxPagesToShow: 5,
+            result_url: '#',
+            showSummary: false,
+            total: pages.count,
+        }) }}
+    {% else %}
+        <p>No content available for selection.</p>
+    {% endif %}
+</div>

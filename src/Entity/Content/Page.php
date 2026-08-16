@@ -105,14 +105,14 @@ class Page
      * @var User|null The UUID of the author for the {@link Page}
      */
     #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\User\User', cascade: ['detach'])]
-    #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'author_id', nullable: true, onDelete: 'SET NULL', referencedColumnName: 'id')]
     protected ?User $author = null;
 
     /**
      * @var Image|null The featured {@link Image} for the {@link Page}
      */
     #[ORM\ManyToOne(targetEntity: 'Inachis\Entity\Media\Image', cascade: ['detach'])]
-    #[ORM\JoinColumn(name: 'image_id', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'image_id', nullable: true, onDelete: 'SET NULL', referencedColumnName: 'id')]
     protected ?Image $featureImage = null;
 
     /**

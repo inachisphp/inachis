@@ -61,7 +61,7 @@ class ContentSelectorController extends AbstractInachisController
         $limit = $request->request->getInt('limit', 25);
         $offset = $request->request->getInt('offset', 0);
 
-        return $this->render('inadmin/dialog/content-selector.html.twig', [
+        return $this->render('inadmin/partials/content_selector_results.html.twig', [
             'pages' => $pageRepository->getFilteredOfTypeByPostDate(
                 $filters,
                 '*',

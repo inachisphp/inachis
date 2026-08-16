@@ -24,9 +24,29 @@ window.Inachis.ContentSelectorDialog = {
       id: 'dialog__contentSelector',
       title: 'Choose content…',
       content: `
-        <p>&nbsp;</p>
-        <div class="loader"></div>
-        <p>&nbsp;</p>
+        <section class="ui-dialog-secondary-bar">
+          <form class="search">
+            <label for="ui-dialog-search-input">Search</label>
+            <input
+              class="text ui-icon-search"
+              id="ui-dialog-search-input"
+              placeholder="Filter by name"
+              type="search"
+            />
+          </form>
+
+          <p id="content-selector-summary">
+            <span class="loader"></span>
+          </p>
+        </section>
+
+        <form class="form">
+          <div id="content-selector-results">
+            <p>&nbsp;</p>
+            <div class="loader"></div>
+            <p>&nbsp;</p>
+          </div>
+        </form>
       `,
       buttons: [
         {
@@ -55,20 +75,24 @@ window.Inachis.ContentSelectorDialog = {
     this.dialog.open();
   },
 
-  /* -----------------------------
-     Content loading
-     ----------------------------- */
-
   loadContentList(dialog) {
-    const keyword =
-      dialog.dialog.querySelector('#ui-dialog-search-input')?.value || '';
+    const search = dialog.dialog.querySelector('#ui-dialog-search-input');
+    const keyword = search?.value || '';
 
-    const body = dialog.body;
-    body.innerHTML = '<p/><div class="loader"></div><p/>';
+    const results = dialog.dialog.querySelector('#content-selector-results');
+    const summary = dialog.dialog.querySelector('#content-selector-summary');
+
+    if (!results || !summary) {
+      return;
+    }
+
+    results.innerHTML = '<p>&nbsp;</p><div class="loader"></div><p>&nbsp;</p>';
 
     fetch(`${Inachis.prefix}/ax/contentSelector/get`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
       body: new URLSearchParams({
         offset: this.offset,
         limit: this.limit,
@@ -78,11 +102,28 @@ window.Inachis.ContentSelectorDialog = {
     })
       .then(res => res.text())
       .then(html => {
-        body.innerHTML = html;
+        const template = document.createElement('template');
+        template.innerHTML = html;
+
+        const newSummary =
+          template.content.querySelector('#content-selector-summary');
+
+        const newList =
+          template.content.querySelector('#content-selector-list');
+
+        if (newSummary) {
+          summary.innerHTML = newSummary.innerHTML;
+        }
+
+        if (newList) {
+          results.innerHTML = newList.innerHTML;
+        }
+
         this.initInputs(dialog);
       })
       .catch(() => {
-        body.innerHTML = '<p role="alert">Failed to load content</p>';
+        results.innerHTML =
+          '<p role="alert">Failed to load content</p>';
       });
   },
 
@@ -92,24 +133,28 @@ window.Inachis.ContentSelectorDialog = {
 
   initInputs(dialog) {
     const container = dialog.dialog;
+    const results = container.querySelector('#content-selector-results');
     const submitBtn = dialog.getFirstButtonByClass('btn--primary');
 
-    // Pagination
-    container
-      .querySelectorAll('.pagination li a')
+    results
+      ?.querySelectorAll('.pagination li a')
       .forEach(link => {
         link.addEventListener('click', e => {
           e.preventDefault();
-          this.offset = (Number(link.textContent) - 1) * this.limit;
+
+          this.offset =
+            (Number(link.textContent) - 1) * this.limit;
+
           this.loadContentList(dialog);
         });
       });
 
-    // Search input (debounced)
     const search = container.querySelector('#ui-dialog-search-input');
+
     if (search) {
       search.addEventListener('input', () => {
         clearTimeout(this.saveTimeout);
+
         this.saveTimeout = setTimeout(() => {
           this.offset = 0;
           this.loadContentList(dialog);
@@ -117,11 +162,15 @@ window.Inachis.ContentSelectorDialog = {
       });
     }
 
-    // Checkbox → enable button
     container.addEventListener('change', e => {
-      if (!e.target.matches('input[type="checkbox"]')) return;
+      if (!e.target.matches('input[type="checkbox"]')) {
+        return;
+      }
+
       submitBtn.disabled =
-        !container.querySelectorAll('input[type="checkbox"]:checked').length;
+        !container.querySelectorAll(
+          'input[type="checkbox"]:checked'
+        ).length;
     });
   },
 
