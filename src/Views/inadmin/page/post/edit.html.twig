@@ -202,20 +202,20 @@
                         {{ form_widget(form.nofollow) }}
                         {{ form_label(form.nofollow) }}
                     </p>
-                    
+
                     <div id="post_audio_player_wrapper">
                         <!-- If audio already exists, render player on page load -->
                         {% if hasAudio %}
-                            <audio controls class="w-100">
+                            <audio controls>
                                 <source src="{{ path('api_post_audio_stream', { id: post.id }) }}" type="audio/mpeg">
                             </audio>
                         {% endif %}
                     </div>
                     {% if not hasAudio %}
                     <p>
-                        <button 
-                            type="button" 
-                            id="post_generate_audio" 
+                        <button
+                            type="button"
+                            id="post_generate_audio"
                             class="btn btn--ai"
                             data-post-id="{{ post.id }}"
                         >

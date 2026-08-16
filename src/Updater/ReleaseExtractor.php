@@ -21,6 +21,9 @@ final class ReleaseExtractor
                 throw new \RuntimeException(sprintf('Unable to create release directory "%s".', $destination));
             }
             $destination = realpath($destination);
+            if (!$destination) {
+                throw new \RuntimeException(sprintf('Unable to locate release directory \'%s\'.', $destination));
+            }
         }
 
         $zip = new \ZipArchive();

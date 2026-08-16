@@ -25,6 +25,14 @@ final class ReleaseInstaller
     ) {
     }
 
+    /**
+     * Install the release
+     *
+     * @param Manifest $manifest
+     * @param string $archiveFile
+     * @param array<string, string> $sharedDirectoryMappings
+     * @return ReleaseInstance
+     */
     public function install(
         Manifest $manifest,
         string $archiveFile,

@@ -10,6 +10,25 @@ namespace Inachis\Updater\Release;
 
 final class ManifestFactory
 {
+    /**
+     * Create Manifest from array of data
+     *
+     * @param array{
+     *     archive?: string,
+     *     migrations?: list<string>,
+     *     minimumVersion?: string,
+     *     package?: string,
+     *     packageSha256?: string,
+     *     preserve?: list<string>,
+     *     published?: string,
+     *     releaseNotes?: string,
+     *     replace?: list<string>,
+     *     sha256?: string,
+     *     type?: string,
+     *     version?: string,
+     * } $data
+     * @return Manifest
+     */
     public function create(array $data): Manifest
     {
         // Support aliases between build process keys and Manifest keys
