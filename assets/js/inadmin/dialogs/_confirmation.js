@@ -94,7 +94,7 @@ window.Inachis.ConfirmationPrompt = {
         if (this.isSubmitting || !this.targetEl) return;
         this.isSubmitting = true;
 
-        const confirmBtn = this.dialog.getButton(1);
+        const confirmBtn = this.dialog.getFirstButtonByClass('btn--primary');
         confirmBtn?.setAttribute('disabled', 'true');
 
         const form = this.targetEl.closest('form');

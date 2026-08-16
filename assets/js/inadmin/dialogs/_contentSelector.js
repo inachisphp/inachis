@@ -92,7 +92,7 @@ window.Inachis.ContentSelectorDialog = {
 
   initInputs(dialog) {
     const container = dialog.dialog;
-    const submitBtn = dialog.getButton(0);
+    const submitBtn = dialog.getFirstButtonByClass('btn--primary');
 
     // Pagination
     container
@@ -131,7 +131,7 @@ window.Inachis.ContentSelectorDialog = {
 
   addContentToSeries() {
     const container = this.dialog.dialog;
-    const submitBtn = this.dialog.getButton(0);
+    const submitBtn = this.dialog.getFirstButtonByClass('btn--primary');
 
     const selectedIds = [
       ...container.querySelectorAll(

@@ -118,6 +118,10 @@ export class Dialog {
     return this.buttons[index] ?? null;
   }
 
+  getFirstButtonByClass(className) {
+    return this.buttons.find(button => button.classList.contains(className)) ?? null;
+  }
+
   _cacheFocusable() {
     const selectors =
       'button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])';

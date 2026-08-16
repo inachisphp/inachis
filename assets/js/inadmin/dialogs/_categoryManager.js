@@ -55,7 +55,7 @@ window.Inachis.CategoryManager = {
         .then(res => res.text())
         .then(html => {
             dialog.setContent(html);
-            // this.submitButton = dialog.getButton(0);
+            // this.submitButton = dialog.getFirstButtonByClass('btn--primary');
             this.initInputs(dialog.dialog);
         })
         .catch(() => {
