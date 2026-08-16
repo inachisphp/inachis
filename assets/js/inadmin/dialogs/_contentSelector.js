@@ -4,12 +4,15 @@ window.Inachis.ContentSelectorDialog = {
   dialog: null,
   offset: 0,
   limit: 25,
-  saveTimeout: null,
+  searchTimeout: null,
 
   init() {
     document.addEventListener('click', e => {
       const link = e.target.closest('.content-selector__link');
-      if (!link) return;
+
+      if (!link) {
+        return;
+      }
 
       e.preventDefault();
       this.open();
@@ -18,6 +21,10 @@ window.Inachis.ContentSelectorDialog = {
 
   open() {
     this.dialog?.close();
+
+    clearTimeout(this.searchTimeout);
+    this.searchTimeout = null;
+
     this.offset = 0;
 
     this.dialog = new Dialog({
@@ -61,32 +68,93 @@ window.Inachis.ContentSelectorDialog = {
           class: 'btn btn--primary',
           disabled: true,
           click: () => this.addContentToSeries()
-        },
+        }
       ],
       onOpen: dialog => {
-        document.querySelector('.fixed-bottom-bar')?.classList.toggle('hidden');
+        document
+          .querySelector('.fixed-bottom-bar')
+          ?.classList.toggle('hidden');
+
+        this.bindEvents(dialog);
         this.loadContentList(dialog);
       },
       onClose: () => {
-        document.querySelector('.fixed-bottom-bar')?.classList.toggle('hidden');
+        clearTimeout(this.searchTimeout);
+        this.searchTimeout = null;
+
+        document
+          .querySelector('.fixed-bottom-bar')
+          ?.classList.toggle('hidden');
       }
     });
 
     this.dialog.open();
   },
 
-  loadContentList(dialog) {
-    const search = dialog.dialog.querySelector('#ui-dialog-search-input');
-    const keyword = search?.value || '';
+  /* -----------------------------
+     Event wiring
+     ----------------------------- */
 
-    const results = dialog.dialog.querySelector('#content-selector-results');
-    const summary = dialog.dialog.querySelector('#content-selector-summary');
+  bindEvents(dialog) {
+    const container = dialog.dialog;
+    const search = container.querySelector('#ui-dialog-search-input');
+    const results = container.querySelector('#content-selector-results');
+
+    search?.addEventListener('input', () => {
+      clearTimeout(this.searchTimeout);
+
+      this.searchTimeout = setTimeout(() => {
+        this.offset = 0;
+        this.loadContentList(dialog);
+      }, 500);
+    });
+
+    results?.addEventListener('click', e => {
+      const link = e.target.closest('.pagination li a');
+
+      if (!link) {
+        return;
+      }
+
+      e.preventDefault();
+
+      this.offset =
+        (Number(link.textContent.trim()) - 1) * this.limit;
+
+      this.loadContentList(dialog);
+    });
+
+    results?.addEventListener('change', e => {
+      if (!e.target.matches('input[type="checkbox"]')) {
+        return;
+      }
+
+      this.updateSubmitButton(dialog);
+    });
+  },
+
+  /* -----------------------------
+     Content loading
+     ----------------------------- */
+
+  loadContentList(dialog) {
+    const search =
+      dialog.dialog.querySelector('#ui-dialog-search-input');
+
+    const results =
+      dialog.dialog.querySelector('#content-selector-results');
+
+    const summary =
+      dialog.dialog.querySelector('#content-selector-summary');
 
     if (!results || !summary) {
       return;
     }
 
-    results.innerHTML = '<p>&nbsp;</p><div class="loader"></div><p>&nbsp;</p>';
+    const keyword = search?.value || '';
+
+    results.innerHTML =
+      '<p>&nbsp;</p><div class="loader"></div><p>&nbsp;</p>';
 
     fetch(`${Inachis.prefix}/ax/contentSelector/get`, {
       method: 'POST',
@@ -100,26 +168,35 @@ window.Inachis.ContentSelectorDialog = {
         'filters[keyword]': keyword
       })
     })
-      .then(res => res.text())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        return res.text();
+      })
       .then(html => {
         const template = document.createElement('template');
-        template.innerHTML = html;
+        template.innerHTML = html.trim();
 
         const newSummary =
           template.content.querySelector('#content-selector-summary');
 
-        const newList =
+        const newResults =
           template.content.querySelector('#content-selector-list');
 
         if (newSummary) {
           summary.innerHTML = newSummary.innerHTML;
         }
 
-        if (newList) {
-          results.innerHTML = newList.innerHTML;
+        if (newResults) {
+          results.innerHTML = newResults.innerHTML;
+        } else {
+          results.innerHTML =
+            '<p role="alert">Failed to load content</p>';
         }
 
-        this.initInputs(dialog);
+        this.updateSubmitButton(dialog);
       })
       .catch(() => {
         results.innerHTML =
@@ -128,50 +205,21 @@ window.Inachis.ContentSelectorDialog = {
   },
 
   /* -----------------------------
-     Input wiring (pagination, search, checkboxes)
+     Button state
      ----------------------------- */
 
-  initInputs(dialog) {
-    const container = dialog.dialog;
-    const results = container.querySelector('#content-selector-results');
-    const submitBtn = dialog.getFirstButtonByClass('btn--primary');
+  updateSubmitButton(dialog) {
+    const submitBtn =
+      dialog.getFirstButtonByClass('btn--primary');
 
-    results
-      ?.querySelectorAll('.pagination li a')
-      .forEach(link => {
-        link.addEventListener('click', e => {
-          e.preventDefault();
-
-          this.offset =
-            (Number(link.textContent) - 1) * this.limit;
-
-          this.loadContentList(dialog);
-        });
-      });
-
-    const search = container.querySelector('#ui-dialog-search-input');
-
-    if (search) {
-      search.addEventListener('input', () => {
-        clearTimeout(this.saveTimeout);
-
-        this.saveTimeout = setTimeout(() => {
-          this.offset = 0;
-          this.loadContentList(dialog);
-        }, 500);
-      });
+    if (!submitBtn) {
+      return;
     }
 
-    container.addEventListener('change', e => {
-      if (!e.target.matches('input[type="checkbox"]')) {
-        return;
-      }
-
-      submitBtn.disabled =
-        !container.querySelectorAll(
-          'input[type="checkbox"]:checked'
-        ).length;
-    });
+    submitBtn.disabled =
+      !dialog.dialog.querySelector(
+        '#content-selector-results input[type="checkbox"]:checked'
+      );
   },
 
   /* -----------------------------
@@ -180,19 +228,28 @@ window.Inachis.ContentSelectorDialog = {
 
   addContentToSeries() {
     const container = this.dialog.dialog;
-    const submitBtn = this.dialog.getFirstButtonByClass('btn--primary');
+    const submitBtn =
+      this.dialog.getFirstButtonByClass('btn--primary');
 
     const selectedIds = [
       ...container.querySelectorAll(
-        '#dialog__contentSelector input[type="checkbox"]:checked'
+        '#content-selector-results input[type="checkbox"]:checked'
       )
     ].map(cb => cb.value);
+
+    if (!selectedIds.length) {
+      return;
+    }
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Saving…';
 
     const params = new URLSearchParams();
-    params.append('seriesId', easymde.options.autosave.uniqueId);
+
+    params.append(
+      'seriesId',
+      easymde.options.autosave.uniqueId
+    );
 
     selectedIds.forEach(id => {
       params.append('ids[]', id);
@@ -200,7 +257,9 @@ window.Inachis.ContentSelectorDialog = {
 
     fetch(`${Inachis.prefix}/ax/contentSelector/save`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
       body: params
     })
       .then(res => res.text())
@@ -208,6 +267,7 @@ window.Inachis.ContentSelectorDialog = {
         if (data === 'Saved') {
           submitBtn.innerHTML =
             '<span class="material-icons">done</span> Content added';
+
           setTimeout(() => location.reload(), 5000);
         } else {
           submitBtn.textContent = 'No changes saved';
@@ -217,6 +277,7 @@ window.Inachis.ContentSelectorDialog = {
       .catch(() => {
         submitBtn.textContent = 'Failed to save';
         submitBtn.classList.add('btn--danger');
+
         setTimeout(() => {
           submitBtn.disabled = false;
           submitBtn.classList.remove('btn--danger');
