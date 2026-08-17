@@ -44,7 +44,7 @@ class PostAudioGeneratorController extends AbstractInachisController {
                 'success' => true,
                 'data' => [
                     'cached'   => $result['cached'],
-                    'audioUrl' => $this->generateUrl('api_post_audio_stream', ['id' => (string) $page->getId()]),
+                    'audioUrl' => $this->generateUrl('web_post_audio_stream', ['id' => (string) $page->getId()]),
                 ],
             ]);
         } catch (\Throwable $e) {

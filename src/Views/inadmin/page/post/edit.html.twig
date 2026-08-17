@@ -207,7 +207,7 @@
                         <!-- If audio already exists, render player on page load -->
                         {% if hasAudio %}
                             <audio controls>
-                                <source src="{{ path('api_post_audio_stream', { id: post.id }) }}" type="audio/mpeg">
+                                <source src="{{ path('web_post_audio_stream', { id: post.id }) }}" type="audio/mpeg">
                             </audio>
                         {% endif %}
                     </div>

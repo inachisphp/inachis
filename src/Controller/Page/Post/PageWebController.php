@@ -10,7 +10,6 @@ namespace Inachis\Controller\Page\Post;
 
 use Inachis\Controller\AbstractWebController;
 use Inachis\Entity\Content\Category;
-use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Series;
 use Inachis\Entity\Content\Tag;
 use Inachis\Entity\Content\Url;
@@ -67,6 +66,7 @@ class PageWebController extends AbstractWebController
         requirements: [
             'page' => '^(?!setup$)(?!\d{4}-[a-zA-Z\-]+$)[^/]+$',
         ],
+        name: 'web_view_page',
         methods: ['GET'],
         priority: -100,
     )]
@@ -83,7 +83,7 @@ class PageWebController extends AbstractWebController
     /**
      * Outputs a page of all pages/posts with the specific tag.
      */
-    #[Route('/tag/{tagName}', methods: ['GET'])]
+    #[Route('/tag/{tagName}', name:'web_view_tag', methods: ['GET'])]
     public function getPostsByTag(
         string $tagName,
         PageRepository $pageRepository,
@@ -106,7 +106,7 @@ class PageWebController extends AbstractWebController
     /**
      * Outputs a page of all pages/posts with the specific category.
      */
-    #[Route('/category/{categoryName}', methods: ['GET'])]
+    #[Route('/category/{categoryName}', name: 'web_view_category', methods: ['GET'])]
     public function getPostsByCategory(
         string $categoryName,
         CategoryRepository $categoryRepository,

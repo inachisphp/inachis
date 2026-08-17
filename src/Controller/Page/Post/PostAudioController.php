@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Inachis\Controller\Page\Post;
 
 use Inachis\Entity\Content\Page;
+use Inachis\Enum\EditorialStatus;
 use Inachis\Service\Ai\AiAudioManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,20 +29,17 @@ class PostAudioController
     /**
      * Stream route using Symfony 8 Route attributes
      */
-    #[Route('/incp/api/post/{id}/audio', name: 'api_post_audio_stream', methods: ['GET'])]
+    #[Route('/post/{id}/audio', name: 'web_post_audio_stream', methods: ['GET'])]
     public function streamAudio(Page $page, Request $request): Response
     {
-        // 1. Authorization check
-        // if (!$this->isGranted('CAN_READ', $page)) { ... }
-
-        // 2. Fetch audio file using Ramsey UuidInterface from Page entity
-        $filePath = $this->audioManager->getAudioFilePath($page->getId());
-        
-        if (!$filePath || !file_exists($filePath)) {
+        $filePath = $this->audioManager->getAudioFilePath($page->getId());    
+        if (!$filePath || 
+            !file_exists($filePath) || 
+            $page->getStatus() != EditorialStatus::PUBLISHED
+        ) {
             return new Response('Audio file not found.', 404);
         }
 
-        // 3. Stream binary MP3 response
         $response = new BinaryFileResponse($filePath);
         $response->headers->set('Content-Type', 'audio/mpeg');
         $response->setContentDisposition(
