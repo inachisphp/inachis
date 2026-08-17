@@ -11,7 +11,9 @@ namespace Inachis\Controller\Page\Tools;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Media\ImageRepository;
+use Inachis\Service\System\DatabasePurgeService;
 use Inachis\Service\System\Maintenance\MaintenanceManager;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -54,5 +56,21 @@ class ToolsIndexController extends AbstractInachisController
                 'topPagesBySize' => $pageRepository->getTopPagesByImageSize(25),
             ],
         ]);
+    }
+
+    #[Route('/incp/tools/data-purge', name: 'incp_tools_data_purge', methods: ['POST'])]
+    public function purgeData(
+        Request $request,
+        DatabasePurgeService $purgeService,
+    ): Response {
+        if (!$this->isCsrfTokenValid('data_purge', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Invalid CSRF token.');
+            return $this->redirectToRoute('incp_tools_index');
+        }
+
+        $purged = $purgeService->purgeUserTables();
+        $this->addFlash('success', sprintf('Successfully purged data from %d tables.', count($purged)));
+
+        return $this->redirectToRoute('incp_tools_index');
     }
 }

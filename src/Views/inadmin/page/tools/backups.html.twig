@@ -1,0 +1,128 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incp_tools_index') }}">Tools</a>
+    <span>Backups</span>
+{% endblock pagetitle %}
+
+
+{% block content %}
+<div class="col-12 nested-grid">
+    <table class="table table--hover table--zebra col-6">
+        <thead class="table-light">
+            <tr>
+                <th>Filename</th>
+                <th>Created At</th>
+                <th>Size</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for backup in backups %}
+            <tr>
+                <td>
+                    <code class="fw-bold">{{ backup.filename }}</code>
+                </td>
+                <td>{{ backup.createdAt|date('Y-m-d H:i:s') }}</td>
+                <td><span class="badge bg-secondary">{{ backup.size }}</span></td>
+                <td class="text-end">
+                    <div class="btn-group btn-group-sm" role="group">
+                        {# Download #}
+                        <a href="{{ path('incp_tools_backups_download', { filename: backup.filename }) }}" class="btn btn-outline-secondary" title="Download">
+                            Download
+                        </a>
+
+                        {# Restore Existing File #}
+                        <form action="{{ path('incp_tools_backups_restore') }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to restore {{ backup.filename }}? Current records will be overwritten.');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('backup_restore') }}">
+                            <input type="hidden" name="filename" value="{{ backup.filename }}">
+                            <button type="submit" class="btn btn-outline-warning">
+                                Restore
+                            </button>
+                        </form>
+
+                        {# Delete File #}
+                        <form action="{{ path('incp_tools_backups_delete', { filename: backup.filename }) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ backup.filename }} permanently?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('backup_delete_' ~ backup.filename) }}">
+                            <button type="submit" class="btn btn-outline-danger">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4" class="text-center py-4 text-muted">
+                    No backup files found. Click <strong>Generate New Backup</strong> to create your first dump.
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <section class="ui-section col-6">
+        <form action="{{ path('incp_tools_backups_restore') }}" method="post" enctype="multipart/form-data" onsubmit="return confirm('WARNING: Restoring will overwrite current database records. Proceed?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('backup_restore') }}">
+            <p>
+                <label for="backup_file">
+                    Select <code>.sql.gz</code> file from local computer
+                </label>
+                <input type="file" name="backup_file" id="backup_file" class="form-control" accept=".gz,.sql" required>
+            </p>
+            <p>
+                <button type="submit" class="btn btn--danger">
+                    Upload &amp; Restore
+                </button>
+            </p>
+        </form>
+    </section>
+</div>
+
+<div id="restoreProgressContainer" class="col-12">
+    <div class="progress mb-2" style="height: 22px;">
+        <div id="restoreProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;">0%</div>
+    </div>
+    <p id="restoreStatusText" class="small text-muted mb-0">Starting restore...</p>
+</div>
+
+<script>
+function pollProgress(jobId) {
+    const container = document.getElementById('restoreProgressContainer');
+    const bar = document.getElementById('restoreProgressBar');
+    const statusText = document.getElementById('restoreStatusText');
+    container.classList.remove('d-none');
+
+    const interval = setInterval(async () => {
+        const res = await fetch(`/admin/settings/backups/status/${jobId}`);
+        const data = await res.json();
+
+        if (data.percent < 0) {
+            clearInterval(interval);
+            bar.classList.replace('bg-primary', 'bg-danger');
+            statusText.textContent = data.status;
+            return;
+        }
+
+        bar.style.width = `${Math.max(data.percent, 5)}%`;
+        bar.textContent = `${data.percent}%`;
+        statusText.textContent = data.status;
+
+        if (data.percent === 100) {
+            clearInterval(interval);
+            bar.classList.remove('progress-bar-animated');
+            setTimeout(() => window.location.reload(), 1500);
+        }
+    }, 1000);
+}
+</script>
+
+<div class="fixed-bottom-bar">
+    <form action="{{ path('incp_tools_backups_create') }}" method="post">
+        <input type="hidden" name="_token" value="{{ csrf_token('backup_create') }}">
+        <button type="submit" class="btn btn--primary">
+            <span class="material-icons">backup</span>
+            <span class="btn--text">Generate New Backup</span>
+        </button>
+    </form>
+</div>
+{% endblock %}
