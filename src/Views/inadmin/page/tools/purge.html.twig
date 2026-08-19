@@ -1,0 +1,88 @@
+{% extends "inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <span>Purge User Data</span>
+{% endblock pagetitle %}
+
+{% block content %}
+
+    <div class="col-12">
+        <div class="admonition admonition__danger">
+            <header class="admonition__title">
+                <span class="material-icons" aria-hidden="true">warning</span>
+                <strong>Danger: Destructive Operation</strong>
+            </header>
+            <p>
+                This action permanently removes user data from the site.
+                It cannot be undone.
+            </p>
+        </div>
+    </div>
+
+    {{ form_start(form, {
+        'attr': {
+            'class': 'col-12 form form__user-purge'
+        }
+    }) }}
+
+    {{ form_errors(form) }}
+
+    <div class="content__edit">
+
+        <fieldset class="ui-section" id="user__purge">
+            <legend>User Data</legend>
+
+            <p>
+                Use this page to permanently purge user data from the site.
+            </p>
+            <h3>What will be removed?</h3>
+
+            <ul>
+                <li>Posts and pages created by users</li>
+                <li>Images and other uploaded media</li>
+                <li>Series</li>
+                <li>Categories</li>
+                <li>Tags</li>
+                <li>Other content associated with user-created content</li>
+            </ul>
+
+            <h3>What will not be removed?</h3>
+
+            <ul>
+                <li>User accounts</li>
+                <li>Authentication credentials</li>
+                <li>User preferences</li>
+                <li>Security and login information</li>
+            </ul>
+            <p>
+                <strong>This operation is permanent and cannot be reversed.</strong>
+            </p>
+
+            <div class="admonition admonition__warning">
+                <header class="admonition__title">
+                    <span class="material-icons" aria-hidden="true">info</span>
+                    <strong>Before continuing</strong>
+                </header>
+                <p>
+                    Make sure that any required records have been retained
+                    in accordance with your site's data retention policy
+                    before proceeding.
+                </p>
+            </div>
+            <p>
+                {{ form_widget(form.acknowledge) }}
+                {{ form_label(form.acknowledge) }}
+                {{ form_errors(form.acknowledge) }}
+            </p>
+
+            <p>
+                {{ form_widget(form.purge) }}
+            </p>
+        </fieldset>
+
+    </div>
+
+    {{ form_row(form._token) }}
+    {{ form_end(form) }}
+
+{% endblock content %}
