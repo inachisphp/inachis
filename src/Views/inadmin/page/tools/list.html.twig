@@ -77,7 +77,17 @@
     } %}
 {% endif %}
 
-{% if true %}
+{% if canResource('BACKUP') %}
+    {% include 'inadmin/partials/components/card.html.twig' with {
+        title: 'Backup & Restore',
+        icon: 'backup',
+        description: 'Create complete site backups and restore the site from a previous backup.',
+        button_text: 'Backup / Restore',
+        link: viewModel.settings.domain ~ path('incp_tools_backups'),
+    } %}
+{% endif %}
+
+{% if canResource('PURGE') %}
     {% embed 'inadmin/partials/components/card.html.twig' with {
         title: 'Data Purge',
         icon: 'delete_forever',
