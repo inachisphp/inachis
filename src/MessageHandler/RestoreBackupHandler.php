@@ -43,10 +43,16 @@ class RestoreBackupHandler
             throw new \RuntimeException(sprintf('Unable to open backup file at "%s"', $message->filePath));
         }
 
-        $this->connection->beginTransaction();
+        /** @var \PDO $pdo Bypass DBAL query logging middleware */
+        $pdo = $this->connection->getNativeConnection();
+        if (!$pdo instanceof \PDO) {
+            throw new \RuntimeException('Native PDO connection is required for high-performance restore.');
+        }
+
+        $pdo->beginTransaction();
 
         try {
-            $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0;');
+            $pdo->exec('SET FOREIGN_KEY_CHECKS = 0;');
             $statementBuffer = '';
             $currentTable = 'Initializing...';
             $isExcludedTable = false;
@@ -75,7 +81,7 @@ class RestoreBackupHandler
                 $statementBuffer .= $line;
 
                 if (str_ends_with(rtrim($statementBuffer, "\r\n\t "), ';')) {
-                    $this->connection->executeStatement($statementBuffer);
+                    $pdo->exec($statementBuffer);
                     $statementBuffer = '';
 
                     // Update progress periodically
@@ -90,17 +96,17 @@ class RestoreBackupHandler
                 }
             }
 
-            $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1;');
-            $this->connection->commit();
+            $pdo->exec('SET FOREIGN_KEY_CHECKS = 1;');
+            $pdo->commit();
 
             $this->updateProgress($jobId, 100, 'Restore completed successfully.');
         } catch (\Throwable $e) {
-            if ($this->connection->isTransactionActive()) {
-                $this->connection->rollBack();
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
             }
 
             try {
-                $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1;');
+                $pdo->exec('SET FOREIGN_KEY_CHECKS = 1;');
             } catch (\Throwable) {
                 // Ignore secondary cleanup errors on failure
             }
@@ -132,7 +138,10 @@ class RestoreBackupHandler
 
         $lines = 0;
         while (!gzeof($gz)) {
-            gzgets($gz, 8192);
+            $line = gzgets($gz, 8192);
+            if ($line === false) {
+                break;
+            }
             $lines++;
         }
         gzclose($gz);

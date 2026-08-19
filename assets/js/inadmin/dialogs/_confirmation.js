@@ -99,14 +99,20 @@ window.Inachis.ConfirmationPrompt = {
 
         const form = this.targetEl.closest('form');
 
-        if (form && this.targetEl.name) {
-            const hidden = document.createElement('input');
-            hidden.type = 'hidden';
-            hidden.name = this.targetEl.name;
-            hidden.value = this.targetEl.value ?? '1';
-            form.appendChild(hidden);
+        if (form) {
+            if (this.targetEl.name) {
+                const hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = this.targetEl.name;
+                hidden.value = this.targetEl.value ?? '1';
+                form.appendChild(hidden);
+            }
 
-            form.submit();
+            if (typeof form.requestSubmit === 'function') {
+                form.requestSubmit();
+            } else {
+                form.submit();
+            }
         } else if (this.targetEl.dataset.href) {
             window.location.href = this.targetEl.dataset.href;
         }

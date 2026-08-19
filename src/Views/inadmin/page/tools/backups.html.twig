@@ -5,9 +5,9 @@
     <span>Backups</span>
 {% endblock pagetitle %}
 
-
 {% block content %}
 <div class="col-12 nested-grid">
+
     <table class="table table--hover table--zebra col-6">
         <thead class="table-light">
             <tr>
@@ -27,27 +27,58 @@
                 <td><span class="badge bg-secondary">{{ backup.size }}</span></td>
                 <td class="text-end">
                     <div class="btn-group btn-group-sm" role="group">
+
                         {# Download #}
-                        <a href="{{ path('incp_tools_backups_download', { filename: backup.filename }) }}" class="btn btn-outline-secondary" title="Download">
+                        <a
+                            href="{{ path('incp_tools_backups_download', { filename: backup.filename }) }}"
+                            class="btn"
+                            title="Download"
+                        >
                             Download
                         </a>
 
-                        {# Restore Existing File #}
-                        <form action="{{ path('incp_tools_backups_restore') }}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to restore {{ backup.filename }}? Current records will be overwritten.');">
+                        {# Restore existing file #}
+                        <form
+                            action="{{ path('incp_tools_backups_restore') }}"
+                            method="post"
+                        >
                             <input type="hidden" name="_token" value="{{ csrf_token('backup_restore') }}">
                             <input type="hidden" name="filename" value="{{ backup.filename }}">
-                            <button type="submit" class="btn btn-outline-warning">
+
+                            <button
+                                name="restore[]"
+                                type="submit"
+                                class="btn"
+                                data-confirm="backup-restore"
+                                data-title="Restore Backup"
+                                data-entity="{{ backup.filename }}"
+                                data-warning="Restoring this backup will overwrite the current database records. This action cannot be undone."
+                                data-confirm-text="Restore Backup"
+                            >
                                 Restore
                             </button>
                         </form>
 
-                        {# Delete File #}
-                        <form action="{{ path('incp_tools_backups_delete', { filename: backup.filename }) }}" method="post" class="d-inline" onsubmit="return confirm('Delete {{ backup.filename }} permanently?');">
+                        {# Delete file #}
+                        <form
+                            action="{{ path('incp_tools_backups_delete', { filename: backup.filename }) }}"
+                            method="post"
+                        >
                             <input type="hidden" name="_token" value="{{ csrf_token('backup_delete_' ~ backup.filename) }}">
-                            <button type="submit" class="btn btn-outline-danger">
+
+                            <button
+                                type="submit"
+                                class="btn btn--danger"
+                                data-confirm="backup-delete"
+                                data-title="Delete Backup"
+                                data-entity="{{ backup.filename }}"
+                                data-warning="This will permanently delete the backup file. This action cannot be undone."
+                                data-confirm-text="Delete Backup"
+                            >
                                 Delete
                             </button>
                         </form>
+
                     </div>
                 </td>
             </tr>
@@ -60,29 +91,59 @@
         {% endfor %}
         </tbody>
     </table>
-    <section class="ui-section col-6">
-        <form action="{{ path('incp_tools_backups_restore') }}" method="post" enctype="multipart/form-data" onsubmit="return confirm('WARNING: Restoring will overwrite current database records. Proceed?');">
+
+    <div class="col-6">
+        <div id="restoreProgressContainer" class="admonition admonition__info visually-hidden">
+            <div class="progress" style="height: 22px;">
+                <div
+                    id="restoreProgressBar"
+                    class="progress-bar progress-bar-striped progress-bar-animated"
+                    role="progressbar"
+                    style="width: 0%;"
+                >0%</div>
+            </div>
+            <p id="restoreStatusText" class="small text-muted">
+                Starting restore...
+            </p>
+        </div>
+
+        <form
+            action="{{ path('incp_tools_backups_restore') }}"
+            class="ui-section"
+            method="post"
+            enctype="multipart/form-data"
+        >
             <input type="hidden" name="_token" value="{{ csrf_token('backup_restore') }}">
+
             <p>
                 <label for="backup_file">
                     Select <code>.sql.gz</code> file from local computer
                 </label>
-                <input type="file" name="backup_file" id="backup_file" class="form-control" accept=".gz,.sql" required>
+                <input
+                    type="file"
+                    name="backup_file"
+                    id="backup_file"
+                    class="form-control"
+                    accept=".gz,.sql"
+                    required
+                >
             </p>
+
             <p>
-                <button type="submit" class="btn btn--danger">
+                <button
+                    type="submit"
+                    class="btn btn--danger"
+                    data-confirm="backup-upload-restore"
+                    data-title="Restore Backup"
+                    data-entity="uploaded backup"
+                    data-warning="Restoring this backup will overwrite the current database records. This action cannot be undone."
+                    data-confirm-text="Upload &amp; Restore"
+                >
                     Upload &amp; Restore
                 </button>
             </p>
         </form>
-    </section>
-</div>
-
-<div id="restoreProgressContainer" class="col-12">
-    <div class="progress mb-2" style="height: 22px;">
-        <div id="restoreProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;">0%</div>
     </div>
-    <p id="restoreStatusText" class="small text-muted mb-0">Starting restore...</p>
 </div>
 
 <script>
@@ -90,36 +151,97 @@ function pollProgress(jobId) {
     const container = document.getElementById('restoreProgressContainer');
     const bar = document.getElementById('restoreProgressBar');
     const statusText = document.getElementById('restoreStatusText');
-    container.classList.remove('d-none');
+
+    container.classList.remove('visually-hidden');
 
     const interval = setInterval(async () => {
-        const res = await fetch(`/admin/settings/backups/status/${jobId}`);
-        const data = await res.json();
+        try {
+            const res = await fetch(`/incp/api/status/${jobId}`);
+            const data = await res.json();
 
-        if (data.percent < 0) {
-            clearInterval(interval);
-            bar.classList.replace('bg-primary', 'bg-danger');
+            if (data.percent < 0) {
+                clearInterval(interval);
+                bar.classList.replace('bg-primary', 'bg-danger');
+                statusText.textContent = data.status;
+                return;
+            }
+
+            bar.style.width = `${Math.max(data.percent, 5)}%`;
+            bar.textContent = `${data.percent}%`;
             statusText.textContent = data.status;
-            return;
-        }
 
-        bar.style.width = `${Math.max(data.percent, 5)}%`;
-        bar.textContent = `${data.percent}%`;
-        statusText.textContent = data.status;
-
-        if (data.percent === 100) {
-            clearInterval(interval);
-            bar.classList.remove('progress-bar-animated');
-            setTimeout(() => window.location.reload(), 1500);
+            if (data.percent === 100) {
+                clearInterval(interval);
+                bar.classList.remove('progress-bar-animated');
+                setTimeout(() => window.location.reload(), 1500);
+            }
+        } catch (err) {
+            console.error('Status check error:', err);
         }
     }, 1000);
 }
+
+// Intercept all restore forms to run via AJAX
+document.addEventListener('DOMContentLoaded', () => {
+    const restoreForms = document.querySelectorAll('form[action="{{ path('incp_tools_backups_restore') }}"]');
+
+    restoreForms.forEach(form => {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const container = document.getElementById('restoreProgressContainer');
+            const bar = document.getElementById('restoreProgressBar');
+            const statusText = document.getElementById('restoreStatusText');
+
+            container.classList.remove('visually-hidden');
+            bar.style.width = '5%';
+            bar.textContent = '5%';
+            statusText.textContent = 'Initiating database restore...';
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || data.error) {
+                    statusText.textContent = data.error || 'Failed to start restore.';
+                    bar.classList.add('bg-danger');
+                    return;
+                }
+
+                if (data.jobId) {
+                    pollProgress(data.jobId);
+                }
+            } catch (err) {
+                console.error('Restore submission error:', err);
+                statusText.textContent = 'An unexpected error occurred during submission.';
+                bar.classList.add('bg-danger');
+            }
+        });
+    });
+});
 </script>
 
 <div class="fixed-bottom-bar">
     <form action="{{ path('incp_tools_backups_create') }}" method="post">
         <input type="hidden" name="_token" value="{{ csrf_token('backup_create') }}">
-        <button type="submit" class="btn btn--primary">
+
+        <button
+            type="submit"
+            class="btn btn--primary"
+            data-confirm="backup-create"
+            data-title="Generate Backup"
+            data-entity="new site backup"
+            data-warning="A new backup of the site will be created. This may take some time depending on the size of the site."
+            data-confirm-text="Generate Backup"
+        >
             <span class="material-icons">backup</span>
             <span class="btn--text">Generate New Backup</span>
         </button>

@@ -15,6 +15,7 @@ use Inachis\Service\Formatting\NumberFormatter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -141,7 +142,7 @@ class BackupController extends AbstractInachisController
             $uploadedFile->move($this->getBackupDirectory($projectDir), $newFilename);
             $restorePath = $this->getBackupDirectory($projectDir) . '/' . $newFilename;
         } elseif (is_string($filename) && $filename !== '') {
-            $restorePath = $this->getBackupDirectory() . '/' . basename($filename);
+            $restorePath = $this->getBackupDirectory($projectDir) . '/' . basename($filename);
         }
 
         if ($restorePath === null || !file_exists($restorePath)) {
@@ -165,7 +166,7 @@ class BackupController extends AbstractInachisController
         }
 
         $this->addFlash('success', 'Database restore task queued successfully.');
-        return $this->redirectToRoute('admin_backups_index');
+        return $this->redirectToRoute('incp_tools_backups');
     }
 
     /**
