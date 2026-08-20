@@ -48,7 +48,7 @@ abstract readonly class AbstractPackageScanner
             $packages = $cache->get();
 
             if (is_array($packages)) {
-                /* @var list<T> */
+                /** @var list<T> $packages */
                 return $packages;
             }
         }
@@ -92,11 +92,18 @@ abstract readonly class AbstractPackageScanner
             $status = $cache->get();
 
             if (is_array($status)) {
-                return array_merge([
-                    'lastScannedAt' => null,
-                    'errorCount' => 0,
-                    'errors' => [],
-                ], $status);
+                $rawErrors = $status['errors'] ?? [];
+                /** @var list<string> $errors */
+                $errors = is_array($rawErrors) ? array_values(array_filter($rawErrors, is_string(...))) : [];
+
+                $lastScannedAt = $status['lastScannedAt'] ?? null;
+                $errorCount = $status['errorCount'] ?? 0;
+
+                return [
+                    'lastScannedAt' => is_int($lastScannedAt) ? $lastScannedAt : null,
+                    'errorCount' => is_int($errorCount) ? $errorCount : 0,
+                    'errors' => $errors,
+                ];
             }
         }
 
@@ -199,7 +206,7 @@ abstract readonly class AbstractPackageScanner
             ),
         );
 
-        /* @var list<T> */
+        /** @var list<T> */
         return array_values($packages);
     }
 
@@ -233,6 +240,8 @@ abstract readonly class AbstractPackageScanner
             return null;
         }
 
+        /** @var array<string, mixed> $manifest */
+
         if (!$this->isValidManifest($manifest, $directory)) {
             $errors[] = sprintf(
                 'Invalid manifest in %s',
@@ -248,12 +257,19 @@ abstract readonly class AbstractPackageScanner
         );
     }
 
+    /**
+     * @param array<string, mixed> $manifest
+     *
+     * @return array<int, mixed>
+     */
     protected function createBasePackage(
         string $path,
         array $manifest,
     ): array {
+        $identifier = $manifest['identifier'] ?? null;
+
         return [
-            (string) ($manifest['identifier'] ?? basename($path)),
+            is_string($identifier) ? $identifier : basename($path),
             $this->getString($manifest, 'name', 'Unnamed Package'),
             $this->getString($manifest, 'version', '1.0.0'),
             $this->getNullableString($manifest, 'author'),

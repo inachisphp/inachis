@@ -33,6 +33,8 @@ class DatabasePurgeService
 
     /**
      * Truncates all user tables while preserving schema.
+     * 
+     * @return list<string>
      */
     public function purgeUserTables(): array
     {

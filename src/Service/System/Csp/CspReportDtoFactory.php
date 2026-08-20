@@ -21,17 +21,14 @@ final class CspReportDtoFactory
      * @param array{
      *     document-uri?: string,
      *     blocked-uri?: string,
-     *     effective-directuve?: string,
+     *     effective-directive?: string,
      *     violated-directive?: string,
      *     original-policy?: string,
      *     source-file?: string,
      *     line-number?: int,
      *     column-number?: int,
      *     disposition?: string,
-     *     status-code?: int,
-     *     referrer: string,
-     *     userAgent: string,
-     *     rawPayload: array<string,int|string|array<string, int|string>>
+     *     status-code?: int
      * } $report
      */
     public function fromLegacyReport(
@@ -60,19 +57,21 @@ final class CspReportDtoFactory
      * Turns CSP 2.0 reports into a DTO.
      *
      * @param array{
-     *     documentURL?: string,
-     *     blockedURL?: string,
-     *     effectiveDirective?: string,
-     *     violatedDirective?: string,
-     *     originalPolicy?: string,
-     *     sourceFile?: string,
-     *     lineNumber?: int,
-     *     columnNumber?: int,
-     *     disposition?: string,
-     *     statusCode: int,
-     *     referrer: string,
-     *     userAgent: string,
-     *     rawPayload: array<string,int|string|array<string, int|string>>
+     *     body?: array{
+     *         documentURL?: string,
+     *         blockedURL?: string,
+     *         effectiveDirective?: string,
+     *         violatedDirective?: string,
+     *         originalPolicy?: string,
+     *         sourceFile?: string,
+     *         lineNumber?: int,
+     *         columnNumber?: int,
+     *         disposition?: string
+     *     },
+     *     type?: string,
+     *     url?: string,
+     *     user_agent?: string,
+     *     age?: int
      * } $report
      */
     public function fromReportingApi(

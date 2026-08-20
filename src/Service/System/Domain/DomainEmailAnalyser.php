@@ -82,12 +82,11 @@ final class DomainEmailAnalyser
         ];
 
         if (!empty($serverIp) && !empty($spfRecords)) {
-            /** @var array<int, string> $spfRecords */
-            $authorized = $this->isIpAuthorized($serverIp, $spfRecords[0] ?? '', [], $issues);
+            $authorized = $this->isIpAuthorized($serverIp, $spfRecords[0], [], $issues);
             if (!$authorized) {
                 $issues[] = new ValidationIssue(
                     'spf',
-                    "Server IP {$serverIp} is NOT authorized in SPF record",
+                    "Server IP {$serverIp} is NOT authorised in SPF record",
                     Severity::Error,
                 );
             }
@@ -107,7 +106,6 @@ final class DomainEmailAnalyser
             }
         }
 
-        /* @var list<string> $spfRecords */
         return new DomainDnsReport(
             $domain,
             $dkimRecords,
@@ -313,7 +311,7 @@ final class DomainEmailAnalyser
                 }
                 $records = $this->dns->getRecords($includeDomain, DNS_TXT);
                 foreach ($records as $rec) {
-                    $txt = $rec['txt'] ?? '';
+                    $txt = $rec['txt'] ?? null;
                     if (is_string($txt) && str_starts_with(strtolower($txt), 'v=spf1')) {
                         if ($this->isIpAuthorized($ip, $txt, array_merge($visitedIncludes, [$includeDomain]), $issues)) {
                             return true;
