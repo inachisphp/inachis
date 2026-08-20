@@ -1,0 +1,72 @@
+{% block javascript_bottom %}
+{%- if is_granted('ROLE_USER') and not viewModel.twoFactorPending %}
+    {% if includeEditor|default(false) %}
+    <script src="https://cdn.jsdelivr.net/npm/easymde@2.21.0/dist/easymde.min.js" integrity="sha512-UmZY9uYOaO4z0/s0QZlR5E0hdmbaiFKFbt4sjA5mV+LOHbjCqPatgNmccUDl33tIvh72fQqGnDtt1YNisDRQ7Q==" crossorigin="anonymous"></script>
+        {% if editorHighlighting|default(false) %}
+    <script src="https://cdn.jsdelivr.net/highlight.js/latest/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/highlight.js/latest/styles/github.min.css">
+        {% endif %}
+    <script>
+        let easymde = new EasyMDE({
+            element: document.querySelector('.mde_editor'),
+            toolbar: [
+                "bold","italic","heading","|",
+                "quote","code","unordered-list","ordered-list","|",
+                "link","image",{
+                    name: "imageManager",
+                    action: (editor) => {
+                        const imageManagerButton = document.querySelector('.imageManager.dialog__link');
+                        imageManagerButton.dataset.className = 'dialog__imageManager';
+                        imageManagerButton.dataset.dialog = 'imageManager';
+                        imageManagerButton.dataset.templateName = 'image-manager';
+                        imageManagerButton.dataset.allowedTypes = 'image/png,image/jpeg,image/heic,image/heif,image/webp,image/svg+xml';
+                        imageManagerButton.dataset.view = 'editor';
+                        window.Inachis.ImageManager.open(imageManagerButton);
+                    },
+                    className: "fa fa-th dialog__link",
+                    title: "Image Manager"
+                }, "|",
+                "preview","side-by-side","fullscreen","|","guide",
+            ],
+            autosave: {
+                enabled: true,
+                uniqueId: '{% if includeEditorId|default(null) is not empty %}{{ includeEditorId }}{% else %}new-content-{{ viewModel.session.id }}-{{ date()|date('Ymd') }}{% endif %}'
+            },
+        {% if editorHighlighting|default(false) %}
+            codeSyntaxHighlighting: true,
+        {% endif %}
+            forceSync: true
+        });
+        {% if app.session.get('clearAutosave')|default(false) %}
+        easymde.clearAutosavedValue();
+            {{ app.session.set('clearAutosave', false) }}
+        {% endif %}
+        new window.Inachis.EasyMDELinkValidator(easymde, {
+            endpoint: "/incp/api/validate-links",
+            coloriseBadge: true,
+        });
+        {% if includeEditorId|default(null) is not empty and post is defined and post.status.value == 'review' %}
+        const reviewPlugin = new window.Inachis.EasyMDEReviewPlugin(easymde, {
+            pageId: '{{ includeEditorId }}',
+            endpoint: "/incp/api/review"
+        });
+        {% endif %}
+        const longParagraph = new window.Inachis.EasyMDELongParagraph(
+            easymde.codemirror, {
+                threshold: 150,
+            }
+        );
+        longParagraph.init();
+    </script>
+    {% endif %}
+    <template id="session-timeout-template">
+        {% include 'inadmin/dialog/session_timeout.html.twig' %}
+    </template>
+    <script>
+        window.Inachis.SessionTimeout.init({
+            sessionTimeout: {{ viewModel.sessionTimeout|default(1440) }},
+            sessionEndTime: '{{ viewModel.sessionTimeoutTime }}Z',
+        });
+    </script>
+{% endif %}
+{% endblock javascript_bottom %}

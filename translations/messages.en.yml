@@ -21,6 +21,7 @@ admin.button.enable: 'Enable'
 admin.button.publish: 'Publish'
 admin.button.remove: 'Remove'
 admin.button.save: 'Save'
+admin.button.review: 'Send for review'
 admin.button.schedule: 'Schedule'
 admin.button.viewLive: 'View live'
 
@@ -77,7 +78,7 @@ admin.post.properties.postDate-future.label: 'Publish on'
 admin.post.properties.postDate-past.label: 'Published on'
 admin.post.properties.expireDate-future.label: 'Expires on'
 admin.post.properties.expireDate-past.label: 'Expired on'
-admin.post.properties.modDate.label: 'Last modified'
+admin.post.properties.updatedAt.label: 'Last modified'
 admin.post.properties.categories.label: 'Categories'
 admin.post.properties.categories.placeholder: 'Select a category'
 admin.post.properties.tags.label: 'Tags'
@@ -94,6 +95,8 @@ admin.post.revision.changes: 'Changes'
 admin.post.revision.view: 'View'
 admin.post.revision.download: 'Download'
 admin.post.revision.revert: 'Revert'
+admin.post.expired: 'This post has expired and is no longer visible to the public.'
+admin.post.expired.help: 'You can change the expiry date in the properties tab to make it visible again.'
 
 admin.series.title: 'Series'
 admin.series.help: 'View list of series'
@@ -131,7 +134,8 @@ admin.resources.properties.colourDepth: 'Colour Depth'
 admin.resources.properties.filename: 'File name'
 admin.resources.properties.filetype: 'File type'
 admin.resources.properties.filesize: 'Size'
-admin.resources.properties.modDate: 'Last modified'
+admin.resources.properties.checksum: 'SHA-256 Checksum'
+admin.resources.properties.updatedAt: 'Last modified'
 admin.resources.usages.title: 'Usages'
 admin.resources.usages.notInUse: 'Image is not in known use.'
 
@@ -142,6 +146,9 @@ admin.resources.images.copyLink.help: 'Copy Image Link to Clipboard'
 
 admin.urls.title: 'URLs'
 admin.urls.help: 'View list of defined URLs'
+
+admin.security.title: 'Security & Privacy'
+admin.security.help: 'Manage and review security for your site'
 
 admin.dialog.categories.title: 'Categories'
 
@@ -157,6 +164,8 @@ admin.navigation.url.placeholder: 'e.g. /'
 admin.navigation.isActive.label: 'Active'
 
 admin.setting.robots_txt.label: 'Enter the contents of your robots.txt file below. The sitemap URL will be appended automatically.'
+
+admin.validation.too_large: 'The text is too long. Please reduce it before saving.'
 
 
 admin.label.username: Username

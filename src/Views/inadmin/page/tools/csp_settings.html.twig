@@ -1,0 +1,153 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incp_security_list') }}">Security &amp; Diagnostics</a>
+    <a href="{{ path('incp_tools_csp_dashboard') }}">CSP Reporting</a>
+    <span>CSP Configuration</span>
+{% endblock pagetitle %}
+
+{% block content %}
+
+<div class="col-12">
+{{ include('inadmin/partials/tab-sets/csp.html.twig') }}
+<form class="form form__csp" method="post" action="{{ path('incp_tools_csp_settings') }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('csp_settings') }}">
+
+<fieldset class="ui-section">
+    <h3>General Directives</h3>
+
+    <p>
+        <label for="csp_mode" id="csp_mode_label">CSP Mode</label>
+        <select aria-labelledby="csp_mode_label" class="ui-switch" name="csp_mode" id="csp_mode">
+            <option value="disabled"{{ mode == 'disabled' ? 'selected' : '' }}>Disabled</option>
+            <option value="report-only"{{ mode == 'report-only' ? 'selected' : '' }}>Report only</option>
+            <option value="enforce"{{ mode == 'enforce' ? 'selected' : '' }}>Enforced</option>
+        </select>
+    </p>
+    <p>
+        <label class="inline_label" for="csp_upgrade_insecure" id="upgradeInsecurelabel">Upgrade Insecure Requests (Forces HTTP to HTTPS asset upgrades)</label>
+        <span class="switch-wrapper">
+            <input aria-labelledby="upgradeInsecure_label" class="ui-switch" type="checkbox" name="csp_upgrade_insecure" id="csp_upgrade_insecure" value="1" {{ upgrade_insecure ? 'checked' : '' }} data-label-off="disabled" data-label-on="enabled" >
+        </span>
+    </p>
+</fieldset>
+
+<fieldset class="ui-section">
+    <h3>Directives Config</h3>
+    {% embed 'inadmin/partials/components/admonition.html.twig' with {
+        type: 'info',
+        show_title: false,
+    } %}
+        {% block text %}
+        Type custom domains and hit <strong>Space</strong> or <strong>Comma</strong> to create a rule tag. Use the quick-toggles for critical keyword settings.
+        {% endblock text %}
+    {% endembed %}
+
+    <div id="csp-directives-wrapper">
+        {% for directive in standard_directives %}
+            {{ include('inadmin/partials/csp_directive_row.html.twig', { 'directive': directive, 'policy': policy }) }}
+        {% endfor %}
+    </div>
+
+    <!-- p>
+        <button class="btn btn--add">+ Add Advanced Directive</button>
+    </p -->
+
+    <p>
+        <label for="add_advanced_directive">Need more control?</label>
+        <select id="add_advanced_directive" class="ui-select" style="max-width: 300px;">
+            <option value="">-- Add Advanced Directive --</option>
+            {# Loop through remaining directives not already in primary list #}
+            {% for adv in enum_advanced %}
+                {% if policy[adv.value] is not defined %}
+                    <option value="{{ adv.value }}" data-display="{{ adv.displayName }}" data-desc="{{ adv.description }}" data-placeholder="{{ adv.placeholder }}">{{ adv.value }} ({{ adv.displayName }})</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </p>
+</fieldset>
+<p>&nbsp;</p>
+
+<div class="fixed-bottom-bar">
+    <p>
+        <button type="submit" class="btn btn--primary">
+            <span class="material-icons" aria-hidden="true">save</span>
+            <span class="btn-text">Apply Configuration</span>
+        </button>
+        <a href="{{ path('incp_tools_csp_suggested_policy') }}" class="btn btn--ai">
+            <span class="material-icons" aria-hidden="true">auto_fix_high</span>
+            <span class="btn-text">Generate Rule Suggestions</span>
+        </a>
+    </p>
+</div>
+
+</form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Helper function to turn a text input into TomSelect tags
+    function initTomSelect(el) {
+        if (el.tomselect) return;
+        new TomSelect(el, {
+            plugins: ['remove_button'],
+            createOnBlur: true,
+            create: true,
+            delimiter: ' ',
+            placeholder: el.getAttribute('placeholder') || 'Add source...',
+            onItemAdd: function() { this.setTextboxValue(''); }
+        });
+    }
+
+    // Initialize existing primary elements
+    document.querySelectorAll('.csp-tag-input').forEach(initTomSelect);
+
+    // Watch checkboxes to add/remove special keywords dynamically from TomSelect
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('csp-keyword-toggle')) {
+            const directive = e.target.dataset.directive;
+            const keyword = e.target.value;
+            const tsInput = document.getElementById('directive_' + directive).tomselect;
+
+            if (e.target.checked) {
+                tsInput.addItem(keyword);
+            } else {
+                tsInput.removeItem(keyword);
+            }
+        }
+    });
+
+    // Handle "Add Advanced Directive" selection
+    const advancedSelect = document.getElementById('add_advanced_directive');
+    advancedSelect.addEventListener('change', function() {
+        const value = this.value;
+        if (!value) return;
+
+        const option = this.options[this.selectedIndex];
+        const display = option.dataset.display;
+        const desc = option.dataset.desc;
+        const placeholder = option.dataset.placeholder;
+
+        const wrapper = document.getElementById('csp-directives-wrapper');
+
+        // Generate clean structural row HTML matching partial layout
+        const rowHtml = `
+            <p class="ui-directive-row animate-fade-in">
+                <label class="font-weight-bold">
+                    ${display} <br> <small><code>${value}</code></small>
+                </label>
+                <input type="text" class="text full-width csp-tag-input" id="directive_${value}" name="directives[${value}]" value="" placeholder="${placeholder}">
+                <small class="d-block text-muted">${desc}</small>
+            </p>
+        `;
+
+        wrapper.insertAdjacentHTML('beforeend', rowHtml);
+        initTomSelect(document.getElementById('directive_' + value));
+
+        // Remove option from dropdown so it can't be added twice
+        option.remove();
+        this.value = "";
+    });
+});
+</script>
+{% endblock content %}

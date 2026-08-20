@@ -1,0 +1,84 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * This file is part of the inachis framework.
+ */
+
+namespace Inachis\Tests\phpunit\Service\Content\Page;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
+use Inachis\Enum\EditorialStatus;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\SeriesRepository;
+use Inachis\Service\Content\Page\ContentAggregator;
+use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
+
+class ContentAggregatorTest extends TestCase
+{
+    public function testGetHomepageContent(): void
+    {
+        $seriesRepository = $this->getStubBuilder(SeriesRepository::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getAll'])
+            ->getStub();
+        $pageRepository = $this->getStubBuilder(PageRepository::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getAll'])
+            ->getStub();
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $entityManager->method('getRepository')
+            ->willReturnCallback(function ($class) use ($seriesRepository, $pageRepository) {
+                return Series::class === $class ? $seriesRepository : $pageRepository;
+            });
+        $seriesItemPage = $this->createConfiguredStub(Page::class, [
+            'getId' => Uuid::uuid1(),
+        ]);
+        $seriesItemPage->method('getStatus')->willReturn(EditorialStatus::PUBLISHED);
+        $seriesGroup = $this->createStub(Series::class);
+        $seriesGroup->method('getItems')
+            ->willReturn(new ArrayCollection([$seriesItemPage]));
+        $seriesGroup->method('getLastDate')->willReturn(new \DateTimeImmutable('2024-01-02'));
+        $seriesGroup->method('getDescription')->willReturn('Some <blockquote>test</blockquote>');
+        $seriesGroup->method('setDescription');
+        $seriesRepository->method('getAll')
+            ->willReturn($this->createMockPaginator([$seriesGroup]));
+
+        $pageResult = $this->createStub(Page::class);
+        $pageResult->method('getStatus')->willReturn(EditorialStatus::PUBLISHED);
+        $pageResult->method('getPostDate')->willReturn(new \DateTimeImmutable('2024-01-01'));
+        $pageRepository->method('getAll')
+            ->willReturn($this->createMockPaginator([$pageResult]));
+
+        $aggregator = new ContentAggregator($pageRepository, $seriesRepository);
+
+        $result = $aggregator->getHomepageContent();
+
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertArrayHasKey('p20240102', $result);
+        $this->assertArrayHasKey('p20240101', $result);
+    }
+
+    private function createMockPaginator(array $items): Paginator
+    {
+        $paginator = $this->getStubBuilder(Paginator::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getIterator', 'count'])
+            ->getStub();
+
+        $paginator->method('getIterator')
+            ->willReturn(new \ArrayIterator($items));
+
+        $paginator->method('count')
+            ->willReturn(count($items));
+
+        return $paginator;
+    }
+}

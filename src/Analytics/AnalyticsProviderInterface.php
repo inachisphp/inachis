@@ -1,18 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Analytics;
 
-use Inachis\Entity\{Page, Series};
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
 
 /**
- * Interface for analytics providers
+ * Interface for analytics providers.
  *
  * This interface is used to provide analytics data to the application.
  * It is a common interface for all analytics providers, such as Google Analytics
@@ -22,141 +22,245 @@ interface AnalyticsProviderInterface
     /**
      * Get total page views per day between two dates.
      *
-     * Expected format:
-     * [
-     *   ['date' => '2026-04-29', 'total' => 123],
-     *   ...
-     * ]
+     * @return list<array{date: string, total: numeric-string}>
      */
-    public function getPageViewsPerDay(
-        \DateTimeInterface $from,
-        \DateTimeInterface $to
-    ): array;
+    public function getPageViewsPerDay(\DateTimeInterface $from, \DateTimeInterface $to): array;
 
     /**
      * Get most visited pages.
      *
-     * Expected format:
-     * [
-     *   ['path' => '/post/hello-world', 'total' => 42],
-     *   ...
-     * ]
+     * @return list<array{path: string, total: numeric-string, title: string}>
      */
-    public function getTopPages(int $limit = 10): array;
+    public function getTopPages(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array;
 
     /**
      * Get total views in a date range.
      */
-    public function getTotalViews(
-        \DateTimeInterface $from,
-        \DateTimeInterface $to
-    ): int;
+    public function getTotalViews(\DateTimeInterface $from, \DateTimeInterface $to): int;
+
+    /**
+     * Get monthly unique visitor count.
+     */
+    public function getMonthlyUniqueVisitors(\DateTimeInterface $from, \DateTimeInterface $to): int;
 
     /**
      * Get the most common paths that result in a 4xx or 5xx error.
      *
-     * Expected format:
-     * [
-     *   ['path' => '/post/hello-world', 'code' => 404, 'hits' => 42],
-     *   ...
-     * ]
+     * @return list<array{path: string, code: string, hits: numeric-string}>
      */
-    public function getTopErrors(int $limit = 10): array;
+    public function getTopErrors(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array;
 
     /**
-     * Get trending pages
+     * Get trending pages.
      *
-     * @param int $limit
-     * @return array
+     * @return list<array{path: string, current: int, previous: int, change: float|int|null}>
      */
-    public function getTrendingPages(int $limit = 10): array;
+    public function getTrendingPages(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        \DateTimeInterface $previousFrom,
+        \DateTimeInterface $previousTo,
+        int $limit = 10,
+    ): array;
 
     /**
      * Get the most common referring domains.
      *
-     * Expected format:
-     * [
-     *   ['domain' => 'example.com', 'hits' => 42],
-     *   ...
-     * ]
+     * @return list<array{domain: string, total: numeric-string}>
      */
-    public function getTopReferrers(int $limit = 10): array;
+    public function getTopReferrers(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array;
 
     /**
      * Get the most common referring domains for a specific page.
      *
-     * Expected format:
-     * [
-     *   ['domain' => 'example.com', 'hits' => 42],
-     *   ...
-     * ]
+     * @return list<array{domain: string, total: numeric-string}>
      */
-    public function getTopReferrersForPage(string $path, int $limit = 10): array;
+    public function getTopReferrersForPage(string $path, \DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array;
 
     /**
-     * Get page views per day for paths
-     *
-     * Expected format:
-     * [
-     *   ['date' => '2026-04-29', 'total' => 123],
-     *   ...
-     * ]
+     * Get page views per day for paths.
      *
      * @param string[] $paths
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @return array
+     *
+     * @return list<array{date: string, views: int}>
      */
-    public function getPageViewsPerDayForPaths(
-        array $paths,
-        \DateTimeInterface $from,
-        \DateTimeInterface $to
-    ): array;
+    public function getPageViewsPerDayForPaths(array $paths, \DateTimeInterface $from, \DateTimeInterface $to): array;
 
     /**
-     * Get page stats over time
+     * Get page stats over time.
      *
-     * Expected format:
-     * [
-     *   ['date' => '2026-04-29', 'views' => 123],
-     *   ...
-     * ]
-     *
-     * @param Page $page
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @return array
+     * @return list<array{date: string, views: int}>
      */
     public function getPageStatsOverTime(Page $page, \DateTimeInterface $from, \DateTimeInterface $to): array;
 
     /**
-     * Get series stats over time
+     * Get series stats over time.
      *
-     * Expected format:
-     * [
-     *   ['date' => '2026-04-29', 'views' => 123],
-     *   ...
-     * ]
-     *
-     * @param Series $series
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @return array
+     * @return list<array{date: string, views: int}>
      */
     public function getSeriesStatsOverTime(Series $series, \DateTimeInterface $from, \DateTimeInterface $to): array;
 
     /**
      * Get top visitor countries/regions.
+     *
+     * @return list<array{country_code: string, country_name: string, total: numeric-string}>
      */
     public function getTopRegions(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array;
 
     /**
      * Get RSS subscriber stats over time.
+     *
+     * @return list<array{date: string, subscribers: int}>
      */
     public function getSubscriberStatsOverTime(\DateTimeInterface $from, \DateTimeInterface $to): array;
 
     /**
      * Get current subscribers per feed path.
+     *
+     * @return list<array{path: string, subscribers: numeric-string}>
      */
     public function getCurrentSubscribersPerFeed(): array;
+
+    /**
+     * Get top bot user-agents in the given date range.
+     *
+     * @return list<array{user_agent: string, total: numeric-string}>
+     */
+    public function getTopBots(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 15): array;
+
+    /**
+     * Returns an associative array of views today, yesterday, this month and last month
+     * along with unique visitors this month and last month.
+     *
+     * @return array{
+     *     viewsToday: int,
+     *     viewsYesterday: int,
+     *     viewsThisMonth: int,
+     *     viewsLastMonth: int,
+     *     uniqueVisitorsThisMonth: int,
+     *     uniqueVisitorsLastMonth: int
+     * }
+     */
+    public function getDashboardSummary(): array;
+
+    /**
+     * Total number of 4xx/5xx responses.
+     */
+    public function getTotalErrors(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+    ): int;
+
+    /**
+     * Get security dashboard summary.
+     *
+     * @return array{
+     *     total:int,
+     *     uniqueIps:int,
+     *     high:int,
+     *     critical:int
+     * }
+     */
+    public function getSecuritySummary(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+    ): array;
+
+    /**
+     * Get most targeted paths.
+     *
+     * @return list<array{path:string,total:numeric-string}>
+     */
+    public function getTopSecurityPaths(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10,
+    ): array;
+
+    /**
+     * Get most common security event types.
+     *
+     * @return list<array{type:string,total:numeric-string}>
+     */
+    public function getTopSecurityTypes(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10,
+    ): array;
+
+    /**
+     * Get IP addresses generating the most security events.
+     *
+     * @return list<array{ip:string,total:numeric-string}>
+     */
+    public function getTopSecurityIps(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10,
+    ): array;
+
+    /**
+     * Get security events over time.
+     *
+     * @return list<array{date:string,total:numeric-string}>
+     */
+    public function getSecurityEventsPerDay(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+    ): array;
+
+    /**
+     * Get recent security events.
+     *
+     * @return list<array{
+     *     date:string,
+     *     type:string,
+     *     severity:int,
+     *     path:string,
+     *     ip:string,
+     *     hits:int
+     * }>
+     */
+    public function getRecentSecurityEvents(
+        int $limit = 20,
+    ): array;
+
+    /**
+     * Get highest severity events.
+     *
+     * Useful for an "active threats" panel.
+     *
+     * @return list<array{
+     *     date:string,
+     *     type:string,
+     *     severity:int,
+     *     path:string,
+     *     ip:string,
+     *     hits:int
+     * }>
+     */
+    public function getCriticalSecurityEvents(
+        int $limit = 10,
+    ): array;
+
+    /**
+     * Get security activity by HTTP method.
+     *
+     * @return list<array{method:string,total:numeric-string}>
+     */
+    public function getSecurityMethods(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+    ): array;
+
+    /**
+     * Get security events grouped by type.
+     *
+     * @return list<array{type:string,total:numeric-string}>
+     */
+    public function getSecurityEventsByType(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        int $limit = 10,
+    ): array;
 }

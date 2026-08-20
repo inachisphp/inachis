@@ -1,11 +1,55 @@
 {% extends "inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_post_list', { type: page.tab }) }}">{{ page.tab|title }}s</a>
-    <span>{% if post.id is empty %}New{% else %}Edit{% endif %} {{ page.tab }}</span>
+    <a href="{{ path('incp_post_list', { type: viewModel.page.tab }) }}">{{ viewModel.page.tab|title }}s</a>
+    <span>{% if post.id is empty %}New{% else %}Edit{% endif %} {{ viewModel.page.tab }}</span>
 {% endblock pagetitle %}
 
 {% block content %}
+
+    {% if post.hasExpired %}
+        {% set publishStatus = {
+            icon: 'warning',
+            label: 'admin.post.expired'|trans,
+            help: 'admin.post.expired.help'|trans,
+            className: 'warning',
+        } %}
+    {% elseif post.isScheduledPage %}
+        {% set publishStatus = {
+            label: 'Scheduled for ' ~ post.postDate|date('l jS F Y \\a\\t H:i', viewModel.session.preferences.timezone),
+            className: 'tip'
+        } %}
+    {% elseif post.status.value == 'review' %}
+        {% set publishStatus = { label: 'Under Review', className: 'info' } %}
+    {% elseif post.status.value == 'published' %}
+        {% if post.visible == true %}
+            {% set publishStatus = { label: 'Online', className: 'tip' } %}
+        {% else %}
+            {% set publishStatus = {
+                icon: 'warning',
+                label: 'Offline',
+                help: 'Change visibility to \'public\' to make this content available',
+                className: 'danger',
+            } %}
+        {% endif %}
+    {% endif %}
+
+    {% if publishStatus|default({}) %}
+    <div class="col-12 admonition admonition__{{ publishStatus.className }}">
+        {% if publishStatus.help|default('') %}
+        <header class="admonition__title">
+            {% if publishStatus.icon|default(null) %}
+            <span class="material-icons" aria-hidden="true">{{ publishStatus.icon }}</span>
+            {% endif %}
+            <strong>Published Status: </strong> {{ publishStatus.label}}
+        </header>
+        <p>{{ publishStatus.help }}</p>
+        {% else %}
+            <strong>Published Status: </strong> {{ publishStatus.label}}
+        {% endif %}
+    </div>
+    {% endif %}
+
     {% set showStats = post.id is not empty and post.status|default('') == 'published' %}
 
     {{ form_start(form, {'attr': { 'class': 'col-12 form form__post' }}) }}
@@ -26,7 +70,7 @@
             </li>
             {% endif %}
             {% if showStats %}
-            <li data-source="{{ path('incc_api_post_stats', { 'id': post.id }) }}" class="tab--lazyload">
+            <li data-source="{{ path('incp_api_post_stats', { 'id': post.id }) }}" class="tab--lazyload">
                 <a href="#post__stats">{% trans %}admin.posts.tabs.stats{% endtrans %}</a>
             </li>
             {% endif %}
@@ -50,12 +94,12 @@
             <p class="post__link__edit">
                 {{ form_label(form.url) }}
                 {{ form_errors(form.url) }}
-                {{ settings.domain -}}/<input class="field__wide" id="post_url" name="post[url]" type="text" value="{% if post.urls is not empty %}{{ post.urls|first.link }}{% endif %}" />
+                {{ viewModel.settings.domain -}}/<input class="field__wide" id="post_url" name="post[url]" type="text" value="{% if post.urls is not empty %}{{ post.urls|first.link }}{% endif %}" />
                 {% if post.urls is not empty %}
                 <button aria-label="{{ 'admin.post.share.copyLink.help'|trans }}"
-                        data-prefix="{{ settings.domain }}/"
+                        data-prefix="{{ viewModel.settings.domain }}/"
                         data-target="post_url"
-                        class="button button--info button--copy"
+                        class="btn btn--info btn--copy"
                         type="button"
                 >
                     <span class="material-icons" aria-hidden="true">content_paste</span>
@@ -70,14 +114,14 @@
             </p>
         </fieldset>
 
-        <fieldset class="ui-section" i id="post__properties">
+        <fieldset class="ui-section" id="post__properties">
             <legend>{% trans %}admin.post.properties.fieldset{% endtrans %}</legend>
             <p>
-                {{ form_label(form.visibility) }}
-                {{ form_errors(form.visibility) }}
+                {{ form_label(form.visible) }}
+                {{ form_errors(form.visible) }}
                 <span class="switch-wrapper">
-                    {{ form_widget(form.visibility) }}
-				</span>
+                    {{ form_widget(form.visible) }}
+                </span>
             </p>
             <p>
                 {{ form_label(form.showTableOfContents) }}
@@ -119,13 +163,13 @@
                 {{ form_errors(form.language) }}
                 {{ form_widget(form.language) }}
             </p>
-            {% if textStats is defined %}
+            {% if textStats|default([]) is not empty %}
                 <p>{% trans with {'%readingTime%': '<strong>' ~ textStats.readingTime ~ '</strong>'} from 'messages' %}admin.post.properties.readingTime{% endtrans %}</p>
             {% endif %}
             {% if post.imageSize is defined and post.imageSize > 0 %}
                 <p><strong>Total size of images used:</strong> {{ post.imageSize }} bytes ({{ (post.imageSize / 1024 / 1024)|round(2) }} Mb)</p>
             {% endif %}
-            {% if settings.geotagContent is defined and settings.geotagContent and settings.google.key is defined and settings.google.key is not empty %}
+            {% if viewModel.settings.geotagContent is defined and viewModel.settings.geotagContent and viewModel.settings.google.key is defined and viewModel.settings.google.key is not empty %}
             <p>
                 {{ form_label(form.latlong) }}
                 {{ form_errors(form.latlong) }}
@@ -143,6 +187,11 @@
                         {{ form_widget(form.featureSnippet) }}
                         {% trans %}admin.post.sharing.featureSnippet.help{% endtrans %}
                     </p>
+                    {% if aiTextEnabled and form.generate_seo is defined %}
+                    <p>
+                        {{ form_widget(form.generate_seo) }}
+                    </p>
+                    {% endif %}
                     <p>
                         {{ form_errors(form.noindex) }}
                         {{ form_widget(form.noindex) }}
@@ -153,6 +202,27 @@
                         {{ form_widget(form.nofollow) }}
                         {{ form_label(form.nofollow) }}
                     </p>
+
+                    <div id="post_audio_player_wrapper">
+                        <!-- If audio already exists, render player on page load -->
+                        {% if hasAudio %}
+                            <audio controls>
+                                <source src="{{ path('web_post_audio_stream', { id: post.id }) }}" type="audio/mpeg">
+                            </audio>
+                        {% endif %}
+                    </div>
+                    {% if not hasAudio %}
+                    <p>
+                        <button
+                            type="button"
+                            id="post_generate_audio"
+                            class="btn btn--ai"
+                            data-post-id="{{ post.id }}"
+                        >
+                            <span class="material-icons">graphic_eq</span> Generate Audio Version
+                        </button>
+                    </p>
+                    {% endif %}
                 </section>
                 <section class="col-6">
                 {{
@@ -170,9 +240,9 @@
         <fieldset class="ui-section" i id="post__history">
             {% if post.id is not empty %}
             <p>
-                {{ form_label(form.modDate) }}
-                {{ form_errors(form.modDate) }}
-                {{ form_widget(form.modDate) }}
+                {{ form_label(form.updatedAt) }}
+                {{ form_errors(form.updatedAt) }}
+                {{ form_widget(form.updatedAt) }}
             </p>
             {% endif %}
             <table class="table table-responsive table-striped table-borderless">
@@ -190,11 +260,11 @@
                 {% for revision in revisions %}
                     <tr>
                         <th scope="row">{{ revision.versionNumber }}</th>
-                        <td>{{ revision.modDate|date('d/m/Y H:i') }}</td>
+                        <td>{{ revision.createdAt|date('d/m/Y H:i', viewModel.session.preferences.timezone) }}</td>
                         <td>{{ revision.user.displayName }}</td>
                         <td><span class="badge">{{ revision.action }}</span></td>
                         <td>
-                            <a href="{{ path('inachis_page_post_revision_diff', { 'id': revision.id}) }}" class="button button--info"><span class="material-icons" aria-hidden="true">compare_arrows</span> {% trans %}admin.post.revision.view{% endtrans %}</a>
+                            <a href="{{ path('inachis_page_post_revision_diff', { 'id': revision.id}) }}" class="btn btn--info"><span class="material-icons" aria-hidden="true">compare_arrows</span> {% trans %}admin.post.revision.view{% endtrans %}</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -208,26 +278,23 @@
         </fieldset>
         {% endif %}
     </div>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
 
     {% set previewMode = post.postDate > date() %}
     <div class="fixed-bottom-bar">
         <p>
-            {{ form_widget(form.submit) }}
+            {% if form.submit is defined %}{{ form_widget(form.submit) }}{% endif %}
+
         {% if post.id is not empty %}
-            {%- if post.status != "published" %}
-                <button type="submit" class="button button--secondary button--info" name="publish">
-                {% if previewMode %}
-                    <span class="material-icons" aria-hidden="true">schedule</span> {% trans %}admin.button.schedule{% endtrans %}
-                {% else %}
-                    <span class="material-icons" aria-hidden="true">publish</span> {% trans %}admin.button.publish{% endtrans %}
-                {% endif %}
-                </button>
-            {%- endif %}
-            {{ form_widget(form.delete) }}
+            {% if form.review is defined %}{{ form_widget(form.review) }}{% endif %}
+            {% if form.publish is defined %}{{ form_widget(form.publish) }}{% endif %}
             {%  if not post.isDraft %}
-                <a class="button button--secondary" href="{% if previewMode %}/incc/preview{% endif %}/{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}"><span class="material-icons" aria-hidden="true">exit_to_app</span>
-                    {% trans %}admin.button.viewLive{% endtrans %}</a>
+                <a class="btn btn--secondary" href="{% if previewMode %}/incp/preview{% endif %}/{{ post.urls|first.link }}" target="_blank" title="{% trans %}admin.button.viewLive{% endtrans %}">
+                    <span class="material-icons" aria-hidden="true">exit_to_app</span>
+                    <span class="btn-text">{% trans %}admin.button.viewLive{% endtrans %}</span></a>
             {%  endif %}
+            {% if form.delete is defined %}{{ form_widget(form.delete) }}{% endif %}
         {% endif %}
         </p>
     </div>
@@ -235,3 +302,10 @@
     {{ form_end(form, { 'render_rest': false }) }}
 
 {% endblock content %}
+
+
+{% block reviewbar %}
+    {% if post.status.value == 'review' %}
+    <div id="review-sidebar-container"></div>
+    {% endif %}
+{% endblock reviewbar %}

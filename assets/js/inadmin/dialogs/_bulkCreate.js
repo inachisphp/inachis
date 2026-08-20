@@ -30,18 +30,18 @@ window.Inachis.BulkCreateDialog = {
       `,
       buttons: [
         {
-          text: 'Create',
-          class: 'button button--positive',
-          disabled: true,
-          click: () => this.createPosts()
-        },
-        {
           text: 'Close',
-          class: 'button button--info',
+          class: 'btn btn--outline',
           click() {
             this.close();
           }
-        }
+        },
+        {
+          text: 'Create',
+          class: 'btn btn--primary',
+          disabled: true,
+          click: () => this.createPosts()
+        },
       ],
       onOpen: dialog => {
         document.querySelector('.fixed-bottom-bar')?.classList.toggle('hidden');
@@ -56,11 +56,16 @@ window.Inachis.BulkCreateDialog = {
   },
 
   loadForm(dialog) {
-    fetch(`${window.Inachis.prefix}/ax/bulkCreate/get`, { method: 'POST' })
+    fetch(`${window.Inachis.prefix}/ax/bulkCreate/get`, {
+        method: 'POST',
+        body: new URLSearchParams({
+          title: document.getElementById('series_title').value,
+        }),
+      })
       .then(res => res.text())
       .then(html => {
         dialog.setContent(html);
-        this.submitButton = dialog.getButton(0);
+        this.submitButton = dialog.getFirstButtonByClass('btn--primary');
         this.initInputs(dialog.dialog);
       })
       .catch(() => {

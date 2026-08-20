@@ -1,58 +1,55 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Navigation;
 
-use Inachis\Entity\NavigationTab;
-use Inachis\Repository\NavigationTabRepository;
-use Inachis\Service\Doctrine\TransactionHelper;
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Entity\System\NavigationTab;
+use Inachis\Model\NavigationTabDto;
+use Inachis\Repository\System\NavigationTabRepository;
+use Inachis\Service\Doctrine\TransactionHelper;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
- * Service for managing navigation tabs
+ * Service for managing navigation tabs.
  */
 class NavigationTabService
 {
     private const CACHE_KEY = 'navigation_tabs';
 
     /**
-     * Constructor
-     *
-     * @param NavigationTabRepository $repository
-     * @param CacheInterface $cache
-     * @param EntityManagerInterface $entityManager
-     * @param TransactionHelper $transactionHelper
+     * Constructor.
      */
     public function __construct(
         private NavigationTabRepository $repository,
         private CacheInterface $cache,
         private EntityManagerInterface $entityManager,
         private TransactionHelper $transactionHelper,
-    ) {}
+    ) {
+    }
 
     /**
-     * Get all active navigation tabs ordered by position
+     * Get all active navigation tabs ordered by position.
      *
-     * @return array<NavigationTab>
+     * @return list<NavigationTabDto>
      */
     public function getActiveTabs(): array
     {
         return $this->cache->get(self::CACHE_KEY, function (ItemInterface $item) {
             $item->expiresAfter(null);
+
             return $this->repository->findActiveOrderedModels();
         });
     }
 
     /**
-     * Clear the navigation cache
+     * Clear the navigation cache.
      */
     public function clearCache(): void
     {
@@ -60,25 +57,18 @@ class NavigationTabService
     }
 
     /**
-     * Add or update a navigation tab
-     *
-     * @param NavigationTab $tab
-     * @return void
+     * Add or update a navigation tab.
      */
     public function add(NavigationTab $tab): void
     {
         $this->transactionHelper->executeInTransaction(function () use ($tab) {
-            $maxPosition = $this->repository->getMaxPosition();
-            $tab->setPosition($maxPosition + 1);
+            if (null === $tab->getId()) {
+                $tab->setPosition(
+                    $this->repository->getMaxPosition() + 1,
+                );
 
-            if ($tab->getId() === null) {
                 $this->entityManager->persist($tab);
             }
-
-            // Normalise positions in case there are gaps
-            $tabs = $this->repository->getAllOrdered();
-            $tabs[] = $tab;
-            $this->normalisePositionsIndexed($tabs);
 
             $this->entityManager->flush();
             $this->clearCache();
@@ -86,9 +76,30 @@ class NavigationTabService
     }
 
     /**
-     * Move a tab up or down
+     * Reassign positions safely while preserving the unique constraint.
      *
-     * @param NavigationTab $tab
+     * @param NavigationTab[] $orderedTabs
+     */
+    private function applyOrderedPositions(array $orderedTabs): void
+    {
+        // Phase 1: move everything out of the way
+        foreach ($orderedTabs as $index => $tab) {
+            $tab->setPosition(1000 + $index);
+        }
+
+        $this->entityManager->flush();
+
+        // Phase 2: assign final positions
+        foreach ($orderedTabs as $index => $tab) {
+            $tab->setPosition($index + 1);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    /**
+     * Move a tab up or down.
+     *
      * @param int $direction -1 for up, 1 for down
      */
     private function move(NavigationTab $tab, int $direction): void
@@ -96,38 +107,34 @@ class NavigationTabService
         $tabs = $this->repository->getAllOrdered();
 
         foreach ($tabs as $index => $item) {
-            if ($item->getId()->equals($tab->getId())) {
+            if ($item->getId()?->equals($tab->getId())) {
                 $swapIndex = $index + $direction;
+
                 if ($swapIndex >= 0 && $swapIndex < count($tabs)) {
-                    $this->swapPositions($item, $tabs[$swapIndex]);
-                    break;
+                    [$tabs[$index], $tabs[$swapIndex]] =
+                        [$tabs[$swapIndex], $tabs[$index]];
                 }
+
+                break;
             }
         }
 
         $this->transactionHelper->executeInTransaction(function () use ($tabs) {
-            $this->normalisePositionsIndexed($tabs);
-            $this->entityManager->flush();
+            $this->applyOrderedPositions($tabs);
             $this->clearCache();
         });
     }
 
     /**
-     * Move a navigation tab up
-     *
-     * @param NavigationTab $tab
-     * @return void
+     * Move a navigation tab up.
      */
     public function moveUp(NavigationTab $tab): void
     {
-         $this->move($tab, -1);
+        $this->move($tab, -1);
     }
 
     /**
-     * Move a navigation tab down
-     *
-     * @param NavigationTab $tab
-     * @return void
+     * Move a navigation tab down.
      */
     public function moveDown(NavigationTab $tab): void
     {
@@ -135,99 +142,81 @@ class NavigationTabService
     }
 
     /**
-     * Swap the positions of two navigation tabs
+     * Reorder navigation tabs based on input data.
      *
-     * @param NavigationTab $a
-     * @param NavigationTab $b
-     * @return void
-     */
-    private function swapPositions(NavigationTab $a, NavigationTab $b): void
-    {
-        $posA = $a->getPosition();
-        $a->setPosition($b->getPosition());
-        $b->setPosition($posA);
-    }
-
-    /**
-     * Reorder navigation tabs based on input data
+     * @param array{id?: string, order?: list<string>} $data
      *
-     * @param array<int, array{id?: string, position?: int}> $data
      * @return bool True if any changes were made
      */
     public function reorderTabs(array $data): bool
     {
-        $tabs = $this->repository->findAllIndexedById();
-        $updated = false;
+        if (!isset($data['order'])) {
+            return false;
+        }
 
-        $this->transactionHelper->executeInTransaction(function () use ($data, $tabs, &$updated) {
-            foreach ($data as $item) {
-                $id = (string) ($item['id'] ?? '');
-                $position = isset($item['position']) ? (int) $item['position'] : null;
+        $tabsById = $this->repository->findAllIndexedById();
 
-                if ($id && isset($tabs[$id]) && $position !== null) {
-                    if ($tabs[$id]->getPosition() !== $position) {
-                        $tabs[$id]->setPosition($position);
-                        $updated = true;
-                    }
-                }
+        $orderedTabs = [];
+
+        foreach ($data['order'] as $id) {
+            if (isset($tabsById[$id])) {
+                $orderedTabs[] = $tabsById[$id];
             }
+        }
 
-            if ($updated) {
-                $this->normalisePositionsIndexed($tabs);
-                $this->entityManager->flush();
-                $this->clearCache();
+        if (count($orderedTabs) !== count($tabsById)) {
+            return false;
+        }
+
+        $changed = false;
+
+        foreach ($orderedTabs as $index => $tab) {
+            if ($tab->getPosition() !== ($index + 1)) {
+                $changed = true;
+                break;
             }
+        }
+
+        if (!$changed) {
+            return false;
+        }
+
+        $this->transactionHelper->executeInTransaction(function () use ($orderedTabs) {
+            $this->applyOrderedPositions($orderedTabs);
+            $this->clearCache();
         });
 
-        return $updated;
+        return true;
     }
 
-
     /**
-     * Normalise the positions of all navigation tabs
+     * Normalise the positions of all navigation tabs.
      */
     public function normalisePositions(): void
     {
         $tabs = $this->repository->getAllOrdered();
-        $this->normalisePositionsIndexed(array_combine(
-            array_map(fn($t) => $t->getId(), $tabs),
-            $tabs
-        ));
 
-        $this->entityManager->flush();
-        $this->clearCache();
+        $this->transactionHelper->executeInTransaction(function () use ($tabs) {
+            $this->applyOrderedPositions($tabs);
+            $this->clearCache();
+        });
     }
 
     /**
-     * Normalise positions of given tabs in memory to be 1..n
-     *
-     * @param array<NavigationTab> $tabs
-     */
-    private function normalisePositionsIndexed(array $tabs): void
-    {
-        usort($tabs, fn(NavigationTab $a, NavigationTab $b) => $a->getPosition() <=> $b->getPosition());
-
-        foreach ($tabs as $index => $tab) {
-            $tab->setPosition($index + 1);
-        }
-    }
-
-    /**
-     * Delete navigation tabs
-     *
-     * @param NavigationTab $tab
+     * Delete navigation tabs.
      */
     private function delete(NavigationTab $tab): void
     {
+        if ($tab->isSystem()) {
+            return;
+        }
         $this->entityManager->remove($tab);
     }
 
     /**
-     * Apply an action to navigation tabs
+     * Apply an action to navigation tabs.
      *
-     * @param string $action
      * @param array<string> $ids
-     * @return int
      */
     public function apply(string $action, array $ids): int
     {
@@ -240,12 +229,12 @@ class NavigationTabService
                     continue;
                 }
                 match ($action) {
-                    'delete'  => $this->delete($tab),
-                    'enable'  => $tab->setIsActive(true),
+                    'delete' => $this->delete($tab),
+                    'enable' => $tab->setIsActive(true),
                     'disable' => $tab->setIsActive(false),
-                    default   => null,
+                    default => null,
                 };
-                $count++;
+                ++$count;
             }
             $this->entityManager->flush();
             $this->clearCache();

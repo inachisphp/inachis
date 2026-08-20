@@ -1,0 +1,70 @@
+{% if form|default(null) %}
+    {{ form_start(form, {'attr': { 'class': 'form form__' ~ type ~ ' content__list' }}) }}
+    {{- form_errors(form) -}}
+{% endif %}
+
+{{ include('inadmin/partials/components/filters.html.twig', {
+    show_select_deselect: view_setting|default('list') == 'table' ? false : show_select_deselect|default(false),
+}) }}
+
+<section class="ui-section paginated-list{%- if zebra|default(false) %} zebra{% endif %}">
+{% if filter_values|default(null) is not empty and dataset|default(null) is empty %}
+    <p class="content-warning">
+        <i class="material-icons" aria-hidden="true">info_outline</i>
+        <span>Oops! We couldn't find anything</span>
+    </p>
+    <p class="centred">You may want to try a different search or filter.</p>
+{% elseif dataset|default(null) is empty %}
+    <p class="content-warning">
+        <img src="{{ viewModel.settings.domain ~ '/assets/imgs/incp/no-content.png' }}" alt="No content here yet" />
+        <span>No content here yet</span>
+    </p>
+    {% if add_button is defined and add_button.url is defined %}
+        {% set tagname = add_button.type|default('a') %}
+    <p class="centred">
+        <{{ tagname }}
+            class="btn btn--add {{ add_button.class|default('') }}"
+    {% for dataName,dataValue in add_button.data|default(null) %}
+        data-{{ dataName }}="{{ dataValue }}"
+    {% endfor %}
+            href="{{ add_button.url }}"
+            {% if add_button.type|default('a') == 'button' %} type="button"{% endif %}
+        ><span class="material-icons" aria-hidden="true">{{ add_button.image|default('add') }}</span>
+        <span class="btn-text">{{ add_button.text }}</span>
+        </{{ tagname }}>
+    </p>
+    {% endif %}
+{% else %}
+
+{% if view_setting|default('') not in view_modes|default([]) and view_modes|default([]) is not empty %}
+    {% set view_setting = view_default|default('') %}
+{% endif %}
+
+    {# Show the content view #}
+    {% if view_setting|default('list') == 'grid' %}
+        {{ include('inadmin/partials/components/view_grid.html.twig') }}
+    {% elseif view_setting|default('list') == 'list' %}
+        {{ include('inadmin/partials/components/view_list.html.twig') }}
+    {% elseif view_setting|default('list') == 'table' %}
+        {{ include('inadmin/partials/components/view_table.html.twig') }}
+    {% endif %}
+
+    {% if show_pagination is not defined or show_pagination %}
+    {{ include('inadmin/partials/components/pagination.html.twig', {
+        offset: offset + 1,
+        limit: limit,
+        maxResults: total,
+        maxPagesToShow: 4,
+        result_url: url_result,
+        total: total,
+    }) }}
+    {% endif %}
+    {% if actions|default(null) is not empty %}
+        {% include 'inadmin/partials/components/action_bar.html.twig' %}
+    {% endif %}
+{% endif %}
+</section>
+
+{% if form|default(null) %}
+    {{ form_end(form) }}
+{% endif %}

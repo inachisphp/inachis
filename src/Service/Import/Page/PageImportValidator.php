@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Import\Page;
@@ -22,9 +21,10 @@ final class PageImportValidator
     private array $warnings = [];
 
     /**
-     * Validate an array of PageImportDto objects.
+     * Validate an array of PageExportDto objects.
      *
-     * @param PageImportDto[] $pages
+     * @param array<PageExportDto> $pages
+     *
      * @return array<int, array<string>> Warnings per page (by index)
      */
     public function validateAll(array $pages): array
@@ -39,9 +39,8 @@ final class PageImportValidator
     }
 
     /**
-     * Validate a single PageImportDto.
+     * Validate a single PageExportDto.
      *
-     * @param PageImportDto $pageDto
      * @param int $index Index in the import list (for warnings)
      */
     public function validate(PageExportDto $pageDto, int $index): void
@@ -61,16 +60,6 @@ final class PageImportValidator
         // Status must be valid
         if (!in_array($pageDto->status, ['draft', 'published'], true)) {
             $pageWarnings[] = sprintf('Invalid status "%s"', $pageDto->status);
-        }
-
-        // Check visibility
-        if (!is_bool($pageDto->visibility)) {
-            $pageWarnings[] = 'Visibility must be boolean';
-        }
-
-        // Check allowComments
-        if (!is_bool($pageDto->allowComments)) {
-            $pageWarnings[] = 'AllowComments must be boolean';
         }
 
         // Validate postDate if provided

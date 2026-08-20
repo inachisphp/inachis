@@ -1,0 +1,50 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incp_settings_index') }}">Settings</a>
+    <span>Crawlers &amp; Discovery</span>
+{% endblock pagetitle %}
+
+{% block content %}
+<div class="col-12 content__edit">
+
+{% include "/inadmin/partials/tab-sets/discovery.html.twig" %}
+
+{{ form_start(form, {'attr': { 'class': 'form form__post form__tabs' }}) }}
+
+    <section class="ui-section">
+        {{ include('inadmin/partials/components/admonition.html.twig', {
+            type: 'info',
+            show_title: false,
+            text: 'The Expires field should be reviewed regularly.
+                If you are using the default security policy, update this date
+                whenever you review or change your security contact process.',
+        })}}
+        <p>
+            {{ form_label(form.security_txt) }}
+            {{ form_errors(form.security_txt) }}
+            {{ form_widget(form.security_txt) }}
+        </p>
+    </section>
+
+    <div class="fixed-bottom-bar">
+        <p>
+            {% if form.submit is defined %}
+                {{ form_widget(form.submit) }}
+            {% endif %}
+            <a
+                class="btn btn--secondary"
+                href="{{ path('web_security_txt') }}"
+                target="_blank"
+                title="{% trans %}admin.button.viewLive{% endtrans %}"
+            >
+                <span class="material-icons" aria-hidden="true">exit_to_app</span>
+                {% trans %}admin.button.viewLive{% endtrans %}
+            </a>
+        </p>
+    </div>
+
+{{ form_end(form) }}
+
+</div>
+{% endblock content %}

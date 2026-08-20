@@ -1,0 +1,123 @@
+{% block filter %}
+
+{% set hasToolbarFeatures =
+    filters|default([]) is not empty
+    or show_search|default(false)
+    or sort_options|default([]) is not empty
+    or add_button|default(null) is not empty
+    or view_modes|default([]) is not empty
+%}
+{% set hasContent = dataset|default([]) is not empty %}
+{% set hasAppliedFilters = filter_values|default([]) is not empty %}
+
+{% if hasToolbarFeatures and (hasContent or hasAppliedFilters) %}
+<section class="filter-bar sticky-nav" aria-label="Filter and sort content list">
+<div id="toolbar-form" class="toolbar-container">
+    {% if add_button|default(null) is not empty or show_search|default(false) %}
+    <div class="row main-actions">
+        {% if show_search|default(false) %}
+            {% include('/inadmin/partials/components/search.html.twig') with {
+                placeholder: search_placeholder|default('Search…'),
+                ariaLabel: search_label|default('Search posts'),
+                enterKeyHint: 'search',
+                id: search_id|default('filter__keyword'),
+                name: search_name|default('filter[keyword]'),
+                clearBtn: true,
+                value: search_value|default(filter_values['keyword']|default('')),
+            } %}
+        {% endif %}
+        {% if add_button is defined and add_button is not empty %}
+            {% set tagname = add_button.type|default('a') %}
+        <p>
+            <{{ tagname }}
+                class="btn btn--add {{ add_button.class|default('') }}"
+        {% for dataName,dataValue in add_button.data|default(null) %}
+            data-{{ dataName }}="{{ dataValue }}"
+        {% endfor %}
+                href="{{ add_button.url }}"
+                {% if add_button.type|default('a') == 'button' %} type="button"{% endif %}
+            ><span class="material-icons" aria-hidden="true">{{ add_button.image|default('add') }}</span>
+            <span class="btn-text">{{ add_button.text }}</span>
+            </{{ tagname }}>
+        </p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="row secondary-controls">
+        {% if filters|default(null) is not empty %}
+        <button type="button" class="filter__toggle icon-badge-wrapper" id="toggle-filters" aria-expanded="{{ hasAppliedFilters ? 'true' : 'false' }}" aria-controls="filter__options">
+            <span class="material-icons" aria-hidden="true">filter_list</span>
+            <span id="global-filter-dot" class="filter-indicator"{% if not hasAppliedFilters %} hidden{% endif %}></span>
+            <span>Filters</span>
+        </button>
+        {% endif %}
+        {% if sort_options|default(null) is not empty %}
+            {{ include('/inadmin/partials/components/sort-by.html.twig') }}
+        {% endif %}
+
+        {% if view_modes|default([])|length > 1 %}
+        <div class="grid-toggle">
+            {% if view_modes is defined and 'grid' in view_modes %}
+            <button aria-pressed="{{ view_setting == 'grid' ? 'true' : 'false' }}" class="btn btn--grid" id="grid-toggle" name="view" value="grid" title="Grid view" type="submit">
+                <span class="material-icons" aria-hidden="true">grid_view</span>
+                <span class="btn-text">Grid view</span>
+            </button>
+            {% endif %}
+            {% if view_modes is defined and 'list' in view_modes %}
+            <button aria-pressed="{{ view_setting == 'list' ? 'true' : 'false' }}" class="btn btn--list" id="list-toggle" name="view" value="list" title="List view" type="submit">
+                <span class="material-icons" aria-hidden="true">list</span>
+                <span class="btn-text">List view</span>
+            </button>
+            {% endif %}
+            {% if view_modes is defined and 'table' in view_modes %}
+            <button aria-pressed="{{ view_setting == 'table' ? 'true' : 'false' }}" class="btn btn--compact" id="compact-toggle" name="view" value="table" title="Table view" type="submit">
+                <span class="material-icons" aria-hidden="true">table_view</span>
+                <span class="btn-text">Table view</span>
+            </button>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if filters|default(null) is not empty %}
+<div id="filter__options" class="collapsible{% if hasAppliedFilters %} is-open"{% else %}" hidden{% endif %}>
+<div class="filter__inner">
+    {% for filter_name, filter in filters %}
+    <span class="filter__section-{{ filter_name|lower }}">
+        <label for="filter__{{ filter_name|lower }}">{{ filter_name }}</label>
+        <select name="filter[{{ filter_name|lower }}]" id="filter__{{ filter_name|lower }}">
+            {% for key, value in filter %}
+                <option value="{{ key }}"{% if filter_values[filter_name|lower]|default('') == key %} selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+        </select>
+    </span>
+    {% endfor %}
+    {% if show_category_filter is defined and show_category_filter %}
+    <span class="filter__section-categories">
+        <label id="filter__categories_label" for="filter__categories">Categories</label>
+        <select id="filter__categories" name="filter[categories][]" aria-labelledby="filter__categories_label" aria-required="false" class="js-select" data-tags="true" data-url="/incp/ax/categoryList/get" multiple="multiple">
+        {% for uuid, categoryName in filter_values['categories']|default([]) %}
+            <option value="{{ uuid }}" selected>{{ categoryName }}</option>
+        {% endfor %}
+        </select>
+    </span>
+    {% endif %}
+</div>
+</div>
+{% endif %}
+
+{% if show_select_deselect is defined and show_select_deselect %}
+<div class="row">
+    <p class="btn btn--selectAllNone">
+        <input aria-labelledby="selectAllNone_label" class="checkbox selectAllNone" id="selectAllNone" name="selectAllNone" type="checkbox" />
+        <label class="" id="selectAllNone_label" for="selectAllNone">Select all items</label>
+    </p>
+</div>
+{% endif %}
+
+</section>
+
+{% endif %}
+{% endblock %}

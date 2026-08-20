@@ -2,11 +2,11 @@
 
 {% block pagetitle %}
     {% if username|default(null) %}
-    <a href="{{ path('incc_admin_list') }}">Users</a>
-    <a href="{{ path('incc_admin_login_activity', { 'id': activity.user.username }) }}">Edit User</a>
+    <a href="{{ path('incp_admin_list') }}">Users</a>
+    <a href="{{ path('incp_admin_login_activity', { 'id': activity.user.username }) }}">Edit User</a>
     <span>Audit Log Entry</span>
     {% else %}
-    <a href="{{ path('incc_admin_login_activity_index') }}">Audit Logs</a>
+    <a href="{{ path('incp_admin_login_activity_index') }}">Audit Logs</a>
     <span>Audit Log Entry</span>
     {% endif %}
 {% endblock pagetitle %}
@@ -15,9 +15,9 @@
 
 <div class="col-12 widget-data-list">
     <section class="ui-section">
-        <p><strong>Time:</strong> {{ activity.loggedAt|date('Y-m-d H:i:s') }}</p>
+        <p><strong>Time:</strong> {{ activity.loggedAt|date('Y-m-d H:i:s', viewModel.session.preferences.timezone) }}</p>
         <p><strong>User:</strong> {{ (activity.user ? activity.user.userIdentifier : activity.username)|default('Unknown') }}</p>
-        <p><strong>Type:</strong> {{ activity.type }}</p>
+        <p><strong>Type:</strong> {{ activity.type.value }}</p>
         <p><strong>IP Address:</strong> {{ activity.ipAddress }}</p>
         <p><strong>User Agent:</strong> {{ activity.userAgent }}</p>
         <p><strong>Extra Data:</strong></p>

@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Dialog;
@@ -13,25 +12,28 @@ use Inachis\Controller\AbstractInachisController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 class ConfirmationController extends AbstractInachisController
 {
     /**
-     * @param Request $request
-     * @return Response
+     * Renders a confirmation dialog.
      */
-    #[Route("/incc/ax/confirmation/get", methods: [ "POST" ])]
+    #[Route('/incp/ax/confirmation/get', methods: ['POST'])]
     public function contentList(Request $request): Response
     {
-        $this->data['title'] = $request->request->get('title', '') ?: sprintf(
-            '<%s>',
-            $this->translator->trans('admin.dialog.confirm.default.title', [], 'messages'),
-        );
-        $this->data['entity'] = $request->request->get('entity', '');
-        $this->data['warning'] = $request->request->get('warning', '') ?:
-            $this->translator->trans('admin.dialog.confirm.default.warning', [], 'messages');
-        return $this->render('inadmin/dialog/confirmation.html.twig', $this->data);
+        $data = [
+            'title' => $request->request->getString('title', '') ?: sprintf(
+                '<%s>',
+                $this->translator->trans('admin.dialog.confirm.default.title', [], 'messages'),
+            ),
+            'entity' => $request->request->getString('entity', ''),
+            'warning' => $request->request->getString('warning', '') ?:
+                $this->translator->trans('admin.dialog.confirm.default.warning', [], 'messages'),
+        ];
+        if ($request->request->getBoolean('hideHelp', false)) {
+            $data['hideHelp'] = $request->request->getBoolean('hideHelp', false);
+        }
+
+        return $this->render('inadmin/dialog/confirmation.html.twig', $data);
     }
 }

@@ -1,17 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Export\Page;
 
-use Inachis\Entity\Page;
-use Inachis\Model\Page\PageExportDto;
+use Inachis\Entity\Content\Page;
 use Inachis\Model\Page\CategoryPathDto;
+use Inachis\Model\Page\PageExportDto;
 use Inachis\Model\Page\TagDto;
 use Inachis\Model\Page\UrlDto;
 
@@ -23,8 +22,9 @@ final class PageExportNormaliser
     /**
      * Normalises a page for export.
      *
-     * @param Page $page The page to normalise.
-     * @return PageExportDto The normalised page.
+     * @param Page $page the page to normalise
+     *
+     * @return PageExportDto the normalised page
      */
     public function normalise(Page $page): PageExportDto
     {
@@ -34,8 +34,8 @@ final class PageExportNormaliser
         $dto->subTitle = $page->getSubTitle();
         $dto->content = $page->getContent();
         $dto->type = $page->getType();
-        $dto->status = $page->getStatus();
-        $dto->visibility = $page->getVisibility();
+        $dto->status = $page->getStatus()->value;
+        $dto->visible = $page->isVisible();
         $dto->allowComments = $page->isAllowComments();
         $dto->language = $page->getLanguage();
         $dto->timezone = $page->getTimezone();
@@ -67,10 +67,11 @@ final class PageExportNormaliser
     }
 
     /**
-     * Normalize multiple pages
+     * Normalize multiple pages.
      *
-     * @param iterable $pages The pages to normalise.
-     * @return array The normalised pages.
+     * @param iterable $pages the pages to normalise
+     *
+     * @return array the normalised pages
      */
     public function normaliseCollection(iterable $pages): array
     {
@@ -78,6 +79,7 @@ final class PageExportNormaliser
         foreach ($pages as $page) {
             $result[] = $this->normalise($page);
         }
+
         return $result;
     }
 }

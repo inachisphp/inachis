@@ -1,41 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Import\Series;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\{Page,Series};
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
 use Inachis\Model\Series\SeriesExportDto;
-use Inachis\Repository\PageRepository;
-use Inachis\Service\Import\Series\SeriesImportResult;
-use DateTime;
-use InvalidArgumentException;
+use Inachis\Repository\Content\PageRepository;
 
 /**
  * Service for importing series and linking pages.
  */
 final class SeriesImportService
 {
-    /**
-     * @param EntityManagerInterface $entityManager
-     * @param PageRepository $pageRepository
-     */
     public function __construct(
         private EntityManagerInterface $entityManager,
         private PageRepository $pageRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Import series from DTOs.
      *
-     * @param SeriesExportDto[] $seriesDtos
-     * @return SeriesImportResult
+     * @param list<SeriesExportDto|null> $seriesDtos
      */
     public function import(iterable $seriesDtos): SeriesImportResult
     {
@@ -45,17 +38,17 @@ final class SeriesImportService
         try {
             foreach ($seriesDtos as $seriesDto) {
                 if (!$seriesDto instanceof SeriesExportDto) {
-                    throw new InvalidArgumentException('All items must be SeriesExportDto');
+                    throw new \InvalidArgumentException('All items must be SeriesExportDto');
                 }
 
                 $series = new Series();
                 $series->setTitle($seriesDto->title);
                 $series->setSubTitle($seriesDto->subTitle);
-                $series->setUrl($seriesDto->url); //@todo need to check if URL is already in use and generate a new one if so
+                $series->setUrl($seriesDto->url); // TODO: need to check if URL is already in use and generate a new one if so
                 $series->setDescription($seriesDto->description);
-                $series->setFirstDate(new DateTime($seriesDto->firstDate));
-                $series->setLastDate(new DateTime($seriesDto->lastDate));
-                $series->setVisibility(Series::PRIVATE);
+                $series->setFirstDate(new \DateTimeImmutable($seriesDto->firstDate ?: ''));
+                $series->setLastDate(new \DateTimeImmutable($seriesDto->lastDate ?: ''));
+                $series->setVisible(false);
 
                 // Link pages by title
                 foreach ($seriesDto->items as $pageTitle) {
@@ -64,25 +57,25 @@ final class SeriesImportService
 
                     if ($page) {
                         $series->addItem($page);
-                        $result->pagesLinked++;
+                        ++$result->pagesLinked;
                     } else {
                         $result->warnings[] = sprintf(
                             'Series "%s": page "%s" not found and could not be linked.',
                             $seriesDto->title,
-                            $pageTitle
+                            $pageTitle,
                         );
                     }
                 }
 
                 $this->entityManager->persist($series);
-                $result->seriesImported++;
+                ++$result->seriesImported;
             }
 
             $this->entityManager->flush();
             $this->entityManager->commit();
         } catch (\Throwable $e) {
             $this->entityManager->rollback();
-            $result->warnings[] = 'Import failed: ' . $e->getMessage();
+            $result->warnings[] = 'Import failed: '.$e->getMessage();
         }
 
         return $result;
@@ -91,7 +84,17 @@ final class SeriesImportService
     /**
      * Maps the imported data to DTOs.
      *
-     * @param array $data
+     * @param array<array{
+     *     title?: string,
+     *     subTitle?: string,
+     *     url?: string,
+     *     description?: string,
+     *     firstDate?: string,
+     *     lastDate?: string,
+     *     visible?: bool,
+     *     items?: list<string>
+     * }> $data
+     *
      * @return SeriesExportDto[]
      */
     public function mapToDto(array $data): array
@@ -106,7 +109,7 @@ final class SeriesImportService
             $dto->description = $series['description'] ?? null;
             $dto->firstDate = $series['firstDate'] ?? null;
             $dto->lastDate = $series['lastDate'] ?? null;
-            $dto->visibility = $series['visibility'] ?? true;
+            $dto->visible = $series['visible'] ?? true;
             $dto->items = $series['items'] ?? [];
 
             $dtos[] = $dto;

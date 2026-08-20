@@ -1,24 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Admin;
 
-use DateTimeImmutable;
-use Exception;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\PasswordResetRequest;
-use Inachis\Entity\User;
+use Inachis\Entity\User\LoginActivity;
+use Inachis\Enum\Security\LoginResultType;
 use Inachis\Form\ChangePasswordType;
 use Inachis\Form\ForgotPasswordType;
 use Inachis\Form\LoginType;
-use Inachis\Repository\PasswordResetRequestRepository;
-use Inachis\Repository\UserRepository;
+use Inachis\Repository\User\PasswordResetRequestRepository;
+use Inachis\Repository\User\UserRepository;
 use Inachis\Service\User\PasswordResetTokenService;
 use Inachis\Service\User\UserAccountEmailService;
 use Random\RandomException;
@@ -31,18 +28,16 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 /**
- * Account controller
+ * Account controller.
  */
 class AccountController extends AbstractInachisController
 {
     /**
-     * Login
-     * 
-     * @param Request $request
-     * @param AuthenticationUtils $authenticationUtils
+     * Login.
+     *
      * @return Response The response the controller results in
      */
-    #[Route("/incc/login", name: "incc_account_login")]
+    #[Route('/incp/login', name: 'incp_account_login')]
     public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
     {
         $redirectTo = $this->redirectIfAuthenticatedOrNoAdmins();
@@ -53,37 +48,33 @@ class AccountController extends AbstractInachisController
             'loginUsername' => $authenticationUtils->getLastUsername(),
         ]);
         $form->handleRequest($request);
-        $this->data['page']['title'] = 'Sign In';
-        $this->data['form'] = $form->createView();
-        $this->data['expired'] = $request->query->has('expired');
-        $this->data['error'] = $authenticationUtils->getLastAuthenticationError();
+        $this->viewModel->page->title = 'Sign In';
 
-        return $this->render('inadmin/page/admin/signin.html.twig', $this->data);
+        return $this->render('inadmin/page/admin/signin.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'expired' => $request->query->has('expired'),
+            'error' => $authenticationUtils->getLastAuthenticationError(),
+        ]);
     }
 
     /**
-     * Logout
-     * 
+     * Logout.
+     *
      * @throws \Exception
      */
-    #[Route("/incc/logout", name: "incc_logout")]
+    #[Route('/incp/logout', name: 'incp_logout')]
     public function logout(): void
     {
         throw new \LogicException('This method is blank and will be intercepted by the logout key on your firewall.');
     }
 
     /**
-     * Forgot password
-     * 
-     * @param Request $request
-     * @param PasswordResetRequestRepository $passwordResetRequestRepository
-     * @param RateLimiterFactoryInterface $forgotPasswordIpLimiter
-     * @param RateLimiterFactoryInterface $forgotPasswordAccountLimiter
-     * @param UserRepository $userRepository
-     * @return Response
+     * Forgot password.
+     *
      * @throws RandomException
      */
-    #[Route("/incc/forgot-password", name: "incc_account_forgot-password", methods: [ "GET", "POST" ])]
+    #[Route('/incp/forgot-password', name: 'incp_account_forgot-password', methods: ['GET', 'POST'])]
     public function forgotPassword(
         Request $request,
         PasswordResetRequestRepository $passwordResetRequestRepository,
@@ -99,73 +90,74 @@ class AccountController extends AbstractInachisController
         $ipLimiter = $forgotPasswordIpLimiter->create($request->getClientIp() ?? 'unknown');
         $limit = $ipLimiter->consume(1);
         if (!$limit->isAccepted()) {
-            $headers = [
-                'X-RateLimit-Remaining' => $limit->getRemainingTokens(),
-                'X-RateLimit-Retry-After' => $limit->getRetryAfter()->getTimestamp() - time(),
-                'X-RateLimit-Limit' => $limit->getLimit(),
-            ];
-            // @todo replace with something better - throw new TooManyRequestsHttpException();
-            return new Response('Too many attempts from this IP. Try again later.', 429, $headers);
+            return $this->tooManyRequests(
+                'Too many requests. Try again later.',
+                $limit,
+            );
         }
         $passwordResetRequestRepository->purgeExpiredHashes();
 
-        $this->data['page']['title'] = 'Request a password reset';
         $form = $this->createForm(ForgotPasswordType::class, [
-            'forgot_email' => $request->request->get('forgot_email'),
+            'forgot_email' => $request->request->getString('forgot_email'),
         ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $emailAddress = (string) $request->request->all('forgot_password')['forgot_email'];
+            /** @var array{forgot_email:string} $forgotPassword */
+            $forgotPassword = $request->request->all('forgot_password');
+
+            $emailAddress = $forgotPassword['forgot_email'];
             if ($emailAddress) {
                 $accountLimiter = $forgotPasswordAccountLimiter->create(strtolower($emailAddress));
                 $limit = $accountLimiter->consume(1);
                 if (!$limit->isAccepted()) {
-                    $headers = [
-                        'X-RateLimit-Remaining' => $limit->getRemainingTokens(),
-                        'X-RateLimit-Retry-After' => $limit->getRetryAfter()->getTimestamp() - time(),
-                        'X-RateLimit-Limit' => $limit->getLimit(),
-                    ];
-                    // @todo replace with something better - throw new TooManyRequestsHttpException();
-                    return new Response('Too many reset attempts for this account. Try again later.', 429, $headers);
+                    return $this->tooManyRequests(
+                        'Too many reset attempts. Try again later.',
+                        $limit,
+                    );
                 }
             }
             $user = $userRepository->findOneBy([
                 'email' => $emailAddress,
             ]);
             if (null !== $user) {
-                $this->data['clientIP'] = $request->getClientIp();
                 try {
                     $userRegistrationService->sendForgotPasswordEmail(
                         $user,
-                        $this->data,
+                        [
+                            'viewModel' => $this->viewModel,
+                            'clientIP' => $request->getClientIp(),
+                        ],
                         fn (string $token) => $this->generateUrl(
-                            'incc_account_new-password',
-                            [ 'token' => $token ]
-                        )
+                            'incp_account_new-password',
+                            ['token' => $token],
+                        ),
                     );
+                    $this->entityManager->flush();
                 } catch (TransportExceptionInterface $e) {
-                    $this->addFlash('warning', 'Error while sending mail: ' . $e->getMessage());
+                    $this->addFlash('warning', 'Error while sending mail: '.$e->getMessage());
                 }
             }
-            $this->data['page']['title'] = 'Password reset request sent';
-            $this->data['form'] = $this->createFormBuilder()->getForm()->createView();
-            return $this->render('inadmin/page/admin/forgot-password-sent.html.twig', $this->data);
-        }
-        $this->data['form'] = $form->createView();
+            $this->viewModel->page->title = 'Password reset request sent';
 
-        return $this->render('inadmin/page/admin/forgot-password.html.twig', $this->data);
+            return $this->render('inadmin/page/admin/forgot-password-sent.html.twig', [
+                'viewModel' => $this->viewModel,
+                'form' => $this->createFormBuilder()->getForm()->createView(),
+            ]);
+        }
+
+        $this->viewModel->page->title = 'Request a password reset';
+
+        return $this->render('inadmin/page/admin/forgot-password.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+        ]);
     }
 
-    /**
-     * @param Request $request
-     * @param PasswordResetTokenService $tokenService
-     * @param RateLimiterFactoryInterface $forgotPasswordIpLimiter
-     * @param UserPasswordHasherInterface $passwordHasher
-     * @param UserRepository $userRepository
-     * @param string $token
-     * @return Response
-     */
-    #[Route("/incc/new-password/{token}", name: "incc_account_new-password", methods: [ "GET", "POST" ])]
+    #[Route(
+        '/incp/new-password/{token}',
+        name: 'incp_account_new-password',
+        methods: ['GET', 'POST'],
+    )]
     public function newPassword(
         Request $request,
         PasswordResetTokenService $tokenService,
@@ -179,58 +171,86 @@ class AccountController extends AbstractInachisController
             return $this->redirectToRoute($redirectTo);
         }
 
-        if (!$token || strlen($token) !== 64) {
+        if (!$token || 64 !== strlen($token)) {
             $this->addFlash('warning', 'Invalid token.');
-            return $this->redirectToRoute('incc_account_forgot-password');
+
+            return $this->redirectToRoute('incp_account_forgot-password');
+        }
+        $changePassword = $request->request->all('change_password');
+        if ([] === $changePassword) {
+            $changePassword = [
+                'username' => '',
+            ];
         }
 
-        $form = $this->createForm(ChangePasswordType::class, [
-            'change_password' => $request->request->all('change_password', [
-                'username' => '',
-            ]),
-        ], [
-            'password_reset' => true,
-        ]);
+        $form = $this->createForm(
+            ChangePasswordType::class,
+            [
+                'change_password' => $changePassword,
+            ],
+            [
+                'password_reset' => true,
+            ],
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $limiter = $forgotPasswordIpLimiter->create($request->getClientIp() ?? 'unknown');
             $limit = $limiter->consume(1);
             if (!$limit->isAccepted()) {
-                $headers = [
-                    'X-RateLimit-Remaining' => $limit->getRemainingTokens(),
-                    'X-RateLimit-Retry-After' => $limit->getRetryAfter()->getTimestamp() - time(),
-                    'X-RateLimit-Limit' => $limit->getLimit(),
-                ];
-                // @todo replace with something better - throw new TooManyRequestsHttpException();
-                return new Response('Too many password reset attempts from this IP. Try again later.', 429, $headers);
-            };
-            $user = $userRepository->findOneBy(
-                [ 'username' => $form->getData()['change_password']['username'] ]
-            );
+                return $this->tooManyRequests(
+                    'Too many reset attempts. Try again later.',
+                    $limit,
+                );
+            }
+            /** @var array{
+             *     change_password: array{
+             *         username: string,
+             *         new_password: string
+             *     }
+             * } $data
+             */
+            $data = $form->getData();
+            $user = $userRepository->findOneBy([
+                'username' => $data['change_password']['username'],
+            ]);
             if (!$user) {
                 $this->addFlash('error', 'Invalid token.');
-                return $this->redirectToRoute('incc_account_forgot-password');
+
+                return $this->redirectToRoute('incp_account_forgot-password');
             }
             $resetRequest = $tokenService->validateTokenForUser($token, $user);
             if (!$resetRequest) {
                 $this->addFlash('error', 'Invalid or expired reset token.');
-                return $this->redirectToRoute('incc_account_forgot-password');
+
+                return $this->redirectToRoute('incp_account_forgot-password');
             }
-            $plainPassword = $form->getData()['change_password']['new_password'];
+            $plainPassword = $data['change_password']['new_password'];
+
+            $activity = new LoginActivity(
+                $user,
+                LoginResultType::TYPE_PASSWORD_RESET,
+                $request->getClientIp(),
+                $request->headers->get('User-Agent'),
+            );
+            $this->entityManager->persist($activity);
+
             $hashed = $passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashed);
-            $user->setPasswordModDate(new DateTimeImmutable());
+            $user->setPasswordChangedAt(new \DateTimeImmutable());
             $tokenService->markAsUsed($resetRequest);
             $this->entityManager->persist($user);
             $this->entityManager->flush();
 
             $this->addFlash('success', 'Your password has been reset. You can now log in.');
-            return $this->redirectToRoute('incc_account_login');
-        }
-        $this->data['form'] = $form->createView();
-        $this->data['token'] = $token;
 
-        return $this->render('inadmin/page/admin/new-password.html.twig', $this->data);
+            return $this->redirectToRoute('incp_account_login');
+        }
+
+        return $this->render('inadmin/page/admin/new-password.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'token' => $token,
+        ]);
     }
 }

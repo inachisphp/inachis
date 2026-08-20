@@ -1,96 +1,197 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_admin_list') }}">Users</a>
+    <a href="{{ path('incp_admin_list') }}">Users</a>
     <span>Edit User</span>
 {% endblock pagetitle %}
 
 {% block content %}
-    {% block profile_pre %}{% endblock profile_pre %}
+{{ form_start(form, {'attr': { 'class': 'col-12 form form__post form__user' }}) }}
 
-    {% block profile %}
-
-        {{ form_start(form, {'attr': { 'class': 'col-12 form form__post form__user' }}) }}
-        <div>
-    {% if user.username is defined and user.username is not empty %}
-            {{ include('inadmin/partials/tab-sets/profile.html.twig', {
-                'activeTab': 'profile'
-            }) }}
+{% if user.username is defined and user.username is not empty %}
+    {{ include('inadmin/partials/tab-sets/profile.html.twig', {
+        'activeTab': 'profile'
+    }) }}
+{% endif %}
+<fieldset class="ui-section" id="user__profile">
+    <legend>Personal Information</legend>
+    {% if user.id is not empty and app.user.id != user.id and user.isTotpEnabled %}
+        {% embed 'inadmin/partials/components/admonition.html.twig' with {
+            type: 'tip',
+            title: 'Two-Factor Authentication is enabled',
+            icon: 'verified_user',
+        } %}
+            {% block text %}
+            <p>Enabled on <strong>{{ user.totp.enabledAt|date('l jS F Y \\a\\t H:i', viewModel.session.preferences.timezone) }}</strong></p>
+            {% endblock text %}
+        {% endembed %}
     {% endif %}
-            <section class="ui-section">
-    {% if user.username is defined and user.username is not empty %}
-{# @todo add avatar selector #}
-        {% if false and app.user.username == user.username %}
-            <fieldset class="multisection">
-                <legend>Your Display Picture</legend>
-                {{ form_widget(form.avatar) }}
-                {% if user.avatar is defined and user.avatar is not empty %}
-                <p class="profile-photo">
-                    <img alt="A user uploaded profile picture" height="100" src="/incc/profile-img/{{ user.avatar }}" width="100" />
-                </p>
-                {% endif %}
-                <p>
-                    <button class="button button--info dialog__link"
-                            data-class-name="dialog__uploader"
-                            data-target="avatar"
-                            data-template-name="uploader"
-                            data-title="Upload a new display picture"
-                            data-filesize-limit="2048"
-                            data-dimensions-limt="200"
-                            type="button"
-                    ><span class="material-icons" aria-hidden="true">image</span> Upload a new picture</button>
-                </p>
-                <p>You can upload a JPEG {% if heicSupported %},PNG, or HEIC{% else%}or PNG{% endif %} image. It is recommended that this image is square (such as 100px x 100px) to avoid distortion.</p>
-            </fieldset>
-        {% endif %}
-    {% else %}
-        <h3>New administrator</h3>
-    {% endif %}
-            <fieldset class="content__edit multisection">
-                <legend>Personal Information</legend>
     {% if user.id is not defined or user.id is empty %}
-                    {{ form_label(form.username) }}
-                    {{ form_widget(form.username) }}
-                    {{ form_errors(form.username) }}
+    <p>
+        {{ form_label(form.username) }}
+        {{ form_widget(form.username) }}
+        {{ form_errors(form.username) }}
+    </p>
     {% endif %}
-                    {{ form_label(form.displayName) }}
-                    {{ form_widget(form.displayName) }}
-                    {{ form_errors(form.displayName) }}
 
-                    {{ form_label(form.email) }}
-                    {{ form_widget(form.email) }}
-                    {{ form_errors(form.email) }}
+    <p>
+    {{ form_label(form.displayName) }}
+    {{ form_widget(form.displayName) }}
+    {{ form_errors(form.displayName) }}
+    </p>
 
-                    {{ form_label(form.timezone) }}
-                    {{ form_widget(form.timezone) }}
-                    {{ form_errors(form.timezone) }}
-            </fieldset>
+    <p>
+    {{ form_label(form.email) }}
+    {{ form_widget(form.email) }}
+    {{ form_errors(form.email) }}
+    </p>
+
+    <p>
+    {{ form_label(form.timezone) }}
+    {{ form_widget(form.timezone) }}
+    {{ form_errors(form.timezone) }}
+    </p>
 
     {% if app.user.username == user.username %}
-            <fieldset class="multisection">
-                <legend>Settings</legend>
-                <p>
-                    {{ form_label(form.color) }}
-                    {{ form_widget(form.color) }}
-                    {{ form_errors(form.color) }}
-                </p>
-            </fieldset>
+    <p>
+        {{ form_label(form.color) }}
+        {{ form_widget(form.color) }}
+        {{ form_errors(form.color) }}
+    </p>
     {% endif %}
+</fieldset>
 
-            <div class="fixed-bottom-bar">
-                <p>
-                    {{ form_widget(form.submit) }}
-    {% if user.id is not empty and app.user.username != user.username %}
-                    {{ form_widget(form.enableDisable) }}
-                    {{ form_widget(form.delete) }}
-    {% endif %}
-                </p>
+{% if form.assignedRoles is defined %}
+<fieldset class="ui-section" id="user__roles">
+    <legend>
+        {{ form_label(form.assignedRoles) }}
+    </legend>
+    {{ form_errors(form.assignedRoles) }}
+
+    {% for child in form.assignedRoles %}
+        {% set role = form.assignedRoles.vars.choices[loop.index0].data %}
+
+        <label for="{{ child.vars.id }}" class="role-card {% if child.vars.checked %}is-selected{% endif %}">
+            <div class="role-card-checkbox">
+                {{ form_widget(child) }}
             </div>
-            </section>
-        </div>
-    {{ form_end(form) }}
 
-    {% endblock profile %}
+            <div class="role-card-content">
+                <span class="role-title">{{ role.name }}</span>
+                {% if role.description %}
+                    <p class="role-description">
+                        {{ role.description }}
+                    </p>
+                {% endif %}
+            </div>
+        </label>
+    {% endfor %}
+</fieldset>
+{% endif %}
 
-    {% block profile_post %}{% endblock profile_post %}
+{% if user.id is not empty and app.user.id == user.id %}
+<fieldset class="ui-section" id="user__auth">
+<div class="nested-grid">
+    <div class="col-6">
+        {% if not user.isTotpEnabled %}
+            {{ include ('inadmin/partials/components/admonition.html.twig', {
+                type: 'warning',
+                text: 'It is strongly recommended that two-factor authentication is enabled for enhanced security.'
+            }) }}
+            <p>
+                {{ form_widget(form.enableTotp) }}
+            </p>
+        {% else %}
+            {% embed 'inadmin/partials/components/admonition.html.twig' with {
+                type: remainingRecoveryCodes >= 4
+                    ? 'tip'
+                    : (remainingRecoveryCodes >= 1 ? 'warning' : 'danger'),
+                title: 'Two-Factor Authentication is enabled',
+                icon: 'verified_user',
+            } %}
+                {% block text %}
+                <p>Enabled on <strong>{{ user.totp.enabledAt|date('l jS F Y \\a\\t H:i', viewModel.session.preferences.timezone) }}</strong></p>
+                <p>Recovery codes remaining: <strong>{{ remainingRecoveryCodes }}</strong></p>
+                <p>Recovery codes can be used once if you lose access to your authenticator.</p>
+                {% endblock text %}
+            {% endembed %}
+            <p>{{ form_widget(form.regenerateCodes) }} {{ form_widget(form.disableTotp) }}</p>
+        {% endif %}
+        {% if trustedDevices|default([]) is not empty %}
+            {% include 'inadmin/partials/components/view_table.html.twig' with {
+                className: 'form__roles',
+                type: 'userTrustedDevice',
+
+                table_name: 'Trusted Devices',
+                table_class: 'table-responsive table--row-borders table--darkhead',
+                table_desc: 'This table lists the devices trusted by the current user.',
+                columns: [
+                    {
+                        title: 'Device',
+                        slug: 'id',
+                        source: 'displayName',
+                        header: true,
+                    },
+                    {
+                        title: 'Trusted Until',
+                        source: 'expiresAt',
+                        source_type: 'date',
+                    },
+                    {
+                        title: 'Last Used',
+                        source: 'lastUsedAt',
+                        source_type: 'date',
+                    },
+                    {
+                        title: '',
+                        badges: {
+                            'Current Device': {
+                                'field': 'id',
+                                'condition': currentTrustedDevice.id,
+                                'className': 'badge__hotlink'
+                            }
+                        }
+                    },
+                ],
+                dataset: trustedDevices,
+
+                slug_prefix: 'admin/trusted_devices',
+
+                show_search: false,
+                show_select_deselect: false,
+                zebra: true,
+            } %}
+        {% endif %}
+        <p>
+            <button class="btn btn--add">
+                <span class="material-icons">phonelink_erase</span>
+                <span class="btn-text">Remove all trusted devices</span>
+            </button>
+        </p>
+        <p>&nbsp;</p>
+    </div>
+    <div class="col-6">
+        {% embed 'inadmin/partials/components/admonition.html.twig' with {
+            type: 'info',
+            title: 'WebAuthn / Passkeys',
+            icon: 'info',
+            text: 'Coming soon…',
+        } %}
+        {% endembed %}
+    </div>
+</div>
+</fieldset>
+{% endif %}
+
+<div class="fixed-bottom-bar">
+    <p>
+        {{ form_widget(form.submit) }}
+        {% if user.id is not empty and app.user.id != user.id %}
+            {{ form_widget(form.enableDisable) }}
+            {{ form_widget(form.delete) }}
+        {% endif %}
+    </p>
+</div>
+
+{{ form_end(form) }}
 {% endblock content %}

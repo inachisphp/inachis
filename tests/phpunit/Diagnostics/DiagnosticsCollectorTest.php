@@ -1,10 +1,16 @@
 <?php
 
-namespace Inachis\Tests\Diagnostics;
+declare(strict_types=1);
 
+/**
+ * This file is part of the inachis framework.
+ */
+
+namespace Inachis\Tests\phpunit\Diagnostics;
+
+use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
 use Inachis\Diagnostics\DiagnosticsCollector;
-use Inachis\Diagnostics\CheckInterface;
 use PHPUnit\Framework\TestCase;
 
 final class DiagnosticsCollectorTest extends TestCase
@@ -46,7 +52,7 @@ final class DiagnosticsCollectorTest extends TestCase
 
         $this->assertArrayHasKey('SectionA', $groups);
         $this->assertArrayHasKey('SectionB', $groups);
-        
+
         $this->assertSame('SectionA', $groups['SectionA']['label']);
         $this->assertCount(2, $groups['SectionA']['checks']);
         $this->assertSame($result1, $groups['SectionA']['checks'][0]);

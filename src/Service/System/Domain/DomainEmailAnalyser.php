@@ -1,42 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\System\Domain;
 
 use Inachis\Model\Domain\DomainDnsReport;
+use Inachis\Model\Domain\Severity;
+use Inachis\Model\Domain\ValidationIssue;
 use Inachis\Validator\BimiValidator;
+use Inachis\Validator\CaaValidator;
 use Inachis\Validator\DkimValidator;
 use Inachis\Validator\DmarcValidator;
 use Inachis\Validator\MxValidator;
 use Inachis\Validator\SpfValidator;
 use Inachis\Validator\TlsRptValidator;
-use Inachis\Validator\CaaValidator;
-use Inachis\Model\Domain\ValidationIssue;
-use Inachis\Model\Domain\Severity;
-use InvalidArgumentException;
-use OpenSSLCertificate;
 
 /**
- * Analyses the email settings of a domain
+ * Analyses the email settings of a domain.
+ *
+ * @phpstan-import-type DnsRecord from \Inachis\Service\System\Domain\DnsResolverInterface
+ * @phpstan-import-type DnsEntries from \Inachis\Service\System\Domain\DnsResolverInterface
+ * @phpstan-import-type DnsMxRecord from \Inachis\Service\System\Domain\DnsResolverInterface
+ * @phpstan-import-type DnsTxtRecord from \Inachis\Service\System\Domain\DnsResolverInterface
+ * @phpstan-import-type DnsCaaRecord from \Inachis\Service\System\Domain\DnsResolverInterface
  */
 final class DomainEmailAnalyser
 {
-    /**
-     * @param DnsResolverInterface $dns
-     * @param DkimValidator $dkimValidator
-     * @param SpfValidator $spfValidator
-     * @param DmarcValidator $dmarcValidator
-     * @param MxValidator $mxValidator
-     * @param BimiValidator $bimiValidator
-     * @param TlsRptValidator $tlsRptValidator
-     * @param CaaValidator $caaValidator
-     */
     public function __construct(
         private DnsResolverInterface $dns,
         private DkimValidator $dkimValidator,
@@ -46,15 +39,11 @@ final class DomainEmailAnalyser
         private BimiValidator $bimiValidator,
         private TlsRptValidator $tlsRptValidator,
         private CaaValidator $caaValidator,
-    ) {}
+    ) {
+    }
 
     /**
-     * Analyses the email settings of a domain
-     *
-     * @param string $domain
-     * @param string $serverIp
-     * @param string $selector
-     * @return DomainDnsReport
+     * Analyses the email settings of a domain.
      */
     public function analyse(string $domain, ?string $serverIp = '', string $selector = 'default'): DomainDnsReport
     {
@@ -63,13 +52,20 @@ final class DomainEmailAnalyser
 
         $txtRecords = $this->dns->getRecords($domain, DNS_TXT);
         $mxRecords = $this->dns->getRecords($domain, DNS_MX);
-        $dmarcTxt = $this->dns->getRecords('_dmarc.' . $domain, DNS_TXT);
+        $dmarcTxt = $this->dns->getRecords('_dmarc.'.$domain, DNS_TXT);
         $dkimHost = sprintf('%s._domainkey.%s', $selector, $domain);
         $dkimTxt = $this->dns->getRecords($dkimHost, DNS_TXT);
         $bimiRecord = $this->dns->getRecords("_bimi.$domain", DNS_TXT);
         $tlsRptRecords = $this->dns->getRecords("_smtp._tls.$domain", DNS_TXT);
         $caaRecords = $this->dns->getRecords($domain, DNS_CAA);
 
+        /** @var list<DnsTxtRecord> $txtRecords */
+        /** @var list<DnsMxRecord> $mxRecords */
+        /** @var list<DnsTxtRecord> $dmarcTxt */
+        /** @var list<DnsTxtRecord> $dkimTxt */
+        /** @var list<DnsTxtRecord> $bimiRecord */
+        /** @var list<DnsTxtRecord> $tlsRptRecords */
+        /** @var list<DnsCaaRecord> $caaRecords */
         $spfRecords = $this->extractSpf($txtRecords);
         $dmarcRecords = $this->extractDmarc($dmarcTxt);
         $dkimRecords = $this->extractDkim($dkimTxt);
@@ -86,12 +82,13 @@ final class DomainEmailAnalyser
         ];
 
         if (!empty($serverIp) && !empty($spfRecords)) {
-            $authorized = $this->isIpAuthorized($serverIp, $spfRecords[0] ?? '', $issues);
+            /** @var array<int, string> $spfRecords */
+            $authorized = $this->isIpAuthorized($serverIp, $spfRecords[0] ?? '', [], $issues);
             if (!$authorized) {
                 $issues[] = new ValidationIssue(
                     'spf',
                     "Server IP {$serverIp} is NOT authorized in SPF record",
-                    Severity::Error
+                    Severity::Error,
                 );
             }
         }
@@ -105,11 +102,12 @@ final class DomainEmailAnalyser
                         $issues[] = new ValidationIssue('mx', "MX host {$host} TLS certificate invalid", Severity::Warning);
                     }
                 } catch (\Exception $e) {
-                    $issues[] = new ValidationIssue('mx', "MX host {$host} TLS check failed: " . $e->getMessage(), Severity::Warning);
+                    $issues[] = new ValidationIssue('mx', "MX host {$host} TLS check failed: ".$e->getMessage(), Severity::Warning);
                 }
             }
         }
 
+        /* @var list<string> $spfRecords */
         return new DomainDnsReport(
             $domain,
             $dkimRecords,
@@ -119,14 +117,12 @@ final class DomainEmailAnalyser
             $bimiRecord,
             $tlsRptRecords,
             $caaRecords,
-            $issues
+            $issues,
         );
     }
 
     /**
-     * Asserts that the domain is valid
-     *
-     * @param string $domain
+     * Asserts that the domain is valid.
      */
     private function assertValidDomain(string $domain): void
     {
@@ -136,9 +132,10 @@ final class DomainEmailAnalyser
     }
 
     /**
-     * Check full SPF mechanisms for deprecated/unsupported issues
+     * Check full SPF mechanisms for deprecated/unsupported issues.
      *
      * @param list<string> $spfRecords
+     *
      * @return list<ValidationIssue>
      */
     private function checkSpfMechanisms(array $spfRecords): array
@@ -162,13 +159,13 @@ final class DomainEmailAnalyser
 
                     case 'redirect':
                         if (!$value) {
-                            $issues[] = new ValidationIssue('spf', "SPF redirect mechanism missing target", Severity::Error);
+                            $issues[] = new ValidationIssue('spf', 'SPF redirect mechanism missing target', Severity::Error);
                         }
                         break;
 
                     case 'include':
                         if (!$value) {
-                            $issues[] = new ValidationIssue('spf', "SPF include mechanism missing domain", Severity::Error);
+                            $issues[] = new ValidationIssue('spf', 'SPF include mechanism missing domain', Severity::Error);
                             break;
                         }
 
@@ -198,9 +195,10 @@ final class DomainEmailAnalyser
     }
 
     /**
-     * Extracts the SPF records from the DNS records
+     * Extracts the SPF records from the DNS records.
      *
-     * @param array<int, array{txt: string}> $txtRecords
+     * @param DnsEntries $txtRecords
+     *
      * @return list<string>
      */
     private function extractSpf(array $txtRecords): array
@@ -210,15 +208,15 @@ final class DomainEmailAnalyser
 
         return array_values(array_filter(
             $txts,
-            /** @param mixed $txt */
-            fn($txt) => str_starts_with(strtolower($txt), 'v=spf1')
+            fn ($txt) => str_starts_with(strtolower($txt), 'v=spf1'),
         ));
     }
 
     /**
-     * Extracts the DMARC records from the DNS records
+     * Extracts the DMARC records from the DNS records.
      *
-     * @param array<int, array{txt: string}> $txtRecords
+     * @param DnsEntries $txtRecords
+     *
      * @return list<string>
      */
     private function extractDmarc(array $txtRecords): array
@@ -228,16 +226,16 @@ final class DomainEmailAnalyser
 
         return array_values(array_filter(
             $txts,
-            /** @param mixed $txt */
-            fn($txt) => str_starts_with(strtolower($txt), 'v=dmarc1')
+            fn ($txt) => str_starts_with(strtolower($txt), 'v=dmarc1'),
         ));
     }
 
     /**
-     * Extracts the DKIM records from the DNS records
+     * Extracts the DKIM records from the DNS records.
      *
-     * @param array<int, array{txt: string}> $txtRecords
-     * @return array<int, string>
+     * @param DnsEntries $txtRecords
+     *
+     * @return list<string>
      */
     private function extractDkim(array $txtRecords): array
     {
@@ -246,38 +244,33 @@ final class DomainEmailAnalyser
 
         return array_values(array_filter(
             $txts,
-            /** @param mixed $txt */
-            fn($txt) => str_starts_with(strtolower($txt), 'v=dkim1')
+            fn ($txt) => str_starts_with(strtolower($txt), 'v=dkim1'),
         ));
     }
 
     /**
-     * Normalises a domain name
-     *
-     * @param string $domain
-     * @return string
+     * Normalises a domain name.
      */
     private function normaliseDomain(string $domain): string
     {
         $domain = strtolower(trim($domain));
         $domain = preg_replace('#^https?://#', '', $domain);
+        /** @var string $domain */
         if (str_starts_with($domain, 'www.')) {
             $domain = substr($domain, 4);
         }
-        if ($domain === '') {
-            throw new InvalidArgumentException('Domain cannot be empty');
+        if ('' === $domain) {
+            throw new \InvalidArgumentException('Domain cannot be empty');
         }
+
         return $domain;
     }
 
     /**
-     * Checks if the IP address is authorized in the SPF record
+     * Checks if the IP address is authorized in the SPF record.
      *
-     * @param string $ip
-     * @param string $spf
-     * @param list<string> $visitedIncludes
+     * @param list<string>          $visitedIncludes
      * @param list<ValidationIssue> $issues
-     * @return bool
      */
     private function isIpAuthorized(string $ip, string $spf, array $visitedIncludes = [], array &$issues = []): bool
     {
@@ -285,12 +278,14 @@ final class DomainEmailAnalyser
         if (preg_match_all('/ip4:([0-9\.\/]+)/', $spf, $matches)) {
             foreach ($matches[1] as $cidr) {
                 try {
-                    if ($this->cidrMatch($ip, $cidr)) return true;
-                } catch (InvalidArgumentException $e) {
+                    if ($this->cidrMatch($ip, $cidr)) {
+                        return true;
+                    }
+                } catch (\InvalidArgumentException $e) {
                     $issues[] = new ValidationIssue(
                         'spf',
                         sprintf('Invalid CIDR record: %s', $cidr),
-                        Severity::Error
+                        Severity::Error,
                     );
                 }
             }
@@ -298,12 +293,14 @@ final class DomainEmailAnalyser
         if (preg_match_all('/ip6:([a-f0-9:\/]+)/', $spf, $matches)) {
             foreach ($matches[1] as $cidr) {
                 try {
-                    if ($this->cidrMatch($ip, $cidr)) return true;
-                } catch (InvalidArgumentException $e) {
+                    if ($this->cidrMatch($ip, $cidr)) {
+                        return true;
+                    }
+                } catch (\InvalidArgumentException $e) {
                     $issues[] = new ValidationIssue(
                         'spf',
                         sprintf('Invalid CIDR record: %s', $cidr),
-                        Severity::Error
+                        Severity::Error,
                     );
                 }
             }
@@ -330,11 +327,7 @@ final class DomainEmailAnalyser
     }
 
     /**
-     * Checks if the IP address matches the CIDR notation
-     *
-     * @param string $ip
-     * @param string $cidr
-     * @return bool
+     * Checks if the IP address matches the CIDR notation.
      */
     private function cidrMatch(string $ip, string $cidr): bool
     {
@@ -342,41 +335,41 @@ final class DomainEmailAnalyser
         $cidr = trim($cidr);
 
         // Append default CIDR if missing
-        if (strpos($cidr, '/') === false) {
-            $cidr .= strpos($ip, ':') === false ? '/32' : '/128';
+        if (false === strpos($cidr, '/')) {
+            $cidr .= false === strpos($ip, ':') ? '/32' : '/128';
         }
 
         list($subnet, $mask) = explode('/', $cidr);
-        $mask = (int)$mask;
+        $mask = (int) $mask;
 
         // Detect IPv4
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
+        if (false !== filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             if ($mask < 0 || $mask > 32) {
-                throw new InvalidArgumentException(sprintf('Invalid IPv4 CIDR mask %d for IP %s', $mask, $ip));
+                throw new \InvalidArgumentException(sprintf('Invalid IPv4 CIDR mask %d for IP %s', $mask, $ip));
             }
 
             $ipLong = ip2long($ip);
             $subnetLong = ip2long($subnet);
-            $maskLong = $mask === 0 ? 0 : (0xFFFFFFFF << (32 - $mask)) & 0xFFFFFFFF;
+            $maskLong = 0 === $mask ? 0 : (0xFFFFFFFF << (32 - $mask)) & 0xFFFFFFFF;
 
             return ($ipLong & $maskLong) === ($subnetLong & $maskLong);
         }
 
         // Detect IPv6
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
+        if (false !== filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
             if ($mask < 0 || $mask > 128) {
-                throw new InvalidArgumentException(sprintf('Invalid IPv6 CIDR mask %d for IP %s', $mask, $ip));
+                throw new \InvalidArgumentException(sprintf('Invalid IPv6 CIDR mask %d for IP %s', $mask, $ip));
             }
 
             $ipBin = inet_pton($ip);
             $subnetBin = inet_pton($subnet);
-            if ($ipBin === false || $subnetBin === false) {
-                throw new InvalidArgumentException("Invalid IPv6 address or subnet");
+            if (false === $ipBin || false === $subnetBin) {
+                throw new \InvalidArgumentException('Invalid IPv6 address or subnet');
             }
 
             $maskLeft = $mask;
 
-            for ($i = 0; $i < 16; $i++) {
+            for ($i = 0; $i < 16; ++$i) {
                 $bits = min($maskLeft, 8);
                 $maskLeft -= $bits;
                 $maskByte = (0xFF << (8 - $bits)) & 0xFF;
@@ -384,17 +377,15 @@ final class DomainEmailAnalyser
                     return false;
                 }
             }
+
             return true;
         }
 
-        throw new InvalidArgumentException(sprintf('Invalid IP address: %s', $ip));
+        throw new \InvalidArgumentException(sprintf('Invalid IP address: %s', $ip));
     }
 
     /**
-     * Validate TLS certificate of an MX host
-     *
-     * @param string $host
-     * @return bool|int
+     * Validate TLS certificate of an MX host.
      */
     private function validateMxTls(string $host): bool|int
     {
@@ -406,7 +397,7 @@ final class DomainEmailAnalyser
                 'capture_peer_cert' => true,
                 'verify_peer' => true,
                 'verify_peer_name' => true,
-            ]
+            ],
         ]);
 
         $client = @stream_socket_client("ssl://{$host}:{$port}", $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $context);
@@ -419,7 +410,7 @@ final class DomainEmailAnalyser
         if (isset($params['options']['ssl']) && is_array($params['options']['ssl'])) {
             $cert = $params['options']['ssl']['peer_certificate'] ?? null;
         }
-        if (!($cert instanceof OpenSSLCertificate || is_string($cert))) {
+        if (!($cert instanceof \OpenSSLCertificate || is_string($cert))) {
             return false;
         }
 

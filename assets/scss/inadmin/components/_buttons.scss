@@ -1,146 +1,223 @@
 @use '../definitions' as *;
 @use 'sass:color';
 
-.button,
-.button:visited {
-    background-color: $bg-surface;
-    border: 1px solid $border-color-input;
-    border-radius: $radius-standard;
-    padding: 0.5em 0.75em;
+.btn,
+.btn:visited {
+  align-items: center;
+  background-color: $bg-surface;
+  border: 1px solid transparent;
+  border-radius: $radius-standard;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  gap: 0.5rem;
+  justify-content: center;
+  line-height: 1.25;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  text-wrap-mode: nowrap;
+  transition:
+    background-color $transition-base,
+    border-color $transition-base,
+    box-shadow $transition-base,
+    transform $transition-base,
+    filter $transition-base;
+  user-select: none;
+  white-space: nowrap;
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:hover {
+    background-color: $color-neutral-250;
     text-decoration: none;
-    text-wrap-mode: nowrap;
-    transition: background-color 0.2s ease;
+  }
 
-    &.button--large {
-        display: block;
-        padding: 1rem;
-        text-align: center;
-        text-transform: uppercase;
-        text-wrap: auto;
-        width: 100%;
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+  }
+
+  &:disabled,
+  &.is-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .material-icons,
+  .material-symbols-outlined {
+    font-size: 1.125rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  // -------------------------------------------------------------------------
+  // Variants
+  // -------------------------------------------------------------------------
+
+  &.btn--primary,
+  &.btn--add {
+    background-color: $color-primary;
+    border-color: $color-primary;
+    color: #ffffff;
+
+    &:hover {
+      background-color: $color-primary-hover;
+      border-color: $color-primary-hover;
+      color: #ffffff;
     }
+  }
 
-    .btn-text {
-        display: none;
+  &.btn--secondary {
+    background-color: $color-button-default-bg;
+    border-color: $color-button-default-bg;
+    color: $text-main;
+
+    &:hover {
+      background-color: $color-button-default-hover;
+      border-color: $color-button-default-hover;
+    }
+  }
+
+  &.btn--danger {
+    background-color: $color-danger-500;
+    border-color: $color-danger-500;
+    color: $text-inverse;
+
+    &:hover {
+      filter: brightness(0.9);
+      color: $text-inverse;
+    }
+  }
+
+  &.btn--outline {
+    background-color: transparent;
+    border-color: $color-outline;
+    color: $text-main;
+
+    &:hover {
+      background-color: $bg-body;
+      border-color: $color-outline-hover;
+    }
+  }
+
+  &.btn--info {
+    background-color: $color-info-500;
+    border-color: $color-info-500;
+    color: $text-inverse;
+
+    &:hover {
+      background-color: $color-info-700;
+      border-color: $color-info-700;
+    }
+  }
+
+  &.btn--ghost {
+    background-color: transparent;
+    border-color: transparent;
+    color: $text-muted;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+      color: $text-main;
+    }
+  }
+
+  &.btn--menu {
+    float: left;
+    padding: 5px 10px;
+  }
+
+  &.btn--action {
+    input {
+      color: $text-inverse;
+      border: none;
+      margin-top: 5px;
+      padding: 5px 10px;
+      background-color: $color-info-700;
+    }
+  }
+
+  &.btn--switch {
+    input:checked + label {
+      background-color: $action-primary;
+      border-color: $action-primary;
+      color: $text-inverse;
     }
 
     &:hover {
-        background-color: $color-neutral-250;
+      background-color: $action-primary-hover;
+    }
+  }
+
+  &.btn--ai {
+    background: linear-gradient(90deg, #069, #0063a7, #005fb4, #0059c0, #1751c9, #3e46ce, #5d35cf, #7914cc);
+    border-color: #470099;
+    color: $text-inverse;
+    transition: background 0.3s ease;
+
+    &:hover {
+      filter: brightness(1.1);
+      border-color: $alert-warning-border;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Sizes & Icon Modifiers
+  // -------------------------------------------------------------------------
+
+  &.btn--sm {
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+
+    .material-icons {
+      font-size: 1rem;
+    }
+  }
+
+  &.btn--lg {
+    display: flex;
+    width: 100%;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    text-align: center;
+  }
+
+  &.btn--full {
+    display: flex;
+    width: 100%;
+    text-align: center;
+  }
+
+  &.btn--caps {
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+
+  &.btn--icon-only {
+    padding: 0.5rem;
+    border-radius: $radius-round;
+
+    span:not(.material-icons) {
+      display: none;
     }
 
-    &:disabled {
-        opacity: 0.5;
+    .material-icons {
+      display: inline-block;
+      font-size: 1.25rem;
     }
+  }
 
-    span:nth-of-type(2),
-    i:nth-last-of-type(1) {
-        margin-top: 0.2em;
+  @media (min-width: $breakpoint-medium) {
+    .btn-text {
+      display: inline;
     }
-
-    span,
-    i {
-        display: inline-block;
-        vertical-align: middle;
-    }
-
-    &.button--positive {
-        background-color: $success-color;
-        color: $text-inverse;
-
-        &:hover {
-            background-color: $action-primary-hover;
-        }
-    }
-
-    &.button--secondary {
-        background-color: $color-button-default-bg;
-        border-color: $color-button-default-bg;
-
-        &:hover {
-            background-color: $color-button-default-hover;
-        }
-    }
-
-    &.button--negative {
-        background-color: $color-danger-500;
-        border-color: $color-danger-500;
-        color: $text-inverse;
-
-        &:hover {
-            background-color: var(--color-danger-300);
-        }
-    }
-
-    &.button--info {
-        background-color: $color-info-500;
-        border-color: $color-info-500;
-        color: $text-inverse;
-
-        &:hover {
-            background-color: $color-info-700;
-        }
-    }
-
-    &.button--menu {
-        float: left;
-        padding: 5px 10px;
-    }
-
-    &.button--add {
-        background-color: $action-primary;
-        border-color: $action-primary;
-        color: $text-inverse;
-
-        &:hover {
-            background-color: $action-primary-hover;
-        }
-    }
-
-    &.button--action {
-        input {
-            color: $text-inverse;
-            border: none;
-            margin-top: 5px;
-            padding: 5px 10px;
-            background-color: $color-info-700;
-        }
-    }
-
-    &.button--switch {
-        input:checked+label {
-            background-color: $action-primary;
-            border-color: $action-primary;
-            color: $text-inverse;
-        }
-
-        &:hover {
-            background-color: $action-primary-hover;
-        }
-    }
-
-    &.button--ai {
-        background: linear-gradient(90deg, #069, #0063a7, #005fb4, #0059c0, #1751c9, #3e46ce, #5d35cf, #7914cc); // Keeping as specific gradient unless requested otherwise
-        border-color: #470099;
-        color: $text-inverse;
-        transition: background 0.3s ease;
-
-        &:hover {
-            background: linear-gradient(90deg,
-                    $color-brand-400,
-                    color.adjust(#0063a7, $lightness: 10%),
-                    color.adjust(#005fb4, $lightness: 10%),
-                    color.adjust(#0059c0, $lightness: 10%),
-                    color.adjust(#1751c9, $lightness: 10%),
-                    color.adjust(#3e46ce, $lightness: 10%),
-                    color.adjust(#5d35cf, $lightness: 10%),
-                    color.adjust(#7914cc, $lightness: 10%));
-            border-color: $alert-warning-border;
-        }
-    }
-
-    @media (min-width: $breakpoint-medium) {
-        .btn-text {
-            display: inline;
-        }
-    }
+  }
 }

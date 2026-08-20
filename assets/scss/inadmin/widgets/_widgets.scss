@@ -1,59 +1,143 @@
 @use '../definitions' as *;
 
-div.widget-container {
+.widget-container {
   display: grid;
-  flex-wrap: $gutter;
   gap: $gutter;
-  grid-template-columns: repeat(
-    auto-fit,
-    minmax(240px, 1fr)
-  );
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   margin-bottom: 2rem;
 }
 
-
-section.widget-settings {
+.widget-settings {
   background: $bg-surface;
   border: 1px solid $border-color;
   border-radius: $radius-standard;
-  display: grid;
-  grid-template-rows: auto auto auto 1fr auto;
-  height: 100%;
-  margin: 1em;
-  max-width: 250px;
-  min-width: 225px;
-  padding: 1.25rem;
-  text-align: center;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  width: 25%;
+  transition: transform $transition-base, box-shadow $transition-base, border-color $transition-base;
 
-  & p:last-child {
-    margin-top: auto;
-  }
   &:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    border-color: $border-color-dark;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
     transform: translateY(-2px);
-  }
 
-  &.widget-settings--danger {
-    border: 1px solid $diagnostic-error;
-    background: $diagnostic-error;
-    color: $text-inverse;
-
-    h2 {
-      color: $text-inverse;
+    .btn--secondary {
+      background-color: $color-button-default-hover;
     }
-    .button {
-      background: $bg-surface;
-      color: $diagnostic-error;
+
+    .btn--danger {
+      background-color: var(--color-danger-300, #cc0000);
     }
   }
 
-  .material-icons {
-    font-size: 5em;
+  div.widget-settings__link {
+    cursor: default;
   }
 
-  p span {
-    font-size: 0.85em;
+  // Full card interactive link target wrapper
+  &__link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding: 1.5rem 1.25rem;
+    text-decoration: none;
+    color: inherit;
+    text-align: center;
+  }
+
+  // Icon Badge Container
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-bottom: 1rem;
+    background-color: $bg-panel;
+    border-radius: $radius-round;
+    color: $action-primary;
+
+    .material-icons {
+      font-size: 2rem;
+    }
+  }
+
+  h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: $text-main;
+  }
+
+  &__desc {
+    font-size: 0.875rem;
+    color: $text-muted;
+    line-height: 1.4;
+    margin: 0 0 1.5rem 0;
+
+    strong {
+      color: $color-danger-500;
+    }
+  }
+
+  &__action {
+    margin-top: auto;
+
+    .btn {
+      pointer-events: none;
+      display: inline-block;
+    }
+  }
+
+  &--warning {
+    .widget-settings__icon {
+      background-color: var(--color-flash-warning-bg);
+      color: var(--color-warning-700);
+    }
+  }
+  &--danger {
+    border-color: var(--color-danger-100, #ffcccc);
+
+    .widget-settings__icon {
+      background-color: var(--color-danger-100, #ffcccc);
+      color: $color-danger-500;
+    }
+
+    &:hover {
+      border-color: $color-danger-500;
+      box-shadow: 0 10px 20px rgba($color-danger-500, 0.12);
+    }
+  }
+
+  // Alert/OK Banners inside cards
+  .widget__alert,
+  .widget__ok {
+    width: 100%;
+    margin: 0 0 1rem 0;
+    padding: 0.75rem;
+    border-radius: $radius-standard;
+    font-size: 0.8125rem;
+    text-align: left;
+    line-height: 1.4;
+
+    p {
+      margin: 0 0 0.25rem 0;
+    }
+
+    ul {
+      list-style-type: disc;
+      margin: 0;
+      padding-left: 1.25rem;
+    }
+  }
+
+  .widget__alert {
+    background-color: var(--color-flash-warning-bg);
+    color: var(--color-flash-warning-text);
+    border: 1px solid var(--color-warning-200);
+  }
+
+  .widget__ok {
+    background-color: var(--color-flash-success-bg);
+    color: var(--color-flash-success-text);
+    border: 1px solid var(--color-success-500);
   }
 }

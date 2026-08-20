@@ -5,10 +5,10 @@
 <div class="col-12">
 <div class="container__login">
     {{ form_start(form, {attr: {class: 'form form__login', autocomplete: false}}) }}
-    <img src="/assets/imgs/incc/inachis.png" height="56.9" title="inachis logo" width="80" />
+    <img src="/assets/imgs/incp/inachis.png" height="56.9" title="inachis logo" width="80" />
     <h1>{{ page_title }}</h1>
-    {% if settings.siteTitle is defined %}
-    <h2>{{ settings.siteTitle }}</h2>
+    {% if viewModel.settings.siteTitle is defined %}
+    <h2>{{ viewModel.settings.siteTitle }}</h2>
     {% endif %}
 
     {% include 'inadmin/partials/flashes.html.twig' %}

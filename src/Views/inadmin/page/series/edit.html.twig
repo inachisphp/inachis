@@ -1,12 +1,12 @@
 {% extends "inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_series_list') }}">Series</a>
+    <a href="{{ path('incp_series_list') }}">Series</a>
     <span>{% if series.id is empty %}New{% else %}Edit{% endif %} Series</span>
 {% endblock pagetitle %}
 
 {% block content %}
-{% set showStats = series.id is not empty and series.visibility == '1' %}
+{% set showStats = series.id is not empty and series.visible == '1' %}
 
 {{ form_start(form, {'attr': { 'class': 'col-12 form form__post form__series' }}) }}
 <div class="content__edit">
@@ -22,7 +22,7 @@
         </li>
         {% endif %}
         {% if showStats %}
-        <li data-source="{{ path('incc_api_series_stats', { 'id': series.id }) }}" class="tab--lazyload">
+        <li data-source="{{ path('incp_api_series_stats', { 'id': series.id }) }}" class="tab--lazyload">
             <a href="#series__stats">{% trans %}admin.posts.tabs.stats{% endtrans %}</a>
         </li>
         {% endif %}
@@ -51,15 +51,15 @@
         <p>
             {{ form_label(form.url) }}
             {{ form_errors(form.url) }}
-            {{ settings.domain -}}/{{ series.firstDate|date('Y') }}-{{ form_widget(form.url) }}
+            {{ viewModel.settings.domain -}}/{{ series.firstDate|date('Y') }}-{{ form_widget(form.url) }}
             <span class="admonition admonition__info">The year is defined by the last date of the series</span>
         </p>
         {% if series.items is not empty %}
         <p>
-            {{ form_label(form.visibility) }}
-            {{ form_errors(form.visibility) }}
+            {{ form_label(form.visible) }}
+            {{ form_errors(form.visible) }}
             <span class="switch-wrapper">
-                {{ form_widget(form.visibility) }}
+                {{ form_widget(form.visible) }}
             </span>
         </p>
             {{ form_widget(form.firstDate) }}
@@ -84,17 +84,21 @@
 
 <div class="fixed-bottom-bar">
     <p>
+        {% if form.submit is defined %}
         {{ form_widget(form.submit) }}
-        {%  if series.id is not empty %}
-        {{ form_widget(form.delete) }}
         {% endif %}
         {%  if series.id is not empty and series.items|length > 0 %}
-            <a class="button button--secondary" href="{{ path('web_series_view', { 'year': series.lastDate|date('Y'), 'title': series.url}) }}" target="_blank" title="View Live"><span class="material-icons" aria-hidden="true">exit_to_app</span> View Live</a>
+            <a class="btn btn--secondary" href="{{ path('web_series_view', { 'year': series.lastDate|date('Y'), 'title': series.url}) }}" target="_blank" title="View Live"><span class="material-icons" aria-hidden="true">exit_to_app</span> View Live</a>
+        {% endif %}
+        {%  if series.id is not empty and series.items|length > 0 and form.remove is defined %}
             <span class="series__controls visually-hidden">
             with selected:
             {{ form_widget(form.remove) }}
+            </span>
         {%  endif %}
-        </span>
+        {%  if series.id is not empty and form.delete is defined %}
+        {{ form_widget(form.delete) }}
+        {% endif %}
     </p>
 </div>
 

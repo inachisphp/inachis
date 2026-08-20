@@ -8,7 +8,7 @@
     <div class="col-12">
         {% include 'inadmin/partials/tab-sets/users.html.twig' %}
 
-        {% include 'inadmin/partials/table.html.twig' with {
+        {% include 'inadmin/partials/components/view_content.html.twig' with {
             className: 'form__users',
             type: 'users',
 
@@ -25,6 +25,12 @@
                 {
                     title: 'Username',
                     source: 'username',
+                },
+                {
+                    title: 'Roles',
+                    source: 'assignedRoles',
+                    source_type: 'object',
+                    object_field: 'name',
                 },
                 {
                     title: 'Status',
@@ -47,13 +53,28 @@
                     },
                 },
                 {
+                    title: '2FA Status',
+                    badges: {
+                        '2FA': {
+                            field: 'isTotpEnabled',
+                            condition: true,
+                            className: 'badge__active',
+                        },
+                        'n/a': {
+                            default: true,
+                        }
+
+                    }
+                },
+                {
                     title: 'Last Login',
-                    source: '',
+                    source: 'lastLoginAt',
+                    source_type: 'date',
                     hideOnMobile: true,
                 },
                 {
-                    title: 'Password Last Modified',
-                    source: 'passwordModDate',
+                    title: 'Password Modified',
+                    source: 'passwordChangedAt',
                     source_type: 'date',
                     hideOnMobile: true,
                 },
@@ -65,38 +86,76 @@
 
             slug_prefix: 'admin',
 
-            filters: [],
+            'filters': {
+                'Status': {
+                    '': 'All',
+                    'enabled': 'Enabled',
+                    'disabled': 'Disabled',
+                },
+                'Role': { '': 'All'}|merge(roles),
+                'Last Sign-in': {
+                    '': 'All',
+                    '30': 'Over 30 days',
+                    '90': 'Over 90 days',
+                    '180': 'Over 180 days',
+                    '365': 'Over 365 days',
+                },
+                'Password Modified': {
+                    '': 'All',
+                    '30': 'Over 30 days',
+                    '90': 'Over 90 days',
+                    '180': 'Over 180 days',
+                    '365': 'Over 365 days',
+                },
+                '2FA Status': {
+                    '': 'All',
+                    'enabled': 'Enabled',
+                    'disabled': 'Disabled',
+                },
+            },
             filter_values: query.filters,
             show_search: true,
-            show_select_deselect: true,
-
-            add_button: {
-                text: 'Create Admin',
-                url: path('incc_admin_edit', { id: 'new' }),
+            search_placeholder: 'Search users…',
+            show_select_deselect: can('USER', ['EDIT', 'DELETE']),
+            sort_options: {
+                'createdAt desc': 'Created: Newest',
+                'createdAt asc': 'Created: Oldest',
+                'updatedAt desc': 'Modified: Newest',
+                'updatedAt asc': 'Modified: Oldest',
+                'displayName desc': 'Name: Z-A',
+                'displayName asc': 'Name: A-Z',
+                'username asc': 'Username: A-Z',
+                'username desc': 'Username: Z-A',
             },
 
-            url_result: path('incc_admin_list'),
+            add_button: can('USER', 'CREATE') ? {
+                image: 'person_add',
+                text: 'Create Admin',
+                url: path('incp_admin_edit', { id: 'new' }),
+            } : null,
+
+            url_result: path('incp_admin_list'),
             zebra: true,
 
             actions: {
-                enable: {
-                    button_class: 'button--secondary',
+                enable: can('USER', 'EDIT') ? {
+                    button_class: 'btn--secondary',
                     'data': {
                         'form-action': '',
                     },
                     icon: 'person_outline',
                     title: 'admin.button.enable'|trans,
-                },
-                disable: {
-                    button_class: 'button--secondary',
+                } : null,
+                disable: can('USER', 'EDIT') ? {
+                    button_class: 'btn--secondary',
                     'data': {
                         'form-action': '',
                     },
                     icon: 'person_off',
                     title: 'admin.button.disable'|trans,
-                },
-                delete: {
-                    button_class: 'button--negative button--delete button--confirm',
+                } : null,
+                delete: can('USER', 'DELETE') ? {
+                    button_class: 'btn--danger btn--delete btn--confirm',
                     'data': {
                         'confirm': 'delete',
                         'confirm-text': 'Yes, delete',
@@ -109,8 +168,10 @@
                     name: 'delete',
                     value: '1',
                     title: 'Delete',
-                }
-            }
+                } : null,
+            }|filter(v => v is not null),
+            view_setting: 'table',
+
         } %}
     </div>
 {% endblock content %}

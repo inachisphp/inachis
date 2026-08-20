@@ -16,11 +16,11 @@
             </li>
         {% endfor %}
     </ol>
-    {{ include('inadmin/partials/pagination.html.twig', {
+    {{ include('inadmin/partials/components/pagination.html.twig', {
         offset: query.offset,
         limit: query.limit,
         maxPagesToShow: 5,
-        result_url: path('incc_resource_list', { type: 'images' }),
+        result_url: path('incp_resource_list', { type: 'images' }),
         showSummary: false,
         total: images.count,
     }) }}

@@ -1,78 +1,78 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Admin;
 
-use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Form\ChangePasswordType;
-use Inachis\Repository\UserRepository;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Inachis\Repository\User\UserRepository;
+use Inachis\Security\Authentication\TrustedDeviceManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Validator\Constraints\PasswordStrengthValidator;
 
+/**
+ * Controller used for changing password for an administrator {@link User}.
+ */
 class ChangePasswordController extends AbstractInachisController
 {
     /**
-     * Controller for the change-password tab in the admin interface
-     * @param Request $request
-     * @param UserPasswordHasherInterface $passwordHasher
-     * @param UserRepository $userRepository
-     * @return Response
+     * Controller for the change-password tab in the admin interface.
      */
-    #[Route("/incc/admin/{id}/change-password", name: "incc_admin_change_password", methods: [ "GET", "POST" ])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/incp/admin/{id}/change-password', name: 'incp_admin_change_password', methods: ['GET', 'POST'])]
     public function changePasswordTab(
         Request $request,
+        TrustedDeviceManager $trustedDeviceManager,
         UserPasswordHasherInterface $passwordHasher,
         UserRepository $userRepository,
     ): Response {
-        $user = $userRepository->findOneBy(['username' => $request->attributes->get('id')]);
+        /** @var \Inachis\Entity\User\User */
+        $currentUser = $this->security->getUser();
+        /** @var \Inachis\Entity\User\User|null */
+        $user = $userRepository->findOneBy(['username' => $request->attributes->getString('id')]);
+        if (!$user) {
+            throw new AccessDeniedHttpException();
+        }
+
         $form = $this->createForm(
             ChangePasswordType::class,
             null,
             [
-                'last_modified' => $this->security->getUser()->getPasswordModDate()->format('d F Y'),
-            ]
+                'last_modified' => $currentUser->getPasswordChangedAt()?->format('d F Y'),
+            ],
         );
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid() && $user->getId() === $this->security->getUser()->getId()) {
+        if ($form->isSubmitted() && $form->isValid() && $user->getId() === $currentUser->getId()) {
+            /** @var string */
             $plaintextPassword = $request->request->all('change_password')['new_password'];
+            if (str_contains(strtolower($plaintextPassword), strtolower($user->getUsername() ?: ''))) {
+                throw new \Exception('Your password cannot contain username.');
+            }
             $hashedPassword = $passwordHasher->hashPassword($user, $plaintextPassword);
             $user->setPassword($hashedPassword);
-            $user->setPasswordModDate(new DateTimeImmutable());
+            $user->setPasswordChangedAt(new \DateTimeImmutable());
             if (!$passwordHasher->isPasswordValid($user, $plaintextPassword)) {
                 throw new AccessDeniedHttpException();
             }
-            $this->addFlash('success', 'Password updated.');
+            $trustedDeviceManager->removeAll($user);
             $this->entityManager->flush();
+            $this->addFlash('success', 'Password updated.');
         }
-        $this->data['user'] = $user;
-        $this->data['form'] = $form->createView();
-        $this->data['page']['title'] = 'Change Password';
-        $this->data['page']['tab'] = 'users';
-        return $this->render('inadmin/page/admin/change-password.html.twig', $this->data);
-    }
 
-    /**
-     * Returns a JSON object containing the result of calculating the password strength entropy
-     * @param Request $request
-     * @return JsonResponse
-     */
-    #[Route("/incc/ax/calculate-password-strength", name:"incc_admin_calculate-password-strength", methods: [ "POST" ])]
-    public function calculatePasswordStrength(Request $request): JsonResponse
-    {
-        return new JsonResponse(PasswordStrengthValidator::estimateStrength($request->request->get('password')));
+        $this->viewModel->page->title = 'Change Password';
+        $this->viewModel->page->tab = 'change-password';
+
+        return $this->render('inadmin/page/admin/change-password.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'user' => $user,
+        ]);
     }
 }

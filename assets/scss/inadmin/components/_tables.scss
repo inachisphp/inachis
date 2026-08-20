@@ -12,12 +12,12 @@
   scrollbar-color: $border-color transparent;
 
   &::-webkit-scrollbar {
-    height: 8px;
+    height: 6px;
   }
 
   &::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: $radius-round;
+    background-color: rgba(0, 0, 0, 0.15);
   }
 
   &::before,
@@ -32,12 +32,12 @@
 
   &::before {
     left: 0;
-    background: linear-gradient(to right, rgba(0, 0, 0, 0.2), transparent);
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.08), transparent);
   }
 
   &::after {
     right: 0;
-    background: linear-gradient(to left, rgba(0, 0, 0, 0.2), transparent);
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.08), transparent);
   }
 }
 
@@ -49,7 +49,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   background-color: $bg-surface;
-  font-size: 0.95rem;
+  font-size: 0.9375rem;
   line-height: 1.4;
 
   // Caption
@@ -71,6 +71,12 @@ table {
       font-weight: 600;
       text-align: left;
       white-space: nowrap;
+      letter-spacing: 0.015em;
+    }
+
+    tr th.table-header-alternate {
+      background-color: #000000;
+      text-align: center;
     }
   }
 
@@ -81,13 +87,40 @@ table {
 
   .badgecol {
     text-align: center;
-    width: 6rem;
+    max-width: 40ch;
+  }
+
+  .col-select {
+    width: 3ch;
+  }
+
+  .col-count {
+    width: 12ch;
+    text-align: center;
+    white-space: nowrap;
+    text-wrap: wrap;
+  }
+
+  .col-date {
+    width: 13ch;
+    white-space: nowrap;
+    text-wrap: wrap;
+  }
+
+  .col-datetime {
+    width: 22ch;
+    white-space: nowrap;
+    text-wrap: wrap;
   }
 
   // Body
   tbody {
+    th {
+      text-align: left;
+    }
+
     tr {
-      transition: background 0.15s ease;
+      transition: background-color $transition-base;
 
       &:hover {
         background-color: $color-neutral-100;
@@ -99,6 +132,16 @@ table {
       padding: 0.75rem 1rem;
       vertical-align: middle;
       border-bottom: 1px solid $border-color-dark;
+
+      a {
+        color: $text-main;
+        text-decoration: none;
+        transition: color $transition-base;
+
+        &:hover {
+          color: $color-primary;
+        }
+      }
     }
   }
 }
@@ -109,7 +152,6 @@ table {
 
 // Borderless table
 .table--borderless {
-
   tbody td,
   tbody th {
     border: none !important;
@@ -151,7 +193,6 @@ td.column--monospaced {
 
 // Compact mode
 .table--compact {
-
   thead th,
   tbody td {
     padding: 0.5rem 0.75rem;
@@ -160,19 +201,17 @@ td.column--monospaced {
 
 // Dense mode
 .table--dense {
-
   thead th,
   tbody td {
     padding: 0.35rem 0.5rem;
+    font-size: 0.8125rem;
   }
 }
 
 // Automatically switch to dense mode on small screens
 @media (max-width: $breakpoint-small) {
-
   .table--compact,
   .table--dense {
-
     thead th,
     tbody td {
       padding: 0.3rem 0.5rem;
@@ -194,6 +233,12 @@ td.column--monospaced {
   tr td:first-child,
   tr th:first-child {
     width: 0.8em;
+
+    input[type="checkbox"],
+    input[type="radio"] {
+      accent-color: $color-primary;
+      cursor: pointer;
+    }
   }
 
   th[scope="row"] {
@@ -213,8 +258,8 @@ td.column--monospaced {
 
 .table--focusable td:focus,
 .table--focusable th:focus {
-  outline: 3px solid $color-focus;
-  outline-offset: 2px;
+  outline: 2px solid $color-primary;
+  outline-offset: -2px;
 }
 
 // ---------------------------------------------------------------------------
@@ -226,6 +271,11 @@ td.column--monospaced {
   user-select: none;
   position: relative;
   padding-right: 1.75rem;
+  transition: background-color $transition-base;
+
+  &:hover {
+    filter: brightness(0.95);
+  }
 
   &::after {
     content: "⇅";
@@ -280,9 +330,10 @@ td.column--monospaced {
   position: absolute;
   pointer-events: none;
   opacity: 0.95;
-  background: #f0f8ff;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  background: $bg-surface;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
   z-index: 1000;
+  border-radius: $radius-standard;
   transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
 
   input {
@@ -290,8 +341,8 @@ td.column--monospaced {
   }
 
   &.lifted {
-    transform: scale(1.03);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    transform: scale(1.02);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
   }
 
   &.fade-out {
@@ -326,7 +377,7 @@ td.column--monospaced {
 }
 
 .table--sticky-header thead {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .table--sticky-col tbody td:first-child,
@@ -347,9 +398,7 @@ td.column--monospaced {
 // MOBILE / RESPONSIVE TABLE IMPROVEMENTS
 // ---------------------------------------------------------------------------
 
-// Convert table to flex/grid for mobile
 @media (max-width: $breakpoint-medium) {
-
   .table-responsive table,
   .table-responsive tbody,
   .table-responsive tr,
@@ -358,7 +407,6 @@ td.column--monospaced {
     display: block;
   }
 
-  // Hide columns marked for mobile
   .hide-on-mobile {
     display: none !important;
   }
@@ -368,6 +416,7 @@ td.column--monospaced {
     border: 1px solid $border-color-dark;
     border-radius: $radius-standard;
     padding: 0.5rem;
+    background-color: $bg-surface;
   }
 
   tbody td {
@@ -393,7 +442,6 @@ td.column--monospaced {
   }
 }
 
-// Card-style layout for very small screens
 @media (max-width: $table-mobile-break) {
   .table--cards {
     thead {
@@ -406,6 +454,7 @@ td.column--monospaced {
       border: 1px solid $border-color-dark;
       border-radius: $radius-standard;
       padding: 0.5rem;
+      background-color: $bg-surface;
     }
 
     tbody td {
@@ -437,7 +486,7 @@ td.column--monospaced {
   &:hover {
     overflow: visible;
     white-space: normal;
-    background: #fff;
+    background: $bg-surface;
     position: relative;
     z-index: 10;
   }
@@ -448,7 +497,7 @@ td.column--monospaced {
 // ---------------------------------------------------------------------------
 
 .table--expandable tbody tr {
-  transition: background 0.2s ease;
+  transition: background-color $transition-base;
 
   &.expanded {
     background-color: $table-expandable--expanded;
@@ -468,7 +517,54 @@ td.column--monospaced {
   }
 }
 
-.table--expandable tr.expanded+.row-details {
+.table--expandable tr.expanded + .row-details {
   display: table-row;
-  max-height: 500px; // smooth transition
+  max-height: 500px;
+}
+
+// ---------------------------------------------------------------------------
+// PERMISSION MATRIX & SPECIAL STATES
+// ---------------------------------------------------------------------------
+
+.permission-matrix {
+  th, td {
+    padding: 0.5rem;
+    text-align: center;
+  }
+
+  td.cell--border-right {
+    border: 1px solid $border-color-dark;
+    width: 13ch;
+
+    &.permission--selected {
+      background-color: var(--color-progress-good);
+    }
+
+    &.permission--implied {
+      opacity: 0.75;
+    }
+  }
+
+  thead tr th,
+  tbody th {
+    text-align: left;
+  }
+
+  input.permission-matrix__checkbox {
+    width: 3.25rem;
+    accent-color: $color-primary;
+  }
+
+  span.material-icons {
+    vertical-align: middle;
+    margin-right: 0.5rem;
+  }
+}
+
+.row--disabled {
+  color: var(--color-neutral-450);
+}
+
+.table-danger {
+  background-color: var(--color-warning-200);
 }

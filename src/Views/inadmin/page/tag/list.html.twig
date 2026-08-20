@@ -7,7 +7,7 @@
 {% block content %}
 <div class="col-12">
     {% include 'inadmin/partials/tab-sets/posts.html.twig' %}
-	{% include 'inadmin/partials/table.html.twig' with {
+	{% include 'inadmin/partials/components/view_content.html.twig' with {
 		className: 'form__tag col-6',
 		type: 'tag',
 		additional_classes: 'default',
@@ -26,26 +26,28 @@
 			{
 				title: 'Usage',
 				source: 'usageCount',
+				source_type: 'numeric',
 			}
 		],
 
 		limit: query.limit,
 		offset: query.offset,
 		total: total,
-		url_result: path('incc_tags_list'),
+		url_result: path('incp_tags_list'),
 
 		show_select_deselect: true,
+		view_setting: 'table',
 		zebra: true,
 
 		actions: {
 			merge: {
-				button_class: 'button--neutral button--merge',
+				button_class: 'btn--neutral btn--merge',
 				href: '#',
 				icon: 'merge',
 				title: 'Merge',
 			},
 			delete: {
-				button_class: 'button--negative button--delete',
+				button_class: 'btn--danger btn--delete',
 				icon: 'delete_forever',
 				title: 'Delete',
 			},

@@ -1,27 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Import\Page;
 
-use Inachis\Entity\Category;
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Tag;
 
 /**
  * Mapper for importing pages.
  */
 final class PageImportMapper
 {
-    public function __construct(private EntityManagerInterface $entityManager) {}
+    public function __construct(private EntityManagerInterface $entityManager)
+    {
+    }
 
     /**
      * Resolve or create category chain from full path.
-     * @return Category The last Category in the path.
+     *
+     * @return Category the last Category in the path
      */
     public function resolveCategoryPath(string $fullPath, bool $createMissing = false): Category
     {
@@ -49,7 +52,8 @@ final class PageImportMapper
 
     /**
      * Resolve or create tag from title.
-     * @return Tag The tag.
+     *
+     * @return Tag the tag
      */
     public function resolveTag(string $title, bool $createMissing = false): Tag
     {

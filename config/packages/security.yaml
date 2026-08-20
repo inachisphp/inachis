@@ -5,7 +5,7 @@ security:
     providers:
         app_user_provider:
             entity:
-                class: Inachis\Entity\User
+                class: Inachis\Entity\User\User
                 property: username
 
     firewalls:
@@ -17,26 +17,26 @@ security:
             pattern: ^/health$
             security: false
 
-        incc:
-            pattern: ^/incc(/|$)
+        incp:
+            pattern: ^/incp(/|$)
             lazy: true
             stateless: false
             provider: app_user_provider
-            user_checker: Inachis\Security\UserChecker
+            user_checker: Inachis\Security\Authentication\UserChecker
 
             form_login:
-                login_path: incc_account_login
-                check_path: incc_account_login
+                login_path: incp_account_login
+                check_path: incp_account_login
                 username_parameter: login[loginUsername]
                 password_parameter: login[loginPassword]
                 csrf_parameter: login[_token]
-                default_target_path: incc_dashboard
+                default_target_path: incp_dashboard
                 use_referer: true
                 enable_csrf: true
 
             logout:
-                path: incc_logout
-                target: incc_account_login
+                path: incp_logout
+                target: incp_account_login
                 invalidate_session: true
                 delete_cookies:
                     PHPSESSID: null
@@ -51,8 +51,8 @@ security:
 
     access_control:
         - { path: ^/health$, roles: PUBLIC_ACCESS, ips: [127.0.0.1, ::1, 10.0.0.0/8, 192.168.0.0/16] }
-        - { path: ^/incc/(login|forgot-password|new-password|logout|ax/calculate-password-strength)$, roles: PUBLIC_ACCESS }
-        - { path: ^/incc, roles: ROLE_ADMIN }
+        - { path: ^/incp/(login|login/totp|login/recovery|forgot-password|new-password/?.*?|logout|api/calculate-password-strength)$, roles: PUBLIC_ACCESS }
+        - { path: ^/incp, roles: ROLE_USER }
         - { path: ^/.*, roles: PUBLIC_ACCESS }
 
 when@test:

@@ -5,13 +5,13 @@
     <dl>
     {% for item in items %}
         <dt>
-            <a aria-label="Edit {{ item.title }}" href="{{ '/incc/' ~ item.type ~ '/' ~ item.urls[0].link }}">
+            <a aria-label="Edit {{ item.title }}" href="{{ '/incp/' ~ item.type ~ '/' ~ item.urls[0].link }}">
                 {{ item.title }}{{ item.subtitle ? ' - ' ~ item.subtitle }}
                 {{ include('inadmin/partials/badge.html.twig', {
                     'item': item,
                     'badges': {
                         'private': {
-                        'field': 'visibility',
+                        'field': 'visible',
                         'condition': false,
                         'className': 'badge__private'
                     }
@@ -20,7 +20,7 @@
         </dt>
         <dd class="date">
             {% if item.status === 'draft' %}
-            Updated: <em>{{ item.modDate|date('jS F Y', item.timezone) }}</em>
+            Updated: <em>{{ item.updatedAt|date('jS F Y', item.timezone) }}</em>
             {% elseif item.postDate|date('U') > "now"|date('U') %}
             Scheduled for <em>{{ item.postDate|date('jS F Y \\a\\t H:i', item.timezone) }} {{ item.timezone }}</em>
             {% else %}
@@ -35,10 +35,9 @@
         <a aria-label="View all {{ view_all_label }}" href="{{ view_all_url }}">View all {{ view_all_label }} &rarr;</a>
     </p>
     {% endif %}
-
+</div>
 {% elseif empty_message %}
         <p>{{ empty_message }}</p>
 {% endif %}
-</div>
 
 {% endmacro %}

@@ -1,180 +1,101 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Dashboard;
 
-use DateTimeImmutable;
 use Inachis\Analytics\AnalyticsProviderInterface;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\{Image, Page, Series};
-use Inachis\Enum\EditorialStatus;
-use Inachis\Repository\{ImageRepository, PageRepository, SeriesRepository};
-use Symfony\Component\HttpFoundation\Request;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\SeriesRepository;
+use Inachis\Repository\Media\ImageRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 class DashboardController extends AbstractInachisController
 {
     /**
-     * @param Request $request The request made to the controller
-     * @return Response
+     * Provides the main dashboard.
      */
-    #[Route('/incc', name: "incc_dashboard", methods: [ 'GET' ])]
+    #[Route('/incp', name: 'incp_dashboard', methods: ['GET'])]
     public function default(
-        Request $request,
         AnalyticsProviderInterface $analytics,
         ImageRepository $imageRepository,
         PageRepository $pageRepository,
-        SeriesRepository $seriesRepository
+        SeriesRepository $seriesRepository,
     ): Response {
-        $this->data['page'] = [
-            'tab'   => 'dashboard',
-            'title' => 'Dashboard',
-        ];
-        $recentDraft = $pageRepository->getAll(
-            0,
-            1,
-            [
-                'q.status = :status',
-                [
-                    'status' => EditorialStatus::DRAFT,
-                ],
-            ],
-            [ ['q.modDate' , 'DESC'] ]
-        );
-        if ($recentDraft->count() > 0) {
-            $now = new DateTimeImmutable();
-            $recentDraftTimeAgo = $now->diff($recentDraft->getIterator()->current()->getModDate());
-        }
-        $this->data['dashboard'] = [
-            'draftCount' => 0,
-            'publishCount' => 0,
-            'upcomingCount' => 0,
-            'recentDraft' => $recentDraft,
-            'draftTimeAgo' => $recentDraftTimeAgo ?? 0,
-            'drafts' => $pageRepository->getAll(
-                0,
-                5,
-                [
-                    'q.status = :status',
-                    [
-                        'status' => EditorialStatus::DRAFT,
-                    ],
-                ],
-                'q.postDate ASC, q.modDate'
-            ),
-            'upcoming' => $pageRepository->getAll(
-                0,
-                5,
-                [
-                    'q.status = :status AND q.postDate > :postDate',
-                    [
-                        'status' => EditorialStatus::PUBLISHED,
-                        'postDate' => new DateTimeImmutable(),
-                    ],
-                ],
-                'q.postDate ASC, q.modDate'
-            ),
-            'posts' => $pageRepository->getAll(
-                0,
-                5,
-                [
-                    'q.status = :status AND q.postDate <= :postDate',
-                    [
-                        'status' => EditorialStatus::PUBLISHED,
-                        'postDate' => new DateTimeImmutable(),
-                    ],
-                ],
-                'q.postDate DESC, q.modDate'
-            ),
-            'draftSeries' => $seriesRepository->getAll(
-                0,
-                5,
-                [
-                    'q.visibility = :visibility',
-                    [
-                        'visibility' => Series::PRIVATE,
-                    ],
-                ],
-                'q.firstDate DESC, q.lastDate'
-            ),
-            'series' => $seriesRepository->getAll(
-                0,
-                5,
-                [
-                    'q.visibility != :visibility',
-                    [
-                        'visibility' => Series::PRIVATE,
-                    ],
-                ],
-                'q.firstDate DESC, q.lastDate'
-            )
-        ];
-        $this->data['dashboard']['analytics'] = [
-            'topPages' => $analytics->getTopPages(5),
-            'viewsToday' => $analytics->getTotalViews(
-                new DateTimeImmutable(),
-                new DateTimeImmutable()
-            ),
-            'viewsYesterday' => $analytics->getTotalViews(
-                new DateTimeImmutable('-1 day'),
-                new DateTimeImmutable('-1 day')
-            ),
-            'viewsThisMonth' => $analytics->getTotalViews(
-                new DateTimeImmutable('first day of this month'),
-                new DateTimeImmutable()
-            ),
-            'viewsLastMonth' => $analytics->getTotalViews(
-                new DateTimeImmutable('first day of last month'),
-                new DateTimeImmutable('last day of last month')
-            ),
-            'uniqueVisitorsThisMonth' => $analytics->getMonthlyUniqueVisitors(
-                new DateTimeImmutable('first day of this month'),
-                new DateTimeImmutable()
-            ),
-            'uniqueVisitorsLastMonth' => $analytics->getMonthlyUniqueVisitors(
-                new DateTimeImmutable('first day of last month'),
-                new DateTimeImmutable('last day of last month')
-            ),
-            // 'pageViewsPerDay' => $analytics->getPageViewsPerDay(
-            //     new DateTimeImmutable('-7 days'),
-            //     new DateTimeImmutable()
-            // ),
-        ];
-        $this->data['dashboard']['alerts'] = [
-            'altText' => [
-                'count' => $imageRepository->getImagesWithoutAltTextCount(),
-                // 'pages' => $imageRepository->getImagesWithoutAltText(5),
-            ],
-            'tags' => [
-                'count' => $pageRepository->getPagesWithoutTagsCount(),
-                // 'pages' => $pageRepository->getPagesWithoutTags(5),
-            ],
-            'categories' => [
-                'count' => $pageRepository->getPagesWithoutCategoriesCount(),
-                // 'pages' => $pageRepository->getPagesWithoutCategories(5),
-            ],
-            'featureImage' => [
-                'count' => $pageRepository->getPagesWithoutFeatureImageCount(),
-                // 'pages' => $pageRepository->getPagesWithoutFeatureImage(5),
-            ],
-            'sharingMessage' => [
-                'count' => $pageRepository->getPagesWithoutSharingMessageCount(),
-                // 'pages' => $pageRepository->getPagesWithoutSharingMessage(5),
-            ],
-        ];
-        $this->data['dashboard']['draftCount'] = $this->data['dashboard']['drafts']->count();
-        $this->data['dashboard']['upcomingCount'] = $this->data['dashboard']['upcoming']->count();
-        $this->data['dashboard']['publishCount'] = $this->data['dashboard']['posts']->count();
+        $this->viewModel->page->title = 'Dashboard';
+        $this->viewModel->page->tab = 'dashboard';
 
-        return $this->render('inadmin/page/dashboard/dashboard.html.twig', $this->data);
+        $recentDraft = $pageRepository->findMostRecentlyEditedDraft();
+        if ($recentDraft) {
+            $now = new \DateTimeImmutable();
+            $recentDraftTimeAgo = $now->diff($recentDraft->getUpdatedAt());
+        }
+
+        $draftPosts = $pageRepository->findRecentDrafts(5);
+        $upcoming = $pageRepository->findUpcoming(5);
+        $recentPosts = $pageRepository->findRecentPublished(5);
+        $counts = $pageRepository->getDashboardCounts();
+
+        $draftSeries = $seriesRepository->findRecentDrafts(5);
+        $recentSeries = $seriesRepository->findRecentPublished(5);
+        $analyticsSummary = $analytics->getDashboardSummary();
+
+        $from = new \DateTimeImmutable('first day of this week');
+        $today = new \DateTimeImmutable('today');
+        if ($from == $today) {
+            $from = $from->modify('-1 week');
+        }
+        $to = new \DateTimeImmutable();
+
+        return $this->render('inadmin/page/dashboard/dashboard.html.twig', [
+            'viewModel' => $this->viewModel,
+            'dashboard' => [
+                'draftTimeAgo' => $recentDraftTimeAgo ?? 0,
+                'recentDraft' => $recentDraft,
+
+                'drafts' => $draftPosts,
+                'draftCount' => $counts['drafts'],
+                'posts' => $recentPosts,
+                'publishCount' => $counts['published'],
+                'upcoming' => $upcoming,
+                'upcomingCount' => $counts['upcoming'],
+
+                'draftSeries' => $draftSeries,
+                'series' => $recentSeries,
+
+                'alerts' => [
+                    'altText' => [
+                        'count' => $imageRepository->getImagesWithoutAltTextCount(),
+                        // 'pages' => $imageRepository->getImagesWithoutAltText(5),
+                    ],
+                    'tags' => [
+                        'count' => $pageRepository->getPagesWithoutTagsCount(),
+                        // 'pages' => $pageRepository->getPagesWithoutTags(5),
+                    ],
+                    'categories' => [
+                        'count' => $pageRepository->getPagesWithoutCategoriesCount(),
+                        // 'pages' => $pageRepository->getPagesWithoutCategories(5),
+                    ],
+                    'featureImage' => [
+                        'count' => $pageRepository->getPagesWithoutFeatureImageCount(),
+                        // 'pages' => $pageRepository->getPagesWithoutFeatureImage(5),
+                    ],
+                    'featureSnippet' => [
+                        'count' => $pageRepository->getPagesWithoutFeatureSnippetCount(),
+                        // 'pages' => $pageRepository->getPagesWithoutFeatureSnippet(5),
+                    ],
+                ],
+                'analytics' => [
+                    ...$analyticsSummary,
+                    'topPages' => $analytics->getTopPages($from, $to, 5),
+                ],
+            ],
+        ]);
     }
 }

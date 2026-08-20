@@ -1,0 +1,151 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incp_security_list') }}">Security &amp; Diagnostics</a>
+    <span>Privacy &amp; GDPR Management</span>
+{% endblock pagetitle %}
+
+{% block content %}
+<form method="post" action="{{ path('incp_security_privacy_save') }}" class="col-12 form form__post">
+    <input type="hidden" name="_token" value="{{ csrf_token('privacy_save') }}">
+
+    <div class="nested-grid">
+
+    {# CARD 1: COOKIE CONSENT BANNER #}
+    <section class="col-6 ui-section widget">
+        <header class="widget__header">
+            <h2>
+                <span>
+                    <span class="material-icons" aria-hidden="true">cookie</span>
+                    Cookie Consent Banner
+                </span>
+            </h2>
+        </header>
+        <div class="widget__content content__edit">
+            <p>
+                <label id="gdpr_banner_enabled_label" class="inline_label" for="gdpr_banner_enabled">Visibility</label>
+
+                <span class="switch-wrapper">
+                    <input type="checkbox" id="gdpr_banner_enabled" name="gdpr[banner_enabled]" aria-labelledby="gdpr_banner_enabled_label" aria-required="false" class="ui-switch switch-btn-input" data-label-off="Disabled" data-label-on="Enabled (Show to Visitors)" value="1" {% if privacy.banner_enabled == '1' %}checked="checked"{% endif %}>
+                </span>
+            </p>
+            <p><small class="text-muted">Displays a consent banner to EU/UK visitors prior to setting non-essential cookies.</small></p>
+
+            <p>
+                <label for="gdpr_consent_mode">Consent Enforcement Mode</label>
+                <select id="gdpr_consent_mode" name="gdpr[consent_mode]" class="form-control" {% if not can('PRIVACY_GDPR', 'EDIT') %}disabled{% endif %}>
+                    <option value="opt_in" {% if privacy.consent_mode == 'opt_in' %}selected{% endif %}>Strict Opt-In (Block scripts until accepted)</option>
+                    <option value="opt_out" {% if privacy.consent_mode == 'opt_out' %}selected{% endif %}>Opt-Out (Notice only / Implicit)</option>
+                </select>
+            </p>
+            <p><small class="text-muted">Strict Opt-In is required for strict ePrivacy / GDPR compliance.</small></p>
+
+            <p>
+                <label for="gdpr_banner_message">Banner Message Text</label>
+                <textarea id="gdpr_banner_message" name="gdpr[banner_message]" class="full-width" rows="3" {% if not can('PRIVACY_GDPR', 'EDIT') %}readonly{% endif %}>{{ privacy.banner_message|default('We use cookies to improve your browsing experience and analyze site traffic.') }}</textarea>
+            </p>
+        </div>
+    </section>
+
+    {# CARD 2: IP ANONYMIZATION & LOG RETENTION #}
+    <section class="col-6 ui-section widget">
+        <header class="widget__header">
+            <h2>
+                <span>
+                    <span class="material-icons" aria-hidden="true">visibility_off</span>
+                    IP Anonymization &amp; Logging
+                </span>
+            </h2>
+        </header>
+        <div class="widget__content content__edit">
+            <p>
+                <label for="gdpr_anonymize_ips">Anonymize IP Addresses</label>
+                <select id="gdpr_anonymize_ips" name="gdpr[anonymize_ips]" class="form-control" {% if not can('PRIVACY_GDPR', 'EDIT') %}disabled{% endif %}>
+                    <option value="1" {% if privacy.anonymize_ips == '1' %}selected{% endif %}>Enabled (Mask last octet e.g., 192.168.1.xxx)</option>
+                    <option value="0" {% if privacy.anonymize_ips == '0' %}selected{% endif %}>Disabled (Log Full IPs)</option>
+                </select>
+            </p>
+            <p class="text-muted">
+                <span class="text-muted">Applies to internal analytics, audit logs, and access logs.</span>
+            </p>
+
+            <p>
+                <label for="gdpr_log_retention_days">Log Data Retention (Days)</label>
+                <input type="number" id="gdpr_log_retention_days" name="gdpr[log_retention_days]" class="form-control" value="{{ privacy.log_retention_days|default(90) }}" min="7" max="730" {% if not can('PRIVACY_GDPR', 'EDIT') %}readonly{% endif %}>
+            </p>
+            <p>
+                <span class="text-muted">Automatically purge analytics &amp; access logs older than this threshold.</span>
+            </p>
+        </div>
+    </section>
+
+    {% if can('PRIVACY_GDPR', 'EDIT') %}
+    <div class="fixed-bottom-bar">
+        <p>
+            <button type="submit" class="btn btn--primary">
+                <span class="material-icons">save</span>
+                <span>Save Privacy Settings</span>
+            </button>
+        </p>
+    </div>
+    {% endif %}
+</form>
+</div>
+
+{# CARD 3: USER DATA REQUESTS (SAR / ERASURE) — SEPARATE FORM CONTAINER #}
+<div class="col-12 ui-section">
+    <section class="widget form form__post">
+        <header class="widget__header">
+            <h2>
+                <span>
+                    <span class="material-icons" aria-hidden="true">download_for_offline</span>
+                    User Data Requests (SAR / Erasure)
+                </span>
+            </h2>
+        </header>
+        <div class="widget__content content__edit">
+            <p>Execute Subject Access Requests (SAR) or process "Right to be Forgotten" account deletions for specific users.</p>
+
+            <p>
+                <label class="inline_label" for="sar_user_identifier">Target User Email / Username</label>
+                <input type="text" id="sar_user_identifier" class="text inline-label" placeholder="user@example.com" />
+            </p>
+
+            <form method="post" action="{{ path('incp_security_privacy_export_user') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('sar_export') }}">
+                <input type="hidden" name="user_identifier" class="js-target-user-input">
+                <button type="submit" class="btn btn--secondary">
+                    <span class="material-icons" aria-hidden="true">download</span>
+                    <span>Export Data</span>
+                </button>
+            </form>
+
+            {# Anonymize Form #}
+            {% if can('PRIVACY_GDPR', 'DELETE') %}
+            <form method="post" action="{{ path('incp_security_privacy_anonymize_user') }}" onsubmit="return confirm('Are you sure you want to permanently anonymize this user? This action cannot be undone.');">
+                <input type="hidden" name="_token" value="{{ csrf_token('anonymize_user') }}">
+                <input type="hidden" name="user_identifier" class="js-target-user-input">
+                <button type="submit" class="btn btn--danger">
+                    <span class="material-icons" aria-hidden="true">delete</span>
+                    <span>Anonymize User</span>
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('sar_user_identifier');
+    if (input) {
+        input.addEventListener('input', function(e) {
+            document.querySelectorAll('.js-target-user-input').forEach(hiddenInput => {
+                hiddenInput.value = e.target.value;
+            });
+        });
+    }
+});
+</script>
+{% endblock content %}

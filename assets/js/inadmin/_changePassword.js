@@ -14,7 +14,7 @@ window.Inachis.PasswordManager = {
 
         if (currentPassword !== newPassword && window.Inachis.PasswordManager.basicValidatePassword(newPassword)) {
           try {
-            const response = await fetch(`${window.Inachis.prefix}/ax/calculate-password-strength`, {
+            const response = await fetch(`${window.Inachis.prefix}/api/calculate-password-strength`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',

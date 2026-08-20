@@ -1,15 +1,21 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <a href="{{ path('incp_tools_index') }}">Tools</a>
     <span>Maintenance Mode</span>
 {% endblock pagetitle %}
 {% block content %}
 <div class="col-12 content__edit">
-    <section class="admonition admonition__info">
+    {% embed 'inadmin/partials/components/admonition.html.twig' with {
+        type: 'info',
+        show_title: false,
+        show_icon: false,
+    } %}
+        {% block text %}
         <p>Current IP: <strong>{{ current_ip }}</strong></p>
         <p>Status: <strong>{{ enabled ? 'Enabled' : 'Disabled' }}</strong></p>
-    </section>
+        {% endblock text %}
+    {% endembed %}
 
     <form class="form form__post" method="post">
     <fieldset class="ui-section">
@@ -30,29 +36,29 @@
             <input class="text" type="number" id="retry_after" name="retry_after" value="{{ config.retry_after }}">
         </p>
 
-        {% include 'inadmin/partials/action_bar.html.twig' with {
+        {% include 'inadmin/partials/components/action_bar.html.twig' with {
             actions: {
                 toggle: {
-                    button_class: enabled ? 'button--positive' : 'button--negative',
+                    button_class: enabled ? 'btn--primary' : 'btn--danger',
                     button_type: 'submit',
                     name: 'toggle',
                     value: enabled ? 'off' : 'on',
                     title: enabled ? 'Disable Maintenance' : 'Enable Maintenance'
                 },
                 save: {
-                    button_class: 'button--secondary',
+                    button_class: 'btn--secondary',
                     button_type: 'submit',
                     name: 'save',
                     value: 'save',
                     title: 'Save Config & Generate Page'
                 },
                 preview: {
-                    button_class: 'button--info',
+                    button_class: 'btn--info',
                     button_type: 'button',
                     name: 'preview',
                     value: 'preview',
                     title: 'Preview',
-                    href: path('incc_tools_maintenance_preview')
+                    href: path('incp_tools_maintenance_preview')
                 }
             }
         } %}

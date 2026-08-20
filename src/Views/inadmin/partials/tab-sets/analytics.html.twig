@@ -1,0 +1,14 @@
+{{ include('inadmin/partials/tabs.html.twig', {
+    tabs: [
+        {
+            id: 'analytics',
+            title: 'Analytics',
+            url: path('incp_tools_analytics'),
+        },
+        {
+            'id': 'analytics-security',
+            'title': 'Security Events',
+            'url': path('incp_tools_analytics_security'),
+        },
+    ]
+}) }}

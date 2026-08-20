@@ -1,0 +1,14 @@
+{{ include('inadmin/partials/tabs.html.twig', {
+    tabs: [
+        {
+            id: 'csp-report',
+            title: 'Report',
+            url: path('incp_tools_csp_dashboard'),
+        },
+        {
+            'id': 'csp-policy',
+            'title': 'Policy',
+            'url': path('incp_tools_csp_settings'),
+        },
+    ]
+}) }}

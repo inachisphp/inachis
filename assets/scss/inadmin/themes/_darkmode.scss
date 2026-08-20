@@ -34,9 +34,11 @@
     --color-track-del-bg: #4a2b2b; /* Deep Rose */
 
     /* Flash Messages */
-    --color-flash-autosave-bg: #2d2618;   // Deep Charcoal-Amber
-    --color-flash-autosave-text: #fcd34d; // Bright Amber Text
-    --color-flash-autosave-discard: #f87171;
+    --color-flash-autosave-bg: #3b2510;
+    --color-flash-autosave-border: #78350f;
+    --color-flash-autosave-text: #fde68a;
+    --color-flash-autosave-discard: #ef4444;
+    --color-flash-autosave-discard-hover: #dc2626;
 
   div.EasyMDEContainer {
     background: $bg-body;

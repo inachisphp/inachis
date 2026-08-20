@@ -1,68 +1,48 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Controller\Page\Post;
 
-use Inachis\Controller\Page\Post\PageController;
-use Inachis\Entity\Page;
-use Inachis\Entity\Revision;
-use Inachis\Entity\Url;
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\PageRepositoryInterface;
-use Inachis\Repository\RevisionRepository;
-use Inachis\Repository\UrlRepository;
-use Inachis\Util\ContentRevisionCompare;
-use ArrayIterator;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Exception;
-use PHPUnit\Framework\MockObject\MockObject;
-use ReflectionClass;
-use ReflectionException;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Inachis\Controller\Page\Post\PageController;
+use Inachis\Entity\Content\Revision;
+use Inachis\Entity\Content\Url;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\ReviewThreadRepository;
+use Inachis\Repository\Content\RevisionRepository;
+use Inachis\Repository\Content\TagRepository;
+use Inachis\Repository\Content\UrlRepository;
+use Inachis\Repository\Media\ImageRepository;
+use Inachis\Service\Ai\AiTextManager;
+use Inachis\Service\Content\ContentRevisionCompare;
+use Inachis\Service\Content\Page\CategoryManager;
+use Inachis\Service\Content\Page\PageBulkActionService;
+use Inachis\Service\Content\Page\ReviewRebaseService;
+use Inachis\Service\Content\Page\TagManager;
+use Inachis\Service\Content\Page\UrlManager;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PageControllerTest extends WebTestCase
+class PageControllerTest extends InachisControllerTestCase
 {
-    private EntityManagerInterface|MockObject $entityManager;
-    private Security|MockObject $security;
-
-    private TranslatorInterface $translator;
-
-    /**
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     */
-    protected function setUp(): void
-    {
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->security = $this->createStub(Security::class);
-        $this->translator = $this->createStub(TranslatorInterface::class);
-    }
-
     /**
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     public function testGetPostAdminRedirectsWhenUrlMissing(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/post/some-post'
+            'REQUEST_URI' => '/incp/post/some-post',
         ]);
         $request->setSession(new Session(new MockArraySessionStorage()));
         $pageRepository = $this->createStub(PageRepository::class);
@@ -79,35 +59,51 @@ class PageControllerTest extends WebTestCase
             ->willReturn($urlRepository);
 
         $controller = $this->getMockBuilder(PageController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
+            ])
             ->onlyMethods(['denyAccessUnlessGranted', 'redirectToRoute'])
             ->getMock();
         $controller->expects($this->once())
             ->method('redirectToRoute')
-            ->with('incc_post_list', ['type' => 'post'])
+            ->with('incp_post_list', ['type' => 'post'])
             ->willReturn(new RedirectResponse('/redirected'));
         $revisionRepository = $this->createStub(RevisionRepository::class);
 
         $response = $controller->edit(
             $request,
+            $this->createStub(AiTextManager::class),
+            $this->createStub(CategoryManager::class),
             $this->createStub(ContentRevisionCompare::class),
+            $this->createStub(ImageRepository::class),
+            $this->createStub(PageBulkActionService::class),
             $pageRepository,
             $revisionRepository,
+            $this->createStub(ReviewThreadRepository::class),
+            $this->createStub(ReviewRebaseService::class),
+            $this->createStub(TagManager::class),
+            $this->createStub(UrlManager::class),
             'post',
-            'ome-post'
+            'ome-post',
         );
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertEquals('/redirected', $response->getTargetUrl());
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     public function testGetPostAdminWithNewPostRendersForm(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/post/new'
+            'REQUEST_URI' => '/incp/post/new',
         ]);
         $request->setSession(new Session(new MockArraySessionStorage()));
 
@@ -122,14 +118,14 @@ class PageControllerTest extends WebTestCase
         $revisionRepository = $this->getMockBuilder(RevisionRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $revisionRepository->expects($this->atLeast(0))
-            ->method('getAll')
+        $revisionRepository->method('getAll')
             ->willReturn($paginator);
         $this->entityManager->expects($this->atLeastOnce())
             ->method('getRepository')
             ->willReturnMap([
                 [Url::class, $urlRepository],
                 [Revision::class, $revisionRepository],
+                [Tag::class, $this->createStub(TagRepository::class)],
             ]);
 
         $form = $this->createMock(Form::class);
@@ -137,7 +133,15 @@ class PageControllerTest extends WebTestCase
         $form->expects($this->once())->method('isSubmitted')->willReturn(false);
 
         $controller = $this->getMockBuilder(PageController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
+            ])
             ->onlyMethods(['denyAccessUnlessGranted', 'createForm', 'render'])
             ->getMock();
         $controller->expects($this->once())
@@ -150,11 +154,19 @@ class PageControllerTest extends WebTestCase
 
         $response = $controller->edit(
             $request,
+            $this->createStub(AiTextManager::class),
+            $this->createStub(CategoryManager::class),
             $this->createStub(ContentRevisionCompare::class),
+            $this->createStub(ImageRepository::class),
+            $this->createStub(PageBulkActionService::class),
             $pageRepository,
             $revisionRepository,
+            $this->createStub(ReviewThreadRepository::class),
+            $this->createStub(ReviewRebaseService::class),
+            $this->createStub(TagManager::class),
+            $this->createStub(UrlManager::class),
             'post',
-            'new'
+            'new',
         );
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals('Rendered form', $response->getContent());

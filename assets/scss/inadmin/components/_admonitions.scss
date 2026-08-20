@@ -1,5 +1,6 @@
 @use '../definitions' as *;
 @use 'sass:color';
+@use 'sass:map';
 
 .admonition {
   border-left: 3px solid transparent;
@@ -9,23 +10,47 @@
   padding: 1em;
 
   .admonition__title {
-    display: block;
+    align-items: center;
+    display: flex;
     font-weight: bold;
     margin-bottom: 1em;
     text-transform: uppercase;
+  }
 
-    .material-icons {
-      vertical-align: middle;
-    }
+  .material-icons {
+    margin-right: 1rem;
+    vertical-align: middle;
+  }
+
+  span {
+    vertical-align: middle;
+  }
+
+  &.admonition-with-action {
+    display: flex;
+    gap: 1rem;
+    justify-content:space-between;
+    align-items: center;
+    flex-wrap: wrap;
   }
 }
 
-.admonition__info {
-  background-color: $color-brand-050;
-  border-left-color: $action-primary;
-}
+@each $name, $colors in $admonition-colors {
+    .admonition__#{$name}{
+        background-color: map.get($colors, bg);
+        border-left-color: map.get($colors, accent);
 
-.admonition__warning {
-  background-color: $alert-warning-bg;
-  border-left-color: $alert-warning-border;
+        .material-icons {
+            color: map.get($colors, accent);
+        }
+        strong {
+          color: color.adjust(map.get($colors, accent), $lightness:-10%)
+        }
+        code {
+          background-color: color.adjust(map.get($colors, bg), $lightness:-5%);
+          border: 1px solid color.adjust(map.get($colors, bg), $lightness:-20%);
+          border-radius: $radius-standard;
+          padding:0 0.25rem;
+        }
+    }
 }

@@ -17,21 +17,17 @@ export default class DatePicker {
       materialIcons: options.materialIcons || false,
     };
 
-    this.isMobile = /Mobi|Android/i.test(navigator.userAgent);
     this.selectedDate = null;
     this.currentMonth = null;
     this.currentYear = null;
     this.yearPanelVisible = false;
     this.isAnimating = false;
 
-    if (this.isMobile) {
-      this.input.setAttribute('type', 'datetime-local');
-      this.input.addEventListener('input', () => this.options.onChange(this.input.value));
-    } else {
-      this.input.setAttribute('type', 'text');
-      this.createPicker();
-      this.addEventListeners();
-    }
+    // Prevent mobile software keyboard from opening over the custom picker
+    this.input.setAttribute('inputmode', 'none');
+
+    this.createPicker();
+    this.addEventListeners();
   }
 
   parseInputDate() {
@@ -80,9 +76,10 @@ export default class DatePicker {
     this.picker.setAttribute('aria-modal', 'true');
     this.picker.style.display = 'none';
 
-    // Today Button (above month)
+    // Today Button
     if (this.options.showTodayButton) {
       this.todayButton = document.createElement('button');
+      this.todayButton.type = 'button';
       this.todayButton.className = 'datepicker-today-btn';
       if (this.options.materialIcons) {
         this.todayButton.innerHTML = `<span class="material-icons">${this.options.todayButtonIcon}</span> Today`;
@@ -90,12 +87,12 @@ export default class DatePicker {
         this.todayButton.textContent = 'Today';
       }
       this.todayButton.addEventListener('click', () => {
-        const today = new Date();
-        if ((this.options.minDate && today < this.options.minDate) ||
-            (this.options.maxDate && today > this.options.maxDate)) return;
-        this.selectedDate = today;
-        this.currentMonth = today.getMonth();
-        this.currentYear = today.getFullYear();
+        const todayDate = new Date();
+        if ((this.options.minDate && todayDate < this.options.minDate) ||
+            (this.options.maxDate && todayDate > this.options.maxDate)) return;
+        this.selectedDate = todayDate;
+        this.currentMonth = todayDate.getMonth();
+        this.currentYear = todayDate.getFullYear();
         this.updateValue();
         this.hidePicker();
       });
@@ -138,8 +135,6 @@ export default class DatePicker {
     // Calendar container
     this.calendarContainer = document.createElement('div');
     this.calendarContainer.className = 'datepicker-calendar-container';
-    this.calendarContainer.style.position = 'relative';
-    this.calendarContainer.style.overflow = 'hidden';
 
     this.calendar = document.createElement('table');
     this.calendar.className = 'datepicker-calendar';
@@ -154,36 +149,68 @@ export default class DatePicker {
     this.yearPanel.style.display = 'none';
     this.picker.appendChild(this.yearPanel);
 
-    // Time Picker (number inputs)
+    // Time Picker
     if (this.options.format.match(/H|i/)) this.createTimePicker();
 
     document.body.appendChild(this.picker);
     this.renderCalendar();
   }
 
+  positionPicker() {
+    if (this.picker.style.display === 'none') return;
+
+    const rect = this.input.getBoundingClientRect();
+    const margin = 8;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Temporarily ensure picker has dimensions calculated
+    const pickerWidth = this.picker.offsetWidth || 320;
+    const pickerHeight = this.picker.offsetHeight || 380;
+
+    // 1. Calculate vertical placement (flip above if space below is limited)
+    let top = rect.bottom + window.scrollY;
+    if (rect.bottom + pickerHeight > viewportHeight && rect.top - pickerHeight > 0) {
+      top = rect.top + window.scrollY - pickerHeight;
+    }
+
+    // 2. Calculate horizontal placement (clamp within viewport margins)
+    let left = rect.left + window.scrollX;
+    const maxLeft = window.scrollX + viewportWidth - pickerWidth - margin;
+    const minLeft = window.scrollX + margin;
+
+    left = Math.max(minLeft, Math.min(left, maxLeft));
+
+    this.picker.style.top = `${top}px`;
+    this.picker.style.left = `${left}px`;
+  }
+
   addEventListeners() {
-    const positionPicker = () => {
-      const rect = this.input.getBoundingClientRect();
-      this.picker.style.top = rect.bottom + window.scrollY + 'px';
-      this.picker.style.left = rect.left + window.scrollX + 'px';
-      this.picker.style.width = (rect.width + 90) + 'px';
-    };
-
     this.input.addEventListener('focus', () => {
-      positionPicker();
       this.picker.style.display = 'block';
+      this.positionPicker();
     });
 
-    document.addEventListener('click', (e) => {
-      if (!this.picker.contains(e.target) && e.target !== this.input) this.hidePicker();
+    this.input.addEventListener('click', () => {
+      this.picker.style.display = 'block';
+      this.positionPicker();
     });
 
-    window.addEventListener('resize', positionPicker);
+    // Close on click outside (using pointerdown for touch responsiveness)
+    document.addEventListener('pointerdown', (e) => {
+      if (this.picker.style.display === 'block' &&
+          !this.picker.contains(e.target) &&
+          e.target !== this.input) {
+        this.hidePicker();
+      }
+    });
+
+    window.addEventListener('resize', () => this.positionPicker());
+    window.addEventListener('scroll', () => this.positionPicker(), { passive: true });
 
     this.prevBtn.addEventListener('click', () => this.changeMonth(-1));
     this.nextBtn.addEventListener('click', () => this.changeMonth(1));
 
-    // Keyboard navigation
     this.picker.addEventListener('keydown', (e) => this.handleKeyboard(e));
   }
 
@@ -191,7 +218,6 @@ export default class DatePicker {
     this.picker.style.display = 'none';
     this.yearPanelVisible = false;
     this.yearPanel.style.display = 'none';
-    // this.input.focus();
   }
 
   toggleYearPanel() {
@@ -206,16 +232,13 @@ export default class DatePicker {
       this.yearPanel.style.display = 'none';
       this.calendarContainer.style.display = 'block';
     }
+    this.positionPicker();
   }
 
   renderTimePicker() {
     if (!this.timeContainer) return;
-
-    const selectedH = this.selectedDate?.getHours() ?? 0;
-    const selectedM = this.selectedDate?.getMinutes() ?? 0;
-
-    this.hourInput.value = selectedH;
-    this.minuteInput.value = selectedM;
+    this.hourInput.value = this.selectedDate?.getHours() ?? 0;
+    this.minuteInput.value = this.selectedDate?.getMinutes() ?? 0;
   }
 
   renderYearPanel() {
@@ -254,7 +277,7 @@ export default class DatePicker {
 
     const newTable = this.createCalendarTable();
     newTable.style.position = 'absolute';
-    newTable.style.top = 0;
+    newTable.style.top = '0';
     newTable.style.left = direction > 0 ? '100%' : '-100%';
     this.calendarContainer.appendChild(newTable);
 
@@ -262,11 +285,13 @@ export default class DatePicker {
       oldTable.style.transition = 'transform 0.25s';
       newTable.style.transition = 'transform 0.25s';
       oldTable.style.transform = `translateX(${-100 * direction}%)`;
-      newTable.style.transform = `translateX(0%)`;
+      newTable.style.transform = 'translateX(0%)';
     });
 
     setTimeout(() => {
-      this.calendarContainer.removeChild(oldTable);
+      if (oldTable.parentNode === this.calendarContainer) {
+        this.calendarContainer.removeChild(oldTable);
+      }
       newTable.style.position = 'static';
       newTable.style.transform = '';
       newTable.style.transition = '';
@@ -280,11 +305,9 @@ export default class DatePicker {
     const table = document.createElement('table');
     table.className = 'datepicker-calendar';
     table.setAttribute('role', 'grid');
-    table.style.width = '100%';
-    table.style.tableLayout = 'fixed';
 
     const headerRow = document.createElement('tr');
-    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
+    ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => {
       const th = document.createElement('th');
       th.textContent = d;
       headerRow.appendChild(th);
@@ -316,7 +339,7 @@ export default class DatePicker {
       const cellDate = new Date(this.currentYear, this.currentMonth, date);
       if ((this.options.minDate && cellDate < this.options.minDate) ||
           (this.options.maxDate && cellDate > this.options.maxDate)) {
-        cell.setAttribute('disabled', true);
+        cell.setAttribute('disabled', 'true');
       } else {
         cell.addEventListener('click', () => {
           if (!this.selectedDate) this.selectedDate = new Date();
@@ -338,8 +361,9 @@ export default class DatePicker {
 
   updateMonthYearLabel() {
     const monthNames = [];
-    for (let m = 0; m < 12; m++)
+    for (let m = 0; m < 12; m++) {
       monthNames.push(new Intl.DateTimeFormat(this.options.locale, { month: 'long' }).format(new Date(this.currentYear, m)));
+    }
     this.monthLabelBtn.textContent = `${monthNames[this.currentMonth]} ${this.currentYear}`;
   }
 
@@ -348,18 +372,12 @@ export default class DatePicker {
     const newTable = this.createCalendarTable();
     this.calendarContainer.replaceChild(newTable, this.calendar);
     this.calendar = newTable;
-
     this.renderTimePicker();
   }
 
   createTimePicker() {
     this.timeContainer = document.createElement('div');
     this.timeContainer.className = 'datepicker-time-container';
-
-    // Hour input
-    const hourLabel = document.createElement('label');
-    hourLabel.textContent = 'H:';
-    hourLabel.style.display = 'none';
 
     this.hourInput = document.createElement('input');
     this.hourInput.type = 'number';
@@ -370,25 +388,17 @@ export default class DatePicker {
     const timeDivider = document.createElement('span');
     timeDivider.textContent = ':';
 
-    // Minute input
-    const minuteLabel = document.createElement('label');
-    minuteLabel.textContent = 'M:';
-    minuteLabel.style.display = 'none';
-
     this.minuteInput = document.createElement('input');
     this.minuteInput.type = 'number';
     this.minuteInput.min = 0;
     this.minuteInput.max = 59;
     this.minuteInput.value = this.selectedDate?.getMinutes() ?? 0;
 
-    this.timeContainer.appendChild(hourLabel);
     this.timeContainer.appendChild(this.hourInput);
     this.timeContainer.appendChild(timeDivider);
-    this.timeContainer.appendChild(minuteLabel);
     this.timeContainer.appendChild(this.minuteInput);
     this.picker.appendChild(this.timeContainer);
 
-    // Sync inputs
     this.hourInput.addEventListener('input', () => {
       if (!this.selectedDate) this.selectedDate = new Date();
       let val = parseInt(this.hourInput.value, 10);

@@ -1,26 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Controller\Page\Search;
 
 use Inachis\Controller\Page\Search\SearchController;
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Model\SearchResult;
-use Inachis\Repository\SearchRepository;
-use Inachis\Repository\UrlRepository;
-use Inachis\Repository\UserRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Repository\Content\SearchRepository;
+use Inachis\Repository\Content\UrlRepository;
+use Inachis\Repository\User\UserRepository;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
-use PHPUnit\Framework\MockObject\MockObject;
 use Ramsey\Uuid\Uuid;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -28,45 +24,43 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SearchControllerTest extends WebTestCase
+class SearchControllerTest extends InachisControllerTestCase
 {
     private SearchController $controller;
-    private EntityManagerInterface|MockObject $entityManager;
-    private Security|MockObject $security;
-
-    private TranslatorInterface $translator;
 
     /**
      * @throws \ReflectionException
      */
     protected function setUp(): void
     {
-        $this->entityManager = $this->createStub(EntityManagerInterface::class);
-        $this->security = $this->createStub(Security::class);
-        $this->translator = $this->createStub(TranslatorInterface::class);
+        parent::setUp();
+
         $form = $this->createStub(Form::class);
         $formBuilder = $this->createMock(FormBuilder::class);
-        $formBuilder->expects($this->atLeast(0))
-            ->method('getForm')->willReturn($form);
+        $formBuilder->method('getForm')->willReturn($form);
 
         $this->controller = $this->getMockBuilder(SearchController::class)
-            ->setConstructorArgs([$this->entityManager, $this->security, $this->translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
+            ])
             ->onlyMethods(['createFormBuilder', 'generateUrl', 'render'])
             ->getMock();
-        $this->controller->expects($this->atLeast(0))
-            ->method('render')
+        $this->controller->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
-        $this->controller->expects($this->atLeast(0))
-            ->method('generateUrl')
+        $this->controller->method('generateUrl')
             ->willReturnCallback(function (string $route, array $parameters) {
-                return 'redirected:' . $route;
+                return 'redirected:'.$route;
             });
-        $this->controller->expects($this->atLeast(0))
-            ->method('createFormBuilder')->willReturn($formBuilder);
+        $this->controller->method('createFormBuilder')->willReturn($formBuilder);
     }
 
     /**
@@ -81,7 +75,7 @@ class SearchControllerTest extends WebTestCase
             'offset' => 50,
             'limit' => 25,
         ], [], [], [
-            'REQUEST_URI' => '/incc/search/results/{keyword}/{offset}/{limit}',
+            'REQUEST_URI' => '/incp/search/results/{keyword}/{offset}/{limit}',
         ]);
         $request->setMethod(Request::METHOD_POST);
         $request->setSession(new Session(new MockArraySessionStorage()));
@@ -89,31 +83,31 @@ class SearchControllerTest extends WebTestCase
         $results = $this->createMock(SearchResult::class);
         $results->method('getResults')->willReturn([
             0 => [
-                'id' => Uuid::uuid1(),
+                'id' => Uuid::uuid1()->getBytes(),
                 'type' => 'Image',
                 'title' => 'Test image',
                 'sub_title' => 'image.jpeg',
-                'relevance' => '0.345678',
+                'relevance' => 0.345678,
                 'url' => '',
-                'author' => '',
+                'author' => null,
             ],
             1 => [
                 'type' => 'Series',
                 'title' => 'Test Series',
                 'sub_title' => '',
-                'id' => Uuid::uuid1(),
-                'relevance' => '0.3',
+                'id' => Uuid::uuid1()->getBytes(),
+                'relevance' => 0.3,
                 'url' => '',
-                'author' => '',
+                'author' => null,
             ],
             2 => [
                 'type' => 'Post',
                 'title' => 'Test Series',
                 'sub_title' => '',
-                'id' => Uuid::uuid1(),
-                'relevance' => '0.3',
+                'id' => Uuid::uuid1()->getBytes(),
+                'relevance' => 0.3,
                 'url' => '',
-                'author' => '',
+                'author' => null,
             ],
         ]);
         $results->expects($this->once())->method('getOffset')->willReturn(50);
@@ -142,7 +136,7 @@ class SearchControllerTest extends WebTestCase
             'offset' => 50,
             'limit' => 25,
         ], [], [], [
-            'REQUEST_URI' => '/incc/search/results/ /{offset}/{limit}',
+            'REQUEST_URI' => '/incp/search/results/ /{offset}/{limit}',
         ]);
 
         $searchRepository = $this->createStub(SearchRepository::class);
@@ -151,7 +145,7 @@ class SearchControllerTest extends WebTestCase
 
         $result = $this->controller->results($request, $searchRepository, $urlRepository, $userRepository);
         $this->assertInstanceOf(RedirectResponse::class, $result);
-        $this->assertEquals('redirected:incc_search_results', $result->headers->get('Location'));
+        $this->assertEquals('redirected:incp_search_results', $result->headers->get('Location'));
     }
 
     /**
@@ -164,7 +158,7 @@ class SearchControllerTest extends WebTestCase
             'offset' => 50,
             'limit' => 25,
         ], [], [], [
-            'REQUEST_URI' => '/incc/search/results/{keyword}/{offset}/{limit}',
+            'REQUEST_URI' => '/incp/search/results/{keyword}/{offset}/{limit}',
         ]);
         $session = new Session(new MockArraySessionStorage());
         $session->set('search_sort', 'from session');
@@ -173,13 +167,13 @@ class SearchControllerTest extends WebTestCase
         $results = $this->createMock(SearchResult::class);
         $results->expects($this->once())->method('getResults')->willReturn([
             0 => [
-                'id' => Uuid::uuid1(),
+                'id' => Uuid::uuid1()->getBytes(),
                 'type' => 'Image',
                 'title' => 'Test image',
                 'sub_title' => 'image.jpeg',
-                'relevance' => '0.345678',
+                'relevance' => 0.345678,
                 'url' => '',
-                'author' => '',
+                'author' => null,
             ],
         ]);
         $results->expects($this->once())->method('getOffset')->willReturn(50);

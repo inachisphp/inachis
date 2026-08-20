@@ -1,18 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Export\Category;
 
-use Inachis\Repository\CategoryRepository;
-use Inachis\Service\Export\Category\CategoryExportNormaliser;
-use Symfony\Component\TaggedIterator\TaggedIterator;
+use Inachis\Entity\Content\Category;
+use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Service\Export\AbstractExportService;
+use Inachis\Service\Export\ExportWriterInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
  * Service for exporting categories. The service uses the {@link CategoryRepository} to retrieve categories,
@@ -22,14 +22,14 @@ use Inachis\Service\Export\AbstractExportService;
 final class CategoryExportService extends AbstractExportService
 {
     /**
-     * @param $repository The repository to use for categories operations.
-     * @param $normaliser The normaliser to use.
-     * @param $writers The writers to use.
+     * @param CategoryRepository              $repository the repository to use for categories operations
+     * @param CategoryExportNormaliser        $normaliser the normaliser to use
+     * @param iterable<ExportWriterInterface> $writers    the writers to use
      */
     public function __construct(
         private CategoryRepository $repository,
         private CategoryExportNormaliser $normaliser,
-        #[TaggedIterator('inachis.export_writer')] iterable $writers,
+        #[AutowireIterator('inachis.export_writer')] iterable $writers,
     ) {
         parent::__construct($writers);
     }
@@ -37,21 +37,24 @@ final class CategoryExportService extends AbstractExportService
     /**
      * Export categories to a file of a given type (JSON/XML).
      *
-     * @param iterable $categories The categories to export.
-     * @param string $format The format to export to (json/xml).
-     * @return string The exported categories.
+     * @param iterable<Category> $categories the categories to export
+     * @param string             $format     the format to export to (json/xml)
+     *
+     * @return string the exported categories
      */
     public function export(?iterable $categories = null, string $format = 'json'): string
     {
         $categories ??= $this->repository->findAll();
+
         return $this->exportCollection($categories, $format, 'category');
     }
 
     /**
      * Normalise a category.
      *
-     * @param object $category The category to normalise.
-     * @return object The normalised category.
+     * @param object $category the category to normalise
+     *
+     * @return object the normalised category
      */
     protected function normalise(object $category): object
     {
@@ -61,8 +64,9 @@ final class CategoryExportService extends AbstractExportService
     /**
      * Get categories by IDs via the repository.
      *
-     * @param array $ids The IDs of the categories to retrieve.
-     * @return iterable<Category> The categories.
+     * @param array $ids the IDs of the categories to retrieve
+     *
+     * @return iterable<Category> the categories
      */
     public function getCategoriesByIds(array $ids): iterable
     {
@@ -72,7 +76,7 @@ final class CategoryExportService extends AbstractExportService
     /**
      * Get all categories via the repository.
      *
-     * @return iterable<Category> The categories.
+     * @return iterable<Category> the categories
      */
     public function getAllCategories(): iterable
     {

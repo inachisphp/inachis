@@ -1,28 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics\Check\Database;
 
+use Doctrine\DBAL\Connection;
 use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
 use Inachis\Doctrine\DatabasePlatformTrait;
-use Doctrine\DBAL\Connection;
 
 final class TableEngineCheck implements CheckInterface
 {
     use DatabasePlatformTrait;
 
-    public function __construct(private readonly Connection $connection) {}
+    public function __construct(private readonly Connection $connection)
+    {
+    }
 
-    public function getId(): string { return 'db_table_engine'; }
-    public function getLabel(): string { return 'Table engine'; }
-    public function getSection(): string { return 'Database'; }
+    public function getId(): string
+    {
+        return 'db_table_engine';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Table engine';
+    }
+
+    public function getSection(): string
+    {
+        return 'Database';
+    }
 
     public function run(): CheckResult
     {
@@ -38,28 +50,49 @@ final class TableEngineCheck implements CheckInterface
                 'Table engine check only applies to MySQL/MariaDB.',
                 null,
                 $this->getSection(),
-                'low'
+                'low',
             );
         }
 
         try {
-            $tables = $this->connection->fetchAllAssociative("SHOW TABLE STATUS");
-            $nonInnoDB = array_filter($tables, fn($t) => strtoupper($t['Engine'] ?? '') !== 'INNODB');
+            /** @var list<array{
+             *    Name: string,
+             *    Engine: string|null,
+             *    Version: int|string,
+             *    Row_format: string,
+             *    Rows: int|string|null,
+             *    Avg_row_length: int|string|null,
+             *    Data_length: int|string|null,
+             *    Max_data_length: int|string|null,
+             *    Index_length: int|string|null,
+             *    Data_free: int|string|null,
+             *    Auto_increment: int|string|null,
+             *    Create_time: string|null,
+             *    Update_time: string|null,
+             *    Check_time: string|null,
+             *    Collation: string|null,
+             *    Checksum: int|string|null,
+             *    Create_options: string|null,
+             *    Comment: string
+             *}> $tables
+             */
+            $tables = $this->connection->fetchAllAssociative('SHOW TABLE STATUS');
+            $nonInnoDB = array_filter($tables, fn ($t) => 'INNODB' !== strtoupper($t['Engine'] ?? ''));
             $count = count($nonInnoDB);
-            $status = $count === 0 ? 'ok' : 'warning';
-            $severity = $count === 0 ? 'low' : 'medium';
-            $value = $count === 0 ? 'All tables are InnoDB' : "$count non-InnoDB table(s) found";
-            $recommendation = $count === 0 ? null : 'Consider converting tables to InnoDB for performance and reliability.';
+            $status = 0 === $count ? 'ok' : 'warning';
+            $severity = 0 === $count ? 'low' : 'medium';
+            $value = 0 === $count ? 'All tables are InnoDB' : "$count non-InnoDB table(s) found";
+            $recommendation = 0 === $count ? null : 'Consider converting tables to InnoDB for performance and reliability.';
         } catch (\Throwable $e) {
             return new CheckResult(
                 $this->getId(),
                 $this->getLabel(),
                 'error',
                 null,
-                'Could not retrieve table status: ' . $e->getMessage(),
+                'Could not retrieve table status: '.$e->getMessage(),
                 'Ensure database is running and credentials are correct.',
                 $this->getSection(),
-                'high'
+                'high',
             );
         }
 
@@ -71,7 +104,7 @@ final class TableEngineCheck implements CheckInterface
             $value,
             $recommendation,
             $this->getSection(),
-            $severity
+            $severity,
         );
     }
 }

@@ -1,0 +1,119 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incp_settings_index') }}">Settings</a>
+    <span>Themes</span>
+{% endblock pagetitle %}
+
+{% block content %}
+{% if activeTheme.isFallback and activeTheme.fallbackReason == 'incompatible_version' %}
+    <div aria-live="polite" class="col-12 flash-error">
+        <span class="material-icons" aria-hidden="true">warning</span>
+        <strong>Theme Warning:</strong> The requested theme "<code>{{ activeTheme.requestedIdentifier }}</code>"
+        requires Inachis <code>{{ activeTheme.requiredInachisVersion }}</code> and is incompatible
+        with your current version. Falling back to default theme.
+    </div>
+{% endif %}
+    <div class="col-12 nested-grid">
+        <section class="col-12 admonition admonition-with-action admonition__info">
+            <div>
+                <strong>Last scanned:</strong>
+                {% if scanStatus.lastScannedAt %}
+                    {{ scanStatus.lastScannedAt|date('Y-m-d H:i:s', viewModel.session.preferences.timezone) }}
+                {% else %}
+                    Never
+                {% endif %}
+            </div>
+
+            <div>
+                <strong>Status:</strong>
+                {% if scanStatus.errorCount > 0 %}
+                    {{ scanStatus.errorCount }} error{{ scanStatus.errorCount == 1 ? '' : 's' }} found
+                {% else %}
+                    No errors found
+                {% endif %}
+            </div>
+
+            <div>
+                <a class="btn btn--secondary" href="{{ path('incp_settings_themes_rescan') }}">Rescan now</a>
+            </div>
+        </section>
+
+        {% for theme in themes %}
+            <section class="col-4 ui-section rounded">
+                <div>
+                    <div class="ui-image-header">
+                        {% if theme.screenshot %}
+                            <a href="{{ path('incp_settings_theme_screenshot', { identifier: theme.identifier }) }}" target="_blank" rel="noopener">
+                                <img src="{{ path('incp_settings_theme_screenshot', { identifier: theme.identifier }) }}" alt="{{ theme.name }} screenshot">
+                            </a>
+                        {% else %}
+                            <img src="{{ path('incp_settings_theme_screenshot', { identifier: 'default' }) }}" alt="Default screenshot">
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <div class="header__with-badge">
+                            <h3>{{ theme.name }}</h3>
+                            {% if activeTheme.identifier == theme.identifier %}
+                                <span class="badge badge__active">Active</span>
+                            {% endif %}
+                            {% if not theme.isCompatible %}
+                                <span class="badge badge__critical">Not Compatible</span>
+                            {% endif %}
+                        </div>
+
+                        <p>{{ theme.description ?: 'No description provided.' }}</p>
+
+                        <p><strong>Version:</strong> {{ theme.version }}<br>
+                        <strong>Author:</strong> {{ theme.author ?: 'Unknown' }}</p>
+
+                        <div>
+                            <div>
+                                <strong>Required features</strong>
+                                <ul>
+                                    {% for feature in theme.requiredFeatures %}
+                                        <li>
+                                            {% if feature in activeTheme.requiredFeatures or feature_enabled(feature) %}
+                                                ✓ {{ feature }}
+                                            {% else %}
+                                                ✗ {{ feature }}
+                                            {% endif %}
+                                        </li>
+                                    {% else %}
+                                        <li>None</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            <div>
+                                <strong>Suggested features</strong>
+                                <ul>
+                                    {% for feature in theme.suggestedFeatures %}
+                                        <li>{{ feature }}</li>
+                                    {% else %}
+                                        <li>None</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div>
+                            {% if activeTheme.identifier == theme.identifier %}
+                                <button type="button" class="btn btn--primary btn--full btn--caps" disabled>Active</button>
+                            {% else %}
+                                <form method="post" action="{{ path('incp_settings_theme_activate', { identifier: theme.identifier }) }}">
+                                    <button type="submit" class="btn btn--primary btn--full btn--caps">Activate</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        {% else %}
+            <section class="col-12 ui-section rounded">
+                <p>No themes were discovered. Create a theme under <code>themes/</code> or keep using the legacy <code>templates/themes/</code> fallback.</p>
+            </section>
+        {% endfor %}
+    </div>
+{% endblock content %}

@@ -1,52 +1,93 @@
 @use '../definitions' as *;
-@use 'sass:color';
 
-// Fix to make sure easymde sits in front of sidebar/header/bottom-bar
+// ==========================================================================
+// EasyMDE Markdown Editor & CodeMirror Customizations
+// ==========================================================================
+
+// Fix to make sure EasyMDE sits gracefully in front of sidebar/header/bottom-bar
 div.EasyMDEContainer {
-	div.fullscreen.editor-toolbar {
-		border-top: 2px solid $color-brand-500;
-	}
-	div.fullscreen.editor-toolbar, & div.CodeMirror-fullscreen, & div.editor-preview-side {
-		z-index: 150;
-	}
-  .CodeMirror-lines {
-    line-height: 1.6rem;
+  div.fullscreen.editor-toolbar {
+    border-top: 2px solid $color-brand-500;
   }
+
+  div.fullscreen.editor-toolbar,
+  & div.CodeMirror-fullscreen,
+  & div.editor-preview-side {
+    z-index: 150;
+  }
+
+  .CodeMirror-lines {
+    line-height: 1.65rem;
+    padding: 1rem 0;
+  }
+
   /* ---------------- Toolbar ---------------- */
 
-  div.editor-toolbar, div.editor-toolbar.fullscreen {
-    background: $bg-panel;
+  div.editor-toolbar,
+  div.editor-toolbar.fullscreen {
+    background-color: $bg-body;
+    border: 1px solid $border-color;
     border-bottom: 1px solid $border-color;
     border-radius: $radius-standard $radius-standard 0 0;
+    padding: 0.375rem 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-wrap: wrap;
 
-    button, a {
-      color: $text-main;
-      transition: background 0.15s ease, color 0.15s ease;
+    button,
+    a {
+      color: $text-muted;
+      border: 1px solid transparent;
+      border-radius: $radius-standard;
+      height: 32px;
+      width: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color $transition-base, color $transition-base, border-color $transition-base;
 
-      &:hover, &.active {
-        background: $sidebar-hover;
-        color: $text-inverse;
+      &:hover {
+        background-color: $bg-surface;
+        color: $text-main;
+        border-color: $border-color;
       }
-      &.active {
-        background: $action-primary;
+
+      &.active,
+      &[aria-pressed="true"] {
+        background-color: rgba(0, 102, 153, 0.1);
+        color: $color-primary;
+        border-color: rgba(0, 102, 153, 0.25);
+        font-weight: 600;
       }
+    }
+
+    i.separator {
+      border-left: 1px solid $border-color;
+      margin: 0 0.375rem;
+      height: 18px;
     }
   }
 }
 
+/* ---------------- Link Validation Classes ---------------- */
+
 .cm-link-valid {
   background: rgba(0, 180, 0, 0.12);
   border-bottom: 2px solid rgba(0, 180, 0, 0.6);
+  border-radius: 2px;
 }
 
 .cm-link-broken {
   background: rgba(255, 0, 0, 0.12);
   border-bottom: 2px solid rgba(255, 0, 0, 0.8);
+  border-radius: 2px;
 }
 
 .cm-link-checking {
   background: rgba(255, 165, 0, 0.15);
   border-bottom: 2px dashed orange;
+  border-radius: 2px;
 }
 
 .editor-statusbar .link-health-badge-inline {
@@ -60,18 +101,53 @@ div.EasyMDEContainer {
     min-width: auto;
   }
 }
-.autosave-notification {
-  align-items: center;
-  animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-	background: $flash-autosave-bg;
-	bottom: 3.7rem;
-	color: $flash-autosave-text;
-	display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  width: auto;
 
-  button.button {
+/* ---------------- Autosave Notification Toast ---------------- */
+
+p.autosave-notification {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  position: fixed;
+  bottom: 5.25rem;
+  left: 1.25rem;
+  right: 1.25rem;
+  z-index: 49;
+
+  @media (min-width: $breakpoint-medium) {
+    left: calc(#{$sidebar-collapsed} + 1.25rem);
+    transition: left $transition-base, right $transition-base;
+
+    .layout.expanded & {
+      left: calc(#{$sidebar-expanded} + 1.25rem);
+    }
+  }
+
+  background-color: $flash-autosave-bg;
+  border: 1px solid $flash-autosave-border;
+  border-radius: $radius-standard;
+  padding: 0.625rem 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  & > span:first-child {
+    color: $flash-autosave-text;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: none;
+  }
+
+  // Icons
+  .material-icons,
+  &::before {
+    color: $flash-autosave-text;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+
+  // Discard/Action Button
+  button.btn {
     background-color: transparent;
     border: none;
     color: $flash-autosave-discard;
@@ -80,7 +156,7 @@ div.EasyMDEContainer {
     text-transform: uppercase;
 
     &:hover {
-      background-color: transparent;
+      color: $flash-autosave-discard-hover;
       text-decoration: underline;
     }
   }
@@ -98,15 +174,16 @@ div.EasyMDEContainer {
 }
 
 /* ======================================================
-   EasyMDE – Base + Light Theme
+   EasyMDE – Base & Container Shell
 ====================================================== */
 
 .EasyMDEContainer {
-  background: $bg-surface;
+  background-color: $bg-surface;
   color: $text-main;
   border: 1px solid $border-color;
   border-radius: $radius-standard;
   transition: opacity 0.2s ease, filter 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 
   &.is-inactive {
     opacity: 0.65;
@@ -114,25 +191,26 @@ div.EasyMDEContainer {
   }
 }
 
-/* ---------------- Editor ---------------- */
+/* ---------------- Editor Core Body ---------------- */
 
 .CodeMirror {
-  background: $bg-panel;
+  background-color: $bg-surface;
   color: $text-main;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Helvetica, Arial, sans-serif;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  border-radius: $radius-standard;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  border-radius: 0 0 $radius-standard $radius-standard;
+  padding: 0.5rem 0.75rem;
+
+  .CodeMirror-lines {
+    padding: 0.5rem 0;
+  }
 }
 
-/* Focus glow */
+/* Focus state */
 .CodeMirror-focused {
   outline: none;
-  box-shadow:
-    0 0 0 2px $input-focus-ring,
-    0 6px 20px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(2px);
+  box-shadow: inset 0 0 0 1px $color-primary;
 }
 
 /* ---------------- Status Bar ---------------- */
@@ -140,6 +218,10 @@ div.EasyMDEContainer {
 .editor-statusbar {
   color: $text-muted;
   border-top: 1px solid $border-color;
+  padding: 0.5rem 0.875rem;
+  font-size: 0.75rem;
+  background-color: $bg-body;
+  border-radius: 0 0 $radius-standard $radius-standard;
 }
 
 /* ======================================================
@@ -148,11 +230,12 @@ div.EasyMDEContainer {
 
 .cm-header {
   color: $action-primary;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .cm-strong {
-  font-weight: 600;
+  font-weight: 700;
+  color: $text-main;
 }
 
 .cm-em {
@@ -160,25 +243,30 @@ div.EasyMDEContainer {
 }
 
 .cm-link {
-  color: $link-color;
+  color: $color-primary;
+  text-decoration: underline;
 }
 
 .cm-url {
-  color: $link-hover;
+  color: $text-muted;
 }
 
 .cm-quote {
   color: $text-muted;
-  border-left: 3px solid $border-color;
+  border-left: 3px solid $color-primary;
   padding-left: 0.75rem;
+  font-style: italic;
 }
 
 .cm-code,
 .cm-inline-code {
-  background: $color-neutral-200;
-  color: $color-brand-700;
-  padding: 0.1rem 0.25rem;
-  border-radius: 4px;
+  background-color: $bg-body;
+  color: $color-primary;
+  padding: 0.125rem 0.375rem;
+  border-radius: calc(#{$radius-standard} - 2px);
+  border: 1px solid $border-color;
+  font-family: monospace;
+  font-size: 0.875em;
 }
 
 .cm-comment {
@@ -195,41 +283,41 @@ div.EasyMDEContainer {
 }
 
 .CodeMirror-activeline-background {
-  background: rgba(0, 102, 153, 0.06);
-  transition: background 0.15s ease;
+  background: rgba(0, 102, 153, 0.05);
+  transition: background $transition-base;
 }
 
 /* ---------------- Gutter ---------------- */
 
 .CodeMirror-gutters {
   border-right: 1px solid $border-color;
-  background: transparent;
+  background-color: $bg-body;
 }
 
 .CodeMirror-linenumber {
+  color: $text-muted;
   transition: color 0.15s ease, background 0.15s ease;
 }
 
 .CodeMirror-activeline-gutter .CodeMirror-linenumber {
   color: $action-primary;
-  background: rgba(0, 102, 153, 0.06);
-  border-radius: 4px;
+  background: rgba(0, 102, 153, 0.08);
+  font-weight: 600;
 }
 
 /* ======================================================
-   Selection (Feathered)
+   Selection Highlight
 ====================================================== */
 
 .CodeMirror-selected {
-  background:
-    linear-gradient(
-      90deg,
-      rgba(0, 102, 153, 0.08),
-      rgba(0, 102, 153, 0.18) 12%,
-      rgba(0, 102, 153, 0.18) 88%,
-      rgba(0, 102, 153, 0.08)
-    );
-  transition: background 0.15s ease;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 102, 153, 0.08),
+    rgba(0, 102, 153, 0.18) 12%,
+    rgba(0, 102, 153, 0.18) 88%,
+    rgba(0, 102, 153, 0.08)
+  );
+  transition: background $transition-base;
 }
 
 /* ======================================================
@@ -238,38 +326,38 @@ div.EasyMDEContainer {
 
 .CodeMirror-scroll {
   scrollbar-width: thin;
-  scrollbar-color: $color-neutral-500 transparent;
+  scrollbar-color: $border-color transparent;
 }
 
 .CodeMirror-scroll::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 .CodeMirror-scroll::-webkit-scrollbar-thumb {
-  background-color: $color-neutral-400;
-  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: $radius-round;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
 /* ======================================================
-   Preview
+   Preview Panels
 ====================================================== */
 
 .editor-preview,
 .editor-preview-side {
-  background: $bg-panel;
+  background-color: $bg-surface;
   color: $text-main;
   padding: 1.5rem 2rem;
   line-height: 1.7;
 
   ::selection {
-    background: rgba(0, 102, 153, 0.22);
+    background: rgba(0, 102, 153, 0.2);
   }
 }
 
 /* ======================================================
-   Font smoothing (Light)
+   Font Smoothing
 ====================================================== */
 
 .theme-light {
@@ -277,5 +365,60 @@ div.EasyMDEContainer {
   .CodeMirror {
     -webkit-font-smoothing: subpixel-antialiased;
     -moz-osx-font-smoothing: auto;
+  }
+}
+
+/* ======================================================
+   Inline Review Overlays & Warnings inside Editor
+====================================================== */
+
+.review-comment-button {
+  z-index: 99;
+  background-color: $bg-floating-shell;
+  border: 1px solid $border-floating-shell;
+  color: #ffffff;
+  border-radius: $radius-standard;
+  padding: 0.375rem 0.625rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: $shadow-floating;
+}
+
+.cm-review-highlight {
+  background-color: rgba(254, 240, 138, 0.6);
+  border-bottom: 2px solid #facc15;
+}
+
+.cm-review-highlight-active {
+  background-color: rgba(253, 186, 116, 0.75);
+  border-bottom: 2px solid #f97316;
+  cursor: pointer;
+}
+
+.review-thread-title blockquote {
+  margin: 0.625rem 0;
+  padding-left: 0.625rem;
+  border-left: 3px solid $border-color;
+  color: $text-muted;
+}
+
+.review-warning {
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+  background-color: var(--color-warning-100, #fef3c7);
+  border: 1px solid var(--color-warning-300, #fcd34d);
+  border-radius: $radius-standard;
+  color: var(--color-warning-900, #78350f);
+  font-size: 0.8125rem;
+}
+
+.cm-long-paragraph {
+  background-color: rgba(59, 130, 246, 0.06);
+  border-bottom: 2px dashed rgba(59, 130, 246, 0.45);
+  border-radius: 2px;
+
+  &:hover {
+    background-color: rgba(59, 130, 246, 0.1);
   }
 }

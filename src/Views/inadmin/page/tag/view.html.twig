@@ -1,13 +1,13 @@
 {% extends "inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_tags_list') }}">{{ 'Tags'|trans }}</a>
+    <a href="{{ path('incp_tags_list') }}">{{ 'Tags'|trans }}</a>
 	<span>{{ tag.title }}</span>
 {% endblock pagetitle %}
 
 {% block content %}
 <div class="col-12">
-	{% include 'inadmin/partials/table.html.twig' with {
+	{% include 'inadmin/partials/components/view_content.html.twig' with {
 		className: 'form__tag col-6',
 		type: 'post',
 		additional_classes: 'default',
@@ -38,19 +38,19 @@
 		limit: query.limit,
 		offset: query.offset,
 		total: total,
-		url_result: path('incc_tag_show', {
-			id: tag.id,
+		url_result: path('incp_tag_show', {
+			slug: tag.slug,
 			offset: query.offset,
 			limit: query.limit,
 		}),
-
+		view_setting: 'table',
 		show_select_deselect: true,
 		zebra: true,
 
 		actions: {
 
 			delete: {
-				button_class: 'button--negative button--delete',
+				button_class: 'btn--danger btn--delete',
 				icon: 'delete_forever',
 				title: 'Remove',
 			},

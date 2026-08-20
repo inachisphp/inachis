@@ -1,0 +1,28 @@
+{% if type == 'danger' %}
+    {% set admonition = { icon: 'dangerous', title: 'Danger'} %}
+{% elseif type == 'note' %}
+    {% set admonition = { icon: 'info', title: 'Note'} %}
+{% elseif type == 'tip' %}
+    {% set admonition = { icon: 'lightbulb', title: 'Tip'} %}
+{% elseif type == 'warning' %}
+    {% set admonition = { icon: 'warning', title: 'Warning'} %}
+{% else %}
+    {% set admonition = { icon: 'info', title: 'Info'} %}
+{% endif %}
+
+<section class="admonition admonition__{{ type }} {{ class|default('') }}">
+    {% if show_title is not defined or show_title or title is defined %}
+        <header class="admonition__title">
+        {% if show_icon is not defined or show_icon %}
+            <span class="material-icons" aria-hidden="true">{{ icon|default(admonition.icon) }}</span>
+        {% endif %}
+        {{ title|default(admonition.title) }}
+        </header>
+    {% endif %}
+     {% if (show_icon is not defined or show_icon) and not (show_title is not defined or show_title or title is defined) %}
+        <span class="material-icons" aria-hidden="true">{{ icon|default(admonition.icon) }}</span>
+     {% endif %}
+     {% block text %}
+    <span>{{ text }}</span>
+    {% endblock text %}
+</section>

@@ -9,25 +9,17 @@ const ROOT = process.cwd();
 const isWatch = process.argv.includes("--watch");
 const isProd = !isWatch;
 
-(() => {
-    const composerJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'composer.json'), 'utf-8'));
-    const versionFilePath = path.join(ROOT, 'config/version.php');
+const versionFile = path.join(ROOT, "config/version.json");
 
-    const version = composerJson.version || 'dev';
-    const commit = process.env.GIT_COMMIT || 'dev';
-    const buildDate = new Date().toISOString();
+if (fs.existsSync(versionFile)) {
+    const version = JSON.parse(
+        fs.readFileSync(versionFile, "utf8")
+    );
 
-    const versionFileContent = `<?php
-return [
-    'version' => '${version}',
-    'commit' => '${commit}',
-    'build_date' => '${buildDate}',
-];
-`;
-
-    fs.writeFileSync(versionFilePath, versionFileContent);
-    console.log(`📄 Generated version file: ${versionFilePath}`);
-})();
+    console.log(
+        `Building Inachis ${version.version} (${version.commit})`
+    );
+}
 
 const jsBaseConfig = {
     bundle: true,
@@ -57,12 +49,12 @@ const builds = {
         js: {
             ...jsBaseConfig,
             entryPoints: [path.join(ROOT, "assets/js/inadmin.js")],
-            outfile: path.join(ROOT, "public/assets/js/incc/scripts.min.js")
+            outfile: path.join(ROOT, "public/assets/js/incp/scripts.min.js")
         },
         scss: {
             ...scssBaseConfig,
             entryPoints: [path.join(ROOT, "assets/scss/inadmin/styles.scss")],
-            outfile: path.join(ROOT, "public/assets/css/incc/styles.min.css")
+            outfile: path.join(ROOT, "public/assets/css/incp/styles.min.css")
         }
     },
     web: {
@@ -89,9 +81,9 @@ const color = {
 async function optimizeImages() {
     const targets = [
         {
-            label: 'incc',
-            input: path.join(ROOT, "assets/imgs/incc"),
-            output: path.join(ROOT, "public/assets/imgs/incc")
+            label: 'incp',
+            input: path.join(ROOT, "assets/imgs/incp"),
+            output: path.join(ROOT, "public/assets/imgs/incp")
         },
         {
             label: 'web',
@@ -152,8 +144,8 @@ async function optimizeImages() {
 }
 
 async function copyIconsAndManifests() {
-    const srcDir = path.join(ROOT, "assets/imgs/incc");
-    const destDir = path.join(ROOT, "public/assets/imgs/incc");
+    const srcDir = path.join(ROOT, "assets/imgs/incp");
+    const destDir = path.join(ROOT, "public/assets/imgs/incp");
     const filesToCopy = ['.ico', 'browserconfig.xml', 'site.webmanifest'];
 
     fs.mkdirSync(destDir, { recursive: true });
@@ -182,8 +174,8 @@ async function copyExtraLibraries() {
         "node_modules/tom-select/dist/js/tom-select.complete.min.js"
     ];
 
-    const destDirJs = path.join(ROOT, "public/assets/js/incc/");
-    const destDirCss = path.join(ROOT, "public/assets/css/incc/");
+    const destDirJs = path.join(ROOT, "public/assets/js/incp/");
+    const destDirCss = path.join(ROOT, "public/assets/css/incp/");
     if (!fs.existsSync(destDirJs)) fs.mkdirSync(destDirJs, { recursive: true });
     if (!fs.existsSync(destDirCss)) fs.mkdirSync(destDirCss, { recursive: true });
 

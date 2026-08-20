@@ -1,32 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Import\Category;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Category;
+use Inachis\Entity\Content\Category;
 use Inachis\Model\CategoryExportDto;
+use Inachis\Model\Import\CategoryImportResult;
+use Inachis\Repository\Content\CategoryRepository;
 
 /**
  * Service for importing categories from DTOs and building a tree.
  */
 final class CategoryImportService
 {
+    /**
+     * Constructor for CategoryImportService.
+     */
     public function __construct(
-        private EntityManagerInterface $entityManager
-    ) {}
+        private CategoryRepository $categoryRepository,
+        private EntityManagerInterface $entityManager,
+    ) {
+    }
 
     /**
      * Build or update category tree from DTOs.
      *
-     * @param CategoryExportDto[] $categoryDtos
-     * @return CategoryImportResult
+     * @param iterable<CategoryExportDto> $categoryDtos
      */
     public function import(iterable $categoryDtos): CategoryImportResult
     {
@@ -37,7 +42,7 @@ final class CategoryImportService
 
         try {
             // Map existing categories by full path
-            foreach ($this->entityManager->getRepository(Category::class)->findAll() as $cat) {
+            foreach ($this->categoryRepository->findAll() as $cat) {
                 $existingCategories[$cat->getFullPath()] = $cat;
             }
 
@@ -46,12 +51,16 @@ final class CategoryImportService
                 /** @var CategoryExportDto $dto */
                 $parent = null;
 
+                if (!is_string($dto->fullPath) || empty($dto->fullPath)) {
+                    continue;
+                }
+
                 // Rebuild hierarchy from fullPath
                 $segments = explode('/', $dto->fullPath);
                 $pathSoFar = '';
 
                 foreach ($segments as $title) {
-                    $pathSoFar = $pathSoFar ? $pathSoFar . '/' . $title : $title;
+                    $pathSoFar = $pathSoFar ? $pathSoFar.'/'.$title : $title;
 
                     if (isset($existingCategories[$pathSoFar])) {
                         $cat = $existingCategories[$pathSoFar];
@@ -59,7 +68,7 @@ final class CategoryImportService
                         $cat = new Category($title);
                         $cat->setParent($parent);
                         $this->entityManager->persist($cat);
-                        $result->categoriesCreated++;
+                        ++$result->categoriesCreated;
                         $existingCategories[$pathSoFar] = $cat;
                     }
 
@@ -74,14 +83,14 @@ final class CategoryImportService
             $uow = $this->entityManager->getUnitOfWork();
             foreach ($existingCategories as $category) {
                 if (!empty($uow->getEntityChangeSet($category))) {
-                    $result->categoriesUpdated++;
+                    ++$result->categoriesUpdated;
                 }
             }
             $this->entityManager->flush();
             $this->entityManager->commit();
         } catch (\Throwable $e) {
             $this->entityManager->rollback();
-            $result->warnings[] = 'Import failed: ' . $e->getMessage();
+            $result->warnings[] = 'Import failed: '.$e->getMessage();
         }
 
         return $result;
@@ -90,7 +99,6 @@ final class CategoryImportService
     /**
      * Maps the imported data to DTOs.
      *
-     * @param array $data
      * @return CategoryExportDto[]
      */
     public function mapToDto(array $data): array

@@ -4,12 +4,15 @@ window.Inachis.ContentSelectorDialog = {
   dialog: null,
   offset: 0,
   limit: 25,
-  saveTimeout: null,
+  searchTimeout: null,
 
   init() {
     document.addEventListener('click', e => {
       const link = e.target.closest('.content-selector__link');
-      if (!link) return;
+
+      if (!link) {
+        return;
+      }
 
       e.preventDefault();
       this.open();
@@ -18,37 +21,70 @@ window.Inachis.ContentSelectorDialog = {
 
   open() {
     this.dialog?.close();
+
+    clearTimeout(this.searchTimeout);
+    this.searchTimeout = null;
+
     this.offset = 0;
 
     this.dialog = new Dialog({
       id: 'dialog__contentSelector',
       title: 'Choose content…',
       content: `
-        <p>&nbsp;</p>
-        <div class="loader"></div>
-        <p>&nbsp;</p>
+        <section class="ui-dialog-secondary-bar">
+          <form class="search">
+            <label for="ui-dialog-search-input">Search</label>
+            <input
+              class="text ui-icon-search"
+              id="ui-dialog-search-input"
+              placeholder="Filter by name"
+              type="search"
+            />
+          </form>
+
+          <p id="content-selector-summary">
+            <span class="loader"></span>
+          </p>
+        </section>
+
+        <form class="form">
+          <div id="content-selector-results">
+            <p>&nbsp;</p>
+            <div class="loader"></div>
+            <p>&nbsp;</p>
+          </div>
+        </form>
       `,
       buttons: [
         {
-          text: 'Attach to series',
-          class: 'button button--positive',
-          disabled: true,
-          click: () => this.addContentToSeries()
-        },
-        {
           text: 'Close',
-          class: 'button button--info',
+          class: 'btn btn--outline',
           click() {
             this.close();
           }
+        },
+        {
+          text: 'Attach to series',
+          class: 'btn btn--primary',
+          disabled: true,
+          click: () => this.addContentToSeries()
         }
       ],
       onOpen: dialog => {
-        document.querySelector('.fixed-bottom-bar')?.classList.toggle('hidden');
+        document
+          .querySelector('.fixed-bottom-bar')
+          ?.classList.toggle('hidden');
+
+        this.bindEvents(dialog);
         this.loadContentList(dialog);
       },
       onClose: () => {
-        document.querySelector('.fixed-bottom-bar')?.classList.toggle('hidden');
+        clearTimeout(this.searchTimeout);
+        this.searchTimeout = null;
+
+        document
+          .querySelector('.fixed-bottom-bar')
+          ?.classList.toggle('hidden');
       }
     });
 
@@ -56,19 +92,75 @@ window.Inachis.ContentSelectorDialog = {
   },
 
   /* -----------------------------
+     Event wiring
+     ----------------------------- */
+
+  bindEvents(dialog) {
+    const container = dialog.dialog;
+    const search = container.querySelector('#ui-dialog-search-input');
+    const results = container.querySelector('#content-selector-results');
+
+    search?.addEventListener('input', () => {
+      clearTimeout(this.searchTimeout);
+
+      this.searchTimeout = setTimeout(() => {
+        this.offset = 0;
+        this.loadContentList(dialog);
+      }, 500);
+    });
+
+    results?.addEventListener('click', e => {
+      const link = e.target.closest('.pagination li a');
+
+      if (!link) {
+        return;
+      }
+
+      e.preventDefault();
+
+      this.offset =
+        (Number(link.textContent.trim()) - 1) * this.limit;
+
+      this.loadContentList(dialog);
+    });
+
+    results?.addEventListener('change', e => {
+      if (!e.target.matches('input[type="checkbox"]')) {
+        return;
+      }
+
+      this.updateSubmitButton(dialog);
+    });
+  },
+
+  /* -----------------------------
      Content loading
      ----------------------------- */
 
   loadContentList(dialog) {
-    const keyword =
-      dialog.dialog.querySelector('#ui-dialog-search-input')?.value || '';
+    const search =
+      dialog.dialog.querySelector('#ui-dialog-search-input');
 
-    const body = dialog.body;
-    body.innerHTML = '<p/><div class="loader"></div><p/>';
+    const results =
+      dialog.dialog.querySelector('#content-selector-results');
+
+    const summary =
+      dialog.dialog.querySelector('#content-selector-summary');
+
+    if (!results || !summary) {
+      return;
+    }
+
+    const keyword = search?.value || '';
+
+    results.innerHTML =
+      '<p>&nbsp;</p><div class="loader"></div><p>&nbsp;</p>';
 
     fetch(`${Inachis.prefix}/ax/contentSelector/get`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
       body: new URLSearchParams({
         offset: this.offset,
         limit: this.limit,
@@ -76,53 +168,58 @@ window.Inachis.ContentSelectorDialog = {
         'filters[keyword]': keyword
       })
     })
-      .then(res => res.text())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        return res.text();
+      })
       .then(html => {
-        body.innerHTML = html;
-        this.initInputs(dialog);
+        const template = document.createElement('template');
+        template.innerHTML = html.trim();
+
+        const newSummary =
+          template.content.querySelector('#content-selector-summary');
+
+        const newResults =
+          template.content.querySelector('#content-selector-list');
+
+        if (newSummary) {
+          summary.innerHTML = newSummary.innerHTML;
+        }
+
+        if (newResults) {
+          results.innerHTML = newResults.innerHTML;
+        } else {
+          results.innerHTML =
+            '<p role="alert">Failed to load content</p>';
+        }
+
+        this.updateSubmitButton(dialog);
       })
       .catch(() => {
-        body.innerHTML = '<p role="alert">Failed to load content</p>';
+        results.innerHTML =
+          '<p role="alert">Failed to load content</p>';
       });
   },
 
   /* -----------------------------
-     Input wiring (pagination, search, checkboxes)
+     Button state
      ----------------------------- */
 
-  initInputs(dialog) {
-    const container = dialog.dialog;
-    const submitBtn = dialog.getButton(0);
+  updateSubmitButton(dialog) {
+    const submitBtn =
+      dialog.getFirstButtonByClass('btn--primary');
 
-    // Pagination
-    container
-      .querySelectorAll('.pagination li a')
-      .forEach(link => {
-        link.addEventListener('click', e => {
-          e.preventDefault();
-          this.offset = (Number(link.textContent) - 1) * this.limit;
-          this.loadContentList(dialog);
-        });
-      });
-
-    // Search input (debounced)
-    const search = container.querySelector('#ui-dialog-search-input');
-    if (search) {
-      search.addEventListener('input', () => {
-        clearTimeout(this.saveTimeout);
-        this.saveTimeout = setTimeout(() => {
-          this.offset = 0;
-          this.loadContentList(dialog);
-        }, 500);
-      });
+    if (!submitBtn) {
+      return;
     }
 
-    // Checkbox → enable button
-    container.addEventListener('change', e => {
-      if (!e.target.matches('input[type="checkbox"]')) return;
-      submitBtn.disabled =
-        !container.querySelectorAll('input[type="checkbox"]:checked').length;
-    });
+    submitBtn.disabled =
+      !dialog.dialog.querySelector(
+        '#content-selector-results input[type="checkbox"]:checked'
+      );
   },
 
   /* -----------------------------
@@ -131,19 +228,28 @@ window.Inachis.ContentSelectorDialog = {
 
   addContentToSeries() {
     const container = this.dialog.dialog;
-    const submitBtn = this.dialog.getButton(0);
+    const submitBtn =
+      this.dialog.getFirstButtonByClass('btn--primary');
 
     const selectedIds = [
       ...container.querySelectorAll(
-        '#dialog__contentSelector input[type="checkbox"]:checked'
+        '#content-selector-results input[type="checkbox"]:checked'
       )
     ].map(cb => cb.value);
+
+    if (!selectedIds.length) {
+      return;
+    }
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Saving…';
 
     const params = new URLSearchParams();
-    params.append('seriesId', easymde.options.autosave.uniqueId);
+
+    params.append(
+      'seriesId',
+      easymde.options.autosave.uniqueId
+    );
 
     selectedIds.forEach(id => {
       params.append('ids[]', id);
@@ -151,7 +257,9 @@ window.Inachis.ContentSelectorDialog = {
 
     fetch(`${Inachis.prefix}/ax/contentSelector/save`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
       body: params
     })
       .then(res => res.text())
@@ -159,6 +267,7 @@ window.Inachis.ContentSelectorDialog = {
         if (data === 'Saved') {
           submitBtn.innerHTML =
             '<span class="material-icons">done</span> Content added';
+
           setTimeout(() => location.reload(), 5000);
         } else {
           submitBtn.textContent = 'No changes saved';
@@ -167,10 +276,11 @@ window.Inachis.ContentSelectorDialog = {
       })
       .catch(() => {
         submitBtn.textContent = 'Failed to save';
-        submitBtn.classList.add('button--negative');
+        submitBtn.classList.add('btn--danger');
+
         setTimeout(() => {
           submitBtn.disabled = false;
-          submitBtn.classList.remove('button--negative');
+          submitBtn.classList.remove('btn--danger');
           submitBtn.textContent = 'Attach to series';
         }, 1200);
       });

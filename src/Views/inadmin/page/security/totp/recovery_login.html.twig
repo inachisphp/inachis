@@ -1,0 +1,28 @@
+{% extends "inadmin/partials/form_account.html.twig" %}
+
+{% set page_type = 'login' %}
+{% set page_title = 'Login to' %}
+
+{% block form_account %}
+<p>
+    Enter one of your saved recovery codes.
+    Each recovery code can only be used once.
+</p>
+
+<p>
+    {{ form_label(form.code) }}
+    {{ form_widget(form.code) }}
+    {{ form_errors(form.code) }}
+</p>
+<p>{{ form_widget(form.verify)}}</p>
+
+<p>
+    <a
+        href="{{ path('incp_totp_login') }}">Have access to your authenticator again?
+        Use an authenticator code
+    </a>
+</p>
+
+
+
+{% endblock %}

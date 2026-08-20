@@ -1,76 +1,76 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Tools;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\{Image,Page,Series,Tag,Url};
-use Inachis\Repository\{ImageRepository,PageRepository};
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Media\ImageRepository;
+use Inachis\Service\System\DatabasePurgeService;
+use Inachis\Service\System\Maintenance\MaintenanceManager;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 class ToolsIndexController extends AbstractInachisController
 {
     /**
-     * Index page for tools
-     *
-     * @return Response
+     * Index page for tools.
      */
-    #[Route("/incc/tools", name: 'incc_tools_index')]
-    public function index(): Response
-    {
-        $this->data['environment'] = $this->getParameter('kernel.environment');
-        $this->data['page']['title'] = 'Tools';
-        $this->data['page']['tab'] = 'tools';
-        return $this->render('inadmin/page/tools/list.html.twig', $this->data);
+    #[Route('/incp/tools', name: 'incp_tools_index')]
+    public function index(
+        ImageRepository $imageRepository,
+        MaintenanceManager $manager,
+    ): Response {
+        $this->viewModel->page->title = 'Tools';
+        $this->viewModel->page->tab = 'tools';
+
+        return $this->render('inadmin/page/tools/list.html.twig', [
+            'viewModel' => $this->viewModel,
+            'diskUsage' => $imageRepository->getDiskUsage(),
+            'environment' => $this->getParameter('kernel.environment'),
+            'maintenanceEnabled' => $manager->isEnabled(),
+        ]);
     }
 
     /**
-     * Storage usage page
-     *
-     * @param ImageRepository $imageRepository
-     * @param PageRepository $pageRepository
-     * @return Response
+     * Storage usage page.
      */
-    #[Route("/incc/tools/storage", name: 'incc_tools_storage')]
+    #[Route('/incp/tools/storage', name: 'incp_tools_storage')]
     public function storage(ImageRepository $imageRepository, PageRepository $pageRepository): Response
     {
-        $this->data['environment'] = $this->getParameter('kernel.environment');
-        $this->data['page']['title'] = 'Storage';
-        $this->data['page']['tab'] = 'tools';
-        $this->data['storage'] = [
-            'biggestImages' => $imageRepository->getAll(0, 10, [], [['q.filesize', 'DESC']]),
-            'images' => $imageRepository->getDiskUsage(),
-            'topPagesBySize' => $pageRepository->getTopPagesByImageSize(25),
-        ];
-        return $this->render('inadmin/page/tools/storage.html.twig', $this->data);
+        $this->viewModel->page->title = 'Storage';
+        $this->viewModel->page->tab = 'tools';
+
+        return $this->render('inadmin/page/tools/storage.html.twig', [
+            'viewModel' => $this->viewModel,
+            'environment' => $this->getParameter('kernel.environment'),
+            'storage' => [
+                'biggestImages' => $imageRepository->getAll(10, 0, [], [['q.filesize', 'DESC']]),
+                'images' => $imageRepository->getDiskUsage(),
+                'topPagesBySize' => $pageRepository->getTopPagesByImageSize(25),
+            ],
+        ]);
     }
 
-    // /**
-    //  * @param LoggerInterface $logger
-    //  * @param Request $request
-    //  * @return RedirectResponse
-    //  * @throws \Doctrine\DBAL\ConnectionException
-    //  */
-    // #[Route("/incc/settings/wipe", methods: [ "POST" ])]
-    // public function wipe(LoggerInterface $logger, Request $request): RedirectResponse
-    // {
-    //     if ($request->request->get('confirm', false)) {
-    //         $logger->info('Wiping all content');
-    //         $this->entityManager->getRepository(Image::class)->wipe($logger);
-    //         $this->entityManager->getRepository(Page::class)->wipe($logger);
-    //         $this->entityManager->getRepository(Series::class)->wipe($logger);
-    //         $this->entityManager->getRepository(Tag::class)->wipe($logger);
-    //         $this->entityManager->getRepository(Url::class)->wipe($logger);
-    //     }
-    //     return $this->redirectToRoute('inachis_settings_index');
-    // }
+    #[Route('/incp/tools/data-purge', name: 'incp_tools_data_purge', methods: ['POST'])]
+    public function purgeData(
+        Request $request,
+        DatabasePurgeService $purgeService,
+    ): Response {
+        if (!$this->isCsrfTokenValid('data_purge', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Invalid CSRF token.');
+            return $this->redirectToRoute('incp_tools_index');
+        }
+
+        $purged = $purgeService->purgeUserTables();
+        $this->addFlash('success', sprintf('Successfully purged data from %d tables.', count($purged)));
+
+        return $this->redirectToRoute('incp_tools_index');
+    }
 }

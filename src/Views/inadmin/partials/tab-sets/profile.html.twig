@@ -5,20 +5,29 @@
         {
             id: 'profile',
             title: 'Profile',
-            url: path('incc_admin_edit', { 'id': user.username } ),
+            url: path('incp_admin_edit', { 'id': user.username } ) ~ '#user__profile',
+        },
+        {
+            id: 'roles',
+            title: 'Roles',
+            url: path('incp_admin_edit', { 'id': user.username } ) ~ '#user__roles',
+        },
+        {
+            id: 'auth',
+            title: 'Authentication',
+            url: path('incp_admin_edit', { 'id': user.username } ) ~ '#user__auth',
+            displayCondition: app.user.id == user.id,
         },
         {
             id: 'change-password',
             title: 'Change Password',
-            url: path('incc_admin_change_password', { 'id': user.username }),
-            displayCondition: app.user.username == user.username,
+            url: path('incp_admin_change_password', { 'id': user.username }),
+            displayCondition: app.user.id == user.id,
         },
         {
-            id: 'login-activity',
+            id: 'audit-logs',
             title: 'Audit Logs',
-            url: path('incc_admin_login_activity', { 'id': user.username }),
+            url: path('incp_admin_login_activity', { 'id': user.username }),
         }
     ]
 }) }}
-<!-- Two-factor authentication -->
-<!-- Access -->

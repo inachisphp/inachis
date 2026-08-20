@@ -1,0 +1,32 @@
+<div class="admin__actions">
+    <section class="admin__user">
+        <a href="#admin__user__options">
+            {% if viewModel.session.avatar is not empty %}
+            <img alt="{% trans %}admin.actions.avatar{% endtrans %}" height="40" src="{{ viewModel.session.avatar.filename }}" width="40" />
+            {% else %}
+            <span data-color="{{ userPreference.color }}" data-initials="{{ viewModel.session.initials }}"></span>
+            {% endif %}
+            {%- if viewModel.notifications|length > 0 %}<span class="admin__user__notifications">{{ viewModel.notifications|length }}</span>{% endif %}
+        </a>
+        <ul id="admin__user__options">
+            <li><p><strong>Welcome,</strong> {{ viewModel.session.displayName }}</p></li>
+            <li><a href="{{ path('incp_admin_edit', {'id': viewModel.session.username }) }}" title="Edit profile for {{ viewModel.session.displayName }}">Edit your profile <span class="material-icons" aria-hidden="true">perm_identity</span></a></li>
+            <li><a href="{{ path('incp_admin_theme') }}" title="Change your appearance settings">Appearance <span class="material-icons" aria-hidden="true">brush</span></a></li>
+            <!-- li><a href="/incp/settings/releases">Update available <span class="material-icons" aria-hidden="true">new_releases</span></a></li -->
+            <li><form action="{{ path('incp_logout') }}" method="post"><button>Log out <span class="material-icons" aria-hidden="true">logout</span></button></form></li>
+        </ul>
+    </section>
+    <section class="admin__search">
+        <form action="{{ path('incp_search_results', { 'keyword': ' '}) }}" aria-label="Search content" method="post" role="search">
+            {% include 'inadmin/partials/components/search.html.twig' with {
+                ariaLabel: 'Search all content',
+                clearBtn: true,
+                enterKeyHint: 'search',
+                id: 'q',
+                name: 'keyword',
+                placeholder: 'admin.search.placeholder'|trans,
+                value: keyword|default(''),
+            } %}
+        </form>
+    </section>
+</div>

@@ -1,0 +1,160 @@
+<nav class="sidebar" aria-label="Admin menu">
+    <header class="admin__identity">
+        <h1><span>Inachis</span></h1>
+    </header>
+    <ul>
+{% if canAny([['PAGE', 'CREATE'], ['SERIES', 'CREATE']]) %}
+        <li class="menu-add has-submenu">
+            <a href="#" class="submenu-toggle" role="btn" aria-haspopup="true" aria-expanded="false" tabindex="0" data-tooltip="New">
+                <i class="material-icons" aria-hidden="true">edit</i>
+                <span>New</span>
+                <span class="material-icons arrow" aria-hidden="true">chevron_right</span>
+            </a>
+            <ul class="submenu">
+{% if can('PAGE', 'CREATE') %}
+                <li>
+                    <a href="{{ viewModel.settings.domain ~ path('incp_post_edit', { type: 'post'}) }}/post/new"
+                        data-action="new-post"
+                        data-tooltip="{% trans %}admin.menu.add.post.help{% endtrans %}"
+                        title="{% trans %}admin.menu.add.post.help{% endtrans %}">
+                        <i class="material-icons" aria-hidden="true">short_text</i>
+                        <span>{% trans %}admin.menu.add.post.title{% endtrans %}</span>
+                    </a>
+                </li>
+{% endif %}
+{% if can('SERIES', 'CREATE') %}
+                <li>
+                    <a href="{{ viewModel.settings.domain ~ path('incp_post_edit', { type: 'page'}) }}/new"
+                        data-tooltip="{% trans %}admin.menu.add.page.help{% endtrans %}"
+                        title="{% trans %}admin.menu.add.page.help{% endtrans %}">
+                        <i class="material-icons" aria-hidden="true">content_copy</i>
+                        <span>{% trans %}admin.menu.add.page.title{% endtrans %}</span>
+                    </a>
+                </li>
+{% endif %}
+            </ul>
+        </li>
+{% endif %}
+
+        <li class="{{ viewModel.page.tab|activeMenu('dashboard') }}">
+            <a href="{{ viewModel.settings.domain ~ path('incp_dashboard') }}"
+                data-tooltip="{% trans %}admin.dashboard.help{% endtrans %}"
+                title="{% trans %}admin.dashboard.help{% endtrans %}">
+                <i class="material-icons" aria-hidden="true">home</i>
+                <span>{% trans %}admin.dashboard.title{% endtrans %}</span>
+            </a>
+        </li>
+{% if can('PAGE', 'VIEW') %}
+        <li class="{{ viewModel.page.tab|activeMenu('post') ~ viewModel.page.tab|activeMenu('page') }}">
+            <a href="{{ viewModel.settings.domain ~ path('incp_post_list', {'type': 'post'}) }}"
+                data-tooltip="{% trans %}admin.posts.help{% endtrans %}"
+                title="{% trans %}admin.posts.help{% endtrans %}">
+                <i class="material-icons" aria-hidden="true">article</i>
+                <span>{% trans %}admin.posts.title{% endtrans %}</span></a>
+        </li>
+{% endif %}
+{% if can('SERIES', 'VIEW') %}
+        <li class="{{ viewModel.page.tab|activeMenu('series') }}">
+            <a href="{{ viewModel.settings.domain ~ path('incp_series_list') }}"
+                data-tooltip="{% trans %}admin.series.help{% endtrans %}"
+                title="{% trans %}admin.series.help{% endtrans %}">
+                <i class="material-icons" aria-hidden="true">library_books</i>
+                <span>{% trans %}admin.series.title{% endtrans %}</span>
+            </a>
+        </li>
+{% endif %}
+{% if canAny([['IMAGE', 'VIEW'], ['DOWNLOAD', 'VIEW']]) %}
+        <li class="{{ viewModel.page.tab|activeMenu('Image') }}">
+            <a href="{{ viewModel.settings.domain ~ path('incp_resource_list', { type: 'images' }) }}"
+                data-tooltip="{% trans %}admin.resources.help{% endtrans %}"
+                title="{% trans %}admin.resources.help{% endtrans %}">
+                <i class="material-icons" aria-hidden="true">perm_media</i>
+                <span>{% trans %}admin.resources.title{% endtrans %}</span>
+            </a>
+        </li>
+{% endif %}
+
+{% if can('PAGE', 'VIEW') or canGroup('USERS') or canGroup('TOOLS') or canGroup('SETTINGS') %}
+        <li class="has-submenu">
+            <a href="#admin__nav-settings"
+                class="submenu-toggle"
+                role="button" aria-haspopup="true"
+                aria-expanded="false"
+                tabindex="0"
+                data-tooltip="{% trans %}admin.menu.more.help{% endtrans %}"
+                title="{% trans %}admin.menu.more.help{% endtrans %}">
+                <i class="material-icons" aria-hidden="true">more_horiz</i>
+                <span>{% trans %}admin.menu.more.title{% endtrans %}</span>
+                <span class="material-icons arrow" aria-hidden="true">chevron_right</span>
+            </a>
+
+            <ul class="submenu">
+{% if canGroup('SECURITY') %}
+                <li class="{{ viewModel.page.tab|activeMenu('security') ~ viewModel.page.tab|activeMenu('policies') }}">
+                    <a href="{{ viewModel.settings.domain ~ path('incp_security_list') }}"
+                        data-tooltip="{% trans %}admin.security.help{% endtrans %}"
+                        title="{% trans %}admin.security.help{% endtrans %}">
+                        <i class="material-icons" aria-hidden="true">security</i>
+                        <span>{% trans %}admin.security.title{% endtrans %}</span></a>
+                </li>
+{% endif %}
+{% if canGroup('USERS') %}
+                <li class="{{ viewModel.page.tab|activeMenu('users') ~ viewModel.page.tab|activeMenu('audit-logs') }}">
+                    <a href="{{ viewModel.settings.domain ~ path('incp_admin_list') }}"
+                        data-tooltip="{% trans %}admin.user.help{% endtrans %}"
+                        title="{% trans %}admin.user.help{% endtrans %}">
+                        <i class="material-icons" aria-hidden="true">people</i>
+                        <span>{% trans %}admin.user.title{% endtrans %}</span>
+                    </a>
+                </li>
+{% endif %}
+
+{% if canGroup('TOOLS') %}
+                <li class="{{ viewModel.page.tab|activeMenu('tools') ~ viewModel.page.tab|activeMenu('import') ~ viewModel.page.tab|activeMenu('export') ~ viewModel.page.tab|activeMenu('analytics') ~ viewModel.page.tab|activeMenu('analytics_security') }}">
+                    <a href="{{ viewModel.settings.domain ~ path('incp_tools_index') }}"
+                        data-tooltip="System Tools"
+                        title="Use system tools">
+                        <i class="material-icons" aria-hidden="true">build</i>
+                        <span>Tools</span></a>
+                </li>
+{% endif %}
+{% if canGroup('SETTINGS') %}
+                <li class="{{ viewModel.page.tab|activeMenu('settings') }}">
+                    <a href="{{ viewModel.settings.domain ~ path('incp_settings_index') }}"
+                        data-tooltip="Settings"
+                        title="Change advanced settings">
+                        <i class="material-icons" aria-hidden="true">settings</i>
+                        <span>Settings</span></a>
+                </li>
+{% endif %}
+            </ul>
+        </li>
+    </ul>
+{% endif %}
+    <ul class="menu-view-site">
+{% if canWaste() %}
+        <li class="{{ viewModel.page.tab|activeMenu('waste') }}">
+            <a href="{{ viewModel.settings.domain ~ path('incp_waste_list') }}"
+                data-tooltip="Manage deleted content"
+                title="Manage deleted content">
+                <i class="material-icons" aria-hidden="true">delete</i>
+            {% if viewModel.deletedItems > 0 %}
+                    {% if viewModel.deletedItems > 99 %}{% set deletedItems = '99+' %}{% endif %}
+                    <span class="badge">{{ deletedItems|default(viewModel.deletedItems) }}</span>
+            {% endif %}
+                <span>Bin</span>
+            </a>
+        </li>
+{% endif %}
+        <li>
+            <a href="/" data-tooltip="View site">
+                <i class="material-icons" aria-hidden="true">exit_to_app</i>
+                <span>{% trans %}admin.menu.view_site{% endtrans %}</span>
+            </a>
+        </li>
+    </ul>
+    <button class="menu-toggle desktop-menu-toggle" aria-label="Toggle sidebar">
+      <i class="material-icons chevron" aria-hidden="true">chevron_right</i>
+    </button>
+</nav>
+<div class="sidebar-overlay"></div>

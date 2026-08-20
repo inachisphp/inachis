@@ -1,6 +1,6 @@
 window.Inachis = {
 	_debug: false,
-	prefix: '/incc',
+	prefix: '/incp',
 
 	_log(msg) {
 		if (this._debug) {
@@ -9,6 +9,7 @@ window.Inachis = {
 	},
 
 	bootstrap() {
+		window.Inachis.AiGenerate.init();
 		window.Inachis.BulkCreateDialog.init();
 		window.Inachis.CategoryManager.init();
 		window.Inachis.Components.init();
@@ -17,6 +18,7 @@ window.Inachis = {
 		window.Inachis.ImageManager.init();
 		window.Inachis.MergeTags.init();
 		window.Inachis.PostEdit.init();
+		window.Inachis.PermissionMatrix.init();
 	},
 
 	initOnClick(selector, handler) {

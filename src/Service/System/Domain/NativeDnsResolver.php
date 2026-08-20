@@ -1,21 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\System\Domain;
 
 /**
- * Native DNS resolver
- * 
- * @phpstan-type DnsRecord array{
- *     type: string,
- *     target?: string
- * }
+ * Native DNS resolver.
+ *
+ * @phpstan-import-type DnsRecord from \Inachis\Service\System\Domain\DnsResolverInterface
+ * @phpstan-import-type DnsEntries from \Inachis\Service\System\Domain\DnsResolverInterface
  */
 final class NativeDnsResolver implements DnsResolverInterface
 {
@@ -30,11 +27,9 @@ final class NativeDnsResolver implements DnsResolverInterface
     private int $retryDelay = 100;
 
     /**
-     * Get DNS records for a host
-     
-     * @param string $host
-     * @param int $type
-     * @return list<DnsRecord>
+     * Get DNS records for a host.
+     *
+     * @return DnsEntries
      */
     public function getRecords(string $host, int $type): array
     {
@@ -42,21 +37,21 @@ final class NativeDnsResolver implements DnsResolverInterface
         $attempts = 0;
 
         while ($attempts <= $this->retryCount) {
-            /** @var list<DnsRecord> $records */
+            /** @var DnsEntries */
             $records = @dns_get_record($host, $type) ?: [];
             if (!empty($records)) {
                 break;
             }
 
             // Retry on failure
-            $attempts++;
+            ++$attempts;
             if ($attempts <= $this->retryCount) {
                 usleep($this->retryDelay * 1000);
             }
         }
 
         // Handle CNAME flattening for TXT lookups (DKIM/SPF/BIMI)
-        if ($type === DNS_TXT) {
+        if (DNS_TXT === $type) {
             $records = $this->flattenCnameTxt($host, $records);
         }
 
@@ -64,19 +59,20 @@ final class NativeDnsResolver implements DnsResolverInterface
     }
 
     /**
-     * Flattens CNAME records for TXT lookups
+     * Flattens CNAME records for TXT lookups.
      *
-     * @param string $host
-     * @param list<DnsRecord> $records
-     * @return list<DnsRecord>
+     * @param DnsEntries $records
+     *
+     * @return DnsEntries
      */
     private function flattenCnameTxt(string $host, array $records): array
     {
         foreach ($records as $rec) {
-            if ($rec['type'] === 'CNAME' && isset($rec['target'])) {
+            if ('CNAME' === $rec['type'] && isset($rec['target'])) {
                 $records = array_merge($records, $this->getRecords($rec['target'], DNS_TXT));
             }
         }
+
         return $records;
     }
 }

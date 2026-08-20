@@ -1,7 +1,7 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <a href="{{ path('incp_tools_index') }}">Tools</a>
     <span>Export</span>
 {% endblock pagetitle %}
 
@@ -11,7 +11,7 @@
 
 <section class="ui-section">
 
-<form class="form nested-grid" method="post" action="{{ path('incc_tools_export') }}">
+<form class="form nested-grid" method="post" action="{{ path('incp_tools_export') }}">
     <fieldset class="col-4">
         <legend>Content Type</legend>
         <p>
@@ -94,7 +94,7 @@
         <p class="admonition admonition__info start-hidden" aria-live="polite" aria-atomic="true">
             <strong>{{ selectedIds|default([])|length }}</strong> items will be exported.
         </p>
-        {% include 'inadmin/partials/search.html.twig' with {
+        {% include 'inadmin/partials/components/search.html.twig' with {
             placeholder: 'Search…',
             ariaLabel: 'Search',
             enterKeyHint: 'search',
@@ -110,7 +110,7 @@
 
     <div class="fixed-bottom-bar">
         <p>
-            <button class="button button--positive" name="export" value="1">
+            <button class="btn btn--primary" name="export" value="1">
                 <span class="material-icons">file_download</span> Export
             </button>
         </p>
@@ -122,7 +122,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        window.Inachis.Export.init('{{ path('incc_tools_export_ajax') }}');
+        window.Inachis.Export.init('{{ path('incp_tools_export_ajax') }}');
     });
 </script>
 

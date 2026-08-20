@@ -1,0 +1,124 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incp_settings_index') }}">Settings</a>
+    <span>Audio & Podcast Settings</span>
+{% endblock pagetitle %}
+
+{% block content %}
+<div class="col-12 ui-section">
+    <h2><span class="material-icons">graphic_eq</span> Intro & Outro Audio Bumpers</h3>
+    <p class="text-muted mb-0">
+        Manage standard intro and outro bumpers for synthesized post audio.
+    </p>
+    <div>
+        <span class="badge {{ aiConfigured ? 'bg-success' : 'bg-warning' }}">
+            Provider: {{ activeProvider|upper }}
+        </span>
+    </div>
+
+    <div class="nested-grid">
+        <section class="col-6">
+            <h3>
+                Intro Stinger
+                    {% if stinger.exists %}
+                        <span class="text-success ms-2 small">✓ Active ({{ (stinger.size / 1024)|number_format(1) }} KB)</span>
+                    {% endif %}
+            </h3>
+
+            <form action="{{ path('incp_settings_audio') }}" class="" method="post">
+                <label class="">Generate using AI TTS</label>
+                <textarea name="stinger_script" rows="4" placeholder="e.g. You're listening to Wandering the World. Sit back and enjoy today's story.">You’re listening to Wandering the World. Sit back and enjoy this audio edition of today’s story.</textarea>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <select name="stinger_voice" class="form-select form-select-sm w-auto">
+                        <option value="Aoede">Voice: Aoede / Nova (Friendly)</option>
+                        <option value="Puck">Voice: Puck / Alloy (Neutral)</option>
+                        <option value="Fenrir">Voice: Fenrir / Echo (Deep/Narrative)</option>
+                    </select>
+                    
+                    <button type="submit" name="action" value="generate_stinger" class="btn btn--ai btn--sm" {{ not aiConfigured ? 'disabled' }}>
+                        <span class="material-icons">auto_awesome</span> Generate Stinger
+                    </button>
+                </div>
+            </form>
+
+            <div class="">
+                <form action="{{ path('incp_settings_audio') }}" method="post" enctype="multipart/form-data">
+                    <label class="small text-muted">Or upload custom MP3</label>
+                    <input type="file" name="stinger_file" class="form-control form-control-sm mb-2" accept="audio/mp3,audio/mpeg" />
+                    <button type="submit" name="action" value="upload" class="btn btn--secondary btn--sm">
+                        Upload MP3
+                    </button>
+                </form>
+
+                {% if stinger.exists %}
+                    <div class="text-end mt-2">
+                        <form action="{{ path('incp_settings_audio') }}" method="post">
+                            <button type="submit" name="action" value="remove_stinger" class="btn btn--danger btn--sm">
+                                <span class="material-icons">delete</span> Remove Active File
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="col-6">
+                <div class="card-header">
+                    <strong>Outro Trailer (`pod_trailer.mp3`)</strong>
+                    {% if trailer.exists %}
+                        <span class="text-success ms-2 small">✓ Active ({{ (trailer.size / 1024)|number_format(1) }} KB)</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- AI Generator Form -->
+                        <div class="col-md-7 border-end pe-4">
+                            <form action="{{ path('incp_settings_audio') }}" method="post">
+                                <label class="form-label small text-muted">Generate using AI TTS</label>
+                                <textarea name="trailer_script" class="form-control mb-2" rows="2" placeholder="e.g. Thanks for listening! Visit our site for more travel stories.">Thanks for listening to Wandering the World! For more guides, photos, and travel stories, visit us online. Until next time, happy trails!</textarea>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <select name="trailer_voice" class="form-select form-select-sm w-auto">
+                                        <option value="Aoede">Voice: Aoede / Nova (Friendly)</option>
+                                        <option value="Puck">Voice: Puck / Alloy (Neutral)</option>
+                                        <option value="Fenrir">Voice: Fenrir / Echo (Deep/Narrative)</option>
+                                    </select>
+                                    
+                                    <button type="submit" name="action" value="generate_trailer" class="btn btn-primary btn-sm" {{ not aiConfigured ? 'disabled' }}>
+                                        <span class="material-icons">auto_awesome</span> Generate Trailer
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Manual Upload / Remove -->
+                        <div class="col-md-5 ps-4 d-flex flex-column justify-content-between">
+                            <form action="{{ path('incp_settings_audio') }}" method="post" enctype="multipart/form-data">
+                                <label class="form-label small text-muted">Or upload custom MP3</label>
+                                <input type="file" name="trailer_file" class="form-control form-control-sm mb-2" accept="audio/mp3,audio/mpeg" />
+                                <button type="submit" name="action" value="upload" class="btn btn-outline-secondary btn-sm">
+                                    Upload MP3
+                                </button>
+                            </form>
+
+                            {% if trailer.exists %}
+                                <div class="text-end mt-2">
+                                    <form action="{{ path('incp_settings_audio') }}" method="post">
+                                        <button type="submit" name="action" value="remove_trailer" class="btn btn-outline-danger btn-sm">
+                                            <span class="material-icons">delete</span> Remove Active File
+                                        </button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+{% endblock content %}

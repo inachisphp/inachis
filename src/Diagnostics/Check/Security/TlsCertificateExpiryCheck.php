@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics\Check\Security;
@@ -15,25 +14,40 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final class TlsCertificateExpiryCheck implements CheckInterface
 {
-    public function __construct(
-        private readonly RequestStack $requestStack
-    ) {}
+    /**
+     * Constructor the check.
+     */
+    public function __construct(private readonly RequestStack $requestStack)
+    {
+    }
 
+    /**
+     * Returns the id of the check.
+     */
     public function getId(): string
     {
         return 'tls_certificate_expiry';
     }
 
+    /**
+     * Returns a friendly name for the check.
+     */
     public function getLabel(): string
     {
         return 'TLS Certificate Expiry';
     }
 
+    /**
+     * Returns the section name this check appears under.
+     */
     public function getSection(): string
     {
         return 'Security';
     }
 
+    /**
+     * Runs the check.
+     */
     public function run(): CheckResult
     {
         $request = $this->requestStack->getMainRequest();
@@ -47,7 +61,7 @@ final class TlsCertificateExpiryCheck implements CheckInterface
                 'No active request available.',
                 null,
                 $this->getSection(),
-                'high'
+                'high',
             );
         }
 
@@ -68,7 +82,7 @@ final class TlsCertificateExpiryCheck implements CheckInterface
                 $errstr,
                 10,
                 STREAM_CLIENT_CONNECT,
-                $context
+                $context,
             );
 
             if (!$client) {
@@ -77,22 +91,26 @@ final class TlsCertificateExpiryCheck implements CheckInterface
 
             $params = stream_context_get_params($client);
 
-            $certificate = $params['options']['ssl']['peer_certificate'] ?? null;
+            /** @var array<string, mixed> $ssl */
+            $ssl = $params['options']['ssl'] ?? [];
 
-            if (!$certificate) {
+            $certificate = $ssl['peer_certificate'] ?? null;
+
+            if (!$certificate || !($certificate instanceof \OpenSSLCertificate || is_string($certificate))) {
                 throw new \RuntimeException('Certificate not available');
             }
 
+            /** @var array{validTo_time_t: int,...}|false */
             $parsed = openssl_x509_parse($certificate);
 
             if (!isset($parsed['validTo_time_t'])) {
                 throw new \RuntimeException('Unable to determine certificate expiry');
             }
 
-            $expiryTimestamp = (int) $parsed['validTo_time_t'];
+            $expiryTimestamp = (int) $parsed['validTo_time_t'] ?: 0;
 
             $daysRemaining = (int) floor(
-                ($expiryTimestamp - time()) / 86400
+                ($expiryTimestamp - time()) / 86400,
             );
 
             $expiryDate = (new \DateTimeImmutable())
@@ -108,11 +126,11 @@ final class TlsCertificateExpiryCheck implements CheckInterface
                     sprintf(
                         'Certificate for %s expired on %s.',
                         $host,
-                        $expiryDate
+                        $expiryDate,
                     ),
                     'Renew the TLS certificate immediately.',
                     $this->getSection(),
-                    'high'
+                    'high',
                 );
             }
 
@@ -121,15 +139,15 @@ final class TlsCertificateExpiryCheck implements CheckInterface
                     $this->getId(),
                     $this->getLabel(),
                     'error',
-                    $daysRemaining . ' days',
+                    $daysRemaining.' days',
                     sprintf(
                         'Certificate for %s expires on %s.',
                         $host,
-                        $expiryDate
+                        $expiryDate,
                     ),
                     'Renew the certificate as soon as possible.',
                     $this->getSection(),
-                    'high'
+                    'high',
                 );
             }
 
@@ -138,15 +156,15 @@ final class TlsCertificateExpiryCheck implements CheckInterface
                     $this->getId(),
                     $this->getLabel(),
                     'warning',
-                    $daysRemaining . ' days',
+                    $daysRemaining.' days',
                     sprintf(
                         'Certificate for %s expires on %s.',
                         $host,
-                        $expiryDate
+                        $expiryDate,
                     ),
                     'Plan certificate renewal soon.',
                     $this->getSection(),
-                    'medium'
+                    'medium',
                 );
             }
 
@@ -154,15 +172,15 @@ final class TlsCertificateExpiryCheck implements CheckInterface
                 $this->getId(),
                 $this->getLabel(),
                 'ok',
-                $daysRemaining . ' days',
+                $daysRemaining.' days',
                 sprintf(
                     'Certificate for %s expires on %s.',
                     $host,
-                    $expiryDate
+                    $expiryDate,
                 ),
                 null,
                 $this->getSection(),
-                'low'
+                'low',
             );
         } catch (\Throwable $e) {
             return new CheckResult(
@@ -170,10 +188,10 @@ final class TlsCertificateExpiryCheck implements CheckInterface
                 $this->getLabel(),
                 'error',
                 null,
-                'Unable to check certificate: ' . $e->getMessage(),
+                'Unable to check certificate: '.$e->getMessage(),
                 'Verify TLS connectivity and certificate configuration.',
                 $this->getSection(),
-                'high'
+                'high',
             );
         }
     }

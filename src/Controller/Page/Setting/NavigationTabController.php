@@ -1,192 +1,176 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Setting;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\NavigationTab;
+use Inachis\Entity\System\NavigationTab;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\NavigationTabType;
-use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\NavigationTabRepository;
+use Inachis\Model\Page\ViewStateDefaults;
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\System\NavigationTabRepository;
+use Inachis\Security\Attribute\RequiresPermission;
+use Inachis\Service\Content\ViewStateManager;
 use Inachis\Service\Navigation\NavigationTabService;
-use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Controller for navigation tabs
+ * Controller for navigation tabs.
  */
-#[IsGranted('ROLE_ADMIN')]
 class NavigationTabController extends AbstractInachisController
 {
     /**
-     * List all navigation tabs
-     *
-     * @param Request $request
-     * @param NavigationTabRepository $navigationTabRepository
-     * @param NavigationTabService $navigationTabService
-     * @param EntityManagerInterface $entityManager
-     * @return Response
+     * List all navigation tabs.
      */
-    #[Route('/incc/settings/navigation', name: 'incc_settings_navigation_list')]
+    #[Route('/incp/settings/navigation', name: 'incp_settings_navigation_list')]
+    #[RequiresPermission(
+        resource: PermissionResource::NAVIGATION,
+        action: PermissionAction::VIEW,
+    )]
     public function index(
         Request $request,
-        ContentQueryParameters $contentQueryParameters,
+        CategoryRepository $categoryRepository,
         NavigationTabRepository $navigationTabRepository,
         NavigationTabService $navigationTabService,
+        ViewStateManager $viewStateManager,
     ): Response {
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && !empty($request->request->all('items'))) {
-            $items = $request->request->all('items') ?? [];
-            $action = $request->request->has('delete')  ? 'delete' :
+            /** @var list<string> */
+            $items = $request->request->all('items');
+            $action = $request->request->has('delete') ? 'delete' :
                 ($request->request->has('enable') ? 'enable' :
                 ($request->request->has('disable') ? 'disable' : null));
 
-            if ($action !== null && !empty($items)) {
+            if (null !== $action) {
                 $count = $navigationTabService->apply($action, $items);
                 $this->addFlash('success', "Action '$action' applied to $count tabs");
             }
-            return $this->redirectToRoute('incc_settings_navigation_list');
+
+            return $this->redirectToRoute('incp_settings_navigation_list');
         }
 
-        $contentQuery = $contentQueryParameters->process(
+        $params = $viewStateManager->build(
             $request,
-            $navigationTabRepository,
             'navigationTab',
-            'position asc',
+            new ViewStateDefaults(
+                sort: 'position asc',
+                view: 'table',
+            ),
+            $categoryRepository,
         );
-        $this->data['query'] = $contentQuery;
-        $this->data['form'] = $form->createView();
-        $this->data['dataset'] = $navigationTabRepository->getFiltered(
-            $contentQuery['filters'],
-            $contentQuery['offset'],
-            $contentQuery['limit'],
-            $contentQuery['sort'],
-        );
-        $this->data['page']['title'] = 'Navigation Tabs';
-        $this->data['page']['tab'] = 'settings';
-        return $this->render('inadmin/page/settings/navigation-list.html.twig', $this->data);
+
+        $this->viewModel->page->title = 'Navigation Tabs';
+        $this->viewModel->page->tab = 'settings';
+
+        return $this->render('inadmin/page/settings/navigation-list.html.twig', [
+            'viewModel' => $this->viewModel,
+            'dataset' => $navigationTabRepository->getFiltered(
+                $params->getLimit(),
+                $params->getOffset(),
+            ),
+            'form' => $form->createView(),
+            'query' => $params,
+        ]);
     }
 
     /**
-     * Saves changes to a given navigation tab
-     *
-     * @param Request $request
-     * @param NavigationTab $tab
-     * @param EntityManagerInterface $em
-     * @return Response
+     * Add/Edit a navigation tab.
      */
-    // #[Route('/incc/settings/navigation/{id}/edit', name: 'incc_settings_navigation_edit', methods: ['POST'])]
-    // public function edit(
-    //     Request $request,
-    //     NavigationTab $tab,
-    //     EntityManagerInterface $em
-    // ): Response {
-    //     $form = $this->createForm(NavigationTabType::class, $tab);
-    //     $form->handleRequest($request);
-
-    //     if ($form->isSubmitted() && $form->isValid()) {
-    //         $em->flush();
-    //     }
-    //     // $navigationService->clearCache();
-
-    //     return $this->redirectToRoute('incc_settings_navigation_list');
-    // }
-
-    /**
-     * Add/Edit a navigation tab
-     *
-     * @param Request $request
-     * @param NavigationTabRepository $navigationTabRepository
-     * @param NavigationTabService $navigationTabService
-     * @return Response
-     */
-    #[Route('/incc/settings/navigation/edit/{id}', name: 'incc_settings_navigation_edit')]
+    #[Route('/incp/settings/navigation/edit/{id}', name: 'incp_settings_navigation_edit')]
+    #[RequiresPermission(
+        resource: PermissionResource::NAVIGATION,
+        action: PermissionAction::VIEW,
+    )]
     public function edit(
         Request $request,
         NavigationTabRepository $navigationTabRepository,
         NavigationTabService $navigationTabService,
     ): Response {
-        $id = $request->attributes->get('id');
-        $isNew = ($id === 'new');
+        $id = $request->attributes->getString('id');
+        $isNew = ('new' === $id);
 
-        $tab = $isNew ? new NavigationTab():
-            $navigationTabRepository->findOneBy(
-                [ 'id' => $request->attributes->get('id') ]
-            );
-        /** @var Form $form */
+        $tab = $isNew ? new NavigationTab() :
+        $navigationTabRepository->findOneBy(
+            ['id' => $request->attributes->getString('id')],
+        );
         $form = $this->createForm(NavigationTabType::class, $tab);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid() && $tab instanceof NavigationTab) {
             $navigationTabService->add($tab);
-            return $this->redirectToRoute('incc_settings_navigation_list');
+
+            return $this->redirectToRoute('incp_settings_navigation_list');
         }
 
-        $this->data['page']['title'] = 'Navigation Tab';
-        $this->data['page']['tab'] = 'settings';
-        $this->data['form'] = $form->createView();
+        $this->viewModel->page->title = 'Navigation Tab';
+        $this->viewModel->page->tab = 'settings';
 
-        return $this->render('inadmin/page/settings/navigation-edit.html.twig', $this->data);
+        return $this->render('inadmin/page/settings/navigation-edit.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+        ]);
     }
 
     /**
-     * Move a navigation tab up
-     *
-     * @param NavigationTab $tab
-     * @param NavigationTabManager $manager
-     * @return Response
+     * Move a navigation tab up.
      */
-    #[Route('/incc/settings/navigation/{id}/up', name: 'incc_settings_navigation_up', methods: ['POST'])]
+    #[Route('/incp/settings/navigation/{id}/up', name: 'incp_settings_navigation_up', methods: ['POST'])]
+    #[RequiresPermission(
+        resource: PermissionResource::NAVIGATION,
+        action: PermissionAction::EDIT,
+    )]
     public function moveUp(
         NavigationTab $tab,
-        NavigationTabService $manager
+        NavigationTabService $manager,
     ): Response {
         $manager->moveUp($tab);
 
-        return $this->redirectToRoute('incc_settings_navigation_list');
+        return $this->redirectToRoute('incp_settings_navigation_list');
     }
 
     /**
-     * Move a navigation tab down
-     *
-     * @param NavigationTab $tab
-     * @param NavigationTabManager $manager
-     * @return Response
+     * Move a navigation tab down.
      */
-    #[Route('/incc/settings/navigation/{id}/down', name: 'incc_settings_navigation_down', methods: ['POST'])]
+    #[Route('/incp/settings/navigation/{id}/down', name: 'incp_settings_navigation_down', methods: ['POST'])]
+    #[RequiresPermission(
+        resource: PermissionResource::NAVIGATION,
+        action: PermissionAction::EDIT,
+    )]
     public function moveDown(
         NavigationTab $tab,
-        NavigationTabService $manager
+        NavigationTabService $manager,
     ): Response {
         $manager->moveDown($tab);
 
-        return $this->redirectToRoute('incc_settings_navigation_list');
+        return $this->redirectToRoute('incp_settings_navigation_list');
     }
 
     /**
-     * Reorder all tabs based on provided JSON list
-     *
-     * @param Request $request
-     * @param NavigationTabService $manager
-     * @return JsonResponse
+     * Reorder all tabs based on provided JSON list.
      */
-    #[Route('/incc/settings/navigation/reorder', name: 'incc_settings_navigation_reorder', methods: ['POST'])]
+    #[Route('/incp/settings/navigation/reorder', name: 'incp_settings_navigation_reorder', methods: ['POST'])]
+    #[RequiresPermission(
+        resource: PermissionResource::NAVIGATION,
+        action: PermissionAction::EDIT,
+    )]
     public function reorder(
         Request $request,
         NavigationTabService $manager,
     ): JsonResponse {
+        /** @var array{id?: string, order?: list<string>}|array{}|null */
         $data = json_decode($request->getContent(), true);
 
         if (!is_array($data)) {

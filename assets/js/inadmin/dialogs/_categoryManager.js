@@ -31,11 +31,11 @@ window.Inachis.CategoryManager = {
           buttons: [
             {
               text: 'Close',
-              class: 'button button--info',
+              class: 'btn btn--outline',
               click() {
                 this.close();
               }
-            }
+            },
           ],
           onOpen: dialog => {
             document.querySelector('.fixed-bottom-bar')?.classList.toggle('hidden');
@@ -55,7 +55,7 @@ window.Inachis.CategoryManager = {
         .then(res => res.text())
         .then(html => {
             dialog.setContent(html);
-            // this.submitButton = dialog.getButton(0);
+            // this.submitButton = dialog.getFirstButtonByClass('btn--primary');
             this.initInputs(dialog.dialog);
         })
         .catch(() => {

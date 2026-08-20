@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Validator\Constraints;
@@ -14,16 +13,12 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
- * ValidIPAddressValidator class
+ * ValidIPAddressValidator class.
  */
 class ValidIPAddressValidator extends ConstraintValidator
 {
     /**
-     * Validate the IP address
-     *
-     * @param mixed $value
-     * @param Constraint $constraint
-     * @return void
+     * Validate the IP address.
      */
     public function validate(mixed $value, Constraint $constraint): void
     {
@@ -44,33 +39,27 @@ class ValidIPAddressValidator extends ConstraintValidator
     }
 
     /**
-     * Validate IPv4 address
-     *
-     * @param string $ipAddress
-     * @return bool
+     * Validate IPv4 address.
      */
     public function validateIPv4(string $ipAddress): bool
     {
         return (bool) preg_match(
-            '/^(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\.' .
-            '(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\.' .
-            '(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\.' .
+            '/^(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\.'.
+            '(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\.'.
+            '(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\.'.
             '(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])$/',
-            $ipAddress
+            $ipAddress,
         );
     }
 
     /**
-     * Validate IPv6 address
-     *
-     * @param string $ipAddress
-     * @return bool
+     * Validate IPv6 address.
      */
     public function validateIPv6(string $ipAddress): bool
     {
         return (bool) preg_match(
             '/^([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}$/',
-            $ipAddress
+            $ipAddress,
         );
     }
 }

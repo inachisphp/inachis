@@ -1,16 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Import\Page;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Category;
+use Inachis\Entity\Content\Category;
 
 /**
  * Service for importing categories.
@@ -18,15 +17,14 @@ use Inachis\Entity\Category;
 final class CategoryImportService
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
-    ) {}
+        private EntityManagerInterface $entityManager,
+    ) {
+    }
 
     /**
      * Find a category by its full path, or optionally create missing categories.
      *
      * @param string $fullPath e.g. "Trips/Europe/France"
-     * @param bool $createIfMissing
-     * @return Category|null
      */
     public function findOrCreateByPath(string $fullPath, bool $createIfMissing = false): ?Category
     {

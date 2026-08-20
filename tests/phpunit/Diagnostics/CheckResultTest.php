@@ -1,6 +1,12 @@
 <?php
 
-namespace Inachis\Tests\Diagnostics;
+declare(strict_types=1);
+
+/**
+ * This file is part of the inachis framework.
+ */
+
+namespace Inachis\Tests\phpunit\Diagnostics;
 
 use Inachis\Diagnostics\CheckResult;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +32,7 @@ final class CheckResultTest extends TestCase
             $details,
             $recommendation,
             $section,
-            $confidence
+            $confidence,
         );
 
         $this->assertSame($id, $result->id);

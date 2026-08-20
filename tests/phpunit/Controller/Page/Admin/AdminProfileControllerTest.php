@@ -1,260 +1,459 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Controller\Page\Admin;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Inachis\Controller\Page\Admin\AdminProfileController;
-use Inachis\Entity\User;
-use Inachis\Model\ContentQueryParameters;
-use Inachis\Repository\UserRepository;
-use Inachis\Service\User\UserBulkActionService;
+use Inachis\Entity\Security\Role;
+use Inachis\Entity\User\User;
+use Inachis\Exception\User\CannotRemoveLastAdministratorException;
+use Inachis\Form\UserType;
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Security\RoleRepository;
+use Inachis\Repository\User\UserRepository;
+use Inachis\Repository\User\UserViewStateRepository;
+use Inachis\Security\Authentication\RecoveryCodeManager;
+use Inachis\Security\Authentication\TotpManager;
+use Inachis\Security\Authentication\TrustedDeviceManager;
+use Inachis\Service\Content\ViewStateManager;
 use Inachis\Service\User\UserAccountEmailService;
+use Inachis\Service\User\UserBulkActionService;
+use Inachis\Service\User\UserProtectionServiceInterface;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use Inachis\Transformer\ImageTransformer;
-use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\MockObject\Exception;
-use PHPUnit\Framework\MockObject\MockObject;
-use Ramsey\Uuid\Uuid;
-use Random\RandomException;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Form\Button;
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Twig\Environment;
 
-class AdminProfileControllerTest extends WebTestCase
+#[CoversClass(AdminProfileController::class)]
+final class AdminProfileControllerTest extends InachisControllerTestCase
 {
-    /**
-     * @var AdminProfileController&MockObject $controller
-     */
-    protected AdminProfileController $controller;
+    private AdminProfileController $controller;
+    private FlashBagAwareSessionInterface $session;
 
-    /**
-     * @throws Exception
-     */
-    public function setUp(): void
+    protected function setUp(): void
     {
-        $entityManager = $this->createStub(EntityManagerInterface::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(TranslatorInterface::class);
-        $this->controller = $this->getMockBuilder(AdminProfileController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
-            ->onlyMethods([
-                'addFlash',
-                'createForm',
-                'createFormBuilder',
-                'generateUrl',
-                'redirect',
-                'redirectToRoute',
-                'render',
-            ])
-            ->getMock();
-        $this->controller->expects($this->atLeast(0))
-            ->method('render')
-            ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
-            });
-        $formBuilder = $this->createStub(FormBuilder::class);
-        $this->controller->method('createFormBuilder')->willReturn($formBuilder);
-
         parent::setUp();
+
+        $this->controller = new AdminProfileController(
+            $this->entityManager,
+            $this->params,
+            $this->security,
+            $this->translator,
+            $this->wasteRepository,
+            $this->pageViewFactory,
+            $this->requestStack,
+        );
+
+        $this->session = $this->createStub(FlashBagAwareSessionInterface::class);
+        $flashBag = $this->createStub(FlashBagInterface::class);
+        $this->session->method('getFlashBag')->willReturn($flashBag);
+
+        $tokenStorage = $this->createStub(TokenStorageInterface::class);
+        $token = $this->createStub(TokenInterface::class);
+        $currentUser = new User('admin_user', 'password', 'admin@example.com');
+        $token->method('getUser')->willReturn($currentUser);
+        $tokenStorage->method('getToken')->willReturn($token);
+
+        $container = $this->createStub(ContainerInterface::class);
+        $router = $this->createStub(RouterInterface::class);
+        $router->method('generate')->willReturn('/incp/admin/list');
+
+        $twig = $this->createStub(Environment::class);
+        $twig->method('render')->willReturn('<html>Rendered View</html>');
+
+        $container->method('has')->willReturnCallback(
+            static fn (string $id): bool => in_array($id, [
+                'router',
+                'twig',
+                'request_stack',
+                'session',
+                'security.token_storage',
+            ], true),
+        );
+
+        $container->method('get')->willReturnCallback(
+            function (string $id) use ($router, $twig, $tokenStorage) {
+                return match ($id) {
+                    'router' => $router,
+                    'twig' => $twig,
+                    'request_stack' => $this->requestStack,
+                    'session' => $this->session,
+                    'security.token_storage' => $tokenStorage,
+                    default => null,
+                };
+            },
+        );
+
+        $this->controller->setContainer($container);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function testList(): void
+    private function prepareRequest(Request $request): void
     {
-        $request = new Request([], [], [
-            'offset' => 50,
-            'limit' => 25,
-        ], [], [], [
-            'REQUEST_URI' => '/incc/admin/list/50/25'
-        ]);
+        $request->setSession($this->session);
+        $this->requestStack->push($request);
+    }
+
+    #[Test]
+    public function listReturnsRenderedViewOnGetRequest(): void
+    {
+        $request = new Request();
+        $this->prepareRequest($request);
+
+        $categoryRepository = $this->createStub(CategoryRepository::class);
+        $roleRepository = $this->createStub(RoleRepository::class);
         $userBulkActionService = $this->createStub(UserBulkActionService::class);
         $userRepository = $this->createStub(UserRepository::class);
-        $contentQueryParameters = $this->createMock(ContentQueryParameters::class);
-        $contentQueryParameters->expects($this->once())->method('process')->willReturn([
-            'filters' => [],
-            'offset' => 50,
-            'limit' => 25,
-        ]);
-        $result = $this->controller->list($request, $contentQueryParameters, $userBulkActionService, $userRepository);
-        $this->assertEquals('rendered:inadmin/page/admin/list.html.twig', $result->getContent());
+        $userViewStateRepository = $this->createStub(UserViewStateRepository::class);
+
+        $viewStateManager = new ViewStateManager($this->security, $userViewStateRepository);
+
+        $formFactory = $this->createMock(FormFactoryInterface::class);
+        $formBuilder = $this->createStub(FormBuilderInterface::class);
+        $form = $this->createStub(FormInterface::class);
+
+        $formFactory->method('createBuilder')->willReturn($formBuilder);
+        $formBuilder->method('getForm')->willReturn($form);
+        $form->method('isSubmitted')->willReturn(false);
+        $form->method('createView')->willReturn($this->createStub(FormView::class));
+
+        $paginator = $this->createStub(Paginator::class);
+        $userRepository->method('getFiltered')->willReturn($paginator);
+        $roleRepository->method('getRoleNames')->willReturn([]);
+
+        $response = $this->controller->list(
+            $request,
+            $categoryRepository,
+            $roleRepository,
+            $userBulkActionService,
+            $userRepository,
+            $viewStateManager,
+            $formFactory,
+        );
+
+        self::assertInstanceOf(Response::class, $response);
+        self::assertSame(200, $response->getStatusCode());
     }
 
-    /**
-     * @throws Exception
-     */
-    public function testListDisableAction(): void
+    #[Test]
+    public function listExecutesBulkActionAndRedirectsOnPostRequest(): void
+    {
+        $request = new Request([], ['items' => ['user1', 'user2'], 'delete' => '1']);
+        $request->setMethod('POST');
+        $this->prepareRequest($request);
+
+        $categoryRepository = $this->createStub(CategoryRepository::class);
+        $roleRepository = $this->createStub(RoleRepository::class);
+        $userBulkActionService = $this->createMock(UserBulkActionService::class);
+        $userRepository = $this->createStub(UserRepository::class);
+        $userViewStateRepository = $this->createStub(UserViewStateRepository::class);
+
+        $viewStateManager = new ViewStateManager($this->security, $userViewStateRepository);
+
+        $formFactory = $this->createMock(FormFactoryInterface::class);
+        $formBuilder = $this->createStub(FormBuilderInterface::class);
+        $form = $this->createStub(FormInterface::class);
+
+        $formFactory->method('createBuilder')->willReturn($formBuilder);
+        $formBuilder->method('getForm')->willReturn($form);
+        $form->method('isSubmitted')->willReturn(true);
+
+        $userBulkActionService
+            ->expects(self::once())
+            ->method('apply')
+            ->with('delete', ['user1', 'user2'])
+            ->willReturn(2);
+
+        $response = $this->controller->list(
+            $request,
+            $categoryRepository,
+            $roleRepository,
+            $userBulkActionService,
+            $userRepository,
+            $viewStateManager,
+            $formFactory,
+        );
+
+        self::assertInstanceOf(Response::class, $response);
+        self::assertTrue($response->isRedirection());
+    }
+
+    #[Test]
+    public function listHandlesCannotRemoveLastAdministratorExceptionOnBulkAction(): void
+    {
+        $request = new Request([], ['items' => ['user1'], 'delete' => '1']);
+        $request->setMethod('POST');
+        $this->prepareRequest($request);
+
+        $categoryRepository = $this->createStub(CategoryRepository::class);
+        $roleRepository = $this->createStub(RoleRepository::class);
+        $userBulkActionService = $this->createMock(UserBulkActionService::class);
+        $userRepository = $this->createStub(UserRepository::class);
+        $userViewStateRepository = $this->createStub(UserViewStateRepository::class);
+
+        $viewStateManager = new ViewStateManager($this->security, $userViewStateRepository);
+
+        $formFactory = $this->createMock(FormFactoryInterface::class);
+        $formBuilder = $this->createStub(FormBuilderInterface::class);
+        $form = $this->createStub(FormInterface::class);
+
+        $formFactory->method('createBuilder')->willReturn($formBuilder);
+        $formBuilder->method('getForm')->willReturn($form);
+        $form->method('isSubmitted')->willReturn(true);
+
+        $userBulkActionService
+            ->method('apply')
+            ->willThrowException(new CannotRemoveLastAdministratorException());
+
+        $response = $this->controller->list(
+            $request,
+            $categoryRepository,
+            $roleRepository,
+            $userBulkActionService,
+            $userRepository,
+            $viewStateManager,
+            $formFactory,
+        );
+
+        self::assertInstanceOf(Response::class, $response);
+        self::assertTrue($response->isRedirection());
+    }
+
+    #[Test]
+    public function editRendersFormForExistingUserOnGetRequest(): void
+    {
+        $request = new Request();
+        $request->attributes->set('id', 'admin_user');
+        $this->prepareRequest($request);
+
+        $user = new User('admin_user', 'password', 'admin@example.com');
+        $userRepository = $this->createStub(UserRepository::class);
+        $userRepository->method('findOneBy')->willReturn($user);
+
+        $userProtectionService = $this->createStub(UserProtectionServiceInterface::class);
+
+        $formFactory = $this->createMock(FormFactoryInterface::class);
+        $form = $this->createStub(FormInterface::class);
+
+        $formFactory->expects(self::once())
+            ->method('create')
+            ->with(UserType::class, $user, ['validation_groups' => ['']])
+            ->willReturn($form);
+
+        $form->method('isSubmitted')->willReturn(false);
+        $form->method('createView')->willReturn($this->createStub(FormView::class));
+
+        $imageTransformer = $this->createStub(ImageTransformer::class);
+        $imageTransformer->method('isHEICSupported')->willReturn(true);
+
+        $recoveryCodeManager = $this->createStub(RecoveryCodeManager::class);
+        $recoveryCodeManager->method('getRemainingCount')->willReturn(5);
+
+        $totpManager = $this->createStub(TotpManager::class);
+        $trustedDeviceManager = $this->createStub(TrustedDeviceManager::class);
+        $userAccountEmailService = $this->createStub(UserAccountEmailService::class);
+
+        $response = $this->controller->edit(
+            $request,
+            $formFactory,
+            $imageTransformer,
+            $recoveryCodeManager,
+            $totpManager,
+            $trustedDeviceManager,
+            $userAccountEmailService,
+            $userProtectionService,
+            $userRepository,
+        );
+
+        self::assertInstanceOf(Response::class, $response);
+        self::assertSame(200, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function editSavesUserAndPreferencesOnValidSubmission(): void
     {
         $request = new Request([], [
-            'disable' => '',
-            'items' => [
-                Uuid::uuid1()->toString(),
+            'user' => [
+                'timezone' => 'UTC',
+                'locale' => 'en',
+                'color' => '#123456',
             ],
-        ], [
-            'offset' => 50,
-            'limit' => 25,
-        ], [], [], [
-            'REQUEST_URI' => '/incc/admin/list/50/25'
         ]);
-        $entityManager = $this->createStub(EntityManagerInterface::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(TranslatorInterface::class);
-        $userBulkActionService = $this->createMock(UserBulkActionService::class);
-        $userBulkActionService->expects($this->once())->method('apply')->willReturn(1);
+        $request->setMethod('POST');
+        $request->attributes->set('id', 'admin_user');
+        $this->prepareRequest($request);
+
+        $user = new User('admin_user', 'password', 'admin@example.com');
         $userRepository = $this->createStub(UserRepository::class);
-        $contentQueryParameters = $this->createStub(ContentQueryParameters::class);
-        $this->controller = $this->getMockBuilder(AdminProfileController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
-            ->onlyMethods([
-                'addFlash',
-                'createForm',
-                'createFormBuilder',
-                'generateUrl',
-                'redirect',
-                'redirectToRoute',
-                'render',
-            ])
-            ->getMock();
-        $this->controller->expects($this->once())
-            ->method('redirectToRoute')
-            ->with('incc_admin_list')
-            ->willReturn(new RedirectResponse('/incc/admin/list/50/25'));
-        $formBuilder = $this->createMock(FormBuilder::class);
-        $form = $this->createMock(Form::class);
-        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
-        $formBuilder->expects($this->once())->method('getForm')->willReturn($form);
-        $this->controller->expects($this->once())->method('createFormBuilder')->willReturn($formBuilder);
+        $userRepository->method('findOneBy')->willReturn($user);
 
-        $result = $this->controller->list($request, $contentQueryParameters, $userBulkActionService, $userRepository);
-        $this->assertInstanceOf(RedirectResponse::class, $result);
-    }
+        $userProtectionService = $this->createStub(UserProtectionServiceInterface::class);
 
-    /**
-     * @throws Exception
-     * @throws RandomException
-     */
-    public function testEditView(): void
-    {
-        $request = new Request([], [], [
-            'id' => 'test-user',
-        ], [], [], [
-            'REQUEST_URI' => '/incc/admin/test-user'
-        ]);
-        $imageTransformer = $this->createStub(ImageTransformer::class);
-        $userRegistrationService = $this->createStub(UserAccountEmailService::class);
-        $user = new User();
-        $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->expects($this->atLeastOnce())->method('findOneBy')->willReturn($user);
-
-        $form = $this->createStub(Form::class);
-        $this->controller->expects($this->once())->method('createForm')->willReturn($form);
-
-        $result = $this->controller->edit(
-            $request,
-            $imageTransformer,
-            $userRegistrationService,
-            $userRepository
-        );
-        $this->assertEquals('rendered:inadmin/page/admin/profile.html.twig', $result->getContent());
-    }
-
-    /**
-     * @throws Exception
-     * @throws RandomException
-     */
-    public function testEditSaveEnableDisable(): void
-    {
-        $formData = [
-            'user' => [
-                'username' => 'test-user',
-                'displayName' => 'Test user',
-                'email' => 'test-user@example.com',
-                'timezone' => 'UTC',
-            ],
-        ];
-        $request = new Request([], [ $formData, ], [
-            'id' => 'new',
-        ], [], [], [
-            'REQUEST_URI' => '/incc/admin/test-user'
-        ]);
-        $request->setMethod(Request::METHOD_POST);
+        $formFactory = $this->createMock(FormFactoryInterface::class);
+        $form = $this->createStub(FormInterface::class);
+        $formFactory->method('create')->willReturn($form);
+        $form->method('isSubmitted')->willReturn(true);
+        $form->method('isValid')->willReturn(true);
 
         $imageTransformer = $this->createStub(ImageTransformer::class);
-        $userRegistrationService = $this->createStub(UserAccountEmailService::class);
-        $user = (new User())->setEmail('test-user@example.com');
-        $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->expects($this->atLeast(0))->method('findOneBy')->willReturn($user);
+        $recoveryCodeManager = $this->createStub(RecoveryCodeManager::class);
+        $totpManager = $this->createStub(TotpManager::class);
+        $trustedDeviceManager = $this->createStub(TrustedDeviceManager::class);
+        $userAccountEmailService = $this->createStub(UserAccountEmailService::class);
 
-        $button = $this->createMock(Button::class);
-        $button->expects($this->atLeastOnce())->method('getName')->willReturn('enableDisable');
+        $this->entityManager
+            ->expects(self::once())
+            ->method('flush');
 
-        $form = $this->createMock(Form::class);
-        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
-        $form->expects($this->once())->method('isValid')->willReturn(true);
-        $form->expects($this->atLeastOnce())->method('getClickedButton')->willReturn($button);
-        $this->controller->expects($this->once())->method('createForm')->willReturn($form);
-
-        $result = $this->controller->edit(
+        $response = $this->controller->edit(
             $request,
+            $formFactory,
             $imageTransformer,
-            $userRegistrationService,
-            $userRepository
+            $recoveryCodeManager,
+            $totpManager,
+            $trustedDeviceManager,
+            $userAccountEmailService,
+            $userProtectionService,
+            $userRepository,
         );
-        $this->assertInstanceOf(RedirectResponse::class, $result);
+
+        self::assertInstanceOf(Response::class, $response);
+        self::assertTrue($response->isRedirection());
     }
 
-    /**
-     * @throws Exception
-     * @throws RandomException
-     */
-    public function testEditDelete(): void
+    #[Test]
+    public function editTriggersDisableTotpActionWhenClicked(): void
     {
-        $formData = [
-            'user' => [
-                'username' => 'test-user',
-                'displayName' => 'Test user',
-                'email' => 'test-user@example.com',
-                'timezone' => 'UTC',
-            ],
-        ];
-        $request = new Request([], [ $formData, ], [], [], [], [
-            'REQUEST_URI' => '/incc/admin/test-user'
-        ]);
-        $request->setMethod(Request::METHOD_POST);
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->attributes->set('id', 'admin_user');
+        $this->prepareRequest($request);
+
+        $user = new User('admin_user', 'password', 'admin@example.com');
+        $userRepository = $this->createStub(UserRepository::class);
+        $userRepository->method('findOneBy')->willReturn($user);
+
+        $userProtectionService = $this->createStub(UserProtectionServiceInterface::class);
+
+        $button = $this->createStub(SubmitButton::class);
+        $button->method('isClicked')->willReturn(true);
+
+        $formFactory = $this->createMock(FormFactoryInterface::class);
+        $form = $this->createStub(FormInterface::class);
+        $formFactory->method('create')->willReturn($form);
+        $form->method('isSubmitted')->willReturn(true);
+        $form->method('isValid')->willReturn(true);
+        $form->method('has')->willReturnCallback(static fn (string $name): bool => 'disableTotp' === $name);
+        $form->method('get')->willReturnCallback(static fn (string $name): mixed => 'disableTotp' === $name ? $button : null);
+
+        $totpManager = $this->createMock(TotpManager::class);
+        $totpManager->expects(self::once())->method('disable')->with($user);
+
+        $trustedDeviceManager = $this->createMock(TrustedDeviceManager::class);
+        $trustedDeviceManager->expects(self::once())->method('removeAll')->with($user);
 
         $imageTransformer = $this->createStub(ImageTransformer::class);
-        $userRegistrationService = $this->createStub(UserAccountEmailService::class);
-        $user = (new User())->setEmail('test-user@example.com');
-        $userRepository = $this->createMock(UserRepository::class);
-        $userRepository->expects($this->once())->method('findOneBy')->willReturn($user);
+        $recoveryCodeManager = $this->createStub(RecoveryCodeManager::class);
+        $userAccountEmailService = $this->createStub(UserAccountEmailService::class);
 
-        $button = $this->createMock(Button::class);
-        $button->expects($this->atLeastOnce())->method('getName')->willReturn('delete');
-
-        $form = $this->createMock(Form::class);
-        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
-        $form->expects($this->once())->method('isValid')->willReturn(true);
-        $form->expects($this->atLeastOnce())->method('getClickedButton')->willReturn($button);
-        $this->controller->expects($this->once())->method('createForm')->willReturn($form);
-
-        $result = $this->controller->edit(
+        $response = $this->controller->edit(
             $request,
+            $formFactory,
             $imageTransformer,
-            $userRegistrationService,
-            $userRepository
+            $recoveryCodeManager,
+            $totpManager,
+            $trustedDeviceManager,
+            $userAccountEmailService,
+            $userProtectionService,
+            $userRepository,
         );
-        $this->assertInstanceOf(RedirectResponse::class, $result);
+
+        self::assertInstanceOf(Response::class, $response);
+        self::assertTrue($response->isRedirection());
+    }
+
+    #[Test]
+    public function editAddsFormErrorWhenRemovingLastAdministratorRole(): void
+    {
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->attributes->set('id', 'admin_user');
+        $this->prepareRequest($request);
+
+        $adminRole = new Role();
+        $adminRole->setName('Administrator');
+
+        $user = new User('admin_user', 'password', 'admin@example.com');
+        $user->addAssignedRole($adminRole);
+
+        $userRepository = $this->createStub(UserRepository::class);
+        $userRepository->method('findOneBy')->willReturn($user);
+
+        $userProtectionService = $this->createStub(UserProtectionServiceInterface::class);
+        $userProtectionService
+            ->method('assertAdministratorCanBeRemoved')
+            ->willThrowException(new CannotRemoveLastAdministratorException('Cannot remove the last administrator.'));
+
+        $formFactory = $this->createMock(FormFactoryInterface::class);
+        $form = $this->createMock(FormInterface::class);
+        $assignedRolesField = $this->createMock(FormInterface::class);
+
+        $formFactory->method('create')->willReturn($form);
+        $form->method('isSubmitted')->willReturn(true);
+
+        $form->method('handleRequest')->willReturnCallback(
+            function () use ($user, $adminRole, $form): FormInterface {
+                $user->removeAssignedRole($adminRole);
+
+                return $form;
+            },
+        );
+
+        $form->expects(self::once())
+            ->method('get')
+            ->with('assignedRoles')
+            ->willReturn($assignedRolesField);
+
+        $assignedRolesField->expects(self::once())->method('addError');
+
+        $imageTransformer = $this->createStub(ImageTransformer::class);
+        $recoveryCodeManager = $this->createStub(RecoveryCodeManager::class);
+        $totpManager = $this->createStub(TotpManager::class);
+        $trustedDeviceManager = $this->createStub(TrustedDeviceManager::class);
+        $userAccountEmailService = $this->createStub(UserAccountEmailService::class);
+
+        $response = $this->controller->edit(
+            $request,
+            $formFactory,
+            $imageTransformer,
+            $recoveryCodeManager,
+            $totpManager,
+            $trustedDeviceManager,
+            $userAccountEmailService,
+            $userProtectionService,
+            $userRepository,
+        );
+
+        self::assertInstanceOf(Response::class, $response);
+        self::assertSame(200, $response->getStatusCode());
     }
 }

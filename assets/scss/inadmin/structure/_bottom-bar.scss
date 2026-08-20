@@ -1,23 +1,79 @@
 @use '../definitions' as *;
-@use 'sass:color';
 
 .fixed-bottom-bar {
-  background-color: $bg-panel;
-  border-top: 1px solid $border-color-dark;
-  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.15);
-  bottom: 0;
-  padding-left: 20px;
   position: fixed;
-  width: 100%;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  left: 1.25rem;
   z-index: 50;
-  right: 0;
+
+  // Uses design tokens from definitions
+  background-color: $bg-floating-shell;
+  backdrop-filter: blur(8px);
+  border: 1px solid $border-floating-shell;
+  border-radius: $radius-standard;
+  box-shadow: $shadow-floating;
+
+  padding: 0.625rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+
+  .bar-label,
+  p:first-child,
+  > span:first-child {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: $text-floating-muted;
+    white-space: nowrap;
+  }
+
+  p {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin: 0;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .btn,
+  button {
+    margin: 0;
+    text-transform: capitalize;
+  }
+
+  // Automatically pushes delete/destructive actions to the far right
+  .btn--danger,
+  button[id*="delete"],
+  button[name*="delete"] {
+    margin-left: auto;
+  }
+
+  // Square layout and sizing for icon-only buttons
+  .btn--icon-only {
+    padding: 0.5rem;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-standard;
+
+    .material-icons {
+      margin: 0;
+    }
+  }
 
   @media (min-width: $breakpoint-medium) {
-    left: $sidebar-collapsed;
-    transition: left 0.3s ease;
+    left: calc(#{$sidebar-collapsed} + 1.25rem);
+    transition: left 0.3s ease, right 0.3s ease;
 
     .layout.expanded & {
-      left: $sidebar-expanded;
+      left: calc(#{$sidebar-expanded} + 1.25rem);
     }
   }
 }

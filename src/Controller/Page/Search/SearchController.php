@@ -1,42 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Search;
 
-use Exception;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Url;
-use Inachis\Entity\User;
-use Inachis\Repository\SearchRepository;
-use Inachis\Repository\UrlRepository;
-use Inachis\Repository\UserRepository;
+use Inachis\Repository\Content\SearchRepository;
+use Inachis\Repository\Content\UrlRepository;
+use Inachis\Repository\User\UserRepository;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 class SearchController extends AbstractInachisController
 {
     /**
-     * @param Request $request
-     * @return Response
-     * @throws Exception|\Doctrine\DBAL\Exception
+     * @throws \Exception|\Doctrine\DBAL\Exception
      */
-    #[Route("/incc/search/results/{keyword}/{offset}/{limit}",
-        name: "incc_search_results",
+    #[Route('/incp/search/results/{keyword}/{limit}/{offset}',
+        name: 'incp_search_results',
         requirements: [
-            "offset" => "\d+",
-            "limit" => "\d+"
+            'limit' => "\d+",
+            'offset' => "\d+",
         ],
-        defaults: [ "keyword" => null, "offset" => 0, "limit" => 25 ],
-        methods: [ "GET", "POST" ],
+        defaults: ['keyword' => null, 'limit' => 25, 'offset' => 0],
+        methods: ['GET', 'POST'],
     )]
     public function results(
         Request $request,
@@ -44,91 +37,99 @@ class SearchController extends AbstractInachisController
         UrlRepository $urlRepository,
         UserRepository $userRepository,
     ): Response {
-        if ($request->attributes->get('keyword') === ' ' && !empty($request->request->get('keyword', ''))) {
-            $keyword = str_replace('/', '', $request->request->get('keyword', ''));
+        if (' ' === $request->attributes->getString('keyword') && !empty($request->request->getString('keyword', ''))) {
+            $keyword = str_replace('/', '', $request->request->getString('keyword', ''));
             $keyword = preg_replace('/(?:%25)*2[fF]/', '', $keyword);
-            return $this->redirectToRoute('incc_search_results', ['keyword' => $keyword]);
+
+            return $this->redirectToRoute('incp_search_results', ['keyword' => $keyword]);
         }
 
         $form = $this->createFormBuilder()->getForm();
         $form->handleRequest($request);
 
-        $sort = $request->request->get('sort', '');
+        $sort = $request->request->getString('sort', '');
         if ($request->isMethod('post')) {
             $request->getSession()->set('search_sort', $sort);
         } elseif ($request->getSession()->has('search_sort')) {
+            /** @var string */
             $sort = $request->getSession()->get('search_sort', '');
         }
 
         $results = $searchRepository->search(
-            $request->attributes->get('keyword'),
-            $request->attributes->get('offset'),
-            $request->attributes->get('limit'),
+            $request->attributes->getString('keyword'),
+            $request->attributes->getInt('limit'),
+            $request->attributes->getInt('offset'),
             $sort,
         );
 
-        $this->data['form'] = $form->createView();
-        $this->data['query']['sort'] = $sort;
-        $this->data['query']['offset'] = $results->getOffset();
-        $this->data['query']['limit'] = $results->getLimit();
-        $this->data['page']['title'] =  sprintf('\'%s\' results', $request->attributes->get('keyword'));
+        $this->viewModel->page->title = sprintf('\'%s\' results', $request->attributes->getString('keyword'));
 
-        $this->data['results'] = $results;
+        foreach ($results->getResults() as $key => $result) {
+            $uuidString = Uuid::fromBytes($result['id'])->toString();
+            // $results->updateResultPropertyByKey($key, 'id', $uuidString);
 
-        foreach ($this->data['results']->getResults() as $key => $result) {
-            $this->data['results']->updateResultPropertyByKey(
+            $results->updateResultPropertyByKey(
                 $key,
                 'relevance',
-                number_format($result['relevance'], 2)
+                number_format($result['relevance'], 2),
             );
             $author = $userRepository->findOneBy([
-                'id' => $result['author'],
+                'id' => null !== $result['author'] ? Uuid::fromBytes($result['author'])->toString() : '',
             ]);
-            $this->data['results']->updateResultPropertyByKey(
+            $results->updateResultPropertyByKey(
                 $key,
                 'author',
                 !empty($author) ? $author->getDisplayName() : 'Unknown',
             );
             switch ($result['type']) {
                 case 'Image':
-                    $this->data['results']->updateResultPropertyByKey(
+                    $results->updateResultPropertyByKey(
                         $key,
                         'url',
-                        $this->generateUrl('incc_resource_edit', [
+                        $this->generateUrl('incp_resource_edit', [
                             'type' => 'images',
-                            'filename' => $result['id']]
-                        )
+                            'filename' => $uuidString],
+                        ),
                     );
                     break;
 
                 case 'Series':
-                    $this->data['results']->updateResultPropertyByKey(
+                    $results->updateResultPropertyByKey(
                         $key,
                         'url',
-                        $this->generateUrl('incc_series_edit', ['id' => $result['id']])
+                        $this->generateUrl('incp_series_edit', ['id' => $uuidString]),
                     );
                     break;
 
                 case 'Page':
                 case 'Post':
                     $link = $urlRepository->findOneBy([
-                        'content' => $result['id'],
+                        'content' => $uuidString,
                         'default' => true,
                     ]);
-                    $this->data['results']->updateResultPropertyByKey(
+                    $results->updateResultPropertyByKey(
                         $key,
                         'url',
                         sprintf(
-                            '/incc/%s/%s',
+                            '/incp/%s/%s',
                             strtolower($result['type']),
-                            !empty($link) ? $link->getLink() : ''
+                            !empty($link) ? $link->getLink() : '',
                         ),
                     );
             }
         }
-        $this->data['total'] = $results->getTotal();
-        $this->data['keyword'] = $request->attributes->get('keyword');
 
-        return $this->render('inadmin/page/search/results.html.twig', $this->data);
+        return $this->render('inadmin/page/search/results.html.twig', [
+            'viewModel' => $this->viewModel,
+            'form' => $form->createView(),
+            'keyword' => $request->attributes->getString('keyword'),
+            'query' => [
+                'sort' => $sort,
+                'offset' => $results->getOffset(),
+                'limit' => $results->getLimit(),
+            ],
+            'results' => $results,
+            'total' => $results->getTotal(),
+        ]);
     }
 }

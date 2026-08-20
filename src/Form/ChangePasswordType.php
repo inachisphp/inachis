@@ -1,19 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form;
 
-use Inachis\Entity\User;
+use Inachis\Validator\Constraints\PasswordPolicy;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,27 +20,36 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Change password form used for changing the current password for the user
+ * Change password form used for changing the current password for the user.
+ *
+ * @extends AbstractType<array{
+ *     current_password?: string,
+ *     username?: string,
+ *     new_password?: string
+ * }>
  */
 class ChangePasswordType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface|null
-     */
-    private ?TranslatorInterface $translator;
+    private TranslatorInterface $translator;
 
     /**
-     * @param TranslatorInterface|null $translator Translator for getting UI text from.
+     * @param TranslatorInterface $translator translator for getting UI text from
      */
-    public function __construct(?TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
     /**
-     * @param FormBuilderInterface $builder The form builder object to attach this form to.
-     * @param array                $options Options to use - password_reset toggle, and last_modified date.
-     * @return void
+     * @param FormBuilderInterface<array{
+     *     current_password?: string,
+     *     username?: string,
+     *     new_password?: string
+     * }|null> $builder The form builder object to attach this form to
+     * @param array{
+     *     password_reset: bool,
+     *     last_modified: string|null
+     * } $options Options to use - password_reset toggle, and last_modified date
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -64,7 +70,7 @@ class ChangePasswordType extends AbstractType
                     ],
                     'label' => sprintf('Current password (Last modified: %s)', $options['last_modified']),
                     'label_attr' => [
-                        'id' => 'user__current_password__label'
+                        'id' => 'user__current_password__label',
                     ],
                     'mapped' => false,
                     'toggle_password' => true,
@@ -75,15 +81,15 @@ class ChangePasswordType extends AbstractType
                 ->add('username', TextType::class, [
                     'attr' => [
                         'aria-labelledby' => 'user__username__label',
-                        'aria-required'   => 'true',
-                        'autofocus'       => 'true',
-                        'class'           => 'text',
-                        'placeholder'     => $this->translator->trans('admin.label.username', [], 'messages'),
+                        'aria-required' => 'true',
+                        'autofocus' => 'true',
+                        'class' => 'text',
+                        'placeholder' => $this->translator->trans('admin.label.username', [], 'messages'),
                     ],
                     'constraints' => [
                         new Assert\NotBlank(),
                     ],
-                    'label'      => $this->translator->trans('admin.label.username', [], 'messages'),
+                    'label' => $this->translator->trans('admin.label.username', [], 'messages'),
                     'label_attr' => [
                         'id' => 'user__username__label',
                     ],
@@ -95,11 +101,10 @@ class ChangePasswordType extends AbstractType
                         'Change password',
                     ),
                     'label_html' => true,
-                    'attr'  => [
-                        'class' => 'button button--positive',
+                    'attr' => [
+                        'class' => 'btn btn--primary',
                     ],
                 ]);
-            ;
         }
         $builder
             ->add('new_password', PasswordType::class, [
@@ -113,19 +118,11 @@ class ChangePasswordType extends AbstractType
                 ],
                 'constraints' => [
                     new Assert\NotBlank(),
-                    new Assert\Length(
-                        min: 8,
-                        max: 4096,
-                        minMessage: 'Your password should be at least 8 characters',
-                    ),
-                    new Assert\PasswordStrength(
-                        minScore: Assert\PasswordStrength::STRENGTH_WEAK,
-                        message: 'Your password must be more complex. See the below guidance.',
-                    ),
+                    // new PasswordPolicy(),
                 ],
                 'label' => 'New password',
                 'label_attr' => [
-                    'id' => 'user__new_password__label'
+                    'id' => 'user__new_password__label',
                 ],
                 'mapped' => false,
                 'toggle_password' => true,
@@ -134,8 +131,7 @@ class ChangePasswordType extends AbstractType
     }
 
     /**
-     * @param OptionsResolver $resolver The resolver to apply defaults to.
-     * @return void
+     * @param OptionsResolver $resolver the resolver to apply defaults to
      */
     public function configureOptions(OptionsResolver $resolver): void
     {

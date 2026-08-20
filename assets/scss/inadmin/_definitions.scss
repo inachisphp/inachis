@@ -6,6 +6,7 @@ $gutter: 16px;
 $breakpoint-small: 480px;
 $breakpoint-medium: 768px;
 $breakpoint-large: 1024px;
+$breakpoint-xlarge: 1280px;
 
 $sidebar-collapsed: 60px;
 $sidebar-expanded: 220px;
@@ -18,7 +19,7 @@ $radius-round: 50%;
  Colours
 --------------------------------------------- **/
 :root {
-    --bg-image: url(/assets/imgs/incc/bg-signin.png);
+    --bg-image: url(/assets/imgs/incp/bg-signin.webp);
 
     // Primitives - Neutrals
     --color-neutral-000: #ffffff;
@@ -38,6 +39,7 @@ $radius-round: 50%;
     --color-neutral-900: #000000;
 
     // Primitives - Brand
+    --color-brand-025: #e2e8f0;
     --color-brand-050: #e5f7ff;
     --color-brand-100: #b3e0ff;
     --color-brand-200: #80d4ff;
@@ -87,9 +89,11 @@ $radius-round: 50%;
     --color-flash-warning-text: #8A3B00;
     --color-flash-error-bg: #F9E2E0;
     --color-flash-error-text: #7A1414;
-    --color-flash-autosave-bg: #FFF1D6;
-    --color-flash-autosave-text: #8A3B00;
+    --color-flash-autosave-bg: #fff1d6;
+    --color-flash-autosave-border: #fac19d;
+    --color-flash-autosave-text: #8a3b00;
     --color-flash-autosave-discard: #cc0000;
+    --color-flash-autosave-discard-hover: #990000;
 
     // Dropzone
     --color-dropzone-bg: #f8fafc;
@@ -163,6 +167,16 @@ $sidebar-active: #069;
 $sidebar-active-bg: #333;
 $sidebar-text: #fff;
 
+// -- Floating Overlay & Shell Tokens
+$bg-floating-shell: var(--color-floating-shell, rgba(30, 41, 59, 0.92)) !default;
+$border-floating-shell: var(--color-floating-border, rgba(255, 255, 255, 0.12)) !default;
+$text-floating-muted: var(--color-floating-text-muted, rgba(255, 255, 255, 0.75)) !default;
+$shadow-floating: var(--shadow-floating-elevation, 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.15)) !default;
+
+// -- Review bar
+$reviewbar-bg: var(--color-neutral-300);
+$reviewbar-shadow: -4px 0 24px rgba(0, 0, 0, 0.06), -1px 0 4px rgba(0, 0, 0, 0.03);
+
 // -- Alerts
 $alert-danger-bg: var(--color-danger-100);
 $alert-danger-border: var(--color-danger-500);
@@ -221,11 +235,12 @@ $color-neutral-800: var(--color-neutral-800);
 $color-neutral-850: var(--color-neutral-850);
 $color-neutral-900: var(--color-neutral-900);
 
+$color-brand-025: var(--color-brand-025);
 $color-brand-050: var(--color-brand-050);
 $color-brand-100: var(--color-brand-100);
 $color-brand-300: var(--color-brand-300);
-$color-brand-500: var(--color-brand-500);
 $color-brand-400: var(--color-brand-400);
+$color-brand-500: var(--color-brand-500);
 $color-brand-700: var(--color-brand-700);
 
 $reading-indicator: var(--color-brand-400);
@@ -254,11 +269,23 @@ $flash-warning-text: var(--color-flash-warning-text);
 $flash-error-bg: var(--color-flash-error-bg);
 $flash-error-text: var(--color-flash-error-text);
 $flash-autosave-bg: var(--color-flash-autosave-bg);
+$flash-autosave-border: var(--color-flash-autosave-border);
 $flash-autosave-text: var(--color-flash-autosave-text);
 $flash-autosave-discard: var(--color-flash-autosave-discard);
+$flash-autosave-discard-hover: var(--color-flash-autosave-discard-hover);
 
 $input-focus-border: var(--color-brand-500);
 $input-focus-ring: var(--color-brand-050);
+
+// -- Buttons
+$color-primary: $color-brand-500 !default;
+$color-primary-hover: $color-brand-400 !default;
+$color-primary-light: #eff6ff !default;
+$color-secondary: #64748b !default;
+$color-secondary-hover: #475569 !default;
+$color-outline: $color-brand-025;
+$color-outline-hover: color.adjust(#e2e8f0, $lightness: -10%);
+
 
 $pagination-border-radius: 5px;
 $table-mobile-break: 600px !default;
@@ -267,12 +294,15 @@ $table-expandable--expanded: var(--color-brand-200);
 
 $signin_background-image__dark: var(--bg-image);
 
+$subscribers-color: orange;
+
 $badge-colors: (
     default: (bg: #E0E0E0, text: #000),
     draft: (bg: #F6C343, text: #000),
     scheduled: (bg: #007BFF, text: #fff),
     private: (bg: #6C757D, text: #fff),
     hotlinked: (bg: #E83E8C, text: #fff),
+    inreview: (bg: #6f42c1, text: #fff),
     issue: (bg: #DC3545, text: #fff),
     active: (bg: #28A745, text: #fff),
     newuser: (bg: #17A2B8, text: #fff),
@@ -282,3 +312,13 @@ $badge-colors: (
     warning: (bg: #ffc107, text: #333),
     ok: (bg: #28A745, text: #fff),
 );
+
+$admonition-colors: (
+    danger: (bg: #FFEBEC, accent: #e13238),
+    info: (bg: #e5f7ff, accent: #006699),
+    note: (bg: #fdfdfe, accent: #d4d5d8),
+    tip: (bg: #e6f6e6, accent: #009940),
+    warning: (bg: #fff8e6, accent: #e6a700),
+);
+
+$transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1) !default;

@@ -1,0 +1,112 @@
+{% set source = post is defined ? post : series ?? '' %}
+{% set item = {
+    'title': source.subTitle is defined ?
+    source.title ~ ' - ' ~ source.subTitle :
+    source.title is defined ? source.title : '',
+    'description': source.featureSnippet is defined ?
+    source.featureSnippet :
+    source.description is defined ? source.description : '',
+    'image': source.featureImage is defined ?
+    source.featureImage :
+    source.image is defined ? source.image : '',
+    'author': source.author is defined ? source.author : '',
+    'published_date': source.postDate is defined ?
+    source.postDate :
+    source.lastDate is defined ? source.lastDate : '',
+    'url': source.url.link is defined ?
+    '/' ~ source.url.link :
+    source.url is defined ?
+    path('web_series_view', { 'year': source.firstDate|date('Y', viewModel.settings.displayTimezone), 'title': source.title|lower }) :
+    app.request.uri,
+} %}
+
+{% block metadata %}
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta http-equiv="keywords" content="{{ viewModel.page.keywords }}" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta http-equiv="Last-Update" content="{{ viewModel.page.updatedAt }}" />
+    <meta http-equiv="Content-Language" content="{{ viewModel.settings.language }}" />
+    <meta http-equiv="imagetoolbar" content="no" />
+    <meta name="Author" content="David G. Paul" />
+    <meta name="Copyright" content="&copy; David G. Paul" />
+    <meta name="keywords" content="{{ viewModel.page.keywords }}" />
+    <meta name="description" content="{{ viewModel.page.description }}" />
+    <meta name="abstract" content="" />
+    <meta name="category" content="home page" />
+    <meta name="robots" content="index,follow" />
+    <meta name="googlebot" content="NOODP" />
+    <meta name="language" content="{{ viewModel.settings.language }}" />
+    <meta name="revised" content="{{ viewModel.page.updatedAt }}" />
+{% if viewModel.settings.geo.lat|default('') is not empty and viewModel.settings.geo.long|default('') is not empty %}
+    <meta name="ICBM" content="{{ viewModel.settings.geo.lat }}, {{ viewModel.settings.geo.long }}" />
+    <meta name="geo.position" content="{{ viewModel.settings.geo.lat }}, {{ viewModel.settings.geo.long }}" />
+{% endif %}
+{% if viewModel.settings.geo.name|default('') is not empty %}
+    <meta name="geo.placename" content="{{ viewModel.settings.geo.name }}" />
+{% endif %}
+{% if viewModel.settings.geo.region|default('') is not empty %}
+    <meta name="geo.region" content="{{ viewModel.settings.geo.region }}" />
+{% endif %}
+    <link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
+    <link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />
+    <meta name="DC.title" content="{{ viewModel.settings.siteTitle }}" />
+    <meta name="DC.creator" content="David G. Paul" />
+    <meta name="DC.subject" content="" />
+    <meta name="DC.description" content="{{ viewModel.page.description }}" />
+    <meta name="DC.type" scheme="DCTERMS.DCMIType" content="Text" />
+    <meta name="DC.format" content="text/html" />
+    <meta name="DC.identifier" scheme="DCTERMS.URI" content="{{ app.request.uri }}" />
+    <meta name="generator" content="inachis" />
+
+    <link rel="icon" type="image/png" href="{{ viewModel.settings.domain }}/assets/imgs/favicons/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="{{ viewModel.settings.domain }}/assets/imgs/favicons/favicon.svg" />
+    <link rel="shortcut icon" href="{{ viewModel.settings.domain }}/assets/imgs/favicons/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ viewModel.settings.domain }}/assets/imgs/favicons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="{{ viewModel.settings.siteTitle }}" />
+    <link rel="manifest" href="{{ viewModel.settings.domain }}/assets/imgs/favicons/site.webmanifest" />
+
+    <meta name="application-name" content="{{ viewModel.settings.siteTitle }}">
+
+    <link rel="canonical" href="{{ viewModel.settings.domain }}/" />
+    <link rel="search" type="application/opensearchdescription+xml" title="{{ viewModel.settings.siteTitle }}" href="{{ viewModel.settings.domain }}/search.xml" />
+    <link rel="alternate" type="application/rss+xml" title="All Posts RSS Feed" href="{{ viewModel.settings.domain }}/feed" />
+    {% if filterName is defined and filterName == 'category' and filterValue is defined %}
+        <link rel="alternate" type="application/rss+xml" title="Category: {{ filterValue }} RSS Feed" href="{{ viewModel.settings.domain }}/feed/{{ filterValue }}" />
+    {% endif %}
+{% endblock metadata %}
+
+{% block sm_twitter %}
+    <meta name="twitter:card" content="summary_large_image">
+    {% if viewModel.settings.twitter|default('') is not empty %}
+        <meta name="twitter:site" content="{{ '@' ~ viewModel.settings.twitter }}">
+        <meta name="twitter:creator" content="{{ '@' ~ viewModel.settings.twitter }}">
+    {% endif %}
+    <meta name="twitter:title" content="{% if item.title is not empty %}{{ item.title }} / {% endif %}{{ viewModel.settings.siteTitle }}">
+    <meta name="twitter:description" content="{{ item.description }}">
+    {% if item.image is not empty %}
+        <meta name="twitter:image" content="{% if not (item.image starts with 'http') %}/imgs/{% endif %}{{ item.image.filename }}">
+        <meta name="twitter:image:alt" content="{{ item.image.altText }}">
+    {% endif %}
+{% endblock sm_twitter %}
+
+{% block sm_open_graph %}
+    <meta property="og:site_name" content="{{ viewModel.settings.siteTitle }}">
+    <meta property="og:url" content="{{ item.url }}">
+    <meta property="og:type" content="{% if source is empty %}website{% else %}article{% endif %}">
+    <meta property="og:title" content="{% if item.title is not empty %}{{ item.title }} / {% endif %}{{ viewModel.settings.siteTitle }}">
+    <meta property="og:description" content="{{ item.description }}">
+    {% if item.image is not empty %}
+        <meta property="og:image" content="{% if not (item.image starts with 'http') %}/imgs/{% endif %}{{ item.image.filename }}">
+        <meta property="og:image:type" content="{{ item.image.filetype }}">
+        <meta property="og:image:alt" content="{{ item.image.altText }}">
+    {% endif %}
+    {% if showAuthor|default(true) and item.author is not empty %}
+        <meta property="og:article:author" content="{{ item.author.displayName }}">
+    {% endif %}
+    <meta property="og:article:published_time" content="{{ item.published_date|date('c', viewModel.settings.displayTimezone) }}">
+    {% if viewModel.settings.fb_app_id|default('') is not empty %}
+        <meta property="fb:app_id" content="{{ viewModel.settings.fb_app_id }}">
+    {% endif %}
+{% endblock sm_open_graph %}
+
+{% block additional_metadata %}{% endblock additional_metadata %}

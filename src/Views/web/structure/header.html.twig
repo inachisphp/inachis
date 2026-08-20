@@ -1,0 +1,16 @@
+{% if maintenance_enabled is defined and maintenance_enabled %}
+    <div class="maintenance-banner">
+        Maintenance Mode Enabled - <a href="/maintenance.html">View Maintenance Page</a>
+    </div>
+{% endif %}
+<div class="headercontainer">
+    <header>
+        <h1>{{ viewModel.settings.siteTitle }}</h1>
+        {% include "web/partials/nav.html.twig" %}
+        <form action="{{ path('web_search') }}" method="get" role="search" class="site-search" aria-label="Search the site">
+            <label for="site-search-input" class="visually-hidden">Search</label>
+            <input id="site-search-input" name="q" type="search" value="{{ app.request.query.get('q', '') }}" placeholder="Search pages and series" />
+            <button type="submit">Go</button>
+        </form>
+    </header>
+</div>

@@ -1,24 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Controller\Dialog;
 
 use Inachis\Controller\Dialog\ConfirmationController;
-use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ConfirmationControllerTest extends WebTestCase
+class ConfirmationControllerTest extends InachisControllerTestCase
 {
     /**
      * @throws Exception
@@ -26,18 +22,23 @@ class ConfirmationControllerTest extends WebTestCase
     public function testContentList(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/confirmation/get'
+            'REQUEST_URI' => '/incp/ax/confirmation/get',
         ]);
-        $entityManager = $this->createStub(EntityManagerInterface::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(TranslatorInterface::class);
         $controller = $this->getMockBuilder(ConfirmationController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
+            ])
             ->onlyMethods(['render'])
             ->getMock();
         $controller->expects($this->once())->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
 
         $result = $controller->contentList($request);

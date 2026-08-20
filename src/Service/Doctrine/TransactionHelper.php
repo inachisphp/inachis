@@ -1,37 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Doctrine;
 
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 
 /**
  * Wraps Doctrine transactions in a retry loop to handle optimistic locking exceptions
- * and unique constraint issues potentially caused by concurrency
+ * and unique constraint issues potentially caused by concurrency.
  */
 class TransactionHelper
 {
     /**
-     * Constructor
-     *
-     * @param EntityManagerInterface $entityManager
+     * Constructor.
      */
-    public function __construct(private EntityManagerInterface $entityManager) {}
+    public function __construct(private EntityManagerInterface $entityManager)
+    {
+    }
 
     /**
-     * Execute a callback in a transaction with retry logic
-     *
-     * @param callable $callback
-     * @param int $maxRetries
-     * @return mixed
+     * Execute a callback in a transaction with retry logic.
      */
     public function executeInTransaction(callable $callback, int $maxRetries = 3): mixed
     {
@@ -44,9 +40,8 @@ class TransactionHelper
                 });
 
                 return $result;
-
             } catch (OptimisticLockException|UniqueConstraintViolationException $e) {
-                $retryCount++;
+                ++$retryCount;
                 $this->entityManager->clear();
 
                 if ($retryCount >= $maxRetries) {

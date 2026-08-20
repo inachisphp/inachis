@@ -1,7 +1,7 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_settings_navigation_list') }}">Navigation Tabs</a>
+    <a href="{{ path('incp_settings_navigation_list') }}">Navigation Tabs</a>
     <span>Edit Tab</span>
 {% endblock pagetitle %}
 
@@ -27,11 +27,13 @@
             </span>
         </p>
     </section>
+    {% if form.submit is defined %}
     <div class="fixed-bottom-bar">
         <p>
             {{ form_widget(form.submit) }}
         </p>
     </div>
+    {% endif %}
 {{ form_end(form) }}
 </div>
 {% endblock content %}

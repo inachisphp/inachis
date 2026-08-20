@@ -1,28 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics\Check\Database;
 
+use Doctrine\DBAL\Connection;
 use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
 use Inachis\Doctrine\DatabasePlatformTrait;
-use Doctrine\DBAL\Connection;
 
 final class SQLServerMaxWorkerThreadsCheck implements CheckInterface
 {
     use DatabasePlatformTrait;
 
-    public function __construct(private readonly Connection $connection) {}
+    public function __construct(private readonly Connection $connection)
+    {
+    }
 
-    public function getId(): string { return 'sqlsrv_max_worker_threads'; }
-    public function getLabel(): string { return 'max worker threads'; }
-    public function getSection(): string { return 'Database'; }
+    public function getId(): string
+    {
+        return 'sqlsrv_max_worker_threads';
+    }
+
+    public function getLabel(): string
+    {
+        return 'max worker threads';
+    }
+
+    public function getSection(): string
+    {
+        return 'Database';
+    }
 
     public function run(): CheckResult
     {
@@ -30,7 +42,7 @@ final class SQLServerMaxWorkerThreadsCheck implements CheckInterface
             $platform = $this->connection->getDatabasePlatform();
             $platformName = $this->getDatabasePlatformName($platform);
 
-            if ($platformName !== 'sqlserver') {
+            if ('sqlserver' !== $platformName) {
                 return new CheckResult(
                     $this->getId(),
                     $this->getLabel(),
@@ -39,12 +51,13 @@ final class SQLServerMaxWorkerThreadsCheck implements CheckInterface
                     'Max worker threads check only applies to SQL Server.',
                     null,
                     $this->getSection(),
-                    'low'
+                    'low',
                 );
             }
 
+            /** @var array{value_in_use: int}|false */
             $row = $this->connection->fetchAssociative(
-                "SELECT value_in_use FROM sys.configurations WHERE name = 'max worker threads'"
+                "SELECT value_in_use FROM sys.configurations WHERE name = 'max worker threads'",
             );
             $value = (int) ($row['value_in_use'] ?? 0);
         } catch (\Throwable $e) {
@@ -53,10 +66,10 @@ final class SQLServerMaxWorkerThreadsCheck implements CheckInterface
                 $this->getLabel(),
                 'error',
                 null,
-                'Could not connect to SQL Server: ' . $e->getMessage(),
+                'Could not connect to SQL Server: '.$e->getMessage(),
                 'Check database credentials and availability.',
                 $this->getSection(),
-                'high'
+                'high',
             );
         }
 
@@ -68,15 +81,15 @@ final class SQLServerMaxWorkerThreadsCheck implements CheckInterface
             $this->getId(),
             $this->getLabel(),
             $status,
-            $value,
-            $status === 'ok'
+            (string) $value,
+            'ok' === $status
                 ? 'Max worker threads is sufficient.'
                 : "Max worker threads ($value) below recommended ($recommended).",
-            $status !== 'ok'
-                ? "Increase max worker threads in SQL Server configuration."
+            'ok' !== $status
+                ? 'Increase max worker threads in SQL Server configuration.'
                 : null,
             $this->getSection(),
-            $severity
+            $severity,
         );
     }
 }

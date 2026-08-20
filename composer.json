@@ -1,5 +1,5 @@
 {
-    "name": "jedi58/inachis",
+    "name": "inachisphp/inachis",
     "type": "project",
     "description": "A basic framework for use in producing simple post/page driven websites",
     "license": "proprietary",
@@ -8,7 +8,6 @@
             "name": "David G. Paul"
         }
     ],
-    "version": "1.0.0",
     "require": {
         "php": ">=8.4",
         "ext-fileinfo": "*",
@@ -16,14 +15,14 @@
         "ext-intl": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
-        "composer/package-versions-deprecated": "^1.11",
         "doctrine/doctrine-bundle": "^3.0",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.5",
-        "google/apiclient": "^2.18",
+        "endroid/qr-code": "^6.1",
         "jaybizzle/crawler-detect": "^1.2",
-        "jfcherng/php-diff": "^6.4",
+        "jfcherng/php-diff": "^7.0",
         "league/commonmark": "^2.8",
+        "matomo/device-detector": "^6.5",
         "phpdocumentor/reflection-docblock": "^6.0",
         "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.0",
@@ -38,6 +37,7 @@
         "symfony/framework-bundle": "^8.0",
         "symfony/http-client": "8.*",
         "symfony/http-kernel": "^8.0",
+        "symfony/intl": "8.*",
         "symfony/mailer": "8.*",
         "symfony/messenger": "8.*",
         "symfony/monolog-bundle": "^4.0",
@@ -54,14 +54,17 @@
         "symfony/validator": "^8.0",
         "symfony/yaml": "^8.0",
         "twig/extra-bundle": "^3.21",
+        "twig/intl-extra": "^3.26",
         "twig/markdown-extra": "^3.22",
         "twig/string-extra": "^3.21"
     },
     "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "nikic/php-parser": "^5.8",
         "pheromone/phpcs-security-audit": "^2.0",
-        "php-coveralls/php-coveralls": "^2.1",
         "php-parallel-lint/php-parallel-lint": "*",
         "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-doctrine": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",
         "phpunit/phpunit": "^13.0",
         "psalm/phar": "^6.13",
@@ -92,6 +95,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Inachis\\Build\\": "build/src/",
             "Inachis\\Tests\\": "tests/"
         }
     },
@@ -102,7 +106,6 @@
         "symfony/polyfill-php56": "*"
     },
     "scripts": {
-        "pre-autoload-dump": "Google\\Task\\Composer::cleanup",
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install --symlink --relative %PUBLIC_DIR%": "symfony-cmd",
@@ -126,7 +129,11 @@
         "post-update-cmd": [
             "@auto-scripts",
             "@setup-git-hook"
-        ]
+        ],
+        "phpstan": "phpstan analyse --memory-limit=-1 src/",
+        "phpcs": "php-cs-fixer fix --dry-run --diff --verbose",
+        "phpcs-fix": "php-cs-fixer fix --verbose",
+        "test": "php -d memory_limit=256M -f ./vendor/bin/phpunit"
     },
     "conflict": {
         "symfony/symfony": "*"
@@ -137,9 +144,6 @@
             "allow-contrib": true,
             "docker": true,
             "require": "8.*"
-        },
-        "google/apiclient-services": [
-            "Analytics"
-        ]
+        }
     }
 }

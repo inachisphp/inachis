@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics\Check\Database;
@@ -16,43 +15,47 @@ use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Inachis\Diagnostics\CheckInterface;
 use Inachis\Diagnostics\CheckResult;
+use Inachis\Doctrine\DatabasePlatformTrait;
 
 final class DatabasePerformanceCheck implements CheckInterface
 {
+    use DatabasePlatformTrait;
+
     /**
-     * Constructor
+     * Constructor.
      *
      * @param Connection $connection The connection to use for the check
      */
-    public function __construct(
-        private readonly Connection $connection,
-    ) {}
+    public function __construct(private readonly Connection $connection)
+    {
+    }
 
     /**
-     * Returns the ID of the check
-     *
-     * @return string
+     * Returns the ID of the check.
      */
-    public function getId(): string { return 'database_health'; }
+    public function getId(): string
+    {
+        return 'database_health';
+    }
 
     /**
-     * Returns the label of the check
-     *
-     * @return string
+     * Returns the label of the check.
      */
-    public function getLabel(): string { return 'Database Health'; }
+    public function getLabel(): string
+    {
+        return 'Database Health';
+    }
 
     /**
-     * Returns the section of the check
-     *
-     * @return string
+     * Returns the section of the check.
      */
-    public function getSection(): string { return 'Database'; }
+    public function getSection(): string
+    {
+        return 'Database';
+    }
 
     /**
-     * Runs the check
-     *
-     * @return CheckResult
+     * Runs the check.
      */
     public function run(): CheckResult
     {
@@ -67,28 +70,27 @@ final class DatabasePerformanceCheck implements CheckInterface
                 return $this->checkPostgres();
             }
 
-            return $this->unsupported($platform);
-
+            return $this->unsupported($this->getDatabasePlatformName($platform));
         } catch (Exception $e) {
             return $this->error($e->getMessage());
         }
     }
 
     /**
-     * Checks the performance of a MySQL database
-     *
-     * @return CheckResult
+     * Checks the performance of a MySQL database.
      */
     private function checkMySql(): CheckResult
     {
         $issues = [];
         $severity = 'ok';
 
-        $threads = (int) $this->connection
-            ->fetchOne("SHOW STATUS LIKE 'Threads_running'", [], [], 1);
+        /** @var array{Variable_name: string, Value: numeric-string} */
+        $row = $this->connection->fetchAssociative("SHOW STATUS LIKE 'Threads_running'");
+        $threads = (int) $row['Value'];
 
-        $maxConnections = (int) $this->connection
-            ->fetchOne("SHOW VARIABLES LIKE 'max_connections'", [], [], 1);
+        /** @var array{Variable_name: string, Value: numeric-string} */
+        $row = $this->connection->fetchAssociative("SHOW VARIABLES LIKE 'max_connections'");
+        $maxConnections = (int) $row['Value'];
 
         $usage = $maxConnections > 0
             ? round(($threads / $maxConnections) * 100, 1)
@@ -102,28 +104,32 @@ final class DatabasePerformanceCheck implements CheckInterface
             $issues[] = "Elevated connection usage ({$usage}%)";
         }
 
-        $longQueries = (int) $this->connection->fetchOne(
-            "SELECT COUNT(*) FROM information_schema.processlist WHERE TIME > 10 AND COMMAND != 'Sleep'"
+        /** @var array{Variable_name: string, Value: numeric-string} */
+        $row = $this->connection->fetchAssociative(
+            "SELECT COUNT(*) AS Value FROM information_schema.processlist WHERE TIME > 10 AND COMMAND != 'Sleep'",
         );
+        $longQueries = (int) $row['Value'];
 
         if ($longQueries > 5) {
             $severity = 'error';
             $issues[] = "{$longQueries} long-running queries";
         } elseif ($longQueries > 0) {
-            $severity = $severity === 'error' ? 'error' : 'warning';
+            $severity = 'error' === $severity ? 'error' : 'warning';
             $issues[] = "{$longQueries} long-running queries";
         }
 
-        $deadlocks = (int) $this->connection
-            ->fetchOne("SHOW STATUS LIKE 'Innodb_deadlocks'", [], [], 1);
+        /** @var array{Variable_name: string, Value: numeric-string} */
+        $row = $this->connection->fetchAssociative("SHOW STATUS LIKE 'Innodb_deadlocks'");
+        $deadlocks = (int) $row['Value'];
 
         if ($deadlocks > 0) {
             $severity = 'warning';
             $issues[] = "{$deadlocks} InnoDB deadlocks detected";
         }
 
-        $lockWaits = (int) $this->connection
-            ->fetchOne("SHOW STATUS LIKE 'Innodb_row_lock_current_waits'", [], [], 1);
+        /** @var array{Variable_name: string, Value: numeric-string} */
+        $row = $this->connection->fetchAssociative("SHOW STATUS LIKE 'Innodb_row_lock_current_waits'");
+        $lockWaits = (int) $row['Value'];
 
         if ($lockWaits > 0) {
             $severity = 'warning';
@@ -131,8 +137,9 @@ final class DatabasePerformanceCheck implements CheckInterface
         }
 
         try {
-            $replica = $this->connection->fetchAssociative("SHOW SLAVE STATUS");
-            if ($replica && isset($replica['Seconds_Behind_Master'])) {
+            /** @var array{Seconds_Behind_Master?: numeric-string}|false */
+            $replica = $this->connection->fetchAssociative('SHOW SLAVE STATUS');
+            if (false !== $replica && isset($replica['Seconds_Behind_Master'])) {
                 $lag = (int) $replica['Seconds_Behind_Master'];
                 if ($lag > 30) {
                     $severity = 'error';
@@ -146,7 +153,7 @@ final class DatabasePerformanceCheck implements CheckInterface
             // not a replica or no permission
         }
 
-        $summary = $issues === []
+        $summary = [] === $issues
             ? 'Healthy'
             : implode('; ', $issues);
 
@@ -154,31 +161,33 @@ final class DatabasePerformanceCheck implements CheckInterface
             $this->getId(),
             $this->getLabel(),
             $severity,
-            $usage . '%',
+            $usage.'%',
             $summary,
-            $severity === 'ok' ? null : 'Database experiencing stress conditions.',
+            'ok' === $severity ? null : 'Database experiencing stress conditions.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 
     /**
-     * Checks the performance of a PostgreSQL database
-     *
-     * @return CheckResult
+     * Checks the performance of a PostgreSQL database.
      */
     private function checkPostgres(): CheckResult
     {
         $issues = [];
         $severity = 'ok';
 
-        $active = (int) $this->connection->fetchOne(
-            "SELECT count(*) FROM pg_stat_activity WHERE state != 'idle'"
+        /** @var numeric-string|int $value */
+        $value = $this->connection->fetchOne(
+            "SELECT count(*) FROM pg_stat_activity WHERE state != 'idle'",
         );
+        $active = (int) $value;
 
-        $maxConnections = (int) $this->connection->fetchOne(
-            "SHOW max_connections"
+        /** @var numeric-string|int $value */
+        $value = $this->connection->fetchOne(
+            'SHOW max_connections',
         );
+        $maxConnections = (int) $value;
 
         $usage = $maxConnections > 0
             ? round(($active / $maxConnections) * 100, 1)
@@ -192,21 +201,25 @@ final class DatabasePerformanceCheck implements CheckInterface
             $issues[] = "Elevated connection usage ({$usage}%)";
         }
 
-        $longQueries = (int) $this->connection->fetchOne(
-            "SELECT COUNT(*) FROM pg_stat_activity WHERE state = 'active' AND now() - query_start > interval '10 seconds'"
+        /** @var numeric-string|int $value */
+        $value = $this->connection->fetchOne(
+            "SELECT COUNT(*) FROM pg_stat_activity WHERE state = 'active' AND now() - query_start > interval '10 seconds'",
         );
+        $longQueries = (int) $value;
 
         if ($longQueries > 5) {
             $severity = 'error';
             $issues[] = "{$longQueries} long-running queries";
         } elseif ($longQueries > 0) {
-            $severity = $severity === 'error' ? 'error' : 'warning';
+            $severity = 'error' === $severity ? 'error' : 'warning';
             $issues[] = "{$longQueries} long-running queries";
         }
 
-        $deadlocks = (int) $this->connection->fetchOne(
-            "SELECT deadlocks FROM pg_stat_database WHERE datname = current_database()"
+        /** @var numeric-string|int $value */
+        $value = $this->connection->fetchOne(
+            'SELECT deadlocks FROM pg_stat_database WHERE datname = current_database()',
         );
+        $deadlocks = (int) $value;
 
         if ($deadlocks > 0) {
             $severity = 'warning';
@@ -214,11 +227,12 @@ final class DatabasePerformanceCheck implements CheckInterface
         }
 
         try {
+            /** @var numeric-string|int|null */
             $lag = $this->connection->fetchOne(
-                "SELECT EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())"
+                'SELECT EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())',
             );
 
-            if ($lag !== null) {
+            if (null !== $lag) {
                 $lag = (int) $lag;
                 if ($lag > 30) {
                     $severity = 'error';
@@ -232,7 +246,7 @@ final class DatabasePerformanceCheck implements CheckInterface
             // not replica
         }
 
-        $summary = $issues === []
+        $summary = [] === $issues
             ? 'Healthy'
             : implode('; ', $issues);
 
@@ -240,19 +254,18 @@ final class DatabasePerformanceCheck implements CheckInterface
             $this->getId(),
             $this->getLabel(),
             $severity,
-            $usage . '%',
+            $usage.'%',
             $summary,
-            $severity === 'ok' ? null : 'Database experiencing stress conditions.',
+            'ok' === $severity ? null : 'Database experiencing stress conditions.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 
     /**
-     * Returns a warning check result
+     * Returns a warning check result.
      *
      * @param string $platform The platform name
-     * @return CheckResult
      */
     private function unsupported(string $platform): CheckResult
     {
@@ -264,15 +277,14 @@ final class DatabasePerformanceCheck implements CheckInterface
             "Platform '{$platform}' not supported.",
             null,
             $this->getSection(),
-            'medium'
+            'medium',
         );
     }
 
     /**
-     * Returns a failed check result
+     * Returns a failed check result.
      *
      * @param string $message The error message
-     * @return CheckResult
      */
     private function error(string $message): CheckResult
     {
@@ -284,7 +296,7 @@ final class DatabasePerformanceCheck implements CheckInterface
             $message,
             'Verify DB permissions.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 }

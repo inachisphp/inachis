@@ -1,7 +1,7 @@
 {% if series.id is not empty %}
     {% if series.firstDate is not empty and series.lastDate is not empty %}
         {% set counts = series.itemVisibilityCounts %}
-        {{ include('inadmin/partials/admonition.html.twig', {
+        {{ include('inadmin/partials/components/admonition.html.twig', {
             show_title: false,
             'type': 'info',
             'text': series.firstDate|formatLocalTime('jS F Y') ~
@@ -15,14 +15,18 @@
         }) }}
     {% endif %}
     <p class="series__controls">
+    {% if form.bulkCreate is defined %}
         {{ form_widget(form.bulkCreate) }}
+    {% endif %}
+    {% if form.addItem is defined %}
         {{ form_widget(form.addItem) }}
+    {% endif %}
     </p>
     {% if series.items is not empty %}
         {% set badges = {
             draft: {
-                field: 'status',
-                condition: 'draft',
+                field: 'isDraft',
+                condition: true,
                 className: 'badge__draft',
             },
             scheduled: {
@@ -31,7 +35,7 @@
                 className: 'badge__scheduled',
             },
             private: {
-                field: 'visibility',
+                field: 'visible',
                 condition: false,
                 className: 'badge__private',
             },
@@ -61,7 +65,7 @@
                     </td>
                     <td>
                         <label id="series_item_{{ loop.index }}_label" for="series_item_{{ loop.index }}">
-                            <a aria-label="Edit item" href="/incc/{{ item.type }}/{{ item.urls|first.link|default('') }}" title="Edit {{ item.title }}">{{ item.title }}{% if item.subTitle is not empty %} - {{ item.subTitle }}{% endif %}</a></label>
+                            <a aria-label="Edit item" href="/incp/{{ item.type }}/{{ item.urls|first.link|default('') }}" title="Edit {{ item.title }}">{{ item.title }}{% if item.subTitle is not empty %} - {{ item.subTitle }}{% endif %}</a></label>
                     </td>
                     <td>
                         {{ item.postDate|formatLocalTime('jS F Y') }}

@@ -1,36 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Export;
 
-use Symfony\Component\TaggedIterator\TaggedIterator;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
- * Abstract export service
+ * Abstract export service.
  */
 abstract class AbstractExportService
 {
     /** @var iterable<ExportWriterInterface> */
     protected iterable $writers;
 
+    /**
+     * Inject the export writers.
+     *
+     * @param iterable<ExportWriterInterface> $writers
+     */
     public function __construct(
-        #[TaggedIterator('inachis.export_writer')] iterable $writers,
+        #[AutowireIterator('inachis.export_writer')] iterable $writers,
     ) {
         $this->writers = $writers;
     }
 
     /**
-     * Export the collection
+     * Export the collection.
      *
-     * @param iterable<object> $collection
-     * @param string $format
-     * @return string
+     * @param iterable<Category|Page|Series> $items
      */
     protected function exportCollection(
         iterable $items,
@@ -43,18 +48,17 @@ abstract class AbstractExportService
                 foreach ($items as $item) {
                     $dtos[] = $this->normalise($item);
                 }
+
                 return $writer->write($dtos);
             }
         }
-        throw new \RuntimeException(sprintf(
-            'No export writer for format "%s" and domain "%s"',
-            $format,
-            $domain ?? 'default'
-        ));
+        throw new \RuntimeException(sprintf('No export writer for format "%s" and domain "%s"', $format, $domain ?? 'default'));
     }
 
     /**
-     * Each service must implement its own normalise logic
+     * Each service must implement its own normalise logic.
+     *
+     * @param object $entity
      */
-    abstract protected function normalise(object $entity): object;
+    abstract protected function normalise(Category|Page|Series $entity): object;
 }

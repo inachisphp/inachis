@@ -71,6 +71,10 @@
                 display: none;
             }
 
+            span.badge {
+                display: flex;
+            }
+
             .layout.expanded & span {
                 display: inline;
             }
@@ -142,7 +146,7 @@
     }
 
     .admin__identity {
-        background: transparent url(/assets/imgs/incc/inachis.png) no-repeat 50% 50%;
+        background: transparent url(/assets/imgs/incp/inachis.png) no-repeat 50% 50%;
         background-size: contain;
         display: block;
         height: 3em;
@@ -205,6 +209,7 @@
 
 .has-submenu.open .submenu {
     display: block;
+    z-index: 10;
 }
 
 .arrow {

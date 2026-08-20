@@ -1,27 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Command\Analytics;
 
 use Doctrine\DBAL\Connection;
-use Inachis\Repository\AnalyticsRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * Command to remove old analytics data and delete processed files
- * after 7 days
- * 
+ * after 7 days.
+ *
  * Add this to cron such as:
  * * * * * php /path/to/bin/console inachis:analytics:cleanup
  */
@@ -31,47 +29,51 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 )]
 class CleanupAnalyticsCommand extends Command
 {
-    private string $projectDir;
-
     /**
-     * @param Connection $db
+     * Constructor for CleanupAnalyticsCommand.
      */
     public function __construct(
+        #[Autowire('%kernel.project_dir%')]
+        private readonly string $projectDir,
         private Connection $db,
-        ParameterBagInterface $params
     ) {
         parent::__construct();
-        $this->projectDir = $params->get('kernel.project_dir');
     }
 
     /**
-     * Keep last 90 days of analytics data
-     * 
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
+     * Keep last 90 days of analytics data.
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $days = 90;
-        $output->writeln('Removing analytics data older than ' . $days . ' days');
+        $output->writeln('Removing analytics data older than '.$days.' days');
         $this->db->executeStatement(
             'DELETE FROM analytics_page_view
              WHERE date < DATE_SUB(CURDATE(), INTERVAL :days DAY)',
-             [
-                'days' => $days
-             ]
+            [
+                'days' => $days,
+            ],
         );
         $this->db->executeStatement(
             'DELETE FROM analytics_unique_visitor
              WHERE date < DATE_SUB(CURDATE(), INTERVAL :days DAY)',
-             [
-                'days' => $days
-             ]
+            [
+                'days' => $days,
+            ],
+        );
+        $securityDays = 180;
+        $this->db->executeStatement(
+            '
+            DELETE FROM analytics_security_event
+            WHERE date < DATE_SUB(CURDATE(), INTERVAL :days DAY)
+            ',
+            [
+                'days' => $securityDays,
+            ],
         );
 
         $output->writeln('Removing processed log files older than 7 days');
-        $directory = $this->projectDir . '/var/analytics';
+        $directory = $this->projectDir.'/var/analytics';
         $finder = new Finder();
         $finder
             ->files()

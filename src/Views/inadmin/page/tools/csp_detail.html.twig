@@ -1,0 +1,74 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incp_security_list') }}">Security &amp; Diagnostics</a>
+    <a href="{{ path('incp_tools_csp_dashboard') }}">CSP Reporting</a>
+    <span>CSP Report</span>
+{% endblock pagetitle %}
+
+{% block content %}
+<div class="col-12">
+{{ include('inadmin/partials/tab-sets/csp.html.twig') }}
+<div class="ui-section nested-grid">
+<div class="col-6">
+    <dl class="row">
+        <dt class="col-sm-3">Severity</dt>
+        <dd class="col-sm-9">
+            <span class="badge badge__{{ report.severity.badgeClass }}">
+                {{ report.severity.label }}
+            </span>
+        </dd>
+
+        <dt class="col-sm-3">Directive</dt>
+        <dd class="col-sm-9"><code>{{ report.effectiveDirective }}</code></dd>
+
+        <dt class="col-sm-3">Blocked URI</dt>
+        <dd class="col-sm-9"><code>{{ report.blockedUri }}</code></dd>
+
+        <dt class="col-sm-3">Document URI</dt>
+        <dd class="col-sm-9"><code>{{ report.documentUri }}</code></dd>
+
+        <dt class="col-sm-3">Host</dt>
+        <dd class="col-sm-9">{{ report.host ?? '—' }}</dd>
+
+        <dt class="col-sm-3">Occurrences</dt>
+        <dd class="col-sm-9">{{ report.occurrences }}</dd>
+
+        <dt class="col-sm-3">First Seen</dt>
+        <dd class="col-sm-9">
+            {{ report.firstSeenAt ? report.firstSeenAt|date('Y-m-d H:i', viewModel.session.preferences.timezone) : '—' }}
+        </dd>
+
+        <dt class="col-sm-3">Last Seen</dt>
+        <dd class="col-sm-9">
+            {{ report.lastSeenAt ? report.lastSeenAt|date('Y-m-d H:i', viewModel.session.preferences.timezone) : '—' }}
+        </dd>
+
+        <dt class="col-sm-3">User Agent</dt>
+        <dd class="col-sm-9"><small>{{ report.userAgent }}</small></dd>
+
+    </dl>
+</div>
+
+<div class="col-6 card">
+    <h2>Raw Payload</h2>
+    <pre class="mb-0"><code>
+{{ report.payload|json_encode(constant('JSON_PRETTY_PRINT')) }}
+</code></pre>
+</div>
+</div>
+</div>
+
+{% if not report.isProcessed and can('CSP_POLICY', 'EDIT') %}
+<div class="fixed-bottom-bar">
+    <form action="{{ path('csp_report_process', { id: report.id }) }}" method="post">
+        <input type="hidden" name="_token" value="{{ csrf_token('report_' ~ report.id) }}">
+        <input type="hidden" name="fingerprint" value="{{ report.fingerprint }}" />
+        <p>
+            <button name="action" type="submit" value="approve" class="btn btn--primary">Approve</button>
+            <button name="action" type="submit" value="reject" class="btn btn--danger">Reject</button>
+        </p>
+    </form>
+</div>
+{% endif %}
+{% endblock content %}

@@ -1,11 +1,11 @@
 {% extends "/inadmin/structure/main.html.twig" %}
 {% block pagetitle %}
-    <a href="{{ path('incc_settings_index') }}">Settings</a>
+    <a href="{{ path('incp_settings_index') }}">Settings</a>
     <span>Navigation Tabs</span>
 {% endblock pagetitle %}
 {% block content %}
 <div class="col-12">
-    {% include 'inadmin/partials/table.html.twig' with {
+    {% include 'inadmin/partials/components/view_content.html.twig' with {
         type: 'tabs',
 
         table_name: 'Navigation Tabs list',
@@ -35,7 +35,12 @@
                         field: 'isActive',
                         condition: true,
                         className: 'badge__active',
-                    }
+                    },
+                    'system': {
+                        field: 'isSystem',
+                        condition: true,
+                        className: 'badge__warning'
+                    },
                 },
             },
         ],
@@ -49,37 +54,38 @@
         filters: [],
         filter_values: query.filters,
         show_search: false,
-        show_select_deselect: true,
+        show_select_deselect: can('NAVIGATION', 'EDIT'),
         show_pagination: false,
-        sortable: true,
+        sortable: can('NAVIGATION', 'EDIT'),
 
-        add_button: {
+        add_button: can('NAVIGATION', 'CREATE') ? {
             text: 'Create Tab',
-            url: path('incc_settings_navigation_edit', { id: 'new' }),
-        },
+            url: path('incp_settings_navigation_edit', { id: 'new' }),
+        } : null,
 
-        url_result: path('incc_settings_navigation_list'),
+        url_result: path('incp_settings_navigation_list'),
+        view_setting: 'table',
         zebra: true,
 
         actions: {
-            enable: {
-                button_class: 'button--secondary',
+            enable: can('NAVIGATION', 'EDIT') ? {
+                button_class: 'btn--secondary',
                 'data': {
                     'form-action': '',
                 },
                 icon: 'visibility',
                 title: 'admin.button.enable'|trans,
-            },
-            disable: {
-                button_class: 'button--secondary',
+            } : null,
+            disable: can('NAVIGATION', 'EDIT') ? {
+                button_class: 'btn--secondary',
                 'data': {
                     'form-action': '',
                 },
                 icon: 'visibility_off',
                 title: 'admin.button.disable'|trans,
-            },
-            delete: {
-                button_class: 'button--negative button--delete button--confirm',
+            } : null,
+            delete: can('NAVIGATION', 'DELETE') ? {
+                button_class: 'btn--danger btn--delete btn--confirm',
                 'data': {
                     'confirm': 'delete',
                     'confirm-text': 'Yes, delete',
@@ -92,8 +98,8 @@
                 name: 'delete',
                 value: '1',
                 title: 'Delete',
-            }
-        }
+            } : null,
+        }|filter(v => v is not null),
     } %}
 </div>
 {% endblock content %}

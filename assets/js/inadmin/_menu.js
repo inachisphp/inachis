@@ -82,7 +82,7 @@ window.Inachis.NavMenu = {
 				closeSubMenus(e.target);
 			});
 		}
-		// @todo review the below - need to get it working with LIs instead
+		// TODO: review the below - need to get it working with LIs instead
 		document.querySelectorAll('.submenu a[aria-current="page"]').forEach(link => {
 			const parent = link.closest('.has-submenu');
 			parent.classList.add('open');

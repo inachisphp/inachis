@@ -6,20 +6,20 @@ window.Inachis.ImageManager = {
     allowedTypes: [],
     buttons: [
         {
-            class: 'button button--positive',
+            text: 'Close',
+            class: 'btn btn--outline',
+            click() {
+                this.close();
+            }
+        },
+        {
+            class: 'btn btn--primary',
             disabled: true,
             text: 'Choose Image',
             click() {
                 window.Inachis.ImageManager.chooseImageAction();
             }
         },
-        {
-            text: 'Close',
-            class: 'button button--info',
-            click() {
-                this.close();
-            }
-        }
     ],
 
     offset: 0,
@@ -37,6 +37,7 @@ window.Inachis.ImageManager = {
     },
 
     open(triggerEl) {
+        this.offset = 0; // Reset pagination state when opening dialog
         this.dialog?.close();
 
         this.dialog = new Dialog({
@@ -80,11 +81,15 @@ window.Inachis.ImageManager = {
                 ?.classList.add('visually-hidden');
             this.toggleUploadImage();
         } else {
-            this.buttons[0].disabled = true;
+            this.buttons[1].disabled = true;
 
             const searchInput = document.querySelector('#ui-dialog-search-input');
-            searchInput?.addEventListener('input', () => this.searchImages());
+            searchInput?.addEventListener('input', () => {
+                this.offset = 0; // Reset to page 1 on new search input
+                this.searchImages();
+            });
 
+            this.offset = 0;
             this.searchImages();
         }
         window.Inachis.FileUpload.init('form.filepond', {
@@ -97,7 +102,7 @@ window.Inachis.ImageManager = {
         });
         this.updateDialogButtons();
 
-        document.querySelectorAll('.ui-dialog-secondary-bar .button--add')
+        document.querySelectorAll('.ui-dialog-secondary-bar .btn--add')
             .forEach(a => {
                 a.addEventListener('click', () => this.toggleUploadImage());
             });
@@ -130,6 +135,7 @@ window.Inachis.ImageManager = {
                 } else {
                     document.querySelector('#ui-dialog-search-input').value = imageTitle;
                     this.toggleUploadImage();
+                    this.offset = 0;
                     this.searchImages();
                 }
 
@@ -158,14 +164,16 @@ window.Inachis.ImageManager = {
                     event.preventDefault();
 
                     const page = parseInt(event.currentTarget.textContent, 10);
-                    this.offset = (page - 1) * this.limit;
-                    this.searchImages();
+                    if (!isNaN(page)) {
+                        this.offset = (page - 1) * this.limit;
+                        this.searchImages();
+                    }
                 });
             });
     },
 
     enableChooseButton() {
-        this.buttons[0].disabled = false;
+        this.buttons[1].disabled = false;
         this.updateDialogButtons();
     },
 
@@ -226,7 +234,7 @@ window.Inachis.ImageManager = {
             formData.append('filter[keyword]', keyword);
 
             fetch(
-                `${window.Inachis.prefix}/ax/imageManager/getImages/${this.offset}/${this.limit}`,
+                `${window.Inachis.prefix}/ax/imageManager/getImages/${this.limit}/${this.offset}`,
                 {
                     method: 'POST',
                     body: formData
@@ -236,7 +244,6 @@ window.Inachis.ImageManager = {
                 .then(html => {
                     gallery.innerHTML = html;
 
-                    this.offset = 0;
                     gallery.scrollTop = 0;
 
                     this.addPaginationLinks();

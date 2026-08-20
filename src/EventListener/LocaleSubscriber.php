@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\EventListener;
@@ -13,16 +12,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
+/**
+ * Event listener for setting the locale.
+ */
 class LocaleSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
     private string $defaultLocale;
 
     /**
      * LocaleSubscriber constructor.
-     * @param string $defaultLocale
+     *
+     * @param string $defaultLocale The default locale, defaults to 'en'
      */
     public function __construct(string $defaultLocale = 'en')
     {
@@ -30,7 +30,9 @@ class LocaleSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param RequestEvent $event
+     * Handles kernel requests.
+     *
+     * @param RequestEvent $event The request event
      */
     public function onKernelRequest(RequestEvent $event): void
     {
@@ -39,16 +41,22 @@ class LocaleSubscriber implements EventSubscriberInterface
             return;
         }
         // try to see if the locale has been set as a _locale routing parameter
-        if ($locale = $request->attributes->get('_locale')) {
+        if ($locale = $request->attributes->getString('_locale')) {
             $request->getSession()->set('_locale', $locale);
         } else {
             // if no explicit locale has been set on this request, use one from the session
-            $request->setLocale($request->getSession()->get('_locale', $this->defaultLocale));
+            $locale = $request->getSession()->get('_locale', $this->defaultLocale);
+            if (!is_string($locale)) {
+                $locale = $this->defaultLocale;
+            }
+            $request->setLocale($locale);
         }
     }
 
     /**
-     * @return array
+     * Returns the events this listener is subscribed to.
+     *
+     * @return array<array<string|int>> The events this listener is subscribed to
      */
     public static function getSubscribedEvents(): array
     {

@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics\Check\Performance;
@@ -14,22 +13,35 @@ use Inachis\Diagnostics\CheckResult;
 
 final class ServerModulesCheck implements CheckInterface
 {
-    public function getId(): string { return 'server_modules'; }
-    public function getLabel(): string { return 'Server Modules / Features'; }
-    public function getSection(): string { return 'Performance'; }
+    public function getId(): string
+    {
+        return 'server_modules';
+    }
+
+    public function getLabel(): string
+    {
+        return 'Server Modules / Features';
+    }
+
+    public function getSection(): string
+    {
+        return 'Performance';
+    }
 
     public function run(): CheckResult
     {
+        /** @var string */
         $serverSoftware = $_SERVER['SERVER_SOFTWARE'] ?? 'unknown';
         $serverSoftwareLower = strtolower($serverSoftware);
         $details = [];
         $status = 'ok';
+        $details[] = 'HTTP/2: '.($this->detectHttp2() ? 'enabled' : 'not detected');
 
         if (str_contains($serverSoftwareLower, 'apache')) {
             // Apache best-effort module detection
             $modules = [
                 'mod_deflate' => 'Gzip compression',
-                'mod_brotli'  => 'Brotli compression',
+                'mod_brotli' => 'Brotli compression',
                 'mod_expires' => 'Cache control',
             ];
 
@@ -42,7 +54,7 @@ final class ServerModulesCheck implements CheckInterface
                 } else {
                     $enabled = in_array($mod, $loadedModules) ? 'enabled' : 'disabled';
                     $details[] = "$label: $enabled";
-                    if ($enabled === 'disabled' && $status !== 'error') {
+                    if ('disabled' === $enabled) {
                         $status = 'warning';
                     }
                 }
@@ -51,13 +63,13 @@ final class ServerModulesCheck implements CheckInterface
             // Nginx equivalents via header inspection
             $compression = $this->detectCompression();
             $details[] = "Compression: $compression (gzip/br via headers)";
-            $details[] = "Cache/Expires headers: " . ($this->detectExpires() ? 'yes' : 'unknown');
+            $details[] = 'Cache/Expires headers: '.($this->detectExpires() ? 'yes' : 'unknown');
             $status = 'ok';
         } elseif (str_contains($serverSoftwareLower, 'microsoft-iis')) {
             // IIS: cannot detect modules, only headers
-            $details[] = "IIS detected. Module detection not available via PHP.";
-            $details[] = "Compression: " . $this->detectCompression();
-            $details[] = "Cache/Expires headers: " . ($this->detectExpires() ? 'yes' : 'unknown');
+            $details[] = 'IIS detected. Module detection not available via PHP.';
+            $details[] = 'Compression: '.$this->detectCompression();
+            $details[] = 'Cache/Expires headers: '.($this->detectExpires() ? 'yes' : 'unknown');
             $status = 'ok';
         } else {
             $details[] = "Unknown server software: $serverSoftware";
@@ -70,34 +82,44 @@ final class ServerModulesCheck implements CheckInterface
             $status,
             null,
             implode("\n", $details),
-            "Check if your server modules and features are enabled as recommended.",
+            'Check if your server modules and features are enabled as recommended.',
             $this->getSection(),
-            'medium'
+            'medium',
         );
     }
 
+    /**
+     * Detects if compression is in use.
+     */
     private function detectCompression(): string
     {
         foreach (headers_list() as $header) {
-            if (stripos($header, 'Content-Encoding:') === 0) {
+            if (0 === stripos($header, 'Content-Encoding:')) {
                 return trim(substr($header, 17));
             }
         }
+
         return 'none';
     }
 
+    /**
+     * Detect if HTTP/2 is in use.
+     */
     private function detectHttp2(): bool
     {
-        return isset($_SERVER['SERVER_PROTOCOL']) && str_contains($_SERVER['SERVER_PROTOCOL'], 'HTTP/2');
+        $protocol = $_SERVER['SERVER_PROTOCOL'] ?? null;
+
+        return is_string($protocol) && str_contains($protocol, 'HTTP/2');
     }
 
     private function detectExpires(): bool
     {
         foreach (headers_list() as $header) {
-            if (stripos($header, 'Cache-Control:') === 0 || stripos($header, 'Expires:') === 0) {
+            if (0 === stripos($header, 'Cache-Control:') || 0 === stripos($header, 'Expires:')) {
                 return true;
             }
         }
+
         return false;
     }
 }

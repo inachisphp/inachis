@@ -4,10 +4,17 @@
     <span>Series</span>
 {% endblock pagetitle %}
 
-{% block content %}
+{% set badges = {
+    'private': {
+        'field': 'visible',
+        'condition': false,
+        'className': 'badge__private'
+    },
+} %}
 
+{% block content %}
 <div class="col-12">
-    {% include 'inadmin/partials/list.html.twig' with {
+    {% include 'inadmin/partials/components/view_content.html.twig' with {
         'className': 'form__series',
         'type': 'series',
 
@@ -19,55 +26,57 @@
         'slug_prefix': 'series/edit',
         'slug': 'id',
 
-        'add_button': {
+        'add_button': can('SERIES', 'CREATE') ? {
+            image: 'create_new_folder',
             'text': 'Create Series',
-            'url': path('incc_series_new'),
-        },
-        'url_result': path('incc_series_list'),
+            'url': path('incp_series_new'),
+        } : null,
+        'url_result': path('incp_series_list'),
 
         'filters': {
             'Visibility': {
                 '': 'All',
-                'private': 'Private',
-                'public': 'Public',
+                '0': 'Private',
+                '1': 'Public',
             }
         },
         'filter_values': query.filters,
         'show_select_deselect': true,
-        'show_search': true,
+        show_search: true,
+        search_placeholder: 'Search series…',
         showSummary: true,
-        'zebra': true,
+        zebra: true,
 
         'actions': {
-            'private': {
-                'button_class': 'button--secondary button--privacy',
+            'private': can('SERIES', 'EDIT') ? {
+                'button_class': 'btn--secondary btn--privacy',
                 'data': {
                     'form-action': ''
                 },
                 'icon': 'visibility_off',
                 'title': 'Make private',
-            },
-            'public': {
-                'button_class': 'button--secondary button--privacy',
+            } : null,
+            'public': can('SERIES', 'EDIT') ? {
+                'button_class': 'btn--secondary btn--privacy',
                 'data': {
                     'form-action': ''
                 },
                 'icon': 'visibility',
                 'title': 'Make public',
-            },
+            } : null,
             'export': {
-                'button_class': 'button--secondary button--export',
+                'button_class': 'btn--secondary btn--export',
                 'button_type': 'button',
                 'data': {
                     'content-type': 'series',
-                    'form-action': path('incc_tools_export'),
+                    'form-action': path('incp_tools_export'),
                     'scope': 'manual',
                 },
                 'icon': 'cloud_download',
                 'title': 'Export',
             },
-            'delete': {
-                'button_class': 'button--negative button--delete button--confirm',
+            'delete': can('SERIES', 'DELETE') ? {
+                'button_class': 'btn--danger btn--delete btn--confirm',
                 'data': {
                     'confirm': 'delete',
                     'confirm-text': 'Yes, delete',
@@ -80,25 +89,49 @@
                 'name': 'delete',
                 'value': '1',
                 'title': 'Delete',
-            },
-        },
+            } : null,
+        }|filter(v => v is not null),
 
         'sort_options': {
-            'lastDate asc': 'Newest',
-            'lastDate desc': 'Oldest',
-            'modDate asc': 'Modfied: Newest',
-            'modDate desc': 'Modfiied: Oldest',
+            'lastDate desc': 'Newest',
+            'lastDate asc': 'Oldest',
+            'updatedAt desc': 'Modfied: Newest',
+            'updatedAt asc': 'Modfiied: Oldest',
             'title asc': 'Title: A-Z',
             'title desc': 'Title: Z-A',
         },
 
-        'badges': {
-            'private': {
-                'field': 'visibility',
-                'condition': false,
-                'className': 'badge__private'
+        'badges': badges,
+
+        columns: [
+            {
+                title: 'Title',
+                source: 'title',
+                slug: 'id',
             },
-        }
+            {
+                title: 'Sub-title',
+                source: 'subTitle',
+            },
+            {
+                title: 'First Date',
+                source: 'firstDate',
+                source_type: 'date',
+            },
+            {
+                title: 'Last Date',
+                source: 'lastDate',
+                source_type: 'date',
+            },
+            {
+                title: 'Status',
+                flex: true,
+                badges: badges,
+            }
+        ],
+
+        view_modes: [ 'list', 'table' ],
+        view_setting: query.view|default('list'),
     }
 %}
 </div>

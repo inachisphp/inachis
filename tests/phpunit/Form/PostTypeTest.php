@@ -1,32 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Form;
 
-use Inachis\Entity\Page;
-use Inachis\Form\PostType;
+use Inachis\Entity\Content\Page;
 use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use Inachis\Form\PostType;
+use Inachis\Provider\TimezoneProvider;
+use Inachis\Security\Authorisation\PermissionResolver;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
 final class PostTypeTest extends TestCase
@@ -35,6 +36,7 @@ final class PostTypeTest extends TestCase
     {
         $m = $this->createStub(TranslatorInterface::class);
         $m->method('trans')->willReturnCallback(fn ($s) => (string) $s);
+
         return $m;
     }
 
@@ -42,7 +44,16 @@ final class PostTypeTest extends TestCase
     {
         $m = $this->createStub(RouterInterface::class);
         $m->method('generate')->willReturn('/fake/url');
+
         return $m;
+    }
+
+    private function security(): Security
+    {
+        $security = $this->createStub(Security::class);
+        $security->method('getUser')->willReturn(new \Inachis\Entity\User\User());
+
+        return $security;
     }
 
     private function transformer(): ArrayCollectionToArrayTransformer
@@ -57,9 +68,11 @@ final class PostTypeTest extends TestCase
     public function testBuildFormForNewItem(): void
     {
         $postType = new PostType(
+            new PermissionResolver(),
+            new TimezoneProvider('UTC'),
             $this->translator(),
             $this->router(),
-            $this->transformer()
+            $this->security(),
         );
 
         $page = new Page();
@@ -70,16 +83,18 @@ final class PostTypeTest extends TestCase
             ['subTitle', TextType::class, $this->anything()],
             ['url', TextType::class, $this->anything()],
             ['content', TextareaType::class, $this->anything()],
-            ['visibility', CheckboxType::class, $this->anything()],
+            ['visible', CheckboxType::class, $this->anything()],
+            ['showTableOfContents', CheckboxType::class, $this->anything()],
             ['postDate', DateTimeType::class, $this->anything()],
-            ['categories', EntityType::class, $this->anything()],
-            ['tags', EntityType::class, $this->anything()],
+            ['expireDate', DateTimeType::class, $this->anything()],
+            ['categories', TextType::class, $this->anything()],
+            ['tags', TextType::class, $this->anything()],
             ['language', ChoiceType::class, $this->anything()],
             ['latlong', TextType::class, $this->anything()],
+            ['featureImage', HiddenType::class, $this->anything()],
             ['featureSnippet', TextareaType::class, $this->anything()],
             ['noindex', CheckboxType::class, $this->anything()],
             ['nofollow', CheckboxType::class, $this->anything()],
-            ['submit', SubmitType::class, $this->anything()],
         ];
 
         $this->expectAddCallsInOrder($builder, $expected);
@@ -95,9 +110,11 @@ final class PostTypeTest extends TestCase
     public function testBuildFormForExistingItem(): void
     {
         $postType = new PostType(
+            new PermissionResolver(),
+            new TimezoneProvider('UTC'),
             $this->translator(),
             $this->router(),
-            $this->transformer()
+            $this->security(),
         );
 
         $page = (new Page())->setId(Uuid::uuid1());
@@ -107,20 +124,19 @@ final class PostTypeTest extends TestCase
             ['subTitle', TextType::class, $this->anything()],
             ['url', TextType::class, $this->anything()],
             ['content', TextareaType::class, $this->anything()],
-            ['visibility', CheckboxType::class, $this->anything()],
+            ['visible', CheckboxType::class, $this->anything()],
+            ['showTableOfContents', CheckboxType::class, $this->anything()],
             ['postDate', DateTimeType::class, $this->anything()],
-            ['categories', EntityType::class, $this->anything()],
-            ['tags', EntityType::class, $this->anything()],
+            ['expireDate', DateTimeType::class, $this->anything()],
+            ['categories', TextType::class, $this->anything()],
+            ['tags', TextType::class, $this->anything()],
             ['language', ChoiceType::class, $this->anything()],
             ['latlong', TextType::class, $this->anything()],
+            ['featureImage', HiddenType::class, $this->anything()],
             ['featureSnippet', TextareaType::class, $this->anything()],
             ['noindex', CheckboxType::class, $this->anything()],
             ['nofollow', CheckboxType::class, $this->anything()],
-            ['submit', SubmitType::class, $this->anything()],
-            // Extra fields added only for existing item:
-            ['modDate', DateTimeType::class, $this->anything()],
-            ['publish', SubmitType::class, $this->anything()],
-            ['delete', SubmitType::class, $this->anything()],
+            ['updatedAt', DateTimeType::class, $this->anything()],
         ];
 
         $this->expectAddCallsInOrder($builder, $expected);
@@ -130,9 +146,11 @@ final class PostTypeTest extends TestCase
     public function testConfigureOptions(): void
     {
         $postType = new PostType(
+            new PermissionResolver(),
+            new TimezoneProvider('UTC'),
             $this->translator(),
             $this->router(),
-            $this->transformer()
+            $this->security(),
         );
 
         $resolver = new OptionsResolver();
@@ -145,7 +163,7 @@ final class PostTypeTest extends TestCase
     }
 
     /**
-     * Helper to assert add() calls in exact order
+     * Helper to assert add() calls in exact order.
      */
     private function expectAddCallsInOrder(FormBuilderInterface $builder, array $expectedCalls): void
     {
@@ -163,7 +181,8 @@ final class PostTypeTest extends TestCase
                     $this->assertSame(['selected' => 'selected'], $result);
                 }
 
-                $callIndex++;
+                ++$callIndex;
+
                 return $builder;
             });
     }

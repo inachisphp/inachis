@@ -47,7 +47,8 @@ body.type_login {
 		padding: 0;
 
 		button {
-			&#login_logIn {
+			&#login_logIn, &#login_totp_verify, &#login_recovery_code_verify {
+				justify-content: center;
 				width: 100%;
 			}
 
@@ -75,6 +76,20 @@ body.type_login {
 			color: $text-inverse;
 			margin-bottom: 1.3em;
 			width: 100%;
+
+			&.auth-code-field {
+				font-size: 1.5rem !important;
+				font-family: monospace;
+				letter-spacing: 0.5rem;
+				text-align: center;
+				transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+				&:focus {
+					border-color: var(--color-brand-500) !important;
+					box-shadow: 0 0 0 3px var(--color-brand-100) !important;
+					outline: none;
+				}
+			}
 		}
 
 		input[data-controller=toggle-password] {
@@ -121,7 +136,7 @@ body.type_login {
 
 	a,
 	a:visited {
-		&.button {
+		&.btn {
 			display: inline;
 		}
 
@@ -137,7 +152,7 @@ body.type_login {
 	}
 
 	a:hover {
-		&.button {
+		&.btn {
 			color: $text-inverse;
 			text-decoration: none;
 		}
@@ -148,7 +163,7 @@ body.type_login {
 		}
 	}
 
-	.button--password-toggle {
+	.btn--password-toggle {
 		background: transparent;
 		border: none;
 		color: $text-inverse;

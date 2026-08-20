@@ -1,54 +1,64 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form;
 
-use Karser\Recaptcha3Bundle\Form\Recaptcha3Type;
-use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Undocumented class.
+ *
+ * @extends AbstractType<array{
+ *     forgot_email?: string,
+ * }>
+ */
 class ForgotPasswordType extends AbstractType
 {
-    private ?TranslatorInterface $translator;
-    public function __construct(?TranslatorInterface $translator)
+    /**
+     * Constructor for the ForgotPasswordType.
+     */
+    public function __construct(private readonly TranslatorInterface $translator)
     {
-        $this->translator = $translator;
     }
 
+    /**
+     * Builds the form.
+     *
+     * @param FormBuilderInterface<array{
+     *     forgot_email?: string,
+     * }|null> $builder
+     * @param array<string, mixed> $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('forgot_email', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'form-login__username-label',
-                    'aria-required'   => 'true',
-                    'autofocus'       => 'true',
-                    'class'           => 'text',
-                    'id'              => 'form-forgot__email',
-                    'placeholder'     => $this->translator->trans('admin.email_example'),
+                    'aria-required' => 'true',
+                    'autofocus' => 'true',
+                    'class' => 'text',
+                    'id' => 'form-forgot__email',
+                    'placeholder' => $this->translator->trans('admin.email_example'),
                 ],
-                'label'      => $this->translator->trans('admin.reset.email_address.label'),
+                'label' => $this->translator->trans('admin.reset.email_address.label'),
                 'label_attr' => [
                     'id' => 'forgot__email-label',
                 ],
             ])
             ->add('resetPassword', SubmitType::class, [
                 'label' => $this->translator->trans('admin.reset_password'),
-                'attr'  => [
-                    'class' => 'button button--positive',
+                'attr' => [
+                    'class' => 'btn btn--primary',
                 ],
             ])
         ;

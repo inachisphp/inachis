@@ -18,14 +18,14 @@ window.Inachis.Components = {
 		this.initSwitches('');
 		this.initUIToggle();
 
-		document.querySelectorAll('.image_preview .button--confirm').forEach(button => {
+		document.querySelectorAll('.image_preview .btn--confirm').forEach(button => {
 			button.addEventListener('click', (event) => {
 				event.preventDefault();
 				const imagePreview = button.closest('.image_preview');
 				if (!imagePreview) return;
 				const hiddenInput = imagePreview.querySelector('input[type="hidden"]');
 				if (hiddenInput) hiddenInput.value = '';
-				imagePreview.querySelectorAll('img, button.button--confirm').forEach(el => {
+				imagePreview.querySelectorAll('img, button.btn--confirm').forEach(el => {
 					el.remove();
 				});
 			});
@@ -64,7 +64,7 @@ window.Inachis.Components = {
 		});
 	},
 	initCopyPaste(selector) {
-		document.querySelectorAll(`${selector}.button--copy`).forEach(button => {
+		document.querySelectorAll(`${selector}.btn--copy`).forEach(button => {
 			button.addEventListener('click', async () => {
 				const textSource = document.querySelector(`#${button.dataset.target}`);
 				const copyText = (button.dataset.prefix ?? '') + textSource.value;
@@ -76,21 +76,40 @@ window.Inachis.Components = {
 			});
 		});
 	},
+
 	initDatePicker() {
-		const postDateSelector = document.querySelector('#post_postDate');
-		if (!postDateSelector) return;
-		const datePicker = new DatePicker('#post_postDate', {
-			onChange: (formattedDate) => {
-				if (window.Inachis?.PostEdit) {
-					document.querySelector('#post_url').value = window.Inachis.PostEdit.getUrlFromTitle();
-				}
-			},
-			format: 'dd/mm/yyyy HH:ii',
-			materialIcons: true,
+		const datePickers = document.querySelectorAll('.ui-datepicker');
+		if (!datePickers.length) return;
+
+		datePickers.forEach((input) => {
+			const format = input.dataset.format || 'dd/mm/yyyy HH:ii';
+			const target = input.dataset.target || null;
+			const onChangeName = input.dataset.onChange;
+
+			new DatePicker(input, {
+				format,
+				materialIcons: true,
+				onChange: (formattedDate) => {
+					const callback = this[onChangeName];
+
+					if (null !== target) {
+						const targetElement = document.querySelector(target);
+						if (targetElement) {
+							const [day, month, year] = formattedDate.split('/');
+							targetElement.value = `${year}-${month}-${day}`;
+						}
+					}
+
+					if (typeof callback === 'function') {
+						callback.call(this, formattedDate, input);
+					}
+				},
+			});
 		});
 	},
+
 	initExportButton() {
-		const exportButton = document.querySelector('.button--export');
+		const exportButton = document.querySelector('.btn--export');
 		if (!exportButton) return;
 
 		exportButton.addEventListener('click', () => {
@@ -153,7 +172,7 @@ window.Inachis.Components = {
 		});
 	},
 	initPasswordToggle() {
-		const passwordToggles = document.querySelectorAll('button.button--password-toggle');
+		const passwordToggles = document.querySelectorAll('button.btn--password-toggle');
 		passwordToggles.forEach(toggle => {
 			toggle.closest('div,p').classList.add('password-wrapper');
 			toggle.addEventListener('click', () => {
@@ -270,7 +289,20 @@ window.Inachis.Components = {
 			if (!el.placeholder) el.setAttribute('aria-label', 'Select an option');
 			el.classList.add('wcag-select');
 
-			new TomSelect(el, options);
+			let ts = new TomSelect(el, options);
+
+			const selected = el.dataset.selectedOptions
+				? JSON.parse(el.dataset.selectedOptions)
+				: [];
+
+			if (selected.length) {
+				ts.addOptions(selected.map(opt => ({
+					id: opt.value,
+					text: opt.text
+				})));
+
+				ts.setValue(selected.map(opt => opt.value));
+			}
 		});
 	},
 	initSelectAllNone(selector) {
@@ -313,12 +345,17 @@ window.Inachis.Components = {
 	},
 	initSwitches(selector) {
 		document
-			.querySelectorAll(`${selector} .ui-switch`)
+			.querySelectorAll(`${selector} input.ui-switch`)
 			.forEach((checkbox) => {
 				window.Inachis.SwitchButton.create(checkbox, {
 					onLabel: checkbox.dataset.labelOn || 'On',
 					offLabel: checkbox.dataset.labelOff || 'Off',
 				});
+			});
+		document
+			.querySelectorAll(`${selector} select.ui-switch`)
+			.forEach((selectInput) => {
+				window.Inachis.SwitchSelector.create(selectInput, {});
 			});
 	},
 	initUIToggle() {
@@ -335,6 +372,13 @@ window.Inachis.Components = {
 				targetElement.setAttribute('aria-hidden', targetElement.classList.contains('visually-hidden'));
 			});
 		});
+	},
+
+	updatePostUrl(formattedDate, input) {
+		if (window.Inachis?.PostEdit) {
+			document.querySelector('#post_url').value =
+				window.Inachis.PostEdit.getUrlFromTitle();
+		}
 	},
 
 	toggleActionBar() {

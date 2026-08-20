@@ -1,0 +1,21 @@
+{% extends "inadmin/partials/form_account.html.twig" %}
+{% set page_type = 'login' %}
+{% set page_title = 'Login to' %}
+
+{% block form_account %}
+<p class="auth-instructions">
+    Enter the six-digit code from your authenticator application.
+</p>
+{{ form_row(form.code) }}
+<div>
+    {{ form_widget(form.trustDevice) }}
+    {{ form_label(form.trustDevice) }}
+</div>
+{{ form_row(form.verify) }}
+
+<p class="recovery-action-row">
+    <a href="{{ path('incp_recovery_code_login') }}" class="recovery-link">
+        Trouble accessing your authenticator? <span class="link-underline">Use a recovery code</span>
+    </a>
+</p>
+{% endblock form_account %}

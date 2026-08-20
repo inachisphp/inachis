@@ -2,12 +2,21 @@
 *.php text eol=lf
 *.js  text eol=lf
 *.css text eol=lf
+*.scss text eol=lf
 *.html text eol=lf
-*.sh  text eol=lf
+*.twig text eol=lf
+*.md text eol=lf
+*.sh text eol=lf
+*.xml text eol=lf
+*.txt text eol=lf
 *.yml text eol=lf
+*.yaml text eol=lf
 *.json text eol=lf
 
 # Optionally mark binary files
 *.png binary
 *.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
 *.exe binary

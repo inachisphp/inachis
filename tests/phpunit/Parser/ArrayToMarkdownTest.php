@@ -1,47 +1,84 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Parser;
 
-use Inachis\Parser\ArrayToMarkdown;
+use Inachis\Service\Parser\ArrayToMarkdown;
 use PHPUnit\Framework\TestCase;
 
 class ArrayToMarkdownTest extends TestCase
 {
-    protected ArrayToMarkdown $parser;
-
-    public function setUp(): void
+    public function testParseFullPost(): void
     {
-        $this->parser  = new ArrayToMarkdown();
-        parent::setUp();
-    }
-
-    public function testParse(): void
-    {
-        $result = $this->parser->parse([
+        $result = ArrayToMarkdown::parse([
             'title' => 'A title',
             'subTitle' => 'Sub-title',
-            'postDate' => '2025-01-01 01:23:45',
-            'categories' => [
-                ['fullPath' => 'Trips/Europe/Wales']
-            ],
             'content' => 'This is a test',
         ]);
-        $this->assertEquals($result, <<<MD
+
+        $this->assertSame(
+            <<<MD
 # A title
 ## Sub-title
-2025-01-01 01:23:45
-Trips/Europe/Wales
 
 
 This is a test
-MD
+MD,
+            $result,
+        );
+    }
+
+    public function testParseWithoutSubtitle(): void
+    {
+        $result = ArrayToMarkdown::parse([
+            'title' => 'A title',
+            'content' => 'Body',
+        ]);
+
+        $this->assertSame(
+            <<<MD
+# A title
+
+
+Body
+MD,
+            $result,
+        );
+    }
+
+    public function testParseWithoutContent(): void
+    {
+        $result = ArrayToMarkdown::parse([
+            'title' => 'A title',
+            'subTitle' => 'Sub-title',
+        ]);
+
+        $this->assertSame(
+            <<<MD
+# A title
+## Sub-title
+MD,
+            $result,
+        );
+    }
+
+    public function testParseEmptyArray(): void
+    {
+        $this->assertSame('', ArrayToMarkdown::parse([]));
+    }
+
+    public function testParseOnlyContent(): void
+    {
+        $this->assertSame(
+            PHP_EOL.PHP_EOL.'Body',
+            ArrayToMarkdown::parse([
+                'content' => 'Body',
+            ]),
         );
     }
 }

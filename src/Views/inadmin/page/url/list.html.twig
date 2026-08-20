@@ -5,79 +5,74 @@
 {% endblock pagetitle %}
 
 {% block content %}
+<div class="col-12 widget-data-list">
 
-    {% block url_list_pre %}{% endblock url_list_pre %}
+    {% include 'inadmin/partials/tab-sets/posts.html.twig' %}
+    {% include 'inadmin/partials/components/view_content.html.twig' with {
+        className: 'form__url',
+        type: 'url',
+        additional_classes: 'default',
 
-    {% block url_list %}
-        <div class="col-12 widget-data-list">
-            {% include 'inadmin/partials/table.html.twig' with {
-                className: 'form__url',
-                type: 'url',
-                additional_classes: 'default',
+        table_name: 'URL list',
+        table_class: 'table--responsive table--row-borders table--focusable table--darkhead',
+        table_desc: 'This table lists URLs used by pages and posts. The first column contains checkboxes allowing users to select one or more tasks.',
 
-                table_name: 'URL list',
-                table_class: 'table--responsive table--row-borders table--focusable table--darkhead',
-                table_desc: 'This table lists URLs used by pages and posts. The first column contains checkboxes allowing users to select one or more tasks.',
-
-                columns: [
-                    {
-                        title: 'URL',
-                        source: 'link',
-                        header: true,
-                    },
-                    {
-                        title: 'Content',
-                        source: 'content',
-                        source_type: 'title',
-                    },
-                    {
-                        title: 'Default',
-                        badges: {
-                            'default': {
-                                'field': 'default',
-                                'condition': 'default',
-                                'className': 'badge__default'
-                            }
-                        },
-                    },
-                ],
-
-                limit: query.limit,
-                offset: query.offset,
-                total: dataset.count,
-                url_result: path('incc_url_list'),
-
-                zebra: true,
-                show_search: true,
-                show_select_deselect: true,
-                sort_options: {
-                    'contentDate asc': 'Content Date ASC',
-                    'contentDate desc': 'Content Date DESC',
-                    'link asc': 'URL A-Z',
-                    'link desc': 'URL Z-A',
-                    'content asc': 'Content A-Z',
-                    'content desc': 'Content Z-A',
+        columns: [
+            {
+                title: 'URL',
+                source: 'link',
+                header: true,
+            },
+            {
+                title: 'Content',
+                source: 'content',
+                source_type: 'title',
+            },
+            {
+                title: 'Default',
+                badges: {
+                    'default': {
+                        'field': 'default',
+                        'condition': 'default',
+                        'className': 'badge__default'
+                    }
                 },
-                filters: [],
-                filter_values: query.filters,
+            },
+        ],
 
-                actions: {
-                    make_default: {
-                        button_class: 'button--info',
-                        icon: 'published_with_changes',
-                        title: 'Set as default',
-                    },
-                    delete: {
-                        button_class: 'button--negative button--delete',
-                        icon: 'delete_forever',
-                        title: 'Delete',
-                    },
-                }
-            }
-            %}
-        </div>
-    {% endblock url_list %}
+        limit: query.limit,
+        offset: query.offset,
+        total: dataset.count,
+        url_result: path('incp_url_list'),
 
+        zebra: true,
+        show_search: true,
+        show_select_deselect: can('PAGE', 'EDIT') ? can('PAGE', 'DELETE'),
+        sort_options: {
+            'contentDate asc': 'Content Date ASC',
+            'contentDate desc': 'Content Date DESC',
+            'link asc': 'URL A-Z',
+            'link desc': 'URL Z-A',
+            'content asc': 'Content A-Z',
+            'content desc': 'Content Z-A',
+        },
+        filters: [],
+        filter_values: query.filters,
 
-    {% block url_list_post %}{% endblock url_list_post %}
+        actions: {
+            make_default: can('PAGE', 'EDIT') ? {
+                button_class: 'btn--info',
+                icon: 'published_with_changes',
+                title: 'Set as default',
+            } : null,
+            delete: can('PAGE', 'DELETE') ? {
+                button_class: 'btn--danger btn--delete',
+                icon: 'delete_forever',
+                title: 'Delete',
+            } : null,
+        }|filter(v => v is not null),
+        view_setting: 'table',
+    }
+    %}
+</div>
 {% endblock content %}

@@ -1,20 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form;
 
-use Inachis\Entity\User;
-use Inachis\Util\RandomColorPicker;
-use Inachis\Util\TimezoneChoices;
+use Inachis\Entity\Security\Role;
+use Inachis\Entity\User\User;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
+use Inachis\Form\Provider\TimezoneChoices;
+use Inachis\Security\Authorisation\PermissionResolver;
+use Inachis\Service\User\ProfileColorPalette;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -24,31 +27,58 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Form type for creating and editing users
+ * Form type for creating and editing users.
+ *
+ * @extends AbstractType<User>
  */
 class UserType extends AbstractType
 {
     /**
-     * Creates a new instance of {@link UserType}
-     * 
+     * Creates a new instance of {@link UserType}.
+     *
      * @param TranslatorInterface $translator The translator service
-     * @param Security $security The security service
+     * @param Security            $security   The security service
      */
     public function __construct(
+        private PermissionResolver $permissionResolver,
         private TranslatorInterface $translator,
-        private Security $security
-    ) {}
+        private Security $security,
+    ) {
+    }
 
     /**
-     * Builds the form
-     * 
-     * @param FormBuilderInterface $builder The form builder
-     * @param array<string, mixed> $options The form options
-     * @return void
+     * Builds the form.
+     *
+     * @param FormBuilderInterface<User|null> $builder The form builder
+     * @param array<string, mixed>            $options The form options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $newUser = !isset($options['data']) || !($options['data'] instanceof User) || $options['data']->getId() === null;
+        $targetUser = $options['data'] ?? null;
+        $targetUser = $targetUser instanceof User ? $targetUser : null;
+
+        $newUser = null === $targetUser || null === $targetUser->getId();
+
+        $currentUser = $this->security->getUser();
+        if (!$currentUser instanceof User) {
+            throw new \LogicException('Current user must be authenticated to build UserType form.');
+        }
+
+        $isCurrentUser = null !== $targetUser && $currentUser->getId() === $targetUser->getId();
+
+        $allowEdit = $this->permissionResolver->hasPermission(
+            $currentUser,
+            PermissionResource::USER,
+            $newUser ? PermissionAction::CREATE : PermissionAction::EDIT,
+        );
+        $canEditUserOrOwn = $allowEdit || $isCurrentUser;
+
+        $allowDelete = $this->permissionResolver->hasPermission(
+            $currentUser,
+            PermissionResource::USER,
+            PermissionAction::DELETE,
+        );
+
         $builder
             ->add('username', $newUser ? TextType::class : HiddenType::class, [
                 'attr' => [
@@ -58,10 +88,11 @@ class UserType extends AbstractType
                     'placeholder' => 'Enter a unique username',
                     'readOnly' => !$newUser,
                 ],
+                'disabled' => !$newUser,
                 'label' => 'Username',
                 'label_attr' => [
                     'class' => 'inline_label',
-                    'id' => 'user__username__label'
+                    'id' => 'user__username__label',
                 ],
                 'required' => true,
             ])
@@ -70,10 +101,11 @@ class UserType extends AbstractType
                     'aria-labelledby' => 'user__displayName__label',
                     'class' => 'text inline_label',
                 ],
+                'disabled' => !$canEditUserOrOwn,
                 'label' => 'Display Name',
                 'label_attr' => [
                     'class' => 'inline_label',
-                    'id' => 'user__displayName__label'
+                    'id' => 'user__displayName__label',
                 ],
             ])
             ->add('email', TextType::class, [
@@ -82,10 +114,11 @@ class UserType extends AbstractType
                     'class' => 'text inline_label',
                     'readOnly' => !$newUser,
                 ],
+                'disabled' => !$canEditUserOrOwn,
                 'label' => 'Email Address',
                 'label_attr' => [
                     'class' => 'inline_label',
-                    'id' => 'user__email__label'
+                    'id' => 'user__email__label',
                 ],
                 'required' => true,
             ])
@@ -94,86 +127,149 @@ class UserType extends AbstractType
                     'aria-labelledby' => 'user__timezone__label',
                     'class' => 'text inline_label',
                 ],
-                'choices' => (new TimezoneChoices)->getTimezones(),
+                'choices' => (new TimezoneChoices())->getTimezones(),
+                'disabled' => !$canEditUserOrOwn,
                 'label' => 'Timezone',
                 'label_attr' => [
                     'class' => 'inline_label',
                     'id' => 'user__timezone__label',
                 ],
                 'property_path' => 'preferences.timezone',
-            ])
-            ->add('avatar', HiddenType::class)
-            ->add('submit', SubmitType::class, [
+            ]);
+
+        if ($allowEdit) {
+            $builder->add('assignedRoles', EntityType::class, [
+                'class' => Role::class,
+                'choice_label' => 'name',
+                'choice_value' => static fn (?Role $role) => $role?->getId()?->toString(),
+                'multiple' => true,
+                'expanded' => true,
+                'by_reference' => false,
+                'label' => 'Assigned Roles',
+                'label_attr' => [
+                    'class' => 'inline_label',
+                ],
+                'required' => false,
+                'choice_attr' => static function (Role $role) {
+                    return [
+                        'class' => 'checkbox',
+                    ];
+                },
+            ]);
+        }
+
+        $builder->add('avatar', HiddenType::class);
+        if ($canEditUserOrOwn) {
+            $builder->add('submit', SubmitType::class, [
                 'attr' => [
-                    'class' => 'button button--positive',
+                    'class' => 'btn btn--primary',
                 ],
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> %s',
                     'save',
-                    $this->translator->trans('admin.button.save', [], 'messages')
+                    $this->translator->trans('admin.button.save', [], 'messages'),
                 ),
                 'label_html' => true,
-            ])
-        ;
-        if (!$newUser) {
-            $builder->add('color', ChoiceType::class, [
-                'attr' => [
-                    'aria-labelledby' => 'user__color__label',
-                ],
-                'choices' => array_combine(RandomColorPicker::getAll(), RandomColorPicker::getAll()),
-                'choice_attr' => function ($choice, $key, $value) {
-                    return ['data-color' => $value];
-                },
-                'expanded' => true,
-                'label' => 'Color',
-                'label_attr' => [
-                    'id' => 'user__color__label'
-                ],
-                'multiple' => false,
-                'property_path' => 'preferences.color',
             ]);
-            if ($options['data']->getId() !== $this->security->getUser()->getId()) {
-                $builder
-                    ->add('delete', SubmitType::class, [
+        }
+        if (!$newUser) {
+            if (!$isCurrentUser) {
+                if ($allowDelete) {
+                    $builder->add('delete', SubmitType::class, [
                         'attr' => [
                             'data-confirm' => 'delete',
                             'data-confirm-text' => 'Yes, delete',
-                            'class' => 'button button--negative button--confirm',
+                            'class' => 'btn btn--danger btn--confirm',
                             'data-entity' => 'user',
                             'data-title' => sprintf(
                                 '%s (%s)',
-                                $options['data']->getDisplayName(),
-                                $options['data']->getUsername(),
+                                $targetUser->getDisplayName(),
+                                $targetUser->getUsername(),
                             ),
                             'data-warning' => 'This action cannot be undone, and will result in the user no longer being able to access this system.',
                         ],
                         'label' => sprintf(
                             '<span class="material-icons">%s</span> %s',
                             'delete',
-                            $this->translator->trans('admin.button.delete', [], 'messages')
+                            $this->translator->trans('admin.button.delete', [], 'messages'),
                         ),
                         'label_html' => true,
-                    ])
-                    ->add('enableDisable', SubmitType::class, [
+                    ]);
+                }
+                if ($allowEdit) {
+                    $builder->add('enableDisable', SubmitType::class, [
                         'attr' => [
-                            'class' => 'button button--secondary',
+                            'class' => 'btn btn--secondary',
                         ],
                         'label' => sprintf(
                             '<span class="material-icons">%s</span> %s',
                             $options['data']->isEnabled() ? 'person_off' : 'person_outline',
-                            $this->translator->trans($options['data']->isEnabled() ? 'admin.button.disable' : 'admin.button.enable', [], 'messages')
+                            $this->translator->trans($options['data']->isEnabled() ? 'admin.button.disable' : 'admin.button.enable', [], 'messages'),
                         ),
                         'label_html' => true,
                     ]);
+                }
+            } else {
+                $builder->add('color', ChoiceType::class, [
+                    'attr' => [
+                        'aria-labelledby' => 'user__color__label',
+                    ],
+                    'choices' => array_combine(ProfileColorPalette::getAll(), ProfileColorPalette::getAll()),
+                    'choice_attr' => function ($choice, $key, $value) {
+                        return ['data-color' => $value];
+                    },
+                    'expanded' => true,
+                    'label' => 'Color',
+                    'label_attr' => [
+                        'id' => 'user__color__label',
+                    ],
+                    'multiple' => false,
+                    'property_path' => 'preferences.color',
+                ]);
+                if ($currentUser->isTotpEnabled()) {
+                    $builder->add('disableTotp', SubmitType::class, [
+                        'attr' => [
+                            'class' => 'btn btn--danger',
+                        ],
+                        'label' => sprintf(
+                            '<span class="material-icons">%s</span> %s',
+                            'gpp_bad',
+                            'Disable Two-Factor Authentication',
+                        ),
+                        'label_html' => true,
+                    ]);
+                    $builder->add('regenerateCodes', SubmitType::class, [
+                        'attr' => [
+                            'class' => 'btn btn--add',
+                        ],
+                        'label' => sprintf(
+                            '<span class="material-icons">%s</span> %s',
+                            'loop',
+                            'Generate New Recovery Codes',
+                        ),
+                        'label_html' => true,
+                    ]);
+                } else {
+                    $builder->add('enableTotp', SubmitType::class, [
+                        'attr' => [
+                            'class' => 'btn btn--primary',
+                        ],
+                        'label' => sprintf(
+                            '<span class="material-icons">%s</span> %s',
+                            'verified_user',
+                            'Enable Two-Factor Authentication',
+                        ),
+                        'label_html' => true,
+                    ]);
+                }
             }
         }
     }
 
     /**
-     * Configures the options for the form
-     * 
+     * Configures the options for the form.
+     *
      * @param OptionsResolver $resolver The options resolver
-     * @return void
      */
     public function configureOptions(OptionsResolver $resolver): void
     {

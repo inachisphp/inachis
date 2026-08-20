@@ -17,10 +17,36 @@
 	margin: 0 auto;
 	max-width: 1400px;
 
+	&.analytics-toolbar {
+		display: block;
+		margin: 0;
+
+		form.grid-toggle {
+			border: none;
+		}
+	}
+
 	input[type=Search],
 	select {
 		border-color: transparent;
 		width: auto;
+	}
+
+	.grid-toggle {
+		border: 1px solid $border-color;
+		border-radius: $radius-standard;
+
+		button {
+			border: none;
+
+			&[aria-pressed="true"] {
+				background: $input-focus-ring;
+				color: $action-primary;
+			}
+			.btn-text {
+				display: none;
+			}
+		}
 	}
 
 	.filter__toggle {
@@ -109,7 +135,7 @@
 	}
 }
 
-.button.button--selectAllNone {
+.btn.btn--selectAllNone {
 	background: $border-color;
 	border: 1px solid transparent;
 	display: inline-block;

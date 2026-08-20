@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Import\Series;
@@ -25,6 +24,7 @@ final class SeriesImportValidator
      * Validate an array of SeriesExportDto objects.
      *
      * @param SeriesExportDto[] $seriesList
+     *
      * @return array<int, array<string>> Warnings per series (by index)
      */
     public function validateAll(array $seriesList): array
@@ -41,7 +41,6 @@ final class SeriesImportValidator
     /**
      * Validate a single SeriesExportDto.
      *
-     * @param SeriesExportDto $dto
      * @param int $index Index in the import list (for warnings)
      */
     public function validate(SeriesExportDto $dto, int $index): void

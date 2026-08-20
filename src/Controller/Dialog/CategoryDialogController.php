@@ -1,87 +1,66 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Dialog;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Controller\ZipStream;
-use Inachis\Entity\Category;
-use Inachis\Entity\Page;
-use Inachis\Repository\CategoryRepository;
-use Inachis\Repository\PageRepository;
-use Psr\Log\LoggerInterface;
+use Inachis\Entity\Content\Category;
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Content\PageRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Category Dialog Controller
+ * Category Dialog Controller.
  */
-#[IsGranted('ROLE_ADMIN')]
 class CategoryDialogController extends AbstractInachisController
 {
     /**
-     * @var array<string, mixed>
+     * Get the category manager content.
      */
-    protected array $data = [];
-
-    /**
-     * Get the category manager content
-     *
-     * @param CategoryRepository $categoryRepository
-     * @return Response
-     */
-    #[Route("/incc/ax/categoryManager/get", methods: [ "POST" ])]
+    #[Route('/incp/ax/categoryManager/get', methods: ['POST'])]
     public function getCategoryManagerContent(CategoryRepository $categoryRepository): Response
     {
-        $this->data['categories'] = $categoryRepository->findBy(['parent' => null]);
-
-        return $this->render('inadmin/dialog/category-manager.html.twig', $this->data);
+        return $this->render('inadmin/dialog/category-manager.html.twig', [
+            'categories' => $categoryRepository->findBy(['parent' => null]),
+        ]);
     }
 
     /**
-     * Get the category manager list
-     *
-     * @param CategoryRepository $categoryRepository
-     * @return Response
+     * Get the category manager list.
      */
-    #[Route("/incc/ax/categoryManager/list", methods: [ "POST" ])]
+    #[Route('/incp/ax/categoryManager/list', methods: ['POST'])]
     public function getCategoryManagerList(CategoryRepository $categoryRepository): Response
     {
-        $this->data['categories'] = $categoryRepository->findBy(['parent' => null]);
-
-        return $this->render('inadmin/dialog/category-manager-list.html.twig', $this->data);
+        return $this->render('inadmin/dialog/category-manager-list.html.twig', [
+            'categories' => $categoryRepository->findBy(['parent' => null]),
+        ]);
     }
 
     /**
-     * Get the category manager list content
-     *
-     * @param Request $request
-     * @param CategoryRepository $categoryRepository
-     * @return Response
+     * Get the category manager list content.
      */
-    #[Route("incc/ax/categoryList/get", methods: [ "POST" ])]
+    #[Route('incp/ax/categoryList/get', methods: ['POST'])]
     public function getCategoryManagerListContent(Request $request, CategoryRepository $categoryRepository): Response
     {
         /** @var array<int, Category> $categories */
-        $categories = empty($request->request->get('q')) ?
+        $categories = empty($request->request->getString('q')) ?
             $categoryRepository->findBy(['parent' => null]) :
-            $categoryRepository->findByTitleLike($request->request->get('q'));
+            $categoryRepository->findByTitleLike($request->request->getString('q'));
         /** @var array<int, Category> $result */
         $result = [];
         // Below code is used to handle where categories exist with the same name under multiple locations but are distinct
         if (!empty($categories)) {
             $result['items'] = [];
             foreach ($categories as $category) {
-                $title = $category->getTitle() ?? '';
+                $title = $category->getTitle();
                 if (isset($result['items'][$title])) {
                     $result['items'][$result['items'][$title]->path] = $result['items'][$title];
                     $result['items'][$result['items'][$title]->path]->text = $result['items'][$title]->path;
@@ -89,7 +68,7 @@ class CategoryDialogController extends AbstractInachisController
                     $title = $category->getFullPath();
                 }
                 $result['items'][$title] = (object) [
-                    'id'   => $category->getId(),
+                    'id' => $category->getId(),
                     'text' => $title,
                     'path' => $category->getFullPath(),
                 ];
@@ -99,60 +78,52 @@ class CategoryDialogController extends AbstractInachisController
 
         return new JsonResponse(
             [
-                'items'      => $result,
+                'items' => $result,
                 'totalCount' => count($result),
             ],
-            Response::HTTP_OK
+            Response::HTTP_OK,
         );
     }
 
     /**
-     * Save the category manager content
-     *
-     * @param Request $request
-     * @param CategoryRepository $categoryRepository
-     * @return Response
+     * Save the category manager content.
      */
-    #[Route("incc/ax/categoryManager/save", methods: [ "POST" ])]
+    #[Route('incp/ax/categoryManager/save', methods: ['POST'])]
     public function saveCategoryManagerContent(
         Request $request,
-        CategoryRepository $categoryRepository
+        CategoryRepository $categoryRepository,
     ): Response {
         /** @var Category $category */
-        $category = $request->request->get('id') !== '-1' ?
-            $categoryRepository->findOneBy(['id' => $request->request->get('id')]) :
+        $category = '-1' !== $request->request->getString('id') ?
+            $categoryRepository->findOneBy(['id' => $request->request->getString('id')]) :
             new Category();
         /** @var Category|null $parentCategory */
-        $parentCategory = $request->request->get('parentID') !== '-1' ?
-            $categoryRepository->findOneBy(['id' => $request->request->get('parentID')]) :
+        $parentCategory = '-1' !== $request->request->getString('parentID') ?
+            $categoryRepository->findOneBy(['id' => $request->request->getString('parentID')]) :
             null;
         $categoryRepository->hydrate($category, $request->request->all());
         $category->setParent($parentCategory);
         $this->entityManager->persist($category);
         $this->entityManager->flush();
+
         return new JsonResponse(
             [
                 'success' => '<span class="material-icons">check_circle</span> Category saved',
             ],
-            Response::HTTP_OK
+            Response::HTTP_OK,
         );
     }
 
     /**
-     * Get the category usages
-     *
-     * @param Request $request
-     * @param CategoryRepository $categoryRepository
-     * @param PageRepository $pageRepository
-     * @return JsonResponse
+     * Get the category usages.
      */
-    #[Route("incc/ax/categoryManager/usage", methods: [ "POST" ])]
+    #[Route('incp/ax/categoryManager/usage', methods: ['POST'])]
     public function getCategoryUsages(
         Request $request,
         CategoryRepository $categoryRepository,
-        PageRepository $pageRepository
+        PageRepository $pageRepository,
     ): JsonResponse {
-        $id = $request->request->get('id');
+        $id = $request->request->getString('id');
         /** @var Category|null $category */
         $category = $categoryRepository->find($id);
         if (!$category) {
@@ -163,26 +134,21 @@ class CategoryDialogController extends AbstractInachisController
         foreach ($category->getChildren() as $child) {
             $count += $pageRepository->getPagesWithCategoryCount($child);
         }
-        return new JsonResponse([ 'count' => $count]);
+
+        return new JsonResponse(['count' => $count]);
     }
 
     /**
-     * Delete the category
-     *
-     * @param Request $request
-     * @param CategoryRepository $categoryRepository
-     * @param PageRepository $pageRepository
-     * @return Response
+     * Delete the category.
      */
-    #[Route("incc/ax/categoryManager/delete", methods: [ "POST" ])]
+    #[Route('incp/ax/categoryManager/delete', methods: ['POST'])]
     public function deleteCategory(
         Request $request,
         CategoryRepository $categoryRepository,
-        PageRepository $pageRepository
-    ): Response
-    {
+        PageRepository $pageRepository,
+    ): Response {
         /** @var Category $category */
-        $category = $categoryRepository->findOneBy(['id' => $request->request->get('id')]);
+        $category = $categoryRepository->findOneBy(['id' => $request->request->getString('id')]);
         $count = $pageRepository->getPagesWithCategoryCount($category);
 
         if ($count > 0) {
@@ -191,12 +157,13 @@ class CategoryDialogController extends AbstractInachisController
                     'error' => sprintf(
                         '<span class="material-icons">warning</span> %d categories present',
                         $count,
-                    )
+                    ),
                 ],
-                Response::HTTP_BAD_REQUEST
+                Response::HTTP_BAD_REQUEST,
             );
         }
         $categoryRepository->remove($category);
+
         return new JsonResponse();
     }
 }

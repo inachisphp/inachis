@@ -1,68 +1,60 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Dialog;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\Image;
+use Inachis\Entity\Media\Image;
 use Inachis\Form\ImageType;
-use Inachis\Repository\ImageRepository;
+use Inachis\Repository\Media\ImageRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
 class ImageGalleryDialogController extends AbstractInachisController
 {
-    /**
-     * @return Response
-     */
-    #[Route('/incc/ax/imageManager/get', methods: [ 'POST' ])]
+    #[Route('/incp/ax/imageManager/get', methods: ['POST'])]
     public function getImageManagerList(): Response
     {
-        $this->data['form'] = $this->createForm(ImageType::class)->createView();
-        $this->data['allowedTypes'] = Image::ALLOWED_MIME_TYPES;
-        $this->data['dataset'] = [];
-        return $this->render('inadmin/dialog/image-manager.html.twig', $this->data);
+        return $this->render('inadmin/dialog/image-manager.html.twig', [
+            'form' => $this->createForm(ImageType::class)->createView(),
+            'allowedTypes' => Image::ALLOWED_MIME_TYPES,
+            'dataset' => [],
+        ]);
     }
 
-    /**
-     * @param Request $request
-     * @return Response
-     */
-    #[Route('/incc/ax/imageManager/getImages/{offset}/{limit}',
+    #[Route('/incp/ax/imageManager/getImages/{limit}/{offset}',
         requirements: [
-            "offset" => "\d+",
-            "limit" => "\d+"
+            'limit' => "\d+",
+            'offset' => "\d+",
         ],
-        defaults: [ "offset" => 0, "limit" => 25 ],
-        methods: [ "POST" ],
+        defaults: ['limit' => 25, 'offset' => 0],
+        methods: ['POST'],
     )]
     public function getImageList(
         Request $request,
         ImageRepository $imageRepository,
     ): Response {
+        /** @var array{keyword?: string} */
         $filters = array_filter($request->request->all('filter'));
-        $offsetRaw = $request->attributes->get('offset');
-        $offset = is_numeric($offsetRaw) ? $offsetRaw : 0;
-        $limitRaw = $request->attributes->get('limit');
-        $limit = is_numeric($limitRaw) ? $limitRaw : $imageRepository::MAX_ITEMS_TO_SHOW_ADMIN;
-        $this->data['images'] = $imageRepository->getFiltered(
-            $filters,
-            $offset,
-            $limit
-        );
-        $this->data['query'] = [
-            'offset' => $offset,
-            'limit' => $limit
-        ];
-        return $this->render('inadmin/partials/gallery.html.twig', $this->data);
+        $limit = $request->attributes->getInt('limit', $imageRepository::MAX_ITEMS_TO_SHOW_ADMIN);
+        $offset = $request->attributes->getInt('offset', 0);
+
+        return $this->render('inadmin/partials/gallery.html.twig', [
+            'images' => $imageRepository->getFiltered(
+                $filters,
+                $limit,
+                $offset,
+            ),
+            'query' => [
+                'limit' => $limit,
+                'offset' => $offset,
+            ],
+        ]);
     }
 }

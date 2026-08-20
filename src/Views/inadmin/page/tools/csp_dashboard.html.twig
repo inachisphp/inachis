@@ -1,0 +1,150 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incp_security_list') }}">Security &amp; Diagnostics</a>
+    <span>CSP Reporting</span>
+{% endblock pagetitle %}
+{% block content %}
+<div class="col-12">
+{{ include('inadmin/partials/tab-sets/csp.html.twig') }}
+<div class="ui-section nested-grid">
+{% if reports is empty and activeDirective is empty and activeSeverity is empty and activeHost is empty %}
+        {% embed 'inadmin/partials/components/admonition.html.twig' with {
+            type: 'info',
+            title: 'Get Started: Bootstrap Your CSP Tracking',
+            class: 'col-12',
+            icon: 'security',
+        } %}
+            {% block text %}
+    <p>
+        No violation logs have been registered yet. To start mapping out your application's external dependencies without breaking current client-side functionality, add the following temporary <strong>Report-Only</strong> header to your application's HTTP response configuration:
+    </p>
+    <p>
+        <code>Content-Security-Policy-Report-Only: default-src 'none'; script-src 'none'; style-src 'none'; img-src 'none'; font-src 'none'; connect-src 'none'; object-src 'none'; media-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none';base-uri 'none'; form-action 'none'; frame-ancestors 'none'; report-uri {{ url('csp_report') }};</code>
+    </p>
+
+    <p>
+        <button class="btn btn--secondary" onclick="navigator.clipboard.writeText(document.getElementById('bootstrapCsp').innerText)">
+            <em class="material-icons">content_copy</em> Copy to clipboard
+        </button>
+    </p>
+
+    <hr>
+    <p>
+        <em class="material-icons">info</em> This baseline allows standard local mechanics to load seamlessly while cataloging external CDNs, third-party trackers, and asset injects back into this dashboard.
+    </p>
+            {% endblock text %}
+        {% endembed %}
+
+{% else %}
+<div class="col-6">
+    <div class="widget__content nested-grid">
+        <article class="col-3 widget-stats__card {% if today > 0 %}widget-stats__card--warn{% else %}widget-stats__card--ok{% endif %}" aria-labelledby="stats-total-visits">
+            <div class="widget-stats__content">
+                <h2 id="stats-total-visits">Today</h2>
+                <p class="widget-stats__value">{{ today|number_format }}</p>
+            </div>
+        </article>
+        <article class="col-3 widget-stats__card widget-stats__card--error" aria-labelledby="stats-total-visits">
+            <div class="widget-stats__content">
+                <h2 id="stats-total-visits">Critical</h2>
+                <p class="widget-stats__value">{{ critical|number_format }}</p>
+            </div>
+        </article>
+        <article class="col-3 widget-stats__card" aria-labelledby="stats-total-visits">
+
+            <div class="widget-stats__content">
+                <h2 id="stats-total-visits">Hosts</h2>
+                <p class="widget-stats__value">{{ hosts|number_format }}</p>
+            </div>
+        </article>
+        <article class="col-3 widget-stats__card" aria-labelledby="stats-total-visits">
+            <div class="widget-stats__content">
+                <h2 id="stats-total-visits">Directives</h2>
+                <p class="widget-stats__value">{{ directives|number_format }}</p>
+            </div>
+        </article>
+    </div>
+
+{% if topCritical is not empty%}
+    <section class="widget">
+        <header class="widget__header">
+            <h2>Top Critical</h2>
+        </header>
+        <table class="table table--striped">
+            <thead>
+            <tr>
+                <th>Host</th>
+                <th>Directive</th>
+                <th class="col-count">Hits</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for row in topCritical %}
+                <tr>
+                    <td>{{ row.host ?? '—' }}</td>
+                    <td><code>{{ row.effectiveDirective }}</code></td>
+                    <td class="col-count">{{ row.occurrences }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+{% endif %}
+
+{% if topHosts is not empty %}
+    <section class="widget">
+        <header class="widget__header">
+            <h2>Top Hosts</h2>
+        </header>
+        <table class="table table--striped">
+            <thead>
+                <tr>
+                    <th>Host</th>
+                    <th class="col-count">Count</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in topHosts %}
+                <tr>
+                    <td>{{ row.host ?? 'unknown' }}</td>
+                    <td class="col-count">{{ row.occurrences }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+{% endif %}
+
+{% if topDirectives is not empty %}
+    <section class="widget">
+        <header class="widget__header">
+            <h2>Top Directives</h2>
+        </header>
+        <table class="table table--striped">
+            <thead>
+                <tr>
+                    <th>Directive</th>
+                    <th class="col-count">Count</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in topDirectives %}
+                <tr>
+                    <td>{{ row.directive }}</td>
+                    <td class="col-count">{{ row.occurrences }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+{% endif %}
+</div>
+
+{% include 'inadmin/partials/csp_reports.html.twig' %}
+
+{% endif %}
+</div>
+</div>
+{% endblock content %}

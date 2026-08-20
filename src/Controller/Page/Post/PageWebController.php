@@ -1,176 +1,184 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Post;
 
-use Exception;
-use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\{Category,Image,Page,Revision,Series,Tag,Url};
-use Inachis\Form\PostType;
-use Inachis\Repository\RevisionRepository;
-use Inachis\Util\{ContentRevisionCompare,ReadingTime};
+use Inachis\Controller\AbstractWebController;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Series;
+use Inachis\Entity\Content\Tag;
+use Inachis\Entity\Content\Url;
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\SeriesRepository;
+use Inachis\Repository\Content\UrlRepository;
+use Inachis\Service\Content\ReadingTime;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
-use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-class PageWebController extends AbstractInachisController
+class PageWebController extends AbstractWebController
 {
     /**
-     * @param Request $request
-     * @param int $year
-     * @param int $month
-     * @param int $day
-     * @param string $title
-     * @return Response
-     * @throws NotFoundHttpException|Exception
+     * @throws NotFoundHttpException|\Exception
      */
     #[Route(
-        "/{year}/{month}/{day}/{title}",
+        '/{year}/{month}/{day}/{title}',
         requirements: [
-            "year" => "\d{4}",
-            "month" => "\d{2}",
-            "day" => "\d{2}"
+            'year' => "\d{4}",
+            'month' => "\d{2}",
+            'day' => "\d{2}",
         ],
-        methods: ["GET" ]
+        methods: ['GET'],
     )]
     #[Route(
-        "/incc/preview/{year}/{month}/{day}/{title}",
+        '/incp/preview/{year}/{month}/{day}/{title}',
         requirements: [
-            "year" => "\d{4}",
-            "month" => "\d{2}",
-            "day" => "\d{2}"
+            'year' => "\d{4}",
+            'month' => "\d{2}",
+            'day' => "\d{2}",
         ],
-        methods: ["GET" ]
+        methods: ['GET'],
     )]
-    public function getPost(Request $request, int $year, int $month, int $day, string $title): Response
-    {
+    public function getPost(
+        string $year,
+        string $month,
+        string $day,
+        string $title,
+        SeriesRepository $seriesRepository,
+        UrlRepository $urlRepository,
+    ): Response {
         $link = sprintf('%d/%02d/%02d/%s', $year, $month, $day, $title);
-        $url = $this->entityManager->getRepository(Url::class)->findOneBy([
-            'link' => $link
-        ]);
-        if (empty($url)) {
-            throw new NotFoundHttpException(
-                sprintf(
-                    '%s does not exist',
-                    $link
-                )
-            );
-        }
-        if (
-            ($url->getContent()->isScheduledPage() || $url->getContent()->isDraft())
-            && !$this->security->isGranted('IS_AUTHENTICATED_REMEMBERED')
-        ) {
-            return $this->redirectToRoute(
-                'inachis_default_homepage',
-                []
-            );
-        }
-        if (!$url->isDefault()) {
-            $url = $this->entityManager->getRepository(Url::class)->getDefaultUrl($url->getContent());
-            if (!empty($url) && $url->isDefault()) {
-                return new RedirectResponse('/' . $url->getLink(), Response::HTTP_PERMANENTLY_REDIRECT);
-            }
-        }
-        $this->data['post'] = $url->getContent();
-        $this->data['url'] = $url->getLink();
-        $this->data['textStats'] = ReadingTime::getWordCountAndReadingTime($this->data['post']->getContent());
 
-        $series = $this->entityManager->getRepository(Series::class)->getPublishedSeriesByPost($this->data['post']);
+        return $this->renderPostOrPage($link, $seriesRepository, $urlRepository);
+    }
+
+    #[Route(
+        '/{page}',
+        requirements: [
+            'page' => '^(?!setup$)(?!\d{4}-[a-zA-Z\-]+$)[^/]+$',
+        ],
+        name: 'web_view_page',
+        methods: ['GET'],
+        priority: -100,
+    )]
+    public function getPage(
+        Request $request,
+        SeriesRepository $seriesRepository,
+        UrlRepository $urlRepository,
+    ): Response {
+        $link = $request->attributes->getString('page');
+
+        return $this->renderPostOrPage($link, $seriesRepository, $urlRepository);
+    }
+
+    /**
+     * Outputs a page of all pages/posts with the specific tag.
+     */
+    #[Route('/tag/{tagName}', name:'web_view_tag', methods: ['GET'])]
+    public function getPostsByTag(
+        string $tagName,
+        PageRepository $pageRepository,
+    ): Response {
+        // TODO Change this to use slug
+        $tag = $this->entityManager->getRepository(Tag::class)->findOneBy(['title' => $tagName]);
+
+        if (!$tag instanceof Tag) {
+            throw new NotFoundHttpException(sprintf('%s does not exist', $tagName));
+        }
+
+        return $this->render('web/pages/homepage.html.twig', [
+            'viewModel' => $this->viewModel,
+            'filterName' => 'tag',
+            'filterValue' => $tagName,
+            'content' => $pageRepository->getLiveContentWithTag($tag),
+        ]);
+    }
+
+    /**
+     * Outputs a page of all pages/posts with the specific category.
+     */
+    #[Route('/category/{categoryName}', name: 'web_view_category', methods: ['GET'])]
+    public function getPostsByCategory(
+        string $categoryName,
+        CategoryRepository $categoryRepository,
+        PageRepository $pageRepository,
+    ): Response {
+        // TODO change this to use slug
+        $category = $categoryRepository->findOneBy(['title' => $categoryName]);
+        if (!$category instanceof Category) {
+            throw new NotFoundHttpException(sprintf('%s does not exist', $categoryName));
+        }
+
+        return $this->render('web/pages/homepage.html.twig', [
+            'viewModel' => $this->viewModel,
+            'filterName' => 'category',
+            'filterValue' => $categoryName,
+            'content' => $pageRepository->getLiveContentWithCategory($category),
+        ]);
+    }
+
+    /**
+     * Helper function for rendering posts and pages to avoid code repitition.
+     */
+    protected function renderPostOrPage(
+        string $link,
+        SeriesRepository $seriesRepository,
+        UrlRepository $urlRepository,
+    ): Response {
+        /** @var Url|null */
+        $url = $urlRepository->findOneBy(['link' => $link]);
+        if (!$url instanceof Url || (
+            !$url->isContentLive() && !$this->security->isGranted('IS_AUTHENTICATED_REMEMBERED')
+        )) {
+            throw new NotFoundHttpException(sprintf('%s does not exist', $link));
+        }
+
+        if (!$url->isDefault()) {
+            /** @var Url|null */
+            $url = $urlRepository->getDefaultUrl($url->getContent());
+            if ($url instanceof Url) {
+                return new RedirectResponse('/'.$url->getLink(), Response::HTTP_PERMANENTLY_REDIRECT);
+            }
+            throw new NotFoundHttpException(sprintf('%s does not exist', $link));
+        }
+
+        /** @var Series|null */
+        $series = $seriesRepository->getPublishedSeriesByPost($url->getContent());
+        $seriesNav = null;
         if (!empty($series)) {
-            $postIndex = $series->getItems()->indexOf($this->data['post']);
-            $this->data['series'] = [
+            /** @var int */
+            $postIndex = $series->getItems()->indexOf($url->getContent());
+            $seriesNav = [
                 'title' => $series->getTitle(),
-                'subTitle' => $series->getSubTitle()
+                'subTitle' => $series->getSubTitle(),
             ];
-            if (!empty($series->getItems())) {
-                if ($postIndex - 1 >= 0) {
-                    $this->data['series']['previous'] = $series->getItems()->get($postIndex - 1);
-                }
-                if ($postIndex + 1 < $series->getItems()->count()) {
-                    $this->data['series']['next'] = $series->getItems()->get($postIndex + 1);
-                }
+            if ($postIndex - 1 >= 0) {
+                $seriesNav['previous'] = $series->getItems()->get($postIndex - 1);
+            }
+            if ($postIndex + 1 < $series->getItems()->count()) {
+                $seriesNav['next'] = $series->getItems()->get($postIndex + 1);
             }
         }
         $crawlerDetect = new CrawlerDetect();
         if (!$crawlerDetect->isCrawler()) {
-            // @todo record page hit by day
+            // TODO: record page hit by day
         }
-        return $this->render('web/pages/post.html.twig', $this->data);
-    }
 
-    /**
-     * @param Request $request
-     * @return Response
-     */
-    #[Route(
-        "/{page}",
-        requirements: [
-            'page' => '^(?!setup$)(?!\d{4}-[a-zA-Z\-]+$)[^/]+$'
-        ],
-        methods: [ "GET" ],
-        priority: -100
-    )]
-    public function getPage(Request $request): Response
-    {
-        return $this->getPost($request, 0, 0, 0, '');
-    }
-
-    /**
-     * @param Request $request
-     * @param string $tagName
-     * @return Response
-     */
-    #[Route("/tag/{tagName}", methods: [ "GET" ])]
-    public function getPostsByTag(Request $request, string $tagName): Response
-    {
-        $tag = $this->entityManager->getRepository(Tag::class)->findOneBy(['title' => $tagName]);
-
-        if (!$tag instanceof Tag) {
-            throw new NotFoundHttpException(
-                sprintf(
-                    '%s does not exist',
-                    $tagName
-                )
-            );
-        }
-        $this->data['filterName'] = 'tag';
-        $this->data['filterValue'] = $tagName;
-        $this->data['content'] = $this->entityManager->getRepository(Page::class)->getPagesWithTag($tag);
-
-        return $this->render('web/pages/homepage.html.twig', $this->data);
-    }
-
-    /**
-     * @param Request $request
-     * @param string $categoryName
-     * @return Response
-     */
-    #[Route("/category/{categoryName}", methods: [ "GET" ])]
-    public function getPostsByCategory(Request $request, string $categoryName): Response
-    {
-        $category = $this->entityManager->getRepository(Category::class)->findOneBy(['title' => $categoryName]);
-        if (!$category instanceof Category) {
-            throw new NotFoundHttpException(
-                sprintf(
-                    '%s does not exist',
-                    $categoryName
-                )
-            );
-        }
-        $this->data['filterName'] = 'category';
-        $this->data['filterValue'] = $categoryName;
-        $this->data['content'] = $this->entityManager->getRepository(Page::class)->getPagesWithCategory($category);
-
-        return $this->render('web/pages/homepage.html.twig', $this->data);
+        return $this->render('web/pages/post.html.twig', [
+            'viewModel' => $this->viewModel,
+            'post' => $url->getContent(),
+            'series' => $seriesNav,
+            'textStats' => ReadingTime::getWordCountAndReadingTime($url->getContent()->getContent()),
+            'url' => $url->getLink(),
+        ]);
     }
 }

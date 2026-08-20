@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Form;
@@ -12,13 +11,11 @@ namespace Inachis\Tests\phpunit\Form;
 use Inachis\Form\ChangePasswordType;
 use Inachis\Form\Extension\TogglePasswordTypeExtension;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormFactoryBuilderInterface;
-use Symfony\Component\Form\Forms;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -30,7 +27,7 @@ class ChangePasswordTypeTest extends TypeTestCase
     protected function getExtensions(): array
     {
         $translator = $this->createStub(TranslatorInterface::class);
-        $validator  = Validation::createValidator();
+        $validator = Validation::createValidator();
 
         return [
             new ValidatorExtension($validator),
@@ -42,7 +39,7 @@ class ChangePasswordTypeTest extends TypeTestCase
                     PasswordType::class => [
                         new TogglePasswordTypeExtension(),
                     ],
-                ]
+                ],
             ),
         ];
     }
@@ -52,16 +49,16 @@ class ChangePasswordTypeTest extends TypeTestCase
         $form = $this->factory->create(ChangePasswordType::class, null);
         $view = $form->createView();
 
-        $expectedFields = [ 'current_password', 'new_password', ];
+        $expectedFields = ['current_password', 'new_password'];
         $this->assertSame($expectedFields, array_keys($view->children));
     }
 
     public function testBuildFormForForgotChange(): void
     {
-        $form = $this->factory->create(ChangePasswordType::class, null, [ 'password_reset' => true, ]);
+        $form = $this->factory->create(ChangePasswordType::class, null, ['password_reset' => true]);
         $view = $form->createView();
 
-        $expectedFields = [ 'username', 'resetPassword', 'new_password', ];
+        $expectedFields = ['username', 'resetPassword', 'new_password'];
         $this->assertSame($expectedFields, array_keys($view->children));
     }
 }

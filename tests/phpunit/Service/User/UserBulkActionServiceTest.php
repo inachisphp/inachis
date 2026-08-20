@@ -1,19 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Service\User;
 
-use Inachis\Entity\User;
-use Inachis\Repository\UserRepository;
-use Inachis\Service\User\UserBulkActionService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Entity\User\User;
+use Inachis\Repository\User\UserRepository;
+use Inachis\Service\User\UserBulkActionService;
+use Inachis\Service\User\UserProtectionServiceInterface;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -23,8 +23,8 @@ class UserBulkActionServiceTest extends TestCase
     private EntityManagerInterface $entityManager;
     private User $user;
     private UserRepository $userRepository;
-
     private UserBulkActionService $userBulkActionService;
+    private UserProtectionServiceInterface $userProtectionService;
 
     /**
      * @throws Exception
@@ -38,8 +38,13 @@ class UserBulkActionServiceTest extends TestCase
             ->method('find')
             ->willReturn($this->user);
         $this->entityManager = $this->createStub(EntityManager::class);
+        $this->userProtectionService = $this->createMock(UserProtectionServiceInterface::class);
 
-        $this->userBulkActionService = new UserBulkActionService($this->userRepository, $this->entityManager);
+        $this->userBulkActionService = new UserBulkActionService(
+            $this->userProtectionService,
+            $this->userRepository,
+            $this->entityManager,
+        );
     }
 
     /**
@@ -55,7 +60,11 @@ class UserBulkActionServiceTest extends TestCase
             ->method('find')
             ->with($uuid)
             ->willReturn($this->user);
-        $this->userBulkActionService = new UserBulkActionService($this->userRepository, $this->entityManager);
+        $this->userBulkActionService = new UserBulkActionService(
+            $this->userProtectionService,
+            $this->userRepository,
+            $this->entityManager,
+        );
 
         $result = $this->userBulkActionService->apply('', [$uuid]);
         $this->assertEquals(0, $result);
@@ -63,6 +72,10 @@ class UserBulkActionServiceTest extends TestCase
 
     public function testApplyDelete(): void
     {
+        $this->userProtectionService
+            ->expects($this->once())
+            ->method('assertAdministratorsCanBeRemoved')
+            ->with([$this->user]);
         $result = $this->userBulkActionService->apply('delete', [$this->user->getId()]);
         $this->assertEquals(1, $result);
         $this->assertTrue($this->user->hasBeenRemoved());
@@ -71,12 +84,19 @@ class UserBulkActionServiceTest extends TestCase
     public function testApplyEnable(): void
     {
         $result = $this->userBulkActionService->apply('enable', [$this->user->getId()]);
+        $this->userProtectionService
+            ->expects($this->never())
+            ->method('assertAdministratorsCanBeRemoved');
         $this->assertEquals(1, $result);
         $this->assertTrue($this->user->isEnabled());
     }
 
     public function testApplyDisable(): void
     {
+        $this->userProtectionService
+            ->expects($this->once())
+            ->method('assertAdministratorsCanBeRemoved')
+            ->with([$this->user]);
         $result = $this->userBulkActionService->apply('disable', [$this->user->getId()]);
         $this->assertEquals(1, $result);
         $this->assertFalse($this->user->isEnabled());
@@ -85,6 +105,9 @@ class UserBulkActionServiceTest extends TestCase
     public function testApplyDefault(): void
     {
         $result = $this->userBulkActionService->apply('', [$this->user->getId()]);
+        $this->userProtectionService
+            ->expects($this->never())
+            ->method('assertAdministratorsCanBeRemoved');
         $this->assertEquals(1, $result);
     }
 }

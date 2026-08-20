@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Diagnostics\Check\Webserver;
@@ -14,72 +13,73 @@ use Inachis\Diagnostics\CheckResult;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * Checks if the log files are healthy
+ * Checks if the log files are healthy.
  */
 final class LogfileRotationCheck implements CheckInterface
 {
     /**
-     * The state file name
+     * The state file name.
      */
     private const STATE_FILE = 'log_health_state.json';
 
     /**
-     * The log directory
+     * @var string The log directory
      */
     private string $logDir;
 
     /**
-     * The cache directory
+     * @var string The cache directory
      */
     private string $cacheDir;
 
     /**
-     * The environment
+     * @var string The environment
      */
     private string $environment;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param KernelInterface $kernel The kernel to use for the check
-     * @param int $warningSizeMb The warning size in MB
-     * @param int $errorSizeMb The error size in MB
+     * @param KernelInterface $kernel        The kernel to use for the check
+     * @param int             $warningSizeMb The warning size in MB
+     * @param int             $errorSizeMb   The error size in MB
      */
     public function __construct(
         KernelInterface $kernel,
         private readonly int $warningSizeMb = 200,
         private readonly int $errorSizeMb = 500,
     ) {
-        $this->logDir = $kernel->getLogDir();
+        $this->logDir = $kernel->getLogDir() ?? '';
         $this->cacheDir = $kernel->getCacheDir();
         $this->environment = $kernel->getEnvironment();
     }
 
     /**
-     * Get the ID of the check
-     *
-     * @return string
+     * Get the ID of the check.
      */
-    public function getId(): string { return 'log_health'; }
+    public function getId(): string
+    {
+        return 'log_health';
+    }
 
     /**
-     * Get the label of the check
-     *
-     * @return string
+     * Get the label of the check.
      */
-    public function getLabel(): string { return 'Log Health'; }
+    public function getLabel(): string
+    {
+        return 'Log Health';
+    }
 
     /**
-     * Get the section of the check
-     *
-     * @return string
+     * Get the section of the check.
      */
-    public function getSection(): string { return 'Webserver'; }
+    public function getSection(): string
+    {
+        return 'Webserver';
+    }
 
     /**
-     * Run the check
-     *
-     * @return CheckResult
+     * Run the check.
      */
     public function run(): CheckResult
     {
@@ -88,13 +88,13 @@ final class LogfileRotationCheck implements CheckInterface
         }
 
         $now = time();
-        $files = glob($this->logDir . '/*.log') ?: [];
-        $statePath = $this->cacheDir . '/' . self::STATE_FILE;
+        $files = glob($this->logDir.'/*.log') ?: [];
+        $statePath = $this->cacheDir.'/'.self::STATE_FILE;
 
+        /** @var array<string, array{size: int, time: int}|array{}|null> */
         $previous = file_exists($statePath)
-            ? json_decode(file_get_contents($statePath), true)
+            ? json_decode(file_get_contents($statePath) ?: '', true)
             : [];
-
         $current = [];
         $issues = [];
         $severity = 'ok';
@@ -112,22 +112,22 @@ final class LogfileRotationCheck implements CheckInterface
 
             if ($size > $this->errorSizeMb * 1024 * 1024) {
                 $severity = 'error';
-                $issues[] = basename($file) . ' exceeds ' . $this->errorSizeMb . 'MB';
+                $issues[] = basename($file).' exceeds '.$this->errorSizeMb.'MB';
             } elseif ($size > $this->warningSizeMb * 1024 * 1024) {
-                $severity = $severity === 'error' ? 'error' : 'warning';
-                $issues[] = basename($file) . ' exceeds ' . $this->warningSizeMb . 'MB';
+                $severity = 'error' === $severity ? 'error' : 'warning';
+                $issues[] = basename($file).' exceeds '.$this->warningSizeMb.'MB';
             }
 
             if (isset($previous[$file])) {
-                $deltaBytes = $size - $previous[$file]['size'];
-                $deltaTime = $now - $previous[$file]['time'];
+                $deltaBytes = $size - ($previous[$file]['size'] ?? 0);
+                $deltaTime = $now - ($previous[$file]['time'] ?? 0);
 
                 if ($deltaBytes > 0 && $deltaTime > 0) {
                     $bytesPerSecond = $deltaBytes / $deltaTime;
 
                     if ($bytesPerSecond > 1024 * 1024 / 60) {
                         $severity = 'warning';
-                        $issues[] = basename($file) . ' growing rapidly';
+                        $issues[] = basename($file).' growing rapidly';
                     }
                 }
             }
@@ -151,22 +151,22 @@ final class LogfileRotationCheck implements CheckInterface
                         $severity = 'error';
                         $issues[] = 'Disk exhaustion predicted in < 1 hour';
                     } elseif ($predictedSeconds < 86400) {
-                        $severity = $severity === 'error' ? 'error' : 'warning';
+                        $severity = 'error' === $severity ? 'error' : 'warning';
                         $issues[] = 'Disk exhaustion predicted in < 24 hours';
                     }
                 }
             }
         }
 
-        if ($this->environment === 'dev') {
-            if ($severity === 'warning') {
+        if ('dev' === $this->environment) {
+            if ('warning' === $severity) {
                 $severity = 'ok';
             }
         }
 
         file_put_contents($statePath, json_encode($current));
 
-        $summary = $issues === []
+        $summary = [] === $issues
             ? 'Logs healthy'
             : implode('; ', $issues);
 
@@ -174,21 +174,16 @@ final class LogfileRotationCheck implements CheckInterface
             $this->getId(),
             $this->getLabel(),
             $severity,
-            round($totalSize / 1024 / 1024, 1) . 'MB total',
+            round($totalSize / 1024 / 1024, 1).'MB total',
             $summary,
-            $severity === 'ok' ? null : 'Investigate log verbosity or rotation policy.',
+            'ok' === $severity ? null : 'Investigate log verbosity or rotation policy.',
             $this->getSection(),
-            'high'
+            'high',
         );
     }
 
     /**
-     * Create a check result
-     *
-     * @param string $status
-     * @param string $value
-     * @param string $details
-     * @return CheckResult
+     * Create a check result.
      */
     private function result(string $status, string $value, string $details): CheckResult
     {
@@ -200,7 +195,7 @@ final class LogfileRotationCheck implements CheckInterface
             $details,
             null,
             $this->getSection(),
-            'medium'
+            'medium',
         );
     }
 }

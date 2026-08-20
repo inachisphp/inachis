@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\EventListener;
@@ -13,8 +12,8 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
-use Inachis\Entity\Page;
-use Inachis\Repository\ImageRepository;
+use Inachis\Entity\Content\Page;
+use Inachis\Repository\Media\ImageRepository;
 
 /**
  * Event subscriber to calculate and set the total size of images
@@ -59,7 +58,7 @@ class PageImageSizeListener implements EventSubscriber
         // Find all markdown /imgs/ references, e.g. ![alt](/imgs/filename.ext)
         if (preg_match_all('/\/imgs\/([a-zA-Z0-9_\-\.]+)/', $content, $matches)) {
             $filenames = array_unique($matches[1]);
-            
+
             if (!empty($filenames)) {
                 $images = $this->imageRepository->findBy(['filename' => $filenames]);
                 foreach ($images as $image) {
@@ -69,7 +68,7 @@ class PageImageSizeListener implements EventSubscriber
         }
 
         // Also include the feature image size if there is one
-        if ($entity->getFeatureImage() !== null) {
+        if (null !== $entity->getFeatureImage()) {
             $totalSize += $entity->getFeatureImage()->getFilesize();
         }
 

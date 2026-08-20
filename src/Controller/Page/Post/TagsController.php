@@ -1,0 +1,243 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * This file is part of the inachis framework.
+ */
+
+namespace Inachis\Controller\Page\Post;
+
+use Doctrine\ORM\EntityManagerInterface;
+use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Content\Tag;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
+use Inachis\Model\Page\ViewStateDefaults;
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\TagRepository;
+use Inachis\Security\Attribute\RequiresPermission;
+use Inachis\Service\Content\Page\TagBulkActionService;
+use Inachis\Service\Content\ViewStateManager;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+
+class TagsController extends AbstractInachisController
+{
+    /**
+     * Get tag list content for ajax requests.
+     */
+    #[Route('incp/ax/tagList/get', methods: ['POST'], name: 'api_tags_list')]
+    public function getTagManagerListContent(Request $request, TagRepository $tagRepository): Response
+    {
+        /** @var \Doctrine\ORM\Tools\Pagination\Paginator<Tag> */
+        $tags = $tagRepository->findByTitleLike($request->request->getString('q'));
+        $items = [];
+
+        foreach ($tags as $tag) {
+            $title = $tag->getTitle();
+            $items[$title] = (object) [
+                'id' => $tag->getId(),
+                'text' => $title,
+            ];
+        }
+
+        $result = array_values($items);
+
+        return new JsonResponse(
+            [
+                'items' => $result,
+                'totalCount' => count($result),
+            ],
+            Response::HTTP_OK,
+        );
+    }
+
+    /**
+     * List all tags and provide ability to delete or merge.
+     */
+    #[Route(
+        '/incp/tags/{limit}/{offset}',
+        name: 'incp_tags_list',
+        requirements: ['limit' => "\d+", 'offset' => "\d+"],
+        defaults: ['limit' => 20, 'offset' => 0],
+    )]
+    #[RequiresPermission(
+        resource: PermissionResource::TAG,
+        action: PermissionAction::VIEW,
+    )]
+    public function index(
+        Request $request,
+        CategoryRepository $categoryRepository,
+        TagBulkActionService $tagBulkActionService,
+        TagRepository $tagRepository,
+        ViewStateManager $viewStateManager,
+        int $limit = 25,
+        int $offset = 0,
+    ): Response {
+        $form = $this->createFormBuilder()->getForm();
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
+            /** @var list<string> */
+            $items = $request->request->all('items');
+            $action = $request->request->has('delete') ? 'delete' : null;
+
+            if (null !== $action) {
+                try {
+                    $count = $tagBulkActionService->apply($action, $items);
+                    $this->addFlash('success', "Action '$action' applied to $count tags.");
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
+                }
+            }
+            $this->entityManager->flush();
+
+            return $this->redirectToRoute('incp_tags_list');
+        }
+
+        $params = $viewStateManager->build(
+            $request,
+            'tags',
+            new ViewStateDefaults(
+                sort: 'title asc',
+                view: 'table',
+            ),
+            $categoryRepository,
+        );
+
+        $this->viewModel->page->title = 'Tags';
+        $this->viewModel->page->tab = 'tag';
+
+        return $this->render('inadmin/page/tag/list.html.twig', [
+            'viewModel' => $this->viewModel,
+            'dataset' => array_map(
+                fn ($row) => (object) [
+                    'id' => $row[0]->getId(),
+                    'title' => $row[0]->getTitle(),
+                    'url' => '/incp/tags/'.$row[0]->getSlug(),
+                    'usageCount' => $row['usageCount'],
+                ],
+                $tagRepository->findAllWithUsageCount($limit, $offset),
+            ),
+            'form' => $form->createView(),
+            'query' => $params,
+            'total' => $tagRepository->getAllCount(),
+        ]);
+    }
+
+    /**
+     * Merge two tags, deleting the source tag and updating the target tag with any pages associated with the source tag.
+     */
+    #[Route('/incp/tags/merge', name: 'incp_tags_merge', methods: ['POST'])]
+    public function mergeTags(
+        Request $request,
+        PageRepository $pageRepository,
+        TagRepository $tagRepository,
+        EntityManagerInterface $entityManager,
+    ): Response {
+        $targetId = $request->request->getString('target');
+        $sourceIds = $request->request->all('sources');
+
+        if (!$targetId || empty($sourceIds)) {
+            return new Response('Invalid request', 400);
+        }
+
+        $target = $tagRepository->find($targetId);
+        if (!$target) {
+            return new Response('Target not found', 404);
+        }
+
+        $sources = $tagRepository->findBy(['id' => $sourceIds]);
+
+        foreach ($sources as $source) {
+            if ($source->getId() === $target->getId()) {
+                continue;
+            }
+
+            // Move pages across
+            $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$source->getId()]], '*', 0, 0);
+            foreach ($pages as $page) {
+                $page->removeTag($source);
+                $page->addTag($target);
+            }
+
+            $entityManager->remove($source);
+        }
+        $entityManager->flush();
+
+        return new Response('OK');
+    }
+
+    /**
+     * Show tag and its pages.
+     */
+    #[Route(
+        '/incp/tags/{slug}/{limit}/{offset}',
+        name: 'incp_tag_show',
+        requirements: ['limit' => "\d+", 'offset' => "\d+"],
+        defaults: ['limit' => 25, 'offset' => 0],
+    )]
+    public function show(
+        string $slug,
+        CategoryRepository $categoryRepository,
+        PageRepository $pageRepository,
+        TagBulkActionService $tagBulkActionService,
+        TagRepository $tagRepository,
+        ViewStateManager $viewStateManager,
+        Request $request,
+        int $limit = 25,
+        int $offset = 0,
+    ): Response {
+        $tag = $tagRepository->findOneBy(['slug' => $slug]);
+        if (empty($tag)) {
+            return $this->redirectToRoute('incp_tags_list');
+        }
+        $form = $this->createFormBuilder()->getForm();
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid() && !empty($request->request->all('items'))) {
+            $items = $request->request->all('items');
+            $action = $request->request->has('delete') ? 'delete' : null;
+
+            // TODO: move the following foreach loop into a TagsBulkActionService and pass it $request
+            foreach ($items as $item) {
+                $page = $pageRepository->findOneBy(['id' => $item]);
+                if (null === $page) {
+                    continue;
+                }
+                $page->removeTag($tag);
+            }
+            $this->entityManager->flush();
+
+            return $this->redirectToRoute('incp_tag_show', ['id' => $tag->getId()]);
+        }
+
+        $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$tag->getId()]], '*', $limit, $offset);
+
+        $params = $viewStateManager->build(
+            $request,
+            'tags-page',
+            new ViewStateDefaults(
+                sort: 'title asc',
+                view: 'table',
+            ),
+            $categoryRepository,
+        );
+
+        $this->viewModel->page->title = 'Tags';
+        $this->viewModel->page->tab = 'tag';
+
+        return $this->render('inadmin/page/tag/view.html.twig', [
+            'viewModel' => $this->viewModel,
+            'dataset' => $pages,
+            'form' => $form->createView(),
+            'query' => $params,
+            'total' => $pages->count(),
+            'tag' => $tag,
+        ]);
+    }
+}

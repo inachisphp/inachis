@@ -1,21 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Security;
 
-use Inachis\Entity\User;
-use Inachis\Security\UserChecker;
+use Inachis\Entity\User\User;
+use Inachis\Security\Authentication\UserChecker;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class MockUser implements UserInterface {
+class MockUser implements UserInterface
+{
     /**
      * @return string[]
      */
@@ -24,14 +24,10 @@ class MockUser implements UserInterface {
         return [];
     }
 
-    /**
-     * @return void
-     */
-    public function eraseCredentials(): void { }
+    public function eraseCredentials(): void
+    {
+    }
 
-    /**
-     * @return string
-     */
     public function getUserIdentifier(): string
     {
         return '';

@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form;
 
-use Inachis\Entity\NavigationTab;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
+use Inachis\Security\Authorisation\PermissionResolver;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -18,47 +20,74 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Form for editing a navigation tab
+ * Form for editing a navigation tab.
+ *
+ * @extends AbstractType<array{
+ *     robots_txt?: string,
+ *     submit?: string,
+ * }>
  */
 class RobotsTxtType extends AbstractType
 {
-
-    public function __construct(private TranslatorInterface $translator) {}
     /**
-     * Build the form
+     * Constructor for RobotsTxtType.
+     */
+    public function __construct(
+        private PermissionResolver $permissionResolver,
+        private Security $security,
+        private readonly TranslatorInterface $translator,
+    ) {
+    }
+
+    /**
+     * Build the form.
+     *
+     * @param FormBuilderInterface<array{
+     *     robots_txt?: string,
+     *     submit?: string,
+     * }|null> $builder
+     * @param array<string, mixed> $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('robots_txt', TextareaType::class, [
+        $user = $this->security->getUser();
+        $allowEdit = $this->permissionResolver->hasPermission(
+            $user,
+            PermissionResource::CRAWLER,
+            PermissionAction::EDIT,
+        );
+
+        $builder->add('robots_txt', TextareaType::class, [
+            'attr' => [
+                'aria-labelledby' => 'title_label',
+                'autofocus' => 'true',
+                'class' => 'text halfwidth',
+                'rows' => 15,
+            ],
+            'disabled' => !$allowEdit,
+            'label' => $this->translator->trans('admin.setting.robots_txt.label', [], 'messages'),
+            'label_attr' => [
+                'id' => 'title_label',
+            ],
+            'required' => false,
+        ]);
+        if ($allowEdit) {
+            $builder->add('submit', SubmitType::class, [
                 'attr' => [
-                    'aria-labelledby' => 'title_label',
-                    'autofocus' => 'true',
-                    'class' => 'text halfwidth',
-                    'rows' => 15,
-                ],
-                'label' => $this->translator->trans('admin.setting.robots_txt.label', [], 'messages'),
-                'label_attr' => [
-                    'id' => 'title_label',
-                ],
-                'required' => false,
-            ])
-            ->add('submit', SubmitType::class, [
-                'attr' => [
-                    'class' => 'button button--positive',
+                    'class' => 'btn btn--primary',
                 ],
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> %s',
                     'save',
-                    $this->translator->trans('admin.button.save', [], 'messages')
+                    $this->translator->trans('admin.button.save', [], 'messages'),
                 ),
                 'label_html' => true,
-            ])
-        ;
+            ]);
+        }
     }
 
     /**
-     * Configure the options for the form
+     * Configure the options for the form.
      */
     public function configureOptions(OptionsResolver $resolver): void
     {

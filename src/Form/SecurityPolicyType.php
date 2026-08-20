@@ -1,115 +1,112 @@
 <?php
+
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form;
 
-use Inachis\Entity\SecurityPolicy;
+use Inachis\Entity\Security\SecurityPolicy;
+use Inachis\Enum\Security\AuthenticationPolicy;
+use Inachis\Enum\Security\PasswordStrengthLevel;
+use Inachis\Enum\Security\SensitiveAction;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Form template for specifying security policy
+ * Form used to edit a security policy.
+ *
+ * @extends AbstractType<SecurityPolicy>
  */
 class SecurityPolicyType extends AbstractType
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
+     * @param FormBuilderInterface<SecurityPolicy|null> $builder
+     * @param array<string, mixed>                      $options
      */
-    public function buildForm(FormBuilderInterface $builder, array $options): void
-    {
+    public function buildForm(
+        FormBuilderInterface $builder,
+        array $options,
+    ): void {
         $builder
             ->add('name', TextType::class)
-            ->add('minLength', IntegerType::class)
-            ->add('requireUppercase', CheckboxType::class, [
+
+            ->add('description', TextareaType::class, [
+                'required' => false,
                 'attr' => [
-                    'class'           => 'ui-switch',
-                    'data-label-off'  => 'No',
-                    'data-label-on'   => 'Yes',
+                    'rows' => 4,
                 ],
+            ])
+
+            ->add('minimumPasswordLength', IntegerType::class)
+
+            ->add('maximumPasswordLength', IntegerType::class, [
                 'required' => false,
             ])
-            ->add('requireLowercase', CheckboxType::class, [
+
+            ->add('passwordStrength', EnumType::class, [
+                'class' => PasswordStrengthLevel::class,
+                'choice_label' => static fn (PasswordStrengthLevel $choice) => $choice->label(),
+            ])
+
+            ->add('rejectCompromisedPasswords', CheckboxType::class, [
+                'required' => false,
                 'attr' => [
-                    'class'           => 'ui-switch',
-                    'data-label-off'  => 'No',
-                    'data-label-on'   => 'Yes',
+                    'class' => 'ui-switch',
+                    'data-label-on' => 'Yes',
+                    'data-label-off' => 'No',
                 ],
+            ])
+
+            ->add('passwordReuseLimit', IntegerType::class)
+
+            ->add('minimumPasswordAgeDays', IntegerType::class, [
                 'required' => false,
             ])
-            ->add('requireNumber', CheckboxType::class, [
-                'attr' => [
-                    'class'           => 'ui-switch',
-                    'data-label-off'  => 'No',
-                    'data-label-on'   => 'Yes',
-                ],
+
+            ->add('passwordLifetimeDays', IntegerType::class, [
                 'required' => false,
             ])
-            ->add('requireSpecial', CheckboxType::class, [
-                'attr' => [
-                    'class'           => 'ui-switch',
-                    'data-label-off'  => 'No',
-                    'data-label-on'   => 'Yes',
-                ],
-                'required' => false,
+
+            ->add('administratorPolicy', EnumType::class, [
+                'class' => AuthenticationPolicy::class,
+                'choice_label' => static fn (AuthenticationPolicy $choice) => $choice->label(),
             ])
-            ->add('passwordRegex', TextType::class, ['required' => false])
-            ->add('passwordExpiryDays', IntegerType::class, ['required' => false])
-            ->add('passwordHistory', IntegerType::class)
-            ->add('maxFailedLoginAttempts', IntegerType::class)
-            ->add('lockoutDurationMinutes', IntegerType::class)
-            ->add('adminRequire2FA', CheckboxType::class, [
-                'attr' => [
-                    'class'           => 'ui-switch',
-                    'data-label-off'  => 'No',
-                    'data-label-on'   => 'Yes',
-                ],
-                'label' => 'Require 2FA for Admins',
-                'required' => false,
+
+            ->add('superAdministratorPolicy', EnumType::class, [
+                'class' => AuthenticationPolicy::class,
+                'choice_label' => static fn (AuthenticationPolicy $choice) => $choice->label(),
             ])
-            ->add('superAdminRequire2FA', CheckboxType::class, [
-                'attr' => [
-                    'class'           => 'ui-switch',
-                    'data-label-off'  => 'No',
-                    'data-label-on'   => 'Yes',
-                ],
-                'label' => 'Require 2FA for Super Admins',
+
+            ->add('requireStepUpAuthentication', CheckboxType::class, [
                 'required' => false,
+                'attr' => [
+                    'class' => 'ui-switch',
+                    'data-label-on' => 'Yes',
+                    'data-label-off' => 'No',
+                ],
             ])
-            ->add('superAdminRequiresWebAuthn', CheckboxType::class, [
-                'attr' => [
-                    'class'           => 'ui-switch',
-                    'data-label-off'  => 'No',
-                    'data-label-on'   => 'Yes',
-                ],
-                'label' => 'Require WebAuthn for Super Admins',
+
+            ->add('stepUpRequiredActions', EnumType::class, [
+                'class' => SensitiveAction::class,
+                'multiple' => true,
+                'expanded' => true,
                 'required' => false,
-            ])
-            ->add('stepUpForSensitiveActions', CheckboxType::class, [
-                'attr' => [
-                    'class'           => 'ui-switch',
-                    'data-label-off'  => 'No',
-                    'data-label-on'   => 'Yes',
-                ],
-                'label' => 'Require Step Up for Sensitive Actions',
-                'required' => false,
+                'choice_label' => static fn (SensitiveAction $choice) => $choice->label(),
             ]);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
-    public function configureOptions(OptionsResolver $resolver): void
-    {
+    public function configureOptions(
+        OptionsResolver $resolver,
+    ): void {
         $resolver->setDefaults([
             'data_class' => SecurityPolicy::class,
         ]);

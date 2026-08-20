@@ -28,12 +28,24 @@
 /bin/.phpunit
 /bin/phpunit
 /composer
-/config/version.php
-
 /docker
 /docker-compose.yml
+
+# Generated build metadata
+/config/version.php
+/config/version.json
 
 deploy.php
 maintenance.html
 sitemap.xml
 sitemaps/
+
+build/workspace
+build/dist
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+
+.vscode

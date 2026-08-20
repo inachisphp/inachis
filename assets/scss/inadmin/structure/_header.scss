@@ -28,7 +28,7 @@
 
 @media (min-width: $breakpoint-medium) {
     .content-header {
-        grid-column: 2;
+        grid-column: 2 / span 2;
         grid-row: 1;
         justify-content: space-between;
         padding: 0.25em 0;
@@ -42,7 +42,7 @@
 
         h1 a,
         h1 a:visited {
-            background-color: #333;
+            background-color: var(--color-neutral-800, #1e293b);
             border: 1px solid transparent;
             border-top-right-radius: 2em;
             border-bottom-right-radius: 2em;
@@ -61,25 +61,26 @@
         }
 
         h1 a:nth-child(1) {
-            background-color: #333;
+            background-color: var(--color-neutral-800, #1e293b);
         }
 
         h1 a:nth-child(2) {
-            background-color: #555;
+            background-color: var(--color-neutral-700, #334155);
         }
 
         h1 a:nth-child(3) {
-            background-color: #777;
+            background-color: var(--color-neutral-600, #475569);
         }
 
         h1 a:hover {
-            background-color: #999;
-            color: #333;
+            background-color: $color-primary;
+            color: #fff;
         }
 
         h1 span {
             padding: 1em;
+            color: $text-main;
+            font-weight: 600;
         }
-
     }
 }

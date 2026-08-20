@@ -1,80 +1,106 @@
 {% extends "/inadmin/structure/main.html.twig" %}
+
 {% block pagetitle %}
     <span>Tools</span>
 {% endblock pagetitle %}
 
 {% block content %}
-{% block settings_pre %}{% endblock settings_pre %}
-{% block settings %}
 <div class="col-12 widget-container">
 
-<section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">show_chart</span></p>
-    <h2>Analytics</h2>
-    <p><span>Review your site's analytics data.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_tools_analytics') }}" class="button button--secondary">Review Analytics</a></p>
-</section>
-
-<section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">domain</span></p>
-    <h2>System Status</h2>
-    <p><span>Check your current server and application settings.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_tools_diagnostics') }}" class="button button--secondary">Review System Status</a></p>
-</section>
-
-<section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">email</span></p>
-    <h2>Email DNS Status</h2>
-    <p><span>Check your email DNS configuration for DKIM/DMARC/SPF settings.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_tools_email') }}" class="button button--secondary">Review Email DNS</a></p>
-</section>
-
-<section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">storage</span></p>
-    <h2>Storage</h2>
-    <p><span>Check your storage usage.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_tools_storage') }}" class="button button--secondary">Review Storage</a></p>
-</section>
-
-{% if environment !== 'prod' %}
-<section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">receipt_long</span></p>
-    <h2>Logs</h2>
-    <p><span>Review application logs.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_tools_logs') }}" class="button button--secondary">Review Logs</a></p>
-</section>
+{% if canResource('ANALYTICS') %}
+    {% include 'inadmin/partials/components/card.html.twig' with {
+        title: 'Analytics',
+        icon: 'analytics',
+        description: 'Review traffic trends, popular content, and visitor metrics.',
+        button_text: 'View Analytics',
+        link: viewModel.settings.domain ~ path('incp_tools_analytics'),
+    } %}
 {% endif %}
 
-<section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">import_export</span></p>
-    <h2>Import / Export</h2>
-    <p><span>Import or export your site data.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_tools_import') }}" class="button button--secondary">Import / Export</a></p>
-</section>
+{% if canResource('STORAGE') %}
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: 'Storage',
+        icon: 'sd_storage',
+        description: 'Inspect disk usage, media upload limits, and temporary assets.',
+        button_text: 'Check Storage',
+        link: viewModel.settings.domain ~ path('incp_tools_storage'),
+    } %}
+    {% block extra_content %}
+        <div class="text-muted">
+            <small>
+                <strong>Disk Usage:</strong> {{ (diskUsage/1024/1024)|round(2) }} MB
+            </small>
+        </div>
+    {% endblock extra_content %}
+    {% endembed %}
+{% endif %}
 
-<!-- section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">backup</span></p>
-    <h2>Backup / Restore</h2>
-    <p><span>Backup your site and restore from a backup.</span></p>
-    <p><a href="{{ settings.domain }}" class="button button--secondary">Backup / Restore</a></p>
-</section -->
+{% if canResource('IMPORT_EXPORT') %}
+    {% include 'inadmin/partials/components/card.html.twig' with {
+        title: 'Import & Export',
+        icon: 'import_export',
+        description: 'Export site content or import backup packages and media.',
+        button_text: 'Import / Export',
+        link: viewModel.settings.domain ~ path('incp_tools_import'),
+    } %}
+{% endif %}
 
-<section class="widget widget-settings">
-    <p><span class="material-icons" aria-hidden="true">construction</span></p>
-    <h2>Maintenance Mode</h2>
-    <p><span>Put your site in maintenance mode.</span></p>
-    <p><a href="{{ settings.domain ~ path('incc_tools_maintenance') }}" class="button button--secondary">Maintenance Mode</a></p>
-</section>
+{% if canResource('MAINTENANCE') %}
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: 'Maintenance Mode',
+        icon: 'construction',
+        description: 'Toggle maintenance mode and manage public access notices.',
+        button_text: 'Manage Mode',
+        link: viewModel.settings.domain ~ path('incp_tools_maintenance'),
+    } %}
+    {% block extra_content %}
+        {% if maintenanceEnabled %}
+        <div class="widget__alert">
+            <strong>Maintenance mode is currently enabled.</strong><br /> Visitors will see a maintenance notice.
+        </div>
+        {% else %}
+        <div class="widget__ok">
+            <strong>Maintenance mode is currently disabled.</strong><br /> Visitors can access the site normally.
+        </div>
+        {% endif %}
+    {% endblock extra_content %}
+    {% endembed %}
+{% endif %}
 
-<section class="widget widget-settings widget-settings--danger">
-    <p><span class="material-icons" aria-hidden="true">delete_forever</span></p>
-    <h2>Data Purge</h2>
-    <p><span><strong>Danger:</strong> Delete all content from your site.</span></p>
-    <p><a href="{{ settings.domain }}" class="button button--negative">Purge Data</a></p>
-</section>
+{% if environment !== 'prod' and canResource('ERROR_LOG') %}
+    {% include 'inadmin/partials/components/card.html.twig' with {
+        title: 'Logs',
+        icon: 'article',
+        description: 'Review recent application, environment, and system error logs.',
+        button_text: 'View Logs',
+        link: viewModel.settings.domain ~ path('incp_tools_logs'),
+    } %}
+{% endif %}
+
+{% if canResource('BACKUP') %}
+    {% include 'inadmin/partials/components/card.html.twig' with {
+        title: 'Backup & Restore',
+        icon: 'backup',
+        description: 'Create complete site backups and restore the site from a previous backup.',
+        button_text: 'Backup / Restore',
+        link: viewModel.settings.domain ~ path('incp_tools_backups'),
+    } %}
+{% endif %}
+
+{% if canResource('PURGE') %}
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: 'Data Purge',
+        icon: 'delete_forever',
+        button_text: 'Purge Data',
+        link: viewModel.settings.domain ~ path('incp_user_content_purge'),
+        className: 'widget-settings--danger',
+        buttonClassName: 'btn--danger',
+    } %}
+    {% block description %}
+    <strong>Danger</strong><br /> Permanently wipe content and reset site data.
+    {% endblock description %}
+    {% endembed %}
+{% endif %}
 
 </div>
-{% endblock settings %}
-{% block settings_post %}{% endblock settings_post %}
 {% endblock content %}
-

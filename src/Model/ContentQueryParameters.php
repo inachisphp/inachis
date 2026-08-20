@@ -1,85 +1,154 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Model;
 
-use Inachis\Entity\Category;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface;
+use Inachis\Entity\Content\Category;
+use Inachis\Repository\Content\CategoryRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * ContentQueryParameters class
+ * ContentQueryParameters class.
  */
 class ContentQueryParameters
 {
     /**
-     * Constructor for ContentQueryParameters class
+     * Constructor for ContentQueryParameters class.
      *
-     * @param array $filters
-     * @param string $sort
-     * @param int $offset
-     * @param int $limit
+     * @param array{
+     *     filters: array<string,mixed>,
+     *     sort: string,
+     *     limit: int,
+     *     offset: int
+     * }|array{} $filters
      */
     public function __construct(
         protected array $filters = [],
         protected string $sort = '',
+        protected int $limit = 10,
         protected int $offset = 0,
-        protected int $limit = 10
-    ) {}
+        protected string $view = 'list',
+    ) {
+    }
 
     /**
-     * Process the request and return the query parameters
-     *
-     * @param Request $request
-     * @param ServiceEntityRepositoryInterface $repository
-     * @param string $prefix
-     * @param string $sortDefault
-     * @return array<string, mixed>
+     * Creates a new instance using the current values as defaults and
+     * overriding them with any values supplied in the request.
      */
-    public function process (
+    public static function fromRequest(
         Request $request,
-        ServiceEntityRepositoryInterface $repository,
-        string $prefix = '',
-        string $sortDefault = '',
-    ): array {
-        $this->filters = array_filter($request->request->all('filter', []));
-        $this->sort = $request->request->get('sort', $sortDefault);
+        self $current,
+        CategoryRepository $categoryRepository,
+    ): self {
+        $filters = $current->getFilters();
 
-        if (isset($this->filters['categories']) && is_array($this->filters['categories']) && array_is_list($this->filters['categories'])) {
-            if (method_exists($repository, 'getEntityManager')) {
-                $categories = $repository->getEntityManager()->getRepository(Category::class)->findBy(['id' => $this->filters['categories']]);
+        /*
+        * If the filter form was submitted, replace the existing filters.
+        * This allows filters to be cleared.
+        */
+        if ($request->request->has('filter')) {
+            $filters = $request->request->all('filter');
+
+            /*
+            * Normalise empty category selection from Tom Select.
+            */
+            if (($filters['categories'] ?? null) === '') {
+                $filters['categories'] = [];
+            }
+
+            /*
+            * Remove empty scalar filters.
+            */
+            $filters = array_filter(
+                $filters,
+                static fn (mixed $value): bool => '' !== $value && [] !== $value,
+            );
+
+            /*
+            * Convert category UUIDs into category labels.
+            */
+            if (
+                isset($filters['categories'])
+                && is_array($filters['categories'])
+                && array_is_list($filters['categories'])
+            ) {
+                /** @var list<Category> $categories */
+                $categories = $categoryRepository->findBy([
+                    'id' => $filters['categories'],
+                ]);
+
                 $categoryFilter = [];
+
                 foreach ($categories as $category) {
-                    $categoryFilter[$category->getId()->toString()] = $category->getTitle();
+                    $id = $category->getId()?->toString();
+
+                    if (null !== $id) {
+                        $categoryFilter[$id] = $category->getTitle();
+                    }
                 }
-                $this->filters['categories'] = $categoryFilter;
+
+                $filters['categories'] = $categoryFilter;
             }
         }
 
-        if ($request->isMethod(Request::METHOD_POST)) {
-            $request->getSession()->set($prefix . '_filters', $this->filters);
-            $request->getSession()->set($prefix . '_sort', $this->sort);
-        } elseif ($request->getSession()->has($prefix . '_filters')) {
-            $this->filters = $request->getSession()->get($prefix . '_filters', '');
-            $this->sort = $request->getSession()->get($prefix . '_sort', '');
-        }
-        $this->offset = (int) $request->attributes->get('offset', 0);
-        $this->limit = (int) $request->attributes->get(
-            'limit',
-            $repository->getMaxItemsToShow(),
-        );
+        return new self(
+            filters: $filters,
+            sort: $request->request->getString('sort')
+                ?: $current->getSort(),
 
+            limit: $request->attributes->getInt(
+                'limit',
+                $current->getLimit(),
+            ),
+
+            offset: $request->attributes->getInt(
+                'offset',
+                $current->getOffset(),
+            ),
+
+            view: $request->request->getString('view')
+                ?: $current->getView(),
+        );
+    }
+
+    public function getFilters(): array
+    {
+        return $this->filters;
+    }
+
+    public function getSort(): string
+    {
+        return $this->sort;
+    }
+
+    public function getLimit(): int
+    {
+        return $this->limit;
+    }
+
+    public function getOffset(): int
+    {
+        return $this->offset;
+    }
+
+    public function getView(): string
+    {
+        return $this->view;
+    }
+
+    public function toArray(): array
+    {
         return [
             'filters' => $this->filters,
             'sort' => $this->sort,
             'offset' => $this->offset,
             'limit' => $this->limit,
+            'view' => $this->view,
         ];
     }
 }

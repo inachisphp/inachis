@@ -1,0 +1,26 @@
+
+{% block content %}
+{% endblock content %}
+
+Best wishes,
+{{ viewModel.settings.siteTitle|default(viewModel.settings.domain) }}
+
+{% if viewModel.settings is defined and viewModel.settings.twitter is defined and viewModel.settings.twitter is not empty %}
+|
+    {% if viewModel.settings.social.twitter is defined and viewModel.settings.social.twitter is not empty %}
+        https://twitter.com/{{ viewModel.settings.social.twitter }} |
+    {% endif %}
+    {% if viewModel.settings.social.facebookUrl is defined and viewModel.settings.social.facebookUrl is not empty %}
+        https://www.facebook.com/{{ viewModel.settings.social.facebookUrl }} |
+    {% endif %}
+    {% if viewModel.settings.social.pinterest is defined and viewModel.settings.social.pinterest is not empty %}
+        http://www.pinterest.com/{{ viewModel.settings.social.pinterest }}/ |
+    {% endif %}
+    {% if viewModel.settings.social.instagram is defined and viewModel.settings.social.instagram is not empty %}
+        https://instagram.com/{{ viewModel.settings.social.instagram }}/ |
+    {% endif %}
+{% endif %}
+
+{% block settings_unsubscribe %}
+Unsubscribe: {{ viewModel.settings.domain }}/unsubscribe
+{% endblock settings_unsubscribe %}

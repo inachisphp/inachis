@@ -1,8 +1,8 @@
 {% extends "inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_post_list', { type: page.tab }) }}">{{ page.tab|title }}s</a>
-    <a href="/incc/{{ page.tab }}/{{ url }}">Edit {{ page.tab }}</a>
+    <a href="{{ path('incp_post_list', { type: viewModel.page.tab }) }}">{{ viewModel.page.tab|title }}s</a>
+    <a href="/incp/{{ viewModel.page.tab }}/{{ url }}">Edit {{ viewModel.page.tab }}</a>
     <span>Track Changes</span>
 {% endblock pagetitle %}
 
@@ -12,26 +12,22 @@
     {% if subTitle is not empty %}
         <h3>{% if subTitle[0][0].tag is defined %}{{ subTitle[0][0].new.lines[0]|raw }}{% else %}{{ subTitle }}{% endif %}</h3>
     {% endif %}
-    {% set skip_lines = 0 %}
+    {% for block in content %}
+        {% if block.type == enum(diffBlockType).UNCHANGED %}
+            {{ block.html|markdown_to_html }}
 
-    {% for content_block in content %}
-        {% if skip_lines > 0 %}
-            {% set skip_lines = skip_lines - 1 %}
-        {% else %}
-            {% if content_block.tag is defined and content_block.tag == 'del' %}
-                {% set skip_lines = content_block.old.lines|length - 1 %}
-                <del>{{ content_block.old.lines|join|markdown_to_html }}</del>
-            {% elseif content_block.tag is defined and content_block.tag == 'rep' %}
-                {% set skip_lines = content_block.old.lines|length - 1 %}
-                <div class="change_block">
-                    <del>{{ content_block.old.lines|join|markdown_to_html }}</del>
-                    <ins>{{ content_block.new.lines|join|markdown_to_html }}</ins>
-                </div>
-            {% else %}
-                {{ content_block|markdown_to_html }}
-            {% endif %}
+        {% elseif block.type == enum(diffBlockType).DELETED %}
+            <del class="revision-diff__deleted">
+                {{ block.html|markdown_to_html }}
+            </del>
+
+        {% elseif block.type == enum(diffBlockType).REPLACED %}
+            <div class="revision-diff__changed">
+                {{ block.html|markdown_to_html }}
+            </div>
         {% endif %}
     {% endfor %}
+
     </section>
     <p>&nbsp;</p>
     <p>&nbsp;</p>
@@ -39,20 +35,22 @@
     <div class="fixed-bottom-bar">
         <form method="post">
             <p>
-                <button class="button button--negative button--delete button--confirm"
+            {% if can('PAGE', 'EDIT') %}
+                <button class="btn btn--danger btn--delete btn--confirm"
                     data-confirm="revert"
                     data-confirm-text="Yes, revert"
                     data-entity="post"
                     data-form-action=""
-                    data-title="Revert selected  {{ page.tab }}"
+                    data-title="Revert selected  {{ viewModel.page.tab }}"
                     data-warning="Your current version will be replaced with the contents of this previous state."
                     name="doRevert" type="submit">
                     <span class="material-icons" aria-hidden="true">undo</span> <span>Revert</span>
                 </button>
-                <a href="{{ path('incc_post_download', { 'id': revision_id }) }}" class="button button--secondary">
+            {% endif %}
+                <a href="{{ path('incp_post_download', { 'id': revision_id }) }}" class="btn btn--secondary">
                     <span class="material-icons" aria-hidden="true">save_alt</span> {% trans %}admin.post.revision.download{% endtrans %}
                 </a>
-                <a href="/incc/post/{{ link }}" class="button button--info">
+                <a href="/incp/post/{{ url }}" class="btn btn--info">
                     <span>Cancel</span>
                 </a>
             </p>

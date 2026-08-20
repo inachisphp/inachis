@@ -13,6 +13,10 @@
 		line-height: 1.5em;
 		padding: 5px 10px;
 		width: 15em;
+
+		&.full-width {
+			width: 100%;
+		}
 	}
 
 	input.checkbox {

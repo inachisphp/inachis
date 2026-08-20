@@ -1,70 +1,182 @@
 @use '../definitions' as *;
 
-/* Container spacing */
+/* Container spacing & Grid layout */
 .diagnostics-summary {
-    display: flex;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-}
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
 
-.card {
-    background: $border-color;
-    min-width: 200px;
-    padding: 0.05em 0.5em;
-}
+  /* Card Container */
+  .card {
+    background: $bg-surface;
+    border: 1px solid $border-color;
+    border-radius: $radius-standard;
+    padding: 1rem;
+    transition: transform $transition-base, box-shadow $transition-base;
 
-/* Card status border */
-.card.border-ok {
-    border-left: 4px solid $diagnostic-ok;
-    /* Green */
-}
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
 
-.card.border-warning {
-    border-left: 4px solid $diagnostic-warning;
-    /* Yellow */
-}
+    /* Card status left-borders */
+    &.border-ok {
+      border-left: 4px solid $diagnostic-ok;
+    }
 
-.card.border-error {
-    border-left: 4px solid $diagnostic-error;
-    /* Red */
-}
+    &.border-warning {
+      border-left: 4px solid $diagnostic-warning;
+    }
 
-/* Status text inside card */
-.diagnostics-status {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    font-size: 1rem;
-}
+    &.border-error {
+      border-left: 4px solid $diagnostic-error;
+    }
 
-.diagnostics-status-ok {
-    color: $diagnostic-ok;
-}
+    .card-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: $diagnostic-muted;
+      margin: 0 0 0.5rem 0;
+      text-transform: capitalize;
+    }
+  }
 
-.diagnostics-status-warning {
-    color: $diagnostic-warning;
-}
-
-.diagnostics-status-error {
-    color: $diagnostic-error;
-}
-
-/* Optional: adjust the list under each card */
-.diagnostics-summary ul {
+  /* List of check breakdown inside card */
+  ul {
     list-style-type: none;
     margin-bottom: 0;
     padding-left: 0;
-}
 
-.diagnostics-summary ul li {
-    font-size: 0.875rem;
-    color: $diagnostic-muted;
-    /* muted gray for counts */
-}
-
-/* Responsive spacing: small gutter between columns */
-@media (min-width: 768px) {
-    .diagnostics-summary .col-md-3 {
-        margin-bottom: 1rem;
+    li {
+      font-size: 0.875rem;
+      color: $diagnostic-muted;
     }
+  }
+}
+
+/* Status text inside summary cards */
+.diagnostics-status {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+
+  &-ok {
+    color: $diagnostic-ok;
+  }
+
+  &-warning {
+    color: $diagnostic-warning;
+  }
+
+  &-error {
+    color: $diagnostic-error;
+  }
+}
+
+/* User Permission / Role Cards */
+.role-card {
+  align-items: flex-start;
+  cursor: pointer;
+  display: flex;
+  padding: 1rem 1rem 0 1rem;
+  transition: background-color 0.2s, border-color 0.2s;
+
+  input[type=checkbox]:focus-visible {
+    outline: 2px solid $button-bright-focus;
+    outline-offset: 2px;
+  }
+
+  &:nth-child(even) {
+    background-color: $bg-panel;
+  }
+
+  &.is-selected {
+    background-color: $table-selected !important;
+    outline: 2px solid $table-selected;
+  }
+
+  &:hover {
+    background-color: $color-neutral-100;
+  }
+
+  .role-card-content {
+    margin-left: 1rem;
+
+    .role-title {
+      font-weight: 600;
+    }
+  }
+
+  .role-description {
+    font-size: 0.875rem;
+  }
+}
+
+/* Toolbar Alignment */
+.diagnostics-toolbar {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+// /* Heading Highlight Flash on Card Jump */
+// .content section h2 {
+//   transition: background-color 0.4s ease, color 0.4s ease;
+
+//   &.highlight-section {
+//     background-color: var(--color-flash-warning-bg, #fef7e0);
+//     padding-left: 0.5rem;
+//     border-radius: $radius-standard;
+//   }
+// }
+
+// /* Diagnostic Sections & Table Overhaul */
+// .content section {
+//   scroll-margin-top: 5rem;
+//   margin-bottom: 2.5rem;
+
+//   h2 {
+//     font-size: 1.25rem;
+//     font-weight: 600;
+//     margin-bottom: 1rem;
+//     color: $text-main;
+//     border-bottom: 2px solid $border-color;
+//     padding-bottom: 0.5rem;
+//     scroll-margin-top: 5rem;
+//   }
+// }
+
+.table--responsive {
+//   width: 100%;
+//   border-collapse: collapse;
+//   background: $bg-surface;
+//   border-radius: $radius-standard;
+//   overflow: hidden;
+//   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  tbody tr {
+    // border-bottom: 1px solid $border-color;
+
+    &.status-error {
+      background-color: rgba($diagnostic-error, 0.03);
+    }
+
+    &.status-warning {
+      background-color: rgba($diagnostic-warning, 0.03);
+    }
+  }
+
+  /* Inline Recommendation Callout Box */
+  .recommendation-box,
+  .text-muted.small.mt-1 {
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background-color: $bg-panel;
+    border-left: 3px solid $action-primary;
+    border-radius: 0 $radius-standard $radius-standard 0;
+    font-size: 0.8125rem;
+    color: $diagnostic-muted;
+  }
 }

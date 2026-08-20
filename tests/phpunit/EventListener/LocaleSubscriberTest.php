@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\EventListener;
@@ -23,25 +22,29 @@ class LocaleSubscriberTest extends TestCase
     private function createEvent(Request $request): RequestEvent
     {
         $kernel = $this->createStub(HttpKernelInterface::class);
+
         return new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
     }
 
     public function testSetsLocaleFromRequestAttribute(): void
     {
         $session = new Session(new MockArraySessionStorage());
-        $request = $this
-            ->getMockBuilder(Request::class)
-            ->onlyMethods(['hasPreviousSession'])
-            ->getMock();
+
+        $request = new class extends Request {
+            public function hasPreviousSession(): bool
+            {
+                return true;
+            }
+        };
+
         $request->setSession($session);
         $request->attributes->set('_locale', 'fr');
-        $request->expects($this->once())
-            ->method('hasPreviousSession')->willReturn(true);
-        $subscriber = new LocaleSubscriber('en');
-        $event = $this->createEvent($request);
-        $subscriber->onKernelRequest($event);
 
-        $this->assertSame('fr', $session->get('_locale'));
+        $subscriber = new LocaleSubscriber('en');
+
+        $subscriber->onKernelRequest($this->createEvent($request));
+
+        $this->assertSame('fr', $request->getSession()->get('_locale'));
     }
 
     public function testNoPreviousSession(): void

@@ -9,7 +9,7 @@
 {% block waste %}
 
 <div class="col-12">
-{% include 'inadmin/partials/table.html.twig' with {
+{% include 'inadmin/partials/components/view_content.html.twig' with {
     'className': 'form__waste',
     'type': 'waste',
 
@@ -29,7 +29,7 @@
         },
         {
             'title': 'Date Deleted',
-            'source': 'modDate',
+            'source': 'updatedAt',
             'source_type': 'date',
             'hideOnMobile': true,
         },
@@ -46,27 +46,27 @@
     'show_search': false,
     'show_select_deselect': true,
 
-    'url_result': path('incc_waste_list'),
+    'url_result': path('incp_waste_list'),
     'zebra': true,
 
     'actions': {
         'recover': {
-            'button_class': 'button--positive button-recover',
+            'button_class': 'btn--primary button-recover',
             'icon': 'restore_from_trash',
             'title': 'Restore',
             'value': '1',
             'name': 'recover',
         },
         'delete': {
-            'button_class': 'button--negative button--delete',
+            'button_class': 'btn--danger btn--delete',
             'icon': 'delete_forever',
             'title': 'Delete',
             'value': '1',
             'name': 'delete',
-            },
-        }
-    }
-%}
+        },
+    },
+    view_setting: 'table'
+} %}
 </div>
 
 {% endblock waste %}

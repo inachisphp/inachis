@@ -1,0 +1,24 @@
+{% if actions|default(null) is not empty %}
+<div class="fixed-bottom-bar{% if show_select_deselect is defined and show_select_deselect %} visually-hidden{% endif %}">
+    <p>
+        {% if show_select_deselect is defined and show_select_deselect %}
+        <span class="error ui-state-error error-select">Select content to see actions</span>
+        <span>with selected:</span>
+        {% endif %}
+        {% for key, action in actions %}
+            {% set elementType = action.href ?? '' ? 'a' : 'button' %}
+            <{{ elementType }}{% if action.href ?? '' %} href="{{ action.href }}"{% endif %} class="btn {{ action.button_class|default(null) }}"{%-
+                if action.data is defined and action.data is not empty %}
+                {% for datakey, datavalue in action.data %} data-{{ datakey }}="{{ datavalue }}"{% endfor %}
+                    {%- endif %}{%-
+                if action.id is defined %} id="{{ action.id }}"{% endif
+            %} name="{{ key }}" type="{{ action.button_type|default('submit') }}"{%if action.value is defined and action.value is not empty %} value="{{ action.value }}"{% endif %}>
+                {% if action.icon is defined and action.icon is not empty %}
+                    <span class="material-icons" aria-hidden="true">{{ action.icon }}</span>
+                {% endif %}
+                <span class="btn-txt">{{ action.title|default(null) }}</span>
+            </{{ elementType }}>
+        {% endfor %}
+    </p>
+</div>
+{% endif %}

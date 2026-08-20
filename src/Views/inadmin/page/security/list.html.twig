@@ -1,0 +1,129 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <span>Security &amp; Diagnostics</span>
+{% endblock pagetitle %}
+
+{% block content %}
+<div class="col-12 widget-container">
+
+{% if canResource('SYSTEM_STATUS') %}
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: 'System Health & Diagnostics',
+        icon: 'health_and_safety',
+        description: 'Inspect server configuration, memory, security headers, and environmental health.',
+        button_text: 'View Status',
+        link: viewModel.settings.domain ~ path('incp_tools_diagnostics'),
+    } %}
+    {% block extra_content %}
+        {% if systemIssues.warning is not empty or systemIssues.error is not empty %}
+            <div class="widget__alert">
+                <p>There are issues detected in the system diagnostics.</p>
+                <ul>
+                {% if systemIssues.warning is not empty %}
+                    <li><strong>Warning:</strong> {{ systemIssues.warning|length }} issue(s)</li>
+                {% endif %}
+                {% if systemIssues.error is not empty %}
+                    <li><strong>Error:</strong> {{ systemIssues.error|length }} issue(s)</li>
+                {% endif %}
+                </ul>
+            </div>
+        {% else %}
+            <div class="widget__ok">
+                <p>All system diagnostics checks passed successfully.</p>
+            </div>
+        {% endif %}
+    {% endblock extra_content %}
+    {% endembed %}
+{% endif %}
+
+{% if canResource('EMAIL_DNS') %}
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: 'Email & DNS Authentication',
+        icon: 'mark_email_read',
+        description: 'Verify SPF, DKIM, DMARC, for email deliverability, and domain security compliance.',
+        button_text: 'Check Mail Security',
+        link: viewModel.settings.domain ~ path('incp_tools_email'),
+    } %}
+    {% block extra_content %}
+        {% if domainEmailReport.issues is empty %}
+            <div class="widget__ok">
+                <p>All email authentication records are valid.</p>
+            </div>
+        {% else %}
+            <div class="widget__alert">
+                <ul>
+                {% for issue in domainEmailReport.issues %}
+                    <li>{{ issue.message }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endblock extra_content %}
+    {% endembed %}
+{% endif %}
+
+{% if canResource('PRIVACY_GDPR') %}
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: 'Privacy & GDPR Compliance',
+        icon: 'verified_user',
+        description: 'Manage cookie consent banners, user data exports, and IP anonymization settings.',
+        button_text: 'Manage Privacy',
+        link: viewModel.settings.domain ~ path('incp_security_privacy'),
+    } %}
+    {% block extra_content %}
+    Cookie Banner: Active • IP Anonymization: On
+    {% endblock extra_content %}
+    {% endembed %}
+{% endif %}
+
+{% if canResource('CSP_POLICY') %}
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: 'Content Security Policy & Reports',
+        icon: 'policy',
+        description: 'Configure CSP directives and monitor real-time violation reports.',
+        button_text: 'Manage CSP',
+        link: viewModel.settings.domain ~ path('incp_tools_csp_dashboard'),
+    } %}
+    {% block extra_content %}
+    {% if cspMode.value == 'off' %}
+        <div class="widget__alert">
+            <p>CSP is currently disabled.</p>
+        </div>
+        {% elseif cspMode.value == 'report-only' %}
+        <div class="widget__alert">
+            <p>CSP is in report-only mode.</p>
+        </div>
+    {% elseif cspMode.value == 'enforce' %}
+        <div class="widget__ok">
+            <p>CSP is fully enforced.</p>
+        </div>
+    {% endif %}
+    {% endblock extra_content %}
+    {% endembed %}
+{% endif %}
+
+{% if canResource('PASSWORD_POLICY') %}
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: 'Security Policy & Authentication',
+        icon: 'password',
+        description: 'Manage password requirements, multi-factor authentication, and step-up action controls.',
+        button_text: 'Manage Security Policy',
+        link: viewModel.settings.domain ~ path('incp_admin_security_policy'),
+    } %}
+    {% block extra_content %}
+        <div class="text-muted">
+            <p>
+                <strong>Active Policy:</strong>
+                {{ securityPolicy.name }} <br />
+                <small><strong>Password Strength:</strong>
+                    {{ securityPolicy.passwordStrength.label }}
+                </small>
+            </p>
+        </div>
+    {% endblock extra_content %}
+    {% endembed %}
+{% endif %}
+
+</div>
+{% endblock content %}

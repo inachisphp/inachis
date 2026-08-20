@@ -5,7 +5,7 @@ window.Inachis.MergeTags = {
     selectedTagIds: [],
 
     init() {
-        this.mergeTagsLink = document.querySelector('.button--merge');
+        this.mergeTagsLink = document.querySelector('.btn--merge');
         if (!this.mergeTagsLink) return;
 
         this.mergeTagsLink.addEventListener('click', e => {
@@ -33,18 +33,18 @@ window.Inachis.MergeTags = {
 			`,
 			buttons: [
 				{
-					text: 'Merge',
-					class: 'button button--positive',
-					disabled: true,
-					click: () => this.submitMerge(this, this.selectedTagIds)
-				},
-				{
 					text: 'Cancel',
-					class: 'button button--info',
+					class: 'btn btn--outline',
 					click() {
 						this.close();
 					}
-				}
+				},
+				{
+					text: 'Merge',
+					class: 'btn btn--primary',
+					disabled: true,
+					click: () => this.submitMerge(this, this.selectedTagIds)
+				},
 			],
 			onOpen: dialog => {
 				document.querySelector('.fixed-bottom-bar')?.classList.toggle('hidden');
@@ -105,7 +105,7 @@ window.Inachis.MergeTags = {
 		const payload = new URLSearchParams();
 		payload.append('target', target.value);
 		sources.forEach(id => payload.append('sources[]', id));
-		fetch('/incc/tags/merge', {
+		fetch('/incp/tags/merge', {
 			method: 'POST',
 			body: payload
 		})

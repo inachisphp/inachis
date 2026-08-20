@@ -1,0 +1,87 @@
+{% if reports is not empty or activeDirective is not empty or activeSeverity is not empty or activeHost is not empty %}
+<div class="col-6">
+<form method="get" class="form">
+<section class="section-ui">
+        {{ include('inadmin/partials/components/filters.html.twig', {
+            filters: {
+                Processed: {
+                    '': 'Unprocessed only',
+                    'all': 'All',
+                },
+                Severity: {
+                    '': 'All',
+                    'critical': 'Critical',
+                    'high': 'High',
+                    'medium': 'Medium',
+                    'low': 'Low',
+                    'info': 'Info',
+                },
+                Directive: {
+                    '': 'All',
+                    'script-src': 'script-src',
+                    'style-src': 'style-src',
+                    'connect-src': 'connect-src',
+                },
+            },
+            filter_values: filters,
+            show_search: true,
+            search_id: 'filter__host',
+            search_label: 'Search CSP hosts',
+            search_name: 'host',
+            search_placeholder: 'e.g. example.com',
+            search_value: activeHost,
+        }) }}
+        {# query.filters, #}
+</section>
+</form>
+{% if reports is not empty %}
+<section class="widget">
+    <header class="widget__header">
+        <h2>Reports</h2>
+    </header>
+    <table class="table table--striped table--hover">
+
+        <thead>
+        <tr>
+            <th>Severity</th>
+            <th>Directive</th>
+            <th>Host</th>
+            <th class="col-count">Count</th>
+            <th>Last Seen</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for report in reports %}
+            <tr class="{% if report.processed%}row--disabled{% elseif report.severity.value == 'critical' %}table-danger{% endif %}">
+                <td>
+                    <span class="badge badge__{{ report.severity.badgeClass }}">
+                        {{ report.severity.label }}
+                    </span>
+                </td>
+                <td><code>{{ report.effectiveDirective }}</code></td>
+                <td>
+                    <a href="{{ path('incp_tools_csp_dashboard', {host: report.host}) }}">
+                        {{ report.host ?? '—' }}
+                    </a>
+                </td>
+                <td class="col-count">{{ report.occurrences }}</td>
+
+                <td>
+                    {{ report.lastSeenAt ? report.lastSeenAt|date('Y-m-d H:i', viewModel.session.preferences.timezone) : '—' }}
+                </td>
+
+                <td class="col-actions">
+                    <a href="{{ path('csp_report_show', {id: report.id}) }}"
+                       class="btn btn-sm btn-outline-primary">
+                        View
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+</div>
+{% endif %}
+{% endif %}

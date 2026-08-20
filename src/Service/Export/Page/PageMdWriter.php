@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Export\Page;
 
 use Inachis\Model\Page\PageExportDto;
 use Inachis\Service\Export\ExportWriterInterface;
-use \SimpleXMLElement;
 
 /**
  * XML writer for pages.
@@ -21,19 +19,21 @@ class PageMdWriter implements ExportWriterInterface
     /**
      * Checks if the writer supports the given format.
      *
-     * @param string $format The format to check.
-     * @return bool True if the writer supports the format, false otherwise.
+     * @param string $format the format to check
+     *
+     * @return bool true if the writer supports the format, false otherwise
      */
     public function supports(string $format): bool
     {
-        return $format === 'md';
+        return 'md' === $format;
     }
 
     /**
      * Checks if the writer supports the given content domain.
      *
-     * @param string|null $domain The content domain to check.
-     * @return bool True if the writer supports the domain, false otherwise.
+     * @param string|null $domain the content domain to check
+     *
+     * @return bool true if the writer supports the domain, false otherwise
      */
     public function supportsDomain(?string $domain): bool
     {
@@ -43,8 +43,9 @@ class PageMdWriter implements ExportWriterInterface
     /**
      * Writes the given pages to MD format.
      *
-     * @param iterable $pages The pages to write.
-     * @return string The exported pages.
+     * @param iterable $pages the pages to write
+     *
+     * @return string the exported pages
      */
     public function write(iterable $pages, array $options = []): string
     {
@@ -58,17 +59,17 @@ class PageMdWriter implements ExportWriterInterface
             $subTitle = $page->subTitle ?? '';
             $date = $page->postDate ?? date('Y-m-d');
             $category = $page->categories[0]->path ?? '';
-            $tags = array_map(fn($t) => $t->title, $page->tags);
+            $tags = array_map(fn ($t) => $t->title, $page->tags);
 
             // YAML front matter
             $output .= "---\n";
-            $output .= 'title: ' . json_encode($title) . "\n";
+            $output .= 'title: '.json_encode($title)."\n";
             if ($subTitle) {
-                $output .= 'subTitle: ' . json_encode($subTitle) . "\n";
+                $output .= 'subTitle: '.json_encode($subTitle)."\n";
             }
             $output .= "date: {$date}\n";
-            $output .= 'tags: ' . json_encode($tags) . "\n";
-            $output .= 'category: ' . json_encode($category) . "\n";
+            $output .= 'tags: '.json_encode($tags)."\n";
+            $output .= 'category: '.json_encode($category)."\n";
             $output .= "---\n\n";
 
             // Markdown content
@@ -76,7 +77,7 @@ class PageMdWriter implements ExportWriterInterface
             if ($subTitle) {
                 $output .= "## {$subTitle}\n\n";
             }
-            $output .= ($page->content ?? '') . "\n\n";
+            $output .= ($page->content ?? '')."\n\n";
         }
 
         return $output;

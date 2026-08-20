@@ -1,118 +1,115 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Dialog;
 
-use DateTimeImmutable;
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Repository\PageRepository;
-use Inachis\Repository\SeriesRepository;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\SeriesRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Controller for content selector dialog
+ * Controller for content selector dialog.
  */
-#[IsGranted('ROLE_ADMIN')]
 class ContentSelectorController extends AbstractInachisController
 {
     /**
-     * Get content list
-     * 
-     * @param Request $request
-     * @param SeriesRepository $seriesRepository
-     * @param PageRepository $pageRepository
-     * @return Response
+     * Get content list.
      */
-    #[Route("/incc/ax/contentSelector/get", methods: [ "POST" ])]
+    #[Route('/incp/ax/contentSelector/get', methods: ['POST'])]
     public function contentList(
         Request $request,
         SeriesRepository $seriesRepository,
         PageRepository $pageRepository,
     ): Response {
+        /**
+         * @var array{
+         *   categories?:array<string>,
+         *   tags?:array<string>,
+         *   status?:string,
+         *   visible?:bool,
+         *   keyword?:string,
+         *   excludeIds?:list<string>,
+         *   fromDate?:\DateTimeImmutable,
+         *   toDate?:\DateTimeImmutable
+         * }
+         */
         $filters = array_filter($request->request->all('filters'));
 
         /** @var string $seriesId */
-        $seriesId = $request->request->get('seriesId', '');
-        if ($seriesId !== '') {
+        $seriesId = $request->request->getString('seriesId', '');
+        if ('' !== $seriesId) {
             $series = $seriesRepository->find($seriesId);
-            if ($series !== null) {
-            $items = $series->getItems();
-                if ($items instanceof \Doctrine\Common\Collections\Collection && !$items->isEmpty()) {
+            if (null !== $series) {
+                $items = $series->getItems();
+                if (!$items->isEmpty()) {
                     $filters['excludeIds'] = [];
-                    /** @var \Inachis\Entity\Page $item */
+                    /** @var \Inachis\Entity\Content\Page $item */
                     foreach ($items as $item) {
-                        $filters['excludeIds'][] = $item->getId();
+                        $filters['excludeIds'][] = $item->getId()?->toString() ?: '';
                     }
                 }
             }
         }
-        $offset = (int) $request->request->get('offset', 0);
-        $limit = (int) $request->request->get('limit', 25);
-        $this->data['pages'] = $pageRepository->getFilteredOfTypeByPostDate(
-            $filters,
-            '*',
-            $offset,
-            $limit,
-            'title asc'
-        );
-        $this->data['query'] = [
-            'filters' => $filters,
-            'offset' => $offset,
-            'limit' => $limit,
-        ];
-        return $this->render('inadmin/dialog/content-selector.html.twig', $this->data);
+        $limit = $request->request->getInt('limit', 25);
+        $offset = $request->request->getInt('offset', 0);
+
+        return $this->render('inadmin/partials/content_selector_results.html.twig', [
+            'pages' => $pageRepository->getFilteredOfTypeByPostDate(
+                $filters,
+                '*',
+                $limit,
+                $offset,
+                'title asc',
+            ),
+            'query' => [
+                'filters' => $filters,
+                'limit' => $limit,
+                'offset' => $offset,
+            ],
+        ]);
     }
 
-    /**
-     * @param Request $request
-     * @param SeriesRepository $seriesRepository
-     * @param PageRepository $pageRepository
-     * @return Response
-     */
-    #[Route("/incc/ax/contentSelector/save", methods: [ "POST" ])]
+    #[Route('/incp/ax/contentSelector/save', methods: ['POST'])]
     public function saveContent(
         Request $request,
         SeriesRepository $seriesRepository,
         PageRepository $pageRepository,
     ): Response {
         $ids = $request->request->all('ids');
-        $seriesId = (string) $request->request->get('seriesId', '');
+        $seriesId = $request->request->getString('seriesId', '');
         $series = $seriesRepository->find($seriesId);
-        if (empty($ids) || $series === null) {
+        if (empty($ids) || null === $series) {
             return new Response('No change', Response::HTTP_NO_CONTENT);
         }
 
         foreach ($ids as $pageId) {
             $page = $pageRepository->find($pageId);
-            if (!$page instanceof \Inachis\Entity\Page) {
+            if (!$page instanceof \Inachis\Entity\Content\Page) {
                 continue;
             }
 
             $series->addItem($page);
 
             $pageDate = $page->getPostDate();
-            if ($pageDate instanceof DateTimeImmutable) {
-                $firstDate = $series->getFirstDate();
-                $lastDate = $series->getLastDate();
+            $firstDate = $series->getFirstDate();
+            $lastDate = $series->getLastDate();
 
-                if ($firstDate === null || $pageDate < $firstDate) {
-                    $series->setFirstDate($pageDate);
-                }
-                if ($lastDate === null || $pageDate > $lastDate) {
-                    $series->setLastDate($pageDate);
-                }
+            if (null === $firstDate || $pageDate < $firstDate) {
+                $series->setFirstDate($pageDate);
+            }
+            if (null === $lastDate || $pageDate > $lastDate) {
+                $series->setLastDate($pageDate);
             }
         }
-        $series->setModDate(new DateTimeImmutable());
+        $series->setUpdatedAt(new \DateTimeImmutable());
 
         $this->entityManager->persist($series);
         $this->entityManager->flush();

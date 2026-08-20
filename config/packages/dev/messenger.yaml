@@ -1,0 +1,5 @@
+framework:
+  messenger:
+    transports:
+      # Force async routed messages to execute synchronously in dev
+      async: 'sync://'

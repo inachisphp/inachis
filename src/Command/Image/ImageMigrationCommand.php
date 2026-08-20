@@ -1,460 +1,302 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Command\Image;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Inachis\Entity\Image;
-use Inachis\Entity\Page;
-use Inachis\Entity\Series;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\SeriesRepository;
+use Inachis\Repository\Media\ImageRepository;
+use Inachis\Service\Image\Migration\ImageMigrationApplier;
+use Inachis\Service\Image\Migration\ImageMigrationPlanner;
+use Inachis\Service\Image\Migration\ImageMigrationReporter;
+use Inachis\Service\Image\Migration\ImageMigrationRollback;
+use Inachis\Service\Image\Migration\ImageMigrationVerifier;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[AsCommand(
     name: 'inachis:images:migrate',
-    description: 'Full image migration: rename, deduplicate, WebP optimise, and update references'
+    description: 'Full image migration: rename, deduplicate, WebP optimise, update references, and verify',
 )]
 class ImageMigrationCommand extends Command
 {
     private string $imageDir;
+    private string $varDir;
+    private string $backupDir;
     private string $planFile;
-    private string $projectDir;
+    private string $checkpointFile;
+    private string $reportMdFile;
+    private string $reportJsonFile;
 
-    /**
-     * @param EntityManagerInterface $em
-     * @param SluggerInterface $slugger
-     */
     public function __construct(
-        private EntityManagerInterface $em,
-        private SluggerInterface $slugger
+        #[Autowire('%kernel.project_dir%')]
+        private string $projectDir,
+        private ImageRepository $imageRepository,
+        private PageRepository $pageRepository,
+        private SeriesRepository $seriesRepository,
+        private ImageMigrationPlanner $planner,
+        private ImageMigrationApplier $applier,
+        private ImageMigrationRollback $rollbackService,
+        private ImageMigrationVerifier $verifier,
+        private ImageMigrationReporter $reporter,
     ) {
         parent::__construct();
 
-        $this->projectDir = getcwd();
-        $this->imageDir = $this->projectDir . '/public/imgs/';
-        $this->planFile = $this->projectDir . '/var/image_migration_plan.json';
+        $this->imageDir = rtrim($this->projectDir, '/').'/public/imgs/';
+        $this->varDir = rtrim($this->projectDir, '/').'/var/image-migration/';
+        $this->backupDir = $this->varDir.'backups/';
+        $this->planFile = $this->varDir.'plan.json';
+        $this->checkpointFile = $this->varDir.'checkpoint.json';
+        $this->reportMdFile = $this->varDir.'report.md';
+        $this->reportJsonFile = $this->varDir.'report.json';
     }
 
-    /**
-     * Configure the command.
-     */
     protected function configure(): void
     {
-        $this->addArgument('mode', InputArgument::REQUIRED, 'scan | apply | rollback');
+        $this
+            ->addArgument('mode', InputArgument::REQUIRED, 'scan | apply | rollback | report | verify')
+            ->addOption('clean', null, InputOption::VALUE_NONE, 'Remove var/image-migration directory upon successful verification')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Preview migration without making changes')
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Force operation without prompts or bypassing stale plan checks')
+            ->addOption('resume', null, InputOption::VALUE_NONE, 'Resume apply mode from last checkpoint')
+            ->addOption('no-webp', null, InputOption::VALUE_NONE, 'Disable WebP conversion')
+            ->addOption('no-dedup', null, InputOption::VALUE_NONE, 'Disable image deduplication')
+            ->addOption('no-resize', null, InputOption::VALUE_NONE, 'Disable image resizing');
     }
 
-    /**
-     * Execute the command.
-     * 
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        return match ($input->getArgument('mode')) {
-            'scan' => $this->scan($output),
-            'apply' => $this->apply($output),
-            'rollback' => $this->rollback($output),
-            default => Command::FAILURE
+        $mode = strtolower((string) $input->getArgument('mode'));
+        $dryRun = (bool) $input->getOption('dry-run');
+        $force = (bool) $input->getOption('force');
+        $resume = (bool) $input->getOption('resume');
+        $noWebp = (bool) $input->getOption('no-webp');
+        $noDedup = (bool) $input->getOption('no-dedup');
+        $noResize = (bool) $input->getOption('no-resize');
+
+        return match ($mode) {
+            'scan' => $this->scan($output, $noWebp, $noDedup, $noResize),
+            'apply' => $this->apply($output, $dryRun, $force, $resume, $noWebp, $noDedup, $noResize),
+            'rollback' => $this->rollback($output, $dryRun),
+            'report' => $this->report($output),
+            'verify' => $this->verify($input, $output),
+            default => $this->invalidMode($output, $mode)
         };
     }
 
-    /**
-     * Scan the image directory for unused and broken images.
-     * 
-     * @param OutputInterface $output
-     * @return int
-     */
-    private function scan(OutputInterface $output): int
+    private function scan(OutputInterface $output, bool $noWebp, bool $noDedup, bool $noResize): int
     {
-        $images = $this->em->getRepository(Image::class)->findAll();
-        $pages = $this->em->getRepository(Page::class)->findAll();
-        $seriesList = $this->em->getRepository(Series::class)->findAll();
+        $plan = $this->planner->generatePlan($this->imageDir, $noWebp, $noDedup, $noResize);
 
-        $plan = [
-            'images' => [],
-            'contentReplacements' => [],
-            'unused' => [],
-            'broken' => [],
-            'dedup' => [
-                'map' => [],
-                'duplicates' => []
-            ]
-        ];
+        $this->ensureDirectoriesExist();
+        file_put_contents($this->planFile, (string) json_encode($plan, JSON_PRETTY_PRINT));
+        $this->reporter->writeReports($plan, [], $this->reportMdFile, $this->reportJsonFile);
 
-        $used = [];
-        $checksumMap = [];
-
-        // -----------------------------
-        // Detect usage
-        // -----------------------------
-        foreach ($pages as $page) {
-            if ($page->getFeatureImage()) {
-                $used[$page->getFeatureImage()->getId()->toString()] = true;
-            }
-
-            $this->extractRefs($page->getContent(), $used);
-        }
-
-        foreach ($seriesList as $series) {
-            if ($series->getImage()) {
-                $used[$series->getImage()->getId()->toString()] = true;
-            }
-
-            $this->extractRefs($series->getDescription(), $used);
-        }
-
-        // // -----------------------------
-        // // Deduplication by checksum
-        // // -----------------------------
-        // foreach ($images as $image) {
-        //     $file = $image->getFilename();
-        //     if (!$file) continue;
-
-        //     $path = $this->imageDir . $file;
-        //     if (!file_exists($path)) continue;
-
-        //     $checksum = hash_file('sha256', $path);
-
-        //     if (!isset($checksumMap[$checksum])) {
-        //         $checksumMap[$checksum] = $file;
-        //         $plan['dedup']['map'][$checksum] = $file;
-        //     } else {
-        //         $plan['dedup']['duplicates'][] = [
-        //             'duplicate' => $file,
-        //             'kept' => $checksumMap[$checksum]
-        //         ];
-        //     }
-        // }
-        // dump($plan['dedup']);
-        // exit;
-
-        // -----------------------------
-        // Rename planning
-        // -----------------------------
-        foreach ($images as $image) {
-            $old = $image->getFilename();
-            if (!$old) continue;
-
-            $ext = strtolower(pathinfo($old, PATHINFO_EXTENSION));
-            $safe = strtolower($this->slugger->slug($image->getTitle() ?: 'image'));
-
-            $new = $safe . '.' . $ext;
-
-            $path = $this->imageDir . $old;
-            $checksum = (file_exists($path)) ? hash_file('sha256', $path) : null;
-
-            $plan['images'][] = [
-                'id' => $image->getId()->toString(),
-                'old' => $old,
-                'new' => $new,
-                'ext' => $ext,
-                'convertToWebp' => in_array($ext, ['jpg', 'jpeg', 'png']),
-                'oldChecksum' => $checksum,
-                'newChecksum' => null
-            ];
-
-            $plan['contentReplacements'][$old] = $new;
-
-            if (!isset($used[$image->getId()->toString()]) && !isset($used[$old])) {
-                $plan['unused'][] = $old;
-            }
-        }
-
-        // -----------------------------
-        // Broken references
-        // -----------------------------
-        foreach ($pages as $page) {
-            $broken = $this->findBroken($page->getContent());
-            if ($broken) {
-                $plan['broken']['page:' . $page->getId()] = $broken;
-            }
-        }
-
-        foreach ($seriesList as $series) {
-            $broken = $this->findBroken($series->getDescription());
-            if ($broken) {
-                $plan['broken']['series:' . $series->getId()] = $broken;
-            }
-        }
-
-        file_put_contents($this->planFile, json_encode($plan, JSON_PRETTY_PRINT));
-
-        $output->writeln('<info>Scan complete</info>');
-        $output->writeln('Unused: ' . count($plan['unused']));
-        $output->writeln('Duplicates: ' . count($plan['dedup']['duplicates']));
-        $output->writeln('Broken refs: ' . count($plan['broken']));
+        $output->writeln('<info>Scan complete. Plan saved to var/image-migration/plan.json</info>');
+        $output->writeln(sprintf('Images scanned: <comment>%d</comment>', count($plan['images'] ?? [])));
+        $output->writeln(sprintf('Duplicates found: <comment>%d</comment>', count($plan['duplicates'] ?? [])));
+        $output->writeln(sprintf('Unused images: <comment>%d</comment>', count($plan['unused'] ?? [])));
+        $output->writeln(sprintf('Broken references: <comment>%d</comment>', count($plan['broken'] ?? [])));
 
         return Command::SUCCESS;
     }
 
-    /**
-     * Apply the plan to the image directory.
-     * 
-     * @param OutputInterface $output
-     * @return int
-     */
-    private function apply(OutputInterface $output): int
-    {
+    private function apply(
+        OutputInterface $output,
+        bool $dryRun,
+        bool $force,
+        bool $resume,
+        bool $noWebp,
+        bool $noDedup,
+        bool $noResize,
+    ): int {
         if (!file_exists($this->planFile)) {
-            $output->writeln('<error>No plan file found</error>');
+            $output->writeln('<error>No migration plan found. Run scan first.</error>');
+
             return Command::FAILURE;
         }
 
-        $plan = json_decode(file_get_contents($this->planFile), true);
+        /** @var array<string, mixed> $plan */
+        $plan = json_decode((string) file_get_contents($this->planFile), true);
 
-        // -----------------------------
-        // Deduplication
-        // -----------------------------
-        // foreach ($plan['dedup']['duplicates'] as $dup) {
-        //     $dupPath = $this->imageDir . $dup['duplicate'];
-        //     $keepPath = $this->imageDir . $dup['kept'];
+        if (!$force && $this->applier->isPlanStale($plan)) {
+            $output->writeln('<error>Migration plan is stale! Repository entity counts have changed since scan. Re-run scan or pass --force.</error>');
 
-        //     if (file_exists($dupPath) && file_exists($keepPath)) {
-        //         unlink($dupPath);
+            return Command::FAILURE;
+        }
 
-        //         $image = $this->em->getRepository(Image::class)
-        //             ->findOneBy(['filename' => $dup['duplicate']]);
+        if ($dryRun) {
+            $pageCount = count($this->pageRepository->findAll());
+            $seriesCount = count($this->seriesRepository->findAll());
+            $this->reporter->executeDryRun($output, $plan, $pageCount, $seriesCount);
 
-        //         if ($image) {
-        //             $canonical = $this->em->getRepository(Image::class)
-        //                 ->findOneBy(['filename' => $dup['kept']]);
+            return Command::SUCCESS;
+        }
 
-        //             if ($canonical) {
-        //                 $image->setFilename($dup['kept']);
-        //                 $image->setChecksum($canonical->getChecksum());
-        //             }
-        //         }
-        //     }
-        // }
+        $checkpoint = $this->loadCheckpoint($resume);
+        $this->ensureDirectoriesExist();
 
-        // -----------------------------
-        // Rename + WebP
-        // -----------------------------
-        foreach ($plan['images'] as &$img) {
-            $oldPath = $this->imageDir . $img['old'];
-            if (!file_exists($oldPath)) continue;
+        $saveCheckpointCallback = fn (array $cp) => file_put_contents($this->checkpointFile, (string) json_encode($cp, JSON_PRETTY_PRINT));
 
-            $newPath = $this->imageDir . $img['new'];
+        $appliedStats = $this->applier->applyPlan(
+            $plan,
+            $checkpoint,
+            $this->imageDir,
+            $this->backupDir,
+            $output,
+            $noWebp,
+            $noDedup,
+            $noResize,
+            $saveCheckpointCallback,
+        );
 
-            if ($img['convertToWebp']) {
-                $webpPath = preg_replace('/\.\w+$/', '.webp', $newPath);
+        if (file_exists($this->checkpointFile)) {
+            @unlink($this->checkpointFile);
+        }
+        $this->reporter->writeReports($plan, $appliedStats, $this->reportMdFile, $this->reportJsonFile);
 
-                $this->convertWebp($oldPath, $webpPath);
+        $output->writeln('<info>Migration successfully applied!</info>');
 
-                if (file_exists($webpPath) && filesize($webpPath) < filesize($oldPath)) {
-                    unlink($oldPath);
-                    $newPath = $webpPath;
-                    $img['new'] = basename($webpPath);
-                } else {
-                    if (file_exists($webpPath)) unlink($webpPath);
-                    rename($oldPath, $newPath);
-                }
+        return Command::SUCCESS;
+    }
+
+    private function rollback(OutputInterface $output, bool $dryRun): int
+    {
+        if (!file_exists($this->planFile)) {
+            $output->writeln('<error>No plan file found to rollback from.</error>');
+
+            return Command::FAILURE;
+        }
+
+        /** @var array<string, mixed> $plan */
+        $plan = json_decode((string) file_get_contents($this->planFile), true);
+
+        if ($dryRun) {
+            $output->writeln('<comment>[DRY RUN] Previewing Rollback from var/image-migration/backups/...</comment>');
+            foreach ($plan['images'] ?? [] as $img) {
+                $output->writeln(sprintf('RESTORE %s → %s', $img['newFilename'], $img['oldFilename']));
+            }
+
+            return Command::SUCCESS;
+        }
+
+        $output->writeln('<info>Rolling back image migration from backups...</info>');
+        $this->rollbackService->rollbackPlan($plan, $this->imageDir, $this->backupDir, $output);
+
+        $output->writeln('<info>Rollback complete.</info>');
+
+        return Command::SUCCESS;
+    }
+
+    private function verify(InputInterface $input, OutputInterface $output): int
+    {
+        $result = $this->verifier->verify($this->imageDir, $output);
+        $shouldClean = (bool) $input->getOption('clean');
+
+        if ($result) {
+            if ($shouldClean) {
+                $output->writeln('<info>Verification successful. Cleaning up temporary migration artifacts...</info>');
+                $this->removeDirectory($this->varDir);
+                $output->writeln('<info>✓ Removed var/image-migration/</info>');
             } else {
-                rename($oldPath, $newPath);
+                $output->writeln('<comment>Tip: Run verify with --clean to purge backup files and migration logs (var/image-migration/).</comment>');
             }
 
-            $checksum = hash_file('sha256', $newPath);
-
-            $image = $this->em->find(Image::class, $img['id']);
-            $image->setFilename($img['new']);
-            $image->setChecksum($checksum);
-
-            $img['newChecksum'] = $checksum;
+            return Command::SUCCESS;
         }
 
-        // -----------------------------
-        // Update content
-        // -----------------------------
-        $pages = $this->em->getRepository(Page::class)->findAll();
-
-        foreach ($pages as $page) {
-            $content = $page->getContent();
-
-            foreach ($plan['contentReplacements'] as $old => $new) {
-                $content = str_replace('/imgs/' . $old, '/imgs/' . $new, $content);
-            }
-
-            foreach ($plan['dedup']['duplicates'] as $dup) {
-                $content = str_replace('/imgs/' . $dup['duplicate'], '/imgs/' . $dup['kept'], $content);
-            }
-
-            $page->setContent($content);
-            $page->setImageSize($this->computeSize($content));
-        }
-
-        $seriesList = $this->em->getRepository(Series::class)->findAll();
-
-        foreach ($seriesList as $series) {
-            $desc = $series->getDescription();
-
-            foreach ($plan['contentReplacements'] as $old => $new) {
-                $desc = str_replace('/imgs/' . $old, '/imgs/' . $new, $desc);
-            }
-
-            foreach ($plan['dedup']['duplicates'] as $dup) {
-                $desc = str_replace('/imgs/' . $dup['duplicate'], '/imgs/' . $dup['kept'], $desc);
-            }
-
-            $series->setDescription($desc);
-        }
-
-        $this->em->flush();
-
-        file_put_contents($this->planFile, json_encode($plan, JSON_PRETTY_PRINT));
-
-        $output->writeln('<info>Apply complete</info>');
-
-        return Command::SUCCESS;
+        return Command::FAILURE;
     }
 
     /**
-     * Rollback the plan to the image directory.
-     * 
-     * @param OutputInterface $output
-     * @return int
+     * Recursively remove a directory and its contents safely.
      */
-    private function rollback(OutputInterface $output): int
+    private function removeDirectory(string $dir): void
     {
-        if (!file_exists($this->planFile)) {
-            $output->writeln('<error>No plan</error>');
-            return Command::FAILURE;
+        if (!is_dir($dir)) {
+            return;
         }
 
-        $plan = json_decode(file_get_contents($this->planFile), true);
-
-        foreach ($plan['images'] as $img) {
-            $oldPath = $this->imageDir . $img['old'];
-            $newPath = $this->imageDir . $img['new'];
-
-            if (file_exists($newPath)) {
-                rename($newPath, $oldPath);
-            }
-
-            $image = $this->em->find(Image::class, $img['id']);
-            $image->setFilename($img['old']);
+        $files = array_diff(scandir($dir) ?: [], ['.', '..']);
+        foreach ($files as $file) {
+            $path = $dir.'/'.$file;
+            is_dir($path) ? $this->removeDirectory($path) : @unlink($path);
         }
 
-        $reverse = array_flip($plan['contentReplacements']);
-
-        $pages = $this->em->getRepository(Page::class)->findAll();
-
-        foreach ($pages as $page) {
-            $content = $page->getContent();
-
-            foreach ($reverse as $new => $old) {
-                $content = str_replace('/imgs/' . $new, '/imgs/' . $old, $content);
-            }
-
-            $page->setContent($content);
-        }
-
-        $this->em->flush();
-
-        $output->writeln('<info>Rollback complete</info>');
-
-        return Command::SUCCESS;
+        @rmdir($dir);
     }
 
-    /**
-     * Extract references to images from the content.
-     * 
-     * @param string|null $content
-     * @param array $used
-     * @return void
-     */
-    private function extractRefs(?string $content, array &$used): void
+    private function report(OutputInterface $output): int
     {
-        if (!$content) return;
+        if (file_exists($this->reportMdFile)) {
+            $output->writeln(file_get_contents($this->reportMdFile) ?: 'Empty report.');
 
-        preg_match_all('/\/imgs\/([^)]+)/', $content, $m);
-        foreach ($m[1] as $f) {
-            $used[$f] = true;
+            return Command::SUCCESS;
+        }
+
+        if (file_exists($this->planFile)) {
+            /** @var array<string, mixed> $plan */
+            $plan = json_decode((string) file_get_contents($this->planFile), true);
+            $output->writeln($this->reporter->generateReportMarkdown($plan, []));
+
+            return Command::SUCCESS;
+        }
+
+        $output->writeln('<error>No plan or report file found. Run scan first.</error>');
+
+        return Command::FAILURE;
+    }
+
+    private function loadCheckpoint(bool $resume): array
+    {
+        if ($resume && file_exists($this->checkpointFile)) {
+            /** @var array<string, mixed> $data */
+            $data = json_decode((string) file_get_contents($this->checkpointFile), true);
+
+            return [
+                'imageIndex' => (int) ($data['imageIndex'] ?? 0),
+                'pageIndex' => (int) ($data['pageIndex'] ?? 0),
+                'seriesIndex' => (int) ($data['seriesIndex'] ?? 0),
+                'completedImageIds' => array_values($data['completedImageIds'] ?? []),
+                'completedPageIds' => array_values($data['completedPageIds'] ?? []),
+                'completedSeriesIds' => array_values($data['completedSeriesIds'] ?? []),
+            ];
+        }
+
+        return [
+            'imageIndex' => 0,
+            'pageIndex' => 0,
+            'seriesIndex' => 0,
+            'completedImageIds' => [],
+            'completedPageIds' => [],
+            'completedSeriesIds' => [],
+        ];
+    }
+
+    private function ensureDirectoriesExist(): void
+    {
+        if (!is_dir($this->varDir)) {
+            mkdir($this->varDir, 0777, true);
+        }
+        if (!is_dir($this->backupDir)) {
+            mkdir($this->backupDir, 0777, true);
         }
     }
 
-    /**
-     * Find broken references to images in the content.
-     * 
-     * @param string|null $content
-     * @return array
-     */
-    private function findBroken(?string $content): array
+    private function invalidMode(OutputInterface $output, string $mode): int
     {
-        if (!$content) return [];
+        $output->writeln(sprintf('<error>Invalid mode "%s". Supported modes: scan, apply, rollback, report, verify</error>', $mode));
 
-        $broken = [];
-
-        preg_match_all('/\/imgs\/([^)]+)/', $content, $m);
-
-        foreach ($m[1] as $f) {
-            if (!file_exists($this->imageDir . $f)) {
-                $broken[] = $f;
-            }
-        }
-
-        return $broken;
-    }
-
-    /**
-     * Compute the total size of images in the content.
-     * 
-     * @param string|null $content
-     * @return int
-     */
-    private function computeSize(?string $content): int
-    {
-        if (!$content) return 0;
-
-        $total = 0;
-
-        preg_match_all('/\/imgs\/([^)]+)/', $content, $m);
-
-        foreach ($m[1] as $f) {
-            $p = $this->imageDir . $f;
-            if (file_exists($p)) {
-                $total += filesize($p);
-            }
-        }
-
-        return $total;
-    }
-
-    /**
-     * Convert an image to WebP.
-     * 
-     * @param string $src
-     * @param string $dst
-     * @return void
-     */
-    private function convertWebp(string $src, string $dst): void
-    {
-        $info = getimagesize($src);
-        if (!$info) return;
-
-        switch ($info['mime']) {
-            case 'image/jpeg':
-                $img = imagecreatefromjpeg($src);
-                break;
-            case 'image/png':
-                $img = imagecreatefrompng($src);
-                break;
-            default:
-                return;
-        }
-
-        imagewebp($img, $dst, 80);
-        imagedestroy($img);
+        return Command::FAILURE;
     }
 }

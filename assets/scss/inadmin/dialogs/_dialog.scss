@@ -3,7 +3,8 @@
 .dialog-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
   z-index: 999;
 }
 
@@ -17,21 +18,23 @@
 }
 
 .dialog-content {
-  background: #fff;
-  color: #000;
-  border: 1px solid #aaa;
-  border-radius: 4px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  background: $bg-surface;
+  color: $text-main;
+  border: 1px solid $border-color;
+  border-radius: $radius-standard;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
   width: clamp(320px, 75vw, 800px);
   max-height: 90vh;
   min-height: 350px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .dialog-header {
-  background: #fff;
-  padding: 0.75rem 1rem;
+  background: $bg-surface;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid $border-color;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -39,58 +42,98 @@
 
 .dialog-title {
   font-size: 1.125rem;
+  font-weight: 700;
+  color: $text-main;
   margin: 0;
 }
 
 .dialog-close {
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  color: $text-muted;
   cursor: pointer;
+  padding: 0.25rem;
+  border-radius: $radius-standard;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color $transition-base, background-color $transition-base;
+
+  &:hover {
+    color: $text-main;
+    background-color: $bg-body;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+  }
 }
 
 .dialog-body {
-  padding: 1rem;
+  padding: 1.25rem;
   overflow-y: auto;
   flex: 1;
+  background-color: $bg-surface;
+  color: $text-main;
 }
 
 .ui-dialog-secondary-bar {
-    align-items: center;
-    background-color: var(--color-neutral-300);
-    border: 1px solid var(--color-neutral-400);
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: space-between;
-    margin: 10px 0 0 0;
-    padding: 5px;
+  align-items: center;
+  background-color: $bg-body;
+  border: 1px solid $border-color;
+  border-radius: $radius-standard;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  margin: 0 0 1rem 0;
+  padding: 0.625rem 0.875rem;
 
-    a,
-    a:visited {
-      text-decoration: none;
-    }
+  a,
+  a:visited {
+    font-size: 0.875rem;
+    color: $text-muted;
+    text-decoration: none;
 
-    .search {
-      button {
-        vertical-align: middle;
-      }
-
-      input {
-        font-size: 1.2em;
-        padding: 5px;
-        vertical-align: middle;
-      }
-
-      label {
-        display: none;
-      }
+    &:hover {
+      color: $color-primary;
     }
   }
 
+  .search {
+    button {
+      vertical-align: middle;
+    }
+
+    input {
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: 0.375rem 0.625rem;
+      border: 1px solid $border-color;
+      border-radius: $radius-standard;
+      background-color: $bg-surface;
+      color: $text-main;
+      vertical-align: middle;
+      transition: border-color $transition-base, box-shadow $transition-base;
+
+      &:focus {
+        outline: none;
+        border-color: $color-primary;
+        box-shadow: 0 0 0 3px rgba(0, 102, 153, 0.15);
+      }
+    }
+
+    label {
+      display: none;
+    }
+  }
+}
+
 .dialog-footer {
-  background: #eee;
-  border-top: 1px solid #ddd;
-  padding: 0.75rem 1rem;
+  background: $bg-body;
+  border-top: 1px solid $border-color;
+  padding: 0.875rem 1.25rem;
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
@@ -100,30 +143,51 @@
   .dialog-content {
     width: 95vw;
     height: 95vh;
-    border-radius: 0;
+    border-radius: $radius-standard;
   }
 }
 
 #dialog__contentSelector {
   ol {
     list-style-type: none;
+    padding: 0;
+    margin: 0;
 
     li {
-      margin: 0.5em;
+      margin: 0.25rem 0;
+      padding: 0.5rem 0.75rem;
+      border-radius: $radius-standard;
+      transition: background-color $transition-base;
+      display: flex;
+      align-items: center;
+
+      &:hover {
+        background-color: $bg-body;
+      }
+
+      label {
+        cursor: pointer;
+        width: 100%;
+        display: flex;
+        align-items: center;
+      }
     }
 
     input {
-      margin: 0 1em 0 0;
-      width: auto;
+      margin: 0 0.75rem 0 0;
+      width: 1rem;
+      height: 1rem;
+      accent-color: $color-primary;
+      cursor: pointer;
     }
   }
 }
 
 .loader {
   margin: 5em auto;
-  width: 40px;
-  height: 40px;
-  --c: no-repeat linear-gradient(#006699 0 0);
+  width: 60px;
+  height: 60px;
+  --c: no-repeat linear-gradient(#{$color-primary} 0 0);
   background: var(--c), var(--c), var(--c), var(--c);
   background-size: 21px 21px;
   animation: l5 1.5s infinite cubic-bezier(0.3, 1, 0, 1);
@@ -131,23 +195,23 @@
 
 @keyframes l5 {
   0% {
-    background-position: 0 0, 100% 0, 100% 100%, 0 100%
+    background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+    background-size: 21px 21px;
   }
 
   33% {
     background-position: 0 0, 100% 0, 100% 100%, 0 100%;
-    width: 60px;
-    height: 60px
+    background-size: 30px 30px;
   }
 
   66% {
     background-position: 100% 0, 100% 100%, 0 100%, 0 0;
-    width: 60px;
-    height: 60px
+    background-size: 30px 30px;
   }
 
   100% {
-    background-position: 100% 0, 100% 100%, 0 100%, 0 0
+    background-position: 100% 0, 100% 100%, 0 100%, 0 0;
+    background-size: 21px 21px;
   }
 }
 
@@ -159,12 +223,14 @@
     height: 150px;
     object-fit: cover;
     width: 150px;
+    border-radius: $radius-standard;
   }
 
   input {
     position: absolute;
     right: 0.5em;
     top: 0.5em;
+    accent-color: $color-primary;
   }
 
   label span {
@@ -174,6 +240,9 @@
   li {
     float: left;
     position: relative;
+    margin: 0.25rem;
+    border-radius: $radius-standard;
+    overflow: hidden;
   }
 
   ol,
@@ -184,10 +253,10 @@
   }
 
   .material-icons {
-    color: var(--color-neutral-000);
+    color: #ffffff;
     bottom: 0.1em;
     position: absolute;
     right: 0.1em;
-    text-shadow: 1px 1px 3px var(--color-neutral-800);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
   }
 }

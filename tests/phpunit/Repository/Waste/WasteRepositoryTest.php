@@ -1,0 +1,51 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * This file is part of the inachis framework.
+ */
+
+namespace Inachis\Tests\phpunit\Repository\Waste;
+
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Entity\User\User;
+use Inachis\Repository\Waste\WasteRepository;
+use PHPUnit\Framework\TestCase;
+
+class WasteRepositoryTest extends TestCase
+{
+    private EntityManagerInterface $entityManager;
+    private ManagerRegistry $registry;
+
+    public function setUp(): void
+    {
+        $this->registry = $this->createStub(ManagerRegistry::class);
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+    }
+
+    public function testDeleteWasteByUser()
+    {
+        $repository = $this->getStubBuilder(WasteRepository::class)
+            ->setConstructorArgs([$this->registry])
+            ->onlyMethods(['createQueryBuilder'])
+            ->getStub();
+        $qb = $this->createStub(QueryBuilder::class);
+        $qb->method('delete')->willReturnSelf();
+        $qb->method('where')->willReturnSelf();
+        $qb->method('setParameter')->willReturnSelf();
+
+        $query = $this->createStub(Query::class);
+        $query->method('execute')->willReturn(3);
+        $qb->method('getQuery')->willReturn($query);
+
+        $repository->method('createQueryBuilder')->willReturn($qb);
+        $user = new User();
+        $result = $repository->deleteWasteByUser($user);
+        $this->assertIsInt($result);
+        $this->assertEquals(3, $result);
+    }
+}

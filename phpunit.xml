@@ -8,6 +8,12 @@
          failOnNotice="true"
          failOnPhpunitDeprecation="true"
          failOnWarning="true"
+         displayDetailsOnIncompleteTests="true"
+         displayDetailsOnSkippedTests="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnTestsThatTriggerErrors="true"
+         displayDetailsOnTestsThatTriggerNotices="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
 >
   <source>
     <include>
@@ -29,6 +35,11 @@
     <server name="APP_ENV" value="test" force="true"/>
     <server name="KERNEL_CLASS" value="Inachis\Kernel"/>
     <server name="SHELL_VERBOSITY" value="-1"/>
+    <env name="DB_HOST" value="127.0.0.1"/>
+    <env name="DB_PORT" value="33016"/>
+    <env name="DB_DATABASE" value="inachis"/>
+    <env name="DB_USERNAME" value="inachis"/>
+    <env name="DB_PASSWORD" value="Secret123"/>
   </php>
   <testsuites>
     <testsuite name="Inachis">

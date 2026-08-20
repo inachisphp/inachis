@@ -1,0 +1,39 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incp_admin_list') }}">Users</a>
+    <span>Recovery Codes</span>
+{% endblock pagetitle %}
+
+{% block content %}
+<article class="col-12 ui-section">
+    {{ include('inadmin/partials/components/admonition.html.twig', {
+        type: 'warning',
+        title: 'Important',
+        text: 'These recovery codes will only be shown once.
+            Store them somewhere safe such as a password manager or print them.
+            Each code can only be used once.',
+    })}}
+
+    <div class="card">
+    {% for code in codes %}
+        <p>
+            <code>{{ code }}</code>
+        </p>
+    {% endfor %}
+    </div>
+    <p>
+        <button
+            class="btn btn--secondary"
+            onclick="window.print()">
+            Print Codes
+        </button>
+
+        <a
+            href="{{ path('incp_admin_edit', {'id': viewModel.session.username }) }}"
+            class="btn btn--primary">
+            I've Saved These Codes
+        </a>
+    </p>
+</article>
+{% endblock content %}

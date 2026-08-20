@@ -9,7 +9,7 @@ body {
 }
 
 body .visually-hidden {
-  display: none;
+  display: none !important;
 }
 
 .skip-link {
@@ -31,7 +31,9 @@ body .visually-hidden {
   background-color: $color-brand-500;
   border: none;
   border-radius: $radius-round;
-  bottom: 2rem;
+  // Position above the floating bottom bar when active (1.25rem bar bottom + ~3.5rem bar height + padding)
+  bottom: 5.5rem;
+  right: 2rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   color: #fff;
   cursor: pointer;
@@ -39,17 +41,28 @@ body .visually-hidden {
   height: 3rem;
   justify-content: center;
   opacity: 0;
+  pointer-events: none; // Prevent ghost clicks when hidden
   position: fixed;
-  right: 2rem;
-  transition: opacity 350ms ease;
+  transition: opacity 350ms ease, bottom 300ms ease;
   width: 3rem;
   z-index: 99;
 
   &[hidden="false"],
   &:not([hidden]) {
     opacity: 1;
+    pointer-events: auto;
   }
 }
+
+.centred {
+  text-align: center;
+}
+
+.small { font-size: 0.85rem; }
+.text-muted { color: $text-muted; }
+
+span.material-icons { vertical-align: middle; }
+.role-stat .material-icons { margin: 0 1rem; }
 
 @media (prefers-reduced-motion: reduce) {
   * {

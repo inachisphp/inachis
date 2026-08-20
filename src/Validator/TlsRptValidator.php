@@ -1,25 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Validator;
 
-use Inachis\Model\Domain\ValidationIssue;
 use Inachis\Model\Domain\Severity;
+use Inachis\Model\Domain\ValidationIssue;
 
 /**
- * Validates TLS-RPT records
+ * Validates TLS-RPT records.
+ *
+ * @phpstan-import-type DnsTxtRecord from \Inachis\Service\System\Domain\DnsResolverInterface
  */
 final class TlsRptValidator
 {
     /**
-     * Validate TLS-RPT records
-     * @param list<array{target: string, priority: int, txt?: string}> $records
+     * Validate TLS-RPT records.
+     *
+     * @param list<DnsTxtRecord> $records
+     *
      * @return list<ValidationIssue>
      */
     public function validate(array $records): array

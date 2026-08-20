@@ -1,0 +1,7 @@
+{% block javascript_top %}
+    <script src="/assets/js/incp/scripts.min.js"></script>
+
+    {%- if is_granted('ROLE_USER') and not viewModel.twoFactorPending %}
+    <script src="/assets/js/incp/tom-select.complete.min.js"></script>
+    {% endif %}
+{% endblock javascript_top %}

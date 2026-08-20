@@ -1,47 +1,51 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- * 
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Controller;
 
 use Inachis\Controller\DefaultController;
-use Inachis\Service\Page\ContentAggregator;
-use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Inachis\Service\Content\Page\ContentAggregator;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DefaultControllerTest extends TestCase
+class DefaultControllerTest extends AbstractWebControllerTestCase
 {
     public function testHomepageRendersWithContent(): void
     {
         $mockContent = [
-            '20240101' => 'test value'
+            '20240101' => 'test value',
         ];
-        $contentProvider = $this->createMock(ContentAggregator::class);
-        $contentProvider->expects($this->once())
-            ->method('getHomepageContent')
+
+        $contentProvider = $this->createStub(ContentAggregator::class);
+        $contentProvider->method('getHomepageContent')
             ->willReturn($mockContent);
 
         $controller = $this->getMockBuilder(DefaultController::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->pageViewFactory,
+                $this->params,
+                $this->security,
+                $this->translator,
+            ])
             ->onlyMethods(['render'])
             ->getMock();
+
         $controller->expects($this->once())
             ->method('render')
             ->with(
                 'web/pages/homepage.html.twig',
-                ['content' => $mockContent]
+                $this->callback(function (array $vars) use ($mockContent) {
+                    $this->assertArrayHasKey('viewModel', $vars);
+                    $this->assertSame($mockContent, $vars['content']);
+
+                    return true;
+                }),
             )
             ->willReturn(new Response('OK'));
 
@@ -49,5 +53,22 @@ class DefaultControllerTest extends TestCase
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame('OK', $response->getContent());
+    }
+
+    public function testHealthReturnsOkResponse(): void
+    {
+        /** @var DefaultController $controller */
+        $controller = $this->createController(DefaultController::class);
+
+        $response = $controller->health();
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+
+        $data = json_decode((string) $response->getContent(), true);
+
+        $this->assertIsArray($data);
+        $this->assertSame('ok', $data['status']);
+        $this->assertArrayHasKey('time', $data);
+        $this->assertIsInt($data['time']);
     }
 }

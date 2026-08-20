@@ -1,8 +1,9 @@
 includes:
+    - vendor/phpstan/phpstan-doctrine/extension.neon
     - vendor/phpstan/phpstan-symfony/extension.neon
 
 parameters:
     level: max
     paths:
         - src
-
+        - build/src

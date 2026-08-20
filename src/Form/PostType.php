@@ -1,25 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form;
 
-use DateTimeImmutable;
-use IntlException;
-use Inachis\Entity\{Category,Page,Tag};
-use Inachis\Form\DataTransformer\ArrayCollectionToArrayTransformer;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Tag;
+use Inachis\Enum\EditorialStatus;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
+use Inachis\Provider\TimezoneProvider;
+use Inachis\Security\Authorisation\PermissionResolver;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -29,61 +33,80 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Form for creating and editing a post
+ * Form for creating and editing a post.
+ *
+ * @extends AbstractType<Page>
  */
 class PostType extends AbstractType
 {
-    private ArrayCollectionToArrayTransformer $transformer;
     private EmojiTransliterator $emojisTransliterator;
-    private RouterInterface $router;
-    private Security $security;
-    private TranslatorInterface $translator;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param TranslatorInterface $translator
-     * @param RouterInterface $router
-     * @param Security $security
-     * @param ArrayCollectionToArrayTransformer $transformer
-     * @throws IntlException
+     * @throws \IntlException
      */
     public function __construct(
-        TranslatorInterface $translator,
-        RouterInterface $router,
-        Security $security,
-        ArrayCollectionToArrayTransformer $transformer
+        private PermissionResolver $permissionResolver,
+        private readonly TimezoneProvider $timezoneProvider,
+        private readonly TranslatorInterface $translator,
+        private RouterInterface $router,
+        private Security $security,
     ) {
         $this->emojisTransliterator = EmojiTransliterator::create('github-emoji');
-        $this->router = $router;
-        $this->security = $security;
-        $this->translator = $translator;
-        $this->transformer = $transformer;
     }
 
     /**
-     * Build the form
+     * Build the form.
      *
-     * @param FormBuilderInterface $builder
-     * @param array $options
+     * @param FormBuilderInterface<Page|null> $builder
+     * @param array<string, mixed>            $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $newItem = empty($options['data']->getId());
         $user = $this->security->getUser();
-        $userTimezone = $user && method_exists($user, 'getPreferences')
-            ? $user->getPreferences()->getTimezone()
-            : 'UTC';
+        $userTimezone = $this->timezoneProvider->getForUser($user);
+
+        $newItem = !$options['data'] instanceof Page || empty($options['data']->getId());
+        $isScheduled = $options['data'] instanceof Page && $options['data']->getPostDate() > new \DateTimeImmutable('now');
+
+        $allowEdit = $this->permissionResolver->hasPermission(
+            $user,
+            PermissionResource::PAGE,
+            !$newItem ? PermissionAction::EDIT : PermissionAction::CREATE,
+        );
+        $showReview = $this->permissionResolver->hasPermission(
+            $user,
+            PermissionResource::PAGE,
+            PermissionAction::REVIEW,
+        )
+            && $options['data'] instanceof Page
+            && EditorialStatus::DRAFT == $options['data']->getStatus()
+        ;
+        $showPublish = $this->permissionResolver->hasPermission(
+            $user,
+            PermissionResource::PAGE,
+            PermissionAction::PUBLISH,
+        )
+            && $options['data'] instanceof Page
+            && EditorialStatus::REVIEW == $options['data']->getStatus()
+        ;
+        $showDelete = $this->permissionResolver->hasPermission(
+            $user,
+            PermissionResource::PAGE,
+            PermissionAction::DELETE,
+        );
         $builder
             ->add('title', TextType::class, [
                 'attr' => [
-                    'aria-labelledby'  => 'title_label',
-                    'aria-required'    => 'true',
-                    'autofocus'        => 'true',
-                    'class'            => 'editor__title text',
-                    'placeholder'      => 'admin.post.title.placeholder',
+                    'aria-labelledby' => 'title_label',
+                    'aria-required' => 'true',
+                    'autofocus' => 'true',
+                    'class' => 'editor__title text',
+                    'placeholder' => 'admin.post.title.placeholder',
                 ],
-                'label'      => 'admin.post.title.label',
+                'disabled' => !$allowEdit,
+                'label' => 'admin.post.title.label',
                 'label_attr' => [
                     'id' => 'title_label',
                     'class' => 'inline_label',
@@ -92,11 +115,12 @@ class PostType extends AbstractType
             ->add('subTitle', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'subTitle_label',
-                    'aria-required'   => 'false',
+                    'aria-required' => 'false',
                     'class' => 'editor__sub-title text inline_label',
-                    'placeholder'     => 'admin.post.subTitle.placeholder',
+                    'placeholder' => 'admin.post.subTitle.placeholder',
                 ],
-                'label'      => 'admin.post.subTitle.label',
+                'disabled' => !$allowEdit,
+                'label' => 'admin.post.subTitle.label',
                 'label_attr' => [
                     'id' => 'subTitle_label',
                     'class' => 'inline_label',
@@ -106,40 +130,43 @@ class PostType extends AbstractType
             ->add('url', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'url_label',
-                    'aria-required'   => 'false',
+                    'aria-required' => 'false',
                     'class' => 'field__wide',
                 ],
-                'label'      => 'admin.post.url.label',
+                'disabled' => !$allowEdit,
+                'label' => 'admin.post.url.label',
                 'label_attr' => [
                     'id' => 'url_label',
                 ],
-                'mapped'   => false,
+                'mapped' => false,
                 'required' => false,
             ])
             ->add('content', TextareaType::class, [
                 'attr' => [
                     'aria-labelledby' => 'content_label',
-                    'aria-required'   => 'false',
+                    'aria-required' => 'false',
                     'class' => 'mde_editor',
                 ],
-                'label'      => 'admin.post.content.label',
+                'disabled' => !$allowEdit,
+                'label' => 'admin.post.content.label',
                 'label_attr' => [
                     'class' => 'hidden',
-                    'id'    => 'content_label',
+                    'id' => 'content_label',
                 ],
                 'required' => false,
             ])
-            ->add('visibility', CheckboxType::class, [
+            ->add('visible', CheckboxType::class, [
                 'attr' => [
-                    'aria-labelledby' => 'visibility_label',
-                    'aria-required'   => 'false',
-                    'class'           => 'ui-switch',
-                    'data-label-off'  => $this->translator->trans('admin.post.properties.visibility.private'),
-                    'data-label-on'   => $this->translator->trans('admin.post.properties.visibility.public'),
+                    'aria-labelledby' => 'visible_label',
+                    'aria-required' => 'false',
+                    'class' => 'ui-switch',
+                    'data-label-off' => $this->translator->trans('admin.post.properties.visibility.private'),
+                    'data-label-on' => $this->translator->trans('admin.post.properties.visibility.public'),
                 ],
-                'label'      => 'admin.post.properties.visibility.label',
+                'disabled' => !$allowEdit,
+                'label' => 'admin.post.properties.visibility.label',
                 'label_attr' => [
-                    'id' => 'visibility_label',
+                    'id' => 'visible_label',
                     'class' => 'inline_label',
                 ],
                 'required' => false,
@@ -149,9 +176,10 @@ class PostType extends AbstractType
                     'aria-labelledby' => 'showTableOfContents_label',
                     'aria-required' => 'false',
                     'class' => 'ui-switch',
-                    'data-label-off'  => $this->translator->trans('admin.post.properties.showTableOfContents.off'),
-                    'data-label-on'   => $this->translator->trans('admin.post.properties.showTableOfContents.on'),
+                    'data-label-off' => $this->translator->trans('admin.post.properties.showTableOfContents.off'),
+                    'data-label-on' => $this->translator->trans('admin.post.properties.showTableOfContents.on'),
                 ],
+                'disabled' => !$allowEdit,
                 'label' => 'admin.post.properties.showTableOfContents.label',
                 'label_attr' => [
                     'id' => 'showTableOfContents_label',
@@ -161,15 +189,21 @@ class PostType extends AbstractType
             ])
             ->add('postDate', DateTimeType::class, [
                 'attr' => [
-                    'aria-labelledby'  => 'postDate_label',
-                    'aria-required'    => 'false',
+                    'aria-labelledby' => 'postDate_label',
+                    'aria-required' => 'false',
+                    'class' => 'ui-datepicker',
+                    'data-format' => 'dd/mm/yyyy HH:ii',
+                    'data-on-change' => 'updatePostUrl',
                 ],
+                'disabled' => !$allowEdit,
                 'format' => 'dd/MM/yyyy HH:mm',
-                'html5'  => false,
-                'input'  => 'datetime_immutable',
-                'label'  => isset($options['data']) && $options['data']->getPostDate() < new DateTimeImmutable() ?
-                    'admin.post.properties.postDate-past.label' :
-                    'admin.post.properties.postDate-future.label',
+                'html5' => false,
+                'input' => 'datetime_immutable',
+                'label' => isset($options['data'])
+                    && $options['data'] instanceof Page
+                    && $options['data']->getPostDate() < new \DateTimeImmutable() ?
+                        'admin.post.properties.postDate-past.label' :
+                        'admin.post.properties.postDate-future.label',
                 'label_attr' => [
                     'id' => 'postDate_label',
                     'class' => 'inline_label',
@@ -177,19 +211,25 @@ class PostType extends AbstractType
                 'model_timezone' => 'UTC',
                 'view_timezone' => $userTimezone,
                 'required' => false,
-                'widget'   => 'single_text',
+                'widget' => 'single_text',
             ])
             ->add('expireDate', DateTimeType::class, [
                 'attr' => [
-                    'aria-labelledby'  => 'expireDate_label',
-                    'aria-required'    => 'false',
+                    'aria-labelledby' => 'expireDate_label',
+                    'aria-required' => 'false',
+                    'class' => 'ui-datepicker',
+                    'data-format' => 'dd/mm/yyyy HH:ii',
                 ],
+                'disabled' => !$allowEdit,
                 'format' => 'dd/MM/yyyy HH:mm',
-                'html5'  => false,
-                'input'  => 'datetime_immutable',
-                'label'  => isset($options['data']) && $options['data']->getExpireDate() != '' && $options['data']->getExpireDate() < new DateTimeImmutable() ?
-                    'admin.post.properties.expireDate-past.label' :
-                    'admin.post.properties.expireDate-future.label',
+                'html5' => false,
+                'input' => 'datetime_immutable',
+                'label' => isset($options['data'])
+                    && $options['data'] instanceof Page
+                    && '' != $options['data']->getExpireDate()
+                    && $options['data']->getExpireDate() < new \DateTimeImmutable() ?
+                        'admin.post.properties.expireDate-past.label' :
+                        'admin.post.properties.expireDate-future.label',
                 'label_attr' => [
                     'id' => 'expireDate_label',
                     'class' => 'inline_label',
@@ -197,52 +237,63 @@ class PostType extends AbstractType
                 'model_timezone' => 'UTC',
                 'view_timezone' => $userTimezone,
                 'required' => false,
-                'widget'   => 'single_text',
+                'widget' => 'single_text',
             ])
-            ->add('categories', EntityType::class, [
-                'choice_attr' => function ($choice, $key, $value) {
-                    return ['selected' => 'selected'];
-                },
-                'choice_label' => 'title',
-                'choices'      => isset($options['data']) ?
-                    $options['data']->getCategories()->toArray() : [],
-                'class'        => Category::class,
-                'attr'         => [
+            ->add('categories', TextType::class, [
+                'attr' => [
                     'aria-labelledby' => 'categories_label',
                     'aria-required' => 'false',
                     'class' => 'js-select halfwidth',
                     'placeholder' => $this->translator->trans('admin.post.properties.categories.placeholder'),
                     'data-url' => $this->router->generate('inachis_dialog_categorydialog_getcategorymanagerlistcontent'),
                     'data-render-description-field' => 'path',
+                    'data-selected-options' => json_encode(
+                        array_map(
+                            static fn (Category $category) => [
+                                'value' => (string) $category->getId(),
+                                'text' => $category->getTitle(),
+                            ],
+                            $options['data'] instanceof Page
+                                ? $options['data']->getCategories()->toArray()
+                                : [],
+                        ),
+                        JSON_THROW_ON_ERROR,
+                    ),
                 ],
-                'label'      => 'admin.post.properties.categories.label',
+                'disabled' => !$allowEdit,
+                'label' => 'admin.post.properties.categories.label',
                 'label_attr' => [
                     'id' => 'categories_label',
                 ],
-                'mapped'   => false,
-                'multiple' => true,
+                'mapped' => false,
                 'required' => false,
             ])
-            ->add('tags', EntityType::class, [
+            ->add('tags', TextType::class, [
                 'attr' => [
-                    'aria-labelledby'  => 'tags_label',
-                    'aria-required'    => 'false',
-                    'class'            => 'js-select halfwidth',
-                    'data-tags'        => 'true',
-                    'data-url'         => $this->router->generate('inachis_tags_gettagmanagerlistcontent'),
+                    'aria-labelledby' => 'tags_label',
+                    'aria-required' => 'false',
+                    'class' => 'js-select halfwidth',
+                    'data-selected-options' => json_encode(
+                        array_map(
+                            static fn (Tag $tag) => [
+                                'value' => (string) $tag->getId(),
+                                'text' => $tag->getTitle(),
+                            ],
+                            $options['data'] instanceof Page
+                                ? $options['data']->getTags()->toArray()
+                                : [],
+                        ),
+                        JSON_THROW_ON_ERROR,
+                    ),
+                    'data-tags' => 'true',
+                    'data-url' => $this->router->generate('api_tags_list'),
                 ],
-                'choices'      => isset($options['data']) ? $options['data']->getTags()->toArray() : [],
-                'choice_label' => 'title',
-                'choice_attr'  => function ($choice, $key, $value) {
-                    return ['selected' => 'selected'];
-                },
-                'class'      => Tag::class,
-                'label'      => 'admin.post.properties.tags.label',
+                'disabled' => !$allowEdit,
+                'label' => 'admin.post.properties.tags.label',
                 'label_attr' => [
                     'id' => 'tags_label',
                 ],
-                'mapped'   => false,
-                'multiple' => true,
+                'mapped' => false,
                 'required' => false,
             ])
             ->add('language', ChoiceType::class, [
@@ -251,33 +302,47 @@ class PostType extends AbstractType
                     $this->emojisTransliterator->transliterate(':uk: English') => 'en_GB',
                     $this->emojisTransliterator->transliterate(':fr: Français') => 'fr_FR',
                 ],
+                'disabled' => !$allowEdit,
                 'duplicate_preferred_choices' => false,
-                'empty_data'  => 'en_GB',
-                'preferred_choices' => [ 'en_GB' ],
+                'empty_data' => 'en_GB',
+                'preferred_choices' => ['en_GB'],
             ])
             ->add('latlong', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'latlong_label',
                     'aria-required' => 'false',
                     'class' => 'ui-map',
-                    'data-google-key' => '{{ settings.google.key }}',
+                    'data-google-key' => '{{ viewModel.settings.google.key }}',
                 ],
+                'disabled' => !$allowEdit,
                 'label' => 'admin.post.properties.location.label',
                 'label_attr' => [
-                    'id' => 'latlong_label'
+                    'id' => 'latlong_label',
                 ],
                 'required' => false,
             ])
+            ->add('featureImage', HiddenType::class, [
+                'disabled' => !$allowEdit,
+                'mapped' => false,
+                'required' => false,
+            ])
+            // ->add('featureImage', EntityType::class, [
+            //     'class' => Image::class,
+            //     'choice_label' => 'filename',
+            //     'choice_value' => static fn (?Image $image) => $image?->getId()?->toString(),
+            //     'required' => false,
+            // ])
             ->add('featureSnippet', TextareaType::class, [
                 'attr' => [
                     'aria-labelledby' => 'teaser_label',
-                    'aria-required'   => 'false',
+                    'aria-required' => 'false',
                     'class' => 'full-width',
                     'rows' => 3,
                 ],
-                'label'      => 'admin.post.sharing.featureSnippet.label',
+                'disabled' => !$allowEdit,
+                'label' => 'admin.post.sharing.featureSnippet.label',
                 'label_attr' => [
-                    'id'    => 'teaser_label',
+                    'id' => 'teaser_label',
                 ],
                 'required' => false,
             ])
@@ -287,6 +352,7 @@ class PostType extends AbstractType
                     'aria-required' => 'false',
                     'class' => 'checkbox',
                 ],
+                'disabled' => !$allowEdit,
                 'label' => 'admin.post.sharing.noindex.label',
                 'label_attr' => [
                     'id' => 'noindex_label',
@@ -299,15 +365,17 @@ class PostType extends AbstractType
                     'aria-required' => 'false',
                     'class' => 'checkbox',
                 ],
+                'disabled' => !$allowEdit,
                 'label' => 'admin.post.sharing.nofollow.label',
                 'label_attr' => [
                     'id' => 'nofollow_label',
                 ],
                 'required' => false,
-            ])
-            ->add('submit', SubmitType::class, [
+            ]);
+        if ($allowEdit) {
+            $builder->add('submit', SubmitType::class, [
                 'attr' => [
-                    'class' => 'button button--positive',
+                    'class' => 'btn btn--primary',
                 ],
                 'label' => sprintf(
                     '<span class="material-icons">%s</span> <span>%s</span>',
@@ -315,44 +383,75 @@ class PostType extends AbstractType
                     $this->translator->trans('admin.button.save'),
                 ),
                 'label_html' => true,
-            ])
-        ;
+            ]);
+        }
         if (!$newItem) {
             $builder
-                ->add('modDate', DateTimeType::class, [
+                ->add('updatedAt', DateTimeType::class, [
                     'attr' => [
-                        'aria-labelledby'  => 'modDate_label',
-                        'aria-readonly'    => 'true',
+                        'aria-labelledby' => 'updatedAt_label',
+                        'aria-readonly' => 'true',
                         'readOnly' => true,
                     ],
+                    'disabled' => true,
                     'format' => 'dd/MM/yyyy HH:mm',
-                    'html5'  => false,
-                    'input'  => 'datetime_immutable',
-                    'label'  => 'admin.post.properties.modDate.label',
+                    'html5' => false,
+                    'input' => 'datetime_immutable',
+                    'label' => 'admin.post.properties.updatedAt.label',
                     'label_attr' => [
-                        'id' => 'modDate_label',
+                        'id' => 'updatedAt_label',
                         'class' => 'inline_label',
                     ],
                     'model_timezone' => 'UTC',
                     'view_timezone' => $userTimezone,
-                    'widget'   => 'single_text',
-                ])
-                ->add('publish', SubmitType::class, [
+                    'widget' => 'single_text',
+                ]);
+            if ($allowEdit) {
+                $builder->add('generate_seo', ButtonType::class, [
                     'attr' => [
-                        'class' => 'button button--info',
+                        'class' => 'btn btn--ai',
                     ],
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> <span>%s</span>',
-                        'publish',
-                        $this->translator->trans('admin.button.publish'),
+                        'auto_awesome',
+                        'Generate SEO Excerpt',
                     ),
                     'label_html' => true,
-                ])
-                ->add('delete', SubmitType::class, [
+                ]);
+            }
+            if ($showReview) {
+                $builder->add('review', SubmitType::class, [
+                    'attr' => [
+                        'class' => 'btn btn--secondary',
+                    ],
+                    'label' => sprintf(
+                        '<span class="material-icons">%s</span> <span>%s</span>',
+                        'rate_review',
+                        $this->translator->trans('admin.button.review'),
+                    ),
+                    'label_html' => true,
+                ]);
+            }
+            if ($showPublish) {
+                $builder->add('publish', SubmitType::class, [
+                    'attr' => [
+                        'class' => 'btn btn--secondary',
+                    ],
+                    'label' => sprintf(
+                        '<span class="material-icons">%s</span> <span>%s</span>',
+                        $isScheduled ? 'schedule' : 'publish',
+                        $isScheduled ? $this->translator->trans('admin.button.schedule')
+                         : $this->translator->trans('admin.button.publish'),
+                    ),
+                    'label_html' => true,
+                ]);
+            }
+            if ($showDelete) {
+                $builder->add('delete', SubmitType::class, [
                     'attr' => [
                         'data-confirm' => 'delete',
                         'data-confirm-text' => 'Yes, delete',
-                        'class' => 'button button--negative button--confirm',
+                        'class' => 'btn btn--danger btn--confirm',
                         'data-entity' => $options['data']->getType(),
                         'data-title' => $options['data']->getTitle(),
                     ],
@@ -362,15 +461,13 @@ class PostType extends AbstractType
                         $this->translator->trans('admin.button.delete'),
                     ),
                     'label_html' => true,
-                ])
-            ;
+                ]);
+            }
         }
     }
 
     /**
-     * Configure the options
-     *
-     * @param OptionsResolver $resolver
+     * Configure the options.
      */
     public function configureOptions(OptionsResolver $resolver): void
     {

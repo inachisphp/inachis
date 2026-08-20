@@ -1,0 +1,164 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * This file is part of the inachis framework.
+ */
+
+namespace Inachis\Repository\System;
+
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
+use Inachis\Entity\System\NavigationTab;
+use Inachis\Model\NavigationTabDto;
+use Inachis\Repository\AbstractRepository;
+
+/**
+ * Repository for navigation tabs.
+ *
+ * @extends AbstractRepository<NavigationTab>
+ */
+class NavigationTabRepository extends AbstractRepository
+{
+    /**
+     * Constructor.
+     */
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, NavigationTab::class);
+    }
+
+    /**
+     * Returns the maximum position.
+     */
+    public function getMaxPosition(): int
+    {
+        return (int) $this->createQueryBuilder('t')
+            ->select('COALESCE(MAX(t.position), 0)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Returns paginated tabs ordered by position.
+     *
+     * @return Paginator<NavigationTab>
+     */
+    public function getFiltered(int $limit, int $offset): Paginator
+    {
+        return $this->getAll(
+            $limit,
+            $offset,
+            [],
+            [
+                ['q.position', 'ASC'],
+            ],
+        );
+    }
+
+    /**
+     * Returns tabs ordered by position.
+     *
+     * @return array<int,NavigationTab>
+     */
+    public function getAllOrdered(): array
+    {
+        /** @var array<int, NavigationTab> */
+        $result = $this->createQueryBuilder('t')
+            ->orderBy('t.position', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return $result;
+    }
+
+    /**
+     * Returns all tabs indexed by UUID string for easy lookup.
+     *
+     * @return array<string,NavigationTab>
+     */
+    public function findAllIndexedById(): array
+    {
+        $tabs = $this->getAllOrdered();
+        $result = [];
+        foreach ($tabs as $tab) {
+            $id = $tab->getId();
+            if (null === $id) {
+                continue;
+            }
+            $result[$id->toString()] = $tab;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns active tabs ordered by position.
+     *
+     * @return array<int,NavigationTab>
+     */
+    public function findActiveOrdered(): array
+    {
+        /** @var array<int, NavigationTab> */
+        $result = $this->createQueryBuilder('t')
+            ->where('t.isActive = :active')
+            ->setParameter('active', true)
+            ->orderBy('t.position', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return $result;
+    }
+
+    /**
+     * Returns active tabs models ordered by position.
+     *
+     * @return list<NavigationTabDto>
+     */
+    public function findActiveOrderedModels(): array
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->select('t.id, t.title, t.url, t.position')
+            ->where('t.isActive = :active')
+            ->setParameter('active', true)
+            ->orderBy('t.position', 'ASC');
+
+        /** @var list<array{
+         *     id:string,
+         *     title:string,
+         *     url:string,
+         *     position:int
+         * }>
+         */
+        $rows = $qb->getQuery()->getArrayResult();
+
+        return array_map(
+            [NavigationTabDto::class, 'fromArray'],
+            $rows,
+        );
+    }
+
+    /**
+     * Returns active tabs ordered by position.
+     *
+     * @return array<string,array{url:string}>
+     */
+    public function findActiveOrderedUrlsIndexedByLabel(): array
+    {
+        /** @var array<int,NavigationTab> $tabs */
+        $tabs = $this->createQueryBuilder('t')
+            ->where('t.isActive = :active')
+            ->setParameter('active', true)
+            ->orderBy('t.position', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $result = [];
+        foreach ($tabs as $tab) {
+            $result[$tab->getTitle()] = ['url' => $tab->getUrl()];
+        }
+
+        return $result;
+    }
+}

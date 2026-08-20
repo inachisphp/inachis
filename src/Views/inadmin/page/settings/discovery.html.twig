@@ -1,0 +1,55 @@
+{% extends "/inadmin/structure/main.html.twig" %}
+
+{% block pagetitle %}
+    <a href="{{ path('incp_settings_index') }}">
+        Settings
+    </a>
+    <span>Crawlers &amp; Discovery</span>
+{% endblock pagetitle %}
+
+{% block content %}
+<div class="col-12">
+    {% include "/inadmin/partials/tab-sets/discovery.html.twig" %}
+<div class="ui-section">
+<div class="widget-container">
+
+{% for item in status.documents|merge(status.generated) %}
+    {% embed 'inadmin/partials/components/card.html.twig' with {
+        title: item.title,
+        icon: item.statusIcon,
+        description: item.description,
+        button_text: 'View live',
+        link: item.url,
+        link_external: true,
+        className: item.messages ? 'widget-settings--warning' : '',
+    } %}
+        {% block extra_content %}
+            {% if item.messages %}
+        <div class="widget__alert">
+            <p>
+                <span class="material-icons">warning</span> 
+                <strong>Status: Issues identified</strong>
+            </p>
+            <ul>
+            {% for message in item.messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+        {% else %}
+        <div class="widget__ok">
+            <p>
+                <span class="material-icons">check_circle</span> 
+                <strong>Status: OK</strong>
+            </p>
+        </div>
+            {% endif %}
+        {% endblock extra_content %}
+    {% endembed %}
+{% endfor %}
+
+</div>
+<p>&nbsp;</p>
+</div>
+</div>
+{% endblock content %}

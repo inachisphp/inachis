@@ -1,20 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Form;
 
-use Inachis\Entity\Series;
+use Inachis\Entity\Content\Series;
+use Inachis\Enum\Security\PermissionAction;
+use Inachis\Enum\Security\PermissionResource;
+use Inachis\Provider\TimezoneProvider;
+use Inachis\Security\Authorisation\PermissionResolver;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -23,34 +27,52 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Form for creating and editing a series
+ * Form for creating and editing a series.
+ *
+ * @extends AbstractType<Series>
  */
 class SeriesType extends AbstractType
 {
     /**
-     * Constructor
-
-     * @param Security $security
-     * @param TranslatorInterface $translator
+     * Constructor.
      */
     public function __construct(
+        private PermissionResolver $permissionResolver,
         private Security $security,
-        private TranslatorInterface $translator
-    ) {}
+        private readonly TimezoneProvider $timezoneProvider,
+        private readonly TranslatorInterface $translator,
+    ) {
+    }
 
     /**
-     * Build the form
+     * Build the form.
      *
-     * @param FormBuilderInterface $builder
-     * @param array $options
+     * @param FormBuilderInterface<Series|null> $builder
+     * @param array<string, mixed>              $options The form options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $newItem = empty($options['data']->getId());
         $user = $this->security->getUser();
-        $userTimezone = $user && method_exists($user, 'getPreferences')
-            ? $user->getPreferences()->getTimezone()
-            : 'UTC';
+        $userTimezone = $this->timezoneProvider->getForUser($user);
+
+        $newItem = !$options['data'] instanceof Series
+            || empty($options['data']->getId());
+        $allowEdit = $this->permissionResolver->hasPermission(
+            $user,
+            PermissionResource::SERIES,
+            $newItem ? PermissionAction::CREATE : PermissionAction::EDIT,
+        );
+        $allowBulkCreate = $allowEdit && $this->permissionResolver->hasPermission(
+            $user,
+            PermissionResource::PAGE,
+            PermissionAction::CREATE,
+        );
+        $allowDelete = $this->permissionResolver->hasPermission(
+            $user,
+            PermissionResource::SERIES,
+            PermissionAction::DELETE,
+        );
+
         $builder
             ->add('title', TextType::class, [
                 'attr' => [
@@ -60,7 +82,8 @@ class SeriesType extends AbstractType
                     'class' => 'editor__title text',
                     'placeholder' => $this->translator->trans('admin.series.title.placeholder', [], 'messages'),
                 ],
-                'label'      => $this->translator->trans('admin.series.title.label', [], 'messages'),
+                'disabled' => !$allowEdit,
+                'label' => $this->translator->trans('admin.series.title.label', [], 'messages'),
                 'label_attr' => [
                     'class' => 'inline_label',
                     'id' => 'title_label',
@@ -73,6 +96,7 @@ class SeriesType extends AbstractType
                     'class' => 'editor__sub-title text',
                     'placeholder' => $this->translator->trans('admin.series.subTitle.placeholder', [], 'messages'),
                 ],
+                'disabled' => !$allowEdit,
                 'label' => $this->translator->trans('admin.series.subTitle.label', [], 'messages'),
                 'label_attr' => [
                     'class' => 'inline_label',
@@ -83,12 +107,13 @@ class SeriesType extends AbstractType
             ->add('url', TextType::class, [
                 'attr' => [
                     'aria-labelledby' => 'url_label',
-                    'aria-required'   => 'false',
+                    'aria-required' => 'false',
                     'class' => 'editor__url text',
                     'pattern' => '[0-9a-zA-ZÀ-ž\-]{4,}',
-                    'placeholder'     => $this->translator->trans('admin.series.url.placeholder', [], 'messages'),
+                    'placeholder' => $this->translator->trans('admin.series.url.placeholder', [], 'messages'),
                 ],
-                'label'      => $this->translator->trans('admin.series.url.label', [], 'messages'),
+                'disabled' => !$allowEdit,
+                'label' => $this->translator->trans('admin.series.url.label', [], 'messages'),
                 'label_attr' => [
                     'id' => 'url_label',
                 ],
@@ -100,6 +125,7 @@ class SeriesType extends AbstractType
                     'aria-required' => 'false',
                     'class' => 'mde_editor',
                 ],
+                'disabled' => !$allowEdit,
                 'label' => $this->translator->trans('admin.series.description.label', [], 'messages'),
                 'label_attr' => [
                     'class' => 'hidden',
@@ -107,6 +133,17 @@ class SeriesType extends AbstractType
                 ],
                 'required' => false,
             ])
+            ->add('image', HiddenType::class, [
+                'disabled' => !$allowEdit,
+                'mapped' => false,
+                'required' => false,
+            ])
+            // ->add('image', EntityType::class, [
+            //     'class' => Image::class,
+            //     'choice_label' => 'filename',
+            //     'choice_value' => static fn (?Image $image) => $image?->getId()?->toString(),
+            //     'required' => false,
+            // ])
         ;
         if (!$newItem) {
             $builder
@@ -115,8 +152,10 @@ class SeriesType extends AbstractType
                         'style' => 'display: none;',
                         'readOnly' => true,
                     ],
+                    'disabled' => !$allowEdit,
                     'input' => 'datetime_immutable',
                     'required' => false,
+                    'view_timezone' => $userTimezone,
                     'widget' => 'single_text',
                 ])
                 ->add('lastDate', DateType::class, [
@@ -124,104 +163,112 @@ class SeriesType extends AbstractType
                         'style' => 'display: none;',
                         'readOnly' => true,
                     ],
+                    'disabled' => !$allowEdit,
                     'input' => 'datetime_immutable',
                     'required' => false,
+                    'view_timezone' => $userTimezone,
                     'widget' => 'single_text',
-                ])
-                ->add('bulkCreate', ButtonType::class, [
+                ]);
+            if ($allowBulkCreate) {
+                $builder->add('bulkCreate', ButtonType::class, [
                     'attr' => [
-                        'class' => 'button button--add bulk-create__link',
+                        'class' => 'btn btn--add bulk-create__link',
                     ],
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> %s',
                         'create',
-                        $this->translator->trans('admin.series.bulk.label', [], 'messages')
+                        $this->translator->trans('admin.series.bulk.label', [], 'messages'),
                     ),
                     'label_html' => true,
-                ])
-                ->add('addItem', ButtonType::class, [
+                ]);
+            }
+            if ($allowEdit) {
+                $builder->add('addItem', ButtonType::class, [
                     'attr' => [
-                        'class' => 'button button--info content-selector__link',
+                        'class' => 'btn btn--info content-selector__link',
                     ],
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> %s',
                         'playlist_add',
-                        $this->translator->trans('admin.series.add.label', [], 'messages')
+                        $this->translator->trans('admin.series.add.label', [], 'messages'),
+                    ),
+                    'label_html' => true,
+                ]);
+            }
+            $builder->add('visible', CheckboxType::class, [
+                'attr' => [
+                    'aria-labelledby' => 'visiblelabel',
+                    'aria-required' => 'false',
+                    'class' => 'ui-switch',
+                    'data-label-off' => 'private',
+                    'data-label-on' => 'public',
+                ],
+                'disabled' => !$allowEdit,
+                'label' => $this->translator->trans('admin.series.visibility.label', [], 'messages'),
+                'label_attr' => [
+                    'id' => 'visible_label',
+                    'class' => 'inline_label',
+                ],
+                'required' => false,
+            ]);
+        }
+        if ($allowEdit) {
+            $builder
+                ->add('submit', SubmitType::class, [
+                    'attr' => [
+                        'class' => 'btn btn--primary',
+                    ],
+                    'label' => sprintf(
+                        '<span class="material-icons">%s</span> %s',
+                        'save',
+                        $this->translator->trans('admin.button.save', [], 'messages'),
                     ),
                     'label_html' => true,
                 ])
-                ->add('visibility', CheckboxType::class, [
-                    'attr' => [
-                        'aria-labelledby' => 'visibility_label',
-                        'aria-required' => 'false',
-                        'class' => 'ui-switch',
-                        'data-label-off' => 'private',
-                        'data-label-on' => 'public',
-                    ],
-                    'label' => $this->translator->trans('admin.series.visibility.label', [], 'messages'),
-                    'label_attr' => [
-                        'id' => 'visibility_label',
-                        'class' => 'inline_label',
-                    ],
-                    'required' => false,
-                ])
+    //            ->add('publish', SubmitType::class, [
+    //                'attr' => [
+    //                    'class' => 'btn btn--info',
+    //                ],
+    //                'label' => $this->translator->trans('admin.button.publish', [], 'messages'),
+    //            ])
             ;
         }
-        $builder
-            ->add('submit', SubmitType::class, [
-                'attr' => [
-                    'class' => 'button button--positive',
-                ],
-                'label' => sprintf(
-                    '<span class="material-icons">%s</span> %s',
-                    'save',
-                    $this->translator->trans('admin.button.save', [], 'messages')
-                ),
-                'label_html' => true,
-            ])
-//            ->add('publish', SubmitType::class, [
-//                'attr' => [
-//                    'class' => 'button button--info',
-//                ],
-//                'label' => $this->translator->trans('admin.button.publish', [], 'messages'),
-//            ])
-        ;
         if (!$newItem) {
-            $builder
-                ->add('delete', SubmitType::class, [
+            if ($allowDelete) {
+                $builder->add('delete', SubmitType::class, [
                     'attr' => [
                         'data-confirm' => 'delete',
                         'data-confirm-text' => 'Yes, delete',
-                        'class' => 'button button--negative button--confirm',
+                        'class' => 'btn btn--danger btn--confirm',
                         'data-entity' => 'series',
                         'data-title' => $options['data']->getTitle(),
                     ],
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> %s',
                         'delete_forever',
-                        $this->translator->trans('admin.button.delete', [], 'messages')
+                        $this->translator->trans('admin.button.delete', [], 'messages'),
                     ),
                     'label_html' => true,
-                ])
-                ->add('remove', SubmitType::class, [
+                ]);
+            }
+            if ($allowEdit) {
+                $builder->add('remove', SubmitType::class, [
                     'attr' => [
-                        'class' => 'button button--negative',
+                        'class' => 'btn btn--danger',
                     ],
                     'label' => sprintf(
                         '<span class="material-icons">%s</span> %s',
                         'playlist_remove',
-                        $this->translator->trans('admin.button.remove', [], 'messages')
+                        $this->translator->trans('admin.button.remove', [], 'messages'),
                     ),
                     'label_html' => true,
-                ])
-            ;
+                ]);
+            }
         }
     }
 
     /**
-     * Configure the options for the form
-     *
-     * @param OptionsResolver $resolver
+     * Configure the options for the form.
      */
     public function configureOptions(OptionsResolver $resolver): void
     {

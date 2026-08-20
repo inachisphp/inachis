@@ -1,0 +1,120 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * This file is part of the inachis framework.
+ */
+
+namespace Inachis\Service\Content\Page;
+
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
+use Inachis\Enum\EditorialStatus;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Repository\Content\SeriesRepository;
+use Inachis\Service\Content\TextCleaner;
+use Ramsey\Uuid\Uuid;
+
+/**
+ * Content aggregator service.
+ */
+class ContentAggregator
+{
+    /**
+     * Items to show.
+     */
+    public const ITEMS_TO_SHOW = 10;
+
+    /**
+     * Constructor.
+     */
+    public function __construct(
+        private readonly PageRepository $pageRepository,
+        private readonly SeriesRepository $seriesRepository,
+    ) {
+    }
+
+    /**
+     * Get homepage content.
+     *
+     * @return array<string, Page|Series>
+     */
+    public function getHomepageContent(): array
+    {
+        $data = [];
+        $excludePages = [];
+
+        /** @var Paginator<Series> $series */
+        $series = $this->seriesRepository->getAll(
+            self::ITEMS_TO_SHOW,
+            0,
+            [
+                'q.lastDate < :postDate AND q.visible = :visible',
+                [
+                    'postDate' => new \DateTimeImmutable('now'),
+                    'visible' => true,
+                ],
+            ],
+            [['q.lastDate', 'DESC']],
+        );
+
+        foreach ($series as $group) {
+            foreach ($group->getItems() as $page) {
+                if (EditorialStatus::PUBLISHED !== $page->getStatus()) {
+                    $group->getItems()->removeElement($page);
+                } else {
+                    $excludePages[] = $page->getId();
+                }
+            }
+
+            $group->setDescription(TextCleaner::strip(
+                $group->getDescription(),
+                TextCleaner::REMOVE_BLOCKQUOTE_CONTENT | TextCleaner::REMOVE_IMAGE_ALT,
+            ));
+
+            $lastDate = $group->getLastDate();
+            if ($lastDate instanceof \DateTimeImmutable) {
+                $data['p'.$lastDate->format('Ymd')] = $group;
+            }
+        }
+
+        $pageQuery = 'q.status = :status AND q.visible = :visible AND q.postDate <= :postDate AND q.type = :type';
+        $pageParameters = [
+            'status' => EditorialStatus::PUBLISHED,
+            'visible' => true,
+            'postDate' => new \DateTimeImmutable('now'),
+            'type' => Page::TYPE_POST,
+        ];
+
+        // todo: move this to repository function
+        if ($excludePages) {
+            $binaryIds = array_map(
+                fn ($id) => $id instanceof \Ramsey\Uuid\UuidInterface
+                    ? $id->getBytes()
+                    : Uuid::fromString($id)->getBytes(),
+                $excludePages,
+            );
+            $pageQuery .= ' AND q.id NOT IN (:excludedPages)';
+            $pageParameters['excludedPages'] = ['value' => $binaryIds];
+        }
+
+        /** @var Paginator<Page> $pages */
+        $pages = $this->pageRepository->getAll(
+            self::ITEMS_TO_SHOW,
+            0,
+            [$pageQuery, $pageParameters],
+            'q.postDate DESC, q.updatedAt',
+        );
+
+        foreach ($pages as $page) {
+            $postDate = $page->getPostDate();
+            $data['p'.$postDate->format('Ymd')] = $page;
+        }
+
+        krsort($data);
+
+        return $data;
+    }
+}

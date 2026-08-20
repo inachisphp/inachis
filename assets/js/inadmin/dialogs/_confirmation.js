@@ -34,12 +34,12 @@ window.Inachis.ConfirmationPrompt = {
         return [
             {
                 text: 'Cancel',
-                class: 'button button--info',
+                class: 'btn btn--outline',
                 click: () => this.dialog.close(),
             },
             {
                 text: this.targetEl.dataset.confirmText || 'Confirm',
-                class: 'button button--negative',
+                class: 'btn btn--danger',
                 click: () => this.confirm(),
             },
         ];
@@ -62,6 +62,9 @@ window.Inachis.ConfirmationPrompt = {
             warning: this.targetEl.dataset.warning ?? '',
             action: this.targetEl.dataset.confirm ?? '',
         });
+        if (this.targetEl.dataset.hidehelp) {
+            params.append('hideHelp', true);
+        }
 
         try {
             const response = await fetch(
@@ -91,19 +94,25 @@ window.Inachis.ConfirmationPrompt = {
         if (this.isSubmitting || !this.targetEl) return;
         this.isSubmitting = true;
 
-        const confirmBtn = this.dialog.getButton(1);
+        const confirmBtn = this.dialog.getFirstButtonByClass('btn--primary');
         confirmBtn?.setAttribute('disabled', 'true');
 
         const form = this.targetEl.closest('form');
 
-        if (form && this.targetEl.name) {
-            const hidden = document.createElement('input');
-            hidden.type = 'hidden';
-            hidden.name = this.targetEl.name;
-            hidden.value = this.targetEl.value ?? '1';
-            form.appendChild(hidden);
+        if (form) {
+            if (this.targetEl.name) {
+                const hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = this.targetEl.name;
+                hidden.value = this.targetEl.value ?? '1';
+                form.appendChild(hidden);
+            }
 
-            form.submit();
+            if (typeof form.requestSubmit === 'function') {
+                form.requestSubmit();
+            } else {
+                form.submit();
+            }
         } else if (this.targetEl.dataset.href) {
             window.location.href = this.targetEl.dataset.href;
         }

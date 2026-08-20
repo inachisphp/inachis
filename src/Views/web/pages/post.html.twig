@@ -1,0 +1,67 @@
+{% extends "web/structure/main.html.twig" %}
+
+{% set pageClass = 'post' %}
+{% set showReadProgress = true %}
+
+{% block content %}
+
+<div class="content-column">
+
+    {% if post is defined %}
+    <article class="post type-{{ post.type }} status-{{ post.status.value }} format-standard hentry {% if post.categories is not empty %}category-{{ post.categories|first.title|lower }}{% endif %}" id="{{ post.type }}-{{ post.id }}">
+        <header class="entry-header">
+            <h1 class="entry-title">{{ post.title }}</h1>
+            {%- if post.subTitle is not empty %}
+            <h2 class="entry-subtitle">{{ post.subTitle }}</h2>
+            {% endif %}
+            {% if post.type == "post" %}
+            <div class="entry-meta">
+                Posted on
+                <a href="{{ url }}" title="{{ post.postDate|date('H:i', viewModel.settings.displayTimezone) }}" rel="bookmark">
+                    <time class="entry-date" datetime="{{ post.postDate|date('c', viewModel.settings.displayTimezone) }}" pubdate>{{ post.postDate|date('F j, Y', viewModel.settings.displayTimezone) }}</time></a>
+                <span class="byline"> by <span class="author vcard">{{ post.author.displayName }}</span></span>
+                <span class="cats-links"> under
+                    {% if post.categories is not empty -%}
+                        {% for category in post.categories -%}
+                            <a href="/category/{{ category.title|url_encode }}/" rel="category">{{ category.title }}</a>
+                        {% endfor %}
+                    {% endif %}
+			    </span>
+                {% if textStats.readingTime >= 5 %}
+                <p>Reading Time: {{ textStats.readingTime }} minutes ({{ textStats.wordCount }} words)</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </header>
+        {% if post.showTableOfContents %}
+            {% include 'web/partials/toc.html.twig' %}
+        {% endif %}
+        <div class="entry-content">
+            {% if post.content is not empty %}{{ post.content|markdown_to_html }}{% endif %}
+        </div>
+
+        {% if series is defined and series is not empty %}
+            <ul class="page-navigation">
+                <li><span>More posts on &ldquo;</span><a href="{{ path('web_series_view', { 'year': post.postDate|date('Y', viewModel.settings.displayTimezone), 'title': series.title|lower }) }}">{{ series.title }}{% if series.subTitle is not empty %} {% if series.subTitle|slice(0,3) != 'And' %}- {% endif %}{{ series.subTitle }}{% endif %}</a><span>&rdquo;</span></li>
+            {% if viewModel.series.previous|default('') is not empty and series.previous.status.value == 'published' %}
+                <li><span>Previous:</span> <a href="{{ viewModel.settings.domain }}/{{ series.previous.urls|first.link }}">{{ series.previous.title }}{% if series.previous.subTitle is not empty %} - {{ series.previous.subTitle }}{% endif %}</a></li>
+            {% endif %}
+            {% if series.next|default('') is not empty and series.next.status.value == 'published' %}
+                <li><span>Next:</span> <a href="{{ viewModel.settings.domain }}/{{ series.next.urls|first.link }}">{{ series.next.title }}{% if series.next.subTitle is not empty %} - {{ series.next.subTitle }}{% endif %}</a></li>
+            {% endif %}
+            </ul>
+        {% endif %}
+
+        {% if post.tags is not empty -%}
+            <p>Tags:
+            {% for tag in post.tags -%}
+                <a href="/tag/{{ tag.title|url_encode }}/" rel="category tag">{{ tag.title }}</a>
+            {% endfor %}
+            </p>
+        {% endif %}
+    </article>
+    {% endif %}
+
+</div>
+
+{% endblock content %}

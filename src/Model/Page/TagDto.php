@@ -1,21 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Model\Page;
 
 /**
- * Data Transfer Object for tag
-     */
+ * Data Transfer Object for tag.
+ */
 final class TagDto
 {
-    /**
-     * @var string
-     */
     public string $title;
 }

@@ -1,31 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Tests\phpunit\Controller\Dialog;
 
-use Inachis\Controller\Dialog\CategoryDialogController;
-use Inachis\Controller\Dialog\ImageGalleryDialogController;
-use Inachis\Entity\Category;
-use Inachis\Repository\CategoryRepository;
-use Inachis\Repository\PageRepository;
-use ArrayIterator;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Inachis\Controller\Dialog\CategoryDialogController;
+use Inachis\Entity\Content\Category;
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Content\PageRepository;
+use Inachis\Tests\phpunit\Helper\InachisControllerTestCase;
 use PHPUnit\Framework\MockObject\Exception;
 use Ramsey\Uuid\Nonstandard\Uuid;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CategoryDialogControllerTest extends WebTestCase
+class CategoryDialogControllerTest extends InachisControllerTestCase
 {
     protected CategoryRepository $categoryRepository;
     protected CategoryDialogController $controller;
@@ -35,26 +29,35 @@ class CategoryDialogControllerTest extends WebTestCase
      */
     public function setUp(): void
     {
-        $entityManager = $this->createStub(EntityManagerInterface::class);
-        $security = $this->createStub(Security::class);
-        $translator = $this->createStub(TranslatorInterface::class);
+        parent::setUp();
+
         $this->controller = $this->getMockBuilder(CategoryDialogController::class)
-            ->setConstructorArgs([$entityManager, $security, $translator])
+            ->setConstructorArgs([
+                $this->entityManager,
+                $this->params,
+                $this->security,
+                $this->translator,
+                $this->wasteRepository,
+                $this->pageViewFactory,
+                $this->requestStack,
+            ])
             ->onlyMethods(['render'])
             ->getMock();
-        $this->controller->expects($this->atLeast(0))->method('render')
+        $this->controller->method('render')
             ->willReturnCallback(function (string $template, array $data) {
-                return new Response('rendered:' . $template);
+                return new Response('rendered:'.$template);
             });
         $this->categoryRepository = $this->createMock(CategoryRepository::class);
         parent::setUp();
     }
+
     public function testGetCategoryManagerContent(): void
     {
         $this->categoryRepository->expects($this->never())->method('findAll');
         $result = $this->controller->getCategoryManagerContent($this->categoryRepository);
         $this->assertEquals('rendered:inadmin/dialog/category-manager.html.twig', $result->getContent());
     }
+
     public function testGetCategoryManagerList(): void
     {
         $this->categoryRepository->expects($this->never())->method('findAll');
@@ -65,7 +68,7 @@ class CategoryDialogControllerTest extends WebTestCase
     public function testGetCategoryManagerListContentRootCategory(): void
     {
         $request = new Request([], [], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/categoryList/get'
+            'REQUEST_URI' => '/incp/ax/categoryList/get',
         ]);
         $category = (new Category('test-category'))->setId(Uuid::uuid1());
         $this->categoryRepository->expects($this->once())
@@ -83,7 +86,7 @@ class CategoryDialogControllerTest extends WebTestCase
         $request = new Request([], [
             'q' => 'test-category',
         ], [], [], [], [
-            'REQUEST_URI' => '/incc/ax/categoryList/get'
+            'REQUEST_URI' => '/incp/ax/categoryList/get',
         ]);
         $category = (new Category('test-category'))->setId(Uuid::uuid1());
         $paginator = $this->getMockBuilder(Paginator::class)
@@ -92,7 +95,7 @@ class CategoryDialogControllerTest extends WebTestCase
             ->getMock();
         $paginator->expects($this->once())
             ->method('getIterator')
-            ->willReturn(new ArrayIterator([$category, $category]));
+            ->willReturn(new \ArrayIterator([$category, $category]));
 
         $this->categoryRepository->expects($this->once())
             ->method('findByTitleLike')
@@ -109,8 +112,9 @@ class CategoryDialogControllerTest extends WebTestCase
         $uuid = Uuid::uuid1();
         $request = new Request([], [
             'id' => $uuid->toString(),
+            'parentID' => '-1',
         ], [], [], [], [
-            'REQUEST_URI' => 'incc/ax/categoryManager/save'
+            'REQUEST_URI' => 'incp/ax/categoryManager/save',
         ]);
         $category = (new Category('test-category'))->setId($uuid);
         $this->categoryRepository->expects($this->atLeastOnce())
@@ -127,7 +131,7 @@ class CategoryDialogControllerTest extends WebTestCase
             'id' => '-1',
             'parentID' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => 'incc/ax/categoryManager/save'
+            'REQUEST_URI' => 'incp/ax/categoryManager/save',
         ]);
         $this->categoryRepository->expects($this->once())
             ->method('findOneBy')
@@ -145,12 +149,12 @@ class CategoryDialogControllerTest extends WebTestCase
         $request = new Request([], [
             'id' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => 'incc/ax/categoryManager/usage'
+            'REQUEST_URI' => 'incp/ax/categoryManager/usage',
         ]);
         $category = (new Category('test-category'))->setId($uuid);
         $category->addChild(new Category('test-sub-category'));
         $this->categoryRepository->expects($this->once())
-            ->method('findOneBy')
+            ->method('find')
             ->willReturn($category);
         $pageRepository = $this->createMock(PageRepository::class);
         $pageRepository->expects($this->atLeastOnce())
@@ -169,7 +173,7 @@ class CategoryDialogControllerTest extends WebTestCase
         $request = new Request([], [
             'id' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => 'incc/ax/categoryManager/delete'
+            'REQUEST_URI' => 'incp/ax/categoryManager/delete',
         ]);
         $category = (new Category('test-category'))->setId($uuid);
         $category->addChild(new Category('test-sub-category'));
@@ -194,7 +198,7 @@ class CategoryDialogControllerTest extends WebTestCase
         $request = new Request([], [
             'id' => $uuid->toString(),
         ], [], [], [], [
-            'REQUEST_URI' => 'incc/ax/categoryManager/delete'
+            'REQUEST_URI' => 'incp/ax/categoryManager/delete',
         ]);
         $category = (new Category('test-category'))->setId($uuid);
         $category->addChild(new Category('test-sub-category'));

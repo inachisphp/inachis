@@ -3,14 +3,18 @@ parameters:
 
     app.config.title: 'Wandering the World'
     app.config.locale: 'en'
+    app.config.displayTimezone: '%env(APP_DEFAULT_TIMEZONE)%'
     app.domain: '%env(APP_DOMAIN)%'
 
     password_reset.ttl: '%env(PASSWORD_RESET_TTL)%'
     app.public_img_path: '%env(APP_PUBLIC_IMG_PATH)%'
 
     app.config.twitter: 'jedi58'
-
-    csp: ''
+    env(AI_PROVIDER): ''
+    env(AI_AUDIO_PROVIDER): ''
+    env(GEMINI_API_KEY): '' #https://aistudio.google.com/prompts/new_chat
+    env(OPENAI_API_KEY): ''
+    env(ELEVENLABS_API_KEY): ''
 
 services:
     # default configuration for services in *this* file
@@ -30,12 +34,8 @@ services:
     Inachis\Analytics\Provider\InternalAnalyticsProvider: ~
 
     Inachis\Analytics\AnalyticsProviderInterface:
-        # @todo Google Analytics / Umami / Plausible providers can be swapped in here if desired
+        # TODO: Google Analytics / Umami / Plausible providers can be swapped in here if desired
         alias: Inachis\Analytics\Provider\InternalAnalyticsProvider
-
-    Inachis\Command\Image\SyncImagesFromContentCommand:
-        arguments:
-            $imageDirectory: '%kernel.project_dir%/public/imgs'
 
     Inachis\Diagnostics\Check\:
         resource: '../src/Diagnostics/Check/*/*'
@@ -49,12 +49,8 @@ services:
         tags:
             - {
               name: doctrine.orm.entity_listener,
-              entity: Inachis\Entity\Setting,
+              entity: Inachis\Entity\System\Setting,
             }
-
-    Inachis\EventListener\AdminResponseEvent:
-        arguments:
-            $csp: '%csp%'
 
     Inachis\EventListener\LoginSuccessListener:
         tags:
@@ -67,9 +63,11 @@ services:
     Inachis\EventSubscriber\AnalyticsSubscriber:
         tags: ['kernel.event_subscriber']
 
-    Inachis\Service\Image\ImageLocaliser:
+    Inachis\EventSubscriber\ThemeTwigPathSubscriber:
         arguments:
-            $publicImgPath: '%app.public_img_path%'
+            $twigLoader: '@twig.loader.native_filesystem'
+        tags:
+            - { name: kernel.event_subscriber }
 
     Inachis\Service\Export\Page\PageExportService:
         arguments:
@@ -112,11 +110,11 @@ services:
             $appSecret: '%env(APP_SECRET)%'
             $ttlSeconds: '%password_reset.ttl%'
 
-    Inachis\Service\EncryptionService:
+    Inachis\Service\Crypto\EncryptionService:
         arguments:
             $masterKey: '%env(INACHIS_MASTER_KEY)%'
 
-    Inachis\Service\VersionService:
+    Inachis\Service\System\VersionService:
         arguments:
             $versionFile: '%kernel.project_dir%/config/version.php'
 
@@ -139,3 +137,10 @@ services:
     # Inachis\Service\ImageResizer\ImageResizerInterface:
     #     factory: ['Inachis\Service\ImageResizer\ImageResizerFactory', 'create']
     #     public: true
+
+when@dev:
+    services:
+        Inachis\Build\:
+            resource: '../build/src/'
+            autowire: true
+            autoconfigure: true

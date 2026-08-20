@@ -1,46 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Controller\Page\Tools;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Entity\User;
+use Inachis\Entity\User\User;
 use Inachis\Model\Import\ImportOptionsDto;
-use Inachis\Model\Page\{CategoryPathDto,PageExportDto,TagDto};
-use Inachis\Model\Series\SeriesExportDto;
-use Inachis\Model\CategoryExportDto;
-use Inachis\Service\Import\ImportDetector;
-use Inachis\Service\Import\Series\SeriesImportService;
-use Inachis\Service\Import\Series\SeriesImportValidator;
 use Inachis\Service\Import\Category\CategoryImportService;
 use Inachis\Service\Import\Category\CategoryImportValidator;
+use Inachis\Service\Import\ImportDetector;
 use Inachis\Service\Import\Page\PageImportService;
 use Inachis\Service\Import\Page\PageImportValidator;
+use Inachis\Service\Import\Series\SeriesImportService;
+use Inachis\Service\Import\Series\SeriesImportValidator;
+use Inachis\Service\Parser\MarkdownFileParser;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Inachis\Parser\MarkdownFileParser;
 
 /**
- * Controller for importing pages and posts
+ * Controller for importing pages and posts.
  */
-#[IsGranted('ROLE_ADMIN')]
 class ImportController extends AbstractInachisController
 {
-    /**
-     * @param Request $request
-     * @param PageImportService $pageImportService
-     * @param PageImportValidator $pageImportValidator
-     * @return Response
-     */
-    #[Route('/incc/tools/import', name: 'incc_tools_import', methods: ['GET', 'POST'])]
+    #[Route('/incp/tools/import', name: 'incp_tools_import', methods: ['GET', 'POST'])]
     public function import(
         Request $request,
         ImportDetector $importDetector,
@@ -49,20 +38,22 @@ class ImportController extends AbstractInachisController
         SeriesImportService $seriesImportService,
         SeriesImportValidator $seriesImportValidator,
         PageImportService $pageImportService,
-        PageImportValidator $pageImportValidator
+        PageImportValidator $pageImportValidator,
     ): Response {
-        $this->data['page']['title'] = 'Import';
-        $this->data['page']['tab'] = 'import';
+        $this->viewModel->page->title = 'Import';
+        $this->viewModel->page->tab = 'import';
 
         if ($request->isMethod('POST')) {
+            /** @var UploadedFile|null */
             $uploadedFile = $request->files->get('import_file');
 
             if (!$uploadedFile) {
                 $this->addFlash('error', 'No file uploaded.');
-                return $this->redirectToRoute('incc_tools_import');
+
+                return $this->redirectToRoute('incp_tools_import');
             }
 
-            $content = file_get_contents($uploadedFile->getPathname());
+            $content = file_get_contents($uploadedFile->getPathname()) ?: '';
             $ext = strtolower($uploadedFile->getClientOriginalExtension());
             $importType = 'page';
 
@@ -72,20 +63,22 @@ class ImportController extends AbstractInachisController
                         $data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
                         break;
                     case 'xml':
-                        $xml = simplexml_load_string($content, "SimpleXMLElement", LIBXML_NOCDATA);
+                        $xml = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
                         $data = json_decode(json_encode($xml), true)['category'];
                         break;
                     case 'md':
-                        $parser = new MarkdownFileParser();
+                        $parser = new MarkdownFileParser($this->entityManager);
                         $data = $parser->parse($content);
-dump($data);exit;
+                        dump($data);
+                        exit;
                         break;
                     default:
                         throw new \InvalidArgumentException('Unsupported file format.');
                 }
             } catch (\Throwable $e) {
-                $this->addFlash('error', 'Error parsing file: ' . $e->getMessage());
-                return $this->redirectToRoute('incc_tools_import');
+                $this->addFlash('error', 'Error parsing file: '.$e->getMessage());
+
+                return $this->redirectToRoute('incp_tools_import');
             }
 
             $importType = $importDetector->detectImportType($data);
@@ -108,7 +101,8 @@ dump($data);exit;
 
                 default:
                     $this->addFlash('error', 'Unknown import type.');
-                    return $this->redirectToRoute('incc_tools_import');
+
+                    return $this->redirectToRoute('incp_tools_import');
             }
 
             $request->getSession()->set('import_preview', [
@@ -116,21 +110,19 @@ dump($data);exit;
                 'items' => $dtos,
                 'warnings' => $warnings,
             ]);
-            $this->data['items'] = $dtos;
-            $this->data['warnings'] = $warnings;
-            $this->data['import_type'] = $importType;
-            return $this->render('inadmin/page/tools/import_preview.html.twig', $this->data);
+
+            return $this->render('inadmin/page/tools/import_preview.html.twig', [
+                'viewModel' => $this->viewModel,
+                'items' => $dtos,
+            ]);
         }
 
-        return $this->render('inadmin/page/tools/import_upload.html.twig', $this->data);
+        return $this->render('inadmin/page/tools/import_upload.html.twig', [
+            'viewModel' => $this->viewModel,
+        ]);
     }
 
-    /**
-     * @param Request $request
-     * @param PageImportService $pageImportService
-     * @return Response
-     */
-    #[Route('/incc/tools/import/execute', name: 'incc_tools_import_process', methods: ['POST'])]
+    #[Route('/incp/tools/import/execute', name: 'incp_tools_import_process', methods: ['POST'])]
     public function importExecute(
         Request $request,
         CategoryImportService $categoryImportService,
@@ -142,7 +134,8 @@ dump($data);exit;
 
         if (!$importPreview || empty($importPreview['items'])) {
             $this->addFlash('error', 'No items to import.');
-            return $this->redirectToRoute('incc_tools_import');
+
+            return $this->redirectToRoute('incp_tools_import');
         }
 
         $importType = $importPreview['type'];
@@ -171,7 +164,7 @@ dump($data);exit;
                         'Imported %d pages, created %d categories, and %d tags.',
                         $result->pagesImported,
                         $result->categoriesCreated,
-                        $result->tagsCreated
+                        $result->tagsCreated,
                     ),
                 ];
                 break;
@@ -185,27 +178,28 @@ dump($data);exit;
                     'message' => sprintf(
                         'Imported %d series, and linked %d pages.',
                         $result->seriesImported,
-                        $result->pagesLinked
+                        $result->pagesLinked,
                     ),
                 ];
                 break;
 
             case 'category':
                 $result = $categoryImportService->import($dtos, $currentUser, $options);
-                $warnings = $result->warnings ?? [];
+                $warnings = $result->warnings;
                 $resultSummary = [
-                    'items' => $result->categoriesCreated ?? 0,
+                    'items' => $result->categoriesCreated,
                     'message' => sprintf(
                         'Imported %d categories, and updated %d categories.',
                         $result->categoriesCreated,
-                        $result->categoriesUpdated
+                        $result->categoriesUpdated,
                     ),
                 ];
                 break;
 
             default:
                 $this->addFlash('error', 'Invalid import type.');
-                return $this->redirectToRoute('incc_tools_import');
+
+                return $this->redirectToRoute('incp_tools_import');
         }
 
         if ($resultSummary['items'] > 0) {
@@ -222,6 +216,6 @@ dump($data);exit;
 
         $session->remove('import_preview');
 
-        return $this->redirectToRoute('incc_tools_index');
+        return $this->redirectToRoute('incp_tools_index');
     }
 }

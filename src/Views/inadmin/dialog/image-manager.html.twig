@@ -3,7 +3,7 @@
         <label class="ui-helper-hidden-accessible" for="ui-dialog-search-input">Search</label>
         <input class="text ui-icon-search" id="ui-dialog-search-input" placeholder="Filter by name" type="search" />
         <!-- button class="material-icons" type="submit">search</button -->
-        <a class="button button--add" href="#"><span class="material-icons" aria-hidden="true">cloud_upload</span> Upload a new Image</a>
+        <a class="btn btn--add" href="#"><span class="material-icons" aria-hidden="true">cloud_upload</span> Upload a new Image</a>
     </form>
     <p id="images_count">
         Showing <strong>0</strong>-<strong>0</strong> of <strong>0</strong> images
@@ -16,11 +16,13 @@
 <section class="gallery">
     <div class="loader"></div>
 </section>
+
+{% if can('IMAGE', 'CREATE') %}
 <section class="ui-dialog-image-uploader visually-hidden">
     {{ form_start(form, {
         'attr': { 'class': 'filepond form nested-grid' },
         'multipart': true,
-        'action': path('incc_resource_upload_image')
+        'action': path('incp_resource_upload_image')
     }) }}
         <fieldset class="col-6">
             {% include 'inadmin/partials/components/file-upload.html.twig' with {
@@ -53,10 +55,11 @@
                 {{ form_widget(form.description) }}
             </p>
             <p>
-                <button class="button button--positive" type="submit"><span class="material-icons" aria-hidden="true">save</span> Save Image</button>
+                <button class="btn btn--primary" type="submit"><span class="material-icons" aria-hidden="true">save</span> Save Image</button>
             </p>
         </fieldset>
     {{ form_row(form._token) }}
     {{ form_end(form, { 'render_rest': false }) }}
 </section>
+{% endif %}
 <script>window.Inachis.ImageManager._init();</script>

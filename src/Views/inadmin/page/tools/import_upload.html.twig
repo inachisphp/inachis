@@ -1,7 +1,7 @@
 {% extends "inadmin/structure/main.html.twig" %}
 
 {% block pagetitle %}
-    <a href="{{ path('incc_tools_index') }}">Tools</a>
+    <a href="{{ path('incp_tools_index') }}">Tools</a>
     <span>Import</span>
 {% endblock pagetitle %}
 
@@ -17,7 +17,7 @@
             <li class="badge">XML (.xml)</li>
             <li class="badge">JSON (.json)</li>
         </ul>
-        <form action="{{ path('incc_tools_import') }}" class="filepond form" enctype="multipart/form-data" method="post">
+        <form action="{{ path('incp_tools_import') }}" class="filepond form" enctype="multipart/form-data" method="post">
             <p>
                 <label for="import_file">Import File</label>
 
@@ -38,7 +38,7 @@
             </p>
             <div class="fixed-bottom-bar">
                 <p>
-                    <button type="submit" class="button button--positive">
+                    <button type="submit" class="btn btn--primary">
                         <span class="material-icons" aria-hidden="true">file_upload</span>
                         <span>Preview Import</span>
                     </button>

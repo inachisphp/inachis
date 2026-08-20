@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+
+    <style type="text/css">
+        @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+
+        body, .body {
+            -webkit-font-smoothing: antialiased;
+            -webkit-text-size-adjust: none;
+            background-color: #eee;
+            font-family: 'Open Sans', sans-serif;
+            height: 100%;
+            line-height: 1.1em;
+            width: 100%;
+        }
+
+        a {
+            border: 0;
+            outline: none;
+        }
+        a img {
+            border: none;
+        }
+        a[x-apple-data-detectors] {
+            color: inherit !important;
+            text-decoration: none !important;
+            font-size: inherit !important;
+            font-family: inherit !important;
+            font-weight: inherit !important;
+            line-height: inherit !important;
+        }
+
+        img {
+            outline: none;
+            text-decoration: none;
+            -ms-interpolation-mode: bicubic;
+            /*
+            height: auto;
+            max-width: 100% !important;
+             */
+        }
+
+        table {
+            border-collapse: collapse !important;
+            display: block;
+            width: 100% !important;
+        }
+
+        td {
+            font-size: 13px;
+            line-height: 1.9em;
+            text-align: left;
+        }
+
+        h1, h2, h3 {
+            padding: 0;
+            margin: 0 0 30px 0;
+            color: #444;
+            font-weight: 400;
+        }
+
+        h1 {
+            font-size: 35px;
+        }
+
+        h2 {
+            font-size: 30px;
+        }
+
+        h3 {
+            font-size: 24px;
+        }
+
+        h4 {
+            font-size: 18px;
+            font-weight: normal;
+        }
+
+        .preheader { height: 0; overflow:hidden; }
+
+        .important-font {
+            color: #21BEB4;
+            font-weight: bold;
+        }
+
+        .hide {
+            display: none !important;
+        }
+
+        .force-full-width {
+            width: 100% !important;
+        }
+
+
+
+        .fixed-table {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 1em;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .btn--cta {
+            background-color:#D84A38;
+            color:#fff;
+            display:inline-block;
+            font-family:sans-serif;
+            font-weight:bold;
+            font-size: 1.05em;
+            line-height:33px;
+            padding: 5px 15px;
+            text-align:center;
+            text-decoration:none;
+            -webkit-text-size-adjust:none;
+        }
+
+        {% block email_styles %}{% endblock email_styles %}
+    </style>
+
+    <style type="text/css" media="screen">
+        @media screen {
+            @import url(http://fonts.googleapis.com/css?family=Open+Sans:400);
+
+            td, h1, h2, h3 {
+                font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif !important;
+            }
+        }
+    </style>
+
+    <style type="text/css" media="only screen and (max-width: 600px)">
+        /* Mobile styles */
+        @media only screen and (max-width: 600px) {
+
+            table[class="w320"] {
+                width: 320px !important;
+            }
+
+            table[class="w300"] {
+                width: 300px !important;
+            }
+
+            table[class="w290"] {
+                width: 290px !important;
+            }
+
+            td[class="w320"] {
+                width: 320px !important;
+            }
+
+            td[class~="mobile-padding"] {
+                padding-left: 14px !important;
+                padding-right: 14px !important;
+            }
+
+            td[class*="mobile-padding-left"] {
+                padding-left: 14px !important;
+            }
+
+            td[class*="mobile-padding-right"] {
+                padding-right: 14px !important;
+            }
+
+            td[class*="mobile-block"] {
+                display: block !important;
+                width: 100% !important;
+                text-align: left !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                padding-bottom: 15px !important;
+            }
+
+            td[class*="mobile-no-padding-bottom"] {
+                padding-bottom: 0 !important;
+            }
+
+            td[class~="mobile-center"] {
+                text-align: center !important;
+            }
+
+            table[class*="mobile-center-block"] {
+                float: none !important;
+                margin: 0 auto !important;
+            }
+
+            *[class*="mobile-hide"] {
+                display: none !important;
+                width: 0 !important;
+                height: 0 !important;
+                line-height: 0 !important;
+                font-size: 0 !important;
+            }
+
+            td[class*="mobile-border"] {
+                border: 0 !important;
+            }
+        }
+    </style>
+
+    <title>{% block title %}Title goes here{% endblock title %}</title>
+</head>
+
+<body class="body">
+<p class="preheader">{% block preheader %}Preheader text goes here - 85-199 chars{% endblock preheader %}</></p>
+
+<p>
+    <a href="{{ viewModel.settings.domain }}/incp" style="text-decoration:none;">
+        <center>
+        {% block email_logo %}
+            <img src="{{ logo }}" alt="{{ viewModel.settings.siteTitle }}" width="150" />
+        {% endblock email_logo %}
+        </center>
+    </a>
+</p>
+
+{% block content %}
+{% endblock content %}
+<p><center>Best wishes,</center></p>
+<p><center>{{ viewModel.settings.siteTitle|default(viewModel.settings.domain) }}</center></p>
+
+<p>
+{% if viewModel.settings is defined and viewModel.settings.twitter is defined and viewModel.settings.twitter is not empty %}
+    <a href="https://twitter.com/{{ viewModel.settings.twitter }}" class="twitter-follow-btn" data-show-count="false"><span>Follow @{{ viewModel.settings.twitter }}</span></a>
+{% endif %}
+{% if viewModel.settings.facebookUrl is defined and viewModel.settings.facebookUrl is not empty %}
+    <a href="https://www.facebook.com/{{ viewModel.settings.facebookUrl }}" class="facebook-follow-btn" data-show-count="false"><span>Facebook</span></a>
+{% endif %}
+{% if viewModel.settings.pinterest is defined and viewModel.settings.pinterest is not empty %}
+    <a href="http://www.pinterest.com/{{ viewModel.settings.pinterest }}/" class="pinterest-follow-btn" data-show-count="false"><span>Pinterest</span></a>
+{% endif %}
+{% if viewModel.settings.instagram is defined and viewModel.settings.instagram is not empty %}
+    <a href="https://instagram.com/{{ viewModel.settings.instagram }}/" class="googleplus-follow-btn" data-show-count="false"><span>Instagram</span></a>
+{% endif %}
+</p>
+
+{% block settings_unsubscribe %}
+<p><center><a href="{{ viewModel.settings.domain }}">Edit email settings</a> | <a href="{{ viewModel.settings.domain }}">Unsubscribe</a></center></p>
+{% endblock settings_unsubscribe %}
+</body>
+</html>

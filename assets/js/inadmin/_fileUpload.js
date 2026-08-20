@@ -35,14 +35,14 @@ window.Inachis.FileUpload = {
     init: async function (selector, options) {
         this.options = { ...options };
         await Promise.all([
-            this.loadCSS('/assets/css/incc/filepond.min.css'),
-            this.loadCSS('/assets/css/incc/filepond-plugin-image-preview.min.css')
+            this.loadCSS('/assets/css/incp/filepond.min.css'),
+            this.loadCSS('/assets/css/incp/filepond-plugin-image-preview.min.css')
         ]);
-        await this.loadScript('/assets/js/incc/filepond.min.js');
+        await this.loadScript('/assets/js/incp/filepond.min.js');
         await Promise.all([
-            this.loadScript('/assets/js/incc/filepond-plugin-image-preview.min.js'),
-            this.loadScript('/assets/js/incc/filepond-plugin-file-validate-size.min.js'),
-            this.loadScript('/assets/js/incc/filepond-plugin-file-validate-type.min.js')
+            this.loadScript('/assets/js/incp/filepond-plugin-image-preview.min.js'),
+            this.loadScript('/assets/js/incp/filepond-plugin-file-validate-size.min.js'),
+            this.loadScript('/assets/js/incp/filepond-plugin-file-validate-type.min.js')
         ]);
         if (!FilePond) return;
 

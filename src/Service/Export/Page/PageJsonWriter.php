@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /**
- * This file is part of the inachis framework
- *
- * @package Inachis
- * @license https://github.com/inachisphp/inachis/blob/main/LICENSE.md
+ * This file is part of the inachis framework.
  */
 
 namespace Inachis\Service\Export\Page;
@@ -19,19 +18,21 @@ class PageJsonWriter implements ExportWriterInterface
     /**
      * Checks if the writer supports the given format.
      *
-     * @param string $format The format to check.
-     * @return bool True if the writer supports the format, false otherwise.
+     * @param string $format the format to check
+     *
+     * @return bool true if the writer supports the format, false otherwise
      */
     public function supports(string $format): bool
     {
-        return $format === 'json';
+        return 'json' === $format;
     }
 
     /**
      * Checks if the writer supports the given content domain.
      *
-     * @param string|null $domain The content domain to check.
-     * @return bool True if the writer supports the domain, false otherwise.
+     * @param string|null $domain the content domain to check
+     *
+     * @return bool true if the writer supports the domain, false otherwise
      */
     public function supportsDomain(?string $domain): bool
     {
@@ -41,8 +42,9 @@ class PageJsonWriter implements ExportWriterInterface
     /**
      * Writes the given pages to JSON format.
      *
-     * @param iterable $pages The pages to write.
-     * @return string The exported pages.
+     * @param iterable $pages the pages to write
+     *
+     * @return string the exported pages
      */
     public function write(iterable $pages): string
     {
