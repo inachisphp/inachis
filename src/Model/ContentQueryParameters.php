@@ -20,12 +20,7 @@ class ContentQueryParameters
     /**
      * Constructor for ContentQueryParameters class.
      *
-     * @param array{
-     *     filters: array<string,mixed>,
-     *     sort: string,
-     *     limit: int,
-     *     offset: int
-     * }|array{} $filters
+     * @param array<string, mixed> $filters
      */
     public function __construct(
         protected array $filters = [],
@@ -52,6 +47,7 @@ class ContentQueryParameters
         * This allows filters to be cleared.
         */
         if ($request->request->has('filter')) {
+            /** @var array<string, mixed> $filters */
             $filters = $request->request->all('filter');
 
             /*
@@ -116,6 +112,9 @@ class ContentQueryParameters
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getFilters(): array
     {
         return $this->filters;
@@ -141,6 +140,15 @@ class ContentQueryParameters
         return $this->view;
     }
 
+    /**
+     * @return array{
+     *     filters: array<string, mixed>,
+     *     sort: string,
+     *     offset: int,
+     *     limit: int,
+     *     view: string
+     * }
+     */
     public function toArray(): array
     {
         return [

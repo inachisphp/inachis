@@ -32,12 +32,14 @@ class CspReportRepository extends ServiceEntityRepository
     public function findOneByFingerprint(
         string $fingerprint,
     ): ?CspReport {
-        /* @var CspReport|null */
-        return $this->createQueryBuilder('r')
+        /** @var CspReport|null $result */
+        $result = $this->createQueryBuilder('r')
             ->andWhere('r.fingerprint = :fingerprint')
             ->setParameter('fingerprint', $fingerprint)
             ->getQuery()
             ->getOneOrNullResult();
+
+        return $result;
     }
 
     /**
@@ -97,8 +99,8 @@ class CspReportRepository extends ServiceEntityRepository
      */
     public function findTopHosts(int $limit = 10): array
     {
-        /* @var list<array{host: string, occurrences: int}> */
-        return $this->createQueryBuilder('r')
+        /** @var list<array{host: string, occurrences: int}> $result */
+        $result = $this->createQueryBuilder('r')
             ->select('r.host, SUM(r.occurrences) as occurrences')
             ->where('r.host IS NOT NULL')
             ->groupBy('r.host')
@@ -106,6 +108,8 @@ class CspReportRepository extends ServiceEntityRepository
             ->setMaxResults($limit)
             ->getQuery()
             ->getArrayResult();
+
+        return $result;
     }
 
     /**
@@ -115,8 +119,8 @@ class CspReportRepository extends ServiceEntityRepository
      */
     public function findTopDirectives(int $limit = 10): array
     {
-        /* @var list<array{directive: string, occurrences: int}> */
-        return $this->createQueryBuilder('r')
+        /** @var list<array{directive: string, occurrences: int}> $result */
+        $result = $this->createQueryBuilder('r')
             ->select(
                 'r.effectiveDirective as directive,
                 SUM(r.occurrences) as occurrences',
@@ -126,6 +130,8 @@ class CspReportRepository extends ServiceEntityRepository
             ->setMaxResults($limit)
             ->getQuery()
             ->getArrayResult();
+
+        return $result;
     }
 
     /**
@@ -143,8 +149,7 @@ class CspReportRepository extends ServiceEntityRepository
      */
     public function findTopCritical(int $limit = 10): array
     {
-        /*
-         * @var list<array{
+        /** @var list<array{
          *     host: string,
          *     documentUri: string,
          *     blockedUri: string,
@@ -152,9 +157,8 @@ class CspReportRepository extends ServiceEntityRepository
          *     severity: string,
          *     occurrences: int,
          *     lastSeenAt: \DateTimeInterface
-         * }>
-         */
-        return $this->createQueryBuilder('r')
+         * }> $result */
+        $result = $this->createQueryBuilder('r')
             ->select('
                 r.id,
                 r.host,
@@ -172,13 +176,15 @@ class CspReportRepository extends ServiceEntityRepository
             ->setMaxResults($limit)
             ->getQuery()
             ->getArrayResult();
+
+        return $result;
     }
 
     /**
      * Returns the top critical reports grouped by fingerprint.
      *
      * @return list<array{
-     *    fingerprint: string,
+     *     fingerprint: string,
      *     host: string,
      *     documentUri: string,
      *     blockedUri: string,
@@ -186,12 +192,12 @@ class CspReportRepository extends ServiceEntityRepository
      *     severity: string,
      *     occurrences: int,
      *     lastSeenAt: \DateTimeInterface
-     *  }>
+     * }>
      */
     public function findTopCriticalGrouped(int $limit = 10): array
     {
-        /* @var list<array{
-         *    fingerprint: string,
+        /** @var list<array{
+         *     fingerprint: string,
          *     host: string,
          *     documentUri: string,
          *     blockedUri: string,
@@ -199,9 +205,8 @@ class CspReportRepository extends ServiceEntityRepository
          *     severity: string,
          *     occurrences: int,
          *     lastSeenAt: \DateTimeInterface
-         *  }>
-         */
-        return $this->createQueryBuilder('r')
+         * }> $result */
+        $result = $this->createQueryBuilder('r')
             ->select('
                 r.fingerprint,
                 r.host,
@@ -227,6 +232,8 @@ class CspReportRepository extends ServiceEntityRepository
             ->setMaxResults($limit)
             ->getQuery()
             ->getArrayResult();
+
+        return $result;
     }
 
     /**
@@ -236,18 +243,20 @@ class CspReportRepository extends ServiceEntityRepository
      */
     public function findRecent(int $limit = 100): array
     {
-        /* @var list<CspReport> */
-        return $this->createQueryBuilder('r')
+        /** @var list<CspReport> $result */
+        $result = $this->createQueryBuilder('r')
             ->orderBy('r.lastSeenAt', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**
      * Returns filtered CSP reports.
      *
-     * @return list<array<string,string>>
+     * @return list<array<string, string>>
      */
     public function findFiltered(
         ?string $severity,
@@ -259,30 +268,32 @@ class CspReportRepository extends ServiceEntityRepository
 
         if ($severity) {
             $qb->andWhere('r.severity = :severity')
-            ->setParameter('severity', $severity);
+                ->setParameter('severity', $severity);
         }
 
         if ($host) {
             $qb->andWhere('r.host = :host')
-            ->setParameter('host', $host);
+                ->setParameter('host', $host);
         }
 
         if ($directive) {
             $qb->andWhere('r.effectiveDirective = :directive')
-            ->setParameter('directive', $directive);
+                ->setParameter('directive', $directive);
         }
 
         if (!$includeProcessed) {
             $qb->andWhere('r.processed = :processed')
-            ->setParameter('processed', false);
+                ->setParameter('processed', false);
         }
 
-        /* @var list<array<string,string>> */
-        return $qb
+        /** @var list<array<string, string>> $result */
+        $result = $qb
             ->orderBy('r.lastSeenAt', 'DESC')
             ->setMaxResults(200)
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**
@@ -292,13 +303,15 @@ class CspReportRepository extends ServiceEntityRepository
      */
     public function findUniqueDirectivesAndBlockedUris(): array
     {
-        /* @var list<array{effectiveDirective: string, blockedUri: string}> */
-        return $this->createQueryBuilder('r')
+        /** @var list<array{effectiveDirective: string, blockedUri: string}> $result */
+        $result = $this->createQueryBuilder('r')
             ->select('DISTINCT r.effectiveDirective, r.blockedUri')
             ->where('r.effectiveDirective IS NOT NULL')
             ->andWhere('r.blockedUri IS NOT NULL')
             ->getQuery()
             ->getScalarResult();
+
+        return $result;
     }
 
     /**
@@ -342,12 +355,13 @@ class CspReportRepository extends ServiceEntityRepository
      */
     public function deleteOldReports(\DateTimeInterface $date): int
     {
-        /* @var int */
-        return $this->createQueryBuilder('r')
+        $result = $this->createQueryBuilder('r')
             ->delete()
             ->where('r.updatedAt < :date')
             ->setParameter('date', $date)
             ->getQuery()
             ->execute();
+
+        return is_numeric($result) ? (int) $result : 0;
     }
 }

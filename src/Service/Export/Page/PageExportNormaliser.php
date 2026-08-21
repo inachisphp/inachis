@@ -30,7 +30,7 @@ final class PageExportNormaliser
     {
         $dto = new PageExportDto();
 
-        $dto->title = $page->getTitle() ?? '';
+        $dto->title = $page->getTitle();
         $dto->subTitle = $page->getSubTitle();
         $dto->content = $page->getContent();
         $dto->type = $page->getType();
@@ -39,21 +39,21 @@ final class PageExportNormaliser
         $dto->allowComments = $page->isAllowComments();
         $dto->language = $page->getLanguage();
         $dto->timezone = $page->getTimezone();
-        $dto->postDate = $page->getPostDate()?->format('c');
+        $dto->postDate = $page->getPostDate()->format('c');
 
-        foreach ($page->getCategories() ?? [] as $category) {
+        foreach ($page->getCategories() as $category) {
             $catDto = new CategoryPathDto();
             $catDto->path = $category->getFullPath();
             $dto->categories[] = $catDto;
         }
 
-        foreach ($page->getTags() ?? [] as $tag) {
+        foreach ($page->getTags() as $tag) {
             $tagDto = new TagDto();
             $tagDto->title = $tag->getTitle();
             $dto->tags[] = $tagDto;
         }
 
-        foreach ($page->getUrls() ?? [] as $url) {
+        foreach ($page->getUrls() as $url) {
             if ($url->isDefault()) {
                 $urlDto = new UrlDto();
                 $urlDto->path = $url->getLink();
@@ -69,15 +69,17 @@ final class PageExportNormaliser
     /**
      * Normalize multiple pages.
      *
-     * @param iterable $pages the pages to normalise
+     * @param iterable<object> $pages the pages to normalise
      *
-     * @return array the normalised pages
+     * @return list<PageExportDto> the normalised pages
      */
     public function normaliseCollection(iterable $pages): array
     {
         $result = [];
         foreach ($pages as $page) {
-            $result[] = $this->normalise($page);
+            if ($page instanceof Page) {
+                $result[] = $this->normalise($page);
+            }
         }
 
         return $result;

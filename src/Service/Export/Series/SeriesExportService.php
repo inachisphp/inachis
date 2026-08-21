@@ -8,21 +8,23 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Export\Series;
 
+use Inachis\Entity\Content\Series;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Service\Export\AbstractExportService;
+use Inachis\Service\Export\ExportWriterInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
  * Service for exporting series. The service uses the {@link SeriesRepository} to retrieve series,
- * and the {@link SeriesExportNormaliser} to normalise them. The service uses the {@link SeriesExportWriter}
+ * and the {@link SeriesExportNormaliser} to normalise them. The service uses the {@link ExportWriterInterface}
  * interface to write the series to a file of a given type (JSON/MD/XML).
  */
 final class SeriesExportService extends AbstractExportService
 {
     /**
-     * @param SeriesRepository             $repository the repository to use for series operations
-     * @param SeriesExportNormaliser       $normaliser the normaliser to use
-     * @param iterable<SeriesExportWriter> $writers    the writers to use
+     * @param SeriesRepository               $repository the repository to use for series operations
+     * @param SeriesExportNormaliser         $normaliser the normaliser to use
+     * @param iterable<ExportWriterInterface> $writers    the writers to use
      */
     public function __construct(
         private SeriesRepository $repository,
@@ -35,8 +37,8 @@ final class SeriesExportService extends AbstractExportService
     /**
      * Export series to a file of a given type (JSON/MD/XML).
      *
-     * @param iterable<Series> $series the series to export
-     * @param string           $format the format to export to (json/md/xml)
+     * @param iterable<Series>|null $series the series to export
+     * @param string                $format the format to export to (json/md/xml)
      *
      * @return string the exported series
      */
@@ -56,13 +58,17 @@ final class SeriesExportService extends AbstractExportService
      */
     protected function normalise(object $series): object
     {
+        if (!$series instanceof Series) {
+            throw new \InvalidArgumentException('Expected instance of '.Series::class);
+        }
+
         return $this->normaliser->normalise($series);
     }
 
     /**
      * Get series by IDs via the repository.
      *
-     * @param array $ids the IDs of the series to retrieve
+     * @param list<string> $ids the IDs of the series to retrieve
      *
      * @return iterable<Series> the series
      */

@@ -21,13 +21,13 @@ class AudioSettingsController extends AbstractInachisController
     #[Route('/incp/settings/audio', name: 'incp_settings_audio', methods: ['GET', 'POST'])]
     public function index(Request $request, AiAudioManager $audioManager): Response
     {
-        $uploadsDir = $this->getParameter('kernel.project_dir') . '/var/uploads/';
+        $projectDir = $this->getParameter('kernel.project_dir');
+        $uploadsDir = (is_string($projectDir) ? $projectDir : '') . '/var/uploads/';
 
         if (!is_dir($uploadsDir)) {
             mkdir($uploadsDir, 0755, true);
         }
 
-        // --- HANDLE POST ACTIONS ---
         if ($request->isMethod('POST')) {
             $action = $request->request->get('action');
 
@@ -47,6 +47,10 @@ class AudioSettingsController extends AbstractInachisController
                 } else {
                     try {
                         $provider = $audioManager->getActiveProvider();
+                        if (null === $provider) {
+                            throw new \RuntimeException('No active AI audio provider available.');
+                        }
+
                         $mp3Binary = $provider->generateSpeech($scriptText, $voice);
                         file_put_contents($targetFile, $mp3Binary);
 

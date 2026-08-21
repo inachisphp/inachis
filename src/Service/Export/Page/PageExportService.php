@@ -8,21 +8,23 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Export\Page;
 
+use Inachis\Entity\Content\Page;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Service\Export\AbstractExportService;
+use Inachis\Service\Export\ExportWriterInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
  * Service for exporting pages. The service uses the {@link PageRepository} to retrieve pages,
- * and the {@link PageExportNormaliser} to normalise them. The service uses the {@link PageExportWriter}
+ * and the {@link PageExportNormaliser} to normalise them. The service uses the {@link ExportWriterInterface}
  * interface to write the pages to a file of a given type (JSON/MD/XML).
  */
 final class PageExportService extends AbstractExportService
 {
     /**
-     * @param PageRepository       $pageRepository the repository to use for page operations
-     * @param PageExportNormaliser $normaliser     the normaliser to use
-     * @param iterable             $writers        the writers to use
+     * @param PageRepository                 $pageRepository the repository to use for page operations
+     * @param PageExportNormaliser           $normaliser     the normaliser to use
+     * @param iterable<ExportWriterInterface> $writers        the writers to use
      */
     public function __construct(
         private PageRepository $pageRepository,
@@ -35,8 +37,8 @@ final class PageExportService extends AbstractExportService
     /**
      * Export pages to a file of a given type (JSON/MD/XML).
      *
-     * @param iterable|null $pages  the pages to export
-     * @param string        $format the format to export to (json/md/xml)
+     * @param iterable<Page>|null $pages  the pages to export
+     * @param string              $format the format to export to (json/md/xml)
      *
      * @return string the exported pages
      */
@@ -56,13 +58,17 @@ final class PageExportService extends AbstractExportService
      */
     protected function normalise(object $page): object
     {
+        if (!$page instanceof Page) {
+            throw new \InvalidArgumentException('Expected instance of '.Page::class);
+        }
+
         return $this->normaliser->normalise($page);
     }
 
     /**
      * Get pages by IDs via the repository.
      *
-     * @param array $ids the IDs of the pages to retrieve
+     * @param list<string> $ids the IDs of the pages to retrieve
      *
      * @return iterable<Page> the pages
      */
@@ -84,18 +90,28 @@ final class PageExportService extends AbstractExportService
     /**
      * Get filtered pages via the repository.
      *
-     * @param array $filter the filter to use
+     * @param array{
+     *     type?: string,
+     *     categories?: array<string>,
+     *     tags?: array<string>,
+     *     status?: string,
+     *     visible?: bool,
+     *     keyword?: string,
+     *     excludeIds?: list<string>,
+     *     fromDate?: \DateTimeImmutable,
+     *     toDate?: \DateTimeImmutable
+     * } $filter the filter to use
      *
      * @return iterable<Page> the pages
      */
     public function getFilteredPages(array $filter): iterable
     {
-        $filter_type = $filter['type'] ?? '*';
+        $type = isset($filter['type']) ? (string) $filter['type'] : '*';
         unset($filter['type']);
 
         return $this->pageRepository->getFilteredOfTypeByPostDate(
             array_filter($filter),
-            $filter_type,
+            $type,
             10000,
             0,
         );

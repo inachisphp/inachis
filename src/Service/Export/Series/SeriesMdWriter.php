@@ -43,7 +43,7 @@ final class SeriesMdWriter implements ExportWriterInterface
     /**
      * Writes the given series to the specified format.
      *
-     * @param iterable<SeriesExportDto> $items the series to write
+     * @param iterable<object> $items the series to write
      *
      * @return string the written series
      */
@@ -52,6 +52,10 @@ final class SeriesMdWriter implements ExportWriterInterface
         $output = '';
 
         foreach ($items as $item) {
+            if (!$item instanceof SeriesExportDto) {
+                continue;
+            }
+
             $output .= "---\n";
             $output .= 'title: '.$item->title."\n";
             $output .= 'subtitle: '.$item->subTitle."\n";
@@ -59,7 +63,7 @@ final class SeriesMdWriter implements ExportWriterInterface
             $output .= 'description: '.$item->description."\n";
             $output .= 'firstDate: '.$item->firstDate."\n";
             $output .= 'lastDate: '.$item->lastDate."\n";
-            $output .= 'visible: '.$item->visible."\n";
+            $output .= 'visible: '.($item->visible ? 'true' : 'false')."\n";
             $output .= 'items: '.implode(', ', $item->items)."\n";
             $output .= "---\n";
         }

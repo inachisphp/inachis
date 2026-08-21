@@ -33,9 +33,9 @@ final class PageImportService
     /**
      * Imports the given pages.
      *
-     * @param iterable<PageExportDto> $pageDtos the pages to import
-     * @param User                    $author   the author of the pages
-     * @param ImportOptionsDto        $options  the import options
+     * @param iterable<object> $pageDtos the pages to import
+     * @param User             $author   the author of the pages
+     * @param ImportOptionsDto $options  the import options
      *
      * @return PageImportResult the result of the import
      */
@@ -104,8 +104,6 @@ final class PageImportService
                         $result->warnings[] = "Tag not found: {$tagDto->title}";
                     }
                 }
-
-                // TODO: add page URL
 
                 $this->entityManager->persist($page);
                 ++$result->pagesImported;

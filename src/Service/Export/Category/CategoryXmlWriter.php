@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Export\Category;
 
-use Inachis\Model\Category\CategoryExportDto;
+use Inachis\Model\CategoryExportDto;
 use Inachis\Service\Export\AbstractXmlExportWriter;
 
 /**
@@ -64,11 +64,14 @@ final class CategoryXmlWriter extends AbstractXmlExportWriter
      * Writes a single category DTO to XML.
      *
      * @param \SimpleXMLElement $xml  the XML element to write to
-     * @param CategoryExportDto $item the category DTO to write
+     * @param object            $item the category DTO to write
      */
     protected function writeItem(\SimpleXMLElement $xml, object $item): void
     {
-        /* @var CategoryExportDto $item */
+        if (!$item instanceof CategoryExportDto) {
+            throw new \InvalidArgumentException('Expected instance of '.CategoryExportDto::class);
+        }
+
         $this->optional($xml, 'id', $item->id);
         $this->optional($xml, 'title', $item->title);
         $this->optional($xml, 'description', $item->description);
@@ -79,8 +82,10 @@ final class CategoryXmlWriter extends AbstractXmlExportWriter
 
         if (!empty($item->childrenIds)) {
             $childrenXml = $xml->addChild('children');
-            foreach ($item->childrenIds as $childId) {
-                $childrenXml->addChild('child', $childId);
+            if (null !== $childrenXml) {
+                foreach ($item->childrenIds as $childId) {
+                    $childrenXml->addChild('child', $childId);
+                }
             }
         }
 

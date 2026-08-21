@@ -34,16 +34,16 @@ class AnalyticsRepository
     public function increment(string $path, string $date, int $views): void
     {
         // $this->db->executeStatement(
-        // 	'
-        // 	INSERT INTO analytics_page_view (path, date, views)
-        // 	VALUES (:path, :date, :views)
-        // 	ON DUPLICATE KEY UPDATE views = views + :views
-        // 	',
-        // 	[
-        // 		'path' => $path,
-        // 		'date' => $date,
-        // 		'views' => $views,
-        // 	]
+        //  '
+        //  INSERT INTO analytics_page_view (path, date, views)
+        //  VALUES (:path, :date, :views)
+        //  ON DUPLICATE KEY UPDATE views = views + :views
+        //  ',
+        //  [
+        //      'path' => $path,
+        //      'date' => $date,
+        //      'views' => $views,
+        //  ]
         // );
     }
 
@@ -57,20 +57,22 @@ class AnalyticsRepository
         \DateTimeInterface $to,
         int $limit = 10,
     ): array {
-        /* @var list<array{path: string, total: numeric-string}> */
-        return $this->db->executeQuery(
+        /** @var list<array{path: string, total: numeric-string}> $rows */
+        $rows = $this->db->executeQuery(
             '
-			SELECT path, SUM(views) as total
-			FROM analytics_page_view
+            SELECT path, SUM(views) as total
+            FROM analytics_page_view
             WHERE date BETWEEN :from AND :to
-			GROUP BY path
-			ORDER BY total DESC
-			LIMIT '.$limit,
+            GROUP BY path
+            ORDER BY total DESC
+            LIMIT '.$limit,
             [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
             ],
         )->fetchAllAssociative();
+
+        return $rows;
     }
 
     /**
@@ -82,8 +84,8 @@ class AnalyticsRepository
         \DateTimeInterface $from,
         \DateTimeInterface $to,
     ): array {
-        /* @var list<array{date: string, total: numeric-string}> */
-        return $this->db->fetchAllAssociative(
+        /** @var list<array{date: string, total: numeric-string}> $rows */
+        $rows = $this->db->fetchAllAssociative(
             '
             SELECT date, SUM(views) as total
             FROM analytics_page_view
@@ -96,6 +98,8 @@ class AnalyticsRepository
                 'to' => $to->format('Y-m-d'),
             ],
         );
+
+        return $rows;
     }
 
     /**
@@ -150,8 +154,9 @@ class AnalyticsRepository
         \DateTimeInterface $to,
         int $limit = 10,
     ): array {
-        /* @var list<array{path: string, code: string, hits: numeric-string}> */
-        return $this->db->fetchAllAssociative('
+        /** @var list<array{path: string, code: string, hits: numeric-string}> $rows */
+        $rows = $this->db->fetchAllAssociative(
+            '
             SELECT path, code, SUM(hits) AS hits
             FROM analytics_errors
             WHERE date BETWEEN :from AND :to
@@ -163,6 +168,8 @@ class AnalyticsRepository
                 'to' => $to->format('Y-m-d'),
             ],
         );
+
+        return $rows;
     }
 
     /**
@@ -247,8 +254,8 @@ class AnalyticsRepository
         \DateTimeInterface $to,
         int $limit = 10,
     ): array {
-        /* @var list<array{domain: string, total: numeric-string}> */
-        return $this->db->fetchAllAssociative(
+        /** @var list<array{domain: string, total: numeric-string}> $rows */
+        $rows = $this->db->fetchAllAssociative(
             '
             SELECT domain, SUM(hits) AS total
             FROM analytics_referrer
@@ -261,6 +268,8 @@ class AnalyticsRepository
                 'to' => $to->format('Y-m-d'),
             ],
         );
+
+        return $rows;
     }
 
     /**
@@ -274,8 +283,8 @@ class AnalyticsRepository
         \DateTimeInterface $to,
         int $limit = 10,
     ): array {
-        /* @var list<array{domain: string, total: numeric-string}> */
-        return $this->db->fetchAllAssociative(
+        /** @var list<array{domain: string, total: numeric-string}> $rows */
+        $rows = $this->db->fetchAllAssociative(
             '
             SELECT domain, SUM(hits) AS total
             FROM analytics_referrer
@@ -290,6 +299,8 @@ class AnalyticsRepository
                 'to' => $to->format('Y-m-d'),
             ],
         );
+
+        return $rows;
     }
 
     /**
@@ -308,7 +319,7 @@ class AnalyticsRepository
             return [];
         }
 
-        /** @var list<array{date:string, total:numeric-string}> $data */
+        /** @var list<array{date:string, total:int|string|null}> $data */
         $data = $this->db->executeQuery(
             '
             SELECT date, SUM(views) as total
@@ -328,7 +339,10 @@ class AnalyticsRepository
             ],
         )->fetchAllAssociative();
 
-        return $this->fillMissingSeries($data, $from, $to, 'views');
+        /** @var list<array{date: string, views: int}> $filled */
+        $filled = $this->fillMissingSeries($data, $from, $to, 'views');
+
+        return $filled;
     }
 
     /**
@@ -366,8 +380,8 @@ class AnalyticsRepository
      */
     public function getTopRegions(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 10): array
     {
-        /* @var list<array{country_code: string, country_name: string, total: numeric-string}> */
-        return $this->db->fetchAllAssociative(
+        /** @var list<array{country_code: string, country_name: string, total: numeric-string}> $rows */
+        $rows = $this->db->fetchAllAssociative(
             '
             SELECT country_code, country_name, SUM(hits) AS total
             FROM analytics_regions
@@ -380,6 +394,8 @@ class AnalyticsRepository
                 'to' => $to->format('Y-m-d'),
             ],
         );
+
+        return $rows;
     }
 
     /**
@@ -406,13 +422,15 @@ class AnalyticsRepository
             ],
         );
 
-        /* @var list<array{date:string,subscribers:int}> */
-        return $this->fillMissingSeries(
+        /** @var list<array{date: string, subscribers: int}> $filled */
+        $filled = $this->fillMissingSeries(
             $data,
             $from,
             $to,
             'subscribers',
         );
+
+        return $filled;
     }
 
     /**
@@ -422,8 +440,8 @@ class AnalyticsRepository
      */
     public function getCurrentSubscribersPerFeed(): array
     {
-        /* @var list<array{path: string, subscribers: numeric-string}> */
-        return $this->db->fetchAllAssociative(
+        /** @var list<array{path: string, subscribers: numeric-string}> $rows */
+        $rows = $this->db->fetchAllAssociative(
             '
             SELECT s.path, s.subscribers
             FROM analytics_subscribers s
@@ -436,6 +454,8 @@ class AnalyticsRepository
             LIMIT 10
             ',
         );
+
+        return $rows;
     }
 
     /**
@@ -445,8 +465,8 @@ class AnalyticsRepository
      */
     public function getTopBots(\DateTimeInterface $from, \DateTimeInterface $to, int $limit = 15): array
     {
-        /* @var list<array{user_agent: string, total: numeric-string}> */
-        return $this->db->fetchAllAssociative(
+        /** @var list<array{user_agent: string, total: numeric-string}> $rows */
+        $rows = $this->db->fetchAllAssociative(
             '
             SELECT user_agent, SUM(hits) AS total
             FROM analytics_bots
@@ -459,6 +479,8 @@ class AnalyticsRepository
                 'to' => $to->format('Y-m-d'),
             ],
         );
+
+        return $rows;
     }
 
     /**
@@ -483,11 +505,11 @@ class AnalyticsRepository
         $lastMonth = $today->modify('first day of last month');
 
         /** @var array{
-         *     views_today:string|int|null,
-         *     views_yesterday:string|int|null,
-         *     views_this_month:string|int|null,
-         *     views_last_month:string|int|null
-         * } $views
+         *     views_today?: int|string|null,
+         *     views_yesterday?: int|string|null,
+         *     views_this_month?: int|string|null,
+         *     views_last_month?: int|string|null
+         * }|false $views
          */
         $views = $this->db->fetchAssociative(
             '
@@ -528,9 +550,9 @@ class AnalyticsRepository
         );
 
         /** @var array{
-         *     unique_this_month:string|int|null,
-         *     unique_last_month:string|int|null
-         * } $visitors
+         *     unique_this_month?: int|string|null,
+         *     unique_last_month?: int|string|null
+         * }|false $visitors
          */
         $visitors = $this->db->fetchAssociative(
             '
@@ -557,13 +579,13 @@ class AnalyticsRepository
         );
 
         return [
-            'viewsToday' => (int) ($views['views_today'] ?? 0),
-            'viewsYesterday' => (int) ($views['views_yesterday'] ?? 0),
-            'viewsThisMonth' => (int) ($views['views_this_month'] ?? 0),
-            'viewsLastMonth' => (int) ($views['views_last_month'] ?? 0),
+            'viewsToday' => is_array($views) ? (int) ($views['views_today'] ?? 0) : 0,
+            'viewsYesterday' => is_array($views) ? (int) ($views['views_yesterday'] ?? 0) : 0,
+            'viewsThisMonth' => is_array($views) ? (int) ($views['views_this_month'] ?? 0) : 0,
+            'viewsLastMonth' => is_array($views) ? (int) ($views['views_last_month'] ?? 0) : 0,
 
-            'uniqueVisitorsThisMonth' => (int) ($visitors['unique_this_month'] ?? 0),
-            'uniqueVisitorsLastMonth' => (int) ($visitors['unique_last_month'] ?? 0),
+            'uniqueVisitorsThisMonth' => is_array($visitors) ? (int) ($visitors['unique_this_month'] ?? 0) : 0,
+            'uniqueVisitorsLastMonth' => is_array($visitors) ? (int) ($visitors['unique_last_month'] ?? 0) : 0,
         ];
     }
 
@@ -572,10 +594,13 @@ class AnalyticsRepository
      *
      * The query should return rows with a "date" column and a "total" column.
      *
-     * @param list<array{date:string,total:int|string|null}> $data
-     * @param string                                         $valueKey The key to use in the returned array (e.g. "views", "subscribers")
+     * @param list<array{
+     *     date:string,
+     *     total:int|string|null
+     * }> $data
+     * @param string $valueKey The key to use in the returned array (e.g. "views", "subscribers")
      *
-     * @return list<array{date:string}>
+     * @return list<array<string, mixed>>
      */
     private function fillMissingSeries(
         array $data,
@@ -586,7 +611,8 @@ class AnalyticsRepository
         $indexed = [];
 
         foreach ($data as $row) {
-            $indexed[$row['date']] = (int) $row['total'];
+            $total = $row['total'] ?? 0;
+            $indexed[$row['date']] = is_numeric($total) ? (int) $total : 0;
         }
 
         $result = [];
@@ -642,6 +668,13 @@ class AnalyticsRepository
         \DateTimeInterface $from,
         \DateTimeInterface $to,
     ): array {
+        /** @var array{
+         *     total?: int|string|null,
+         *     unique_ips?: int|string|null,
+         *     high?: int|string|null,
+         *     critical?: int|string|null
+         * }|false $result
+         */
         $result = $this->db->fetchAssociative(
             '
             SELECT
@@ -659,10 +692,10 @@ class AnalyticsRepository
         );
 
         return [
-            'total' => (int) ($result['total'] ?? 0),
-            'uniqueIps' => (int) ($result['unique_ips'] ?? 0),
-            'high' => (int) ($result['high'] ?? 0),
-            'critical' => (int) ($result['critical'] ?? 0),
+            'total' => is_array($result) ? (int) ($result['total'] ?? 0) : 0,
+            'uniqueIps' => is_array($result) ? (int) ($result['unique_ips'] ?? 0) : 0,
+            'high' => is_array($result) ? (int) ($result['high'] ?? 0) : 0,
+            'critical' => is_array($result) ? (int) ($result['critical'] ?? 0) : 0,
         ];
     }
 
@@ -676,7 +709,8 @@ class AnalyticsRepository
         \DateTimeInterface $to,
         int $limit = 10,
     ): array {
-        return $this->db->fetchAllAssociative(
+        /** @var list<array{path:string,total:numeric-string}> $rows */
+        $rows = $this->db->fetchAllAssociative(
             '
             SELECT
                 path,
@@ -691,6 +725,8 @@ class AnalyticsRepository
                 'to' => $to->format('Y-m-d'),
             ],
         );
+
+        return $rows;
     }
 
     /**
@@ -703,7 +739,8 @@ class AnalyticsRepository
         \DateTimeInterface $to,
         int $limit = 10,
     ): array {
-        return $this->db->fetchAllAssociative(
+        /** @var list<array{type:string,total:numeric-string}> $rows */
+        $rows = $this->db->fetchAllAssociative(
             '
             SELECT
                 type,
@@ -718,6 +755,8 @@ class AnalyticsRepository
                 'to' => $to->format('Y-m-d'),
             ],
         );
+
+        return $rows;
     }
 
     /**
@@ -730,7 +769,8 @@ class AnalyticsRepository
         \DateTimeInterface $to,
         int $limit = 10,
     ): array {
-        return $this->db->fetchAllAssociative(
+        /** @var list<array{ip:string,total:numeric-string}> $rows */
+        $rows = $this->db->fetchAllAssociative(
             '
             SELECT
                 ip,
@@ -745,6 +785,8 @@ class AnalyticsRepository
                 'to' => $to->format('Y-m-d'),
             ],
         );
+
+        return $rows;
     }
 
     /**
@@ -756,7 +798,8 @@ class AnalyticsRepository
         \DateTimeInterface $from,
         \DateTimeInterface $to,
     ): array {
-        return $this->db->fetchAllAssociative(
+        /** @var list<array{date:string,total:numeric-string}> $rows */
+        $rows = $this->db->fetchAllAssociative(
             '
             SELECT
                 date,
@@ -771,6 +814,8 @@ class AnalyticsRepository
                 'to' => $to->format('Y-m-d'),
             ],
         );
+
+        return $rows;
     }
 
     /**
@@ -788,7 +833,15 @@ class AnalyticsRepository
     public function getRecentSecurityEvents(
         int $limit = 20,
     ): array {
-        return $this->db->fetchAllAssociative(
+        /** @var list<array{
+         *     date:string,
+         *     type:string,
+         *     severity:int,
+         *     path:string,
+         *     ip:string,
+         *     hits:int
+         * }> $rows */
+        $rows = $this->db->fetchAllAssociative(
             '
             SELECT
                 date,
@@ -801,6 +854,8 @@ class AnalyticsRepository
             ORDER BY id DESC
             LIMIT '.(int) $limit,
         );
+
+        return $rows;
     }
 
     /**
@@ -820,7 +875,15 @@ class AnalyticsRepository
     public function getCriticalSecurityEvents(
         int $limit = 10,
     ): array {
-        return $this->db->fetchAllAssociative(
+        /** @var list<array{
+         *     date:string,
+         *     type:string,
+         *     severity:int,
+         *     path:string,
+         *     ip:string,
+         *     hits:int
+         * }> $rows */
+        $rows = $this->db->fetchAllAssociative(
             '
             SELECT
                 date,
@@ -834,6 +897,8 @@ class AnalyticsRepository
             ORDER BY severity DESC, hits DESC
             LIMIT '.(int) $limit,
         );
+
+        return $rows;
     }
 
     /**
@@ -845,7 +910,8 @@ class AnalyticsRepository
         \DateTimeInterface $from,
         \DateTimeInterface $to,
     ): array {
-        return $this->db->fetchAllAssociative(
+        /** @var list<array{method:string,total:numeric-string}> $rows */
+        $rows = $this->db->fetchAllAssociative(
             '
             SELECT
                 method,
@@ -860,6 +926,8 @@ class AnalyticsRepository
                 'to' => $to->format('Y-m-d'),
             ],
         );
+
+        return $rows;
     }
 
     /**
@@ -872,7 +940,8 @@ class AnalyticsRepository
         \DateTimeInterface $to,
         int $limit = 10,
     ): array {
-        return $this->db->fetchAllAssociative(
+        /** @var list<array{type:string,total:numeric-string}> $rows */
+        $rows = $this->db->fetchAllAssociative(
             '
             SELECT
                 type,
@@ -887,5 +956,7 @@ class AnalyticsRepository
                 'to' => $to->format('Y-m-d'),
             ],
         );
+
+        return $rows;
     }
 }

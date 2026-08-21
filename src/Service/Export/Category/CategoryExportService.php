@@ -58,27 +58,31 @@ final class CategoryExportService extends AbstractExportService
      */
     protected function normalise(object $category): object
     {
+        if (!$category instanceof Category) {
+            throw new \InvalidArgumentException('Expected instance of '.Category::class);
+        }
+
         return $this->normaliser->normalise($category);
     }
 
     /**
      * Get categories by IDs via the repository.
      *
-     * @param array $ids the IDs of the categories to retrieve
+     * @param list<string> $ids the IDs of the categories to retrieve
      *
-     * @return iterable<Category> the categories
+     * @return list<Category> the categories
      */
-    public function getCategoriesByIds(array $ids): iterable
+    public function getCategoriesByIds(array $ids): array
     {
-        return $this->repository->getFilteredIds($ids);
+        return $this->repository->findBy(['id' => $ids]);
     }
 
     /**
      * Get all categories via the repository.
      *
-     * @return iterable<Category> the categories
+     * @return list<Category> the categories
      */
-    public function getAllCategories(): iterable
+    public function getAllCategories(): array
     {
         return $this->repository->findAll();
     }
