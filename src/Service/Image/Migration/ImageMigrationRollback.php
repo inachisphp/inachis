@@ -33,7 +33,27 @@ class ImageMigrationRollback
     /**
      * Execute full file and database rollback.
      *
-     * @param array<string, mixed> $plan
+     * @param array{
+     *     images?: list<array{id: string, oldFilename: string, newFilename: string}>,
+     *     contentReplacements?: array<string, string>,
+     *     entityBackups?: array{
+     *         images?: array<string, array{
+     *             title?: string,
+     *             description?: string|null,
+     *             authorId?: string|null,
+     *             createdAt?: string|null,
+     *             updatedAt?: string|null,
+     *             filename: string,
+     *             filesize: int,
+     *             checksum: string,
+     *             dimensionX: int,
+     *             dimensionY: int,
+     *             filetype?: string
+     *         }>,
+     *         pages?: array<string, array{featureImageId?: string|null}>,
+     *         series?: array<string, array{imageId?: string|null}>
+     *     }
+     * } $plan
      */
     public function rollbackPlan(
         array $plan,
@@ -42,6 +62,7 @@ class ImageMigrationRollback
         OutputInterface $output,
     ): void {
         $images = $plan['images'] ?? [];
+        /** @var array<string, string> $contentReplacements */
         $contentReplacements = $plan['contentReplacements'] ?? [];
         $entityBackups = $plan['entityBackups'] ?? [];
 
@@ -53,7 +74,7 @@ class ImageMigrationRollback
         $manifestPath = $backupDir.'backup_manifest.json';
         if (file_exists($manifestPath)) {
             /** @var array<string, array{sha256: string, size: int}> $manifest */
-            $manifest = json_decode((string) file_get_contents($manifestPath), true);
+            $manifest = json_decode((string) file_get_contents($manifestPath), true) ?? [];
             foreach ($manifest as $file => $meta) {
                 $bakPath = $backupDir.$file;
                 if (file_exists($bakPath)) {
@@ -70,9 +91,9 @@ class ImageMigrationRollback
         try {
             // 2. Restore Physical Binary Files and Re-instantiate Deleted Image Entities
             foreach ($images as $img) {
-                $imageId = $img['id'];
-                $oldFilename = $img['oldFilename'];
-                $newFilename = $img['newFilename'];
+                $imageId = (string) $img['id'];
+                $oldFilename = (string) $img['oldFilename'];
+                $newFilename = (string) $img['newFilename'];
 
                 $bakPath = $backupDir.$oldFilename;
                 $targetPath = $imageDir.$oldFilename;
@@ -124,6 +145,7 @@ class ImageMigrationRollback
             }
 
             // 3. Restore Page content and Feature Image relationships
+            /** @var array<string, string> $reverseReplacements */
             $reverseReplacements = array_flip($contentReplacements);
             $pages = $this->pageRepository->findAll();
 

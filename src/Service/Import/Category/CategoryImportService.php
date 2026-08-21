@@ -76,9 +76,7 @@ final class CategoryImportService
                 }
 
                 $cat->setDescription($dto->description ?? $cat->getDescription());
-                $cat->setVisible($dto->visible ?? $cat->isVisible());
-                $cat->setImage($dto->image ?? $cat->getImage());
-                $cat->setIcon($dto->icon ?? $cat->getIcon());
+                $cat->setVisible($dto->visible);
             }
             $uow = $this->entityManager->getUnitOfWork();
             foreach ($existingCategories as $category) {
@@ -99,7 +97,17 @@ final class CategoryImportService
     /**
      * Maps the imported data to DTOs.
      *
-     * @return CategoryExportDto[]
+     * @param list<array{
+     *     id?: string|null,
+     *     title?: string|null,
+     *     fullPath?: string|null,
+     *     description?: string|null,
+     *     visible?: bool|null,
+     *     image?: string|null,
+     *     icon?: string|null
+     * }> $data
+     *
+     * @return list<CategoryExportDto>
      */
     public function mapToDto(array $data): array
     {
@@ -107,13 +115,15 @@ final class CategoryImportService
 
         foreach ($data as $category) {
             $dto = new CategoryExportDto();
-            $dto->id = $category['id'] ?? null;
-            $dto->title = $category['title'] ?? null;
-            $dto->fullPath = $category['fullPath'] ?? ($category['title'] ?? '');
-            $dto->description = $category['description'] ?? null;
-            $dto->visible = $category['visible'] ?? true;
-            $dto->image = $category['image'] ?? null;
-            $dto->icon = $category['icon'] ?? null;
+            $dto->id = isset($category['id']) ? (string) $category['id'] : null;
+            $dto->title = (string) ($category['title'] ?? '');
+            $dto->fullPath = isset($category['fullPath'])
+                ? (string) $category['fullPath']
+                : (isset($category['title']) ? (string) $category['title'] : '');
+            $dto->description = isset($category['description']) ? (string) $category['description'] : null;
+            $dto->visible = (bool) ($category['visible'] ?? true);
+            $dto->image = isset($category['image']) ? (string) $category['image'] : null;
+            $dto->icon = isset($category['icon']) ? (string) $category['icon'] : null;
 
             $dtos[] = $dto;
         }

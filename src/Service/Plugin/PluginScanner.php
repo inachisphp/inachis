@@ -53,12 +53,13 @@ final readonly class PluginScanner extends AbstractPackageScanner
         string $path,
         array $manifest,
     ): Plugin {
-        $plugin = new Plugin(
-            ...$this->createBasePackage(
-                $path,
-                $manifest,
-            ),
+        /** @var array<string> $basePackage */
+        $basePackage = $this->createBasePackage(
+            $path,
+            $manifest,
         );
+
+        $plugin = new Plugin(...$basePackage);
 
         $plugin->features = $this->extractFeatures(
             $manifest,

@@ -48,7 +48,7 @@ final class PageImportService
         $this->entityManager->beginTransaction();
 
         try {
-            foreach ($pageDtos['pages'] as $dto) {
+            foreach ($pageDtos as $dto) {
                 if (!$dto instanceof PageExportDto) {
                     throw new \InvalidArgumentException('All items must be PageExportDto');
                 }
@@ -70,7 +70,7 @@ final class PageImportService
                     $page->setPostDate(new \DateTimeImmutable($dto->postDate));
                 }
 
-                foreach ($dto->categories ?? [] as $categoryDto) {
+                foreach ($dto->categories as $categoryDto) {
                     $category = $this->categoryService->findOrCreateByPath(
                         $categoryDto->path,
                         $options->createMissingCategories,
@@ -88,7 +88,7 @@ final class PageImportService
                     }
                 }
 
-                foreach ($dto->tags ?? [] as $tagDto) {
+                foreach ($dto->tags as $tagDto) {
                     $tag = $this->tagService->findOrCreateByTitle(
                         $tagDto->title,
                         $options->createMissingTags,

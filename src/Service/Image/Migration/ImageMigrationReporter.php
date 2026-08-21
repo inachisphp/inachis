@@ -24,7 +24,45 @@ class ImageMigrationReporter
         string $reportMdFile,
         string $reportJsonFile,
     ): void {
-        $markdown = $this->generateReportMarkdown($plan, $appliedStats);
+        /** @var array{
+         *     images?: list<array{
+         *         oldFilename: string,
+         *         newFilename: string,
+         *         needsResize: bool,
+         *         convertToWebp: bool,
+         *         origWidth: int,
+         *         origHeight: int,
+         *         origMegapixels: float,
+         *         targetWidth: int,
+         *         targetHeight: int,
+         *         targetMegapixels: float,
+         *         pixelReductionPercent: float|int,
+         *         oldFilesize: int,
+         *         estimatedFilesize: int
+         *     }>,
+         *     duplicates?: list<array{duplicateFilename: string, canonicalFilename: string, pixelHash?: string}>,
+         *     broken?: list<array{entity: string, id: string, filename: string}>,
+         *     unused?: list<array{filename: string, size: int}>,
+         *     stats?: array{
+         *         totalOriginalBytes?: int,
+         *         totalEstimatedFinalBytes?: int,
+         *         totalOriginalMegapixels?: float,
+         *         totalFinalMegapixels?: float
+         *     }
+         * } $typedPlan */
+        $typedPlan = $plan;
+
+        /** @var array{
+         *     totalOriginalBytes?: int,
+         *     totalFinalBytes?: int,
+         *     renamedCount?: int,
+         *     webpCount?: int,
+         *     resizedCount?: int,
+         *     errors?: list<string>
+         * } $typedAppliedStats */
+        $typedAppliedStats = $appliedStats;
+
+        $markdown = $this->generateReportMarkdown($typedPlan, $typedAppliedStats);
         file_put_contents($reportMdFile, $markdown);
 
         $jsonReport = [
@@ -43,7 +81,26 @@ class ImageMigrationReporter
     /**
      * Display Git-like structured dry-run output.
      *
-     * @param array<string, mixed> $plan
+     * @param array{
+     *     images?: list<array{
+     *         oldFilename: string,
+     *         newFilename: string,
+     *         isDuplicate: bool,
+     *         needsResize: bool,
+     *         convertToWebp: bool,
+     *         origWidth: int,
+     *         origHeight: int,
+     *         origMegapixels: float,
+     *         targetWidth: int,
+     *         targetHeight: int,
+     *         targetMegapixels: float,
+     *         pixelReductionPercent: float|int
+     *     }>,
+     *     duplicates?: list<array{duplicateFilename: string, canonicalId: string}>,
+     *     broken?: list<mixed>,
+     *     unused?: list<mixed>,
+     *     stats?: array{totalOriginalBytes?: int, totalEstimatedFinalBytes?: int}
+     * } $plan
      */
     public function executeDryRun(OutputInterface $output, array $plan, int $pageCount, int $seriesCount): void
     {
@@ -76,7 +133,7 @@ class ImageMigrationReporter
                     $img['targetWidth'],
                     $img['targetHeight'],
                     $img['targetMegapixels'],
-                    $img['pixelReductionPercent'],
+                    (string) $img['pixelReductionPercent'],
                 ));
             }
         }
@@ -109,8 +166,40 @@ class ImageMigrationReporter
     /**
      * Generate comprehensive report Markdown document.
      *
-     * @param array<string, mixed> $plan
-     * @param array<string, mixed> $appliedStats
+     * @param array{
+     *     images?: list<array{
+     *         oldFilename: string,
+     *         newFilename: string,
+     *         needsResize: bool,
+     *         convertToWebp: bool,
+     *         origWidth: int,
+     *         origHeight: int,
+     *         origMegapixels: float,
+     *         targetWidth: int,
+     *         targetHeight: int,
+     *         targetMegapixels: float,
+     *         pixelReductionPercent: float|int,
+     *         oldFilesize: int,
+     *         estimatedFilesize: int
+     *     }>,
+     *     duplicates?: list<array{duplicateFilename: string, canonicalFilename: string, pixelHash?: string}>,
+     *     broken?: list<array{entity: string, id: string, filename: string}>,
+     *     unused?: list<array{filename: string, size: int}>,
+     *     stats?: array{
+     *         totalOriginalBytes?: int,
+     *         totalEstimatedFinalBytes?: int,
+     *         totalOriginalMegapixels?: float,
+     *         totalFinalMegapixels?: float
+     *     }
+     * } $plan
+     * @param array{
+     *     totalOriginalBytes?: int,
+     *     totalFinalBytes?: int,
+     *     renamedCount?: int,
+     *     webpCount?: int,
+     *     resizedCount?: int,
+     *     errors?: list<string>
+     * } $appliedStats
      */
     public function generateReportMarkdown(array $plan, array $appliedStats): string
     {
@@ -120,13 +209,13 @@ class ImageMigrationReporter
         $unused = $plan['unused'] ?? [];
         $stats = $plan['stats'] ?? [];
 
-        $origBytes = $appliedStats['totalOriginalBytes'] ?? ($stats['totalOriginalBytes'] ?? 0);
-        $finalBytes = $appliedStats['totalFinalBytes'] ?? ($stats['totalEstimatedFinalBytes'] ?? $origBytes);
+        $origBytes = (int) ($appliedStats['totalOriginalBytes'] ?? ($stats['totalOriginalBytes'] ?? 0));
+        $finalBytes = (int) ($appliedStats['totalFinalBytes'] ?? ($stats['totalEstimatedFinalBytes'] ?? $origBytes));
         $savedBytes = max(0, $origBytes - $finalBytes);
         $percentReduction = $origBytes > 0 ? round(($savedBytes / $origBytes) * 100.0, 2) : 0.0;
 
-        $origMP = $stats['totalOriginalMegapixels'] ?? 0.0;
-        $finalMP = $stats['totalFinalMegapixels'] ?? $origMP;
+        $origMP = (float) ($stats['totalOriginalMegapixels'] ?? 0.0);
+        $finalMP = (float) ($stats['totalFinalMegapixels'] ?? $origMP);
         $savedMP = max(0.0, $origMP - $finalMP);
 
         $md = "# Image Migration Report\n\n";
@@ -140,12 +229,12 @@ class ImageMigrationReporter
         $md .= sprintf("- **Broken references**: %d\n", count($broken));
         $md .= sprintf("- **Original size**: %s\n", $this->formatBytes($origBytes));
         $md .= sprintf("- **Final size**: %s\n", $this->formatBytes($finalBytes));
-        $md .= sprintf("- **Space saved**: %s (%s%% reduction)\n", $this->formatBytes($savedBytes), $percentReduction);
+        $md .= sprintf("- **Space saved**: %s (%s%% reduction)\n", $this->formatBytes($savedBytes), (string) $percentReduction);
         $md .= sprintf("- **Total Megapixels Removed**: %.2f MP\n\n", $savedMP);
 
         // Top 20 Resized Images
-        $resizedImages = array_filter($images, fn ($i) => !empty($i['needsResize']));
-        usort($resizedImages, fn ($a, $b) => ($b['origMegapixels'] <=> $a['origMegapixels']));
+        $resizedImages = array_filter($images, fn (array $i): bool => !empty($i['needsResize']));
+        usort($resizedImages, fn (array $a, array $b): int => ($b['origMegapixels'] <=> $a['origMegapixels']));
         $topResized = array_slice($resizedImages, 0, 20);
 
         if (!empty($topResized)) {
@@ -162,15 +251,15 @@ class ImageMigrationReporter
                     $r['targetWidth'],
                     $r['targetHeight'],
                     $r['targetMegapixels'],
-                    $r['pixelReductionPercent'],
+                    (string) $r['pixelReductionPercent'],
                 );
             }
             $md .= "\n";
         }
 
         // Top 20 WebP Conversions
-        $webpImages = array_filter($images, fn ($i) => !empty($i['convertToWebp']));
-        usort($webpImages, fn ($a, $b) => (($b['oldFilesize'] - $b['estimatedFilesize']) <=> ($a['oldFilesize'] - $a['estimatedFilesize'])));
+        $webpImages = array_filter($images, fn (array $i): bool => !empty($i['convertToWebp']));
+        usort($webpImages, fn (array $a, array $b): int => (($b['oldFilesize'] - $b['estimatedFilesize']) <=> ($a['oldFilesize'] - $a['estimatedFilesize'])));
         $topWebp = array_slice($webpImages, 0, 20);
 
         if (!empty($topWebp)) {
