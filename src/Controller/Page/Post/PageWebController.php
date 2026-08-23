@@ -18,6 +18,7 @@ use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Repository\Content\UrlRepository;
+use Inachis\Service\Ai\AiAudioManager;
 use Inachis\Service\Content\ReadingTime;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -54,12 +55,13 @@ class PageWebController extends AbstractWebController
         string $month,
         string $day,
         string $title,
+        AiAudioManager $audioManager,
         SeriesRepository $seriesRepository,
         UrlRepository $urlRepository,
     ): Response {
         $link = sprintf('%d/%02d/%02d/%s', $year, $month, $day, $title);
 
-        return $this->renderPostOrPage($link, $seriesRepository, $urlRepository);
+        return $this->renderPostOrPage($link, $audioManager, $seriesRepository, $urlRepository);
     }
 
     #[Route(
@@ -72,12 +74,13 @@ class PageWebController extends AbstractWebController
     )]
     public function getPage(
         Request $request,
+        AiAudioManager $audioManager,
         SeriesRepository $seriesRepository,
         UrlRepository $urlRepository,
     ): Response {
         $link = $request->attributes->getString('page');
 
-        return $this->renderPostOrPage($link, $seriesRepository, $urlRepository);
+        return $this->renderPostOrPage($link, $audioManager, $seriesRepository, $urlRepository);
     }
 
     /**
@@ -131,6 +134,7 @@ class PageWebController extends AbstractWebController
      */
     protected function renderPostOrPage(
         string $link,
+        AiAudioManager $audioManager,
         SeriesRepository $seriesRepository,
         UrlRepository $urlRepository,
     ): Response {
@@ -168,14 +172,17 @@ class PageWebController extends AbstractWebController
                 $seriesNav['next'] = $series->getItems()->get($postIndex + 1);
             }
         }
-        $crawlerDetect = new CrawlerDetect();
-        if (!$crawlerDetect->isCrawler()) {
-            // TODO: record page hit by day
-        }
+
+        $page = $url->getContent();
+
+        $hasAudio = $audioManager->hasAudio($page);
+        $audioUrl = $hasAudio ? $this->generateUrl('api_post_audio_stream', ['id' => $page->getId()]) : null;
 
         return $this->render('web/pages/post.html.twig', [
             'viewModel' => $this->viewModel,
-            'post' => $url->getContent(),
+            'audioUrl' => $audioUrl,
+            'hasAudio' => $hasAudio,
+            'post' => $page,
             'series' => $seriesNav,
             'textStats' => ReadingTime::getWordCountAndReadingTime($url->getContent()->getContent()),
             'url' => $url->getLink(),
