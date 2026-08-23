@@ -155,11 +155,10 @@ class SeriesController extends AbstractInachisController
                     'id' => $request->request->all('series')['itemList'],
                 ]);
                 foreach ($deleteItems as $deleteItem) {
-                    $series->getItems()->removeElement($deleteItem);
+                    $series->removeItem($deleteItem);
                 }
-                if ($series->getItems()->isEmpty()) {
-                    $series->setFirstDate(null)->setLastDate(null);
-                }
+
+                $series->recalculateDates();
             }
 
             $series->setAuthor($this->getCurrentUser());

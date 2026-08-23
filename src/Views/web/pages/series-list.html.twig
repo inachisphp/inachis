@@ -8,7 +8,7 @@
         {% set lazyload = false %}
         {% for entry in series %}
             <article class="series">
-                <a href="{{ path('app_series_view', { 'year': entry.firstDate|date('Y', viewModel.settings.displayTimezone), 'title': entry.title|lower }) }}">
+                <a href="{{ path('app_series_view', { 'year': entry.firstDate|date('Y', viewModel.settings.displayTimezone), 'title': entry.url}) }}">
                     <span class="image_container">
                     {% if (entry.image is not empty) %}
                         <img alt="{{ entry.image.altText }}" src="{% if not (entry.image.filename starts with 'http') %}/imgs/{% endif %}{{ entry.image.filename }}" width="400" />

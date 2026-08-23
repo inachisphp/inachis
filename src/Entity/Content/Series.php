@@ -457,4 +457,34 @@ class Series
             'private' => $private,
         ];
     }
+
+    /**
+     * Determines the correct values for first and last dates
+     *
+     * @return self
+     */
+    public function recalculateDates(): self
+    {
+        if ($this->items->isEmpty()) {
+            $this->firstDate = null;
+            $this->lastDate = null;
+
+            return $this;
+        }
+
+        $dates = [];
+        foreach ($this->items as $item) {
+            $dates[] = $item->getPostDate();
+        }
+
+        usort(
+            $dates,
+            static fn (\DateTimeImmutable $a, \DateTimeImmutable $b): int => $a <=> $b,
+        );
+
+        $this->firstDate = $dates[0];
+        $this->lastDate = $dates[array_key_last($dates)];
+
+        return $this;
+    }
 }
