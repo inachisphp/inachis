@@ -59,7 +59,7 @@ class WidgetController extends AbstractController
             'title' => $categoryName,
         ]);
         if ($category instanceof Category) {
-            return $this->entityManager->getRepository(Page::class)->getPagesWithCategory(
+            return $this->entityManager->getRepository(Page::class)->getLiveContentWithCategory(
                 $category,
                 $maxDisplayCount,
             );
