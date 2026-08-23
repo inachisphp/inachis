@@ -33,9 +33,9 @@ final class PageImportService
     /**
      * Imports the given pages.
      *
-     * @param iterable<PageExportDto> $pageDtos the pages to import
-     * @param User                    $author   the author of the pages
-     * @param ImportOptionsDto        $options  the import options
+     * @param iterable<object> $pageDtos the pages to import
+     * @param User             $author   the author of the pages
+     * @param ImportOptionsDto $options  the import options
      *
      * @return PageImportResult the result of the import
      */
@@ -48,7 +48,7 @@ final class PageImportService
         $this->entityManager->beginTransaction();
 
         try {
-            foreach ($pageDtos['pages'] as $dto) {
+            foreach ($pageDtos as $dto) {
                 if (!$dto instanceof PageExportDto) {
                     throw new \InvalidArgumentException('All items must be PageExportDto');
                 }
@@ -70,7 +70,7 @@ final class PageImportService
                     $page->setPostDate(new \DateTimeImmutable($dto->postDate));
                 }
 
-                foreach ($dto->categories ?? [] as $categoryDto) {
+                foreach ($dto->categories as $categoryDto) {
                     $category = $this->categoryService->findOrCreateByPath(
                         $categoryDto->path,
                         $options->createMissingCategories,
@@ -88,7 +88,7 @@ final class PageImportService
                     }
                 }
 
-                foreach ($dto->tags ?? [] as $tagDto) {
+                foreach ($dto->tags as $tagDto) {
                     $tag = $this->tagService->findOrCreateByTitle(
                         $tagDto->title,
                         $options->createMissingTags,
@@ -104,8 +104,6 @@ final class PageImportService
                         $result->warnings[] = "Tag not found: {$tagDto->title}";
                     }
                 }
-
-                // TODO: add page URL
 
                 $this->entityManager->persist($page);
                 ++$result->pagesImported;

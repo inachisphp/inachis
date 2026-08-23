@@ -139,11 +139,13 @@ class ElevenLabsAudioProvider implements AiAudioProviderInterface
     private function prepareTextForSpeech(string $rawText): string
     {
         // 1. Replace Markdown headings (# Title) with Title + ElevenLabs SSML Break Tag
-        $text = preg_replace_callback('/^(#{1,6})\s+(.+)$/m', function ($matches) {
+        $text = preg_replace_callback('/^(#{1,6})\s+(.+)$/m', static function (array $matches): string {
             $headingText = trim($matches[2]);
             // Adds a 1.2s break after a heading for natural podcast transition
             return sprintf('%s <break time="1.2s" />', $headingText);
         }, $rawText);
+
+        $text = is_string($text) ? $text : $rawText;
 
         // 2. Strip HTML tags but preserve break tags
         $text = strip_tags($text, '<break>');
@@ -151,7 +153,7 @@ class ElevenLabsAudioProvider implements AiAudioProviderInterface
         // 3. Normalize multiple blank lines/newlines
         $text = preg_replace('/\n{2,}/', "\n\n", $text);
 
-        return trim($text);
+        return trim(is_string($text) ? $text : '');
     }
 
     private function createException(int $statusCode, string $content): \Throwable
@@ -193,7 +195,22 @@ class ElevenLabsAudioProvider implements AiAudioProviderInterface
         }
 
         $data = json_decode($content, true);
+        if (!is_array($data)) {
+            return null;
+        }
 
-        return $data['detail']['message'] ?? $data['message'] ?? null;
+        if (isset($data['detail']) && is_array($data['detail']) && isset($data['detail']['message']) && is_string($data['detail']['message'])) {
+            return $data['detail']['message'];
+        }
+
+        if (isset($data['detail']) && is_string($data['detail'])) {
+            return $data['detail'];
+        }
+
+        if (isset($data['message']) && is_string($data['message'])) {
+            return $data['message'];
+        }
+
+        return null;
     }
 }

@@ -29,6 +29,7 @@ readonly class AiExceptionResponseFactory
             'error_code' => $exception->getErrorCode(),
             'http_status' => $exception->getHttpStatus(),
             'message' => $exception->getMessage(),
+            'provider' => $exception->provider,
         ];
 
         if ($exception->getPrevious()) {
@@ -36,11 +37,7 @@ readonly class AiExceptionResponseFactory
             $context['previous_message'] = $exception->getPrevious()->getMessage();
         }
 
-        if (property_exists($exception, 'provider')) {
-            $context['provider'] = $exception->provider;
-        }
-
-        if (property_exists($exception, 'providerStatusCode')) {
+        if (null !== $exception->providerStatusCode) {
             $context['provider_status_code'] = $exception->providerStatusCode;
         }
 

@@ -70,23 +70,45 @@ class GeminiAudioProvider implements AiAudioProviderInterface
 
         $response = $this->client->generateContent($payload, $this->model);
 
-        $part = $response['candidates'][0]['content']['parts'][0]['inlineData'] ?? null;
+        $base64Data = $this->extractAudioData($response);
 
-        if (empty($part['data'])) {
-            throw new AiResponseException(
-                'Gemini failed to return synthesized audio data.',
-                provider: 'gemini',
-            );
-        }
-
-        $audioBinary = base64_decode($part['data'], true);
+        $audioBinary = base64_decode($base64Data, true);
 
         if (false === $audioBinary) {
             throw new AiResponseException(
                 'Failed to decode audio response from Gemini.', 
                 provider: 'gemini'
-            );        }
+            );
+        }
 
         return $audioBinary;
+    }
+
+    /**
+     * @param array<string, mixed> $response
+     */
+    private function extractAudioData(array $response): string
+    {
+        $candidates = $response['candidates'] ?? null;
+        if (!is_array($candidates) || !isset($candidates[0]) || !is_array($candidates[0])) {
+            throw new AiResponseException('Gemini response missing candidate data.', provider: 'gemini');
+        }
+
+        $content = $candidates[0]['content'] ?? null;
+        if (!is_array($content)) {
+            throw new AiResponseException('Gemini response missing content payload.', provider: 'gemini');
+        }
+
+        $parts = $content['parts'] ?? null;
+        if (!is_array($parts) || !isset($parts[0]) || !is_array($parts[0])) {
+            throw new AiResponseException('Gemini response missing parts data.', provider: 'gemini');
+        }
+
+        $inlineData = $parts[0]['inlineData'] ?? null;
+        if (!is_array($inlineData) || empty($inlineData['data']) || !is_string($inlineData['data'])) {
+            throw new AiResponseException('Gemini failed to return synthesized audio data.', provider: 'gemini');
+        }
+
+        return $inlineData['data'];
     }
 }

@@ -65,12 +65,8 @@ final readonly class PackageManager
     ): ?Package {
         return match ($type) {
             PackageType::Core => throw new \LogicException('The core package is not managed by PackageManager.'),
-
             PackageType::Theme => $this->themeScanner->getTheme($identifier),
-
             PackageType::Plugin => $this->pluginScanner->getPlugin($identifier),
-
-            default => throw new \LogicException(sprintf('Package type "%s" is not handled by PackageManager.', $type->value)),
         };
     }
 

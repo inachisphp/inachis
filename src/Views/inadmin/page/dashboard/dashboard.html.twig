@@ -50,6 +50,7 @@
     {% endif %}
     <h2>Welcome back {{ app.user.displayName }},</h2>
 </div>
+<div class="col-12 nested-grid">
 
 <div class="col-6">
 {% set showResume = dashboard.recentDraft|default(null) is not empty and can('PAGE', 'EDIT') %}
@@ -97,5 +98,5 @@
     {% include "inadmin/page/dashboard/series.html.twig" %}
 </div>
 {% endif %}
-
+</div>
 {% endblock content %}

@@ -90,7 +90,7 @@ final class VersionService
         if (str_starts_with($constraint, '^')) {
             $min = substr($constraint, 1);
             $parts = explode('.', $min);
-            $nextMajor = ((int) ($parts[0] ?? 0)) + 1;
+            $nextMajor = ((int) $parts[0]) + 1;
             $max = $nextMajor.'.0.0';
 
             return version_compare($version, $min, '>=')
@@ -101,7 +101,7 @@ final class VersionService
             $min = substr($constraint, 1);
             $parts = explode('.', $min);
             $nextMinor = ((int) ($parts[1] ?? 0)) + 1;
-            $max = ($parts[0] ?? 0).'.'.$nextMinor.'.0';
+            $max = $parts[0].'.'.$nextMinor.'.0';
 
             return version_compare($version, $min, '>=')
                 && version_compare($version, $max, '<');

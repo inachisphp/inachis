@@ -223,7 +223,7 @@ class ImageMigrationPlanner
             $estimatedFilesize = $filesize;
             $finalExt = $origExt;
 
-            if (!$noWebp && in_array($origExt, ['jpg', 'jpeg', 'png', 'heic', 'heif', 'webp'], true) && 'svg' !== $origExt && $fileExists) {
+            if (!$noWebp && in_array($origExt, ['jpg', 'jpeg', 'png', 'heic', 'heif', 'webp'], true) && $fileExists) {
                 $tempWebpPath = tempnam(sys_get_temp_dir(), 'scan_webp_').'.webp';
                 try {
                     if ($this->imageProcessor->convertToWebp($filePath, $tempWebpPath)) {

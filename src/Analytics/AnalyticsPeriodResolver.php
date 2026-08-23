@@ -49,7 +49,8 @@ class AnalyticsPeriodResolver
         );
 
         if (!$request->query->has('range')) {
-            $period = $state->getFilters()['period'] ?? [];
+            /** @var array{range?: string|null, from?: string|null, to?: string|null} $period */
+            $period = is_array($state->getFilters()['period'] ?? null) ? $state->getFilters()['period'] : [];
 
             if (!empty($period['range'])) {
                 $request->query->set('range', $period['range']);
@@ -69,19 +70,19 @@ class AnalyticsPeriodResolver
         $this->viewStateManager->save(
             $request->getSession(),
             $stateKey,
-            new ContentQueryParameters(
-                filters: [
+            new ContentQueryParameters([
+                'filters' => [
                     'period' => [
                         'range' => $period->range,
                         'from' => $period->from->format('Y-m-d'),
                         'to' => $period->to->format('Y-m-d'),
                     ],
                 ],
-                sort: '',
-                limit: 0,
-                offset: 0,
-                view: '',
-            ),
+                'sort' => '',
+                'limit' => 0,
+                'offset' => 0,
+                'view' => '',
+            ]),
         );
 
         return $period;

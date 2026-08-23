@@ -20,7 +20,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ImageMigrationApplier
 {
-    private const BATCH_SIZE = 50;
     private const MAX_DIMENSION = 1024;
 
     public function __construct(
@@ -36,7 +35,13 @@ class ImageMigrationApplier
     /**
      * Validate plan freshness against current database state.
      *
-     * @param array<string, mixed> $plan
+     * @param array{
+     *     metadata?: array{
+     *         imageCount?: int,
+     *         pageCount?: int,
+     *         seriesCount?: int
+     *     }
+     * } $plan
      */
     public function isPlanStale(array $plan): bool
     {
@@ -57,10 +62,40 @@ class ImageMigrationApplier
     /**
      * Apply migration plan.
      *
-     * @param array<string, mixed> $plan
-     * @param array<string, mixed> $checkpoint
+     * @param array{
+     *     images?: list<array{
+     *         id: string,
+     *         oldFilename: string,
+     *         newFilename: string,
+     *         oldFilesize: int,
+     *         isDuplicate: bool,
+     *         needsResize: bool,
+     *         convertToWebp: bool
+     *     }>,
+     *     duplicates?: list<array{
+     *         duplicateId: string,
+     *         canonicalId: string,
+     *         duplicateFilename: string
+     *     }>,
+     *     contentReplacements?: array<string, string>
+     * } $plan
+     * @param array{
+     *     imageIndex: int,
+     *     pageIndex: int,
+     *     seriesIndex: int,
+     *     completedImageIds: list<string>,
+     *     completedPageIds: list<string>,
+     *     completedSeriesIds: list<string>
+     * } $checkpoint
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     renamedCount: int,
+     *     resizedCount: int,
+     *     webpCount: int,
+     *     totalOriginalBytes: int,
+     *     totalFinalBytes: int,
+     *     errors: list<string>
+     * }
      */
     public function applyPlan(
         array $plan,
@@ -77,6 +112,7 @@ class ImageMigrationApplier
 
         $images = $plan['images'] ?? [];
         $duplicates = $plan['duplicates'] ?? [];
+        /** @var array<string, string> $contentReplacements */
         $contentReplacements = $plan['contentReplacements'] ?? [];
 
         // 1. Create Physical Backups with SHA-256 Manifest
@@ -101,7 +137,9 @@ class ImageMigrationApplier
         file_put_contents($backupDir.'backup_manifest.json', (string) json_encode($backupManifest, JSON_PRETTY_PRINT));
 
         // Build deduplication maps
+        /** @var array<string, string> $dedupFilenameMap */
         $dedupFilenameMap = [];
+        /** @var array<string, string> $duplicateIdMap */
         $duplicateIdMap = [];
         if (!$noDedup && !empty($duplicates)) {
             $imagePlanById = [];
@@ -243,13 +281,14 @@ class ImageMigrationApplier
                     $finalSize = file_exists($targetPath) ? (filesize($targetPath) ?: 0) : 0;
                     $totalFinalBytes += $finalSize;
                     $finalChecksum = file_exists($targetPath) ? (hash_file('sha256', $targetPath) ?: '') : '';
-                    $finalDimensions = file_exists($targetPath) ? (getimagesize($targetPath) ?: [0, 0]) : [0, 0];
+                    /** @var array{0: int, 1: int}|false $finalDimensions */
+                    $finalDimensions = file_exists($targetPath) ? getimagesize($targetPath) : false;
 
                     $imageEntity->setFilename($targetFilename);
                     $imageEntity->setFilesize($finalSize);
                     $imageEntity->setChecksum($finalChecksum);
-                    $imageEntity->setDimensionX($finalDimensions[0] ?? 0);
-                    $imageEntity->setDimensionY($finalDimensions[1] ?? 0);
+                    $imageEntity->setDimensionX(false !== $finalDimensions ? $finalDimensions[0] : 0);
+                    $imageEntity->setDimensionY(false !== $finalDimensions ? $finalDimensions[1] : 0);
 
                     $mimeType = file_exists($targetPath) ? $this->imageProcessor->detectMimeType($targetPath) : 'image/jpeg';
                     if ($imageEntity->isValidFiletype($mimeType)) {
@@ -280,7 +319,8 @@ class ImageMigrationApplier
         $output->writeln('');
 
         // 3. Update Pages safely by fetching IDs upfront
-        $pageIds = array_map(fn ($p) => (string) $p->getId(), $this->pageRepository->findBy([], ['id' => 'ASC']));
+        /** @var list<string> $pageIds */
+        $pageIds = array_map(fn (Page $p): string => (string) $p->getId(), $this->pageRepository->findBy([], ['id' => 'ASC']));
         $output->writeln('<info>Updating page content and feature images...</info>');
         $pageProgress = new ProgressBar($output, count($pageIds));
         $pageProgress->setFormat("%label%\n%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%eta:-6s% %memory:6s%");
@@ -341,7 +381,8 @@ class ImageMigrationApplier
         $output->writeln('');
 
         // 4. Update Series safely by fetching IDs upfront
-        $seriesIds = array_map(fn ($s) => (string) $s->getId(), $this->seriesRepository->findBy([], ['id' => 'ASC']));
+        /** @var list<string> $seriesIds */
+        $seriesIds = array_map(fn (Series $s): string => (string) $s->getId(), $this->seriesRepository->findBy([], ['id' => 'ASC']));
         $output->writeln('<info>Updating series description and images...</info>');
         $seriesProgress = new ProgressBar($output, count($seriesIds));
         $seriesProgress->setFormat("%label%\n%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%eta:-6s% %memory:6s%");

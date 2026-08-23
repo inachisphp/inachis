@@ -42,6 +42,7 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
         \DateTimeInterface $to,
         int $limit = 10,
     ): array {
+        /** @var list<array{path: string, total: numeric-string, title: string}> */
         return $this->cache->get(
             'analytics_top_pages_'.$limit,
             function (ItemInterface $item) use ($from, $to, $limit) {
@@ -49,10 +50,12 @@ class InternalAnalyticsProvider implements AnalyticsProviderInterface
 
                 $rows = $this->analyticsRepository->getTopPages($from, $to, $limit);
 
-                return array_map(function ($row) {
-                    $row['title'] = $this->resolveTitle($row['path']);
-
-                    return $row;
+                return array_map(function (array $row): array {
+                    return [
+                        'path' => $row['path'],
+                        'total' => $row['total'],
+                        'title' => $this->resolveTitle($row['path']),
+                    ];
                 }, $rows);
             },
         );

@@ -38,8 +38,8 @@ class ResourceUsageService
 
         if ($file instanceof Download) {
             return [
-                // 'posts' => $this->pageRepository->getPostsUsingDownload($file),
-                // 'series' => $this->seriesRepository->getSeriesUsingDownload($file),
+                'posts' => [], //$this->pageRepository->getPostsUsingDownload($file),
+                'series' => [], //$this->seriesRepository->getSeriesUsingDownload($file),
             ];
         }
 

@@ -9,6 +9,9 @@ declare(strict_types=1);
 namespace Inachis\Controller\Page\Tools;
 
 use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Service\Export\Category\CategoryExportService;
@@ -31,12 +34,19 @@ class ExportController extends AbstractInachisController
         PageRepository $pageRepository,
         SeriesExportService $seriesExportService,
     ): Response {
-        $contentType = $request->request->getString('content_type') ?? 'post';
-        $scope = $request->request->getString('scope') ?? 'all';
-        $format = $request->request->getString('format') ?? 'json';
-        $selectedIds = array_filter(
-            explode(',', $request->request->get('selectedIds') ?? ''),
-        );
+        $contentType = $request->request->getString('content_type', 'post');
+        $scope = $request->request->getString('scope', 'all');
+        $format = $request->request->getString('format', 'json');
+
+        $rawSelectedIds = $request->request->get('selectedIds');
+        $selectedIdsString = is_string($rawSelectedIds) ? $rawSelectedIds : '';
+        /** @var list<string> $selectedIds */
+        $selectedIds = array_values(array_filter(
+            explode(',', $selectedIdsString),
+            static fn (string $id): bool => '' !== trim($id),
+        ));
+
+        /** @var array<string, mixed> $filter */
         $filter = $request->request->all('filter');
         $filterType = $filter['type'] ?? null;
         $filterStatus = $filter['status'] ?? null;
@@ -46,9 +56,13 @@ class ExportController extends AbstractInachisController
 
         $pagesPreview = null;
         $previewCount = null;
-        $pages = [];
 
         if ($request->isMethod('POST') && $request->request->has('export')) {
+            /** @var CategoryExportService|PageExportService|SeriesExportService|null $exportService */
+            $exportService = null;
+            /** @var iterable<object> $items */
+            $items = [];
+
             switch ($contentType) {
                 case 'category':
                     $items = $categoryExportService->getAllCategories();
@@ -66,7 +80,9 @@ class ExportController extends AbstractInachisController
                         }
                         $items = $pageExportService->getPagesByIds($selectedIds);
                     } elseif ('filtered' === $scope) {
-                        $items = $pageExportService->getFilteredPages($filter);
+                        /** @var array{type?: string, categories?: array<string>, tags?: array<string>, status?: string, visible?: bool, keyword?: string, excludeIds?: list<string>} $typedFilter */
+                        $typedFilter = $filter;
+                        $items = $pageExportService->getFilteredPages($typedFilter);
                     }
                     $exportService = $pageExportService;
                     break;
@@ -82,8 +98,10 @@ class ExportController extends AbstractInachisController
                         }
                         $items = $seriesExportService->getSeriesByIds($selectedIds);
                     } elseif ('filtered' === $scope) {
+                        /** @var array{categories?: array<string>, tags?: array<string>, status?: string, visible?: bool, visibility?: bool, issues?: string, keyword?: string, excludeIds?: list<string>} $typedFilter */
+                        $typedFilter = array_filter($filter);
                         $items = $pageRepository->getFilteredOfTypeByPostDate(
-                            array_filter($filter),
+                            $typedFilter,
                             '*',
                             10000,
                             0,
@@ -93,8 +111,33 @@ class ExportController extends AbstractInachisController
                     break;
             }
 
+            if (null === $exportService) {
+                $this->addFlash('error', 'Invalid content type selected for export.');
+
+                return $this->redirectToRoute('incp_tools_export');
+            }
+
             try {
-                $exportedData = $exportService->export($items, $format);
+                $exportedData = match (true) {
+                    $exportService instanceof CategoryExportService => (function () use ($exportService, $items, $format): string {
+                        /** @var iterable<Category> $categories */
+                        $categories = $items;
+
+                        return $exportService->export($categories, $format);
+                    })(),
+                    $exportService instanceof PageExportService => (function () use ($exportService, $items, $format): string {
+                        /** @var iterable<Page> $pages */
+                        $pages = $items;
+
+                        return $exportService->export($pages, $format);
+                    })(),
+                    $exportService instanceof SeriesExportService => (function () use ($exportService, $items, $format): string {
+                        /** @var iterable<Series> $series */
+                        $series = $items;
+
+                        return $exportService->export($series, $format);
+                    })(),
+                };
             } catch (\InvalidArgumentException $e) {
                 $this->addFlash('error', $e->getMessage());
 
@@ -109,10 +152,10 @@ class ExportController extends AbstractInachisController
                 ]);
             }
 
-            $contentType = 'json' === $format ? 'application/json' : 'application/xml';
+            $responseContentType = 'json' === $format ? 'application/json' : 'application/xml';
 
             return new Response($exportedData, 200, [
-                'Content-Type' => $contentType,
+                'Content-Type' => $responseContentType,
                 'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             ]);
         }
@@ -144,11 +187,17 @@ class ExportController extends AbstractInachisController
         SeriesRepository $seriesRepository,
     ): Response {
         $contentType = $request->query->get('content_type', 'post');
-        $query = $request->query->get('q', '');
+        $query = (string) $request->query->get('q', '');
         $page = (int) $request->query->get('page', 1);
-        $selectedIds = array_filter(explode(',', $request->query->get('selectedIds', '')));
 
-        if (empty(trim($query))) {
+        $selectedIdsString = (string) $request->query->get('selectedIds', '');
+        /** @var list<string> $selectedIds */
+        $selectedIds = array_values(array_filter(
+            explode(',', $selectedIdsString),
+            static fn (string $id): bool => '' !== trim($id),
+        ));
+
+        if ('' === trim($query)) {
             return new Response('', 200);
         }
 
@@ -166,7 +215,6 @@ class ExportController extends AbstractInachisController
                     $offset,
                     'parent_id',
                 );
-                // $total = get count - make sure results limited to 50
                 break;
 
             case 'series':
@@ -175,18 +223,9 @@ class ExportController extends AbstractInachisController
                     $limit,
                     $offset,
                 );
-                // $total = get count - make sure results limited to 50
-                break;
-
-            default:
-                $pages = [];
                 break;
         }
 
-        // $total = $pageExportService->getFilteredOfTypeByPostDateCount(
-        //     ['keyword' => $query],
-        //     $contentType
-        // );
         return $this->render('inadmin/partials/export_table.html.twig', [
             'viewModel' => $this->viewModel,
             'dataset' => $items,

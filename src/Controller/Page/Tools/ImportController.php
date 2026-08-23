@@ -10,7 +10,10 @@ namespace Inachis\Controller\Page\Tools;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\User\User;
+use Inachis\Model\CategoryExportDto;
 use Inachis\Model\Import\ImportOptionsDto;
+use Inachis\Model\Page\PageExportDto;
+use Inachis\Model\Series\SeriesExportDto;
 use Inachis\Service\Import\Category\CategoryImportService;
 use Inachis\Service\Import\Category\CategoryImportValidator;
 use Inachis\Service\Import\ImportDetector;
@@ -44,7 +47,7 @@ class ImportController extends AbstractInachisController
         $this->viewModel->page->tab = 'import';
 
         if ($request->isMethod('POST')) {
-            /** @var UploadedFile|null */
+            /** @var UploadedFile|null $uploadedFile */
             $uploadedFile = $request->files->get('import_file');
 
             if (!$uploadedFile) {
@@ -53,28 +56,40 @@ class ImportController extends AbstractInachisController
                 return $this->redirectToRoute('incp_tools_import');
             }
 
-            $content = file_get_contents($uploadedFile->getPathname()) ?: '';
+            $content = file_get_contents($uploadedFile->getPathname());
+            if (false === $content) {
+                $this->addFlash('error', 'Failed to read uploaded file.');
+
+                return $this->redirectToRoute('incp_tools_import');
+            }
+
             $ext = strtolower($uploadedFile->getClientOriginalExtension());
-            $importType = 'page';
 
             try {
-                switch ($ext) {
-                    case 'json':
-                        $data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
-                        break;
-                    case 'xml':
+                /** @var list<mixed> $data */
+                $data = match ($ext) {
+                    'json' => (array) json_decode($content, true, 512, JSON_THROW_ON_ERROR),
+                    'xml' => (function () use ($content): array {
                         $xml = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
-                        $data = json_decode(json_encode($xml), true)['category'];
-                        break;
-                    case 'md':
+                        $array = json_decode((string) json_encode($xml), true);
+
+                        return is_array($array) && isset($array['category']) && is_array($array['category'])
+                            ? $array['category']
+                            : [];
+                    })(),
+                    'md' => (function () use ($content): array {
                         $parser = new MarkdownFileParser($this->entityManager);
-                        $data = $parser->parse($content);
-                        dump($data);
-                        exit;
-                        break;
-                    default:
-                        throw new \InvalidArgumentException('Unsupported file format.');
-                }
+                        $page = $parser->parse($content);
+
+                        return [[
+                            'title' => $page->getTitle(),
+                            'content' => $page->getContent(),
+                            'status' => $page->getStatus(),
+                            'postDate' => $page->getPostDate()->format('Y-m-d H:i:s'),
+                        ]];
+                    })(),
+                    default => throw new \InvalidArgumentException('Unsupported file format.'),
+                };
             } catch (\Throwable $e) {
                 $this->addFlash('error', 'Error parsing file: '.$e->getMessage());
 
@@ -85,17 +100,39 @@ class ImportController extends AbstractInachisController
 
             switch ($importType) {
                 case 'page':
-                    $dtos = $pageImportService->mapToDto($data);
+                case 'post':
+                    /** @var list<array<string, mixed>> $pageData */
+                    $pageData = $data;
+                    /** @var list<PageExportDto> $dtos */
+                    $dtos = array_map(
+                        static function (array $item): PageExportDto {
+                            $dto = new PageExportDto();
+                            $dto->title = is_scalar($item['title'] ?? null) ? (string) $item['title'] : '';
+                            $dto->content = is_scalar($item['content'] ?? null) ? (string) $item['content'] : '';
+                            $dto->subTitle = is_scalar($item['subTitle'] ?? null) ? (string) $item['subTitle'] : null;
+                            $dto->type = is_scalar($item['type'] ?? null) ? (string) $item['type'] : 'post';
+                            $dto->status = is_scalar($item['status'] ?? null) ? (string) $item['status'] : 'draft';
+                            $dto->postDate = is_scalar($item['postDate'] ?? null) ? (string) $item['postDate'] : null;
+                            $dto->visible = (bool) ($item['visible'] ?? true);
+
+                            return $dto;
+                        },
+                        $pageData,
+                    );
                     $warnings = $pageImportValidator->validateAll($dtos);
                     break;
 
                 case 'series':
-                    $dtos = $seriesImportService->mapToDto($data);
+                    /** @var list<array{title?: string, subTitle?: string, url?: string, description?: string, firstDate?: string, lastDate?: string, visible?: bool, items?: list<string>}> $seriesData */
+                    $seriesData = $data;
+                    $dtos = $seriesImportService->mapToDto($seriesData);
                     $warnings = $seriesImportValidator->validateAll($dtos);
                     break;
 
                 case 'category':
-                    $dtos = $categoryImportService->mapToDto($data);
+                    /** @var list<array{id?: string|null, title?: string|null, fullPath?: string|null, description?: string|null, visible?: bool|null, image?: string|null, icon?: string|null}> $categoryData */
+                    $categoryData = $data;
+                    $dtos = $categoryImportService->mapToDto($categoryData);
                     $warnings = $categoryImportValidator->validateAll($dtos);
                     break;
 
@@ -130,9 +167,10 @@ class ImportController extends AbstractInachisController
         SeriesImportService $seriesImportService,
     ): Response {
         $session = $request->getSession();
+        /** @var array{type: string, items: list<mixed>}|null $importPreview */
         $importPreview = $session->get('import_preview');
 
-        if (!$importPreview || empty($importPreview['items'])) {
+        if (!is_array($importPreview) || empty($importPreview['items'])) {
             $this->addFlash('error', 'No items to import.');
 
             return $this->redirectToRoute('incp_tools_import');
@@ -145,16 +183,18 @@ class ImportController extends AbstractInachisController
         $currentUser = $this->getUser();
 
         $options = new ImportOptionsDto();
-        $options->createMissingCategories = $request->request->getBoolean('createMissingCategories', false);
-        $options->createMissingTags = $request->request->getBoolean('createMissingTags', false);
-        // $options->overridePostDates = $request->request->getBoolean('overridePostDates', false);
+        $options->createMissingCategories = $request->request->getBoolean('createMissingCategories');
+        $options->createMissingTags = $request->request->getBoolean('createMissingTags');
 
         $warnings = [];
         $resultSummary = [];
 
         switch ($importType) {
             case 'page':
-                $result = $pageImportService->import($dtos, $currentUser, $options);
+            case 'post':
+                /** @var list<PageExportDto> $pageDtos */
+                $pageDtos = $dtos;
+                $result = $pageImportService->import($pageDtos, $currentUser, $options);
                 $warnings = $result->warnings;
                 $resultSummary = [
                     'items' => $result->pagesImported,
@@ -170,11 +210,13 @@ class ImportController extends AbstractInachisController
                 break;
 
             case 'series':
-                $result = $seriesImportService->import($dtos, $currentUser, $options);
+                /** @var list<SeriesExportDto> $seriesDtos */
+                $seriesDtos = $dtos;
+                $result = $seriesImportService->import($seriesDtos);
                 $warnings = $result->warnings;
                 $resultSummary = [
-                    'items' => $result->seriesImported ?? 0,
-                    'pagesLinked' => $result->pagesLinked ?? 0,
+                    'items' => $result->seriesImported,
+                    'pagesLinked' => $result->pagesLinked,
                     'message' => sprintf(
                         'Imported %d series, and linked %d pages.',
                         $result->seriesImported,
@@ -184,7 +226,9 @@ class ImportController extends AbstractInachisController
                 break;
 
             case 'category':
-                $result = $categoryImportService->import($dtos, $currentUser, $options);
+                /** @var list<CategoryExportDto> $categoryDtos */
+                $categoryDtos = $dtos;
+                $result = $categoryImportService->import($categoryDtos);
                 $warnings = $result->warnings;
                 $resultSummary = [
                     'items' => $result->categoriesCreated,

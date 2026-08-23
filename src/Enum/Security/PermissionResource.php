@@ -35,7 +35,8 @@ enum PermissionResource: string
     case IMPORT_EXPORT = 'IMPORT_EXPORT';
     case MAINTENANCE = 'MAINTENANCE';
     case CSP_POLICY = 'CSP_POLICY';
-    // case BACKUP;
+    case BACKUP = 'BACKUP';
+    case PURGE = 'PURGE';
 
     case NAVIGATION = 'NAVIGATION';
     case PLUGIN = 'PLUGIN';
@@ -75,10 +76,12 @@ enum PermissionResource: string
             //     PermissionAction::CREATE,
             // ],
 
+            self::BACKUP,
             self::IMPORT_EXPORT,
             self::PASSWORD_POLICY,
-            self::ROLE,
             self::PLUGIN,
+            self::PURGE,
+            self::ROLE,
             self::THEME => [
                 PermissionAction::MANAGE,
             ],
@@ -133,8 +136,9 @@ enum PermissionResource: string
             self::MAINTENANCE => 'Maintenance Mode',
             self::ERROR_LOG => 'Error Log',
             self::STORAGE => 'Storage Usage',
-            // self::BACKUP => 'Backups',
+            self::BACKUP => 'Backups',
             self::CSP_POLICY => 'Content Security Policy',
+            self::PURGE => 'User Content Purge',
 
             self::NAVIGATION => 'Navigation',
             self::PLUGIN => 'Plugins & Addons',
@@ -197,6 +201,8 @@ enum PermissionResource: string
                     self::STORAGE,
                     self::IMPORT_EXPORT,
                     self::MAINTENANCE,
+                    self::BACKUP,
+                    self::PURGE,
                 ],
             ],
         ];

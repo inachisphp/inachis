@@ -15,6 +15,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
+/**
+ * @phpstan-import-type ManifestData from ManifestFactory
+ */
 final readonly class GithubReleaseProvider implements ReleaseProviderInterface
 {
     private const API = 'https://api.github.com/repos/%s/%s/releases';
@@ -83,27 +86,39 @@ final readonly class GithubReleaseProvider implements ReleaseProviderInterface
         }
 
         $manifestAsset = null;
+        /** @var array<string, string> $assetsByName */
         $assetsByName = [];
 
         foreach ($release['assets'] as $asset) {
-            if (isset($asset['name'], $asset['browser_download_url'])) {
-                $assetsByName[$asset['name']] = $asset['browser_download_url'];
-                if (str_ends_with($asset['name'], '.json')) {
+            if (!is_array($asset)) {
+                continue;
+            }
+
+            $name = $asset['name'] ?? null;
+            $downloadUrl = $asset['browser_download_url'] ?? null;
+
+            if (is_string($name) && is_string($downloadUrl)) {
+                $assetsByName[$name] = $downloadUrl;
+                if (str_ends_with($name, '.json')) {
                     $manifestAsset = $asset;
                 }
             }
         }
 
-        if (null === $manifestAsset) {
+        if (null === $manifestAsset || !isset($manifestAsset['browser_download_url']) || !is_string($manifestAsset['browser_download_url'])) {
             throw new \RuntimeException('No release manifest JSON asset found.');
         }
 
         $manifestData = $this->requestJson($manifestAsset['browser_download_url']);
+
+        /** @var ManifestData $manifestData */
         $manifest = $this->manifestFactory->create($manifestData);
 
         // Match the ZIP archive URL specified in the manifest to the GitHub asset URL
         if (isset($assetsByName[$manifest->package])) {
-            // UPDATED: Populate archiveUrl, releaseNotes, and publishedAt from GitHub API payload
+            $body = $release['body'] ?? null;
+            $publishedAt = $release['published_at'] ?? null;
+
             return new Manifest(
                 version: $manifest->version,
                 minimumVersion: $manifest->minimumVersion,
@@ -114,8 +129,8 @@ final readonly class GithubReleaseProvider implements ReleaseProviderInterface
                 replace: $manifest->replace,
                 archiveUrl: $assetsByName[$manifest->package],
                 type: $manifest->type,
-                releaseNotes: (string) ($release['body'] ?? ''),
-                publishedAt: (string) ($release['published_at'] ?? ''),
+                releaseNotes: is_string($body) ? $body : '',
+                publishedAt: is_string($publishedAt) ? $publishedAt : '',
             );
         }
 
@@ -154,6 +169,7 @@ final readonly class GithubReleaseProvider implements ReleaseProviderInterface
             throw new \RuntimeException(sprintf('Unexpected JSON structure from "%s".', $url));
         }
 
+        /** @var array<string, mixed> $data */
         return $data;
     }
 }

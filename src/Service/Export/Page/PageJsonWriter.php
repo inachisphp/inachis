@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Export\Page;
 
+use Inachis\Entity\Content\Page;
 use Inachis\Service\Export\ExportWriterInterface;
 
 /**
@@ -42,12 +43,14 @@ class PageJsonWriter implements ExportWriterInterface
     /**
      * Writes the given pages to JSON format.
      *
-     * @param iterable $pages the pages to write
+     * @param iterable<Page> $pages the pages to write
      *
      * @return string the exported pages
      */
     public function write(iterable $pages): string
     {
-        return json_encode($pages, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $json = json_encode($pages, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+        return false !== $json ? $json : '[]';
     }
 }

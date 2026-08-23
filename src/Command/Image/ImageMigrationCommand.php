@@ -10,7 +10,6 @@ namespace Inachis\Command\Image;
 
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
-use Inachis\Repository\Media\ImageRepository;
 use Inachis\Service\Image\Migration\ImageMigrationApplier;
 use Inachis\Service\Image\Migration\ImageMigrationPlanner;
 use Inachis\Service\Image\Migration\ImageMigrationReporter;
@@ -41,7 +40,6 @@ class ImageMigrationCommand extends Command
     public function __construct(
         #[Autowire('%kernel.project_dir%')]
         private string $projectDir,
-        private ImageRepository $imageRepository,
         private PageRepository $pageRepository,
         private SeriesRepository $seriesRepository,
         private ImageMigrationPlanner $planner,
@@ -76,7 +74,8 @@ class ImageMigrationCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $mode = strtolower((string) $input->getArgument('mode'));
+        $argumentMode = $input->getArgument('mode');
+        $mode = strtolower(is_string($argumentMode) ? $argumentMode : '');
         $dryRun = (bool) $input->getOption('dry-run');
         $force = (bool) $input->getOption('force');
         $resume = (bool) $input->getOption('resume');
@@ -102,11 +101,20 @@ class ImageMigrationCommand extends Command
         file_put_contents($this->planFile, (string) json_encode($plan, JSON_PRETTY_PRINT));
         $this->reporter->writeReports($plan, [], $this->reportMdFile, $this->reportJsonFile);
 
+        /** @var list<mixed> $images */
+        $images = is_array($plan['images'] ?? null) ? $plan['images'] : [];
+        /** @var list<mixed> $duplicates */
+        $duplicates = is_array($plan['duplicates'] ?? null) ? $plan['duplicates'] : [];
+        /** @var list<mixed> $unused */
+        $unused = is_array($plan['unused'] ?? null) ? $plan['unused'] : [];
+        /** @var list<mixed> $broken */
+        $broken = is_array($plan['broken'] ?? null) ? $plan['broken'] : [];
+
         $output->writeln('<info>Scan complete. Plan saved to var/image-migration/plan.json</info>');
-        $output->writeln(sprintf('Images scanned: <comment>%d</comment>', count($plan['images'] ?? [])));
-        $output->writeln(sprintf('Duplicates found: <comment>%d</comment>', count($plan['duplicates'] ?? [])));
-        $output->writeln(sprintf('Unused images: <comment>%d</comment>', count($plan['unused'] ?? [])));
-        $output->writeln(sprintf('Broken references: <comment>%d</comment>', count($plan['broken'] ?? [])));
+        $output->writeln(sprintf('Images scanned: <comment>%d</comment>', count($images)));
+        $output->writeln(sprintf('Duplicates found: <comment>%d</comment>', count($duplicates)));
+        $output->writeln(sprintf('Unused images: <comment>%d</comment>', count($unused)));
+        $output->writeln(sprintf('Broken references: <comment>%d</comment>', count($broken)));
 
         return Command::SUCCESS;
     }
@@ -126,8 +134,9 @@ class ImageMigrationCommand extends Command
             return Command::FAILURE;
         }
 
-        /** @var array<string, mixed> $plan */
-        $plan = json_decode((string) file_get_contents($this->planFile), true);
+        /** @var array<string, mixed> $rawPlan */
+        $rawPlan = json_decode((string) file_get_contents($this->planFile), true) ?? [];
+        $plan = $this->assertPlanShape($rawPlan);
 
         if (!$force && $this->applier->isPlanStale($plan)) {
             $output->writeln('<error>Migration plan is stale! Repository entity counts have changed since scan. Re-run scan or pass --force.</error>');
@@ -178,12 +187,14 @@ class ImageMigrationCommand extends Command
             return Command::FAILURE;
         }
 
-        /** @var array<string, mixed> $plan */
-        $plan = json_decode((string) file_get_contents($this->planFile), true);
+        /** @var array<string, mixed> $rawPlan */
+        $rawPlan = json_decode((string) file_get_contents($this->planFile), true) ?? [];
+        $plan = $this->assertPlanShape($rawPlan);
 
         if ($dryRun) {
             $output->writeln('<comment>[DRY RUN] Previewing Rollback from var/image-migration/backups/...</comment>');
-            foreach ($plan['images'] ?? [] as $img) {
+            $images = $plan['images'] ?? [];
+            foreach ($images as $img) {
                 $output->writeln(sprintf('RESTORE %s → %s', $img['newFilename'], $img['oldFilename']));
             }
 
@@ -245,8 +256,9 @@ class ImageMigrationCommand extends Command
         }
 
         if (file_exists($this->planFile)) {
-            /** @var array<string, mixed> $plan */
-            $plan = json_decode((string) file_get_contents($this->planFile), true);
+            /** @var array<string, mixed> $rawPlan */
+            $rawPlan = json_decode((string) file_get_contents($this->planFile), true) ?? [];
+            $plan = $this->assertPlanShape($rawPlan);
             $output->writeln($this->reporter->generateReportMarkdown($plan, []));
 
             return Command::SUCCESS;
@@ -257,19 +269,38 @@ class ImageMigrationCommand extends Command
         return Command::FAILURE;
     }
 
+    /**
+     * Load checkpoint state from disk.
+     *
+     * @return array{
+     *     imageIndex: int,
+     *     pageIndex: int,
+     *     seriesIndex: int,
+     *     completedImageIds: list<string>,
+     *     completedPageIds: list<string>,
+     *     completedSeriesIds: list<string>
+     * }
+     */
     private function loadCheckpoint(bool $resume): array
     {
         if ($resume && file_exists($this->checkpointFile)) {
             /** @var array<string, mixed> $data */
-            $data = json_decode((string) file_get_contents($this->checkpointFile), true);
+            $data = json_decode((string) file_get_contents($this->checkpointFile), true) ?? [];
+
+            /** @var list<mixed> $completedImageIds */
+            $completedImageIds = is_array($data['completedImageIds'] ?? null) ? $data['completedImageIds'] : [];
+            /** @var list<mixed> $completedPageIds */
+            $completedPageIds = is_array($data['completedPageIds'] ?? null) ? $data['completedPageIds'] : [];
+            /** @var list<mixed> $completedSeriesIds */
+            $completedSeriesIds = is_array($data['completedSeriesIds'] ?? null) ? $data['completedSeriesIds'] : [];
 
             return [
-                'imageIndex' => (int) ($data['imageIndex'] ?? 0),
-                'pageIndex' => (int) ($data['pageIndex'] ?? 0),
-                'seriesIndex' => (int) ($data['seriesIndex'] ?? 0),
-                'completedImageIds' => array_values($data['completedImageIds'] ?? []),
-                'completedPageIds' => array_values($data['completedPageIds'] ?? []),
-                'completedSeriesIds' => array_values($data['completedSeriesIds'] ?? []),
+                'imageIndex' => is_numeric($data['imageIndex'] ?? null) ? (int) $data['imageIndex'] : 0,
+                'pageIndex' => is_numeric($data['pageIndex'] ?? null) ? (int) $data['pageIndex'] : 0,
+                'seriesIndex' => is_numeric($data['seriesIndex'] ?? null) ? (int) $data['seriesIndex'] : 0,
+                'completedImageIds' => array_map(static fn (mixed $id): string => is_scalar($id) ? (string) $id : '', $completedImageIds),
+                'completedPageIds' => array_map(static fn (mixed $id): string => is_scalar($id) ? (string) $id : '', $completedPageIds),
+                'completedSeriesIds' => array_map(static fn (mixed $id): string => is_scalar($id) ? (string) $id : '', $completedSeriesIds),
             ];
         }
 
@@ -281,6 +312,133 @@ class ImageMigrationCommand extends Command
             'completedPageIds' => [],
             'completedSeriesIds' => [],
         ];
+    }
+
+    /**
+     * Asserts and types the migration plan shape loaded from disk.
+     *
+     * @param array<string, mixed> $plan
+     *
+     * @return array{
+     *     images?: list<array{
+     *         id: string,
+     *         oldFilename: string,
+     *         newFilename: string,
+     *         oldFilesize: int,
+     *         estimatedFilesize: int,
+     *         isDuplicate: bool,
+     *         needsResize: bool,
+     *         convertToWebp: bool,
+     *         origWidth: int,
+     *         origHeight: int,
+     *         origMegapixels: float,
+     *         targetWidth: int,
+     *         targetHeight: int,
+     *         targetMegapixels: float,
+     *         pixelReductionPercent: float|int
+     *     }>,
+     *     duplicates?: list<array{
+     *         duplicateId: string,
+     *         canonicalId: string,
+     *         duplicateFilename: string,
+     *         canonicalFilename: string,
+     *         pixelHash?: string
+     *     }>,
+     *     broken?: list<array{entity: string, id: string, filename: string}>,
+     *     unused?: list<array{filename: string, size: int}>,
+     *     stats?: array{
+     *         totalOriginalBytes?: int,
+     *         totalEstimatedFinalBytes?: int,
+     *         totalOriginalMegapixels?: float,
+     *         totalFinalMegapixels?: float
+     *     },
+     *     metadata?: array{
+     *         imageCount?: int,
+     *         pageCount?: int,
+     *         seriesCount?: int
+     *     },
+     *     contentReplacements?: array<string, string>,
+     *     entityBackups?: array{
+     *         images?: array<string, array{
+     *             title?: string,
+     *             description?: string|null,
+     *             authorId?: string|null,
+     *             createdAt?: string|null,
+     *             updatedAt?: string|null,
+     *             filename: string,
+     *             filesize: int,
+     *             checksum: string,
+     *             dimensionX: int,
+     *             dimensionY: int,
+     *             filetype?: string
+     *         }>,
+     *         pages?: array<string, array{featureImageId?: string|null}>,
+     *         series?: array<string, array{imageId?: string|null}>
+     *     }
+     * }
+     */
+    private function assertPlanShape(array $plan): array
+    {
+        /** @var array{
+         *     images?: list<array{
+         *         id: string,
+         *         oldFilename: string,
+         *         newFilename: string,
+         *         oldFilesize: int,
+         *         estimatedFilesize: int,
+         *         isDuplicate: bool,
+         *         needsResize: bool,
+         *         convertToWebp: bool,
+         *         origWidth: int,
+         *         origHeight: int,
+         *         origMegapixels: float,
+         *         targetWidth: int,
+         *         targetHeight: int,
+         *         targetMegapixels: float,
+         *         pixelReductionPercent: float|int
+         *     }>,
+         *     duplicates?: list<array{
+         *         duplicateId: string,
+         *         canonicalId: string,
+         *         duplicateFilename: string,
+         *         canonicalFilename: string,
+         *         pixelHash?: string
+         *     }>,
+         *     broken?: list<array{entity: string, id: string, filename: string}>,
+         *     unused?: list<array{filename: string, size: int}>,
+         *     stats?: array{
+         *         totalOriginalBytes?: int,
+         *         totalEstimatedFinalBytes?: int,
+         *         totalOriginalMegapixels?: float,
+         *         totalFinalMegapixels?: float
+         *     },
+         *     metadata?: array{
+         *         imageCount?: int,
+         *         pageCount?: int,
+         *         seriesCount?: int
+         *     },
+         *     contentReplacements?: array<string, string>,
+         *     entityBackups?: array{
+         *         images?: array<string, array{
+         *             title?: string,
+         *             description?: string|null,
+         *             authorId?: string|null,
+         *             createdAt?: string|null,
+         *             updatedAt?: string|null,
+         *             filename: string,
+         *             filesize: int,
+         *             checksum: string,
+         *             dimensionX: int,
+         *             dimensionY: int,
+         *             filetype?: string
+         *         }>,
+         *         pages?: array<string, array{featureImageId?: string|null}>,
+         *         series?: array<string, array{imageId?: string|null}>
+         *     }
+         * } $typedPlan */
+        $typedPlan = $plan;
+
+        return $typedPlan;
     }
 
     private function ensureDirectoriesExist(): void

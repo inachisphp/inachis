@@ -103,11 +103,12 @@ TEXT;
             );
         }
 
+        /** @var array<string, mixed> $result */
         return [
             'title' => $this->getStringValue(
                 $result,
                 'title',
-                $image->getTitle(),
+                $image->getTitle() ?? '',
             ),
             'altText' => $this->getStringValue(
                 $result,

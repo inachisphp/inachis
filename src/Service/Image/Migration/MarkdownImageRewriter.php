@@ -47,6 +47,6 @@ class MarkdownImageRewriter
 
         preg_match_all('~/imgs/([a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9]{3,4})(?:[\?#][^\s"\'()<>\[\]]*)?~', $content, $matches);
 
-        return array_values(array_unique($matches[1] ?? []));
+        return array_values(array_unique($matches[1]));
     }
 }

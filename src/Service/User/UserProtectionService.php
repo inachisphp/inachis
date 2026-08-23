@@ -26,8 +26,7 @@ final readonly class UserProtectionService implements UserProtectionServiceInter
     }
 
     /**
-     * Determines if the {@link User} can be deleted, disabled, or the
-     * role removed.
+     * {@inheritDoc}
      */
     public function assertAdministratorCanBeRemoved(): void
     {
@@ -37,8 +36,7 @@ final readonly class UserProtectionService implements UserProtectionServiceInter
     }
 
     /**
-     * Determines if the {@link User}s can be deleted, disabled, or a
-     * role removed from them.
+     * {@inheritDoc}
      */
     public function assertAdministratorsCanBeRemoved(iterable $users): void
     {

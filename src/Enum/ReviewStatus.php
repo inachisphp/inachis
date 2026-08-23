@@ -11,17 +11,17 @@ namespace Inachis\Enum;
 enum ReviewStatus: string
 {
     /**
-     * @var string Indicates a review is currently open
+     * Indicates a review is currently open
      */
     case OPEN = 'open';
 
     /**
-     * @var string Indicates a Review has been resolved
+     * Indicates a Review has been resolved
      */
     case RESOLVED = 'resolved';
 
     /**
-     * @var string Indicates a Review has been closed
+     * Indicates a Review has been closed
      */
     case CLOSED = 'closed';
 

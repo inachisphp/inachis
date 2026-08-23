@@ -107,11 +107,11 @@ final readonly class CspReportProcessor
          * }
          */
         if (isset($payload['csp-report'])) {
-            yield $this->dtoFactory->fromLegacyReport(
-                $payload['csp-report'],
-                $userAgent,
-                $referrer,
-            );
+            /** @var array<string, mixed> $legacyReport */
+            $legacyReport = $payload['csp-report'];
+
+            /** @phpstan-ignore argument.type */
+            yield $this->dtoFactory->fromLegacyReport($legacyReport, $userAgent, $referrer);
 
             return;
         }
@@ -135,11 +135,11 @@ final readonly class CspReportProcessor
                     continue;
                 }
 
-                yield $this->dtoFactory->fromReportingApi(
-                    $report,
-                    $userAgent,
-                    $referrer,
-                );
+                /** @var array<string, mixed> $reportingApiReport */
+                $reportingApiReport = $report;
+
+                /** @phpstan-ignore argument.type */
+                yield $this->dtoFactory->fromReportingApi($reportingApiReport, $userAgent, $referrer);
             }
         }
     }
@@ -250,8 +250,31 @@ final readonly class CspReportProcessor
 
         $report->setOccurrences(1);
 
+        /** @var array<'csp-report'|int<0, max>, array{
+         *     age: int,
+         *     type: string,
+         *     url: string,
+         *     user_agent: string,
+         *     body: array{
+         *         blockedUrl: string,
+         *         disposition: string,
+         *         effectiveDirective: string,
+         *         originalPoliy: string,
+         *         statusCode: int
+         *     }
+         * }|array{
+         *     document-uri: string,
+         *     referrer?: string,
+         *     violated-directive: string,
+         *     effective-directive: string,
+         *     original-policy: string,
+         *     blocked-uri: string,
+         *     status-code: int
+         * }|null> $rawPayload */
+        $rawPayload = $dto->rawPayload;
+
         $report->setPayload(
-            $dto->rawPayload,
+            $rawPayload,
         );
 
         $report->setFirstSeenAt(

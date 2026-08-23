@@ -65,7 +65,7 @@ class ImageProcessor
             return hash_file('sha256', $filePath) ?: '';
         }
 
-        $mime = $info['mime'] ?? '';
+        $mime = $info['mime'];
         $srcImage = match ($mime) {
             'image/jpeg' => function_exists('imagecreatefromjpeg') ? @imagecreatefromjpeg($filePath) : false,
             'image/png' => function_exists('imagecreatefrompng') ? @imagecreatefrompng($filePath) : false,
@@ -170,10 +170,10 @@ class ImageProcessor
         }
 
         $ratio = min($maxDimension / $width, $maxDimension / $height, 1.0);
-        $newWidth = (int) round($width * $ratio);
-        $newHeight = (int) round($height * $ratio);
+        $newWidth = max(1, (int) round($width * $ratio));
+        $newHeight = max(1, (int) round($height * $ratio));
 
-        $mime = $info['mime'] ?? '';
+        $mime = $info['mime'];
         $srcImage = match ($mime) {
             'image/jpeg' => function_exists('imagecreatefromjpeg') ? @imagecreatefromjpeg($srcPath) : false,
             'image/png' => function_exists('imagecreatefrompng') ? @imagecreatefrompng($srcPath) : false,
@@ -263,7 +263,7 @@ class ImageProcessor
             return false;
         }
 
-        $mime = $info['mime'] ?? '';
+        $mime = $info['mime'];
         $srcImage = match ($mime) {
             'image/jpeg' => function_exists('imagecreatefromjpeg') ? @imagecreatefromjpeg($srcPath) : false,
             'image/png' => function_exists('imagecreatefrompng') ? @imagecreatefrompng($srcPath) : false,
@@ -306,7 +306,7 @@ class ImageProcessor
             if (false !== $finfo) {
                 $mime = finfo_file($finfo, $filePath);
                 finfo_close($finfo);
-                if (!empty($mime) && is_string($mime)) {
+                if (!empty($mime)) {
                     return $mime;
                 }
             }

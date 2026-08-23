@@ -19,10 +19,12 @@ window.Inachis.EasyMDELinkValidator = class {
     this.cacheTTL = 60000;
 
     this.queue = new Set();
+    this.inFlight = new Set();
     this.processing = false;
 
     this.activeMarkers = [];
     this.currentFilter = "all";
+    this.timer = null;
 
     this.coloriseBadge = options.coloriseBadge ?? true;
 
@@ -40,22 +42,39 @@ window.Inachis.EasyMDELinkValidator = class {
   }
 
   /* --------------------------
+   * URL Normalization & Helpers
+   * -------------------------- */
+
+  normaliseUrl(url) {
+    if (!url) return "";
+    try {
+      return new URL(url, window.location.origin).href;
+    } catch {
+      return url;
+    }
+  }
+
+  isPending(rawUrl) {
+    const key = this.normaliseUrl(rawUrl);
+    return (
+      this.cache.has(key) ||
+      this.cache.has(rawUrl) ||
+      this.queue.has(key) ||
+      this.queue.has(rawUrl) ||
+      this.inFlight.has(key) ||
+      this.inFlight.has(rawUrl)
+    );
+  }
+
+  /* --------------------------
    * Scheduling
    * -------------------------- */
 
   scheduleValidation() {
-    if (this.idleHandle) {
-      cancelIdleCallback?.(this.idleHandle);
-      clearTimeout(this.idleHandle);
+    if (this.timer) {
+      clearTimeout(this.timer);
     }
-
-    const run = () => this.handleChange();
-
-    if ("requestIdleCallback" in window) {
-      this.idleHandle = requestIdleCallback(run, { timeout: 1000 });
-    } else {
-      this.idleHandle = setTimeout(run, this.delay);
-    }
+    this.timer = setTimeout(() => this.handleChange(), this.delay);
   }
 
   handlePaste(event) {
@@ -63,7 +82,9 @@ window.Inachis.EasyMDELinkValidator = class {
     const links = this.extractLinks(pasted);
 
     links.forEach(link => {
-      if (!this.cache.has(link)) this.queue.add(link);
+      if (!this.isPending(link)) {
+        this.queue.add(this.normaliseUrl(link));
+      }
     });
 
     this.processQueue();
@@ -73,21 +94,21 @@ window.Inachis.EasyMDELinkValidator = class {
     const content = this.mde.value();
     const links = this.extractLinks(content);
 
-    this.cleanupCache(links);
+    this.cleanupCache();
 
     if (!links.length) {
       this.clearMarkers();
       return;
     }
 
-    const uncached = links.filter(l => !this.cache.has(l));
+    const uncached = links.filter(l => !this.isPending(l));
 
     if (uncached.length && uncached.length < 5) {
       this.markChecking(uncached);
     }
 
     links.forEach(link => {
-      if (!this.cache.has(link) && !this.queue.has(link)) {
+      if (!this.isPending(link)) {
         this.queue.add(link);
       }
     });
@@ -104,6 +125,11 @@ window.Inachis.EasyMDELinkValidator = class {
     const batch = Array.from(this.queue);
     this.queue.clear();
 
+    batch.forEach(url => {
+      this.inFlight.add(url);
+      this.inFlight.add(this.normaliseUrl(url));
+    });
+
     try {
       let results;
 
@@ -113,18 +139,40 @@ window.Inachis.EasyMDELinkValidator = class {
         results = await this.validateInParallel(batch);
       }
 
-      results.forEach(r => {
-        this.cache.set(r.url, r);
-        this.cacheTime.set(r.url, Date.now());
-      });
+      if (Array.isArray(results)) {
+        results.forEach((r, idx) => {
+          const originalUrl = batch[idx] || r.url;
+          const normalised = this.normaliseUrl(originalUrl);
+          const now = Date.now();
 
-      this.renderFromCache();
+          this.cache.set(originalUrl, r);
+          this.cache.set(normalised, r);
+          if (r.url) this.cache.set(this.normaliseUrl(r.url), r);
 
+          this.cacheTime.set(originalUrl, now);
+          this.cacheTime.set(normalised, now);
+        });
+      }
     } catch (e) {
-      console.error(e);
+      console.error("Validation error:", e);
+      // Cache failure placeholder to avoid infinite re-fetching on error
+      batch.forEach(url => {
+        const failureObj = { url, ok: false, status: null, error: "Validation failed" };
+        const normalised = this.normaliseUrl(url);
+        this.cache.set(url, failureObj);
+        this.cache.set(normalised, failureObj);
+        this.cacheTime.set(url, Date.now());
+        this.cacheTime.set(normalised, Date.now());
+      });
+    } finally {
+      batch.forEach(url => {
+        this.inFlight.delete(url);
+        this.inFlight.delete(this.normaliseUrl(url));
+      });
+      this.processing = false;
     }
 
-    this.processing = false;
+    this.renderFromCache();
 
     if (this.queue.size) this.processQueue();
   }
@@ -144,7 +192,6 @@ window.Inachis.EasyMDELinkValidator = class {
 
     for (let i = 0; i < links.length; i += this.currentConcurrent) {
       const chunk = links.slice(i, i + this.currentConcurrent);
-
       const start = performance.now();
 
       const res = await Promise.all(
@@ -214,7 +261,9 @@ window.Inachis.EasyMDELinkValidator = class {
 
   renderFromCache() {
     const links = this.extractLinks(this.mde.value());
-    const results = links.map(l => this.cache.get(l)).filter(Boolean);
+    const results = links
+      .map(l => this.cache.get(l) || this.cache.get(this.normaliseUrl(l)))
+      .filter(Boolean);
 
     this.markLinks(results);
     this.updateHealthBadge(results);
@@ -310,7 +359,6 @@ window.Inachis.EasyMDELinkValidator = class {
     badge.style.cursor = "pointer";
     badge.onclick = () => this.openLinkModal();
 
-    // Initial text
     badge.innerHTML = `✔ 0 ⚠ 0 ✖ 0`;
 
     bottomBar.appendChild(badge);
@@ -374,7 +422,9 @@ window.Inachis.EasyMDELinkValidator = class {
   renderModal() {
     const container = this.modal.querySelector(".link-modal-list");
     const links = this.extractLinks(this.mde.value());
-    const results = links.map(l => this.cache.get(l)).filter(Boolean);
+    const results = links
+      .map(l => this.cache.get(l) || this.cache.get(this.normaliseUrl(l)))
+      .filter(Boolean);
 
     container.innerHTML = "";
 
@@ -407,7 +457,13 @@ window.Inachis.EasyMDELinkValidator = class {
     const links = this.extractLinks(this.mde.value());
 
     links.forEach(l => {
+      const normalised = this.normaliseUrl(l);
       this.cache.delete(l);
+      this.cache.delete(normalised);
+      this.cacheTime.delete(l);
+      this.cacheTime.delete(normalised);
+      this.inFlight.delete(l);
+      this.inFlight.delete(normalised);
       this.queue.add(l);
     });
 
@@ -417,7 +473,7 @@ window.Inachis.EasyMDELinkValidator = class {
   exportReport() {
     const links = this.extractLinks(this.mde.value());
     const broken = links
-      .map(l => this.cache.get(l))
+      .map(l => this.cache.get(l) || this.cache.get(this.normaliseUrl(l)))
       .filter(r => r && !r.ok);
 
     const blob = new Blob([JSON.stringify(broken, null, 2)]);
@@ -444,12 +500,11 @@ window.Inachis.EasyMDELinkValidator = class {
     return [...links];
   }
 
-  cleanupCache(currentLinks) {
+  cleanupCache() {
     const now = Date.now();
 
     this.cache.forEach((_, key) => {
-      if (!currentLinks.includes(key) ||
-          now - (this.cacheTime.get(key) || 0) > this.cacheTTL) {
+      if (now - (this.cacheTime.get(key) || 0) > this.cacheTTL) {
         this.cache.delete(key);
         this.cacheTime.delete(key);
       }

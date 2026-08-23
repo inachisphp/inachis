@@ -12,7 +12,7 @@ use Inachis\Model\Page\PageExportDto;
 use Inachis\Service\Export\ExportWriterInterface;
 
 /**
- * XML writer for pages.
+ * Markdown writer for pages.
  */
 class PageMdWriter implements ExportWriterInterface
 {
@@ -43,7 +43,8 @@ class PageMdWriter implements ExportWriterInterface
     /**
      * Writes the given pages to MD format.
      *
-     * @param iterable $pages the pages to write
+     * @param iterable<object>     $pages   the pages to write
+     * @param array<string, mixed> $options optional configuration options
      *
      * @return string the exported pages
      */
@@ -59,7 +60,7 @@ class PageMdWriter implements ExportWriterInterface
             $subTitle = $page->subTitle ?? '';
             $date = $page->postDate ?? date('Y-m-d');
             $category = $page->categories[0]->path ?? '';
-            $tags = array_map(fn ($t) => $t->title, $page->tags);
+            $tags = array_map(static fn (object $t): string => $t->title ?? '', $page->tags);
 
             // YAML front matter
             $output .= "---\n";

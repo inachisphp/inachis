@@ -299,7 +299,7 @@ class PageController extends AbstractInachisController
         }
 
         $hasAudio = $audioManager->hasAudio($post);
-        $audioUrl = $hasAudio ? $this->generateUrl('api_post_audio_stream', ['id' => $post->getId()]) : null;
+        $audioUrl = $hasAudio ? $this->generateUrl('web_post_audio_stream', ['id' => $post->getId()]) : null;
 
         $this->viewModel->page->title = null !== $post->getId() ?
             'Editing "'.$post->getTitle().'"' :

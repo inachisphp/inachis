@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Export\Page;
 
+use Inachis\Model\Page\PageExportDto;
 use Inachis\Service\Export\AbstractXmlExportWriter;
 
 /**
@@ -56,12 +57,14 @@ final class PageXmlWriter extends AbstractXmlExportWriter
     }
 
     /**
-     * Writes the given pages to XML format.
-     *
-     * @return string the exported pages
+     * Writes the given page to XML format.
      */
     protected function writeItem(\SimpleXMLElement $xml, object $item): void
     {
+        if (!$item instanceof PageExportDto) {
+            throw new \InvalidArgumentException('Expected instance of '.PageExportDto::class);
+        }
+
         $this->optional($xml, 'title', $item->title);
         $this->optional($xml, 'subTitle', $item->subTitle);
         $this->optional($xml, 'content', $item->content);
@@ -71,13 +74,17 @@ final class PageXmlWriter extends AbstractXmlExportWriter
         $this->boolean($xml, 'allowComments', $item->allowComments);
 
         $categories = $xml->addChild('categories');
-        foreach ($item->categories as $category) {
-            $categories->addChild('category', $category->path);
+        if (null !== $categories) {
+            foreach ($item->categories as $category) {
+                $categories->addChild('category', $category->path);
+            }
         }
 
         $tags = $xml->addChild('tags');
-        foreach ($item->tags as $tag) {
-            $tags->addChild('tag', $tag->title);
+        if (null !== $tags) {
+            foreach ($item->tags as $tag) {
+                $tags->addChild('tag', $tag->title);
+            }
         }
     }
 }

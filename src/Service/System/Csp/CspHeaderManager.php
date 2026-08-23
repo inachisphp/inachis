@@ -92,17 +92,20 @@ class CspHeaderManager
             }
 
             // Map keywords to wrapped versions (e.g., self -> 'self', data -> data:)
-            $cleanedSources = array_map(function ($source) {
+            $cleanedSources = [];
+            foreach ($sources as $source) {
+                if (!is_string($source)) {
+                    continue;
+                }
                 $source = trim($source);
-                if (in_array($source, ['self', 'none', 'unsafe-inline', 'unsafe-eval', 'strict-dynamic'])) {
-                    return "'$source'";
+                if (in_array($source, ['self', 'none', 'unsafe-inline', 'unsafe-eval', 'strict-dynamic'], true)) {
+                    $cleanedSources[] = "'$source'";
+                } elseif ('data-uri' === $source || 'data' === $source) {
+                    $cleanedSources[] = 'data:';
+                } else {
+                    $cleanedSources[] = $source;
                 }
-                if ('data-uri' === $source || 'data' === $source) {
-                    return 'data:';
-                }
-
-                return $source;
-            }, $sources);
+            }
 
             $directives[] = $directive.' '.implode(' ', $cleanedSources);
         }
@@ -123,13 +126,21 @@ class CspHeaderManager
             'script-src' => ['self'],
             'style-src' => ['self'],
             'img-src' => ['self', 'data-uri'],
-        ]);
+        ]) ?: '{}';
 
         $policySetting = $this->settingRepository->getOrCreateSetting(
             'csp_policy_frontend',
             $defaultPolicyJson,
         );
-        $policy = json_decode($policySetting->getValue(), true) ?? [];
+
+        $rawPolicy = $policySetting->getValue();
+        $policyData = is_string($rawPolicy) ? json_decode($rawPolicy, true) : [];
+        if (!is_array($policyData)) {
+            $policyData = [];
+        }
+
+        /** @var array<string, list<string>> $policy */
+        $policy = $policyData;
 
         // 4. Normalize the directive from the incoming report
         $rawDirective = $report->getEffectiveDirective();
@@ -145,9 +156,9 @@ class CspHeaderManager
         }
 
         $cleanSource = $blockedUri;
-        if (in_array(strtolower($cleanSource), ['inline', 'unsafe-inline'])) {
+        if (in_array(strtolower($cleanSource), ['inline', 'unsafe-inline'], true)) {
             $cleanSource = 'unsafe-inline';
-        } elseif (in_array(strtolower($cleanSource), ['eval', 'unsafe-eval'])) {
+        } elseif (in_array(strtolower($cleanSource), ['eval', 'unsafe-eval'], true)) {
             $cleanSource = 'unsafe-eval';
         } elseif (filter_var($blockedUri, FILTER_VALIDATE_URL)) {
             $parsed = parse_url($blockedUri);
@@ -160,10 +171,11 @@ class CspHeaderManager
         }
 
         // 6. Append the domain if it's unique, serialize, and save
-        if (!in_array($cleanSource, $policy[$directive])) {
+        if (!in_array($cleanSource, $policy[$directive], true)) {
             $policy[$directive][] = $cleanSource;
         }
 
-        $policySetting->setValue(json_encode($policy));
+        $encodedPolicy = json_encode($policy);
+        $policySetting->setValue(false !== $encodedPolicy ? $encodedPolicy : null);
     }
 }

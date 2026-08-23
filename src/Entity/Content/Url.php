@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Url
 {
     /**
-     * @var The maximum size allowed for SEO-friendly short URLs
+     * @var int The maximum size allowed for SEO-friendly short URLs
      */
     public const DEFAULT_URL_SIZE_LIMIT = 255;
 

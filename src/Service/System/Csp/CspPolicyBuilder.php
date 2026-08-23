@@ -12,14 +12,18 @@ class CspPolicyBuilder
 {
     /**
      * Compiles unique DB entries into a structured associative array or string policy.
+     *
+     * @param list<array{effectiveDirective?: string|null, blockedUri?: string|null}> $rawReports
+     * @return array<string, list<string>>
      */
     public function buildPolicyFromReports(array $rawReports): array
     {
+        /** @var array<string, array<string, true>> $policy */
         $policy = [];
 
         foreach ($rawReports as $report) {
-            $directive = $report['effectiveDirective'];
-            $blockedUri = $report['blockedUri'];
+            $directive = $report['effectiveDirective'] ?? null;
+            $blockedUri = $report['blockedUri'] ?? null;
 
             if (empty($directive) || empty($blockedUri)) {
                 continue;
@@ -52,7 +56,7 @@ class CspPolicyBuilder
         if ('eval' === $uri) {
             return "'unsafe-eval'";
         }
-        if (in_array($uri, ['self', 'about', 'blob', 'data', 'mediastream', 'filesystem'])) {
+        if (in_array($uri, ['self', 'about', 'blob', 'data', 'mediastream', 'filesystem'], true)) {
             return "'".$uri."'";
         }
 
@@ -73,6 +77,8 @@ class CspPolicyBuilder
 
     /**
      * Format the policy array into a raw HTTP header string.
+     *
+     * @param array<string, list<string>> $compiledPolicy
      */
     public function stringifyPolicy(array $compiledPolicy): string
     {
