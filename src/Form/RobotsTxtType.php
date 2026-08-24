@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Inachis\Form;
 
+use Inachis\Entity\User\User;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Security\Authorisation\PermissionResolver;
@@ -51,6 +52,10 @@ class RobotsTxtType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            throw new \LogicException('Current user must be authenticated to build RobotsTxtType form.');
+        }
+
         $allowEdit = $this->permissionResolver->hasPermission(
             $user,
             PermissionResource::CRAWLER,

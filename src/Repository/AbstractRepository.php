@@ -173,7 +173,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
             $query = $query->setFirstResult($offset);
         }
 
-        /* @var Paginator<T> */
+        /** @var Paginator<T> */
         return new Paginator($query, false);
     }
 

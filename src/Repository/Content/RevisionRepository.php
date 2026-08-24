@@ -100,16 +100,18 @@ class RevisionRepository extends AbstractRepository implements RevisionRepositor
      *
      * @return list<Revision>
      */
-    public function getRevisionsForPage(Page $page)
+    public function getRevisionsForPage(Page $page): array
     {
-        /* @var list<Revision> */
-        return $this->createQueryBuilder('r')
+        /** @var list<Revision> $result */
+        $result = $this->createQueryBuilder('r')
             ->where('r.page = :pageId')
             ->setParameter('pageId', $page->getId(), 'uuid_binary')
             ->orderBy('r.versionNumber', 'DESC')
             ->setMaxResults(25)
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**

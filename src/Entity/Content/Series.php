@@ -477,13 +477,20 @@ class Series
             $dates[] = $item->getPostDate();
         }
 
+        if ([] === $dates) {
+            $this->firstDate = null;
+            $this->lastDate = null;
+
+            return $this;
+        }
+
         usort(
             $dates,
             static fn (\DateTimeImmutable $a, \DateTimeImmutable $b): int => $a <=> $b,
         );
 
-        $this->firstDate = $dates[0];
-        $this->lastDate = $dates[array_key_last($dates)];
+        $this->firstDate = reset($dates);
+        $this->lastDate = end($dates);
 
         return $this;
     }

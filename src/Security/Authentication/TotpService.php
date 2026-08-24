@@ -35,12 +35,15 @@ final class TotpService
      */
     public function generateSecret(int $length = 64): string
     {
-        if (0 !== $length % 8) {
-            throw new \InvalidArgumentException('TOTP secret length must be a multiple of 8.');
+        if ($length <= 0 || 0 !== $length % 8) {
+            throw new \InvalidArgumentException('TOTP secret length must be a positive multiple of 8.');
         }
 
+        /** @var int<1, max> $byteLength */
+        $byteLength = (int) ($length * 5 / 8);
+
         return $this->base32Encode(
-            random_bytes((int) ($length * 5 / 8)),
+            random_bytes($byteLength),
         );
     }
 

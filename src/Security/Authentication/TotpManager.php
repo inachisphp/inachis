@@ -39,7 +39,7 @@ class TotpManager
     ): array {
         $secret = $this->totpService->generateSecret();
         $uri = $this->totpService->getProvisioningUri(
-            $user->getUsername(),
+            $user->getUsername() ?? '',
             $secret,
         );
 

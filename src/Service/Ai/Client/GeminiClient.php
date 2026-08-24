@@ -153,10 +153,14 @@ readonly class GeminiClient
 			return null;
 		}
 
-		$message = $data['error']['message'] ?? null;
+		if (isset($data['error']) && is_array($data['error']) && isset($data['error']['message']) && is_string($data['error']['message'])) {
+            return $data['error']['message'];
+        }
 
-		return is_string($message) && '' !== trim($message)
-			? trim($message)
-			: null;
+        if (isset($data['message']) && is_string($data['message'])) {
+            return $data['message'];
+        }
+
+        return null;
 	}
 }

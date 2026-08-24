@@ -42,6 +42,8 @@ class DiscoveryStatusService
 
     /**
      * Returns site discoery status by groups.
+     * 
+     * @return array<string, list<DiscoveryStatus>>
      */
     public function getGroupedStatus(): array
     {

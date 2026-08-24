@@ -116,7 +116,7 @@ class LlmsTxtGenerator
     /**
      * Get the RSS feed URL if available.
      */
-    private function getFeedUrl(): ?string
+    private function getFeedUrl(): string
     {
         return $this->getBaseUrl().'/feed';
     }

@@ -659,4 +659,51 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             'upcoming' => is_array($result) ? (int) ($result['upcoming'] ?? 0) : 0,
         ];
     }
+
+    /**
+     * Get published homepage posts, optionally excluding specific page IDs.
+     *
+     * @param list<string|\Ramsey\Uuid\UuidInterface> $excludePages
+     *
+     * @return Paginator<Page>
+     */
+    public function findHomepagePosts(int $limit = 10, int $offset = 0, array $excludePages = []): Paginator
+    {
+        $pageQuery = 'q.status = :status AND q.visible = :visible AND q.postDate <= :postDate AND q.type = :type';
+        $pageParameters = [
+            'status' => EditorialStatus::PUBLISHED,
+            'visible' => true,
+            'postDate' => new \DateTimeImmutable('now'),
+            'type' => Page::TYPE_POST,
+        ];
+
+        if ([] !== $excludePages) {
+            $binaryIds = array_values(array_filter(array_map(
+                static function (string|\Ramsey\Uuid\UuidInterface $id): ?string {
+                    if ($id instanceof \Ramsey\Uuid\UuidInterface) {
+                        return $id->getBytes();
+                    }
+
+                    if ('' !== trim($id)) {
+                        return Uuid::fromString($id)->getBytes();
+                    }
+
+                    return null;
+                },
+                $excludePages,
+            )));
+
+            if ([] !== $binaryIds) {
+                $pageQuery .= ' AND q.id NOT IN (:excludedPages)';
+                $pageParameters['excludedPages'] = ['value' => $binaryIds];
+            }
+        }
+
+        return $this->getAll(
+            $limit,
+            $offset,
+            [$pageQuery, $pageParameters],
+            'q.postDate DESC, q.updatedAt',
+        );
+    }
 }

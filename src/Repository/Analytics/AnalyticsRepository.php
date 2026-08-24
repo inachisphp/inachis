@@ -612,7 +612,7 @@ class AnalyticsRepository
 
         foreach ($data as $row) {
             $total = $row['total'] ?? 0;
-            $indexed[$row['date']] = is_numeric($total) ? (int) $total : 0;
+            $indexed[$row['date']] = is_numeric($total) ? intval($total) : 0;
         }
 
         $result = [];
@@ -641,7 +641,7 @@ class AnalyticsRepository
         \DateTimeInterface $from,
         \DateTimeInterface $to,
     ): int {
-        return (int) $this->db->fetchOne(
+        $total = $this->db->fetchOne(
             '
             SELECT COALESCE(SUM(hits), 0)
             FROM analytics_errors
@@ -652,6 +652,8 @@ class AnalyticsRepository
                 'to' => $to->format('Y-m-d'),
             ],
         );
+
+        return is_numeric($total) ? (int) $total : 0;
     }
 
     /**

@@ -13,8 +13,15 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<array<string, mixed>>
+ */
 final class ContentPurgeType extends AbstractType
 {
+    /**
+     * @param FormBuilderInterface<array<string, mixed>|null> $builder
+     * @param array<string, mixed>                            $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder

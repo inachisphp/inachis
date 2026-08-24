@@ -91,6 +91,13 @@ class AiAudioManager
 
     /**
      * Generates or retrieves cached MP3 file path for a given Page/Post.
+     *
+     * @return array{
+     *     success: bool,
+     *     cached: bool,
+     *     filePath: string,
+     *     hash: string
+     * }
      */
     public function getOrGeneratePostAudio(
         UuidInterface|string $postId, 
@@ -176,15 +183,19 @@ class AiAudioManager
         $pattern = $this->storageDir . sprintf('post_%s_*.mp3', $idString);
         $files = glob($pattern);
 
-        return !empty($files) ? $files[0] : null;
+        return (is_array($files) && !empty($files)) ? $files[0] : null;
     }
 
     private function purgeOldPostAudio(string $idString): void
     {
         $pattern = $this->storageDir . sprintf('post_%s_*.mp3', $idString);
-        foreach (glob($pattern) as $oldFile) {
-            if (is_file($oldFile)) {
-                unlink($oldFile);
+        $files = glob($pattern);
+
+        if (is_array($files)) {
+            foreach ($files as $oldFile) {
+                if (is_file($oldFile)) {
+                    unlink($oldFile);
+                }
             }
         }
     }

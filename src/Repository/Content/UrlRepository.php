@@ -59,18 +59,18 @@ class UrlRepository extends AbstractRepository
      * Find URLs that are similar to the given URL, excluding a specific ID.
      * This is useful for ensuring URL uniqueness when updating or creating new URLs.
      *
-     * @return list{0?: array{link: string}}
+     * @return list<array{link: string}>
      */
-    public function findSimilarUrlsExcludingId(string $url, string $id)
+    public function findSimilarUrlsExcludingId(string $url, string $id): array
     {
         $qb = $this->createQueryBuilder('u');
 
-        /* @var list{0?: array{link: string}} */
-        return $qb
+        /** @var list<array{link: string}> $result */
+        $result = $qb
             ->select('u.link')
             ->where(
                 $qb->expr()->andX(
-                    'u.link LIKE  :url',
+                    'u.link LIKE :url',
                     $qb->expr()->not($qb->expr()->eq('u.content', ':id')),
                 ),
             )
@@ -80,6 +80,8 @@ class UrlRepository extends AbstractRepository
             ->setMaxResults(1)
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**

@@ -250,16 +250,26 @@ class TrustedDeviceManager
         $dd = new DeviceDetector($userAgent);
         $dd->parse();
         if ($dd->isBot()) {
+            /** @var array{name?: string}|null $bot */
             $bot = $dd->getBot();
 
-            return $bot['name'] ?? 'Bot';
+            return is_array($bot) && isset($bot['name'])
+                ? $bot['name']
+                : 'Bot';
         }
 
+        /** @var array{name?: string}|null $client */
         $client = $dd->getClient();
+        /** @var array{name?: string}|null $os */
         $os = $dd->getOs();
 
-        $browser = $client['name'] ?? 'Unknown Browser';
-        $platform = $os['name'] ?? 'Unknown OS';
+        $browser = is_array($client) && isset($client['name'])
+            ? $client['name']
+            : 'Unknown Browser';
+
+        $platform = is_array($os) && isset($os['name'])
+            ? $os['name']
+            : 'Unknown OS';
 
         if ('Unknown Browser' === $browser && 'Unknown OS' === $platform) {
             return 'Unknown Device';

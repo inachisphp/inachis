@@ -102,12 +102,17 @@ final readonly class ViewStateManager implements ViewStateManagerInterface
             );
         }
 
+        /** @var array<string, mixed> $filters */
+        $filters = is_array($state['filters'] ?? null) ? $state['filters'] : [];
+        $sort = is_string($state['sort'] ?? null) ? $state['sort'] : $defaults->getSort();
+        $view = is_string($state['view'] ?? null) ? $state['view'] : $defaults->getView();
+
         return new ContentQueryParameters(
-            filters: $state['filters'],
-            sort: $state['sort'],
+            filters: $filters,
+            sort: $sort,
             limit: $request->attributes->getInt('limit', 10),
             offset: $request->attributes->getInt('offset', 0),
-            view: $state['view'],
+            view: $view,
         );
     }
 

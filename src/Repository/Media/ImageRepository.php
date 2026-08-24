@@ -110,12 +110,12 @@ class ImageRepository extends AbstractRepository implements ResourceRepositoryIn
             )
         ';
 
-        return array_column(
-            $this->getEntityManager()
-                ->getConnection()
-                ->executeQuery($sql)
-                ->fetchAllAssociative(),
-            'id',
-        );
+        /** @var list<array{id: string}> $rows */
+        $rows = $this->getEntityManager()
+            ->getConnection()
+            ->executeQuery($sql)
+            ->fetchAllAssociative();
+
+        return array_column($rows, 'id');
     }
 }

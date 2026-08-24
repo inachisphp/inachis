@@ -65,7 +65,10 @@ class ContentAggregator
                 if (EditorialStatus::PUBLISHED !== $page->getStatus()) {
                     $group->getItems()->removeElement($page);
                 } else {
-                    $excludePages[] = $page->getId();
+                    $pageId = $page->getId();
+                    if (null !== $pageId) {
+                        $excludePages[] = $pageId;
+                    }
                 }
             }
 
@@ -80,32 +83,10 @@ class ContentAggregator
             }
         }
 
-        $pageQuery = 'q.status = :status AND q.visible = :visible AND q.postDate <= :postDate AND q.type = :type';
-        $pageParameters = [
-            'status' => EditorialStatus::PUBLISHED,
-            'visible' => true,
-            'postDate' => new \DateTimeImmutable('now'),
-            'type' => Page::TYPE_POST,
-        ];
-
-        // todo: move this to repository function
-        if ($excludePages) {
-            $binaryIds = array_map(
-                fn ($id) => $id instanceof \Ramsey\Uuid\UuidInterface
-                    ? $id->getBytes()
-                    : Uuid::fromString($id)->getBytes(),
-                $excludePages,
-            );
-            $pageQuery .= ' AND q.id NOT IN (:excludedPages)';
-            $pageParameters['excludedPages'] = ['value' => $binaryIds];
-        }
-
-        /** @var Paginator<Page> $pages */
-        $pages = $this->pageRepository->getAll(
+        $pages = $this->pageRepository->findHomepagePosts(
             self::ITEMS_TO_SHOW,
             0,
-            [$pageQuery, $pageParameters],
-            'q.postDate DESC, q.updatedAt',
+            $excludePages,
         );
 
         foreach ($pages as $page) {

@@ -49,9 +49,7 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
     public function getFilteredIds(array $ids): Paginator
     {
         $binaryIds = array_map(
-            fn ($id) => $id instanceof \Ramsey\Uuid\UuidInterface
-                ? $id->getBytes()
-                : Uuid::fromString($id)->getBytes(),
+            static fn (string $id): string => Uuid::fromString($id)->getBytes(),
             $ids,
         );
 
@@ -82,14 +80,16 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      */
     public function getSeriesByPost(Page $page): ?Series
     {
-        /* @var Series|null */
-        return $this->createQueryBuilder('s')
+        /** @var Series|null $result */
+        $result = $this->createQueryBuilder('s')
             ->select('s')
             ->leftJoin('s.items', 'Series_pages')
             ->where('Series_pages.id = :pageId')
             ->setParameter('pageId', $page->getId())
             ->getQuery()
             ->getOneOrNullResult();
+
+        return $result;
     }
 
     /**
@@ -104,12 +104,12 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      *
      * @throws NonUniqueResultException
      */
-    public function getPublishedSeriesByPost(Page $page)
+    public function getPublishedSeriesByPost(Page $page): ?Series
     {
         $qb = $this->createQueryBuilder('s');
 
-        /* @var Series|null */
-        return $qb
+        /** @var Series|null $result */
+        $result = $qb
             ->select('s', 'i')
             ->join('s.items', 'i')
             ->where(':page MEMBER OF s.items')
@@ -121,6 +121,8 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             ->orderBy('i.postDate', 'ASC')
             ->getQuery()
             ->getOneOrNullResult();
+
+        return $result;
     }
 
     /**
@@ -134,12 +136,12 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      *
      * @return Series|null the public Series that matches the given year and URL, or null if no such Series exists
      */
-    public function getPublicSeriesByYearAndUrl($year, $url): ?Series
+    public function getPublicSeriesByYearAndUrl(string $year, string $url): ?Series
     {
         $qb = $this->createQueryBuilder('s');
 
-        /* @var Series|null */
-        return $qb
+        /** @var Series|null $result */
+        $result = $qb
             ->select('s')
             ->where('s.lastDate >= :start')
             ->andWhere('s.lastDate < :end')
@@ -151,12 +153,18 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             ->setParameter('visible', true)
             ->getQuery()
             ->getOneOrNullResult();
+
+        return $result;
     }
 
     /**
      * Get a paginator of Series entities filtered by the given criteria.
      *
-     * @param array{keyword?:string,visible?:string} $filters
+     * @param array{
+     *     keyword?: string,
+     *     visible?: bool|string,
+     *     visibility?: bool|string
+     * } $filters
      *
      * @return Paginator<Series>
      */
@@ -173,7 +181,7 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
         if (isset($filters['visibility'])) {
             $where[0] .= ' AND q.visible = :visibility';
         }
-        $sort = match ($sort) {
+        $sortArray = match ($sort) {
             'title desc' => [
                 ['q.title', 'DESC'],
                 ['q.subTitle', 'DESC'],
@@ -195,7 +203,7 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             $limit,
             $offset,
             $where,
-            $sort,
+            $sortArray,
         );
     }
 
@@ -244,8 +252,8 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
         int $limit,
         int $offset,
     ): array {
-        /* @var array<Series> */
-        return $this->createQueryBuilder('s')
+        /** @var array<Series> $result */
+        $result = $this->createQueryBuilder('s')
             ->where('s.visible = :visible')
             ->setParameter('visible', true)
             ->orderBy('s.lastDate', 'DESC')
@@ -253,6 +261,8 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             ->setFirstResult($offset)
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**
@@ -263,8 +273,8 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      */
     public function findRecentDrafts(int $limit = 5): array
     {
-        /* @var array<Series> */
-        return $this->createQueryBuilder('s')
+        /** @var array<Series> $result */
+        $result = $this->createQueryBuilder('s')
             ->where('s.visible = :visible')
             ->setParameter('visible', false)
             ->orderBy('s.firstDate', 'DESC')
@@ -272,6 +282,8 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**
@@ -281,8 +293,8 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      */
     public function findRecentPublished(int $limit = 5): array
     {
-        /* @var array<Series> */
-        return $this->createQueryBuilder('s')
+        /** @var array<Series> $result */
+        $result = $this->createQueryBuilder('s')
             ->where('s.visible = :visible')
             ->setParameter('visible', true)
             ->orderBy('s.firstDate', 'DESC')
@@ -290,5 +302,7 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 }

@@ -41,7 +41,10 @@ class LoginActivityRepository extends ServiceEntityRepository
             ->setMaxResults($limit)
             ->getQuery();
 
-        return new Paginator($query, false);
+        /** @var Paginator<LoginActivity> $paginator */
+        $paginator = new Paginator($query, false);
+
+        return $paginator;
     }
 
     /**
@@ -51,22 +54,27 @@ class LoginActivityRepository extends ServiceEntityRepository
      */
     public function getFiltered(ContentQueryParameters $params): Paginator
     {
-        $query = $this->createQueryBuilder('l')
+        $queryBuilder = $this->createQueryBuilder('l')
             ->leftJoin('l.user', 'u')
             ->addSelect('u');
+
         $filters = $params->getFilters();
         if (!empty($filters['keyword']) && is_string($filters['keyword'])) {
-            $query
+            $queryBuilder
                 ->where('u.username LIKE :username')
                 ->setParameter('username', $filters['keyword']);
         }
+
         [$field, $direction] = $this->determineOrderBy($params->getSort());
-        $query
+        $query = $queryBuilder
             ->orderBy($field, $direction)
             ->setMaxResults($params->getLimit())
             ->getQuery();
 
-        return new Paginator($query, false);
+        /** @var Paginator<LoginActivity> $paginator */
+        $paginator = new Paginator($query, false);
+
+        return $paginator;
     }
 
     /**
@@ -86,7 +94,10 @@ class LoginActivityRepository extends ServiceEntityRepository
             ->setMaxResults($limit)
             ->getQuery();
 
-        return new Paginator($query, false);
+        /** @var Paginator<LoginActivity> $paginator */
+        $paginator = new Paginator($query, false);
+
+        return $paginator;
     }
 
     /**
@@ -94,25 +105,7 @@ class LoginActivityRepository extends ServiceEntityRepository
      */
     public function deviceExists(User $user, string $fingerprint): bool
     {
-        // TODO: Change this so it gets distinct fingerprints instead
-        // $all = $this->createQueryBuilder('l')
-        //     ->select('1')
-        //     ->where('l.user = :user')
-        //     ->andWhere('l.type = :type')
-        // ->setParameter('user', $user->getId(), 'uuid_binary')
-        //     ->setParameter('type', 'success')
-        //     ->setMaxResults(50)
-        //     ->getQuery()
-        //     ->getOneOrNullResult();
-
-        //     foreach ($all as $login) {
-        //         $extraData = $login->getExtraData() ?? [];
-        //         if (($extraData['fingerprint'] ?? null) === $fingerprint) {
         return true; // device is known
-        //     }
-        // }
-
-        // return true;
     }
 
     /**

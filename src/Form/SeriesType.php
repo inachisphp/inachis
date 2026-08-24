@@ -44,7 +44,7 @@ class SeriesType extends AbstractType
     ) {
     }
 
-    /**
+   /**
      * Build the form.
      *
      * @param FormBuilderInterface<Series|null> $builder
@@ -53,6 +53,10 @@ class SeriesType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $user = $this->security->getUser();
+        if (!$user instanceof \Inachis\Entity\User\User) {
+            throw new \LogicException('Current user must be authenticated to build SeriesType form.');
+        }
+
         $userTimezone = $this->timezoneProvider->getForUser($user);
 
         $newItem = !$options['data'] instanceof Series

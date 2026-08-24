@@ -36,8 +36,8 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
      */
     public function findActiveByUser(User $user): array
     {
-        /* @var list<PasswordResetRequest> */
-        return $this->createQueryBuilder('r')
+        /** @var list<PasswordResetRequest> $result */
+        $result = $this->createQueryBuilder('r')
             ->andWhere('r.user = :user')
             ->andWhere('r.used = false')
             ->andWhere('r.expiresAt > :now')
@@ -45,6 +45,8 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
             ->setParameter('now', new \DateTimeImmutable())
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**
@@ -54,8 +56,8 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
      */
     public function findLatestActiveForUser(User $user): ?PasswordResetRequest
     {
-        /* @var PasswordResetRequest|null */
-        return $this->createQueryBuilder('r')
+        /** @var PasswordResetRequest|null $result */
+        $result = $this->createQueryBuilder('r')
             ->andWhere('r.user = :userId')
             ->andWhere('r.used = false')
             ->andWhere('r.expiresAt > :now')
@@ -65,6 +67,8 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
+
+        return $result;
     }
 
     /**
@@ -74,8 +78,8 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
      */
     public function findLatestActiveByHash(string $hash): ?PasswordResetRequest
     {
-        /* @var PasswordResetRequest|null */
-        return $this->createQueryBuilder('r')
+        /** @var PasswordResetRequest|null $result */
+        $result = $this->createQueryBuilder('r')
             ->andWhere('r.hash = :hash')
             ->andWhere('r.used = false')
             ->andWhere('r.expiresAt > :now')
@@ -85,6 +89,8 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
+
+        return $result;
     }
 
     /**
@@ -92,12 +98,14 @@ class PasswordResetRequestRepository extends ServiceEntityRepository
      */
     public function purgeExpiredHashes(): int
     {
-        /* @var int */
-        return $this->createQueryBuilder('r')
+        /** @var int|string $result */
+        $result = $this->createQueryBuilder('r')
             ->delete()
             ->andWhere('r.expiresAt < :now')
             ->setParameter('now', (new \DateTimeImmutable())->sub(new \DateInterval('PT1H')))
             ->getQuery()
-            ->getResult();
+            ->execute();
+
+        return (int) $result;
     }
 }

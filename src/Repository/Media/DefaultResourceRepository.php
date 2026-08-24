@@ -63,7 +63,11 @@ trait DefaultResourceRepository
     /**
      * Returns a filtered list of resource files.
      *
-     * @param array{keyword?: string} $filters
+     * @param array{
+     *     keyword?: string,
+     *     usage?: string,
+     *     duplicates?: string
+     * } $filters
      *
      * @return Paginator<T>
      */

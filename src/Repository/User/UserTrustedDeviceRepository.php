@@ -37,8 +37,8 @@ class UserTrustedDeviceRepository extends AbstractRepository
      */
     public function getTrustedDevices(User $user): array
     {
-        /* @var list<UserTrustedDevice> */
-        return $this->createQueryBuilder('d')
+        /** @var list<UserTrustedDevice> $result */
+        $result = $this->createQueryBuilder('d')
             ->where('d.user = :user')
             ->andWhere('d.expiresAt > :now')
             ->setParameter('user', $user->getId(), 'uuid_binary')
@@ -47,6 +47,8 @@ class UserTrustedDeviceRepository extends AbstractRepository
             ->addOrderBy('d.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**
@@ -56,14 +58,16 @@ class UserTrustedDeviceRepository extends AbstractRepository
         User $user,
         string $selector,
     ): ?UserTrustedDevice {
-        /* @var UserTrustedDevice|null */
-        return $this->createQueryBuilder('d')
+        /** @var UserTrustedDevice|null $result */
+        $result = $this->createQueryBuilder('d')
             ->where('d.user = :user')
             ->andWhere('d.selector = :selector')
             ->setParameter('user', $user->getId(), 'uuid_binary')
             ->setParameter('selector', $selector)
             ->getQuery()
             ->getOneOrNullResult();
+
+        return $result;
     }
 
     /**
