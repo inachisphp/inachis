@@ -30,9 +30,7 @@ final class UserContentPurgeController extends AbstractInachisController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid() && 
-            $form->has('acknowledge') && $form->get('acknowledge')
-        ) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $purgeService->purgeUserTables();
 
             $this->addFlash(

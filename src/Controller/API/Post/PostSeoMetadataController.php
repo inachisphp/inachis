@@ -35,9 +35,15 @@ class PostSeoMetadataController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        $payload = json_decode($request->getContent(), true) ?: $request->request->all();
-        $content = $payload['content'] ?? '';
-        $title = $payload['title'] ?? null;
+        /** @var mixed $decoded */
+        $decoded = json_decode($request->getContent(), true);
+        $payload = is_array($decoded) ? $decoded : $request->request->all();
+
+        $rawContent = $payload['content'] ?? '';
+        $rawTitle = $payload['title'] ?? null;
+
+        $content = is_string($rawContent) ? $rawContent : '';
+        $title = is_string($rawTitle) ? $rawTitle : null;
 
         if (empty(trim(strip_tags($content)))) {
             return new JsonResponse([

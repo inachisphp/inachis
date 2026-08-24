@@ -46,6 +46,8 @@ class UserRepository extends AbstractRepository
     /**
      * Gets filtered users.
      *
+     * @param ContentQueryParameters<array<string, mixed>> $params The query parameters DTO
+     *
      * @return Paginator<User> The paginator
      */
     public function getFiltered(ContentQueryParameters $params): Paginator

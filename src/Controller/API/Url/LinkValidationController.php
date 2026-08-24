@@ -327,14 +327,15 @@ final class LinkValidationController
                 'redirects' => $info['redirect_count'] ?? 0,
             ];
         } catch (RedirectionExceptionInterface $e) {
-            $info = $e->getResponse()->getInfo();
+            /** @var int $redirectCount */
+            $redirectCount = $e->getResponse()->getInfo('redirect_count') ?? self::MAX_REDIRECTS;
 
             return [
                 'url' => $url,
                 'ok' => false,
                 'status' => $e->getResponse()->getStatusCode(),
                 'error' => 'Maximum redirects exceeded',
-                'redirects' => $info['redirect_count'] ?? self::MAX_REDIRECTS,
+                'redirects' => (int) $redirectCount,
             ];
         } catch (ExceptionInterface $e) {
             return [

@@ -22,9 +22,23 @@ class PostAudioGeneratorController extends AbstractInachisController {
         Request $request,
         AiAudioManager $audioManager,
     ): JsonResponse {
-        $payload = json_decode($request->getContent(), true) ?? [];
-        $title = $payload['title'] ?? $page->getTitle();
-        $content = $payload['content'] ?? $page->getContent() ?? '';
+        $id = $page->getId();
+        if (null === $id) {
+            return new JsonResponse([
+                'success' => false,
+                'error' => 'Post ID cannot be null.',
+            ], 400);
+        }
+
+        /** @var mixed $decoded */
+        $decoded = json_decode($request->getContent(), true);
+        $payload = is_array($decoded) ? $decoded : [];
+
+        $rawTitle = $payload['title'] ?? $page->getTitle();
+        $rawContent = $payload['content'] ?? $page->getContent() ?? '';
+
+        $title = is_string($rawTitle) ? $rawTitle : '';
+        $content = is_string($rawContent) ? $rawContent : '';
 
         if (empty(trim($content))) {
             return new JsonResponse([
@@ -35,7 +49,7 @@ class PostAudioGeneratorController extends AbstractInachisController {
 
         try {
             $result = $audioManager->getOrGeneratePostAudio(
-                $page->getId(),
+                $id,
                 $title,
                 $content
             );
@@ -44,7 +58,7 @@ class PostAudioGeneratorController extends AbstractInachisController {
                 'success' => true,
                 'data' => [
                     'cached'   => $result['cached'],
-                    'audioUrl' => $this->generateUrl('web_post_audio_stream', ['id' => (string) $page->getId()]),
+                    'audioUrl' => $this->generateUrl('web_post_audio_stream', ['id' => (string) $id]),
                 ],
             ]);
         } catch (\Throwable $e) {

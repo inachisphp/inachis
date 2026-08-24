@@ -15,6 +15,7 @@ use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Exception\User\CannotRemoveLastAdministratorException;
 use Inachis\Form\UserType;
+use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Security\RoleRepository;
@@ -92,14 +93,14 @@ class AdminProfileController extends AbstractInachisController
             return $this->redirectToRoute('incp_admin_list');
         }
 
-        $params = $viewStateManager->build(
+        /** @var ContentQueryParameters<array{keyword?: string}> $params */
+        $params = $viewStateManager->load(
             $request,
             'admin',
             new ViewStateDefaults(
                 sort: 'displayName asc',
                 view: 'table',
             ),
-            $categoryRepository,
         );
 
         $this->viewModel->page->title = 'Users';
@@ -268,6 +269,9 @@ class AdminProfileController extends AbstractInachisController
 
     /**
      * Prevent the final administrator from being removed.
+     *
+     * @param FormInterface<User> $form
+     * @param array<int, \Inachis\Entity\Security\Role> $originalRoles
      */
     private function validateAdministratorRoleRemoval(
         FormInterface $form,
@@ -298,6 +302,8 @@ class AdminProfileController extends AbstractInachisController
      *
      * Returns a response when the request should end immediately,
      * otherwise null when normal saving should continue.
+     *
+     * @param FormInterface<User> $form
      *
      * @throws RandomException
      */
@@ -355,6 +361,8 @@ class AdminProfileController extends AbstractInachisController
 
     /**
      * Check whether a submit button exists and was clicked.
+     *
+     * @param FormInterface<User> $form
      */
     private function isClicked(
         FormInterface $form,
@@ -471,18 +479,22 @@ class AdminProfileController extends AbstractInachisController
         Request $request,
         UserPreference $preferences,
     ): void {
+        /** @var array<string, mixed> $userData */
         $userData = $request->request->all('user');
 
-        $preferences->setTimezone(
-            $userData['timezone'] ?? $preferences->getTimezone(),
-        );
+        $timezone = $userData['timezone'] ?? null;
+        if (is_string($timezone) || null === $timezone) {
+            $preferences->setTimezone($timezone ?? $preferences->getTimezone());
+        }
 
-        $preferences->setLocale(
-            $userData['locale'] ?? $preferences->getLocale(),
-        );
+        $locale = $userData['locale'] ?? null;
+        if (is_string($locale)) {
+            $preferences->setLocale($locale);
+        }
 
-        $preferences->setColor(
-            $userData['color'] ?? $preferences->getColor(),
-        );
+        $color = $userData['color'] ?? null;
+        if (is_string($color)) {
+            $preferences->setColor($color);
+        }
     }
 }

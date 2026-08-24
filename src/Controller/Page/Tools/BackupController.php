@@ -40,10 +40,13 @@ class BackupController extends AbstractInachisController
             $files = glob($backupDir . '/*.sql.gz');
             if ($files !== false) {
                 foreach ($files as $file) {
+                    $mtime = filemtime($file);
                     $backups[] = [
                         'filename' => basename($file),
                         'size' => NumberFormatter::formatBytes((int) filesize($file)),
-                        'createdAt' => (new \DateTimeImmutable())->setTimestamp(filemtime($file)),
+                        'createdAt' => (new \DateTimeImmutable())->setTimestamp(
+                            false !== $mtime ? $mtime : time()
+                        ),
                     ];
                 }
 

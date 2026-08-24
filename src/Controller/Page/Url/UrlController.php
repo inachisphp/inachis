@@ -12,6 +12,7 @@ use Doctrine\ORM\OptimisticLockException;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
+use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\UrlRepository;
@@ -62,6 +63,7 @@ class UrlController extends AbstractInachisController
             return $this->redirectToRoute('incp_url_list');
         }
 
+        /** @var ContentQueryParameters<array{keyword?: string}> $params */
         $params = $viewStateManager->load(
             $request,
             'url',

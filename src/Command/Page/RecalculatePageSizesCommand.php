@@ -56,11 +56,9 @@ final class RecalculatePageSizesCommand extends Command
             if (preg_match_all('/\/imgs\/([a-zA-Z0-9_\-\.]+)/', $content, $matches)) {
                 $filenames = array_unique($matches[1]);
 
-                if (!empty($filenames)) {
-                    $images = $this->imageRepository->findBy(['filename' => $filenames]);
-                    foreach ($images as $image) {
-                        $totalSize += $image->getFilesize();
-                    }
+                $images = $this->imageRepository->findBy(['filename' => $filenames]);
+                foreach ($images as $image) {
+                    $totalSize += $image->getFilesize();
                 }
             }
 

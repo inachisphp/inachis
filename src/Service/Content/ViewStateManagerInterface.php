@@ -15,12 +15,18 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 interface ViewStateManagerInterface
 {
+    /**
+     * @return ContentQueryParameters<array<string, mixed>>
+     */
     public function load(
         Request $request,
         string $context,
         ViewStateDefaults $defaults,
     ): ContentQueryParameters;
 
+    /**
+     * @param ContentQueryParameters<array<string, mixed>> $parameters
+     */
     public function save(
         SessionInterface $session,
         string $context,

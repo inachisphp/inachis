@@ -32,10 +32,15 @@ class PostAudioController
     #[Route('/post/{id}/audio', name: 'web_post_audio_stream', methods: ['GET'])]
     public function streamAudio(Page $page, Request $request): Response
     {
-        $filePath = $this->audioManager->getAudioFilePath($page->getId());    
+        $id = $page->getId();
+        if (null === $id) {
+            return new Response('Audio file not found.', 404);
+        }
+
+        $filePath = $this->audioManager->getAudioFilePath($id);    
         if (!$filePath || 
             !file_exists($filePath) || 
-            $page->getStatus() != EditorialStatus::PUBLISHED
+            $page->getStatus() !== EditorialStatus::PUBLISHED
         ) {
             return new Response('Audio file not found.', 404);
         }

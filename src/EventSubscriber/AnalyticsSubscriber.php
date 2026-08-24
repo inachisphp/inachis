@@ -158,6 +158,8 @@ class AnalyticsSubscriber implements EventSubscriberInterface
 
     /**
      * Append data to specified log file.
+     *
+     * @param array<string, mixed> $data
      */
     private function appendLog(string $filename, array $data): void
     {

@@ -119,7 +119,7 @@ class SecurityPolicyController extends AbstractInachisController
             'inadmin/page/admin/security_policy.html.twig',
             [
                 'viewModel' => $this->viewModel,
-                'form' => $form?->createView(),
+                'form' => $form->createView(),
                 'policy' => $selectedPolicy,
                 'policies' => $policies,
             ],

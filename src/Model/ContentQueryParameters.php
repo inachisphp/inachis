@@ -14,13 +14,15 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * ContentQueryParameters class.
+ *
+ * @template-covariant TFilter of array<string, mixed>
  */
-class ContentQueryParameters
+readonly class ContentQueryParameters
 {
     /**
      * Constructor for ContentQueryParameters class.
      *
-     * @param array<string, mixed> $filters
+     * @param TFilter $filters
      */
     public function __construct(
         protected array $filters = [],
@@ -34,6 +36,9 @@ class ContentQueryParameters
     /**
      * Creates a new instance using the current values as defaults and
      * overriding them with any values supplied in the request.
+     * 
+     * @param self<array<string, mixed>> $current
+     * @return self<array<string, mixed>>
      */
     public static function fromRequest(
         Request $request,
@@ -113,7 +118,7 @@ class ContentQueryParameters
     }
 
     /**
-     * @return array<string, mixed>
+     * @return TFilter
      */
     public function getFilters(): array
     {

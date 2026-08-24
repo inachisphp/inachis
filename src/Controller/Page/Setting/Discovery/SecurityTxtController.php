@@ -15,6 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * @extends AbstractTextFileController<array{security_txt?: string, submit?: string}>
+ */
 class SecurityTxtController extends AbstractTextFileController
 {
     /**
@@ -34,6 +37,9 @@ class SecurityTxtController extends AbstractTextFileController
         );
     }
 
+    /**
+     * @return FormInterface<array{security_txt?: string, submit?: string}>
+     */
     protected function createTextFileForm(
         SettingRepository $settingRepository,
     ): FormInterface {

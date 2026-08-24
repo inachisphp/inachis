@@ -40,7 +40,6 @@ final class UpdateController extends AbstractInachisController
         private readonly ReleaseCleaner $releaseCleaner,
         private readonly ReleaseLocator $releaseLocator,
         private readonly ReleaseRollback $releaseRollback,
-        private readonly Downloader $downloader,
         protected EntityManagerInterface $entityManager,
         protected ParameterBagInterface $params,
         protected Security $security,

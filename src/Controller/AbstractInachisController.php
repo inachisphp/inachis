@@ -112,10 +112,10 @@ abstract class AbstractInachisController extends AbstractController
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        return $request?->getSession()->get(
+        return (bool) ($request?->getSession()->get(
             'security.totp_pending',
             false,
-        ) ?? false;
+        ) ?? false);
     }
 
     protected function isFullyAuthenticated(): bool

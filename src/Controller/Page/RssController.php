@@ -107,16 +107,16 @@ class RssController extends AbstractWebController
         // TODO: change categories to use sub-categories also
         $paginator = $pageRepository->getFilteredOfTypeByPostDate(
             [
-                'status' => EditorialStatus::PUBLISHED,
+                'status' => EditorialStatus::PUBLISHED->value,
                 'visible' => true,
                 'toDate' => new \DateTimeImmutable(),
-                'categories' => [$category->getId()],
+                'categories' => [(string) $category->getId()],
             ],
             Page::TYPE_POST,
             20,
             0,
         );
-
+        
         $response = new Response();
         $response->headers->set('Content-Type', 'application/rss+xml; charset=utf-8');
 

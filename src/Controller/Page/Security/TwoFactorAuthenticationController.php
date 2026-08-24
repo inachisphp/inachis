@@ -60,7 +60,8 @@ class TwoFactorAuthenticationController extends AbstractInachisController
         $form = $this->createForm(LoginTotpType::class)->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $code = (string) $form->get('code')->getData();
+            $codeData = $form->get('code')->getData();
+            $code = is_string($codeData) ? $codeData : '';
             if ($totpManager->verify($this->getCurrentUser(), $code)) {
                 return $completer->complete(
                     $request,
@@ -115,7 +116,8 @@ class TwoFactorAuthenticationController extends AbstractInachisController
         $form = $this->createForm(LoginRecoveryCodeType::class)->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $code = (string) $form->get('code')->getData();
+            $codeData = $form->get('code')->getData();
+            $code = is_string($codeData) ? $codeData : '';
             if ($recoveryCodeManager->verify($this->getCurrentUser(), $code)) {
                 return $completer->complete(
                     $request,

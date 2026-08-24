@@ -50,6 +50,8 @@ class LoginActivityRepository extends ServiceEntityRepository
     /**
      * Returns the most recent login activity, defaults to 50.
      *
+     * @param ContentQueryParameters<array<string, mixed>> $params
+     *
      * @return Paginator<LoginActivity>
      */
     public function getFiltered(ContentQueryParameters $params): Paginator

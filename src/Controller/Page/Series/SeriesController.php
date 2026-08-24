@@ -14,6 +14,7 @@ use Inachis\Entity\Media\Image;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\SeriesType;
+use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\PageRepository;
@@ -66,6 +67,7 @@ class SeriesController extends AbstractInachisController
             return $this->redirectToRoute('incp_series_list');
         }
 
+        /** @var ContentQueryParameters<array{keyword?: string}> $params */
         $params = $viewStateManager->load(
             $request,
             'series',
@@ -147,7 +149,7 @@ class SeriesController extends AbstractInachisController
             }
             if (empty($request->request->all('series')['url'])) {
                 $series->setUrl(
-                    UrlNormaliser::toUri($series->getTitle() ?? ''),
+                    UrlNormaliser::toUri($series->getTitle()),
                 );
             }
             if ($remove instanceof \Symfony\Component\Form\ClickableInterface && $remove->isClicked()) {

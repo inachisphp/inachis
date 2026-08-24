@@ -14,6 +14,7 @@ use Inachis\Entity\Security\RolePermission;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\RoleType;
+use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Security\RoleRepository;
@@ -116,6 +117,7 @@ class RolesController extends AbstractInachisController
             return $this->redirectToRoute('incp_admin_role_index');
         }
 
+        /** @var ContentQueryParameters<array{keyword?: string}> $params */
         $params = $viewStateManager->build(
             $request,
             'roles',
@@ -126,12 +128,6 @@ class RolesController extends AbstractInachisController
             $categoryRepository,
         );
 
-        // $contentQuery = $contentQueryParameters->process(
-        //     $request,
-        //     $categoryRepository,
-        //     'admin',
-        //     'displayName asc',
-        // );
         $this->viewModel->page->title = 'Roles';
         $this->viewModel->page->tab = 'roles';
 
@@ -221,8 +217,11 @@ class RolesController extends AbstractInachisController
             // Synchronise permissions: rebuild from posted checkboxes.
             $this->syncPermissions($request, $role);
 
+            /** @var array<string, array<string, numeric-string>> $postedPermissions */
+            $postedPermissions = $request->request->all('permissions');
+
             $warnings = $rolePermissionValidator->validate(
-                $request->request->all('permissions'),
+                $postedPermissions,
             );
 
             foreach ($warnings as $warning) {
@@ -277,9 +276,6 @@ class RolesController extends AbstractInachisController
     {
         /** @var array<string, array<string, mixed>> $posted */
         $posted = $request->request->all('permissions');
-        if (!is_array($posted)) {
-            $posted = [];
-        }
 
         // Remove all existing permissions; orphanRemoval will delete them.
         foreach ($role->getRolePermissions() as $existing) {
@@ -314,7 +310,7 @@ class RolesController extends AbstractInachisController
     /**
      * Builds the permissions matrix.
      *
-     * @return array<string, array<string, string>>
+     * @return array<string, array<string, bool>>
      */
     private function buildPermissionMatrix(Role $role): array
     {

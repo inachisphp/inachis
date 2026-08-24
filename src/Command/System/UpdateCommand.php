@@ -84,6 +84,8 @@ final class UpdateCommand extends Command
             return Command::FAILURE;
         }
 
+        $publishedAtTimestamp = null !== $manifest->publishedAt ? strtotime($manifest->publishedAt) : false;
+
         $io->section('Update Details');
         $io->table(
             ['Property', 'Value'],
@@ -91,7 +93,7 @@ final class UpdateCommand extends Command
                 ['Target Version', 'v'.$plan->targetVersion],
                 ['Package Archive', $plan->package],
                 ['Migrations Required', $plan->requiresMigration ? 'Yes' : 'No'],
-                ['Release Date', $manifest->publishedAt ? date('F j, Y H:i', strtotime($manifest->publishedAt)) : 'N/A'],
+                ['Release Date', is_int($publishedAtTimestamp) ? date('F j, Y H:i', $publishedAtTimestamp) : 'N/A'],
             ],
         );
 

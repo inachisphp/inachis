@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Inachis\Form;
 
 use Inachis\Entity\System\NavigationTab;
+use Inachis\Entity\User\User;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Security\Authorisation\PermissionResolver;
@@ -47,6 +48,10 @@ class NavigationTabType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            throw new \LogicException('Current user must be authenticated to build NavigationTabType form.');
+        }
+
         $newItem = !$options['data'] instanceof NavigationTab
             || empty($options['data']->getId());
         $allowEdit = $this->permissionResolver->hasPermission(

@@ -49,7 +49,8 @@ class SettingsIndexController extends AbstractInachisController
             'badgeClass' => $hasIssues ? 'badge--warning' : 'badge--success',
         ];
 
-        $uploadsDir = $this->getParameter('kernel.project_dir') . '/var/uploads/';
+        $projectDir = $this->getParameter('kernel.project_dir');
+        $uploadsDir = (is_string($projectDir) ? $projectDir : '') . '/var/uploads/';
         $audioSummary = [
             'hasStinger' => file_exists($uploadsDir . 'pod_stinger.mp3'),
             'hasTrailer' => file_exists($uploadsDir . 'pod_trailer.mp3'),

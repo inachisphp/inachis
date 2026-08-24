@@ -17,6 +17,8 @@ use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Controller for managing the llms.txt content in the admin settings.
+ *
+ * @extends AbstractTextFileController<array<string, string>>
  */
 class LlmsTxtController extends AbstractTextFileController
 {
@@ -31,6 +33,9 @@ class LlmsTxtController extends AbstractTextFileController
         return $this->editTextFile($request, $settingRepository);
     }
 
+    /**
+     * @return FormInterface<array<string, string>>
+     */
     protected function createTextFileForm(
         SettingRepository $settingRepository,
     ): FormInterface {

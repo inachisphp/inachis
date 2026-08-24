@@ -15,6 +15,7 @@ use Inachis\Entity\Media\Image;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\ResourceType;
+use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Media\DownloadRepository;
@@ -80,6 +81,7 @@ class ResourceController extends AbstractInachisController
             ->getForm();
         $form->handleRequest($request);
 
+        /** @var ContentQueryParameters<array{keyword?: string}> $params */
         $params = $viewStateManager->load(
             $request,
             $typePlural,
@@ -192,7 +194,7 @@ class ResourceController extends AbstractInachisController
                     try {
                         if (!$filesystem->exists($filePath)) {
                             $this->addFlash('error', 'The file for this resource does not exist on disk and will not be recoverable.');
-                        } else {
+                        } elseif ($resource instanceof Image || $resource instanceof Download) {
                             $wasteManagerService->sendToWaste($resource);
                         }
                         $repository->remove($resource);
@@ -274,6 +276,7 @@ class ResourceController extends AbstractInachisController
         Request $request,
         DownloadFileService $downloadFileService,
     ): JsonResponse {
+        /** @var array<string, mixed> $downloadData */
         $downloadData = $request->request->all('download');
         $uploadedFileInput = null;
 
@@ -284,18 +287,22 @@ class ResourceController extends AbstractInachisController
             }
         }
 
-        if (!$uploadedFileInput) {
+        if (!$uploadedFileInput instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
             return new JsonResponse(['error' => 'No file provided'], 400);
         }
-        if (empty($downloadData['title'])) {
+
+        $title = is_string($downloadData['title'] ?? null) ? trim($downloadData['title']) : '';
+        if ('' === $title) {
             return new JsonResponse(['error' => 'No title provided'], 400);
         }
+
+        $description = is_string($downloadData['description'] ?? null) ? $downloadData['description'] : null;
 
         try {
             $download = $downloadFileService->createFromUpload(
                 $uploadedFileInput,
-                $downloadData['title'],
-                $downloadData['description'] ?? null,
+                $title,
+                $description,
                 $this->getCurrentUser(),
             );
 

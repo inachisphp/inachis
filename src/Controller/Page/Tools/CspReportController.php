@@ -97,14 +97,14 @@ class CspReportController extends AbstractInachisController
         }
 
         match ($request->request->getString('action')) {
-            'approve' => [
-                $cspHeaderManager->addReportToPolicy($report),
+            'approve' => (function () use ($cspHeaderManager, $repository, $report) {
+                $cspHeaderManager->addReportToPolicy($report);
                 $repository->processSimilarReports(
                     $report->getViolatedDirective() ?: '',
                     $report->getBlockedUri() ?: '',
-                ),
-                $this->addFlash('success', 'Domain added to configuration successfully.'),
-            ],
+                );
+                $this->addFlash('success', 'Domain added to configuration successfully.');
+            })(),
             'reject' => $this->addFlash('info', 'Report marked as ignored.'),
             default => throw new \InvalidArgumentException(),
         };
@@ -191,7 +191,10 @@ class CspReportController extends AbstractInachisController
             return $this->redirectToRoute('incp_tools_csp_settings');
         }
 
-        $policyData = json_decode($cspPolicy->getValue() ?? '', true) ?? [];
+        $decodedPolicy = json_decode($cspPolicy->getValue() ?? '', true);
+        /** @var array<string, mixed> $policyData */
+        $policyData = is_array($decodedPolicy) ? $decodedPolicy : [];
+
         $displayDirectives = CspDirective::primary();
         foreach (CspDirective::advanced() as $advancedDirective) {
             if (isset($policyData[$advancedDirective->value])) {
@@ -207,7 +210,7 @@ class CspReportController extends AbstractInachisController
             'standard_directives' => $displayDirectives,
             'enum_advanced' => CspDirective::advanced(),
             'mode' => $cspMode->getValue(), // String: 'off', 'report-only', or 'enforce'
-            'policy' => json_decode($cspPolicy->getValue() ?? '', true) ?? [],
+            'policy' => $policyData,
             'upgrade_insecure' => '1' === $cspUpgradeInsecure->getValue(),
         ]);
     }

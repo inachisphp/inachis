@@ -13,8 +13,15 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * @extends AbstractType<array{code?: string, verify?: mixed}>
+ */
 class LoginRecoveryCodeType extends AbstractType
 {
+    /**
+     * @param FormBuilderInterface<array{code?: string, verify?: mixed}|null> $builder
+     * @param array<string, mixed>                                            $options
+     */
     public function buildForm(
         FormBuilderInterface $builder,
         array $options,

@@ -33,6 +33,8 @@ final readonly class ViewStateManager implements ViewStateManagerInterface
      * top if set.
      *
      * Priority: POST > Session > DB > Defaults
+     *
+     * @return ContentQueryParameters<array<string, mixed>>
      */
     public function load(
         Request $request,
@@ -118,6 +120,8 @@ final readonly class ViewStateManager implements ViewStateManagerInterface
 
     /**
      * Update the session and database with the current View settings.
+     *
+     * @param ContentQueryParameters<array<string, mixed>> $parameters
      */
     public function save(
         SessionInterface $session,
@@ -183,6 +187,8 @@ final readonly class ViewStateManager implements ViewStateManagerInterface
     /**
      * Loads and returns {@link ContentQueryParameters} for the current
      * request context.
+     *
+     * @return ContentQueryParameters<array<string, mixed>>
      */
     public function build(
         Request $request,
@@ -198,6 +204,10 @@ final readonly class ViewStateManager implements ViewStateManagerInterface
     /**
      * Creates a DTO from the Request parameters and updates the
      * session and DB values for this context.
+     *
+     * @param ContentQueryParameters<array<string, mixed>> $current
+     *
+     * @return ContentQueryParameters<array<string, mixed>>
      */
     public function update(
         Request $request,

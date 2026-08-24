@@ -16,11 +16,15 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Base controller for editable text-based discovery documents.
+ * 
+ * @template TData of array<string, mixed>
  */
 abstract class AbstractTextFileController extends AbstractInachisController
 {
     /**
      * Create the form used to edit the document.
+     * 
+     * @return FormInterface<TData>
      */
     abstract protected function createTextFileForm(
         SettingRepository $settingRepository,
@@ -74,9 +78,8 @@ abstract class AbstractTextFileController extends AbstractInachisController
             /** @var array<string, mixed> $data */
             $data = $form->getData();
 
-            $content = trim(
-                (string) ($data[$this->getFormField()] ?? ''),
-            );
+            $fieldValue = $data[$this->getFormField()] ?? '';
+            $content = trim(is_string($fieldValue) ? $fieldValue : '');
 
             $this->validateContent($content);
 

@@ -159,7 +159,12 @@ class TagsController extends AbstractInachisController
             }
 
             // Move pages across
-            $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$source->getId()]], '*', 0, 0);
+            $pages = $pageRepository->getFilteredOfTypeByPostDate(
+                ['tags' => [(string) $source->getId()]],
+                '*',
+                0,
+                0,
+            );
             foreach ($pages as $page) {
                 $page->removeTag($source);
                 $page->addTag($target);
@@ -216,7 +221,12 @@ class TagsController extends AbstractInachisController
             return $this->redirectToRoute('incp_tag_show', ['id' => $tag->getId()]);
         }
 
-        $pages = $pageRepository->getFilteredOfTypeByPostDate(['tags' => [$tag->getId()]], '*', $limit, $offset);
+        $pages = $pageRepository->getFilteredOfTypeByPostDate(
+            ['tags' => [(string) $tag->getId()]],
+            '*',
+            $limit,
+            $offset,
+        );
 
         $params = $viewStateManager->build(
             $request,
