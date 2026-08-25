@@ -51,9 +51,8 @@ final class TagReleaseCommand extends Command
             $output
         );
 
-        $type = strtolower(
-            (string) $input->getArgument('type')
-        );
+        $rawType = $input->getArgument('type');
+        $type = strtolower(is_string($rawType) ? $rawType : 'patch');
 
         if (!in_array($type, ['major', 'minor', 'patch'], true)) {
             $io->error(sprintf(

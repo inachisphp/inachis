@@ -47,8 +47,11 @@ final class ComposerInstaller implements BuildStepInterface
             static fn ($value) => is_scalar($value) || $value === null
         );
 
+        /** @var array<string, string> $env */
+        $env = array_map('strval', $envVars);
+
         $process = new Process($arguments, $workspace->path);
-        $process->setEnv(array_map('strval', $envVars));
+        $process->setEnv($env);
         $process->setWorkingDirectory($workspace->path);
         $process->setTimeout(null);
 

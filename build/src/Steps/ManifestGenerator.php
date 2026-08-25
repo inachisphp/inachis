@@ -41,8 +41,7 @@ final class ManifestGenerator implements BuildStepInterface
         );
 
         foreach ($iterator as $file) {
-
-            if (!$file->isFile()) {
+            if (!$file instanceof \SplFileInfo || !$file->isFile()) {
                 continue;
             }
 

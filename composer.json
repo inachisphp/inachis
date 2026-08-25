@@ -130,7 +130,7 @@
             "@auto-scripts",
             "@setup-git-hook"
         ],
-        "phpstan": "phpstan analyse --memory-limit=-1 src/",
+        "phpstan": "phpstan analyse --memory-limit=-1 {src/,build/src}",
         "phpcs": "php-cs-fixer fix --dry-run --diff --verbose",
         "phpcs-fix": "php-cs-fixer fix --verbose",
         "test": "php -d memory_limit=256M -f ./vendor/bin/phpunit"
