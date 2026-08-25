@@ -117,9 +117,9 @@ PHP;
 	private function hasValidHeader(string $contents): bool
 	{
 		return preg_match(
-			'/^<\?php\r?\n\r?\ndeclare\(strict_types=1\);\r?\n\r?\n'
-				. preg_quote(self::HEADER, '/')
-				. '\r?\n\r?\n/',
+			'/^<\?php\r?\n\r?\n'
+			. preg_quote(self::HEADER, '/')
+			. '\r?\n\r?\ndeclare\(strict_types=1\);\r?\n\r?\n/',
 			$contents,
 		) === 1;
 	}
@@ -128,18 +128,18 @@ PHP;
 	{
 		$contents = preg_replace(
 			'/^<\?php\s*'
-				. '(?:declare\(strict_types=1\);\s*)?'
-				. '(?:\/\*\*\s*'
-				. '\* This file is part of the inachis framework.*?'
-				. '\*\/\s*)?/s',
+			. '(?:declare\(strict_types=1\);\s*)?'
+			. '(?:\/\*\*\s*'
+			. '\* This file is part of the inachis framework\.?\s*'
+			. '\*\/\s*)?/s',
 			'',
 			$contents,
 			1,
 		);
 
-		return "<?php\n\ndeclare(strict_types=1);\n\n"
+		return "<?php\n\n"
 			. self::HEADER
-			. "\n\n"
+			. "\n\ndeclare(strict_types=1);\n\n"
 			. ltrim((string) $contents);
 	}
 }
