@@ -150,6 +150,7 @@ class ImportController extends AbstractInachisController
 
             return $this->render('inadmin/page/tools/import_preview.html.twig', [
                 'viewModel' => $this->viewModel,
+                'import_type' => $importType,
                 'items' => $dtos,
             ]);
         }
