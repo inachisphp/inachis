@@ -10,12 +10,18 @@ namespace Inachis\Service\Export\Series;
 
 use Inachis\Entity\Content\Series;
 use Inachis\Model\Series\SeriesExportDto;
+use Inachis\Service\Export\Page\PageExportNormaliser;
 
 /**
  * Normalises a series for export.
  */
 final class SeriesExportNormaliser
 {
+    public function __construct(
+        private ?PageExportNormaliser $pageNormaliser = null,
+    ) {
+    }
+
     /**
      * Normalises a series for export.
      *
@@ -23,7 +29,7 @@ final class SeriesExportNormaliser
      *
      * @return SeriesExportDto the normalised series
      */
-    public function normalise(Series $series): SeriesExportDto
+    public function normalise(Series $series, bool $includeFullPages = false): SeriesExportDto
     {
         $dto = new SeriesExportDto();
 
@@ -37,8 +43,14 @@ final class SeriesExportNormaliser
 
         $dto->visible = $series->isVisible();
 
+        $pageNormaliser = $this->pageNormaliser ?? new PageExportNormaliser();
+
         foreach ($series->getItems() as $page) {
-            $dto->items[] = $page->getTitle();
+            if ($includeFullPages) {
+                $dto->items[] = $pageNormaliser->normalise($page);
+            } else {
+                $dto->items[] = $page->getTitle();
+            }
         }
 
         return $dto;

@@ -34,17 +34,21 @@ final class SeriesExportService extends AbstractExportService
         parent::__construct($writers);
     }
 
+    private bool $includeFullPages = false;
+
     /**
      * Export series to a file of a given type (JSON/MD/XML).
      *
-     * @param iterable<Series>|null $series the series to export
-     * @param string                $format the format to export to (json/md/xml)
+     * @param iterable<Series>|null $series           the series to export
+     * @param string                $format           the format to export to (json/md/xml)
+     * @param bool                  $includeFullPages whether to export full linked page details or stubs
      *
      * @return string the exported series
      */
-    public function export(?iterable $series = null, string $format = 'json'): string
+    public function export(?iterable $series = null, string $format = 'json', bool $includeFullPages = false): string
     {
         $series ??= $this->repository->findAll();
+        $this->includeFullPages = $includeFullPages;
 
         return $this->exportCollection($series, $format, 'series');
     }
@@ -62,7 +66,7 @@ final class SeriesExportService extends AbstractExportService
             throw new \InvalidArgumentException('Expected instance of '.Series::class);
         }
 
-        return $this->normaliser->normalise($series);
+        return $this->normaliser->normalise($series, $this->includeFullPages);
     }
 
     /**

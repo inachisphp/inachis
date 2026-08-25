@@ -85,6 +85,29 @@ class UrlRepository extends AbstractRepository
     }
 
     /**
+     * Ensures the given URL link is unique in the repository by appending/incrementing a numerical suffix if already in use.
+     */
+    public function getUniqueUrl(string $url, string $excludeId = ''): string
+    {
+        $urls = $this->findSimilarUrlsExcludingId($url, $excludeId);
+
+        if (isset($urls[0])) {
+            preg_match('/\-([0-9]+)$/', $urls[0]['link'], $matches);
+            if (!isset($matches[1])) {
+                $matches = [
+                    '-0',
+                    '0',
+                ];
+                $urls[0]['link'] .= '-0';
+            }
+            $url = str_replace($matches[0], '-'.++$matches[1], $urls[0]['link']);
+        }
+
+        return $url;
+    }
+
+
+    /**
      * Determine the order by clause based on the input parameter.
      * This method maps specific sort options to corresponding database fields and sort directions.
      *

@@ -112,23 +112,8 @@ class UrlController extends AbstractInachisController
         UrlRepository $urlRepository,
     ): Response {
         $url = $request->request->getString('url');
-        $urls = $urlRepository->findSimilarUrlsExcludingId(
-            $url,
-            $request->request->getString('id'),
-        );
+        $id = $request->request->getString('id');
 
-        if (isset($urls[0])) {
-            preg_match('/\-([0-9]+)$/', $urls[0]['link'], $matches);
-            if (!isset($matches[1])) {
-                $matches = [
-                    '-0',
-                    '0',
-                ];
-                $urls[0]['link'] .= '-0';
-            }
-            $url = str_replace($matches[0], '-'.++$matches[1], $urls[0]['link']);
-        }
-
-        return new Response($url);
+        return new Response($urlRepository->getUniqueUrl($url, $id));
     }
 }

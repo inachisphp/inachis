@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Inachis\Model\Series;
 
+use Inachis\Model\Page\PageExportDto;
+
 /**
  * Data transfer object for exporting a series.
  */
@@ -43,7 +45,7 @@ final class SeriesExportDto
     public bool $visible;
 
     /**
-     * @var array<int, string> The titles of the posts for series contents
+     * @var array<int, string|PageExportDto> The titles of the posts for series contents
      */
     public array $items = [];
 }

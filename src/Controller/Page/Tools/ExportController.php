@@ -33,10 +33,12 @@ class ExportController extends AbstractInachisController
         PageExportService $pageExportService,
         PageRepository $pageRepository,
         SeriesExportService $seriesExportService,
+        SeriesRepository $seriesRepository,
     ): Response {
         $contentType = $request->request->getString('content_type', 'post');
         $scope = $request->request->getString('scope', 'all');
         $format = $request->request->getString('format', 'json');
+        $includeLinkedPages = $request->request->getBoolean('include_linked_pages');
 
         $rawSelectedIds = $request->request->get('selectedIds');
         $selectedIdsString = is_string($rawSelectedIds) ? $rawSelectedIds : '';
@@ -98,11 +100,10 @@ class ExportController extends AbstractInachisController
                         }
                         $items = $seriesExportService->getSeriesByIds($selectedIds);
                     } elseif ('filtered' === $scope) {
-                        /** @var array{categories?: array<string>, tags?: array<string>, status?: string, visible?: bool, visibility?: bool, issues?: string, keyword?: string, excludeIds?: list<string>} $typedFilter */
+                        /** @var array{keyword?: string, visible?: bool|string, visibility?: bool|string} $typedFilter */
                         $typedFilter = array_filter($filter);
-                        $items = $pageRepository->getFilteredOfTypeByPostDate(
+                        $items = $seriesRepository->getFiltered(
                             $typedFilter,
-                            '*',
                             10000,
                             0,
                         );
@@ -131,11 +132,11 @@ class ExportController extends AbstractInachisController
 
                         return $exportService->export($pages, $format);
                     })(),
-                    $exportService instanceof SeriesExportService => (function () use ($exportService, $items, $format): string {
+                    $exportService instanceof SeriesExportService => (function () use ($exportService, $items, $format, $includeLinkedPages): string {
                         /** @var iterable<Series> $series */
                         $series = $items;
 
-                        return $exportService->export($series, $format);
+                        return $exportService->export($series, $format, $includeLinkedPages);
                     })(),
                 };
             } catch (\InvalidArgumentException $e) {
@@ -160,23 +161,13 @@ class ExportController extends AbstractInachisController
             ]);
         }
 
-        $this->viewModel->page->title = 'Export';
-        $this->viewModel->page->tab = 'export';
-
         return $this->render('inadmin/page/tools/export.html.twig', [
             'viewModel' => $this->viewModel,
-            'pages' => $pageExportService->getAllPages(),
+            'content_type' => $contentType,
             'scope' => $scope,
-            'format' => $format,
-            'contentType' => $contentType,
-            'manualPages' => $pagesPreview,
+            'includeLinkedPages' => $includeLinkedPages,
             'selectedIds' => $selectedIds,
-            'previewCount' => $previewCount,
-            'filterType' => $filterType,
-            'filterStatus' => $filterStatus,
-            'filterStartDate' => $filterStartDate,
-            'filterEndDate' => $filterEndDate,
-            'filterKeyword' => $filterKeyword,
+            'filter' => $filter,
         ]);
     }
 
@@ -187,8 +178,8 @@ class ExportController extends AbstractInachisController
         SeriesRepository $seriesRepository,
     ): Response {
         $contentType = $request->query->get('content_type', 'post');
-        $query = (string) $request->query->get('q', '');
-        $page = (int) $request->query->get('page', 1);
+        $query = trim((string) $request->query->get('q', ''));
+        $page = max(1, (int) $request->query->get('page', 1));
 
         $selectedIdsString = (string) $request->query->get('selectedIds', '');
         /** @var list<string> $selectedIds */
@@ -197,10 +188,6 @@ class ExportController extends AbstractInachisController
             static fn (string $id): bool => '' !== trim($id),
         ));
 
-        if ('' === trim($query)) {
-            return new Response('', 200);
-        }
-
         $limit = 25;
         $offset = ($page - 1) * $limit;
         $items = [];
@@ -208,23 +195,32 @@ class ExportController extends AbstractInachisController
 
         switch ($contentType) {
             case 'post':
-                $items = $pageRepository->getFilteredOfTypeByPostDate(
-                    ['keyword' => $query],
+                $filter = '' !== $query ? ['keyword' => $query] : [];
+                $paginator = $pageRepository->getFilteredOfTypeByPostDate(
+                    $filter,
                     '*',
                     $limit,
                     $offset,
-                    'parent_id',
+                    'title asc',
                 );
+                $items = iterator_to_array($paginator);
+                $total = count($paginator);
                 break;
 
             case 'series':
-                $items = $seriesRepository->getFiltered(
-                    ['keyword' => $query],
+                $filter = '' !== $query ? ['keyword' => $query] : [];
+                $paginator = $seriesRepository->getFiltered(
+                    $filter,
                     $limit,
                     $offset,
+                    'title asc',
                 );
+                $items = iterator_to_array($paginator);
+                $total = count($paginator);
                 break;
         }
+
+        $totalPages = (int) ceil($total / $limit);
 
         return $this->render('inadmin/partials/export_table.html.twig', [
             'viewModel' => $this->viewModel,
@@ -235,6 +231,10 @@ class ExportController extends AbstractInachisController
                 'offset' => $page,
                 'limit' => $limit,
                 'total' => $total,
+                'currentPage' => $page,
+                'totalPages' => max(1, $totalPages),
+                'prevPage' => $page > 1 ? $page - 1 : null,
+                'nextPage' => $page < $totalPages ? $page + 1 : null,
             ],
             'selectedIds' => $selectedIds,
         ]);

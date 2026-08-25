@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Inachis\Service\Export\Series;
 
+use Inachis\Model\Page\PageExportDto;
 use Inachis\Model\Series\SeriesExportDto;
 use Inachis\Service\Export\ExportWriterInterface;
 
@@ -64,8 +65,32 @@ final class SeriesMdWriter implements ExportWriterInterface
             $output .= 'firstDate: '.$item->firstDate."\n";
             $output .= 'lastDate: '.$item->lastDate."\n";
             $output .= 'visible: '.($item->visible ? 'true' : 'false')."\n";
-            $output .= 'items: '.implode(', ', $item->items)."\n";
+
+            $itemTitles = [];
+            $fullPages = [];
+            foreach ($item->items as $pageItem) {
+                if ($pageItem instanceof PageExportDto) {
+                    $itemTitles[] = $pageItem->title;
+                    $fullPages[] = $pageItem;
+                } else {
+                    $itemTitles[] = (string) $pageItem;
+                }
+            }
+            $output .= 'items: '.implode(', ', $itemTitles)."\n";
             $output .= "---\n";
+
+            if (!empty($fullPages)) {
+                foreach ($fullPages as $p) {
+                    $output .= "\n## Page: ".$p->title."\n";
+                    if ($p->subTitle) {
+                        $output .= 'Subtitle: '.$p->subTitle."\n";
+                    }
+                    if (!empty($p->urls)) {
+                        $output .= 'URL: '.$p->urls[0]->path."\n";
+                    }
+                    $output .= "\n".($p->content ?? '')."\n";
+                }
+            }
         }
 
         return $output;

@@ -17,6 +17,7 @@ use Inachis\Model\Series\SeriesExportDto;
 use Inachis\Service\Import\Category\CategoryImportService;
 use Inachis\Service\Import\Category\CategoryImportValidator;
 use Inachis\Service\Import\ImportDetector;
+use Inachis\Service\Import\Page\PageImportMapper;
 use Inachis\Service\Import\Page\PageImportService;
 use Inachis\Service\Import\Page\PageImportValidator;
 use Inachis\Service\Import\Series\SeriesImportService;
@@ -42,6 +43,7 @@ class ImportController extends AbstractInachisController
         SeriesImportValidator $seriesImportValidator,
         PageImportService $pageImportService,
         PageImportValidator $pageImportValidator,
+        PageImportMapper $pageImportMapper,
     ): Response {
         $this->viewModel->page->title = 'Import';
         $this->viewModel->page->tab = 'import';
@@ -103,22 +105,7 @@ class ImportController extends AbstractInachisController
                 case 'post':
                     /** @var list<array<string, mixed>> $pageData */
                     $pageData = $data;
-                    /** @var list<PageExportDto> $dtos */
-                    $dtos = array_map(
-                        static function (array $item): PageExportDto {
-                            $dto = new PageExportDto();
-                            $dto->title = is_scalar($item['title'] ?? null) ? (string) $item['title'] : '';
-                            $dto->content = is_scalar($item['content'] ?? null) ? (string) $item['content'] : '';
-                            $dto->subTitle = is_scalar($item['subTitle'] ?? null) ? (string) $item['subTitle'] : null;
-                            $dto->type = is_scalar($item['type'] ?? null) ? (string) $item['type'] : 'post';
-                            $dto->status = is_scalar($item['status'] ?? null) ? (string) $item['status'] : 'draft';
-                            $dto->postDate = is_scalar($item['postDate'] ?? null) ? (string) $item['postDate'] : null;
-                            $dto->visible = (bool) ($item['visible'] ?? true);
-
-                            return $dto;
-                        },
-                        $pageData,
-                    );
+                    $dtos = $pageImportMapper->mapToDto($pageData);
                     $warnings = $pageImportValidator->validateAll($dtos);
                     break;
 
@@ -152,6 +139,7 @@ class ImportController extends AbstractInachisController
                 'viewModel' => $this->viewModel,
                 'import_type' => $importType,
                 'items' => $dtos,
+                'warnings' => $warnings,
             ]);
         }
 
@@ -213,7 +201,7 @@ class ImportController extends AbstractInachisController
             case 'series':
                 /** @var list<SeriesExportDto> $seriesDtos */
                 $seriesDtos = $dtos;
-                $result = $seriesImportService->import($seriesDtos);
+                $result = $seriesImportService->import($seriesDtos, $currentUser, $options);
                 $warnings = $result->warnings;
                 $resultSummary = [
                     'items' => $result->seriesImported,

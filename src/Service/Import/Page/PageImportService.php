@@ -10,10 +10,12 @@ namespace Inachis\Service\Import\Page;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Url;
 use Inachis\Entity\User\User;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Model\Import\ImportOptionsDto;
 use Inachis\Model\Page\PageExportDto;
+use Inachis\Repository\Content\UrlRepository;
 
 /**
  * Service for importing pages.
@@ -27,6 +29,7 @@ final class PageImportService
         private EntityManagerInterface $entityManager,
         private CategoryImportService $categoryService,
         private TagImportService $tagService,
+        private ?UrlRepository $urlRepository = null,
     ) {
     }
 
@@ -45,6 +48,8 @@ final class PageImportService
         ImportOptionsDto $options,
     ): PageImportResult {
         $result = new PageImportResult();
+        $urlRepo = $this->urlRepository ?? $this->entityManager->getRepository(Url::class);
+
         $this->entityManager->beginTransaction();
 
         try {
@@ -71,38 +76,41 @@ final class PageImportService
                 }
 
                 foreach ($dto->categories as $categoryDto) {
-                    $category = $this->categoryService->findOrCreateByPath(
-                        $categoryDto->path,
-                        $options->createMissingCategories,
-                    );
+                    if (empty($categoryDto->path)) {
+                        continue;
+                    }
+                    $wasCreatedBefore = $this->categoryService->wasCreated($categoryDto->path);
+                    $category = $this->categoryService->findOrCreateByPath($categoryDto->path, true);
 
                     if ($category) {
                         $page->addCategory($category);
-
-                        // Count creation if it was newly created
-                        if ($options->createMissingCategories) {
+                        if (!$wasCreatedBefore && $this->categoryService->wasCreated($categoryDto->path)) {
                             ++$result->categoriesCreated;
                         }
-                    } else {
-                        $result->warnings[] = "Category not found: {$categoryDto->path}";
                     }
                 }
 
                 foreach ($dto->tags as $tagDto) {
-                    $tag = $this->tagService->findOrCreateByTitle(
-                        $tagDto->title,
-                        $options->createMissingTags,
-                    );
+                    if (empty($tagDto->title)) {
+                        continue;
+                    }
+                    $wasCreatedBefore = $this->tagService->wasCreated($tagDto->title);
+                    $tag = $this->tagService->findOrCreateByTitle($tagDto->title, true);
 
                     if ($tag) {
                         $page->addTag($tag);
-
-                        if ($options->createMissingTags) {
+                        if (!$wasCreatedBefore && $this->tagService->wasCreated($tagDto->title)) {
                             ++$result->tagsCreated;
                         }
-                    } else {
-                        $result->warnings[] = "Tag not found: {$tagDto->title}";
                     }
+                }
+
+                foreach ($dto->urls as $urlDto) {
+                    if (empty($urlDto->path)) {
+                        continue;
+                    }
+                    $uniquePath = $urlRepo->getUniqueUrl($urlDto->path);
+                    new Url($page, $uniquePath, $urlDto->default);
                 }
 
                 $this->entityManager->persist($page);
