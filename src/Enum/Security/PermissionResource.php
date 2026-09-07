@@ -13,6 +13,7 @@ namespace Inachis\Enum\Security;
  */
 enum PermissionResource: string
 {
+    case AUDIO = 'AUDIO';
     case PAGE = 'PAGE';
     case SERIES = 'SERIES';
     case IMAGE = 'IMAGE';
@@ -59,6 +60,7 @@ enum PermissionResource: string
                 PermissionAction::PUBLISH,
             ],
 
+            self::AUDIO,
             self::CATEGORY,
             self::IMAGE,
             self::DOWNLOAD,
@@ -115,6 +117,7 @@ enum PermissionResource: string
     public function label(): string
     {
         return match ($this) {
+            self::AUDIO => 'Audio',
             self::PAGE => 'Pages',
             self::SERIES => 'Series',
             self::IMAGE => 'Images',
@@ -158,6 +161,7 @@ enum PermissionResource: string
             [
                 'group' => PermissionGroup::CONTENT,
                 'resources' => [
+                    self::AUDIO,
                     self::PAGE,
                     self::SERIES,
                     self::IMAGE,

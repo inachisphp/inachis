@@ -55,7 +55,7 @@ abstract class AbstractFile
     #[Assert\Length(max: 127)]
     #[Assert\NotBlank]
     #[ORM\Column(type: 'string', length: 127, nullable: false)]
-    protected string $filetype = '';
+    protected string $filetype = 'application/octet-stream';
 
     #[Assert\PositiveOrZero]
     #[ORM\Column(type: 'integer')]
@@ -65,7 +65,7 @@ abstract class AbstractFile
     #[Assert\NotBlank]
     #[Assert\Regex('/^[a-f0-9]{64}$/i')]
     #[ORM\Column(type: 'string', length: 64, nullable: false)]
-    protected string $checksum = '';
+    protected string $checksum = '0000000000000000000000000000000000000000000000000000000000000000';
 
     /**
      * @var User|null The UUID of the {@link User} that uploaded the file
