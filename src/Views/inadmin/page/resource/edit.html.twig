@@ -60,7 +60,7 @@
             {% endif %}
             {% if viewModel.page.type == 'audio' %}
                 <audio controls>
-                    <source src="" type="audio/mpeg">
+                    <source src="{{ path('web_audio_stream', { filename: resource.filename }) }}" type="audio/mpeg">
                 </audio>
             {% endif %}
             {% if resource.id is not empty %}

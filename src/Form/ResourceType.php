@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Inachis\Form;
 
 use Inachis\Entity\Media\AbstractFile;
+use Inachis\Entity\Media\Audio;
 use Inachis\Entity\Media\Download;
 use Inachis\Entity\Media\Image;
 use Inachis\Entity\User\User;
@@ -61,6 +62,8 @@ class ResourceType extends AbstractType
             $type = PermissionResource::IMAGE;
         } elseif ($options['data'] instanceof Download) {
             $type = PermissionResource::DOWNLOAD;
+        } elseif ($options['data'] instanceof Audio) {
+            $type = PermissionResource::AUDIO;
         } else {
             throw new \InvalidArgumentException('Unrecognised content type');
         }
@@ -126,6 +129,34 @@ class ResourceType extends AbstractType
                     new File(
                         maxSize: Download::MAX_FILESIZE.'M',
                         mimeTypes: Download::ALLOWED_MIME_TYPES,
+                        mimeTypesMessage: sprintf(
+                            'Please upload a valid file type (%s).',
+                            $typesPreview,
+                        ),
+                    ),
+                ],
+            ]);
+        } elseif ($options['data'] instanceof Audio) {
+            // Build dynamic human-readable string: "MP3, WAV, etc."
+            $allowedExts = array_map(
+                static fn (string $ext): string => strtoupper(ltrim($ext, '.')),
+                Audio::ALLOWED_TYPES,
+            );
+
+            $typesPreview = implode(', ', array_slice($allowedExts, 0, 5)) . ', etc.';
+
+            $builder->add('file', FileType::class, [
+                'label' => $isNew ? 'Upload File' : 'Replace File',
+                'mapped' => false,
+                'required' => $isNew,
+                'attr' => [
+                    'class' => 'filepond',
+                    'data-max-file-size' => '50MB',
+                ],
+                'constraints' => [
+                    new File(
+                        maxSize: Download::MAX_FILESIZE.'M',
+                        mimeTypes: Audio::ALLOWED_MIME_TYPES,
                         mimeTypesMessage: sprintf(
                             'Please upload a valid file type (%s).',
                             $typesPreview,

@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
 class PostAudioGeneratorController extends AbstractInachisController {
-    #[Route('/incp/api/post/{id}/generate-audio', name: 'inadin_api_post_generate_audio', methods: ['POST'])]
+    #[Route('/incp/api/post/{id}/generate-audio', name: 'incp_api_post_generate_audio', methods: ['POST'])]
     public function generateAudio(
         Page $page,
         Request $request,
@@ -49,9 +49,7 @@ class PostAudioGeneratorController extends AbstractInachisController {
 
         try {
             $result = $audioManager->getOrGeneratePostAudio(
-                $id,
-                $title,
-                $content
+                $page,
             );
 
             return new JsonResponse([
