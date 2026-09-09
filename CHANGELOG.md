@@ -14,6 +14,7 @@
 - Added ability to upload file attachments
 - Added auto-updater and build/release tools for easier updates
 - Added backup/restore and data purge tools
+- Added Audio resource type that can be linked to Pages and Posts
 - Added AI generation for image metadata, post summaries, and audio versions
 - Added 2FA and trusted devices
 - Added ability to upload podcast bumpers to auto-append to uploaded/generated podcasts

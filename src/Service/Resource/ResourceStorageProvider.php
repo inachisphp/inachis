@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Inachis\Service\Resource;
 
 use Inachis\Entity\Media\AbstractFile;
+use Inachis\Entity\Media\Audio;
 use Inachis\Entity\Media\Download;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -20,6 +21,9 @@ class ResourceStorageProvider
 
         #[Autowire('%kernel.project_dir%/var/uploads')]
         private readonly string $downloadDirectory,
+
+        #[Autowire('%kernel.project_dir%/var/audio')]
+        private readonly string $audioDirectory,
     ) {
     }
 
@@ -32,9 +36,13 @@ class ResourceStorageProvider
             ? $resource::class
             : $resource;
 
-        $dir = is_a($type, Download::class, true) || in_array($type, ['downloads', 'download'], true)
-            ? $this->downloadDirectory
-            : $this->imageDirectory;
+        if (is_a($type, Audio::class, true) || in_array($type, ['audio'], true)) {
+            $dir = $this->audioDirectory;
+        } elseif (is_a($type, Download::class, true) || in_array($type, ['downloads', 'download'], true)) {
+            $dir = $this->downloadDirectory;
+        } else {
+            $dir = $this->imageDirectory;
+        }
 
         return rtrim($dir, '/\\').'/';
     }
