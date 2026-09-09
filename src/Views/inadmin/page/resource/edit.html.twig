@@ -58,7 +58,7 @@
                        type="text"
                        value="{% if not (resource.filename starts with 'http')  %}/imgs/{% endif %}{{ resource.filename }}" />
             {% endif %}
-            {% if viewModel.page.type == 'audio' %}
+            {% if viewModel.page.type == 'audio' and resource.id is not null %}
                 <audio controls>
                     <source src="{{ path('web_audio_stream', { filename: resource.filename }) }}" type="audio/mpeg">
                 </audio>
