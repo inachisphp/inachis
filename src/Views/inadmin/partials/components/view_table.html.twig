@@ -92,40 +92,40 @@
             <{% if column.header is defined and column.header %}th scope="row"{% else %}td class="{{ cellClasses|join(' ') }}"{% endif %}>
                 {% if column.slug is defined %}
                     {% if column.slug_prefix is defined %}
-                        <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incp/{{ attribute(item, column.slug_prefix) }}/{{ slug_object }}">
+                        <a aria-label="Edit {{ property(item, column.source) }}" href="/incp/{{ property(item, column.slug_prefix) }}/{{ slug_object }}">
                     {% elseif slug_prefix is defined %}
-                        <a aria-label="Edit {{ attribute(item, column.source) }}" href="/incp/{{ slug_prefix }}/{{ slug_object }}">
+                        <a aria-label="Edit {{ property(item, column.source) }}" href="/incp/{{ slug_prefix }}/{{ slug_object }}">
                     {% endif %}
                 {% elseif column.url is defined and column.url is not empty %}
-                        <a aria-label="Edit {{ attribute(item, 'title') }}" href="{{ attribute(item, column.url) }}">
+                        <a aria-label="Edit {{ attribute(item, 'title') }}" href="{{ property(item, column.url) }}">
                 {% elseif url is defined and url is not empty and column.path is defined %}
                         <a aria-label="Edit" href="{{ url }}">
                 {% endif %}
-                {% if column.source is defined and attribute(item, column.source) is defined %}
+                {% if column.source is defined and property(item, column.source) is not null %}
                     {% if column.source_type is defined and column.source_type == 'date' %}
-                        {{ attribute(item, column.source)|date('d/m/Y', viewModel.session.preferences.timezone) }}
+                        {{ property(item, column.source)|date('d/m/Y', viewModel.session.preferences.timezone) }}
                     {% elseif column.source_type is defined and column.source_type == 'datetime' %}
-                        {{ attribute(item, column.source)|date(column.dateFormat|default('d/m/Y H:i'), viewModel.session.preferences.timezone) }}
+                        {{ property(item, column.source)|date(column.dateFormat|default('d/m/Y H:i'), viewModel.session.preferences.timezone) }}
                     {% elseif column.source_type is defined and column.source_type == 'title' %}
                         {{ property(item, column.source ~ '.title') }}
                     {% elseif column.source_type is defined and column.source_type == 'count' %}
-                        {{ attribute(item, column.source)|length }}
+                        {{ property(item, column.source)|length }}
                     {% elseif column.source_type is defined and column.source_type == 'boolean' %}
-                        {{ attribute(item, column.source) ? 'Yes' : 'No' }}
+                        {{ property(item, column.source) ? 'Yes' : 'No' }}
                     {% elseif column.source_type is defined and column.source_type == 'object' %}
-                        {% if attribute(item, column.source) is iterable %}
-                            {% for object in attribute(item, column.source) %}
-                                {{ attribute(object, column.object_field)}}{% if not loop.last %}, {% endif %}
+                        {% if property(item, column.source) is iterable %}
+                            {% for object in property(item, column.source) %}
+                                {{ property(object, column.object_field)}}{% if not loop.last %}, {% endif %}
                             {% endfor %}
                         {% else %}
-                            {{ attribute(attribute(item, column.source), column.object_field)|default('-') }}
+                            {{ property(property(item, column.source), column.object_field)|default('-') }}
                         {% endif %}
                     {% else %}
                         {% if column.maxLength is defined %}
-                            {{ attribute(item, column.source)|slice(0, column.maxLength) }}
-                            {% if attribute(item, column.source)|length > column.maxLength %}…{% endif %}
+                            {{ property(item, column.source)|slice(0, column.maxLength) }}
+                            {% if property(item, column.source)|length > column.maxLength %}…{% endif %}
                         {% else %}
-                            {{ attribute(item, column.source)|default('-') }}
+                            {{ property(item, column.source)|default('-') }}
                         {% endif %}
                     {% endif %}
                 {% elseif column.badges|default(null) is not empty %}

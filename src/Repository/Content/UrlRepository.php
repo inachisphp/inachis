@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Repository\Content;
 
@@ -59,18 +59,18 @@ class UrlRepository extends AbstractRepository
      * Find URLs that are similar to the given URL, excluding a specific ID.
      * This is useful for ensuring URL uniqueness when updating or creating new URLs.
      *
-     * @return list{0?: array{link: string}}
+     * @return list<array{link: string}>
      */
-    public function findSimilarUrlsExcludingId(string $url, string $id)
+    public function findSimilarUrlsExcludingId(string $url, string $id): array
     {
         $qb = $this->createQueryBuilder('u');
 
-        /* @var list{0?: array{link: string}} */
-        return $qb
+        /** @var list<array{link: string}> $result */
+        $result = $qb
             ->select('u.link')
             ->where(
                 $qb->expr()->andX(
-                    'u.link LIKE  :url',
+                    'u.link LIKE :url',
                     $qb->expr()->not($qb->expr()->eq('u.content', ':id')),
                 ),
             )
@@ -80,7 +80,32 @@ class UrlRepository extends AbstractRepository
             ->setMaxResults(1)
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
+
+    /**
+     * Ensures the given URL link is unique in the repository by appending/incrementing a numerical suffix if already in use.
+     */
+    public function getUniqueUrl(string $url, string $excludeId = ''): string
+    {
+        $urls = $this->findSimilarUrlsExcludingId($url, $excludeId);
+
+        if (isset($urls[0])) {
+            preg_match('/\-([0-9]+)$/', $urls[0]['link'], $matches);
+            if (!isset($matches[1])) {
+                $matches = [
+                    '-0',
+                    '0',
+                ];
+                $urls[0]['link'] .= '-0';
+            }
+            $url = str_replace($matches[0], '-'.++$matches[1], $urls[0]['link']);
+        }
+
+        return $url;
+    }
+
 
     /**
      * Determine the order by clause based on the input parameter.

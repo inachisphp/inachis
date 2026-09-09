@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Service\Ai\Client;
 
@@ -21,7 +21,10 @@ readonly class GeminiClient
 {
 	private const string BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 
-	private const string DEFAULT_MODEL = 'gemini-flash-latest';
+	/**
+	 * Use a specific stable model rather than Google's moving "latest" alias.
+	 */
+	private const string DEFAULT_MODEL = 'gemini-3.8-flash';
 
 	public function __construct(
 		private HttpClientInterface $httpClient,
@@ -31,7 +34,7 @@ readonly class GeminiClient
 
 	public function isConfigured(): bool
 	{
-		return !empty($this->apiKey);
+		return null !== $this->apiKey && '' !== trim($this->apiKey);
 	}
 
 	/**
@@ -52,30 +55,44 @@ readonly class GeminiClient
 			);
 		}
 
+		$model = trim($model);
+
+		if ('' === $model) {
+			throw new AiConfigurationException(
+				'Gemini model is not configured.',
+				provider: 'gemini',
+			);
+		}
+
 		$endpoint = sprintf(
 			'%s/%s:generateContent',
 			self::BASE_URL,
-			$model,
+			rawurlencode($model),
 		);
 
 		try {
 			$response = $this->httpClient->request('POST', $endpoint, [
 				'headers' => [
 					'Content-Type' => 'application/json',
+					'Accept' => 'application/json',
 					'x-goog-api-key' => $this->apiKey,
 				],
 				'json' => $payload,
-				'timeout' => 30,
+				'timeout' => 60,
+				'max_duration' => 300,
 			]);
 
 			$statusCode = $response->getStatusCode();
 
-			// Prevent Symfony's HTTP client from throwing before we can
-			// classify the provider response ourselves.
+			// Do not allow Symfony to throw on non-2xx responses. We need
+			// the provider response so we can classify the exception.
 			$content = $response->getContent(false);
 		} catch (TransportExceptionInterface $e) {
 			throw new AiTemporaryException(
-				'Unable to communicate with the Gemini API.',
+				sprintf(
+					'Gemini API request failed: %s',
+					$e->getMessage(),
+				),
 				provider: 'gemini',
 				previous: $e,
 			);
@@ -110,35 +127,32 @@ readonly class GeminiClient
 	): AiConfigurationException|AiRateLimitException|AiTemporaryException|AiProviderException {
 		$message = $this->extractErrorMessage($content);
 
-		if (in_array($statusCode, [401, 403], true)) {
-			return new AiConfigurationException(
+		return match (true) {
+			401 === $statusCode,
+			403 === $statusCode => new AiConfigurationException(
 				$message ?? 'Gemini rejected the configured API credentials.',
 				provider: 'gemini',
-			);
-		}
+			),
 
-		if (429 === $statusCode) {
-			return new AiRateLimitException(
+			429 === $statusCode => new AiRateLimitException(
 				$message ?? 'Gemini API rate limit exceeded.',
 				provider: 'gemini',
-			);
-		}
+			),
 
-		if (in_array($statusCode, [408, 425, 500, 502, 503, 504], true)) {
-			return new AiTemporaryException(
+			in_array($statusCode, [408, 425, 500, 502, 503, 504], true) => new AiTemporaryException(
 				$message ?? 'Gemini API is temporarily unavailable.',
 				provider: 'gemini',
-			);
-		}
-
-		return new AiProviderException(
-			$message ?? sprintf(
-				'Gemini API returned HTTP %d.',
-				$statusCode,
 			),
-			provider: 'gemini',
-			providerStatusCode: $statusCode,
-		);
+
+			default => new AiProviderException(
+				$message ?? sprintf(
+					'Gemini API returned HTTP %d.',
+					$statusCode,
+				),
+				provider: 'gemini',
+				providerStatusCode: $statusCode,
+			),
+		};
 	}
 
 	private function extractErrorMessage(string $content): ?string
@@ -147,16 +161,37 @@ readonly class GeminiClient
 			return null;
 		}
 
-		$data = json_decode($content, true);
+		try {
+			$data = json_decode(
+				$content,
+				true,
+				512,
+				JSON_THROW_ON_ERROR,
+			);
+		} catch (\JsonException) {
+			return null;
+		}
 
 		if (!is_array($data)) {
 			return null;
 		}
 
-		$message = $data['error']['message'] ?? null;
+		$error = $data['error'] ?? null;
 
-		return is_string($message) && '' !== trim($message)
-			? trim($message)
-			: null;
+		if (is_array($error)) {
+			$message = $error['message'] ?? null;
+
+			if (is_string($message) && '' !== trim($message)) {
+				return $message;
+			}
+		}
+
+		$message = $data['message'] ?? null;
+
+		if (is_string($message) && '' !== trim($message)) {
+			return $message;
+		}
+
+		return null;
 	}
 }

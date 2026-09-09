@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\EntityListener;
 
@@ -102,13 +102,18 @@ class UserTotpListener
             return;
         }
 
-        $rowKey = $this->crypto->unwrapKey(
-            $totp->getEncryptedKey(),
-        );
+        $encryptedKey = $totp->getEncryptedKey();
+        $encryptedSecret = $totp->getEncryptedSecret();
+
+        if (null === $encryptedKey || null === $encryptedSecret) {
+            return;
+        }
+
+        $rowKey = $this->crypto->unwrapKey($encryptedKey);
 
         $totp->setSecret(
             $this->crypto->decryptValue(
-                $totp->getEncryptedSecret(),
+                $encryptedSecret,
                 $rowKey,
             ),
         );

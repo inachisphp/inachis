@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Service\Plugin;
 
@@ -53,12 +53,13 @@ final readonly class PluginScanner extends AbstractPackageScanner
         string $path,
         array $manifest,
     ): Plugin {
-        $plugin = new Plugin(
-            ...$this->createBasePackage(
-                $path,
-                $manifest,
-            ),
+        /** @var array<string> $basePackage */
+        $basePackage = $this->createBasePackage(
+            $path,
+            $manifest,
         );
+
+        $plugin = new Plugin(...$basePackage);
 
         $plugin->features = $this->extractFeatures(
             $manifest,

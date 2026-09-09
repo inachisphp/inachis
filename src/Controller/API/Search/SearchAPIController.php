@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller\API\Search;
 
@@ -50,8 +50,8 @@ class SearchAPIController extends AbstractController
 
             if ('series' === $type) {
                 $entity = $seriesRepository->find($id);
-                $path = null !== $entity && is_scalar($entity->getUrl())
-                    ? '/series/'.ltrim((string) $entity->getUrl(), '/')
+                $path = null !== $entity
+                    ? '/series/'.ltrim($entity->getUrl(), '/')
                     : null;
             } else {
                 /** @var \Inachis\Entity\Content\Url|null $url */

@@ -1,27 +1,27 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Enum;
 
 enum EditorialStatus: string
 {
     /**
-     * @var string Indicates a Page is currently a draft
+     * Indicates a Page is currently a draft
      */
     case DRAFT = 'draft';
 
     /**
-     * @var string Indicates a Page is current in review
+     * Indicates a Page is current in review
      */
     case REVIEW = 'review';
 
     /**
-     * @var string Indicates a Page has been published
+     * Indicates a Page has been published
      */
     case PUBLISHED = 'published';
 

@@ -1,13 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
 
+declare(strict_types=1);
+
 namespace Inachis\Form;
 
+use Inachis\Entity\User\User;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Security\Authorisation\PermissionResolver;
@@ -19,6 +20,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends AbstractType<array{security_txt?: string, submit?: string}>
+ */
 class SecurityTxtType extends AbstractType
 {
     /**
@@ -43,6 +47,10 @@ class SecurityTxtType extends AbstractType
         array $options,
     ): void {
         $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            throw new \LogicException('Current user must be authenticated to build SecurityTxtType form.');
+        }
+
         $allowEdit = $this->permissionResolver->hasPermission(
             $user,
             PermissionResource::CRAWLER,

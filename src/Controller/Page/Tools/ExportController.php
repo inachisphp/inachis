@@ -1,14 +1,17 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
 
+declare(strict_types=1);
+
 namespace Inachis\Controller\Page\Tools;
 
 use Inachis\Controller\AbstractInachisController;
+use Inachis\Entity\Content\Category;
+use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Series;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Service\Export\Category\CategoryExportService;
@@ -30,13 +33,22 @@ class ExportController extends AbstractInachisController
         PageExportService $pageExportService,
         PageRepository $pageRepository,
         SeriesExportService $seriesExportService,
+        SeriesRepository $seriesRepository,
     ): Response {
-        $contentType = $request->request->getString('content_type') ?? 'post';
-        $scope = $request->request->getString('scope') ?? 'all';
-        $format = $request->request->getString('format') ?? 'json';
-        $selectedIds = array_filter(
-            explode(',', $request->request->get('selectedIds') ?? ''),
-        );
+        $contentType = $request->request->getString('content_type', 'post');
+        $scope = $request->request->getString('scope', 'all');
+        $format = $request->request->getString('format', 'json');
+        $includeLinkedPages = $request->request->getBoolean('include_linked_pages');
+
+        $rawSelectedIds = $request->request->get('selectedIds');
+        $selectedIdsString = is_string($rawSelectedIds) ? $rawSelectedIds : '';
+        /** @var list<string> $selectedIds */
+        $selectedIds = array_values(array_filter(
+            explode(',', $selectedIdsString),
+            static fn (string $id): bool => '' !== trim($id),
+        ));
+
+        /** @var array<string, mixed> $filter */
         $filter = $request->request->all('filter');
         $filterType = $filter['type'] ?? null;
         $filterStatus = $filter['status'] ?? null;
@@ -46,9 +58,13 @@ class ExportController extends AbstractInachisController
 
         $pagesPreview = null;
         $previewCount = null;
-        $pages = [];
 
         if ($request->isMethod('POST') && $request->request->has('export')) {
+            /** @var CategoryExportService|PageExportService|SeriesExportService|null $exportService */
+            $exportService = null;
+            /** @var iterable<object> $items */
+            $items = [];
+
             switch ($contentType) {
                 case 'category':
                     $items = $categoryExportService->getAllCategories();
@@ -66,7 +82,9 @@ class ExportController extends AbstractInachisController
                         }
                         $items = $pageExportService->getPagesByIds($selectedIds);
                     } elseif ('filtered' === $scope) {
-                        $items = $pageExportService->getFilteredPages($filter);
+                        /** @var array{type?: string, categories?: array<string>, tags?: array<string>, status?: string, visible?: bool, keyword?: string, excludeIds?: list<string>} $typedFilter */
+                        $typedFilter = $filter;
+                        $items = $pageExportService->getFilteredPages($typedFilter);
                     }
                     $exportService = $pageExportService;
                     break;
@@ -82,9 +100,10 @@ class ExportController extends AbstractInachisController
                         }
                         $items = $seriesExportService->getSeriesByIds($selectedIds);
                     } elseif ('filtered' === $scope) {
-                        $items = $pageRepository->getFilteredOfTypeByPostDate(
-                            array_filter($filter),
-                            '*',
+                        /** @var array{keyword?: string, visible?: bool|string, visibility?: bool|string} $typedFilter */
+                        $typedFilter = array_filter($filter);
+                        $items = $seriesRepository->getFiltered(
+                            $typedFilter,
                             10000,
                             0,
                         );
@@ -93,8 +112,33 @@ class ExportController extends AbstractInachisController
                     break;
             }
 
+            if (null === $exportService) {
+                $this->addFlash('error', 'Invalid content type selected for export.');
+
+                return $this->redirectToRoute('incp_tools_export');
+            }
+
             try {
-                $exportedData = $exportService->export($items, $format);
+                $exportedData = match (true) {
+                    $exportService instanceof CategoryExportService => (function () use ($exportService, $items, $format): string {
+                        /** @var iterable<Category> $categories */
+                        $categories = $items;
+
+                        return $exportService->export($categories, $format);
+                    })(),
+                    $exportService instanceof PageExportService => (function () use ($exportService, $items, $format): string {
+                        /** @var iterable<Page> $pages */
+                        $pages = $items;
+
+                        return $exportService->export($pages, $format);
+                    })(),
+                    $exportService instanceof SeriesExportService => (function () use ($exportService, $items, $format, $includeLinkedPages): string {
+                        /** @var iterable<Series> $series */
+                        $series = $items;
+
+                        return $exportService->export($series, $format, $includeLinkedPages);
+                    })(),
+                };
             } catch (\InvalidArgumentException $e) {
                 $this->addFlash('error', $e->getMessage());
 
@@ -109,31 +153,21 @@ class ExportController extends AbstractInachisController
                 ]);
             }
 
-            $contentType = 'json' === $format ? 'application/json' : 'application/xml';
+            $responseContentType = 'json' === $format ? 'application/json' : 'application/xml';
 
             return new Response($exportedData, 200, [
-                'Content-Type' => $contentType,
+                'Content-Type' => $responseContentType,
                 'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             ]);
         }
 
-        $this->viewModel->page->title = 'Export';
-        $this->viewModel->page->tab = 'export';
-
         return $this->render('inadmin/page/tools/export.html.twig', [
             'viewModel' => $this->viewModel,
-            'pages' => $pageExportService->getAllPages(),
+            'content_type' => $contentType,
             'scope' => $scope,
-            'format' => $format,
-            'contentType' => $contentType,
-            'manualPages' => $pagesPreview,
+            'includeLinkedPages' => $includeLinkedPages,
             'selectedIds' => $selectedIds,
-            'previewCount' => $previewCount,
-            'filterType' => $filterType,
-            'filterStatus' => $filterStatus,
-            'filterStartDate' => $filterStartDate,
-            'filterEndDate' => $filterEndDate,
-            'filterKeyword' => $filterKeyword,
+            'filter' => $filter,
         ]);
     }
 
@@ -144,13 +178,15 @@ class ExportController extends AbstractInachisController
         SeriesRepository $seriesRepository,
     ): Response {
         $contentType = $request->query->get('content_type', 'post');
-        $query = $request->query->get('q', '');
-        $page = (int) $request->query->get('page', 1);
-        $selectedIds = array_filter(explode(',', $request->query->get('selectedIds', '')));
+        $query = trim((string) $request->query->get('q', ''));
+        $page = max(1, (int) $request->query->get('page', 1));
 
-        if (empty(trim($query))) {
-            return new Response('', 200);
-        }
+        $selectedIdsString = (string) $request->query->get('selectedIds', '');
+        /** @var list<string> $selectedIds */
+        $selectedIds = array_values(array_filter(
+            explode(',', $selectedIdsString),
+            static fn (string $id): bool => '' !== trim($id),
+        ));
 
         $limit = 25;
         $offset = ($page - 1) * $limit;
@@ -159,34 +195,33 @@ class ExportController extends AbstractInachisController
 
         switch ($contentType) {
             case 'post':
-                $items = $pageRepository->getFilteredOfTypeByPostDate(
-                    ['keyword' => $query],
+                $filter = '' !== $query ? ['keyword' => $query] : [];
+                $paginator = $pageRepository->getFilteredOfTypeByPostDate(
+                    $filter,
                     '*',
                     $limit,
                     $offset,
-                    'parent_id',
+                    'title asc',
                 );
-                // $total = get count - make sure results limited to 50
+                $items = iterator_to_array($paginator);
+                $total = count($paginator);
                 break;
 
             case 'series':
-                $items = $seriesRepository->getFiltered(
-                    ['keyword' => $query],
+                $filter = '' !== $query ? ['keyword' => $query] : [];
+                $paginator = $seriesRepository->getFiltered(
+                    $filter,
                     $limit,
                     $offset,
+                    'title asc',
                 );
-                // $total = get count - make sure results limited to 50
-                break;
-
-            default:
-                $pages = [];
+                $items = iterator_to_array($paginator);
+                $total = count($paginator);
                 break;
         }
 
-        // $total = $pageExportService->getFilteredOfTypeByPostDateCount(
-        //     ['keyword' => $query],
-        //     $contentType
-        // );
+        $totalPages = (int) ceil($total / $limit);
+
         return $this->render('inadmin/partials/export_table.html.twig', [
             'viewModel' => $this->viewModel,
             'dataset' => $items,
@@ -196,6 +231,10 @@ class ExportController extends AbstractInachisController
                 'offset' => $page,
                 'limit' => $limit,
                 'total' => $total,
+                'currentPage' => $page,
+                'totalPages' => max(1, $totalPages),
+                'prevPage' => $page > 1 ? $page - 1 : null,
+                'nextPage' => $page < $totalPages ? $page + 1 : null,
             ],
             'selectedIds' => $selectedIds,
         ]);

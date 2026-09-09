@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Search;
 
@@ -43,14 +43,19 @@ class SearchWebController extends AbstractWebController
             foreach ($searchResults->getResults() as $result) {
                 /** @var array<string, mixed> $result */
                 $type = is_scalar($result['type'] ?? null) ? strtolower((string) $result['type']) : '';
-                $uuidString = Uuid::fromBytes($result['id'])->toString();
+                $rawId = $result['id'] ?? '';
+                if (!is_string($rawId) || '' === $rawId) {
+                    continue;
+                }
+
+                $uuidString = Uuid::fromBytes($rawId)->toString();
                 $title = is_scalar($result['title'] ?? null) ? (string) $result['title'] : '';
                 $excerpt = is_scalar($result['content'] ?? null) ? (string) $result['content'] : '';
 
                 if ('series' === $type) {
                     $entity = $seriesRepository->find($uuidString);
-                    $url = null !== $entity && is_scalar($entity->getUrl())
-                        ? '/series/'.ltrim((string) $entity->getUrl(), '/')
+                    $url = null !== $entity
+                        ? '/series/'.ltrim($entity->getUrl(), '/')
                         : null;
                 } else {
                     /** @var \Inachis\Entity\Content\Url|null $contentUrl */

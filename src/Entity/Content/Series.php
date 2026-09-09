@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Entity\Content;
 
@@ -456,5 +456,42 @@ class Series
             'public' => $public,
             'private' => $private,
         ];
+    }
+
+    /**
+     * Determines the correct values for first and last dates
+     *
+     * @return self
+     */
+    public function recalculateDates(): self
+    {
+        if ($this->items->isEmpty()) {
+            $this->firstDate = null;
+            $this->lastDate = null;
+
+            return $this;
+        }
+
+        $dates = [];
+        foreach ($this->items as $item) {
+            $dates[] = $item->getPostDate();
+        }
+
+        if ([] === $dates) {
+            $this->firstDate = null;
+            $this->lastDate = null;
+
+            return $this;
+        }
+
+        usort(
+            $dates,
+            static fn (\DateTimeImmutable $a, \DateTimeImmutable $b): int => $a <=> $b,
+        );
+
+        $this->firstDate = reset($dates);
+        $this->lastDate = end($dates);
+
+        return $this;
     }
 }

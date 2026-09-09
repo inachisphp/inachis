@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Updater;
 
@@ -43,8 +43,11 @@ final class ReleaseExtractor
                 // Prevent Zip Slip vulnerability
                 $targetPath = $destination.DIRECTORY_SEPARATOR.$filename;
 
-                // Resolve normalized path check
-                $parts = array_filter(explode('/', str_replace('\\', '/', $filename)), strlen(...));
+                // Resolve normalised path check
+                $parts = array_filter(
+                    explode('/', str_replace('\\', '/', $filename)),
+                    static fn(string $part): bool => $part !== ''
+                );
                 $p = [];
                 foreach ($parts as $part) {
                     if ('.' === $part) {

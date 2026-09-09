@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller;
 
@@ -59,7 +59,7 @@ class WidgetController extends AbstractController
             'title' => $categoryName,
         ]);
         if ($category instanceof Category) {
-            return $this->entityManager->getRepository(Page::class)->getPagesWithCategory(
+            return $this->entityManager->getRepository(Page::class)->getLiveContentWithCategory(
                 $category,
                 $maxDisplayCount,
             );

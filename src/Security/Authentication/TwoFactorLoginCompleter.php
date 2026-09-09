@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Security\Authentication;
 
@@ -63,10 +63,10 @@ class TwoFactorLoginCompleter
     ): RedirectResponse {
         $session = $request->getSession();
 
-        $target = $session->get(
-            'security.pending_2fa_target',
-            $this->urlGenerator->generate('incp_dashboard'),
-        );
+        $target = $session->get('security.pending_2fa_target');
+        $targetUrl = is_string($target) && '' !== $target
+            ? $target
+            : $this->urlGenerator->generate('incp_dashboard');
 
         $session->remove('security.totp_pending');
         $session->remove('security.pending_2fa_target');
@@ -74,7 +74,7 @@ class TwoFactorLoginCompleter
         /** @var User|null $user */
         $user = $this->security->getUser();
 
-        $response = new RedirectResponse($target);
+        $response = new RedirectResponse($targetUrl);
 
         if ($trustDevice && $user instanceof User) {
             $response->headers->setCookie(

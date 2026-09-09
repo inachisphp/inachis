@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Service\Resource;
 
@@ -12,7 +12,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Media\Download;
 use Inachis\Entity\User\User;
 use Inachis\Repository\Media\DownloadRepository;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -24,7 +23,6 @@ class DownloadFileService
         private readonly SluggerInterface $slugger,
         private ResourceStorageProvider $storageProvider,
         private EntityManagerInterface $entityManager,
-        private Filesystem $filesystem = new Filesystem(),
     ) {
     }
 
@@ -120,7 +118,8 @@ class DownloadFileService
             $download->archiveCurrentPayload();
         }
 
-        $fileMeta = $this->storeFile($file, $download->getTitle());
+        $title = $download->getTitle() ?? '';
+        $fileMeta = $this->storeFile($file, $title);
 
         $download
             ->setFilename($fileMeta['filename'])

@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Tools;
 
@@ -91,7 +91,12 @@ class AnalyticsController extends AbstractInachisController
                 ),
                 'peakViews' => array_reduce(
                     $viewsPerDay,
-                    static function ($carry, $row) {
+                    /**
+                     * @param array{date?: string, total: int}|null $carry
+                     * @param array{date?: string, total: int} $row
+                     * @return array{date?: string, total: int}|null
+                     */
+                    static function (?array $carry, array $row): array {
                         return (null === $carry || $row['total'] > $carry['total'])
                             ? $row
                             : $carry;

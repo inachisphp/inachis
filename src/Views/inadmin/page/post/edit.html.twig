@@ -202,27 +202,10 @@
                         {{ form_widget(form.nofollow) }}
                         {{ form_label(form.nofollow) }}
                     </p>
-
-                    <div id="post_audio_player_wrapper">
-                        <!-- If audio already exists, render player on page load -->
-                        {% if hasAudio %}
-                            <audio controls>
-                                <source src="{{ path('web_post_audio_stream', { id: post.id }) }}" type="audio/mpeg">
-                            </audio>
-                        {% endif %}
-                    </div>
-                    {% if not hasAudio %}
-                    <p>
-                        <button
-                            type="button"
-                            id="post_generate_audio"
-                            class="btn btn--ai"
-                            data-post-id="{{ post.id }}"
-                        >
-                            <span class="material-icons">graphic_eq</span> Generate Audio Version
-                        </button>
-                    </p>
-                    {% endif %}
+                    {{ include('inadmin/partials/_audio_player.html.twig', {
+                        'hasAudio': hasAudio,
+                        'post': post
+                    }) }}
                 </section>
                 <section class="col-6">
                 {{

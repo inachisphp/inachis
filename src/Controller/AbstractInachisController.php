@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller;
 
@@ -112,10 +112,10 @@ abstract class AbstractInachisController extends AbstractController
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        return $request?->getSession()->get(
+        return (bool) ($request?->getSession()->get(
             'security.totp_pending',
             false,
-        ) ?? false;
+        ) ?? false);
     }
 
     protected function isFullyAuthenticated(): bool

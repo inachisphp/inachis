@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Repository\Content;
 
@@ -84,6 +84,8 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      *   tags?:array<string>,
      *   status?:string,
      *   visible?:bool,
+     *   visibility?:bool,
+     *   issues?:string,
      *   keyword?:string,
      *   excludeIds?:list<string>,
      *   fromDate?:\DateTimeImmutable,
@@ -102,14 +104,14 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
     ): Paginator {
         $allowedIssueFilters = ['categories', 'image', 'snippet', 'tags'];
         if (
-            !empty($filters['issues'])
-            && in_array($filters['issues'], $allowedIssueFilters)
+            isset($filters['issues'])
+            && in_array($filters['issues'], $allowedIssueFilters, true)
         ) {
             return match ($filters['issues']) {
                 'categories' => $this->getPagesWithoutCategories($limit, $offset),
                 'image' => $this->getPagesWithoutFeatureImage($limit, $offset),
                 'snippet' => $this->getPagesWithoutFeatureSnippet($limit, $offset),
-                'tags' => $this->getPagesWithoutTags($limit, $offset),
+                default => $this->getPagesWithoutTags($limit, $offset),
             };
         }
         $join = [];
@@ -138,7 +140,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             $where[0] .= ' AND c.id IN (:categories)';
             $where[1]['categories'] = [
                 'value' => implode(',', array_map(
-                    fn ($t) => $t,
+                    static fn (string $t): string => $t,
                     array_is_list($filters['categories']) ? $filters['categories'] : array_keys($filters['categories']),
                 )),
                 'type' => 'uuid_binary',
@@ -149,7 +151,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             $where[0] .= ' AND t.id IN (:tags)';
             $where[1]['tags'] = [
                 'value' => implode(',', array_map(
-                    fn ($t) => $t?->toString(),
+                    static fn (string $t): string => $t,
                     array_is_list($filters['tags']) ? $filters['tags'] : array_keys($filters['tags']),
                 )),
                 'type' => 'uuid_binary',
@@ -159,11 +161,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         if (!empty($filters['status'])) {
             if ('expired' === $filters['status']) {
                 $now = (new \DateTimeImmutable('now'))->format('Y-m-d H:i:s');
-                // if ($filters['expired'] === 'expired') {
                 $where[0] .= ' AND q.expireDate IS NOT NULL AND q.expireDate < :now';
-                // } else {
-                //     $where[0] .= ' AND (q.expireDate IS NULL OR q.expireDate >= :now)';
-                // }
                 $where[1]['now'] = $now;
             } else {
                 $where[0] .= ' AND q.status = :status';
@@ -180,9 +178,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         }
         if (!empty($filters['excludeIds'])) {
             $binaryIds = array_map(
-                fn ($id) => $id instanceof \Ramsey\Uuid\UuidInterface
-                    ? $id->getBytes()
-                    : Uuid::fromString($id)->getBytes(),
+                static fn (string $id): string => Uuid::fromString($id)->getBytes(),
                 $filters['excludeIds'],
             );
             $where[0] .= ' AND q.id NOT IN (:excludeIds)';
@@ -197,6 +193,16 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         if (!empty($filters['toDate'])) {
             $where[0] .= ' AND q.postDate <= :toDate';
             $where[1]['toDate'] = $filters['toDate'];
+        }
+        if (!empty($filters['author'])) {
+            $binaryIds = array_map(
+                static fn (string $id): string => Uuid::fromString($id)->getBytes(),
+                $filters['author'],
+            );
+            $where[0] .= ' AND q.author IN (:author)';
+            $where[1]['author'] = [
+                'value' => $binaryIds,
+            ];
         }
 
         return $this->getAll(
@@ -233,7 +239,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      *
      * @return array<Page>
      */
-    public function getLiveContentWithCategory(Category $category, int $limit = 0, int $offset = 0)
+    public function getLiveContentWithCategory(Category $category, int $limit = 0, int $offset = 0): array
     {
         $qb = $this->createQueryBuilder('p')
             ->select('p')
@@ -249,8 +255,10 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             $qb = $qb->setFirstResult($offset);
         }
 
-        /* @var array<Page> */
-        return $qb->getQuery()->getResult();
+        /** @var array<Page> $result */
+        $result = $qb->getQuery()->getResult();
+
+        return $result;
     }
 
     /**
@@ -265,8 +273,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             ->setParameter('categoryId', $category->getId())
         ;
 
-        /* @var int */
-        return $qb->getQuery()->getSingleScalarResult();
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
@@ -276,8 +283,6 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function getLiveContentWithTag(Tag $tag, int $limit = 0, int $offset = 0): array
     {
-        $now = new \DateTimeImmutable();
-
         $qb = $this->createQueryBuilder('p')
             ->select('p')
             ->leftJoin('p.tags', 't')
@@ -292,8 +297,10 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             $qb = $qb->setFirstResult($offset);
         }
 
-        /* @var array<Page> */
-        return $qb->getQuery()->getResult();
+        /** @var array<Page> $result */
+        $result = $qb->getQuery()->getResult();
+
+        return $result;
     }
 
     /**
@@ -306,19 +313,19 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
     public function getFilteredIds(array $ids): array
     {
         $binaryIds = array_map(
-            fn ($id) => $id instanceof \Ramsey\Uuid\UuidInterface
-                ? $id->getBytes()
-                : Uuid::fromString($id)->getBytes(),
+            static fn (string $id): string => Uuid::fromString($id)->getBytes(),
             $ids,
         );
 
-        /* @var list<Page> */
-        return $this->createQueryBuilder('p')
+        /** @var list<Page> $result */
+        $result = $this->createQueryBuilder('p')
             ->select('p')
             ->where('p.id IN (:ids)')
             ->setParameter('ids', $binaryIds)
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**
@@ -328,8 +335,8 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function getPostsUsingImage(Image $image): array
     {
-        /* @var list<Page> */
-        return $this->createQueryBuilder('p')
+        /** @var list<Page> $result */
+        $result = $this->createQueryBuilder('p')
             ->select('p')
             ->where('p.content LIKE :filename OR p.featureImage = :image')
             ->setParameter('filename', '%'.$image->getFilename().'%')
@@ -337,6 +344,8 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             ->setMaxResults(25)
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**
@@ -346,13 +355,15 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function getTopPagesByImageSize(int $limit = 10): array
     {
-        /* @var list<Page> */
-        return $this->createQueryBuilder('p')
+        /** @var list<Page> $result */
+        $result = $this->createQueryBuilder('p')
             ->select('p')
             ->orderBy('p.imageSize', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**
@@ -379,7 +390,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function getPagesWithoutTagsCount(): int
     {
-        return $this->cache->get('pages_without_tags_count', function (ItemInterface $item) {
+        return (int) $this->cache->get('pages_without_tags_count', function (ItemInterface $item) {
             $item->expiresAfter(7200);
             $item->tag(['page_metrics']);
 
@@ -389,8 +400,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
                 ->leftJoin('p.tags', 'Page_tags')
                 ->where('Page_tags.id IS NULL');
 
-            /* @var int */
-            return $qb->getQuery()->getSingleScalarResult();
+            return (int) $qb->getQuery()->getSingleScalarResult();
         });
     }
 
@@ -418,7 +428,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function getPagesWithoutCategoriesCount(): int
     {
-        return $this->cache->get(
+        return (int) $this->cache->get(
             'pages_without_categories_count',
             function (ItemInterface $item) {
                 $item->expiresAfter(7200);
@@ -430,8 +440,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
                     ->leftJoin('p.categories', 'Page_categories')
                     ->where('Page_categories.id IS NULL');
 
-                /* @var int */
-                return $qb->getQuery()->getSingleScalarResult();
+                return (int) $qb->getQuery()->getSingleScalarResult();
             },
         );
     }
@@ -460,7 +469,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function getPagesWithoutFeatureImageCount(): int
     {
-        return $this->cache->get(
+        return (int) $this->cache->get(
             'pages_without_feature_image_count',
             function (ItemInterface $item) {
                 $item->expiresAfter(7200);
@@ -471,8 +480,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
                     ->select('COUNT(p)')
                     ->where('p.featureImage IS NULL');
 
-                /* @var int */
-                return $qb->getQuery()->getSingleScalarResult();
+                return (int) $qb->getQuery()->getSingleScalarResult();
             },
         );
     }
@@ -501,7 +509,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function getPagesWithoutFeatureSnippetCount(): int
     {
-        return $this->cache->get(
+        return (int) $this->cache->get(
             'pages_without_sharing_message_count',
             function (ItemInterface $item) {
                 $item->expiresAfter(7200);
@@ -512,8 +520,7 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
                     ->select('COUNT(p)')
                     ->where('p.featureSnippet IS NULL');
 
-                /* @var int */
-                return $qb->getQuery()->getSingleScalarResult();
+                return (int) $qb->getQuery()->getSingleScalarResult();
             },
         );
     }
@@ -526,8 +533,8 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function findRecentDrafts(int $limit = 5): array
     {
-        /* @var array<Page> */
-        return $this->createQueryBuilder('p')
+        /** @var array<Page> $result */
+        $result = $this->createQueryBuilder('p')
             ->where('p.status = :status')
             ->setParameter('status', EditorialStatus::DRAFT)
             ->orderBy('p.postDate', 'ASC')
@@ -535,6 +542,8 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**
@@ -544,8 +553,8 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function findRecentPublished(int $limit = 5): array
     {
-        /* @var array<Page> */
-        return $this->createQueryBuilder('p')
+        /** @var array<Page> $result */
+        $result = $this->createQueryBuilder('p')
             ->where('p.status = :status')
             ->andWhere('p.postDate <= :now')
             ->setParameter('status', EditorialStatus::PUBLISHED)
@@ -555,6 +564,8 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**
@@ -565,8 +576,8 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
      */
     public function findUpcoming(int $limit = 5): array
     {
-        /* @var array<Page> */
-        return $this->createQueryBuilder('p')
+        /** @var array<Page> $result */
+        $result = $this->createQueryBuilder('p')
             ->where('p.status = :status')
             ->andWhere('p.postDate > :now')
             ->setParameter('status', EditorialStatus::PUBLISHED)
@@ -576,6 +587,8 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**
@@ -603,10 +616,10 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
         $now = new \DateTimeImmutable();
 
         /** @var array{
-         *     drafts:string|int|null,
-         *     published:string|int|null,
-         *     upcoming:string|int|null
-         * } $result
+         *     drafts?:string|int|null,
+         *     published?:string|int|null,
+         *     upcoming?:string|int|null
+         * }|false $result
          */
         $result = $this->getEntityManager()
             ->getConnection()
@@ -651,9 +664,56 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             );
 
         return [
-            'drafts' => (int) ($result['drafts'] ?? 0),
-            'published' => (int) ($result['published'] ?? 0),
-            'upcoming' => (int) ($result['upcoming'] ?? 0),
+            'drafts' => is_array($result) ? (int) ($result['drafts'] ?? 0) : 0,
+            'published' => is_array($result) ? (int) ($result['published'] ?? 0) : 0,
+            'upcoming' => is_array($result) ? (int) ($result['upcoming'] ?? 0) : 0,
         ];
+    }
+
+    /**
+     * Get published homepage posts, optionally excluding specific page IDs.
+     *
+     * @param list<string|\Ramsey\Uuid\UuidInterface> $excludePages
+     *
+     * @return Paginator<Page>
+     */
+    public function findHomepagePosts(int $limit = 10, int $offset = 0, array $excludePages = []): Paginator
+    {
+        $pageQuery = 'q.status = :status AND q.visible = :visible AND q.postDate <= :postDate AND q.type = :type';
+        $pageParameters = [
+            'status' => EditorialStatus::PUBLISHED,
+            'visible' => true,
+            'postDate' => new \DateTimeImmutable('now'),
+            'type' => Page::TYPE_POST,
+        ];
+
+        if ([] !== $excludePages) {
+            $binaryIds = array_values(array_filter(array_map(
+                static function (string|\Ramsey\Uuid\UuidInterface $id): ?string {
+                    if ($id instanceof \Ramsey\Uuid\UuidInterface) {
+                        return $id->getBytes();
+                    }
+
+                    if ('' !== trim($id)) {
+                        return Uuid::fromString($id)->getBytes();
+                    }
+
+                    return null;
+                },
+                $excludePages,
+            )));
+
+            if ([] !== $binaryIds) {
+                $pageQuery .= ' AND q.id NOT IN (:excludedPages)';
+                $pageParameters['excludedPages'] = ['value' => $binaryIds];
+            }
+        }
+
+        return $this->getAll(
+            $limit,
+            $offset,
+            [$pageQuery, $pageParameters],
+            'q.postDate DESC, q.updatedAt',
+        );
     }
 }

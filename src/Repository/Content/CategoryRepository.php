@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Repository\Content;
 
@@ -44,7 +44,7 @@ class CategoryRepository extends AbstractRepository implements CategoryRepositor
      */
     public function getRootCategories(): array
     {
-        /* @var array<int,Category> */
+        /** @var array<int,Category> */
         return $this->createQueryBuilder('q')
             ->where('q.parent is null')
             ->getQuery()
@@ -91,7 +91,7 @@ class CategoryRepository extends AbstractRepository implements CategoryRepositor
         int $limit,
         int $offset,
     ): array {
-        /* @var array<int,Category> */
+        /** @var array<int,Category> */
         return $this->createQueryBuilder('c')
             ->orderBy('c.title', 'ASC')
             ->setMaxResults($limit)

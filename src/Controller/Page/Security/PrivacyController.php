@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Security;
 
@@ -59,15 +59,21 @@ class PrivacyController extends AbstractInachisController
             return $this->redirectToRoute('incp_security_privacy');
         }
 
+        /** @var array<string, mixed> $gdprData */
         $gdprData = $request->request->all('gdpr');
         $settingRepo = $this->entityManager->getRepository(Setting::class);
 
+        $consentMode = is_string($gdprData['consent_mode'] ?? null) ? $gdprData['consent_mode'] : 'opt_in';
+        $anonymizeIps = is_string($gdprData['anonymize_ips'] ?? null) ? $gdprData['anonymize_ips'] : '1';
+        $retentionDays = is_numeric($gdprData['log_retention_days'] ?? null) ? (int) $gdprData['log_retention_days'] : 90;
+
+        /** @var array<string, string> $allowedSettings */
         $allowedSettings = [
             'banner_enabled' => isset($gdprData['banner_enabled']) ? '1' : '0',
-            'consent_mode' => $gdprData['consent_mode'] ?? 'opt_in',
-            'banner_message' => trim((string) ($gdprData['banner_message'] ?? '')),
-            'anonymize_ips' => $gdprData['anonymize_ips'] ?? '1',
-            'log_retention_days' => (string) max(7, (int) ($gdprData['log_retention_days'] ?? 90)),
+            'consent_mode' => $consentMode,
+            'banner_message' => trim(is_string($gdprData['banner_message'] ?? null) ? $gdprData['banner_message'] : ''),
+            'anonymize_ips' => $anonymizeIps,
+            'log_retention_days' => (string) max(7, $retentionDays),
         ];
 
         foreach ($allowedSettings as $key => $value) {
@@ -128,7 +134,7 @@ class PrivacyController extends AbstractInachisController
                 'username' => $user->getUsername(),
                 'email' => $user->getEmail(),
                 'displayName' => $user->getDisplayName(),
-                'createdAt' => $user->getPostDate()?->format(\DateTimeInterface::ATOM),
+                'createdAt' => $user->getCreatedAt()->format(\DateTimeInterface::ATOM),
             ],
         ];
 
@@ -169,7 +175,7 @@ class PrivacyController extends AbstractInachisController
         $user->setEmail(sprintf('deleted_%s@anonymized.invalid', $anonymizedHash));
         $user->setUsername(sprintf('deleted_user_%s', $anonymizedHash));
         $user->setDisplayName('Anonymized User');
-        $user->setDisabled(true);
+        $user->setActive(false);
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
@@ -200,7 +206,7 @@ class PrivacyController extends AbstractInachisController
         foreach ($defaults as $key => $defaultValue) {
             $settingName = self::SETTING_PREFIX.$key;
             $setting = $settingRepo->findOneBy(['name' => $settingName]);
-            $settings[$key] = $setting ? $setting->getValue() : $defaultValue;
+            $settings[$key] = $setting?->getValue() ?? $defaultValue;
         }
 
         return $settings;

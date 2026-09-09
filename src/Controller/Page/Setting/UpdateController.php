@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Setting;
 
@@ -40,7 +40,6 @@ final class UpdateController extends AbstractInachisController
         private readonly ReleaseCleaner $releaseCleaner,
         private readonly ReleaseLocator $releaseLocator,
         private readonly ReleaseRollback $releaseRollback,
-        private readonly Downloader $downloader,
         protected EntityManagerInterface $entityManager,
         protected ParameterBagInterface $params,
         protected Security $security,

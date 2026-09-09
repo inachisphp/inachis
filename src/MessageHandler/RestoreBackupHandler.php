@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * This file is part of the inachis framework.
+ */
+
 declare(strict_types=1);
 
 namespace Inachis\MessageHandler;
@@ -8,8 +12,8 @@ use Doctrine\DBAL\Connection;
 use Inachis\Message\RestoreBackupMessage;
 use Inachis\Service\System\BackupValidationService;
 use Inachis\Service\System\DatabasePurgeService;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Contracts\Cache\CacheInterface;
 
 #[AsMessageHandler]
 class RestoreBackupHandler
@@ -18,7 +22,7 @@ class RestoreBackupHandler
         private readonly Connection $connection,
         private readonly BackupValidationService $validator,
         private readonly DatabasePurgeService $purgeService,
-        private readonly CacheInterface $cache,
+        private readonly CacheItemPoolInterface $cache,
     ) {
     }
 
@@ -43,7 +47,6 @@ class RestoreBackupHandler
             throw new \RuntimeException(sprintf('Unable to open backup file at "%s"', $message->filePath));
         }
 
-        /** @var \PDO $pdo Bypass DBAL query logging middleware */
         $pdo = $this->connection->getNativeConnection();
         if (!$pdo instanceof \PDO) {
             throw new \RuntimeException('Native PDO connection is required for high-performance restore.');

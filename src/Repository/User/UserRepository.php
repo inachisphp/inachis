@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Repository\User;
 
@@ -44,7 +44,31 @@ class UserRepository extends AbstractRepository
     }
 
     /**
+     * Returns an array of Users where {@link $query} exists in the username or
+     * the display name.
+     *
+     * @param string $query
+     * @return array<User>
+     */
+    public function searchUsers(string $query): array
+    {
+        $query = trim($query);
+
+        if ($query === '') {
+            return [];
+        }
+
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.username LIKE :query OR u.displayName LIKE :query')
+            ->setParameter('query', '%' . $query . '%')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Gets filtered users.
+     *
+     * @param ContentQueryParameters<array<string, mixed>> $params The query parameters DTO
      *
      * @return Paginator<User> The paginator
      */

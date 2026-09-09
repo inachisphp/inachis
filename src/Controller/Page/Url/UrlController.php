@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Url;
 
@@ -12,6 +12,7 @@ use Doctrine\ORM\OptimisticLockException;
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
+use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\UrlRepository;
@@ -62,6 +63,7 @@ class UrlController extends AbstractInachisController
             return $this->redirectToRoute('incp_url_list');
         }
 
+        /** @var ContentQueryParameters<array{keyword?: string}> $params */
         $params = $viewStateManager->load(
             $request,
             'url',
@@ -110,23 +112,8 @@ class UrlController extends AbstractInachisController
         UrlRepository $urlRepository,
     ): Response {
         $url = $request->request->getString('url');
-        $urls = $urlRepository->findSimilarUrlsExcludingId(
-            $url,
-            $request->request->getString('id'),
-        );
+        $id = $request->request->getString('id');
 
-        if (isset($urls[0])) {
-            preg_match('/\-([0-9]+)$/', $urls[0]['link'], $matches);
-            if (!isset($matches[1])) {
-                $matches = [
-                    '-0',
-                    '0',
-                ];
-                $urls[0]['link'] .= '-0';
-            }
-            $url = str_replace($matches[0], '-'.++$matches[1], $urls[0]['link']);
-        }
-
-        return new Response($url);
+        return new Response($urlRepository->getUniqueUrl($url, $id));
     }
 }
