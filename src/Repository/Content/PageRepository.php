@@ -194,6 +194,16 @@ class PageRepository extends AbstractRepository implements PageRepositoryInterfa
             $where[0] .= ' AND q.postDate <= :toDate';
             $where[1]['toDate'] = $filters['toDate'];
         }
+        if (!empty($filters['author'])) {
+            $binaryIds = array_map(
+                static fn (string $id): string => Uuid::fromString($id)->getBytes(),
+                $filters['author'],
+            );
+            $where[0] .= ' AND q.author IN (:author)';
+            $where[1]['author'] = [
+                'value' => $binaryIds,
+            ];
+        }
 
         return $this->getAll(
             $limit,

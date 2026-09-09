@@ -106,6 +106,15 @@
                 icon: 'cloud_download',
                 'title': 'Export',
             },
+            change_owner: can('PAGE', 'EDIT') ? {
+                button_class: 'btn--secondary btn--change',
+                button_type: 'button',
+                data: {
+                    'form-action': '',
+                },
+                icon: 'people',
+                title: 'Change Owner',
+            } : null,
             delete: can('PAGE', 'DELETE') ? {
                 button_class: 'btn--danger btn--delete btn--icon-only btn--confirm',
                 data: {
@@ -183,6 +192,7 @@
         },
 
         show_category_filter: true,
+        show_author_filter: true,
         show_select_deselect: true,
         show_search: true,
         search_placeholder: 'Search posts…',
