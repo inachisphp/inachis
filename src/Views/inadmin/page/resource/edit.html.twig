@@ -68,7 +68,7 @@
                     {% endif %}
                     {% if viewModel.page.type == 'images' %}
                     <p><strong>{{ 'admin.resources.properties.dimensions'|trans }}:</strong> {{ resource.dimensionX ~ ' (w) x ' ~ resource.dimensionY ~ ' (h)' }}</p>
-                        {% if additional.channels is not empty or additional.bits is not empty %}
+                        {% if additional.channels|default(null) is not empty or additional.bits|default(null) is not empty %}
                     <p><strong>{{ 'admin.resources.properties.colourDepth'|trans }}:</strong> {% if additional.bits is not empty %}{{ additional.bits }}-bit{% endif %} {% if additional.channels == 3 %}RGB{% elseif additional.channels == 4 %}CMYK{% endif %}</p>
                         {% endif %}
                     {% elseif viewModel.page.tab == 'download' %}
@@ -76,7 +76,7 @@
                     {% endif %}
                     <p><strong>{{ 'admin.resources.properties.updatedAt'|trans }}:</strong> {{ resource.updatedAt|date('d F Y', viewModel.session.preferences.timezone) }}</p>
                 </div>
-                
+
                 <script>
                     document.addEventListener('DOMContentLoaded', () => {
                         const btn = document.getElementById('btn-toggle-replace-file');
