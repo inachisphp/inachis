@@ -1,206 +1,236 @@
-window.Inachis.Export = {
-    admonition: null,
-    typeRadios: null,
-    scopeRadios: null,
-    scopeOptions: null,
-    formatOptions: null,
-    filterOptions: null,
-    keyword: null,
-    manualOptions: null,
-    manualTableContainer: null,
-    selectAllNone: null,
-    currentController: null,
-    selectedIds: [],
+/**
+ * Interactive controller for the export UI workflow.
+ */
+window.Inachis = window.Inachis || {};
 
-    supportedFormats: {
-        'category': ['json', 'xml'],
-        'post': ['json', 'md', 'xml'],
-        'series': ['json', 'xml'],
-    },
+window.Inachis.Export = (function () {
+    'use strict';
 
-    url: null,
+    let ajaxEndpoint = '';
+    let selectedIds = new Set();
 
-    init(url) {
-        this.url = url;
-        this.admonition = document.querySelector('.admonition__info');
-        this.typeRadios = document.querySelectorAll('input[name="content_type"]');
-        this.scopeRadios = document.querySelectorAll('input[name="scope"]');
-        this.scopeOptions = document.querySelectorAll('fieldset[data-content-type]');
-        this.formatOptions = document.getElementById('format__options');
-        this.filterOptions = document.getElementById('filter__options');
-        this.keyword = document.getElementById('filter__keyword');
-        this.manualOptions = document.getElementById('manual__options');
-        this.manualTableContainer = document.getElementById('manual__table-container');
-        const selectedIds = document.getElementById('selectedIds').value.split(',').filter(id => id !== '');
+    /**
+     * Initialize event bindings and scope visibilities.
+     */
+    function init(endpointUrl) {
+        ajaxEndpoint = endpointUrl;
 
-        this.initTypeRadios();
-        this.initScopeRadios();
-
-        this.debouncedLoadTable = window.Inachis.debounce(this.loadTable.bind(this), 300);
-
-        // Manual search
-        this.keyword.addEventListener('input', e => {
-            this.debouncedLoadTable(e.target.value, 1);
-        });
-        // prevent accidental submission of form when searching
-        this.keyword.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-            }
-        });
-
-        // Ensure correct intial state on POST
-        if (selectedIds.length > 0) {
-            const selectedContentType = document.querySelector('input[name="content_type"]:checked').value;
-            this.showFormatOptions(selectedContentType);
-            this.showScopeOptions(selectedContentType);
-            this.showFilterOptions('manual');
-            this.selectedIds = selectedIds;
-            this.syncIds();
+        const hiddenInput = document.getElementById('selectedIds');
+        if (hiddenInput && hiddenInput.value) {
+            hiddenInput.value.split(',').filter(Boolean).forEach(id => selectedIds.add(id));
         }
-    },
 
-    initTypeRadios() {
-        this.typeRadios.forEach(radio => {
+        bindContentTypeToggle();
+        bindScopeToggle();
+        bindSearchInput();
+
+        // Initial state render
+        updateContentTypeVisibility();
+        updateScopeVisibility();
+    }
+
+    function bindContentTypeToggle() {
+        const radios = document.querySelectorAll('input[name="content_type"]');
+        radios.forEach(radio => {
             radio.addEventListener('change', () => {
-                this.showScopeOptions(radio.value);
-                this.showFilterOptions('');
-                this.showFormatOptions(radio.value);
+                updateContentTypeVisibility();
+                resetSelection();
             });
         });
-    },
+    }
 
-    initScopeRadios() {
-        this.scopeRadios.forEach(radio => {
+    function bindScopeToggle() {
+        const scopeRadios = document.querySelectorAll('input[name="scope"]');
+        scopeRadios.forEach(radio => {
             radio.addEventListener('change', () => {
-                this.showFilterOptions(radio.value);
+                updateScopeVisibility();
             });
         });
-    },
+    }
 
-    initCheckboxes() {
-        this.selectAllNone = document.querySelector('.selectAllNone');
-        if (!this.selectAllNone) {
-            return;
+    function updateContentTypeVisibility() {
+        const selectedType = getSelectedContentType();
+
+        // Toggle domain-specific scope fieldsets
+        document.querySelectorAll('fieldset[data-content-type]').forEach(fieldset => {
+            const isMatch = fieldset.getAttribute('data-content-type') === selectedType;
+            fieldset.hidden = !isMatch;
+            fieldset.setAttribute('aria-hidden', (!isMatch).toString());
+        });
+
+        // Toggle filter fieldset (only available for pages/posts)
+        const filterOptions = document.getElementById('filter__options');
+        if (filterOptions) {
+            const isPost = selectedType === 'post';
+            filterOptions.hidden = !isPost;
+            filterOptions.setAttribute('aria-hidden', (!isPost).toString());
         }
-        const manualCheckboxes = this.manualTableContainer.querySelectorAll('input[type=checkbox]:not(.selectAllNone)');
-        // check/uncheck all checkboxes in the table
-        this.selectAllNone.addEventListener('change', () => {
-            manualCheckboxes.forEach(cb => {
-                cb.checked = this.selectAllNone.checked;
-                this.updateSelectedIds(cb.value, cb.checked);
-            });
-        });
-        manualCheckboxes.forEach(cb => {
-            cb.addEventListener('change', () => {
-                if (!cb.checked) {
-                    this.selectAllNone.checked = false;
-                }
-                this.updateSelectedIds(cb.value, cb.checked);
-            });
-        });
-    },
 
-    initPagination() {
-        this.manualTableContainer.querySelectorAll('.pagination-link').forEach(link => {
-            link.addEventListener('click', e => {
-                e.preventDefault();
-                this.loadTable(document.getElementById('filter__keyword').value, link.dataset.page);
-            });
-        });
-    },
+        updateScopeVisibility();
+    }
 
-    updateSelectedIds(value, checked) {
-        if (checked) {
-            this.selectedIds = [...new Set([...this.selectedIds, value])];
-        } else {
-            this.selectedIds.splice(this.selectedIds.indexOf(value), 1);
-        }
-        this.syncIds();
-    },
+    function updateScopeVisibility() {
+        const selectedType = getSelectedContentType();
+        const activeScopeRadio = document.querySelector(`fieldset[data-content-type="${selectedType}"] input[name="scope"]:checked`)
+            || document.querySelector('input[name="scope"]:checked');
 
-    syncIds() {
-        document.getElementById('selectedIds').value = this.selectedIds.join(',');
-        this.admonition.innerHTML = `<strong>${this.selectedIds.length}</strong> items will be exported.`;
-    },
+        const scope = activeScopeRadio ? activeScopeRadio.value : 'all';
+        const manualOptions = document.getElementById('manual__options');
 
-    showFormatOptions(type) {
-        this.formatOptions.querySelectorAll('input[type=radio]').forEach(radio => {
-            if (this.supportedFormats[type].includes(radio.value)) {
-                radio.parentNode.removeAttribute('hidden');
-                radio.parentNode.removeAttribute('aria-hidden');
-            } else {
-                radio.parentNode.setAttribute('hidden', 'true');
-                radio.parentNode.setAttribute('aria-hidden', 'true');
+        if (manualOptions) {
+            const isManual = scope === 'manual';
+            manualOptions.hidden = !isManual;
+            manualOptions.setAttribute('aria-hidden', (!isManual).toString());
+
+            if (isManual) {
+                fetchManualItems();
             }
+        }
+    }
+
+    function bindSearchInput() {
+        const searchInput = document.getElementById('filter__keyword');
+        if (!searchInput) return;
+
+        let debounceTimer;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                fetchManualItems();
+            }, 300);
         });
-    },
+    }
 
-    showScopeOptions(type) {
-        this.scopeOptions.forEach(option => {
-            if (option.dataset.contentType === type) {
-                option.removeAttribute('hidden');
-                option.removeAttribute('aria-hidden');
-            } else {
-                option.setAttribute('hidden', 'true');
-                option.setAttribute('aria-hidden', 'true');
-            }
-        });
-    },
+    function getSelectedContentType() {
+        const checked = document.querySelector('input[name="content_type"]:checked');
+        return checked ? checked.value : 'post';
+    }
 
-    showFilterOptions(type) {
-        // clean up old event listener by removing DOM element cleanly
-        if (this.selectAllNone) {
-            this.selectAllNone.remove();
-        }
-        this.selectedIds = [];
-        this.syncIds();
-        this.manualTableContainer.innerHTML = '';
-        this.keyword.value = '';
-        if (type === 'filtered') {
-            this.filterOptions.removeAttribute('hidden');
-            this.filterOptions.removeAttribute('aria-hidden');
-        } else {
-            this.filterOptions.setAttribute('hidden', 'true');
-            this.filterOptions.setAttribute('aria-hidden', 'true');
-        }
-        if (type === 'manual') {
-            this.manualOptions.removeAttribute('hidden');
-            this.manualOptions.removeAttribute('aria-hidden');
-            this.keyword.focus();
-        } else {
-            this.keyword.blur();
-            this.manualOptions.setAttribute('hidden', 'true');
-            this.manualOptions.setAttribute('aria-hidden', 'true');
-        }
-    },
+    function fetchManualItems() {
+        const container = document.getElementById('manual__table-container');
+        const keywordInput = document.getElementById('filter__keyword');
+        if (!container) return;
 
-    loadTable(query = '', page = 1) {
-        if (this.currentController) {
-            this.currentController.abort();
-        }
-        this.currentController = new AbortController();
-        const type = document.querySelector('input[name="content_type"]:checked').value;
+        const domain = getSelectedContentType();
+        const keyword = keywordInput ? keywordInput.value : '';
 
-        fetch(`${this.url}?content_type=${type}&q=${encodeURIComponent(query)}&page=${page}&selectedIds=${this.selectedIds.join(',')}`, {
-            signal: this.currentController.signal
-        })
-            .then(result => {
-                if (!result.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return result.text();
-            })
-            .then(html => {
-                this.manualTableContainer.innerHTML = html;
-                this.initCheckboxes();
-                this.initPagination();
-            })
-            .catch(err => {
-                if (err.name === 'AbortError') {
-                    return;
-                }
-                console.error(err);
+        container.innerHTML = '<p class="loading">Loading items…</p>';
+
+        const url = new URL(ajaxEndpoint, window.location.origin);
+        url.searchParams.append('domain', domain);
+        url.searchParams.append('keyword', keyword);
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => renderManualTable(data.items || []))
+            .catch(() => {
+                container.innerHTML = '<p class="error">Failed to load content for selection.</p>';
             });
     }
-}
+
+    function renderManualTable(items) {
+        const container = document.getElementById('manual__table-container');
+        if (!items.length) {
+            container.innerHTML = '<p>No items found matching criteria.</p>';
+            return;
+        }
+
+        let html = `
+            <table class="table table--compact table--striped">
+                <thead>
+                    <tr>
+                        <th width="40"><input type="checkbox" id="select-all-manual"></th>
+                        <th>Title</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        items.forEach(item => {
+            const isChecked = selectedIds.has(item.id.toString()) ? 'checked' : '';
+            html += `
+                <tr>
+                    <td>
+                        <input type="checkbox" class="manual-item-checkbox" value="${item.id}" ${isChecked}>
+                    </td>
+                    <td><strong>${escapeHtml(item.title)}</strong></td>
+                    <td><code>${escapeHtml(item.subtitle)}</code></td>
+                </tr>
+            `;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+
+        bindTableEvents();
+        updateSelectedCounter();
+    }
+
+    function bindTableEvents() {
+        const selectAll = document.getElementById('select-all-manual');
+        const itemCheckboxes = document.querySelectorAll('.manual-item-checkbox');
+
+        if (selectAll) {
+            selectAll.addEventListener('change', (e) => {
+                itemCheckboxes.forEach(cb => {
+                    cb.checked = e.target.checked;
+                    toggleSelection(cb.value, cb.checked);
+                });
+                updateSelectedCounter();
+            });
+        }
+
+        itemCheckboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                toggleSelection(cb.value, cb.checked);
+                updateSelectedCounter();
+            });
+        });
+    }
+
+    function toggleSelection(id, add) {
+        if (add) {
+            selectedIds.add(id.toString());
+        } else {
+            selectedIds.delete(id.toString());
+        }
+        syncHiddenInput();
+    }
+
+    function resetSelection() {
+        selectedIds.clear();
+        syncHiddenInput();
+        updateSelectedCounter();
+    }
+
+    function syncHiddenInput() {
+        const hiddenInput = document.getElementById('selectedIds');
+        if (hiddenInput) {
+            hiddenInput.value = Array.from(selectedIds).join(',');
+        }
+    }
+
+    function updateSelectedCounter() {
+        const counterAdmonition = document.querySelector('#manual__options .admonition__info');
+        if (counterAdmonition) {
+            counterAdmonition.classList.toggle('start-hidden', selectedIds.size === 0);
+            const strong = counterAdmonition.querySelector('strong');
+            if (strong) {
+                strong.textContent = selectedIds.size.toString();
+            }
+        }
+    }
+
+    function escapeHtml(str) {
+        return (str || '').replace(/[&<>"']/g, m => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        }[m]));
+    }
+
+    return { init };
+})();

@@ -1,5 +1,10 @@
-{% set filename = value.filename|default('')|trim %}
-{% if not (filename starts with 'http') and not(filename starts with '/') and filename is not empty %}
+{% set filename = '' %}
+
+{% if value is not null %}
+    {% set filename = value.filename|default('')|trim %}
+{% endif %}
+
+{% if not (filename starts with 'http') and not (filename starts with '/') and filename is not empty %}
     {% set filename = '/imgs/' ~ filename %}
 {% endif %}
 

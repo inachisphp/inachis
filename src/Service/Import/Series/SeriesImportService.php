@@ -35,7 +35,7 @@ final class SeriesImportService
     /**
      * Import series from DTOs.
      *
-     * @param list<SeriesExportDto|null> $seriesDtos
+     * @param iterable<SeriesExportDto> $seriesDtos
      */
     public function import(
         iterable $seriesDtos,
@@ -43,12 +43,14 @@ final class SeriesImportService
         ?ImportOptionsDto $options = null,
     ): SeriesImportResult {
         $result = new SeriesImportResult();
+        $options ??= new ImportOptionsDto();
+
         $this->entityManager->beginTransaction();
 
         try {
             foreach ($seriesDtos as $seriesDto) {
                 if (!$seriesDto instanceof SeriesExportDto) {
-                    throw new \InvalidArgumentException('All items must be SeriesExportDto');
+                    throw new \InvalidArgumentException('All items must be instances of ' . SeriesExportDto::class);
                 }
 
                 $series = new Series();
@@ -62,34 +64,36 @@ final class SeriesImportService
 
                 foreach ($seriesDto->items as $item) {
                     if (is_string($item)) {
-                        /** @var Page|null $page */
                         $page = $this->pageRepository->findOneBy(['title' => $item]);
 
-                        if ($page) {
+                        if ($page instanceof Page) {
                             $series->addItem($page);
                             ++$result->pagesLinked;
                         } else {
                             $result->warnings[] = sprintf(
-                                'Series "%s": page "%s" not found and could not be linked.',
+                                'Series "%s": Referenced page "%s" not found.',
                                 $seriesDto->title,
-                                $item,
+                                $item
                             );
                         }
                     } elseif ($item instanceof PageExportDto) {
                         $existingPage = $this->findMatchingPage($item);
 
-                        if ($existingPage) {
+                        if ($existingPage instanceof Page) {
                             $series->addItem($existingPage);
                             ++$result->pagesLinked;
-                        } else {
+                        } elseif (null !== $this->pageImportService) {
                             $pageAuthor = $author ?? $this->entityManager->getRepository(User::class)->findOneBy([]);
-                            if ($pageAuthor && $this->pageImportService) {
-                                $this->pageImportService->import([$item], $pageAuthor, $options ?? new ImportOptionsDto());
+
+                            if ($pageAuthor instanceof User) {
+                                $pageResult = $this->pageImportService->import([$item], $pageAuthor, $options);
                                 $newPage = $this->findMatchingPage($item) ?? $this->pageRepository->findOneBy(['title' => $item->title]);
 
-                                if ($newPage) {
+                                if ($newPage instanceof Page) {
                                     $series->addItem($newPage);
                                     ++$result->pagesLinked;
+                                } else {
+                                    $result->warnings = array_merge($result->warnings, $pageResult->warnings);
                                 }
                             }
                         }
@@ -104,7 +108,7 @@ final class SeriesImportService
             $this->entityManager->commit();
         } catch (\Throwable $e) {
             $this->entityManager->rollback();
-            $result->warnings[] = 'Import failed: '.$e->getMessage();
+            $result->warnings[] = 'Series import failed: ' . $e->getMessage();
         }
 
         return $result;
@@ -143,20 +147,10 @@ final class SeriesImportService
     }
 
     /**
-     * Maps the imported data to DTOs.
+     * Maps array raw data to DTOs.
      *
-     * @param array<array{
-     *     title?: string,
-     *     subTitle?: string,
-     *     url?: string,
-     *     description?: string,
-     *     firstDate?: string,
-     *     lastDate?: string,
-     *     visible?: bool,
-     *     items?: list<mixed>
-     * }> $data
-     *
-     * @return SeriesExportDto[]
+     * @param list<array<string, mixed>> $data
+     * @return list<SeriesExportDto>
      */
     public function mapToDto(array $data): array
     {
@@ -165,18 +159,17 @@ final class SeriesImportService
 
         foreach ($data as $series) {
             $dto = new SeriesExportDto();
-            $dto->title = $series['title'] ?? '';
-            $dto->subTitle = $series['subTitle'] ?? null;
-            $dto->url = $series['url'] ?? '';
-            $dto->description = $series['description'] ?? null;
-            $dto->firstDate = $series['firstDate'] ?? null;
-            $dto->lastDate = $series['lastDate'] ?? null;
-            $dto->visible = $series['visible'] ?? true;
+            $dto->title = (string) ($series['title'] ?? '');
+            $dto->subTitle = isset($series['subTitle']) ? (string) $series['subTitle'] : null;
+            $dto->url = (string) ($series['url'] ?? '');
+            $dto->description = isset($series['description']) ? (string) $series['description'] : null;
+            $dto->firstDate = isset($series['firstDate']) ? (string) $series['firstDate'] : null;
+            $dto->lastDate = isset($series['lastDate']) ? (string) $series['lastDate'] : null;
+            $dto->visible = (bool) ($series['visible'] ?? true);
 
-            $items = $series['items'] ?? [];
+            $items = is_array($series['items'] ?? null) ? $series['items'] : [];
             foreach ($items as $item) {
                 if (is_array($item)) {
-                    /** @var array<string, mixed> $item */
                     $dto->items[] = $mapper->mapItemToDto($item);
                 } elseif (is_scalar($item)) {
                     $dto->items[] = (string) $item;

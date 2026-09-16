@@ -12,9 +12,12 @@ use Inachis\Entity\Content\Category;
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Series;
 
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+
 /**
  * Interface for export writers.
  */
+#[AutoconfigureTag('inachis.export_writer')]
 interface ExportWriterInterface
 {
     /**
