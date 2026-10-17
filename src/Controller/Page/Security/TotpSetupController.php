@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Security;
 
@@ -34,9 +34,9 @@ class TotpSetupController extends AbstractInachisController
         SessionInterface $session,
         TotpManager $totpManager,
     ): Response {
-        /** @var User $user */
+        /** @var User|null $user */
         $user = $this->getUser();
-        if (null === $user) {
+        if (!$user instanceof User) {
             throw $this->createAccessDeniedException();
         }
 
@@ -81,12 +81,9 @@ class TotpSetupController extends AbstractInachisController
         TrustedDeviceManager $trustedDeviceManager,
     ): Response {
         $user = $this->getCurrentUser();
-        if (null === $user) {
-            throw $this->createAccessDeniedException();
-        }
-
         $secret = $session->get('totp.setup.secret');
-        if (null === $secret) {
+
+        if (!is_string($secret) || '' === $secret) {
             return $this->redirectToRoute(
                 'incp_admin_totp_confirm',
             );

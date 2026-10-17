@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Form;
 
@@ -197,14 +197,15 @@ class UserType extends AbstractType
                     ]);
                 }
                 if ($allowEdit) {
+                    $isEnabled = $targetUser->isEnabled();
                     $builder->add('enableDisable', SubmitType::class, [
                         'attr' => [
                             'class' => 'btn btn--secondary',
                         ],
                         'label' => sprintf(
                             '<span class="material-icons">%s</span> %s',
-                            $options['data']->isEnabled() ? 'person_off' : 'person_outline',
-                            $this->translator->trans($options['data']->isEnabled() ? 'admin.button.disable' : 'admin.button.enable', [], 'messages'),
+                            $isEnabled ? 'person_off' : 'person_outline',
+                            $this->translator->trans($isEnabled ? 'admin.button.disable' : 'admin.button.enable', [], 'messages'),
                         ),
                         'label_html' => true,
                     ]);

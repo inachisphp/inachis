@@ -1,4 +1,4 @@
-.PHONY: help headers fix-headers release release-patch release-minor release-major build-release publish-release check-update apply-update apply-update-force phpcs phpcs-fix phpstan phpunit qa clean
+.PHONY: help headers fix-headers release release-patch release-minor release-major build-release publish-release check-update apply-update apply-update-force cs-check cs-fix phpstan phpunit qa clean
 
 # Color output helpers
 CYAN := \033[36m
@@ -86,13 +86,13 @@ apply-update-force: ## Run system updater non-interactively (useful for CI/cron)
 	@echo "$(CYAN)Running forced system update...$(RESET)"
 	@php bin/console inachis:system:update --force --no-interaction
 
-phpcs:
+cs-check:
 	@echo "$(CYAN)Running PHP-CS-Fixer (dry run)...$(RESET)"
-	@composer phpcs
+	@composer cs-check
 
-phpcs-fix:
+cs-fix:
 	@echo "$(CYAN)Fixing PHP coding standards...$(RESET)"
-	@composer phpcs-fix
+	@composer cs-fix
 
 phpstan: ## Run PHPStan static analysis on src/
 	@echo "$(CYAN)Running PHPStan analysis...$(RESET)"
@@ -103,7 +103,7 @@ phpunit: ## Run PHPUnit tests with code coverage
 	@mkdir -p tests/logs/coverage-report
 	-XDEBUG_MODE=coverage composer test
 
-qa: phpcs phpstan phpunit ## Run full QA suite (PHPStan + PHPUnit)
+qa: cs-check phpstan phpunit ## Run full QA suite (PHPStan + PHPUnit)
 
 clean: ## Clean local build artifacts and temporary download files
 	@echo "$(YELLOW)Cleaning build directory and temporary archives...$(RESET)"

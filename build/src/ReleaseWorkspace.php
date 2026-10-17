@@ -10,6 +10,9 @@ namespace Inachis\Build;
 
 final readonly class ReleaseWorkspace
 {
+    /**
+     * @param array<string, mixed> $metadata
+     */
     public function __construct(
         public string $path,
         public ReleaseDefinition $definition,

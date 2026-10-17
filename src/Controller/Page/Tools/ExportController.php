@@ -1,203 +1,87 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
 
+declare(strict_types=1);
+
 namespace Inachis\Controller\Page\Tools;
 
 use Inachis\Controller\AbstractInachisController;
-use Inachis\Repository\Content\PageRepository;
-use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Service\Export\Category\CategoryExportService;
 use Inachis\Service\Export\Page\PageExportService;
 use Inachis\Service\Export\Series\SeriesExportService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
 
-/**
- * Controller for exporting pages and posts.
- */
 class ExportController extends AbstractInachisController
 {
-    #[Route('incp/tools/export', name: 'incp_tools_export', methods: ['GET', 'POST'])]
+    #[Route('/incp/tools/export', name: 'incp_tools_export', methods: ['GET', 'POST'])]
     public function export(
         Request $request,
         CategoryExportService $categoryExportService,
         PageExportService $pageExportService,
-        PageRepository $pageRepository,
         SeriesExportService $seriesExportService,
     ): Response {
-        $contentType = $request->request->getString('content_type') ?? 'post';
-        $scope = $request->request->getString('scope') ?? 'all';
-        $format = $request->request->getString('format') ?? 'json';
-        $selectedIds = array_filter(
-            explode(',', $request->request->get('selectedIds') ?? ''),
-        );
-        $filter = $request->request->all('filter');
-        $filterType = $filter['type'] ?? null;
-        $filterStatus = $filter['status'] ?? null;
-        $filterStartDate = $filter['start_date'] ?? null;
-        $filterEndDate = $filter['end_date'] ?? null;
-        $filterKeyword = $filter['keyword'] ?? null;
+        $this->viewModel->page->title = 'Export Data';
+        $this->viewModel->page->tab = 'export';
 
-        $pagesPreview = null;
-        $previewCount = null;
-        $pages = [];
+        if ($request->isMethod('POST')) {
+            $contentType = $request->request->get('content_type', 'post');
+            $format = strtolower($request->request->get('format', 'json'));
+            $scope = $request->request->get('scope', 'all');
+            $selectedIds = array_filter(explode(',', (string) $request->request->get('selectedIds', '')));
+            $includeLinkedPages = (bool) $request->request->get('include_linked_pages', false);
 
-        if ($request->isMethod('POST') && $request->request->has('export')) {
-            switch ($contentType) {
-                case 'category':
-                    $items = $categoryExportService->getAllCategories();
-                    $exportService = $categoryExportService;
-                    break;
-
-                case 'post':
-                    if ('all' === $scope) {
-                        $items = $pageExportService->getAllPages();
-                    } elseif ('manual' === $scope) {
-                        if (empty($selectedIds)) {
-                            $this->addFlash('error', 'No pages selected for export.');
-
-                            return $this->redirectToRoute('incp_tools_export');
-                        }
-                        $items = $pageExportService->getPagesByIds($selectedIds);
-                    } elseif ('filtered' === $scope) {
-                        $items = $pageExportService->getFilteredPages($filter);
-                    }
-                    $exportService = $pageExportService;
-                    break;
-
-                case 'series':
-                    if ('all' === $scope) {
-                        $items = $seriesExportService->getAllSeries();
-                    } elseif ('manual' === $scope) {
-                        if (empty($selectedIds)) {
-                            $this->addFlash('error', 'No series selected for export.');
-
-                            return $this->redirectToRoute('incp_tools_export');
-                        }
-                        $items = $seriesExportService->getSeriesByIds($selectedIds);
-                    } elseif ('filtered' === $scope) {
-                        $items = $pageRepository->getFilteredOfTypeByPostDate(
-                            array_filter($filter),
-                            '*',
-                            10000,
-                            0,
-                        );
-                    }
-                    $exportService = $seriesExportService;
-                    break;
-            }
+            // Normalize content_type ('post' -> 'page')
+            $domain = 'post' === $contentType ? 'page' : $contentType;
 
             try {
-                $exportedData = $exportService->export($items, $format);
-            } catch (\InvalidArgumentException $e) {
-                $this->addFlash('error', $e->getMessage());
-
+                $exportData = match ($domain) {
+                    'category' => $categoryExportService->export(null, $format),
+                    'series' => $seriesExportService->export(
+                        'manual' === $scope && !empty($selectedIds)
+                            ? $seriesExportService->getSeriesByIds($selectedIds)
+                            : null,
+                        $format,
+                        $includeLinkedPages
+                    ),
+                    default => $pageExportService->export(
+                        'manual' === $scope && !empty($selectedIds)
+                            ? $pageExportService->getPagesByIds($selectedIds)
+                            : ('filtered' === $scope
+                                ? $pageExportService->getFilteredPages((array) $request->request->all('filter'))
+                                : null),
+                        $format
+                    ),
+                };
+            } catch (\InvalidArgumentException|\RuntimeException $e) {
+                $this->addFlash('error', 'Export failed: ' . $e->getMessage());
                 return $this->redirectToRoute('incp_tools_export');
             }
 
-            $filename = $contentType.'-export-'.date('Y-m-d-His').'.'.$format;
-            if ('md' === $format) {
-                return new Response($exportedData, 200, [
-                    'Content-Type' => 'text/markdown',
-                    'Content-Disposition' => 'attachment; filename="'.$filename.'"',
-                ]);
-            }
+            $filename = sprintf('export-%s-%s.%s', $domain, date('Y-m-d-His'), $format);
+            $response = new Response($exportData);
 
-            $contentType = 'json' === $format ? 'application/json' : 'application/xml';
+            $disposition = $response->headers->makeDisposition(
+                ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+                $filename
+            );
 
-            return new Response($exportedData, 200, [
-                'Content-Type' => $contentType,
-                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
-            ]);
+            $response->headers->set('Content-Disposition', $disposition);
+            $response->headers->set(
+                'Content-Type',
+                'xml' === $format ? 'application/xml' : ('json' === $format ? 'application/json' : 'text/markdown')
+            );
+
+            return $response;
         }
-
-        $this->viewModel->page->title = 'Export';
-        $this->viewModel->page->tab = 'export';
 
         return $this->render('inadmin/page/tools/export.html.twig', [
             'viewModel' => $this->viewModel,
-            'pages' => $pageExportService->getAllPages(),
-            'scope' => $scope,
-            'format' => $format,
-            'contentType' => $contentType,
-            'manualPages' => $pagesPreview,
-            'selectedIds' => $selectedIds,
-            'previewCount' => $previewCount,
-            'filterType' => $filterType,
-            'filterStatus' => $filterStatus,
-            'filterStartDate' => $filterStartDate,
-            'filterEndDate' => $filterEndDate,
-            'filterKeyword' => $filterKeyword,
-        ]);
-    }
-
-    #[Route('incp/ax/tools/export', name: 'incp_tools_export_ajax', methods: ['GET'])]
-    public function exportAjax(
-        Request $request,
-        PageRepository $pageRepository,
-        SeriesRepository $seriesRepository,
-    ): Response {
-        $contentType = $request->query->get('content_type', 'post');
-        $query = $request->query->get('q', '');
-        $page = (int) $request->query->get('page', 1);
-        $selectedIds = array_filter(explode(',', $request->query->get('selectedIds', '')));
-
-        if (empty(trim($query))) {
-            return new Response('', 200);
-        }
-
-        $limit = 25;
-        $offset = ($page - 1) * $limit;
-        $items = [];
-        $total = 0;
-
-        switch ($contentType) {
-            case 'post':
-                $items = $pageRepository->getFilteredOfTypeByPostDate(
-                    ['keyword' => $query],
-                    '*',
-                    $limit,
-                    $offset,
-                    'parent_id',
-                );
-                // $total = get count - make sure results limited to 50
-                break;
-
-            case 'series':
-                $items = $seriesRepository->getFiltered(
-                    ['keyword' => $query],
-                    $limit,
-                    $offset,
-                );
-                // $total = get count - make sure results limited to 50
-                break;
-
-            default:
-                $pages = [];
-                break;
-        }
-
-        // $total = $pageExportService->getFilteredOfTypeByPostDateCount(
-        //     ['keyword' => $query],
-        //     $contentType
-        // );
-        return $this->render('inadmin/partials/export_table.html.twig', [
-            'viewModel' => $this->viewModel,
-            'dataset' => $items,
-            'content_type' => $contentType,
-            'form' => $this->createFormBuilder()->getForm()->createView(),
-            'pagination' => [
-                'offset' => $page,
-                'limit' => $limit,
-                'total' => $total,
-            ],
-            'selectedIds' => $selectedIds,
         ]);
     }
 }

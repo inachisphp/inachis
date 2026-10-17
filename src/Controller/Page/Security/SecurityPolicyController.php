@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Security;
 
@@ -119,7 +119,7 @@ class SecurityPolicyController extends AbstractInachisController
             'inadmin/page/admin/security_policy.html.twig',
             [
                 'viewModel' => $this->viewModel,
-                'form' => $form?->createView(),
+                'form' => $form->createView(),
                 'policy' => $selectedPolicy,
                 'policies' => $policies,
             ],

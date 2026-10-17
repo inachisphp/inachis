@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Entity\Content;
 
@@ -1036,6 +1036,11 @@ class Page
         );
 
         return EditorialStatus::PUBLISHED == $this->getStatus() && $postDate->format('YmdHis') > $today->format('YmdHis');
+    }
+
+    public function isPublished(): bool
+    {
+        return EditorialStatus::PUBLISHED === $this->status;
     }
 
     /**

@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Admin;
 
@@ -90,9 +90,13 @@ class UserTrustedDevicesController extends AbstractInachisController
             'id' => $this->getCurrentUser()->getUsername(),
         ]);
 
+        $currentDeviceId = $currentDevice?->getId();
+        $deviceId = $device->getId();
+
         if (
-            null !== $currentDevice
-            && $currentDevice->getId()->equals($device->getId())
+            null !== $currentDeviceId
+            && null !== $deviceId
+            && $currentDeviceId->equals($deviceId)
         ) {
             $response->headers->setCookie(
                 $trustedDeviceManager->clearCookie(),

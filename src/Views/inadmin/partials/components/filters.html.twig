@@ -104,6 +104,16 @@
         </select>
     </span>
     {% endif %}
+    {% if show_author_filter is defined and show_author_filter %}
+    <span class="filter__section-owner">
+        <label id="filter__author_label" for="filter__author">Author</label>
+        <select id="filter__author" name="filter[author][]" aria-labelledby="filter__author_label" aria-required="false" class="js-select" data-tags="true" data-url="/incp/api/users/get" multiple="multiple">
+        {% for uuid, displayName in filter_values['author']|default([]) %}
+            <option value="{{ uuid }}" selected>{{ displayName }}</option>
+        {% endfor %}
+        </select>
+    </span>
+    {% endif %}
 </div>
 </div>
 {% endif %}

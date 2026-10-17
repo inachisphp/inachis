@@ -1,14 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
 
+declare(strict_types=1);
+
 namespace Inachis\Controller\Page\Waste;
 
 use Inachis\Controller\AbstractInachisController;
+use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Waste\WasteRepository;
@@ -67,6 +68,7 @@ class WasteController extends AbstractInachisController
             );
         }
 
+        /** @var ContentQueryParameters<array{keyword?: string}> $params */
         $params = $viewStateManager->build(
             $request,
             'waste',

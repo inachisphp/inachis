@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Repository\Content;
 
@@ -37,8 +37,8 @@ class ReviewThreadRepository extends ServiceEntityRepository
      */
     public function findOpenForPage(Page $page): array
     {
-        /* @var array<ReviewThread> */
-        return $this->createQueryBuilder('t')
+        /** @var array<ReviewThread> $result */
+        $result = $this->createQueryBuilder('t')
             ->where('t.page = :page')
             ->andWhere('t.status = :status')
             ->setParameter('page', $page)
@@ -46,6 +46,8 @@ class ReviewThreadRepository extends ServiceEntityRepository
             ->orderBy('t.updated', 'DESC')
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**
@@ -56,13 +58,15 @@ class ReviewThreadRepository extends ServiceEntityRepository
      */
     public function findAllForPage(Page $page): array
     {
-        /* @var array<ReviewThread> */
-        return $this->createQueryBuilder('t')
+        /** @var array<ReviewThread> $result */
+        $result = $this->createQueryBuilder('t')
             ->where('t.page = :page')
             ->setParameter('page', $page)
             ->orderBy('t.updated', 'DESC')
             ->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**

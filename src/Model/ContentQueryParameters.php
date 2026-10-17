@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Model;
 
@@ -14,18 +14,15 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * ContentQueryParameters class.
+ *
+ * @template-covariant TFilter of array<string, mixed>
  */
-class ContentQueryParameters
+readonly class ContentQueryParameters
 {
     /**
      * Constructor for ContentQueryParameters class.
      *
-     * @param array{
-     *     filters: array<string,mixed>,
-     *     sort: string,
-     *     limit: int,
-     *     offset: int
-     * }|array{} $filters
+     * @param TFilter $filters
      */
     public function __construct(
         protected array $filters = [],
@@ -39,6 +36,9 @@ class ContentQueryParameters
     /**
      * Creates a new instance using the current values as defaults and
      * overriding them with any values supplied in the request.
+     * 
+     * @param self<array<string, mixed>> $current
+     * @return self<array<string, mixed>>
      */
     public static function fromRequest(
         Request $request,
@@ -52,6 +52,7 @@ class ContentQueryParameters
         * This allows filters to be cleared.
         */
         if ($request->request->has('filter')) {
+            /** @var array<string, mixed> $filters */
             $filters = $request->request->all('filter');
 
             /*
@@ -116,6 +117,9 @@ class ContentQueryParameters
         );
     }
 
+    /**
+     * @return TFilter
+     */
     public function getFilters(): array
     {
         return $this->filters;
@@ -141,6 +145,15 @@ class ContentQueryParameters
         return $this->view;
     }
 
+    /**
+     * @return array{
+     *     filters: array<string, mixed>,
+     *     sort: string,
+     *     offset: int,
+     *     limit: int,
+     *     view: string
+     * }
+     */
     public function toArray(): array
     {
         return [

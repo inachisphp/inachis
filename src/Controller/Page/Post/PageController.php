@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Post;
 
@@ -124,8 +124,11 @@ class PageController extends AbstractInachisController
             ]);
         }
 
+        /** @var array{categories?: array<string>, tags?: array<string>, status?: string, visible?: bool, visibility?: bool, issues?: string, keyword?: string, excludeIds?: list<string>} $filters */
+        $filters = $params->getFilters();
+
         $posts = $pageRepository->getFilteredOfTypeByPostDate(
-            $params->getFilters(),
+            $filters,
             $type,
             $params->getLimit(),
             $params->getOffset(),
@@ -140,7 +143,7 @@ class PageController extends AbstractInachisController
             'form' => $form->createView(),
             'posts' => $posts,
             'query' => $params,
-            'queryString' => $queryString ?? '',
+            'queryString' => $request->getQueryString() ?? '',
         ]);
     }
 
@@ -211,6 +214,7 @@ class PageController extends AbstractInachisController
         }
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
+        $threads = [];
         if ($post->getId()) {
             $threads = $reviewThreadRepository->findOpenForPage($post);
         }
@@ -281,10 +285,8 @@ class PageController extends AbstractInachisController
                 $this->entityManager->persist($revision);
             }
             $this->entityManager->persist($post);
-            if (isset($threads)) {
-                foreach ($threads as $thread) {
-                    $reviewRebaseService->rebase($thread, $post->getContent() ?: '');
-                }
+            foreach ($threads as $thread) {
+                $reviewRebaseService->rebase($thread, $post->getContent() ?: '');
             }
             $this->entityManager->flush();
 

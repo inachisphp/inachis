@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\EventSubscriber;
 
@@ -158,6 +158,8 @@ class AnalyticsSubscriber implements EventSubscriberInterface
 
     /**
      * Append data to specified log file.
+     *
+     * @param array<string, mixed> $data
      */
     private function appendLog(string $filename, array $data): void
     {

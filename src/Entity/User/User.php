@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Entity\User;
 
@@ -379,11 +379,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Returns the identifier (in this case, username) for the  {@link User}.
+     * Returns the identifier (in this case, username) for the {@link User}.
+     *
+     * @return non-empty-string
      */
     public function getUserIdentifier(): string
     {
-        return $this->username;
+        /** @var non-empty-string $identifier */
+        $identifier = '' !== $this->username ? $this->username : 'anonymous';
+
+        return $identifier;
     }
 
     /**

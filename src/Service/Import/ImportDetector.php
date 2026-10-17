@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Service\Import;
 
@@ -16,7 +16,7 @@ class ImportDetector
     /**
      * Detects the type of import based on the JSON content.
      *
-     * @param array $data The decoded JSON/XML data
+     * @param array<mixed> $data The decoded JSON/XML data
      *
      * @return string One of: category, post, series
      */

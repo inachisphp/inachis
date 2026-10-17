@@ -48,6 +48,11 @@
         <p><label><input type="radio" class="checkbox" name="scope" value="manual"
         {% if contentType|default('series') == 'series' and scope|default('all') == 'manual' %}checked{% endif %}>
             Select series manually</label></p>
+        <p>
+            <label><input type="checkbox" class="checkbox" name="include_linked_pages" value="1"
+            {% if includeLinkedPages|default(false) %}checked{% endif %}>
+            Include full page details (otherwise stubs will be exported)</label>
+        </p>
     </fieldset>
     <fieldset id="scope__categories" class="col-4" data-content-type="category" aria-hidden="true" hidden>
         <legend>Scope</legend>

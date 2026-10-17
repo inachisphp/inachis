@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Tools;
 
@@ -40,10 +40,13 @@ class BackupController extends AbstractInachisController
             $files = glob($backupDir . '/*.sql.gz');
             if ($files !== false) {
                 foreach ($files as $file) {
+                    $mtime = filemtime($file);
                     $backups[] = [
                         'filename' => basename($file),
                         'size' => NumberFormatter::formatBytes((int) filesize($file)),
-                        'createdAt' => (new \DateTimeImmutable())->setTimestamp(filemtime($file)),
+                        'createdAt' => (new \DateTimeImmutable())->setTimestamp(
+                            false !== $mtime ? $mtime : time()
+                        ),
                     ];
                 }
 

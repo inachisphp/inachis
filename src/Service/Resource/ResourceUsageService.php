@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Service\Resource;
 
@@ -38,8 +38,8 @@ class ResourceUsageService
 
         if ($file instanceof Download) {
             return [
-                // 'posts' => $this->pageRepository->getPostsUsingDownload($file),
-                // 'series' => $this->seriesRepository->getSeriesUsingDownload($file),
+                'posts' => [], //$this->pageRepository->getPostsUsingDownload($file),
+                'series' => [], //$this->seriesRepository->getSeriesUsingDownload($file),
             ];
         }
 

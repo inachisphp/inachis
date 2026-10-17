@@ -5,6 +5,7 @@ use PhpCsFixer\Finder;
 
 $finder = (new Finder())
     ->in([
+        __DIR__ . '/build/src',
         __DIR__ . '/src',
         __DIR__ . '/tests',
         __DIR__ . '/migrations',

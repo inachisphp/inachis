@@ -58,6 +58,11 @@
                        type="text"
                        value="{% if not (resource.filename starts with 'http')  %}/imgs/{% endif %}{{ resource.filename }}" />
             {% endif %}
+            {% if viewModel.page.type == 'audio' and resource.id is not null %}
+                <audio controls>
+                    <source src="{{ path('web_audio_stream', { filename: resource.filename }) }}" type="audio/mpeg">
+                </audio>
+            {% endif %}
             {% if resource.id is not empty %}
                 <div class="edit-properties" id="post__properties">
                     <h3><span class="material-icons">attach_file</span> {{ 'admin.resources.properties.title'|trans }}</h3>
@@ -68,7 +73,7 @@
                     {% endif %}
                     {% if viewModel.page.type == 'images' %}
                     <p><strong>{{ 'admin.resources.properties.dimensions'|trans }}:</strong> {{ resource.dimensionX ~ ' (w) x ' ~ resource.dimensionY ~ ' (h)' }}</p>
-                        {% if additional.channels is not empty or additional.bits is not empty %}
+                        {% if additional.channels|default(null) is not empty or additional.bits|default(null) is not empty %}
                     <p><strong>{{ 'admin.resources.properties.colourDepth'|trans }}:</strong> {% if additional.bits is not empty %}{{ additional.bits }}-bit{% endif %} {% if additional.channels == 3 %}RGB{% elseif additional.channels == 4 %}CMYK{% endif %}</p>
                         {% endif %}
                     {% elseif viewModel.page.tab == 'download' %}
@@ -76,7 +81,7 @@
                     {% endif %}
                     <p><strong>{{ 'admin.resources.properties.updatedAt'|trans }}:</strong> {{ resource.updatedAt|date('d F Y', viewModel.session.preferences.timezone) }}</p>
                 </div>
-                
+
                 <script>
                     document.addEventListener('DOMContentLoaded', () => {
                         const btn = document.getElementById('btn-toggle-replace-file');
@@ -90,21 +95,14 @@
                 </script>
             {% endif %}
 
-            {% if viewModel.page.type == 'downloads' %}
+            {% if viewModel.page.type in [ 'audio', 'downloads' ] %}
             <div id="replace-file-wrapper" class="{% if resource.id is not empty %}visually-hidden{% endif %}">
                 {% include 'inadmin/partials/components/file-upload.html.twig' with {
                     paramName: 'resource[file]',
                     required: resource.id is empty,
                     autoUpload: false,
                     uploadMultiple: false,
-                    acceptedFiles: [
-                        'application/pdf',
-                        'application/zip',
-                        'application/msword',
-                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                        'text/csv',
-                        'text/plain'
-                    ]
+                    acceptedFiles: acceptedFiles,
                 } %}
             </div>
             {% endif %}
@@ -141,7 +139,7 @@
     </div>
     {% endif %}
 
-    {% if viewModel.page.type == 'downloads' and resource.id is not empty and resource.versions is not empty %}
+    {% if viewModel.page.type in ['audio', 'downloads' ] and resource.id is not empty and resource.versions is not empty %}
     <div id="resource__history" class="ui-section">
         <fieldset class="edit-versions col-12" id="post_versions">
             <h3>File Version History</h3>

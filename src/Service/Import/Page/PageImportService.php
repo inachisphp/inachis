@@ -1,19 +1,21 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Service\Import\Page;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Content\Page;
+use Inachis\Entity\Content\Url;
 use Inachis\Entity\User\User;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Model\Import\ImportOptionsDto;
 use Inachis\Model\Page\PageExportDto;
+use Inachis\Repository\Content\UrlRepository;
 
 /**
  * Service for importing pages.
@@ -27,15 +29,16 @@ final class PageImportService
         private EntityManagerInterface $entityManager,
         private CategoryImportService $categoryService,
         private TagImportService $tagService,
+        private ?UrlRepository $urlRepository = null,
     ) {
     }
 
     /**
      * Imports the given pages.
      *
-     * @param iterable<PageExportDto> $pageDtos the pages to import
-     * @param User                    $author   the author of the pages
-     * @param ImportOptionsDto        $options  the import options
+     * @param iterable<object> $pageDtos the pages to import
+     * @param User             $author   the author of the pages
+     * @param ImportOptionsDto $options  the import options
      *
      * @return PageImportResult the result of the import
      */
@@ -45,10 +48,12 @@ final class PageImportService
         ImportOptionsDto $options,
     ): PageImportResult {
         $result = new PageImportResult();
+        $urlRepo = $this->urlRepository ?? $this->entityManager->getRepository(Url::class);
+
         $this->entityManager->beginTransaction();
 
         try {
-            foreach ($pageDtos['pages'] as $dto) {
+            foreach ($pageDtos as $dto) {
                 if (!$dto instanceof PageExportDto) {
                     throw new \InvalidArgumentException('All items must be PageExportDto');
                 }
@@ -70,42 +75,43 @@ final class PageImportService
                     $page->setPostDate(new \DateTimeImmutable($dto->postDate));
                 }
 
-                foreach ($dto->categories ?? [] as $categoryDto) {
-                    $category = $this->categoryService->findOrCreateByPath(
-                        $categoryDto->path,
-                        $options->createMissingCategories,
-                    );
+                foreach ($dto->categories as $categoryDto) {
+                    if (empty($categoryDto->path)) {
+                        continue;
+                    }
+                    $wasCreatedBefore = $this->categoryService->wasCreated($categoryDto->path);
+                    $category = $this->categoryService->findOrCreateByPath($categoryDto->path, true);
 
                     if ($category) {
                         $page->addCategory($category);
-
-                        // Count creation if it was newly created
-                        if ($options->createMissingCategories) {
+                        if (!$wasCreatedBefore && $this->categoryService->wasCreated($categoryDto->path)) {
                             ++$result->categoriesCreated;
                         }
-                    } else {
-                        $result->warnings[] = "Category not found: {$categoryDto->path}";
                     }
                 }
 
-                foreach ($dto->tags ?? [] as $tagDto) {
-                    $tag = $this->tagService->findOrCreateByTitle(
-                        $tagDto->title,
-                        $options->createMissingTags,
-                    );
+                foreach ($dto->tags as $tagDto) {
+                    if (empty($tagDto->title)) {
+                        continue;
+                    }
+                    $wasCreatedBefore = $this->tagService->wasCreated($tagDto->title);
+                    $tag = $this->tagService->findOrCreateByTitle($tagDto->title, true);
 
                     if ($tag) {
                         $page->addTag($tag);
-
-                        if ($options->createMissingTags) {
+                        if (!$wasCreatedBefore && $this->tagService->wasCreated($tagDto->title)) {
                             ++$result->tagsCreated;
                         }
-                    } else {
-                        $result->warnings[] = "Tag not found: {$tagDto->title}";
                     }
                 }
 
-                // TODO: add page URL
+                foreach ($dto->urls as $urlDto) {
+                    if (empty($urlDto->path)) {
+                        continue;
+                    }
+                    $uniquePath = $urlRepo->getUniqueUrl($urlDto->path);
+                    new Url($page, $uniquePath, $urlDto->default);
+                }
 
                 $this->entityManager->persist($page);
                 ++$result->pagesImported;

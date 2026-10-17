@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Service\Image\Migration;
 
@@ -47,6 +47,6 @@ class MarkdownImageRewriter
 
         preg_match_all('~/imgs/([a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9]{3,4})(?:[\?#][^\s"\'()<>\[\]]*)?~', $content, $matches);
 
-        return array_values(array_unique($matches[1] ?? []));
+        return array_values(array_unique($matches[1]));
     }
 }

@@ -1,17 +1,16 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Security\Authentication;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\User\User;
 use Inachis\Entity\User\UserRecoveryCode;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * Manages TOTP recovery codes.
@@ -40,7 +39,6 @@ class RecoveryCodeManager
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly UserPasswordHasherInterface $passwordHasher,
     ) {
     }
 

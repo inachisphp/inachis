@@ -1,15 +1,20 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
 
+declare(strict_types=1);
+
 namespace Inachis\Service\Ai;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Inachis\Entity\Content\Page;
+use Inachis\Entity\Media\Audio;
+use Inachis\Enum\Media\AudioStorage;
+use Inachis\Repository\Media\AudioRepository;
 use Inachis\Service\Ai\Provider\AiAudioProviderInterface;
+use Inachis\Service\Resource\ResourceStorageProvider;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -20,8 +25,6 @@ class AiAudioManager
     private array $providers = [];
 
     private string $activeProviderName;
-    private string $storageDir;
-    private string $uploadsDir;
 
     /**
      * @param iterable<AiAudioProviderInterface> $providers
@@ -29,32 +32,21 @@ class AiAudioManager
     public function __construct(
         #[AutowireIterator('app.ai_audio_provider')]
         iterable $providers,
+        private readonly AudioRepository $audioRepository,
+        private readonly ResourceStorageProvider $storageProvider,
+        private readonly EntityManagerInterface $entityManager,
         #[Autowire('%env(default::AI_AUDIO_PROVIDER)%')]
         ?string $audioProviderName = null,
         #[Autowire('%env(default::AI_PROVIDER)%')]
         ?string $defaultProviderName = 'gemini',
-        #[Autowire('%kernel.project_dir%')]
-        private readonly string $projectDirectory = '',
-        string $relativeAudioDir = 'var/audio/',
-        string $relativeUploadsDir = 'var/uploads/',
     ) {
         foreach ($providers as $provider) {
             $this->providers[$provider->getName()] = $provider;
         }
 
-        // 1. Use AI_AUDIO_PROVIDER if defined
-        // 2. Fall back to AI_PROVIDER
-        // 3. Fall back to 'gemini'
-        $this->activeProviderName = !empty($audioProviderName) 
-            ? strtolower($audioProviderName) 
+        $this->activeProviderName = !empty($audioProviderName)
+            ? strtolower($audioProviderName)
             : (!empty($defaultProviderName) ? strtolower($defaultProviderName) : 'gemini');
-
-        $this->storageDir = rtrim($this->projectDirectory, '/') . '/' . trim($relativeAudioDir, '/') . '/';
-        $this->uploadsDir = rtrim($this->projectDirectory, '/') . '/' . trim($relativeUploadsDir, '/') . '/';
-
-        if (!is_dir($this->storageDir)) {
-            mkdir($this->storageDir, 0755, true);
-        }
     }
 
     public function getActiveProvider(): ?AiAudioProviderInterface
@@ -69,90 +61,76 @@ class AiAudioManager
         return null !== $provider && $provider->isConfigured();
     }
 
-    public function hasAudio(Page $post): bool
-    {
-        $audioPath = $this->getAudioPath($post);
-
-        return file_exists($audioPath) && filesize($audioPath) > 0;
-    }
-
-    public function getAudioPath(Page $post): string
-    {
-        $idString = (string) $post->getId();
-        $fullText = $post->getTitle() . "\n\n" . $post->getContent();
-        
-        $hasStinger = file_exists($this->uploadsDir . 'pod_stinger.mp3');
-        $hasTrailer = file_exists($this->uploadsDir . 'pod_trailer.mp3');
-
-        $contentHash = md5($fullText . ($hasStinger ? '1' : '0') . ($hasTrailer ? '1' : '0'));
-
-        return $this->storageDir . sprintf('post_%s_%s.mp3', $idString, $contentHash);
-    }
-
     /**
-     * Generates or retrieves cached MP3 file path for a given Page/Post.
+     * Generates or retrieves an existing Audio entity for a given Page/Post.
      */
-    public function getOrGeneratePostAudio(
-        UuidInterface|string $postId, 
-        string $title, 
-        string $content, 
-        string $voice = 'alloy'
-    ): array {
+    public function getOrGeneratePostAudio(Page $post, string $voice = 'george'): Audio
+    {
         $provider = $this->getActiveProvider();
         if (null === $provider || !$provider->isConfigured()) {
-            throw new \LogicException(sprintf('AI Audio Provider "%s" is not registered or configured.', $this->activeProviderName));
+            throw new \LogicException(
+                sprintf('AI Audio Provider "%s" is not registered or configured.', $this->activeProviderName)
+            );
         }
 
-        $idString = (string) $postId;
-        
-        $stingerPath = $this->uploadsDir . 'pod_stinger.mp3';
-        $trailerPath = $this->uploadsDir . 'pod_trailer.mp3';
+        $title = $post->getTitle() ?? 'Untitled';
+        $content = $post->getContent() ?? '';
+        $fullText = $title . "\n\n" . $content;
+
+        $storageDir = $this->storageProvider->getStorageDirectory(Audio::class);
+        $uploadsDir = rtrim(dirname($storageDir), '/') . '/uploads/';
+
+        $stingerPath = $uploadsDir . 'pod_stinger.mp3';
+        $trailerPath = $uploadsDir . 'pod_trailer.mp3';
 
         $hasStinger = file_exists($stingerPath);
         $hasTrailer = file_exists($trailerPath);
 
-        $fullText = $title . "\n\n" . $content;
-        $contentHash = md5($fullText . ($hasStinger ? '1' : '0') . ($hasTrailer ? '1' : '0'));
-        
-        $filename = sprintf('post_%s_%s.mp3', $idString, $contentHash);
-        $filePath = $this->storageDir . $filename;
+        $sourceHash = hash('sha256', $fullText . ($hasStinger ? '1' : '0') . ($hasTrailer ? '1' : '0'));
 
-        // --- CACHE HIT ---
-        if (file_exists($filePath)) {
-            return [
-                'success'  => true,
-                'cached'   => true,
-                'filePath' => $filePath,
-                'hash'     => $contentHash,
-            ];
+        // Look for an existing Audio entity matching this source hash
+        $existing = $this->audioRepository->findOneBy(['sourceHash' => $sourceHash]);
+        if (null !== $existing) {
+            return $existing;
         }
 
-        // --- CACHE MISS ---
-        $this->purgeOldPostAudio($idString);
-
-        // 1. Generate core post audio binary via active provider
+        // Generate audio binary via provider
         $postAudioBinary = $provider->generateSpeech($fullText, $voice);
 
-        // 2. Stitch Stinger + Post Audio + Trailer together
+        // Stitch components
         $finalAudioBinary = $this->stitchAudioFiles(
             $postAudioBinary,
             $hasStinger ? $stingerPath : null,
             $hasTrailer ? $trailerPath : null
         );
 
+        $filename = sprintf('post_%s_%s.mp3', (string) $post->getId(), substr($sourceHash, 0, 12));
+        $filePath = $storageDir . $filename;
+
         file_put_contents($filePath, $finalAudioBinary);
 
-        return [
-            'success'  => true,
-            'cached'   => false,
-            'filePath' => $filePath,
-            'hash'     => $contentHash,
-        ];
+        // Create and persist the Audio entity
+        $audio = new Audio();
+        $audio
+            ->setTitle(sprintf('Audio for "%s"', $title))
+            ->setFilename($filename)
+            ->setFiletype('audio/mpeg')
+            ->setFilesize(filesize($filePath) ?: 0)
+            ->setChecksum(hash_file('sha256', $filePath) ?: '')
+            ->setSourceHash($sourceHash)
+            ->setStorage(AudioStorage::LOCAL)
+            ->setPage($post)
+            ->setAuthor($post->getAuthor());
+
+        $this->entityManager->persist($audio);
+        $this->entityManager->flush();
+
+        return $audio;
     }
 
     private function stitchAudioFiles(
-        string $postAudioBinary, 
-        ?string $stingerPath, 
+        string $postAudioBinary,
+        ?string $stingerPath,
         ?string $trailerPath
     ): string {
         $output = '';
@@ -170,22 +148,17 @@ class AiAudioManager
         return $output;
     }
 
-    public function getAudioFilePath(UuidInterface|string $postId): ?string
+    /**
+     * Checks whether an Audio entity already exists for the given Page/Post.
+     */
+    public function hasAudio(Page $post): bool
     {
-        $idString = (string) $postId;
-        $pattern = $this->storageDir . sprintf('post_%s_*.mp3', $idString);
-        $files = glob($pattern);
-
-        return !empty($files) ? $files[0] : null;
-    }
-
-    private function purgeOldPostAudio(string $idString): void
-    {
-        $pattern = $this->storageDir . sprintf('post_%s_*.mp3', $idString);
-        foreach (glob($pattern) as $oldFile) {
-            if (is_file($oldFile)) {
-                unlink($oldFile);
-            }
+        if (null === $post->getId()) {
+            return false;
         }
+
+        $audio = $this->audioRepository->findOneBy(['page' => $post]);
+
+        return null !== $audio;
     }
 }

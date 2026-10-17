@@ -1,13 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
 
+declare(strict_types=1);
+
 namespace Inachis\Service\Export\Series;
 
+use Inachis\Model\Page\PageExportDto;
 use Inachis\Model\Series\SeriesExportDto;
 use Inachis\Service\Export\ExportWriterInterface;
 
@@ -43,7 +44,7 @@ final class SeriesMdWriter implements ExportWriterInterface
     /**
      * Writes the given series to the specified format.
      *
-     * @param iterable<SeriesExportDto> $items the series to write
+     * @param iterable<object> $items the series to write
      *
      * @return string the written series
      */
@@ -52,6 +53,10 @@ final class SeriesMdWriter implements ExportWriterInterface
         $output = '';
 
         foreach ($items as $item) {
+            if (!$item instanceof SeriesExportDto) {
+                continue;
+            }
+
             $output .= "---\n";
             $output .= 'title: '.$item->title."\n";
             $output .= 'subtitle: '.$item->subTitle."\n";
@@ -59,9 +64,33 @@ final class SeriesMdWriter implements ExportWriterInterface
             $output .= 'description: '.$item->description."\n";
             $output .= 'firstDate: '.$item->firstDate."\n";
             $output .= 'lastDate: '.$item->lastDate."\n";
-            $output .= 'visible: '.$item->visible."\n";
-            $output .= 'items: '.implode(', ', $item->items)."\n";
+            $output .= 'visible: '.($item->visible ? 'true' : 'false')."\n";
+
+            $itemTitles = [];
+            $fullPages = [];
+            foreach ($item->items as $pageItem) {
+                if ($pageItem instanceof PageExportDto) {
+                    $itemTitles[] = $pageItem->title;
+                    $fullPages[] = $pageItem;
+                } else {
+                    $itemTitles[] = (string) $pageItem;
+                }
+            }
+            $output .= 'items: '.implode(', ', $itemTitles)."\n";
             $output .= "---\n";
+
+            if (!empty($fullPages)) {
+                foreach ($fullPages as $p) {
+                    $output .= "\n## Page: ".$p->title."\n";
+                    if ($p->subTitle) {
+                        $output .= 'Subtitle: '.$p->subTitle."\n";
+                    }
+                    if (!empty($p->urls)) {
+                        $output .= 'URL: '.$p->urls[0]->path."\n";
+                    }
+                    $output .= "\n".($p->content ?? '')."\n";
+                }
+            }
         }
 
         return $output;

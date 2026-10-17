@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Repository\Media;
 
@@ -110,12 +110,12 @@ class ImageRepository extends AbstractRepository implements ResourceRepositoryIn
             )
         ';
 
-        return array_column(
-            $this->getEntityManager()
-                ->getConnection()
-                ->executeQuery($sql)
-                ->fetchAllAssociative(),
-            'id',
-        );
+        /** @var list<array{id: string}> $rows */
+        $rows = $this->getEntityManager()
+            ->getConnection()
+            ->executeQuery($sql)
+            ->fetchAllAssociative();
+
+        return array_column($rows, 'id');
     }
 }

@@ -68,7 +68,6 @@
         "phpstan/phpstan-symfony": "^2.0",
         "phpunit/phpunit": "^13.0",
         "psalm/phar": "^6.13",
-        "slevomat/coding-standard": "^8.21",
         "symfony/browser-kit": "^8.0",
         "symfony/css-selector": "^8.0",
         "symfony/error-handler": "^8.0",
@@ -84,8 +83,7 @@
         "sort-packages": true,
         "allow-plugins": {
             "symfony/flex": true,
-            "symfony/runtime": true,
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "symfony/runtime": true
         }
     },
     "autoload": {
@@ -130,9 +128,9 @@
             "@auto-scripts",
             "@setup-git-hook"
         ],
-        "phpstan": "phpstan analyse --memory-limit=-1 src/",
-        "phpcs": "php-cs-fixer fix --dry-run --diff --verbose",
-        "phpcs-fix": "php-cs-fixer fix --verbose",
+        "phpstan": "phpstan analyse --memory-limit=-1 {src/,build/src}",
+        "cs-check": "php-cs-fixer fix --dry-run --diff --verbose",
+        "cs-fix": "php-cs-fixer fix --verbose",
         "test": "php -d memory_limit=256M -f ./vendor/bin/phpunit"
     },
     "conflict": {

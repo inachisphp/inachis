@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Tools;
 
@@ -30,9 +30,7 @@ final class UserContentPurgeController extends AbstractInachisController
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid() && 
-            $form->has('acknowledge') && $form->get('acknowledge')
-        ) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $purgeService->purgeUserTables();
 
             $this->addFlash(

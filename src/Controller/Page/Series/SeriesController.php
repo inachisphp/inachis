@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Series;
 
@@ -14,10 +14,12 @@ use Inachis\Entity\Media\Image;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\SeriesType;
+use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
+use Inachis\Repository\Media\ImageRepository;
 use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\Series\SeriesBulkActionService;
 use Inachis\Service\Content\ViewStateManager;
@@ -66,6 +68,7 @@ class SeriesController extends AbstractInachisController
             return $this->redirectToRoute('incp_series_list');
         }
 
+        /** @var ContentQueryParameters<array{keyword?: string}> $params */
         $params = $viewStateManager->load(
             $request,
             'series',
@@ -118,6 +121,7 @@ class SeriesController extends AbstractInachisController
     )]
     public function edit(
         Request $request,
+        ImageRepository $imageRepository,
         SeriesRepository $seriesRepository,
         PageRepository $pageRepository,
         WasteManagerService $wasteManagerService,
@@ -145,9 +149,16 @@ class SeriesController extends AbstractInachisController
 
                 return $this->redirect($this->generateUrl('incp_series_list'));
             }
+
+            $imageId = $form->get('image')->getData();
+            if ($imageId) {
+                $image = $imageRepository->find($imageId);
+                $series->setImage($image);
+            }
+
             if (empty($request->request->all('series')['url'])) {
                 $series->setUrl(
-                    UrlNormaliser::toUri($series->getTitle() ?? ''),
+                    UrlNormaliser::toUri($series->getTitle()),
                 );
             }
             if ($remove instanceof \Symfony\Component\Form\ClickableInterface && $remove->isClicked()) {
@@ -155,11 +166,10 @@ class SeriesController extends AbstractInachisController
                     'id' => $request->request->all('series')['itemList'],
                 ]);
                 foreach ($deleteItems as $deleteItem) {
-                    $series->getItems()->removeElement($deleteItem);
+                    $series->removeItem($deleteItem);
                 }
-                if ($series->getItems()->isEmpty()) {
-                    $series->setFirstDate(null)->setLastDate(null);
-                }
+
+                $series->recalculateDates();
             }
 
             $series->setAuthor($this->getCurrentUser());
