@@ -458,6 +458,15 @@ class Series
         ];
     }
 
+    public function getPublishedVisibleItems(): Collection
+    {
+        return $this->items->filter(fn(Page $p) =>
+            $p->isPublished() &&
+            $p->isVisible()
+        );
+    }
+
+
     /**
      * Determines the correct values for first and last dates
      *

@@ -83,7 +83,7 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
         /** @var Series|null $result */
         $result = $this->createQueryBuilder('s')
             ->select('s')
-            ->leftJoin('s.items', 'Series_pages')
+            ->leftJoin('s.items', 'Series_pages', 'uuid_binary')
             ->where('Series_pages.id = :pageId')
             ->setParameter('pageId', $page->getId())
             ->getQuery()
@@ -106,19 +106,12 @@ class SeriesRepository extends AbstractRepository implements SeriesRepositoryInt
      */
     public function getPublishedSeriesByPost(Page $page): ?Series
     {
-        $qb = $this->createQueryBuilder('s');
-
         /** @var Series|null $result */
-        $result = $qb
-            ->select('s', 'i')
-            ->join('s.items', 'i')
-            ->where(':page MEMBER OF s.items')
-            ->andWhere('i.status = :status')
-            ->andWhere('s.visible = :visible')
-            ->setParameter('page', $page)
-            ->setParameter('status', EditorialStatus::PUBLISHED)
-            ->setParameter('visible', true)
-            ->orderBy('i.postDate', 'ASC')
+        $result = $this->createQueryBuilder('s')
+            ->innerJoin('s.items', 'p')
+            ->andWhere('p.id = :pageId')
+            ->andWhere('s.visible = true')
+            ->setParameter('pageId', $page->getId(), 'uuid_binary')
             ->getQuery()
             ->getOneOrNullResult();
 

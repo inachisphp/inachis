@@ -1038,6 +1038,11 @@ class Page
         return EditorialStatus::PUBLISHED == $this->getStatus() && $postDate->format('YmdHis') > $today->format('YmdHis');
     }
 
+    public function isPublished(): bool
+    {
+        return EditorialStatus::PUBLISHED === $this->status;
+    }
+
     /**
      * Determines if the current page/post is not yet published.
      *

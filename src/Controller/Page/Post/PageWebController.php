@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Post;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Inachis\Controller\AbstractWebController;
 use Inachis\Entity\Content\Category;
 use Inachis\Entity\Content\Series;
@@ -19,7 +20,6 @@ use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Repository\Content\UrlRepository;
 use Inachis\Service\Ai\AiAudioManager;
 use Inachis\Service\Content\ReadingTime;
-use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -159,20 +159,23 @@ class PageWebController extends AbstractWebController
         $series = $seriesRepository->getPublishedSeriesByPost($url->getContent());
         $seriesNav = null;
         if (!empty($series)) {
+            $seriesItems = $series->getPublishedVisibleItems();
+            $seriesItems = new ArrayCollection(
+                array_values($seriesItems->toArray())
+            );
             /** @var int */
-            $postIndex = $series->getItems()->indexOf($url->getContent());
+            $postIndex = $seriesItems->indexOf($url->getContent());
             $seriesNav = [
                 'title' => $series->getTitle(),
                 'subTitle' => $series->getSubTitle(),
             ];
             if ($postIndex - 1 >= 0) {
-                $seriesNav['previous'] = $series->getItems()->get($postIndex - 1);
+                $seriesNav['previous'] = $seriesItems->get($postIndex - 1);
             }
-            if ($postIndex + 1 < $series->getItems()->count()) {
-                $seriesNav['next'] = $series->getItems()->get($postIndex + 1);
+            if ($postIndex + 1 < $seriesItems->count()) {
+                $seriesNav['next'] = $seriesItems->get($postIndex + 1);
             }
         }
-
         $page = $url->getContent();
 
         $hasAudio = $audioManager->hasAudio($page);

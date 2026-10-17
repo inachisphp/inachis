@@ -19,6 +19,7 @@ use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
+use Inachis\Repository\Media\ImageRepository;
 use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Content\Series\SeriesBulkActionService;
 use Inachis\Service\Content\ViewStateManager;
@@ -120,6 +121,7 @@ class SeriesController extends AbstractInachisController
     )]
     public function edit(
         Request $request,
+        ImageRepository $imageRepository,
         SeriesRepository $seriesRepository,
         PageRepository $pageRepository,
         WasteManagerService $wasteManagerService,
@@ -147,6 +149,13 @@ class SeriesController extends AbstractInachisController
 
                 return $this->redirect($this->generateUrl('incp_series_list'));
             }
+
+            $imageId = $form->get('image')->getData();
+            if ($imageId) {
+                $image = $imageRepository->find($imageId);
+                $series->setImage($image);
+            }
+
             if (empty($request->request->all('series')['url'])) {
                 $series->setUrl(
                     UrlNormaliser::toUri($series->getTitle()),
