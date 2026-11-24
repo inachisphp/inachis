@@ -1,14 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
 
+declare(strict_types=1);
+
 namespace Inachis\EventSubscriber;
 
-use Inachis\Service\Theme\FeatureRegistry;
+// use Inachis\Service\Theme\FeatureRegistry;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -21,8 +21,9 @@ final readonly class FeatureRegistrySubscriber implements EventSubscriberInterfa
     /**
      * Constructor for the FeatureRegistrySubscriber.
      */
-    public function __construct(private FeatureRegistry $featureRegistry)
-    {
+    public function __construct(
+        // private FeatureRegistry $featureRegistry
+    ) {
     }
 
     /**

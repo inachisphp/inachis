@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * This file is part of the inachis framework.
+ */
+
 declare(strict_types=1);
 
 namespace Inachis\Service\System;
@@ -33,6 +37,8 @@ class DatabasePurgeService
 
     /**
      * Truncates all user tables while preserving schema.
+     * 
+     * @return list<string>
      */
     public function purgeUserTables(): array
     {

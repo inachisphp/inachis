@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Service\Import\Page;
 
@@ -16,6 +16,12 @@ use Inachis\Entity\Content\Category;
  */
 final class CategoryImportService
 {
+    /** @var array<string, Category> */
+    private array $cache = [];
+
+    /** @var array<string, bool> */
+    private array $createdInSession = [];
+
     public function __construct(
         private EntityManagerInterface $entityManager,
     ) {
@@ -28,21 +34,38 @@ final class CategoryImportService
      */
     public function findOrCreateByPath(string $fullPath, bool $createIfMissing = false): ?Category
     {
-        $segments = array_filter(explode('/', $fullPath));
+        $segments = array_filter(array_map('trim', explode('/', $fullPath)));
         if (empty($segments)) {
             return null;
         }
 
+        $cleanPath = implode('/', $segments);
+        if (isset($this->cache[$cleanPath])) {
+            return $this->cache[$cleanPath];
+        }
+
         $parent = null;
+        $currentPath = '';
 
         foreach ($segments as $title) {
-            $category = $this->entityManager->getRepository(Category::class)
-                ->findOneBy(['title' => $title, 'parent' => $parent]);
+            $currentPath = '' === $currentPath ? $title : $currentPath.'/'.$title;
 
-            if (!$category && $createIfMissing) {
-                $category = new Category($title);
-                $category->setParent($parent);
-                $this->entityManager->persist($category);
+            if (isset($this->cache[$currentPath])) {
+                $category = $this->cache[$currentPath];
+            } else {
+                $category = $this->entityManager->getRepository(Category::class)
+                    ->findOneBy(['title' => $title, 'parent' => $parent]);
+
+                if (!$category && $createIfMissing) {
+                    $category = new Category($title);
+                    $category->setParent($parent);
+                    $this->entityManager->persist($category);
+                    $this->createdInSession[$currentPath] = true;
+                }
+
+                if ($category) {
+                    $this->cache[$currentPath] = $category;
+                }
             }
 
             if (!$category) {
@@ -53,5 +76,16 @@ final class CategoryImportService
         }
 
         return $parent;
+    }
+
+    /**
+     * Returns true if the category path was newly created during the current import session.
+     */
+    public function wasCreated(string $fullPath): bool
+    {
+        $segments = array_filter(array_map('trim', explode('/', $fullPath)));
+        $cleanPath = implode('/', $segments);
+
+        return !empty($this->createdInSession[$cleanPath]);
     }
 }

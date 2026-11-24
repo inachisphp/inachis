@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Service\Discovery\Generator;
 
@@ -116,7 +116,7 @@ class LlmsTxtGenerator
     /**
      * Get the RSS feed URL if available.
      */
-    private function getFeedUrl(): ?string
+    private function getFeedUrl(): string
     {
         return $this->getBaseUrl().'/feed';
     }

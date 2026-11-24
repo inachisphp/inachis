@@ -1,19 +1,23 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
 
+declare(strict_types=1);
+
 namespace Inachis\Service\Export;
 
+use Inachis\Entity\Content\Category;
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Series;
+
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
  * Interface for export writers.
  */
+#[AutoconfigureTag('inachis.export_writer')]
 interface ExportWriterInterface
 {
     /**
@@ -34,12 +38,10 @@ interface ExportWriterInterface
      */
     public function supportsDomain(?string $domain): bool;
 
-    /**
-     * Writes the given content to the specified format.
+/**
+     * Writes items to the export format.
      *
-     * @param iterable<Page|Series> $items the content to write
-     *
-     * @return string the exported content
+     * @param iterable<Category|Page|Series> $items
      */
     public function write(iterable $items): string;
 }

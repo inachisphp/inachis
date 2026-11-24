@@ -12,14 +12,13 @@ final readonly class ReleaseDefinition
 {
     /**
      * @param list<ReleaseEntry> $contents
+     * @param list<string> $persistent
+     * @param list<string> $commands
      */
     public function __construct(
         public string $name,
         public array $contents,
         public array $persistent = [],
-        /**
-         * @param list<string> $commands
-         */
         public array $commands = [],
         public bool $composerInstall = true,
         public bool $composerNoDev = true,

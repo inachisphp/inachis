@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Repository\Media;
 
@@ -63,7 +63,11 @@ trait DefaultResourceRepository
     /**
      * Returns a filtered list of resource files.
      *
-     * @param array{keyword?: string} $filters
+     * @param array{
+     *     keyword?: string,
+     *     usage?: string,
+     *     duplicates?: string
+     * } $filters
      *
      * @return Paginator<T>
      */

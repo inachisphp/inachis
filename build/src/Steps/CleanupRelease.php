@@ -70,7 +70,8 @@ final class CleanupRelease implements BuildStepInterface
         ];
 
         foreach ($patternsToClean as $pattern) {
-            foreach (glob($vendorDir . $pattern) as $path) {
+            $paths = glob($vendorDir . $pattern) ?: [];
+            foreach ($paths as $path) {
                 if (is_dir($path)) {
                     self::remove($path);
                 } elseif (is_file($path)) {
@@ -98,6 +99,10 @@ final class CleanupRelease implements BuildStepInterface
         );
 
         foreach ($iterator as $item) {
+            if (!$item instanceof \SplFileInfo) {
+                continue;
+            }
+
             if ($item->isDir()) {
                 rmdir($item->getPathname());
                 continue;

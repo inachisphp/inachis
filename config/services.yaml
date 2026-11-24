@@ -69,42 +69,6 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
-    Inachis\Service\Export\Page\PageExportService:
-        arguments:
-            $writers: !tagged_iterator inachis.export_writer
-
-    Inachis\Service\Export\Page\PageJsonWriter:
-        tags:
-            - { name: 'inachis.export_writer', priority: 0 }
-
-    Inachis\Service\Export\Page\PageMdWriter:
-        tags:
-            - { name: 'inachis.export_writer', priority: 0 }
-
-    Inachis\Service\Export\Page\PageXmlWriter:
-        tags:
-            - { name: 'inachis.export_writer', priority: 0 }
-
-    Inachis\Service\Export\Series\SeriesExportService:
-        arguments:
-            $writers: !tagged_iterator inachis.export_writer
-
-    Inachis\Service\Export\Series\SeriesMdWriter:
-        tags:
-            - { name: 'inachis.export_writer', priority: 10 }
-
-    Inachis\Service\Export\Series\SeriesXmlWriter:
-        tags:
-            - { name: 'inachis.export_writer', priority: 10 }
-
-    Inachis\Service\Export\Category\CategoryExportService:
-        arguments:
-            $writers: !tagged_iterator inachis.export_writer
-
-    Inachis\Service\Export\Category\CategoryXmlWriter:
-        tags:
-            - { name: 'inachis.export_writer', priority: 10 }
-
     Inachis\Service\User\PasswordResetTokenService:
         arguments:
             $appSecret: '%env(APP_SECRET)%'

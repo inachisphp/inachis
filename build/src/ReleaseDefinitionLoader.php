@@ -36,7 +36,7 @@ final readonly class ReleaseDefinitionLoader
         }
 
         try {
-            /** @var array{name:string,contents:list<array<string,mixed>>} $data */
+            /** @var mixed $data */
             $data = json_decode(
                 $json,
                 true,
@@ -53,7 +53,7 @@ final readonly class ReleaseDefinitionLoader
             );
         }
 
-        if (!isset($data['name']) || !is_string($data['name'])) {
+        if (!is_array($data) || !isset($data['name']) || !is_string($data['name'])) {
             throw new RuntimeException('Release definition is missing "name".');
         }
 
@@ -64,26 +64,37 @@ final readonly class ReleaseDefinitionLoader
         $contents = [];
 
         foreach ($data['contents'] as $entry) {
-            if (!isset($entry['type'], $entry['path'])) {
+            if (!is_array($entry) || !isset($entry['type'], $entry['path'])) {
                 throw new RuntimeException(
                     'Every release entry must define "type" and "path".'
                 );
             }
 
+            $type = is_string($entry['type']) || is_int($entry['type']) ? $entry['type'] : '';
+            $path = is_string($entry['path']) ? $entry['path'] : '';
+
             $contents[] = new ReleaseEntry(
-                type: ReleaseEntryType::from($entry['type']),
-                path: $entry['path'],
-                optional: (bool)($entry['optional'] ?? false),
+                type: ReleaseEntryType::from($type),
+                path: $path,
+                optional: (bool) ($entry['optional'] ?? false),
             );
         }
 
-        $composer = $data['composer'] ?? [];
+        $composer = is_array($data['composer'] ?? null) ? $data['composer'] : [];
+
+        /** @var array<mixed> $rawPersistent */
+        $rawPersistent = is_array($data['persistent'] ?? null) ? $data['persistent'] : [];
+        $persistent = array_values(array_filter($rawPersistent, 'is_string'));
+
+        /** @var array<mixed> $rawCommands */
+        $rawCommands = is_array($data['commands'] ?? null) ? $data['commands'] : [];
+        $commands = array_values(array_filter($rawCommands, 'is_string'));
 
         return new ReleaseDefinition(
             name: $data['name'],
             contents: $contents,
-            persistent: (array) ($data['persistent'] ?? []),
-            commands: (array) ($data['commands'] ?? []),
+            persistent: $persistent,
+            commands: $commands,
             composerInstall: (bool) ($composer['install'] ?? true),
             composerNoDev: (bool) ($composer['noDev'] ?? true),
             composerOptimizeAutoloader: (bool) ($composer['optimizeAutoloader'] ?? true),

@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Security\Attribute;
 
@@ -15,9 +15,9 @@ use Inachis\Enum\Security\PermissionResource;
 final readonly class RequiresPermission
 {
     /**
-     * Undocumented function.
+     * Constructor
      *
-     * @param PermissionResource|array<PermissionResource> $resource
+     * @param PermissionResource|list<PermissionResource>|array<PermissionResource> $resource
      */
     public function __construct(
         public PermissionResource|array $resource,
@@ -31,7 +31,7 @@ final readonly class RequiresPermission
     public function resources(): array
     {
         return is_array($this->resource)
-            ? $this->resource
+            ? array_values($this->resource)
             : [$this->resource];
     }
 }

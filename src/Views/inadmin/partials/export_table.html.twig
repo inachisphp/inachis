@@ -32,7 +32,7 @@
         {% endfor %}
     </tbody>
 </table>
-{% if pagination is defined and false %}
+{% if pagination is defined and pagination.total > 0 %}
 <nav class="pagination">
     {% if pagination.prevPage %}
         <a href="#" class="pagination-link" data-page="{{ pagination.prevPage }}">« Prev</a>

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * This file is part of the inachis framework.
+ */
+
 declare(strict_types=1);
 
 namespace Inachis\Command\System;
@@ -40,7 +44,8 @@ class PruneOldBackupsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $days = (int) $input->getOption('days');
+        $daysOption = $input->getOption('days');
+        $days = is_numeric($daysOption) ? (int) $daysOption : 30;
 
         $this->bus->dispatch(new PruneOldBackupsMessage(
             retentionDays: $days,

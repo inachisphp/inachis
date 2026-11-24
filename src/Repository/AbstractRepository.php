@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Repository;
 
@@ -173,7 +173,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
             $query = $query->setFirstResult($offset);
         }
 
-        /* @var Paginator<T> */
+        /** @var Paginator<T> */
         return new Paginator($query, false);
     }
 

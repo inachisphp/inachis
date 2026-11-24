@@ -26,7 +26,7 @@ final class ReleaseMetadataGenerator implements BuildStepInterface
 
         $archive = $workspace->metadata['archive'] ?? null;
 
-        if ($archive === null || !file_exists($archive)) {
+        if (!is_string($archive) || !file_exists($archive)) {
             throw new RuntimeException(
                 'Release archive not found.'
             );
@@ -34,21 +34,35 @@ final class ReleaseMetadataGenerator implements BuildStepInterface
 
         $manifestPath = $workspace->metadata['manifest'] ?? null;
 
-        if ($manifestPath === null || !file_exists($manifestPath)) {
+        if (!is_string($manifestPath) || !file_exists($manifestPath)) {
             throw new RuntimeException(
                 'Release manifest not found.'
             );
         }
 
+        $manifestContent = file_get_contents($manifestPath);
+        if (!is_string($manifestContent)) {
+            throw new RuntimeException(
+                'Failed to read release manifest.'
+            );
+        }
+
+        /** @var mixed $manifest */
         $manifest = json_decode(
-            file_get_contents($manifestPath),
+            $manifestContent,
             true,
             flags: JSON_THROW_ON_ERROR
         );
 
+        if (!is_array($manifest)) {
+            throw new RuntimeException(
+                'Invalid release manifest structure.'
+            );
+        }
+
         $metadata = [
-            'name' => $manifest['name'],
-            'version' => $manifest['version'],
+            'name' => is_string($manifest['name'] ?? null) ? $manifest['name'] : '',
+            'version' => is_string($manifest['version'] ?? null) ? $manifest['version'] : 'dev',
             'published' => (new \DateTimeImmutable())
                 ->format(DATE_ATOM),
             'archive' => basename($archive),

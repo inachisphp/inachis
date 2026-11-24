@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Repository\User;
 
@@ -21,7 +21,7 @@ use Inachis\Entity\User\UserViewState;
 class UserViewStateRepository extends ServiceEntityRepository
 {
     /**
-     * Creates a new instance of the WasteRepository.
+     * Creates a new instance of the UserViewStateRepository.
      *
      * @param ManagerRegistry $registry The registry
      */
@@ -44,9 +44,24 @@ class UserViewStateRepository extends ServiceEntityRepository
     /**
      * Saves the current view state of this context.
      */
-    public function save(UserViewState $state): void
+    public function save(UserViewState $state, bool $flush = true): void
     {
         $this->getEntityManager()->persist($state);
-        $this->getEntityManager()->flush();
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    /**
+     * Removes the view state for this context.
+     */
+    public function remove(UserViewState $state, bool $flush = true): void
+    {
+        $this->getEntityManager()->remove($state);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
     }
 }

@@ -1,27 +1,31 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Resource;
 
 use Inachis\Controller\AbstractInachisController;
 use Inachis\Entity\Media\AbstractFile;
+use Inachis\Entity\Media\Audio;
 use Inachis\Entity\Media\Download;
 use Inachis\Entity\Media\Image;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
 use Inachis\Form\ResourceType;
+use Inachis\Model\ContentQueryParameters;
 use Inachis\Model\Page\ViewStateDefaults;
 use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Media\AudioRepository;
 use Inachis\Repository\Media\DownloadRepository;
 use Inachis\Repository\Media\ImageRepository;
 use Inachis\Security\Attribute\RequiresPermission;
 use Inachis\Service\Ai\AiVisionManager;
 use Inachis\Service\Content\ViewStateManager;
+use Inachis\Service\Resource\AudioFileService;
 use Inachis\Service\Resource\DownloadFileService;
 use Inachis\Service\Resource\ImageFileService;
 use Inachis\Service\Resource\ResourceStorageProvider;
@@ -43,7 +47,7 @@ class ResourceController extends AbstractInachisController
     #[Route('/incp/resources/{type}/{limit}/{offset}',
         name: 'incp_resource_list',
         requirements: [
-            'type' => '(images|downloads)',
+            'type' => '(images|downloads|audio)',
             'limit' => "\d+",
             'offset' => "\d+",
         ],
@@ -54,24 +58,27 @@ class ResourceController extends AbstractInachisController
         resource: [
             PermissionResource::IMAGE,
             PermissionResource::DOWNLOAD,
+            PermissionResource::AUDIO,
         ],
         action: PermissionAction::VIEW,
     )]
     public function list(
         Request $request,
+        AudioRepository $audioRepository,
         CategoryRepository $categoryRepository,
         DownloadRepository $downloadRepository,
         ImageRepository $imageRepository,
         ViewStateManager $viewStateManager,
     ): Response {
         $typePlural = $request->attributes->getString('type');
-        $typeClass = 'downloads' === $typePlural ? Download::class : Image::class;
-        $typeShort = 'downloads' === $typePlural ? 'Download' : 'Image';
+        $typeClass = 'downloads' === $typePlural ? Download::class : 
+            ('audio' === $typePlural ? Audio::class : Image::class);
+        $typeShort = 'downloads' === $typePlural ? 'Download' : 
+            ('audio' === $typePlural ? 'Audio' : 'Image');
         $typeSingular = strtolower($typeShort);
 
-        $repository = 'Download' === $typeShort ?
-            $downloadRepository :
-            $imageRepository;
+        $repository = 'Download' === $typeShort ? $downloadRepository :
+            ('Audio' === $typeShort ? $audioRepository : $imageRepository);
 
         $form = $this->createFormBuilder()
             ->setAction($this->generateUrl('incp_resource_list', [
@@ -80,12 +87,16 @@ class ResourceController extends AbstractInachisController
             ->getForm();
         $form->handleRequest($request);
 
+        /** @var ContentQueryParameters<array{keyword?: string}> $params */
         $params = $viewStateManager->load(
             $request,
             $typePlural,
             new ViewStateDefaults(
                 sort: 'title asc',
-                view: Download::class === $typeClass ? 'table' : 'grid',
+                view: match ($typeClass) {
+                    Download::class, Audio::class => 'table',
+                    default => 'grid',
+                },
             ),
         );
 
@@ -137,13 +148,15 @@ class ResourceController extends AbstractInachisController
     #[Route('/incp/resources/{type}/{filename}',
         name: 'incp_resource_edit',
         requirements: [
-            'type' => '(images|downloads)',
+            'type' => '(images|downloads|audio)',
         ],
         methods: ['GET', 'POST'],
     )]
     public function edit(
         Request $request,
         Filesystem $filesystem,
+        AudioFileService $audioFileService,
+        AudioRepository $audioRepository,
         DownloadFileService $downloadFileService,
         DownloadRepository $downloadRepository,
         ImageRepository $imageRepository,
@@ -153,11 +166,14 @@ class ResourceController extends AbstractInachisController
         WasteManagerService $wasteManagerService,
     ): Response {
         $typePlural = $request->attributes->getString('type');
-        $typeClass = 'downloads' === $typePlural ? Download::class : Image::class;
-        $typeShort = 'downloads' === $typePlural ? 'Download' : 'Image';
+        $typeClass = 'downloads' === $typePlural ? Download::class : 
+            ('audio' === $typePlural ? Audio::class : Image::class);
+        $typeShort = 'downloads' === $typePlural ? 'Download' : 
+            ('audio' === $typePlural ? 'Audio' : 'Image');
         $typeSingular = strtolower($typeShort);
 
-        $repository = 'Download' === $typeShort ? $downloadRepository : $imageRepository;
+        $repository = 'Download' === $typeShort ? $downloadRepository :
+            ('Audio' === $typeShort ? $audioRepository : $imageRepository);
 
         $filenameParam = $request->attributes->getString('filename');
         if ('new' === $filenameParam) {
@@ -192,7 +208,7 @@ class ResourceController extends AbstractInachisController
                     try {
                         if (!$filesystem->exists($filePath)) {
                             $this->addFlash('error', 'The file for this resource does not exist on disk and will not be recoverable.');
-                        } else {
+                        } elseif ($resource instanceof Image || $resource instanceof Download || $resource instanceof Audio) {
                             $wasteManagerService->sendToWaste($resource);
                         }
                         $repository->remove($resource);
@@ -219,12 +235,30 @@ class ResourceController extends AbstractInachisController
                 }
             }
 
-            if ($resource instanceof Download && $form->has('file')) {
+            $fileService = match ($typePlural) {
+                'audio' => $audioFileService,
+                'downloads'=> $downloadFileService,
+            };
+
+            if (($resource instanceof Download || $resource instanceof Audio)
+                && $form->has('file')
+            ) {
                 /** @var \Symfony\Component\HttpFoundation\File\UploadedFile|null $uploadedFile */
                 $uploadedFile = $form->get('file')->getData();
 
                 if ($uploadedFile) {
-                    $downloadFileService->replaceFile($resource, $uploadedFile);
+                    try {
+                        $fileService->replaceFile($resource, $uploadedFile);
+                    } catch (\RuntimeException $e) {
+                        $this->addFlash('error', $e->getMessage());
+
+                        return $this->redirectToRoute('incp_resource_edit', [
+                            'type' => $typePlural,
+                            'filename' => 'new' === $filenameParam ? 
+                                'new' : 
+                                $resource->getId(),
+                        ]);
+                    }
                 }
             }
 
@@ -265,51 +299,13 @@ class ResourceController extends AbstractInachisController
             'form' => $form->createView(),
             'resource' => $resource,
             'usages' => $usages,
+            'acceptedFiles' => 'downloads' === $typePlural ? Download::ALLOWED_MIME_TYPES : 
+            ('audio' === $typePlural ? Audio::ALLOWED_MIME_TYPES : Image::ALLOWED_MIME_TYPES),
             'aiVisionEnabled' => $aiVisionManager->isConfigured(),
         ]);
     }
 
-    #[Route('/incp/resource/download/upload', name: 'incp_resource_upload_download', methods: ['POST', 'PUT'])]
-    public function uploadDownload(
-        Request $request,
-        DownloadFileService $downloadFileService,
-    ): JsonResponse {
-        $downloadData = $request->request->all('download');
-        $uploadedFileInput = null;
-
-        if ($request->files->has('download')) {
-            $fileBag = $request->files->get('download');
-            if (is_array($fileBag)) {
-                $uploadedFileInput = $fileBag['file'] ?? null;
-            }
-        }
-
-        if (!$uploadedFileInput) {
-            return new JsonResponse(['error' => 'No file provided'], 400);
-        }
-        if (empty($downloadData['title'])) {
-            return new JsonResponse(['error' => 'No title provided'], 400);
-        }
-
-        try {
-            $download = $downloadFileService->createFromUpload(
-                $uploadedFileInput,
-                $downloadData['title'],
-                $downloadData['description'] ?? null,
-                $this->getCurrentUser(),
-            );
-
-            return new JsonResponse([
-                'success' => true,
-                'id' => $download->getId()?->toString(),
-                'filename' => $download->getFilename(),
-            ]);
-        } catch (\Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 400);
-        }
-    }
-
-    #[Route('/incp/resource/image/upload', name: 'incp_resource_upload_image', methods: ['POST', 'PUT'])]
+     #[Route('/incp/resource/image/upload', name: 'incp_resource_upload_image', methods: ['POST', 'PUT'])]
     public function uploadImage(
         Request $request,
         ImageFileService $imageFileService,

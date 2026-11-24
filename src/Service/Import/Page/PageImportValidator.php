@@ -1,97 +1,109 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
 
+declare(strict_types=1);
+
 namespace Inachis\Service\Import\Page;
 
+use Inachis\Entity\Content\Category;
 use Inachis\Model\Page\PageExportDto;
+use Inachis\Repository\Content\CategoryRepository;
+use Inachis\Repository\Content\TagRepository;
+use Inachis\Repository\Content\UrlRepository;
 
-/**
- * Validator for importing pages.
- */
-final class PageImportValidator
+class PageImportValidator
 {
-    /**
-     * @var array<int, array<string>>
-     */
-    private array $warnings = [];
+    public function __construct(
+        private CategoryRepository $categoryRepository,
+        private TagRepository $tagRepository,
+        private UrlRepository $urlRepository,
+    ) {}
 
     /**
-     * Validate an array of PageExportDto objects.
-     *
-     * @param array<PageExportDto> $pages
-     *
-     * @return array<int, array<string>> Warnings per page (by index)
+     * @param list<PageExportDto> $dtos
+     * @return array<int, list<array{type: string, title: string}>>
      */
-    public function validateAll(array $pages): array
+    public function validateAll(array $dtos): array
     {
-        $this->warnings = [];
+        $warnings = [];
 
-        foreach ($pages as $index => $pageDto) {
-            $this->validate($pageDto, $index);
+        foreach ($dtos as $index => $dto) {
+            $itemWarnings = [];
+
+            // Check URLs
+            foreach ($dto->urls as $urlDto) {
+                if (empty($urlDto->path)) {
+                    continue;
+                }
+
+                $existingUrl = $this->urlRepository->findOneBy(['link' => $urlDto->path]);
+                if ($existingUrl) {
+                    $itemWarnings[] = [
+                        'type' => 'url_exists',
+                        'title' => 'URL "' . $urlDto->path . '" already exists',
+                    ];
+                } else {
+                    $itemWarnings[] = [
+                        'type' => 'url_new',
+                        'title' => 'New URL: "' . $urlDto->path . '"',
+                    ];
+                }
+            }
+
+            // Check Categories by traversing the tree
+            foreach ($dto->categories as $categoryDto) {
+                if (!$this->categoryExistsByPath($categoryDto->path)) {
+                    $itemWarnings[] = [
+                        'type' => 'category_create',
+                        'title' => 'Category "' . $categoryDto->path . '" will be created',
+                    ];
+                }
+            }
+
+            // Check Tags
+            foreach ($dto->tags as $tagDto) {
+                $existingTag = $this->tagRepository->findOneBy(['title' => $tagDto->title]);
+                if (!$existingTag) {
+                    $itemWarnings[] = [
+                        'type' => 'tag_create',
+                        'title' => 'Tag "' . $tagDto->title . '" will be created',
+                    ];
+                }
+            }
+
+            $warnings[$index] = $itemWarnings;
         }
 
-        return $this->warnings;
+        return $warnings;
     }
 
     /**
-     * Validate a single PageExportDto.
-     *
-     * @param int $index Index in the import list (for warnings)
+     * Traverses category parents to verify if a given full path exists.
      */
-    public function validate(PageExportDto $pageDto, int $index): void
+    private function categoryExistsByPath(string $path): bool
     {
-        $pageWarnings = [];
-
-        // Title is required
-        if (empty($pageDto->title)) {
-            $pageWarnings[] = 'Title is missing';
+        $parts = array_filter(explode('/', trim($path, '/')));
+        if (empty($parts)) {
+            return false;
         }
 
-        // Type must be valid
-        if (!in_array($pageDto->type, ['post', 'page'], true)) {
-            $pageWarnings[] = sprintf('Invalid type "%s"', $pageDto->type);
-        }
+        $parent = null;
+        foreach ($parts as $title) {
+            $category = $this->categoryRepository->findOneBy([
+                'title' => $title,
+                'parent' => $parent,
+            ]);
 
-        // Status must be valid
-        if (!in_array($pageDto->status, ['draft', 'published'], true)) {
-            $pageWarnings[] = sprintf('Invalid status "%s"', $pageDto->status);
-        }
-
-        // Validate postDate if provided
-        if (!empty($pageDto->postDate)) {
-            try {
-                new \DateTime($pageDto->postDate);
-            } catch (\Exception $e) {
-                $pageWarnings[] = sprintf('Invalid postDate "%s"', $pageDto->postDate);
+            if (!$category instanceof Category) {
+                return false;
             }
+
+            $parent = $category;
         }
 
-        // Validate timezone if provided
-        if (!empty($pageDto->timezone) && !in_array($pageDto->timezone, \DateTimeZone::listIdentifiers(), true)) {
-            $pageWarnings[] = sprintf('Invalid timezone "%s"', $pageDto->timezone);
-        }
-
-        // Validate categories
-        foreach ($pageDto->categories as $cat) {
-            if (empty($cat->path)) {
-                $pageWarnings[] = 'Category path cannot be empty';
-            }
-        }
-
-        // Validate tags
-        foreach ($pageDto->tags as $tag) {
-            if (empty($tag->title)) {
-                $pageWarnings[] = 'Tag title cannot be empty';
-            }
-        }
-
-        if (!empty($pageWarnings)) {
-            $this->warnings[$index] = $pageWarnings;
-        }
+        return true;
     }
 }

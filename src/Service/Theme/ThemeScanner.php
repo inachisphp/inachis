@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Service\Theme;
 
@@ -37,18 +37,22 @@ final readonly class ThemeScanner extends AbstractPackageScanner
         string $path,
         array $manifest,
     ): Theme {
-        $theme = new Theme(
-            ...$this->createBasePackage(
-                $path,
-                $manifest,
-            ),
+        /** @var array<string> $basePackage */
+        $basePackage = $this->createBasePackage(
+            $path,
+            $manifest,
         );
+
+        $theme = new Theme(...$basePackage);
 
         $theme->screenshot = $this->findScreenshot($path);
 
         return $theme;
     }
 
+    /** 
+     * @return list<Theme>
+     */
     public function getThemes(): array
     {
         return $this->getPackages();
@@ -59,6 +63,9 @@ final readonly class ThemeScanner extends AbstractPackageScanner
         return $this->getPackage($identifier);
     }
 
+    /**
+     * @return list<Theme>
+     */
     public function rescanThemes(): array
     {
         return $this->rescanPackages();

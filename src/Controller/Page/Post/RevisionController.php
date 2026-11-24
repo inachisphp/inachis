@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Controller\Page\Post;
 
@@ -134,7 +134,7 @@ class RevisionController extends AbstractInachisController
         PageRepository $pageRepository,
         RevisionRepository $revisionRepository,
     ): Response {
-        [$revision, $page] = $this->loadPageWithRevision($request, $revisionRepository, $pageRepository);
+        [$revision, $page] = $this->loadPageWithRevision($request, $revisionRepository);
         $page->setTitle($revision->getTitle() ?? '')
             ->setSubTitle($revision->getSubTitle())
             ->setContent($revision->getContent())
@@ -213,7 +213,7 @@ class RevisionController extends AbstractInachisController
             throw new NotFoundHttpException(sprintf('Version history could not be found for %s', $request->attributes->getString('id')));
         }
         $page = $revision->getPage();
-        if (empty($page) || empty($page->getId())) {
+        if (null === $page->getId()) {
             throw new NotFoundHttpException(sprintf('Page could not be found for revision %s', $request->attributes->getString('id')));
         }
 

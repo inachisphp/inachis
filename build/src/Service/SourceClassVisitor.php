@@ -96,7 +96,11 @@ final class SourceClassVisitor extends NodeVisitorAbstract
     ): SourceClass {
         $type = $this->getType($node);
 
-        $name = $node->name?->toString();
+        $nameNode = ($node instanceof Class_ || $node instanceof Interface_ || $node instanceof Trait_ || $node instanceof Enum_)
+            ? $node->name
+            : null;
+
+        $name = $nameNode?->toString();
 
         if ($name === null) {
             throw new \RuntimeException(

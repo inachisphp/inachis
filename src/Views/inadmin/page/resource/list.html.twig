@@ -20,6 +20,16 @@
     url: '#',
 } : null %}
 
+{% set audioAddButton = can('AUDIO', 'CREATE') ? {
+    data: {
+        title: 'admin.dialog.upload.title'|trans,
+    },
+    text: 'Upload a new Audio file',
+    image: 'cloud_upload',
+    type: 'a',
+    url: path('incp_resource_edit', { type: 'audio', filename: 'new' }),
+} : null %}
+
 {% set downloadAddButton = can('DOWNLOAD', 'CREATE') ? {
     data: {
         title: 'admin.dialog.upload.title'|trans,
@@ -62,16 +72,26 @@
 {% block content %}
 <div class="col-12">
     <ul class="ui-tabs">
+        {% if can('IMAGE', 'VIEW') %}
         <li role="tab" class="{% if viewModel.page.tab == 'image' %} ui-state-active{% endif %}">
             <a href="{{ viewModel.settings.domain ~ path('incp_resource_list', { type: 'images' }) }}">Images</a>
         </li>
+        {% endif %}
+        {% if can('DOWNLOAD', 'VIEW') %}
         <li role="tab" class="{% if viewModel.page.tab == 'download' %} ui-state-active{% endif %}">
             <a href="{{ viewModel.settings.domain ~ path('incp_resource_list', { type: 'downloads' }) }}">Downloads</a>
         </li>
+        {% endif %}
+        {% if can('AUDIO', 'VIEW') %}
+        <li role="tab" class="{% if viewModel.page.tab == 'audio' %} ui-state-active{% endif %}">
+            <a href="{{ viewModel.settings.domain ~ path('incp_resource_list', { type: 'audio' }) }}">Audio</a>
+        </li>
+        {% endif %}
     </ul>
 
     {{ include ('inadmin/partials/components/view_content.html.twig', {
-        add_button: viewModel.page.tab == 'image' ? imageAddButton : downloadAddButton,
+        add_button: viewModel.page.tab == 'image' ? imageAddButton : (
+            viewModel.page.tab == 'audio' ? audioAddButton : downloadAddButton),
 
         columns: columns,
 

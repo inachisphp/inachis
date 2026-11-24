@@ -1,13 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
 
+declare(strict_types=1);
+
 namespace Inachis\Controller\Page\Post;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Inachis\Controller\AbstractWebController;
 use Inachis\Entity\Content\Category;
 use Inachis\Entity\Content\Series;
@@ -17,8 +18,8 @@ use Inachis\Repository\Content\CategoryRepository;
 use Inachis\Repository\Content\PageRepository;
 use Inachis\Repository\Content\SeriesRepository;
 use Inachis\Repository\Content\UrlRepository;
+use Inachis\Service\Ai\AiAudioManager;
 use Inachis\Service\Content\ReadingTime;
-use Jaybizzle\CrawlerDetect\CrawlerDetect;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -53,12 +54,13 @@ class PageWebController extends AbstractWebController
         string $month,
         string $day,
         string $title,
+        AiAudioManager $audioManager,
         SeriesRepository $seriesRepository,
         UrlRepository $urlRepository,
     ): Response {
         $link = sprintf('%d/%02d/%02d/%s', $year, $month, $day, $title);
 
-        return $this->renderPostOrPage($link, $seriesRepository, $urlRepository);
+        return $this->renderPostOrPage($link, $audioManager, $seriesRepository, $urlRepository);
     }
 
     #[Route(
@@ -72,12 +74,13 @@ class PageWebController extends AbstractWebController
     )]
     public function getPage(
         Request $request,
+        AiAudioManager $audioManager,
         SeriesRepository $seriesRepository,
         UrlRepository $urlRepository,
     ): Response {
         $link = $request->attributes->getString('page');
 
-        return $this->renderPostOrPage($link, $seriesRepository, $urlRepository);
+        return $this->renderPostOrPage($link, $audioManager, $seriesRepository, $urlRepository);
     }
 
     /**
@@ -131,6 +134,7 @@ class PageWebController extends AbstractWebController
      */
     protected function renderPostOrPage(
         string $link,
+        AiAudioManager $audioManager,
         SeriesRepository $seriesRepository,
         UrlRepository $urlRepository,
     ): Response {
@@ -155,27 +159,33 @@ class PageWebController extends AbstractWebController
         $series = $seriesRepository->getPublishedSeriesByPost($url->getContent());
         $seriesNav = null;
         if (!empty($series)) {
+            $seriesItems = $series->getPublishedVisibleItems();
+            $seriesItems = new ArrayCollection(
+                array_values($seriesItems->toArray())
+            );
             /** @var int */
-            $postIndex = $series->getItems()->indexOf($url->getContent());
+            $postIndex = $seriesItems->indexOf($url->getContent());
             $seriesNav = [
                 'title' => $series->getTitle(),
                 'subTitle' => $series->getSubTitle(),
             ];
             if ($postIndex - 1 >= 0) {
-                $seriesNav['previous'] = $series->getItems()->get($postIndex - 1);
+                $seriesNav['previous'] = $seriesItems->get($postIndex - 1);
             }
-            if ($postIndex + 1 < $series->getItems()->count()) {
-                $seriesNav['next'] = $series->getItems()->get($postIndex + 1);
+            if ($postIndex + 1 < $seriesItems->count()) {
+                $seriesNav['next'] = $seriesItems->get($postIndex + 1);
             }
         }
-        $crawlerDetect = new CrawlerDetect();
-        if (!$crawlerDetect->isCrawler()) {
-            // TODO: record page hit by day
-        }
+        $page = $url->getContent();
+
+        $hasAudio = $audioManager->hasAudio($page);
+        $audioUrl = $hasAudio ? $this->generateUrl('api_post_audio_stream', ['id' => $page->getId()]) : null;
 
         return $this->render('web/pages/post.html.twig', [
             'viewModel' => $this->viewModel,
-            'post' => $url->getContent(),
+            'audioUrl' => $audioUrl,
+            'hasAudio' => $hasAudio,
+            'post' => $page,
             'series' => $seriesNav,
             'textStats' => ReadingTime::getWordCountAndReadingTime($url->getContent()->getContent()),
             'url' => $url->getLink(),

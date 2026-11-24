@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Diagnostics\Check\Security;
 
@@ -35,13 +35,10 @@ final class PermissionsPolicyCheck implements CheckInterface
 
     public function run(): CheckResult
     {
-        /** @var array<string, string>|false $headers */
-        $headers = getallheaders();
-        if (!is_array($headers)) {
-            $headers = [];
-        }
+        $headers = array_change_key_case((array) getallheaders(), CASE_LOWER);
 
-        $value = $headers['Permissions-Policy'] ?? $headers['Feature-Policy'] ?? '(not set)';
+        $rawValue = $headers['permissions-policy'] ?? $headers['feature-policy'] ?? '(not set)';
+        $value = is_string($rawValue) ? $rawValue : '(not set)';
         $status = ('(not set)' !== $value) ? 'ok' : 'warning';
 
         return new CheckResult(

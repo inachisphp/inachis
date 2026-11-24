@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Service\Ai\Provider;
 
@@ -42,6 +42,12 @@ readonly class GeminiTextProvider implements AiTextProviderInterface
                     ],
                 ],
             ],
+
+            'generationConfig' => [
+                'thinkingConfig' => [
+                    'thinkingLevel' => 'low',
+                ],
+            ],
         ];
 
         if (null !== $systemPrompt && '' !== trim($systemPrompt)) {
@@ -55,9 +61,7 @@ readonly class GeminiTextProvider implements AiTextProviderInterface
         }
 
         if ($jsonMode) {
-            $payload['generationConfig'] = [
-                'responseMimeType' => 'application/json',
-            ];
+            $payload['generationConfig']['responseMimeType'] = 'application/json';
         }
 
         $data = $this->client->generateContent($payload);

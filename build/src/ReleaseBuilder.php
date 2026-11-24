@@ -11,6 +11,7 @@ namespace Inachis\Build;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RuntimeException;
+use SplFileInfo;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -107,6 +108,10 @@ final readonly class ReleaseBuilder
         );
 
         foreach ($iterator as $item) {
+            if (!$item instanceof SplFileInfo) {
+                continue;
+            }
+
             $target = $destination
                 . DIRECTORY_SEPARATOR
                 . $iterator->getSubPathName();
@@ -170,6 +175,10 @@ final readonly class ReleaseBuilder
         );
 
         foreach ($iterator as $item) {
+            if (!$item instanceof SplFileInfo) {
+                continue;
+            }
+
             if ($item->isDir()) {
                 if (!rmdir($item->getPathname())) {
                     throw new RuntimeException(sprintf(

@@ -1,16 +1,17 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Form;
 
 use Inachis\Entity\Content\Category;
 use Inachis\Entity\Content\Page;
 use Inachis\Entity\Content\Tag;
+use Inachis\Entity\User\User;
 use Inachis\Enum\EditorialStatus;
 use Inachis\Enum\Security\PermissionAction;
 use Inachis\Enum\Security\PermissionResource;
@@ -65,6 +66,10 @@ class PostType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            throw new \LogicException('Current user must be authenticated to build PostType form.');
+        }
+
         $userTimezone = $this->timezoneProvider->getForUser($user);
 
         $newItem = !$options['data'] instanceof Page || empty($options['data']->getId());
@@ -326,12 +331,6 @@ class PostType extends AbstractType
                 'mapped' => false,
                 'required' => false,
             ])
-            // ->add('featureImage', EntityType::class, [
-            //     'class' => Image::class,
-            //     'choice_label' => 'filename',
-            //     'choice_value' => static fn (?Image $image) => $image?->getId()?->toString(),
-            //     'required' => false,
-            // ])
             ->add('featureSnippet', TextareaType::class, [
                 'attr' => [
                     'aria-labelledby' => 'teaser_label',

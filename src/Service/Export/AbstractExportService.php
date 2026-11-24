@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Service\Export;
 
@@ -58,7 +58,9 @@ abstract class AbstractExportService
     /**
      * Each service must implement its own normalise logic.
      *
-     * @param object $entity
+     * @param Category|Page|Series $entity
+     * 
+     * @return Category|Page|Series
      */
     abstract protected function normalise(Category|Page|Series $entity): object;
 }

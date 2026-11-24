@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Repository\Security;
 
@@ -29,12 +29,11 @@ class RoleRepository extends AbstractRepository
     /**
      * Gets an associative array of role names as 'identifier' => 'name'.
      *
-     * @param int $limit
-     *
      * @return array<string, string>
      */
-    public function getRoleNames($limit = 25)
+    public function getRoleNames(int $limit = 25): array
     {
+        /** @var array<int, array{identifier: string, name: string}> $rows */
         $rows = $this->createQueryBuilder('r')
             ->select('r.identifier, r.name')
             ->orderBy('r.name', 'ASC')
@@ -42,23 +41,25 @@ class RoleRepository extends AbstractRepository
             ->getQuery()
             ->getArrayResult();
 
-        return array_column($rows, 'name', 'identifier');
+        /** @var array<string, string> $result */
+        $result = array_column($rows, 'name', 'identifier');
+
+        return $result;
     }
 
     /**
      * Returns a {@link Role} by the provided identifier.
-     *
-     * @return Role
      */
-    public function getRoleByIdentifier(string $identifier)
+    public function getRoleByIdentifier(string $identifier): ?Role
     {
-        /* @var Role */
-        return $this->createQueryBuilder('r')
-            ->select('r.identifier, r.name')
-            ->where('identifier = :identifier')
+        /** @var Role|null $result */
+        $result = $this->createQueryBuilder('r')
+            ->where('r.identifier = :identifier')
             ->setParameter('identifier', $identifier)
             ->getQuery()
-            ->getSingleResult();
+            ->getOneOrNullResult();
+
+        return $result;
     }
 
     /**

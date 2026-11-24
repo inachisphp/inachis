@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\MessageHandler;
 
@@ -76,11 +76,13 @@ class CreateBackupHandler
                         $val === null => 'NULL',
                         is_bool($val) => $val ? '1' : '0',
                         is_int($val), is_float($val) => (string) $val,
-                        default => $this->connection->quote((string) $val),
+                        is_string($val) => $this->connection->quote($val),
+                        $val instanceof \Stringable => $this->connection->quote((string) $val),
+                        default => 'NULL',
                     },
                     array_values($row)
                 );
-
+                
                 $sql = sprintf(
                     "INSERT INTO %s (%s) VALUES (%s);\n",
                     $quotedTable,

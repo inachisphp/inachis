@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * This file is part of the inachis framework.
  */
+
+declare(strict_types=1);
 
 namespace Inachis\Form;
 
@@ -52,18 +52,17 @@ class UserPreferenceType extends AbstractType
                     'Dark' => 'dark',
                     'Auto' => 'auto',
                 ],
-                'choice_attr' => function ($choice, $key, $value) {
+                'choice_attr' => function (mixed $choice, mixed $key, mixed $value): array {
+                    $val = is_string($value) ? $value : '';
                     $icons = [
                         'light' => 'light_mode',
                         'dark' => 'dark_mode',
                         'auto' => 'brightness_auto',
                     ];
 
-                    /* @var string $value */
                     return [
                         'class' => 'theme-option',
-                        // 'id' => 'theme-' . $value,
-                        'data-icon' => $icons[$value] ?? '',
+                        'data-icon' => $icons[$val] ?? '',
                     ];
                 },
                 'expanded' => true,
@@ -96,10 +95,11 @@ class UserPreferenceType extends AbstractType
                     'Larger' => 'larger',
                     'Largest' => 'largest',
                 ],
-                'choice_attr' => function ($choice, $key, $value) {
-                    /* @var string $value */
+                'choice_attr' => function (mixed $choice, mixed $key, mixed $value): array {
+                    $val = is_string($value) ? $value : '';
+
                     return [
-                        'class' => 'fontSizePreview-'.$value,
+                        'class' => 'fontSizePreview-'.$val,
                         'data-icon' => 'format_size',
                     ];
                 },
@@ -118,8 +118,8 @@ class UserPreferenceType extends AbstractType
                     'Mono' => 'mono',
                     'Dyslexic' => 'dyslexic',
                 ],
-                'choice_attr' => function ($choice, $key, $value) {
-                    /** @var string $value */
+                'choice_attr' => function (mixed $choice, mixed $key, mixed $value): array {
+                    $val = is_string($value) ? $value : '';
                     $icons = [
                         'sans' => 'font_download',
                         'serif' => 'font_download',
@@ -128,8 +128,8 @@ class UserPreferenceType extends AbstractType
                     ];
 
                     return [
-                        'class' => 'fontFamilyPreview-'.$value,
-                        'data-icon' => $icons[$value],
+                        'class' => 'fontFamilyPreview-'.$val,
+                        'data-icon' => $icons[$val] ?? 'font_download',
                     ];
                 },
                 'expanded' => true,
@@ -146,10 +146,11 @@ class UserPreferenceType extends AbstractType
                     'Comfort' => 'comfort',
                     'Spacious' => 'spacious',
                 ],
-                'choice_attr' => function ($choice, $key, $value) {
-                    /* @var string $value */
+                'choice_attr' => function (mixed $choice, mixed $key, mixed $value): array {
+                    $val = is_string($value) ? $value : '';
+
                     return [
-                        'class' => 'lineHeightPreview-'.$value,
+                        'class' => 'lineHeightPreview-'.$val,
                         'data-icon' => 'line_weight',
                     ];
                 },
@@ -161,33 +162,6 @@ class UserPreferenceType extends AbstractType
                     'aria-checked' => 'false',
                 ],
             ])
-            // ->add('timezone', ChoiceType::class, [
-            //     'attr' => [
-            //         'aria-labelledby' => 'user__timezone__label',
-            //         'class' => 'text inline_label',
-            //     ],
-            //     'choices' => (new TimezoneChoices)->getTimezones(),
-            //     'label' => 'Timezone',
-            //     'label_attr' => [
-            //         'class' => 'inline_label',
-            //         'id' => 'user__timezone__label',
-            //     ],
-            // ])
-            // ->add('color', ChoiceType::class, [
-            //     'attr' => [
-            //         'aria-labelledby' => 'user__color__label',
-            //     ],
-            //     'choices' => array_combine(ProfileColorPalette::getAll(), ProfileColorPalette::getAll()),
-            //     'choice_attr' => function ($choice, $key, $value) {
-            //         return ['data-color' => $value];
-            //     },
-            //     'expanded' => true,
-            //     'label' => 'Color',
-            //     'label_attr' => [
-            //         'id' => 'user__color__label'
-            //     ],
-            //     'multiple' => false,
-            // ])
             ->add('submit', SubmitType::class, [
                 'attr' => [
                     'class' => 'btn btn--primary',
